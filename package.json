@@ -1,6 +1,6 @@
 {
   "name": "tagjs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "tagged template reactive html",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,8 @@
     "save:dist": "npm run patch:version && npm run build:dist && git add . && git commit -m \"dist patch\" && git push",
     "save": "git add . && git commit -m \"patch\" && git push",
     "build:dist:pack": "cp package.json dist/package.json && node scripts/package-dist.js",
-    "patch:version": "npm --no-git-tag-version version patch"
+    "patch:version": "npm --no-git-tag-version version patch",
+    "publish": "npm run build:dist && npm run save:dist && cd ../dist && npm run publish"
   },
   "keywords": [
     "react",
