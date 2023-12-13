@@ -1,6 +1,3 @@
-export let globalSubCount = 0 // for ease of debugging
-export let globalSubs = [] // 🔬 testing
-
 export class Subject {
   constructor() {
     this.subscribers = []
@@ -10,14 +7,14 @@ export class Subject {
 
   subscribe(callback) {
     this.subscribers.push(callback)
-    globalSubs.push(callback) // 🔬 testing
+    Subject.globalSubs.push(callback) // 🔬 testing
 
-    ++globalSubCount
+    ++Subject.globalSubCount
 
     const unsubscribe = () => {
       removeSubFromArray(this.subscribers, callback)
-      removeSubFromArray(globalSubs, callback) // 🔬 testing
-      --globalSubCount
+      removeSubFromArray(Subject.globalSubs, callback) // 🔬 testing
+      --Subject.globalSubCount
     }
 
     // Return a function to unsubscribe from the BehaviorSubject
@@ -43,3 +40,6 @@ function removeSubFromArray(subscribers, callback) {
     subscribers.splice(index, 1)
   }
 }
+
+Subject.globalSubCount = 0 // for ease of debugging
+Subject.globalSubs = [] // 🔬 testing
