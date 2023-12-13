@@ -1,5 +1,5 @@
 {
-  "name": "tagjs",
+  "name": "taggedjs",
   "version": "0.0.3",
   "description": "tagged template reactive html",
   "main": "index.js",

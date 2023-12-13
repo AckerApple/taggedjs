@@ -4,7 +4,7 @@ module.exports = {
   mode: 'production',
   entry: './src/index.js', // Your entry file
   output: {
-    filename: 'tagjs.js',
+    filename: 'taggedjs.js',
     path: path.resolve(__dirname, 'dist'),
   },
   module: {
