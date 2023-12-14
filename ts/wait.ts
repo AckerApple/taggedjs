@@ -1,7 +1,7 @@
-export function wait(ms) {
+export function wait(ms: number) {
   return new Promise(res => {
     setTimeout(() => {
-      res()
+      res(0)
     }, ms)
   })
 }

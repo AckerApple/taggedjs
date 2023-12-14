@@ -1,8 +1,10 @@
 export const interpolateReplace = /(?:<[^>]*>)|({__tagVar[^}]+})/g
 
 /** replaces ${x} with <template id="x-start"></template><template id="x-end"></template> */
-export function interpolateToTemplates(template) {
-  const keys = []
+export function interpolateToTemplates(
+  template: string
+) {
+  const keys: string[] = []
   const string = template.replace(interpolateReplace, (match, expression) => {
     if (match.startsWith('<')) {
       // If the match is an HTML tag, don't replace

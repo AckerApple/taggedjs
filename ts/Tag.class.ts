@@ -3,7 +3,8 @@ import { deepEqual } from "./deepFunctions.js"
 import { isTagComponent } from "./interpolateTemplate.js"
 import { TagSupport, getTagSupport } from "./getTagSupport.js"
 import { config as states } from "./state.js"
-import { config as providers } from "./providers.js"
+import { Provider, config as providers } from "./providers.js"
+import { Subscription } from "./Subject.js"
 
 export const variablePrefix = '__tagVar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -11,20 +12,16 @@ export const escapeVariable = '--' + variablePrefix + '--'
 const prefixSearch = new RegExp(variablePrefix, 'g')
 export const escapeSearch = new RegExp(escapeVariable, 'g')
 
-export class Provider {
-  instance = Object
-  clone = Object
-  constructorMethod = Object
-}
+export type Context = {[index: string]: any}
 
 const tagUse = [{
-  beforeRedraw: tag => {
+  beforeRedraw: (tag: Tag) => {
     states.currentTag = tag
     if(tag.states.length) {
       states.rearray.push(...tag.states)
     }
   },
-  afterRender: tag => {
+  afterRender: (tag: Tag) => {
     if(states.rearray.length) {
       if(states.rearray.length !== states.array.length) {
         throw new Error(`States lengths mismatched ${states.rearray.length} !== ${states.array.length}`)
@@ -33,60 +30,49 @@ const tagUse = [{
 
     states.rearray.length = 0 // clean up any previous runs
 
-    tag.states = [...states.array]
+    tag.states = [...states.array] as any
     states.array.length = 0
   }
 },{ // providers
-  beforeRedraw: tag => {
+  beforeRedraw: (tag: Tag) => {
     providers.currentTag = tag
     providers.ownerTag = tag.ownerTag
     if(tag.providers.length) {
-      providers.rearray.push(...tag.providers)
+      providers.providers.length = 0
+      providers.providers.push(...tag.providers)
     }
   },
-  afterRender: tag => {
-    if(providers.rearray.length) {
-      if(providers.rearray.length !== providers.array.length) {
-        throw new Error(`Providers lengths mismatched ${providers.rearray.length} !== ${providers.array.length}`)
-      }
-    }
-
-    providers.rearray.length = 0 // clean up any previous runs
-
-    tag.providers = [...providers.array]
-    providers.array.length = 0
+  afterRender: (tag: Tag) => {
+    tag.providers = [...providers.providers]
+    providers.providers.length = 0
   }
 }]
 
 export class Tag {
-  context = {} // populated after reading interpolated.values array converted to an object {variable0, variable:1}
-  clones = [] // elements on document
-  cloneSubs = [] // subscriptions created by clones
-  children = [] // tags on me
+  context: Context = {} // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+  clones: (Element | Text | ChildNode)[] = [] // elements on document
+  cloneSubs: Subscription[] = [] // subscriptions created by clones
+  children: Tag[] = [] // tags on me
 
-  /** @type {TagSupport} */
-  tagSupport
+  tagSupport!: TagSupport
   
   // only present when a child of a tag
-  // ownerTag: Tag
+  ownerTag?: Tag
   
   // present only when an array. Populated by this.key()
-  // arrayValue: any[]
+  arrayValue?: any[]
 
-  constructor(strings, values) {
-    this.strings = strings
-    this.values = values
-  }
+  constructor(
+    public strings: string[],
+    public values: any[],
+  ) {}
 
   /**
    * @template T
    * @type {((x: T) => [T, T])[]} */
   states = []
 
-  /**
-   * @template T
-   * @type {(Provider)[]} */
-  providers = []
+  providers: Provider[] = []
 
   beforeRedraw() {
     tagUse.forEach(tagUse => tagUse.beforeRedraw(this))
@@ -97,21 +83,20 @@ export class Tag {
   }
 
   /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
-  key(arrayValue) {
+  key(arrayValue: any[]) {
     this.arrayValue = arrayValue
     return this
   }
 
   destroy(
     stagger = 0,
-    byParent, // who's destroying me? if byParent, ignore possible animations
+    byParent = false, // who's destroying me? if byParent, ignore possible animations
   ) {
     this.children.forEach((kid, index) => kid.destroy(0, true))
     this.destroySubscriptions()
 
     if(!byParent) {
-      const result = this.destroyClones(stagger)
-      stagger = result.stagger
+      stagger = this.destroyClones(stagger)
     }
 
     return stagger
@@ -125,7 +110,7 @@ export class Tag {
   destroyClones(
     stagger = 0,
   ) {
-    this.clones.reverse().forEach((clone, index) => {
+    this.clones.reverse().forEach((clone: any, index: number) => {
       let promise = Promise.resolve()
       if(clone.ondestroy) {
         promise = elementDestroyCheck(clone, stagger)
@@ -140,21 +125,21 @@ export class Tag {
     return stagger
   }
 
-  updateByTag(tag) {
+  updateByTag(tag: Tag) {
     this.updateConfig(tag.strings, tag.values)
     this.tagSupport.templater = tag.tagSupport.templater
   }
 
-  lastTemplateString = undefined // used to compare templates for updates
+  lastTemplateString: string | undefined = undefined // used to compare templates for updates
 
   /** A method of passing down the same render method */
-  setSupport(tagSupport) {
+  setSupport(tagSupport: TagSupport) {
     this.tagSupport = this.tagSupport || tagSupport
     this.tagSupport.mutatingRender = this.tagSupport.mutatingRender || tagSupport.mutatingRender
     this.children.forEach(kid => kid.setSupport(tagSupport))
   }
   
-  updateConfig(strings, values) {
+  updateConfig(strings: string[], values: any[]) {
     this.strings = strings
     this.updateValues(values)
   }
@@ -170,7 +155,7 @@ export class Tag {
     return { string, strings: this.strings, values: this.values, context:this.context }
   }
 
-  isLikeTag(tag) {
+  isLikeTag(tag: Tag) {
     if(tag.lastTemplateString !== this.lastTemplateString) {
       return false
     }
@@ -218,12 +203,12 @@ export class Tag {
     return this.updateContext( this.context )
   }
 
-  updateValues(values, topDown) {
+  updateValues(values: any[]) {
     this.values = values
-    return this.updateContext(this.context, topDown)
+    return this.updateContext(this.context)
   }
 
-  updateContext(context) {
+  updateContext(context: Context) {
     this.strings.map((_string, index) => {
       const variableName = variablePrefix + index
       const hasValue = this.values.length > index
@@ -324,7 +309,7 @@ export class Tag {
   }
 
   getAppElement() {
-    let tag = this
+    let tag: Tag = this
     
     while(tag.ownerTag) {
       tag = tag.ownerTag
@@ -334,7 +319,10 @@ export class Tag {
   }
 }
 
-function getSubjectFunction(value, tag) {
+function getSubjectFunction(
+  value: any,
+  tag: Tag,
+) {
   return new ValueSubject(bindSubjectFunction(value, tag))
 }
 
@@ -343,11 +331,18 @@ function getSubjectFunction(value, tag) {
  * @param {Tag} tag 
  * @returns 
  */
-function bindSubjectFunction(value, tag) {
-  function subjectFunction(element, args) {
+function bindSubjectFunction(
+  value: (...args: any[]) => any,
+  tag: Tag,
+) {
+  function subjectFunction(
+    element: Element,
+    args: any[]
+  ) {
     const renderCount = tag.tagSupport.renderCount
 
-    const callbackResult = value.bind(element)(...args)
+    const method = value.bind(element)
+    const callbackResult = method(...args)
 
     if(renderCount !== tag.tagSupport.renderCount) {
       return // already rendered
@@ -369,9 +364,9 @@ function bindSubjectFunction(value, tag) {
   return subjectFunction
 }
 
-const ExistingValue = {
-  tagSupport: TagSupport,
-  tag: new Tag,
+type ExistingValue = {
+  tagSupport: TagSupport
+  tag: Tag
 }
 
 /**
@@ -381,9 +376,9 @@ const ExistingValue = {
  * @param {Tag} ownerTag 
  */
 function setValueRedraw(
-  templater, // latest tag function to call for rendering
-  existing,
-  ownerTag,
+  templater: any, // latest tag function to call for rendering
+  existing: any,
+  ownerTag: Tag,
 ) {
   // redraw does not communicate to parent
   templater.redraw = () => {
@@ -395,7 +390,9 @@ function setValueRedraw(
     ++tagSupport.renderCount
 
     existing.tagSupport = tagSupport
-    tagSupport.mutatingRender = tagSupport.mutatingRender || existing.tagSupport?.mutatingRender || this.tagSupport.mutatingRender
+    // const self = this as any
+    const self = templater as any
+    tagSupport.mutatingRender = tagSupport.mutatingRender || existing.tagSupport?.mutatingRender || self.tagSupport.mutatingRender
     const runtimeOwnerTag = existingTag?.ownerTag || ownerTag
 
     if(tagSupport.oldest) {
@@ -439,15 +436,15 @@ function setValueRedraw(
 }
 
 function elementDestroyCheck(
-  nextSibling,
-  stagger,
+  nextSibling: Element & {ondestroy?: () => any},
+  stagger: number,
 ) {
   const onDestroyDoubleWrap = nextSibling.ondestroy // nextSibling.getAttribute('onDestroy')
   if(!onDestroyDoubleWrap) {
     return
   }
 
-  const onDestroyWrap = onDestroyDoubleWrap.tagFunction
+  const onDestroyWrap = (onDestroyDoubleWrap as any).tagFunction
   if(!onDestroyWrap) {
     return
   }

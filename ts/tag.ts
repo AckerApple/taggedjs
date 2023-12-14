@@ -5,11 +5,13 @@ import { deepClone } from "./deepFunctions.js"
  * @param {T} tagComponent 
  * @returns {T}
  */
-export function tag(tagComponent) {
-  return (props) => {
-    let asyncFunc = param => param
+export function tag(
+  tagComponent: (...args: any[]) => any
+) {
+  return (props: any) => {
+    let asyncFunc = (param: unknown) => param
     
-    const callback = (toCall, callWith) => {
+    const callback = (toCall: any, callWith: any) => {
       const callbackResult = toCall(...callWith)
       const ownerTag = templater.newest.ownerTag
       ownerTag.tagSupport.render()
@@ -22,20 +24,23 @@ export function tag(tagComponent) {
     templater.props = props
     templater.newProps = newProps
     templater.cloneProps = deepClone( newProps )
-    templater.setCallback = x => {
+    templater.setCallback = (x: any) => {
       return asyncFunc = x
     }
     return templater
   }
 }
 
-function resetFunctionProps(props, callback) {
+function resetFunctionProps(
+  props: any,
+  callback: any,
+) {
   const newProps = {...props}
 
   Object.entries(newProps).forEach(([name, value]) => {
     if(value instanceof Function) {
-      newProps[name] = (...args) => {
-        return callback(value,args)
+      newProps[name] = (...args: any[]) => {
+        return callback(value, args)
       }
       return
     }

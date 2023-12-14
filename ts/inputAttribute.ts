@@ -1,13 +1,13 @@
 export function inputAttribute(
-  name,
-  value,
-  element,
+  name: string,
+  value: any,
+  element: Element,
 ) {
   const names = name.split('.')
 
   // style.position = "absolute"
   if(names[0] === 'style') {
-    element.style[names[1]] = value
+    (element as any).style[names[1]] = value
   }
 
   // Example: class.width-full = "true"

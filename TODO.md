@@ -1,4 +1,9 @@
 ### TODO NOW: Before Mega-aide / Cary
+- Simplify attaching to an element
+  - instead of `renderAppToElement(App, element, {test:1})`
+  - do `???`
+- It appears props only watch the first argument
+  - Most like re-engineer tag.js:9 `return (props) => {`
 - How to have subscription display logic
   - html`...${subscribe(directory$, directory => {})}`
   - html`...${async(directoryPromise, directory => {})}`

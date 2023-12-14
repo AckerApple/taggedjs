@@ -1,29 +1,29 @@
 import { buildItemTagMap, elementInitCheck } from "./render.js"
-import { Tag, Provider, variablePrefix } from "./Tag.class.js"
+import { Context, Tag, variablePrefix } from "./Tag.class.js"
 import { Subject } from "./Subject.js"
 import { processTagArray } from "./processTagArray.js"
-import { getTagSupport, TagSupport } from "./getTagSupport.js"
+import { getTagSupport } from "./getTagSupport.js"
 import { deepClone, deepEqual } from "./deepFunctions.js"
-import { config as providers } from "./providers.js"
+import { Provider, config as providers } from "./providers.js"
 
 export function interpolateTemplate(
-  template, // <template end interpolate /> (will be removed)
-  context, // variable scope of {`__tagVar${index}`:'x'}
-  ownerTag, // Tag class
-  counts, // {added:0, removed:0}
+  template: Element & {clone?: any}, // <template end interpolate /> (will be removed)
+  context: Context, // variable scope of {`__tagVar${index}`:'x'}
+  ownerTag: Tag, // Tag class
+  counts: Counts, // {added:0, removed:0}
 ) {
   if ( !template.hasAttribute('end') ) {
     return // only care about starts
   }
 
   const variableName = template.getAttribute('id')
-  if(variableName.substring(0, variablePrefix.length) !== variablePrefix) {
+  if(variableName?.substring(0, variablePrefix.length) !== variablePrefix) {
     return // ignore, not a tagVar
   }
 
   const result = context[variableName]
   if(result instanceof Subject) {
-    const callback = templateNewValue => {
+    const callback = (templateNewValue: any) => {
       processSubjectValue(templateNewValue, result, template, ownerTag, counts)
 
       setTimeout(() => {
@@ -31,7 +31,8 @@ export function interpolateTemplate(
         counts.removed = 0 // reset
       }, 0)
     }
-    const sub = result.subscribe(callback)
+
+    const sub = result.subscribe(callback as any)
     ownerTag.cloneSubs.push(sub)
     return
   }
@@ -57,11 +58,11 @@ export function interpolateTemplate(
  * @returns 
  */
 function processSubjectValue(
-  value,
-  result, // could be tag via result.tag
-  template, // <template end interpolate /> (will be removed)
-  ownerTag,
-  counts, // {added:0, removed:0}
+  value: any,
+  result: any, // could be tag via result.tag
+  template: any, // <template end interpolate /> (will be removed)
+  ownerTag: Tag,
+  counts: Counts, // {added:0, removed:0}
 ) {
   if (value instanceof Tag) {
     // first time seeing this tag?
@@ -70,7 +71,7 @@ function processSubjectValue(
       value.tagSupport.mutatingRender = ownerTag.tagSupport.mutatingRender
       value.tagSupport.oldest = value.tagSupport.oldest || value
       
-      ownerTag.children.push(value)
+      ownerTag.children.push(value as Tag)
       value.ownerTag = ownerTag
     }
 
@@ -136,10 +137,10 @@ function processSubjectValue(
 
 // Function to update the value of x
 export function updateBetweenTemplates(
-  value,
-  lastFirstChild,
+  value: any,
+  lastFirstChild: Element,
 ) {
-  const parent = lastFirstChild.parentNode
+  const parent = lastFirstChild.parentNode as ParentNode
   
   // mimic React skipping to display EXCEPT for true does display on page
   if(value === undefined || value === false || value === null) { // || value === true
@@ -151,19 +152,24 @@ export function updateBetweenTemplates(
   parent.insertBefore(textNode, lastFirstChild)
 
   /* remove existing nodes */
-  lastFirstChild.parentNode.removeChild(lastFirstChild)
+  parent.removeChild(lastFirstChild)
   
   return textNode
 }
 
+export type Counts = {added:0, removed:0}
+
 /** Returns {clones:[], subs:[]} */
 export function processTagResult(
-  tag,
-  result, // used for recording past and current value
-  insertBefore, // <template end interpolate />
+  tag: Tag,
+  result: any, // used for recording past and current value
+  insertBefore: Element, // <template end interpolate />
   {
     index,
-    counts, // {added:0, removed:0}
+    counts,
+  }: {
+    index?: number
+    counts: Counts
   }
 ) {
   const template = tag.getTemplate()
@@ -205,7 +211,7 @@ export function processTagResult(
   }
 
   // *if just now appearing to be a Tag
-  const before = insertBefore.clone || insertBefore
+  const before = (insertBefore as any).clone || insertBefore
 
   const clones = buildItemTagMap(tag, template, before, counts)
   clones.forEach(clone => afterElmBuild(clone, counts))
@@ -215,16 +221,16 @@ export function processTagResult(
 }
 
 
-export function isTagComponent(value) {
+export function isTagComponent(value: unknown) {
   return value instanceof Function && value.toString().includes('html`')
 }
 
 function processSubjectComponent(
-  value,
-  result,
-  template,
-  ownerTag,
-  counts
+  value: any,
+  result: any,
+  template: any,
+  ownerTag: Tag,
+  counts: Counts,
 ) {
   if(!value.cloneProps) {
     const error = new Error(`Not a tag component. Use functionName = component(functionName) on component:\n\n${value.toString().substring(0,120)}\n\n`)
@@ -256,7 +262,7 @@ function processSubjectComponent(
     }
 
     // draw to my parent
-    const newest = tagSupport.newest = ownerTag.tagSupport.render( value.newProps )
+    const newest = tagSupport.newest = ownerTag.tagSupport.render()
     return newest
   }
 
@@ -293,24 +299,22 @@ function processSubjectComponent(
   return
 }
 
-function afterElmBuild(elm, counts) {
-  if(!elm.getAttribute) {
+function afterElmBuild(
+  elm: Element | ChildNode,
+  counts: Counts,
+) {
+  if(!(elm as Element).getAttribute) {
     return
   }
 
   elementInitCheck(elm, counts)
 
-  if(elm.children) {
-    new Array(...elm.children).forEach(child => afterElmBuild(child, counts))
+  if((elm as Element).children) {
+    new Array(...(elm as Element).children as any).forEach(child => afterElmBuild(child, counts))
   }
 }
-// document.getElementById('player_0_input').select()
 
-/**
- * 
- * @param {Tag} tag 
- */
-function providersChangeCheck(tag) {
+function providersChangeCheck(tag: Tag) {
   const providersWithChanges = tag.providers.filter(provider => {
     return !deepEqual(provider.instance, provider.clone)
   })
@@ -331,8 +335,8 @@ function providersChangeCheck(tag) {
  * @param {Provider} provider 
  */
 function handleProviderChanges(
-  appElement,
-  provider,
+  appElement: Tag,
+  provider: Provider,
 ) {
   const tagsWithProvider = getTagsWithProvider(appElement, provider)
 
@@ -352,14 +356,22 @@ function handleProviderChanges(
  */
 
 function getTagsWithProvider(
-  tag,
-  provider,
-  memory = []
+  tag: Tag,
+  provider: Provider,
+  memory: {
+    tag: Tag
+    renderCount: number
+    provider: Provider
+  }[] = []
 ) {
-  const hasProvider = tag.providers.find(xProvider => xProvider.constructorMethod === provider.constructorMethod)
+  const hasProvider = tag.providers.find(xProvider => xProvider.constructMethod === provider.constructMethod)
   
   if(hasProvider) {
-    memory.push({tag, renderCount: tag.tagSupport.renderCount, provider: hasProvider})
+    memory.push({
+      tag,
+      renderCount: tag.tagSupport.renderCount,
+      provider: hasProvider
+    })
   }
 
   tag.children.forEach(child => getTagsWithProvider(child, provider, memory))

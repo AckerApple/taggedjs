@@ -1,7 +1,7 @@
 import { interpolateAttributes } from "./interpolateAttributes.js"
 import { interpolateToTemplates } from "./interpolations.js"
 import { interpolateContentTemplates } from "./interpolateContentTemplates.js"
-import { Tag, escapeSearch, variablePrefix } from "./Tag.class.js"
+import { Context, Tag, escapeSearch, variablePrefix } from "./Tag.class.js"
 
 /**
  * 
@@ -10,11 +10,11 @@ import { Tag, escapeSearch, variablePrefix } from "./Tag.class.js"
  * @param {Tag} ownerTag 
  */
 export function interpolateElement(
-  element,
-  context, // variables used to evaluate
-  ownerTag,
+  element: Element,
+  context: Context, // variables used to evaluate
+  ownerTag: Tag,
 ) {
-  const result = interpolateElementChild(element, context)
+  const result = interpolateElementChild(element)
 
   if(result.keys.length) {
     interpolateContentTemplates(element, context, ownerTag)
@@ -22,8 +22,8 @@ export function interpolateElement(
 
   interpolateAttributes(element, context, ownerTag)
 
-  function processChildren(children) {
-    new Array(...children).forEach(child => {
+  function processChildren(children: HTMLCollection) {
+    new Array(...children as any).forEach(child => {
       interpolateAttributes(child, context, ownerTag)
 
       if(child.children) {
@@ -37,9 +37,9 @@ export function interpolateElement(
 
 /** Convert interpolations into template tags */
 export function interpolateElementChild(
-  child, context,
+  child: Element,
 ) {
-  const result = interpolateToTemplates(child.innerHTML, context)
+  const result = interpolateToTemplates(child.innerHTML)
   result.string = result.string.replace(escapeSearch, variablePrefix)
   child.innerHTML = result.string
   return result

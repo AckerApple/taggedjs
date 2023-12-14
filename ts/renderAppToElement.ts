@@ -1,7 +1,12 @@
 import { interpolateElement } from "./interpolateElement.js"
-import { getTagSupport } from "./getTagSupport.js"
+import { TagSupport, getTagSupport } from "./getTagSupport.js"
+import { Tag } from "./Tag.class.js"
 
-export function renderAppToElement(app, element, props) {
+export function renderAppToElement(
+  app: (...args: unknown[]) => any,
+  element: Element,
+  props: unknown,
+) {
   // Create the app which returns [props, runOneTimeFunction]
   const wrapper = app(props)
 
@@ -18,7 +23,7 @@ export function renderAppToElement(app, element, props) {
     tag.afterRender()
 
     fromTag.setSupport(tag.tagSupport)
-    tag.updateByTag(fromTag, true)
+    tag.updateByTag(fromTag)
 
     if(lastTag) {
       lastTag.destroy(0)
@@ -36,8 +41,8 @@ export function renderAppToElement(app, element, props) {
 }
 
 export function applyTagUpdater(
-  wrapper, //: ({render, async, watch}) => ({strings, values})
-){
+  wrapper: (tagSupport: TagSupport) => Tag,
+) {
   const tagSupport = getTagSupport(wrapper)
 
   // Call the apps function for our tag templater

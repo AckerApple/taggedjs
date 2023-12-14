@@ -1,20 +1,21 @@
-import { interpolateTemplate } from "./interpolateTemplate.js"
+import { Tag } from "./Tag.class.js"
+import { Counts, interpolateTemplate } from "./interpolateTemplate.js"
 
 /** Returns subscriptions[] that will need to be unsubscribed from when element is destroyed */
 export function interpolateContentTemplates(
-  element,
-  variable,
-  ownerTag,
+  element: Element,
+  variable: any,
+  ownerTag: Tag,
 ) {
   if ( !element.children || element.tagName === 'TEMPLATE' ) {
     return // done
   }
-  const counts = {
+  const counts: Counts = {
     added: 0,
     removed: 0,
   }
 
-  const children = new Array(...element.children)
+  const children = new Array(...(element.children as any))
 
   children.forEach((child, index) => {
     interpolateChild(child, index, children)
@@ -31,7 +32,11 @@ export function interpolateContentTemplates(
     }
   })
 
-  function interpolateChild(child, index, children) {
+  function interpolateChild(
+    child: Element,
+    index: number,
+    children: Element[]
+  ) {
     children.forEach((child, subIndex) => {
       if ( subIndex < index ) {
         return // too low
@@ -59,7 +64,7 @@ export function interpolateContentTemplates(
   return
 }
 
-function isRenderEndTemplate(child) {
+function isRenderEndTemplate(child: Element) {
   const isTemplate = child.tagName==='TEMPLATE'
   return isTemplate &&
   child.getAttribute('interpolate') !== undefined && 

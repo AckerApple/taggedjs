@@ -1,17 +1,21 @@
-import { processTagResult } from "./interpolateTemplate.js"
+import { Tag } from "./Tag.class.js"
+import { Counts, processTagResult } from "./interpolateTemplate.js"
 
 export function processTagArray(
-  result, // tag
-  value, // arry of Tag classes
-  template, // <template end interpolate />
-  ownerTag,
-  counts, // {added:0, removed:0}
+  result: any,
+  value: Tag[], // arry of Tag classes
+  template: Element, // <template end interpolate />
+  ownerTag: Tag,
+  counts: Counts,
 ) {
   result.lastArray = result.lastArray || [] // {tag, index}[] populated in processTagResult
 
   let removed = 0
   /** 🗑️ remove previous items first */
-  result.lastArray = result.lastArray.filter((item, index) => {
+  result.lastArray = result.lastArray.filter((
+    item: any,
+    index: number,
+  ) => {
     const lessLength = value.length-1 < index - removed
     const subTag = value[index - removed]
     const subArrayValue = subTag?.arrayValue
@@ -35,7 +39,7 @@ export function processTagArray(
       // appears arrayValue is not there but maybe arrayValue is actually the value of undefined
       if (!Object.keys(subTag).includes('arrayValue')) {
         const err = new Error('Use html`...`.key(item) instead of html`...` to template an Array')
-        err.code = 'add-array-key'
+        ;(err as any).code = 'add-array-key'
         throw err
       }
     }
@@ -48,7 +52,7 @@ export function processTagArray(
       return
     }
 
-    const before = template || template.clone
+    const before = template || (template as any).clone
     processTagResult(
       subTag,
       result,

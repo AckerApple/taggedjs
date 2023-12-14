@@ -1,4 +1,7 @@
-export function deepClone(obj, visited = new WeakMap()) {
+export function deepClone(
+  obj: any,
+  visited = new WeakMap()
+) {
   // If obj is a primitive type or null, return it directly
   if (obj === null || typeof obj !== 'object') {
     return obj;
@@ -40,7 +43,7 @@ export function deepClone(obj, visited = new WeakMap()) {
   return clone;
 }
 
-export function deepEqual(obj1, obj2) {
+export function deepEqual(obj1: any, obj2: any) {
   if (obj1 === obj2) {
     return true
   }

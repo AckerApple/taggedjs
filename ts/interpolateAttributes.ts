@@ -1,25 +1,28 @@
 import { Subject } from "./Subject.js"
+import { Context, Tag } from "./Tag.class.js"
 import { inputAttribute } from "./inputAttribute.js"
 
 const startRegX = /^\s*{/
 const endRegX = /}\s*$/
 
 export function interpolateAttributes(
-  child, scope, ownerTag
+  child: Element,
+  scope: Context,
+  ownerTag: Tag,
 ) {
   child.getAttributeNames().forEach(attrName => {
     const value = child.getAttribute(attrName)
     const isSpecial = isSpecialAttr(attrName)
 
     // An attempt to replicate React
-    if ( value.search(startRegX) >= 0 && value.search(endRegX) >= 0 ) {
+    if ( value && value.search(startRegX) >= 0 && value.search(endRegX) >= 0 ) {
       // get the code inside the brackets like "variable0" or "{variable0}"
       const code = value.replace('{','').split('').reverse().join('').replace('}','').split('').reverse().join('')
       const result = scope[code]
 
       // attach as callback
       if(result instanceof Function) {
-        child[attrName] = function(...args) {
+        ;(child as any)[attrName] = function(...args: any[]) {
           result(child, args)
         }
         return
@@ -27,13 +30,13 @@ export function interpolateAttributes(
 
       if(result instanceof Subject) {
         child.removeAttribute(attrName)
-        const callback = newAttrValue => {
+        const callback = (newAttrValue: any) => {
           if(newAttrValue instanceof Function) {
-            child[attrName] = function(...args) {
+            ;(child as any)[attrName] = function(...args: any[]) {
               newAttrValue(child, args)
             }
 
-            child[attrName].tagFunction = newAttrValue
+            ;(child as any)[attrName].tagFunction = newAttrValue
 
             return
           }
@@ -48,7 +51,7 @@ export function interpolateAttributes(
 
           const isDeadValue = newAttrValue === undefined || newAttrValue === false || newAttrValue === null
           if(isDeadValue) {
-            child.removeAttribute(attrName, newAttrValue)
+            child.removeAttribute(attrName)
             return
           }
 
@@ -56,7 +59,7 @@ export function interpolateAttributes(
           child.setAttribute(attrName, newAttrValue)
         }
 
-        const sub = result.subscribe(callback)
+        const sub = result.subscribe(callback as any)
         ownerTag.cloneSubs.push(sub) // this is where unsubscribe is picked up
 
         return
@@ -80,6 +83,6 @@ export function interpolateAttributes(
   })
 }
 
-export function isSpecialAttr(attrName) {
+export function isSpecialAttr(attrName: string) {
   return attrName.search(/^(class|style)(\.)/) >= 0
 }

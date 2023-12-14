@@ -1,12 +1,13 @@
-import { Tag } from "./Tag.class.js"
+import { Context, Tag } from "./Tag.class.js"
 import { interpolateElement } from "./interpolateElement.js"
+import { Counts } from "./interpolateTemplate.js"
 
 export function buildItemTagMap(
-  /** @type {Tag} */ tag,
-  template, // {string, context}
-  insertBefore,
-  counts, // {removed:0, added:0}
-) {
+  tag: Tag,
+  template: {string: string, context: Context}, // {string, context}
+  insertBefore: Element,
+  counts: Counts,
+): (ChildNode | Element)[] {
   const temporary = document.createElement('div')
   temporary.id = 'tag-temp-holder'
   
@@ -23,9 +24,9 @@ export function buildItemTagMap(
 }
 
 function buildClones(
-  temporary,
-  insertBefore,
-  counts, // {removed:0, added:0}
+  temporary: Element,
+  insertBefore: Element,
+  counts: Counts,
 ) {
   const clones = []
   const templateClone = temporary.children[0]
@@ -35,7 +36,7 @@ function buildClones(
   
   while (nextSibling) {
     const nextNextSibling = nextSibling.nextSibling
-    buildSibling(nextSibling, temporary, insertBefore, counts)
+    buildSibling(nextSibling, insertBefore)
     clones.push(nextSibling)
     nextSibling = nextNextSibling
   }
@@ -44,21 +45,22 @@ function buildClones(
 }
 
 function buildSibling(
-  nextSibling,
-  temporary,
-  insertBefore,
-  counts, // {removed:0, added:0}
+  nextSibling: ChildNode,
+  insertBefore: Element,
 ) {
-  // temporary.removeChild(nextSibling) // is auto moved
-  insertBefore.parentNode.insertBefore(nextSibling, insertBefore)  
+  (insertBefore.parentNode as ParentNode).insertBefore(nextSibling, insertBefore)  
 
   /*if(nextSibling.getAttribute) {
     elementInitCheck(nextSibling, counts)
   }*/
 }
 
-export function elementInitCheck(nextSibling, counts) {
-  const onInitDoubleWrap = nextSibling.oninit // nextSibling.getAttribute('oninit')
+/** TODO may be ready to remove this */
+export function elementInitCheck(
+  nextSibling: ChildNode,
+  counts: Counts
+) {
+  const onInitDoubleWrap = (nextSibling as any).oninit // nextSibling.getAttribute('oninit')
   if(!onInitDoubleWrap) {
     return
   }
