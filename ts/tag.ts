@@ -1,40 +1,58 @@
+import { Tag } from "./Tag.class.js"
 import { deepClone } from "./deepFunctions.js"
 
-/**
- * @template T
- * @param {T} tagComponent 
- * @returns {T}
- */
-export function tag(
-  tagComponent: (...args: any[]) => any
-) {
-  return (props: any) => {
-    let asyncFunc = (param: unknown) => param
+export type Props = unknown
+
+export type TemplaterResult = {
+  props: Props
+  newProps: Props
+  cloneProps: Props
+  tagged: boolean
+  setCallback: <T>(x: T) => T
+
+  newest?: Tag
+}
+
+export function tag<T>(
+  tagComponent: (
+    props: Props | Tag, // props or children
+    children?: Tag
+  ) => TemplaterResult
+): T {
+  return ((props?: Props | Tag, children?: Tag) => {
+    let asyncFunc = (param: Props) => param
     
     const callback = (toCall: any, callWith: any) => {
       const callbackResult = toCall(...callWith)
-      const ownerTag = templater.newest.ownerTag
-      ownerTag.tagSupport.render()
+      templater.newest?.ownerTag?.tagSupport.render()
       return callbackResult
     }
     
-    const newProps = resetFunctionProps(props, callback)
+    const isPropTag = props instanceof Tag
+    const watchProps = isPropTag ? 0 : props
+    const newProps = resetFunctionProps(watchProps, callback)
+    const argProps = isPropTag ? props : newProps
 
-    const templater = tagComponent( newProps )
-    templater.props = props
+    const templater = tagComponent(argProps, children)
+    templater.tagged = true
+    templater.props = props // used to call function
     templater.newProps = newProps
     templater.cloneProps = deepClone( newProps )
     templater.setCallback = (x: any) => {
       return asyncFunc = x
     }
     return templater
-  }
+  }) as T // we override the function provided and pretend original is what's returned
 }
 
 function resetFunctionProps(
   props: any,
   callback: any,
 ) {
+  if(typeof(props)!=='object') {
+    return props
+  }
+
   const newProps = {...props}
 
   Object.entries(newProps).forEach(([name, value]) => {

@@ -1,4 +1,7 @@
 ### TODO NOW: Before Mega-aide / Cary
+- innerHTML?
+- Changelog
+- Allow any arguments. Do not restrict to 1 arg with props
 - Simplify attaching to an element
   - instead of `renderAppToElement(App, element, {test:1})`
   - do `???`
@@ -8,7 +11,8 @@
   - html`...${subscribe(directory$, directory => {})}`
   - html`...${async(directoryPromise, directory => {})}`
 - Remove need for function within function
-  - move {async, init, callback} out and to work like state using beforeRedraw and afterRender
+  - move {async, init} out and to work like state using beforeRedraw and afterRender
+  - Consider rename async to callback()
 - routing
 - ? Create `const [debug, setDebug] = useState()` ?
   - Issue is hot reloading
@@ -16,12 +20,12 @@
     - However, it is just development mode and accidental use of development mode in production
 
 ### Extra testing
-- test intervals again (search for 'counter fired')
 - Test switching a components return string
   - return x ? html`.0.` : html`.1.`
 
 ### Before wider audience
 - Hot reloading
+- How to load styles other than just inline & non-dynamic style tag that effects entire page
 - Ability to produce one time HTML files
   - Then rehydrate with actual JavaScript
 - SSR - server side rendering
@@ -30,9 +34,7 @@
     - title="real title here" tag:title="__tagVar2_"
 
 ## Attributes
-
 - We need to properly process [style.background-color]=${isSomething ? 'red' : null}
-
 
 ## Documentations
 

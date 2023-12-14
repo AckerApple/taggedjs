@@ -232,8 +232,14 @@ function processSubjectComponent(
   ownerTag: Tag,
   counts: Counts,
 ) {
-  if(!value.cloneProps) {
-    const error = new Error(`Not a tag component. Use functionName = component(functionName) on component:\n\n${value.toString().substring(0,120)}\n\n`)
+  if(value.tagged !== true) {
+    let name = value.name || value.constructor?.name
+
+    if(name === 'Function') {
+      name = undefined
+    }
+
+    const error = new Error(`Not a tag component. Wrap your function with tag(). Example tag(props => html\`\`) on component:\n\n${name || value.toString().substring(0,120)}\n\n`)
     throw error
   }
 
