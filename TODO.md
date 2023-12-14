@@ -1,5 +1,4 @@
 ### TODO NOW: Before Mega-aide / Cary
-- innerHTML?
 - Changelog
 - Allow any arguments. Do not restrict to 1 arg with props
 - Simplify attaching to an element
@@ -49,6 +48,7 @@
   - render hook - move
   - init hook - move
   - async hook - move
+- innerHTML is 1st or 2nd argument
 
 ### Angular similarities
 - Support for bracket element definitions

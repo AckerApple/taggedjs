@@ -11,3 +11,5 @@ export { state } from "./state.js"
 export { wait } from "./wait.js"
 
 export { renderAppToElement } from "./renderAppToElement.js"
+
+export { Tag } from "./Tag.class.js"
