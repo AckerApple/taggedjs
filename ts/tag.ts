@@ -8,7 +8,6 @@ export type TemplaterResult = {
   newProps: Props
   cloneProps: Props
   tagged: boolean
-  setCallback: <T>(x: T) => T
 
   newest?: Tag
 }
@@ -19,9 +18,7 @@ export function tag<T>(
     children?: Tag
   ) => TemplaterResult
 ): T {
-  return ((props?: Props | Tag, children?: Tag) => {
-    let asyncFunc = (param: Props) => param
-    
+  return ((props?: Props | Tag, children?: Tag) => {    
     const callback = (toCall: any, callWith: any) => {
       const callbackResult = toCall(...callWith)
       templater.newest?.ownerTag?.tagSupport.render()
@@ -31,19 +28,24 @@ export function tag<T>(
     const isPropTag = props instanceof Tag
     const watchProps = isPropTag ? 0 : props
     const newProps = resetFunctionProps(watchProps, callback)
-    const argProps = isPropTag ? props : newProps
+    
+    let argProps = newProps
+    if(isPropTag) {
+      children = props
+      argProps = noPropsGiven
+    }
 
     const templater = tagComponent(argProps, children)
     templater.tagged = true
     templater.props = props // used to call function
     templater.newProps = newProps
     templater.cloneProps = deepClone( newProps )
-    templater.setCallback = (x: any) => {
-      return asyncFunc = x
-    }
     return templater
   }) as T // we override the function provided and pretend original is what's returned
 }
+
+class NoPropsGiven {}
+const noPropsGiven = new NoPropsGiven()
 
 function resetFunctionProps(
   props: any,

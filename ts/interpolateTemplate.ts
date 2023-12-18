@@ -1,10 +1,12 @@
-import { buildItemTagMap, elementInitCheck } from "./render.js"
+import { buildItemTagMap } from "./render.js"
 import { Context, Tag, variablePrefix } from "./Tag.class.js"
 import { Subject } from "./Subject.js"
 import { processTagArray } from "./processTagArray.js"
 import { getTagSupport } from "./getTagSupport.js"
 import { deepClone, deepEqual } from "./deepFunctions.js"
 import { Provider, config as providers } from "./providers.js"
+import { elementInitCheck } from "./elementInitCheck.js"
+import { runBeforeRender } from "./tagRunner.js"
 
 export function interpolateTemplate(
   template: Element & {clone?: any}, // <template end interpolate /> (will be removed)
@@ -184,7 +186,7 @@ export function processTagResult(
     }
 
     const lastFirstChild = insertBefore // tag.clones[0] // insertBefore.lastFirstChild
-    const clones = buildItemTagMap(tag, template, lastFirstChild, counts)
+    const clones = buildItemTagMap(tag, template, lastFirstChild)
     clones.forEach(clone => afterElmBuild(clone, counts))
     result.lastArray.push({
       tag, index
@@ -213,7 +215,7 @@ export function processTagResult(
   // *if just now appearing to be a Tag
   const before = (insertBefore as any).clone || insertBefore
 
-  const clones = buildItemTagMap(tag, template, before, counts)
+  const clones = buildItemTagMap(tag, template, before)
   clones.forEach(clone => afterElmBuild(clone, counts))
   result.tag = tag // let reprocessing know we saw this previously as an if
 
@@ -246,8 +248,6 @@ function processSubjectComponent(
   /** @type {TagSupport} */
   const tagSupport = result.tagSupport || getTagSupport( value )
   
-  value.setCallback( ownerTag.tagSupport.async )
-
   tagSupport.mutatingRender = () => {
     const preRenderCount = tagSupport.renderCount
 
@@ -277,9 +277,11 @@ function processSubjectComponent(
   let tag = templater.newest
   providers.ownerTag = ownerTag
   const isFirstTime = !tag
+  runBeforeRender(tagSupport, tag)
 
   if(isFirstTime) {
     tag = templater(tagSupport)
+    tag.tagSupport = tagSupport
     tag.afterRender()
     templater.oldest = tag
     tagSupport.oldest = tag

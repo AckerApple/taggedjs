@@ -1,10 +1,11 @@
+import { bindSubjectFunction, elementDestroyCheck, getSubjectFunction, setValueRedraw } from "./Tag.utils.js"
+import { TagSupport, getTagSupport } from "./getTagSupport.js"
+import { Provider, config as providers } from "./providers.js"
+import { isTagComponent } from "./interpolateTemplate.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { deepEqual } from "./deepFunctions.js"
-import { isTagComponent } from "./interpolateTemplate.js"
-import { TagSupport, getTagSupport } from "./getTagSupport.js"
-import { config as states } from "./state.js"
-import { Provider, config as providers } from "./providers.js"
 import { Subscription } from "./Subject.js"
+import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
 
 export const variablePrefix = '__tagVar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -13,40 +14,6 @@ const prefixSearch = new RegExp(variablePrefix, 'g')
 export const escapeSearch = new RegExp(escapeVariable, 'g')
 
 export type Context = {[index: string]: any}
-
-const tagUse = [{
-  beforeRedraw: (tag: Tag) => {
-    states.currentTag = tag
-    if(tag.states.length) {
-      states.rearray.push(...tag.states)
-    }
-  },
-  afterRender: (tag: Tag) => {
-    if(states.rearray.length) {
-      if(states.rearray.length !== states.array.length) {
-        throw new Error(`States lengths mismatched ${states.rearray.length} !== ${states.array.length}`)
-      }
-    }
-
-    states.rearray.length = 0 // clean up any previous runs
-
-    tag.states = [...states.array] as any
-    states.array.length = 0
-  }
-},{ // providers
-  beforeRedraw: (tag: Tag) => {
-    providers.currentTag = tag
-    providers.ownerTag = tag.ownerTag
-    if(tag.providers.length) {
-      providers.providers.length = 0
-      providers.providers.push(...tag.providers)
-    }
-  },
-  afterRender: (tag: Tag) => {
-    tag.providers = [...providers.providers]
-    providers.providers.length = 0
-  }
-}]
 
 export class Tag {
   context: Context = {} // populated after reading interpolated.values array converted to an object {variable0, variable:1}
@@ -67,19 +34,14 @@ export class Tag {
     public values: any[],
   ) {}
 
-  /**
-   * @template T
-   * @type {((x: T) => [T, T])[]} */
-  states = []
-
   providers: Provider[] = []
 
   beforeRedraw() {
-    tagUse.forEach(tagUse => tagUse.beforeRedraw(this))
+    runBeforeRedraw(this.tagSupport, this)
   }
 
   afterRender() {
-    tagUse.forEach(tagUse => tagUse.afterRender(this))
+    runAfterRender(this.tagSupport, this)
   }
 
   /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
@@ -256,11 +218,12 @@ export class Tag {
         if(ogTag) {
           const tagSupport = ogTag.tagSupport
           const templater = value
-          
+          runBeforeRender(tagSupport, ogTag)
           tagSupport.oldest.beforeRedraw()
 
           const retag = templater(tagSupport)
           
+          retag.tagSupport = tagSupport
           templater.newest = retag
           tagSupport.oldest.afterRender()          
           ogTag.updateByTag(retag)
@@ -271,7 +234,7 @@ export class Tag {
         
         // now its a function
         if(value instanceof Function) {
-          existing.set(bindSubjectFunction(value, this))
+          existing.set( bindSubjectFunction(value, this) )
           return
         }
 
@@ -317,143 +280,4 @@ export class Tag {
 
     return tag
   }
-}
-
-function getSubjectFunction(
-  value: any,
-  tag: Tag,
-) {
-  return new ValueSubject(bindSubjectFunction(value, tag))
-}
-
-/**
- * @param {*} value 
- * @param {Tag} tag 
- * @returns 
- */
-function bindSubjectFunction(
-  value: (...args: any[]) => any,
-  tag: Tag,
-) {
-  function subjectFunction(
-    element: Element,
-    args: any[]
-  ) {
-    const renderCount = tag.tagSupport.renderCount
-
-    const method = value.bind(element)
-    const callbackResult = method(...args)
-
-    if(renderCount !== tag.tagSupport.renderCount) {
-      return // already rendered
-    }
-
-    tag.tagSupport.render()
-    
-    if(callbackResult instanceof Promise) {
-      callbackResult.then(() => {
-        tag.tagSupport.render()
-      })
-    }
-
-    return callbackResult
-  }
-
-  subjectFunction.tagFunction = value
-
-  return subjectFunction
-}
-
-type ExistingValue = {
-  tagSupport: TagSupport
-  tag: Tag
-}
-
-/**
- * 
- * @param {*} templater 
- * @param {ExistingValue} existing 
- * @param {Tag} ownerTag 
- */
-function setValueRedraw(
-  templater: any, // latest tag function to call for rendering
-  existing: any,
-  ownerTag: Tag,
-) {
-  // redraw does not communicate to parent
-  templater.redraw = () => {
-    // Find previous variables
-    const existingTag = existing.tag
-    const tagSupport = existingTag?.tagSupport || getTagSupport(templater) // this.tagSupport
-
-    // signify to other operations that a rendering has occurred so they do not need to render again
-    ++tagSupport.renderCount
-
-    existing.tagSupport = tagSupport
-    // const self = this as any
-    const self = templater as any
-    tagSupport.mutatingRender = tagSupport.mutatingRender || existing.tagSupport?.mutatingRender || self.tagSupport.mutatingRender
-    const runtimeOwnerTag = existingTag?.ownerTag || ownerTag
-
-    if(tagSupport.oldest) {
-      tagSupport.oldest.beforeRedraw()
-    } else {
-      providers.ownerTag = runtimeOwnerTag
-    }
-
-    const retag = templater(tagSupport)
-
-    if(tagSupport.oldest) {
-      tagSupport.oldest.afterRender()
-    } else {
-      retag.afterRender()
-    }
-    
-    templater.newest = retag
-    retag.ownerTag = runtimeOwnerTag
-
-    tagSupport.oldest = tagSupport.oldest || retag
-    tagSupport.newest = retag
-
-    const oldestTagSupport = tagSupport.oldest.tagSupport
-    tagSupport.oldest.tagSupport = oldestTagSupport || tagSupport
-    tagSupport.oldest.tagSupport.templater = templater
-
-    // retag.getTemplate() // cause lastTemplateString to render
-    retag.setSupport(tagSupport)
-    const isSameTag = existingTag && existingTag.isLikeTag(retag)
-
-    // If previously was a tag and seems to be same tag, then just update current tag with new values
-    if(isSameTag) {
-      tagSupport.oldest.updateByTag(retag)
-      return
-    }
-
-    existing.set(templater)
-
-    return retag
-  }
-}
-
-function elementDestroyCheck(
-  nextSibling: Element & {ondestroy?: () => any},
-  stagger: number,
-) {
-  const onDestroyDoubleWrap = nextSibling.ondestroy // nextSibling.getAttribute('onDestroy')
-  if(!onDestroyDoubleWrap) {
-    return
-  }
-
-  const onDestroyWrap = (onDestroyDoubleWrap as any).tagFunction
-  if(!onDestroyWrap) {
-    return
-  }
-
-  const onDestroy = onDestroyWrap.tagFunction
-  if(!onDestroy) {
-    return
-  }
-
-  const event = {target: nextSibling, stagger}
-  return onDestroy(event)
 }

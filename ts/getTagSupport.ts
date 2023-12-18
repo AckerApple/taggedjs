@@ -9,11 +9,7 @@ export interface TagSupport {
   
   mutatingRender: () => any
   
-  render: () => any
-  
-  init: (runOnce: () => any) => any
-  
-  async: (callback: any) => any
+  render: () => any  
 
   /**
    * 
@@ -29,6 +25,7 @@ export interface TagSupport {
   ) => boolean,
 
   oldest?: Tag
+  newest?: Tag
 }
 
 export function getTagSupport(
@@ -52,24 +49,6 @@ export function getTagSupport(
       const isCommonEqual = props === undefined && props === compareToProps
       const isEqual = isCommonEqual || deepEqual(newProps, oldProps)
       return !isEqual
-    },
-
-    // TODO: We need to move these
-    init: (runOnce: () => any) => {
-      runOnce()
-      tagSupport.init = () => undefined
-    },
-
-    async: (callback: any) => (...args: any[]) => {
-      const result = callback(...args)
-      tagSupport.render()
-
-      // the callback function returned another promise
-      if(result instanceof Promise) {
-        result.then(() => {
-          tagSupport.render()
-        })
-      }
     },
   }
     

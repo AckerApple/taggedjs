@@ -1,5 +1,6 @@
 import { Tag } from "./Tag.class.js"
 import { deepClone } from "./deepFunctions.js"
+import { setUse } from "./tagRunner.js"
 
 export type Provider = {
   constructMethod: any
@@ -78,3 +79,18 @@ export const providers = {
     throw new Error(msg)
   }
 }
+
+setUse({ // providers
+  beforeRedraw: (_tagSupport, tag: Tag) => {
+    config.currentTag = tag
+    config.ownerTag = tag.ownerTag
+    if(tag.providers.length) {
+      config.providers.length = 0
+      config.providers.push(...tag.providers)
+    }
+  },
+  afterRender: (_tagSupport, tag: Tag) => {
+    tag.providers = [...config.providers]
+    config.providers.length = 0
+  }
+})

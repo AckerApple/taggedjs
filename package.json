@@ -1,6 +1,6 @@
 {
   "name": "taggedjs",
-  "version": "0.0.14",
+  "version": "2.0.1",
   "description": "tagged template reactive html",
   "main": "js/index.js",
   "type": "module",
@@ -14,7 +14,8 @@
     "save": "git add . && git commit -m \"patch\" && git push",
     "build:dist:pack": "cp package.json dist/package.json && node scripts/package-dist.cjs",
     "patch:version": "npm --no-git-tag-version version patch",
-    "publish": "npm run build:dist && npm run save:dist && cd ../dist && npm publish"
+    "publish": "npm run build:dist && npm run save:dist && cd ../dist && npm publish",
+    "build:watch": "chokidar 'ts/**/*' -c 'npm run build'"
   },
   "keywords": [
     "react",
@@ -33,6 +34,8 @@
   "devDependencies": {
     "@babel/core": "^7.23.6",
     "@babel/preset-env": "^7.23.6",
+    "chokidar-cli": "^3.0.0",
+    "nodemon": "^3.0.2",
     "typescript": "^5.3.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4"
