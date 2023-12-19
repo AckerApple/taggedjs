@@ -1,6 +1,4 @@
-import { Tag } from "./Tag.class.js"
-import { TagSupport } from "./getTagSupport.js"
-import { State, StateConfig, StateConfigArray, StateTagSupport, getStateValue } from "./state.js"
+import { State, StateConfigArray, StateTagSupport, getStateValue } from "./state.js"
 import { setUse } from "./tagRunner.js"
 
 type Callback = <T>(...args: unknown[]) => T

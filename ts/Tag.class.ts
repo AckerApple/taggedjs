@@ -6,6 +6,7 @@ import { ValueSubject } from "./ValueSubject.js"
 import { deepEqual } from "./deepFunctions.js"
 import { Subscription } from "./Subject.js"
 import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
+import { TemplaterResult } from "./tag.js"
 
 export const variablePrefix = '__tagVar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -217,11 +218,11 @@ export class Tag {
         // handle already seen tags
         if(ogTag) {
           const tagSupport = ogTag.tagSupport
-          const templater = value
+          const templater = value as TemplaterResult
           runBeforeRender(tagSupport, ogTag)
           tagSupport.oldest.beforeRedraw()
 
-          const retag = templater(tagSupport)
+          const retag = templater.wrapper()
           
           retag.tagSupport = tagSupport
           templater.newest = retag

@@ -81,7 +81,11 @@ export function getStateValue(state: StateConfig) {
   const [checkValue] = state( oldValue ) // set back to original value
 
   if(checkValue !== EchoBack) {
-    const error = new Error('State property not used correctly. Please check usage as `name = state(default, x => [name, name = x])` for the function:\n\n' + state +'\n')
+    const error = new Error(
+      'State property not used correctly.\n\n' +
+      'For "let" state use `let name = state(default, x => [name, name = x])`\n\n' +
+      'For "const" state use `const name = state(default)`\n\n' +
+      'Problem function:\n' + state +'\n')
     throw error
   }
 

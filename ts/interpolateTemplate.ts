@@ -7,6 +7,7 @@ import { deepClone, deepEqual } from "./deepFunctions.js"
 import { Provider, config as providers } from "./providers.js"
 import { elementInitCheck } from "./elementInitCheck.js"
 import { runBeforeRender } from "./tagRunner.js"
+import { TemplaterResult } from "./tag.js"
 
 export function interpolateTemplate(
   template: Element & {clone?: any}, // <template end interpolate /> (will be removed)
@@ -223,8 +224,8 @@ export function processTagResult(
 }
 
 
-export function isTagComponent(value: unknown) {
-  return value instanceof Function && value.toString().includes('html`')
+export function isTagComponent(value: unknown | TemplaterResult) {
+  return value instanceof TemplaterResult
 }
 
 function processSubjectComponent(
@@ -272,15 +273,14 @@ function processSubjectComponent(
     return newest
   }
 
-  const templater = value
-  /** @type {Tag} */
-  let tag = templater.newest
+  const templater = value as TemplaterResult
+  let tag = templater.newest as Tag
   providers.ownerTag = ownerTag
   const isFirstTime = !tag
   runBeforeRender(tagSupport, tag)
 
   if(isFirstTime) {
-    tag = templater(tagSupport)
+    tag = templater.wrapper()
     tag.tagSupport = tagSupport
     tag.afterRender()
     templater.oldest = tag

@@ -3,6 +3,7 @@ import { config as providers } from "./providers.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { Tag } from "./Tag.class.js"
 import { runBeforeRender } from "./tagRunner.js"
+import { TemplaterResult } from "./tag.js"
 
 export function getSubjectFunction(
   value: any,
@@ -61,7 +62,7 @@ type ExistingValue = {
  * @param {Tag} ownerTag 
  */
 export function setValueRedraw(
-  templater: any, // latest tag function to call for rendering
+  templater: TemplaterResult, // latest tag function to call for rendering
   existing: any,
   ownerTag: Tag,
 ) {
@@ -76,8 +77,8 @@ export function setValueRedraw(
 
     existing.tagSupport = tagSupport
     // const self = this as any
-    const self = templater as any
-    tagSupport.mutatingRender = tagSupport.mutatingRender || existing.tagSupport?.mutatingRender || self.tagSupport.mutatingRender
+    const self = templater
+    tagSupport.mutatingRender = tagSupport.mutatingRender || existing.tagSupport?.mutatingRender || (/* TODO: we might be able to remove this last OR */(self as any).tagSupport.mutatingRender)
     const runtimeOwnerTag = existingTag?.ownerTag || ownerTag
     runBeforeRender(tagSupport, tagSupport.oldest)
 
@@ -87,7 +88,7 @@ export function setValueRedraw(
       providers.ownerTag = runtimeOwnerTag
     }
 
-    const retag = templater(tagSupport)
+    const retag = templater.wrapper()
 
     retag.tagSupport = tagSupport
 

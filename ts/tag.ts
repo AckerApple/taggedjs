@@ -3,22 +3,29 @@ import { deepClone } from "./deepFunctions.js"
 
 export type Props = unknown
 
-export type TemplaterResult = {
+export type Wrapper = () => Tag
+
+export class TemplaterResult {
   props: Props
   newProps: Props
   cloneProps: Props
-  tagged: boolean
+  tagged!: boolean
+  wrapper!: Wrapper
 
   newest?: Tag
+  oldest?: Tag
+  redraw?: () => Tag | undefined
 }
 
+type TagResult = (
+  props: Props, // props or children
+  children?: Tag
+) => Tag
+
 export function tag<T>(
-  tagComponent: (
-    props: Props | Tag, // props or children
-    children?: Tag
-  ) => TemplaterResult
+  tagComponent: T | TagResult
 ): T {
-  return ((props?: Props | Tag, children?: Tag) => {    
+  return ((props?: Props | Tag, children?: Tag) => {
     const callback = (toCall: any, callWith: any) => {
       const callbackResult = toCall(...callWith)
       templater.newest?.ownerTag?.tagSupport.render()
@@ -35,11 +42,15 @@ export function tag<T>(
       argProps = noPropsGiven
     }
 
-    const templater = tagComponent(argProps, children)
+    const wrapper = () => (tagComponent as TagResult)(argProps, children)
+    
+    const templater: TemplaterResult = new TemplaterResult()
     templater.tagged = true
     templater.props = props // used to call function
     templater.newProps = newProps
     templater.cloneProps = deepClone( newProps )
+    templater.wrapper = wrapper
+
     return templater
   }) as T // we override the function provided and pretend original is what's returned
 }

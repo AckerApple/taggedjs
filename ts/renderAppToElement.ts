@@ -2,9 +2,10 @@ import { interpolateElement } from "./interpolateElement.js"
 import { TagSupport, getTagSupport } from "./getTagSupport.js"
 import { Tag } from "./Tag.class.js"
 import { runBeforeRender } from "./tagRunner.js"
+import { TemplaterResult } from "./tag.js"
 
 export function renderAppToElement(
-  app: (...args: unknown[]) => any,
+  app: (...args: unknown[]) => TemplaterResult,
   element: Element,
   props: unknown,
 ) {
@@ -20,7 +21,7 @@ export function renderAppToElement(
     runBeforeRender(tagSupport, tag)
     tag.beforeRedraw()
 
-    const fromTag = lastTag = wrapper(tag.tagSupport)
+    const fromTag = lastTag = wrapper.wrapper()
 
     fromTag.setSupport(tag.tagSupport)
     tag.afterRender()
@@ -42,13 +43,14 @@ export function renderAppToElement(
 }
 
 export function applyTagUpdater(
-  wrapper: (tagSupport: TagSupport) => Tag,
+  wrapper: TemplaterResult,
 ) {
   const tagSupport = getTagSupport(wrapper)
   runBeforeRender(tagSupport)
 
   // Call the apps function for our tag templater
-  const tag = wrapper(tagSupport)
+  const templater = tagSupport.templater as TemplaterResult
+  const tag = templater.wrapper()
 
   tag.tagSupport = tagSupport
   tag.afterRender()

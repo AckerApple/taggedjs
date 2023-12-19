@@ -1,8 +1,9 @@
 import { Tag } from "./Tag.class.js"
 import { deepEqual } from "./deepFunctions.js"
+import { TemplaterResult } from "./tag.js"
 
 export interface TagSupport {
-  templater?: any
+  templater?: TemplaterResult
 
   /** Indicator of re-rending. Saves from double rending something already rendered */
   renderCount: 0
@@ -29,7 +30,7 @@ export interface TagSupport {
 }
 
 export function getTagSupport(
-  templater?: (tagSupport: TagSupport) => Tag,
+  templater?: TemplaterResult,
 ): TagSupport {
   const tagSupport: TagSupport = {
     templater,
