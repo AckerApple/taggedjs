@@ -17,13 +17,18 @@ export class Subject {
     ++(Subject as any).globalSubCount
 
     const unsubscribe: Subscription = () => {
-      removeSubFromArray(this.subscribers, callback)
-      removeSubFromArray((Subject as any).globalSubs, callback) // 🔬 testing
-      --(Subject as any).globalSubCount
+      unsubscribe.unsubscribe()
     }
 
     // Return a function to unsubscribe from the BehaviorSubject
-    unsubscribe.unsubscribe = unsubscribe
+    unsubscribe.unsubscribe = () => {
+      removeSubFromArray(this.subscribers, callback)
+      removeSubFromArray((Subject as any).globalSubs, callback) // 🔬 testing
+      --(Subject as any).globalSubCount
+      
+      // any double unsubscribes will be ignored
+      unsubscribe.unsubscribe = () => undefined
+    }
 
     return unsubscribe
   }

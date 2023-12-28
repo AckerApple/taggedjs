@@ -1,9 +1,9 @@
 import { TagSubject, bindSubjectFunction, elementDestroyCheck, getSubjectFunction, setValueRedraw } from "./Tag.utils.js"
 import { TagSupport, getTagSupport } from "./getTagSupport.js"
-import { Provider, config as providers } from "./providers.js"
+import { Provider } from "./providers.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { deepEqual } from "./deepFunctions.js"
-import { Subject, Subscription } from "./Subject.js"
+import { Subscription } from "./Subject.js"
 import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
 import { TemplaterResult } from "./tag.js"
 import { isTagComponent, isTagInstance } from "./isInstance.js"
@@ -69,6 +69,14 @@ export class Tag {
 
     if(!options.byParent) {
       options.stagger = this.destroyClones(options)
+    }
+
+    if(options.rebuilding) {
+      // Object.values(this.context).forEach(context => context.set(context.value))
+      Object.keys(this.context).forEach(key => {
+        // this.context[key].unsubscribe()
+        delete this.context[key]
+      })
     }
 
     return options.stagger
@@ -307,15 +315,19 @@ export class Tag {
     }
 
     this.destroy({stagger: 0, rebuilding: true})
-    Object.keys(this.context).forEach(key => delete this.context[key])
-    this.buildBeforeElement(insertBefore)
+    
+    this.buildBeforeElement(insertBefore, {
+      rebuilding: true, 
+      counts: {added: 0, removed: 0}
+    })
     // this.tagSupport.render()
   }
 
   buildBeforeElement(
     insertBefore: Element,
-    counts: Counts = {
-      added: 0, removed: 0,
+    options: ElementBuildOptions = {
+      rebuilding: false,
+      counts: {added:0, removed: 0},
     },
   ): (ChildNode | Element)[] {
     this.insertBefore = insertBefore
@@ -333,7 +345,7 @@ export class Tag {
     const clones = buildClones(temporary, insertBefore)
     this.clones.push( ...clones )
 
-    clones.forEach(clone => afterElmBuild(clone, counts))
+    clones.forEach(clone => afterElmBuild(clone, options))
   
     return clones
   }
@@ -344,4 +356,9 @@ type DestroyOptions = {
   stagger: number
   byParent?: boolean // who's destroying me? if byParent, ignore possible animations
   rebuilding?: boolean // Used during HMR
+}
+
+export type ElementBuildOptions = {
+  counts: Counts
+  rebuilding?: boolean
 }

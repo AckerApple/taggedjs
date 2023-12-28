@@ -1,4 +1,4 @@
-import { Context, Tag, variablePrefix } from "./Tag.class.js"
+import { Context, ElementBuildOptions, Tag, variablePrefix } from "./Tag.class.js"
 import { processTagArray } from "./processTagArray.js"
 import { TagSupport, getTagSupport } from "./getTagSupport.js"
 import { deepClone, deepEqual } from "./deepFunctions.js"
@@ -191,7 +191,7 @@ export function processTagResult(
 
     const lastFirstChild = insertBefore // tag.clones[0] // insertBefore.lastFirstChild
     
-    tag.buildBeforeElement(lastFirstChild, counts)
+    tag.buildBeforeElement(lastFirstChild, {counts})
     
     result.lastArray.push({
       tag, index
@@ -227,7 +227,7 @@ export function processTagResult(
   const original = wrapper?.original
   const name = original?.name
   console.log('new tag', name || original, {wrapper, templater, tagSupport})
-  tag.buildBeforeElement(before, counts)
+  tag.buildBeforeElement(before, {counts})
   result.tag = tag // let reprocessing know we saw this previously as an if
 
   return
@@ -311,16 +311,18 @@ function processSubjectComponent(
 
 export function afterElmBuild(
   elm: Element | ChildNode,
-  counts: Counts,
+  options: ElementBuildOptions,
 ) {
   if(!(elm as Element).getAttribute) {
     return
   }
 
-  elementInitCheck(elm, counts)
+  if(!options.rebuilding) {
+    elementInitCheck(elm, options.counts)
+  }
 
   if((elm as Element).children) {
-    new Array(...(elm as Element).children as any).forEach(child => afterElmBuild(child, counts))
+    new Array(...(elm as Element).children as any).forEach(child => afterElmBuild(child, options))
   }
 }
 
