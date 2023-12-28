@@ -8,12 +8,16 @@ export class Subject {
         Subject.globalSubs.push(callback); // 🔬 testing
         ++Subject.globalSubCount;
         const unsubscribe = () => {
+            unsubscribe.unsubscribe();
+        };
+        // Return a function to unsubscribe from the BehaviorSubject
+        unsubscribe.unsubscribe = () => {
             removeSubFromArray(this.subscribers, callback);
             removeSubFromArray(Subject.globalSubs, callback); // 🔬 testing
             --Subject.globalSubCount;
+            // any double unsubscribes will be ignored
+            unsubscribe.unsubscribe = () => undefined;
         };
-        // Return a function to unsubscribe from the BehaviorSubject
-        unsubscribe.unsubscribe = unsubscribe;
         return unsubscribe;
     }
     set(value) {

@@ -52,6 +52,13 @@ export class Tag {
         if (!options.byParent) {
             options.stagger = this.destroyClones(options);
         }
+        if (options.rebuilding) {
+            // Object.values(this.context).forEach(context => context.set(context.value))
+            Object.keys(this.context).forEach(key => {
+                // this.context[key].unsubscribe()
+                delete this.context[key];
+            });
+        }
         return options.stagger;
     }
     destroySubscriptions() {
@@ -232,12 +239,15 @@ export class Tag {
             throw err;
         }
         this.destroy({ stagger: 0, rebuilding: true });
-        Object.keys(this.context).forEach(key => delete this.context[key]);
-        this.buildBeforeElement(insertBefore);
+        this.buildBeforeElement(insertBefore, {
+            rebuilding: true,
+            counts: { added: 0, removed: 0 }
+        });
         // this.tagSupport.render()
     }
-    buildBeforeElement(insertBefore, counts = {
-        added: 0, removed: 0,
+    buildBeforeElement(insertBefore, options = {
+        rebuilding: false,
+        counts: { added: 0, removed: 0 },
     }) {
         this.insertBefore = insertBefore;
         const context = this.update();
@@ -249,7 +259,7 @@ export class Tag {
         interpolateElement(temporary, context, this);
         const clones = buildClones(temporary, insertBefore);
         this.clones.push(...clones);
-        clones.forEach(clone => afterElmBuild(clone, counts));
+        clones.forEach(clone => afterElmBuild(clone, options));
         return clones;
     }
 }

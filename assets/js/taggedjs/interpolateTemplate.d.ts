@@ -1,4 +1,4 @@
-import { Context, Tag } from "./Tag.class.js";
+import { Context, ElementBuildOptions, Tag } from "./Tag.class.js";
 export declare function interpolateTemplate(template: Element & {
     clone?: any;
 }, // <template end interpolate /> (will be removed)
@@ -17,4 +17,4 @@ insertBefore: Element, // <template end interpolate />
     index?: number;
     counts: Counts;
 }): void;
-export declare function afterElmBuild(elm: Element | ChildNode, counts: Counts): void;
+export declare function afterElmBuild(elm: Element | ChildNode, options: ElementBuildOptions): void;

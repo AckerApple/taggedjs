@@ -120,7 +120,7 @@ insertBefore, // <template end interpolate />
             return;
         }
         const lastFirstChild = insertBefore; // tag.clones[0] // insertBefore.lastFirstChild
-        tag.buildBeforeElement(lastFirstChild, counts);
+        tag.buildBeforeElement(lastFirstChild, { counts });
         result.lastArray.push({
             tag, index
         });
@@ -149,7 +149,7 @@ insertBefore, // <template end interpolate />
     const original = wrapper?.original;
     const name = original?.name;
     console.log('new tag', name || original, { wrapper, templater, tagSupport });
-    tag.buildBeforeElement(before, counts);
+    tag.buildBeforeElement(before, { counts });
     result.tag = tag; // let reprocessing know we saw this previously as an if
     return;
 }
@@ -201,13 +201,15 @@ function processSubjectComponent(value, result, template, ownerTag, counts) {
     });
     return;
 }
-export function afterElmBuild(elm, counts) {
+export function afterElmBuild(elm, options) {
     if (!elm.getAttribute) {
         return;
     }
-    elementInitCheck(elm, counts);
+    if (!options.rebuilding) {
+        elementInitCheck(elm, options.counts);
+    }
     if (elm.children) {
-        new Array(...elm.children).forEach(child => afterElmBuild(child, counts));
+        new Array(...elm.children).forEach(child => afterElmBuild(child, options));
     }
 }
 function providersChangeCheck(tag) {

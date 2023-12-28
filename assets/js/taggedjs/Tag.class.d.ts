@@ -48,11 +48,15 @@ export declare class Tag {
     getAppElement(): Tag;
     /** Used during HMR only where static content itself could have been edited */
     rebuild(): void;
-    buildBeforeElement(insertBefore: Element, counts?: Counts): (ChildNode | Element)[];
+    buildBeforeElement(insertBefore: Element, options?: ElementBuildOptions): (ChildNode | Element)[];
 }
 type DestroyOptions = {
     stagger: number;
     byParent?: boolean;
+    rebuilding?: boolean;
+};
+export type ElementBuildOptions = {
+    counts: Counts;
     rebuilding?: boolean;
 };
 export {};
