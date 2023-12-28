@@ -8,9 +8,9 @@ export interface TagSupport {
   /** Indicator of re-rending. Saves from double rending something already rendered */
   renderCount: 0
   
-  mutatingRender: () => any
+  mutatingRender: (force?: boolean) => any
   
-  render: () => any  
+  render: (force?: boolean) => any
 
   /**
    * 
@@ -36,9 +36,9 @@ export function getTagSupport(
     templater,
     renderCount: 0,
     mutatingRender: () => {throw new Error('Tag function "render()" was called in sync but can only be called async')}, // loaded later and only callable async
-    render: () => {
+    render: (force?: boolean) => {
       ++tagSupport.renderCount
-      return tagSupport.mutatingRender()
+      return tagSupport.mutatingRender(force)
     }, // ensure this function still works even during deconstructing
 
     hasPropChanges: (

@@ -28,6 +28,7 @@ export function interpolateAttributes(
         return
       }
 
+      // TODO: Need to just see if can be subscribed to
       if(result instanceof Subject) {
         child.removeAttribute(attrName)
         const callback = (newAttrValue: any) => {

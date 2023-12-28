@@ -17,7 +17,6 @@ setUse({
     tagSupport.callbacks = []
 
     getCallback = () => {
-      
       const callbackMaker = (
         callback: Callback
       ) => {

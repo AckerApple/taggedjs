@@ -1,13 +1,13 @@
 {
   "name": "taggedjs",
   "private": true,
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "tagged template reactive html",
   "main": "js/index.js",
   "type": "module",
   "scripts": {
     "build:js": "tsc -p tsconfig.json",
-    "build": "npm run build:js && npx webpack && npm run build:gh-pages",
+    "build": "npm run build:js && npx webpack && npm run build:gh-pages && echo \"✅ Build completed\"",
     "build:gh-pages": "cp -R js/. ../gh-pages/assets/js/taggedjs",
     "build:dist": "npm run build && cp README.MD dist/README.md && npm run build:dist:pack && cp -R js dist/js && cp -R dist/. ../dist",
     "test": "echo \"Error: no test specified\" && exit 1",

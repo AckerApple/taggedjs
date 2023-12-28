@@ -36,7 +36,7 @@ export function interpolateElement(
 }
 
 /** Convert interpolations into template tags */
-export function interpolateElementChild(
+function interpolateElementChild(
   child: Element,
 ) {
   const result = interpolateToTemplates(child.innerHTML)

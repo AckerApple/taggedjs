@@ -5,6 +5,7 @@ export type Subscription = (() => void) & {
 type Subscriber = () => any
 
 export class Subject {
+  isSubject = true
   subscribers: Subscriber[] = []
   value?: any
   // unsubcount = 0 // 🔬 testing

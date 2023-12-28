@@ -1,6 +1,5 @@
 import { interpolateElement } from "./interpolateElement.js"
-import { TagSupport, getTagSupport } from "./getTagSupport.js"
-import { Tag } from "./Tag.class.js"
+import { getTagSupport } from "./getTagSupport.js"
 import { runBeforeRender } from "./tagRunner.js"
 import { TemplaterResult } from "./tag.js"
 
@@ -15,31 +14,40 @@ export function renderAppToElement(
   // have a function setup and call the tagWrapper with (props, {update, async, on})
   const result = applyTagUpdater(wrapper)
   const {tag, tagSupport} = result
+
+  tag.appElement = element
   
   let lastTag
-  tagSupport.mutatingRender = () => {
+  tagSupport.mutatingRender = () => {    
     runBeforeRender(tagSupport, tag)
     tag.beforeRedraw()
 
-    const fromTag = lastTag = wrapper.wrapper()
+    const templater = tagSupport.templater as TemplaterResult // wrapper
+    const fromTag = lastTag = templater.wrapper()
 
     fromTag.setSupport(tag.tagSupport)
     tag.afterRender()
     tag.updateByTag(fromTag)
 
     if(lastTag) {
-      lastTag.destroy(0)
+      lastTag.destroy({stagger: 0})
     }
 
     return lastTag
   }
   
   const context = tag.updateValues(tag.values)
-  const template = tag.getTemplate()
   
+  const templateElm = document.createElement('template')
+  element.appendChild(templateElm)
+  
+  tag.buildBeforeElement(templateElm)
+  /*
+  const template = tag.getTemplate()
   element.innerHTML = template.string
   interpolateElement(element, context, tag)
-
+  */
+  ;(element as any).tag = tag
 }
 
 export function applyTagUpdater(

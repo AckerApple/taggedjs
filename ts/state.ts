@@ -1,4 +1,3 @@
-import { Tag } from "./Tag.class.js"
 import { TagSupport } from "./getTagSupport.js"
 import { setUse } from "./tagRunner.js"
 
@@ -15,6 +14,7 @@ export type StateTagSupport = TagSupport & {
   state?: State
 }
 
+// TODO: rename
 export const config = {
   array: [] as StateConfigArray,
   rearray: [] as StateConfigArray,
@@ -77,10 +77,10 @@ setUse({
 
 
 export function getStateValue(state: StateConfig) {
-  const [oldValue] = state(EchoBack) // get value and set to undefined
+  const [oldValue] = state(StateEchoBack) // get value and set to undefined
   const [checkValue] = state( oldValue ) // set back to original value
 
-  if(checkValue !== EchoBack) {
+  if(checkValue !== StateEchoBack) {
     const error = new Error(
       'State property not used correctly.\n\n' +
       'For "let" state use `let name = state(default, x => [name, name = x])`\n\n' +
@@ -92,4 +92,4 @@ export function getStateValue(state: StateConfig) {
   return oldValue
 }
 
-class EchoBack {}
+export class StateEchoBack {}

@@ -1,12 +1,15 @@
-import { bindSubjectFunction, elementDestroyCheck, getSubjectFunction, setValueRedraw } from "./Tag.utils.js"
+import { TagSubject, bindSubjectFunction, elementDestroyCheck, getSubjectFunction, setValueRedraw } from "./Tag.utils.js"
 import { TagSupport, getTagSupport } from "./getTagSupport.js"
 import { Provider, config as providers } from "./providers.js"
-import { isTagComponent } from "./interpolateTemplate.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { deepEqual } from "./deepFunctions.js"
-import { Subscription } from "./Subject.js"
+import { Subject, Subscription } from "./Subject.js"
 import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
 import { TemplaterResult } from "./tag.js"
+import { isTagComponent, isTagInstance } from "./isInstance.js"
+import { buildClones } from "./render.js"
+import { interpolateElement } from "./interpolateElement.js"
+import { Counts, afterElmBuild } from "./interpolateTemplate.js"
 
 export const variablePrefix = '__tagVar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -17,6 +20,7 @@ export const escapeSearch = new RegExp(escapeVariable, 'g')
 export type Context = {[index: string]: any}
 
 export class Tag {
+  isTag = true
   context: Context = {} // populated after reading interpolated.values array converted to an object {variable0, variable:1}
   clones: (Element | Text | ChildNode)[] = [] // elements on document
   cloneSubs: Subscription[] = [] // subscriptions created by clones
@@ -26,6 +30,8 @@ export class Tag {
   
   // only present when a child of a tag
   ownerTag?: Tag
+  insertBefore?: Element
+  appElement?: Element // only seen on this.getAppElement().appElement
   
   // present only when an array. Populated by this.key()
   arrayValue?: any[]
@@ -52,17 +58,20 @@ export class Tag {
   }
 
   destroy(
-    stagger = 0,
-    byParent = false, // who's destroying me? if byParent, ignore possible animations
+    options: DestroyOptions = {
+      stagger: 0,
+      byParent: false, // who's destroying me? if byParent, ignore possible animations
+      rebuilding: false
+    }
   ) {
-    this.children.forEach((kid, index) => kid.destroy(0, true))
+    this.children.forEach((kid) => kid.destroy({...options, byParent: true}))
     this.destroySubscriptions()
 
-    if(!byParent) {
-      stagger = this.destroyClones(stagger)
+    if(!options.byParent) {
+      options.stagger = this.destroyClones(options)
     }
 
-    return stagger
+    return options.stagger
   }
 
   destroySubscriptions() {
@@ -71,11 +80,15 @@ export class Tag {
   }
 
   destroyClones(
-    stagger = 0,
+    {stagger, rebuilding}: DestroyOptions = {
+      rebuilding:false,
+      stagger: 0,
+    }
   ) {
     this.clones.reverse().forEach((clone: any, index: number) => {
       let promise = Promise.resolve()
-      if(clone.ondestroy) {
+      
+      if(!rebuilding &&clone.ondestroy) {
         promise = elementDestroyCheck(clone, stagger)
       }
 
@@ -119,7 +132,9 @@ export class Tag {
   }
 
   isLikeTag(tag: Tag) {
-    if(tag.lastTemplateString !== this.lastTemplateString) {
+    const {string} = tag.getTemplate()
+    
+    if(string !== this.lastTemplateString) {
       return false
     }
 
@@ -140,7 +155,7 @@ export class Tag {
         return false
       }
 
-      if(value instanceof Tag && compareTo instanceof Tag) {        
+      if(isTagInstance(value) && isTagInstance(compareTo)) {
         value.ownerTag = this // let children know I own them
         this.children.push(value) // record children I created        
         value.lastTemplateString || value.getTemplate().string // ensure last template string is generated
@@ -178,7 +193,7 @@ export class Tag {
       const value = this.values[index]
 
       // is something already there?
-      const existing = context[variableName]
+      const existing = context[variableName] as TagSubject
 
       if(existing) {
         /** @type {Tag | undefined} */
@@ -244,10 +259,10 @@ export class Tag {
         return
       }
 
-      // First time values below
+      // 🆕 First time values below
 
       if(isTagComponent(value)) {
-        const existing = context[variableName] = new ValueSubject(value)
+        const existing = context[variableName] = new ValueSubject(value) as TagSubject
         setValueRedraw(value, existing, this)
         return
       }
@@ -261,7 +276,7 @@ export class Tag {
         return // more strings than values, stop here
       }
 
-      if(value instanceof Tag) {
+      if(isTagInstance(value)) {
         value.ownerTag = this
         this.children.push(value)
       }
@@ -281,4 +296,52 @@ export class Tag {
 
     return tag
   }
+
+  /** Used during HMR only where static content itself could have been edited */
+  rebuild() {
+    const insertBefore = this.insertBefore
+    if(!insertBefore) {
+      const err = new Error('Cannot rebuild. Previous insertBefore element is not defined on tag')
+      ;(err as any).tag = this
+      throw err
+    }
+
+    this.destroy({stagger: 0, rebuilding: true})
+    Object.keys(this.context).forEach(key => delete this.context[key])
+    this.buildBeforeElement(insertBefore)
+    // this.tagSupport.render()
+  }
+
+  buildBeforeElement(
+    insertBefore: Element,
+    counts: Counts = {
+      added: 0, removed: 0,
+    },
+  ): (ChildNode | Element)[] {
+    this.insertBefore = insertBefore
+    
+    const context = this.update()
+    const template = this.getTemplate()
+    
+    const temporary = document.createElement('div')
+    temporary.id = 'tag-temp-holder'
+    // render content with a first child that we can know is our first element
+    temporary.innerHTML = '<div></div>' + template.string
+  
+    interpolateElement(temporary, context, this)
+    
+    const clones = buildClones(temporary, insertBefore)
+    this.clones.push( ...clones )
+
+    clones.forEach(clone => afterElmBuild(clone, counts))
+  
+    return clones
+  }
+  
+}
+
+type DestroyOptions = {
+  stagger: number
+  byParent?: boolean // who's destroying me? if byParent, ignore possible animations
+  rebuilding?: boolean // Used during HMR
 }

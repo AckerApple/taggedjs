@@ -8,6 +8,7 @@ export type Provider = {
   clone: any
 }
 
+// TODO: rename
 export const config = {
   providers: [] as Provider[],
 
@@ -74,7 +75,7 @@ export const providers = {
       owner = owner.ownerTag // cause reloop
     }
     
-    const msg = `Could not inject provider: ${constructor}`
+    const msg = `Could not inject provider: ${constructor.name} ${constructor}`
     console.warn(`${msg}. Available providers`, config.providers)
     throw new Error(msg)
   }

@@ -4,6 +4,9 @@ import { ValueSubject } from "./ValueSubject.js"
 import { Tag } from "./Tag.class.js"
 import { runBeforeRender } from "./tagRunner.js"
 import { TemplaterResult } from "./tag.js"
+import { Subject } from "./Subject.js"
+
+export type TagSubject = Subject & {tagSupport: TagSupport, tag: Tag}
 
 export function getSubjectFunction(
   value: any,
@@ -63,7 +66,7 @@ type ExistingValue = {
  */
 export function setValueRedraw(
   templater: TemplaterResult, // latest tag function to call for rendering
-  existing: any,
+  existing: TagSubject,
   ownerTag: Tag,
 ) {
   // redraw does not communicate to parent
@@ -88,33 +91,9 @@ export function setValueRedraw(
       providers.ownerTag = runtimeOwnerTag
     }
 
-    const retag = templater.wrapper()
+    const {remit, retag} = templater.renderWithSupport(tagSupport, runtimeOwnerTag, existingTag)
 
-    retag.tagSupport = tagSupport
-
-    if(tagSupport.oldest) {
-      tagSupport.oldest.afterRender()
-    } else {
-      retag.afterRender()
-    }
-    
-    templater.newest = retag
-    retag.ownerTag = runtimeOwnerTag
-
-    const oldest = tagSupport.oldest = tagSupport.oldest || retag
-    tagSupport.newest = retag
-
-    const oldestTagSupport = oldest.tagSupport
-    oldest.tagSupport = oldestTagSupport || tagSupport
-    oldest.tagSupport.templater = templater
-
-    // retag.getTemplate() // cause lastTemplateString to render
-    retag.setSupport(tagSupport)
-    const isSameTag = existingTag && existingTag.isLikeTag(retag)
-
-    // If previously was a tag and seems to be same tag, then just update current tag with new values
-    if(isSameTag) {
-      oldest.updateByTag(retag)
+    if(!remit) {
       return
     }
 

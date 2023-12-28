@@ -19,12 +19,19 @@ export function processTagArray(
     const lessLength = value.length-1 < index - removed
     const subTag = value[index - removed]
     const subArrayValue = subTag?.arrayValue
+    
     if(lessLength || subArrayValue !== item.tag.arrayValue) {
       const last = result.lastArray[index]
-      const tag = last.tag
-      tag.destroy(counts.removed, false)
+      const tag: Tag = last.tag
+      
+      tag.destroy({
+        stagger: counts.removed,
+        byParent: false
+      })
+
       ++removed
       ++counts.removed
+      
       return false
     }
     return true
