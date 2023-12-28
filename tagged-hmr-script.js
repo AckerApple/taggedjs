@@ -60,7 +60,7 @@ async function updateByElement(
 ) {
   const oldTag = app.tag
 
-  console.log('rebuilding...', oldTag.clones.length, oldTag.clones)
+  console.log('rebuilding...', oldTag.context)
   oldTag.rebuild()
   console.log('✅ rebuilt')
   

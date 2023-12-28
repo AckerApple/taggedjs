@@ -232,18 +232,20 @@ export class Tag {
             throw err;
         }
         this.destroy({ stagger: 0, rebuilding: true });
+        Object.keys(this.context).forEach(key => delete this.context[key]);
         this.buildBeforeElement(insertBefore);
+        // this.tagSupport.render()
     }
     buildBeforeElement(insertBefore, counts = {
         added: 0, removed: 0,
     }) {
         this.insertBefore = insertBefore;
+        const context = this.update();
         const template = this.getTemplate();
         const temporary = document.createElement('div');
         temporary.id = 'tag-temp-holder';
         // render content with a first child that we can know is our first element
         temporary.innerHTML = '<div></div>' + template.string;
-        const context = this.update();
         interpolateElement(temporary, context, this);
         const clones = buildClones(temporary, insertBefore);
         this.clones.push(...clones);

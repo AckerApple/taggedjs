@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "save": "git add . && git commit -m \"patch\" && git push",
     "start": "dir=assets/js node tagged-hmr.js"
   },
   "devDependencies": {
