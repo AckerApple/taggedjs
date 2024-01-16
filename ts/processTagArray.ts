@@ -6,7 +6,7 @@ export function processTagArray(
   value: Tag[], // arry of Tag classes
   template: Element, // <template end interpolate />
   ownerTag: Tag,
-  counts: Counts,
+  options: {counts: Counts, forceElement?: boolean},
 ) {
   result.lastArray = result.lastArray || [] // {tag, index}[] populated in processTagResult
 
@@ -25,20 +25,28 @@ export function processTagArray(
       const tag: Tag = last.tag
       
       tag.destroy({
-        stagger: counts.removed,
+        stagger: options.counts.removed,
         byParent: false
       })
 
       ++removed
-      ++counts.removed
+      ++options.counts.removed
       
       return false
     }
     return true
   })
 
+  // const masterBefore = template || (template as any).clone
+  const before = template || (template as any).clone
+
   value.forEach((subTag, index) => {
-    subTag.tagSupport = ownerTag.tagSupport
+    // subTag.tagSupport = ownerTag.tagSupport
+    // const itemMemory = subTag.tagSupport.memory
+    subTag.tagSupport = {...ownerTag.tagSupport}
+    subTag.tagSupport.memory = {...ownerTag.tagSupport.memory}
+    subTag.tagSupport.memory.context = {} // itemMemory
+
     subTag.ownerTag = ownerTag
     ownerTag.children.push(subTag)
 
@@ -59,14 +67,13 @@ export function processTagArray(
       return
     }
 
-    const before = template || (template as any).clone
     processTagResult(
       subTag,
       result,
       before,
       {
         index,
-        counts,
+        ...options,
       }
     )
   })

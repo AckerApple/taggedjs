@@ -15,5 +15,6 @@ export * from "./getTagSupport.js"
   // TODO: export *
   export { state } from "./state.js"
   export * from "./onInit.js"
+  export * from "./onDestroy.js"
   export * from "./getCallback.js"
 /* end: hooks */

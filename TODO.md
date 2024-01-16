@@ -1,19 +1,21 @@
-### TODO NOW: Before Mega-aide / Cary
+### TODO NOW: Before Mega-aide
 - Simplify attaching to an element
   - instead of `renderAppToElement(App, element, {test:1})`
-  - do `???`
 - How to have subscription display logic
   - ${subscribe => x}
   - html`...${subscribe(directory$, directory => {})}`
   - html`...${async(directoryPromise, directory => {})}`
 - routing
 - Upgrade state to support both named and array state memory
+  - helps with HMR
 
 ### Extra testing
 - Test switching a components return string
   - return x ? html`.0.` : html`.1.`
 
 ### Before wider audience
+- remove console.errors
+  - maybe have a subject that emits logs?
 - Hot reloading
 - How to load styles other than just inline & non-dynamic style tag that effects entire page
 - Ability to produce one time HTML files

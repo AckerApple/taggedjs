@@ -3,9 +3,9 @@ import { TagSupport, getTagSupport } from "./getTagSupport.js"
 import { Provider } from "./providers.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { deepEqual } from "./deepFunctions.js"
-import { Subscription } from "./Subject.js"
-import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
-import { TemplaterResult } from "./tag.js"
+import { Subject, Subscription } from "./Subject.js"
+import { runAfterRender, runAfterTagClone, runBeforeDestroy, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
+import { TemplateRedraw, TemplaterResult } from "./tag.js"
 import { isTagComponent, isTagInstance } from "./isInstance.js"
 import { buildClones } from "./render.js"
 import { interpolateElement } from "./interpolateElement.js"
@@ -18,10 +18,11 @@ const prefixSearch = new RegExp(variablePrefix, 'g')
 export const escapeSearch = new RegExp(escapeVariable, 'g')
 
 export type Context = {[index: string]: any}
+export type TagMemory = Record<string, any> // & {context: Context}
 
 export class Tag {
   isTag = true
-  context: Context = {} // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+
   clones: (Element | Text | ChildNode)[] = [] // elements on document
   cloneSubs: Subscription[] = [] // subscriptions created by clones
   children: Tag[] = [] // tags on me
@@ -51,6 +52,10 @@ export class Tag {
     runAfterRender(this.tagSupport, this)
   }
 
+  afterClone(newTag: Tag) {
+    runAfterTagClone(this, newTag)
+  }
+
   /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
   key(arrayValue: any[]) {
     this.arrayValue = arrayValue
@@ -61,22 +66,15 @@ export class Tag {
     options: DestroyOptions = {
       stagger: 0,
       byParent: false, // who's destroying me? if byParent, ignore possible animations
-      rebuilding: false
     }
   ) {
+    runBeforeDestroy(this.tagSupport, this)
+
     this.children.forEach((kid) => kid.destroy({...options, byParent: true}))
     this.destroySubscriptions()
 
     if(!options.byParent) {
       options.stagger = this.destroyClones(options)
-    }
-
-    if(options.rebuilding) {
-      // Object.values(this.context).forEach(context => context.set(context.value))
-      Object.keys(this.context).forEach(key => {
-        // this.context[key].unsubscribe()
-        delete this.context[key]
-      })
     }
 
     return options.stagger
@@ -88,15 +86,14 @@ export class Tag {
   }
 
   destroyClones(
-    {stagger, rebuilding}: DestroyOptions = {
-      rebuilding:false,
+    {stagger}: DestroyOptions = {
       stagger: 0,
     }
   ) {
     this.clones.reverse().forEach((clone: any, index: number) => {
       let promise = Promise.resolve()
       
-      if(!rebuilding &&clone.ondestroy) {
+      if( clone.ondestroy ) {
         promise = elementDestroyCheck(clone, stagger)
       }
 
@@ -136,7 +133,12 @@ export class Tag {
       return endString
     }).join('')
 
-    return { string, strings: this.strings, values: this.values, context:this.context }
+    return {
+      string,
+      strings: this.strings,
+      values: this.values,
+      context: this.tagSupport?.memory.context || {},
+    }
   }
 
   isLikeTag(tag: Tag) {
@@ -163,12 +165,13 @@ export class Tag {
         return false
       }
 
-      if(isTagInstance(value) && isTagInstance(compareTo)) {
-        value.ownerTag = this // let children know I own them
-        this.children.push(value) // record children I created        
-        value.lastTemplateString || value.getTemplate().string // ensure last template string is generated
+      const tag = value as Tag
+      if(isTagInstance(tag) && isTagInstance(compareTo)) {
+        tag.ownerTag = this // let children know I own them
+        this.children.push(tag) // record children I created        
+        tag.lastTemplateString || tag.getTemplate().string // ensure last template string is generated
 
-        if(value.isLikeTag(compareTo)) {
+        if(tag.isLikeTag(compareTo)) {
           return true
         }
 
@@ -186,12 +189,12 @@ export class Tag {
   }
 
   update() {
-    return this.updateContext( this.context )
+    return this.updateContext( this.tagSupport.memory.context )
   }
 
   updateValues(values: any[]) {
     this.values = values
-    return this.updateContext(this.context)
+    return this.updateContext(this.tagSupport.memory.context)
   }
 
   updateContext(context: Context) {
@@ -204,67 +207,7 @@ export class Tag {
       const existing = context[variableName] as TagSubject
 
       if(existing) {
-        /** @type {Tag | undefined} */
-        const ogTag = existing.value?.tag
-
-        // handle already seen tag components
-        if(isTagComponent(value)) {
-          const latestProps = value.cloneProps
-          const existingTag = existing.tag
-
-          // previously was something else, now a tag component
-          if(!existing.tag) {
-            setValueRedraw(value, existing, this)
-            value.redraw(latestProps)
-            return
-          }
-
-          const oldTagSetup = existingTag.tagSupport
-          const tagSupport = value.tagSupport || oldTagSetup || getTagSupport(value)
-          const oldCloneProps = tagSupport.templater?.cloneProps
-          const oldProps = tagSupport.templater?.props
-
-          if(existingTag) {
-            const isCommonEqual = oldProps === undefined && oldProps === latestProps
-            const equal = isCommonEqual || deepEqual(oldCloneProps, latestProps)  
-            if(equal) {
-              return
-            }
-          }
-          
-          setValueRedraw(value, existing, this)
-          oldTagSetup.templater = value
-          existing.value.tag = oldTagSetup.newest = value.redraw(latestProps)
-          return
-        }
-
-        // handle already seen tags
-        if(ogTag) {
-          const tagSupport = ogTag.tagSupport
-          const templater = value as TemplaterResult
-          runBeforeRender(tagSupport, ogTag)
-          tagSupport.oldest.beforeRedraw()
-
-          const retag = templater.wrapper()
-          
-          retag.tagSupport = tagSupport
-          templater.newest = retag
-          tagSupport.oldest.afterRender()          
-          ogTag.updateByTag(retag)
-          existing.set(value)
-          
-          return
-        }
-        
-        // now its a function
-        if(value instanceof Function) {
-          existing.set( bindSubjectFunction(value, this) )
-          return
-        }
-
-        existing.set(value) // let ValueSubject now of newest value
-        
-        return
+        return updateExistingValue(existing, value, this)
       }
 
       // 🆕 First time values below
@@ -314,11 +257,11 @@ export class Tag {
       throw err
     }
 
-    this.destroy({stagger: 0, rebuilding: true})
-    
+    // this.destroy({stagger: 0, rebuilding: true})
     this.buildBeforeElement(insertBefore, {
-      rebuilding: true, 
-      counts: {added: 0, removed: 0}
+      forceElement: true,
+      counts: {added: 0, removed: 0},
+      depth: this.tagSupport.depth,
     })
     // this.tagSupport.render()
   }
@@ -326,8 +269,9 @@ export class Tag {
   buildBeforeElement(
     insertBefore: Element,
     options: ElementBuildOptions = {
-      rebuilding: false,
+      forceElement: false,
       counts: {added:0, removed: 0},
+      depth: 0,
     },
   ): (ChildNode | Element)[] {
     this.insertBefore = insertBefore
@@ -340,8 +284,8 @@ export class Tag {
     // render content with a first child that we can know is our first element
     temporary.innerHTML = '<div></div>' + template.string
   
-    interpolateElement(temporary, context, this)
-    
+    interpolateElement(temporary, context, this, {forceElement: options.forceElement, depth: options.depth})
+
     const clones = buildClones(temporary, insertBefore)
     this.clones.push( ...clones )
 
@@ -355,10 +299,81 @@ export class Tag {
 type DestroyOptions = {
   stagger: number
   byParent?: boolean // who's destroying me? if byParent, ignore possible animations
-  rebuilding?: boolean // Used during HMR
 }
 
 export type ElementBuildOptions = {
   counts: Counts
-  rebuilding?: boolean
+  forceElement?: boolean
+  depth: number
+}
+
+function updateExistingValue(
+  existing: Subject | TemplaterResult,
+  value: TemplaterResult | TagSupport | Function,
+  tag: Tag,
+) {
+  /** @type {Tag | undefined} */
+  const ogTag = (existing as Subject).value?.tag
+  const tempResult = value as TemplateRedraw
+  const existingSubject = existing as TagSubject
+
+  // handle already seen tag components
+  if(isTagComponent(tempResult)) {
+    const latestProps = tempResult.cloneProps
+    const existingTag = existingSubject.tag
+
+    // previously was something else, now a tag component
+    if( !existingSubject.tag ) {
+      setValueRedraw(tempResult, existingSubject, tag)
+      tempResult.redraw()
+      return
+    }
+
+    const oldTagSetup = existingTag.tagSupport
+    // TODO: The first argument can most likely be delete `tempResult.tagSupport`
+    const tagSupport = tempResult.tagSupport || oldTagSetup || getTagSupport(tag.tagSupport.depth, tempResult)
+    const oldCloneProps = tagSupport.templater?.cloneProps
+    const oldProps = tagSupport.templater?.props
+
+    if(existingTag) {
+      const isCommonEqual = oldProps === undefined && oldProps === latestProps
+      const equal = isCommonEqual || deepEqual(oldCloneProps, latestProps)  
+      if(equal) {
+        return
+      }
+    }
+    
+    setValueRedraw(tempResult, existingSubject, tag)
+    oldTagSetup.templater = tempResult
+    existingSubject.value.tag = oldTagSetup.newest = tempResult.redraw()
+    return
+  }
+
+  // handle already seen tags
+  if(ogTag) {
+    const tagSupport = ogTag.tagSupport
+    const templater = value as TemplaterResult
+    runBeforeRender(tagSupport, ogTag)
+    tagSupport.oldest.beforeRedraw()
+
+    const retag = templater.wrapper()
+    
+    retag.tagSupport = tagSupport
+    templater.newest = retag
+    tagSupport.oldest.afterRender()          
+    ogTag.updateByTag(retag)
+    existingSubject.set(value)
+    
+    return
+  }
+  
+  // now its a function
+  if(value instanceof Function) {
+    existingSubject.set( bindSubjectFunction(value as any, tag) )
+    return
+  }
+
+  existingSubject.set(value) // let ValueSubject now of newest value
+
+  return
 }

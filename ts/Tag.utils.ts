@@ -1,10 +1,10 @@
 import { TagSupport, getTagSupport } from "./getTagSupport.js"
 import { config as providers } from "./providers.js"
 import { ValueSubject } from "./ValueSubject.js"
-import { Tag } from "./Tag.class.js"
 import { runBeforeRender } from "./tagRunner.js"
 import { TemplaterResult } from "./tag.js"
 import { Subject } from "./Subject.js"
+import { Tag } from "./Tag.class.js"
 
 export type TagSubject = Subject & {tagSupport: TagSupport, tag: Tag}
 
@@ -73,7 +73,7 @@ export function setValueRedraw(
   templater.redraw = () => {
     // Find previous variables
     const existingTag: Tag | undefined = existing.tag
-    const tagSupport = existingTag?.tagSupport || getTagSupport(templater) // this.tagSupport
+    const tagSupport = existingTag?.tagSupport || getTagSupport(ownerTag.tagSupport.depth, templater) // this.tagSupport
 
     // signify to other operations that a rendering has occurred so they do not need to render again
     ++tagSupport.renderCount
@@ -91,7 +91,11 @@ export function setValueRedraw(
       providers.ownerTag = runtimeOwnerTag
     }
 
-    const {remit, retag} = templater.renderWithSupport(tagSupport, runtimeOwnerTag, existingTag)
+    const {remit, retag} = templater.renderWithSupport(
+      tagSupport,
+      runtimeOwnerTag,
+      existingTag
+    )
 
     if(!remit) {
       return

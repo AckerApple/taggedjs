@@ -1,18 +1,19 @@
 import { Context, ElementBuildOptions, Tag, variablePrefix } from "./Tag.class.js"
-import { processTagArray } from "./processTagArray.js"
+import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js"
 import { TagSupport, getTagSupport } from "./getTagSupport.js"
-import { deepClone, deepEqual } from "./deepFunctions.js"
-import { Provider, config as providers } from "./providers.js"
+import { config as providers } from "./providers.js"
+import { InterpolateOptions } from "./interpolateElement.js"
 import { elementInitCheck } from "./elementInitCheck.js"
+import { processTagArray } from "./processTagArray.js"
 import { runBeforeRender } from "./tagRunner.js"
 import { TemplaterResult } from "./tag.js"
-import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js"
 
 export function interpolateTemplate(
-  template: Element & {clone?: any}, // <template end interpolate /> (will be removed)
+  template: Template, // <template end interpolate /> (will be removed)
   context: Context, // variable scope of {`__tagVar${index}`:'x'}
   ownerTag: Tag, // Tag class
   counts: Counts, // {added:0, removed:0}
+  {forceElement}: InterpolateOptions,
 ) {
   if ( !template.hasAttribute('end') ) {
     return // only care about starts
@@ -24,11 +25,23 @@ export function interpolateTemplate(
   }
 
   const result = context[variableName]
-  
+  const isSubject = isSubjectInstance(result)
+    
+  /*if(forceElement && isSubject) {
+    result = result.value
+    isSubject = false
+  }*/
+
   // TODO: Need to just check if it can be subscribed to
-  if(isSubjectInstance(result)) {
+  if( isSubject ) {
     const callback = (templateNewValue: any) => {
-      processSubjectValue(templateNewValue, result, template, ownerTag, counts)
+      processSubjectValue(
+        templateNewValue,
+        result,
+        template,
+        ownerTag,
+        {counts, forceElement}
+      )
 
       setTimeout(() => {
         counts.added = 0 // reset
@@ -38,12 +51,19 @@ export function interpolateTemplate(
 
     const sub = result.subscribe(callback as any)
     ownerTag.cloneSubs.push(sub)
+
+    /*if(forceElement) {
+      callback(result.value)
+    }*/
+
     return
   }
 
+  const before = template.clone || template
+
   const clone = updateBetweenTemplates(
     result,
-    template.clone || template, // The element set here will be removed from document
+    before, // The element set here will be removed from document
   )
   
   ownerTag.clones.push(clone)
@@ -52,26 +72,19 @@ export function interpolateTemplate(
   return
 }
 
-/**
- * 
- * @param {*} value 
- * @param {*} result 
- * @param {*} template 
- * @param {Tag} ownerTag 
- * @param {{added: number, removed: number}} counts 
- * @returns 
- */
+export type Template = Element & {clone: any}
+
 function processSubjectValue(
   value: any,
   result: any, // could be tag via result.tag
-  template: any, // <template end interpolate /> (will be removed)
+  template: Template, // <template end interpolate /> (will be removed)
   ownerTag: Tag,
-  counts: Counts, // {added:0, removed:0}
+  options: {counts: Counts, forceElement?: boolean}, // {added:0, removed:0}
 ) {
   if (isTagInstance(value)) {
     // first time seeing this tag?
     if(!value.tagSupport) {
-      value.tagSupport = getTagSupport()
+      value.tagSupport = getTagSupport( ownerTag.tagSupport.depth + 1 )
       value.tagSupport.mutatingRender = ownerTag.tagSupport.mutatingRender
       value.tagSupport.oldest = value.tagSupport.oldest || value
       
@@ -79,25 +92,24 @@ function processSubjectValue(
       value.ownerTag = ownerTag
     }
 
-    // value.tagSupport.newest = value
-
     processTagResult(
       value,
       result, // Function will attach result.tag
       template,
-      {counts},
+      options,
     )
 
     return
   }
 
   // *for map
-  if(value instanceof Array && value.every(x => isTagInstance(x))) {
-    return processTagArray(result, value, template, ownerTag, counts)
+  const isArray = value instanceof Array && value.every(x => isTagInstance(x))
+  if(isArray) {
+    return processTagArray(result, value, template, ownerTag, options)
   }
 
-  if(isTagComponent(value)) {  
-    return processSubjectComponent(value, result, template, ownerTag, counts)
+  if(isTagComponent(value)) {
+    return processSubjectComponent(value, result, template, ownerTag, options)
   }
 
   // *if processing WAS a tag BUT NOW its some other non-tag value
@@ -106,12 +118,12 @@ function processSubjectValue(
     const lastFirstChild = template.clone || template// result.tag.clones[0] // template.lastFirstChild
     lastFirstChild.parentNode.insertBefore(template, lastFirstChild)
 
-    const stagger = counts.removed
+    const stagger = options.counts.removed
     const tag: Tag = result.tag
     const animated = tag.destroy({stagger})
-    counts.removed = stagger + animated
+    options.counts.removed = stagger + animated
     delete result.tag
-
+  
     const clone = updateBetweenTemplates(
       value,
       lastFirstChild // ✅ this will be removed
@@ -121,7 +133,6 @@ function processSubjectValue(
 
     return
   }
-
 
   const before = template.clone || template // Either the template is on the doc OR its the first element we last put on doc
 
@@ -158,6 +169,9 @@ export function updateBetweenTemplates(
 
   /* remove existing nodes */
   parent.removeChild(lastFirstChild)
+  if(lastFirstChild.nodeName === 'TEMPLATE') {
+    lastFirstChild.setAttribute('removeAt', Date.now().toString())
+  }
   
   return textNode
 }
@@ -173,11 +187,11 @@ export function processTagResult(
   result: any, // used for recording past and current value
   insertBefore: Element, // <template end interpolate />
   {
-    index,
-    counts,
+    index, counts, forceElement,
   }: {
     index?: number
     counts: Counts
+    forceElement?: boolean
   }
 ) {
   // *for
@@ -191,7 +205,7 @@ export function processTagResult(
 
     const lastFirstChild = insertBefore // tag.clones[0] // insertBefore.lastFirstChild
     
-    tag.buildBeforeElement(lastFirstChild, {counts})
+    tag.buildBeforeElement(lastFirstChild, {counts, forceElement, depth: tag.tagSupport.depth + 1})
     
     result.lastArray.push({
       tag, index
@@ -201,8 +215,7 @@ export function processTagResult(
   }
 
   // *if appears we already have seen
-  if(result.tag) {
-    console.log('retag', result.tag.isLikeTag(tag), result.tag, tag)
+  if(result.tag && !forceElement) {
     // are we just updating an if we already had?
     if(result.tag.isLikeTag(tag)) {
       // components
@@ -221,13 +234,7 @@ export function processTagResult(
   // *if just now appearing to be a Tag
   const before = (insertBefore as any).clone || insertBefore
 
-  const tagSupport = tag.tagSupport
-  const templater = tagSupport.templater
-  const wrapper = templater?.wrapper
-  const original = wrapper?.original
-  const name = original?.name
-  console.log('new tag', name || original, {wrapper, templater, tagSupport})
-  tag.buildBeforeElement(before, {counts})
+  tag.buildBeforeElement(before, {counts, forceElement, depth: tag.tagSupport.depth})
   result.tag = tag // let reprocessing know we saw this previously as an if
 
   return
@@ -238,7 +245,7 @@ function processSubjectComponent(
   result: any,
   template: Element,
   ownerTag: Tag,
-  counts: Counts,
+  options: {counts: Counts, forceElement?: boolean},
 ) {
   const anyValue = value as Function & {tagged?: boolean}
   if(anyValue.tagged !== true) {
@@ -254,29 +261,14 @@ function processSubjectComponent(
   }
 
   const templater = value as TemplaterResult
-  const tagSupport: TagSupport = result.tagSupport || getTagSupport( templater )
+  const tagSupport: TagSupport = result.tagSupport || getTagSupport(ownerTag.tagSupport.depth+1, templater )
   
   tagSupport.mutatingRender = () => {
-    const preRenderCount = tagSupport.renderCount
-
     // Is this NOT my first render
     if(result.tag) {
-      providersChangeCheck(result.tag)
-
-      // When the providers were checked, a render to myself occurred and I do not need to re-render again
-      if(preRenderCount !== tagSupport.renderCount) {
-        return tagSupport.newest
-      }
-
-      const hasPropsChanged = tagSupport.hasPropChanges(
-        templater.props,
-        templater.newProps,
-        result.tag.tagSupport.templater.props
-      )
-
-      if(!hasPropsChanged) {
-        tagSupport.newest = (templater as any).redraw(templater.newProps) // No change detected, just redraw me only
-        return tagSupport.newest
+      const exit = tagSupport.renderExistingTag(result.tag, templater)
+      if(exit) {
+        return
       }
     }
 
@@ -299,11 +291,9 @@ function processSubjectComponent(
 
   processTagResult(
     tag,
-    result, // The element set here will be removed from document
+    result, // The element set here will be removed from document. Also result.tag will be added in here
     template, // <template end interpolate /> (will be removed)
-    {
-      counts,
-    }
+    options,
   )
 
   return
@@ -317,76 +307,11 @@ export function afterElmBuild(
     return
   }
 
-  if(!options.rebuilding) {
+  if(!options.forceElement) {
     elementInitCheck(elm, options.counts)
   }
 
   if((elm as Element).children) {
     new Array(...(elm as Element).children as any).forEach(child => afterElmBuild(child, options))
   }
-}
-
-function providersChangeCheck(tag: Tag) {
-  const providersWithChanges = tag.providers.filter(provider => {
-    return !deepEqual(provider.instance, provider.clone)
-  })
-
-  // reset clones
-  providersWithChanges.forEach(provider => {
-    const appElement = tag.getAppElement()
-
-    handleProviderChanges(appElement, provider)
-
-    provider.clone = deepClone(provider.instance)
-  })
-}
-
-/**
- * 
- * @param {Tag} appElement 
- * @param {Provider} provider 
- */
-function handleProviderChanges(
-  appElement: Tag,
-  provider: Provider,
-) {
-  const tagsWithProvider = getTagsWithProvider(appElement, provider)
-
-  tagsWithProvider.forEach(({tag, renderCount, provider}) => {
-    if(renderCount === tag.tagSupport.renderCount) {
-      provider.clone = deepClone(provider.instance)
-      tag.tagSupport.render()
-    }
-  })
-}
-
-/**
- * 
- * @param {Tag} appElement 
- * @param {Provider} provider 
- * @returns {{tag: Tag, renderCount: numer, provider: Provider}[]}
- */
-
-function getTagsWithProvider(
-  tag: Tag,
-  provider: Provider,
-  memory: {
-    tag: Tag
-    renderCount: number
-    provider: Provider
-  }[] = []
-) {
-  const hasProvider = tag.providers.find(xProvider => xProvider.constructMethod === provider.constructMethod)
-  
-  if(hasProvider) {
-    memory.push({
-      tag,
-      renderCount: tag.tagSupport.renderCount,
-      provider: hasProvider
-    })
-  }
-
-  tag.children.forEach(child => getTagsWithProvider(child, provider, memory))
-
-  return memory
 }

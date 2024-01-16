@@ -22,5 +22,9 @@ function buildSibling(
   nextSibling: ChildNode,
   insertBefore: Element,
 ) {
-  (insertBefore.parentNode as ParentNode).insertBefore(nextSibling, insertBefore)  
+  const parentNode = insertBefore.parentNode as ParentNode
+  parentNode.insertBefore(
+    nextSibling,
+    insertBefore
+  )
 }

@@ -1,6 +1,7 @@
 import { Subject } from "./Subject.js"
 import { Context, Tag } from "./Tag.class.js"
 import { inputAttribute } from "./inputAttribute.js"
+import { isSubjectInstance } from "./isInstance.js"
 
 const startRegX = /^\s*{/
 const endRegX = /}\s*$/
@@ -10,10 +11,12 @@ export function interpolateAttributes(
   scope: Context,
   ownerTag: Tag,
 ) {
-  child.getAttributeNames().forEach(attrName => {
+  const attrNames = child.getAttributeNames()
+  attrNames.forEach(attrName => {
     const value = child.getAttribute(attrName)
     const isSpecial = isSpecialAttr(attrName)
 
+    
     // An attempt to replicate React
     if ( value && value.search(startRegX) >= 0 && value.search(endRegX) >= 0 ) {
       // get the code inside the brackets like "variable0" or "{variable0}"
@@ -29,7 +32,7 @@ export function interpolateAttributes(
       }
 
       // TODO: Need to just see if can be subscribed to
-      if(result instanceof Subject) {
+      if(isSubjectInstance(result)) {
         child.removeAttribute(attrName)
         const callback = (newAttrValue: any) => {
           if(newAttrValue instanceof Function) {
@@ -44,10 +47,12 @@ export function interpolateAttributes(
       
           if (isSpecial) {
             inputAttribute(attrName, newAttrValue, child)
+            return
           }
 
           if(newAttrValue) {
             child.setAttribute(attrName, newAttrValue)
+            return
           }
 
           const isDeadValue = newAttrValue === undefined || newAttrValue === false || newAttrValue === null
@@ -63,15 +68,12 @@ export function interpolateAttributes(
         const sub = result.subscribe(callback as any)
         ownerTag.cloneSubs.push(sub) // this is where unsubscribe is picked up
 
+        // child.setAttribute(attrName, result.value)
+        // callback(result.value)
+
         return
       }
 
-      // child.setAttribute(attrName, result)
-      /*
-      if(attrName === 'style') {
-        return
-      }
-      */
 
       child.setAttribute(attrName, result.value)
       return
@@ -84,6 +86,7 @@ export function interpolateAttributes(
   })
 }
 
+/** Looking for (class | style) followed by a period */
 export function isSpecialAttr(attrName: string) {
   return attrName.search(/^(class|style)(\.)/) >= 0
 }

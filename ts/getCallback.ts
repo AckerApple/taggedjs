@@ -1,4 +1,5 @@
-import { State, StateConfigArray, StateTagSupport, getStateValue } from "./state.js"
+import { TagSupport } from "./getTagSupport.js"
+import { State, StateConfigArray, getStateValue } from "./state.js"
 import { setUse } from "./tagRunner.js"
 
 type Callback = <T>(...args: unknown[]) => T
@@ -7,21 +8,16 @@ export let getCallback = () => (callback: Callback) => (): void => {
   throw new Error('The real callback function was called and that should never occur')
 }
 
-type CallbackTagSupport = StateTagSupport & {
-  getCallback?: Callback
-  callbacks?: any[]
-}
-
 setUse({
-  beforeRender: (tagSupport: CallbackTagSupport) => {
-    tagSupport.callbacks = []
+  beforeRender: (tagSupport: TagSupport) => {
+    tagSupport.memory.callbacks = []
 
     getCallback = () => {
       const callbackMaker = (
         callback: Callback
       ) => {
         const trigger = () => {
-          const state = tagSupport.state as State
+          const state = tagSupport.memory.state as State
           const oldest = (callbackMaker as any).state // state.oldest as StateConfigArray
           const newest = state.newest
     
@@ -46,25 +42,29 @@ setUse({
           }
         }
 
-        const state = tagSupport.state as State
+        const state = tagSupport.memory.state as State
         trigger.state = state
 
         return trigger
       }
 
-      const callbacks = tagSupport.callbacks as any[]
+      const callbacks = tagSupport.memory.callbacks as any[]
       callbacks.push(callbackMaker)
 
       return callbackMaker
     }
   },
-  afterRender: (tagSupport: CallbackTagSupport) => {
-    const callbacks = tagSupport.callbacks as any[]
+  afterRender: (tagSupport: TagSupport) => {
+    const callbacks = tagSupport.memory.callbacks as any[]
     callbacks.forEach(callback => {
-      const state = tagSupport.state as State
+      const state = tagSupport.memory.state as State
       callback.state = [...state.newest as any]
     })
-  }
+  },
+  afterTagClone(_oldTag, newTag) {
+    // do not transfer callbacks
+    newTag.tagSupport.memory.callbacks = []
+  },
 })
 
 function updateState(
@@ -72,7 +72,8 @@ function updateState(
   stateTo: StateConfigArray,
 ) {
   stateFrom.forEach((state, index) => {
-    const oldValue = getStateValue(state)
-    const [checkValue] = stateTo[index]( oldValue )
+    const oldValue = getStateValue(state.callback)
+    const [checkValue] = stateTo[index].callback( oldValue )
+    stateTo[index].lastValue = oldValue
   })
 }

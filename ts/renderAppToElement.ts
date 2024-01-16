@@ -1,7 +1,8 @@
 import { interpolateElement } from "./interpolateElement.js"
-import { getTagSupport } from "./getTagSupport.js"
+import { TagSupport, getTagSupport } from "./getTagSupport.js"
 import { runBeforeRender } from "./tagRunner.js"
 import { TemplaterResult } from "./tag.js"
+import { Tag } from "./Tag.class.js"
 
 export function renderAppToElement(
   app: (...args: unknown[]) => TemplaterResult,
@@ -17,6 +18,43 @@ export function renderAppToElement(
 
   tag.appElement = element
   
+  addAppTagRender(tagSupport, tag)
+  
+  const context = tag.updateValues(tag.values)
+  
+  const templateElm = document.createElement('template')
+  templateElm.setAttribute('tag-detail','app-template-placeholder')
+  element.appendChild(templateElm)
+  
+  tag.buildBeforeElement(templateElm)
+  /*
+  const template = tag.getTemplate()
+  element.innerHTML = template.string
+  interpolateElement(element, context, tag)
+  */
+  ;(element as any).tag = tag
+}
+
+export function applyTagUpdater(
+  wrapper: TemplaterResult,
+) {
+  const tagSupport = getTagSupport(0, wrapper)
+  runBeforeRender(tagSupport)
+
+  // Call the apps function for our tag templater
+  const templater = tagSupport.templater as TemplaterResult
+  const tag = templater.wrapper()
+
+  tag.tagSupport = tagSupport
+  tag.afterRender()
+  
+  return { tag, tagSupport }
+}
+
+export function addAppTagRender(
+  tagSupport: TagSupport,
+  tag: Tag,
+) {
   let lastTag
   tagSupport.mutatingRender = () => {    
     runBeforeRender(tagSupport, tag)
@@ -35,33 +73,4 @@ export function renderAppToElement(
 
     return lastTag
   }
-  
-  const context = tag.updateValues(tag.values)
-  
-  const templateElm = document.createElement('template')
-  element.appendChild(templateElm)
-  
-  tag.buildBeforeElement(templateElm)
-  /*
-  const template = tag.getTemplate()
-  element.innerHTML = template.string
-  interpolateElement(element, context, tag)
-  */
-  ;(element as any).tag = tag
-}
-
-export function applyTagUpdater(
-  wrapper: TemplaterResult,
-) {
-  const tagSupport = getTagSupport(wrapper)
-  runBeforeRender(tagSupport)
-
-  // Call the apps function for our tag templater
-  const templater = tagSupport.templater as TemplaterResult
-  const tag = templater.wrapper()
-
-  tag.tagSupport = tagSupport
-  tag.afterRender()
-  
-  return { tag, tagSupport }
 }

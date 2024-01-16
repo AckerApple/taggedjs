@@ -76,6 +76,14 @@ export class TemplaterResult {
   }
 }
 
+
+export interface TemplateRedraw extends TemplaterResult {
+  redraw: () => Tag | undefined
+
+  // TODO: This might be removable
+  tagSupport?: TagSupport
+}
+
 type TagResult = (
   props: Props, // props or children
   children?: Tag

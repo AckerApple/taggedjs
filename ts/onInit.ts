@@ -1,25 +1,26 @@
-import { Tag } from "./Tag.class.js"
+import { TagSupport } from "./getTagSupport.js"
 import { setUse } from "./tagRunner.js"
 
 export type OnInitCallback = () => unknown
 
 /** When undefined, it means a tag is being built for the first time so do run init(s) */
-let initCurrentTag: Tag | undefined
+let initCurrentSupport: TagSupport
 
-function setCurrentInitTag(tag: Tag | undefined) {
-  initCurrentTag = tag
+function setCurrentTagSupport(support: TagSupport) {
+  initCurrentSupport = support
 }
 
 export function onInit(
   callback: OnInitCallback
 ) {
-  if(!initCurrentTag) {
+  if(!initCurrentSupport.memory.init) {
+    initCurrentSupport.memory.init = callback
     callback()
   }
 }
 
 setUse({
-  beforeRender: (_tagSupport, tag) => {
-    setCurrentInitTag(tag)
+  beforeRender: (tagSupport) => {
+    setCurrentTagSupport(tagSupport)
   }
 })
