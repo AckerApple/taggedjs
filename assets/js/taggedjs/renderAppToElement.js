@@ -7,6 +7,29 @@ export function renderAppToElement(app, element, props) {
     const result = applyTagUpdater(wrapper);
     const { tag, tagSupport } = result;
     tag.appElement = element;
+    addAppTagRender(tagSupport, tag);
+    const context = tag.updateValues(tag.values);
+    const templateElm = document.createElement('template');
+    templateElm.setAttribute('tag-detail', 'app-template-placeholder');
+    element.appendChild(templateElm);
+    tag.buildBeforeElement(templateElm);
+    element.tag = tag;
+    element.tags = app.original.tags;
+    element.setUse = app.original.setUse;
+    return tag;
+}
+export function applyTagUpdater(wrapper) {
+    const tagSupport = getTagSupport(0, wrapper);
+    runBeforeRender(tagSupport);
+    // Call the apps function for our tag templater
+    const templater = tagSupport.templater;
+    const tag = templater.wrapper();
+    tag.tagSupport = tagSupport;
+    tag.afterRender();
+    return { tag, tagSupport };
+}
+/** Overwrites arguments.tagSupport.mutatingRender */
+export function addAppTagRender(tagSupport, tag) {
     let lastTag;
     tagSupport.mutatingRender = () => {
         runBeforeRender(tagSupport, tag);
@@ -21,20 +44,5 @@ export function renderAppToElement(app, element, props) {
         }
         return lastTag;
     };
-    const context = tag.updateValues(tag.values);
-    const templateElm = document.createElement('template');
-    element.appendChild(templateElm);
-    tag.buildBeforeElement(templateElm);
-    element.tag = tag;
-}
-export function applyTagUpdater(wrapper) {
-    const tagSupport = getTagSupport(wrapper);
-    runBeforeRender(tagSupport);
-    // Call the apps function for our tag templater
-    const templater = tagSupport.templater;
-    const tag = templater.wrapper();
-    tag.tagSupport = tagSupport;
-    tag.afterRender();
-    return { tag, tagSupport };
 }
 //# sourceMappingURL=renderAppToElement.js.map

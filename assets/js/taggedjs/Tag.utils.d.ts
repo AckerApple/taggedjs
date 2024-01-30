@@ -1,8 +1,8 @@
 import { TagSupport } from "./getTagSupport.js";
 import { ValueSubject } from "./ValueSubject.js";
-import { Tag } from "./Tag.class.js";
 import { TemplaterResult } from "./tag.js";
 import { Subject } from "./Subject.js";
+import { Tag } from "./Tag.class.js";
 export type TagSubject = Subject & {
     tagSupport: TagSupport;
     tag: Tag;

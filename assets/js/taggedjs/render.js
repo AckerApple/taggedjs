@@ -1,6 +1,11 @@
 export function buildClones(temporary, insertBefore) {
     const clones = [];
     const templateClone = temporary.children[0];
+    /*
+    if(!templateClone) {
+      return []
+    }
+    */
     const sibling = templateClone; // a div we added
     let nextSibling = sibling.nextSibling;
     temporary.removeChild(templateClone); // remove the div
@@ -13,6 +18,7 @@ export function buildClones(temporary, insertBefore) {
     return clones;
 }
 function buildSibling(nextSibling, insertBefore) {
-    insertBefore.parentNode.insertBefore(nextSibling, insertBefore);
+    const parentNode = insertBefore.parentNode;
+    parentNode.insertBefore(nextSibling, insertBefore);
 }
 //# sourceMappingURL=render.js.map

@@ -1,5 +1,7 @@
 import { deepClone } from "./deepFunctions.js";
 import { isTagInstance } from "./isInstance.js";
+import { runBeforeRender } from "./tagRunner.js";
+import { setUse } from "./setUse.function.js";
 export class TemplaterResult {
     props;
     newProps;
@@ -21,9 +23,24 @@ export class TemplaterResult {
         tag.ownerTag = ownerTag;
         return tag;
     }
-    renderWithSupport(tagSupport, runtimeOwnerTag, existingTag) {
+    renderWithSupport(tagSupport, existingTag, ownerTag) {
+        /* BEFORE RENDER */
+        // signify to other operations that a rendering has occurred so they do not need to render again
+        ++tagSupport.renderCount;
+        const runtimeOwnerTag = existingTag?.ownerTag || ownerTag;
+        runBeforeRender(tagSupport, tagSupport.oldest);
+        if (tagSupport.oldest) {
+            tagSupport.oldest.beforeRedraw();
+        }
+        else {
+            // TODO: Logic below most likely could live within providers.ts inside the runBeforeRender function
+            const providers = setUse.memory.providerConfig;
+            providers.ownerTag = runtimeOwnerTag;
+        }
+        /* END: BEFORE RENDER */
         const templater = this;
         const retag = templater.wrapper();
+        /* AFTER */
         retag.tagSupport = tagSupport;
         if (tagSupport.oldest) {
             tagSupport.oldest.afterRender();
@@ -49,6 +66,8 @@ export class TemplaterResult {
         return { remit: true, retag };
     }
 }
+// type TagResultReady = TagResult & {isTag: true, original: TagResult}
+export const tags = [];
 export function tag(tagComponent) {
     const result = (function tagWrapper(props, children) {
         function callback(toCall, callWith) {
@@ -78,6 +97,10 @@ export function tag(tagComponent) {
     }) // we override the function provided and pretend original is what's returned
     ;
     result.isTag = true;
+    result.original = tagComponent;
+    tagComponent.tags = tags;
+    tagComponent.setUse = setUse;
+    tags.push(tagComponent);
     return result;
 }
 class NoPropsGiven {

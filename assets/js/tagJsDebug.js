@@ -1,8 +1,10 @@
 import { animateDestroy, animateInit } from "./animations.js"
+import { counters } from "./countersDebug.js"
 import { intervalTester0, intervalTester1 } from "./intervalDebug.js"
+import { providerDebug } from "./providerDebug.js"
 import { state, html, tag, providers, Subject, onInit } from "./taggedjs/index.js"
 
-function tagDebugProvider() {
+export function tagDebugProvider() {
   const upper = providers.create( upperTagDebugProvider )
   return {
     upper,
@@ -10,7 +12,7 @@ function tagDebugProvider() {
   }
 }
 
-function upperTagDebugProvider() {
+export function upperTagDebugProvider() {
   return {
     name: 'upperTagDebugProvider',
     test: 2
@@ -19,36 +21,18 @@ function upperTagDebugProvider() {
 
 export const tagDebug = tag(function tagDebug() {
   // tagDebug.js
-  let showIntervals = state(true, x => [showIntervals, showIntervals = x])
-  let renderCount = state(0, x => [renderCount, renderCount = x])
-  let counter = state(0, x => [counter, counter = x])
-  let initCounter = state(0, x => [initCounter, initCounter = x])
+  let showIntervals = state(false, x => [showIntervals, showIntervals = x])
 
   const provider = providers.create( tagDebugProvider )
 
-  onInit(() => {
-    ++initCounter
-    console.info('👉 i should only ever run once')
-  })
-
-  const increaseCounter = () => {
-    ++counter
-  }
-
-  ++renderCount // for debugging
-
-  return html`
-    <!-- tagDebug.js -->
-    <div style="padding:1em;background:rgba(0,0,0,.5)" oninit=${animateInit} ondestroy=${animateDestroy}>
-      <div>Subscriptions:${Subject.globalSubCount}:${Subject.globalSubs.length}</div>
-      <div>renderCount:${renderCount}</div>
-      <div>initCounter:${initCounter}</div>
-      <button onclick=${increaseCounter}>counter:${counter}</button>
-      <button onclick=${() => console.info('subs', Subject.globalSubs)}>log subs</button>
+  return html`<!-- tagDebug.js -->
+    <div id="tagDebug-fx-wrap" style="padding:1em;background:rgba(0,0,0,.5)" oninit=${animateInit} ondestroy=${animateDestroy}>
+      <h2 id="tagDebugCounters">counters**</h2>
+      ${counters()}
 
       <br /><br />
 
-      <fieldset>
+      <fieldset id="debug-intervals">
         <legend>
           interval testing
           <button
@@ -67,14 +51,14 @@ export const tagDebug = tag(function tagDebug() {
             
       <br /><br />
 
-      <fieldset>
+      <fieldset id="provider-debug">
         <legend>Provider Debug: ${provider.test}:${provider.upper?.test | '?'}</legend>
         ${providerDebug()}
       </fieldset>
 
       <br />
 
-      <fieldset>
+      <fieldset id="content-debug">
         <legend>Content Debug: ${provider.test}</legend>        
         <div>
           <div style="font-size:0.8em">You should see "0" here => "${0}"</div>
@@ -90,24 +74,5 @@ export const tagDebug = tag(function tagDebug() {
         </div>
       </fieldset>
     </div>
-  `
-})
-
-const providerDebug = tag(function ProviderDebug() {
-  const provider = providers.inject( tagDebugProvider )
-  const upperProvider = providers.inject( upperTagDebugProvider )
-
-  let renderCount = state(0, x => [renderCount, renderCount = x])
-
-  ++renderCount
-
-  return html`
-    <button onclick=${() => ++provider.test}
-    >increase provider.test ${provider.test}</button>
-    
-    <button onclick=${() => console.info('render count', renderCount)}>render counter: ${renderCount}</button>
-    
-    <button onclick=${() => ++upperProvider.test}
-    >increase upper.provider.test ${upperProvider.test}</button>
   `
 })
