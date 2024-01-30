@@ -2,6 +2,7 @@ import { interpolateAttributes } from "./interpolateAttributes.js"
 import { interpolateToTemplates } from "./interpolations.js"
 import { interpolateContentTemplates } from "./interpolateContentTemplates.js"
 import { Context, Tag, escapeSearch, variablePrefix } from "./Tag.class.js"
+import { Clones } from "./Clones.type.js"
 
 export type InterpolateOptions = {
   /** make the element go on document */
@@ -12,18 +13,21 @@ export type InterpolateOptions = {
 export function interpolateElement(
   element: Element,
   context: Context, // variables used to evaluate
-  ownerTag: Tag,
+  tag: Tag,
   options: InterpolateOptions,
-) {
-
+): Clones {
+  const clones = []
   const result = interpolateElementChild(element, options.depth + 1)
 
   if(result.keys.length) {
-    interpolateContentTemplates(element, context, ownerTag, options)
+    const nextClones = interpolateContentTemplates(element, context, tag, options)
+    clones.push( ...nextClones )
   }
 
-  interpolateAttributes(element, context, ownerTag)
-  processChildrenAttributes(element.children, context, ownerTag)
+  interpolateAttributes(element, context, tag)
+  processChildrenAttributes(element.children, context, tag)
+
+  return clones
 }
 
 function processChildrenAttributes(

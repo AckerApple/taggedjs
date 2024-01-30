@@ -1,6 +1,6 @@
 import { TagSupport } from "./getTagSupport.js"
+import { setUse } from "./setUse.function.js"
 import { State, StateConfigArray, getStateValue } from "./state.js"
-import { setUse } from "./tagRunner.js"
 
 type Callback = <T>(...args: unknown[]) => T
 
@@ -18,7 +18,7 @@ setUse({
       ) => {
         const trigger = () => {
           const state = tagSupport.memory.state as State
-          const oldest = (callbackMaker as any).state // state.oldest as StateConfigArray
+          const oldest = (callbackMaker as any).state
           const newest = state.newest
     
           // ensure that the oldest has the latest values first
@@ -73,7 +73,8 @@ function updateState(
 ) {
   stateFrom.forEach((state, index) => {
     const oldValue = getStateValue(state.callback)
-    const [checkValue] = stateTo[index].callback( oldValue )
+    // const [checkValue] = stateTo[index].callback( oldValue )
+    stateTo[index].callback( oldValue )
     stateTo[index].lastValue = oldValue
   })
 }

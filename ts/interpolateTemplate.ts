@@ -1,75 +1,61 @@
 import { Context, ElementBuildOptions, Tag, variablePrefix } from "./Tag.class.js"
 import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js"
-import { TagSupport, getTagSupport } from "./getTagSupport.js"
-import { config as providers } from "./providers.js"
+import { getTagSupport } from "./getTagSupport.js"
 import { InterpolateOptions } from "./interpolateElement.js"
 import { elementInitCheck } from "./elementInitCheck.js"
 import { processTagArray } from "./processTagArray.js"
-import { runBeforeRender } from "./tagRunner.js"
-import { TemplaterResult } from "./tag.js"
+import { Clones } from "./Clones.type.js"
+import { processSubjectComponent } from "./processSubjectComponent.function.js"
+import { processTagResult } from "./processTagResult.function.js"
 
 export function interpolateTemplate(
   template: Template, // <template end interpolate /> (will be removed)
   context: Context, // variable scope of {`__tagVar${index}`:'x'}
-  ownerTag: Tag, // Tag class
+  tag: Tag, // Tag class
   counts: Counts, // {added:0, removed:0}
-  {forceElement}: InterpolateOptions,
-) {
+  options: InterpolateOptions,
+): Clones {
+  const clones: Clones = []
+
   if ( !template.hasAttribute('end') ) {
-    return // only care about starts
+    return clones // only care about starts
   }
 
   const variableName = template.getAttribute('id')
   if(variableName?.substring(0, variablePrefix.length) !== variablePrefix) {
-    return // ignore, not a tagVar
+    return clones // ignore, not a tagVar
   }
 
   const result = context[variableName]
-  const isSubject = isSubjectInstance(result)
-    
-  /*if(forceElement && isSubject) {
-    result = result.value
-    isSubject = false
-  }*/
+  // const isSubject = isSubjectInstance(result)
+  let isForceElement = options.forceElement
+  
+  const callback = (templateNewValue: any) => {
+    const subjectClones = processSubjectValue(
+      templateNewValue,
+      result,
+      template,
+      tag,
+      {counts, forceElement: isForceElement}
+    )
 
-  // TODO: Need to just check if it can be subscribed to
-  if( isSubject ) {
-    const callback = (templateNewValue: any) => {
-      processSubjectValue(
-        templateNewValue,
-        result,
-        template,
-        ownerTag,
-        {counts, forceElement}
-      )
-
-      setTimeout(() => {
-        counts.added = 0 // reset
-        counts.removed = 0 // reset
-      }, 0)
+    if(isForceElement) {
+      isForceElement = false // only can happen once
     }
 
-    const sub = result.subscribe(callback as any)
-    ownerTag.cloneSubs.push(sub)
+    clones.push(...subjectClones)
 
-    /*if(forceElement) {
-      callback(result.value)
-    }*/
-
-    return
+    // TODO: See if we can remove
+    setTimeout(() => {
+      counts.added = 0 // reset
+      counts.removed = 0 // reset
+    }, 0)
   }
 
-  const before = template.clone || template
+  const sub = result.subscribe(callback as any)
+  tag.cloneSubs.push(sub)
 
-  const clone = updateBetweenTemplates(
-    result,
-    before, // The element set here will be removed from document
-  )
-  
-  ownerTag.clones.push(clone)
-  template.clone = clone
-  
-  return
+  return clones
 }
 
 export type Template = Element & {clone: any}
@@ -78,60 +64,62 @@ function processSubjectValue(
   value: any,
   result: any, // could be tag via result.tag
   template: Template, // <template end interpolate /> (will be removed)
-  ownerTag: Tag,
-  options: {counts: Counts, forceElement?: boolean}, // {added:0, removed:0}
-) {
+  tag: Tag,
+  options: {forceElement?: boolean, counts: Counts}, // {added:0, removed:0}
+): Clones {
   if (isTagInstance(value)) {
     // first time seeing this tag?
     if(!value.tagSupport) {
-      value.tagSupport = getTagSupport( ownerTag.tagSupport.depth + 1 )
-      value.tagSupport.mutatingRender = ownerTag.tagSupport.mutatingRender
+      value.tagSupport = getTagSupport( tag.tagSupport.depth + 1 )
+      value.tagSupport.mutatingRender = tag.tagSupport.mutatingRender
       value.tagSupport.oldest = value.tagSupport.oldest || value
       
-      ownerTag.children.push(value as Tag)
-      value.ownerTag = ownerTag
+      tag.children.push(value as Tag)
+      value.ownerTag = tag
     }
 
-    processTagResult(
+    const clones = processTagResult(
       value,
       result, // Function will attach result.tag
       template,
       options,
     )
 
-    return
+    return clones
   }
 
   // *for map
   const isArray = value instanceof Array && value.every(x => isTagInstance(x))
   if(isArray) {
-    return processTagArray(result, value, template, ownerTag, options)
+    return processTagArray(result, value, template, tag, options)
   }
 
   if(isTagComponent(value)) {
-    return processSubjectComponent(value, result, template, ownerTag, options)
+    return processSubjectComponent(value, result, template, tag, options)
   }
 
   // *if processing WAS a tag BUT NOW its some other non-tag value
   if (result.tag) {
     // put the template back
     const lastFirstChild = template.clone || template// result.tag.clones[0] // template.lastFirstChild
+    const parentNode = lastFirstChild.parentNode || template.parentNode
     lastFirstChild.parentNode.insertBefore(template, lastFirstChild)
 
     const stagger = options.counts.removed
     const tag: Tag = result.tag
-    const animated = tag.destroy({stagger})
-    options.counts.removed = stagger + animated
-    delete result.tag
-  
+    tag.destroy({stagger}).then(animated => {      
+      options.counts.removed = stagger + animated
+      delete result.tag
+    })
+
     const clone = updateBetweenTemplates(
       value,
-      lastFirstChild // ✅ this will be removed
+      template, // ✅ this will be removed
     ) // the template will be remove in here
 
     template.clone = clone
 
-    return
+    return []
   }
 
   const before = template.clone || template // Either the template is on the doc OR its the first element we last put on doc
@@ -143,17 +131,21 @@ function processSubjectValue(
   )
 
   template.clone = clone
+  const clones: Clones = []
 
-  const oldPos = ownerTag.clones.indexOf(before)
-  if(oldPos>=0 && !ownerTag.clones.includes(clone) && !before.parentNode) {
-    ownerTag.clones.splice(oldPos, 1)
-    ownerTag.clones.push(clone)    
+  const oldPos = tag.clones.indexOf(before)
+  if(oldPos>=0 && !tag.clones.includes(clone) && !before.parentNode) {
+    tag.clones.splice(oldPos, 1)
+    tag.clones.push(clone)
+    clones.push(clone)
   }
+
+  return clones
 }
 
 // Function to update the value of x
 export function updateBetweenTemplates(
-  value: any,
+  value: string | undefined | boolean | number,
   lastFirstChild: Element,
 ) {
   const parent = lastFirstChild.parentNode as ParentNode
@@ -164,7 +156,7 @@ export function updateBetweenTemplates(
   }
 
   // Insert the new value (never use innerHTML here)
-  const textNode = document.createTextNode(value) // never innerHTML
+  const textNode = document.createTextNode(value as string) // never innerHTML
   parent.insertBefore(textNode, lastFirstChild)
 
   /* remove existing nodes */
@@ -179,124 +171,6 @@ export function updateBetweenTemplates(
 export type Counts = {
   added: number
   removed: number
-}
-
-/** Returns {clones:[], subs:[]} */
-export function processTagResult(
-  tag: Tag,
-  result: any, // used for recording past and current value
-  insertBefore: Element, // <template end interpolate />
-  {
-    index, counts, forceElement,
-  }: {
-    index?: number
-    counts: Counts
-    forceElement?: boolean
-  }
-) {
-  // *for
-  if(index !== undefined) {
-    const existing = result.lastArray[index]
-
-    if(existing?.tag.isLikeTag(tag)) {
-      existing.tag.updateByTag(tag)
-      return
-    }
-
-    const lastFirstChild = insertBefore // tag.clones[0] // insertBefore.lastFirstChild
-    
-    tag.buildBeforeElement(lastFirstChild, {counts, forceElement, depth: tag.tagSupport.depth + 1})
-    
-    result.lastArray.push({
-      tag, index
-    })
-    
-    return
-  }
-
-  // *if appears we already have seen
-  if(result.tag && !forceElement) {
-    // are we just updating an if we already had?
-    if(result.tag.isLikeTag(tag)) {
-      // components
-      if(result instanceof Function) {
-        const newTag = result(result.tag.tagSupport)
-        result.tag.updateByTag(newTag)
-        return
-      }
-
-      result.tag.updateByTag(tag)
-      
-      return
-    }    
-  }
-
-  // *if just now appearing to be a Tag
-  const before = (insertBefore as any).clone || insertBefore
-
-  tag.buildBeforeElement(before, {counts, forceElement, depth: tag.tagSupport.depth})
-  result.tag = tag // let reprocessing know we saw this previously as an if
-
-  return
-}
-
-function processSubjectComponent(
-  value: unknown,
-  result: any,
-  template: Element,
-  ownerTag: Tag,
-  options: {counts: Counts, forceElement?: boolean},
-) {
-  const anyValue = value as Function & {tagged?: boolean}
-  if(anyValue.tagged !== true) {
-    let name: string | undefined = anyValue.name || anyValue.constructor?.name
-
-    if(name === 'Function') {
-      name = undefined
-    }
-
-    const label = name || anyValue.toString().substring(0,120)
-    const error = new Error(`Not a tag component. Wrap your function with tag(). Example tag(props => html\`\`) on component:\n\n${label}\n\n`)
-    throw error
-  }
-
-  const templater = value as TemplaterResult
-  const tagSupport: TagSupport = result.tagSupport || getTagSupport(ownerTag.tagSupport.depth+1, templater )
-  
-  tagSupport.mutatingRender = () => {
-    // Is this NOT my first render
-    if(result.tag) {
-      const exit = tagSupport.renderExistingTag(result.tag, templater)
-      if(exit) {
-        return
-      }
-    }
-
-    // draw to my parent
-    const newest = tagSupport.newest = ownerTag.tagSupport.render()
-    return newest
-  }
-
-  let tag = templater.newest as Tag
-  providers.ownerTag = ownerTag
-  const isFirstTime = !tag
-  runBeforeRender(tagSupport, tag)
-
-  if(isFirstTime) {
-    tag = templater.forceRenderTemplate(tagSupport, ownerTag)
-  }
-  
-  ownerTag.children.push(tag)
-  tag.setSupport(tagSupport)
-
-  processTagResult(
-    tag,
-    result, // The element set here will be removed from document. Also result.tag will be added in here
-    template, // <template end interpolate /> (will be removed)
-    options,
-  )
-
-  return
 }
 
 export function afterElmBuild(

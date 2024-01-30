@@ -2,6 +2,9 @@ import { Tag } from "./Tag.class.js"
 import { deepClone } from "./deepFunctions.js"
 import { TagSupport } from "./getTagSupport.js"
 import { isTagInstance } from "./isInstance.js"
+import { runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
+import { setUse } from "./setUse.function.js"
+import { State } from "./state.js"
 
 export type Props = unknown
 
@@ -18,7 +21,9 @@ export class TemplaterResult {
 
   newest?: Tag
   oldest?: Tag
-  redraw?: () => Tag | undefined
+  redraw?: (
+    force?: boolean, // force children to redraw
+  ) => Tag | undefined
   isTemplater = true
 
   forceRenderTemplate(
@@ -38,12 +43,30 @@ export class TemplaterResult {
 
   renderWithSupport(
     tagSupport: TagSupport,
-    runtimeOwnerTag: Tag,
-    existingTag: Tag,
+    existingTag: Tag | undefined,
+    ownerTag?: Tag,
   ) {
+    /* BEFORE RENDER */
+      // signify to other operations that a rendering has occurred so they do not need to render again
+      ++tagSupport.renderCount
+
+      const runtimeOwnerTag = existingTag?.ownerTag || ownerTag
+
+      runBeforeRender(tagSupport, tagSupport.oldest)
+
+      if(tagSupport.oldest) {
+        tagSupport.oldest.beforeRedraw()
+      } else {
+        // TODO: Logic below most likely could live within providers.ts inside the runBeforeRender function
+        const providers = setUse.memory.providerConfig
+        providers.ownerTag = runtimeOwnerTag
+      }
+    /* END: BEFORE RENDER */
+
     const templater = this
     const retag = templater.wrapper()
-  
+
+    /* AFTER */
     retag.tagSupport = tagSupport
   
     if(tagSupport.oldest) {
@@ -51,7 +74,7 @@ export class TemplaterResult {
     } else {
       retag.afterRender()
     }
-    
+
     templater.newest = retag
     retag.ownerTag = runtimeOwnerTag
   
@@ -65,13 +88,13 @@ export class TemplaterResult {
     // retag.getTemplate() // cause lastTemplateString to render
     retag.setSupport(tagSupport)
     const isSameTag = existingTag && existingTag.isLikeTag(retag)
-  
+
     // If previously was a tag and seems to be same tag, then just update current tag with new values
     if(isSameTag) {
-      oldest.updateByTag(retag)
+      oldest.updateByTag(retag)  
       return {remit: false, retag}
     }
-  
+
     return {remit: true, retag}
   }
 }
@@ -84,13 +107,17 @@ export interface TemplateRedraw extends TemplaterResult {
   tagSupport?: TagSupport
 }
 
-type TagResult = (
+export type TagComponent = (
   props: Props, // props or children
   children?: Tag
 ) => Tag
 
+// type TagResultReady = TagResult & {isTag: true, original: TagResult}
+
+export const tags: TagComponent[] = []
+
 export function tag<T>(
-  tagComponent: T | TagResult
+  tagComponent: T | TagComponent
 ): T {
   const result = (function tagWrapper(
     props?: Props | Tag,
@@ -113,7 +140,7 @@ export function tag<T>(
     }
 
     function innerTagWrap() {
-      return (innerTagWrap.original as TagResult)(argProps, children)
+      return (innerTagWrap.original as TagComponent)(argProps, children)
     }
 
     innerTagWrap.original = tagComponent
@@ -129,6 +156,12 @@ export function tag<T>(
   }) as T // we override the function provided and pretend original is what's returned
 
   ;(result as any).isTag = true
+  ;(result as any).original = tagComponent
+
+  // group tags together and have hmr pickup
+  ;(tagComponent as any).tags = tags
+  ;(tagComponent as any).setUse = setUse
+  tags.push(tagComponent as TagComponent)
 
   return result
 }

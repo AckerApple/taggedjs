@@ -1,6 +1,7 @@
 import { Tag } from "./Tag.class.js"
 import { deepClone } from "./deepFunctions.js"
-import { setUse } from "./tagRunner.js"
+import { TagSupport } from "./getTagSupport.js"
+import { setUse } from "./setUse.function.js"
 
 export type Provider = {
   constructMethod: any
@@ -9,7 +10,7 @@ export type Provider = {
 }
 
 // TODO: rename
-export const config = {
+setUse.memory.providerConfig = {
   providers: [] as Provider[],
 
   currentTag: undefined as Tag | undefined,
@@ -17,7 +18,9 @@ export const config = {
 }
 
 function get(constructMethod: Function) {
-  return config.providers.find(provider => provider.constructMethod === constructMethod)
+  const config = setUse.memory.providerConfig
+  const providers: Provider[] = config.providers
+  return providers.find(provider => provider.constructMethod === constructMethod)
 }
 
 export const providers = {
@@ -35,6 +38,8 @@ export const providers = {
 
     // Providers with provider requirements just need to use providers.create() and providers.inject()
     const instance = constructMethod.constructor ? new constructMethod() : constructMethod()
+    
+    const config = setUse.memory.providerConfig
     config.providers.push({
       constructMethod,
       instance,
@@ -54,9 +59,11 @@ export const providers = {
       return oldValue.instance
     }
 
+    const config = setUse.memory.providerConfig
     let owner = {
       ownerTag: config.ownerTag
     } as Tag
+  
     while(owner.ownerTag) {
       const ownerProviders = owner.ownerTag.providers
 
@@ -82,7 +89,11 @@ export const providers = {
 }
 
 setUse({ // providers
-  beforeRedraw: (_tagSupport, tag: Tag) => {
+  beforeRedraw: (
+    _tagSupport: TagSupport,
+    tag: Tag
+  ) => {
+    const config = setUse.memory.providerConfig
     config.currentTag = tag
     config.ownerTag = tag.ownerTag
     if(tag.providers.length) {
@@ -90,7 +101,11 @@ setUse({ // providers
       config.providers.push(...tag.providers)
     }
   },
-  afterRender: (_tagSupport, tag: Tag) => {
+  afterRender: (
+    _tagSupport: TagSupport,
+    tag: Tag
+  ) => {
+    const config = setUse.memory.providerConfig
     tag.providers = [...config.providers]
     config.providers.length = 0
   }

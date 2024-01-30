@@ -1,5 +1,7 @@
+import { Clones } from "./Clones.type.js"
 import { Tag } from "./Tag.class.js"
-import { Counts, processTagResult } from "./interpolateTemplate.js"
+import { Counts } from "./interpolateTemplate.js"
+import { processTagResult } from "./processTagResult.function.js"
 
 export function processTagArray(
   result: any,
@@ -7,7 +9,8 @@ export function processTagArray(
   template: Element, // <template end interpolate />
   ownerTag: Tag,
   options: {counts: Counts, forceElement?: boolean},
-) {
+): Clones {
+  const clones: Clones = []
   result.lastArray = result.lastArray || [] // {tag, index}[] populated in processTagResult
 
   let removed = 0
@@ -64,10 +67,10 @@ export function processTagArray(
       if (previous.tag.arrayValue === subTag.arrayValue) {
         previous.tag.updateValues(subTag.values)
       }
-      return
+      return []
     }
 
-    processTagResult(
+    const nextClones = processTagResult(
       subTag,
       result,
       before,
@@ -76,7 +79,9 @@ export function processTagArray(
         ...options,
       }
     )
+
+    clones.push(...nextClones)
   })
 
-  return
+  return clones
 }

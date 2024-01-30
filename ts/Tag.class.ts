@@ -6,10 +6,11 @@ import { deepEqual } from "./deepFunctions.js"
 import { Subject, Subscription } from "./Subject.js"
 import { runAfterRender, runAfterTagClone, runBeforeDestroy, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
 import { TemplateRedraw, TemplaterResult } from "./tag.js"
-import { isTagComponent, isTagInstance } from "./isInstance.js"
+import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js"
 import { buildClones } from "./render.js"
 import { interpolateElement } from "./interpolateElement.js"
 import { Counts, afterElmBuild } from "./interpolateTemplate.js"
+import { State } from "./state.js"
 
 export const variablePrefix = '__tagVar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -18,7 +19,10 @@ const prefixSearch = new RegExp(variablePrefix, 'g')
 export const escapeSearch = new RegExp(escapeVariable, 'g')
 
 export type Context = {[index: string]: any}
-export type TagMemory = Record<string, any> // & {context: Context}
+export type TagMemory = Record<string, any> & {
+  context: Context
+  state: State
+}
 
 export class Tag {
   isTag = true
@@ -62,20 +66,23 @@ export class Tag {
     return this
   }
 
-  destroy(
+  async destroy(
     options: DestroyOptions = {
       stagger: 0,
       byParent: false, // who's destroying me? if byParent, ignore possible animations
     }
   ) {
-    runBeforeDestroy(this.tagSupport, this)
-
-    this.children.forEach((kid) => kid.destroy({...options, byParent: true}))
+    runBeforeDestroy(this.tagSupport, this)    
     this.destroySubscriptions()
+    const promises = this.children.map((kid) => kid.destroy({...options, byParent: true}))
+        
+    options.stagger = await this.destroyClones(options)
 
-    if(!options.byParent) {
-      options.stagger = this.destroyClones(options)
+    if(this.ownerTag) {
+      this.ownerTag.children = this.ownerTag.children.filter(child => child !== this)
     }
+
+    await Promise.all(promises)
 
     return options.stagger
   }
@@ -85,24 +92,45 @@ export class Tag {
     this.cloneSubs.length = 0
   }
 
-  destroyClones(
+  async destroyClones(
     {stagger}: DestroyOptions = {
       stagger: 0,
     }
   ) {
-    this.clones.reverse().forEach((clone: any, index: number) => {
+    const promises = this.clones.reverse().map((clone: any, index: number) => {
       let promise = Promise.resolve()
       
       if( clone.ondestroy ) {
         promise = elementDestroyCheck(clone, stagger)
       }
 
-      promise.then(() =>
-        clone.parentNode.removeChild(clone)
-      )
+      promise.then(() => {
+        clone.parentNode?.removeChild(clone)
+
+        const ownerTag = this.ownerTag
+        if(ownerTag) {
+          // Sometimes my clones were first registered to my owner, remove them
+          ownerTag.clones = ownerTag.clones.filter(compareClone => {
+            if(compareClone === clone) {
+              console.error('my clone found in a parent - 1', {
+                compareClone, clone,
+                tag: this.tagSupport.templater?.wrapper.original,
+                ownerTag: ownerTag.tagSupport.templater?.wrapper.original,
+              })
+              // throw new Error('issue')
+              return false
+            }
+            return true
+          })
+        }
+      })
+
+      return promise
     })
-    this.clones.length = 0
     
+    await Promise.all(promises)
+    // this.clones.length = 0
+
     return stagger
   }
 
@@ -130,7 +158,9 @@ export class Tag {
     const string = this.lastTemplateString = this.strings.map((string, index) => {
       const safeString = string.replace(prefixSearch, escapeVariable)
       const endString = safeString + (this.values.length > index ? `{${variablePrefix}${index}}` : '')
-      return endString
+      // const trimString = index === 0 || index === this.strings.length-1 ? endString.trim() : endString
+      const trimString = endString.replace(/>\s*/g,'>').replace(/\s*</g,'<')
+      return trimString
     }).join('')
 
     return {
@@ -232,6 +262,11 @@ export class Tag {
         this.children.push(value)
       }
 
+      if(isSubjectInstance(value)) {
+        context[variableName] = value
+        return
+      }
+
       context[variableName] = new ValueSubject(value)
     })
 
@@ -257,13 +292,13 @@ export class Tag {
       throw err
     }
 
-    // this.destroy({stagger: 0, rebuilding: true})
+    // redrawTag(this, this.tagSupport.templater as TemplaterResult, this.ownerTag)
+
     this.buildBeforeElement(insertBefore, {
       forceElement: true,
       counts: {added: 0, removed: 0},
       depth: this.tagSupport.depth,
     })
-    // this.tagSupport.render()
   }
 
   buildBeforeElement(
@@ -278,20 +313,78 @@ export class Tag {
     
     const context = this.update()
     const template = this.getTemplate()
+    const ownerTag = this.ownerTag
     
     const temporary = document.createElement('div')
     temporary.id = 'tag-temp-holder'
     // render content with a first child that we can know is our first element
-    temporary.innerHTML = '<div></div>' + template.string
-  
-    interpolateElement(temporary, context, this, {forceElement: options.forceElement, depth: options.depth})
+    temporary.innerHTML = '<div id="top-element-insert-after"></div>' + template.string
 
-    const clones = buildClones(temporary, insertBefore)
-    this.clones.push( ...clones )
+    if(ownerTag) {
+      // Sometimes my clones were first registered to my owner, remove them
+      // this.ownerTag.clones = this.ownerTag.clones.filter(compareClone =>
+      //   !this.clones.find(myClone => compareClone === myClone)
+      // )
+      ownerTag.clones = ownerTag.clones.filter(compareClone => {
+        const match = this.clones.find(myClone => compareClone === myClone)
+        if(match) {
+          console.error('found clone in parents clones', {match, compareClone})
+          throw new Error('found clone in parents clones')
+          this.clones.push(compareClone)
+          // ownerTag.clones = ownerTag.clones.filter(clone => compareClone !== clone)
+          return false
+        }
 
-    clones.forEach(clone => afterElmBuild(clone, options))
+        return true
+      })
+    }
+
+    // const preClones = buildClones(temporary, insertBefore)
+    // temporary.innerHTML = '<div id="top-element-insert-after"></div>'
+
+    // const clonesBefore = this.clones.map(clone => clone)
+    const intClones = interpolateElement(
+      temporary,
+      context,
+      this, // this.ownerTag || this,
+      {forceElement: options.forceElement, depth: options.depth}
+    )
+
+    /*
+    // this.destroyClones()
+    */
+   this.clones.length = 0
+   const clones = buildClones(temporary, insertBefore)
+
+   this.clones.push( ...clones )
+   // this.clones.push( ...preClones )
+
+   if(intClones.length) {
+     this.clones = this.clones.filter(cloneFilter => !intClones.find(clone => clone === cloneFilter))
+   }
+
+    if(ownerTag) {
+      // Sometimes my clones were first registered to my owner, remove them
+      // this.ownerTag.clones = this.ownerTag.clones.filter(compareClone =>
+      //   !this.clones.find(myClone => compareClone === myClone)
+      // )
+      ownerTag.clones = ownerTag.clones.filter(compareClone => {
+        const match = this.clones.find(myClone => compareClone === myClone)
+        if(match) {
+          console.error('found clone in parents clones', {match, compareClone})
+          throw new Error('found clone in parents clones')
+          this.clones.push(compareClone)
+          // ownerTag.clones = ownerTag.clones.filter(clone => compareClone !== clone)
+          return false
+        }
+
+        return true
+      })
+    }
+
+    this.clones.forEach(clone => afterElmBuild(clone, options))
   
-    return clones
+    return this.clones
   }
   
 }
@@ -309,7 +402,7 @@ export type ElementBuildOptions = {
 
 function updateExistingValue(
   existing: Subject | TemplaterResult,
-  value: TemplaterResult | TagSupport | Function,
+  value: TemplaterResult | TagSupport | Function | Subject,
   tag: Tag,
 ) {
   /** @type {Tag | undefined} */
@@ -370,6 +463,11 @@ function updateExistingValue(
   // now its a function
   if(value instanceof Function) {
     existingSubject.set( bindSubjectFunction(value as any, tag) )
+    return
+  }
+
+  if(isSubjectInstance(value as Subject)) {
+    existingSubject.set( (value as Subject).value ) // let ValueSubject now of newest value
     return
   }
 

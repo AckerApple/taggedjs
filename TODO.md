@@ -8,6 +8,7 @@
 - routing
 - Upgrade state to support both named and array state memory
   - helps with HMR
+- Test tag switch ${ trueFalse ? tagOne() : tagTwo() }
 
 ### Extra testing
 - Test switching a components return string
@@ -25,6 +26,7 @@
   - We may need to render attributes and then make a marker attribute
     - title="real title here" tag:title="__tagVar2_"
 
+
 ## Documentations
 
 ### React differences
@@ -39,9 +41,12 @@
   - init hook - move
   - async hook - move
 - innerHTML is 1st or 2nd argument
+- No tags for Components
+  - `<Component a={b} x={y}></Component>` <- Instead of
+  - `${Component({x: y, a: b})}` <- its this
 
 ### Angular similarities
 - Support for bracket element definitions
-  - [style.background-color]="red"
+  - `<div style.background-color]="red"></div>`
   - NOT [style.background-color]="'red'"
   - NOT [style.backgroundColor]="'red'" NOR [style.backgroundColor]="red"

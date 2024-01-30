@@ -2,9 +2,14 @@ export type Subscription = (() => void) & {
   unsubscribe: () => any
 }
 
-type Subscriber = () => any
+type Subscriber = (value?: any) => any
 
-export class Subject {
+export interface SubjectLike {
+  subscribe: (callback: (value?: any) => any) => any,
+  isSubject?: boolean
+}
+
+export class Subject implements SubjectLike {
   isSubject = true
   subscribers: Subscriber[] = []
   value?: any
@@ -12,9 +17,8 @@ export class Subject {
 
   subscribe(callback: Subscriber) {
     this.subscribers.push(callback)
-    ;(Subject as any).globalSubs.push(callback) // 🔬 testing
-
-    ++(Subject as any).globalSubCount
+    SubjectClass.globalSubs.push(callback) // 🔬 testing
+    SubjectClass.globalSubCount$.set( SubjectClass.globalSubCount$.value + 1 )
 
     const unsubscribe: Subscription = () => {
       unsubscribe.unsubscribe()
@@ -23,8 +27,8 @@ export class Subject {
     // Return a function to unsubscribe from the BehaviorSubject
     unsubscribe.unsubscribe = () => {
       removeSubFromArray(this.subscribers, callback)
-      removeSubFromArray((Subject as any).globalSubs, callback) // 🔬 testing
-      --(Subject as any).globalSubCount
+      removeSubFromArray(SubjectClass.globalSubs, callback) // 🔬 testing
+      SubjectClass.globalSubCount$.set( SubjectClass.globalSubCount$.value - 1 )
       
       // any double unsubscribes will be ignored
       unsubscribe.unsubscribe = () => undefined
@@ -55,5 +59,10 @@ function removeSubFromArray(
   }
 }
 
-;(Subject as any).globalSubCount = 0 // for ease of debugging
-;(Subject as any).globalSubs = [] // 🔬 testing
+const SubjectClass = Subject as typeof Subject & {
+  globalSubCount$: Subject
+  globalSubs: Subscriber[]
+}
+SubjectClass.globalSubs = [] // 🔬 for testing
+SubjectClass.globalSubCount$ = new Subject() // for ease of debugging
+SubjectClass.globalSubCount$.set(0)

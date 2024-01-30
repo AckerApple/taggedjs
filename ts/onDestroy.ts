@@ -1,5 +1,5 @@
 import { TagSupport } from "./getTagSupport.js"
-import { setUse } from "./tagRunner.js"
+import { setUse } from "./setUse.function.js"
 
 export type OnDestroyCallback = () => unknown
 

@@ -1,3 +1,4 @@
+import { Clones } from "./Clones.type.js"
 import { Tag } from "./Tag.class.js"
 import { InterpolateOptions } from "./interpolateElement.js"
 import { Counts, Template, interpolateTemplate } from "./interpolateTemplate.js"
@@ -6,67 +7,78 @@ import { Counts, Template, interpolateTemplate } from "./interpolateTemplate.js"
 export function interpolateContentTemplates(
   element: Element,
   variable: any,
-  ownerTag: Tag,
+  tag: Tag,
   options: InterpolateOptions,
-) {
+): Clones {
   if ( !element.children || element.tagName === 'TEMPLATE' ) {
-    return // done
+    return [] // done
   }
 
   const counts: Counts = {
     added: 0,
     removed: 0,
   }
+  const clones: Clones = []
 
   const children = new Array(...(element.children as any))
 
   children.forEach((child, index) => {
-    interpolateChild(child, index, children, options)
+    const nextClones = interpolateChild(child, index, children, options, variable, tag, counts)
+
+    clones.push(...nextClones)
     
     if ( child.children ) {  
       const nextKids = new Array(...child.children)
       nextKids.forEach((subChild, index) => {
         if ( isRenderEndTemplate(subChild) ) {
-          interpolateChild(subChild, index, nextKids, options)
+          interpolateChild(subChild, index, nextKids, options, variable, tag, counts)
         }
 
-        interpolateContentTemplates(subChild, variable, ownerTag, options)
+        const nextClones = interpolateContentTemplates(subChild, variable, tag, options)
+        clones.push( ...nextClones )
       })
     }
   })
 
-  function interpolateChild(
-    child: Element,
-    index: number,
-    children: Element[],
-    options: InterpolateOptions,
-  ) {
-    children.forEach((child, subIndex) => {
-      if ( subIndex < index ) {
-        return // too low
-      }
+  return clones
+}
 
-      if ( child.tagName!=='TEMPLATE' ) {
-        return // not a template
-      }
-    
-      if ( child.getAttribute('interpolate')===undefined || child.getAttribute('end') === undefined ) {
-        return // not a rendering template
-      }
+function interpolateChild(
+  child: Element,
+  index: number,
+  children: Element[],
+  options: InterpolateOptions,
+  variable: any,
+  tag: Tag,
+  counts: Counts,
+): Clones {
+  /*
+  children.forEach((child, subIndex) => {
+    if ( subIndex < index ) {
+      return // too low
+    }
 
-      return child
-    })
+    if ( child.tagName!=='TEMPLATE' ) {
+      return // not a template
+    }
+  
+    if ( child.getAttribute('interpolate')===undefined || child.getAttribute('end') === undefined ) {
+      return // not a rendering template
+    }
 
-    interpolateTemplate(
-      child as Template,
-      variable,
-      ownerTag,
-      counts,
-      options,
-    )
-  }
+    return child
+  })
+  */
 
-  return
+  const clones = interpolateTemplate(
+    child as Template,
+    variable,
+    tag,
+    counts,
+    options,
+  )
+
+  return clones
 }
 
 function isRenderEndTemplate(child: Element) {

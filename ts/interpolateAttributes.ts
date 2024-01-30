@@ -31,7 +31,6 @@ export function interpolateAttributes(
         return
       }
 
-      // TODO: Need to just see if can be subscribed to
       if(isSubjectInstance(result)) {
         child.removeAttribute(attrName)
         const callback = (newAttrValue: any) => {

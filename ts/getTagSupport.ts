@@ -42,7 +42,10 @@ export function getTagSupport(
     renderCount: 0,
     depth,
     memory: {
-      context: {} // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+      context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+      state: {
+        newest: [],
+      }
     },
     mutatingRender: () => {
       const message = 'Tag function "render()" was called in sync but can only be called async'
@@ -59,7 +62,6 @@ export function getTagSupport(
       newTemplater: TemplaterResult,
     ): boolean => {
       const preRenderCount = tagSupport.renderCount
-
       providersChangeCheck(tag)
 
       // When the providers were checked, a render to myself occurred and I do not need to re-render again

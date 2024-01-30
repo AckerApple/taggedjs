@@ -1,20 +1,26 @@
 import { TagSupport } from "./getTagSupport.js"
-import { setUse } from "./tagRunner.js"
+import { setUse } from "./setUse.function.js"
 
 export type StateConfig = ((x?: any) => [any, any])
 
 export type StateConfigArray = {callback: StateConfig, lastValue?: any}[]
 
+export type Config = {
+  array: StateConfigArray // state memory on the first render
+  rearray: StateConfigArray // state memory to be used before the next render
+}
+
 export type State = {
   newest: StateConfigArray
-  oldest?: StateConfigArray
+  // oldest?: StateConfigArray
+  // config: Config
 }
 
 // TODO: rename
-export const config = {
+setUse.memory.stateConfig = {
   array: [] as StateConfigArray, // state memory on the first render
   rearray: [] as StateConfigArray, // state memory to be used before the next render
-}
+} as Config
 
 /**
  * @template T
@@ -25,9 +31,7 @@ export function state <T>(
   defaultValue: T,
   getSetMethod?: (x: T) => [T, T],
 ): T {
-  /*if(!getSetMethod) {
-    getSetMethod = (x: any) => [x, x]
-  }*/
+  const config: Config = setUse.memory.stateConfig
 
   const restate = config.rearray[config.array.length]
   if(restate) {
@@ -47,16 +51,12 @@ export function state <T>(
 }
 
 setUse({
-  beforeRender: (tagSupport: TagSupport) => {
-    tagSupport.memory.state = tagSupport.memory.state || {
-      newest: [],// oldest: [],
-    }
-  },
+  /* beforeRender: (tagSupport: TagSupport) => {}, */
   beforeRedraw: (
     tagSupport: TagSupport,
   ) => {
-    //config.array.length = 0
-    const state: State = tagSupport.memory.state
+    const state = tagSupport.memory.state as State
+    const config: Config = setUse.memory.stateConfig
     
     config.rearray.length = 0
 
@@ -67,19 +67,25 @@ setUse({
   afterRender: (
     tagSupport: TagSupport,
   ) => {
+    const state: State = tagSupport.memory.state
+    // const config = state.config
+    const config: Config = setUse.memory.stateConfig
+
     if(config.rearray.length) {
       if(config.rearray.length !== config.array.length) {
         const message = `States lengths mismatched ${config.rearray.length} !== ${config.array.length}`
+        console.error(message, {
+          oldStates: config.array,
+          newStates: config.rearray,
+        })
         throw new Error(message)
       }
     }
 
     config.rearray.length = 0 // clean up any previous runs
 
-    const state = tagSupport.memory.state as State
     state.newest.length = 0
     state.newest.push(...config.array) as any
-    state.oldest = state.oldest || [...config.array] // always preserve oldest
     config.array.length = 0
   }
 })
