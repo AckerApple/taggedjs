@@ -91,9 +91,6 @@ export function setValueRedraw(
           return
         }
 
-        runBeforeRender(item.tag.tagSupport, item.tag)
-        item.tag.beforeRedraw()
-    
         item.value.redraw()
       })
     }

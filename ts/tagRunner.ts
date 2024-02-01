@@ -12,14 +12,6 @@ export function runBeforeRender(
   setUse.tagUse.forEach(tagUse => tagUse.beforeRender(tagSupport, tag))
 }
 
-// Life cycle 1.1
-export function runAfterTagClone(
-  oldTag: Tag,
-  newTag: Tag,
-) {
-  setUse.tagUse.forEach(tagUse => tagUse.afterTagClone(oldTag, newTag))
-}
-
 // Life cycle 2
 export function runAfterRender(
   tagSupport: TagSupport,

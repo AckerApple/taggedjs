@@ -51,19 +51,8 @@ export function state <T>(
 }
 
 setUse({
-  /* beforeRender: (tagSupport: TagSupport) => {}, */
-  beforeRedraw: (
-    tagSupport: TagSupport,
-  ) => {
-    const state = tagSupport.memory.state as State
-    const config: Config = setUse.memory.stateConfig
-    
-    config.rearray.length = 0
-
-    if(state?.newest.length) {
-      config.rearray.push( ...state.newest )
-    }
-  },
+  beforeRender: (tagSupport: TagSupport) => initState(tagSupport),
+  beforeRedraw: (tagSupport: TagSupport) => initState(tagSupport),
   afterRender: (
     tagSupport: TagSupport,
   ) => {
@@ -74,10 +63,13 @@ setUse({
     if(config.rearray.length) {
       if(config.rearray.length !== config.array.length) {
         const message = `States lengths mismatched ${config.rearray.length} !== ${config.array.length}`
+        
         console.error(message, {
           oldStates: config.array,
           newStates: config.rearray,
+          component: tagSupport.templater?.wrapper.original
         })
+        
         throw new Error(message)
       }
     }
@@ -111,3 +103,26 @@ export function getStateValue(
 }
 
 export class StateEchoBack {}
+
+function initState(
+  tagSupport: TagSupport
+) {
+  const state = tagSupport.memory.state as State
+  const config: Config = setUse.memory.stateConfig
+  
+  if (config.rearray.length) {
+    const message = 'last array not cleared'
+    console.error(message, {
+      config,
+      component: tagSupport.templater?.wrapper.original,
+      state,
+    })
+    throw message
+  }
+
+  config.rearray.length = 0
+
+  if(state?.newest.length) {
+    config.rearray.push( ...state.newest )
+  }
+}

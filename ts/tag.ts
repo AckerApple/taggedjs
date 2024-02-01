@@ -2,7 +2,7 @@ import { Tag } from "./Tag.class.js"
 import { deepClone } from "./deepFunctions.js"
 import { TagSupport } from "./getTagSupport.js"
 import { isTagInstance } from "./isInstance.js"
-import { runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
+import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
 import { setUse } from "./setUse.function.js"
 import { State } from "./state.js"
 
@@ -52,11 +52,12 @@ export class TemplaterResult {
 
       const runtimeOwnerTag = existingTag?.ownerTag || ownerTag
 
-      runBeforeRender(tagSupport, tagSupport.oldest)
-
       if(tagSupport.oldest) {
         tagSupport.oldest.beforeRedraw()
       } else {
+        // first time render
+        runBeforeRender(tagSupport, tagSupport.oldest)
+
         // TODO: Logic below most likely could live within providers.ts inside the runBeforeRender function
         const providers = setUse.memory.providerConfig
         providers.ownerTag = runtimeOwnerTag
@@ -69,12 +70,8 @@ export class TemplaterResult {
     /* AFTER */
     retag.tagSupport = tagSupport
   
-    if(tagSupport.oldest) {
-      tagSupport.oldest.afterRender()
-    } else {
-      retag.afterRender()
-    }
-
+   runAfterRender(tagSupport, retag)
+  
     templater.newest = retag
     retag.ownerTag = runtimeOwnerTag
   
@@ -85,7 +82,6 @@ export class TemplaterResult {
     oldest.tagSupport = oldestTagSupport || tagSupport
     oldest.tagSupport.templater = templater
   
-    // retag.getTemplate() // cause lastTemplateString to render
     retag.setSupport(tagSupport)
     const isSameTag = existingTag && existingTag.isLikeTag(retag)
 
@@ -98,7 +94,6 @@ export class TemplaterResult {
     return {remit: true, retag}
   }
 }
-
 
 export interface TemplateRedraw extends TemplaterResult {
   redraw: () => Tag | undefined
@@ -140,7 +135,8 @@ export function tag<T>(
     }
 
     function innerTagWrap() {
-      return (innerTagWrap.original as TagComponent)(argProps, children)
+      const originalFunction = innerTagWrap.original as TagComponent
+      return originalFunction(argProps, children)
     }
 
     innerTagWrap.original = tagComponent

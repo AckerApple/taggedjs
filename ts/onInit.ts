@@ -24,5 +24,8 @@ export function onInit(
 setUse({
   beforeRender: (tagSupport) => {
     setCurrentTagSupport(tagSupport)
+  },
+  beforeRedraw(tagSupport, tag) {
+    setCurrentTagSupport(tagSupport)
   }
 })

@@ -4,7 +4,7 @@ import { Provider } from "./providers.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { deepEqual } from "./deepFunctions.js"
 import { Subject, Subscription } from "./Subject.js"
-import { runAfterRender, runAfterTagClone, runBeforeDestroy, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
+import { runAfterRender, runBeforeDestroy, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
 import { TemplateRedraw, TemplaterResult } from "./tag.js"
 import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js"
 import { buildClones } from "./render.js"
@@ -54,10 +54,6 @@ export class Tag {
 
   afterRender() {
     runAfterRender(this.tagSupport, this)
-  }
-
-  afterClone(newTag: Tag) {
-    runAfterTagClone(this, newTag)
   }
 
   /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
@@ -145,7 +141,7 @@ export class Tag {
   setSupport(tagSupport: TagSupport) {
     this.tagSupport = this.tagSupport || tagSupport
     this.tagSupport.mutatingRender = this.tagSupport.mutatingRender || tagSupport.mutatingRender
-    this.children.forEach(kid => kid.setSupport(tagSupport))
+    // this.children.forEach(kid => kid.setSupport(tagSupport))
   }
   
   updateConfig(strings: string[], values: any[]) {
@@ -446,14 +442,14 @@ function updateExistingValue(
   if(ogTag) {
     const tagSupport = ogTag.tagSupport
     const templater = value as TemplaterResult
-    runBeforeRender(tagSupport, ogTag)
+    // runBeforeRender(tagSupport, ogTag)
     tagSupport.oldest.beforeRedraw()
 
     const retag = templater.wrapper()
     
     retag.tagSupport = tagSupport
     templater.newest = retag
-    tagSupport.oldest.afterRender()          
+    tagSupport.oldest.afterRender()
     ogTag.updateByTag(retag)
     existingSubject.set(value)
     

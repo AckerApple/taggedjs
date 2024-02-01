@@ -9,6 +9,9 @@
 - Upgrade state to support both named and array state memory
   - helps with HMR
 - Test tag switch ${ trueFalse ? tagOne() : tagTwo() }
+- All logging must go through subscriptions
+- Production mode
+  - Remove guards like state checks
 
 ### Extra testing
 - Test switching a components return string
