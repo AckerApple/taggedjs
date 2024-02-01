@@ -15,6 +15,7 @@ export class TemplaterResult {
     forceRenderTemplate(tagSupport, ownerTag) {
         const tag = this.wrapper();
         tag.tagSupport = tagSupport;
+        console.log('after forceRenderTemplate');
         tag.afterRender();
         this.oldest = tag;
         tagSupport.oldest = tag;
@@ -43,6 +44,7 @@ export class TemplaterResult {
         const retag = templater.wrapper();
         /* AFTER */
         retag.tagSupport = tagSupport;
+        console.log('after renderWithSupport');
         runAfterRender(tagSupport, retag);
         templater.newest = retag;
         retag.ownerTag = runtimeOwnerTag;

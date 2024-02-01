@@ -329,6 +329,7 @@ function updateExistingValue(existing, value, tag) {
         const retag = templater.wrapper();
         retag.tagSupport = tagSupport;
         templater.newest = retag;
+        console.log('after already seen tag');
         tagSupport.oldest.afterRender();
         ogTag.updateByTag(retag);
         existingSubject.set(value);
