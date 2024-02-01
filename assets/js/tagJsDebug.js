@@ -19,22 +19,23 @@ export function upperTagDebugProvider() {
   }
 }
 
-export const tagDebug = tag(function tagDebug() {
+export const tagDebug = tag(function TagDebug() {
   // tagDebug.js
+  let _firstState = state('tagJsDebug.js', x => [_firstState, _firstState = x])
   let showIntervals = state(false, x => [showIntervals, showIntervals = x])
 
   const provider = providers.create( tagDebugProvider )
 
   return html`<!-- tagDebug.js -->
     <div id="tagDebug-fx-wrap" style="padding:1em;background:rgba(0,0,0,.5)" oninit=${animateInit} ondestroy=${animateDestroy}>
-      <h2 id="tagDebugCounters">counters**</h2>
+      <h2 id="tagDebugCounters">counters</h2>
       ${counters()}
 
       <br /><br />
 
       <fieldset id="debug-intervals">
         <legend>
-          interval testing
+          Interval Testing...
           <button
             onclick=${() => showIntervals = !showIntervals}
           >hide/show</button>

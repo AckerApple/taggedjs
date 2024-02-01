@@ -1,6 +1,6 @@
 import { deepClone } from "./deepFunctions.js";
 import { isTagInstance } from "./isInstance.js";
-import { runBeforeRender } from "./tagRunner.js";
+import { runAfterRender, runBeforeRender } from "./tagRunner.js";
 import { setUse } from "./setUse.function.js";
 export class TemplaterResult {
     props;
@@ -28,11 +28,12 @@ export class TemplaterResult {
         // signify to other operations that a rendering has occurred so they do not need to render again
         ++tagSupport.renderCount;
         const runtimeOwnerTag = existingTag?.ownerTag || ownerTag;
-        runBeforeRender(tagSupport, tagSupport.oldest);
         if (tagSupport.oldest) {
             tagSupport.oldest.beforeRedraw();
         }
         else {
+            // first time render
+            runBeforeRender(tagSupport, tagSupport.oldest);
             // TODO: Logic below most likely could live within providers.ts inside the runBeforeRender function
             const providers = setUse.memory.providerConfig;
             providers.ownerTag = runtimeOwnerTag;
@@ -42,12 +43,7 @@ export class TemplaterResult {
         const retag = templater.wrapper();
         /* AFTER */
         retag.tagSupport = tagSupport;
-        if (tagSupport.oldest) {
-            tagSupport.oldest.afterRender();
-        }
-        else {
-            retag.afterRender();
-        }
+        runAfterRender(tagSupport, retag);
         templater.newest = retag;
         retag.ownerTag = runtimeOwnerTag;
         const oldest = tagSupport.oldest = tagSupport.oldest || retag;
@@ -55,7 +51,6 @@ export class TemplaterResult {
         const oldestTagSupport = oldest.tagSupport;
         oldest.tagSupport = oldestTagSupport || tagSupport;
         oldest.tagSupport.templater = templater;
-        // retag.getTemplate() // cause lastTemplateString to render
         retag.setSupport(tagSupport);
         const isSameTag = existingTag && existingTag.isLikeTag(retag);
         // If previously was a tag and seems to be same tag, then just update current tag with new values
@@ -84,7 +79,8 @@ export function tag(tagComponent) {
             argProps = noPropsGiven;
         }
         function innerTagWrap() {
-            return innerTagWrap.original(argProps, children);
+            const originalFunction = innerTagWrap.original;
+            return originalFunction(argProps, children);
         }
         innerTagWrap.original = tagComponent;
         const templater = new TemplaterResult();

@@ -3,6 +3,7 @@ import { html, tag, renderAppToElement, state } from "./taggedjs/index.js"
 import { tagDebug } from "./tagJsDebug.js"
 
 export const App = tag(function App(){
+  let _firstState = state('app first state', x => [_firstState, _firstState=x])
   let toggleValue = state(false, x => [toggleValue, toggleValue=x])
 
   const toggle = () => {
@@ -11,7 +12,7 @@ export const App = tag(function App(){
   }
 
   return html`<!--app.js-->
-    <h1 id="app">🏷️ TaggedJs** - ${2+2}</h1>
+    <h1 id="app">🏷️ TaggedJs??? - ${2+2}</h1>
 
     <button onclick=${toggle}>toggle test ${toggleValue}</button>
 

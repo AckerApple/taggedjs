@@ -1,6 +1,5 @@
 import { ValueSubject } from "./ValueSubject.js";
 import { redrawTag } from "./redrawTag.function.js";
-import { runBeforeRender } from "./tagRunner.js";
 export function getSubjectFunction(value, tag) {
     return new ValueSubject(bindSubjectFunction(value, tag));
 }
@@ -53,8 +52,6 @@ existing, ownerTag) {
                 if (!item.value?.isTemplater) {
                     return;
                 }
-                runBeforeRender(item.tag.tagSupport, item.tag);
-                item.tag.beforeRedraw();
                 item.value.redraw();
             });
         }

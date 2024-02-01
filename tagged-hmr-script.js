@@ -32,14 +32,13 @@ function reconnect() {
       return
     }
 
-    console.log('reloading app...')
     runElementSelector()
   })
 
   // Connection closed
   socket.addEventListener('close', (event) => {
     console.log('WebSocket connection closed:', event);
-    
+
     reconnect()
   })
 }
@@ -64,7 +63,6 @@ async function getNewApp() {
 async function updateByElement(
   app
 ) {
-  console.log('update element')
   const oldTag = app.tag
   const oldTags = app.tags
   const oldSetUse = app.setUse
@@ -74,7 +72,12 @@ async function updateByElement(
   const newSetUse = newTemplater.wrapper.original.setUse
 
   oldSetUse.tagUse = newSetUse.tagUse
-  oldSetUse.memory = newSetUse.memory
+  
+  // update old middleware to use new memory
+  Object.assign(oldSetUse.memory, newSetUse.memory)
+  
+  // bind the old and new together
+  newSetUse.memory = oldSetUse.memory
 
   const tagChangeStates = oldTags.reduce((all, oldTag) => {
     const newTag = newTags.find(newTag => newTag.toString() === oldTag.toString())
@@ -100,67 +103,61 @@ async function updateByElement(
 
   if(tagChangeStates.length) {
     const compareTag = tagChangeStates[0].oldTag
-    console.debug('replacing components', tagChangeStates[0], oldTag.tagSupport)
     const oldTemplater = oldTag.tagSupport.templater
     const match0 = oldTemplater.wrapper.original === compareTag
     const match1 = oldTemplater.wrapper.original.toString() === compareTag.toString()
 
+    // Check to rebuild the MAIN APP
     if(match0 || match1) {
       const newTag = tagChangeStates[0].newTag
       oldTag.tagSupport.templater.wrapper.original = newTag
-
-      console.log('oldTag 0', oldTag)
-      app.tag = await rebuildTag(oldTag, newTag)
+      app.tag = await rebuildTag(oldTag)
       app.tags = newTags
-      // app.setUse = newSetUse    
       return
     }
 
     const count = await replaceTemplater(oldTag, tagChangeStates[0])
     
     if(count <= 0) {
-      console.warn('No components were updated', tagChangeStates[0])
+      console.warn('✋ No components were updated', tagChangeStates[0])
     } else {
-      console.debug(`Replaced and update components ${count}`, tagChangeStates[0])
+      console.debug(`✅ Replaced and update components ${count}`, tagChangeStates[0])
     }
   }
 
   app.tags = newTags
-  // app.setUse = newSetUse
 
   console.log('✅ ✅ ✅ rebuilt')
 }
 
-async function rebuildTag(tag, newTag) { 
+async function rebuildTag(
+  tag,
+) { 
   const hasOldest = tag.tagSupport.oldest
-  
+  await tag.destroy()
+
+  /*
   if(hasOldest) {
-    // await tag.tagSupport.oldest.destroy()
-    tag.tagSupport.oldest.destroy()
-    // delete tag.tagSupport.oldest
+    await tag.tagSupport.oldest.destroy()
   }
+  */
 
   if(!hasOldest) {
-    if(tag.ownerTag) {
-      tag.ownerTag.clones = tag.ownerTag.clones.filter(clone=>clone.parentNode)
-    }
-
     if(tag.clones.filter(clone=>!clone.parentNode).length) {
       throw new Error('clones with no parent')
     }
 
     tag.clones = tag.clones.filter(clone=>clone.parentNode)
-    await tag.destroy()
+    // await tag.destroy()
   }
 
+  /*
   if(tag.tagSupport.newest) {
-    // await tag.tagSupport.newest.destroy()
-    tag.tagSupport.newest.destroy()
-    delete tag.tagSupport.newest
+    await tag.tagSupport.newest.destroy()
   }
+  */
 
-  const {retag} = redrawTag(tag, tag.tagSupport.templater)
-
+  const { retag } = redrawTag(tag, tag.tagSupport.templater)
 
   retag.providers = tag.providers
   retag.insertBefore = tag.insertBefore
@@ -190,23 +187,27 @@ async function replaceTemplater(
 
     const match0 = value.wrapper.original === oldTag
     const match1 = value.wrapper.original.toString() === oldTag.toString()
+
+    // Check to rebuild a component within an app
     if(match0 || match1) {
       // replaceTags(tag, value, index, {oldTag, newTag})
       const contextSubject = tag.tagSupport.memory.context[`__tagVar${index}`]
       value.wrapper.original = newTag
-    
-      contextSubject.tag = await rebuildTag(contextSubject.tag, newTag)
+      
+      contextSubject.tag.tagSupport.templater.wrapper.original = newTag
+      contextSubject.tag = await rebuildTag(contextSubject.tag)
 
       ++count
     }
 
     if(value.newest) {
       count = count + await replaceTemplater(value.newest, {oldTag, newTag}, count)
-      return
+      // return
     }
 
     /*if(value.oldest) {
       count = count + await replaceTemplater(value.oldest, {oldTag, newTag}, count)
+      // return
     }*/
   })
 
@@ -229,4 +230,8 @@ function rebuildApps() {
       const tag = renderAppToElement(newApp.App, element, {test:1})
     })
   })
+}
+
+function wait(time) {
+  return new Promise((res) => setTimeout(() => res(), time))
 }

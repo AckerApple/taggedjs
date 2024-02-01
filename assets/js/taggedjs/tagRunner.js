@@ -4,10 +4,6 @@ import { setUse } from "./setUse.function.js";
 export function runBeforeRender(tagSupport, tag) {
     setUse.tagUse.forEach(tagUse => tagUse.beforeRender(tagSupport, tag));
 }
-// Life cycle 1.1
-export function runAfterTagClone(oldTag, newTag) {
-    setUse.tagUse.forEach(tagUse => tagUse.afterTagClone(oldTag, newTag));
-}
 // Life cycle 2
 export function runAfterRender(tagSupport, tag) {
     setUse.tagUse.forEach(tagUse => tagUse.afterRender(tagSupport, tag));

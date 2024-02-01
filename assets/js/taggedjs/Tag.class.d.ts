@@ -29,7 +29,6 @@ export declare class Tag {
     providers: Provider[];
     beforeRedraw(): void;
     afterRender(): void;
-    afterClone(newTag: Tag): void;
     /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
     key(arrayValue: any[]): this;
     destroy(options?: DestroyOptions): Promise<number>;

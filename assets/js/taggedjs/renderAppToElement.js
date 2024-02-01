@@ -32,16 +32,18 @@ export function applyTagUpdater(wrapper) {
 export function addAppTagRender(tagSupport, tag) {
     let lastTag;
     tagSupport.mutatingRender = () => {
-        runBeforeRender(tagSupport, tag);
+        // runBeforeRender(tagSupport, tag)
         tag.beforeRedraw();
         const templater = tagSupport.templater; // wrapper
         const fromTag = lastTag = templater.wrapper();
-        fromTag.setSupport(tag.tagSupport);
+        // fromTag.setSupport(tagSupport)
+        fromTag.tagSupport = tagSupport;
         tag.afterRender();
         tag.updateByTag(fromTag);
         if (lastTag) {
             lastTag.destroy({ stagger: 0 });
         }
+        tagSupport.newest = fromTag;
         return lastTag;
     };
 }

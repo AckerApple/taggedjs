@@ -2,7 +2,7 @@ import { bindSubjectFunction, elementDestroyCheck, getSubjectFunction, setValueR
 import { getTagSupport } from "./getTagSupport.js";
 import { ValueSubject } from "./ValueSubject.js";
 import { deepEqual } from "./deepFunctions.js";
-import { runAfterRender, runAfterTagClone, runBeforeDestroy, runBeforeRedraw, runBeforeRender } from "./tagRunner.js";
+import { runAfterRender, runBeforeDestroy, runBeforeRedraw } from "./tagRunner.js";
 import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js";
 import { buildClones } from "./render.js";
 import { interpolateElement } from "./interpolateElement.js";
@@ -35,9 +35,6 @@ export class Tag {
     }
     afterRender() {
         runAfterRender(this.tagSupport, this);
-    }
-    afterClone(newTag) {
-        runAfterTagClone(this, newTag);
     }
     /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
     key(arrayValue) {
@@ -104,7 +101,7 @@ export class Tag {
     setSupport(tagSupport) {
         this.tagSupport = this.tagSupport || tagSupport;
         this.tagSupport.mutatingRender = this.tagSupport.mutatingRender || tagSupport.mutatingRender;
-        this.children.forEach(kid => kid.setSupport(tagSupport));
+        // this.children.forEach(kid => kid.setSupport(tagSupport))
     }
     updateConfig(strings, values) {
         this.strings = strings;
@@ -327,7 +324,7 @@ function updateExistingValue(existing, value, tag) {
     if (ogTag) {
         const tagSupport = ogTag.tagSupport;
         const templater = value;
-        runBeforeRender(tagSupport, ogTag);
+        // runBeforeRender(tagSupport, ogTag)
         tagSupport.oldest.beforeRedraw();
         const retag = templater.wrapper();
         retag.tagSupport = tagSupport;

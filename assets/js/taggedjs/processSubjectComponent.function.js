@@ -30,17 +30,15 @@ export function processSubjectComponent(value, result, template, ownerTag, optio
     let tag = templater.newest;
     const providers = setUse.memory.providerConfig;
     providers.ownerTag = ownerTag;
-    let isFirstTime = !tag;
-    runBeforeRender(tagSupport, tag);
-    if (options.forceElement) {
-        isFirstTime = true;
-        const oldTag = tag;
-        // only true when options.forceElement
-        if (oldTag) {
-            runBeforeRedraw(oldTag.tagSupport, oldTag);
-        }
-    }
+    const isFirstTime = !tag || options.forceElement;
     if (isFirstTime) {
+        if (!tag) {
+            runBeforeRender(tagSupport, tag);
+        }
+        // only true when options.forceElement
+        if (tag) {
+            runBeforeRedraw(tagSupport, tag);
+        }
         tag = templater.forceRenderTemplate(tagSupport, ownerTag);
     }
     ownerTag.children.push(tag);

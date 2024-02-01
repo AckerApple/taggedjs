@@ -15,6 +15,9 @@ export function onInit(callback) {
 setUse({
     beforeRender: (tagSupport) => {
         setCurrentTagSupport(tagSupport);
+    },
+    beforeRedraw(tagSupport, tag) {
+        setCurrentTagSupport(tagSupport);
     }
 });
 //# sourceMappingURL=onInit.js.map

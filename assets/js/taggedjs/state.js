@@ -27,15 +27,8 @@ export function state(defaultValue, getSetMethod) {
     return defaultValue;
 }
 setUse({
-    /* beforeRender: (tagSupport: TagSupport) => {}, */
-    beforeRedraw: (tagSupport) => {
-        const state = tagSupport.memory.state;
-        const config = setUse.memory.stateConfig;
-        config.rearray.length = 0;
-        if (state?.newest.length) {
-            config.rearray.push(...state.newest);
-        }
-    },
+    beforeRender: (tagSupport) => initState(tagSupport),
+    beforeRedraw: (tagSupport) => initState(tagSupport),
     afterRender: (tagSupport) => {
         const state = tagSupport.memory.state;
         // const config = state.config
@@ -46,6 +39,7 @@ setUse({
                 console.error(message, {
                     oldStates: config.array,
                     newStates: config.rearray,
+                    component: tagSupport.templater?.wrapper.original
                 });
                 throw new Error(message);
             }
@@ -70,5 +64,22 @@ export function getStateValue(state) {
     return oldValue;
 }
 export class StateEchoBack {
+}
+function initState(tagSupport) {
+    const state = tagSupport.memory.state;
+    const config = setUse.memory.stateConfig;
+    if (config.rearray.length) {
+        const message = 'last array not cleared';
+        console.error(message, {
+            config,
+            component: tagSupport.templater?.wrapper.original,
+            state,
+        });
+        throw message;
+    }
+    config.rearray.length = 0;
+    if (state?.newest.length) {
+        config.rearray.push(...state.newest);
+    }
 }
 //# sourceMappingURL=state.js.map
