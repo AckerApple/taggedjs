@@ -1,7 +1,10 @@
-import { runBeforeRender, redrawTag, Subject, Tag, getTagSupport, renderAppToElement } from "./assets/js/taggedjs/index.js";
-import { addAppTagRender } from "./assets/js/taggedjs/renderAppToElement.js";
+import { redrawTag, Tag, renderAppToElement } from "./assets/js/taggedjs/index.js";
 
 reconnect()
+
+/**
+ * @typedef {import("./assets/js/taggedjs/templater.utils.js").TagComponent} TagComponent
+ */
 
 function reconnect() {
   const socket = new WebSocket('ws://localhost:3000');
@@ -13,18 +16,12 @@ function reconnect() {
 
   // Connection opened
   socket.addEventListener('open', (event) => {
-    console.log('WebSocket connection opened:', event);
-
-    // Send a message to the server
-    socket.send('Hello, server!');
-
-    // destroy previous app
-    destroyApps()
+    console.info('WebSocket connection opened:', event);
   })
 
   // Listen for messages from the server
   socket.addEventListener('message', async (event) => {
-    console.log('Message from server:', event.data, event.data);
+    console.info('Message from server:', event.data, event.data);
 
     if(event.data==='Connected to the WebSocket endpoint') {
       // immediately overwrite existing running app
@@ -37,7 +34,7 @@ function reconnect() {
 
   // Connection closed
   socket.addEventListener('close', (event) => {
-    console.log('WebSocket connection closed:', event);
+    console.info('WebSocket connection closed:', event);
 
     reconnect()
   })
@@ -60,14 +57,18 @@ async function getNewApp() {
   return {newApp, newTemplater}
 }
 
+/** @type {TagComponent{}} */
+let lastTags = []
+
 async function updateByElement(
   app
 ) {
-  const oldTag = app.tag
-  const oldTags = app.tags
+  /** @type {TagComponent[]} */
+  const oldTags = lastTags
   const oldSetUse = app.setUse
     
   const { newTemplater } = await getNewApp()
+  /** @type {TagComponent[]} */
   const newTags = newTemplater.wrapper.original.tags
   const newSetUse = newTemplater.wrapper.original.setUse
 
@@ -91,11 +92,33 @@ async function updateByElement(
     console.warn('No old tags changed')
   }
 
+  const matchedTagCounts = oldTags.length === newTags.length
+
   newTags.forEach(newTag => {
-    const oldTag = oldTags.find(oldTag => newTag.toString() === oldTag.toString())
+    let oldTag = oldTags.find(oldTag => newTag.toString() === oldTag.toString())
+
+    let tagIndex = null
+    if(!oldTag && tagChangeStates[0].newTag) {
+      // const tagIndex = newTag.tagSupport.templater.wrapper.tagIndex // newTag.tagIndex
+      tagIndex = newTag.tagIndex
+      if(matchedTagCounts && oldTags[ tagIndex ].length === newTag.length) {
+        oldTag = oldTags[ tagIndex ]
+      }
+    }
+    
     if(!oldTag) {
       if(tagChangeStates[0].newTag) {
-        throw new Error('HMR tags mismatched')
+        const message = 'HMR has two tags'
+
+        console.warn(message, {
+          first: tagChangeStates[0].newTag,
+          second: newTag,
+          equal: newTag === tagChangeStates[0].newTag,
+          oldTags,
+          newTags,
+          tagIndex,
+        })
+        throw new Error(message)
       }
       tagChangeStates[0].newTag = newTag
     }
@@ -103,20 +126,21 @@ async function updateByElement(
 
   if(tagChangeStates.length) {
     const compareTag = tagChangeStates[0].oldTag
-    const oldTemplater = oldTag.tagSupport.templater
+    
+    // Check to rebuild the MAIN APP
+    const oldTemplater = lastApp.tagSupport.templater
     const match0 = oldTemplater.wrapper.original === compareTag
     const match1 = oldTemplater.wrapper.original.toString() === compareTag.toString()
-
-    // Check to rebuild the MAIN APP
     if(match0 || match1) {
       const newTag = tagChangeStates[0].newTag
-      oldTag.tagSupport.templater.wrapper.original = newTag
-      app.tag = await rebuildTag(oldTag)
-      app.tags = newTags
+      lastApp.tagSupport.templater.wrapper.original = newTag
+      await lastApp.destroy()
+      lastApp = await rebuildTag( lastApp )
+      lastTags = newTags
       return
     }
 
-    const count = await replaceTemplater(oldTag, tagChangeStates[0])
+    const count = await replaceTemplater(lastApp, tagChangeStates[0])
     
     if(count <= 0) {
       console.warn('✋ No components were updated', tagChangeStates[0])
@@ -125,41 +149,16 @@ async function updateByElement(
     }
   }
 
-  app.tags = newTags
+  lastTags = newTags
 
-  console.log('✅ ✅ ✅ rebuilt')
+  console.info('✅ ✅ ✅ rebuilt')
 }
 
 async function rebuildTag(
   tag,
-) { 
-  const hasOldest = tag.tagSupport.oldest
-  await tag.destroy()
-
-  /*
-  if(hasOldest) {
-    await tag.tagSupport.oldest.destroy()
-  }
-  */
-
-  if(!hasOldest) {
-    if(tag.clones.filter(clone=>!clone.parentNode).length) {
-      throw new Error('clones with no parent')
-    }
-
-    tag.clones = tag.clones.filter(clone=>clone.parentNode)
-    // await tag.destroy()
-  }
-
-  /*
-  if(tag.tagSupport.newest) {
-    await tag.tagSupport.newest.destroy()
-  }
-  */
-
+) {
   const { retag } = redrawTag(tag, tag.tagSupport.templater)
 
-  retag.providers = tag.providers
   retag.insertBefore = tag.insertBefore
 
   retag.rebuild()
@@ -195,43 +194,57 @@ async function replaceTemplater(
       value.wrapper.original = newTag
       
       contextSubject.tag.tagSupport.templater.wrapper.original = newTag
+      await contextSubject.tag.destroy()
+
+      destroyContextClones(contextSubject.tag.tagSupport.memory.context)
+
       contextSubject.tag = await rebuildTag(contextSubject.tag)
 
       ++count
+      return
     }
 
-    if(value.newest) {
+    // TODO: this might be removable
+    /*if(value.newest) {
       count = count + await replaceTemplater(value.newest, {oldTag, newTag}, count)
-      // return
-    }
-
-    /*if(value.oldest) {
-      count = count + await replaceTemplater(value.oldest, {oldTag, newTag}, count)
-      // return
     }*/
   })
-
+  
   await Promise.all(promises)
+
+  const subPromises = tag.children.map(async child => {
+    count = count + await replaceTemplater(child,{oldTag, newTag})
+  })
+
+  await Promise.all(subPromises)
 
   return count
 }
 
-function destroyApps() {
-  forEachApp(element => {
-    const oldTag = element.tag
-    oldTag.destroy()
-    delete element.tag
-  })
-}
+/** @type {Tag | undefined} */
+let lastApp;
 
 function rebuildApps() {
   forEachApp(element => {
     getNewApp().then(({newApp}) => {
-      const tag = renderAppToElement(newApp.App, element, {test:1})
+      const result = renderAppToElement(newApp.App, element, {test:1})
+      
+      lastTags = result.tags
+      lastApp = result.tag
+
+      return result
     })
   })
 }
 
-function wait(time) {
-  return new Promise((res) => setTimeout(() => res(), time))
+function destroyContextClones(context) {
+  Object.values(context).forEach(context => {
+    if(context.clone) {
+      delete context.clone
+    }
+
+    if(context.tag) {
+      destroyContextClones(context.tag.tagSupport.memory.context)
+    }
+  })
 }

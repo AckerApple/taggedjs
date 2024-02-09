@@ -13,25 +13,28 @@ export function state(defaultValue, getSetMethod) {
     const config = setUse.memory.stateConfig;
     const restate = config.rearray[config.array.length];
     if (restate) {
-        const oldValue = restate.callback ? getStateValue(restate.callback) : defaultValue;
+        const oldValue = getStateValue(restate);
         config.array.push({
             callback: getSetMethod,
-            lastValue: oldValue
+            lastValue: oldValue,
+            defaultValue: restate.defaultValue,
         });
         return oldValue; // return old value instead
     }
+    const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue;
+    const initValue = defaultFn();
     config.array.push({
         callback: getSetMethod,
-        lastValue: defaultValue,
+        lastValue: initValue,
+        defaultValue: initValue,
     });
-    return defaultValue;
+    return initValue;
 }
 setUse({
     beforeRender: (tagSupport) => initState(tagSupport),
     beforeRedraw: (tagSupport) => initState(tagSupport),
-    afterRender: (tagSupport) => {
+    afterRender: (tagSupport, tag) => {
         const state = tagSupport.memory.state;
-        // const config = state.config
         const config = setUse.memory.stateConfig;
         if (config.rearray.length) {
             if (config.rearray.length !== config.array.length) {
@@ -44,16 +47,25 @@ setUse({
                 throw new Error(message);
             }
         }
-        config.rearray.length = 0; // clean up any previous runs
-        state.newest.length = 0;
-        state.newest.push(...config.array);
-        config.array.length = 0;
+        // config.rearray.length = 0 // clean up any previous runs
+        config.rearray = []; // clean up any previous runs
+        // state.newest.length = 0
+        // state.newest.push(...config.array) as any
+        state.newest = [...config.array];
+        // config.array.length = 0
+        config.array = [];
     }
 });
-export function getStateValue(state) {
-    const oldState = state(StateEchoBack); // get value and set to undefined
+export function getStateValue(
+// state: StateConfig,
+state) {
+    const callback = state.callback;
+    if (!callback) {
+        return state.defaultValue;
+    }
+    const oldState = callback(StateEchoBack); // get value and set to undefined
     const [oldValue] = oldState;
-    const [checkValue] = state(oldValue); // set back to original value
+    const [checkValue] = callback(oldValue); // set back to original value
     if (checkValue !== StateEchoBack) {
         const error = new Error('State property not used correctly.\n\n' +
             'For "let" state use `let name = state(default, x => [name, name = x])`\n\n' +
@@ -77,7 +89,8 @@ function initState(tagSupport) {
         });
         throw message;
     }
-    config.rearray.length = 0;
+    // TODO: this maybe redundant and not needed
+    config.rearray = []; // .length = 0
     if (state?.newest.length) {
         config.rearray.push(...state.newest);
     }

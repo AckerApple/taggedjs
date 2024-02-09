@@ -1,3 +1,4 @@
+import { renderCountDiv } from "./renderCount.component.js"
 import { state, html, tag, Subject, onInit } from "./taggedjs/index.js"
 
 export const counters = tag(function Counters() {
@@ -20,13 +21,10 @@ export const counters = tag(function Counters() {
   ++renderCount // for debugging
 
   return html`<!--counters-->
-    <fieldset id="counters">
-      <legend>counters</legend>
-      <div>Subscriptions:${Subject.globalSubCount$}:${Subject.globalSubs.length}</div>
-      <div>renderCount:${renderCount}</div>
-      <div>initCounter:${initCounter}</div>
-      <button onclick=${increaseCounter}>counter:${counter}</button>
-      <button onclick=${() => console.info('subs', Subject.globalSubs)}>log subs</button>
-    </fieldset>
+    <div>Subscriptions:${Subject.globalSubCount$}:${Subject.globalSubs.length}</div>
+    <div>initCounter:${initCounter}</div>
+    <button onclick=${increaseCounter}>counter:${counter}</button>
+    <button onclick=${() => console.info('subs', Subject.globalSubs)}>log subs</button>
+    ${renderCountDiv(renderCount)}
   `
 })

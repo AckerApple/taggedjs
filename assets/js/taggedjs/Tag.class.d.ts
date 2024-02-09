@@ -12,6 +12,7 @@ export type Context = {
 export type TagMemory = Record<string, any> & {
     context: Context;
     state: State;
+    providers: Provider[];
 };
 export declare class Tag {
     strings: string[];
@@ -26,7 +27,6 @@ export declare class Tag {
     appElement?: Element;
     arrayValue?: any[];
     constructor(strings: string[], values: any[]);
-    providers: Provider[];
     beforeRedraw(): void;
     afterRender(): void;
     /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
@@ -55,6 +55,7 @@ export declare class Tag {
     buildBeforeElement(insertBefore: Element, options?: ElementBuildOptions): (ChildNode | Element)[];
 }
 type DestroyOptions = {
+    depth?: number;
     stagger: number;
     byParent?: boolean;
 };

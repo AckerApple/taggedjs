@@ -1,3 +1,4 @@
+import { getTagSupport } from "./getTagSupport.js";
 import { processTagResult } from "./processTagResult.function.js";
 export function processTagArray(result, value, // arry of Tag classes
 template, // <template end interpolate />
@@ -26,11 +27,11 @@ ownerTag, options) {
     // const masterBefore = template || (template as any).clone
     const before = template || template.clone;
     value.forEach((subTag, index) => {
-        // subTag.tagSupport = ownerTag.tagSupport
-        // const itemMemory = subTag.tagSupport.memory
-        subTag.tagSupport = { ...ownerTag.tagSupport };
-        subTag.tagSupport.memory = { ...ownerTag.tagSupport.memory };
-        subTag.tagSupport.memory.context = {}; // itemMemory
+        subTag.tagSupport = getTagSupport(-1, {}); // {...ownerTag.tagSupport} // ownerTag.tagSupport.templater
+        subTag.tagSupport.mutatingRender = () => {
+            ownerTag.tagSupport.render();
+            return subTag;
+        }; // fake having a render function
         subTag.ownerTag = ownerTag;
         ownerTag.children.push(subTag);
         if (subTag.arrayValue === undefined) {
