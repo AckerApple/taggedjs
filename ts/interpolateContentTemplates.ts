@@ -3,6 +3,8 @@ import { Tag } from "./Tag.class.js"
 import { InterpolateOptions } from "./interpolateElement.js"
 import { Counts, Template, interpolateTemplate } from "./interpolateTemplate.js"
 
+const templateSearch = new RegExp('\\s*<template interpolate end id="__tagVar(\\d{1,4})"([^>]*)></template>(\\s*)')
+
 /** Returns subscriptions[] that will need to be unsubscribed from when element is destroyed */
 export function interpolateContentTemplates(
   element: Element,
@@ -22,9 +24,25 @@ export function interpolateContentTemplates(
 
   const children = new Array(...(element.children as any))
 
-  children.forEach((child, index) => {
-    const nextClones = interpolateChild(child, index, children, options, variable, tag, counts)
+  if(element.tagName==='TEXTAREA') {
+    scanTextAreaValue(element as HTMLTextAreaElement)
+  }
 
+  children.forEach((child, index) => {
+    const nextClones = interpolateChild(
+      child,
+      index, // seems no longer used
+      children, // seems no longer used
+      options,
+      variable,
+      tag,
+      counts,
+    )
+
+    if(child.tagName==='TEXTAREA') {
+      scanTextAreaValue(child as HTMLTextAreaElement)
+    }
+  
     clones.push(...nextClones)
     
     if ( child.children ) {  
@@ -86,4 +104,16 @@ function isRenderEndTemplate(child: Element) {
   return isTemplate &&
   child.getAttribute('interpolate') !== undefined && 
   child.getAttribute('end') !== undefined
+}
+
+function scanTextAreaValue(textarea: HTMLTextAreaElement) {
+  const value = textarea.value
+  if( value.search(templateSearch) >=0 ) {
+    const match = value.match(/__tagVar(\d{1,4})/);
+    const result = match ? match[0] : ''
+    const token = '{' + result + '}'
+    // textarea.value = token
+    textarea.value = ''
+    textarea.setAttribute('textVarValue', token)
+  }
 }

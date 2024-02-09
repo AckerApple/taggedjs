@@ -1,7 +1,9 @@
 import { Clones } from "./Clones.type.js"
 import { Tag } from "./Tag.class.js"
+import { TagSupport, getTagSupport } from "./getTagSupport.js"
 import { Counts } from "./interpolateTemplate.js"
 import { processTagResult } from "./processTagResult.function.js"
+import { TemplaterResult } from "./templater.utils.js"
 
 export function processTagArray(
   result: any,
@@ -44,13 +46,14 @@ export function processTagArray(
   const before = template || (template as any).clone
 
   value.forEach((subTag, index) => {
-    // subTag.tagSupport = ownerTag.tagSupport
-    // const itemMemory = subTag.tagSupport.memory
-    subTag.tagSupport = {...ownerTag.tagSupport}
-    subTag.tagSupport.memory = {...ownerTag.tagSupport.memory}
-    subTag.tagSupport.memory.context = {} // itemMemory
+    subTag.tagSupport = getTagSupport(-1, {} as TemplaterResult) // {...ownerTag.tagSupport} // ownerTag.tagSupport.templater
+        
+    subTag.tagSupport.mutatingRender = () => {
+      ownerTag.tagSupport.render()
+      return subTag
+    } // fake having a render function
 
-    subTag.ownerTag = ownerTag
+    subTag.ownerTag = ownerTag    
     ownerTag.children.push(subTag)
 
     if (subTag.arrayValue === undefined) {

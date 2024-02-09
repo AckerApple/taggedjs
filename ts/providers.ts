@@ -13,7 +13,7 @@ export type Provider = {
 setUse.memory.providerConfig = {
   providers: [] as Provider[],
 
-  currentTag: undefined as Tag | undefined,
+  currentTagSupport: undefined as TagSupport | undefined,
   ownerTag: undefined as Tag | undefined,
 }
 
@@ -23,13 +23,13 @@ function get(constructMethod: Function) {
   return providers.find(provider => provider.constructMethod === constructMethod)
 }
 
+type functionProvider = <T>() => T
+type classProvider = new <T>(...args: any[]) => T
+
 export const providers = {
-  /**
-   * @template T
-   * @param {(new (...args: any[]) => T) | () => T} constructor 
-   * @returns {T}
-   */
-  create: (constructMethod: any) => {
+  create: <T>(
+    constructMethod: classProvider | functionProvider
+  ): T => {
     const existing = get(constructMethod)
     if(existing) {
       existing.clone = deepClone(existing.instance)
@@ -37,7 +37,7 @@ export const providers = {
     }
 
     // Providers with provider requirements just need to use providers.create() and providers.inject()
-    const instance = constructMethod.constructor ? new constructMethod() : constructMethod()
+    const instance: T = constructMethod.constructor ? new (constructMethod as classProvider)() : (constructMethod as functionProvider)()
     
     const config = setUse.memory.providerConfig
     config.providers.push({
@@ -45,6 +45,7 @@ export const providers = {
       instance,
       clone: deepClone(instance)
     })
+    
     return instance
   },
   
@@ -65,7 +66,7 @@ export const providers = {
     } as Tag
   
     while(owner.ownerTag) {
-      const ownerProviders = owner.ownerTag.providers
+      const ownerProviders = owner.ownerTag.tagSupport.memory.providers
 
       const provider = ownerProviders.find(provider => {
         if(provider.constructMethod === constructor) {
@@ -89,24 +90,40 @@ export const providers = {
 }
 
 setUse({ // providers
-  beforeRedraw: (
-    _tagSupport: TagSupport,
-    tag: Tag
+  beforeRender: (
+    tagSupport: TagSupport,
+    ownerTag: Tag,
   ) => {
-    const config = setUse.memory.providerConfig
-    config.currentTag = tag
-    config.ownerTag = tag.ownerTag
-    if(tag.providers.length) {
-      config.providers.length = 0
-      config.providers.push(...tag.providers)
-    }
+    run(tagSupport, ownerTag)
+  },
+  beforeRedraw: (
+    tagSupport: TagSupport,
+    tag: Tag,
+  ) => {
+    run(tagSupport, tag.ownerTag as Tag)
   },
   afterRender: (
-    _tagSupport: TagSupport,
-    tag: Tag
+    tagSupport: TagSupport,
+    // tag: Tag
   ) => {
     const config = setUse.memory.providerConfig
-    tag.providers = [...config.providers]
+    tagSupport.memory.providers = [...config.providers]
     config.providers.length = 0
   }
 })
+
+function run(
+  tagSupport: TagSupport,
+  ownerTag: Tag,
+  // tag: Tag,
+) {
+  const config = setUse.memory.providerConfig
+  config.currentTagSuport = tagSupport
+  
+  config.ownerTag = ownerTag
+  
+  if(tagSupport.memory.providers.length) {
+    config.providers.length = 0
+    config.providers.push(...tagSupport.memory.providers)
+  }
+}

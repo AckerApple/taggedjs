@@ -1,11 +1,12 @@
 import { Tag } from "./Tag.class.js"
 import { TagSupport } from "./getTagSupport"
+import { Config } from "./state"
 
 const tagUse: TagUse[] = []
 
 interface TagUse {
   // runs only one time at creation of component html elements
-  beforeRender: (tagSupport: TagSupport, tag?: Tag) => void
+  beforeRender: (tagSupport: TagSupport, ownerTag: Tag) => void
   
   // runs every render
   beforeRedraw: (tagSupport: TagSupport, tag: Tag) => void
@@ -17,7 +18,7 @@ interface TagUse {
 }
 
 export type UseOptions = {
-  beforeRender?: (tagSupport: TagSupport, tag?: Tag) => void
+  beforeRender?: (tagSupport: TagSupport, ownerTag: Tag) => void
   beforeRedraw?: (tagSupport: TagSupport, tag: Tag) => void
   afterRender?: (tagSupport: TagSupport, tag: Tag) => void
   beforeDestroy?: (tagSupport: TagSupport, tag: Tag) => void
@@ -36,4 +37,4 @@ export function setUse(use: UseOptions) {
 }
 
 setUse.tagUse = tagUse
-setUse.memory = {} as Record<string,any>
+setUse.memory = {} as (Record<string,any> & {stateConfig: Config})

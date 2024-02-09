@@ -52,8 +52,8 @@ export function processTagResult(
   }
 
   // *if just now appearing to be a Tag
-  const before = (insertBefore as any).clone || insertBefore
-  const clones = tag.buildBeforeElement(before, {
+  // const before = (insertBefore as any).clone || insertBefore
+  const clones = tag.buildBeforeElement(insertBefore, {
     counts,
     forceElement,
     depth: tag.tagSupport.depth,

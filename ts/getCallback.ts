@@ -10,21 +10,8 @@ export let getCallback = () => (callback: Callback) => (): void => {
 
 setUse({
   beforeRender: (tagSupport: TagSupport) => initMemory(tagSupport),
-  beforeRedraw: (tagSupport: TagSupport) => {
-    if(tagSupport.memory.callbacks){
-      return
-    }
-  
-    initMemory(tagSupport)
-  },
-
-  afterRender: (tagSupport: TagSupport) => {
-    const callbacks = tagSupport.memory.callbacks as any[]
-    callbacks.forEach(callback => {
-      const state = tagSupport.memory.state as State
-      callback.state = [...state.newest as any]
-    })
-  },
+  beforeRedraw: (tagSupport: TagSupport) => initMemory(tagSupport),
+  // afterRender: (tagSupport: TagSupport) => {},
 })
 
 function updateState(
@@ -32,55 +19,62 @@ function updateState(
   stateTo: StateConfigArray,
 ) {
   stateFrom.forEach((state, index) => {
-    const oldValue = getStateValue(state.callback)
-    // const [checkValue] = stateTo[index].callback( oldValue )
-    stateTo[index].callback( oldValue )
-    stateTo[index].lastValue = oldValue
+    const fromValue = getStateValue(state)
+    const callback = stateTo[index].callback
+    
+    if(callback) {
+      callback( fromValue ) // set the value
+    }
+    
+    stateTo[index].lastValue = fromValue // record the value
   })
 }
 
-function initMemory (tagSupport: TagSupport) {
-  tagSupport.memory.callbacks = []
+type Trigger = () => void
+type CallbackMaker = (callback: Callback) => Trigger
 
+function initMemory (tagSupport: TagSupport) {
   getCallback = () => {
-    const callbackMaker = (
+    const oldState: StateConfigArray = setUse.memory.stateConfig.array
+
+    const callbackMaker: CallbackMaker = (
       callback: Callback
     ) => {
-      const trigger = () => {
-        const state = tagSupport.memory.state as State
-        const oldest = (callbackMaker as any).state
-        const newest = state.newest
-  
-        // ensure that the oldest has the latest values first
-        updateState(newest, oldest)
-  
-        // run the callback
-        const promise = callback()
-  
-        // send the oldest state changes into the newest
-        updateState(oldest, newest)
-  
-        tagSupport.render()
-        
-        if(promise instanceof Promise) {
-          promise.finally(() => {
-            // send the oldest state changes into the newest
-            updateState(oldest, newest)
-  
-            tagSupport.render()    
-          })
-        }
-      }
-
-      const state = tagSupport.memory.state as State
-      trigger.state = state
-
+      const trigger = (...args: any[]) => triggerStateUpdate(tagSupport, callback, oldState, ...args)
       return trigger
     }
 
-    const callbacks = tagSupport.memory.callbacks as any[]
-    callbacks.push(callbackMaker)
-
     return callbackMaker
+  }
+}
+
+function triggerStateUpdate(
+  tagSupport: TagSupport,
+  callback: Callback,
+  oldState: StateConfigArray,
+  ...args: any[]
+) {
+  const state = tagSupport.memory.state as State
+  const newest = state.newest
+
+  // ensure that the oldest has the latest values first
+  updateState(newest, oldState)
+  
+  // run the callback
+  const promise = callback(...args)
+
+  // send the oldest state changes into the newest
+  updateState(oldState, newest)
+  
+  tagSupport.render()        
+  
+  // TODO: turn back on below
+  if(promise instanceof Promise) {
+    promise.finally(() => {
+      // send the oldest state changes into the newest
+      updateState(oldState, newest)
+
+      tagSupport.render()    
+    })
   }
 }

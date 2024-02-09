@@ -9,14 +9,17 @@ let destroyCurrentTagSupport: TagSupport
 export function onDestroy(
   callback: OnDestroyCallback
 ) {
+  if(!destroyCurrentTagSupport.memory) {
+    console.error('xxx',destroyCurrentTagSupport)
+  }
+
   destroyCurrentTagSupport.memory.destroyCallback = callback
 }
 
 setUse({
-  beforeRender: (tagSupport) => {
-    destroyCurrentTagSupport = tagSupport
-  },
-  beforeDestroy: (tagSupport) => {
+  beforeRender: tagSupport => destroyCurrentTagSupport = tagSupport,
+  beforeRedraw: tagSupport => destroyCurrentTagSupport = tagSupport,
+  beforeDestroy: (tagSupport, tag) => {
     const callback = tagSupport.memory.destroyCallback
 
     if(callback) {

@@ -1,9 +1,16 @@
+import { Tag } from "./Tag.class.js"
 import { TagSupport } from "./getTagSupport.js"
 import { setUse } from "./setUse.function.js"
 
 export type StateConfig = ((x?: any) => [any, any])
 
-export type StateConfigArray = {callback: StateConfig, lastValue?: any}[]
+type StateConfigItem = {
+  callback?: StateConfig
+  lastValue?: any
+  defaultValue?: any
+}
+
+export type StateConfigArray = StateConfigItem[]
 
 export type Config = {
   array: StateConfigArray // state memory on the first render
@@ -28,26 +35,32 @@ setUse.memory.stateConfig = {
  * @returns {T}
  */
 export function state <T>(
-  defaultValue: T,
+  defaultValue: T | (() => T),
   getSetMethod?: (x: T) => [T, T],
 ): T {
   const config: Config = setUse.memory.stateConfig
 
   const restate = config.rearray[config.array.length]
   if(restate) {
-    const oldValue = restate.callback ? getStateValue(restate.callback) : defaultValue
+    const oldValue = getStateValue(restate)
     config.array.push({
       callback: getSetMethod as StateConfig,
-      lastValue: oldValue
+      lastValue: oldValue,
+      defaultValue: restate.defaultValue,
     })
     return oldValue // return old value instead
   }
 
+  const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue
+  const initValue = defaultFn()
+
   config.array.push({
     callback: getSetMethod as StateConfig,
-    lastValue: defaultValue,
+    lastValue: initValue,
+    defaultValue: initValue,
   })
-  return defaultValue
+  
+  return initValue
 }
 
 setUse({
@@ -55,9 +68,9 @@ setUse({
   beforeRedraw: (tagSupport: TagSupport) => initState(tagSupport),
   afterRender: (
     tagSupport: TagSupport,
+    tag: Tag,
   ) => {
     const state: State = tagSupport.memory.state
-    // const config = state.config
     const config: Config = setUse.memory.stateConfig
 
     if(config.rearray.length) {
@@ -73,22 +86,33 @@ setUse({
         throw new Error(message)
       }
     }
+    
+    // config.rearray.length = 0 // clean up any previous runs
+    config.rearray = [] // clean up any previous runs
 
-    config.rearray.length = 0 // clean up any previous runs
-
-    state.newest.length = 0
-    state.newest.push(...config.array) as any
-    config.array.length = 0
+    // state.newest.length = 0
+    // state.newest.push(...config.array) as any
+    state.newest = [...config.array]
+    
+    // config.array.length = 0
+    config.array = []
   }
 })
 
 
 export function getStateValue(
-  state: StateConfig,
+  // state: StateConfig,
+  state: StateConfigItem,
 ) {
-  const oldState = state(StateEchoBack) // get value and set to undefined
+  const callback = state.callback
+  
+  if(!callback) {
+    return state.defaultValue
+  }
+
+  const oldState = callback(StateEchoBack) // get value and set to undefined
   const [oldValue] = oldState
-  const [checkValue] = state( oldValue ) // set back to original value
+  const [checkValue] = callback( oldValue ) // set back to original value
 
   if(checkValue !== StateEchoBack) {
     const error = new Error(
@@ -120,7 +144,8 @@ function initState(
     throw message
   }
 
-  config.rearray.length = 0
+  // TODO: this maybe redundant and not needed
+  config.rearray = [] // .length = 0
 
   if(state?.newest.length) {
     config.rearray.push( ...state.newest )

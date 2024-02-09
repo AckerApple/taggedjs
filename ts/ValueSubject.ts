@@ -1,6 +1,6 @@
 import { Subject } from './Subject.js'
 
-export class ValueSubject extends Subject {
+export class ValueSubject<T> extends Subject<T> {
   value: any
   
   constructor(initialValue: any) {

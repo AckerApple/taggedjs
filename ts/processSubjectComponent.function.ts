@@ -1,40 +1,41 @@
-import { TagSupport, getTagSupport } from "./getTagSupport.js"
+import { TagSupport } from "./getTagSupport.js"
 import { runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
-import { TemplaterResult } from "./tag.js"
+import { TemplaterResult } from "./templater.utils.js"
 import { setUse } from "./setUse.function.js"
 import { Counts } from "./interpolateTemplate.js"
 import { Tag } from "./Tag.class.js"
 import { processTagResult } from "./processTagResult.function.js"
+import { TagSubject } from "./Tag.utils.js"
 
 export function processSubjectComponent(
-  value: unknown,
-  result: any,
+  value: TemplaterResult,
+  result: TagSubject,
   template: Element,
   ownerTag: Tag,
   options: {counts: Counts, forceElement?: boolean},
 ) {
-  const anyValue = value as Function & {tagged?: boolean}
-  if(anyValue.tagged !== true) {
-    let name: string | undefined = anyValue.name || anyValue.constructor?.name
+  // TODO: This below check not needed in production mode
+  if(value.tagged !== true) {
+    let name: string | undefined = value.wrapper.original.name || value.wrapper.original.constructor?.name
 
     if(name === 'Function') {
       name = undefined
     }
 
-    const label = name || anyValue.toString().substring(0,120)
+    const label = name || value.wrapper.original.toString().substring(0,120)
     const error = new Error(`Not a tag component. Wrap your function with tag(). Example tag(props => html\`\`) on component:\n\n${label}\n\n`)
     throw error
   }
 
   const templater = value as TemplaterResult
-  const tagSupport: TagSupport = result.tagSupport || getTagSupport(ownerTag.tagSupport.depth+1, templater )
-  
+  const tagSupport: TagSupport = value.tagSupport // || getTagSupport(ownerTag.tagSupport.depth+1, templater )
+
   tagSupport.mutatingRender = () => {
     // Is this NOT my first render
     if(result.tag) {
       const exit = tagSupport.renderExistingTag(result.tag, templater)
       if(exit) {
-        return
+        return result.tag
       }
     }
 
@@ -43,31 +44,36 @@ export function processSubjectComponent(
     return newest
   }
 
-  let tag = templater.newest as Tag
+  let retag = templater.newest as Tag
   
   const providers = setUse.memory.providerConfig
   providers.ownerTag = ownerTag
   
-  const isFirstTime = !tag || options.forceElement
-  
+  const isFirstTime = !retag || options.forceElement
+
   if(isFirstTime) {
-    if(!tag) {
-      runBeforeRender(tagSupport, tag)
+    if(!retag) {
+      runBeforeRender(tagSupport, ownerTag)
     }
   
     // only true when options.forceElement
-    if(tag) {
-      runBeforeRedraw(tagSupport, tag)
+    if(retag) {
+      runBeforeRedraw(tagSupport, retag)
     }
   
-    tag = templater.forceRenderTemplate(tagSupport, ownerTag)
+    retag = templater.forceRenderTemplate(tagSupport, ownerTag)
   }
   
-  ownerTag.children.push(tag)
-  tag.setSupport(tagSupport)
+  ownerTag.children.push(retag)
+
+  tagSupport.latestProps = retag.tagSupport.props
+  tagSupport.latestClonedProps = retag.tagSupport.clonedProps
+  tagSupport.memory = retag.tagSupport.memory
+
+  retag.setSupport(tagSupport)
 
   const clones = processTagResult(
-    tag,
+    retag,
     result, // The element set here will be removed from document. Also result.tag will be added in here
     template, // <template end interpolate /> (will be removed)
     options,

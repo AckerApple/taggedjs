@@ -6,20 +6,20 @@ export function elementInitCheck(
 ) {
   const onInitDoubleWrap = (nextSibling as any).oninit
   if (!onInitDoubleWrap) {
-      return;
+      return
   }
 
-  const onInitWrap = onInitDoubleWrap.tagFunction;
+  const onInitWrap = onInitDoubleWrap.tagFunction
   if (!onInitWrap) {
-      return;
+      return
   }
   
-  const onInit = onInitWrap.tagFunction;
+  const onInit = onInitWrap.tagFunction
   if (!onInit) {
-      return;
+      return
   }
   
-  const event = { target: nextSibling, stagger: counts.added };
-  onInit(event);
-  ++counts.added;
+  const event = { target: nextSibling, stagger: counts.added } as unknown as Event
+  onInit(event)
+  ++counts.added
 }

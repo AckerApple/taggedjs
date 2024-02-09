@@ -1,16 +1,16 @@
-import { TagSubject, bindSubjectFunction, elementDestroyCheck, getSubjectFunction, setValueRedraw } from "./Tag.utils.js"
-import { TagSupport, getTagSupport } from "./getTagSupport.js"
+import { TagSubject, getSubjectFunction, setValueRedraw } from "./Tag.utils.js"
+import { TagSupport } from "./getTagSupport.js"
 import { Provider } from "./providers.js"
 import { ValueSubject } from "./ValueSubject.js"
-import { deepEqual } from "./deepFunctions.js"
-import { Subject, Subscription } from "./Subject.js"
-import { runAfterRender, runBeforeDestroy, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
-import { TemplateRedraw, TemplaterResult } from "./tag.js"
+import { Subscription } from "./Subject.js"
+import { runAfterRender, runBeforeDestroy, runBeforeRedraw } from "./tagRunner.js"
 import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js"
 import { buildClones } from "./render.js"
 import { interpolateElement } from "./interpolateElement.js"
 import { Counts, afterElmBuild } from "./interpolateTemplate.js"
 import { State } from "./state.js"
+import { elementDestroyCheck } from "./elementDestroyCheck.function.js"
+import { updateExistingValue } from "./updateTag.utils.js"
 
 export const variablePrefix = '__tagVar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -22,6 +22,7 @@ export type Context = {[index: string]: any}
 export type TagMemory = Record<string, any> & {
   context: Context
   state: State
+  providers: Provider[]
 }
 
 export class Tag {
@@ -46,8 +47,6 @@ export class Tag {
     public values: any[],
   ) {}
 
-  providers: Provider[] = []
-
   beforeRedraw() {
     runBeforeRedraw(this.tagSupport, this)
   }
@@ -64,15 +63,19 @@ export class Tag {
 
   async destroy(
     options: DestroyOptions = {
+      depth: 0,
       stagger: 0,
-      byParent: false, // who's destroying me? if byParent, ignore possible animations
+      byParent: false, // TODO: Replace with depth control. Only destroy clones of direct children
     }
   ) {
+    const depth = options.depth || 0
     runBeforeDestroy(this.tagSupport, this)    
     this.destroySubscriptions()
-    const promises = this.children.map((kid) => kid.destroy({...options, byParent: true}))
-        
-    options.stagger = await this.destroyClones(options)
+    const promises = this.children.map((kid) => kid.destroy({...options, byParent: true, depth: depth + 1}))
+
+    if( depth <= 0 ) {
+      options.stagger = await this.destroyClones(options)
+    }
 
     if(this.ownerTag) {
       this.ownerTag.children = this.ownerTag.children.filter(child => child !== this)
@@ -106,18 +109,7 @@ export class Tag {
         const ownerTag = this.ownerTag
         if(ownerTag) {
           // Sometimes my clones were first registered to my owner, remove them
-          ownerTag.clones = ownerTag.clones.filter(compareClone => {
-            if(compareClone === clone) {
-              console.error('my clone found in a parent - 1', {
-                compareClone, clone,
-                tag: this.tagSupport.templater?.wrapper.original,
-                ownerTag: ownerTag.tagSupport.templater?.wrapper.original,
-              })
-              // throw new Error('issue')
-              return false
-            }
-            return true
-          })
+          ownerTag.clones = ownerTag.clones.filter(compareClone => compareClone !== clone)
         }
       })
 
@@ -139,9 +131,8 @@ export class Tag {
 
   /** A method of passing down the same render method */
   setSupport(tagSupport: TagSupport) {
-    this.tagSupport = this.tagSupport || tagSupport
-    this.tagSupport.mutatingRender = this.tagSupport.mutatingRender || tagSupport.mutatingRender
-    // this.children.forEach(kid => kid.setSupport(tagSupport))
+    this.tagSupport = tagSupport
+    this.tagSupport.mutatingRender = tagSupport.mutatingRender
   }
   
   updateConfig(strings: string[], values: any[]) {
@@ -288,8 +279,6 @@ export class Tag {
       throw err
     }
 
-    // redrawTag(this, this.tagSupport.templater as TemplaterResult, this.ownerTag)
-
     this.buildBeforeElement(insertBefore, {
       forceElement: true,
       counts: {added: 0, removed: 0},
@@ -309,34 +298,12 @@ export class Tag {
     
     const context = this.update()
     const template = this.getTemplate()
-    const ownerTag = this.ownerTag
+    // const ownerTag = this.ownerTag
     
     const temporary = document.createElement('div')
     temporary.id = 'tag-temp-holder'
     // render content with a first child that we can know is our first element
     temporary.innerHTML = '<div id="top-element-insert-after"></div>' + template.string
-
-    if(ownerTag) {
-      // Sometimes my clones were first registered to my owner, remove them
-      // this.ownerTag.clones = this.ownerTag.clones.filter(compareClone =>
-      //   !this.clones.find(myClone => compareClone === myClone)
-      // )
-      ownerTag.clones = ownerTag.clones.filter(compareClone => {
-        const match = this.clones.find(myClone => compareClone === myClone)
-        if(match) {
-          console.error('found clone in parents clones', {match, compareClone})
-          throw new Error('found clone in parents clones')
-          this.clones.push(compareClone)
-          // ownerTag.clones = ownerTag.clones.filter(clone => compareClone !== clone)
-          return false
-        }
-
-        return true
-      })
-    }
-
-    // const preClones = buildClones(temporary, insertBefore)
-    // temporary.innerHTML = '<div id="top-element-insert-after"></div>'
 
     // const clonesBefore = this.clones.map(clone => clone)
     const intClones = interpolateElement(
@@ -346,46 +313,22 @@ export class Tag {
       {forceElement: options.forceElement, depth: options.depth}
     )
 
-    /*
-    // this.destroyClones()
-    */
-   this.clones.length = 0
-   const clones = buildClones(temporary, insertBefore)
+    this.clones.length = 0
+    const clones = buildClones(temporary, insertBefore)
+    this.clones.push( ...clones )
 
-   this.clones.push( ...clones )
-   // this.clones.push( ...preClones )
-
-   if(intClones.length) {
+    if(intClones.length) {
      this.clones = this.clones.filter(cloneFilter => !intClones.find(clone => clone === cloneFilter))
-   }
-
-    if(ownerTag) {
-      // Sometimes my clones were first registered to my owner, remove them
-      // this.ownerTag.clones = this.ownerTag.clones.filter(compareClone =>
-      //   !this.clones.find(myClone => compareClone === myClone)
-      // )
-      ownerTag.clones = ownerTag.clones.filter(compareClone => {
-        const match = this.clones.find(myClone => compareClone === myClone)
-        if(match) {
-          console.error('found clone in parents clones', {match, compareClone})
-          throw new Error('found clone in parents clones')
-          this.clones.push(compareClone)
-          // ownerTag.clones = ownerTag.clones.filter(clone => compareClone !== clone)
-          return false
-        }
-
-        return true
-      })
     }
 
     this.clones.forEach(clone => afterElmBuild(clone, options))
   
     return this.clones
   }
-  
 }
 
 type DestroyOptions = {
+  depth?: number
   stagger: number
   byParent?: boolean // who's destroying me? if byParent, ignore possible animations
 }
@@ -394,80 +337,4 @@ export type ElementBuildOptions = {
   counts: Counts
   forceElement?: boolean
   depth: number
-}
-
-function updateExistingValue(
-  existing: Subject | TemplaterResult,
-  value: TemplaterResult | TagSupport | Function | Subject,
-  tag: Tag,
-) {
-  /** @type {Tag | undefined} */
-  const ogTag = (existing as Subject).value?.tag
-  const tempResult = value as TemplateRedraw
-  const existingSubject = existing as TagSubject
-
-  // handle already seen tag components
-  if(isTagComponent(tempResult)) {
-    const latestProps = tempResult.cloneProps
-    const existingTag = existingSubject.tag
-
-    // previously was something else, now a tag component
-    if( !existingSubject.tag ) {
-      setValueRedraw(tempResult, existingSubject, tag)
-      tempResult.redraw()
-      return
-    }
-
-    const oldTagSetup = existingTag.tagSupport
-    // TODO: The first argument can most likely be delete `tempResult.tagSupport`
-    const tagSupport = tempResult.tagSupport || oldTagSetup || getTagSupport(tag.tagSupport.depth, tempResult)
-    const oldCloneProps = tagSupport.templater?.cloneProps
-    const oldProps = tagSupport.templater?.props
-
-    if(existingTag) {
-      const isCommonEqual = oldProps === undefined && oldProps === latestProps
-      const equal = isCommonEqual || deepEqual(oldCloneProps, latestProps)  
-      if(equal) {
-        return
-      }
-    }
-    
-    setValueRedraw(tempResult, existingSubject, tag)
-    oldTagSetup.templater = tempResult
-    existingSubject.value.tag = oldTagSetup.newest = tempResult.redraw()
-    return
-  }
-
-  // handle already seen tags
-  if(ogTag) {
-    const tagSupport = ogTag.tagSupport
-    const templater = value as TemplaterResult
-    // runBeforeRender(tagSupport, ogTag)
-    tagSupport.oldest.beforeRedraw()
-
-    const retag = templater.wrapper()
-    
-    retag.tagSupport = tagSupport
-    templater.newest = retag
-    tagSupport.oldest.afterRender()
-    ogTag.updateByTag(retag)
-    existingSubject.set(value)
-    
-    return
-  }
-  
-  // now its a function
-  if(value instanceof Function) {
-    existingSubject.set( bindSubjectFunction(value as any, tag) )
-    return
-  }
-
-  if(isSubjectInstance(value as Subject)) {
-    existingSubject.set( (value as Subject).value ) // let ValueSubject now of newest value
-    return
-  }
-
-  existingSubject.set(value) // let ValueSubject now of newest value
-
-  return
 }

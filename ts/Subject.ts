@@ -9,7 +9,7 @@ export interface SubjectLike {
   isSubject?: boolean
 }
 
-export class Subject implements SubjectLike {
+export class Subject<T> implements SubjectLike {
   isSubject = true
   subscribers: Subscriber[] = []
   value?: any
@@ -60,7 +60,7 @@ function removeSubFromArray(
 }
 
 const SubjectClass = Subject as typeof Subject & {
-  globalSubCount$: Subject
+  globalSubCount$: Subject<number>
   globalSubs: Subscriber[]
 }
 SubjectClass.globalSubs = [] // 🔬 for testing

@@ -1,107 +1,110 @@
+import { Props } from "./Props.js"
 import { Tag, TagMemory } from "./Tag.class.js"
 import { deepClone, deepEqual } from "./deepFunctions.js"
 import { Provider } from "./providers.js"
-import { TemplaterResult } from "./tag.js"
+import { TemplateRedraw, TemplaterResult, getNewProps } from "./templater.utils.js"
 
-export interface TagSupport {
-  depth: number
-  memory: TagMemory
-  templater?: TemplaterResult
+/*
+{    
+  depth,
+}
+*/
 
-  /** Indicator of re-rending. Saves from double rending something already rendered */
-  renderCount: 0
+export class TagSupport {
+  depth: number = 0 // TODO: maybe remove
+
+  // props from **constructor** are converted for comparing over renders
+  clonedProps: Props
+  latestProps: Props // new props NOT cloned props
+  latestClonedProps: Props
   
-  mutatingRender: (force?: boolean) => any
-  
-  render: (force?: boolean) => any
-  renderExistingTag: (tag: Tag, newTemplater: TemplaterResult,) => boolean
+  memory: TagMemory = {
+    context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+    state: {
+      newest: [],
+    },
+    providers: [],
+    /** Indicator of re-rending. Saves from double rending something already rendered */
+    renderCount: 0,
+  }
 
-  /**
-   * 
-   * @param {*} props value.props
-   * @param {*} newProps value.newProps
-   * @param {*} compareToProps compareSupport.templater.props
-   * @returns {boolean}
-   */
-  hasPropChanges: (
-    props: any,
-    newProps: any,
-    compareToProps: any,
-  ) => boolean,
+  constructor(
+    public templater: TemplaterResult,
+    public props?: Props,  // natural props
+  ) {
+    this.latestProps = props // getNewProps(props, templater)
+    
+    const latestProps = getNewProps(props, templater)
+    this.latestClonedProps = deepClone( latestProps )
 
+    this.clonedProps = this.latestClonedProps
+  }
+
+  // TODO: these below may not be in use
   oldest?: Tag
   newest?: Tag
+
+  hasPropChanges(
+    props: any, // natural props
+    pastCloneProps: any, // previously cloned props
+    compareToProps: any, // new props NOT cloned props
+  ) {
+    const oldProps = this.props
+    const isCommonEqual = props === undefined && props === compareToProps
+    const isEqual = isCommonEqual || deepEqual(pastCloneProps, oldProps)
+    return !isEqual
+  }
+
+  mutatingRender(): Tag {
+    const message = 'Tag function "render()" was called in sync but can only be called async'
+    console.error(message, {tagSupport: this})
+    throw new Error(message)
+  } // loaded later and only callable async
+
+  render () {
+    ++this.memory.renderCount
+    return this.mutatingRender()
+  } // ensure this function still works even during deconstructing
+
+  renderExistingTag(
+    tag: Tag,
+    newTemplater: TemplaterResult,
+  ): boolean {
+    const preRenderCount = this.memory.renderCount
+    providersChangeCheck(tag)
+  
+    // When the providers were checked, a render to myself occurred and I do not need to re-render again
+    if(preRenderCount !== this.memory.renderCount) {
+      return true
+    }
+  
+    const oldTemplater = tag.tagSupport.templater
+    const nowProps = newTemplater.tagSupport.props // natural props
+    const oldProps = oldTemplater?.tagSupport.props // previously cloned props
+    const newProps = newTemplater.tagSupport.clonedProps // new props cloned
+
+    return renderTag(
+      this,
+      nowProps,
+      oldProps,
+      newProps,
+      this.templater as TemplateRedraw,
+    )
+  }
 }
 
 export function getTagSupport(
   depth: number,
-  templater?: TemplaterResult,
-): TagSupport {
-  const tagSupport: TagSupport = {
-    templater,
-    renderCount: 0,
-    depth,
-    memory: {
-      context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
-      state: {
-        newest: [],
-      }
-    },
-    mutatingRender: () => {
-      const message = 'Tag function "render()" was called in sync but can only be called async'
-      console.error(message, {tagSupport})
-      throw new Error(message)
-    }, // loaded later and only callable async
-    render: (force?: boolean) => {
-      ++tagSupport.renderCount
-      return tagSupport.mutatingRender(force)
-    }, // ensure this function still works even during deconstructing
-
-    renderExistingTag: (
-      tag: Tag,
-      newTemplater: TemplaterResult,
-    ): boolean => {
-      const preRenderCount = tagSupport.renderCount
-      providersChangeCheck(tag)
-
-      // When the providers were checked, a render to myself occurred and I do not need to re-render again
-      if(preRenderCount !== tagSupport.renderCount) {
-        return true
-      }
-
-      const oldTemplater = tag.tagSupport.templater
-      const oldProps = oldTemplater?.props
-      const hasPropsChanged = tagSupport.hasPropChanges(
-        newTemplater.props,
-        newTemplater.newProps,
-        oldProps,
-      )
-
-      if(!hasPropsChanged) {
-        tagSupport.newest = (templater as any).redraw(newTemplater.newProps) // No change detected, just redraw me only
-        return true
-      }
-
-      return false
-    },
-
-    hasPropChanges: (
-      props: any,
-      newProps: any,
-      compareToProps: any,
-    ) => {
-      const oldProps = (tagSupport.templater as any).cloneProps
-      const isCommonEqual = props === undefined && props === compareToProps
-      const isEqual = isCommonEqual || deepEqual(newProps, oldProps)
-      return !isEqual
-    },
-  }
-    
+  templater: TemplaterResult,
+  props?: Props,
+): TagSupport {  
+  const tagSupport: TagSupport = new TagSupport(templater, props)
+  tagSupport.depth = depth
   return tagSupport
 }
 
 function providersChangeCheck(tag: Tag) {
-  const providersWithChanges = tag.providers.filter(provider => {
+  const providersWithChanges = tag.tagSupport.memory.providers.filter(provider => {
     return !deepEqual(provider.instance, provider.clone)
   })
 
@@ -115,11 +118,6 @@ function providersChangeCheck(tag: Tag) {
   })
 }
 
-/**
- * 
- * @param {Tag} appElement 
- * @param {Provider} provider 
- */
 function handleProviderChanges(
   appElement: Tag,
   provider: Provider,
@@ -127,19 +125,13 @@ function handleProviderChanges(
   const tagsWithProvider = getTagsWithProvider(appElement, provider)
 
   tagsWithProvider.forEach(({tag, renderCount, provider}) => {
-    if(renderCount === tag.tagSupport.renderCount) {
+    const unRendered = renderCount === tag.tagSupport.memory.renderCount
+    if(unRendered) {
       provider.clone = deepClone(provider.instance)
       tag.tagSupport.render()
     }
   })
 }
-
-/**
- * 
- * @param {Tag} appElement 
- * @param {Provider} provider 
- * @returns {{tag: Tag, renderCount: numer, provider: Provider}[]}
- */
 
 function getTagsWithProvider(
   tag: Tag,
@@ -150,12 +142,12 @@ function getTagsWithProvider(
     provider: Provider
   }[] = []
 ) {
-  const hasProvider = tag.providers.find(xProvider => xProvider.constructMethod === provider.constructMethod)
+  const hasProvider = tag.tagSupport.memory.providers.find(xProvider => xProvider.constructMethod === provider.constructMethod)
   
   if(hasProvider) {
     memory.push({
       tag,
-      renderCount: tag.tagSupport.renderCount,
+      renderCount: tag.tagSupport.memory.renderCount,
       provider: hasProvider
     })
   }
@@ -163,4 +155,26 @@ function getTagsWithProvider(
   tag.children.forEach(child => getTagsWithProvider(child, provider, memory))
 
   return memory
+}
+
+function renderTag(
+  tagSupport: TagSupport,
+  nowProps: any, // natural props
+  oldProps: any, // previously NOT cloned props
+  newProps: any, // now props cloned
+  templater: TemplateRedraw,
+) {
+  const hasPropsChanged = tagSupport.hasPropChanges(
+    nowProps,
+    newProps,
+    oldProps, // not cloned
+  )
+
+  tagSupport.newest = templater.redraw() // No change detected, just redraw me only
+
+  if(!hasPropsChanged) {
+    return true
+  }
+
+  return false
 }

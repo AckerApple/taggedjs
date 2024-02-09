@@ -1,17 +1,24 @@
 ### TODO NOW: Before Mega-aide
-- Simplify attaching to an element
-  - instead of `renderAppToElement(App, element, {test:1})`
-- How to have subscription display logic
-  - ${subscribe => x}
-  - html`...${subscribe(directory$, directory => {})}`
-  - html`...${async(directoryPromise, directory => {})}`
+- Need to support attribute non-existance
+	- `<option ${ yesNo ? { selected: true } : {} }></option>`
+  - To support the above lets update interpolateAttributes
 - routing
 - Upgrade state to support both named and array state memory
   - helps with HMR
+  - Can fix `state mismatch` error
 - Test tag switch ${ trueFalse ? tagOne() : tagTwo() }
 - All logging must go through subscriptions
 - Production mode
   - Remove guards like state checks
+
+### Small TODO
+- Simplify attaching to an element
+  - instead of `renderAppToElement(App, element, {test:1})`
+  - maybe just a rename? `appToElement(App, element, {test:1})`
+- How to have subscription display logic
+  - ${subscribe => x}
+  - html`...${subscribe(directory$, directory => {})}`
+  - html`...${async(directoryPromise, directory => {})}`
 
 ### Extra testing
 - Test switching a components return string
@@ -25,17 +32,35 @@
 - Ability to produce one time HTML files
   - Then rehydrate with actual JavaScript
 - SSR - server side rendering
-  - we will need <template start> present
+  - we will need `<template start>` present
   - We may need to render attributes and then make a marker attribute
     - title="real title here" tag:title="__tagVar2_"
 
 
 ## Documentations
 
-### React differences
-- Use html`` instead of ()
-- The boolean -true- will render to screen
-- Render template syntax is ${} instead of {}
+### TaggedJs differences from React
+- Use ``` html`` ``` instead of `()` to define HTML content
+  - `() => (<div></div>)` - React (19 chars)
+  - ```() => html`<div></div>` ``` - TaggedJs (23 chars)
+- Components render as `${component()}` instead of `<component />`
+  - `() => (<div><component /></div>)` - ReactJs (32 chars)
+  - ```() => html`<div>${component()}</div>` ``` - TaggedJs (37 chars)
+- The boolean `true` will render to screen
+- Render template syntax is `${}` instead of `{}`
+  - `<div onclick={handler}></div>` - ReactJs (29 chars)
+  - `<div onclick=${handler}></div>` - TaggedJs (30 chars)
+- innerHTML can be the 1st or 2nd argument
+  - `<div>${component(html`<small>hello world</small>`)}</div>`
+  - `<div>${component({ x: y }, html`<small>hello world</small>`)}</div>`
+  - The component always has fixed arguments for this of `component = (props, children)`
+
+### Benefits to TaggedJs over React
+
+- You can have components with single argument inputs:
+  - instead of  `Hello <something x=3> World`
+  - you can now `Hello ${something(3)} World`
+  - The component for this is very small `export const something = tag(x => html`${x}rd`)`
 - Concept of providers
 - Provided hooks
   - state hook
@@ -43,10 +68,6 @@
   - render hook - move
   - init hook - move
   - async hook - move
-- innerHTML is 1st or 2nd argument
-- No tags for Components
-  - `<Component a={b} x={y}></Component>` <- Instead of
-  - `${Component({x: y, a: b})}` <- its this
 
 ### Angular similarities
 - Support for bracket element definitions
