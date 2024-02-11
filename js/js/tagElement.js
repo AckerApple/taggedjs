@@ -9,7 +9,7 @@ element, props) {
         console.warn('Found and destroyed app element already rendered to element', { element });
     }
     // Create the app which returns [props, runOneTimeFunction]
-    const wrapper = app(props);
+    const wrapper = app(props, { parentNode: element });
     // have a function setup and call the tagWrapper with (props, {update, async, on})
     const result = applyTagUpdater(wrapper);
     const { tag, tagSupport } = result;

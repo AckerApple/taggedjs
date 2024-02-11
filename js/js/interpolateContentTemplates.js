@@ -15,18 +15,16 @@ export function interpolateContentTemplates(element, variable, tag, options) {
         scanTextAreaValue(element);
     }
     children.forEach((child, index) => {
-        const nextClones = interpolateChild(child, index, // seems no longer used
-        children, // seems no longer used
-        options, variable, tag, counts);
+        const nextClones = interpolateChild(child, options, variable, tag, counts);
         if (child.tagName === 'TEXTAREA') {
             scanTextAreaValue(child);
         }
         clones.push(...nextClones);
         if (child.children) {
             const nextKids = new Array(...child.children);
-            nextKids.forEach((subChild, index) => {
+            nextKids.forEach(subChild => {
                 if (isRenderEndTemplate(subChild)) {
-                    interpolateChild(subChild, index, nextKids, options, variable, tag, counts);
+                    interpolateChild(subChild, options, variable, tag, counts);
                 }
                 const nextClones = interpolateContentTemplates(subChild, variable, tag, options);
                 clones.push(...nextClones);
@@ -35,24 +33,7 @@ export function interpolateContentTemplates(element, variable, tag, options) {
     });
     return clones;
 }
-function interpolateChild(child, index, children, options, variable, tag, counts) {
-    /*
-    children.forEach((child, subIndex) => {
-      if ( subIndex < index ) {
-        return // too low
-      }
-  
-      if ( child.tagName!=='TEMPLATE' ) {
-        return // not a template
-      }
-    
-      if ( child.getAttribute('interpolate')===undefined || child.getAttribute('end') === undefined ) {
-        return // not a rendering template
-      }
-  
-      return child
-    })
-    */
+function interpolateChild(child, options, variable, tag, counts) {
     const clones = interpolateTemplate(child, variable, tag, counts, options);
     return clones;
 }
