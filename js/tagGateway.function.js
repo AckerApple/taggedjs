@@ -35,6 +35,7 @@ export const tagGateway = function tagGateway(component) {
                     return;
                 }
                 const props = parsePropsString(element);
+                props.element = element;
                 try {
                     const { tag } = tagElement(component, element, props);
                     watchElement(id, element, tag);

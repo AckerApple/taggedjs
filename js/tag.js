@@ -4,19 +4,19 @@ import { TemplaterResult, getNewProps } from "./templater.utils.js";
 export const tags = [];
 let tagCount = 0;
 export function tag(tagComponent) {
-    const result = (function tagWrapper(props, tagEnv) {
+    const result = (function tagWrapper(props, children) {
         const isPropTag = isTagInstance(props);
         const templater = new TemplaterResult(props);
         const newProps = getNewProps(props, templater);
         let argProps = newProps;
         if (isPropTag) {
-            tagEnv.children = props;
+            children = props;
             argProps = noPropsGiven;
         }
         function innerTagWrap() {
             const originalFunction = innerTagWrap.original;
             const props = templater.tagSupport.props; // argProps
-            const tag = originalFunction(props, tagEnv);
+            const tag = originalFunction(props, children);
             tag.setSupport(templater.tagSupport);
             return tag;
         }
