@@ -1,6 +1,7 @@
 import { Tag } from "./Tag.class.js";
 import { TagSupport } from "./getTagSupport.js";
 import { Props } from "./Props.js";
+import { TagEnv } from "./tag.js";
 export type Wrapper = (() => Tag) & {
     original: () => Tag;
 };
@@ -23,5 +24,5 @@ export interface TemplateRedraw extends TemplaterResult {
     redraw: () => Tag | undefined;
 }
 export type TagComponent = (props: Props, // props or children
-children?: Tag) => Tag;
+tagEnv: TagEnv) => Tag;
 export declare function getNewProps(props: Props, templater: TemplaterResult): any;
