@@ -1,6 +1,5 @@
 import { redrawTag } from "./redrawTag.function.js";
 import { tagElement } from "./tagElement.js";
-const gateways = {};
 export function destroyGateways() {
     Object.entries(gateways).forEach(([id, gateway]) => checkGateway(gateway));
 }
@@ -63,7 +62,11 @@ function parsePropsString(element) {
     }
     try {
         const props = JSON.parse(propsString);
-        props.element = element;
+        // props.element = element
+        props.dispatchEvent = function (name, eventData) {
+            const event = new CustomEvent(name, eventData);
+            element.dispatchEvent(event);
+        };
         return props;
     }
     catch (err) {
@@ -117,4 +120,5 @@ function functionToHtmlId(func) {
     }
     return cleanedString;
 }
+const gateways = {};
 //# sourceMappingURL=tagGateway.function.js.map
