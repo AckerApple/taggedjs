@@ -47,7 +47,7 @@
 - innerHTML can be the 1st or 2nd argument
   - `<div>${component(html`<small>hello world</small>`)}</div>`
   - `<div>${component({ x: y }, html`<small>hello world</small>`)}</div>`
-  - The component always has fixed arguments for this of `component = (props, children)`
+  - The component always has fixed arguments for this of `component = (props, {children})`
 
 ### Benefits to TaggedJs over React
 

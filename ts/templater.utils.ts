@@ -4,6 +4,7 @@ import { isTagInstance } from "./isInstance.js"
 import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
 import { setUse } from "./setUse.function.js"
 import { Props } from "./Props.js"
+import { TagEnv } from "./tag.js"
 
 export type Wrapper = (() => Tag) & {
   original: () => Tag
@@ -112,7 +113,7 @@ export interface TemplateRedraw extends TemplaterResult {
 
 export type TagComponent = (
   props: Props, // props or children
-  children?: Tag
+  tagEnv: TagEnv,
 ) => Tag
 
 /* rewriter */

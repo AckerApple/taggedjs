@@ -31,8 +31,6 @@ export function interpolateContentTemplates(
   children.forEach((child, index) => {
     const nextClones = interpolateChild(
       child,
-      index, // seems no longer used
-      children, // seems no longer used
       options,
       variable,
       tag,
@@ -47,9 +45,9 @@ export function interpolateContentTemplates(
     
     if ( child.children ) {  
       const nextKids = new Array(...child.children)
-      nextKids.forEach((subChild, index) => {
+      nextKids.forEach(subChild => {
         if ( isRenderEndTemplate(subChild) ) {
-          interpolateChild(subChild, index, nextKids, options, variable, tag, counts)
+          interpolateChild(subChild, options, variable, tag, counts)
         }
 
         const nextClones = interpolateContentTemplates(subChild, variable, tag, options)
@@ -63,31 +61,11 @@ export function interpolateContentTemplates(
 
 function interpolateChild(
   child: Element,
-  index: number,
-  children: Element[],
   options: InterpolateOptions,
   variable: any,
   tag: Tag,
   counts: Counts,
 ): Clones {
-  /*
-  children.forEach((child, subIndex) => {
-    if ( subIndex < index ) {
-      return // too low
-    }
-
-    if ( child.tagName!=='TEMPLATE' ) {
-      return // not a template
-    }
-  
-    if ( child.getAttribute('interpolate')===undefined || child.getAttribute('end') === undefined ) {
-      return // not a rendering template
-    }
-
-    return child
-  })
-  */
-
   const clones = interpolateTemplate(
     child as Template,
     variable,

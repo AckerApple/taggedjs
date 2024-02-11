@@ -7,7 +7,7 @@ const appElements: {tag: Tag, element: Element}[] = []
 
 export function tagElement(
   app: TagComponent, // (...args: unknown[]) => TemplaterResult,
-  element: Element,
+  element: HTMLElement | Element,
   props: unknown,
 ): {tag: Tag, tags: TagComponent[]} {
   const appElmIndex = appElements.findIndex(appElm => appElm.element === element)
@@ -18,7 +18,7 @@ export function tagElement(
   }
 
   // Create the app which returns [props, runOneTimeFunction]
-  const wrapper = app(props) as unknown as TemplaterResult
+  const wrapper = app(props, {parentNode: element}) as unknown as TemplaterResult
 
   // have a function setup and call the tagWrapper with (props, {update, async, on})
   const result = applyTagUpdater(wrapper)

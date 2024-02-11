@@ -8,12 +8,17 @@ export const tags: TagComponent[] = []
 
 let tagCount = 0
 
+export type TagEnv = {
+  parentNode: HTMLElement | Element
+  children?: Tag
+}
+
 export function tag<T>(
   tagComponent: T | TagComponent
 ): T {
   const result = (function tagWrapper(
-    props?: Props | Tag,
-    children?: Tag
+    props: Props | Tag | undefined,
+    tagEnv: TagEnv
   ) {
     const isPropTag = isTagInstance(props)
     const templater: TemplaterResult = new TemplaterResult(props)
@@ -21,14 +26,14 @@ export function tag<T>(
     
     let argProps = newProps
     if(isPropTag) {
-      children = props as Tag
+      tagEnv.children = props as Tag
       argProps = noPropsGiven
     }
 
     function innerTagWrap() {
       const originalFunction = innerTagWrap.original as TagComponent
       const props = templater.tagSupport.props // argProps
-      const tag = originalFunction(props, children)
+      const tag = originalFunction(props, tagEnv)
       tag.setSupport( templater.tagSupport )
       return tag
     }
