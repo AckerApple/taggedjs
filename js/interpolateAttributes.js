@@ -14,7 +14,15 @@ export function interpolateAttributes(child, scope, ownerTag) {
         const value = child.getAttribute('textVarValue'); // (child as any).value
         processAttribute('textVarValue', value, child, scope, ownerTag, (_name, value) => child.value = value);
     }
-    const howToSet = (name, value) => child.setAttribute(name, value);
+    const howToSet = (name, value) => {
+        /*
+        if(name === 'class'){
+          value.split(' ').forEach(className => child.classList.add(className))
+          return
+        }
+        */
+        child.setAttribute(name, value);
+    };
     attrNames.forEach(attrName => {
         const value = child.getAttribute(attrName);
         processAttribute(attrName, value, child, scope, ownerTag, howToSet);
@@ -60,7 +68,7 @@ function processNameOnlyAttr(attrValue, lastValue, child, ownerTag, howToSet) {
             Object.entries(lastValue).forEach(([name]) => child.removeAttribute(name));
         }
     }
-    if (typeof (lastValue) === 'string') {
+    if (typeof (attrValue) === 'string') {
         if (!attrValue.length) {
             return;
         }
