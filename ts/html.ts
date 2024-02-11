@@ -1,8 +1,8 @@
 import { Tag } from "./Tag.class.js"
 
 export function html(
-  strings: string[],
+  strings: string[] | TemplateStringsArray,
   ...values: unknown[]
 ) {
-  return new Tag(strings, values)
+  return new Tag(strings as string[], values)
 }
