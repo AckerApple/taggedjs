@@ -3,7 +3,7 @@ import { Tag } from "./Tag.class.js"
 import { InterpolateOptions } from "./interpolateElement.js"
 import { Counts, Template, interpolateTemplate } from "./interpolateTemplate.js"
 
-const templateSearch = new RegExp('\\s*<template interpolate end id="__tagVar(\\d{1,4})"([^>]*)></template>(\\s*)')
+const templateSearch = new RegExp('\\s*<template interpolate end id="__tagvar(\\d{1,4})"([^>]*)></template>(\\s*)')
 
 /** Returns subscriptions[] that will need to be unsubscribed from when element is destroyed */
 export function interpolateContentTemplates(
@@ -109,7 +109,7 @@ function isRenderEndTemplate(child: Element) {
 function scanTextAreaValue(textarea: HTMLTextAreaElement) {
   const value = textarea.value
   if( value.search(templateSearch) >=0 ) {
-    const match = value.match(/__tagVar(\d{1,4})/);
+    const match = value.match(/__tagvar(\d{1,4})/);
     const result = match ? match[0] : ''
     const token = '{' + result + '}'
     // textarea.value = token

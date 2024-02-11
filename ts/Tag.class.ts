@@ -12,7 +12,7 @@ import { State } from "./state.js"
 import { elementDestroyCheck } from "./elementDestroyCheck.function.js"
 import { updateExistingValue } from "./updateTag.utils.js"
 
-export const variablePrefix = '__tagVar'
+export const variablePrefix = '__tagvar'
 export const escapeVariable = '--' + variablePrefix + '--'
 
 const prefixSearch = new RegExp(variablePrefix, 'g')

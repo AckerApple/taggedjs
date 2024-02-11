@@ -1,6 +1,6 @@
 import { Tag } from "./Tag.class.js"
 import { redrawTag } from "./redrawTag.function.js"
-import { renderAppToElement } from "./renderAppToElement.js"
+import { tagElement } from "./tagElement.js"
 import { TagComponent, TemplaterResult } from "./templater.utils.js"
 
 type Gateway = {tag:Tag, id:string, observer: MutationObserver}
@@ -56,7 +56,7 @@ export const tagGateway = function tagGateway(
         const props = parsePropsString(element)
   
         try {
-          const { tag } = renderAppToElement(component, element, props)
+          const { tag } = tagElement(component, element, props)
           
           watchElement(id, element as HTMLElement, tag)
         } catch (err) {

@@ -5,7 +5,7 @@ import { Tag } from "./Tag.class.js"
 
 const appElements: {tag: Tag, element: Element}[] = []
 
-export function renderAppToElement(
+export function tagElement(
   app: TagComponent, // (...args: unknown[]) => TemplaterResult,
   element: Element,
   props: unknown,

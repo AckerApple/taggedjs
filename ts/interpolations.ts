@@ -1,4 +1,4 @@
-export const interpolateReplace = /(?:<[^>]*>)|({__tagVar[^}]+})/g
+export const interpolateReplace = /(?:<[^>]*>)|({__tagvar[^}]+})/g
 
 /** replaces ${x} with <template id="x-start"></template><template id="x-end"></template> */
 export function interpolateToTemplates(

@@ -1,7 +1,4 @@
 ### TODO NOW: Before Mega-aide
-- Need to support attribute non-existance
-	- `<option ${ yesNo ? { selected: true } : {} }></option>`
-  - To support the above lets update interpolateAttributes
 - routing
 - Upgrade state to support both named and array state memory
   - helps with HMR
@@ -12,9 +9,6 @@
   - Remove guards like state checks
 
 ### Small TODO
-- Simplify attaching to an element
-  - instead of `renderAppToElement(App, element, {test:1})`
-  - maybe just a rename? `appToElement(App, element, {test:1})`
 - How to have subscription display logic
   - ${subscribe => x}
   - html`...${subscribe(directory$, directory => {})}`
@@ -34,7 +28,7 @@
 - SSR - server side rendering
   - we will need `<template start>` present
   - We may need to render attributes and then make a marker attribute
-    - title="real title here" tag:title="__tagVar2_"
+    - title="real title here" tag:title="__tagvar2_"
 
 
 ## Documentations
