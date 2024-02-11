@@ -35,7 +35,6 @@ export const tagGateway = function tagGateway(component) {
                     return;
                 }
                 const props = parsePropsString(element);
-                props.element = element;
                 try {
                     const { tag } = tagElement(component, element, props);
                     watchElement(id, element, tag);
@@ -60,14 +59,15 @@ export const tagGateway = function tagGateway(component) {
 function parsePropsString(element) {
     const propsString = element.getAttribute('props');
     if (!propsString) {
-        return;
+        return { element };
     }
-    let props = {};
     try {
-        return JSON.parse(propsString);
+        const props = JSON.parse(propsString);
+        props.element = element;
+        return props;
     }
     catch (err) {
-        console.warn('Failed to parse props on element', { element, propsString, props });
+        console.warn('Failed to parse props on element', { element, propsString });
         throw err;
     }
 }
