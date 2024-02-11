@@ -1,2 +1,2 @@
-# tagjs
+# taggedjs
 tagged template reactive html

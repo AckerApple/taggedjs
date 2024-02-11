@@ -1,0 +1,21 @@
+{
+  "name": "taggedjs",
+  "version": "2.3.2",
+  "description": "tagged template reactive html",
+  "main": "js/index.js",
+  "type": "module",
+  "keywords": [
+    "react",
+    "angular",
+    "vue",
+    "svelte",
+    "alternative",
+    "works",
+    "native",
+    "in",
+    "web",
+    "browser"
+  ],
+  "author": "Acker Dawn Apple",
+  "license": "MIT"
+}
