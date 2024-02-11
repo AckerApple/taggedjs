@@ -2,6 +2,7 @@ import { Props } from "./Props.js";
 import { TagComponent } from "./templater.utils.js";
 export type dispatchEvent = (name: string, eventData: EventData) => void;
 export type GatewayProps = Props & {
+    [key: string]: unknown;
     dispatchEvent: dispatchEvent;
 };
 export declare function destroyGateways(): void;

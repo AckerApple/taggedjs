@@ -2,6 +2,13 @@ import { inputAttribute } from "./inputAttribute.js";
 import { isSubjectInstance } from "./isInstance.js";
 export function interpolateAttributes(child, scope, ownerTag) {
     const attrNames = child.getAttributeNames();
+    if (attrNames.includes('class.backgroundorange')) {
+        console.log('child.attributes', child.attributes, child.attributes.backgroundOrange, attrNames);
+        for (var i = 0; i < child.attributes.length; i++) {
+            // Log the original case of attribute names
+            console.log("Original Attribute Name:", child.attributes[i].name);
+        }
+    }
     const isTextArea = child.nodeName === 'TEXTAREA';
     if (isTextArea && !attrNames.includes('value')) {
         const value = child.getAttribute('textVarValue'); // (child as any).value
@@ -81,7 +88,7 @@ function processNameValueAttr(attrName, result, child, ownerTag, howToSet) {
     }
     if (isSubjectInstance(result)) {
         child.removeAttribute(attrName);
-        const callback = (newAttrValue) => processSubjectValue(newAttrValue, child, attrName, isSpecial, result, howToSet);
+        const callback = (newAttrValue) => processSubjectValue(newAttrValue, child, attrName, isSpecial, howToSet);
         // the above callback gets called immediately since its a ValueSubject()
         const sub = result.subscribe(callback);
         ownerTag.cloneSubs.push(sub); // this is where unsubscribe is picked up
@@ -91,7 +98,7 @@ function processNameValueAttr(attrName, result, child, ownerTag, howToSet) {
     // child.setAttribute(attrName, result.value)
     return;
 }
-function processSubjectValue(newAttrValue, child, attrName, isSpecial, result, howToSet) {
+function processSubjectValue(newAttrValue, child, attrName, isSpecial, howToSet) {
     if (newAttrValue instanceof Function) {
         ;
         child[attrName] = function (...args) {
