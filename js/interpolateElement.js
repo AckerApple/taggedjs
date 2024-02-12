@@ -6,6 +6,7 @@ export function interpolateElement(element, context, // variables used to evalua
 interpolatedTemplates, tagOwner, options) {
     const clones = [];
     const result = interpolatedTemplates.interpolation; // interpolateElementChild(element)
+    // const result = interpolateElementChild(element)
     const template = element.children[0];
     const children = template.content.children;
     if (result.keys.length) {
@@ -25,15 +26,11 @@ function processChildrenAttributes(children, context, ownerTag) {
     });
 }
 /** Convert interpolations into template tags */
-/*
-function interpolateElementChild(
-  child: Element,
-) {
-  const result = interpolateString(child.innerHTML)
-  child.innerHTML = result.string
-  return result
+function interpolateElementChild(child) {
+    const result = interpolateString(child.innerHTML);
+    child.innerHTML = result.string;
+    return result;
 }
-*/
 export function interpolateString(string) {
     const result = interpolateToTemplates(string);
     result.string = result.string.replace(escapeSearch, variablePrefix);

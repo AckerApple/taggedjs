@@ -6,5 +6,4 @@ export type InterpolateOptions = {
 };
 export declare function interpolateElement(element: Element, context: Context, // variables used to evaluate
 interpolatedTemplates: TagTemplate, tagOwner: Tag, options: InterpolateOptions): Clones;
-/** Convert interpolations into template tags */
 export declare function interpolateString(string: string): import("./interpolations.js").InterpolatedTemplates;

@@ -97,8 +97,7 @@ export class Tag {
         this.updateValues(values);
     }
     getTemplate() {
-        // TODO: treat interpolation hack here
-        const string = this.lastTemplateString = this.strings.map((string, index) => {
+        const string = this.strings.map((string, index) => {
             const safeString = string.replace(prefixSearch, escapeVariable);
             const endString = safeString + (this.values.length > index ? `{${variablePrefix}${index}}` : '');
             // const trimString = index === 0 || index === this.strings.length-1 ? endString.trim() : endString
@@ -106,11 +105,11 @@ export class Tag {
             return trimString;
         }).join('');
         const interpolation = interpolateString(string);
+        this.lastTemplateString = interpolation.string;
         return {
             interpolation,
-            string: interpolation.string,
-            // intString: interpolateToTemplates(string),
             // string,
+            string: interpolation.string,
             strings: this.strings,
             values: this.values,
             context: this.tagSupport?.memory.context || {},
@@ -225,11 +224,9 @@ export class Tag {
         temporary.id = 'tag-temp-holder';
         // render content with a first child that we can know is our first element
         temporary.innerHTML = `<template tag-wrap="22">${template.string}</template>`;
-        console.log('template.string', { x: new Array(...temporary.children[0].content.children) });
         // const clonesBefore = this.clones.map(clone => clone)
         const intClones = interpolateElement(temporary, context, template, this, // this.ownerTag || this,
         { forceElement: options.forceElement });
-        console.log('intClones', intClones);
         this.clones.length = 0;
         const clones = buildClones(temporary, insertBefore);
         this.clones.push(...clones);
