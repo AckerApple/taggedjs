@@ -13,7 +13,7 @@ export function processSubjectComponent(value, result, template, ownerTag, optio
         throw error;
     }
     const templater = value;
-    const tagSupport = value.tagSupport; // || getTagSupport(ownerTag.tagSupport.depth+1, templater )
+    const tagSupport = value.tagSupport;
     tagSupport.mutatingRender = () => {
         // Is this NOT my first render
         if (result.tag) {

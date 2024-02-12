@@ -87,7 +87,7 @@ tag, // owner
 options) {
     // first time seeing this tag?
     if (!value.tagSupport) {
-        value.tagSupport = getTagSupport(tag.tagSupport.depth + 1, {});
+        value.tagSupport = getTagSupport({});
         // asking me to render will cause my parent to render
         value.tagSupport.mutatingRender = tag.tagSupport.mutatingRender;
         value.tagSupport.oldest = value.tagSupport.oldest || value;

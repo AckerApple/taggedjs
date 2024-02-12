@@ -2,13 +2,6 @@ import { inputAttribute } from "./inputAttribute.js";
 import { isSubjectInstance } from "./isInstance.js";
 export function interpolateAttributes(child, scope, ownerTag) {
     const attrNames = child.getAttributeNames();
-    if (attrNames.includes('class.backgroundorange')) {
-        console.log('child.attributes', child.attributes, child.attributes.backgroundOrange, attrNames);
-        for (var i = 0; i < child.attributes.length; i++) {
-            // Log the original case of attribute names
-            console.log("Original Attribute Name:", child.attributes[i].name);
-        }
-    }
     const isTextArea = child.nodeName === 'TEXTAREA';
     if (isTextArea && !attrNames.includes('value')) {
         const value = child.getAttribute('textVarValue'); // (child as any).value

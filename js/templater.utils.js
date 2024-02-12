@@ -9,7 +9,7 @@ export class TemplaterResult {
     oldest;
     tagSupport;
     constructor(props) {
-        this.tagSupport = getTagSupport(0, this, props);
+        this.tagSupport = getTagSupport(this, props);
     }
     redraw;
     isTemplater = true;

@@ -1,8 +1,9 @@
 import { interpolateTemplate } from "./interpolateTemplate.js";
 const templateSearch = new RegExp('\\s*<template interpolate end id="__tagvar(\\d{1,4})"([^>]*)></template>(\\s*)');
 /** Returns subscriptions[] that will need to be unsubscribed from when element is destroyed */
-export function interpolateContentTemplates(element, variable, tag, options) {
-    if (!element.children || element.tagName === 'TEMPLATE') {
+export function interpolateContentTemplates(element, // <div><div></div><template tag-wrap="22">...</template></div>
+variable, tag, options, children) {
+    if (!children || element.tagName === 'TEMPLATE') {
         return []; // done
     }
     const counts = {
@@ -10,12 +11,12 @@ export function interpolateContentTemplates(element, variable, tag, options) {
         removed: 0,
     };
     const clones = [];
-    const children = new Array(...element.children);
+    const childArray = new Array(...children);
     if (element.tagName === 'TEXTAREA') {
         scanTextAreaValue(element);
     }
-    children.forEach((child, index) => {
-        const nextClones = interpolateChild(child, options, variable, tag, counts);
+    childArray.forEach(child => {
+        const nextClones = interpolateTemplate(child, variable, tag, counts, options);
         if (child.tagName === 'TEXTAREA') {
             scanTextAreaValue(child);
         }
@@ -24,17 +25,13 @@ export function interpolateContentTemplates(element, variable, tag, options) {
             const nextKids = new Array(...child.children);
             nextKids.forEach(subChild => {
                 if (isRenderEndTemplate(subChild)) {
-                    interpolateChild(subChild, options, variable, tag, counts);
+                    interpolateTemplate(subChild, variable, tag, counts, options);
                 }
-                const nextClones = interpolateContentTemplates(subChild, variable, tag, options);
+                const nextClones = interpolateContentTemplates(subChild, variable, tag, options, subChild.children);
                 clones.push(...nextClones);
             });
         }
     });
-    return clones;
-}
-function interpolateChild(child, options, variable, tag, counts) {
-    const clones = interpolateTemplate(child, variable, tag, counts, options);
     return clones;
 }
 function isRenderEndTemplate(child) {

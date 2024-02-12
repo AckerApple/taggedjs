@@ -4,7 +4,6 @@ import { TemplaterResult } from "./templater.utils.js";
 export declare class TagSupport {
     templater: TemplaterResult;
     props?: unknown;
-    depth: number;
     clonedProps: Props;
     latestProps: Props;
     latestClonedProps: Props;
@@ -19,4 +18,4 @@ export declare class TagSupport {
     render(): Tag;
     renderExistingTag(tag: Tag, newTemplater: TemplaterResult): boolean;
 }
-export declare function getTagSupport(depth: number, templater: TemplaterResult, props?: Props): TagSupport;
+export declare function getTagSupport(templater: TemplaterResult, props?: Props): TagSupport;

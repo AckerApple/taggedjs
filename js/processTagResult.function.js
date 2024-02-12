@@ -9,7 +9,7 @@ insertBefore, // <template end interpolate />
             return [];
         }
         const lastFirstChild = insertBefore; // tag.clones[0] // insertBefore.lastFirstChild
-        const clones = tag.buildBeforeElement(lastFirstChild, { counts, forceElement, depth: tag.tagSupport.depth + 1 });
+        const clones = tag.buildBeforeElement(lastFirstChild, { counts, forceElement });
         result.lastArray.push({
             tag, index
         });
@@ -29,12 +29,9 @@ insertBefore, // <template end interpolate />
             return []; // no clones created in element already on stage
         }
     }
-    // *if just now appearing to be a Tag
-    // const before = (insertBefore as any).clone || insertBefore
     const clones = tag.buildBeforeElement(insertBefore, {
         counts,
         forceElement,
-        depth: tag.tagSupport.depth,
     });
     result.tag = tag; // let reprocessing know we saw this previously as an if
     return clones;

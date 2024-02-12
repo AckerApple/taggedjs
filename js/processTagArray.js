@@ -27,7 +27,7 @@ ownerTag, options) {
     // const masterBefore = template || (template as any).clone
     const before = template || template.clone;
     value.forEach((subTag, index) => {
-        subTag.tagSupport = getTagSupport(-1, {}); // {...ownerTag.tagSupport} // ownerTag.tagSupport.templater
+        subTag.tagSupport = getTagSupport({}); // {...ownerTag.tagSupport} // ownerTag.tagSupport.templater
         subTag.tagSupport.mutatingRender = () => {
             ownerTag.tagSupport.render();
             return subTag;

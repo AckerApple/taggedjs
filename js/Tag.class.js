@@ -3,7 +3,7 @@ import { ValueSubject } from "./ValueSubject.js";
 import { runAfterRender, runBeforeDestroy, runBeforeRedraw } from "./tagRunner.js";
 import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js";
 import { buildClones } from "./render.js";
-import { interpolateElement } from "./interpolateElement.js";
+import { interpolateElement, interpolateString } from "./interpolateElement.js";
 import { afterElmBuild } from "./interpolateTemplate.js";
 import { elementDestroyCheck } from "./elementDestroyCheck.function.js";
 import { updateExistingValue } from "./updateTag.utils.js";
@@ -41,15 +41,13 @@ export class Tag {
         return this;
     }
     async destroy(options = {
-        depth: 0,
         stagger: 0,
-        byParent: false, // TODO: Replace with depth control. Only destroy clones of direct children
+        byParent: false, // Only destroy clones of direct children
     }) {
-        const depth = options.depth || 0;
         runBeforeDestroy(this.tagSupport, this);
         this.destroySubscriptions();
-        const promises = this.children.map((kid) => kid.destroy({ ...options, byParent: true, depth: depth + 1 }));
-        if (depth <= 0) {
+        const promises = this.children.map((kid) => kid.destroy({ ...options, byParent: true }));
+        if (!options.byParent) {
             options.stagger = await this.destroyClones(options);
         }
         if (this.ownerTag) {
@@ -107,8 +105,12 @@ export class Tag {
             const trimString = endString.replace(/>\s*/g, '>').replace(/\s*</g, '<');
             return trimString;
         }).join('');
+        const interpolation = interpolateString(string);
         return {
-            string,
+            interpolation,
+            string: interpolation.string,
+            // intString: interpolateToTemplates(string),
+            // string,
             strings: this.strings,
             values: this.values,
             context: this.tagSupport?.memory.context || {},
@@ -209,13 +211,11 @@ export class Tag {
         this.buildBeforeElement(insertBefore, {
             forceElement: true,
             counts: { added: 0, removed: 0 },
-            depth: this.tagSupport.depth,
         });
     }
     buildBeforeElement(insertBefore, options = {
         forceElement: false,
         counts: { added: 0, removed: 0 },
-        depth: 0,
     }) {
         this.insertBefore = insertBefore;
         const context = this.update();
@@ -224,10 +224,12 @@ export class Tag {
         const temporary = document.createElement('div');
         temporary.id = 'tag-temp-holder';
         // render content with a first child that we can know is our first element
-        temporary.innerHTML = '<div id="top-element-insert-after"></div>' + template.string;
+        temporary.innerHTML = `<template tag-wrap="22">${template.string}</template>`;
+        console.log('template.string', { x: new Array(...temporary.children[0].content.children) });
         // const clonesBefore = this.clones.map(clone => clone)
-        const intClones = interpolateElement(temporary, context, this, // this.ownerTag || this,
-        { forceElement: options.forceElement, depth: options.depth });
+        const intClones = interpolateElement(temporary, context, template, this, // this.ownerTag || this,
+        { forceElement: options.forceElement });
+        console.log('intClones', intClones);
         this.clones.length = 0;
         const clones = buildClones(temporary, insertBefore);
         this.clones.push(...clones);
