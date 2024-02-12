@@ -13,11 +13,14 @@ function checkGateway(gateway) {
     delete gateways[id];
     return false;
 }
+const namedTimeouts = {};
 export const tagGateway = function tagGateway(component) {
     const componentString = functionToHtmlId(component);
     const id = '__tagTemplate_' + componentString;
+    if (namedTimeouts[id]) {
+        return namedTimeouts[id];
+    }
     let intervalId;
-    let found = false;
     function findElement() {
         intervalId = setInterval(() => {
             const elements = document.querySelectorAll('#' + id);
@@ -26,7 +29,8 @@ export const tagGateway = function tagGateway(component) {
             }
             // Element has been found, load
             clearInterval(intervalId);
-            found = true;
+            clearTimeout(notFoundTimeout);
+            delete namedTimeouts[id];
             elements.forEach(element => {
                 const updateTag = element.updateTag;
                 if (updateTag) {
@@ -46,14 +50,12 @@ export const tagGateway = function tagGateway(component) {
         }, 10);
     }
     findElement();
-    setTimeout(() => {
-        if (found) {
-            return;
-        }
+    const notFoundTimeout = setTimeout(() => {
         clearInterval(intervalId);
         throw new Error(`TaggedJs Element ${id} not found`);
     }, 2000);
-    return { id };
+    namedTimeouts[id] = { id };
+    return namedTimeouts[id];
 };
 function parsePropsString(element) {
     const propsString = element.getAttribute('props');
