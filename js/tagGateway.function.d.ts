@@ -5,7 +5,7 @@ export type GatewayProps = Props & {
     [key: string]: unknown;
     dispatchEvent: dispatchEvent;
 };
-export declare function destroyGateways(): void;
+export declare function checkGateways(): void;
 export declare const tagGateway: (component: TagComponent) => {
     id: string;
 };

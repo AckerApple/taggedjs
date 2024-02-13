@@ -4,7 +4,7 @@ export * from "./Subject.js";
 export * from "./interpolateElement.js";
 export * from "./getTagSupport.js";
 export * from "./redrawTag.function.js";
-export * from "./tagGateway.function.js";
+export * from "./gateway/index.js";
 // TODO: export *
 export { isTagComponent } from "./isInstance.js";
 export { tags, tag } from "./tag.js";
