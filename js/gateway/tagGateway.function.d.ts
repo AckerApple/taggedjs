@@ -10,6 +10,7 @@ export declare function checkAllGateways(): void;
 export declare function checkGateways(gateways: Gateway[]): void;
 export declare function destroyGateway(gateway: Gateway): void;
 export declare function getTagId(component: TagComponent): string;
+export declare function loadTagId(id: string, component: TagComponent): void;
 export declare const tagGateway: (component: TagComponent) => {
     id: string;
 };

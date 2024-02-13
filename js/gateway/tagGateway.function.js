@@ -1,5 +1,7 @@
 import { redrawTag } from "../redrawTag.function.js";
 import { tagElement } from "../tagElement.js";
+const gateways = {};
+const gatewayTagIds = {};
 export function checkAllGateways() {
     Object.entries(gateways).forEach(([id, gateways]) => checkGateways(gateways));
 }
@@ -23,6 +25,9 @@ export function destroyGateway(gateway) {
 export function getTagId(component) {
     const componentString = functionToHtmlId(component);
     return '__tagTemplate_' + componentString;
+}
+export function loadTagId(id, component) {
+    gatewayTagIds[id] = component;
 }
 const namedTimeouts = {};
 export const tagGateway = function tagGateway(component) {
@@ -110,6 +115,7 @@ function watchElement(id, targetNode, tag, component) {
     }
     ;
     targetNode.updateTag = updateTag;
+    loadTagId(id, component);
     const gateway = { id, tag, observer, component, element: targetNode };
     gateways[id] = gateways[id] || [];
     gateways[id].push(gateway);
@@ -130,7 +136,6 @@ function functionToHtmlId(func) {
     }
     return cleanedString;
 }
-const gateways = {};
 function checkTagElementsById(id, component) {
     const elements = document.querySelectorAll('#' + id);
     return checkTagElements(id, elements, component);
