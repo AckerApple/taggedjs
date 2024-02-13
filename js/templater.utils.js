@@ -33,7 +33,6 @@ export class TemplaterResult {
             // ensure props are the last ones used
             tagSupport.props = tagSupport.latestProps;
             tagSupport.clonedProps = tagSupport.latestClonedProps;
-            // tagSupport.oldest.beforeRedraw()
             runBeforeRedraw(tagSupport, tagSupport.oldest);
         }
         else {

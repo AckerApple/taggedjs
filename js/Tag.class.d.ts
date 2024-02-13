@@ -65,4 +65,5 @@ export type ElementBuildOptions = {
     counts: Counts;
     forceElement?: boolean;
 };
+export declare function processNewValue(hasValue: boolean, value: any, context: Context, variableName: string, tag: Tag): void;
 export {};

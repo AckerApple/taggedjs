@@ -44,7 +44,11 @@ export class Tag {
         stagger: 0,
         byParent: false, // Only destroy clones of direct children
     }) {
-        runBeforeDestroy(this.tagSupport, this);
+        // the isComponent check maybe able to be removed
+        const isComponent = this.tagSupport ? true : false;
+        if (isComponent) {
+            runBeforeDestroy(this.tagSupport, this);
+        }
         this.destroySubscriptions();
         const promises = this.children.map((kid) => kid.destroy({ ...options, byParent: true }));
         if (!options.byParent) {
@@ -165,30 +169,10 @@ export class Tag {
             // is something already there?
             const existing = context[variableName];
             if (existing) {
-                return updateExistingValue(existing, value, this);
+                return updateExistingValue(existing, value, this, variableName);
             }
             // 🆕 First time values below
-            if (isTagComponent(value)) {
-                const existing = context[variableName] = new ValueSubject(value);
-                setValueRedraw(value, existing, this);
-                return;
-            }
-            if (value instanceof Function) {
-                context[variableName] = getSubjectFunction(value, this);
-                return;
-            }
-            if (!hasValue) {
-                return; // more strings than values, stop here
-            }
-            if (isTagInstance(value)) {
-                value.ownerTag = this;
-                this.children.push(value);
-            }
-            if (isSubjectInstance(value)) {
-                context[variableName] = value;
-                return;
-            }
-            context[variableName] = new ValueSubject(value);
+            processNewValue(hasValue, value, context, variableName, this);
         });
         return context;
     }
@@ -236,5 +220,28 @@ export class Tag {
         this.clones.forEach(clone => afterElmBuild(clone, options));
         return this.clones;
     }
+}
+export function processNewValue(hasValue, value, context, variableName, tag) {
+    if (isTagComponent(value)) {
+        const existing = context[variableName] = new ValueSubject(value);
+        setValueRedraw(value, existing, tag);
+        return;
+    }
+    if (value instanceof Function) {
+        context[variableName] = getSubjectFunction(value, tag);
+        return;
+    }
+    if (!hasValue) {
+        return; // more strings than values, stop here
+    }
+    if (isTagInstance(value)) {
+        value.ownerTag = tag;
+        tag.children.push(value);
+    }
+    if (isSubjectInstance(value)) {
+        context[variableName] = value;
+        return;
+    }
+    context[variableName] = new ValueSubject(value);
 }
 //# sourceMappingURL=Tag.class.js.map

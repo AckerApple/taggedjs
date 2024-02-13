@@ -21,39 +21,51 @@ export const tagGateway = function tagGateway(component) {
         return namedTimeouts[id];
     }
     let intervalId;
-    function findElement() {
-        intervalId = setInterval(() => {
-            const elements = document.querySelectorAll('#' + id);
-            if (!elements.length) {
+    let hitCount = 0;
+    const interval = 5;
+    function findElements() {
+        const elements = document.querySelectorAll('#' + id);
+        if (!elements.length) {
+            return elements.length;
+        }
+        // Element has been found, load
+        if (intervalId) {
+            clearInterval(intervalId);
+        }
+        delete namedTimeouts[id];
+        elements.forEach(element => {
+            const updateTag = element.updateTag;
+            if (updateTag) {
+                updateTag();
                 return;
             }
-            // Element has been found, load
-            clearInterval(intervalId);
-            clearTimeout(notFoundTimeout);
-            delete namedTimeouts[id];
-            elements.forEach(element => {
-                const updateTag = element.updateTag;
-                if (updateTag) {
-                    updateTag();
-                    return;
-                }
-                const props = parsePropsString(element);
-                try {
-                    const { tag } = tagElement(component, element, props);
-                    watchElement(id, element, tag);
-                }
-                catch (err) {
-                    console.warn('Failed to render component to element', { component, element, props });
-                    throw err;
-                }
-            });
-        }, 10);
+            const props = parsePropsString(element);
+            try {
+                const { tag } = tagElement(component, element, props);
+                watchElement(id, element, tag);
+            }
+            catch (err) {
+                console.warn('Failed to render component to element', { component, element, props });
+                throw err;
+            }
+        });
+        return elements.length;
+    }
+    function findElement() {
+        intervalId = setInterval(() => {
+            hitCount = hitCount + interval;
+            if (hitCount >= 2000) {
+                clearInterval(intervalId);
+                throw new Error(`TaggedJs Element ${id} not found`);
+            }
+            findElements();
+        }, interval);
+    }
+    const elementCounts = findElements();
+    if (elementCounts) {
+        return { id };
     }
     findElement();
-    const notFoundTimeout = setTimeout(() => {
-        clearInterval(intervalId);
-        throw new Error(`TaggedJs Element ${id} not found`);
-    }, 2000);
     namedTimeouts[id] = { id };
     return namedTimeouts[id];
 };
