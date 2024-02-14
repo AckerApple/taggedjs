@@ -4,7 +4,6 @@ import { Gateway } from "./tagGateway.function.js";
  */
 export declare class TagElement extends HTMLElement {
     gateway: Gateway;
-    inlineBlock: HTMLElement;
     constructor();
     disconnectedCallback(): void;
 }

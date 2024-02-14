@@ -81,11 +81,11 @@ function processNameValueAttr(attrName, result, child, ownerTag, howToSet) {
     const isSpecial = isSpecialAttr(attrName);
     // attach as callback
     if (result instanceof Function) {
-        ;
-        child[attrName] = function (...args) {
+        const action = function (...args) {
             return result(child, args);
         };
-        return;
+        child[attrName].action = action;
+        // child.addEventListener(attrName, action)
     }
     if (isSubjectInstance(result)) {
         child.removeAttribute(attrName);

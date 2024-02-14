@@ -1,7 +1,8 @@
 import { redrawTag } from "../redrawTag.function.js";
 import { tagElement } from "../tagElement.js";
+import { loadTagGateway } from "./loadTagGateway.function.js";
 const gateways = {};
-const gatewayTagIds = {};
+export const gatewayTagIds = {};
 export function checkAllGateways() {
     Object.entries(gateways).forEach(([id, gateways]) => checkGateways(gateways));
 }
@@ -25,9 +26,6 @@ export function destroyGateway(gateway) {
 export function getTagId(component) {
     const componentString = functionToHtmlId(component);
     return '__tagTemplate_' + componentString;
-}
-export function loadTagId(id, component) {
-    gatewayTagIds[id] = component;
 }
 const namedTimeouts = {};
 export const tagGateway = function tagGateway(component) {
@@ -75,11 +73,18 @@ function parsePropsString(element) {
     }
     try {
         const props = JSON.parse(propsString);
-        // props.element = element
-        props.dispatchEvent = function (name, eventData) {
+        // attribute eventProps as output bindings
+        const eventPropsString = element.getAttribute('events');
+        if (eventPropsString) {
+            eventPropsString.split(',').map(x => x.trim()).map((name) => {
+                props[name] = (value) => dispatchEvent(name, { detail: { [name]: value } });
+            });
+        }
+        const dispatchEvent = function (name, eventData) {
             const event = new CustomEvent(name, eventData);
             element.dispatchEvent(event);
         };
+        props.dispatchEvent = dispatchEvent;
         return props;
     }
     catch (err) {
@@ -90,7 +95,7 @@ function parsePropsString(element) {
 /** adds to gateways[id].push */
 function watchElement(id, targetNode, tag, component) {
     let lastTag = tag;
-    const observer = new MutationObserver((mutationsList, observer) => {
+    const observer = new MutationObserver(mutationsList => {
         if (!checkGateway(gateway)) {
             return;
         }
@@ -103,26 +108,29 @@ function watchElement(id, targetNode, tag, component) {
     function updateTag() {
         const templater = tag.tagSupport.templater;
         const oldProps = templater.tagSupport.props;
-        templater.tagSupport.props = parsePropsString(targetNode);
-        const isSameProps = JSON.stringify(oldProps) === JSON.stringify(templater.tagSupport.props);
+        const newProps = parsePropsString(targetNode);
+        templater.tagSupport.props = newProps;
+        const isSameProps = JSON.stringify(oldProps) === JSON.stringify(newProps);
         if (isSameProps) {
             return; // no reason to update, same props
         }
-        templater.tagSupport.latestProps = templater.tagSupport.props;
+        templater.tagSupport.latestProps = newProps;
         const result = redrawTag(lastTag, templater);
         // update records
         gateway.tag = lastTag = result.retag;
     }
-    ;
-    targetNode.updateTag = updateTag;
-    loadTagId(id, component);
-    const gateway = { id, tag, observer, component, element: targetNode };
+    loadTagGateway(component);
+    const gateway = {
+        id, tag, observer, component, element: targetNode, updateTag,
+    };
     gateways[id] = gateways[id] || [];
     gateways[id].push(gateway);
+    targetNode.gateway = gateway;
     // Configure the observer to watch for changes in child nodes and attributes
     const config = { attributes: true };
     // Start observing the target node for specified changes
     observer.observe(targetNode, config);
+    return gateway;
 }
 function functionToHtmlId(func) {
     // Convert function to string
@@ -145,33 +153,31 @@ function checkTagElements(id, elements, component) {
     return elements;
 }
 export function checkByElement(element) {
-    const id = element.getAttribute('id');
+    const id = element.id || element.getAttribute('id');
     if (!id) {
-        const message = 'No matching gateway tag registered';
+        const message = 'Cannot check a tag on element with no id attribute';
         console.warn(message, { id, element });
         throw new Error(message);
     }
-    const gateway = gateways[id].find(({ element: elm }) => elm === element);
-    if (!gateway) {
-        const message = 'Gateway reg found by id but no matching element';
+    const component = gatewayTagIds[id];
+    if (!component) {
+        const message = `Cannot find a tag registered by id of ${id}`;
         console.warn(message, { id, element });
         throw new Error(message);
     }
-    const component = gateway.component;
-    checkElement(id, element, component);
-    return gateway;
+    return checkElement(id, element, component);
 }
 export function checkElement(id, element, component) {
-    const updateTag = element.updateTag;
-    if (updateTag) {
-        updateTag();
-        return;
+    const gateway = element.gateway;
+    if (gateway) {
+        gateway.updateTag();
+        return gateway;
     }
     const props = parsePropsString(element);
     try {
         const { tag } = tagElement(component, element, props);
         // watch element AND add to gateways[id].push()
-        watchElement(id, element, tag, component);
+        return watchElement(id, element, tag, component);
     }
     catch (err) {
         console.warn('Failed to render component to element', { component, element, props });

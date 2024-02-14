@@ -1,4 +1,5 @@
-export const interpolateReplace = /(?:<[^>]*>)|({__tagvar[^}]+})/g;
+// support arrow functions in attributes
+export const interpolateReplace = /(?:<[^>]*?(?:(?:\s+\w+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^>\s]+)))*\s*)\/?>)|({__tagvar[^}]+})/g;
 /** replaces ${x} with <template id="x-start"></template><template id="x-end"></template> */
 export function interpolateToTemplates(template) {
     const keys = [];
