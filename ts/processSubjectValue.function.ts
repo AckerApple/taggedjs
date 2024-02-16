@@ -1,12 +1,14 @@
 import { processSubjectComponent } from "./processSubjectComponent.function.js"
 import { processTagResult } from "./processTagResult.function.js"
 import { isTagComponent, isTagInstance } from "./isInstance.js"
-import { processTagArray } from "./processTagArray.js"
+import { TagArraySubject, processTagArray } from "./processTagArray.js"
 import { TemplaterResult } from "./templater.utils.js"
 import { getTagSupport } from "./getTagSupport.js"
 import { Clones } from "./Clones.type.js"
 import { Tag } from "./Tag.class.js"
 import { Counts, Template, updateBetweenTemplates } from "./interpolateTemplate.js"
+import { ValueSubject } from "./ValueSubject.js"
+import { TagSubject } from "./Tag.utils.js"
 
 enum ValueTypes {
   tag = 'tag',
@@ -24,11 +26,15 @@ function getValueType(value: any): ValueTypes {
     return ValueTypes.tag
   }
 
-  if (value instanceof Array && value.every(x => isTagInstance(x))) {
+  if (isTagArray(value)) {
     return ValueTypes.tagArray
   }
 
   return ValueTypes.value
+}
+
+export function isTagArray(value: any) {
+  return value instanceof Array && value.every(x => isTagInstance(x))
 }
 
 type processOptions = {
@@ -43,7 +49,7 @@ export type ClonesAndPromise = {
 
 export function processSubjectValue(
   value: any,
-  result: any, // could be tag via result.tag
+  result: TagArraySubject | TagSubject, // could be tag via result.tag
   template: Template, // <template end interpolate /> (will be removed)
   tag: Tag, // owner
   options: processOptions, // {added:0, removed:0}
@@ -51,13 +57,14 @@ export function processSubjectValue(
   const valueType = getValueType(value)
 
   // Previously was simple value, now its a tag of some sort
-  if(valueType !== ValueTypes.value && result.clone) {
-    const clone = result.clone
-    const parent = clone.parentNode
+  const resultTag = result as TagSubject
+  const clone = resultTag.clone
+  if(valueType !== ValueTypes.value && clone) {
+    const parent = clone.parentNode as ParentNode
     template.removeAttribute('removedAt')
     parent.insertBefore(template, clone)
     parent.removeChild(clone)
-    delete result.clone
+    delete resultTag.clone
     // result.clone = template
   }
   
@@ -69,17 +76,17 @@ export function processSubjectValue(
   
     case ValueTypes.tagArray:
       return {
-        clones: processTagArray(result, value, template, tag, options)
+        clones: processTagArray(result as TagArraySubject, value, template, tag, options)
       }
       
     case ValueTypes.tagComponent:
       return {
-        clones: processSubjectComponent(value, result, template, tag, options)
+        clones: processSubjectComponent(value, result as TagSubject, template, tag, options)
       }
   }
 
   // *if processing WAS a tag BUT NOW its some other non-tag value
-  if (result.tag) {
+  if ( (result as TagSubject).tag ) {
     return {
       clones: [],
       promise: processWasTag(value, result, template, options),
@@ -121,23 +128,28 @@ function processRegularValue(
   return clones
 }
 
-function processTag(
+export function processTag(
   value: any,
-  result: any, // could be tag via result.tag
+  result: TagSubject | TagArraySubject, // could be tag via result.tag
   template: Template, // <template end interpolate /> (will be removed)
   tag: Tag, // owner
   options: processOptions, // {added:0, removed:0}
 ) {
   // first time seeing this tag?
   if(!value.tagSupport) {
-    value.tagSupport = getTagSupport(tag.tagSupport.depth + 1, {} as TemplaterResult)
+    value.tagSupport = getTagSupport({} as TemplaterResult)
     // asking me to render will cause my parent to render
     value.tagSupport.mutatingRender = tag.tagSupport.mutatingRender
     value.tagSupport.oldest = value.tagSupport.oldest || value
     
     tag.children.push(value as Tag)
     value.ownerTag = tag
+
+    ;(result as any).sideTag = tag
   }
+
+  // (result as any).template = template
+  (result as any).template = template
 
   const clones = processTagResult(
     value,

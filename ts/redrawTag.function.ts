@@ -7,8 +7,7 @@ export function redrawTag(
   templater: TemplaterResult, // latest tag function to call for rendering
   ownerTag?: Tag,
 ) {
-  const depth = ownerTag?.tagSupport.depth || 0
-  const tagSupport = existingTag?.tagSupport || getTagSupport(depth, templater)
+  const tagSupport = existingTag?.tagSupport || getTagSupport(templater)
 
   const result = templater.renderWithSupport(
     tagSupport,

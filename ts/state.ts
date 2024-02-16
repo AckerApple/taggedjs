@@ -2,7 +2,7 @@ import { Tag } from "./Tag.class.js"
 import { TagSupport } from "./getTagSupport.js"
 import { setUse } from "./setUse.function.js"
 
-export type StateConfig = ((x?: any) => [any, any])
+export type StateConfig = (x?: any) => [any, any]
 
 type StateConfigItem = {
   callback?: StateConfig
@@ -29,38 +29,49 @@ setUse.memory.stateConfig = {
   rearray: [] as StateConfigArray, // state memory to be used before the next render
 } as Config
 
-/**
- * @template T
- * @param {T} defaultValue 
- * @returns {T}
- */
+/** Used for variables that need to remain the same variable during render passes */
 export function state <T>(
-  defaultValue: T | (() => T),
-  getSetMethod?: (x: T) => [T, T],
-): T {
+  defaultValue: T | (() => T)
+): (
+  x?: (y: T) => [T, T]
+) => T {
   const config: Config = setUse.memory.stateConfig
-
+  let getSetMethod: StateConfig
+  
   const restate = config.rearray[config.array.length]
   if(restate) {
-    const oldValue = getStateValue(restate)
-    config.array.push({
-      callback: getSetMethod as StateConfig,
+    let oldValue = getStateValue(restate)
+    getSetMethod = (x => [oldValue, oldValue = x]) as StateConfig
+    const push: StateConfigItem = {
+      callback: getSetMethod,
       lastValue: oldValue,
       defaultValue: restate.defaultValue,
-    })
-    return oldValue // return old value instead
+    }
+
+    config.array.push(push)
+    
+    return (y: any) => {
+      push.callback = y || (x => [oldValue, oldValue = x])
+      return oldValue
+    }
   }
 
   const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue
-  const initValue = defaultFn()
+  let initValue = defaultFn()
 
-  config.array.push({
-    callback: getSetMethod as StateConfig,
+  getSetMethod = (x => [initValue, initValue = x]) as StateConfig
+  const push: StateConfigItem = {
+    callback: getSetMethod,
     lastValue: initValue,
     defaultValue: initValue,
-  })
+  }
+  config.array.push(push)
   
-  return initValue
+  // return initValue
+  return (y: any) => {
+    push.callback = y || (x => [initValue, initValue = x])
+    return initValue
+  }
 }
 
 setUse({
@@ -115,12 +126,12 @@ export function getStateValue(
   const [checkValue] = callback( oldValue ) // set back to original value
 
   if(checkValue !== StateEchoBack) {
-    const error = new Error(
-      'State property not used correctly.\n\n' +
-      'For "let" state use `let name = state(default, x => [name, name = x])`\n\n' +
-      'For "const" state use `const name = state(default)`\n\n' +
-      'Problem function:\n' + state +'\n')
-    throw error
+    const message = 'State property not used correctly.\n\n' +
+    'For "let" state use `let name = state(default, x => [name, name = x])`\n\n' +
+    'For "const" state use `const name = state(default)`\n\n' +
+    'Problem function:\n' + state +'\n'
+    // console.error(message, {callback, oldState, oldValue, checkValue})
+    throw new Error(message)
   }
 
   return oldValue
@@ -134,6 +145,7 @@ function initState(
   const state = tagSupport.memory.state as State
   const config: Config = setUse.memory.stateConfig
   
+  // TODO: This guard may no longer be needed
   if (config.rearray.length) {
     const message = 'last array not cleared'
     console.error(message, {

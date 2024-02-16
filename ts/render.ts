@@ -3,17 +3,8 @@ export function buildClones(
   insertBefore: Element,
 ) {
   const clones = []
-  const templateClone = temporary.children[0]
-
-  /*
-  if(!templateClone) {
-    return []
-  }
-  */
-
-  const sibling = templateClone // a div we added
-  let nextSibling = sibling.nextSibling
-  temporary.removeChild(templateClone) // remove the div
+  const template = temporary.children[0] as HTMLTemplateElement
+  let nextSibling = template.content.firstChild
   
   while (nextSibling) {
     const nextNextSibling = nextSibling.nextSibling

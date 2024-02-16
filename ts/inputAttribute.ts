@@ -12,11 +12,11 @@ export function inputAttribute(
 
   // Example: class.width-full = "true"
   if(names[0] === 'class') {
-    names.pop()
+    names.shift()
     if(value) {
-      names.forEach(name => element.classList.remove(name))
-    } else {
       names.forEach(name => element.classList.add(name))
+    } else {
+      names.forEach(name => element.classList.remove(name))
     }
     return
   }

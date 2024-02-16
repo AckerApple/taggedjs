@@ -1,4 +1,5 @@
 ### TODO NOW: Before Mega-aide
+- HTML Tables
 - routing
 - Upgrade state to support both named and array state memory
   - helps with HMR
@@ -44,6 +45,9 @@
 - Render template syntax is `${}` instead of `{}`
   - `<div onclick={handler}></div>` - ReactJs (29 chars)
   - `<div onclick=${handler}></div>` - TaggedJs (30 chars)
+- `className` is just `class`
+  - `<div className={'flex'}></div>` - React (30 chars)
+  - `<div class=${'flex'}></div>` - TaggedJs (27 chars)
 - innerHTML can be the 1st or 2nd argument
   - `<div>${component(html`<small>hello world</small>`)}</div>`
   - `<div>${component({ x: y }, html`<small>hello world</small>`)}</div>`
@@ -51,6 +55,10 @@
 
 ### Benefits to TaggedJs over React
 
+- You can have multiple root elements in TaggedJs
+  - You don't need `<></>`
+  - In React this will fail `() => (<div>Hello</div><div>World</div>)
+  - In TaggedJs this will work `() => html`<div>Hello</div><div>World</div>`
 - You can have components with single argument inputs:
   - instead of  `Hello <something x=3> World`
   - you can now `Hello ${something(3)} World`

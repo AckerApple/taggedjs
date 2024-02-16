@@ -1,10 +1,12 @@
 import { Tag } from "./Tag.class.js"
 import { Clones } from "./Clones.type.js"
 import { Counts } from "./interpolateTemplate.js"
+import { TagArraySubject } from "./processTagArray.js"
+import { TagSubject } from "./Tag.utils.js"
 
 export function processTagResult(
   tag: Tag,
-  result: any, // used for recording past and current value
+  result: TagArraySubject | TagSubject | Function, // used for recording past and current value
   insertBefore: Element, // <template end interpolate />
   {
     index, counts, forceElement,
@@ -16,7 +18,8 @@ export function processTagResult(
 ): Clones {
   // *for
   if(index !== undefined) {
-    const existing = result.lastArray[index]
+    const resultArray = (result as TagArraySubject).lastArray
+    const existing = resultArray[index]
 
     if(existing?.tag.isLikeTag(tag)) {
       existing.tag.updateByTag(tag)
@@ -25,9 +28,9 @@ export function processTagResult(
 
     const lastFirstChild = insertBefore // tag.clones[0] // insertBefore.lastFirstChild
     
-    const clones = tag.buildBeforeElement(lastFirstChild, {counts, forceElement, depth: tag.tagSupport.depth + 1})
+    const clones = tag.buildBeforeElement(lastFirstChild, {counts, forceElement})
     
-    result.lastArray.push({
+    resultArray.push({
       tag, index
     })
     
@@ -35,30 +38,29 @@ export function processTagResult(
   }
 
   // *if appears we already have seen
-  if(result.tag && !forceElement) {
+  const subjectTag = result as TagSubject
+  const rTag = subjectTag.tag
+  if(rTag && !forceElement) {
     // are we just updating an if we already had?
-    if(result.tag.isLikeTag(tag)) {
+    if(rTag.isLikeTag(tag)) {
       // components
       if(result instanceof Function) {
-        const newTag = result(result.tag.tagSupport)
-        result.tag.updateByTag(newTag)
+        const newTag = result(rTag.tagSupport)
+        rTag.updateByTag(newTag)
         return []
       }
 
-      result.tag.updateByTag(tag)
+      rTag.updateByTag(tag)
       
       return [] // no clones created in element already on stage
     }    
   }
 
-  // *if just now appearing to be a Tag
-  // const before = (insertBefore as any).clone || insertBefore
   const clones = tag.buildBeforeElement(insertBefore, {
     counts,
     forceElement,
-    depth: tag.tagSupport.depth,
   })
-  result.tag = tag // let reprocessing know we saw this previously as an if
+  subjectTag.tag = tag // let reprocessing know we saw this previously as an if
 
   return clones
 }

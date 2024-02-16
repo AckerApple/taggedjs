@@ -1,11 +1,13 @@
 /** Must use .js and NOT .ts extensions here */
 
+export * from "./ElementTargetEvent.interface.js"
+
 export * from "./html.js"
 export * from "./Subject.js"
 export * from "./interpolateElement.js"
 export * from "./getTagSupport.js"
 export * from "./redrawTag.function.js"
-export * from "./tagGateway.function.js"
+export * from "./gateway/index.js"
 
 // TODO: export *
 export { isTagComponent } from "./isInstance.js"
@@ -25,3 +27,4 @@ export { setUse } from "./setUse.function.js"
   export * from "./onDestroy.js"
   export * from "./getCallback.js"
 /* end: hooks */
+

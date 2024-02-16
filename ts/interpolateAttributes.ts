@@ -15,7 +15,16 @@ export function interpolateAttributes(
     processAttribute('textVarValue', value, child, scope, ownerTag, (_name, value) => (child as any).value = value)
   }
 
-  const howToSet = (name: string, value: string) => child.setAttribute(name, value)
+  const howToSet = (name: string, value: string) => {
+    /*
+    if(name === 'class'){
+      value.split(' ').forEach(className => child.classList.add(className))
+      return
+    }
+    */
+
+    child.setAttribute(name, value)
+  }
 
   attrNames.forEach(attrName => {
     const value = child.getAttribute(attrName)
@@ -101,7 +110,7 @@ function processNameOnlyAttr(
     }
   }
 
-  if(typeof(lastValue) === 'string') {
+  if(typeof(attrValue) === 'string') {
     if(!attrValue.length) {
       return
     }
@@ -151,14 +160,17 @@ function processNameValueAttr(
 ) {
   const isSpecial = isSpecialAttr(attrName)
 
-  // attach as callback
+  // attach as callback?
   if(result instanceof Function) {
-    ;(child as any)[attrName] = function(...args: any[]) {
+    const action = function(...args: any[]) {
       return result(child, args)
     }
-    return
+    
+    ;(child as any)[attrName].action = action
+    // child.addEventListener(attrName, action)
   }
 
+  // Most every variable comes in here since everything is made a ValueSubject
   if(isSubjectInstance(result)) {
     child.removeAttribute(attrName)
     const callback = (newAttrValue: any) =>
@@ -167,13 +179,14 @@ function processNameValueAttr(
         child,
         attrName,
         isSpecial,
-        result,
-        howToSet,      
+        howToSet,
       )
 
-    // the above callback gets called immediately since its a ValueSubject()
+    // 🗞️ Subscribe. Above callback called immediately since its a ValueSubject()
     const sub = result.subscribe(callback as any)
-    ownerTag.cloneSubs.push(sub) // this is where unsubscribe is picked up
+    
+    // Record subscription for later unsubscribe when element destroyed
+    ownerTag.cloneSubs.push(sub)
 
     return
   }
@@ -188,12 +201,14 @@ function processSubjectValue(
   child: Element,
   attrName: string,
   isSpecial: boolean,
-  result: any,
   howToSet: HowToSet,
 ) {
   if(newAttrValue instanceof Function) {
     ;(child as any)[attrName] = function(...args: any[]) {
-      return newAttrValue(child, args)
+      console.log(`processing ${attrName} ------------- start`)
+      const result = newAttrValue(child, args)
+      console.log(`processing ${attrName} ------------- end`)
+      return result
     }
 
     // access to original function

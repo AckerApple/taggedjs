@@ -14,11 +14,12 @@ export function tagElement(
   if(appElmIndex >= 0) {
     appElements[appElmIndex].tag.destroy()
     appElements.splice(appElmIndex, 1)
+    // an element already had an app on it
     console.warn('Found and destroyed app element already rendered to element', {element})
   }
 
   // Create the app which returns [props, runOneTimeFunction]
-  const wrapper = app(props, {parentNode: element}) as unknown as TemplaterResult
+  const wrapper = app(props) as unknown as TemplaterResult
 
   // have a function setup and call the tagWrapper with (props, {update, async, on})
   const result = applyTagUpdater(wrapper)
@@ -48,6 +49,7 @@ export function tagElement(
 export function applyTagUpdater(
   wrapper: TemplaterResult,
 ) {
+  console.log('********************')
   const tagSupport = wrapper.tagSupport // getTagSupport(0, wrapper)
   runBeforeRender(tagSupport, undefined as any as Tag)
 
@@ -81,9 +83,11 @@ export function addAppTagRender(
     tag.afterRender()
     tag.updateByTag(fromTag)
 
+    /*
     if(lastTag) {
       lastTag.destroy({stagger: 0})
     }
+    */
 
     tagSupport.newest = fromTag
 

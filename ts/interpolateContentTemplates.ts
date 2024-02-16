@@ -7,12 +7,14 @@ const templateSearch = new RegExp('\\s*<template interpolate end id="__tagvar(\\
 
 /** Returns subscriptions[] that will need to be unsubscribed from when element is destroyed */
 export function interpolateContentTemplates(
-  element: Element,
+  element: Element, // <div><div></div><template tag-wrap="22">...</template></div>
   variable: any,
   tag: Tag,
   options: InterpolateOptions,
+  children: HTMLCollection,
 ): Clones {
-  if ( !element.children || element.tagName === 'TEMPLATE' ) {
+
+  if ( !children || element.tagName === 'TEMPLATE' ) {
     return [] // done
   }
 
@@ -22,19 +24,19 @@ export function interpolateContentTemplates(
   }
   const clones: Clones = []
 
-  const children = new Array(...(element.children as any))
+  const childArray = new Array(...children)
 
   if(element.tagName==='TEXTAREA') {
     scanTextAreaValue(element as HTMLTextAreaElement)
   }
 
-  children.forEach((child, index) => {
-    const nextClones = interpolateChild(
-      child,
-      options,
+  childArray.forEach(child => {
+    const nextClones = interpolateTemplate(
+      child as Template,
       variable,
       tag,
       counts,
+      options,
     )
 
     if(child.tagName==='TEXTAREA') {
@@ -47,32 +49,14 @@ export function interpolateContentTemplates(
       const nextKids = new Array(...child.children)
       nextKids.forEach(subChild => {
         if ( isRenderEndTemplate(subChild) ) {
-          interpolateChild(subChild, options, variable, tag, counts)
+          interpolateTemplate(subChild as Template, variable, tag, counts, options)
         }
 
-        const nextClones = interpolateContentTemplates(subChild, variable, tag, options)
+        const nextClones = interpolateContentTemplates(subChild, variable, tag, options, subChild.children)
         clones.push( ...nextClones )
       })
     }
   })
-
-  return clones
-}
-
-function interpolateChild(
-  child: Element,
-  options: InterpolateOptions,
-  variable: any,
-  tag: Tag,
-  counts: Counts,
-): Clones {
-  const clones = interpolateTemplate(
-    child as Template,
-    variable,
-    tag,
-    counts,
-    options,
-  )
 
   return clones
 }

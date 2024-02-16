@@ -6,11 +6,12 @@ import { Subscription } from "./Subject.js"
 import { runAfterRender, runBeforeDestroy, runBeforeRedraw } from "./tagRunner.js"
 import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js"
 import { buildClones } from "./render.js"
-import { interpolateElement } from "./interpolateElement.js"
+import { interpolateElement, interpolateString } from "./interpolateElement.js"
 import { Counts, afterElmBuild } from "./interpolateTemplate.js"
 import { State } from "./state.js"
 import { elementDestroyCheck } from "./elementDestroyCheck.function.js"
 import { updateExistingValue } from "./updateTag.utils.js"
+import { InterpolatedTemplates } from "./interpolations.js"
 
 export const variablePrefix = '__tagvar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -23,6 +24,14 @@ export type TagMemory = Record<string, any> & {
   context: Context
   state: State
   providers: Provider[]
+}
+
+export interface TagTemplate {
+  interpolation: InterpolatedTemplates,
+  string: string,
+  strings: string[],
+  values: unknown[],
+  context: Context,
 }
 
 export class Tag {
@@ -40,7 +49,7 @@ export class Tag {
   appElement?: Element // only seen on this.getAppElement().appElement
   
   // present only when an array. Populated by this.key()
-  arrayValue?: any[]
+  arrayValue?: unknown
 
   constructor(
     public strings: string[],
@@ -56,24 +65,27 @@ export class Tag {
   }
 
   /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
-  key(arrayValue: any[]) {
+  key(arrayValue: unknown ) {
     this.arrayValue = arrayValue
     return this
   }
 
   async destroy(
     options: DestroyOptions = {
-      depth: 0,
       stagger: 0,
-      byParent: false, // TODO: Replace with depth control. Only destroy clones of direct children
+      byParent: false, // Only destroy clones of direct children
     }
   ) {
-    const depth = options.depth || 0
-    runBeforeDestroy(this.tagSupport, this)    
-    this.destroySubscriptions()
-    const promises = this.children.map((kid) => kid.destroy({...options, byParent: true, depth: depth + 1}))
+    // the isComponent check maybe able to be removed
+    const isComponent = this.tagSupport ? true : false    
+    if(isComponent) {
+      runBeforeDestroy(this.tagSupport, this)    
+    }
 
-    if( depth <= 0 ) {
+    this.destroySubscriptions()
+    const promises = this.children.map((kid) => kid.destroy({...options, byParent: true}))
+
+    if( !options.byParent ) {
       options.stagger = await this.destroyClones(options)
     }
 
@@ -140,9 +152,8 @@ export class Tag {
     this.updateValues(values)
   }
 
-  getTemplate() {
-    // TODO: treat interpolation hack here
-    const string = this.lastTemplateString = this.strings.map((string, index) => {
+  getTemplate(): TagTemplate {
+    const string = this.strings.map((string, index) => {
       const safeString = string.replace(prefixSearch, escapeVariable)
       const endString = safeString + (this.values.length > index ? `{${variablePrefix}${index}}` : '')
       // const trimString = index === 0 || index === this.strings.length-1 ? endString.trim() : endString
@@ -150,8 +161,12 @@ export class Tag {
       return trimString
     }).join('')
 
+    const interpolation = interpolateString(string)
+    this.lastTemplateString = interpolation.string
     return {
-      string,
+      interpolation,
+      // string,
+      string: interpolation.string,
       strings: this.strings,
       values: this.values,
       context: this.tagSupport?.memory.context || {},
@@ -160,12 +175,8 @@ export class Tag {
 
   isLikeTag(tag: Tag) {
     const {string} = tag.getTemplate()
-    
-    if(string !== this.lastTemplateString) {
-      return false
-    }
-
-    if(tag.values.length !== this.values.length) {
+    const stringMatched = string === this.lastTemplateString
+    if(!stringMatched || tag.values.length !== this.values.length) {
       return false
     }
 
@@ -229,32 +240,13 @@ export class Tag {
 
       // 🆕 First time values below
 
-      if(isTagComponent(value)) {
-        const existing = context[variableName] = new ValueSubject(value) as TagSubject
-        setValueRedraw(value, existing, this)
-        return
-      }
-
-      if(value instanceof Function) {
-        context[variableName] = getSubjectFunction(value, this)
-        return
-      }
-
-      if(!hasValue) {
-        return // more strings than values, stop here
-      }
-
-      if(isTagInstance(value)) {
-        value.ownerTag = this
-        this.children.push(value)
-      }
-
-      if(isSubjectInstance(value)) {
-        context[variableName] = value
-        return
-      }
-
-      context[variableName] = new ValueSubject(value)
+      processNewValue(
+        hasValue,
+        value,
+        context,
+        variableName,
+        this,
+      )
     })
 
     return context
@@ -282,7 +274,6 @@ export class Tag {
     this.buildBeforeElement(insertBefore, {
       forceElement: true,
       counts: {added: 0, removed: 0},
-      depth: this.tagSupport.depth,
     })
   }
 
@@ -291,7 +282,6 @@ export class Tag {
     options: ElementBuildOptions = {
       forceElement: false,
       counts: {added:0, removed: 0},
-      depth: 0,
     },
   ): (ChildNode | Element)[] {
     this.insertBefore = insertBefore
@@ -303,14 +293,15 @@ export class Tag {
     const temporary = document.createElement('div')
     temporary.id = 'tag-temp-holder'
     // render content with a first child that we can know is our first element
-    temporary.innerHTML = '<div id="top-element-insert-after"></div>' + template.string
+    temporary.innerHTML = `<template tag-wrap="22">${template.string}</template>`
 
     // const clonesBefore = this.clones.map(clone => clone)
     const intClones = interpolateElement(
       temporary,
       context,
+      template,
       this, // this.ownerTag || this,
-      {forceElement: options.forceElement, depth: options.depth}
+      {forceElement: options.forceElement}
     )
 
     this.clones.length = 0
@@ -328,7 +319,6 @@ export class Tag {
 }
 
 type DestroyOptions = {
-  depth?: number
   stagger: number
   byParent?: boolean // who's destroying me? if byParent, ignore possible animations
 }
@@ -336,5 +326,41 @@ type DestroyOptions = {
 export type ElementBuildOptions = {
   counts: Counts
   forceElement?: boolean
-  depth: number
+}
+
+export function processNewValue(
+  hasValue: boolean,
+  value: any,
+  context: Context,
+  variableName: string,
+  tag: Tag,
+) {
+  if(isTagComponent(value)) {
+    const existing = context[variableName] = new ValueSubject(value) as TagSubject
+    setValueRedraw(value, existing, tag)
+    return
+  }
+
+  if(value instanceof Function) {
+    context[variableName] = getSubjectFunction(value, tag)
+    return
+  }
+
+  if(!hasValue) {
+    return // more strings than values, stop here
+  }
+
+  if(isTagInstance(value)) {
+    value.ownerTag = tag
+    tag.children.push(value)
+    context[variableName] = new ValueSubject(value)
+    return
+  }
+
+  if(isSubjectInstance(value)) {
+    context[variableName] = value
+    return
+  }
+
+  context[variableName] = new ValueSubject(value)
 }

@@ -4,15 +4,7 @@ import { deepClone, deepEqual } from "./deepFunctions.js"
 import { Provider } from "./providers.js"
 import { TemplateRedraw, TemplaterResult, getNewProps } from "./templater.utils.js"
 
-/*
-{    
-  depth,
-}
-*/
-
 export class TagSupport {
-  depth: number = 0 // TODO: maybe remove
-
   // props from **constructor** are converted for comparing over renders
   clonedProps: Props
   latestProps: Props // new props NOT cloned props
@@ -94,12 +86,10 @@ export class TagSupport {
 }
 
 export function getTagSupport(
-  depth: number,
   templater: TemplaterResult,
   props?: Props,
 ): TagSupport {  
   const tagSupport: TagSupport = new TagSupport(templater, props)
-  tagSupport.depth = depth
   return tagSupport
 }
 

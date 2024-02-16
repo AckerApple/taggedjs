@@ -6,7 +6,11 @@ import { redrawTag } from "./redrawTag.function.js"
 import { TemplaterResult } from "./templater.utils.js"
 import { bindSubjectCallback } from "./bindSubjectCallback.function.js"
 
-export type TagSubject = Subject<TemplaterResult> & {tagSupport: TagSupport, tag: Tag}
+export type TagSubject = Subject<TemplaterResult> & {
+  tagSupport?: TagSupport
+  tag?: Tag
+  clone?: Element
+}
 
 export function getSubjectFunction(
   value: any,
@@ -20,12 +24,24 @@ export function setValueRedraw(
   existing: TagSubject,
   ownerTag: Tag,
 ) {
+  const oldCount = existing.tagSupport?.memory.renderCount
+
   // redraw does not communicate to parent
   templater.redraw = (
     force?: boolean // forces redraw on children
   ) => {
-    const existingTag: Tag | undefined = existing.tag
+    const existingTag = existing.tag as Tag
+    console.log('aaaaaaaaa start setValueRedraw aaaaaaaaa', {
+      oldCount
+    })
+    
     const {remit, retag} = redrawTag(existingTag, templater, ownerTag)
+
+    console.log('aaaaaaaaa end setValueRedraw aaaaaaaaa', {
+      oldCount,
+      renderCount: existing.tagSupport?.memory.renderCount,
+      newRenderCount: retag.tagSupport.memory.renderCount,
+    })
 
     existing.tagSupport = retag.tagSupport
 
@@ -36,7 +52,10 @@ export function setValueRedraw(
     existing.set(templater)
 
     if(force) {
-      const context = existingTag.tagSupport.memory.context
+      const tagSupport = existingTag.tagSupport
+      const memory = tagSupport.memory
+      const context = memory.context
+      
       Object.values(context).forEach((item: any) => {
         if(!item.value?.isTemplater) {
           return

@@ -6,6 +6,8 @@ import { TemplateRedraw, TemplaterResult } from "./templater.utils.js"
 import { isSubjectInstance, isTagComponent } from "./isInstance.js"
 import { bindSubjectCallback } from "./bindSubjectCallback.function.js"
 import { Tag } from "./Tag.class.js"
+import { isTagArray, processTag } from "./processSubjectValue.function.js"
+import { TagArraySubject, processTagArray } from "./processTagArray.js"
 
 function updateExistingTagComponent(
   tag: Tag,
@@ -14,46 +16,57 @@ function updateExistingTagComponent(
   subjectValue: any,
 ): void {
   const latestProps = tempResult.tagSupport.props
-  const existingTag = existingSubject.tag
+  let existingTag: Tag | undefined = existingSubject.tag
 
   // previously was something else, now a tag component
-  if( !existingSubject.tag ) {
+  if( !existingTag ) {
     setValueRedraw(tempResult, existingSubject, tag)
     tempResult.redraw()
     return
   }
 
   // tag existingTag
-  const oldFunction = existingTag.tagSupport.templater.wrapper.original
-  const newFunction = tempResult.wrapper.original
-  const isSameTag = oldFunction === newFunction
-  if(!isSameTag) {
-    existingTag.destroy()
+  const oldWrapper = existingTag.tagSupport.templater.wrapper
+  const newWrapper = tempResult.wrapper
+  let isSameTag = false
+  
+  if(oldWrapper && newWrapper) {
+    const oldFunction = oldWrapper.original
+    const newFunction = newWrapper.original
+    isSameTag = oldFunction === newFunction
   }
 
   const oldTagSetup = existingTag.tagSupport
-
   oldTagSetup.latestProps = latestProps
   oldTagSetup.latestClonedProps = tempResult.tagSupport.clonedProps
 
-  const subjectTagSupport = subjectValue?.tagSupport
-  // old props may have changed, reclone first
-  const oldCloneProps = deepClone( subjectTagSupport.props ) // tagSupport.clonedProps
-  const oldProps = subjectTagSupport?.props // tagSupport.props
+  if(!isSameTag) {
+    // TODO: this may not be in use
+    destroyTagMemory(existingTag, existingSubject, subjectValue)
+  } else {
+    const subjectTagSupport = subjectValue?.tagSupport
+    // old props may have changed, reclone first
+    const oldCloneProps = deepClone( subjectTagSupport.props ) // tagSupport.clonedProps
+    const oldProps = subjectTagSupport?.props // tagSupport.props
 
-  if(existingTag) {
-    const equal = oldTagSetup.hasPropChanges(oldProps, oldCloneProps, latestProps)
-
-    if(equal) {
-      return
+    if(existingTag) {
+      const equal = oldTagSetup.hasPropChanges(oldProps, oldCloneProps, latestProps)
+  
+      if(equal) {
+        return
+      }
     }
   }
 
   setValueRedraw(tempResult, existingSubject, tag)
   oldTagSetup.templater = tempResult
-  existingSubject.value.tag = oldTagSetup.newest = tempResult.redraw()
+  
+  const redraw = tempResult.redraw() as Tag
+  existingSubject.value.tag = oldTagSetup.newest = redraw
+
   if(!isSameTag) {
-    existingSubject.tag = existingSubject.value.tag
+    existingSubject.tag = redraw
+    subjectValue.tagSupport = tempResult.tagSupport
   }
 
   return
@@ -87,46 +100,159 @@ function updateExistingTag(
 }
 
 export function updateExistingValue(
-  existing: Subject<Tag> | TemplaterResult | TagSubject,
+  existing: Subject<Tag> | TemplaterResult | TagSubject | TagArraySubject,
   value: TemplaterResult | TagSupport | Function | Subject<any>,
   tag: Tag,
 ): void {
   const subjectValue = (existing as Subject<Tag>).value
   const ogTag: Tag = subjectValue?.tag
   const tempResult = value as TemplateRedraw
-  const existingSubject = existing as TagSubject
+  const existingSubArray = existing as TagArraySubject
+  const existingSubTag = existing as TagSubject
+
+  // was array
+  if((existing as any).lastArray) {    
+    // its another tag array
+    if(isTagArray(value)) {
+      processTagArray(
+        existing as TagArraySubject,
+        value as any as Tag[],
+        existingSubArray.template,
+        tag,
+        {counts: {
+          added: 0,
+          removed: 0,
+        }}
+      )
+  
+      return 
+    }
+
+    // was tag array and now something else
+    ;(existing as any).lastArray.forEach(({tag}: any) => tag.destroy())
+    delete (existing as any).lastArray
+  }
 
   // handle already seen tag components
   if(isTagComponent(tempResult)) {
     return updateExistingTagComponent(
       tag,
       tempResult,
-      existingSubject,
+      existingSubTag as TagSubject,
       subjectValue,
     )
   }
 
-  // handle already seen tags
-  if(ogTag) {
+  // was component but no longer
+  const existingTag = existingSubTag.tag
+  if(existingTag) {
+    // its now an array
+    if(isTagArray(value)) {
+      destroyTagMemory(existingTag, existingSubTag, subjectValue)
+      delete existingSubTag.tag
+    }
+
+    const oldWrapper = existingTag.tagSupport.templater.wrapper
+    const newWrapper = (value as any)?.wrapper
+    const wrapMatch = oldWrapper && newWrapper && oldWrapper?.original === newWrapper?.original
+    const isSameTag = existingTag.lastTemplateString === (value as any).lastTemplateString
+
+    console.log('existingTag', {
+      lastTag: existingTag.lastTemplateString,
+      value,
+      isSameTag,
+      // template: (existing as any).template
+    })
+
+    if(isSameTag) {
+      console.log('**********')
+      processTag(
+        value,
+        existing as TagSubject,
+        (existing as any).template,
+        existingTag, // tag,
+        {
+          counts: {
+            added: 0,
+            removed: 0,
+          }
+        }
+      )
+      return
+    }
+
+    if((value as any).getTemplate && existingTag.isLikeTag(value as any)) {
+      console.log('got in')
+
+      processTag(
+        value,
+        existing as TagSubject,
+        (existing as any).template,
+        existingTag,
+        {
+          counts: {
+            added: 0,
+            removed: 0,
+          }
+        }
+      )
+      return
+      /*
+      return updateExistingTag(
+        value as TemplaterResult,
+        existingTag,
+        existingSubTag,
+      )
+      */
+  
+      //throw 'maybe here'
+    }
+    
+    if(wrapMatch) {
+      return updateExistingTag(
+        value as TemplaterResult,
+        existingTag,
+        existingSubTag,
+      )
+    }
+
+    if(ogTag) {
+      destroyTagMemory(existingTag, existingSubTag, subjectValue)
+      delete existingSubTag.tag
+    }
+  } else if(ogTag) {
+    console.log('🍎🍎🍎🍎🍎🍎🍎🍎🍎')
     return updateExistingTag(
       value as TemplaterResult,
       ogTag,
-      existingSubject,
+      existingSubTag,
     )
   }
 
   // now its a function
   if(value instanceof Function) {
-    existingSubject.set( bindSubjectCallback(value as any, tag) )
+    existingSubTag.set( bindSubjectCallback(value as any, tag) )
     return
   }
 
+  // we have been given a subject
   if(isSubjectInstance(value as Subject<any>)) {
-    existingSubject.set( (value as Subject<any>).value ) // let ValueSubject now of newest value
+    existingSubTag.set( (value as Subject<any>).value ) // let ValueSubject now of newest value
     return
   }
-
-  existingSubject.set(value) // let ValueSubject now of newest value
+  
+  existingSubTag.set(value) // let ValueSubject now of newest value
 
   return
+}
+
+function destroyTagMemory(
+  existingTag: Tag,
+  existingSubject: TagSubject,
+  subjectValue: any
+) {
+  delete existingSubject.tag
+  delete existingSubject.tagSupport
+  delete subjectValue.tagSupport
+  existingTag.destroy()
 }

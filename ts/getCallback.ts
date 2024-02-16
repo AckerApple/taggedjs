@@ -2,7 +2,7 @@ import { TagSupport } from "./getTagSupport.js"
 import { setUse } from "./setUse.function.js"
 import { State, StateConfigArray, getStateValue } from "./state.js"
 
-type Callback = <T>(...args: unknown[]) => T
+type Callback = <T>(...args: unknown[]) => (T | void)
 
 export let getCallback = () => (callback: Callback) => (): void => {
   throw new Error('The real callback function was called and that should never occur')

@@ -1,3 +1,4 @@
+import { InputElementTargetEvent } from "./ElementTargetEvent.interface.js"
 import { Counts } from "./interpolateTemplate.js"
 
 export function elementInitCheck(
@@ -19,7 +20,7 @@ export function elementInitCheck(
       return
   }
   
-  const event = { target: nextSibling, stagger: counts.added } as unknown as Event
+  const event = { target: nextSibling, stagger: counts.added } as unknown as InputElementTargetEvent
   onInit(event)
   ++counts.added
 }

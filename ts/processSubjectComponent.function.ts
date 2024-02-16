@@ -28,7 +28,7 @@ export function processSubjectComponent(
   }
 
   const templater = value as TemplaterResult
-  const tagSupport: TagSupport = value.tagSupport // || getTagSupport(ownerTag.tagSupport.depth+1, templater )
+  const tagSupport: TagSupport = value.tagSupport
 
   tagSupport.mutatingRender = () => {
     // Is this NOT my first render

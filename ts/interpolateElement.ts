@@ -1,31 +1,34 @@
 import { interpolateAttributes } from "./interpolateAttributes.js"
 import { interpolateToTemplates } from "./interpolations.js"
 import { interpolateContentTemplates } from "./interpolateContentTemplates.js"
-import { Context, Tag, escapeSearch, variablePrefix } from "./Tag.class.js"
+import { Context, Tag, TagTemplate, escapeSearch, variablePrefix } from "./Tag.class.js"
 import { Clones } from "./Clones.type.js"
 
 export type InterpolateOptions = {
   /** make the element go on document */
   forceElement?: boolean
-  depth: number
 }
 
 export function interpolateElement(
   element: Element,
   context: Context, // variables used to evaluate
-  tag: Tag,
+  interpolatedTemplates: TagTemplate,
+  tagOwner: Tag,
   options: InterpolateOptions,
 ): Clones {
   const clones = []
-  const result = interpolateElementChild(element, options.depth + 1)
+  const result = interpolatedTemplates.interpolation // interpolateElementChild(element)
+  // const result = interpolateElementChild(element)
+  const template = element.children[0] as HTMLTemplateElement
+  const children = template.content.children
 
   if(result.keys.length) {
-    const nextClones = interpolateContentTemplates(element, context, tag, options)
+    const nextClones = interpolateContentTemplates(element, context, tagOwner, options, children)
     clones.push( ...nextClones )
   }
 
-  interpolateAttributes(element, context, tag)
-  processChildrenAttributes(element.children, context, tag)
+  interpolateAttributes(element, context, tagOwner)
+  processChildrenAttributes(children, context, tagOwner)
 
   return clones
 }
@@ -47,10 +50,14 @@ function processChildrenAttributes(
 /** Convert interpolations into template tags */
 function interpolateElementChild(
   child: Element,
-  depth: number
 ) {
-  const result = interpolateToTemplates(child.innerHTML, {depth})
-  result.string = result.string.replace(escapeSearch, variablePrefix)
+  const result = interpolateString(child.innerHTML)
   child.innerHTML = result.string
+  return result
+}
+
+export function interpolateString(string: string) {
+  const result = interpolateToTemplates(string)
+  result.string = result.string.replace(escapeSearch, variablePrefix)
   return result
 }

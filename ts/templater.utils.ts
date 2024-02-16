@@ -22,7 +22,7 @@ export class TemplaterResult {
   constructor(
     props:Props,
   ) {
-    this.tagSupport = getTagSupport(0, this, props)
+    this.tagSupport = getTagSupport(this, props)
   }
 
   redraw?: (
@@ -61,7 +61,6 @@ export class TemplaterResult {
         tagSupport.props = tagSupport.latestProps
         tagSupport.clonedProps = tagSupport.latestClonedProps
     
-        // tagSupport.oldest.beforeRedraw()
         runBeforeRedraw(tagSupport, tagSupport.oldest)
       } else {
         // first time render
@@ -113,7 +112,8 @@ export interface TemplateRedraw extends TemplaterResult {
 
 export type TagComponent = (
   props: Props, // props or children
-  tagEnv: TagEnv,
+  children?: Tag,
+  // tagEnv: TagEnv,
 ) => Tag
 
 /* rewriter */
