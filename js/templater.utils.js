@@ -33,6 +33,7 @@ export class TemplaterResult {
             // ensure props are the last ones used
             tagSupport.props = tagSupport.latestProps;
             tagSupport.clonedProps = tagSupport.latestClonedProps;
+            // tagSupport.latestClonedProps = tagSupport.latestClonedProps
             runBeforeRedraw(tagSupport, tagSupport.oldest);
         }
         else {
@@ -48,6 +49,7 @@ export class TemplaterResult {
         /* AFTER */
         tagSupport.latestProps = retag.tagSupport.props;
         tagSupport.latestClonedProps = retag.tagSupport.clonedProps;
+        // tagSupport.latestClonedProps = retag.tagSupport.latestClonedProps
         retag.setSupport(tagSupport);
         runAfterRender(tagSupport, retag);
         templater.newest = retag;

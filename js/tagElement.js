@@ -45,6 +45,7 @@ export function addAppTagRender(tagSupport, tag) {
         // tagSupport.props = fromTag.tagSupport.props
         tagSupport.latestProps = fromTag.tagSupport.props;
         tagSupport.latestClonedProps = fromTag.tagSupport.clonedProps;
+        // tagSupport.latestClonedProps = fromTag.tagSupport.latestClonedProps
         fromTag.setSupport(tagSupport);
         tag.afterRender();
         tag.updateByTag(fromTag);

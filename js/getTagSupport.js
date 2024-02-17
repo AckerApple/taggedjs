@@ -1,12 +1,13 @@
 import { deepClone, deepEqual } from "./deepFunctions.js";
+import { isTagInstance } from "./isInstance.js";
 import { getNewProps } from "./templater.utils.js";
 export class TagSupport {
     templater;
     props;
+    latestProps; // new props NOT cloned props
     // props from **constructor** are converted for comparing over renders
     clonedProps;
-    latestProps; // new props NOT cloned props
-    latestClonedProps;
+    latestClonedProps; // This seems to be a duplicate of clonedProps
     memory = {
         context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
         state: {
@@ -21,7 +22,11 @@ export class TagSupport {
         this.props = props;
         this.latestProps = props; // getNewProps(props, templater)
         const latestProps = getNewProps(props, templater);
-        this.latestClonedProps = deepClone(latestProps);
+        this.latestClonedProps = latestProps;
+        // if the latest props are not HTML children, then clone the props for later render cycles to compare
+        if (!isTagInstance(props)) {
+            this.latestClonedProps = deepClone(latestProps);
+        }
         this.clonedProps = this.latestClonedProps;
     }
     // TODO: these below may not be in use
@@ -30,9 +35,10 @@ export class TagSupport {
     hasPropChanges(props, // natural props
     pastCloneProps, // previously cloned props
     compareToProps) {
-        const oldProps = this.props;
+        // const oldProps = this.props
+        const oldProps = compareToProps;
         const isCommonEqual = props === undefined && props === compareToProps;
-        const isEqual = isCommonEqual || deepEqual(pastCloneProps, oldProps);
+        const isEqual = isCommonEqual || deepEqual(pastCloneProps, props);
         return !isEqual;
     }
     mutatingRender() {
@@ -53,9 +59,14 @@ export class TagSupport {
         }
         const oldTemplater = tag.tagSupport.templater;
         const nowProps = newTemplater.tagSupport.props; // natural props
-        const oldProps = oldTemplater?.tagSupport.props; // previously cloned props
-        const newProps = newTemplater.tagSupport.clonedProps; // new props cloned
-        return renderTag(this, nowProps, oldProps, newProps, this.templater);
+        // const oldClonedProps = newTemplater.tagSupport.clonedProps // natural props
+        const oldClonedProps = oldTemplater.tagSupport.clonedProps; // natural props
+        // const oldClonedProps = oldTemplater?.tagSupport.clonedProps // previously cloned props
+        // const newProps = newTemplater.tagSupport.clonedProps // new props cloned
+        const oldProps = oldTemplater?.tagSupport.props; // new props cloned
+        // const newProps = newTemplater.tagSupport.latestClonedProps // new props cloned
+        return renderTag(this, nowProps, oldClonedProps, oldProps, // newProps,
+        this.templater);
     }
 }
 export function getTagSupport(templater, props) {
@@ -63,9 +74,7 @@ export function getTagSupport(templater, props) {
     return tagSupport;
 }
 function providersChangeCheck(tag) {
-    const providersWithChanges = tag.tagSupport.memory.providers.filter(provider => {
-        return !deepEqual(provider.instance, provider.clone);
-    });
+    const providersWithChanges = tag.tagSupport.memory.providers.filter(provider => !deepEqual(provider.instance, provider.clone));
     // reset clones
     providersWithChanges.forEach(provider => {
         const appElement = tag.getAppElement();
@@ -96,10 +105,10 @@ function getTagsWithProvider(tag, provider, memory = []) {
     return memory;
 }
 function renderTag(tagSupport, nowProps, // natural props
+oldCloneProps, // now props cloned
 oldProps, // previously NOT cloned props
-newProps, // now props cloned
 templater) {
-    const hasPropsChanged = tagSupport.hasPropChanges(nowProps, newProps, oldProps);
+    const hasPropsChanged = tagSupport.hasPropChanges(nowProps, oldCloneProps, oldProps);
     tagSupport.newest = templater.redraw(); // No change detected, just redraw me only
     if (!hasPropsChanged) {
         return true;

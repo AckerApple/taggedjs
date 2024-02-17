@@ -1,6 +1,6 @@
 import { setValueRedraw } from "./Tag.utils.js";
 import { deepClone } from "./deepFunctions.js";
-import { isSubjectInstance, isTagComponent } from "./isInstance.js";
+import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js";
 import { bindSubjectCallback } from "./bindSubjectCallback.function.js";
 import { isTagArray, processTag } from "./processSubjectValue.function.js";
 import { processTagArray } from "./processTagArray.js";
@@ -23,8 +23,11 @@ function updateExistingTagComponent(tag, tempResult, existingSubject, subjectVal
         isSameTag = oldFunction === newFunction;
     }
     const oldTagSetup = existingTag.tagSupport;
+    const oldProps = oldTagSetup.props;
     oldTagSetup.latestProps = latestProps;
+    const oldClonedProps = oldTagSetup.latestClonedProps;
     oldTagSetup.latestClonedProps = tempResult.tagSupport.clonedProps;
+    // oldTagSetup.latestClonedProps = tempResult.tagSupport.latestClonedProps
     if (!isSameTag) {
         // TODO: this may not be in use
         destroyTagMemory(existingTag, existingSubject, subjectValue);
@@ -32,11 +35,17 @@ function updateExistingTagComponent(tag, tempResult, existingSubject, subjectVal
     else {
         const subjectTagSupport = subjectValue?.tagSupport;
         // old props may have changed, reclone first
-        const oldCloneProps = deepClone(subjectTagSupport.props); // tagSupport.clonedProps
-        const oldProps = subjectTagSupport?.props; // tagSupport.props
+        let oldCloneProps = subjectTagSupport.props;
+        // if the new props are NOT HTML children, then clone the props for later render cycle comparing
+        if (!isTagInstance(subjectTagSupport.props)) {
+            oldCloneProps = deepClone(subjectTagSupport.props);
+        }
+        // const oldProps = subjectTagSupport?.props // tagSupport.props
         if (existingTag) {
-            const equal = oldTagSetup.hasPropChanges(oldProps, oldCloneProps, latestProps);
-            if (equal) {
+            // const equal = oldTagSetup.hasPropChanges(oldProps, oldCloneProps, latestProps)
+            const equal = oldTagSetup.hasPropChanges(latestProps, oldClonedProps, oldProps);
+            // no changes detected so no need to continue to render
+            if (!equal) {
                 return;
             }
         }
@@ -59,6 +68,7 @@ function updateExistingTag(templater, ogTag, existingSubject) {
     // move my props onto tagSupport
     tagSupport.latestProps = retag.tagSupport.props;
     tagSupport.latestClonedProps = retag.tagSupport.clonedProps;
+    // tagSupport.latestClonedProps = retag.tagSupport.latestClonedProps
     tagSupport.memory = retag.tagSupport.memory;
     retag.setSupport(tagSupport);
     templater.newest = retag;
