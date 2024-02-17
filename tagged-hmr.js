@@ -4,20 +4,26 @@ const path = require('path');
 
 const app = express();
 const port = 3000;
-const index = path.join(__dirname, 'index.html')
+
+const rootPath = './' // '../'
+const servePath = path.join(__dirname, rootPath)
+
+console.log('servePath',servePath)
+
+const index = path.join(__dirname, rootPath, 'index.html')
 const indexString = fs.readFileSync(index).toString()
 
-const inject = path.join(__dirname, 'tagged-hmr-script.js')
+const inject = path.join(__dirname, 'hmr', 'hmr.bundle.js')
 const customScript = '<script type="module">'+ fs.readFileSync(inject).toString() +'</script>'
 const watchPath = process.env.dir ? path.join(__dirname, process.env.dir) : __dirname
 
-const bundleScript = require('./bundleScript.js')
-const indexFilePath = path.join(__dirname, 'index.html')
+const bundleScript = require(rootPath + 'bundleScript.js')
+const indexFilePath = path.join(__dirname, rootPath, 'index.html')
 
 // Custom middleware for serving static files
 app.use((req, res, next) => {
   const correctedPath = req.url === '/' ? 'index.html' : req.url
-  const filePath = path.join(__dirname, correctedPath)
+  const filePath = path.join(__dirname, rootPath, correctedPath)
 
   // Check if the requested file is an HTML file
   const customScriptInjection = path.extname(filePath) === '.html'
@@ -28,6 +34,7 @@ app.use((req, res, next) => {
     sendFile(filePath, res)
   } else {
     // If it's not an HTML file, proceed with the regular static file serving
+    // servePath
     express.static('.', {
       setHeaders: (res, path) => {
           // Set no-store only for HTML files
@@ -47,6 +54,7 @@ app.use((req, res, next) => {
 
 const server = app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Serving path:${servePath}`);
 });
 
 
@@ -79,9 +87,7 @@ fs.watch(watchPath, { recursive: true }, async (eventType, filename) => {
   console.log('filename changed', filename)
   running = true
   promise = promise.then(async () => {
-    console.log('bundling...')
-    await bundleScript.run()
-    console.log('done')
+    bundle()
     running = false
   })
 
@@ -121,3 +127,11 @@ function sendFile(
     res.send(modifiedHtml);
   });
 }
+
+async function bundle() {
+  console.log('bundling...')
+  await bundleScript.run()
+  console.log('done')
+}
+
+bundle()

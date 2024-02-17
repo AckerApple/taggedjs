@@ -1,71 +1,54 @@
-import { state, html, tag, onInit, getCallback, onDestroy } from "./taggedjs/index.js"
-
-const test0interval = 3000
-const test1interval = 6000
-
+import { state, html, tag, onInit, getCallback, onDestroy } from "taggedjs";
+const test0interval = 3000;
+const test1interval = 6000;
 export const intervalTester0 = tag(function IntervalTester0() {
-  let intervalCount = state(0, x => [intervalCount, intervalCount = x])
-  let intervalId = state(undefined, x => [intervalId, intervalId = x])
-  let intervalId2 = state(undefined, x => [intervalId2, intervalId2 = x])
-  let renderCounter = state(0, x => [renderCounter, renderCounter = x])
-  let currentTime = state(0, x => [currentTime, currentTime = x])
-  const callback = getCallback()
-
-  const increase = () => ++intervalCount
-
-  console.log('intervalId', intervalId)
-
-  const startInterval = () => {
-    console.info('interval test 0 started...')
-    trackTime()
-
-    intervalId = setInterval(callback(() => {
-      increase()
-    }),test0interval)
-  }
-
-  const stopInterval = () => {
-    clearInterval(intervalId)
-    clearInterval(intervalId2)
-    intervalId = undefined
-    intervalId2 = undefined
-    console.info('🛑 interval test 0 stopped')
-  }
-
-  function trackTime() {
-    currentTime = 0
-    
-    intervalId2 = setInterval(callback(() => {
-      currentTime = currentTime + 500
-
-      if(currentTime >= test0interval) {
-        currentTime = 0
-        console.log('interval tick')
-      }      
-    }), 500)
-
-    console.log('▶️ interval started')
-  }
-
-  const toggle = () => {
-    if(intervalId || intervalId2) {
-      stopInterval()
-      return
+    let intervalCount = state(0)(x => [intervalCount, intervalCount = x]);
+    let intervalId = state(undefined)(x => [intervalId, intervalId = x]);
+    let intervalId2 = state(undefined)(x => [intervalId2, intervalId2 = x]);
+    let renderCounter = state(0)(x => [renderCounter, renderCounter = x]);
+    let currentTime = state(0)(x => [currentTime, currentTime = x]);
+    const callback = getCallback();
+    const increase = () => ++intervalCount;
+    console.log('intervalId', intervalId);
+    const startInterval = () => {
+        console.info('interval test 0 started...');
+        trackTime();
+        intervalId = setInterval(callback(() => {
+            increase();
+        }), test0interval);
+    };
+    const stopInterval = () => {
+        clearInterval(intervalId);
+        clearInterval(intervalId2);
+        intervalId = undefined;
+        intervalId2 = undefined;
+        console.info('🛑 interval test 0 stopped');
+    };
+    function trackTime() {
+        currentTime = 0;
+        intervalId2 = setInterval(callback(() => {
+            currentTime = currentTime + 500;
+            if (currentTime >= test0interval) {
+                currentTime = 0;
+                console.log('interval tick');
+            }
+        }), 500);
+        console.log('▶️ interval started');
     }
-
-    startInterval()
-  }
-
-  const delayIncrease = () => setTimeout(callback(() => {
-    currentTime = currentTime + 200
-  }), 1000);
-
-  onInit(startInterval)
-  onDestroy(stopInterval)
-
-  ++renderCounter
-
-  return html`<!--intervalDebug.js-->
+    const toggle = () => {
+        if (intervalId || intervalId2) {
+            stopInterval();
+            return;
+        }
+        startInterval();
+    };
+    const delayIncrease = () => setTimeout(callback(() => {
+        currentTime = currentTime + 200;
+    }), 1000);
+    onInit(startInterval);
+    onDestroy(stopInterval);
+    ++renderCounter;
+    return html `<!--intervalDebug.js-->
     <div>interval type 1 at ${test0interval}ms</div>
     intervalId: ${intervalId}
     <button type="button" onclick=${increase}>${intervalCount}:${renderCounter}</button>
@@ -74,57 +57,47 @@ export const intervalTester0 = tag(function IntervalTester0() {
       style.background-color=${intervalId || intervalId2 ? 'red' : 'green'}
     >start/stop</button>
     <button type="button" onclick=${delayIncrease}>delay increase currentTime</button>
-  `
-})
-
+  `;
+});
 export const intervalTester1 = tag(function intervalTester1() {
-  let intervalCount = state(0, x => [intervalCount, intervalCount = x])
-  let intervalId = state(undefined, x => [intervalId, intervalId = x])
-  let intervalId2 = state(undefined, x => [intervalId2, intervalId2 = x])
-  let renderCounter = state(0, x => [renderCounter, renderCounter = x])
-  let currentTime = state(0, x => [currentTime, currentTime = x])
-  const callback = getCallback()
-  const increase = () => ++intervalCount
-
-  function trackTime() {
-    currentTime = 0
-    
-    intervalId2 = setInterval(callback(() => {
-      currentTime = currentTime + 500
-
-      if(currentTime >= test0interval) {
-        currentTime = 0
-      }
-    }), 500)
-  }
-
-  const destroy = () => {
-    clearInterval(intervalId)
-    clearInterval(intervalId2)
-    intervalId = undefined
-    intervalId2 = undefined
-    console.info('interval 1 stopped')
-  }
-
-  function toggleInterval() {
-    if(intervalId) {
-      return destroy()
+    let intervalCount = state(0)(x => [intervalCount, intervalCount = x]);
+    let intervalId = state(undefined)(x => [intervalId, intervalId = x]);
+    let intervalId2 = state(undefined)(x => [intervalId2, intervalId2 = x]);
+    let renderCounter = state(0)(x => [renderCounter, renderCounter = x]);
+    let currentTime = state(0)(x => [currentTime, currentTime = x]);
+    const callback = getCallback();
+    const increase = () => ++intervalCount;
+    function trackTime() {
+        currentTime = 0;
+        intervalId2 = setInterval(callback(() => {
+            currentTime = currentTime + 500;
+            if (currentTime >= test0interval) {
+                currentTime = 0;
+            }
+        }), 500);
     }
-
-    console.info('interval test 1 started...')
-    trackTime()
-    intervalId = setInterval(callback(() => {
-      increase()
-      console.info('slow interval ran')
-    }),test1interval)
-  }
-
-  onInit(toggleInterval)
-  onDestroy(toggleInterval)
-
-  ++renderCounter
-
-  return html`
+    const destroy = () => {
+        clearInterval(intervalId);
+        clearInterval(intervalId2);
+        intervalId = undefined;
+        intervalId2 = undefined;
+        console.info('interval 1 stopped');
+    };
+    function toggleInterval() {
+        if (intervalId) {
+            return destroy();
+        }
+        console.info('interval test 1 started...');
+        trackTime();
+        intervalId = setInterval(callback(() => {
+            increase();
+            console.info('slow interval ran');
+        }), test1interval);
+    }
+    onInit(toggleInterval);
+    onDestroy(toggleInterval);
+    ++renderCounter;
+    return html `
     <div>interval type 2 with ${test1interval}ms</div>
     intervalId: ${intervalId}
     <button type="button" onclick=${increase}>${intervalCount}:${renderCounter}</button>
@@ -132,5 +105,6 @@ export const intervalTester1 = tag(function intervalTester1() {
     <button type="button" onclick=${toggleInterval}
       style.background-color=${intervalId ? 'red' : 'green'}
     >start/stop</button>
-  `
-})
+  `;
+});
+//# sourceMappingURL=intervalDebug.js.map

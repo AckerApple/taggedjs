@@ -1,41 +1,35 @@
-import { propsDebug } from "./PropsDebug.component.js"
-import { animateDestroy, animateInit } from "./animations.js"
-import { counters } from "./countersDebug.js"
-import { arrayTests } from "./arrayTests.js"
-import { intervalTester0, intervalTester1 } from "./intervalDebug.js"
-import { TagDebugProvider, providerDebug } from "./providerDebug.js"
-import { state, html, tag, providers } from "./taggedjs/index.js"
-import { gatewayDebug } from "./gatewayDebug.component.js"
-
+import { propsDebug } from "./PropsDebug.component.js";
+import { animateDestroy, animateInit } from "./animations.js";
+import { counters } from "./countersDebug.js";
+import { arrayTests } from "./arrayTests.js";
+import { intervalTester0, intervalTester1 } from "./intervalDebug.js";
+import { TagDebugProvider, providerDebug } from "./providerDebug.js";
+import { html, tag, providers, state } from "taggedjs";
+import { gatewayDebug } from "./gatewayDebug.component.js";
 export function tagDebugProvider() {
-  const upper = providers.create( upperTagDebugProvider )
-  return {
-    upper,
-    test: 1
-  }
+    const upper = providers.create(upperTagDebugProvider);
+    return {
+        upper,
+        test: 1
+    };
 }
-
 export function upperTagDebugProvider() {
-  return {
-    name: 'upperTagDebugProvider',
-    test: 2
-  }
+    return {
+        name: 'upperTagDebugProvider',
+        test: 2
+    };
 }
-
-export const tagDebug = tag(function TagDebug() {// tagDebug.js
-  let _firstState = state('tagJsDebug.js', x => [_firstState, _firstState = x])
-  let showIntervals = state(false, x => [showIntervals, showIntervals = x])
-  let propsTest = state({test:33, x:'y'}, x => [propsTest, propsTest = x])
-  let renderCount = state(0, x => [renderCount, renderCount = x])
-
-  function propsTestChanged(event) {
-    propsTest = JSON.parse(event.target.value)
-    return propsTest
-  }
-
-  ++renderCount
-
-  return html`<!-- tagDebug.js -->
+export const tagDebug = tag(function TagDebug() {
+    let _firstState = state('tagJsDebug.js')(x => [_firstState, _firstState = x]);
+    let showIntervals = state(false)(x => [showIntervals, showIntervals = x]);
+    let propsTest = state({ test: 33, x: 'y' })(x => [propsTest, propsTest = x]);
+    let renderCount = state(0)(x => [renderCount, renderCount = x]);
+    function propsTestChanged(event) {
+        propsTest = JSON.parse(event.target.value);
+        return propsTest;
+    }
+    ++renderCount;
+    return html `<!-- tagDebug.js -->
       <fieldset id="counters" style="flex:2 2 20em">
         <legend>counters</legend>
         ${counters()}
@@ -55,7 +49,7 @@ export const tagDebug = tag(function TagDebug() {// tagDebug.js
             onclick=${() => showIntervals = !showIntervals}
           >hide/show</button>
 
-        ${showIntervals && html`
+        ${showIntervals && html `
           <div oninit=${animateInit} ondestroy=${animateDestroy}>
             <div>${intervalTester0()}</div>
             <hr />
@@ -67,8 +61,8 @@ export const tagDebug = tag(function TagDebug() {// tagDebug.js
       <fieldset id="props-debug" style="flex:2 2 20em">
         <legend>Props Debug</legend>
         <textarea wrap="off" onchange=${propsTestChanged}
-        >${ JSON.stringify(propsTest, null, 2) }</textarea>
-        <pre>${ JSON.stringify(propsTest, null, 2) }</pre>
+        >${JSON.stringify(propsTest, null, 2)}</textarea>
+        <pre>${JSON.stringify(propsTest, null, 2)}</pre>
         <div><small>(renderCount:${renderCount})</small></div>
         <hr />
         ${propsDebug(propsTest)}
@@ -84,22 +78,20 @@ export const tagDebug = tag(function TagDebug() {// tagDebug.js
         <legend>#tagGateway</legend>
         ${gatewayDebug()}
       </fieldset>
-  `
-})
-
-const providerDebug0 = tag(function() {
-  const provider = providers.create( tagDebugProvider )
-  const providerClass = providers.create( TagDebugProvider )
-
-  return html`
+  `;
+});
+const providerDebug0 = tag(function () {
+    const provider = providers.create(tagDebugProvider);
+    const providerClass = providers.create(TagDebugProvider);
+    return html `
     <div>
       <strong>testValue</strong>:${provider.test}
     </div>
     <div>
-      <strong>upperTest</strong>:${provider.upper?.test | '?'}
+      <strong>upperTest</strong>:${provider.upper?.test || '?'}
     </div>
     <div>
-      <strong>providerClass</strong>:${providerClass.tagDebug | '?'}
+      <strong>providerClass</strong>:${providerClass.tagDebug || '?'}
     </div>
     <button id="increase-provider" onclick=${() => ++provider.test}
     >increase provider.test ${provider.test}</button>
@@ -112,5 +104,6 @@ const providerDebug0 = tag(function() {
 
     <hr />
     ${providerDebug()}
-  `
-})
+  `;
+});
+//# sourceMappingURL=tagJsDebug.js.map

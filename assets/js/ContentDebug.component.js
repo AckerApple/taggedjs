@@ -1,11 +1,8 @@
-import { html, tag, state } from "./taggedjs/index.js"
-
-export const contentDebug = tag(function ContentDebug() {
-  let renderCount = state(0, x => [renderCount, renderCount=x])
-
-  ++renderCount
-
-  return html`
+import { html, tag, state } from "taggedjs";
+export const contentDebug = tag(() => {
+    let renderCount = state(0)(x => [renderCount, renderCount = x]);
+    ++renderCount;
+    return html `
     <div style="font-size:0.8em">You should see "0" here => "${0}"</div>
     <!--proof you cannot see false values -->
     <div style="font-size:0.8em">You should see "" here => "${false}"</div>
@@ -16,6 +13,8 @@ export const contentDebug = tag(function ContentDebug() {
     <!--proof you can try to use the tagVar syntax -->
     <div style="font-size:0.8em">You should see "${'{'}22${'}'}" here => "{22}"</div>
     <div style="font-size:0.8em">You should see "${'{'}__tagVar0${'}'}" here => "{__tagVar0}"</div>
+    <div style="font-size:0.8em">should be a safe string no html "&lt;div&gt;hello&lt;/div&gt;" here => "${'<div>hello</div>'}"</div>
     (render count ${renderCount})
-  `
-})
+  `;
+});
+//# sourceMappingURL=ContentDebug.component.js.map
