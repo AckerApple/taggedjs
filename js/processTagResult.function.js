@@ -3,29 +3,33 @@ insertBefore, // <template end interpolate />
 { index, counts, forceElement, }) {
     // *for
     if (index !== undefined) {
-        const existing = result.lastArray[index];
+        const resultArray = result.lastArray;
+        const existing = resultArray[index];
         if (existing?.tag.isLikeTag(tag)) {
             existing.tag.updateByTag(tag);
             return [];
         }
-        const lastFirstChild = insertBefore; // tag.clones[0] // insertBefore.lastFirstChild
-        const clones = tag.buildBeforeElement(lastFirstChild, { counts, forceElement });
-        result.lastArray.push({
+        // Added to previous array
+        resultArray.push({
             tag, index
         });
+        const lastFirstChild = insertBefore; // tag.clones[0] // insertBefore.lastFirstChild    
+        const clones = tag.buildBeforeElement(lastFirstChild, { counts, forceElement });
         return clones;
     }
     // *if appears we already have seen
-    if (result.tag && !forceElement) {
+    const subjectTag = result;
+    const rTag = subjectTag.tag;
+    if (rTag && !forceElement) {
         // are we just updating an if we already had?
-        if (result.tag.isLikeTag(tag)) {
+        if (rTag.isLikeTag(tag)) {
             // components
             if (result instanceof Function) {
-                const newTag = result(result.tag.tagSupport);
-                result.tag.updateByTag(newTag);
+                const newTag = result(rTag.tagSupport);
+                rTag.updateByTag(newTag);
                 return [];
             }
-            result.tag.updateByTag(tag);
+            rTag.updateByTag(tag);
             return []; // no clones created in element already on stage
         }
     }
@@ -33,7 +37,7 @@ insertBefore, // <template end interpolate />
         counts,
         forceElement,
     });
-    result.tag = tag; // let reprocessing know we saw this previously as an if
+    subjectTag.tag = tag; // let reprocessing know we saw this previously as an if
     return clones;
 }
 //# sourceMappingURL=processTagResult.function.js.map

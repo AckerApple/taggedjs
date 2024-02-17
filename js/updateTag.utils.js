@@ -2,6 +2,8 @@ import { setValueRedraw } from "./Tag.utils.js";
 import { deepClone } from "./deepFunctions.js";
 import { isSubjectInstance, isTagComponent } from "./isInstance.js";
 import { bindSubjectCallback } from "./bindSubjectCallback.function.js";
+import { isTagArray, processTag } from "./processSubjectValue.function.js";
+import { processTagArray } from "./processTagArray.js";
 function updateExistingTagComponent(tag, tempResult, existingSubject, subjectValue) {
     const latestProps = tempResult.tagSupport.props;
     let existingTag = existingSubject.tag;
@@ -24,6 +26,7 @@ function updateExistingTagComponent(tag, tempResult, existingSubject, subjectVal
     oldTagSetup.latestProps = latestProps;
     oldTagSetup.latestClonedProps = tempResult.tagSupport.clonedProps;
     if (!isSameTag) {
+        // TODO: this may not be in use
         destroyTagMemory(existingTag, existingSubject, subjectValue);
     }
     else {
@@ -65,32 +68,74 @@ function updateExistingTag(templater, ogTag, existingSubject) {
     existingSubject.set(templater);
     return;
 }
-export function updateExistingValue(existing, value, tag, variableName) {
+export function updateExistingValue(existing, value, tag) {
     const subjectValue = existing.value;
     const ogTag = subjectValue?.tag;
     const tempResult = value;
-    const existingSubject = existing;
+    const existingSubArray = existing;
+    const existingSubTag = existing;
+    // was array
+    if (existing.lastArray) {
+        // its another tag array
+        if (isTagArray(value)) {
+            processTagArray(existing, value, existingSubArray.template, tag, { counts: {
+                    added: 0,
+                    removed: 0,
+                } });
+            return;
+        }
+        // was tag array and now something else
+        ;
+        existing.lastArray.forEach(({ tag }) => tag.destroy());
+        delete existing.lastArray;
+    }
     // handle already seen tag components
     if (isTagComponent(tempResult)) {
-        return updateExistingTagComponent(tag, tempResult, existingSubject, subjectValue);
+        return updateExistingTagComponent(tag, tempResult, existingSubTag, subjectValue);
     }
     // was component but no longer
-    if (existingSubject.tag) {
-        destroyTagMemory(existingSubject.tag, existingSubject, subjectValue);
-    }
-    else if (ogTag) {
-        return updateExistingTag(value, ogTag, existingSubject);
+    const existingTag = existingSubTag.tag;
+    if (existingTag) {
+        // its now an array
+        if (isTagArray(value)) {
+            destroyTagMemory(existingTag, existingSubTag, subjectValue);
+            delete existingSubTag.tag;
+        }
+        const oldWrapper = existingTag.tagSupport.templater.wrapper;
+        const newWrapper = value?.wrapper;
+        const wrapMatch = oldWrapper && newWrapper && oldWrapper?.original === newWrapper?.original;
+        // TODO: We shouldn't need both of these
+        const isSameTag = value && existingTag.lastTemplateString === value.lastTemplateString;
+        const isSameTag2 = value && value.getTemplate && existingTag.isLikeTag(value);
+        if (isSameTag || isSameTag2) {
+            processTag(value, existing, existing.template, existingTag, // tag,
+            {
+                counts: {
+                    added: 0,
+                    removed: 0,
+                }
+            });
+            return;
+        }
+        if (wrapMatch) {
+            return updateExistingTag(value, existingTag, existingSubTag);
+        }
+        if (ogTag) {
+            destroyTagMemory(existingTag, existingSubTag, subjectValue);
+            delete existingSubTag.tag;
+        }
     }
     // now its a function
     if (value instanceof Function) {
-        existingSubject.set(bindSubjectCallback(value, tag));
+        existingSubTag.set(bindSubjectCallback(value, tag));
         return;
     }
+    // we have been given a subject
     if (isSubjectInstance(value)) {
-        existingSubject.set(value.value); // let ValueSubject now of newest value
+        existingSubTag.set(value.value); // let ValueSubject now of newest value
         return;
     }
-    existingSubject.set(value); // let ValueSubject now of newest value
+    existingSubTag.set(value); // let ValueSubject now of newest value
     return;
 }
 function destroyTagMemory(existingTag, existingSubject, subjectValue) {

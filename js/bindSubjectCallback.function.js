@@ -10,6 +10,7 @@ export function bindSubjectCallback(value, tag) {
         if (callbackResult instanceof Promise) {
             return callbackResult.then(() => tag.tagSupport.render() && 'no-data-ever');
         }
+        // Caller always expects a Promise
         return Promise.resolve(callbackResult).then(() => 'no-data-ever');
     }
     // link back to original. Mostly used for <div oninit ondestroy> animations

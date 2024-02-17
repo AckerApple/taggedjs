@@ -4,31 +4,39 @@ setUse.memory.stateConfig = {
     array: [], // state memory on the first render
     rearray: [], // state memory to be used before the next render
 };
-/**
- * @template T
- * @param {T} defaultValue
- * @returns {T}
- */
-export function state(defaultValue, getSetMethod) {
+/** Used for variables that need to remain the same variable during render passes */
+export function state(defaultValue) {
     const config = setUse.memory.stateConfig;
+    let getSetMethod;
     const restate = config.rearray[config.array.length];
     if (restate) {
-        const oldValue = getStateValue(restate);
-        config.array.push({
+        let oldValue = getStateValue(restate);
+        getSetMethod = (x => [oldValue, oldValue = x]);
+        const push = {
             callback: getSetMethod,
             lastValue: oldValue,
             defaultValue: restate.defaultValue,
-        });
-        return oldValue; // return old value instead
+        };
+        config.array.push(push);
+        return (y) => {
+            push.callback = y || (x => [oldValue, oldValue = x]);
+            return oldValue;
+        };
     }
     const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue;
-    const initValue = defaultFn();
-    config.array.push({
+    let initValue = defaultFn();
+    getSetMethod = (x => [initValue, initValue = x]);
+    const push = {
         callback: getSetMethod,
         lastValue: initValue,
         defaultValue: initValue,
-    });
-    return initValue;
+    };
+    config.array.push(push);
+    // return initValue
+    return (y) => {
+        push.callback = y || (x => [initValue, initValue = x]);
+        return initValue;
+    };
 }
 setUse({
     beforeRender: (tagSupport) => initState(tagSupport),
@@ -67,11 +75,12 @@ state) {
     const [oldValue] = oldState;
     const [checkValue] = callback(oldValue); // set back to original value
     if (checkValue !== StateEchoBack) {
-        const error = new Error('State property not used correctly.\n\n' +
+        const message = 'State property not used correctly.\n\n' +
             'For "let" state use `let name = state(default, x => [name, name = x])`\n\n' +
             'For "const" state use `const name = state(default)`\n\n' +
-            'Problem function:\n' + state + '\n');
-        throw error;
+            'Problem function:\n' + state + '\n';
+        // console.error(message, {callback, oldState, oldValue, checkValue})
+        throw new Error(message);
     }
     return oldValue;
 }
@@ -80,6 +89,7 @@ export class StateEchoBack {
 function initState(tagSupport) {
     const state = tagSupport.memory.state;
     const config = setUse.memory.stateConfig;
+    // TODO: This guard may no longer be needed
     if (config.rearray.length) {
         const message = 'last array not cleared';
         console.error(message, {

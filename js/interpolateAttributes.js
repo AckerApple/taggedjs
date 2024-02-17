@@ -79,7 +79,7 @@ function getContextValueByVarString(scope, value) {
 }
 function processNameValueAttr(attrName, result, child, ownerTag, howToSet) {
     const isSpecial = isSpecialAttr(attrName);
-    // attach as callback
+    // attach as callback?
     if (result instanceof Function) {
         const action = function (...args) {
             return result(child, args);
@@ -87,12 +87,14 @@ function processNameValueAttr(attrName, result, child, ownerTag, howToSet) {
         child[attrName].action = action;
         // child.addEventListener(attrName, action)
     }
+    // Most every variable comes in here since everything is made a ValueSubject
     if (isSubjectInstance(result)) {
         child.removeAttribute(attrName);
         const callback = (newAttrValue) => processSubjectValue(newAttrValue, child, attrName, isSpecial, howToSet);
-        // the above callback gets called immediately since its a ValueSubject()
+        // 🗞️ Subscribe. Above callback called immediately since its a ValueSubject()
         const sub = result.subscribe(callback);
-        ownerTag.cloneSubs.push(sub); // this is where unsubscribe is picked up
+        // Record subscription for later unsubscribe when element destroyed
+        ownerTag.cloneSubs.push(sub);
         return;
     }
     howToSet(attrName, result);
@@ -103,7 +105,8 @@ function processSubjectValue(newAttrValue, child, attrName, isSpecial, howToSet)
     if (newAttrValue instanceof Function) {
         ;
         child[attrName] = function (...args) {
-            return newAttrValue(child, args);
+            const result = newAttrValue(child, args);
+            return result;
         };
         child[attrName].tagFunction = newAttrValue;
         return;

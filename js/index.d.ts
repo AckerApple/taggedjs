@@ -1,4 +1,5 @@
 /** Must use .js and NOT .ts extensions here */
+export * from "./ElementTargetEvent.interface.js";
 export * from "./html.js";
 export * from "./Subject.js";
 export * from "./interpolateElement.js";

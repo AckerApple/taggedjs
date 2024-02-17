@@ -6,6 +6,7 @@ element, props) {
     if (appElmIndex >= 0) {
         appElements[appElmIndex].tag.destroy();
         appElements.splice(appElmIndex, 1);
+        // an element already had an app on it
         console.warn('Found and destroyed app element already rendered to element', { element });
     }
     // Create the app which returns [props, runOneTimeFunction]
@@ -47,9 +48,11 @@ export function addAppTagRender(tagSupport, tag) {
         fromTag.setSupport(tagSupport);
         tag.afterRender();
         tag.updateByTag(fromTag);
-        if (lastTag) {
-            lastTag.destroy({ stagger: 0 });
+        /*
+        if(lastTag) {
+          lastTag.destroy({stagger: 0})
         }
+        */
         tagSupport.newest = fromTag;
         return lastTag;
     };

@@ -18,10 +18,13 @@ function getValueType(value) {
     if (isTagInstance(value)) {
         return ValueTypes.tag;
     }
-    if (value instanceof Array && value.every(x => isTagInstance(x))) {
+    if (isTagArray(value)) {
         return ValueTypes.tagArray;
     }
     return ValueTypes.value;
+}
+export function isTagArray(value) {
+    return value instanceof Array && value.every(x => isTagInstance(x));
 }
 export function processSubjectValue(value, result, // could be tag via result.tag
 template, // <template end interpolate /> (will be removed)
@@ -29,13 +32,14 @@ tag, // owner
 options) {
     const valueType = getValueType(value);
     // Previously was simple value, now its a tag of some sort
-    if (valueType !== ValueTypes.value && result.clone) {
-        const clone = result.clone;
+    const resultTag = result;
+    const clone = resultTag.clone;
+    if (valueType !== ValueTypes.value && clone) {
         const parent = clone.parentNode;
         template.removeAttribute('removedAt');
         parent.insertBefore(template, clone);
         parent.removeChild(clone);
-        delete result.clone;
+        delete resultTag.clone;
         // result.clone = template
     }
     switch (valueType) {
@@ -81,7 +85,7 @@ tag) {
     }
     return clones;
 }
-function processTag(value, result, // could be tag via result.tag
+export function processTag(value, result, // could be tag via result.tag
 template, // <template end interpolate /> (will be removed)
 tag, // owner
 options) {
@@ -93,7 +97,10 @@ options) {
         value.tagSupport.oldest = value.tagSupport.oldest || value;
         tag.children.push(value);
         value.ownerTag = tag;
+        result.sideTag = tag;
     }
+    // (result as any).template = template
+    result.template = template;
     const clones = processTagResult(value, result, // Function will attach result.tag
     template, options);
     return clones;

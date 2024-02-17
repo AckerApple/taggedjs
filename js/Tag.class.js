@@ -121,10 +121,8 @@ export class Tag {
     }
     isLikeTag(tag) {
         const { string } = tag.getTemplate();
-        if (string !== this.lastTemplateString) {
-            return false;
-        }
-        if (tag.values.length !== this.values.length) {
+        const stringMatched = string === this.lastTemplateString;
+        if (!stringMatched || tag.values.length !== this.values.length) {
             return false;
         }
         const allVarsMatch = tag.values.every((value, index) => {
@@ -169,7 +167,7 @@ export class Tag {
             // is something already there?
             const existing = context[variableName];
             if (existing) {
-                return updateExistingValue(existing, value, this, variableName);
+                return updateExistingValue(existing, value, this);
             }
             // 🆕 First time values below
             processNewValue(hasValue, value, context, variableName, this);
@@ -237,6 +235,8 @@ export function processNewValue(hasValue, value, context, variableName, tag) {
     if (isTagInstance(value)) {
         value.ownerTag = tag;
         tag.children.push(value);
+        context[variableName] = new ValueSubject(value);
+        return;
     }
     if (isSubjectInstance(value)) {
         context[variableName] = value;
