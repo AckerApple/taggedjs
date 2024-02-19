@@ -56,9 +56,13 @@ export const App = tag(function App(){
   `
 })
 
-export default () => {
+const app = () => {
   console.info('attaching to element...')
   const element = document.getElementsByTagName('app')[0]
   console.log('App',App)
   tagElement(App, element, {test:1})
 }
+
+app()
+
+export default app
