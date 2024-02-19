@@ -1,11 +1,12 @@
 {
   "scripts": {
     "save": "git add . && git commit -m \"patch\" && git push",
-    "start": "dir=assets/js node tagged-hmr.js",
+    "start": "npm run build:js:watch & dir=assets/js node tagged-hmr.js",
     "build": "npm run build:js && npm run build:hmr",
     "build:bundle": "node runBundleScript.js",
     "build:hmr": "node hmr/runBundleScript.js",
-    "build:js": "tsc -p tsconfig.json"
+    "build:js": "tsc -p tsconfig.json",
+    "build:js:watch": "tsc -p tsconfig.json --watch"
   },
   "devDependencies": {
     "express": "^4.18.2",

@@ -1,1 +1,1 @@
-export declare const renderCountDiv: (renderCount: unknown) => import("taggedjs").Tag;
+export declare const renderCountDiv: (props?: number | undefined, children?: import("taggedjs").TagChildrenInput | undefined) => import("taggedjs").Tag;

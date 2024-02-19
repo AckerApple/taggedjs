@@ -84,15 +84,10 @@ fs.watch(watchPath, { recursive: true }, async (eventType, filename) => {
     return
   }
 
-  console.log('filename changed', filename)
-  running = true
-  promise = promise.then(async () => {
-    bundle()
-    running = false
-  })
+  console.log('📄 file changed', filename)
 
-  await promise
-
+  await runBundle()
+  
   const messageObject = {
     type:'file-change',
     filename:filename,
@@ -128,10 +123,19 @@ function sendFile(
   });
 }
 
-async function bundle() {
-  console.log('bundling...')
-  await bundleScript.run()
-  console.log('done')
+async function runBundle() {
+  running = true
+  promise = promise.then(async () => {
+    console.log('🏗️ making bundle...')
+    await bundleScript.run()
+    running = false
+  })
+
+  await promise
+
+  console.log('✅ 🏗️ bundle made')
+
 }
 
-bundle()
+console.log('🏗️ making first bundle...')
+runBundle()

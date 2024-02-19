@@ -1,9 +1,9 @@
-import { tableDebug } from "./tableDebug.component.js"
+import { childTests } from "./childTests.js"
 import { html, tag } from "taggedjs"
 
 export const IsolatedApp = tag(() => {
-  const component = tableDebug() as any
-  const template = component.wrapper().getTemplate()
+  // const component = childTests() as any
+  // const template = component.wrapper().getTemplate()
   
   return html`<!--isolatedApp.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
@@ -11,12 +11,15 @@ export const IsolatedApp = tag(() => {
     <div id="tagDebug-fx-wrap">
       <div style="display:flex;flex-wrap:wrap;gap:1em">
         <fieldset style="flex:2 2 20em">
-          <legend>Table Tests</legend>
-          ${tableDebug()}
+          <legend>Children Tests</legend>
+          ${childTests()}
         </fieldset>
 
-        <textarea style="min-width:50vw;height:400px">${ template.string }</textarea>
-        <textarea style="min-width:50vw;height:400px">${ JSON.stringify(template, null, 2) }</textarea>
+        ${/*
+          <textarea style="min-width:50vw;height:400px">${ template.string }</textarea>
+          <textarea style="min-width:50vw;height:400px">${ JSON.stringify(template, null, 2) }</textarea>
+          */ false
+        }
       </div>
     </div>
   `

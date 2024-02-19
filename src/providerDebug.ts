@@ -38,7 +38,9 @@ export const providerDebug = tag(function ProviderDebug() {
 })
 
 
-const testProviderAsProps = tag(function TestProviderAsProps(providerClass) {
+const testProviderAsProps = tag((
+  providerClass: TagDebugProvider
+) => {
   return html`<!--providerDebug.js@TestProviderAsProps-->
     <textarea wrap="off" rows="20" style="width:100%">${JSON.stringify(providerClass, null, 2)}</textarea>
   `

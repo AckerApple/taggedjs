@@ -1,10 +1,10 @@
 import { attributeDebug } from "./attributeDebug.component.js"
 import { contentDebug } from "./ContentDebug.component.js"
-import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests.js"
 import { tableDebug } from "./tableDebug.component.js"
 import { html, tag, state, tagElement } from "taggedjs"
 import { tagDebug } from "./tagJsDebug.js"
 import { tagSwitchDebug } from "./tagSwitchDebug.component.js"
+import { childTests } from "./childTests.js"
 
 export const App = tag(function App(){
   let _firstState: string = state('app first state')(x => [_firstState, _firstState=x])
@@ -30,14 +30,7 @@ export const App = tag(function App(){
       <div style="display:flex;flex-wrap:wrap;gap:1em">
         ${tagDebug()}
 
-        ${childContentTest({legend: 'Children Test', id:'children-test'}, html`
-          ${innerHtmlTest(html`
-              <b>Field set body</b>
-            `)}
-            ${innerHtmlPropsTest(33, html`
-              <b>Field set body</b>
-            `)}
-        `)}
+        ${childTests()}
 
         <fieldset style="flex:2 2 20em">
           <legend>Attribute Tests</legend>
@@ -60,15 +53,6 @@ export const App = tag(function App(){
         </fieldset>
       </div>            
     </div>
-  `
-})
-
-export const childContentTest = tag(({legend, id}, children) => {
-  return html`
-    <fieldset id=${id} style="flex:2 2 20em">
-      <legend>${legend}</legend>
-      ${children}
-    </fieldset>
   `
 })
 

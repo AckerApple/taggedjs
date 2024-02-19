@@ -1,1 +1,1 @@
-export declare const arrayTests: () => import("taggedjs").Tag;
+export declare const arrayTests: (props?: unknown, children?: import("taggedjs").TagChildrenInput | undefined) => import("taggedjs").Tag;
