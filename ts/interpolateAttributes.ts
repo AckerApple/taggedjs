@@ -205,9 +205,7 @@ function processSubjectValue(
 ) {
   if(newAttrValue instanceof Function) {
     ;(child as any)[attrName] = function(...args: any[]) {
-      console.log(`processing ${attrName} ------------- start`)
       const result = newAttrValue(child, args)
-      console.log(`processing ${attrName} ------------- end`)
       return result
     }
 

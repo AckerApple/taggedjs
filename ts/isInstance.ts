@@ -2,8 +2,8 @@ import { SubjectLike } from "./Subject.js"
 import { Tag } from "./Tag.class.js"
 import { TemplaterResult } from "./templater.utils.js"
 
-export function isTagComponent(value?: TemplaterResult) {
-  return value?.isTemplater === true
+export function isTagComponent(value?: TemplaterResult | unknown) {
+  return (value as TemplaterResult)?.isTemplater === true
 }
 
 export function isTagInstance(tag?: Tag | unknown) {
@@ -11,7 +11,11 @@ export function isTagInstance(tag?: Tag | unknown) {
 }
 
 export function isSubjectInstance(
-  subject?: SubjectLike
+  subject?: SubjectLike | any
 ): Boolean {
   return (subject?.isSubject === true || subject?.subscribe) ? true : false // subject?.isSubject === true || 
+}
+
+export function isTagArray(value: any) {
+  return value instanceof Array && value.every(x => isTagInstance(x))
 }

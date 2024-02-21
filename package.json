@@ -1,7 +1,7 @@
 {
   "name": "taggedjs",
   "private": true,
-  "version": "2.3.25",
+  "version": "2.3.27",
   "description": "tagged template reactive html",
   "main": "js/index.js",
   "type": "module",
@@ -9,7 +9,7 @@
     "build:js": "tsc -p tsconfig.json",
     "build": "npm-run-all --sequential build:js build:webpack build:gh-pages copy:pinbowl && echo \"✅ Build completed\"",
     "build:webpack": "npx webpack",
-    "build:gh-pages": "cp -R js/. ../gh-pages/node_modules/taggedjs/js && cd ../gh-pages && npm run build:js && echo \"🔬 Built gh-pages\"",
+    "build:gh-pages": "cp -R js/. ../gh-pages/node_modules/taggedjs/js && cd ../gh-pages && npm run build && echo \"🔬 Built gh-pages\"",
     "build:dist": "npm run build && cp README.MD dist/README.md && npm run build:dist:pack && rm -rf dist/js && cp -R js dist/js && cp -R dist/. ../dist",
     "build:pinbowl": "npm run build && npm run copy:pinbowl",
     "copy:pinbowl": "cp -R js/. ../../../services/pinbowl/src/taggedjs && cd ../../../services/pinbowl/taggedjs && npm run build && echo \"🎳 Built pinbowl\"",

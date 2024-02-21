@@ -1,9 +1,9 @@
 import { Subject } from './Subject.js'
 
 export class ValueSubject<T> extends Subject<T> {
-  value: any
+  value: T
   
-  constructor(initialValue: any) {
+  constructor(initialValue: T) {
     super()
     this.value = initialValue
   }

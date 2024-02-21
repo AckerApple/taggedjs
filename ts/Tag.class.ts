@@ -1,16 +1,16 @@
 import { TagSubject, getSubjectFunction, setValueRedraw } from "./Tag.utils.js"
-import { TagSupport } from "./getTagSupport.js"
+import { TagSupport } from "./TagSupport.class.js"
 import { Provider } from "./providers.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { Subscription } from "./Subject.js"
-import { runAfterRender, runBeforeDestroy, runBeforeRedraw } from "./tagRunner.js"
+import { runBeforeDestroy } from "./tagRunner.js"
 import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js"
 import { buildClones } from "./render.js"
 import { interpolateElement, interpolateString } from "./interpolateElement.js"
 import { Counts, afterElmBuild } from "./interpolateTemplate.js"
 import { State } from "./state.js"
 import { elementDestroyCheck } from "./elementDestroyCheck.function.js"
-import { updateExistingValue } from "./updateTag.utils.js"
+import { updateExistingValue } from "./updateExistingValue.function.js"
 import { InterpolatedTemplates } from "./interpolations.js"
 
 export const variablePrefix = '__tagvar'
@@ -34,6 +34,10 @@ export interface TagTemplate {
   context: Context,
 }
 
+export class ArrayValueNeverSet {
+  isArrayValueNeverSet = true
+}
+
 export class Tag {
   isTag = true
 
@@ -49,23 +53,15 @@ export class Tag {
   appElement?: Element // only seen on this.getAppElement().appElement
   
   // present only when an array. Populated by this.key()
-  arrayValue?: unknown
+  arrayValue: unknown | ArrayValueNeverSet = new ArrayValueNeverSet()
 
   constructor(
     public strings: string[],
     public values: any[],
   ) {}
 
-  beforeRedraw() {
-    runBeforeRedraw(this.tagSupport, this)
-  }
-
-  afterRender() {
-    runAfterRender(this.tagSupport, this)
-  }
-
   /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
-  key(arrayValue: unknown ) {
+  key(arrayValue: unknown) {
     this.arrayValue = arrayValue
     return this
   }
@@ -195,6 +191,8 @@ export class Tag {
 
       const tag = value as Tag
       if(isTagInstance(tag) && isTagInstance(compareTo)) {
+        // TODO: THis "is" is setting data, this is not good
+        console.log('🎃')
         tag.ownerTag = this // let children know I own them
         this.children.push(tag) // record children I created        
         tag.lastTemplateString || tag.getTemplate().string // ensure last template string is generated

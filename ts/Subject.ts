@@ -5,7 +5,7 @@ export type Subscription = (() => void) & {
 type Subscriber = (value?: any) => any
 
 export interface SubjectLike {
-  subscribe: (callback: (value?: any) => any) => any,
+  subscribe?: (callback: (value?: any) => any) => any,
   isSubject?: boolean
 }
 

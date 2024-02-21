@@ -1,6 +1,12 @@
 export function deepClone(
   obj: any,
-  visited = new WeakMap()
+) {
+  return makeDeepClone(obj, new WeakMap())
+}
+
+function makeDeepClone(
+  obj: any,
+  visited: WeakMap<any, any>
 ) {
   // If obj is a primitive type or null, return it directly
   if (obj === null || typeof obj !== 'object') {
@@ -9,7 +15,7 @@ export function deepClone(
 
   // If obj is already visited, return the cloned reference
   if (visited.has(obj)) {
-    return visited.get(obj);
+    return visited.get(obj)
   }
 
   // Handle special cases like Date and RegExp
@@ -25,17 +31,17 @@ export function deepClone(
   const clone = Array.isArray(obj) ? [] : Object.create(Object.getPrototypeOf(obj));
 
   // Register the cloned object to avoid cyclic references
-  visited.set(obj, clone);
+  visited.set(obj, clone)
 
   // Clone each property or element of the object or array
   if (Array.isArray(obj)) {
     for (let i = 0; i < obj.length; i++) {
-      clone[i] = deepClone(obj[i], visited);
+      clone[i] = makeDeepClone(obj[i], visited)
     }
   } else {
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
-        clone[key] = deepClone(obj[key], visited);
+        clone[key] = makeDeepClone(obj[key], visited)
       }
     }
   }
@@ -43,7 +49,18 @@ export function deepClone(
   return clone;
 }
 
-export function deepEqual(obj1: any, obj2: any) {
+export function deepEqual(
+  obj1: any,
+  obj2: any,
+) {
+  return isDeepEqual(obj1, obj2, new WeakMap())
+}
+
+function isDeepEqual(
+  obj1: any,
+  obj2: any,
+  visited: WeakMap<any, any>,
+) {
   if (obj1 === obj2) {
     return true
   }
@@ -64,9 +81,19 @@ export function deepEqual(obj1: any, obj2: any) {
     return false
   }
 
+  // If obj is already visited, return the cloned reference
+  if (visited.has(obj1)) {
+    return true
+  }
+
+  // Register the cloned object to avoid cyclic references
+  visited.set(obj1, 0)
+
   for (const key of keys1) {
-    if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key])) {
-      if(obj1[key] instanceof Function && obj2[key] instanceof Function && obj1[key].toString() === obj2[key].toString()) {
+    const keyFound = keys2.includes(key)
+    if (!keyFound || !isDeepEqual(obj1[key], obj2[key], visited)) {
+      const bothFunction = obj1[key] instanceof Function && obj2[key] instanceof Function
+      if(bothFunction && obj1[key].toString() === obj2[key].toString()) {
         continue
       }
       return false
@@ -80,7 +107,7 @@ export function deepEqual(obj1: any, obj2: any) {
     }
 
     for (let i = 0; i < obj1.length; i++) {
-      if (!deepEqual(obj1[i], obj2[i])) {
+      if (!isDeepEqual(obj1[i], obj2[i], visited)) {
         return false
       }
     }

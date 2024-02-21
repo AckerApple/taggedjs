@@ -26,14 +26,15 @@ export function processTagResult(
       return []
     }
 
-    const lastFirstChild = insertBefore // tag.clones[0] // insertBefore.lastFirstChild
-    
-    const clones = tag.buildBeforeElement(lastFirstChild, {counts, forceElement})
-    
+
+    // Added to previous array
     resultArray.push({
       tag, index
     })
-    
+
+    const lastFirstChild = insertBefore // tag.clones[0] // insertBefore.lastFirstChild    
+    const clones = tag.buildBeforeElement(lastFirstChild, {counts, forceElement})
+        
     return clones
   }
 

@@ -1,4 +1,4 @@
-import { getTagSupport } from "./getTagSupport.js"
+import { TagSupport } from "./TagSupport.class.js"
 import { TemplaterResult } from "./templater.utils.js"
 import { Tag } from "./Tag.class.js"
 
@@ -7,7 +7,8 @@ export function redrawTag(
   templater: TemplaterResult, // latest tag function to call for rendering
   ownerTag?: Tag,
 ) {
-  const tagSupport = existingTag?.tagSupport || getTagSupport(templater)
+  // TODO: The or condition here may not be needed since its an obvious "re"draw
+  const tagSupport = existingTag?.tagSupport || new TagSupport(templater, templater.tagSupport.children)
 
   const result = templater.renderWithSupport(
     tagSupport,

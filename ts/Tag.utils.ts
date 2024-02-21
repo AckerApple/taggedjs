@@ -1,4 +1,4 @@
-import { TagSupport } from "./getTagSupport.js"
+import { TagSupport } from "./TagSupport.class.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { Subject } from "./Subject.js"
 import { Tag } from "./Tag.class.js"
@@ -24,24 +24,12 @@ export function setValueRedraw(
   existing: TagSubject,
   ownerTag: Tag,
 ) {
-  const oldCount = existing.tagSupport?.memory.renderCount
+  // const oldCount = existing.tagSupport?.memory.renderCount
 
   // redraw does not communicate to parent
-  templater.redraw = (
-    force?: boolean // forces redraw on children
-  ) => {
-    const existingTag = existing.tag as Tag
-    console.log('aaaaaaaaa start setValueRedraw aaaaaaaaa', {
-      oldCount
-    })
-    
+  templater.redraw = () => {
+    const existingTag = existing.tag as Tag    
     const {remit, retag} = redrawTag(existingTag, templater, ownerTag)
-
-    console.log('aaaaaaaaa end setValueRedraw aaaaaaaaa', {
-      oldCount,
-      renderCount: existing.tagSupport?.memory.renderCount,
-      newRenderCount: retag.tagSupport.memory.renderCount,
-    })
 
     existing.tagSupport = retag.tagSupport
 
@@ -50,20 +38,6 @@ export function setValueRedraw(
     }
 
     existing.set(templater)
-
-    if(force) {
-      const tagSupport = existingTag.tagSupport
-      const memory = tagSupport.memory
-      const context = memory.context
-      
-      Object.values(context).forEach((item: any) => {
-        if(!item.value?.isTemplater) {
-          return
-        }
-
-        item.value.redraw()
-      })
-    }
 
     return retag
   }

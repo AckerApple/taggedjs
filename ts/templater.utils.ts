@@ -1,10 +1,11 @@
 import { Tag } from "./Tag.class.js"
-import { TagSupport, getTagSupport } from "./getTagSupport.js"
+import { TagSupport } from "./TagSupport.class.js"
 import { isTagInstance } from "./isInstance.js"
 import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
 import { setUse } from "./setUse.function.js"
 import { Props } from "./Props.js"
-import { TagEnv } from "./tag.js"
+import { ValueSubject } from "./ValueSubject.js"
+import { TagChildren } from "./tag.js"
 
 export type Wrapper = (() => Tag) & {
   original: () => Tag
@@ -20,9 +21,10 @@ export class TemplaterResult {
   tagSupport: TagSupport
 
   constructor(
-    props:Props,
+    props: Props,
+    children: TagChildren,
   ) {
-    this.tagSupport = getTagSupport(this, props)
+    this.tagSupport = new TagSupport(this, children, props)
   }
 
   redraw?: (
@@ -35,13 +37,16 @@ export class TemplaterResult {
     ownerTag: Tag,
   ) {
     const tag = this.wrapper()
+    
     tag.setSupport(tagSupport)
-    tag.afterRender()
+    runAfterRender(tag.tagSupport, tag)
+    
     this.oldest = tag
     tagSupport.oldest = tag
     this.oldest = tag
     this.newest = tag
     tag.ownerTag = ownerTag
+    
     return tag
   }
 
@@ -60,6 +65,7 @@ export class TemplaterResult {
         // ensure props are the last ones used
         tagSupport.props = tagSupport.latestProps
         tagSupport.clonedProps = tagSupport.latestClonedProps
+        // tagSupport.latestClonedProps = tagSupport.latestClonedProps
     
         runBeforeRedraw(tagSupport, tagSupport.oldest)
       } else {
@@ -78,6 +84,7 @@ export class TemplaterResult {
     /* AFTER */
     tagSupport.latestProps = retag.tagSupport.props
     tagSupport.latestClonedProps = retag.tagSupport.clonedProps
+    // tagSupport.latestClonedProps = retag.tagSupport.latestClonedProps
 
     retag.setSupport(tagSupport)
   
@@ -112,12 +119,11 @@ export interface TemplateRedraw extends TemplaterResult {
 
 export type TagComponent = (
   props: Props, // props or children
-  children?: Tag,
-  // tagEnv: TagEnv,
+  children?: ValueSubject<Tag[]>,
 ) => Tag
 
-/* rewriter */
-export function getNewProps(
+/* Used to rewrite props that are functions. When they are called it should cause parent rendering */
+export function alterProps(
   props: Props,
   templater: TemplaterResult
 ) {
@@ -136,7 +142,7 @@ export function getNewProps(
 
 function resetFunctionProps(
   props: any,
-  callback: any,
+  callback: (toCall: any, callWith: any) => unknown,
 ) {
   if(typeof(props)!=='object') {
     return props

@@ -1,6 +1,6 @@
 import { Tag } from "./Tag.class.js"
 import { deepClone } from "./deepFunctions.js"
-import { TagSupport } from "./getTagSupport.js"
+import { TagSupport } from "./TagSupport.class.js"
 import { setUse } from "./setUse.function.js"
 
 export type Provider = {

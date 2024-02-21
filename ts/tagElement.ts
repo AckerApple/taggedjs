@@ -1,5 +1,5 @@
-import { TagSupport } from "./getTagSupport.js"
-import { runBeforeRender } from "./tagRunner.js"
+import { TagSupport } from "./TagSupport.class.js"
+import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
 import { TagComponent, TemplaterResult } from "./templater.utils.js"
 import { Tag } from "./Tag.class.js"
 
@@ -28,17 +28,13 @@ export function tagElement(
   tag.appElement = element
   
   addAppTagRender(tagSupport, tag)
-  
-  // const context = tag.updateValues(tag.values)
-  
+    
   const templateElm = document.createElement('template')
   templateElm.setAttribute('tag-detail','app-template-placeholder')
   element.appendChild(templateElm)
   
   tag.buildBeforeElement(templateElm)
 
-  // ;(element as any).tag = tag
-  // ;(element as any).tags = (app as any).original.tags
   ;(element as any).setUse = (app as any).original.setUse
 
   appElements.push({element, tag})
@@ -49,16 +45,14 @@ export function tagElement(
 export function applyTagUpdater(
   wrapper: TemplaterResult,
 ) {
-  console.log('********************')
-  const tagSupport = wrapper.tagSupport // getTagSupport(0, wrapper)
+  const tagSupport = wrapper.tagSupport
   runBeforeRender(tagSupport, undefined as any as Tag)
 
   // Call the apps function for our tag templater
-  // const templater = tagSupport.templater as TemplaterResult
-  const tag = wrapper.wrapper() // templater.wrapper()
+  const tag = wrapper.wrapper()
 
   tag.tagSupport = tagSupport
-  tag.afterRender()
+  runAfterRender(tag.tagSupport, tag)
   
   return { tag, tagSupport }
 }
@@ -70,24 +64,17 @@ export function addAppTagRender(
 ) {
   let lastTag
   tagSupport.mutatingRender = () => {
-    tag.beforeRedraw()
+    runBeforeRedraw(tag.tagSupport, tag)
 
     const templater = tagSupport.templater as TemplaterResult // wrapper
     const fromTag = lastTag = templater.wrapper()
 
-    // tagSupport.props = fromTag.tagSupport.props
     tagSupport.latestProps = fromTag.tagSupport.props
     tagSupport.latestClonedProps = fromTag.tagSupport.clonedProps
 
     fromTag.setSupport(tagSupport)
-    tag.afterRender()
+    runAfterRender(tag.tagSupport, tag)
     tag.updateByTag(fromTag)
-
-    /*
-    if(lastTag) {
-      lastTag.destroy({stagger: 0})
-    }
-    */
 
     tagSupport.newest = fromTag
 

@@ -1,10 +1,11 @@
 import { Clones } from "./Clones.type.js"
-import { Tag } from "./Tag.class.js"
+import { ArrayValueNeverSet, Tag } from "./Tag.class.js"
 import { ValueSubject } from "./ValueSubject.js"
-import { getTagSupport } from "./getTagSupport.js"
+import { TagSupport } from "./TagSupport.class.js"
 import { Counts } from "./interpolateTemplate.js"
 import { processTagResult } from "./processTagResult.function.js"
 import { TemplaterResult } from "./templater.utils.js"
+import { ArrayNoKeyError } from "./errors.js"
 
 export type LastArrayItem = {tag: Tag, index: number}
 export type TagArraySubject = ValueSubject<Tag[]> & {
@@ -60,7 +61,7 @@ export function processTagArray(
   const before = template || (template as any).clone
 
   value.forEach((subTag, index) => {
-    subTag.tagSupport = getTagSupport({} as TemplaterResult) // {...ownerTag.tagSupport} // ownerTag.tagSupport.templater
+    subTag.tagSupport = new TagSupport({} as TemplaterResult, new ValueSubject([]))
         
     subTag.tagSupport.mutatingRender = () => {
       ownerTag.tagSupport.render()
@@ -71,13 +72,17 @@ export function processTagArray(
     ownerTag.children.push(subTag)
 
     // check for html``.key()
-    if (subTag.arrayValue === undefined) {
-      // appears arrayValue is not there but maybe arrayValue is actually the value of undefined
-      if (!Object.keys(subTag).includes('arrayValue')) {
-        const err = new Error('Use html`...`.key(item) instead of html`...` to template an Array')
-        ;(err as any).code = 'add-array-key'
-        throw err
+    const keyNotSet = subTag.arrayValue as ArrayValueNeverSet | undefined
+    if (keyNotSet?.isArrayValueNeverSet) {
+      const details = {
+        template: subTag.getTemplate().string,
+        array: value,
+        ownerTagContent: ownerTag.lastTemplateString,
       }
+      const message = 'Use html`...`.key(item) instead of html`...` to template an Array'
+      console.error(message, details)
+      const err = new ArrayNoKeyError(message, details)
+      throw err
     }
 
     const previous = result.lastArray[index]
@@ -89,8 +94,6 @@ export function processTagArray(
       return []
     }
 
-    console.log('"----new array item----"', "----new array item----", {index, length: value.length, value})
-
     const nextClones = processTagResult(
       subTag,
       result,
@@ -100,15 +103,6 @@ export function processTagArray(
         ...options,
       }
     )
-
-    /*
-    // not used
-    updateExistingValue(
-      subTag.tagSupport.templater,
-      subTag.tagSupport,
-      subTag,
-    )
-    */
 
     clones.push(...nextClones)
   })

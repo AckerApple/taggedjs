@@ -1,5 +1,6 @@
+import { StateMismatchError } from "./errors.js"
 import { Tag } from "./Tag.class.js"
-import { TagSupport } from "./getTagSupport.js"
+import { TagSupport } from "./TagSupport.class.js"
 import { setUse } from "./setUse.function.js"
 
 export type StateConfig = (x?: any) => [any, any]
@@ -74,6 +75,18 @@ export function state <T>(
   }
 }
 
+const waitingStates: (() => unknown)[] = []
+export function onNextStateOnly(callback: () => unknown) {
+  const config: Config = setUse.memory.stateConfig
+  
+  if(!config.rearray.length) {
+    callback()
+    return
+  }
+
+  waitingStates.push(callback)
+}
+
 setUse({
   beforeRender: (tagSupport: TagSupport) => initState(tagSupport),
   beforeRedraw: (tagSupport: TagSupport) => initState(tagSupport),
@@ -83,18 +96,16 @@ setUse({
   ) => {
     const state: State = tagSupport.memory.state
     const config: Config = setUse.memory.stateConfig
-
+    
     if(config.rearray.length) {
       if(config.rearray.length !== config.array.length) {
         const message = `States lengths mismatched ${config.rearray.length} !== ${config.array.length}`
-        
-        console.error(message, {
+        const error = new StateMismatchError(message,{
           oldStates: config.array,
           newStates: config.rearray,
           component: tagSupport.templater?.wrapper.original
-        })
-        
-        throw new Error(message)
+        })        
+        throw error
       }
     }
     
@@ -107,6 +118,9 @@ setUse({
     
     // config.array.length = 0
     config.array = []
+
+    waitingStates.forEach(callback => callback())
+    waitingStates.length = 0
   }
 })
 
@@ -152,8 +166,15 @@ function initState(
       config,
       component: tagSupport.templater?.wrapper.original,
       state,
+      expectedClearArray: config.rearray,
     })
-    throw message
+
+    throw new StateMismatchError(message, {
+      config,
+      component: tagSupport.templater?.wrapper.original,
+      state,
+      expectedClearArray: config.rearray,
+    })
   }
 
   // TODO: this maybe redundant and not needed

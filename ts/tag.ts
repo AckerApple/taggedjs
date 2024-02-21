@@ -1,55 +1,83 @@
 import { Tag } from "./Tag.class.js"
-import { isTagInstance } from "./isInstance.js"
+import { isSubjectInstance, isTagArray, isTagInstance } from "./isInstance.js"
 import { setUse } from "./setUse.function.js"
-import { Props } from "./Props.js"
-import { TagComponent, TemplaterResult, Wrapper, getNewProps } from "./templater.utils.js"
+import { TagComponent, TemplaterResult, Wrapper, alterProps } from "./templater.utils.js"
+import { ValueSubject } from "./ValueSubject.js"
+import { runTagCallback } from "./bindSubjectCallback.function.js"
+
+export type TagChildren = ValueSubject<Tag[]>
+export type TagChildrenInput = Tag[] | Tag | TagChildren
 
 export const tags: TagComponent[] = []
 
 let tagCount = 0
 
-export type TagEnv = {
-  // parentNode: HTMLElement | Element
-  /*app: {
-    // tag: TagComponent, // (...args: unknown[]) => TemplaterResult,
-    element: HTMLElement | Element,  
-  }*/
-  children?: Tag
-}
-
+/** Wraps a tag component in a state manager and always push children to last argument as any array */
 export function tag<T>(
-  tagComponent: T | TagComponent
-): T {
+  tagComponent: (
+    ((props: T, children: TagChildren) => Tag) |
+    ((props: T) => Tag) |
+    (() => Tag)
+  )
+): ((props?: T, children?: TagChildrenInput) => Tag) {
   const result = (function tagWrapper(
-    props: Props | Tag | undefined,
-    children?: Tag
+    props?: T | Tag | Tag[],
+    children?: TagChildrenInput
   ) {
-    const isPropTag = isTagInstance(props)
-    const templater: TemplaterResult = new TemplaterResult(props)
-    const newProps = getNewProps(props, templater)
+    const isPropTag = isTagInstance(props) || isTagArray(props)    
     
-    let argProps = newProps
     if(isPropTag) {
-      children = props as Tag
-      argProps = noPropsGiven
+      children = props as Tag | Tag[] | TagChildren
+      props = undefined
+    }
+
+    const { childSubject, madeSubject } = kidsToTagArraySubject(children)
+
+    const templater: TemplaterResult = new TemplaterResult(props, childSubject)
+
+    if(!isPropTag) {
+      // wrap props that are functions
+      alterProps(props, templater)
     }
 
     function innerTagWrap() {
       const originalFunction = innerTagWrap.original as TagComponent
-      const props = templater.tagSupport.props // argProps
-      const tag = originalFunction(props, children)
+      const props = templater.tagSupport.props
+      const tag = originalFunction(props, childSubject)
       tag.setSupport( templater.tagSupport )
+
+      if(madeSubject) {
+        childSubject.value.forEach(kid => {
+          kid.values.forEach((value, index) => {            
+            if(!(value instanceof Function)) {
+              return
+            }
+            
+            if(kid.values[index].isChildOverride) {
+              return // already overwritten
+            }
+            
+            // all functions need to report to me
+            kid.values[index] = function(...args: unknown[]) {
+              runTagCallback(value, tag.ownerTag as Tag, this, args)
+              // runTagCallback(value, tag, this, args)
+            }
+            
+            kid.values[index].isChildOverride = true
+          })
+        })
+      }
+
       return tag
     }
 
     innerTagWrap.original = tagComponent
     
-    
     templater.tagged = true    
     templater.wrapper = innerTagWrap as Wrapper
 
     return templater
-  }) as T // we override the function provided and pretend original is what's returned
+  }) // we override the function provided and pretend original is what's returned
 
   updateResult(result, tagComponent as TagComponent)
 
@@ -57,7 +85,31 @@ export function tag<T>(
   updateComponent(tagComponent)
   tags.push(tagComponent as TagComponent)
 
-  return result
+  return result as any
+}
+
+function kidsToTagArraySubject(
+  children?: TagChildrenInput
+): {
+  childSubject: ValueSubject<Tag[]>,
+  madeSubject: boolean
+} {
+  if(isSubjectInstance(children)) {
+    return {childSubject: children as ValueSubject<Tag[]>, madeSubject: false}
+  }
+  
+  const kidArray = children as Tag[]
+  if(isTagArray(kidArray)) {
+    return {childSubject: new ValueSubject(children as Tag[]), madeSubject: true}
+  }
+
+  const kid = children as Tag
+  if(kid) {
+    kid.arrayValue = 0
+    return {childSubject: new ValueSubject([kid]), madeSubject: true}
+  }
+
+  return {childSubject: new ValueSubject([]), madeSubject: true}
 }
 
 function updateResult(

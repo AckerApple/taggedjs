@@ -1,4 +1,4 @@
-import { TagSupport } from "./getTagSupport.js"
+import { TagSupport } from "./TagSupport.class.js"
 import { setUse } from "./setUse.function.js"
 import { State, StateConfigArray, getStateValue } from "./state.js"
 

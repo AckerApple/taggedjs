@@ -1,14 +1,14 @@
 import { processSubjectComponent } from "./processSubjectComponent.function.js"
 import { processTagResult } from "./processTagResult.function.js"
-import { isTagComponent, isTagInstance } from "./isInstance.js"
+import { isSubjectInstance, isTagArray, isTagComponent, isTagInstance } from "./isInstance.js"
 import { TagArraySubject, processTagArray } from "./processTagArray.js"
 import { TemplaterResult } from "./templater.utils.js"
-import { getTagSupport } from "./getTagSupport.js"
+import { TagSupport } from "./TagSupport.class.js"
 import { Clones } from "./Clones.type.js"
 import { Tag } from "./Tag.class.js"
 import { Counts, Template, updateBetweenTemplates } from "./interpolateTemplate.js"
-import { ValueSubject } from "./ValueSubject.js"
 import { TagSubject } from "./Tag.utils.js"
+import { ValueSubject } from "./ValueSubject.js"
 
 enum ValueTypes {
   tag = 'tag',
@@ -31,10 +31,6 @@ function getValueType(value: any): ValueTypes {
   }
 
   return ValueTypes.value
-}
-
-export function isTagArray(value: any) {
-  return value instanceof Array && value.every(x => isTagInstance(x))
 }
 
 type processOptions = {
@@ -137,7 +133,11 @@ export function processTag(
 ) {
   // first time seeing this tag?
   if(!value.tagSupport) {
-    value.tagSupport = getTagSupport({} as TemplaterResult)
+    value.tagSupport = new TagSupport(
+      {} as TemplaterResult, // the template is provided via html`` call
+      new ValueSubject([]), // no children
+    )
+
     // asking me to render will cause my parent to render
     value.tagSupport.mutatingRender = tag.tagSupport.mutatingRender
     value.tagSupport.oldest = value.tagSupport.oldest || value

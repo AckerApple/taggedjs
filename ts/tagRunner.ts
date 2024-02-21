@@ -1,7 +1,7 @@
 // TODO: This should be more like `new TaggedJs().use({})`
 
 import { Tag } from "./Tag.class.js"
-import { TagSupport } from "./getTagSupport"
+import { TagSupport } from "./TagSupport.class.js"
 import { setUse } from "./setUse.function.js"
 
 // Life cycle 1
