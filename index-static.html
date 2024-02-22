@@ -24,11 +24,12 @@
       </td>
     </tr>
   </table>
-  <!--
   <script type="module">
-    import './assets/dist/bundle.js'
+    import { App, tagElement } from './assets/dist/bundle.js'
+    
+    const element = document.getElementsByTagName('app')[0]
+    tagElement(App, element)
   </script>
-  -->
 </body>
 
 </html>

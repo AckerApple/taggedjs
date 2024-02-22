@@ -20,8 +20,9 @@ export const counters = tag(function Counters() {
   return html`<!--counters-->
     <div>Subscriptions:${(Subject as any).globalSubCount$}:${(Subject as any).globalSubs.length}</div>
     <div>initCounter:${initCounter}</div>
-    <button onclick=${increaseCounter}>counter:${counter}</button>
+    <button id="increase-counter" onclick=${increaseCounter}>counter:${counter}</button>
+    <span id="counter-display">${counter}</span>
     <button onclick=${() => console.info('subs', (Subject as any).globalSubs)}>log subs</button>
-    ${renderCountDiv(renderCount)}
+    ${renderCountDiv({renderCount, name: 'counters'})}
   `
 })

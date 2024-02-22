@@ -17,7 +17,7 @@ const childContentTest = tag((
       ${children}
       <hr />
       <button onclick=${() => ++counter}>increase childContentTest ${counter}</button>
-      ${renderCountDiv(renderCount)}
+      ${renderCountDiv({renderCount, name: 'childContentTest'})}
     </fieldset>
   `
 })
@@ -28,15 +28,22 @@ export const childTests = tag(() => {
 
   ++renderCount
 
+  console.log('----- renderCount -----', {renderCount, counter})
+
   return html`
     <fieldset id="children-test" style="flex:2 2 20em">
       <legend>childTests</legend>
-
+      
+      ${/*renderCountDiv(renderCount)}- ${renderCount*/false}
+      
       ${innerHtmlTest(html`
         <b>Field set body A</b>
         <hr />
-        <button onclick=${() => ++counter}>increase childTests inside ${counter}</button>
-        ${renderCountDiv(renderCount)}
+        <button
+          onclick=${() => ++counter}
+        >increase childTests inside ${counter}:${renderCount}</button>
+        ${renderCountDiv({renderCount, name: 'childTests'})}
+        
       `)}
 
       ${/*innerHtmlPropsTest(22, html`
@@ -46,25 +53,24 @@ export const childTests = tag(() => {
         ${renderCountDiv(renderCount)}
       `)*/false}
 
-      ${childContentTest({legend: 'Inner Test', id:'children-inner-test'}, html`
-        ${/*innerHtmlTest(html`
+      ${/*childContentTest({legend: 'Inner Test', id:'children-inner-test'}, html`
+        ${innerHtmlTest(html`
           <b>Field set body C</b>
-        `)*/false}
+        `)}
         
-        ${/*innerHtmlPropsTest(33, html`
+        ${innerHtmlPropsTest(33, html`
           <b>Field set body D</b>
-        `)*/false}
+        `)}
 
         <hr />
         
         <button onclick=${() => ++counter}>increase childTests inside ${counter}</button>
         ${renderCountDiv(renderCount)}
-      `)}
+      `)*/false}
       
       <hr />
-      
-      <button onclick=${() => ++counter}>increase childTests outside ${counter}</button>
-      ${renderCountDiv(renderCount)}
+      <button onclick=${() => ++counter}>increase childTests outside ${counter} - ${renderCount}</button>
+      ${renderCountDiv({renderCount, name:'childTests'})}
     </fieldset>
   `
 })

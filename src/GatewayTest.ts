@@ -10,6 +10,6 @@ export const GatewayTest = tag((
   
   return html`
     I was loaded by a gateway - props:${typeof props}:${JSON.stringify(props)}
-    ${renderCountDiv(renderCount)}
+    ${renderCountDiv({renderCount, name: 'GatewayTest.ts'})}
   `
 })

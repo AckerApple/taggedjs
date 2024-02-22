@@ -1,7 +1,7 @@
 import { state, html, tag, onInit, getCallback, onDestroy } from "taggedjs";
 const test0interval = 3000;
 const test1interval = 6000;
-export const intervalTester0 = tag(function IntervalTester0() {
+export const intervalTester0 = tag(() => {
     let intervalCount = state(0)(x => [intervalCount, intervalCount = x]);
     let intervalId = state(undefined)(x => [intervalId, intervalId = x]);
     let intervalId2 = state(undefined)(x => [intervalId2, intervalId2 = x]);
@@ -59,7 +59,7 @@ export const intervalTester0 = tag(function IntervalTester0() {
     <button type="button" onclick=${delayIncrease}>delay increase currentTime</button>
   `;
 });
-export const intervalTester1 = tag(function intervalTester1() {
+export const intervalTester1 = tag(() => {
     let intervalCount = state(0)(x => [intervalCount, intervalCount = x]);
     let intervalId = state(undefined)(x => [intervalId, intervalId = x]);
     let intervalId2 = state(undefined)(x => [intervalId2, intervalId2 = x]);

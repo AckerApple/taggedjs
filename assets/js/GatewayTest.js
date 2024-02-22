@@ -5,7 +5,7 @@ export const GatewayTest = tag((props) => {
     ++renderCount;
     return html `
     I was loaded by a gateway - props:${typeof props}:${JSON.stringify(props)}
-    ${renderCountDiv(renderCount)}
+    ${renderCountDiv({ renderCount, name: 'GatewayTest.ts' })}
   `;
 });
 //# sourceMappingURL=GatewayTest.js.map

@@ -1,5 +1,8 @@
 import { tag, html } from "taggedjs"
 
 export const renderCountDiv = tag((
-    renderCount: number,
-) => html`<div><small>(render count ${renderCount})</small></div>`)
+  {renderCount, name}: {
+    renderCount: number
+    name: string
+  }
+) => html`<div><small>(${name} render count ${renderCount})</small></div>`)

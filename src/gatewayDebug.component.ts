@@ -11,7 +11,8 @@ export const gatewayDebug = tag(function gatewayDebug() {
 
   return html`
     <div id=${tagGateway(GatewayTest).id} props=${JSON.stringify(gatewayData)}></div>
-    <button onclick=${() => ++gatewayData.test}>increase ${gatewayData.test}</button>
-    ${renderCountDiv(renderCount)}
+    <button id="increase-gateway-count" onclick=${() => ++gatewayData.test}>increase ${gatewayData.test}</button>
+    <span id="display-gateway-count">${gatewayData.test}</span>
+    ${renderCountDiv({renderCount, name: 'gatewayDebug.component.ts'})}
   `
 })

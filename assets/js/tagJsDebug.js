@@ -6,6 +6,7 @@ import { intervalTester0, intervalTester1 } from "./intervalDebug.js";
 import { TagDebugProvider, providerDebug } from "./providerDebug.js";
 import { html, tag, providers, state } from "taggedjs";
 import { gatewayDebug } from "./gatewayDebug.component.js";
+import { renderCountDiv } from "./renderCount.component.js";
 export function tagDebugProvider() {
     const upper = providers.create(upperTagDebugProvider);
     return {
@@ -19,7 +20,8 @@ export function upperTagDebugProvider() {
         test: 2
     };
 }
-export const tagDebug = tag(function TagDebug() {
+export const tagDebug = tag(() => {
+    console.log('render tagDebug.js');
     let _firstState = state('tagJsDebug.js')(x => [_firstState, _firstState = x]);
     let showIntervals = state(false)(x => [showIntervals, showIntervals = x]);
     let propsTest = state({ test: 33, x: 'y' })(x => [propsTest, propsTest = x]);
@@ -30,6 +32,10 @@ export const tagDebug = tag(function TagDebug() {
     }
     ++renderCount;
     return html `<!-- tagDebug.js -->
+    <h3 id="debugging">Debugging</h3>
+    ${renderCountDiv({ renderCount, name: 'tagJsDebug' })}
+
+    <div style="display:flex;flex-wrap:wrap;gap:1em">
       <fieldset id="counters" style="flex:2 2 20em">
         <legend>counters</legend>
         ${counters()}
@@ -46,8 +52,8 @@ export const tagDebug = tag(function TagDebug() {
         </legend>
 
         <button
-            onclick=${() => showIntervals = !showIntervals}
-          >hide/show</button>
+          onclick=${() => showIntervals = !showIntervals}
+        >hide/show</button>
 
         ${showIntervals && html `
           <div oninit=${animateInit} ondestroy=${animateDestroy}>
@@ -78,6 +84,7 @@ export const tagDebug = tag(function TagDebug() {
         <legend>#tagGateway</legend>
         ${gatewayDebug()}
       </fieldset>
+    </div>
   `;
 });
 const providerDebug0 = tag(function () {

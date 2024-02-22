@@ -11,7 +11,7 @@ export const innerHtmlTest = tag((_props, children) => {
       <div>isSubjectInstance:${isSubjectInstance(children)}</div>
       <div>isSubjectTagArray:${isTagArray(children.value)}</div>
       <button onclick=${() => ++counter}>increase innerHtmlTest ${counter}</button>
-      ${renderCountDiv(renderCount)}
+      ${renderCountDiv({ renderCount, name: 'innerHtmlTest' })}
     </fieldset>
   `;
 });
@@ -24,7 +24,7 @@ export const innerHtmlPropsTest = tag((x, children) => {
       <legend>innerHTML Props: ${x}</legend>
       ${children}
       <button onclick=${() => ++counter}>increase innerHtmlPropsTest ${counter}</button>
-      ${renderCountDiv(renderCount)}
+      ${ /*renderCountDiv(renderCount)*/false}
     </fieldset>
   `;
 });

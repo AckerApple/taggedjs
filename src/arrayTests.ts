@@ -16,12 +16,17 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
 
   ++renderCount
 
+  console.log(22)
+
   return html`<!--arrayTests.js-->
     <div style="display:flex;flex-wrap:wrap">
       ${array0.map((item,index) => html`
         <div oninit=${animateInit} ondestroy=${animateDestroy}>
           <div>
             name:${item.name}
+          </div>
+          <div>
+            index:${index}
           </div>
           
           <div>scores:${item.scores.map(score => html`
@@ -37,7 +42,7 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
             array0.splice(index,0,getNewPerson())
           }}>add before</button>
         </div>
-      `.key(item))}
+      `)}
     </div>
 
     <button onclick=${() => {
@@ -50,7 +55,7 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
       }}>remove all</button>
     `}
 
-    ${renderCountDiv(renderCount)}
+    ${renderCountDiv({renderCount, name: 'arrayTests.ts'})}
   `
 })
 

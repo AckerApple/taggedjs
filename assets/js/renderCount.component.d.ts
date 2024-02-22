@@ -1,1 +1,4 @@
-export declare const renderCountDiv: (props?: number | undefined, children?: import("taggedjs").TagChildrenInput | undefined) => import("taggedjs").Tag;
+export declare const renderCountDiv: (props?: {
+    renderCount: number;
+    name: string;
+} | undefined, children?: import("taggedjs").TagChildrenInput | undefined) => import("taggedjs").Tag;

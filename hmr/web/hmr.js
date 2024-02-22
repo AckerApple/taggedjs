@@ -1,11 +1,13 @@
 /** client code */
 
-import { redrawTag, Tag, tagElement } from "taggedjs"
+// do not use another import as it wont be same memory as running app
+// import { redrawTag, Tag, tagElement } from "taggedjs"
 
 reconnect()
 
 /**
  * @typedef {import("taggedjs").TagComponent} TagComponent
+ * @typedef {import("taggedjs").Tag} Tag
  */
 
 function reconnect() {
@@ -63,6 +65,7 @@ async function discoverTags() {
   const promises = array.map(async element => {
     const url = element.getAttribute('url')
     const tagName = element.getAttribute('name')
+
     console.log(`loading tagName ${tagName}...`)
     const newApp = await import(`${url}?${Date.now()}`)
 
@@ -87,6 +90,7 @@ let lastTags = []
 async function updateByElement(
   app
 ) {
+  console.log('updateByElement *********')
   /** @type {TagComponent[]} */
   const oldTags = lastTags
   const oldSetUse = app.setUse
@@ -94,7 +98,8 @@ async function updateByElement(
   const tags = await discoverTags()
 
   tags.forEach(async tag => {
-    const { newTemplater } = tag
+    const { newApp, newTemplater } = tag
+    const { redrawTag } = newApp.hmr
     
     /** @type {TagComponent[]} */
     const newTags = newTemplater.wrapper.original.tags
@@ -166,7 +171,7 @@ async function updateByElement(
         return
       }
   
-      const count = await replaceTemplater(lastApp, tagChangeStates[0])
+      const count = await replaceTemplater(lastApp, tagChangeStates[0], redrawTag)
       
       if(count <= 0) {
         console.warn('✋ No components were updated', tagChangeStates[0])
@@ -182,7 +187,9 @@ async function updateByElement(
 }
 
 async function rebuildTag(
+  /** @type {Tag} */
   tag,
+  redrawTag,
 ) {
   const { retag } = redrawTag(tag, tag.tagSupport.templater)
 
@@ -204,8 +211,9 @@ async function replaceTemplater(
   tag,
   /** @type {{oldTag: TagComponent, newTag: TagComponent}} */
   {oldTag, newTag},
-  count = 0
-) {
+  redrawTag
+  ) {
+  let  count = 0
   const promises = tag.values.map(async (value, index) => {
     if(!value || !value.isTemplater) {
       return
@@ -249,7 +257,7 @@ async function replaceTemplater(
   await Promise.all(promises)
 
   const subPromises = tag.children.map(async child => {
-    count = count + await replaceTemplater(child,{oldTag, newTag})
+    count = count + await replaceTemplater(child, {oldTag, newTag}, redrawTag)
   })
 
   await Promise.all(subPromises)
@@ -264,6 +272,8 @@ function rebuildApps() {
   forEachApp(element => {
     discoverTags().then(apps => {
       apps.forEach(({newApp, tagName}) => {
+        console.log(111, newApp.hmr)
+        const { tagElement } = newApp.hmr
         const result = tagElement(newApp[tagName], element, {test:1})
         
         lastTags = result.tags

@@ -8,7 +8,7 @@ const port = 3000;
 const rootPath = './' // '../'
 const servePath = path.join(__dirname, rootPath)
 
-console.log('servePath',servePath)
+console.log('📂 servePath',servePath)
 
 const index = path.join(__dirname, rootPath, 'index.html')
 const indexString = fs.readFileSync(index).toString()
@@ -17,7 +17,7 @@ const inject = path.join(__dirname, 'hmr', 'hmr.bundle.js')
 const customScript = '<script type="module">'+ fs.readFileSync(inject).toString() +'</script>'
 const watchPath = process.env.dir ? path.join(__dirname, process.env.dir) : __dirname
 
-const bundleScript = require(rootPath + 'bundleScript.js')
+const bundleScript = require(rootPath + 'bundleScript.hmr.js')
 const indexFilePath = path.join(__dirname, rootPath, 'index.html')
 
 // Custom middleware for serving static files
@@ -28,8 +28,14 @@ app.use((req, res, next) => {
   // Check if the requested file is an HTML file
   const customScriptInjection = path.extname(filePath) === '.html'
 
+  // TODO: remove this
+  const fileName = path.basename(filePath).toLowerCase()
+  const isIndex = fileName === 'index.html'
+
+  console.log(`↖️ 📄 send file ${fileName}`)
+
   // Check if the flag is set for HTML modification
-  if (customScriptInjection) {
+  if (isIndex && customScriptInjection) {
     // Read the HTML file
     sendFile(filePath, res)
   } else {
