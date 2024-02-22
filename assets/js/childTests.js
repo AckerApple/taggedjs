@@ -33,7 +33,6 @@ export const childTests = tag(() => {
           onclick=${() => ++counter}
         >increase childTests inside ${counter}:${renderCount}</button>
         ${renderCountDiv({ renderCount, name: 'childTests' })}
-        
       `)}
 
       ${ /*innerHtmlPropsTest(22, html`
