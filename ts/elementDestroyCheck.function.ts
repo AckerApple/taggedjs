@@ -1,7 +1,7 @@
-export function elementDestroyCheck(
-  nextSibling: Element & {ondestroy?: (event: Event) => any},
+export function elementDestroyCheck<T>(
+  nextSibling: Element & {ondestroy?: (event: Event) => T},
   stagger: number,
-) {
+): T | undefined {
   const onDestroyDoubleWrap = nextSibling.ondestroy
   if(!onDestroyDoubleWrap) {
     return

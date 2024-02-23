@@ -173,14 +173,15 @@ function processNameValueAttr(
   // Most every variable comes in here since everything is made a ValueSubject
   if(isSubjectInstance(result)) {
     child.removeAttribute(attrName)
-    const callback = (newAttrValue: any) =>
-      processSubjectValue(
+    const callback = (newAttrValue: any) => {
+      return processAttributeSubjectValue(
         newAttrValue,
         child,
         attrName,
         isSpecial,
         howToSet,
       )
+    }
 
     // 🗞️ Subscribe. Above callback called immediately since its a ValueSubject()
     const sub = result.subscribe(callback as any)
@@ -196,7 +197,7 @@ function processNameValueAttr(
   return
 }
 
-function processSubjectValue(
+function processAttributeSubjectValue(
   newAttrValue: any,
   child: Element,
   attrName: string,

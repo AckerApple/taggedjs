@@ -35,7 +35,7 @@ function getValueType(value: any): ValueTypes {
 
 type processOptions = {
   forceElement?: boolean
-  counts: Counts
+  counts: Counts // used to count stagger
 }
 
 export type ClonesAndPromise = {
@@ -55,9 +55,11 @@ export function processSubjectValue(
   // Previously was simple value, now its a tag of some sort
   const resultTag = result as TagSubject
   const clone = resultTag.clone
-  if(valueType !== ValueTypes.value && clone) {
+  const noLongerSimpleValue = valueType !== ValueTypes.value && clone
+
+  if(noLongerSimpleValue) {
     const parent = clone.parentNode as ParentNode
-    template.removeAttribute('removedAt')
+    // template.removeAttribute('removedAt')
     parent.insertBefore(template, clone)
     parent.removeChild(clone)
     delete resultTag.clone
@@ -101,7 +103,7 @@ function processRegularValue(
   tag: Tag, // owner
 ) {
   const before = result.clone || template // Either the template is on the doc OR its the first element we last put on doc
-
+  
   // Processing of regular values
   const clone = updateBetweenTemplates(
     value,
@@ -176,24 +178,23 @@ function processWasTag(
   // put the template back down
   lastFirstChild.parentNode.insertBefore(template, lastFirstChild)
 
-  // cleanup old
-  if(result.clone) {
-    result.clone.parentNode.removeChild(result.clone)
-  }
-  delete result.tag
-
-  const stagger = options.counts.removed
-  const promise = tag.destroy({stagger}).then(animated => 
-    options.counts.removed = stagger + animated
-  )
-  delete result.tag
-
   const clone = updateBetweenTemplates(
     value,
-    template, // this will be removed from document inside this function
+    // template // template, // this will be removed from document inside this function
+    lastFirstChild,
   )
 
   result.clone = clone
+
+  // cleanup old
+  delete result.tag
+  
+  /* destroy logic */
+    const stagger = options.counts.removed
+    const promise = tag.destroy({stagger}).then(animated => 
+      options.counts.removed = stagger + animated
+    )
+  /* end: destroy logic */
 
   return promise
 }

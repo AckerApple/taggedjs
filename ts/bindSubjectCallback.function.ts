@@ -13,12 +13,9 @@ export function bindSubjectCallback(
     return value
   }
 
-  function subjectFunction(
-    element: Element,
-    args: any[]
-  ) {
-    return runTagCallback(value, tag, element, args)
-  }
+  const subjectFunction = (
+    element: Element, args: any[]
+  ) => runTagCallback(value, tag, element, args)
 
   // link back to original. Mostly used for <div oninit ondestroy> animations
   subjectFunction.tagFunction = value
@@ -47,5 +44,5 @@ export function runTagCallback(
   }
 
   // Caller always expects a Promise
-  return Promise.resolve(callbackResult).then(() => 'no-data-ever')
+  return 'no-data-ever'
 }

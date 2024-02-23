@@ -3,10 +3,12 @@ import { interpolateToTemplates } from "./interpolations.js"
 import { interpolateContentTemplates } from "./interpolateContentTemplates.js"
 import { Context, Tag, TagTemplate, escapeSearch, variablePrefix } from "./Tag.class.js"
 import { Clones } from "./Clones.type.js"
+import { Counts } from "./interpolateTemplate.js"
 
 export type InterpolateOptions = {
   /** make the element go on document */
   forceElement?: boolean
+  counts: Counts
 }
 
 export function interpolateElement(
@@ -17,8 +19,7 @@ export function interpolateElement(
   options: InterpolateOptions,
 ): Clones {
   const clones = []
-  const result = interpolatedTemplates.interpolation // interpolateElementChild(element)
-  // const result = interpolateElementChild(element)
+  const result = interpolatedTemplates.interpolation
   const template = element.children[0] as HTMLTemplateElement
   const children = template.content.children
 
@@ -45,15 +46,6 @@ function processChildrenAttributes(
       processChildrenAttributes(child.children, context, ownerTag)
     }
   })
-}
-
-/** Convert interpolations into template tags */
-function interpolateElementChild(
-  child: Element,
-) {
-  const result = interpolateString(child.innerHTML)
-  child.innerHTML = result.string
-  return result
 }
 
 export function interpolateString(string: string) {

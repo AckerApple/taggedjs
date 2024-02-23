@@ -10,7 +10,7 @@ export function interpolateTemplate(
   template: Template, // <template end interpolate /> (will be removed)
   context: Context, // variable scope of {`__tagvar${index}`:'x'}
   tag: Tag, // Tag class
-  counts: Counts, // {added:0, removed:0}
+  counts: Counts, // used for animation stagger computing
   options: InterpolateOptions,
 ): Clones {
   const clones: Clones = []
@@ -25,7 +25,6 @@ export function interpolateTemplate(
   }
 
   const result = context[variableName]
-  // const isSubject = isSubjectInstance(result)
   let isForceElement = options.forceElement
   
   const callback = (templateNewValue: any) => {
@@ -34,7 +33,11 @@ export function interpolateTemplate(
       result,
       template,
       tag,
-      {counts, forceElement: isForceElement}
+      {
+        // counts,
+        counts: {added: counts.added, removed: counts.removed},
+        forceElement: isForceElement,
+      }
     )
 
     if(isForceElement) {
@@ -42,12 +45,6 @@ export function interpolateTemplate(
     }
 
     clones.push(...clones)
-
-    // TODO: See if we can remove
-    setTimeout(() => {
-      counts.added = 0 // reset
-      counts.removed = 0 // reset
-    }, 0)
   }
 
   const sub = result.subscribe(callback as any)
@@ -74,16 +71,13 @@ export function updateBetweenTemplates(
 
   /* remove existing nodes */
   parent.removeChild(lastFirstChild)
-  if(lastFirstChild.nodeName === 'TEMPLATE') {
-    lastFirstChild.setAttribute('removedAt', Date.now().toString())
-  }
   
   return textNode
 }
 
 export type Counts = {
   added: number
-  removed: number
+  removed: number // increased when item removed from array
 }
 
 export function afterElmBuild(
@@ -94,11 +88,22 @@ export function afterElmBuild(
     return
   }
 
+  let diff = options.counts.added
   if(!options.forceElement) {
-    elementInitCheck(elm, options.counts)
+    diff = elementInitCheck(elm, options.counts) - diff
   }
 
   if((elm as Element).children) {
-    new Array(...(elm as Element).children as any).forEach(child => afterElmBuild(child, options))
+    const subCounts = {
+      added: options.counts.added, // - diff,
+      removed: options.counts.removed,
+    }
+
+    new Array(...(elm as Element).children as any).forEach((child, index) => {
+      return afterElmBuild(child, {
+        ...options,
+       counts: options.counts,
+      })
+    })
   }
 }

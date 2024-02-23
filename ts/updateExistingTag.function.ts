@@ -27,6 +27,7 @@ export function updateExistingTag(
   tagSupport.newest = retag
   runAfterRender(oldest.tagSupport, oldest)
   ogTag.updateByTag(retag)
+
   existingSubject.set(templater)
   
   return

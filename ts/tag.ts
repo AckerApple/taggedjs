@@ -32,6 +32,7 @@ export function tag<T>(
     }
 
     const { childSubject, madeSubject } = kidsToTagArraySubject(children)
+    ;(childSubject as any).isChildSubject = true
 
     const templater: TemplaterResult = new TemplaterResult(props, childSubject)
 
@@ -43,6 +44,7 @@ export function tag<T>(
     function innerTagWrap() {
       const originalFunction = innerTagWrap.original as TagComponent
       const props = templater.tagSupport.props
+
       const tag = originalFunction(props, childSubject)
       tag.setSupport( templater.tagSupport )
 

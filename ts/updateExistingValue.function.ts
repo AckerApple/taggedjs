@@ -22,7 +22,12 @@ export function updateExistingValue(
   const existingSubTag = existing as TagSubject
 
   // was array
-  if((existing as any).lastArray) {    
+  if(existingSubArray.lastArray) {    
+    // If we are working with tag component 2nd argument children, the value has to be digged
+    if(existingSubArray.isChildSubject) {
+      value = (value as any).value // A subject contains the value
+    }
+
     // its another tag array
     if(isTagArray(value)) {
       processTagArray(

@@ -7,20 +7,21 @@ export function elementInitCheck(
 ) {
   const onInitDoubleWrap = (nextSibling as any).oninit
   if (!onInitDoubleWrap) {
-      return
+    return counts.added
   }
 
   const onInitWrap = onInitDoubleWrap.tagFunction
   if (!onInitWrap) {
-      return
+    return counts.added
   }
   
   const onInit = onInitWrap.tagFunction
   if (!onInit) {
-      return
+    return counts.added
   }
   
   const event = { target: nextSibling, stagger: counts.added } as unknown as InputElementTargetEvent
   onInit(event)
-  ++counts.added
+  
+  return ++counts.added
 }

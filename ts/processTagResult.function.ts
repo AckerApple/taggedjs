@@ -18,23 +18,22 @@ export function processTagResult(
 ): Clones {
   // *for
   if(index !== undefined) {
-    const resultArray = (result as TagArraySubject).lastArray
-    const existing = resultArray[index]
+    const lastArray = (result as TagArraySubject).lastArray
+    const existing = lastArray[index]
 
     if(existing?.tag.isLikeTag(tag)) {
       existing.tag.updateByTag(tag)
       return []
     }
 
-
     // Added to previous array
-    resultArray.push({
+    lastArray.push({
       tag, index
     })
 
     const lastFirstChild = insertBefore // tag.clones[0] // insertBefore.lastFirstChild    
     const clones = tag.buildBeforeElement(lastFirstChild, {counts, forceElement})
-        
+
     return clones
   }
 

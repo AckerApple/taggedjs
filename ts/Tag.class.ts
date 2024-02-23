@@ -33,7 +33,7 @@ export interface TagTemplate {
   values: unknown[],
   context: Context,
 }
-
+console.log(586)
 export class ArrayValueNeverSet {
   isArrayValueNeverSet = true
 }
@@ -81,12 +81,12 @@ export class Tag {
     this.destroySubscriptions()
     const promises = this.children.map((kid) => kid.destroy({...options, byParent: true}))
 
-    if( !options.byParent ) {
-      options.stagger = await this.destroyClones(options)
-    }
-
     if(this.ownerTag) {
       this.ownerTag.children = this.ownerTag.children.filter(child => child !== this)
+    }
+
+    if( !options.byParent ) {
+      options.stagger = await this.destroyClones(options)
     }
 
     await Promise.all(promises)
@@ -104,14 +104,15 @@ export class Tag {
       stagger: 0,
     }
   ) {
+    let hasPromise = false
     const promises = this.clones.reverse().map((clone: any, index: number) => {
-      let promise = Promise.resolve()
+      let promise: Promise<unknown> | undefined
       
       if( clone.ondestroy ) {
         promise = elementDestroyCheck(clone, stagger)
       }
 
-      promise.then(() => {
+      const next = () => {
         clone.parentNode?.removeChild(clone)
 
         const ownerTag = this.ownerTag
@@ -119,13 +120,21 @@ export class Tag {
           // Sometimes my clones were first registered to my owner, remove them
           ownerTag.clones = ownerTag.clones.filter(compareClone => compareClone !== clone)
         }
-      })
+      }
+
+      if(promise instanceof Promise) {
+        hasPromise = true
+        promise.then(next)
+      } else {
+        next()
+      }
 
       return promise
     })
     
-    await Promise.all(promises)
-    // this.clones.length = 0
+    if(hasPromise) {
+      await Promise.all(promises)
+    }
 
     return stagger
   }
@@ -169,7 +178,7 @@ export class Tag {
     }
   }
 
-  isLikeTag(tag: Tag) {
+  isLikeTag(tag: Tag, deepCheck = false) {
     const {string} = tag.getTemplate()
     const stringMatched = string === this.lastTemplateString
     if(!stringMatched || tag.values.length !== this.values.length) {
@@ -190,14 +199,17 @@ export class Tag {
       }
 
       const tag = value as Tag
-      if(isTagInstance(tag) && isTagInstance(compareTo)) {
+      // TODO: All this code can possibly be deleted?
+      if(deepCheck && isTagInstance(tag) && isTagInstance(compareTo)) {
         // TODO: THis "is" is setting data, this is not good
-        console.log('🎃')
         tag.ownerTag = this // let children know I own them
         this.children.push(tag) // record children I created        
-        tag.lastTemplateString || tag.getTemplate().string // ensure last template string is generated
+        tag.lastTemplateString || tag.getTemplate() // ensure last template string is generated
+        const isLikeTag = tag.isLikeTag(compareTo)
 
-        if(tag.isLikeTag(compareTo)) {
+        console.log('🎃', {isLikeTag})
+
+        if(isLikeTag) {
           return true
         }
 
@@ -286,7 +298,6 @@ export class Tag {
     
     const context = this.update()
     const template = this.getTemplate()
-    // const ownerTag = this.ownerTag
     
     const temporary = document.createElement('div')
     temporary.id = 'tag-temp-holder'
@@ -299,7 +310,10 @@ export class Tag {
       context,
       template,
       this, // this.ownerTag || this,
-      {forceElement: options.forceElement}
+      {
+        forceElement: options.forceElement,
+        counts: options.counts
+      }
     )
 
     this.clones.length = 0

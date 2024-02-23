@@ -11,15 +11,18 @@ export type LastArrayItem = {tag: Tag, index: number}
 export type TagArraySubject = ValueSubject<Tag[]> & {
   lastArray: LastArrayItem[]
   template: Element
+  isChildSubject?: boolean // present when children passed as prop0 or prop1
 }
-
 
 export function processTagArray(
   result: TagArraySubject,
   value: Tag[], // arry of Tag classes
   template: Element, // <template end interpolate />
   ownerTag: Tag,
-  options: {counts: Counts, forceElement?: boolean},
+  options: {
+    counts: Counts
+    forceElement?: boolean
+  },
 ): Clones {
   const clones: Clones = []
   result.lastArray = result.lastArray || [] // {tag, index}[] populated in processTagResult
@@ -43,7 +46,7 @@ export function processTagArray(
     if(destroyItem) {
       const last = result.lastArray[index]
       const tag: Tag = last.tag
-      
+
       tag.destroy({
         stagger: options.counts.removed,
         byParent: false
@@ -84,16 +87,17 @@ export function processTagArray(
       const err = new ArrayNoKeyError(message, details)
       throw err
     }
+    
+    if (result.lastArray.length > index) {
+      const previous = result.lastArray[index]
 
-    const previous = result.lastArray[index]
-    if (previous) {
       const isSame = previous.tag.arrayValue === subTag.arrayValue
       if (isSame) {
         previous.tag.updateValues(subTag.values)
       }
       return []
     }
-
+    
     const nextClones = processTagResult(
       subTag,
       result,
@@ -101,6 +105,10 @@ export function processTagArray(
       {
         index,
         ...options,
+        counts: {
+          added: options.counts.added + index,
+          removed: options.counts.removed,
+        }
       }
     )
 

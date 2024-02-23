@@ -66,7 +66,6 @@ export function processSubjectComponent(
 
   tagSupport.latestProps = retag.tagSupport.props
   tagSupport.latestClonedProps = retag.tagSupport.clonedProps
-  // tagSupport.latestClonedProps = retag.tagSupport.latestClonedProps
   tagSupport.memory = retag.tagSupport.memory
 
   retag.setSupport(tagSupport)
