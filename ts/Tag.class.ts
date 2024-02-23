@@ -33,7 +33,7 @@ export interface TagTemplate {
   values: unknown[],
   context: Context,
 }
-console.log(586)
+
 export class ArrayValueNeverSet {
   isArrayValueNeverSet = true
 }
@@ -178,7 +178,7 @@ export class Tag {
     }
   }
 
-  isLikeTag(tag: Tag, deepCheck = false) {
+  isLikeTag(tag: Tag) {
     const {string} = tag.getTemplate()
     const stringMatched = string === this.lastTemplateString
     if(!stringMatched || tag.values.length !== this.values.length) {
@@ -198,8 +198,9 @@ export class Tag {
         return false
       }
 
-      const tag = value as Tag
+      /*
       // TODO: All this code can possibly be deleted?
+      const tag = value as Tag
       if(deepCheck && isTagInstance(tag) && isTagInstance(compareTo)) {
         // TODO: THis "is" is setting data, this is not good
         tag.ownerTag = this // let children know I own them
@@ -215,6 +216,7 @@ export class Tag {
 
         return false
       }
+      */
       
       return true
     })
