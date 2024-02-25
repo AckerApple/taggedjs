@@ -52,6 +52,8 @@
   - `<div>${component(html`<small>hello world</small>`)}</div>`
   - `<div>${component({ x: y }, html`<small>hello world</small>`)}</div>`
   - The component always has fixed arguments for this of `component = (props, {children})`
+- React has `useEffect(fn, [...watch])` and TaggedJs has `watch([...watch], fn)`
+  
 
 ### Benefits to TaggedJs over React
 

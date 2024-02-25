@@ -140,11 +140,13 @@ export function getStateValue(
   const [checkValue] = callback( oldValue ) // set back to original value
 
   if(checkValue !== StateEchoBack) {
-    const message = 'State property not used correctly.\n\n' +
-    'For "let" state use `let name = state(default, x => [name, name = x])`\n\n' +
-    'For "const" state use `const name = state(default)`\n\n' +
-    'Problem function:\n' + state +'\n'
-    // console.error(message, {callback, oldState, oldValue, checkValue})
+    const message = 'State property not used correctly. Second item in array is not setting value as expected.\n\n' +
+    'For "let" state use `let name = state(default)(x => [name, name = x])`\n\n' +
+    'For "const" state use `const name = state(default)()`\n\n' +
+    'Problem state:\n' + (callback ? callback.toString() : JSON.stringify(state)) +'\n'
+    
+    console.error(message, {state, callback, oldState, oldValue, checkValue})
+    
     throw new Error(message)
   }
 
