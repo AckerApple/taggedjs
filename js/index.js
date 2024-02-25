@@ -8,6 +8,7 @@ export * from "./errors.js";
 export * from "./Subject.js";
 export * from "./isInstance.js";
 export * from "./ValueSubject.js";
+export * from "./watch.function.js";
 export * from "./TagSupport.class.js";
 export * from "./gateway/index.js";
 export * from "./redrawTag.function.js";

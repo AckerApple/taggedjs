@@ -14,6 +14,7 @@ export function tag(tagComponent) {
             props = undefined;
         }
         const { childSubject, madeSubject } = kidsToTagArraySubject(children);
+        childSubject.isChildSubject = true;
         const templater = new TemplaterResult(props, childSubject);
         if (!isPropTag) {
             // wrap props that are functions

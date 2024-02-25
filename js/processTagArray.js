@@ -53,8 +53,8 @@ ownerTag, options) {
             const err = new ArrayNoKeyError(message, details);
             throw err;
         }
-        const previous = result.lastArray[index];
-        if (previous) {
+        if (result.lastArray.length > index) {
+            const previous = result.lastArray[index];
             const isSame = previous.tag.arrayValue === subTag.arrayValue;
             if (isSame) {
                 previous.tag.updateValues(subTag.values);
@@ -64,6 +64,10 @@ ownerTag, options) {
         const nextClones = processTagResult(subTag, result, before, {
             index,
             ...options,
+            counts: {
+                added: options.counts.added + index,
+                removed: options.counts.removed,
+            }
         });
         clones.push(...nextClones);
     });
