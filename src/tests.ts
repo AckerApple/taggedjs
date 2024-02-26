@@ -42,6 +42,46 @@ export function runTests() {
       ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'],
     )
 
+    expect(elementCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined')
+    expect(elementCount('#tag-switch-dropdown')).toBe(1)
+    expect(elementCount('#tagSwitch-1-hello')).toBe(1)
+    expect(elementCount('#tagSwitch-2-hello')).toBe(0)
+    expect(elementCount('#tagSwitch-3-hello')).toBe(0)
+
+    const dropdown = document.getElementById('tag-switch-dropdown') as HTMLSelectElement
+    dropdown.value = "1"
+    ;(dropdown as any).onchange({target:dropdown})
+
+    expect(elementCount('#tagSwitch-1-hello')).toBe(3)
+    expect(elementCount('#tagSwitch-2-hello')).toBe(0)
+    expect(elementCount('#tagSwitch-3-hello')).toBe(0)
+    expect(elementCount('#select-tag-above')).toBe(0)
+
+    dropdown.value = "2"
+    ;(dropdown as any).onchange({target:dropdown})
+
+    expect(elementCount('#tagSwitch-1-hello')).toBe(1)
+    expect(elementCount('#tagSwitch-2-hello')).toBe(2)
+    expect(elementCount('#tagSwitch-3-hello')).toBe(0)
+    expect(elementCount('#select-tag-above')).toBe(0)
+
+    dropdown.value = "3"
+    ;(dropdown as any).onchange({target:dropdown})
+
+    expect(elementCount('#tagSwitch-1-hello')).toBe(0,'Expected no hello 1s')
+    expect(elementCount('#tagSwitch-2-hello')).toBe(0)
+    expect(elementCount('#tagSwitch-3-hello')).toBe(3)
+    expect(elementCount('#select-tag-above')).toBe(0)
+
+    dropdown.value = ""
+    ;(dropdown as any).onchange({target:dropdown})
+
+    expect(elementCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined')
+    expect(elementCount('#tag-switch-dropdown')).toBe(1)
+    expect(elementCount('#tagSwitch-1-hello')).toBe(1)
+    expect(elementCount('#tagSwitch-2-hello')).toBe(0)
+    expect(elementCount('#tagSwitch-3-hello')).toBe(0)
+
     console.info('✅ all tests passed')
     return true
   } catch (error: unknown) {
@@ -49,6 +89,10 @@ export function runTests() {
     alert('❌ tests failed: ' + (error as Error).message)
     return false
   }
+}
+
+function elementCount(selector: string) {
+  return document.querySelectorAll(selector).length
 }
 
 function testDuelCounterElements(

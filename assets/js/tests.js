@@ -18,6 +18,37 @@ export function runTests() {
         testDuelCounterElements(['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'], ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display']);
         testDuelCounterElements(['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'], ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display']);
         testDuelCounterElements(['#propsDebug-🥩-0-button', '#propsDebug-🥩-0-display'], ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display']);
+        expect(elementCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined');
+        expect(elementCount('#tag-switch-dropdown')).toBe(1);
+        expect(elementCount('#tagSwitch-1-hello')).toBe(1);
+        expect(elementCount('#tagSwitch-2-hello')).toBe(0);
+        expect(elementCount('#tagSwitch-3-hello')).toBe(0);
+        const dropdown = document.getElementById('tag-switch-dropdown');
+        dropdown.value = "1";
+        dropdown.onchange({ target: dropdown });
+        expect(elementCount('#tagSwitch-1-hello')).toBe(3);
+        expect(elementCount('#tagSwitch-2-hello')).toBe(0);
+        expect(elementCount('#tagSwitch-3-hello')).toBe(0);
+        expect(elementCount('#select-tag-above')).toBe(0);
+        dropdown.value = "2";
+        dropdown.onchange({ target: dropdown });
+        expect(elementCount('#tagSwitch-1-hello')).toBe(1);
+        expect(elementCount('#tagSwitch-2-hello')).toBe(2);
+        expect(elementCount('#tagSwitch-3-hello')).toBe(0);
+        expect(elementCount('#select-tag-above')).toBe(0);
+        dropdown.value = "3";
+        dropdown.onchange({ target: dropdown });
+        expect(elementCount('#tagSwitch-1-hello')).toBe(0, 'Expected no hello 1s');
+        expect(elementCount('#tagSwitch-2-hello')).toBe(0);
+        expect(elementCount('#tagSwitch-3-hello')).toBe(3);
+        expect(elementCount('#select-tag-above')).toBe(0);
+        dropdown.value = "";
+        dropdown.onchange({ target: dropdown });
+        expect(elementCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined');
+        expect(elementCount('#tag-switch-dropdown')).toBe(1);
+        expect(elementCount('#tagSwitch-1-hello')).toBe(1);
+        expect(elementCount('#tagSwitch-2-hello')).toBe(0);
+        expect(elementCount('#tagSwitch-3-hello')).toBe(0);
         console.info('✅ all tests passed');
         return true;
     }
@@ -26,6 +57,9 @@ export function runTests() {
         alert('❌ tests failed: ' + error.message);
         return false;
     }
+}
+function elementCount(selector) {
+    return document.querySelectorAll(selector).length;
 }
 function testDuelCounterElements([button0, display0], // button, display
 [button1, display1]) {
