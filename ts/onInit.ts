@@ -10,11 +10,6 @@ function setCurrentTagSupport(support: TagSupport) {
 export function onInit(
   callback: OnInitCallback
 ) {
-  if(!setUse.memory.initCurrentSupport) {
-    console.warn('possible init issue?')
-    return
-  }
-
   if(!setUse.memory.initCurrentSupport.memory.init) {
     setUse.memory.initCurrentSupport.memory.init = callback
     callback() // fire init

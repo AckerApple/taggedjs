@@ -79,11 +79,6 @@ export class TagSupport {
     }
   
     const oldTemplater = tag.tagSupport.templater
-    /*
-    const nowProps = newTemplater.tagSupport.props // natural props
-    const oldClonedProps = oldTemplater.tagSupport.clonedProps // natural props
-    const oldProps = oldTemplater?.tagSupport.props // new props cloned
-    */
 
     const hasChanged = hasTagSupportChanged(
       oldTemplater.tagSupport,
@@ -183,7 +178,51 @@ export function hasPropChanges(
   compareToProps: Props, // new props NOT cloned props
 ) {
   const isCommonEqual = props === undefined && props === compareToProps
-  const isEqual = isCommonEqual || deepEqual(pastCloneProps, props)
+  
+  let castedProps = props
+  let castedPastProps = pastCloneProps
+
+  // check all prop functions match
+  if(typeof(props) === 'object') {
+    castedProps = {...props}
+    castedPastProps = {...(pastCloneProps || {})}
+    
+    const allFunctionsMatch = Object.entries(castedProps as any).every(([key,value]) => {
+      let compare = (pastCloneProps as any)[key]
+
+      // ensure we are comparing apples to apples as function get wrapped
+      if(compare.original) {
+        compare = compare.original
+      }
+
+      if((value as any).original) {
+        value = (value as any).original
+      }
+
+      if(!(value instanceof Function)) {
+        return true // this will be checked in deepEqual
+      }
+
+      if(!(compare instanceof Function)) {
+        return false // its a function now but was not before
+      }
+
+      if((value as any).toString() !== compare.toString()) {
+        return false // both are function but not the same
+      }
+
+      delete (castedProps as any)[key] // its a function and not needed to be compared
+      delete (castedPastProps as any)[key] // its a function and not needed to be compared
+
+      return true
+    })
+
+    if(!allFunctionsMatch) {
+      return true // a change has been detected
+    }
+  }
+
+  const isEqual = isCommonEqual || deepEqual(castedPastProps, castedProps)
   return !isEqual // if equal then no changes
 }
 

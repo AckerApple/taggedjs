@@ -1,6 +1,6 @@
 import { Tag } from "./Tag.class.js"
 import { TagSupport } from "./TagSupport.class.js"
-import { Config } from "./state"
+import { Config } from "./set.function.js"
 
 const tagUse: TagUse[] = []
 

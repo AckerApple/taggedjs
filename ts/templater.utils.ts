@@ -38,7 +38,7 @@ export class TemplaterResult {
   ) {
     const tag = this.wrapper()
     
-    tag.setSupport(tagSupport)
+    tag.tagSupport = tagSupport
     runAfterRender(tag.tagSupport, tag)
     
     this.oldest = tag
@@ -84,9 +84,8 @@ export class TemplaterResult {
     /* AFTER */
     tagSupport.latestProps = retag.tagSupport.props
     tagSupport.latestClonedProps = retag.tagSupport.clonedProps
-    // tagSupport.latestClonedProps = retag.tagSupport.latestClonedProps
 
-    retag.setSupport(tagSupport)
+    retag.tagSupport = tagSupport
   
     runAfterRender(tagSupport, retag)
   
@@ -100,7 +99,6 @@ export class TemplaterResult {
     oldest.tagSupport = oldestTagSupport || tagSupport
     oldest.tagSupport.templater = templater
   
-    // retag.setSupport(tagSupport)
     const isSameTag = existingTag && existingTag.isLikeTag(retag)
 
     // If previously was a tag and seems to be same tag, then just update current tag with new values
@@ -125,11 +123,17 @@ export type TagComponent = <T>(
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(
   props: Props,
-  templater: TemplaterResult
+  templater: TemplaterResult,
 ) {
   function callback(toCall: any, callWith: any) {
     const callbackResult = toCall(...callWith)
-    templater.newest?.ownerTag?.tagSupport.render()
+
+    const tagSupport = templater.newest?.ownerTag?.tagSupport
+
+    if(tagSupport) {
+      tagSupport.render()
+    }
+
     return callbackResult
   }
   
@@ -155,6 +159,9 @@ function resetFunctionProps(
       newProps[name] = (...args: any[]) => {
         return callback(value, args)
       }
+
+      newProps[name].original = value
+
       return
     }
 

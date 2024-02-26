@@ -38,7 +38,7 @@ export function tag<T>(
 
     if(!isPropTag) {
       // wrap props that are functions
-      alterProps(props, templater)
+      templater.tagSupport.props = alterProps(props, templater)
     }
 
     function innerTagWrap() {
@@ -46,7 +46,7 @@ export function tag<T>(
       const props = templater.tagSupport.props
 
       const tag = originalFunction(props, childSubject)
-      tag.setSupport( templater.tagSupport )
+      tag.tagSupport = templater.tagSupport
 
       if(madeSubject) {
         childSubject.value.forEach(kid => {

@@ -72,7 +72,7 @@ export function addAppTagRender(
     tagSupport.latestProps = fromTag.tagSupport.props
     tagSupport.latestClonedProps = fromTag.tagSupport.clonedProps
 
-    fromTag.setSupport(tagSupport)
+    fromTag.tagSupport = tagSupport
     runAfterRender(tag.tagSupport, tag)
     tag.updateByTag(fromTag)
 

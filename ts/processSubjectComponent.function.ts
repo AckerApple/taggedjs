@@ -68,8 +68,8 @@ export function processSubjectComponent(
   tagSupport.latestClonedProps = retag.tagSupport.clonedProps
   tagSupport.memory = retag.tagSupport.memory
 
-  retag.setSupport(tagSupport)
-
+  retag.tagSupport = tagSupport
+  
   const clones = processTagResult(
     retag,
     result, // The element set here will be removed from document. Also result.tag will be added in here

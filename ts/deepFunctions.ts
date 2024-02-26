@@ -61,7 +61,7 @@ function isDeepEqual(
   obj2: any,
   visited: WeakMap<any, any>,
 ) {
-  if (obj1 === obj2) {
+  if (obj1 === obj2 || isSameFunctions(obj1,obj2)) {
     return true
   }
 
@@ -92,10 +92,11 @@ function isDeepEqual(
   for (const key of keys1) {
     const keyFound = keys2.includes(key)
     if (!keyFound || !isDeepEqual(obj1[key], obj2[key], visited)) {
-      const bothFunction = obj1[key] instanceof Function && obj2[key] instanceof Function
-      if(bothFunction && obj1[key].toString() === obj2[key].toString()) {
+      /*
+      if(isSameFunctions(obj1[key], obj2[key])) {
         continue
       }
+      */
       return false
     }
   }
@@ -117,4 +118,12 @@ function isDeepEqual(
   }
 
   return true
+}
+
+function isSameFunctions(
+  fn0: Function,
+  fn1: Function
+): Boolean {
+  const bothFunction = fn0 instanceof Function && fn1 instanceof Function
+  return bothFunction && fn0.toString() === fn1.toString()
 }

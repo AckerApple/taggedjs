@@ -41,7 +41,7 @@ export function processTagArray(
     const lessLength = newLength < at
     const subTag = value[index - removed]
     const subArrayValue = subTag?.arrayValue
-    const destroyItem = lessLength || subArrayValue !== item.tag.arrayValue
+    const destroyItem = lessLength || !areLikeValues(subArrayValue, item.tag.arrayValue)
     
     if(destroyItem) {
       const last = result.lastArray[index]
@@ -97,7 +97,7 @@ export function processTagArray(
       }
       return []
     }
-    
+
     const nextClones = processTagResult(
       subTag,
       result,
@@ -116,4 +116,20 @@ export function processTagArray(
   })
 
   return clones
+}
+
+/** compare two values. If both values are arrays then the items will be compared */
+function areLikeValues(valueA: unknown, valueB: unknown): Boolean {
+  if(valueA === valueB) {
+    return true
+  }
+
+  const bothArrays = valueA instanceof Array && valueB instanceof Array
+  const matchLengths = bothArrays && valueA.length == valueB.length
+  if(matchLengths) {
+    return valueA.every((item, index) => item == valueB[index])
+  }
+
+  return false
+
 }

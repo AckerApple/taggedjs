@@ -20,8 +20,7 @@ export function updateExistingTag(
   // tagSupport.latestClonedProps = retag.tagSupport.latestClonedProps
   tagSupport.memory  = retag.tagSupport.memory
 
-  // retag.tagSupport = tagSupport
-  retag.setSupport( tagSupport )
+  retag.tagSupport = tagSupport
 
   templater.newest = retag
   tagSupport.newest = retag

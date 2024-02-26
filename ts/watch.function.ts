@@ -1,4 +1,4 @@
-import { state } from "./state.js"
+import { setLet } from "./setLet.function.js"
 
 export type WatchCallback = (
   currentValues: any[],
@@ -6,28 +6,27 @@ export type WatchCallback = (
 ) => unknown | ((currentValues: any[]) => unknown) | (() => unknown)
 
 /** When an item in watch array changes, callback function will be triggered */
-export function watch(
-  currentValues: unknown[],
+export function watch<T>(
+  currentValues: T[],
   callback: WatchCallback
-) {
-  let previousValues = state(undefined as undefined | unknown[])(x => [previousValues, previousValues = x])
+): T[] {
+  let previousValues = setLet(undefined as undefined | unknown[])(x => [previousValues, previousValues = x])
 
   if(previousValues === undefined) {
     callback(currentValues, previousValues)
     const result = {currentValues, previousValues}
     previousValues = currentValues
-    return result
+    return currentValues
   }
 
   const allExact = currentValues.every((item, index) => item === (previousValues as any[])[index])
 
   if(allExact) {
-    return {currentValues, previousValues}
+    return currentValues
   }
 
   callback(currentValues, previousValues)
-  const result = {currentValues, previousValues}
   previousValues = currentValues
 
-  return result
+  return currentValues
 }

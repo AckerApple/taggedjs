@@ -3,15 +3,16 @@ import { Tag } from "./Tag.class.js"
 import { TagSupport } from "./TagSupport.class.js"
 import { setUse } from "./setUse.function.js"
 
-export type StateConfig = (x?: any) => [any, any]
+export type StateConfig<T> = (x: T) => [T, T]
 
-type StateConfigItem = {
-  callback?: StateConfig
-  lastValue?: any
-  defaultValue?: any
+export type StateConfigItem<T> = {
+  callback?: StateConfig<T>
+  lastValue?: T
+  defaultValue?: T
+  watch?: T // when this value changes, the state becomes this value
 }
 
-export type StateConfigArray = StateConfigItem[]
+export type StateConfigArray = StateConfigItem<any>[]
 
 export type Config = {
   array: StateConfigArray // state memory on the first render
@@ -30,49 +31,24 @@ setUse.memory.stateConfig = {
   rearray: [] as StateConfigArray, // state memory to be used before the next render
 } as Config
 
-/** Used for variables that need to remain the same variable during render passes */
-export function state <T>(
-  defaultValue: T | (() => T)
-): (
-  x?: (y: T) => [T, T]
-) => T {
-  const config: Config = setUse.memory.stateConfig
-  let getSetMethod: StateConfig
-  
-  const restate = config.rearray[config.array.length]
-  if(restate) {
-    let oldValue = getStateValue(restate)
-    getSetMethod = (x => [oldValue, oldValue = x]) as StateConfig
-    const push: StateConfigItem = {
-      callback: getSetMethod,
-      lastValue: oldValue,
-      defaultValue: restate.defaultValue,
-    }
+type StateOptions<T> = {
+  changeWith?: T
+}
 
-    config.array.push(push)
-    
-    return (y: any) => {
-      push.callback = y || (x => [oldValue, oldValue = x])
-      return oldValue
-    }
-  }
+export type GetSet<T> = (y: T) => [T, T]
 
-  const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue
-  let initValue = defaultFn()
-
-  getSetMethod = (x => [initValue, initValue = x]) as StateConfig
-  const push: StateConfigItem = {
-    callback: getSetMethod,
-    lastValue: initValue,
-    defaultValue: initValue,
-  }
-  config.array.push(push)
-  
+export function makeStateResult<T>(
+  initValue: T,
+  push: StateConfigItem<T>,
+) {
   // return initValue
-  return (y: any) => {
+  const result =  (y: any) => {
     push.callback = y || (x => [initValue, initValue = x])
+
     return initValue
   }
+
+  return result
 }
 
 const waitingStates: (() => unknown)[] = []
@@ -125,9 +101,9 @@ setUse({
 })
 
 
-export function getStateValue(
+export function getStateValue<T>(
   // state: StateConfig,
-  state: StateConfigItem,
+  state: StateConfigItem<T>,
 ) {
   const callback = state.callback
   
@@ -135,7 +111,7 @@ export function getStateValue(
     return state.defaultValue
   }
 
-  const oldState = callback(StateEchoBack) // get value and set to undefined
+  const oldState = callback(StateEchoBack as any) // get value and set to undefined
   const [oldValue] = oldState
   const [checkValue] = callback( oldValue ) // set back to original value
 
@@ -185,4 +161,41 @@ function initState(
   if(state?.newest.length) {
     config.rearray.push( ...state.newest )
   }
+}
+
+/** Used for variables that need to remain the same variable during render passes */
+export function set <T>(
+  defaultValue: T | (() => T),
+): T {
+  const config: Config = setUse.memory.stateConfig
+  let getSetMethod: StateConfig<T>
+  
+  const restate = config.rearray[config.array.length]
+  if(restate) {
+    let oldValue = getStateValue(restate) as T
+    getSetMethod = ((x: T) => [oldValue, oldValue = x])
+    const push: StateConfigItem<T> = {
+      callback: getSetMethod,
+      lastValue: oldValue,
+      defaultValue: restate.defaultValue,
+    }
+
+    config.array.push(push)
+
+    return oldValue
+  }
+
+  // State first time run
+  const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue
+  let initValue = defaultFn()
+
+  getSetMethod = ((x: T) => [initValue, initValue = x])
+  const push: StateConfigItem<T> = {
+    callback: getSetMethod,
+    lastValue: initValue,
+    defaultValue: initValue,
+  }
+  config.array.push(push)
+  
+  return initValue
 }

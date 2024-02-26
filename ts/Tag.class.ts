@@ -8,7 +8,7 @@ import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.j
 import { buildClones } from "./render.js"
 import { interpolateElement, interpolateString } from "./interpolateElement.js"
 import { Counts, afterElmBuild } from "./interpolateTemplate.js"
-import { State } from "./state.js"
+import { State } from "./set.function.js"
 import { elementDestroyCheck } from "./elementDestroyCheck.function.js"
 import { updateExistingValue } from "./updateExistingValue.function.js"
 import { InterpolatedTemplates } from "./interpolations.js"
@@ -129,6 +129,7 @@ export class Tag {
         next()
       }
 
+
       return promise
     })
     
@@ -145,12 +146,6 @@ export class Tag {
   }
 
   lastTemplateString: string | undefined = undefined // used to compare templates for updates
-
-  /** A method of passing down the same render method */
-  setSupport(tagSupport: TagSupport) {
-    this.tagSupport = tagSupport
-    this.tagSupport.mutatingRender = tagSupport.mutatingRender
-  }
   
   updateConfig(strings: string[], values: any[]) {
     this.strings = strings
@@ -198,26 +193,6 @@ export class Tag {
         return false
       }
 
-      /*
-      // TODO: All this code can possibly be deleted?
-      const tag = value as Tag
-      if(deepCheck && isTagInstance(tag) && isTagInstance(compareTo)) {
-        // TODO: THis "is" is setting data, this is not good
-        tag.ownerTag = this // let children know I own them
-        this.children.push(tag) // record children I created        
-        tag.lastTemplateString || tag.getTemplate() // ensure last template string is generated
-        const isLikeTag = tag.isLikeTag(compareTo)
-
-        console.log('🎃', {isLikeTag})
-
-        if(isLikeTag) {
-          return true
-        }
-
-        return false
-      }
-      */
-      
       return true
     })
 

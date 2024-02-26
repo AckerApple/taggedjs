@@ -1,3 +1,5 @@
+/** File largely responsible for reacting to element events, such as onclick */
+
 import { Tag } from "./Tag.class.js"
 
 type Callback = (...args: any[]) => any & {

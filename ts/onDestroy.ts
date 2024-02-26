@@ -9,10 +9,6 @@ let destroyCurrentTagSupport: TagSupport
 export function onDestroy(
   callback: OnDestroyCallback
 ) {
-  if(!destroyCurrentTagSupport.memory) {
-    console.error('xxx',destroyCurrentTagSupport)
-  }
-
   destroyCurrentTagSupport.memory.destroyCallback = callback
 }
 
