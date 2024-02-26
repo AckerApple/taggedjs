@@ -1,6 +1,6 @@
-import { html, tag, state } from "taggedjs";
+import { html, tag, setLet } from "taggedjs";
 export const contentDebug = tag(() => {
-    let renderCount = state(0)(x => [renderCount, renderCount = x]);
+    let renderCount = setLet(0)(x => [renderCount, renderCount = x]);
     ++renderCount;
     return html `
     <div style="font-size:0.8em">You should see "0" here => "${0}"</div>

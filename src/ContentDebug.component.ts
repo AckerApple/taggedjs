@@ -1,7 +1,7 @@
-import { html, tag, state } from "taggedjs"
+import { html, tag, setLet } from "taggedjs"
 
 export const contentDebug = tag(() => {
-  let renderCount: number = state(0)(x => [renderCount, renderCount=x])
+  let renderCount: number = setLet(0)(x => [renderCount, renderCount=x])
 
   ++renderCount
 

@@ -3,7 +3,7 @@
     "save": "git add . && git commit -m \"patch\" && git push",
     "start": "npm run build:js:watch & npm run start:hmr",
     "start:hmr": "dir=assets/js node tagged-hmr.js",
-    "build": "npm run build:js && npm run build:hmr",
+    "build": "run-s build:js build:bundle build:hmr",
     "build:bundle": "node runBundleScript.js",
     "build:hmr": "node hmr/runBundleScript.js",
     "build:js": "tsc -p tsconfig.json",
@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "express": "^4.18.2",
+    "npm-run-all": "^4.1.5",
     "serve-static": "^1.15.0",
     "typescript": "^5.3.3",
     "webpack": "^5.89.0",

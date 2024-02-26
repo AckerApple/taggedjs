@@ -1,11 +1,11 @@
 import { GatewayTest } from "./GatewayTest.js"
 import { renderCountDiv } from "./renderCount.component.js"
-import { state, html, tag, tagGateway } from "taggedjs"
+import { setLet, html, tag, tagGateway, set } from "taggedjs"
 
 export const gatewayDebug = tag(function gatewayDebug() {
-  let renderCount: number = state(0)(x => [renderCount, renderCount = x])
+  let renderCount: number = setLet(0)(x => [renderCount, renderCount = x])
 
-  const gatewayData = state({test: 22})()
+  const gatewayData = set({test: 22})
 
   ++renderCount
 

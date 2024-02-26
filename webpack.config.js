@@ -1,12 +1,15 @@
 // webpack.config.js
 const path = require('path');
 
+const out = path.resolve(__dirname, 'assets', 'dist')
+console.log('building ./assets/index.js', out)
+
 module.exports = {
   mode: 'production',
-  entry: './assets/js/index.js', // Entry point of your application
+  entry: './assets/index.js', // Entry point of your application
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'assets', 'dist'),
+    path: out,
     libraryTarget: 'module',
     chunkFormat: 'module', // Specify the chunkFormat
   },
@@ -15,3 +18,5 @@ module.exports = {
   },
   target: 'node'
 };
+
+console.log('done?')

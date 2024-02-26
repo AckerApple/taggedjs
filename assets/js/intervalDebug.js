@@ -1,12 +1,12 @@
-import { state, html, tag, onInit, getCallback, onDestroy } from "taggedjs";
+import { setLet, html, tag, onInit, getCallback, onDestroy } from "taggedjs";
 const test0interval = 3000;
 const test1interval = 6000;
 export const intervalTester0 = tag(() => {
-    let intervalCount = state(0)(x => [intervalCount, intervalCount = x]);
-    let intervalId = state(undefined)(x => [intervalId, intervalId = x]);
-    let intervalId2 = state(undefined)(x => [intervalId2, intervalId2 = x]);
-    let renderCounter = state(0)(x => [renderCounter, renderCounter = x]);
-    let currentTime = state(0)(x => [currentTime, currentTime = x]);
+    let intervalCount = setLet(0)(x => [intervalCount, intervalCount = x]);
+    let intervalId = setLet(undefined)(x => [intervalId, intervalId = x]);
+    let intervalId2 = setLet(undefined)(x => [intervalId2, intervalId2 = x]);
+    let renderCounter = setLet(0)(x => [renderCounter, renderCounter = x]);
+    let currentTime = setLet(0)(x => [currentTime, currentTime = x]);
     const callback = getCallback();
     const increase = () => ++intervalCount;
     console.log('intervalId', intervalId);
@@ -60,11 +60,11 @@ export const intervalTester0 = tag(() => {
   `;
 });
 export const intervalTester1 = tag(() => {
-    let intervalCount = state(0)(x => [intervalCount, intervalCount = x]);
-    let intervalId = state(undefined)(x => [intervalId, intervalId = x]);
-    let intervalId2 = state(undefined)(x => [intervalId2, intervalId2 = x]);
-    let renderCounter = state(0)(x => [renderCounter, renderCounter = x]);
-    let currentTime = state(0)(x => [currentTime, currentTime = x]);
+    let intervalCount = setLet(0)(x => [intervalCount, intervalCount = x]);
+    let intervalId = setLet(undefined)(x => [intervalId, intervalId = x]);
+    let intervalId2 = setLet(undefined)(x => [intervalId2, intervalId2 = x]);
+    let renderCounter = setLet(0)(x => [renderCounter, renderCounter = x]);
+    let currentTime = setLet(0)(x => [currentTime, currentTime = x]);
     const callback = getCallback();
     const increase = () => ++intervalCount;
     function trackTime() {

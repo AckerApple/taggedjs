@@ -1,10 +1,10 @@
 import { animateDestroy, animateInit } from './animations.js'
 import { renderCountDiv } from './renderCount.component.js'
-import {html, state, tag} from 'taggedjs'
+import {html, set, setLet, tag} from 'taggedjs'
 
 export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
-  const array0: {name: string, scores: any[]}[] = state([])()
-  let renderCount: number = state(0)(x => [renderCount, renderCount = x])
+  const array0: {name: string, scores: any[]}[] = set([])
+  let renderCount: number = setLet(0)(x => [renderCount, renderCount = x])
 
   const getNewPerson = () => ({
     name: 'Person '+array0.length,
@@ -16,12 +16,10 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
 
   ++renderCount
 
-  console.log(22)
-
   return html`<!--arrayTests.js-->
-    <div style="display:flex;flex-wrap:wrap">
+    <div style="display:flex;flex-wrap:wrap;gap:1em">
       ${array0.map((item,index) => html`
-        <div oninit=${animateInit} ondestroy=${animateDestroy}>
+        <div oninit=${animateInit} ondestroy=${animateDestroy} style="background-color:black;">
           <div>
             name:${item.name}
           </div>
@@ -42,12 +40,30 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
             array0.splice(index,0,getNewPerson())
           }}>add before</button>
         </div>
-      `)}
+      `.key(item))}
     </div>
 
     <button onclick=${() => {
       array0.push(getNewPerson())
     }}>push item ${array0.length+1}</button>
+
+    <button onclick=${() => {
+      array0.push(getNewPerson())
+      array0.push(getNewPerson())
+      array0.push(getNewPerson())
+    }}>push 3 items</button>
+
+    <button onclick=${() => {
+      array0.push(getNewPerson())
+      array0.push(getNewPerson())
+      array0.push(getNewPerson())
+      array0.push(getNewPerson())
+      array0.push(getNewPerson())
+      array0.push(getNewPerson())
+      array0.push(getNewPerson())
+      array0.push(getNewPerson())
+      array0.push(getNewPerson())
+    }}>push 9 items</button>
 
     ${array0.length && html`
       <button onclick=${() => {
@@ -58,7 +74,6 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
     ${renderCountDiv({renderCount, name: 'arrayTests.ts'})}
   `
 })
-
 
 const scoreData = tag(function ScoreData(score: {score: number, frame: number}) {
   return html`${score.frame}:${score.score}`

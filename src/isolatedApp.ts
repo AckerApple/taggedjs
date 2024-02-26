@@ -1,6 +1,9 @@
 import { childTests } from "./childTests.js"
 import { html, tag } from "taggedjs"
 import { gatewayDebug } from "./gatewayDebug.component.js"
+import { arrayTests } from "./arrayTests.js"
+import { tagSwitchDebug } from "./tagSwitchDebug.component.js"
+import { propsDebugMain } from "./PropsDebug.component.js"
 
 export const IsolatedApp = tag(() => {
   // const component = childTests() as any
@@ -11,10 +14,31 @@ export const IsolatedApp = tag(() => {
 
     <div id="tagDebug-fx-wrap">
       <div style="display:flex;flex-wrap:wrap;gap:1em">
+        ${/*
+          <fieldset style="flex:2 2 20em">
+            <legend>gatewayDebug</legend>
+            ${gatewayDebug()}
+          </fieldset>*/false
+        }
+
         <fieldset style="flex:2 2 20em">
-          <legend>gatewayDebug</legend>
-          ${gatewayDebug()}
+          <legend>propsDebugMain</legend>
+          ${propsDebugMain()}
         </fieldset>
+
+        ${/*
+          <fieldset style="flex:2 2 20em">
+            <legend>tagSwitchDebug</legend>
+            ${tagSwitchDebug()}
+          </fieldset>
+        */false}
+
+        ${/*
+        <fieldset style="flex:2 2 20em">
+          <legend>arrays</legend>
+          ${arrayTests()}
+        </fieldset>
+        */false}
 
         ${/*
           <fieldset style="flex:2 2 20em">
@@ -24,8 +48,8 @@ export const IsolatedApp = tag(() => {
         */false}
 
         ${/*
-          <textarea style="min-width:50vw;height:400px">${ template.string }</textarea>
-          <textarea style="min-width:50vw;height:400px">${ JSON.stringify(template, null, 2) }</textarea>
+          <textarea style="font-size:0.6em;min-width:50vw;height:400px">${ template.string }</textarea>
+          <textarea style="font-size:0.6em;min-width:50vw;height:400px">${ JSON.stringify(template, null, 2) }</textarea>
           */ false
         }
       </div>

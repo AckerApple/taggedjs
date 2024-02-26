@@ -20,13 +20,13 @@
   <table cellPadding="0" cellSpacing="0" border="0" style="width: 100%;height: 100%;">
     <tr>
       <td valign="center" style="text-align: center;">
-        <app tag url="./assets/dist/bundle.js" name="App"></app>
+        <app></app>
       </td>
     </tr>
   </table>
   <script type="module">
-    import { App, tagElement } from './assets/dist/bundle.js'
-    
+    import { App, hmr } from './assets/dist/bundle.js'
+    const { tagElement } = hmr
     const element = document.getElementsByTagName('app')[0]
     tagElement(App, element)
   </script>

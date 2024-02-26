@@ -1,9 +1,10 @@
-import { html, state, tag, isSubjectInstance, isTagArray } from "taggedjs";
+import { html, setLet, tag, isSubjectInstance, isTagArray } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
 export const innerHtmlTest = tag((_props, children) => {
-    let renderCount = state(0)(x => [renderCount, renderCount = x]);
-    let counter = state(0)(x => [counter, counter = x]);
+    let renderCount = setLet(0)(x => [renderCount, renderCount = x]);
+    let counter = setLet(0)(x => [counter, counter = x]);
     ++renderCount;
+    console.log('----- innerHtmlTest renderCount -----', { renderCount, counter });
     return html `<!--innerHtmlTests.js-->
     <fieldset id="innerHtmlTests-1">
       <legend>no props test</legend>
@@ -16,8 +17,8 @@ export const innerHtmlTest = tag((_props, children) => {
   `;
 });
 export const innerHtmlPropsTest = tag((x, children) => {
-    let renderCount = state(0)(x => [renderCount, renderCount = x]);
-    let counter = state(0)(x => [counter, counter = x]);
+    let renderCount = setLet(0)(x => [renderCount, renderCount = x]);
+    let counter = setLet(0)(x => [counter, counter = x]);
     ++renderCount;
     return html `<!--innerHtmlTests.js-->
     <fieldset id="innerHtmlTests-2">

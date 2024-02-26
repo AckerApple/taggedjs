@@ -1,7 +1,8 @@
+const staggerBy = 300;
 export const animateInit = async ({ target, stagger }) => {
     target.style.opacity = 0;
     if (stagger) {
-        await wait(stagger * 300);
+        await wait(stagger * staggerBy);
     }
     target.style.opacity = 1;
     target.classList.add('animate__animated', 'animate__fadeInDown');
@@ -11,7 +12,7 @@ export const animateDestroy = async ({ target, stagger, capturePosition = true }
         captureElementPosition(target);
     }
     if (stagger) {
-        await wait(stagger * 300);
+        await wait(stagger * staggerBy);
     }
     target.classList.add('animate__animated', 'animate__fadeOutUp');
     await wait(1000); // don't allow remove from stage until animation completed

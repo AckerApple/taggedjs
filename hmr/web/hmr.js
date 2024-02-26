@@ -74,7 +74,7 @@ async function discoverTags() {
       const newTemplater = newApp[tagName]()
       return {newApp, newTemplater, tagName}
     } catch(err) {
-      console.error(`Could not load tag by name ${tagName}`, newApp)
+      console.error(`Could not load tag by name ${tagName}`, {newApp, url})
       throw err
     }
   })

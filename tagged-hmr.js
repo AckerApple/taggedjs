@@ -59,7 +59,7 @@ app.use((req, res, next) => {
 });
 
 const server = app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`🏃 Server is running on http://localhost:${port}`);
   console.log(`Serving path:${servePath}`);
 });
 

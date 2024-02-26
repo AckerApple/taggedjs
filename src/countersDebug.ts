@@ -1,10 +1,10 @@
 import { renderCountDiv } from "./renderCount.component.js"
-import { html, tag, Subject, onInit, state } from "taggedjs"
+import { html, tag, Subject, onInit, setLet } from "taggedjs"
 
 export const counters = tag(function Counters() {  
-  let counter = state(0)(x => [counter, counter = x])
-  let renderCount = state(0)(x => [renderCount, renderCount = x])
-  let initCounter = state(0)(x => [initCounter, initCounter = x])
+  let counter = setLet(0)(x => [counter, counter = x])
+  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
+  let initCounter = setLet(0)(x => [initCounter, initCounter = x])
 
   onInit(() => {
     ++initCounter

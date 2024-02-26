@@ -1,3 +1,4 @@
+import { expect } from "./expect";
 export function runTests() {
     try {
         expect(document.getElementById('h1-app')).toBeDefined();
@@ -8,46 +9,38 @@ export function runTests() {
         expect(toggleTest?.innerText).toBe('toggle test true');
         toggleTest?.click();
         expect(toggleTest?.innerText).toBe('toggle test');
-        testCounterElements('increase-counter', 'counter-display');
-        testCounterElements('increase-gateway-count', 'display-gateway-count');
+        testCounterElements('#increase-counter', '#counter-display');
+        testCounterElements('#increase-gateway-count', '#display-gateway-count');
+        testCounterElements('#childTests-button', '#childTests-display');
+        testCounterElements('#innerHtmlTest-childTests-button', '#innerHtmlTest-childTests-display');
         console.info('✅ all tests passed');
         return true;
     }
     catch (error) {
-        console.error('error', error);
+        console.error('❌ tests failed: ' + error.message, error);
         alert('❌ tests failed: ' + error.message);
         return false;
     }
 }
-function testCounterElements(counterButtonId, counterDisplayId) {
-    const increaseCounter = document.getElementById(counterButtonId);
-    const counterDisplay = document.getElementById(counterDisplayId);
-    expect(increaseCounter).toBeDefined();
-    expect(counterDisplay).toBeDefined();
-    let counterValue = Number(counterDisplay?.innerText);
-    increaseCounter?.click();
-    expect(counterValue + 1).toBe(counterValue = Number(counterDisplay?.innerText));
-    increaseCounter?.click();
-    expect(counterValue + 1).toBe(Number(counterDisplay?.innerText));
-}
-function expect(received) {
-    return {
-        toBeDefined: () => {
-            if (received !== undefined && received !== null) {
-                return;
-            }
-            const message = `Expected ${JSON.stringify(received)} to be defined`;
-            console.error(message, { received });
-            throw new Error(message);
-        },
-        toBe: (expected) => {
-            if (received === expected) {
-                return;
-            }
-            const message = `Expected ${JSON.stringify(received)} to be ${JSON.stringify(expected)}`;
-            console.error(message, { received, expected });
-            throw new Error(message);
-        }
-    };
+function testCounterElements(counterButtonId, counterDisplayId, { elementCountExpected } = {
+    elementCountExpected: 1
+}) {
+    // const getByIndex = (selector: string, index: number) => document.querySelectorAll(selector)[index] as unknown as HTMLElement[]
+    const increaseCounters = document.querySelectorAll(counterButtonId);
+    const counterDisplays = document.querySelectorAll(counterDisplayId);
+    console.log('increaseCounters', increaseCounters);
+    expect(increaseCounters.length).toBe(elementCountExpected, `Expected ${counterButtonId} to be ${elementCountExpected} elements but is instead ${increaseCounters.length}`);
+    expect(counterDisplays.length).toBe(elementCountExpected, `Expected ${counterDisplayId} to be ${elementCountExpected} elements but is instead ${counterDisplays.length}`);
+    increaseCounters.forEach((increaseCounter, index) => {
+        const counterDisplay = counterDisplays[index];
+        // const counterDisplay = getByIndex(index)
+        let counterValue = Number(counterDisplay?.innerText);
+        increaseCounter?.click();
+        let oldCounterValue = counterValue + 1;
+        counterValue = Number(counterDisplay?.innerText);
+        expect(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to be value ${oldCounterValue} but is instead ${counterValue}`);
+        increaseCounter?.click();
+        expect(counterValue + 1).toBe(Number(counterDisplay?.innerText));
+    });
 }
 //# sourceMappingURL=tests.js.map

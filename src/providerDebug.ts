@@ -1,5 +1,5 @@
 import { tagDebugProvider, upperTagDebugProvider } from "./tagJsDebug.js"
-import { state, html, tag, providers } from "taggedjs"
+import { setLet, html, tag, providers } from "taggedjs"
 
 export class TagDebugProvider {
   tagDebug = 0
@@ -9,9 +9,9 @@ export const providerDebug = tag(function ProviderDebug() {
   const provider = providers.inject( tagDebugProvider )
   const upperProvider = providers.inject( upperTagDebugProvider )
   const providerClass = providers.inject( TagDebugProvider )
-  
-  let showProProps: boolean = state(false)(x => [showProProps, showProProps = x])
-  let renderCount: number = state(0)(x => [renderCount, renderCount = x])
+
+  let showProProps: boolean = setLet(false)(x => [showProProps, showProProps = x])
+  let renderCount: number = setLet(0)(x => [renderCount, renderCount = x])
 
   ++renderCount
 
@@ -42,6 +42,6 @@ const testProviderAsProps = tag((
   providerClass: TagDebugProvider
 ) => {
   return html`<!--providerDebug.js@TestProviderAsProps-->
-    <textarea wrap="off" rows="20" style="width:100%">${JSON.stringify(providerClass, null, 2)}</textarea>
+    <textarea wrap="off" rows="20" style="width:100%;font-size:0.6em">${JSON.stringify(providerClass, null, 2)}</textarea>
   `
 })

@@ -1,8 +1,10 @@
+const staggerBy = 300
+
 export const animateInit = async ({target, stagger}: any) => {/* animateInit */
   target.style.opacity = 0
   
   if(stagger) {
-    await wait(stagger * 300)
+    await wait(stagger * staggerBy)
   }
 
   target.style.opacity = 1
@@ -15,7 +17,7 @@ export const animateDestroy = async ({target, stagger, capturePosition=true}: an
   }
 
   if(stagger) {
-    await wait(stagger * 300)
+    await wait(stagger * staggerBy)
   }
 
   target.classList.add('animate__animated','animate__fadeOutUp')

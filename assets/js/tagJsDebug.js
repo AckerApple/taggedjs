@@ -1,10 +1,10 @@
-import { propsDebug } from "./PropsDebug.component.js";
+import { propsDebugMain } from "./PropsDebug.component.js";
 import { animateDestroy, animateInit } from "./animations.js";
 import { counters } from "./countersDebug.js";
 import { arrayTests } from "./arrayTests.js";
 import { intervalTester0, intervalTester1 } from "./intervalDebug.js";
 import { TagDebugProvider, providerDebug } from "./providerDebug.js";
-import { html, tag, providers, state } from "taggedjs";
+import { html, tag, providers, setLet } from "taggedjs";
 import { gatewayDebug } from "./gatewayDebug.component.js";
 import { renderCountDiv } from "./renderCount.component.js";
 export function tagDebugProvider() {
@@ -22,14 +22,9 @@ export function upperTagDebugProvider() {
 }
 export const tagDebug = tag(() => {
     console.log('render tagDebug.js');
-    let _firstState = state('tagJsDebug.js')(x => [_firstState, _firstState = x]);
-    let showIntervals = state(false)(x => [showIntervals, showIntervals = x]);
-    let propsTest = state({ test: 33, x: 'y' })(x => [propsTest, propsTest = x]);
-    let renderCount = state(0)(x => [renderCount, renderCount = x]);
-    function propsTestChanged(event) {
-        propsTest = JSON.parse(event.target.value);
-        return propsTest;
-    }
+    let _firstState = setLet('tagJsDebug.js')(x => [_firstState, _firstState = x]);
+    let showIntervals = setLet(false)(x => [showIntervals, showIntervals = x]);
+    let renderCount = setLet(0)(x => [renderCount, renderCount = x]);
     ++renderCount;
     return html `<!-- tagDebug.js -->
     <h3 id="debugging">Debugging</h3>
@@ -66,12 +61,7 @@ export const tagDebug = tag(() => {
 
       <fieldset id="props-debug" style="flex:2 2 20em">
         <legend>Props Debug</legend>
-        <textarea wrap="off" onchange=${propsTestChanged}
-        >${JSON.stringify(propsTest, null, 2)}</textarea>
-        <pre>${JSON.stringify(propsTest, null, 2)}</pre>
-        <div><small>(renderCount:${renderCount})</small></div>
-        <hr />
-        ${propsDebug(propsTest)}
+        ${propsDebugMain()}
       </fieldset>
 
       <fieldset id="provider-debug" style="flex:2 2 20em">

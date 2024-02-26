@@ -1,7 +1,7 @@
 import { renderCountDiv } from "./renderCount.component.js";
-import { state, tag, html } from "taggedjs";
+import { setLet, tag, html } from "taggedjs";
 export const GatewayTest = tag((props) => {
-    let renderCount = state(0)(x => [renderCount, renderCount = x]);
+    let renderCount = setLet(0)(x => [renderCount, renderCount = x]);
     ++renderCount;
     return html `
     I was loaded by a gateway - props:${typeof props}:${JSON.stringify(props)}

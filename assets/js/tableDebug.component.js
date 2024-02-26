@@ -1,6 +1,6 @@
-import { html, tag, state } from "taggedjs";
+import { html, tag, setLet } from "taggedjs";
 export const tableDebug = tag(() => {
-    let showCell = state(true)(x => [showCell, showCell = x]);
+    let showCell = setLet(true)(x => [showCell, showCell = x]);
     return html `
     <div style="max-height: 800px;overflow-y: scroll;">
       <table cellPadding=${5} cellSpacing=${5} border="1">

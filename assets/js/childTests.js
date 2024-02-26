@@ -1,9 +1,9 @@
-import { html, state, tag } from "taggedjs";
+import { html, setLet, tag } from "taggedjs";
 import { innerHtmlTest } from "./innerHtmlTests.js";
 import { renderCountDiv } from "./renderCount.component.js";
 const childContentTest = tag(({ legend, id }, children) => {
-    let renderCount = state(0)(x => [renderCount, renderCount = x]);
-    let counter = state(0)(x => [counter, counter = x]);
+    let renderCount = setLet(0)(x => [renderCount, renderCount = x]);
+    let counter = setLet(0)(x => [counter, counter = x]);
     ++renderCount;
     return html `
     <fieldset id=${id} style="flex:2 2 20em">
@@ -16,22 +16,23 @@ const childContentTest = tag(({ legend, id }, children) => {
   `;
 });
 export const childTests = tag(() => {
-    let renderCount = state(0)(x => [renderCount, renderCount = x]);
-    let counter = state(0)(x => [counter, counter = x]);
+    let renderCount = setLet(0)(x => [renderCount, renderCount = x]);
+    let counter = setLet(0)(x => [counter, counter = x]);
     ++renderCount;
-    console.log('----- renderCount -----', { renderCount, counter });
+    console.log('----- childTests renderCount -----', { renderCount, counter });
     return html `
     <fieldset id="children-test" style="flex:2 2 20em">
       <legend>childTests</legend>
       
       ${ /*renderCountDiv(renderCount)}- ${renderCount*/false}
       
-      ${innerHtmlTest(html `
+      ${innerHtmlTest({}, html `
         <b>Field set body A</b>
         <hr />
-        <button
+        <button id="innerHtmlTest-childTests-button"
           onclick=${() => ++counter}
         >increase childTests inside ${counter}:${renderCount}</button>
+        <span id="innerHtmlTest-childTests-display">${counter}</span>
         ${renderCountDiv({ renderCount, name: 'childTests' })}
       `)}
 
@@ -58,7 +59,10 @@ export const childTests = tag(() => {
     `)*/false}
       
       <hr />
-      <button onclick=${() => ++counter}>increase childTests outside ${counter} - ${renderCount}</button>
+      <button id="childTests-button"
+        onclick=${() => ++counter}
+      >increase childTests outside ${counter} - ${renderCount}</button>
+      <span id="childTests-display">${counter}</span>
       ${renderCountDiv({ renderCount, name: 'childTests' })}
     </fieldset>
   `;

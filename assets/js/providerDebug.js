@@ -1,5 +1,5 @@
 import { tagDebugProvider, upperTagDebugProvider } from "./tagJsDebug.js";
-import { state, html, tag, providers } from "taggedjs";
+import { setLet, html, tag, providers } from "taggedjs";
 export class TagDebugProvider {
     tagDebug = 0;
 }
@@ -7,8 +7,8 @@ export const providerDebug = tag(function ProviderDebug() {
     const provider = providers.inject(tagDebugProvider);
     const upperProvider = providers.inject(upperTagDebugProvider);
     const providerClass = providers.inject(TagDebugProvider);
-    let showProProps = state(false)(x => [showProProps, showProProps = x]);
-    let renderCount = state(0)(x => [renderCount, renderCount = x]);
+    let showProProps = setLet(false)(x => [showProProps, showProProps = x]);
+    let renderCount = setLet(0)(x => [renderCount, renderCount = x]);
     ++renderCount;
     return html `<!--providerDebug.js-->
     <button id="increase-provider" onclick=${() => ++provider.test}
@@ -33,7 +33,7 @@ export const providerDebug = tag(function ProviderDebug() {
 });
 const testProviderAsProps = tag((providerClass) => {
     return html `<!--providerDebug.js@TestProviderAsProps-->
-    <textarea wrap="off" rows="20" style="width:100%">${JSON.stringify(providerClass, null, 2)}</textarea>
+    <textarea wrap="off" rows="20" style="width:100%;font-size:0.6em">${JSON.stringify(providerClass, null, 2)}</textarea>
   `;
 });
 //# sourceMappingURL=providerDebug.js.map

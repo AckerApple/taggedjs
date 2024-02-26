@@ -1,7 +1,7 @@
 import { attributeDebug } from "./attributeDebug.component.js";
 import { contentDebug } from "./ContentDebug.component.js";
 import { tableDebug } from "./tableDebug.component.js";
-import { html, tag, state, onInit } from "taggedjs";
+import { html, tag, setLet, onInit } from "taggedjs";
 import { tagDebug } from "./tagJsDebug.js";
 import { tagSwitchDebug } from "./tagSwitchDebug.component.js";
 import { childTests } from "./childTests.js";
@@ -9,9 +9,9 @@ import { runTests } from "./tests.js";
 import { renderCountDiv } from "./renderCount.component.js";
 export const App = tag(() => {
     console.log('render app.js');
-    let _firstState = state('app first state')(x => [_firstState, _firstState = x]);
-    let toggleValue = state(false)(x => [toggleValue, toggleValue = x]);
-    let renderCount = state(0)(x => [renderCount, renderCount = x]);
+    let _firstState = setLet('app first state')(x => [_firstState, _firstState = x]);
+    let toggleValue = setLet(false)(x => [toggleValue, toggleValue = x]);
+    let renderCount = setLet(0)(x => [renderCount, renderCount = x]);
     const toggle = () => {
         toggleValue = !toggleValue;
         console.log('toggled to', toggleValue);
@@ -22,7 +22,7 @@ export const App = tag(() => {
             if (result && manual) {
                 alert('✅ all tests passed');
             }
-        }, 10); // cause delay to be separate from renders
+        }, 3000); // cause delay to be separate from renders
     }
     ++renderCount;
     onInit(() => {
