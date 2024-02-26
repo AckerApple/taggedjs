@@ -191,7 +191,7 @@ async function rebuildTag(
   tag,
   redrawTag,
 ) {
-  const { retag } = redrawTag(tag, tag.tagSupport.templater)
+  const { retag } = redrawTag(tag.tagSupport, tag.tagSupport.templater, tag)
 
   retag.insertBefore = tag.insertBefore
 

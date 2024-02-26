@@ -4,6 +4,7 @@ import { gatewayDebug } from "./gatewayDebug.component.js"
 import { arrayTests } from "./arrayTests.js"
 import { tagSwitchDebug } from "./tagSwitchDebug.component.js"
 import { propsDebugMain } from "./PropsDebug.component.js"
+import { providerDebugBase } from "./providerDebug.js"
 
 export const IsolatedApp = tag(() => {
   // const component = childTests() as any
@@ -21,10 +22,19 @@ export const IsolatedApp = tag(() => {
           </fieldset>*/false
         }
 
+        ${/*
         <fieldset style="flex:2 2 20em">
           <legend>propsDebugMain</legend>
           ${propsDebugMain()}
         </fieldset>
+        */false}
+
+        ${/*
+          <fieldset style="flex:2 2 20em">
+            <legend>providerDebugBase</legend>
+            ${providerDebugBase()}
+          </fieldset>
+        */false}
 
         ${/*
           <fieldset style="flex:2 2 20em">
@@ -40,12 +50,10 @@ export const IsolatedApp = tag(() => {
         </fieldset>
         */false}
 
-        ${/*
-          <fieldset style="flex:2 2 20em">
-            <legend>Children Tests</legend>
-            ${childTests()}
-          </fieldset>
-        */false}
+        <fieldset style="flex:2 2 20em">
+          <legend>Children Tests</legend>
+          ${childTests()}
+        </fieldset>
 
         ${/*
           <textarea style="font-size:0.6em;min-width:50vw;height:400px">${ template.string }</textarea>

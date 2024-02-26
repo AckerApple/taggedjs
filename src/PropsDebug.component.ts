@@ -20,7 +20,10 @@ export const propsDebugMain = tag(() => {
     
     <div><small>(renderCount:${renderCount})</small></div>
     
-    <button onclick=${() => ++propNumber}>propNumber ${propNumber}</button>
+    <div>
+      <button id="propsDebug-🥩-0-button" onclick=${() => ++propNumber}>propNumber ${propNumber}</button>
+      <span id="propsDebug-🥩-0-display">${propNumber}</span>
+    </div>
     
     <fieldset>
       <legend>child</legend>
@@ -73,8 +76,16 @@ const propsDebug = tag((
     <h3>Props Number</h3>
     
     <textarea style="font-size:0.6em;height:200px;width:100%;color:white;" wrap="off" disabled>${ JSON.stringify(watchResults, null, 2) }</textarea>
-    <button onclick=${() => propNumberChange(++propNumber)}>propNumber ${propNumber}</button>
-    <button onclick=${() => ++renderCount}>renderCount ${renderCount}</button>
+    
+    <div>
+      <button id="propsDebug-🥩-1-button" onclick=${() => propNumberChange(++propNumber)}
+      >propNumber ${propNumber}</button>
+      <span id="propsDebug-🥩-1-display">${propNumber}</span>
+    </div>
+    <button
+      title="test of increasing render count and nothing else"
+      onclick=${() => ++renderCount}
+    >renderCount ${renderCount}</button>
     
     <button onclick=${() => ++propNumber}
       title="only changes number locally but if change by parent than that is the number"
@@ -83,7 +94,28 @@ const propsDebug = tag((
     <div><small>(propNumberChangeCount:${propNumberChangeCount})</small></div>
     
     <hr />
+    <h3>Fn update test</h3>
+    ${propFnUpdateTest({propNumber, callback: () => {
+      ++propNumber
+      console.log('increased out here', propNumber)
+    }})}
     
     ${renderCountDiv({renderCount, name: 'propsDebug'})}
+  `
+})
+
+const propFnUpdateTest = tag(({
+  propNumber, callback,
+}: {
+  propNumber: number, callback: Function
+}) => {
+  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
+  ++renderCount
+  return html`
+    <button
+      title="the count here and within parent increases but not in parent parent"
+      onclick=${callback}
+    >local & 1-parent increase ${propNumber}</button>
+    ${renderCountDiv({renderCount, name: 'propFnUpdateTest'})}
   `
 })

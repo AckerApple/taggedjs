@@ -7,6 +7,8 @@ import { tagSwitchDebug } from "./tagSwitchDebug.component.js";
 import { childTests } from "./childTests.js";
 import { runTests } from "./tests.js";
 import { renderCountDiv } from "./renderCount.component.js";
+import { counters } from "./countersDebug.js";
+import { providerDebugBase } from "./providerDebug.js";
 export const App = tag(() => {
     console.log('render app.js');
     let _firstState = setLet('app first state')(x => [_firstState, _firstState = x]);
@@ -40,6 +42,16 @@ export const App = tag(() => {
       ${tagDebug()}
 
       <div style="display:flex;flex-wrap:wrap;gap:1em">
+        <fieldset id="counters" style="flex:2 2 20em">
+          <legend>counters</legend>
+          ${counters()}
+        </fieldset>
+
+        <fieldset id="provider-debug" style="flex:2 2 20em">
+          <legend>Provider Debug</legend>
+          ${providerDebugBase()}
+        </fieldset>
+
         ${childTests()}
 
         <fieldset style="flex:2 2 20em">

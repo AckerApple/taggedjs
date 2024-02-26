@@ -16,6 +16,31 @@ export function runTests() {
     testCounterElements('#increase-gateway-count', '#display-gateway-count')
     testCounterElements('#childTests-button', '#childTests-display')
     testCounterElements('#innerHtmlTest-childTests-button', '#innerHtmlTest-childTests-display')
+    
+    testDuelCounterElements(
+      ['#increase-provider-🍌-0-button', '#increase-provider-🍌-0-display'],
+      ['#increase-provider-🍌-1-button', '#increase-provider-🍌-1-display'],
+    )
+
+    testDuelCounterElements(
+      ['#increase-provider-upper-🌹-0-button', '#increase-provider-upper-🌹-0-display'],
+      ['#increase-provider-upper-🌹-1-button', '#increase-provider-upper-🌹-1-display'],
+    )
+
+    testDuelCounterElements(
+      ['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'],
+      ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display'],
+    )
+
+    testDuelCounterElements(
+      ['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'],
+      ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display'],
+    )
+
+    testDuelCounterElements(
+      ['#propsDebug-🥩-0-button', '#propsDebug-🥩-0-display'],
+      ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'],
+    )
 
     console.info('✅ all tests passed')
     return true
@@ -26,6 +51,27 @@ export function runTests() {
   }
 }
 
+function testDuelCounterElements(
+  [button0, display0]: [string, string], // button, display
+  [button1, display1]: [string, string], // button, display
+) {
+  const display0Element = document.querySelectorAll(display0)[0] as HTMLElement
+  const ip0 = display0Element.innerText
+  testCounterElements(button0, display0)
+  
+  let display1Element = document.querySelectorAll(display1)[0] as HTMLElement
+  let ip1Check = display1Element.innerText
+  const value = (Number(ip0) + 2).toString()
+  expect(ip1Check).toBe(value, `Expected second increase provider to be increased to ${ip0} but got ${ip1Check}`)
+ 
+  testCounterElements(button1, display1)
+  
+  display1Element = document.querySelectorAll(display1)[0] as HTMLElement
+  ip1Check = display1Element.innerText
+  expect(ip1Check).toBe((Number(ip0) + 4).toString())
+}
+
+/** increases counter by two */
 function testCounterElements(
   counterButtonId: string,
   counterDisplayId: string,
@@ -37,7 +83,6 @@ function testCounterElements(
   const increaseCounters = document.querySelectorAll(counterButtonId) as unknown as HTMLElement[]
   const counterDisplays = document.querySelectorAll(counterDisplayId) as unknown as HTMLElement[]
 
-  console.log('increaseCounters', increaseCounters)
   expect(increaseCounters.length).toBe(elementCountExpected, `Expected ${counterButtonId} to be ${elementCountExpected} elements but is instead ${increaseCounters.length}`)
   expect(counterDisplays.length).toBe(elementCountExpected, `Expected ${counterDisplayId} to be ${elementCountExpected} elements but is instead ${counterDisplays.length}`)
 

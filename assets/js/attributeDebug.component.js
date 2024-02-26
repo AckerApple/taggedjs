@@ -9,8 +9,6 @@ export const attributeDebug = tag(() => {
         <option value=${item} ${item == selected ? 'selected' : ''}>${item} - ${item == selected ? 'true' : 'false'}</option>
       `.key(item))}
     </select>
-    ${ /*<textarea wrap="off" style="font-size:0.6em;width:100%;height:300px" readonly>${document.getElementById('select-sample-drop-down')?.innerHTML || 'loading select html...'}</textarea>*/0}
-    ${selected}
     <hr />
     <h3>Special Attributes</h3>
     <div>

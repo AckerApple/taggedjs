@@ -1,5 +1,5 @@
+import { childTests } from "./childTests.js";
 import { html, tag } from "taggedjs";
-import { propsDebugMain } from "./PropsDebug.component.js";
 export const IsolatedApp = tag(() => {
     // const component = childTests() as any
     // const template = component.wrapper().getTemplate()
@@ -14,10 +14,19 @@ export const IsolatedApp = tag(() => {
         ${gatewayDebug()}
       </fieldset>*/false}
 
-        <fieldset style="flex:2 2 20em">
-          <legend>propsDebugMain</legend>
-          ${propsDebugMain()}
-        </fieldset>
+        ${ /*
+    <fieldset style="flex:2 2 20em">
+      <legend>propsDebugMain</legend>
+      ${propsDebugMain()}
+    </fieldset>
+    */false}
+
+        ${ /*
+      <fieldset style="flex:2 2 20em">
+        <legend>providerDebugBase</legend>
+        ${providerDebugBase()}
+      </fieldset>
+    */false}
 
         ${ /*
       <fieldset style="flex:2 2 20em">
@@ -33,12 +42,10 @@ export const IsolatedApp = tag(() => {
     </fieldset>
     */false}
 
-        ${ /*
-      <fieldset style="flex:2 2 20em">
-        <legend>Children Tests</legend>
-        ${childTests()}
-      </fieldset>
-    */false}
+        <fieldset style="flex:2 2 20em">
+          <legend>Children Tests</legend>
+          ${childTests()}
+        </fieldset>
 
         ${ /*
       <textarea style="font-size:0.6em;min-width:50vw;height:400px">${ template.string }</textarea>

@@ -61,7 +61,7 @@ export const arrayTests = tag(function ArrayTests() {
         array0.push(getNewPerson());
     }}>push 9 items</button>
 
-    ${array0.length && html `
+    ${array0.length > 0 && html `
       <button onclick=${() => {
         array0.length = 0;
     }}>remove all</button>
