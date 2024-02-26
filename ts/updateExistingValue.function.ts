@@ -2,21 +2,22 @@ import { TagSubject } from "./Tag.utils.js"
 import { TagSupport } from "./TagSupport.class.js"
 import { Subject } from "./Subject.js"
 import { TemplateRedraw, TemplaterResult } from "./templater.utils.js"
-import { isSubjectInstance, isTagArray, isTagComponent } from "./isInstance.js"
+import { isSubjectInstance, isTagArray, isTagComponent, isTagInstance } from "./isInstance.js"
 import { bindSubjectCallback } from "./bindSubjectCallback.function.js"
 import { Tag } from "./Tag.class.js"
 import { processTag } from "./processSubjectValue.function.js"
 import { TagArraySubject, processTagArray } from "./processTagArray.js"
 import { updateExistingTagComponent } from "./updateExistingTagComponent.function.js"
 import { updateExistingTag } from "./updateExistingTag.function.js"
+import { processRegularValue } from "./processRegularValue.function.js"
 
 export function updateExistingValue(
   existing: Subject<Tag> | TemplaterResult | TagSubject | TagArraySubject,
   value: TemplaterResult | TagSupport | Function | Subject<any>,
-  tag: Tag,
+  ownerTag: Tag,
 ): void {
   const subjectValue = (existing as Subject<Tag>).value
-  const ogTag: Tag = subjectValue?.tag
+  // const ogTag: Tag = subjectValue?.tag
   const tempResult = value as TemplateRedraw
   const existingSubArray = existing as TagArraySubject
   const existingSubTag = existing as TagSubject
@@ -34,7 +35,7 @@ export function updateExistingValue(
         existing as TagArraySubject,
         value as any as Tag[],
         existingSubArray.template,
-        tag,
+        ownerTag,
         {counts: {
           added: 0,
           removed: 0,
@@ -52,7 +53,7 @@ export function updateExistingValue(
   // handle already seen tag components
   if(isTagComponent(tempResult)) {
     return updateExistingTagComponent(
-      tag,
+      ownerTag,
       tempResult,
       existingSubTag as TagSubject,
       subjectValue,
@@ -100,15 +101,26 @@ export function updateExistingValue(
       )
     }
 
-    if(ogTag) {
+    if(existingSubTag.tag) {
       destroyTagMemory(existingTag, existingSubTag, subjectValue)
-      delete existingSubTag.tag
+      
+      const insertBefore = existingTag.insertBefore as Element
+
+      if(isTagInstance(tempResult)) {
+        // processTag(value, result, template, tag, options)
+        processTag(value, existing as TagSubject, insertBefore, ownerTag, {counts:{added:0, removed:0}})
+        return
+      }
+
+      processRegularValue(value, existing, insertBefore, ownerTag)
+
+      return
     }
   }
 
   // now its a function
   if(value instanceof Function) {
-    existingSubTag.set( bindSubjectCallback(value as any, tag) )
+    existingSubTag.set( bindSubjectCallback(value as any, ownerTag) )
     return
   }
 

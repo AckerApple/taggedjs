@@ -2,6 +2,7 @@ import { TagSupport } from "./TagSupport.class.js"
 import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
 import { TagComponent, TemplaterResult } from "./templater.utils.js"
 import { Tag } from "./Tag.class.js"
+import { providersChangeCheck } from "./provider.utils.js"
 
 const appElements: {tag: Tag, element: Element}[] = []
 
@@ -62,10 +63,18 @@ export function addAppTagRender(
   tagSupport: TagSupport,
   tag: Tag,
 ) {
-  let lastTag
+  let lastTag: Tag = tag
   tagSupport.mutatingRender = () => {
-    runBeforeRedraw(tag.tagSupport, tag)
+    const preRenderCount = tagSupport.memory.renderCount
+    providersChangeCheck(tag)
 
+    // When the providers were checked, a render to myself occurred and I do not need to re-render again
+    if(preRenderCount !== tagSupport.memory.renderCount) {
+      return lastTag
+    }
+    
+    runBeforeRedraw(tag.tagSupport, tag)
+    
     const templater = tagSupport.templater as TemplaterResult // wrapper
     const fromTag = lastTag = templater.wrapper()
 

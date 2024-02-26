@@ -1,6 +1,6 @@
 import { processSubjectComponent } from "./processSubjectComponent.function.js"
 import { processTagResult } from "./processTagResult.function.js"
-import { isSubjectInstance, isTagArray, isTagComponent, isTagInstance } from "./isInstance.js"
+import { isTagArray, isTagComponent, isTagInstance } from "./isInstance.js"
 import { TagArraySubject, processTagArray } from "./processTagArray.js"
 import { TemplaterResult } from "./templater.utils.js"
 import { TagSupport } from "./TagSupport.class.js"
@@ -9,6 +9,7 @@ import { Tag } from "./Tag.class.js"
 import { Counts, Template, updateBetweenTemplates } from "./interpolateTemplate.js"
 import { TagSubject } from "./Tag.utils.js"
 import { ValueSubject } from "./ValueSubject.js"
+import { processRegularValue } from "./processRegularValue.function.js"
 
 enum ValueTypes {
   tag = 'tag',
@@ -96,41 +97,11 @@ export function processSubjectValue(
   }
 }
 
-function processRegularValue(
-  value: any,
-  result: any, // could be tag via result.tag
-  template: Template, // <template end interpolate /> (will be removed)
-  tag: Tag, // owner
-) {
-  const before = result.clone || template // Either the template is on the doc OR its the first element we last put on doc
-  
-  // Processing of regular values
-  const clone = updateBetweenTemplates(
-    value,
-    before, // this will be removed
-  )
-
-  result.clone = clone // remember single element put down, for future updates
-
-  const clones: Clones = []
-  const oldPos = tag.clones.indexOf(before) // is the insertBefore guide being considered one of the tags clones?
-  const isOnlyGuideInClones = oldPos>=0 && !tag.clones.includes(clone)
-  const exchangeGuideForClone = isOnlyGuideInClones && !before.parentNode // guide is in clones AND guide is not on the document
-
-  if( exchangeGuideForClone ) {
-    tag.clones.splice(oldPos, 1) // remove insertBefore guide from tag
-    tag.clones.push(clone) // exchange guide for element actually on document
-    clones.push(clone) // record the one element that in the end is on the document
-  }
-
-  return clones
-}
-
 export function processTag(
   value: any,
   result: TagSubject | TagArraySubject, // could be tag via result.tag
   template: Template, // <template end interpolate /> (will be removed)
-  tag: Tag, // owner
+  ownerTag: Tag, // owner
   options: processOptions, // {added:0, removed:0}
 ) {
   // first time seeing this tag?
@@ -141,13 +112,13 @@ export function processTag(
     )
 
     // asking me to render will cause my parent to render
-    value.tagSupport.mutatingRender = tag.tagSupport.mutatingRender
+    value.tagSupport.mutatingRender = ownerTag.tagSupport.mutatingRender
     value.tagSupport.oldest = value.tagSupport.oldest || value
     
-    tag.children.push(value as Tag)
-    value.ownerTag = tag
+    ownerTag.children.push(value as Tag)
+    value.ownerTag = ownerTag
 
-    ;(result as any).sideTag = tag
+    ;(result as any).sideTag = ownerTag
   }
 
   // (result as any).template = template

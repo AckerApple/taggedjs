@@ -2,6 +2,7 @@ import { Props } from "./Props.js"
 import { Tag, TagMemory } from "./Tag.class.js"
 import { deepClone, deepEqual } from "./deepFunctions.js"
 import { isTagArray, isTagComponent, isTagInstance } from "./isInstance.js"
+import { providersChangeCheck } from "./provider.utils.js"
 import { Provider } from "./providers.js"
 import { TagChildren } from "./tag.js"
 import { TagComponent, TemplateRedraw, TemplaterResult, alterProps } from "./templater.utils.js"
@@ -95,62 +96,6 @@ export class TagSupport {
   }
 }
 
-function providersChangeCheck(tag: Tag) {
-  const providersWithChanges = tag.tagSupport.memory.providers.filter(provider =>
-    !deepEqual(provider.instance, provider.clone)
-  )
-
-  // reset clones
-  providersWithChanges.forEach(provider => {
-    const appElement = tag.getAppElement()
-
-    handleProviderChanges(appElement, provider)
-
-    provider.clone = deepClone(provider.instance)
-  })
-}
-
-function handleProviderChanges(
-  appElement: Tag,
-  provider: Provider,
-) {
-  const tagsWithProvider = getTagsWithProvider(appElement, provider)
-
-  tagsWithProvider.forEach(({tag, renderCount, provider}) => {
-    const unRendered = renderCount === tag.tagSupport.memory.renderCount
-    if(unRendered) {
-      provider.clone = deepClone(provider.instance)
-      tag.tagSupport.render()
-    }
-  })
-}
-
-function getTagsWithProvider(
-  tag: Tag,
-  provider: Provider,
-  memory: {
-    tag: Tag
-    renderCount: number
-    provider: Provider
-  }[] = []
-) {
-  const hasProvider = tag.tagSupport.memory.providers.find(
-    xProvider => xProvider.constructMethod === provider.constructMethod
-  )
-  
-  if(hasProvider) {
-    memory.push({
-      tag,
-      renderCount: tag.tagSupport.memory.renderCount,
-      provider: hasProvider
-    })
-  }
-
-  tag.children.forEach(child => getTagsWithProvider(child, provider, memory))
-
-  return memory
-}
-
 export function hasTagSupportChanged(
   oldTagSupport: TagSupport,
   newTagSupport: TagSupport,
@@ -160,7 +105,7 @@ export function hasTagSupportChanged(
   const oldClonedProps = oldTagSupport.latestClonedProps
 
   const propsChanged = hasPropChanges(latestProps, oldClonedProps, oldProps)
-  
+
   // if no changes detected, no need to continue to rendering further tags
   if(propsChanged) {
     return true
@@ -178,6 +123,10 @@ export function hasPropChanges(
   compareToProps: Props, // new props NOT cloned props
 ) {
   const isCommonEqual = props === undefined && props === compareToProps
+
+  if(isCommonEqual) {
+    return false
+  }
   
   let castedProps = props
   let castedPastProps = pastCloneProps
@@ -226,11 +175,11 @@ export function hasPropChanges(
     })
 
     if(!allFunctionsMatch) {
-      return true // a change has been detected
+      return true // a change has been detected by function comparisons
     }
   }
 
-  const isEqual = isCommonEqual || deepEqual(castedPastProps, castedProps)
+  const isEqual = deepEqual(pastCloneProps, props)
   return !isEqual // if equal then no changes
 }
 

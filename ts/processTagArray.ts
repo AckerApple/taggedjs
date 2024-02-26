@@ -67,7 +67,8 @@ export function processTagArray(
     subTag.tagSupport = new TagSupport({} as TemplaterResult, new ValueSubject([]))
         
     subTag.tagSupport.mutatingRender = () => {
-      ownerTag.tagSupport.render()
+      // ownerTag.tagSupport.render()
+      // subTag.tagSupport.render()
       return subTag
     } // fake having a render function
 
@@ -91,10 +92,18 @@ export function processTagArray(
     if (result.lastArray.length > index) {
       const previous = result.lastArray[index]
 
-      const isSame = previous.tag.arrayValue === subTag.arrayValue
+      const isSame = areLikeValues(previous.tag.arrayValue, subTag.arrayValue)
       if (isSame) {
-        previous.tag.updateValues(subTag.values)
+        // previous.tag.updateValues(subTag.values)
+        previous.tag.updateByTag(subTag)
+        return []
       }
+
+      /*
+      previous.tag.destroy()
+      ++removed
+      ++options.counts.removed
+      */
       return []
     }
 

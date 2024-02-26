@@ -4,7 +4,7 @@ import { elementInitCheck } from "./elementInitCheck.js"
 import { Clones } from "./Clones.type.js"
 import { processSubjectValue } from "./processSubjectValue.function.js"
 
-export type Template = Element & {clone: any}
+export type Template = Element & {clone?: any}
 
 export function interpolateTemplate(
   template: Template, // <template end interpolate /> (will be removed)

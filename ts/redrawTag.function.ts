@@ -3,13 +3,11 @@ import { TemplaterResult } from "./templater.utils.js"
 import { Tag } from "./Tag.class.js"
 
 export function redrawTag(
-  existingTag: Tag | undefined,
+  tagSupport: TagSupport,
   templater: TemplaterResult, // latest tag function to call for rendering
+  existingTag?: Tag,
   ownerTag?: Tag,
 ) {
-  // TODO: The or condition here may not be needed since its an obvious "re"draw
-  const tagSupport = existingTag?.tagSupport || new TagSupport(templater, templater.tagSupport.children)
-
   const result = templater.renderWithSupport(
     tagSupport,
     existingTag,

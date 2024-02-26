@@ -9,11 +9,13 @@ export type Provider = {
   clone: any
 }
 
+type ProviderConstructor<T> = (new (...args: any[]) => T) | (() => T)
+
 // TODO: rename
 setUse.memory.providerConfig = {
   providers: [] as Provider[],
 
-  currentTagSupport: undefined as TagSupport | undefined,
+  //currentTagSupport: undefined as TagSupport | undefined,
   ownerTag: undefined as Tag | undefined,
 }
 
@@ -54,7 +56,7 @@ export const providers = {
    * @param {(new (...args: any[]) => T) | () => T} constructor 
    * @returns {T}
    */
-  inject: (constructor: any) => {
+  inject: <T>(constructor: ProviderConstructor<T>): T => {
     const oldValue = get(constructor)
     if(oldValue) {
       return oldValue.instance
@@ -118,7 +120,7 @@ function run(
   // tag: Tag,
 ) {
   const config = setUse.memory.providerConfig
-  config.currentTagSuport = tagSupport
+  // config.currentTagSupport = tagSupport
   
   config.ownerTag = ownerTag
   

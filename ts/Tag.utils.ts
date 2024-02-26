@@ -24,12 +24,12 @@ export function setValueRedraw(
   existing: TagSubject,
   ownerTag: Tag,
 ) {
-  // const oldCount = existing.tagSupport?.memory.renderCount
-
   // redraw does not communicate to parent
-  templater.redraw = () => {
-    const existingTag = existing.tag as Tag    
-    const {remit, retag} = redrawTag(existingTag, templater, ownerTag)
+  templater.redraw = () => {    
+    const existingTag = existing.tag
+    const tagSupport = existingTag?.tagSupport || new TagSupport(templater, templater.tagSupport.children)
+
+    const {remit, retag} = redrawTag(tagSupport, templater, existingTag, ownerTag)
 
     existing.tagSupport = retag.tagSupport
 

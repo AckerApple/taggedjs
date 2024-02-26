@@ -1,7 +1,7 @@
 import { TagSubject, setValueRedraw } from "./Tag.utils.js"
 import { deepClone } from "./deepFunctions.js"
 import { TemplateRedraw } from "./templater.utils.js"
-import { isTagInstance } from "./isInstance.js"
+import { isTagComponent, isTagInstance } from "./isInstance.js"
 import { Tag } from "./Tag.class.js"
 import { destroyTagMemory } from "./updateExistingValue.function.js"
 import { hasTagSupportChanged } from "./TagSupport.class.js"
@@ -35,7 +35,7 @@ export function updateExistingTagComponent(
   const latestProps = tempResult.tagSupport.props
   const oldTagSetup = existingTag.tagSupport
   oldTagSetup.latestProps = latestProps
-  
+
   if(!isSameTag) {
     // TODO: this may not be in use
     destroyTagMemory(existingTag, existingSubject, subjectValue)
@@ -66,8 +66,6 @@ export function updateExistingTagComponent(
 
   existingSubject.value.tag = oldTagSetup.newest = redraw
   oldTagSetup.latestClonedProps = tempResult.tagSupport.clonedProps
-  // oldTagSetup.latestClonedProps = tempResult.tagSupport.latestClonedProps
-
 
   if(!isSameTag) {
     existingSubject.tag = redraw

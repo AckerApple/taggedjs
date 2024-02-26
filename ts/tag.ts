@@ -36,14 +36,16 @@ export function tag<T>(
 
     const templater: TemplaterResult = new TemplaterResult(props, childSubject)
 
+    /*
     if(!isPropTag) {
       // wrap props that are functions
       templater.tagSupport.props = alterProps(props, templater)
     }
+    */
 
     function innerTagWrap() {
       const originalFunction = innerTagWrap.original as TagComponent
-      const props = templater.tagSupport.props
+      const props = alterProps(templater.tagSupport.props, templater) // templater.tagSupport.props
 
       const tag = originalFunction(props, childSubject)
       tag.tagSupport = templater.tagSupport

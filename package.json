@@ -22,7 +22,7 @@
     "patch:version": "npm --no-git-tag-version version patch",
     "publish": "npm run build:dist && npm run save:dist && cd ../dist && npm publish",
     "build:watch": "chokidar 'ts/**/*' -c 'npm run build'",
-    "build:watch:dump": "chokidar 'ts/**/*' -c 'npm run build && npm run build:dump'"
+    "build:watch:dump": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:dist:only && npm run build:dump'"
   },
   "keywords": [
     "react",

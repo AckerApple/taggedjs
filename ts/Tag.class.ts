@@ -1,10 +1,8 @@
-import { TagSubject, getSubjectFunction, setValueRedraw } from "./Tag.utils.js"
+import { TagSubject } from "./Tag.utils.js"
 import { TagSupport } from "./TagSupport.class.js"
 import { Provider } from "./providers.js"
-import { ValueSubject } from "./ValueSubject.js"
 import { Subscription } from "./Subject.js"
 import { runBeforeDestroy } from "./tagRunner.js"
-import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js"
 import { buildClones } from "./render.js"
 import { interpolateElement, interpolateString } from "./interpolateElement.js"
 import { Counts, afterElmBuild } from "./interpolateTemplate.js"
@@ -12,6 +10,7 @@ import { State } from "./set.function.js"
 import { elementDestroyCheck } from "./elementDestroyCheck.function.js"
 import { updateExistingValue } from "./updateExistingValue.function.js"
 import { InterpolatedTemplates } from "./interpolations.js"
+import { processNewValue } from "./processNewValue.function.js"
 
 export const variablePrefix = '__tagvar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -143,6 +142,12 @@ export class Tag {
   updateByTag(tag: Tag) {
     this.updateConfig(tag.strings, tag.values)
     this.tagSupport.templater = tag.tagSupport.templater
+    /*
+    this.tagSupport.props = tag.tagSupport.props
+    this.tagSupport.latestClonedProps = tag.tagSupport.latestClonedProps
+    // TODO: below most likely can be deleted
+    this.tagSupport.clonedProps = tag.tagSupport.clonedProps
+    */
   }
 
   lastTemplateString: string | undefined = undefined // used to compare templates for updates
@@ -315,41 +320,4 @@ type DestroyOptions = {
 export type ElementBuildOptions = {
   counts: Counts
   forceElement?: boolean
-}
-
-export function processNewValue(
-  hasValue: boolean,
-  value: any,
-  context: Context,
-  variableName: string,
-  tag: Tag,
-) {
-  if(isTagComponent(value)) {
-    const existing = context[variableName] = new ValueSubject(value) as TagSubject
-    setValueRedraw(value, existing, tag)
-    return
-  }
-
-  if(value instanceof Function) {
-    context[variableName] = getSubjectFunction(value, tag)
-    return
-  }
-
-  if(!hasValue) {
-    return // more strings than values, stop here
-  }
-
-  if(isTagInstance(value)) {
-    value.ownerTag = tag
-    tag.children.push(value)
-    context[variableName] = new ValueSubject(value)
-    return
-  }
-
-  if(isSubjectInstance(value)) {
-    context[variableName] = value
-    return
-  }
-
-  context[variableName] = new ValueSubject(value)
 }
