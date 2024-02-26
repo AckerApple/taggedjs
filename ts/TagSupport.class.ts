@@ -184,11 +184,19 @@ export function hasPropChanges(
 
   // check all prop functions match
   if(typeof(props) === 'object') {
+    if(!pastCloneProps) {
+      return true
+    }
+
     castedProps = {...props}
     castedPastProps = {...(pastCloneProps || {})}
     
     const allFunctionsMatch = Object.entries(castedProps as any).every(([key,value]) => {
-      let compare = (pastCloneProps as any)[key]
+      let compare = (castedPastProps as any)[key]
+
+      if(!compare) {
+        return false
+      }
 
       // ensure we are comparing apples to apples as function get wrapped
       if(compare.original) {
