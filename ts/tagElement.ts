@@ -25,10 +25,12 @@ export function tagElement(
   // have a function setup and call the tagWrapper with (props, {update, async, on})
   const result = applyTagUpdater(wrapper)
   const {tag, tagSupport} = result
+  // wrapper.tagSupport = tagSupport
 
   tag.appElement = element
-  
-  addAppTagRender(tagSupport, tag)
+  tag.tagSupport.oldest = tag
+
+  addAppTagRender(tag.tagSupport, tag)
     
   const templateElm = document.createElement('template')
   templateElm.setAttribute('tag-detail','app-template-placeholder')
@@ -51,9 +53,7 @@ export function applyTagUpdater(
 
   // Call the apps function for our tag templater
   const tag = wrapper.wrapper()
-
-  tag.tagSupport = tagSupport
-  runAfterRender(tag.tagSupport, tag)
+  runAfterRender(tagSupport, tag)
   
   return { tag, tagSupport }
 }
@@ -72,19 +72,17 @@ export function addAppTagRender(
     if(preRenderCount !== tagSupport.memory.renderCount) {
       return lastTag
     }
-    
     runBeforeRedraw(tag.tagSupport, tag)
     
     const templater = tagSupport.templater as TemplaterResult // wrapper
     const fromTag = lastTag = templater.wrapper()
 
-    tagSupport.latestProps = fromTag.tagSupport.props
-    tagSupport.latestClonedProps = fromTag.tagSupport.clonedProps
-
-    fromTag.tagSupport = tagSupport
+    fromTag.tagSupport.memory = tagSupport.memory
+    tagSupport.propsConfig = {...fromTag.tagSupport.propsConfig}
+    tag.tagSupport.newest = fromTag
     runAfterRender(tag.tagSupport, tag)
-    tag.updateByTag(fromTag)
 
+    ;(tagSupport.oldest as Tag).updateByTag(fromTag)
     tagSupport.newest = fromTag
 
     return lastTag

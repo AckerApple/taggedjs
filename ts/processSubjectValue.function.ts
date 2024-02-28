@@ -48,7 +48,7 @@ export function processSubjectValue(
   value: any,
   result: TagArraySubject | TagSubject, // could be tag via result.tag
   template: Template, // <template end interpolate /> (will be removed)
-  tag: Tag, // owner
+  ownerTag: Tag, // owner
   options: processOptions, // {added:0, removed:0}
 ): ClonesAndPromise {
   const valueType = getValueType(value)
@@ -70,17 +70,17 @@ export function processSubjectValue(
   switch (valueType) {
     case ValueTypes.tag:
       return {
-        clones: processTag(value, result, template, tag, options)
+        clones: processTag(value, result, template, ownerTag, options)
       }
   
     case ValueTypes.tagArray:
       return {
-        clones: processTagArray(result as TagArraySubject, value, template, tag, options)
+        clones: processTagArray(result as TagArraySubject, value, template, ownerTag, options)
       }
       
     case ValueTypes.tagComponent:
       return {
-        clones: processSubjectComponent(value, result as TagSubject, template, tag, options)
+        clones: processSubjectComponent(value, result as TagSubject, template, ownerTag, options)
       }
   }
 
@@ -93,7 +93,7 @@ export function processSubjectValue(
   }
 
   return {
-    clones: processRegularValue(value, result, template, tag)
+    clones: processRegularValue(value, result, template, ownerTag)
   }
 }
 
@@ -106,19 +106,26 @@ export function processTag(
 ) {
   // first time seeing this tag?
   if(!value.tagSupport) {
+    if((result as TagSubject).tagSupport) {
+      throw new Error('586')
+    }
+
     value.tagSupport = new TagSupport(
       {} as TemplaterResult, // the template is provided via html`` call
       new ValueSubject([]), // no children
     )
 
     // asking me to render will cause my parent to render
-    value.tagSupport.mutatingRender = ownerTag.tagSupport.mutatingRender
+    value.tagSupport.mutatingRender = () => {
+      if(value.tagSupport === ownerTag.tagSupport) {
+        throw new Error('787')
+      }
+      ownerTag.tagSupport.render()
+    }
     value.tagSupport.oldest = value.tagSupport.oldest || value
     
     ownerTag.children.push(value as Tag)
     value.ownerTag = ownerTag
-
-    ;(result as any).sideTag = ownerTag
   }
 
   // (result as any).template = template

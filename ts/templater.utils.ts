@@ -6,6 +6,8 @@ import { setUse } from "./setUse.function.js"
 import { Props } from "./Props.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { TagChildren } from "./tag.js"
+import { deepClone } from "./deepFunctions.js"
+import { getStateValue } from "./set.function.js"
 
 export type Wrapper = (() => Tag) & {
   original: () => Tag
@@ -37,9 +39,7 @@ export class TemplaterResult {
     ownerTag: Tag,
   ) {
     const tag = this.wrapper()
-    
-    tag.tagSupport = tagSupport
-    runAfterRender(tag.tagSupport, tag)
+    runAfterRender(tagSupport, tag)
     
     this.oldest = tag
     tagSupport.oldest = tag
@@ -61,13 +61,10 @@ export class TemplaterResult {
 
       const runtimeOwnerTag = existingTag?.ownerTag || ownerTag
 
-      if(tagSupport.oldest) {
-        // ensure props are the last ones used
-        tagSupport.props = tagSupport.latestProps
-        tagSupport.clonedProps = tagSupport.latestClonedProps
-        // tagSupport.latestClonedProps = tagSupport.latestClonedProps
+      if(existingTag) {
+        tagSupport.propsConfig = {...existingTag.tagSupport.propsConfig}
     
-        runBeforeRedraw(tagSupport, tagSupport.oldest)
+        runBeforeRedraw(tagSupport, existingTag)
       } else {
         // first time render
         runBeforeRender(tagSupport, runtimeOwnerTag as Tag)
@@ -82,11 +79,7 @@ export class TemplaterResult {
     const retag = templater.wrapper()
 
     /* AFTER */
-    tagSupport.latestProps = retag.tagSupport.props
-    tagSupport.latestClonedProps = retag.tagSupport.clonedProps
 
-    retag.tagSupport = tagSupport
-  
     runAfterRender(tagSupport, retag)
   
     templater.newest = retag
@@ -95,15 +88,15 @@ export class TemplaterResult {
     const oldest = tagSupport.oldest = tagSupport.oldest || retag
     tagSupport.newest = retag
   
-    const oldestTagSupport = oldest.tagSupport
-    oldest.tagSupport = oldestTagSupport || tagSupport
     oldest.tagSupport.templater = templater
+    oldest.tagSupport.memory = retag.tagSupport.memory
   
     const isSameTag = existingTag && existingTag.isLikeTag(retag)
 
     // If previously was a tag and seems to be same tag, then just update current tag with new values
     if(isSameTag) {
-      oldest.updateByTag(retag)
+      existingTag.updateByTag(retag)
+
       return {remit: false, retag}
     }
 
@@ -152,10 +145,23 @@ function resetFunctionProps(
     return props
   }
 
-  const newProps = {...props}
+  const newProps = props
+  // BELOW: Do not clone because if first argument is object, the memory ref back is lost
+  // const newProps = {...props} 
 
   Object.entries(newProps).forEach(([name, value]) => {
     if(value instanceof Function) {
+      const original = newProps[name].original
+      
+      if(original) {
+        newProps[name] = (...args: any[]) => {
+          return callback(value, args)
+        }
+  
+        newProps[name].original = original
+        return // already previously converted
+      }
+
       newProps[name] = (...args: any[]) => {
         return callback(value, args)
       }
@@ -164,8 +170,6 @@ function resetFunctionProps(
 
       return
     }
-
-    newProps[name] = value
   })
 
   return newProps

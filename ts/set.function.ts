@@ -31,10 +31,6 @@ setUse.memory.stateConfig = {
   rearray: [] as StateConfigArray, // state memory to be used before the next render
 } as Config
 
-type StateOptions<T> = {
-  changeWith?: T
-}
-
 export type GetSet<T> = (y: T) => [T, T]
 
 export function makeStateResult<T>(
@@ -68,7 +64,7 @@ setUse({
   beforeRedraw: (tagSupport: TagSupport) => initState(tagSupport),
   afterRender: (
     tagSupport: TagSupport,
-    tag: Tag,
+    // tag: Tag,
   ) => {
     const state: State = tagSupport.memory.state
     const config: Config = setUse.memory.stateConfig
@@ -85,11 +81,8 @@ setUse({
       }
     }
     
-    // config.rearray.length = 0 // clean up any previous runs
     config.rearray = [] // clean up any previous runs
 
-    // state.newest.length = 0
-    // state.newest.push(...config.array) as any
     state.newest = [...config.array]
     
     // config.array.length = 0

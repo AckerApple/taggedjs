@@ -25,14 +25,45 @@ export function setValueRedraw(
   ownerTag: Tag,
 ) {
   // redraw does not communicate to parent
-  templater.redraw = () => {    
+  templater.redraw = () => {
+    /*
+    if(!existing.tag) {
+      throw new Error('no tag on redraw')
+    }
+    */
+
     const existingTag = existing.tag
-    const tagSupport = existingTag?.tagSupport || new TagSupport(templater, templater.tagSupport.children)
+    // const tagSupport = existingTag?.tagSupport || new TagSupport(templater, templater.tagSupport.children)
+    // const tagSupport = templater.tagSupport
+    
+    const newest = templater.tagSupport.newest
+    // const oldest = templater.tagSupport.oldest
+    
+    // const tagSupport = oldest?.tagSupport || templater.tagSupport
+    /*
+    if(!existingTag) {
+      throw new Error('bad redraw')
+    }
+    */
+    const tagSupport = existingTag?.tagSupport || templater.tagSupport
 
-    const {remit, retag} = redrawTag(tagSupport, templater, existingTag, ownerTag)
+    /*
+    if(Object.keys(tagSupport.memory.context).length === 0) {
+      throw new Error('yo issue here')
+    }
+    */
 
-    existing.tagSupport = retag.tagSupport
+    const {remit, retag} = redrawTag(
+      tagSupport,
+      templater,
+      newest, // existingTag,
+      // existingTag,
+      ownerTag
+    )
 
+    // ???
+    // existing.tagSupport = retag.tagSupport
+    
     if(!remit) {
       return
     }

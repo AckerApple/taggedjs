@@ -1,6 +1,7 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
 import { Tag } from "./Tag.class.js"
+import { getStateValue } from "./set.function.js"
 
 type Callback = (...args: any[]) => any & {
   isChildOverride?: true // if this is set, then a parent tag passed children to a tag/component
@@ -31,19 +32,24 @@ export function runTagCallback(
   bindTo: unknown,
   args: any[]
 ) {
-  const renderCount = tag.tagSupport.memory.renderCount
+  const tagSupport = tag.tagSupport
+  const renderCount = tagSupport ? tagSupport.memory.renderCount : 0
+  
   const method = value.bind(bindTo)
   const callbackResult = method(...args)
+
+  const sameRenderCount = renderCount === tagSupport.memory.renderCount
   
-  if(renderCount !== tag.tagSupport.memory.renderCount) {
-    return // already rendered
+  // TODO: need to restore this
+  if(tagSupport && !sameRenderCount) {
+    // return // already rendered
   }
 
-  tag.tagSupport.render()
+  tagSupport.render()
 
   if(callbackResult instanceof Promise) {
     return callbackResult.then(() => {
-      tag.tagSupport.render()
+      tagSupport.render()
       return 'no-data-ever'
     })
   }

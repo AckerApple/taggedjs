@@ -94,9 +94,9 @@ function watchElement(
 
   function updateTag() {
     const templater = tag.tagSupport.templater
-    const oldProps = templater.tagSupport.props
+    const oldProps = templater.tagSupport.propsConfig.latest
     const newProps = parsePropsString(targetNode)
-    templater.tagSupport.props = newProps
+    templater.tagSupport.propsConfig.latest = newProps
 
     const isSameProps = JSON.stringify(oldProps) === JSON.stringify(newProps)
 
@@ -104,7 +104,7 @@ function watchElement(
       return // no reason to update, same props
     }
     
-    templater.tagSupport.latestProps = newProps
+    templater.tagSupport.propsConfig.latest = newProps
   }
   
   loadTagGateway(component)

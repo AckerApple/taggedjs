@@ -65,7 +65,7 @@ export function updateExistingValue(
   if(existingTag) {
     // its now an array
     if(isTagArray(value)) {
-      destroyTagMemory(existingTag, existingSubTag, subjectValue)
+      destroyTagMemory(existingTag, existingSubTag)
       delete existingSubTag.tag
     }
 
@@ -82,7 +82,7 @@ export function updateExistingValue(
         value,
         existing as TagSubject,
         (existing as any).template,
-        existingTag, // tag,
+        ownerTag,// existingTag, // tag,
         {
           counts: {
             added: 0,
@@ -102,7 +102,7 @@ export function updateExistingValue(
     }
 
     if(existingSubTag.tag) {
-      destroyTagMemory(existingTag, existingSubTag, subjectValue)
+      destroyTagMemory(existingTag, existingSubTag)
       
       const insertBefore = existingTag.insertBefore as Element
 
@@ -116,6 +116,8 @@ export function updateExistingValue(
 
       return
     }
+
+    throw new Error('existing value ignored')
   }
 
   // now its a function
@@ -138,10 +140,9 @@ export function updateExistingValue(
 export function destroyTagMemory(
   existingTag: Tag,
   existingSubject: TagSubject,
-  subjectValue: any
 ) {
   delete existingSubject.tag
   delete existingSubject.tagSupport
-  delete subjectValue.tagSupport
+  // delete subjectValue.tagSupport
   existingTag.destroy()
 }

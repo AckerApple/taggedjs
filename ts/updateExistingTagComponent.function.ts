@@ -1,10 +1,10 @@
 import { TagSubject, setValueRedraw } from "./Tag.utils.js"
 import { deepClone } from "./deepFunctions.js"
 import { TemplateRedraw } from "./templater.utils.js"
-import { isTagComponent, isTagInstance } from "./isInstance.js"
+import { isTagInstance } from "./isInstance.js"
 import { Tag } from "./Tag.class.js"
 import { destroyTagMemory } from "./updateExistingValue.function.js"
-import { hasTagSupportChanged } from "./TagSupport.class.js"
+import { hasTagSupportChanged } from "./hasTagSupportChanged.function.js"
 
 export function updateExistingTagComponent(
   tag: Tag,
@@ -32,13 +32,13 @@ export function updateExistingTagComponent(
     isSameTag = oldFunction === newFunction
   }
 
-  const latestProps = tempResult.tagSupport.props
+  const latestProps = tempResult.tagSupport.propsConfig.latest
   const oldTagSetup = existingTag.tagSupport
-  oldTagSetup.latestProps = latestProps
+  oldTagSetup.propsConfig.latest = latestProps
 
   if(!isSameTag) {
     // TODO: this may not be in use
-    destroyTagMemory(existingTag, existingSubject, subjectValue)
+    destroyTagMemory(existingTag, existingSubject)
   } else {
     const subjectTagSupport = subjectValue?.tagSupport
     // old props may have changed, reclone first
@@ -51,7 +51,8 @@ export function updateExistingTagComponent(
     }
 
     if(existingTag) {
-      const hasChanged = hasTagSupportChanged(oldTagSetup, tempResult.tagSupport)
+      const newTagSupport = tempResult.tagSupport
+      const hasChanged = hasTagSupportChanged(oldTagSetup, newTagSupport)
       if(!hasChanged) {
         return
       }
@@ -65,11 +66,15 @@ export function updateExistingTagComponent(
   const redraw = tempResult.redraw() as Tag
 
   existingSubject.value.tag = oldTagSetup.newest = redraw
-  oldTagSetup.latestClonedProps = tempResult.tagSupport.clonedProps
+  // oldTagSetup.propsConfig.latestCloned = tempResult.tagSupport.propsConfig.clonedProps
+  oldTagSetup.propsConfig = {...tempResult.tagSupport.propsConfig}
 
   if(!isSameTag) {
     existingSubject.tag = redraw
-    subjectValue.tagSupport = tempResult.tagSupport
+    // SAFE: It's a new tagSupport and should overwrite
+    existingSubject.tagSupport = tempResult.tagSupport
+    // ???
+    // subjectValue.tagSupport = tempResult.tagSupport
   }
 
   return

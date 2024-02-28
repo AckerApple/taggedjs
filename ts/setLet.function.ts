@@ -11,6 +11,7 @@ export function setLet <T>(
   const restate = config.rearray[config.array.length]
   if(restate) {
     let oldValue = getStateValue(restate) as T
+
     getSetMethod = ((x: T) => [oldValue, oldValue = x])
     const push: StateConfigItem<T> = {
       callback: getSetMethod,

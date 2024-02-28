@@ -11,6 +11,7 @@ import { elementDestroyCheck } from "./elementDestroyCheck.function.js"
 import { updateExistingValue } from "./updateExistingValue.function.js"
 import { InterpolatedTemplates } from "./interpolations.js"
 import { processNewValue } from "./processNewValue.function.js"
+import { deepClone } from "./deepFunctions.js"
 
 export const variablePrefix = '__tagvar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -140,14 +141,18 @@ export class Tag {
   }
 
   updateByTag(tag: Tag) {
-    this.updateConfig(tag.strings, tag.values)
-    this.tagSupport.templater = tag.tagSupport.templater
     /*
-    this.tagSupport.props = tag.tagSupport.props
-    this.tagSupport.latestClonedProps = tag.tagSupport.latestClonedProps
-    // TODO: below most likely can be deleted
-    this.tagSupport.clonedProps = tag.tagSupport.clonedProps
+    if(Object.keys(this.tagSupport.memory.context).length === 0) {
+      throw new Error('issue right here')
+    }
     */
+
+    this.updateConfig(tag.strings, tag.values)
+    
+    this.tagSupport.templater = tag.tagSupport.templater
+    this.tagSupport.propsConfig = {...tag.tagSupport.propsConfig}
+    this.tagSupport.newest = tag
+    // this.tagSupport.memory = tag.tagSupport.memory
   }
 
   lastTemplateString: string | undefined = undefined // used to compare templates for updates
@@ -180,6 +185,11 @@ export class Tag {
 
   isLikeTag(tag: Tag) {
     const {string} = tag.getTemplate()
+    
+    if(!this.lastTemplateString) {
+      throw new Error('no template here')
+    }
+
     const stringMatched = string === this.lastTemplateString
     if(!stringMatched || tag.values.length !== this.values.length) {
       return false
@@ -224,14 +234,14 @@ export class Tag {
       const value = this.values[index]
 
       // is something already there?
-      const existing = context[variableName] as TagSubject
+      const existing = variableName in context
 
       if(existing) {
+        const existing = context[variableName]
         return updateExistingValue(existing, value, this)
       }
 
       // 🆕 First time values below
-
       processNewValue(
         hasValue,
         value,

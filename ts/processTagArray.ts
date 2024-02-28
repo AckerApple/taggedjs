@@ -6,6 +6,8 @@ import { Counts } from "./interpolateTemplate.js"
 import { processTagResult } from "./processTagResult.function.js"
 import { TemplaterResult } from "./templater.utils.js"
 import { ArrayNoKeyError } from "./errors.js"
+import { TagSubject } from "./Tag.utils.js"
+import { redrawTag } from "./redrawTag.function.js"
 
 export type LastArrayItem = {tag: Tag, index: number}
 export type TagArraySubject = ValueSubject<Tag[]> & {
@@ -46,7 +48,7 @@ export function processTagArray(
     if(destroyItem) {
       const last = result.lastArray[index]
       const tag: Tag = last.tag
-
+      
       tag.destroy({
         stagger: options.counts.removed,
         byParent: false
@@ -64,16 +66,46 @@ export function processTagArray(
   const before = template || (template as any).clone
 
   value.forEach((subTag, index) => {
-    subTag.tagSupport = new TagSupport({} as TemplaterResult, new ValueSubject([]))
-        
-    subTag.tagSupport.mutatingRender = () => {
-      // ownerTag.tagSupport.render()
-      // subTag.tagSupport.render()
-      return subTag
-    } // fake having a render function
+    const previous = result.lastArray[index]
+    const previousSupport = subTag.tagSupport || previous?.tag.tagSupport
 
+    subTag.tagSupport = previousSupport || new TagSupport({} as TemplaterResult, new ValueSubject([]))
+    
+    if(previousSupport) {
+      previousSupport.newest = subTag
+    } else {
+      subTag.tagSupport.mutatingRender = () => {
+        /*
+        const existingTag = previous?.tag || subTag
+        const {retag} = redrawTag(subTag.tagSupport, subTag.tagSupport.templater, existingTag, ownerTag)
+        previous.tag.tagSupport = retag.tagSupport
+        return retag
+        */
+
+        ownerTag.tagSupport.render()
+        //ownerTag.tagSupport.render()
+  
+        // (subTag.ownerTag as any).tagSupport.render()
+        // subTag.tagSupport.render()
+        return subTag
+  
+        /*
+        const exit = subTag.tagSupport.renderExistingTag(subTag, subTag.tagSupport.templater)
+        
+        // result.tag = tagSupport.newest as Tag
+        
+        if(exit) {
+          return subTag
+        }
+  
+        return subTag
+        */
+      } // fake having a render function
+  
+      ownerTag.children.push(subTag)
+    }
+    
     subTag.ownerTag = ownerTag    
-    ownerTag.children.push(subTag)
 
     // check for html``.key()
     const keyNotSet = subTag.arrayValue as ArrayValueNeverSet | undefined
@@ -89,11 +121,13 @@ export function processTagArray(
       throw err
     }
     
-    if (result.lastArray.length > index) {
-      const previous = result.lastArray[index]
+    const couldBeSame = result.lastArray.length > index
+    if (couldBeSame) {
 
       const isSame = areLikeValues(previous.tag.arrayValue, subTag.arrayValue)
       if (isSame) {
+        subTag.tagSupport = subTag.tagSupport || previous.tag.tagSupport
+        // ???
         // previous.tag.updateValues(subTag.values)
         previous.tag.updateByTag(subTag)
         return []
@@ -107,24 +141,47 @@ export function processTagArray(
       return []
     }
 
-    const nextClones = processTagResult(
-      subTag,
-      result,
-      before,
-      {
-        index,
-        ...options,
-        counts: {
-          added: options.counts.added + index,
-          removed: options.counts.removed,
-        }
-      }
-    )
-
+    const nextClones = processAddTagArrayItem(before, subTag, result, index, options)
     clones.push(...nextClones)
   })
 
   return clones
+}
+
+function processAddTagArrayItem(
+  before: Element,
+  subTag: Tag,
+  result: TagArraySubject,
+  index: number,
+  options: {
+    counts: Counts
+    forceElement?: boolean
+  },
+) {
+    
+  /*
+  const lastArray = (result as TagArraySubject).lastArray
+  const existing = lastArray[index]
+  if(existing?.tag.isLikeTag(tag)) {
+    throw new Error('we never get here')
+    existing.tag.updateByTag(tag)
+    return []
+  }
+  */
+
+  // Added to previous array
+  result.lastArray.push({
+    tag: subTag, index
+  })
+
+  const counts: Counts = {
+    added: options.counts.added + index,
+    removed: options.counts.removed,
+  }
+
+  const lastFirstChild = before // tag.clones[0] // insertBefore.lastFirstChild    
+  const nextClones = subTag.buildBeforeElement(lastFirstChild, {counts, forceElement: options.forceElement})
+  return nextClones
 }
 
 /** compare two values. If both values are arrays then the items will be compared */
@@ -140,5 +197,4 @@ function areLikeValues(valueA: unknown, valueB: unknown): Boolean {
   }
 
   return false
-
 }

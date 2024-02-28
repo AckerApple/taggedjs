@@ -4,6 +4,8 @@ import { setUse } from "./setUse.function.js"
 import { TagComponent, TemplaterResult, Wrapper, alterProps } from "./templater.utils.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { runTagCallback } from "./bindSubjectCallback.function.js"
+import { deepClone } from "./deepFunctions.js"
+import { TagSupport } from "./TagSupport.class.js"
 
 export type TagChildren = ValueSubject<Tag[]>
 export type TagChildrenInput = Tag[] | Tag | TagChildren
@@ -45,10 +47,55 @@ export function tag<T>(
 
     function innerTagWrap() {
       const originalFunction = innerTagWrap.original as TagComponent
-      const props = alterProps(templater.tagSupport.props, templater) // templater.tagSupport.props
+      const oldTagSetup = templater.tagSupport
 
-      const tag = originalFunction(props, childSubject)
-      tag.tagSupport = templater.tagSupport
+      const oldest = templater.oldest
+
+      let props = oldTagSetup.propsConfig.latest
+      let castedProps = alterProps(props, templater)
+      
+      // CALL ORIGINAL COMPONENT FUNCTION
+      const tag = originalFunction(castedProps, childSubject)
+
+      if(oldTagSetup.mutatingRender === TagSupport.prototype.mutatingRender) {
+        oldTagSetup.oldest = tag
+        // tag.tagSupport = oldTagSetup
+
+        oldTagSetup.mutatingRender = () => {
+          const exit = oldTagSetup.renderExistingTag(tag, templater)
+        
+          if(exit) {
+            return tag
+          }
+          
+          if(tag.ownerTag) {
+            const newest = tag.ownerTag.tagSupport.render()
+            tag.ownerTag.tagSupport.newest = newest
+            return tag
+          }
+      
+          return tag
+        }
+      }
+
+      tag.tagSupport = new TagSupport(templater, oldTagSetup.children)
+
+      const clonedProps = deepClone(castedProps) // castedProps
+      tag.tagSupport.propsConfig = {
+        latest: props, // castedProps
+        latestCloned: clonedProps,
+        clonedProps: clonedProps,
+        lastClonedKidValues: tag.tagSupport.propsConfig.lastClonedKidValues,
+      }
+
+      tag.tagSupport.memory = oldTagSetup.memory
+      tag.tagSupport.mutatingRender = oldTagSetup.mutatingRender
+      oldTagSetup.newest = tag
+
+      oldTagSetup.propsConfig = {...tag.tagSupport.propsConfig}
+      if(oldest) {
+        oldest.tagSupport.propsConfig = {...tag.tagSupport.propsConfig}
+      }
 
       if(madeSubject) {
         childSubject.value.forEach(kid => {

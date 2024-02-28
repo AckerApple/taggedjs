@@ -9,34 +9,12 @@ export function processTagResult(
   result: TagArraySubject | TagSubject | Function, // used for recording past and current value
   insertBefore: Element, // <template end interpolate />
   {
-    index, counts, forceElement,
+    counts, forceElement,
   }: {
-    index?: number
     counts: Counts
     forceElement?: boolean
   }
 ): Clones {
-  // *for
-  if(index !== undefined) {
-    const lastArray = (result as TagArraySubject).lastArray
-    const existing = lastArray[index]
-
-    if(existing?.tag.isLikeTag(tag)) {
-      existing.tag.updateByTag(tag)
-      return []
-    }
-
-    // Added to previous array
-    lastArray.push({
-      tag, index
-    })
-
-    const lastFirstChild = insertBefore // tag.clones[0] // insertBefore.lastFirstChild    
-    const clones = tag.buildBeforeElement(lastFirstChild, {counts, forceElement})
-
-    return clones
-  }
-
   // *if appears we already have seen
   const subjectTag = result as TagSubject
   const rTag = subjectTag.tag

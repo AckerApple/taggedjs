@@ -8,16 +8,16 @@ export function processNewValue(
   value: any,
   context: Context,
   variableName: string,
-  tag: Tag,
+  ownerTag: Tag,
 ) {
   if(isTagComponent(value)) {
     const existing = context[variableName] = new ValueSubject(value) as TagSubject
-    setValueRedraw(value, existing, tag)
+    setValueRedraw(value, existing, ownerTag)
     return
   }
 
   if(value instanceof Function) {
-    context[variableName] = getSubjectFunction(value, tag)
+    context[variableName] = getSubjectFunction(value, ownerTag)
     return
   }
 
@@ -26,8 +26,8 @@ export function processNewValue(
   }
 
   if(isTagInstance(value)) {
-    value.ownerTag = tag
-    tag.children.push(value)
+    value.ownerTag = ownerTag
+    ownerTag.children.push(value)
     context[variableName] = new ValueSubject(value)
     return
   }
