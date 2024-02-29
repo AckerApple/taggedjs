@@ -1,6 +1,7 @@
 import { TagComponent, redrawTag, tagElement, Tag } from "../index.js"
 // import { onNextStateOnly } from "../state.js"
 import { loadTagGateway } from "./loadTagGateway.function.js"
+import { TagGatewayComponent } from "./tagGateway.function.js"
 
 const gateways: {[id: string]: Gateway[]} = {}
 export const gatewayTagIds: {[id: string]: TagComponent} = {}
@@ -34,7 +35,7 @@ export function destroyGateway(gateway: Gateway) {
   delete gateways[id]
 }
 
-export function getTagId(component: TagComponent) {
+export function getTagId(component: TagGatewayComponent) {
   const componentString = functionToHtmlId(component)
   return '__tagTemplate_' + componentString
 }
@@ -77,7 +78,7 @@ function watchElement(
   id: string,
   targetNode: HTMLElement,
   tag: Tag,
-  component: TagComponent,
+  component: TagGatewayComponent,
 ): Gateway {
   let lastTag = tag
   const observer = new MutationObserver(mutationsList => {
@@ -150,7 +151,7 @@ export type Gateway = {
   id:string
   observer: MutationObserver
   element: HTMLElement
-  component: TagComponent
+  component: TagGatewayComponent // TagComponent
   updateTag: () => unknown
 }
 
@@ -176,7 +177,7 @@ export function checkByElement(element: HTMLElement | Element){
 export function checkElement(
   id: string,
   element: Element,
-  component: TagComponent,
+  component: TagGatewayComponent,
 ): Gateway {
   const gateway = (element as any).gateway
   
@@ -188,7 +189,7 @@ export function checkElement(
   const props = parsePropsString(element)
 
   try {
-    const { tag } = tagElement(component, element, props)
+    const { tag } = tagElement(component as TagComponent, element, props)
     // watch element AND add to gateways[id].push()
     return watchElement(id, element as HTMLElement, tag, component)
   } catch (err) {

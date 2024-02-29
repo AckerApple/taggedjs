@@ -1,10 +1,12 @@
-import { TagComponent } from "../index.js"
+import { TagComponent, TagComponentBase } from "../index.js"
 import { checkElement, getTagId } from "./tagGateway.utils.js"
 
 const namedTimeouts: Record<string, any> = {}
 
+export type TagGatewayComponent = TagComponent | TagComponentBase<[props: unknown]>
+
 export const tagGateway = function tagGateway(
-  component: TagComponent,
+  component: TagGatewayComponent,
 ): {id: string} {
   const id = getTagId(component)
 
@@ -59,7 +61,7 @@ export const tagGateway = function tagGateway(
 
 function checkTagElementsById(
   id: string,
-  component: TagComponent,
+  component: TagGatewayComponent,
 ) {
   const elements = document.querySelectorAll('#' + id)
   return checkTagElements(id, elements, component)
@@ -68,7 +70,7 @@ function checkTagElementsById(
 function checkTagElements(
   id: string,
   elements: NodeListOf<Element>,
-  component: TagComponent,
+  component: TagGatewayComponent,
 ) {
   elements.forEach(element => checkElement(id, element, component))
 

@@ -13,7 +13,7 @@ import { processRegularValue } from "./processRegularValue.function.js"
 
 export function updateExistingValue(
   existing: Subject<Tag> | TemplaterResult | TagSubject | TagArraySubject,
-  value: TemplaterResult | TagSupport | Function | Subject<any>,
+  value: TemplaterResult | Tag[] | TagSupport | Function | Subject<any>,
   ownerTag: Tag,
 ): void {
   const subjectValue = (existing as Subject<Tag>).value
@@ -62,62 +62,14 @@ export function updateExistingValue(
 
   // was component but no longer
   const existingTag = existingSubTag.tag
+
   if(existingTag) {
-    // its now an array
-    if(isTagArray(value)) {
-      destroyTagMemory(existingTag, existingSubTag)
-      delete existingSubTag.tag
-    }
-
-    const oldWrapper = existingTag.tagSupport.templater.wrapper
-    const newWrapper = (value as any)?.wrapper
-    const wrapMatch = oldWrapper && newWrapper && oldWrapper?.original === newWrapper?.original
-
-    // TODO: We shouldn't need both of these
-    const isSameTag = value && existingTag.lastTemplateString === (value as any).lastTemplateString
-    const isSameTag2 = value && (value as any).getTemplate && existingTag.isLikeTag(value as any)
-
-    if(isSameTag || isSameTag2) {
-      processTag(
-        value,
-        existing as TagSubject,
-        (existing as any).template,
-        ownerTag,// existingTag, // tag,
-        {
-          counts: {
-            added: 0,
-            removed: 0,
-          }
-        }
-      )
-      return
-    }
-    
-    if(wrapMatch) {
-      return updateExistingTag(
-        value as TemplaterResult,
-        existingTag,
-        existingSubTag,
-      )
-    }
-
-    if(existingSubTag.tag) {
-      destroyTagMemory(existingTag, existingSubTag)
-      
-      const insertBefore = existingTag.insertBefore as Element
-
-      if(isTagInstance(tempResult)) {
-        // processTag(value, result, template, tag, options)
-        processTag(value, existing as TagSubject, insertBefore, ownerTag, {counts:{added:0, removed:0}})
-        return
-      }
-
-      processRegularValue(value, existing, insertBefore, ownerTag)
-
-      return
-    }
-
-    throw new Error('existing value ignored')
+    handleWasTag(
+      existingTag as Tag,
+      existing as TagSubject | TagArraySubject,
+      value,
+      ownerTag
+    )
   }
 
   // now its a function
@@ -135,6 +87,91 @@ export function updateExistingValue(
   existingSubTag.set(value) // let ValueSubject now of newest value
 
   return
+}
+
+function handleWasTag(
+  existingTag: Tag,
+  existing: TagSubject | TagArraySubject,
+  value: TemplaterResult | Tag[] | TagSupport | Function | Subject<any>,
+  ownerTag: Tag,
+) {
+  if(isTagArray(value)) {
+    const insertBefore = (existing as any)?.template || (existingTag as any).insertBefore as Element
+
+    destroyTagMemory(existingTag, existing)
+    
+    processTagArray(
+      existing as TagArraySubject,
+      value as Tag[],
+      insertBefore,
+      ownerTag,
+      {counts: {added: 0, removed: 0}}
+    )
+
+    return
+  }
+
+  // its now an array
+  if(isTagArray(value)) {
+    destroyTagMemory(existingTag, existing)
+    delete (existing as TagSubject).tag
+  }
+
+  const oldWrapper = existingTag.tagSupport.templater.wrapper
+  const newWrapper = (value as any)?.wrapper
+  const wrapMatch = oldWrapper && newWrapper && oldWrapper?.original === newWrapper?.original
+
+  // TODO: We shouldn't need both of these
+  const isSameTag = value && existingTag.lastTemplateString === (value as any).lastTemplateString
+  const isSameTag2 = value && (value as any).getTemplate && existingTag.isLikeTag(value as any)
+
+  if(isSameTag || isSameTag2) {
+    processTag(
+      value,
+      existing as TagSubject,
+      (existing as any).template,
+      ownerTag,// existingTag, // tag,
+      {
+        counts: {
+          added: 0,
+          removed: 0,
+        }
+      }
+    )
+    return
+  }
+  
+  if(wrapMatch) {
+    return updateExistingTag(
+      value as TemplaterResult,
+      existingTag,
+      existing,
+    )
+  }
+
+  if((existing as TagSubject).tag) {
+    destroyTagMemory(existingTag, existing)
+    
+    const insertBefore = existingTag.insertBefore as Element
+
+    if(isTagInstance(value)) {
+      // processTag(value, result, template, tag, options)
+      processTag(
+        value,
+        existing as TagSubject,
+        insertBefore,
+        ownerTag,
+        {counts:{added:0, removed:0}}
+      )
+      return
+    }
+
+    processRegularValue(value, existing, insertBefore, ownerTag)
+
+    return
+  }
+
+  throw new Error('existing value ignored')
 }
 
 export function destroyTagMemory(

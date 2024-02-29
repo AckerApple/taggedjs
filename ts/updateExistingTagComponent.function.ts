@@ -37,8 +37,10 @@ export function updateExistingTagComponent(
   oldTagSetup.propsConfig.latest = latestProps
 
   if(!isSameTag) {
-    // TODO: this may not be in use
+    console.log('🔀 NOT SAME SWITCH OUT')
     destroyTagMemory(existingTag, existingSubject)
+    delete existingSubject.tag
+    delete existingSubject.tagSupport
   } else {
     const subjectTagSupport = subjectValue?.tagSupport
     // old props may have changed, reclone first
@@ -65,17 +67,9 @@ export function updateExistingTagComponent(
   
   const redraw = tempResult.redraw() as Tag
 
-  existingSubject.value.tag = oldTagSetup.newest = redraw
-  // oldTagSetup.propsConfig.latestCloned = tempResult.tagSupport.propsConfig.clonedProps
+  // ???
+  // existingSubject.value.tag = oldTagSetup.newest = redraw
   oldTagSetup.propsConfig = {...tempResult.tagSupport.propsConfig}
-
-  if(!isSameTag) {
-    existingSubject.tag = redraw
-    // SAFE: It's a new tagSupport and should overwrite
-    existingSubject.tagSupport = tempResult.tagSupport
-    // ???
-    // subjectValue.tagSupport = tempResult.tagSupport
-  }
 
   return
 }

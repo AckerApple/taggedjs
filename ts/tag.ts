@@ -1,7 +1,7 @@
 import { Tag } from "./Tag.class.js"
 import { isSubjectInstance, isTagArray, isTagInstance } from "./isInstance.js"
 import { setUse } from "./setUse.function.js"
-import { TagComponent, TemplaterResult, Wrapper, alterProps } from "./templater.utils.js"
+import { TemplaterResult, Wrapper, alterProps } from "./templater.utils.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { runTagCallback } from "./bindSubjectCallback.function.js"
 import { deepClone } from "./deepFunctions.js"
@@ -9,19 +9,27 @@ import { TagSupport } from "./TagSupport.class.js"
 
 export type TagChildren = ValueSubject<Tag[]>
 export type TagChildrenInput = Tag[] | Tag | TagChildren
+export type TagComponentArg<T extends any[]> = (...args: T) => Tag;
+type FirstArgOptional<T extends any[]> = T['length'] extends 0 ? true : false;
 
-export const tags: TagComponent[] = []
+// export type TagComponent = TagComponentArg<[any?, TagChildren?]>
+export type TagComponentBase<T extends any[]> = (
+  arg: FirstArgOptional<T> extends true ? (T[0] | void) : T[0],
+  // props: FirstParameter<T>,
+  children?: TagChildrenInput
+) => Tag
+
+export const tags: TagComponentBase<any>[] = []
+export type TagComponent = TagComponentBase<[any?, TagChildren?]> | TagComponentBase<[]>
 
 let tagCount = 0
 
+
 /** Wraps a tag component in a state manager and always push children to last argument as any array */
-export function tag<T>(
-  tagComponent: (
-    ((props: T, children: TagChildren) => Tag) |
-    ((props: T) => Tag) |
-    (() => Tag)
-  )
-): ((props?: T, children?: TagChildrenInput) => Tag) {
+// export function tag<T>(a: T): T;
+export function tag<T extends any[]>(
+  tagComponent: TagComponentArg<T>
+): (TagComponentBase<T>) {
   const result = (function tagWrapper(
     props?: T | Tag | Tag[],
     children?: TagChildrenInput
@@ -38,15 +46,8 @@ export function tag<T>(
 
     const templater: TemplaterResult = new TemplaterResult(props, childSubject)
 
-    /*
-    if(!isPropTag) {
-      // wrap props that are functions
-      templater.tagSupport.props = alterProps(props, templater)
-    }
-    */
-
     function innerTagWrap() {
-      const originalFunction = innerTagWrap.original as TagComponent
+      const originalFunction = innerTagWrap.original as unknown as TagComponent
       const oldTagSetup = templater.tagSupport
 
       const oldest = templater.oldest
@@ -130,11 +131,11 @@ export function tag<T>(
     return templater
   }) // we override the function provided and pretend original is what's returned
 
-  updateResult(result, tagComponent as TagComponent)
+  updateResult(result, tagComponent as unknown as TagComponent)
 
   // group tags together and have hmr pickup
   updateComponent(tagComponent)
-  tags.push(tagComponent as TagComponent)
+  tags.push(tagComponent as unknown as TagComponent)
 
   return result as any
 }
@@ -176,7 +177,7 @@ function updateComponent(
 ) {
   tagComponent.tags = tags
   tagComponent.setUse = setUse
-  tagComponent.tagIndex = ++tagCount
+  tagComponent.tagIndex = ++tagCount // needed for things like HMR
 }
 class NoPropsGiven {}
 const noPropsGiven = new NoPropsGiven()

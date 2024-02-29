@@ -106,10 +106,6 @@ export function processTag(
 ) {
   // first time seeing this tag?
   if(!value.tagSupport) {
-    if((result as TagSubject).tagSupport) {
-      throw new Error('586')
-    }
-
     value.tagSupport = new TagSupport(
       {} as TemplaterResult, // the template is provided via html`` call
       new ValueSubject([]), // no children
@@ -117,9 +113,6 @@ export function processTag(
 
     // asking me to render will cause my parent to render
     value.tagSupport.mutatingRender = () => {
-      if(value.tagSupport === ownerTag.tagSupport) {
-        throw new Error('787')
-      }
       ownerTag.tagSupport.render()
     }
     value.tagSupport.oldest = value.tagSupport.oldest || value

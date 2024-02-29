@@ -18,7 +18,6 @@ export * from "./redrawTag.function.js"
 export * from "./interpolateElement.js"
 
 // TODO: export *
-export { TagComponent } from "./templater.utils.js"
 export { tagElement } from "./tagElement.js"
 export { Tag } from "./Tag.class.js"
 export { runBeforeRender } from "./tagRunner.js"

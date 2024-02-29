@@ -141,18 +141,11 @@ export class Tag {
   }
 
   updateByTag(tag: Tag) {
-    /*
-    if(Object.keys(this.tagSupport.memory.context).length === 0) {
-      throw new Error('issue right here')
-    }
-    */
-
     this.updateConfig(tag.strings, tag.values)
     
     this.tagSupport.templater = tag.tagSupport.templater
     this.tagSupport.propsConfig = {...tag.tagSupport.propsConfig}
     this.tagSupport.newest = tag
-    // this.tagSupport.memory = tag.tagSupport.memory
   }
 
   lastTemplateString: string | undefined = undefined // used to compare templates for updates

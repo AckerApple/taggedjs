@@ -1,8 +1,9 @@
 import { TagSupport } from "./TagSupport.class.js"
 import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
-import { TagComponent, TemplaterResult } from "./templater.utils.js"
+import { TemplaterResult } from "./templater.utils.js"
 import { Tag } from "./Tag.class.js"
 import { providersChangeCheck } from "./provider.utils.js"
+import { TagComponent } from "./tag.js"
 
 const appElements: {tag: Tag, element: Element}[] = []
 

@@ -108,11 +108,6 @@ export interface TemplateRedraw extends TemplaterResult {
   redraw: () => Tag | undefined
 }
 
-export type TagComponent = <T>(
-  props?: T, // props or children
-  children?: TagChildren,
-) => Tag
-
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(
   props: Props,

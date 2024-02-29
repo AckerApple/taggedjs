@@ -75,32 +75,9 @@ export function processTagArray(
       previousSupport.newest = subTag
     } else {
       subTag.tagSupport.mutatingRender = () => {
-        /*
-        const existingTag = previous?.tag || subTag
-        const {retag} = redrawTag(subTag.tagSupport, subTag.tagSupport.templater, existingTag, ownerTag)
-        previous.tag.tagSupport = retag.tagSupport
-        return retag
-        */
-
-        ownerTag.tagSupport.render()
-        //ownerTag.tagSupport.render()
-  
-        // (subTag.ownerTag as any).tagSupport.render()
-        // subTag.tagSupport.render()
+        ownerTag.tagSupport.render() // call owner for needed updates
         return subTag
-  
-        /*
-        const exit = subTag.tagSupport.renderExistingTag(subTag, subTag.tagSupport.templater)
-        
-        // result.tag = tagSupport.newest as Tag
-        
-        if(exit) {
-          return subTag
-        }
-  
-        return subTag
-        */
-      } // fake having a render function
+      }
   
       ownerTag.children.push(subTag)
     }
@@ -127,17 +104,10 @@ export function processTagArray(
       const isSame = areLikeValues(previous.tag.arrayValue, subTag.arrayValue)
       if (isSame) {
         subTag.tagSupport = subTag.tagSupport || previous.tag.tagSupport
-        // ???
-        // previous.tag.updateValues(subTag.values)
         previous.tag.updateByTag(subTag)
         return []
       }
 
-      /*
-      previous.tag.destroy()
-      ++removed
-      ++options.counts.removed
-      */
       return []
     }
 
@@ -158,17 +128,6 @@ function processAddTagArrayItem(
     forceElement?: boolean
   },
 ) {
-    
-  /*
-  const lastArray = (result as TagArraySubject).lastArray
-  const existing = lastArray[index]
-  if(existing?.tag.isLikeTag(tag)) {
-    throw new Error('we never get here')
-    existing.tag.updateByTag(tag)
-    return []
-  }
-  */
-
   // Added to previous array
   result.lastArray.push({
     tag: subTag, index
