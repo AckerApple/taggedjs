@@ -1,4 +1,4 @@
-import { TagSubject, setValueRedraw } from "./Tag.utils.js"
+import { DisplaySubject, TagSubject, setValueRedraw } from "./Tag.utils.js"
 import { deepClone } from "./deepFunctions.js"
 import { TemplateRedraw } from "./templater.utils.js"
 import { isTagInstance } from "./isInstance.js"
@@ -37,10 +37,7 @@ export function updateExistingTagComponent(
   oldTagSetup.propsConfig.latest = latestProps
 
   if(!isSameTag) {
-    console.log('🔀 NOT SAME SWITCH OUT')
     destroyTagMemory(existingTag, existingSubject)
-    delete existingSubject.tag
-    delete existingSubject.tagSupport
   } else {
     const subjectTagSupport = subjectValue?.tagSupport
     // old props may have changed, reclone first
@@ -66,9 +63,11 @@ export function updateExistingTagComponent(
   oldTagSetup.templater = tempResult
   
   const redraw = tempResult.redraw() as Tag
-
+  /*
   // ???
-  // existingSubject.value.tag = oldTagSetup.newest = redraw
+  const redraw = tempResult.redraw() as Tag
+  existingSubject.value.tag = oldTagSetup.newest = redraw
+  */
   oldTagSetup.propsConfig = {...tempResult.tagSupport.propsConfig}
 
   return

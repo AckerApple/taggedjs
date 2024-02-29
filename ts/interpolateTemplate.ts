@@ -56,7 +56,7 @@ export function interpolateTemplate(
 // Function to update the value of x
 export function updateBetweenTemplates(
   value: string | undefined | boolean | number,
-  lastFirstChild: Element,
+  lastFirstChild: Element | Text,
 ) {
   const parent = lastFirstChild.parentNode as ParentNode
   

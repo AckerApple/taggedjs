@@ -3,11 +3,8 @@ import { ArrayValueNeverSet, Tag } from "./Tag.class.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { TagSupport } from "./TagSupport.class.js"
 import { Counts } from "./interpolateTemplate.js"
-import { processTagResult } from "./processTagResult.function.js"
 import { TemplaterResult } from "./templater.utils.js"
 import { ArrayNoKeyError } from "./errors.js"
-import { TagSubject } from "./Tag.utils.js"
-import { redrawTag } from "./redrawTag.function.js"
 
 export type LastArrayItem = {tag: Tag, index: number}
 export type TagArraySubject = ValueSubject<Tag[]> & {

@@ -7,7 +7,7 @@ import { TagSupport } from "./TagSupport.class.js"
 import { Clones } from "./Clones.type.js"
 import { Tag } from "./Tag.class.js"
 import { Counts, Template, updateBetweenTemplates } from "./interpolateTemplate.js"
-import { TagSubject } from "./Tag.utils.js"
+import { DisplaySubject, TagSubject } from "./Tag.utils.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { processRegularValue } from "./processRegularValue.function.js"
 
@@ -46,7 +46,7 @@ export type ClonesAndPromise = {
 
 export function processSubjectValue(
   value: any,
-  result: TagArraySubject | TagSubject, // could be tag via result.tag
+  result: TagArraySubject | TagSubject | DisplaySubject, // could be tag via result.tag
   template: Template, // <template end interpolate /> (will be removed)
   ownerTag: Tag, // owner
   options: processOptions, // {added:0, removed:0}
@@ -54,23 +54,24 @@ export function processSubjectValue(
   const valueType = getValueType(value)
 
   // Previously was simple value, now its a tag of some sort
-  const resultTag = result as TagSubject
+  const resultTag = result as DisplaySubject
   const clone = resultTag.clone
   const noLongerSimpleValue = valueType !== ValueTypes.value && clone
 
   if(noLongerSimpleValue) {
-    const parent = clone.parentNode as ParentNode
-    // template.removeAttribute('removedAt')
-    parent.insertBefore(template, clone)
-    parent.removeChild(clone)
-    delete resultTag.clone
-    // result.clone = template
+    destroySimpleValue(template, resultTag)
   }
   
   switch (valueType) {
     case ValueTypes.tag:
       return {
-        clones: processTag(value, result, template, ownerTag, options)
+        clones: processTag(
+          value,
+          result as TagSubject,
+          template,
+          ownerTag,
+          options
+        )
       }
   
     case ValueTypes.tagArray:
@@ -93,13 +94,18 @@ export function processSubjectValue(
   }
 
   return {
-    clones: processRegularValue(value, result, template, ownerTag)
+    clones: processRegularValue(
+      value,
+      result as DisplaySubject,
+      template,
+      ownerTag
+    )
   }
 }
 
 export function processTag(
   value: any,
-  result: TagSubject | TagArraySubject, // could be tag via result.tag
+  result: TagSubject, // could be tag via result.tag
   template: Template, // <template end interpolate /> (will be removed)
   ownerTag: Tag, // owner
   options: processOptions, // {added:0, removed:0}
@@ -121,8 +127,7 @@ export function processTag(
     value.ownerTag = ownerTag
   }
 
-  // (result as any).template = template
-  (result as any).template = template
+  result.template = template
 
   const clones = processTagResult(
     value,
@@ -168,4 +173,15 @@ function processWasTag(
   /* end: destroy logic */
 
   return promise
+}
+
+export function destroySimpleValue(
+  template: Element,
+  resultTag: DisplaySubject,
+) {
+  const clone = resultTag.clone as Element
+  const parent = clone.parentNode as ParentNode
+  parent.insertBefore(template, clone)
+  parent.removeChild(clone)
+  delete resultTag.clone
 }

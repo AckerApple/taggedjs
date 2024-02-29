@@ -7,9 +7,14 @@ import { TemplaterResult } from "./templater.utils.js"
 import { bindSubjectCallback } from "./bindSubjectCallback.function.js"
 
 export type TagSubject = Subject<TemplaterResult> & {
-  tagSupport?: TagSupport
-  tag?: Tag
-  clone?: Element
+  tagSupport: TagSupport
+  tag: Tag
+  template: Element
+}
+
+export type DisplaySubject = Subject<TemplaterResult> & {
+  clone?: Element | Text
+  template: Element
 }
 
 export function getSubjectFunction(

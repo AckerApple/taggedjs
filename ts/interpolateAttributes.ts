@@ -2,6 +2,31 @@ import { Context, Tag } from "./Tag.class.js"
 import { inputAttribute } from "./inputAttribute.js"
 import { isSubjectInstance } from "./isInstance.js"
 
+type HowToSet = (element: Element, name: string, value: string) => any
+
+function howToSetAttribute(
+  element: Element,
+  name: string,
+  value: string
+) {
+  /*
+  if(name === 'class'){
+    value.split(' ').forEach(className => child.classList.add(className))
+    return
+  }
+  */
+
+  element.setAttribute(name, value)
+}
+
+function howToSetInputValue(
+  element: Element,
+  name: string,
+  value: string
+) {
+  (element as any)[name] = value
+}
+
 export function interpolateAttributes(
   child: Element,
   scope: Context,
@@ -15,20 +40,18 @@ export function interpolateAttributes(
     processAttribute('textVarValue', value, child, scope, ownerTag, (_name, value) => (child as any).value = value)
   }
 
-  const howToSet = (name: string, value: string) => {
-    /*
-    if(name === 'class'){
-      value.split(' ').forEach(className => child.classList.add(className))
-      return
-    }
-    */
+  let howToSet = howToSetAttribute
 
-    child.setAttribute(name, value)
-  }
 
   attrNames.forEach(attrName => {
+    if(child.nodeName === 'INPUT' && attrName === 'value') {
+      howToSet = howToSetInputValue
+    }
+
     const value = child.getAttribute(attrName)
     processAttribute(attrName, value, child, scope, ownerTag, howToSet)
+
+    howToSet = howToSetAttribute // put back
   })
 }
 
@@ -45,7 +68,7 @@ function processAttribute(
   child: Element,
   scope: Context,
   ownerTag: Tag,
-  howToSet: (name: string, value: string) => any
+  howToSet: HowToSet
 ) {
   if ( isTagVar(value) ) {
     return processScopedNameValueAttr(
@@ -149,8 +172,6 @@ function getContextValueByVarString(
   return scope[code]
 }
 
-type HowToSet = (name: string, value: string) => any
-
 function processNameValueAttr(
   attrName: string,
   result: any,
@@ -192,7 +213,7 @@ function processNameValueAttr(
     return
   }
 
-  howToSet(attrName, result)
+  howToSet(child, attrName, result)
   // child.setAttribute(attrName, result.value)
   return
 }
@@ -222,8 +243,7 @@ function processAttributeSubjectValue(
   }
 
   if(newAttrValue) {
-    howToSet(attrName, newAttrValue)
-    // child.setAttribute(attrName, newAttrValue)
+    howToSet(child, attrName, newAttrValue)
     return
   }
 
@@ -234,8 +254,7 @@ function processAttributeSubjectValue(
   }
 
   // value is 0
-  howToSet(attrName, newAttrValue)
-  // child.setAttribute(attrName, newAttrValue)
+  howToSet(child, attrName, newAttrValue)
 }
 
 function processScopedNameValueAttr(
@@ -244,7 +263,7 @@ function processScopedNameValueAttr(
   child: Element,
   scope: Context,
   ownerTag: Tag,
-  howToSet: (name: string, value: string) => any
+  howToSet: HowToSet
 ) {
   // get the code inside the brackets like "variable0" or "{variable0}"
   const result = getContextValueByVarString(scope, value)

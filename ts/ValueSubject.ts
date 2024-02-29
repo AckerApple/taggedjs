@@ -1,11 +1,8 @@
 import { Subject } from './Subject.js'
 
 export class ValueSubject<T> extends Subject<T> {
-  value: T
-  
-  constructor(initialValue: T) {
-    super()
-    this.value = initialValue
+  constructor(public value: T) {
+    super(value)
   }
 
   subscribe(callback: any) {

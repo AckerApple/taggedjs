@@ -1,6 +1,5 @@
 import { Tag } from "./Tag.class.js"
 import { TagSubject } from "./Tag.utils.js"
-import { TagSupport } from "./TagSupport.class.js"
 import { runAfterRender, runBeforeRedraw } from "./tagRunner.js"
 import { TemplaterResult } from "./templater.utils.js"
 
@@ -24,5 +23,5 @@ export function updateExistingTag(
 
   existingSubject.set(templater)
   
-  return
+  return []
 }
