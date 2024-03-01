@@ -6,4 +6,4 @@ export declare function upperTagDebugProvider(): {
     name: string;
     test: number;
 };
-export declare const tagDebug: (props?: unknown, children?: import("taggedjs").TagChildrenInput | undefined) => import("taggedjs").Tag;
+export declare const tagDebug: import("taggedjs").TagComponentBase<[]>;

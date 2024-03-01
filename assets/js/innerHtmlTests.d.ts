@@ -1,3 +1,3 @@
-import { Tag } from "taggedjs";
-export declare const innerHtmlTest: (props?: unknown, children?: import("taggedjs").TagChildrenInput | undefined) => Tag;
-export declare const innerHtmlPropsTest: (props?: number | undefined, children?: import("taggedjs").TagChildrenInput | undefined) => Tag;
+import { Tag, ValueSubject, TagChildren } from "taggedjs";
+export declare const innerHtmlTest: import("taggedjs").TagComponentBase<[_props: unknown, children: TagChildren]>;
+export declare const innerHtmlPropsTest: import("taggedjs").TagComponentBase<[x: number, children: ValueSubject<Tag[]>]>;

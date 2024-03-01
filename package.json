@@ -1,8 +1,8 @@
 {
   "scripts": {
     "save": "git add . && git commit -m \"patch\" && git push",
-    "start": "npm run build:js:watch & npm run start:hmr",
-    "start:hmr": "dir=assets/js node tagged-hmr.js",
+    "start": "run-p build:js:watch start:hmr",
+    "start:hmr": "node tagged-hmr.js dir=\"./assets/js\"",
     "build": "run-s build:js build:bundle build:hmr",
     "build:bundle": "node runBundleScript.js",
     "build:hmr": "node hmr/runBundleScript.js",

@@ -1,1 +1,1 @@
-export declare const GatewayTest: (props?: unknown, children?: import("taggedjs").TagChildrenInput | undefined) => import("taggedjs").Tag;
+export declare const GatewayTest: import("taggedjs").TagComponentBase<[props: unknown]>;

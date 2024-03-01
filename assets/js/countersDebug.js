@@ -13,7 +13,7 @@ export const counters = tag(function Counters() {
     };
     ++renderCount; // for debugging
     return html `<!--counters-->
-    <div>Subscriptions:${Subject.globalSubCount$}:${Subject.globalSubs.length}</div>
+    <div>Subscriptions:${Subject.globalSubCount$}</div>
     <div>initCounter:${initCounter}</div>
     <button id="increase-counter" onclick=${increaseCounter}>counter:${counter}</button>
     <span id="counter-display">${counter}</span>

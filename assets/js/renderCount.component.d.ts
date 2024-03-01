@@ -1,4 +1,4 @@
-export declare const renderCountDiv: (props?: {
+export declare const renderCountDiv: import("taggedjs").TagComponentBase<[{
     renderCount: number;
     name: string;
-} | undefined, children?: import("taggedjs").TagChildrenInput | undefined) => import("taggedjs").Tag;
+}]>;

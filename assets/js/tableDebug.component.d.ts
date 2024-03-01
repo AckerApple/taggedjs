@@ -1,1 +1,1 @@
-export declare const tableDebug: (props?: unknown, children?: import("taggedjs").TagChildrenInput | undefined) => import("taggedjs").Tag;
+export declare const tableDebug: import("taggedjs").TagComponentBase<[]>;
