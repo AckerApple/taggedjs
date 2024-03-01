@@ -24,7 +24,7 @@ function checkDestroyPrevious(
   if (wasArray && !isTagArray(value)) {
     wasArray.forEach(({tag}) => tag.destroy())
     delete (existing as any).lastArray  
-    return
+    return true
   }
 
   const existingTagSubject = existing as TagSubject
@@ -37,16 +37,16 @@ function checkDestroyPrevious(
     // no longer a component
     if(isTagComponent(existingTag) && !isValueTagComponent) {
       destroyTagMemory(existingTag, existingTagSubject)
-      return
+      return true
     }
   
     // no longer a tag
     if(!isTagInstance(value)) {
       destroyTagMemory(existingTag, existingTagSubject)
-      return
+      return true
     }
 
-    return // was tag and still is tag
+    return false // was tag and still is tag
   }
 
   const displaySubject = existing as DisplaySubject
@@ -54,7 +54,10 @@ function checkDestroyPrevious(
   // was simple value but now something bigger
   if(clone && !isSimpleValue) {
     destroySimpleValue(displaySubject.template, displaySubject)
+    return true
   }
+
+  return false
 }
 
 export function updateExistingValue(
@@ -66,11 +69,14 @@ export function updateExistingValue(
   const tempResult = value as TemplateRedraw
   const existingSubArray = existing as TagArraySubject
   const existingSubTag = existing as TagSubject
+  const isChildSubject = existingSubArray.isChildSubject
 
-  checkDestroyPrevious(existing, value)
+  const wasDestroyed = checkDestroyPrevious(existing, value)
+
+  console.log('wasDestroyed', {wasDestroyed, isChildSubject, value})
 
   // If we are working with tag component 2nd argument children, the value has to be digged
-  if(existingSubArray.isChildSubject) {
+  if(isChildSubject) {
     value = (value as any).value // A subject contains the value
   }
 

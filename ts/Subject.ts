@@ -61,7 +61,10 @@ function removeSubFromArray(
   }
 }
 
-const SubjectClass = {
-  globalSubCount$: new Subject<number>(0), // for ease of debugging
-  globalSubs: [] as Subscriber[]// 🔬 for testing
+const SubjectClass = Subject as typeof Subject & {
+  globalSubCount$: Subject<number>
+  globalSubs: Subscriber[]
 }
+SubjectClass.globalSubs = [] // 🔬 for testing
+SubjectClass.globalSubCount$ = new Subject() // for ease of debugging
+SubjectClass.globalSubCount$.set(0)

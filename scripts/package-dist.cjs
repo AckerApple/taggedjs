@@ -8,7 +8,8 @@ delete pack.private
 
 const write = JSON.stringify(pack, null, 2)
 
-const pathToWrite = path.join(__dirname,'../','dist','package.json')
+const pathToWrite = path.join(__dirname,'../dist','package.json')
+console.debug(`🖊️ writing to ${pathToWrite}`)
 fs.writeFileSync(pathToWrite, write)
 
 console.info('✅ wrote ' + pathToWrite)
