@@ -1,4 +1,5 @@
-import { TagComponent } from "../index.js";
-export declare const tagGateway: (component: TagComponent) => {
+import { TagComponent, TagComponentBase } from "../index.js";
+export type TagGatewayComponent = TagComponent | TagComponentBase<[props: unknown]>;
+export declare const tagGateway: (component: TagGatewayComponent) => {
     id: string;
 };

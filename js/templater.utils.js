@@ -15,8 +15,7 @@ export class TemplaterResult {
     isTemplater = true;
     forceRenderTemplate(tagSupport, ownerTag) {
         const tag = this.wrapper();
-        tag.setSupport(tagSupport);
-        runAfterRender(tag.tagSupport, tag);
+        runAfterRender(tagSupport, tag);
         this.oldest = tag;
         tagSupport.oldest = tag;
         this.oldest = tag;
@@ -29,12 +28,9 @@ export class TemplaterResult {
         // signify to other operations that a rendering has occurred so they do not need to render again
         ++tagSupport.memory.renderCount;
         const runtimeOwnerTag = existingTag?.ownerTag || ownerTag;
-        if (tagSupport.oldest) {
-            // ensure props are the last ones used
-            tagSupport.props = tagSupport.latestProps;
-            tagSupport.clonedProps = tagSupport.latestClonedProps;
-            // tagSupport.latestClonedProps = tagSupport.latestClonedProps
-            runBeforeRedraw(tagSupport, tagSupport.oldest);
+        if (existingTag) {
+            tagSupport.propsConfig = { ...existingTag.tagSupport.propsConfig };
+            runBeforeRedraw(tagSupport, existingTag);
         }
         else {
             // first time render
@@ -47,23 +43,17 @@ export class TemplaterResult {
         const templater = this;
         const retag = templater.wrapper();
         /* AFTER */
-        tagSupport.latestProps = retag.tagSupport.props;
-        tagSupport.latestClonedProps = retag.tagSupport.clonedProps;
-        // tagSupport.latestClonedProps = retag.tagSupport.latestClonedProps
-        retag.setSupport(tagSupport);
         runAfterRender(tagSupport, retag);
         templater.newest = retag;
         retag.ownerTag = runtimeOwnerTag;
         const oldest = tagSupport.oldest = tagSupport.oldest || retag;
         tagSupport.newest = retag;
-        const oldestTagSupport = oldest.tagSupport;
-        oldest.tagSupport = oldestTagSupport || tagSupport;
         oldest.tagSupport.templater = templater;
-        // retag.setSupport(tagSupport)
+        oldest.tagSupport.memory = retag.tagSupport.memory;
         const isSameTag = existingTag && existingTag.isLikeTag(retag);
         // If previously was a tag and seems to be same tag, then just update current tag with new values
         if (isSameTag) {
-            oldest.updateByTag(retag);
+            existingTag.updateByTag(retag);
             return { remit: false, retag };
         }
         return { remit: true, retag };
@@ -73,7 +63,10 @@ export class TemplaterResult {
 export function alterProps(props, templater) {
     function callback(toCall, callWith) {
         const callbackResult = toCall(...callWith);
-        templater.newest?.ownerTag?.tagSupport.render();
+        const tagSupport = templater.newest?.ownerTag?.tagSupport;
+        if (tagSupport) {
+            tagSupport.render();
+        }
         return callbackResult;
     }
     const isPropTag = isTagInstance(props);
@@ -85,15 +78,25 @@ function resetFunctionProps(props, callback) {
     if (typeof (props) !== 'object') {
         return props;
     }
-    const newProps = { ...props };
+    const newProps = props;
+    // BELOW: Do not clone because if first argument is object, the memory ref back is lost
+    // const newProps = {...props} 
     Object.entries(newProps).forEach(([name, value]) => {
         if (value instanceof Function) {
+            const original = newProps[name].original;
+            if (original) {
+                newProps[name] = (...args) => {
+                    return callback(value, args);
+                };
+                newProps[name].original = original;
+                return; // already previously converted
+            }
             newProps[name] = (...args) => {
                 return callback(value, args);
             };
+            newProps[name].original = value;
             return;
         }
-        newProps[name] = value;
     });
     return newProps;
 }

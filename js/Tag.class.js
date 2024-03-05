@@ -1,12 +1,10 @@
-import { getSubjectFunction, setValueRedraw } from "./Tag.utils.js";
-import { ValueSubject } from "./ValueSubject.js";
 import { runBeforeDestroy } from "./tagRunner.js";
-import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js";
 import { buildClones } from "./render.js";
 import { interpolateElement, interpolateString } from "./interpolateElement.js";
 import { afterElmBuild } from "./interpolateTemplate.js";
 import { elementDestroyCheck } from "./elementDestroyCheck.function.js";
 import { updateExistingValue } from "./updateExistingValue.function.js";
+import { processNewValue } from "./processNewValue.function.js";
 export const variablePrefix = '__tagvar';
 export const escapeVariable = '--' + variablePrefix + '--';
 const prefixSearch = new RegExp(variablePrefix, 'g');
@@ -95,13 +93,10 @@ export class Tag {
     updateByTag(tag) {
         this.updateConfig(tag.strings, tag.values);
         this.tagSupport.templater = tag.tagSupport.templater;
+        this.tagSupport.propsConfig = { ...tag.tagSupport.propsConfig };
+        this.tagSupport.newest = tag;
     }
     lastTemplateString = undefined; // used to compare templates for updates
-    /** A method of passing down the same render method */
-    setSupport(tagSupport) {
-        this.tagSupport = tagSupport;
-        this.tagSupport.mutatingRender = tagSupport.mutatingRender;
-    }
     updateConfig(strings, values) {
         this.strings = strings;
         this.updateValues(values);
@@ -127,6 +122,9 @@ export class Tag {
     }
     isLikeTag(tag) {
         const { string } = tag.getTemplate();
+        if (!this.lastTemplateString) {
+            throw new Error('no template here');
+        }
         const stringMatched = string === this.lastTemplateString;
         if (!stringMatched || tag.values.length !== this.values.length) {
             return false;
@@ -141,25 +139,6 @@ export class Tag {
                 }
                 return false;
             }
-            /*
-            // TODO: All this code can possibly be deleted?
-            const tag = value as Tag
-            if(deepCheck && isTagInstance(tag) && isTagInstance(compareTo)) {
-              // TODO: THis "is" is setting data, this is not good
-              tag.ownerTag = this // let children know I own them
-              this.children.push(tag) // record children I created
-              tag.lastTemplateString || tag.getTemplate() // ensure last template string is generated
-              const isLikeTag = tag.isLikeTag(compareTo)
-      
-              console.log('🎃', {isLikeTag})
-      
-              if(isLikeTag) {
-                return true
-              }
-      
-              return false
-            }
-            */
             return true;
         });
         if (allVarsMatch) {
@@ -180,8 +159,9 @@ export class Tag {
             const hasValue = this.values.length > index;
             const value = this.values[index];
             // is something already there?
-            const existing = context[variableName];
+            const existing = variableName in context;
             if (existing) {
+                const existing = context[variableName];
                 return updateExistingValue(existing, value, this);
             }
             // 🆕 First time values below
@@ -235,30 +215,5 @@ export class Tag {
         this.clones.forEach(clone => afterElmBuild(clone, options));
         return this.clones;
     }
-}
-export function processNewValue(hasValue, value, context, variableName, tag) {
-    if (isTagComponent(value)) {
-        const existing = context[variableName] = new ValueSubject(value);
-        setValueRedraw(value, existing, tag);
-        return;
-    }
-    if (value instanceof Function) {
-        context[variableName] = getSubjectFunction(value, tag);
-        return;
-    }
-    if (!hasValue) {
-        return; // more strings than values, stop here
-    }
-    if (isTagInstance(value)) {
-        value.ownerTag = tag;
-        tag.children.push(value);
-        context[variableName] = new ValueSubject(value);
-        return;
-    }
-    if (isSubjectInstance(value)) {
-        context[variableName] = value;
-        return;
-    }
-    context[variableName] = new ValueSubject(value);
 }
 //# sourceMappingURL=Tag.class.js.map

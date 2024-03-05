@@ -1,4 +1,5 @@
 import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js";
+import { providersChangeCheck } from "./provider.utils.js";
 const appElements = [];
 export function tagElement(app, // (...args: unknown[]) => TemplaterResult,
 element, props) {
@@ -14,8 +15,10 @@ element, props) {
     // have a function setup and call the tagWrapper with (props, {update, async, on})
     const result = applyTagUpdater(wrapper);
     const { tag, tagSupport } = result;
+    // wrapper.tagSupport = tagSupport
     tag.appElement = element;
-    addAppTagRender(tagSupport, tag);
+    tag.tagSupport.oldest = tag;
+    addAppTagRender(tag.tagSupport, tag);
     const templateElm = document.createElement('template');
     templateElm.setAttribute('tag-detail', 'app-template-placeholder');
     element.appendChild(templateElm);
@@ -29,22 +32,27 @@ export function applyTagUpdater(wrapper) {
     runBeforeRender(tagSupport, undefined);
     // Call the apps function for our tag templater
     const tag = wrapper.wrapper();
-    tag.tagSupport = tagSupport;
-    runAfterRender(tag.tagSupport, tag);
+    runAfterRender(tagSupport, tag);
     return { tag, tagSupport };
 }
 /** Overwrites arguments.tagSupport.mutatingRender */
 export function addAppTagRender(tagSupport, tag) {
-    let lastTag;
+    let lastTag = tag;
     tagSupport.mutatingRender = () => {
+        const preRenderCount = tagSupport.memory.renderCount;
+        providersChangeCheck(tag);
+        // When the providers were checked, a render to myself occurred and I do not need to re-render again
+        if (preRenderCount !== tagSupport.memory.renderCount) {
+            return lastTag;
+        }
         runBeforeRedraw(tag.tagSupport, tag);
         const templater = tagSupport.templater; // wrapper
         const fromTag = lastTag = templater.wrapper();
-        tagSupport.latestProps = fromTag.tagSupport.props;
-        tagSupport.latestClonedProps = fromTag.tagSupport.clonedProps;
-        fromTag.setSupport(tagSupport);
+        fromTag.tagSupport.memory = tagSupport.memory;
+        tagSupport.propsConfig = { ...fromTag.tagSupport.propsConfig };
+        tag.tagSupport.newest = fromTag;
         runAfterRender(tag.tagSupport, tag);
-        tag.updateByTag(fromTag);
+        tagSupport.oldest.updateByTag(fromTag);
         tagSupport.newest = fromTag;
         return lastTag;
     };

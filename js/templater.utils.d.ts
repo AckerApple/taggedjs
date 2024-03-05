@@ -23,6 +23,4 @@ export declare class TemplaterResult {
 export interface TemplateRedraw extends TemplaterResult {
     redraw: () => Tag | undefined;
 }
-export type TagComponent = <T>(props?: T, // props or children
-children?: TagChildren) => Tag;
 export declare function alterProps(props: Props, templater: TemplaterResult): any;

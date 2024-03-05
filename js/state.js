@@ -12,32 +12,34 @@ export function state(defaultValue) {
     const restate = config.rearray[config.array.length];
     if (restate) {
         let oldValue = getStateValue(restate);
-        getSetMethod = (x => [oldValue, oldValue = x]);
+        getSetMethod = ((x) => [oldValue, oldValue = x]);
         const push = {
             callback: getSetMethod,
             lastValue: oldValue,
             defaultValue: restate.defaultValue,
         };
         config.array.push(push);
-        return (y) => {
-            push.callback = y || (x => [oldValue, oldValue = x]);
-            return oldValue;
-        };
+        return makeStateResult(oldValue, push);
     }
+    // State first time run
     const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue;
     let initValue = defaultFn();
-    getSetMethod = (x => [initValue, initValue = x]);
+    getSetMethod = ((x) => [initValue, initValue = x]);
     const push = {
         callback: getSetMethod,
         lastValue: initValue,
         defaultValue: initValue,
     };
     config.array.push(push);
+    return makeStateResult(initValue, push);
+}
+function makeStateResult(initValue, push) {
     // return initValue
-    return (y) => {
+    const result = (y) => {
         push.callback = y || (x => [initValue, initValue = x]);
         return initValue;
     };
+    return result;
 }
 const waitingStates = [];
 export function onNextStateOnly(callback) {

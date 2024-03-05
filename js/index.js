@@ -13,6 +13,7 @@ export * from "./TagSupport.class.js";
 export * from "./gateway/index.js";
 export * from "./redrawTag.function.js";
 export * from "./interpolateElement.js";
+// TODO: export *
 export { tagElement } from "./tagElement.js";
 export { Tag } from "./Tag.class.js";
 export { runBeforeRender } from "./tagRunner.js";
@@ -20,8 +21,9 @@ export { setUse } from "./setUse.function.js";
 /* hooks */
 // TODO: export *
 export { providers } from "./providers.js";
-// TODO: export *
-export { state } from "./state.js";
+export { set } from "./set.function.js";
+export { setLet } from "./setLet.function.js";
+export { setProp } from "./setProp.function.js";
 export * from "./onInit.js";
 export * from "./onDestroy.js";
 export * from "./getCallback.js";

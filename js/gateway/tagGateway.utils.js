@@ -62,30 +62,20 @@ function watchElement(id, targetNode, tag, component) {
         }
         for (const mutation of mutationsList) {
             if (mutation.type === 'attributes') {
-                console.log('attributes changed');
                 updateTag();
             }
         }
     });
     function updateTag() {
         const templater = tag.tagSupport.templater;
-        const oldProps = templater.tagSupport.props;
+        const oldProps = templater.tagSupport.propsConfig.latest;
         const newProps = parsePropsString(targetNode);
-        templater.tagSupport.props = newProps;
+        templater.tagSupport.propsConfig.latest = newProps;
         const isSameProps = JSON.stringify(oldProps) === JSON.stringify(newProps);
         if (isSameProps) {
             return; // no reason to update, same props
         }
-        templater.tagSupport.latestProps = newProps;
-        /*
-        onNextStateOnly(() => {
-          console.log('🔁 redrawing gateway')
-          const result = redrawTag(lastTag, templater)
-          
-          // update records
-          gateway.tag = lastTag = result.retag
-        })
-        */
+        templater.tagSupport.propsConfig.latest = newProps;
     }
     loadTagGateway(component);
     const gateway = {
@@ -130,13 +120,11 @@ export function checkByElement(element) {
 export function checkElement(id, element, component) {
     const gateway = element.gateway;
     if (gateway) {
-        console.log('drawing existing gateway =====');
         gateway.updateTag();
         return gateway;
     }
     const props = parsePropsString(element);
     try {
-        console.log('tagging element ***');
         const { tag } = tagElement(component, element, props);
         // watch element AND add to gateways[id].push()
         return watchElement(id, element, tag, component);

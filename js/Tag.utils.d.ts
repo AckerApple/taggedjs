@@ -4,9 +4,13 @@ import { Subject } from "./Subject.js";
 import { Tag } from "./Tag.class.js";
 import { TemplaterResult } from "./templater.utils.js";
 export type TagSubject = Subject<TemplaterResult> & {
-    tagSupport?: TagSupport;
-    tag?: Tag;
-    clone?: Element;
+    tagSupport: TagSupport;
+    tag: Tag;
+    template: Element;
+};
+export type DisplaySubject = Subject<TemplaterResult> & {
+    clone?: Element | Text;
+    template: Element;
 };
 export declare function getSubjectFunction(value: any, tag: Tag): ValueSubject<(...args: any[]) => any>;
 export declare function setValueRedraw(templater: TemplaterResult, // latest tag function to call for rendering

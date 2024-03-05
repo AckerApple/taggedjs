@@ -6,12 +6,12 @@ export function getSubjectFunction(value, tag) {
 }
 export function setValueRedraw(templater, // latest tag function to call for rendering
 existing, ownerTag) {
-    // const oldCount = existing.tagSupport?.memory.renderCount
     // redraw does not communicate to parent
     templater.redraw = () => {
         const existingTag = existing.tag;
-        const { remit, retag } = redrawTag(existingTag, templater, ownerTag);
-        existing.tagSupport = retag.tagSupport;
+        const newest = templater.tagSupport.newest;
+        const tagSupport = existingTag?.tagSupport || templater.tagSupport;
+        const { remit, retag } = redrawTag(tagSupport, templater, newest, ownerTag);
         if (!remit) {
             return;
         }

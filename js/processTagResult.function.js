@@ -1,22 +1,6 @@
 export function processTagResult(tag, result, // used for recording past and current value
 insertBefore, // <template end interpolate />
-{ index, counts, forceElement, }) {
-    // *for
-    if (index !== undefined) {
-        const lastArray = result.lastArray;
-        const existing = lastArray[index];
-        if (existing?.tag.isLikeTag(tag)) {
-            existing.tag.updateByTag(tag);
-            return [];
-        }
-        // Added to previous array
-        lastArray.push({
-            tag, index
-        });
-        const lastFirstChild = insertBefore; // tag.clones[0] // insertBefore.lastFirstChild    
-        const clones = tag.buildBeforeElement(lastFirstChild, { counts, forceElement });
-        return clones;
-    }
+{ counts, forceElement, }) {
     // *if appears we already have seen
     const subjectTag = result;
     const rTag = subjectTag.tag;

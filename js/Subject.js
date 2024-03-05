@@ -1,12 +1,16 @@
 export class Subject {
+    value;
     isSubject = true;
     subscribers = [];
-    value;
     // unsubcount = 0 // 🔬 testing
+    constructor(value) {
+        this.value = value;
+    }
     subscribe(callback) {
         this.subscribers.push(callback);
         SubjectClass.globalSubs.push(callback); // 🔬 testing
-        SubjectClass.globalSubCount$.set(SubjectClass.globalSubCount$.value + 1);
+        const countSubject = SubjectClass.globalSubCount$;
+        SubjectClass.globalSubCount$.set(countSubject.value + 1);
         const unsubscribe = () => {
             unsubscribe.unsubscribe();
         };
@@ -14,7 +18,7 @@ export class Subject {
         unsubscribe.unsubscribe = () => {
             removeSubFromArray(this.subscribers, callback);
             removeSubFromArray(SubjectClass.globalSubs, callback); // 🔬 testing
-            SubjectClass.globalSubCount$.set(SubjectClass.globalSubCount$.value - 1);
+            SubjectClass.globalSubCount$.set(countSubject.value - 1);
             // any double unsubscribes will be ignored
             unsubscribe.unsubscribe = () => undefined;
         };
@@ -36,8 +40,8 @@ function removeSubFromArray(subscribers, callback) {
         subscribers.splice(index, 1);
     }
 }
-const SubjectClass = Subject;
-SubjectClass.globalSubs = []; // 🔬 for testing
-SubjectClass.globalSubCount$ = new Subject(); // for ease of debugging
-SubjectClass.globalSubCount$.set(0);
+const SubjectClass = {
+    globalSubCount$: new Subject(0), // for ease of debugging
+    globalSubs: [] // 🔬 for testing
+};
 //# sourceMappingURL=Subject.js.map

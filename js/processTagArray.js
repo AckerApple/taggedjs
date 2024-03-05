@@ -1,6 +1,5 @@
 import { ValueSubject } from "./ValueSubject.js";
 import { TagSupport } from "./TagSupport.class.js";
-import { processTagResult } from "./processTagResult.function.js";
 import { ArrayNoKeyError } from "./errors.js";
 export function processTagArray(result, value, // arry of Tag classes
 template, // <template end interpolate />
@@ -16,7 +15,7 @@ ownerTag, options) {
         const lessLength = newLength < at;
         const subTag = value[index - removed];
         const subArrayValue = subTag?.arrayValue;
-        const destroyItem = lessLength || subArrayValue !== item.tag.arrayValue;
+        const destroyItem = lessLength || !areLikeValues(subArrayValue, item.tag.arrayValue);
         if (destroyItem) {
             const last = result.lastArray[index];
             const tag = last.tag;
@@ -33,13 +32,20 @@ ownerTag, options) {
     // const masterBefore = template || (template as any).clone
     const before = template || template.clone;
     value.forEach((subTag, index) => {
-        subTag.tagSupport = new TagSupport({}, new ValueSubject([]));
-        subTag.tagSupport.mutatingRender = () => {
-            ownerTag.tagSupport.render();
-            return subTag;
-        }; // fake having a render function
+        const previous = result.lastArray[index];
+        const previousSupport = subTag.tagSupport || previous?.tag.tagSupport;
+        subTag.tagSupport = previousSupport || new TagSupport({}, new ValueSubject([]));
+        if (previousSupport) {
+            previousSupport.newest = subTag;
+        }
+        else {
+            subTag.tagSupport.mutatingRender = () => {
+                ownerTag.tagSupport.render(); // call owner for needed updates
+                return subTag;
+            };
+            ownerTag.children.push(subTag);
+        }
         subTag.ownerTag = ownerTag;
-        ownerTag.children.push(subTag);
         // check for html``.key()
         const keyNotSet = subTag.arrayValue;
         if (keyNotSet?.isArrayValueNeverSet) {
@@ -53,24 +59,44 @@ ownerTag, options) {
             const err = new ArrayNoKeyError(message, details);
             throw err;
         }
-        if (result.lastArray.length > index) {
-            const previous = result.lastArray[index];
-            const isSame = previous.tag.arrayValue === subTag.arrayValue;
+        const couldBeSame = result.lastArray.length > index;
+        if (couldBeSame) {
+            const isSame = areLikeValues(previous.tag.arrayValue, subTag.arrayValue);
             if (isSame) {
-                previous.tag.updateValues(subTag.values);
+                subTag.tagSupport = subTag.tagSupport || previous.tag.tagSupport;
+                previous.tag.updateByTag(subTag);
+                return [];
             }
             return [];
         }
-        const nextClones = processTagResult(subTag, result, before, {
-            index,
-            ...options,
-            counts: {
-                added: options.counts.added + index,
-                removed: options.counts.removed,
-            }
-        });
+        const nextClones = processAddTagArrayItem(before, subTag, result, index, options);
         clones.push(...nextClones);
     });
     return clones;
+}
+function processAddTagArrayItem(before, subTag, result, index, options) {
+    // Added to previous array
+    result.lastArray.push({
+        tag: subTag, index
+    });
+    const counts = {
+        added: options.counts.added + index,
+        removed: options.counts.removed,
+    };
+    const lastFirstChild = before; // tag.clones[0] // insertBefore.lastFirstChild    
+    const nextClones = subTag.buildBeforeElement(lastFirstChild, { counts, forceElement: options.forceElement });
+    return nextClones;
+}
+/** compare two values. If both values are arrays then the items will be compared */
+function areLikeValues(valueA, valueB) {
+    if (valueA === valueB) {
+        return true;
+    }
+    const bothArrays = valueA instanceof Array && valueB instanceof Array;
+    const matchLengths = bothArrays && valueA.length == valueB.length;
+    if (matchLengths) {
+        return valueA.every((item, index) => item == valueB[index]);
+    }
+    return false;
 }
 //# sourceMappingURL=processTagArray.js.map
