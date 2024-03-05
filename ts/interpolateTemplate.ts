@@ -16,7 +16,7 @@ export function interpolateTemplate(
   const clones: Clones = []
 
   if ( !template.hasAttribute('end') ) {
-    return clones // only care about starts
+    return clones // only care about <template end>
   }
 
   const variableName = template.getAttribute('id')
@@ -24,17 +24,20 @@ export function interpolateTemplate(
     return clones // ignore, not a tagVar
   }
 
-  const result = context[variableName]
+  const existingSubject = context[variableName]
   let isForceElement = options.forceElement
   
   const callback = (templateNewValue: any) => {
+    if(existingSubject.clone) {
+      template = existingSubject.clone
+    }
+  
     const {clones} = processSubjectValue(
       templateNewValue,
-      result,
+      existingSubject,
       template,
       tag,
       {
-        // counts,
         counts: {added: counts.added, removed: counts.removed},
         forceElement: isForceElement,
       }
@@ -47,7 +50,7 @@ export function interpolateTemplate(
     clones.push(...clones)
   }
 
-  const sub = result.subscribe(callback as any)
+  const sub = existingSubject.subscribe(callback as any)
   tag.cloneSubs.push(sub)
 
   return clones

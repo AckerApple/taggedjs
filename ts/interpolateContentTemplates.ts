@@ -7,7 +7,7 @@ const templateSearch = new RegExp('\\s*<template interpolate end id="__tagvar(\\
 
 /** Returns subscriptions[] that will need to be unsubscribed from when element is destroyed */
 export function interpolateContentTemplates(
-  element: Element, // <div><div></div><template tag-wrap="22">...</template></div>
+  element: Element,
   context: any,
   tag: Tag,
   options: InterpolateOptions,
@@ -27,7 +27,7 @@ export function interpolateContentTemplates(
     scanTextAreaValue(element as HTMLTextAreaElement)
   }
 
-  childArray.forEach((child, childIndex) => {
+  childArray.forEach(child => {
     const nextClones = interpolateTemplate(
       child as Template,
       context,

@@ -137,6 +137,7 @@ function processAddTagArrayItem(
 
   const lastFirstChild = before // tag.clones[0] // insertBefore.lastFirstChild    
   const nextClones = subTag.buildBeforeElement(lastFirstChild, {counts, forceElement: options.forceElement})
+  // subTag.clones.push(...nextClones)
   return nextClones
 }
 

@@ -12,7 +12,9 @@ export type TagSubject = Subject<TemplaterResult> & {
   template: Element
 }
 
-export type DisplaySubject = Subject<TemplaterResult> & {
+type RegularValue = string | number | boolean
+export type DisplaySubject = Subject<RegularValue> & {
+  lastValue?: RegularValue
   clone?: Element | Text
   template: Element
 }
@@ -32,19 +34,13 @@ export function setValueRedraw(
   // redraw does not communicate to parent
   templater.redraw = () => {
     const existingTag = existing.tag    
-    const newest = templater.tagSupport.newest
     const tagSupport = existingTag?.tagSupport || templater.tagSupport
 
-    const {remit, retag} = redrawTag(
+    const {retag} = templater.renderWithSupport(
       tagSupport,
-      templater,
-      newest,
-      ownerTag
+      existingTag,
+      ownerTag,
     )
-    
-    if(!remit) {
-      return
-    }
 
     existing.set(templater)
 

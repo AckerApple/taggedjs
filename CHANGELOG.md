@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+### v2.4.0
+- Solid version
+
 ### v2.2.0
 - Many fixes
   - clones are not doubled on owner and tag

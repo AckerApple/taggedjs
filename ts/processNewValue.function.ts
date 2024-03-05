@@ -33,7 +33,7 @@ export function processNewValue(
   }
 
   if(isSubjectInstance(value)) {
-    context[variableName] = value
+    context[variableName] = value // its already a value subject
     return
   }
 

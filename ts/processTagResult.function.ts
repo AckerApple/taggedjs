@@ -34,11 +34,15 @@ export function processTagResult(
     }    
   }
 
+  if(!insertBefore || !insertBefore.parentNode) {
+    throw new Error('bad parent already started')
+  }
+  
   const clones = tag.buildBeforeElement(insertBefore, {
     counts,
     forceElement,
   })
-  subjectTag.tag = tag // let reprocessing know we saw this previously as an if
+  subjectTag.tag = subjectTag.tag || tag // let reprocessing know we saw this previously as an if
 
   return clones
 }

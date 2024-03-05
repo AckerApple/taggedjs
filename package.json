@@ -1,7 +1,7 @@
 {
   "name": "taggedjs",
   "private": true,
-  "version": "2.3.30",
+  "version": "2.4.1",
   "description": "tagged template reactive html",
   "main": "js/index.js",
   "type": "module",
@@ -10,6 +10,7 @@
     "build": "npm-run-all --sequential build:js build:webpack build:dist:only build:gh-pages build:dump copy:pinbowl && echo \"✅ Build completed\"",
     "build:webpack": "npx webpack",
     "build:gh-pages": "cp -R js/. ../gh-pages/node_modules/taggedjs/js && cd ../gh-pages && npm run build && echo \"🔬 Built gh-pages\"",
+    "build:watch:gh-pages": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:dist:only && npm run build:gh-pages'",
     "build:dump": "cp -R js/. ../../taggedjs-dump/node_modules/taggedjs/js && cd ../../taggedjs-dump && npm run build && echo \"🔭 Built taggedjs-dump\"",
     "build:dist": "npm-run-all build build:dist:only",
     "build:dist:only": "cp README.MD ./dist/README.md && npm run build:dist:pack && rm -rf ./dist/js && cp -R js ./dist && cp -R ./dist ../dist",
@@ -23,7 +24,6 @@
     "publish": "npm run build:dist && npm run save:dist && cd ../dist && npm publish",
     "build:watch": "chokidar 'ts/**/*' -c 'npm run build'",
     "build:watch:pinbowl": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:dist:only && npm run build:pinbowl'",
-    "build:watch:gh-pages": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:dist:only && npm run build:gh-pages'",
     "build:watch:dump": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:dist:only && npm run build:dump'"
   },
   "keywords": [

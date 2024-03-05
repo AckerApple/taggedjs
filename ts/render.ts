@@ -1,6 +1,6 @@
 export function buildClones(
   temporary: Element,
-  insertBefore: Element,
+  insertBefore: Element | Text,
 ) {
   const clones = []
   const template = temporary.children[0] as HTMLTemplateElement
@@ -18,7 +18,7 @@ export function buildClones(
 
 function buildSibling(
   nextSibling: ChildNode,
-  insertBefore: Element,
+  insertBefore: Element | Text,
 ) {
   const parentNode = insertBefore.parentNode as ParentNode
   parentNode.insertBefore(

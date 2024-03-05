@@ -1,7 +1,6 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
 import { Tag } from "./Tag.class.js"
-import { getStateValue } from "./set.function.js"
 
 type Callback = (...args: any[]) => any & {
   isChildOverride?: true // if this is set, then a parent tag passed children to a tag/component
@@ -50,7 +49,7 @@ export function runTagCallback(
   if(callbackResult instanceof Promise) {
     return callbackResult.then(() => {
       tagSupport.render()
-      return 'no-data-ever'
+      return 'promise-no-data-ever'
     })
   }
 

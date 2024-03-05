@@ -6,6 +6,7 @@ import { ValueSubject } from "./ValueSubject.js"
 import { runTagCallback } from "./bindSubjectCallback.function.js"
 import { deepClone } from "./deepFunctions.js"
 import { TagSupport } from "./TagSupport.class.js"
+import { renderExistingTag } from "./renderExistingTag.function.js"
 
 export type TagChildren = ValueSubject<Tag[]>
 export type TagChildrenInput = Tag[] | Tag | TagChildren
@@ -63,12 +64,13 @@ export function tag<T extends any[]>(
         // tag.tagSupport = oldTagSetup
 
         oldTagSetup.mutatingRender = () => {
-          const exit = oldTagSetup.renderExistingTag(tag, templater)
+          const exit = renderExistingTag(tag, templater, oldTagSetup)
         
           if(exit) {
             return tag
           }
           
+          // Have owner re-render
           if(tag.ownerTag) {
             const newest = tag.ownerTag.tagSupport.render()
             tag.ownerTag.tagSupport.newest = newest

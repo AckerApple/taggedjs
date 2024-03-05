@@ -12,7 +12,8 @@ export function updateExistingTag(
   const oldest = tagSupport.oldest as Tag
   const newest = tagSupport.newest as Tag
 
-  runBeforeRedraw(oldest.tagSupport, newest || oldest)
+  // runBeforeRedraw(oldest.tagSupport, newest || oldest)
+  runBeforeRedraw(oldest.tagSupport, oldest)
 
   const retag = templater.wrapper()
   
@@ -20,6 +21,7 @@ export function updateExistingTag(
   tagSupport.newest = retag
   runAfterRender(oldest.tagSupport, oldest)
   ogTag.updateByTag(retag)
+  // oldest.updateByTag(retag)
 
   existingSubject.set(templater)
   

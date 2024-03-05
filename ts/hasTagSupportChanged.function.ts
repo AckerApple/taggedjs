@@ -1,6 +1,6 @@
 import { Props } from "./Props.js"
 import { TagSupport } from "./TagSupport.class.js"
-import { deepClone, deepEqual } from "./deepFunctions.js"
+import { deepEqual } from "./deepFunctions.js"
 
 export function hasTagSupportChanged(
   oldTagSupport: TagSupport,

@@ -9,11 +9,12 @@ import { TagSubject } from "./Tag.utils.js"
 
 export function processSubjectComponent(
   value: TemplaterResult,
-  result: TagSubject,
+  subject: TagSubject,
   template: Element,
   ownerTag: Tag,
   options: {counts: Counts, forceElement?: boolean},
 ) {
+  // Check if function component is wrapped in a tag() call
   // TODO: This below check not needed in production mode
   if(value.tagged !== true) {
     let name: string | undefined = value.wrapper.original.name || value.wrapper.original.constructor?.name
@@ -28,7 +29,8 @@ export function processSubjectComponent(
   }
 
   const templater = value as TemplaterResult
-  const tagSupport: TagSupport = value.tagSupport
+  templater.insertBefore = template
+  const tagSupport = value.tagSupport
 
   let retag = templater.newest as Tag
   
@@ -39,13 +41,14 @@ export function processSubjectComponent(
 
   if(isFirstTime) {
     if(retag) {
-      runBeforeRedraw(tagSupport, retag)
+      // runBeforeRedraw(tagSupport, retag)
+      runBeforeRedraw(tagSupport, templater.oldest as Tag)
     } else {
       runBeforeRender(tagSupport, ownerTag)
     }
-  
-    retag = templater.forceRenderTemplate(tagSupport, ownerTag)
-
+ 
+    const result = templater.renderWithSupport(tagSupport, subject.tag, ownerTag)
+    retag = result.retag
     templater.newest = retag
   }
   
@@ -55,7 +58,7 @@ export function processSubjectComponent(
   
   const clones = processTagResult(
     retag,
-    result, // The element set here will be removed from document. Also result.tag will be added in here
+    subject, // The element set here will be removed from document. Also result.tag will be added in here
     template, // <template end interpolate /> (will be removed)
     options,
   )
