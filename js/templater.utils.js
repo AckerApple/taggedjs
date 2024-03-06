@@ -68,13 +68,7 @@ export function alterProps(props, templater) {
         // const tagSupport = tag.tagSupport
         // const tagSupport = templater.tagSupport
         const tagSupport = tag?.ownerTag?.tagSupport;
-        // ???
-        console.log('after prop callback --- start');
         tagSupport.render();
-        console.log('after prop callback --- end');
-        /*if(tagSupport) {
-          tagSupport.render()
-        }*/
         return callbackResult;
     }
     const isPropTag = isTagInstance(props);
@@ -93,18 +87,9 @@ function resetFunctionProps(props, callback) {
         if (value instanceof Function) {
             const original = newProps[name].original;
             if (original) {
-                /*
-                newProps[name] = (...args: any[]) => {
-                  console.log('already overrode callback')
-                  return callback(value, args)
-                }
-          
-                newProps[name].original = original
-                */
                 return; // already previously converted
             }
             newProps[name] = (...args) => {
-                console.log('new override callback');
                 return callback(value, args);
             };
             newProps[name].original = value;
