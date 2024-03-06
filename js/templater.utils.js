@@ -63,10 +63,18 @@ export class TemplaterResult {
 export function alterProps(props, templater) {
     function callback(toCall, callWith) {
         const callbackResult = toCall(...callWith);
-        const tagSupport = templater.newest?.ownerTag?.tagSupport;
-        if (tagSupport) {
-            tagSupport.render();
-        }
+        // const tag = templater.oldest as Tag
+        const tag = templater.newest;
+        // const tagSupport = tag.tagSupport
+        // const tagSupport = templater.tagSupport
+        const tagSupport = tag?.ownerTag?.tagSupport;
+        // ???
+        console.log('after prop callback --- start');
+        tagSupport.render();
+        console.log('after prop callback --- end');
+        /*if(tagSupport) {
+          tagSupport.render()
+        }*/
         return callbackResult;
     }
     const isPropTag = isTagInstance(props);
@@ -85,13 +93,18 @@ function resetFunctionProps(props, callback) {
         if (value instanceof Function) {
             const original = newProps[name].original;
             if (original) {
-                newProps[name] = (...args) => {
-                    return callback(value, args);
-                };
-                newProps[name].original = original;
+                /*
+                newProps[name] = (...args: any[]) => {
+                  console.log('already overrode callback')
+                  return callback(value, args)
+                }
+          
+                newProps[name].original = original
+                */
                 return; // already previously converted
             }
             newProps[name] = (...args) => {
+                console.log('new override callback');
                 return callback(value, args);
             };
             newProps[name].original = value;

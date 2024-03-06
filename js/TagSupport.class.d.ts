@@ -12,6 +12,7 @@ export declare class TagSupport {
         clonedProps: Props;
     };
     memory: TagMemory;
+    updateState(): void;
     constructor(templater: TemplaterResult, children: TagChildren, // children tags passed in as arguments
     props?: Props);
     oldest?: Tag;

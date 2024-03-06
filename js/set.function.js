@@ -13,15 +13,19 @@ export function makeStateResult(initValue, push) {
     };
     return result;
 }
-const waitingStates = [];
-export function onNextStateOnly(callback) {
-    const config = setUse.memory.stateConfig;
-    if (!config.rearray.length) {
-        callback();
-        return;
-    }
-    waitingStates.push(callback);
+/*
+const waitingStates: (() => unknown)[] = []
+export function onNextStateOnly(callback: () => unknown) {
+  const config: Config = setUse.memory.stateConfig
+  
+  if(!config.rearray.length) {
+    callback()
+    return
+  }
+
+  waitingStates.push(callback)
 }
+*/
 setUse({
     beforeRender: (tagSupport) => initState(tagSupport),
     beforeRedraw: (tagSupport) => initState(tagSupport),
@@ -43,8 +47,8 @@ setUse({
         state.newest = [...config.array];
         // config.array.length = 0
         config.array = [];
-        waitingStates.forEach(callback => callback());
-        waitingStates.length = 0;
+        // waitingStates.forEach(callback => callback())
+        // waitingStates.length = 0
     }
 });
 export function getStateValue(

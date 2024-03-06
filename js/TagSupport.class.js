@@ -1,5 +1,6 @@
 import { deepClone } from "./deepFunctions.js";
 import { isTagArray, isTagComponent, isTagInstance } from "./isInstance.js";
+import { getStateValue } from "./set.function.js";
 import { alterProps } from "./templater.utils.js";
 export class TagSupport {
     templater;
@@ -14,6 +15,11 @@ export class TagSupport {
         /** Indicator of re-rending. Saves from double rending something already rendered */
         renderCount: 0,
     };
+    updateState() {
+        this.memory.state.newest.forEach(newest => {
+            newest.lastValue = getStateValue(newest);
+        });
+    }
     constructor(templater, children, // children tags passed in as arguments
     props) {
         this.templater = templater;

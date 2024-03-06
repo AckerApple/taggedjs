@@ -30,6 +30,7 @@ export function tag(tagComponent) {
             const tag = originalFunction(castedProps, childSubject);
             if (oldTagSetup.mutatingRender === TagSupport.prototype.mutatingRender) {
                 oldTagSetup.oldest = tag;
+                templater.oldest = tag;
                 // tag.tagSupport = oldTagSetup
                 oldTagSetup.mutatingRender = () => {
                     const exit = renderExistingTag(tag, templater, oldTagSetup);
@@ -113,7 +114,7 @@ function updateResult(result, tagComponent) {
 function updateComponent(tagComponent) {
     tagComponent.tags = tags;
     tagComponent.setUse = setUse;
-    tagComponent.tagIndex = ++tagCount; // needed for things like HMR
+    tagComponent.tagIndex = tagCount++; // needed for things like HMR
 }
 class NoPropsGiven {
 }

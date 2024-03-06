@@ -15,7 +15,6 @@ export type State = {
 };
 export type GetSet<T> = (y: T) => [T, T];
 export declare function makeStateResult<T>(initValue: T, push: StateConfigItem<T>): (y: any) => T;
-export declare function onNextStateOnly(callback: () => unknown): void;
 export declare function getStateValue<T>(state: StateConfigItem<T>): T | undefined;
 export declare class StateEchoBack {
 }
