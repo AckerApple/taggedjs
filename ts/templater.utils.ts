@@ -105,11 +105,18 @@ export function alterProps(
   function callback(toCall: any, callWith: any) {
     const callbackResult = toCall(...callWith)
 
-    const tagSupport = templater.newest?.ownerTag?.tagSupport
-
-    if(tagSupport) {
+    // const tag = templater.oldest as Tag
+    const tag = templater.newest
+    // const tagSupport = tag.tagSupport
+    // const tagSupport = templater.tagSupport
+    const tagSupport = tag?.ownerTag?.tagSupport as TagSupport
+    // ???
+    console.log('after prop callback --- start')
+    tagSupport.render()
+    console.log('after prop callback --- end')
+    /*if(tagSupport) {
       tagSupport.render()
-    }
+    }*/
 
     return callbackResult
   }
@@ -138,15 +145,19 @@ function resetFunctionProps(
       const original = newProps[name].original
       
       if(original) {
+        /*
         newProps[name] = (...args: any[]) => {
+          console.log('already overrode callback')
           return callback(value, args)
         }
   
         newProps[name].original = original
+        */
         return // already previously converted
       }
 
       newProps[name] = (...args: any[]) => {
+        console.log('new override callback')
         return callback(value, args)
       }
 

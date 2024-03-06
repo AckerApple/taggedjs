@@ -1,7 +1,7 @@
 {
   "name": "taggedjs",
   "private": true,
-  "version": "2.4.3",
+  "version": "2.4.4",
   "description": "tagged template reactive html",
   "main": "js/index.js",
   "type": "module",
@@ -14,7 +14,7 @@
     "build:dist": "run-s build build:dist:only",
     "build:dist:only": "cp README.MD ./dist/README.md && npm run build:dist:pack && rm -rf ./dist/js && cp -R js ./dist && cp -R ./dist/. ../dist",
     "build:pinbowl": "npm run copy:pinbowl",
-    "copy:pinbowl": "cp -R js/. ../../../services/pinbowl/src/taggedjs && cd ../../../services/pinbowl/taggedjs && npm run build && echo \"🎳 Built pinbowl\"",
+    "copy:pinbowl": "cp -R js/. ../../../services/pinbowl/src/taggedjs && cd ../../../services/pinbowl/ && npm run build && echo \"🎳 Built pinbowl\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "save:dist": "run-s patch:version build:js build:dist:only save:dist:git",
     "save:dist:git": "cd ../dist && git add . && git commit -m \"dist patch\" && git push",

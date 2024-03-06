@@ -21,6 +21,7 @@ export type Config = {
 
 export type State = {
   newest: StateConfigArray
+  // update: () => any
   // oldest?: StateConfigArray
   // config: Config
 }
@@ -47,6 +48,7 @@ export function makeStateResult<T>(
   return result
 }
 
+/*
 const waitingStates: (() => unknown)[] = []
 export function onNextStateOnly(callback: () => unknown) {
   const config: Config = setUse.memory.stateConfig
@@ -58,6 +60,7 @@ export function onNextStateOnly(callback: () => unknown) {
 
   waitingStates.push(callback)
 }
+*/
 
 setUse({
   beforeRender: (tagSupport: TagSupport) => initState(tagSupport),
@@ -88,8 +91,8 @@ setUse({
     // config.array.length = 0
     config.array = []
 
-    waitingStates.forEach(callback => callback())
-    waitingStates.length = 0
+    // waitingStates.forEach(callback => callback())
+    // waitingStates.length = 0
   }
 })
 

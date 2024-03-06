@@ -61,6 +61,7 @@ export function tag<T extends any[]>(
 
       if(oldTagSetup.mutatingRender === TagSupport.prototype.mutatingRender) {
         oldTagSetup.oldest = tag
+        templater.oldest = tag
         // tag.tagSupport = oldTagSetup
 
         oldTagSetup.mutatingRender = () => {
@@ -179,7 +180,7 @@ function updateComponent(
 ) {
   tagComponent.tags = tags
   tagComponent.setUse = setUse
-  tagComponent.tagIndex = ++tagCount // needed for things like HMR
+  tagComponent.tagIndex = tagCount++ // needed for things like HMR
 }
 class NoPropsGiven {}
 const noPropsGiven = new NoPropsGiven()

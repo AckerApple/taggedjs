@@ -39,9 +39,19 @@ export function runTagCallback(
 
   const sameRenderCount = renderCount === tagSupport.memory.renderCount
   
-  // TODO: need to restore this
-  if(tagSupport && !sameRenderCount) {
-    // return // already rendered
+  if(tagSupport && !sameRenderCount) {    
+    // tag.tagSupport.updateState()
+    // oldest.tagSupport.memory = newest.tagSupport.memory
+    // oldest.tagSupport.memory = tag.tagSupport.memory
+    // newest.tagSupport.memory = tag.tagSupport.memory
+    // oldest.updateByTag(newest)
+    // oldest.updateByTag(tag)
+    // newest.updateByTag(tag)
+    // tag.updateByTag(newest)
+    // tagSupport.updateState()
+    // ???
+    
+    return // already rendered
   }
 
   tagSupport.render()

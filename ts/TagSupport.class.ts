@@ -2,7 +2,7 @@ import { Props } from "./Props.js"
 import { Tag, TagMemory } from "./Tag.class.js"
 import { deepClone } from "./deepFunctions.js"
 import { isTagArray, isTagComponent, isTagInstance } from "./isInstance.js"
-import { renderExistingTag } from "./renderExistingTag.function.js"
+import { StateConfigArray, getStateValue } from "./set.function.js"
 import { TagChildren } from "./tag.js"
 import { TemplaterResult, alterProps } from "./templater.utils.js"
 
@@ -18,11 +18,17 @@ export class TagSupport {
   memory: TagMemory = {
     context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
     state: {
-      newest: [],
+      newest: [] as StateConfigArray,
     },
     providers: [],
     /** Indicator of re-rending. Saves from double rending something already rendered */
     renderCount: 0,
+  }
+
+  updateState() {
+    this.memory.state.newest.forEach(newest => {
+      newest.lastValue = getStateValue(newest)
+    })
   }
 
   constructor(

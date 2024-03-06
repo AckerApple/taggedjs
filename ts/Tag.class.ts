@@ -146,6 +146,7 @@ export class Tag {
     this.tagSupport.templater = tag.tagSupport.templater
     this.tagSupport.propsConfig = {...tag.tagSupport.propsConfig}
     this.tagSupport.newest = tag
+    this.tagSupport.templater.newest = tag
   }
 
   lastTemplateString: string | undefined = undefined // used to compare templates for updates

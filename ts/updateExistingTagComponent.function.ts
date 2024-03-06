@@ -52,6 +52,10 @@ export function updateExistingTagComponent(
     if(existingTag) {
       const newTagSupport = tempResult.tagSupport
       const hasChanged = hasTagSupportChanged(oldTagSetup, newTagSupport)
+      console.log('hasChanged - 1', {
+        hasChanged,
+        org:oldTagSetup.templater.wrapper.original
+      })
       if(!hasChanged) {
         return // its the same tag component
       }
