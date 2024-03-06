@@ -1,3 +1,26 @@
+const onlyTests = [];
+const tests = [];
+export function it(label, run) {
+    tests.push(() => {
+        console.debug(label);
+        run();
+    });
+}
+it.only = (label, run) => {
+    onlyTests.push(() => {
+        console.debug(label);
+        run();
+    });
+};
+export function execute() {
+    if (onlyTests.length) {
+        return runTests(onlyTests);
+    }
+    return runTests(tests);
+}
+function runTests(tests) {
+    tests.forEach(test => test());
+}
 export function expect(expected) {
     return {
         toBeDefined: () => {

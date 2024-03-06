@@ -16,14 +16,18 @@ export const App = tag(() => {
     let renderCount = setLet(0)(x => [renderCount, renderCount = x]);
     const toggle = () => {
         toggleValue = !toggleValue;
-        console.log('toggled to', toggleValue);
     };
     function runTesting(manual = true) {
         setTimeout(() => {
             const result = runTests();
-            if (result && manual) {
-                alert('✅ all tests passed');
+            if (!manual) {
+                return;
             }
+            if (result) {
+                alert('✅ all tests passed');
+                return;
+            }
+            alert('❌ tests failed. See console for more details');
         }, 3000); // cause delay to be separate from renders
     }
     ++renderCount;
@@ -76,7 +80,6 @@ export const App = tag(() => {
       </div>            
     </div>
   `;
-    console.log('app.component content done');
     return content;
 });
 //# sourceMappingURL=app.component.js.map

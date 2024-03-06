@@ -2,13 +2,15 @@ import { animateDestroy, animateInit } from './animations.js'
 import { renderCountDiv } from './renderCount.component.js'
 import {html, set, setLet, tag} from 'taggedjs'
 
+const frameCount = 4
+
 export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
   const array0: {name: string, scores: any[]}[] = set([])
   let renderCount: number = setLet(0)(x => [renderCount, renderCount = x])
 
   const getNewPerson = () => ({
     name: 'Person '+array0.length,
-    scores: '0,'.repeat(4).split(',').map((_v, index) => ({
+    scores: '0,'.repeat(frameCount).split(',').map((_v, index) => ({
       frame: index + 1,
       score: Math.floor(Math.random() * 4) + 1
     }))
@@ -27,10 +29,13 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
             index:${index}
           </div>
           
-          <div>scores:${item.scores.map(score => html`
+          <div>scores:${item.scores.map((score, playerIndex) => html`
             <div style="border:1px solid white;"
               oninit=${animateInit} ondestroy=${animateDestroy}
-            >${scoreData(score)}</div>
+            >
+              ${scoreData({score, playerIndex})}-
+              <button id=${`score-data-${playerIndex}-${score.frame}-outside`} onclick=${() => ++score.score}>${score.score}</button>
+            </div>
           `.key(score))}</div>
           
           <button onclick=${() => {
@@ -43,7 +48,7 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
       `.key(item))}
     </div>
 
-    <button onclick=${() => {
+    <button id="array-test-push-item" onclick=${() => {
       array0.push(getNewPerson())
     }}>push item ${array0.length+1}</button>
 
@@ -66,7 +71,7 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
     }}>push 9 items</button>
 
     ${array0.length > 0 && html`
-      <button onclick=${() => {
+      <button oninit=${animateInit} ondestroy=${animateDestroy} onclick=${() => {
         array0.length = 0
       }}>remove all</button>
     `}
@@ -75,6 +80,23 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
   `
 })
 
-const scoreData = tag(function ScoreData(score: {score: number, frame: number}) {
-  return html`${score.frame}:${score.score}`
+const scoreData = tag((
+  {score, playerIndex}: {
+    playerIndex: number
+    score:{score: number, frame: number}
+  }
+) => {
+  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
+  
+  ++renderCount
+  
+  return html`
+    frame:${score.frame}:
+    <button
+      id=${`score-data-${playerIndex}-${score.frame}-inside`}
+      onclick=${() => ++score.score}
+    >${score.score}</button>
+    <button onclick=${() => ++renderCount}>increase renderCount</button>
+    ${renderCountDiv({renderCount, name:'scoreData' + score.frame})}
+  `
 })

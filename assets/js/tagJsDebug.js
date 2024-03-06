@@ -3,7 +3,6 @@ import { animateDestroy, animateInit } from "./animations.js";
 import { arrayTests } from "./arrayTests.js";
 import { intervalTester0, intervalTester1 } from "./intervalDebug.js";
 import { html, tag, providers, setLet } from "taggedjs";
-import { gatewayDebug } from "./gatewayDebug.component.js";
 import { renderCountDiv } from "./renderCount.component.js";
 export function tagDebugProvider() {
     const upper = providers.create(upperTagDebugProvider);
@@ -19,7 +18,6 @@ export function upperTagDebugProvider() {
     };
 }
 export const tagDebug = tag(() => {
-    console.log('render tagDebug.js');
     let _firstState = setLet('tagJsDebug.js')(x => [_firstState, _firstState = x]);
     let showIntervals = setLet(false)(x => [showIntervals, showIntervals = x]);
     let renderCount = setLet(0)(x => [renderCount, renderCount = x]);
@@ -55,12 +53,6 @@ export const tagDebug = tag(() => {
       <fieldset id="props-debug" style="flex:2 2 20em">
         <legend>Props Debug</legend>
         ${propsDebugMain()}
-      </fieldset>
-
-
-      <fieldset id="content-debug" style="flex:2 2 20em">
-        <legend>#tagGateway</legend>
-        ${gatewayDebug()}
       </fieldset>
     </div>
   `;

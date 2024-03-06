@@ -28,8 +28,6 @@ export const childTests = tag(() => {
 
   ++renderCount
 
-  console.log('----- childTests renderCount -----', {renderCount, counter})
-
   return html`
     <fieldset id="children-test" style="flex:2 2 20em">
       <legend>childTests</legend>
@@ -46,12 +44,15 @@ export const childTests = tag(() => {
         ${renderCountDiv({renderCount, name: 'childTests'})}
       `)}
 
-      ${/*innerHtmlPropsTest(22, html`
+      ${innerHtmlPropsTest(22, html`
         <b>Field set body B</b>
         <hr />
-        <button onclick=${() => ++counter}>increase childTests inside ${counter}</button>
-        ${renderCountDiv(renderCount)}
-      `)*/false}
+        <button id="innerHtmlPropsTest-childTests-button"
+          onclick=${() => ++counter}
+        >increase childTests inside 22 ${counter}</button>
+        <span id="innerHtmlPropsTest-childTests-display">${counter}</span>
+        ${renderCountDiv({renderCount, name: 'innerHtmlPropsTest child'})}
+      `)}
 
       ${/*childContentTest({legend: 'Inner Test', id:'children-inner-test'}, html`
         ${innerHtmlTest(html`

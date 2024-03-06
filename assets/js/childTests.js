@@ -1,5 +1,5 @@
 import { html, setLet, tag } from "taggedjs";
-import { innerHtmlTest } from "./innerHtmlTests.js";
+import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests.js";
 import { renderCountDiv } from "./renderCount.component.js";
 const childContentTest = tag(({ legend, id }, children) => {
     let renderCount = setLet(0)(x => [renderCount, renderCount = x]);
@@ -19,7 +19,6 @@ export const childTests = tag(() => {
     let renderCount = setLet(0)(x => [renderCount, renderCount = x]);
     let counter = setLet(0)(x => [counter, counter = x]);
     ++renderCount;
-    console.log('----- childTests renderCount -----', { renderCount, counter });
     return html `
     <fieldset id="children-test" style="flex:2 2 20em">
       <legend>childTests</legend>
@@ -36,12 +35,15 @@ export const childTests = tag(() => {
         ${renderCountDiv({ renderCount, name: 'childTests' })}
       `)}
 
-      ${ /*innerHtmlPropsTest(22, html`
-      <b>Field set body B</b>
-      <hr />
-      <button onclick=${() => ++counter}>increase childTests inside ${counter}</button>
-      ${renderCountDiv(renderCount)}
-    `)*/false}
+      ${innerHtmlPropsTest(22, html `
+        <b>Field set body B</b>
+        <hr />
+        <button id="innerHtmlPropsTest-childTests-button"
+          onclick=${() => ++counter}
+        >increase childTests inside 22 ${counter}</button>
+        <span id="innerHtmlPropsTest-childTests-display">${counter}</span>
+        ${renderCountDiv({ renderCount, name: 'innerHtmlPropsTest child' })}
+      `)}
 
       ${ /*childContentTest({legend: 'Inner Test', id:'children-inner-test'}, html`
       ${innerHtmlTest(html`

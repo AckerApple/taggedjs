@@ -52,7 +52,10 @@ export const intervalTester0 = tag(() => {
     <div>interval type 1 at ${test0interval}ms</div>
     intervalId: ${intervalId}
     <button type="button" onclick=${increase}>${intervalCount}:${renderCounter}</button>
-    <input type="range" min="0" max=${test0interval} step="1" value=${currentTime} />--${currentTime}--
+    <input type="range" min="0" max=${test0interval} step="1" value=${currentTime} />
+    <div>
+      --${currentTime}--
+    </div>
     <button type="button" onclick=${toggle}
       style.background-color=${intervalId || intervalId2 ? 'red' : 'green'}
     >start/stop</button>
@@ -71,7 +74,7 @@ export const intervalTester1 = tag(() => {
         currentTime = 0;
         intervalId2 = setInterval(callback(() => {
             currentTime = currentTime + 500;
-            if (currentTime >= test0interval) {
+            if (currentTime >= test1interval) {
                 currentTime = 0;
             }
         }), 500);
@@ -102,6 +105,9 @@ export const intervalTester1 = tag(() => {
     intervalId: ${intervalId}
     <button type="button" onclick=${increase}>${intervalCount}:${renderCounter}</button>
     <input type="range" min="0" max=${test1interval} step="1" value=${currentTime} />
+    <div>
+      --${currentTime}--
+    </div>
     <button type="button" onclick=${toggleInterval}
       style.background-color=${intervalId ? 'red' : 'green'}
     >start/stop</button>

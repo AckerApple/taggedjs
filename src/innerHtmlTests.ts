@@ -10,15 +10,15 @@ export const innerHtmlTest = tag((
 
   ++renderCount
 
-  console.log('----- innerHtmlTest renderCount -----', {renderCount, counter})
-
   return html`<!--innerHtmlTests.js-->
     <fieldset id="innerHtmlTests-1">
       <legend>no props test</legend>
       <div>${children}</div>
       <div>isSubjectInstance:${isSubjectInstance(children)}</div>
       <div>isSubjectTagArray:${isTagArray(children.value)}</div>
-      <button onclick=${() => ++counter}>increase innerHtmlTest ${counter}</button>
+      <button id="innerHtmlTest-counter-button"
+      onclick=${() => ++counter}>increase innerHtmlTest ${counter}</button>
+      <span id="innerHtmlTest-counter-display">${counter}</span>
       ${renderCountDiv({renderCount, name: 'innerHtmlTest'})}
     </fieldset>
   `
@@ -37,7 +37,9 @@ export const innerHtmlPropsTest = tag((
     <fieldset id="innerHtmlTests-2">
       <legend>innerHTML Props: ${x}</legend>
       ${children}
-      <button onclick=${() => ++counter}>increase innerHtmlPropsTest ${counter}</button>
+      <button id="innerHtmlPropsTest-button" onclick=${() => ++counter}
+      >increase innerHtmlPropsTest ${counter}</button>
+      <span id="innerHtmlPropsTest-display">${counter}</span>
       ${/*renderCountDiv(renderCount)*/ false}
     </fieldset>
   `

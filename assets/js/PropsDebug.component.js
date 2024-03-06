@@ -17,7 +17,7 @@ export const propsDebugMain = tag(() => {
     <div><small>(renderCount:${renderCount})</small></div>
     
     <div>
-      <button id="propsDebug-🥩-0-button" onclick=${() => ++propNumber}>propNumber ${propNumber}</button>
+      <button id="propsDebug-🥩-0-button" onclick=${() => ++propNumber}>🥩 propNumber ${propNumber}</button>
       <span id="propsDebug-🥩-0-display">${propNumber}</span>
     </div>
     
@@ -27,7 +27,6 @@ export const propsDebugMain = tag(() => {
         propNumber,
         propsJson,
         propNumberChange: x => {
-            console.log('parent callback fired', x);
             propNumber = x;
         }
     })}
@@ -40,13 +39,11 @@ const propsDebug = tag(({ propNumber, propsJson, propNumberChange, }) => {
     let propNumberChangeCount = setLet(0)(x => [propNumberChangeCount, propNumberChangeCount = x]);
     setProp(x => [propNumber, propNumber = x]);
     const watchResults = watch([propNumber], () => {
-        console.log('propNumber changed', propNumber);
         ++propNumberChangeCount;
     });
     ++renderCount;
     function pasteProps(event) {
         const value = JSON.parse(event.target.value);
-        console.log('value', value);
         Object.assign(propsJson, value);
     }
     return html `<!--propsDebug.js-->
@@ -60,7 +57,7 @@ const propsDebug = tag(({ propNumber, propsJson, propNumberChange, }) => {
     
     <div>
       <button id="propsDebug-🥩-1-button" onclick=${() => propNumberChange(++propNumber)}
-      >propNumber ${propNumber}</button>
+      >🥩 propNumber ${propNumber}</button>
       <span id="propsDebug-🥩-1-display">${propNumber}</span>
     </div>
     <button
@@ -78,7 +75,6 @@ const propsDebug = tag(({ propNumber, propsJson, propNumberChange, }) => {
     <h3>Fn update test</h3>
     ${propFnUpdateTest({ propNumber, callback: () => {
             ++propNumber;
-            console.log('increased out here', propNumber);
         } })}
     
     ${renderCountDiv({ renderCount, name: 'propsDebug' })}

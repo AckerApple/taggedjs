@@ -1,3 +1,33 @@
+type Test = () => unknown
+const onlyTests: Test[] = []
+const tests: Test[] = []
+
+export function it(label: string, run: () => any) {
+  tests.push(() => {
+    console.debug(label)
+    run()
+  })
+}
+
+it.only = (label: string, run: () => any) => {
+  onlyTests.push(() => {
+    console.debug(label)
+    run()
+  })
+}
+
+export function execute() {
+  if(onlyTests.length) {
+    return runTests(onlyTests)
+  }
+  
+  return runTests(tests)
+}
+
+function runTests(tests: Test[]) {
+  tests.forEach(test => test())
+}
+
 export function expect(expected: unknown) {
   return {
     toBeDefined: () => {

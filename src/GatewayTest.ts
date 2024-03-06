@@ -2,7 +2,7 @@ import { renderCountDiv } from "./renderCount.component.js"
 import { setLet, tag, html } from "taggedjs"
 
 export const GatewayTest = tag((
-  props: unknown, // : {test:number}
+  props: any, // : {test:number}
 ) => {
   let renderCount: number = setLet(0)(x => [renderCount, renderCount=x])
 
