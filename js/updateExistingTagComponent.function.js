@@ -1,8 +1,8 @@
 import { setValueRedraw } from "./Tag.utils.js";
 import { deepClone } from "./deepFunctions.js";
 import { isTagInstance } from "./isInstance.js";
-import { destroyTagMemory } from "./updateExistingValue.function.js";
 import { hasTagSupportChanged } from "./hasTagSupportChanged.function.js";
+import { destroyTagMemory } from "./checkDestroyPrevious.function.js";
 export function updateExistingTagComponent(tag, tempResult, existingSubject, subjectValue) {
     let existingTag = existingSubject.tag;
     // previously was something else, now a tag component
@@ -38,18 +38,20 @@ export function updateExistingTagComponent(tag, tempResult, existingSubject, sub
             const newTagSupport = tempResult.tagSupport;
             const hasChanged = hasTagSupportChanged(oldTagSetup, newTagSupport);
             if (!hasChanged) {
-                return;
+                return; // its the same tag component
             }
         }
     }
     setValueRedraw(tempResult, existingSubject, tag);
     oldTagSetup.templater = tempResult;
     const redraw = tempResult.redraw();
-    /*
-    // ???
-    const redraw = tempResult.redraw() as Tag
-    existingSubject.value.tag = oldTagSetup.newest = redraw
-    */
+    if (!existingTag.isLikeTag(redraw)) {
+        existingTag.destroy();
+        existingSubject.tagSupport = redraw.tagSupport;
+        existingSubject.tag = redraw;
+        oldTagSetup.oldest = redraw;
+    }
+    oldTagSetup.newest = redraw;
     oldTagSetup.propsConfig = { ...tempResult.tagSupport.propsConfig };
     return;
 }

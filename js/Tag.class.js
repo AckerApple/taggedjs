@@ -16,13 +16,13 @@ export class Tag {
     strings;
     values;
     isTag = true;
-    clones = []; // elements on document
+    clones = []; // elements on document. Needed at destroy process to know what to destroy
     cloneSubs = []; // subscriptions created by clones
     children = []; // tags on me
     tagSupport;
     // only present when a child of a tag
     ownerTag;
-    insertBefore;
+    // insertBefore?: Element
     appElement; // only seen on this.getAppElement().appElement
     // present only when an array. Populated by this.key()
     arrayValue = new ArrayValueNeverSet();
@@ -46,6 +46,7 @@ export class Tag {
         }
         this.destroySubscriptions();
         const promises = this.children.map((kid) => kid.destroy({ ...options, byParent: true }));
+        this.children.length = 0;
         if (this.ownerTag) {
             this.ownerTag.children = this.ownerTag.children.filter(child => child !== this);
         }
@@ -85,6 +86,7 @@ export class Tag {
             }
             return promise;
         });
+        this.clones.length = 0; // tag maybe used for something else
         if (hasPromise) {
             await Promise.all(promises);
         }
@@ -122,6 +124,7 @@ export class Tag {
     }
     isLikeTag(tag) {
         const { string } = tag.getTemplate();
+        // TODO: most likely remove?
         if (!this.lastTemplateString) {
             throw new Error('no template here');
         }
@@ -154,12 +157,14 @@ export class Tag {
         return this.updateContext(this.tagSupport.memory.context);
     }
     updateContext(context) {
+        // const seenContext: string[] = []
         this.strings.map((_string, index) => {
             const variableName = variablePrefix + index;
             const hasValue = this.values.length > index;
             const value = this.values[index];
             // is something already there?
             const existing = variableName in context;
+            // seenContext.push(variableName)
             if (existing) {
                 const existing = context[variableName];
                 return updateExistingValue(existing, value, this);
@@ -167,6 +172,15 @@ export class Tag {
             // 🆕 First time values below
             processNewValue(hasValue, value, context, variableName, this);
         });
+        /*
+        // Support reduction in context
+        Object.entries(context).forEach(([key, subject]) => {
+          if(seenContext.includes(key)) {
+            return
+          }
+          const destroyed = checkDestroyPrevious(subject, undefined as any)
+        })
+        */
         return context;
     }
     getAppElement() {
@@ -178,7 +192,8 @@ export class Tag {
     }
     /** Used during HMR only where static content itself could have been edited */
     rebuild() {
-        const insertBefore = this.insertBefore;
+        // const insertBefore = this.insertBefore
+        const insertBefore = this.tagSupport.templater.insertBefore;
         if (!insertBefore) {
             const err = new Error('Cannot rebuild. Previous insertBefore element is not defined on tag');
             err.tag = this;
@@ -193,13 +208,14 @@ export class Tag {
         forceElement: false,
         counts: { added: 0, removed: 0 },
     }) {
-        this.insertBefore = insertBefore;
+        // this.insertBefore = insertBefore
+        this.tagSupport.templater.insertBefore = insertBefore;
         const context = this.update();
         const template = this.getTemplate();
         const temporary = document.createElement('div');
         temporary.id = 'tag-temp-holder';
         // render content with a first child that we can know is our first element
-        temporary.innerHTML = `<template tag-wrap="22">${template.string}</template>`;
+        temporary.innerHTML = `<template id="temp-template-tag-wrap">${template.string}</template>`;
         // const clonesBefore = this.clones.map(clone => clone)
         const intClones = interpolateElement(temporary, context, template, this, // this.ownerTag || this,
         {

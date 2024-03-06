@@ -5,6 +5,7 @@ import { ValueSubject } from "./ValueSubject.js";
 import { runTagCallback } from "./bindSubjectCallback.function.js";
 import { deepClone } from "./deepFunctions.js";
 import { TagSupport } from "./TagSupport.class.js";
+import { renderExistingTag } from "./renderExistingTag.function.js";
 export const tags = [];
 let tagCount = 0;
 /** Wraps a tag component in a state manager and always push children to last argument as any array */
@@ -31,10 +32,11 @@ export function tag(tagComponent) {
                 oldTagSetup.oldest = tag;
                 // tag.tagSupport = oldTagSetup
                 oldTagSetup.mutatingRender = () => {
-                    const exit = oldTagSetup.renderExistingTag(tag, templater);
+                    const exit = renderExistingTag(tag, templater, oldTagSetup);
                     if (exit) {
                         return tag;
                     }
+                    // Have owner re-render
                     if (tag.ownerTag) {
                         const newest = tag.ownerTag.tagSupport.render();
                         tag.ownerTag.tagSupport.newest = newest;

@@ -40,8 +40,8 @@ function removeSubFromArray(subscribers, callback) {
         subscribers.splice(index, 1);
     }
 }
-const SubjectClass = {
-    globalSubCount$: new Subject(0), // for ease of debugging
-    globalSubs: [] // 🔬 for testing
-};
+const SubjectClass = Subject;
+SubjectClass.globalSubs = []; // 🔬 for testing
+SubjectClass.globalSubCount$ = new Subject(); // for ease of debugging
+SubjectClass.globalSubCount$.set(0);
 //# sourceMappingURL=Subject.js.map

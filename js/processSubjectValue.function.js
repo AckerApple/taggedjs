@@ -3,7 +3,6 @@ import { processTagResult } from "./processTagResult.function.js";
 import { isTagArray, isTagComponent, isTagInstance } from "./isInstance.js";
 import { processTagArray } from "./processTagArray.js";
 import { TagSupport } from "./TagSupport.class.js";
-import { updateBetweenTemplates } from "./interpolateTemplate.js";
 import { ValueSubject } from "./ValueSubject.js";
 import { processRegularValue } from "./processRegularValue.function.js";
 var ValueTypes;
@@ -30,36 +29,21 @@ template, // <template end interpolate /> (will be removed)
 ownerTag, // owner
 options) {
     const valueType = getValueType(value);
-    // Previously was simple value, now its a tag of some sort
-    const resultTag = result;
-    const clone = resultTag.clone;
-    const noLongerSimpleValue = valueType !== ValueTypes.value && clone;
-    if (noLongerSimpleValue) {
-        destroySimpleValue(template, resultTag);
-    }
     switch (valueType) {
         case ValueTypes.tag:
             return {
                 clones: processTag(value, result, template, ownerTag, options)
             };
         case ValueTypes.tagArray:
-            return {
-                clones: processTagArray(result, value, template, ownerTag, options)
-            };
+            const clones = processTagArray(result, value, template, ownerTag, options);
+            return { clones };
         case ValueTypes.tagComponent:
             return {
                 clones: processSubjectComponent(value, result, template, ownerTag, options)
             };
     }
-    // *if processing WAS a tag BUT NOW its some other non-tag value
-    if (result.tag) {
-        return {
-            clones: [],
-            promise: processWasTag(value, result, template, options),
-        };
-    }
     return {
-        clones: processRegularValue(value, result, template, ownerTag)
+        clones: processRegularValue(value, result, template)
     };
 }
 export function processTag(value, result, // could be tag via result.tag
@@ -83,32 +67,16 @@ options) {
     template, options);
     return clones;
 }
-function processWasTag(value, result, // could be tag via result.tag,
-template, // <template end interpolate /> (will be removed)
-options) {
-    const tag = result.tag;
-    // put the template back
-    const lastFirstChild = result.clone || template; // result.tag.clones[0] // template.lastFirstChild
-    // const parentNode = lastFirstChild.parentNode || template.parentNode
-    // put the template back down
-    lastFirstChild.parentNode.insertBefore(template, lastFirstChild);
-    const clone = updateBetweenTemplates(value, 
-    // template // template, // this will be removed from document inside this function
-    lastFirstChild);
-    result.clone = clone;
-    // cleanup old
-    delete result.tag;
-    /* destroy logic */
-    const stagger = options.counts.removed;
-    const promise = tag.destroy({ stagger }).then(animated => options.counts.removed = stagger + animated);
-    /* end: destroy logic */
-    return promise;
-}
-export function destroySimpleValue(template, resultTag) {
-    const clone = resultTag.clone;
+export function destroySimpleValue(template, subject) {
+    const clone = subject.clone;
     const parent = clone.parentNode;
+    if (clone === template) {
+        throw 'ok';
+    }
+    // put the template back down
     parent.insertBefore(template, clone);
     parent.removeChild(clone);
-    delete resultTag.clone;
+    delete subject.clone;
+    delete subject.lastValue;
 }
 //# sourceMappingURL=processSubjectValue.function.js.map

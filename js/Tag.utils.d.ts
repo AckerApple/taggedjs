@@ -8,10 +8,13 @@ export type TagSubject = Subject<TemplaterResult> & {
     tag: Tag;
     template: Element;
 };
-export type DisplaySubject = Subject<TemplaterResult> & {
+type RegularValue = string | number | boolean;
+export type DisplaySubject = Subject<RegularValue> & {
+    lastValue?: RegularValue;
     clone?: Element | Text;
     template: Element;
 };
 export declare function getSubjectFunction(value: any, tag: Tag): ValueSubject<(...args: any[]) => any>;
 export declare function setValueRedraw(templater: TemplaterResult, // latest tag function to call for rendering
 existing: TagSubject, ownerTag: Tag): void;
+export {};

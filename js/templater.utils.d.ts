@@ -8,13 +8,13 @@ export type Wrapper = (() => Tag) & {
 export declare class TemplaterResult {
     tagged: boolean;
     wrapper: Wrapper;
+    insertBefore: Element | Text;
     newest?: Tag;
     oldest?: Tag;
     tagSupport: TagSupport;
     constructor(props: Props, children: TagChildren);
     redraw?: (force?: boolean) => Tag | undefined;
     isTemplater: boolean;
-    forceRenderTemplate(tagSupport: TagSupport, ownerTag: Tag): Tag;
     renderWithSupport(tagSupport: TagSupport, existingTag: Tag | undefined, ownerTag?: Tag): {
         remit: boolean;
         retag: Tag;

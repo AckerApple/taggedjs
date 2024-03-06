@@ -21,7 +21,7 @@ export function processNewValue(hasValue, value, context, variableName, ownerTag
         return;
     }
     if (isSubjectInstance(value)) {
-        context[variableName] = value;
+        context[variableName] = value; // its already a value subject
         return;
     }
     context[variableName] = new ValueSubject(value);

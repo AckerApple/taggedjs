@@ -1,5 +1,5 @@
-import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js";
-import { providersChangeCheck } from "./provider.utils.js";
+import { runAfterRender, runBeforeRender } from "./tagRunner.js";
+import { renderExistingTag } from "./renderExistingTag.function.js";
 const appElements = [];
 export function tagElement(app, // (...args: unknown[]) => TemplaterResult,
 element, props) {
@@ -20,7 +20,8 @@ element, props) {
     tag.tagSupport.oldest = tag;
     addAppTagRender(tag.tagSupport, tag);
     const templateElm = document.createElement('template');
-    templateElm.setAttribute('tag-detail', 'app-template-placeholder');
+    templateElm.setAttribute('id', 'app-tag-' + appElements.length);
+    templateElm.setAttribute('app-tag-detail', appElements.length.toString());
     element.appendChild(templateElm);
     tag.buildBeforeElement(templateElm);
     element.setUse = app.original.setUse;
@@ -37,24 +38,16 @@ export function applyTagUpdater(wrapper) {
 }
 /** Overwrites arguments.tagSupport.mutatingRender */
 export function addAppTagRender(tagSupport, tag) {
-    let lastTag = tag;
+    tagSupport.templater.redraw = () => {
+        const existingTag = tag;
+        const { retag } = tagSupport.templater.renderWithSupport(tagSupport, existingTag, // newest
+        {});
+        tag.updateByTag(retag);
+        return retag;
+    };
     tagSupport.mutatingRender = () => {
-        const preRenderCount = tagSupport.memory.renderCount;
-        providersChangeCheck(tag);
-        // When the providers were checked, a render to myself occurred and I do not need to re-render again
-        if (preRenderCount !== tagSupport.memory.renderCount) {
-            return lastTag;
-        }
-        runBeforeRedraw(tag.tagSupport, tag);
-        const templater = tagSupport.templater; // wrapper
-        const fromTag = lastTag = templater.wrapper();
-        fromTag.tagSupport.memory = tagSupport.memory;
-        tagSupport.propsConfig = { ...fromTag.tagSupport.propsConfig };
-        tag.tagSupport.newest = fromTag;
-        runAfterRender(tag.tagSupport, tag);
-        tagSupport.oldest.updateByTag(fromTag);
-        tagSupport.newest = fromTag;
-        return lastTag;
+        renderExistingTag(tag, tagSupport.templater, tagSupport);
+        return tag;
     };
 }
 //# sourceMappingURL=tagElement.js.map

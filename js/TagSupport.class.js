@@ -1,7 +1,5 @@
 import { deepClone } from "./deepFunctions.js";
-import { hasTagSupportChanged } from "./hasTagSupportChanged.function.js";
 import { isTagArray, isTagComponent, isTagInstance } from "./isInstance.js";
-import { providersChangeCheck } from "./provider.utils.js";
 import { alterProps } from "./templater.utils.js";
 export class TagSupport {
     templater;
@@ -48,24 +46,6 @@ export class TagSupport {
         ++this.memory.renderCount;
         return this.mutatingRender();
     } // ensure this function still works even during deconstructing
-    /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
-    renderExistingTag(tag, newTemplater) {
-        const preRenderCount = this.memory.renderCount;
-        providersChangeCheck(tag);
-        // When the providers were checked, a render to myself occurred and I do not need to re-render again
-        if (preRenderCount !== this.memory.renderCount) {
-            return true;
-        }
-        // const oldTemplater = tag.tagSupport.templater
-        const oldTagSupport = tag.tagSupport;
-        // const oldTagSupport = this
-        const hasChanged = hasTagSupportChanged(oldTagSupport, newTemplater.tagSupport);
-        this.newest = this.templater.redraw(); // No change detected, just redraw me only
-        if (!hasChanged) {
-            return true;
-        }
-        return false;
-    }
 }
 function cloneValueArray(values) {
     return values.map((value) => {

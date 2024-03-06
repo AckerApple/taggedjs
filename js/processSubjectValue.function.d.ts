@@ -19,5 +19,5 @@ export declare function processTag(value: any, result: TagSubject, // could be t
 template: Template, // <template end interpolate /> (will be removed)
 ownerTag: Tag, // owner
 options: processOptions): Clones;
-export declare function destroySimpleValue(template: Element, resultTag: DisplaySubject): void;
+export declare function destroySimpleValue(template: Element, subject: DisplaySubject): void;
 export {};

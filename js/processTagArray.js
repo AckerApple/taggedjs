@@ -85,6 +85,7 @@ function processAddTagArrayItem(before, subTag, result, index, options) {
     };
     const lastFirstChild = before; // tag.clones[0] // insertBefore.lastFirstChild    
     const nextClones = subTag.buildBeforeElement(lastFirstChild, { counts, forceElement: options.forceElement });
+    // subTag.clones.push(...nextClones)
     return nextClones;
 }
 /** compare two values. If both values are arrays then the items will be compared */

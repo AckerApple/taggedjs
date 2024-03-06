@@ -5,6 +5,7 @@ import { setUse } from "./setUse.function.js";
 export class TemplaterResult {
     tagged;
     wrapper;
+    insertBefore;
     newest;
     oldest;
     tagSupport;
@@ -13,21 +14,12 @@ export class TemplaterResult {
     }
     redraw;
     isTemplater = true;
-    forceRenderTemplate(tagSupport, ownerTag) {
-        const tag = this.wrapper();
-        runAfterRender(tagSupport, tag);
-        this.oldest = tag;
-        tagSupport.oldest = tag;
-        this.oldest = tag;
-        this.newest = tag;
-        tag.ownerTag = ownerTag;
-        return tag;
-    }
     renderWithSupport(tagSupport, existingTag, ownerTag) {
         /* BEFORE RENDER */
         // signify to other operations that a rendering has occurred so they do not need to render again
         ++tagSupport.memory.renderCount;
         const runtimeOwnerTag = existingTag?.ownerTag || ownerTag;
+        // const insertBefore = tagSupport.templater.insertBefore
         if (existingTag) {
             tagSupport.propsConfig = { ...existingTag.tagSupport.propsConfig };
             runBeforeRedraw(tagSupport, existingTag);
@@ -46,16 +38,24 @@ export class TemplaterResult {
         runAfterRender(tagSupport, retag);
         templater.newest = retag;
         retag.ownerTag = runtimeOwnerTag;
-        const oldest = tagSupport.oldest = tagSupport.oldest || retag;
         tagSupport.newest = retag;
-        oldest.tagSupport.templater = templater;
-        oldest.tagSupport.memory = retag.tagSupport.memory;
-        const isSameTag = existingTag && existingTag.isLikeTag(retag);
+        // ???
+        // const oldest = tagSupport.oldest = tagSupport.oldest || retag
+        // oldest.tagSupport.templater = templater
+        // oldest.tagSupport.memory = retag.tagSupport.memory
+        // TODO: I think this is duplicated work of updateExistingValue?
+        /*
+        const isSameTag = existingTag && existingTag.isLikeTag(retag)
         // If previously was a tag and seems to be same tag, then just update current tag with new values
-        if (isSameTag) {
-            existingTag.updateByTag(retag);
-            return { remit: false, retag };
+        if(isSameTag) {
+          existingTag.updateByTag(retag)
+          return {remit: false, retag}
         }
+    
+        // MAYBE destroy existing tag here?
+    
+        return {remit: true, retag}
+        */
         return { remit: true, retag };
     }
 }

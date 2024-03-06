@@ -1,84 +1,54 @@
-import { isSubjectInstance, isTagArray, isTagComponent, isTagInstance } from "./isInstance.js";
+import { isSubjectInstance, isTagArray, isTagComponent } from "./isInstance.js";
 import { bindSubjectCallback } from "./bindSubjectCallback.function.js";
-import { destroySimpleValue, processTag } from "./processSubjectValue.function.js";
+import { processTag } from "./processSubjectValue.function.js";
 import { processTagArray } from "./processTagArray.js";
 import { updateExistingTagComponent } from "./updateExistingTagComponent.function.js";
 import { updateExistingTag } from "./updateExistingTag.function.js";
 import { processRegularValue } from "./processRegularValue.function.js";
-function checkDestroyPrevious(existing, value) {
-    const existingSubArray = existing;
-    const wasArray = existingSubArray.lastArray;
-    // no longer an array
-    if (wasArray && !isTagArray(value)) {
-        wasArray.forEach(({ tag }) => tag.destroy());
-        delete existing.lastArray;
-        return;
-    }
-    const existingTagSubject = existing;
-    const existingTag = existingTagSubject.tag;
-    const isValueTagComponent = isTagComponent(value);
-    const isSimpleValue = !(isValueTagComponent || isTagArray(value) || isTagInstance(value));
-    // no longer tag or component?
-    if (existingTag) {
-        // no longer a component
-        if (isTagComponent(existingTag) && !isValueTagComponent) {
-            destroyTagMemory(existingTag, existingTagSubject);
-            return;
-        }
-        // no longer a tag
-        if (!isTagInstance(value)) {
-            destroyTagMemory(existingTag, existingTagSubject);
-            return;
-        }
-        return; // was tag and still is tag
-    }
-    const displaySubject = existing;
-    const clone = displaySubject.clone;
-    // was simple value but now something bigger
-    if (clone && !isSimpleValue) {
-        destroySimpleValue(displaySubject.template, displaySubject);
-    }
-}
-export function updateExistingValue(existing, value, ownerTag) {
-    const subjectValue = existing.value;
-    const tempResult = value;
-    const existingSubArray = existing;
-    const existingSubTag = existing;
-    checkDestroyPrevious(existing, value);
+import { checkDestroyPrevious } from "./checkDestroyPrevious.function.js";
+export function updateExistingValue(subject, value, ownerTag) {
+    const subjectValue = subject.value; // old value
+    const subjectSubArray = subject;
+    const subjectSubTag = subject;
+    const isChildSubject = subjectSubArray.isChildSubject;
+    const isComponent = isTagComponent(value);
     // If we are working with tag component 2nd argument children, the value has to be digged
-    if (existingSubArray.isChildSubject) {
+    if (isChildSubject) {
         value = value.value; // A subject contains the value
     }
+    checkDestroyPrevious(subject, value);
+    // handle already seen tag components
+    if (isComponent) {
+        return updateExistingTagComponent(ownerTag, value, // latest value
+        subjectSubTag, subjectValue);
+    }
     // was component but no longer
-    const existingTag = existingSubTag.tag;
-    if (existingTag) {
-        handleStillTag(existingTag, existing, value, ownerTag);
+    const subjectTag = subjectSubTag.tag;
+    if (subjectTag) {
+        handleStillTag(subjectTag, subject, value, ownerTag);
         return;
     }
     // its another tag array
     if (isTagArray(value)) {
-        const insertBefore = existingSubArray.template || existingSubTag.tag?.insertBefore;
-        processTagArray(existing, value, insertBefore, ownerTag, { counts: {
+        const insertBefore = subjectSubArray.template || subjectSubTag.tag?.tagSupport.templater.insertBefore;
+        const newClones = processTagArray(subject, value, insertBefore, ownerTag, { counts: {
                 added: 0,
                 removed: 0,
             } });
+        ownerTag.clones.push(...newClones);
         return;
-    }
-    // handle already seen tag components
-    if (isTagComponent(tempResult)) {
-        return updateExistingTagComponent(ownerTag, tempResult, existingSubTag, subjectValue);
     }
     // now its a function
     if (value instanceof Function) {
-        existingSubTag.set(bindSubjectCallback(value, ownerTag));
+        subjectSubTag.set(bindSubjectCallback(value, ownerTag));
         return;
     }
     // we have been given a subject
     if (isSubjectInstance(value)) {
-        existingSubTag.set(value.value); // let ValueSubject now of newest value
+        subjectSubTag.set(value.value); // let ValueSubject now of newest value
         return;
     }
-    existingSubTag.set(value); // let ValueSubject now of newest value
+    subjectSubTag.set(value); // let ValueSubject now of newest value
     return;
 }
 function handleStillTag(existingTag, existing, value, ownerTag) {
@@ -101,12 +71,6 @@ function handleStillTag(existingTag, existing, value, ownerTag) {
         return updateExistingTag(value, existingTag, existing);
     }
     const subject = existing;
-    return processRegularValue(value, subject, subject.template, ownerTag);
-}
-export function destroyTagMemory(existingTag, existingSubject) {
-    delete existingSubject.tag;
-    delete existingSubject.tagSupport;
-    // delete subjectValue.tagSupport
-    existingTag.destroy();
+    return processRegularValue(value, subject, subject.template);
 }
 //# sourceMappingURL=updateExistingValue.function.js.map

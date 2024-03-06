@@ -1,5 +1,4 @@
 import { ValueSubject } from "./ValueSubject.js";
-import { redrawTag } from "./redrawTag.function.js";
 import { bindSubjectCallback } from "./bindSubjectCallback.function.js";
 export function getSubjectFunction(value, tag) {
     return new ValueSubject(bindSubjectCallback(value, tag));
@@ -9,12 +8,8 @@ existing, ownerTag) {
     // redraw does not communicate to parent
     templater.redraw = () => {
         const existingTag = existing.tag;
-        const newest = templater.tagSupport.newest;
         const tagSupport = existingTag?.tagSupport || templater.tagSupport;
-        const { remit, retag } = redrawTag(tagSupport, templater, newest, ownerTag);
-        if (!remit) {
-            return;
-        }
+        const { retag } = templater.renderWithSupport(tagSupport, existingTag, ownerTag);
         existing.set(templater);
         return retag;
     };

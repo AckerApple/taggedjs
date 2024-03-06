@@ -18,6 +18,4 @@ export declare class TagSupport {
     newest?: Tag;
     mutatingRender(): Tag;
     render(): Tag;
-    /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
-    renderExistingTag(tag: Tag, newTemplater: TemplaterResult): boolean;
 }

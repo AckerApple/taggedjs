@@ -23,7 +23,7 @@ export function runTagCallback(value, tag, bindTo, args) {
     if (callbackResult instanceof Promise) {
         return callbackResult.then(() => {
             tagSupport.render();
-            return 'no-data-ever';
+            return 'promise-no-data-ever';
         });
     }
     // Caller always expects a Promise
