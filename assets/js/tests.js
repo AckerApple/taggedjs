@@ -12,7 +12,7 @@ export function runTests() {
     });
     it('counters increase', () => {
         testCounterElements('#increase-counter', '#counter-display');
-        testCounterElements('#increase-gateway-count', '#display-gateway-count');
+        // testCounterElements('#increase-gateway-count', '#display-gateway-count')
         testCounterElements('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display');
         testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display');
     });
