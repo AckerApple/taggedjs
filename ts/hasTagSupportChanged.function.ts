@@ -7,7 +7,7 @@ export function hasTagSupportChanged(
   newTagSupport: TagSupport,
 ) {
   if(oldTagSupport === newTagSupport) {
-    throw new Error('someting here')
+    throw new Error('something here')
   }
 
   const oldProps = oldTagSupport.propsConfig.latest

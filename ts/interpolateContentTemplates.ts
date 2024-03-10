@@ -1,34 +1,32 @@
 import { Clones } from "./Clones.type.js"
 import { Tag } from "./Tag.class.js"
 import { InterpolateOptions } from "./interpolateElement.js"
-import { Counts, Template, interpolateTemplate } from "./interpolateTemplate.js"
+import { InterpolateComponentResult, Template, interpolateTemplate } from "./interpolateTemplate.js"
 
-const templateSearch = new RegExp('\\s*<template interpolate end id="__tagvar(\\d{1,4})"([^>]*)></template>(\\s*)')
+export type InterpolatedContentTemplates = {
+  clones: Clones
+  tagComponents: InterpolateComponentResult[]
+}
 
-/** Returns subscriptions[] that will need to be unsubscribed from when element is destroyed */
 export function interpolateContentTemplates(
   element: Element,
   context: any,
   tag: Tag,
   options: InterpolateOptions,
   children: HTMLCollection,
-): Clones {
-
+): InterpolatedContentTemplates {
   if ( !children || element.tagName === 'TEMPLATE' ) {
-    return [] // done
+    return {clones:[], tagComponents: []} // done
   }
 
   // counting for animation stagger computing
   const counts = options.counts
   const clones: Clones = []
+  const tagComponents: InterpolateComponentResult[] = []
   const childArray = new Array(...children)
 
-  if(element.tagName==='TEXTAREA') {
-    scanTextAreaValue(element as HTMLTextAreaElement)
-  }
-
   childArray.forEach(child => {
-    const nextClones = interpolateTemplate(
+    const {clones: nextClones, tagComponent} = interpolateTemplate(
       child as Template,
       context,
       tag,
@@ -36,39 +34,47 @@ export function interpolateContentTemplates(
       options,
     )
 
-    if(child.tagName==='TEXTAREA') {
-      scanTextAreaValue(child as HTMLTextAreaElement)
-    }
-  
     clones.push(...nextClones)
-    
+
+    if(tagComponent) {
+      tagComponents.push(tagComponent)
+      return
+    }
+      
     if ( child.children ) {      
       const nextKids = new Array(...child.children)
       nextKids.forEach((subChild, index) => {
 
+        // IF <template end /> its a variable to be processed
         if ( isRenderEndTemplate(subChild) ) {
-          interpolateTemplate(
+          const {tagComponent} = interpolateTemplate(
             subChild as Template,
             context,
             tag,
             counts,
             options,
           )
+
+          if(tagComponent) {
+            tagComponents.push(tagComponent)
+          }
         }
 
-        const nextClones = interpolateContentTemplates(
+        const {clones:nextClones, tagComponents: nextTagComponent} = interpolateContentTemplates(
           subChild,
           context,
           tag,
           options,
           subChild.children
         )
+
         clones.push( ...nextClones )
+        tagComponents.push( ...nextTagComponent )
       })
     }
   })
 
-  return clones
+  return {clones, tagComponents}
 }
 
 function isRenderEndTemplate(child: Element) {
@@ -76,16 +82,4 @@ function isRenderEndTemplate(child: Element) {
   return isTemplate &&
   child.getAttribute('interpolate') !== undefined && 
   child.getAttribute('end') !== undefined
-}
-
-function scanTextAreaValue(textarea: HTMLTextAreaElement) {
-  const value = textarea.value
-  if( value.search(templateSearch) >=0 ) {
-    const match = value.match(/__tagvar(\d{1,4})/);
-    const result = match ? match[0] : ''
-    const token = '{' + result + '}'
-    // textarea.value = token
-    textarea.value = ''
-    textarea.setAttribute('textVarValue', token)
-  }
 }

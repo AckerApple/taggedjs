@@ -1,20 +1,18 @@
 {
   "name": "taggedjs",
   "private": true,
-  "version": "2.4.5",
+  "version": "2.4.6",
   "description": "tagged template reactive html",
   "main": "js/index.js",
   "type": "module",
   "scripts": {
     "build:js": "tsc -p tsconfig.json",
-    "build": "npm-run-all --sequential build:js build:webpack build:dist:only build:gh-pages copy:pinbowl && echo \"✅ Build completed\"",
+    "build": "npm-run-all --sequential build:js build:webpack build:dist:only build:gh-pages build:pinbowl && echo \"✅ Build completed\"",
     "build:webpack": "npx webpack",
     "build:gh-pages": "cp -R js/. ../gh-pages/node_modules/taggedjs/js && cd ../gh-pages && npm run build && echo \"🔬 Built gh-pages\"",
     "build:watch:gh-pages": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:dist:only && npm run build:gh-pages'",
     "build:dist": "run-s build build:dist:only",
     "build:dist:only": "cp README.MD ./dist/README.md && npm run build:dist:pack && rm -rf ./dist/js && cp -R js ./dist && cp -R ./dist/. ../dist",
-    "build:pinbowl": "npm run copy:pinbowl",
-    "copy:pinbowl": "cp -R js/. ../../../services/pinbowl/src/taggedjs && cd ../../../services/pinbowl/ && npm run build && echo \"🎳 Built pinbowl\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "save:dist": "run-s patch:version build:js build:dist:only save:dist:git",
     "save:dist:git": "cd ../dist && git add . && git commit -m \"dist patch\" && git push",
@@ -23,7 +21,10 @@
     "patch:version": "npm --no-git-tag-version version patch",
     "publish": "npm run build:dist && npm run save:dist && cd ../dist && npm publish",
     "build:watch": "chokidar 'ts/**/*' -c 'npm run build'",
-    "build:watch:pinbowl": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:dist:only && npm run build:pinbowl'"
+    "build:pinbowl": "cp -R js/. ../../../services/pinbowl/src/taggedjs && cd ../../../services/pinbowl/ && npm run build && echo \"🎳 Built pinbowl\"",
+    "build:watch:pinbowl": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:dist:only && npm run build:pinbowl'",
+    "build:dump:gh-pages": "cp -R js/. ../../taggedjs-dump/gh-pages/node_modules/taggedjs/js && cd ../../taggedjs-dump/gh-pages/ && npm run build && echo \"🔭 Built dump#gh-pages\"",
+    "build:watch:dump:gh-pages": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:dist:only && npm run build:dump:gh-pages'"
   },
   "keywords": [
     "react",

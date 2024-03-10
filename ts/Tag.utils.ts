@@ -5,18 +5,19 @@ import { Tag } from "./Tag.class.js"
 import { redrawTag } from "./redrawTag.function.js"
 import { TemplaterResult } from "./templater.utils.js"
 import { bindSubjectCallback } from "./bindSubjectCallback.function.js"
+import { Template } from "./interpolateTemplate.js"
 
 export type TagSubject = Subject<TemplaterResult> & {
   tagSupport: TagSupport
   tag: Tag
-  template: Element
+  template: Element | Text | Template
 }
 
 type RegularValue = string | number | boolean
 export type DisplaySubject = Subject<RegularValue> & {
   lastValue?: RegularValue
-  clone?: Element | Text
-  template: Element
+  clone?: Element | Text | Template
+  template: Element | Text | Template
 }
 
 export function getSubjectFunction(

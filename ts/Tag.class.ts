@@ -4,12 +4,15 @@ import { Subscription } from "./Subject.js"
 import { runBeforeDestroy } from "./tagRunner.js"
 import { buildClones } from "./render.js"
 import { interpolateElement, interpolateString } from "./interpolateElement.js"
-import { Counts, afterElmBuild } from "./interpolateTemplate.js"
+import { Counts, Template, afterElmBuild, subscribeToTemplate } from "./interpolateTemplate.js"
 import { State } from "./set.function.js"
 import { elementDestroyCheck } from "./elementDestroyCheck.function.js"
 import { updateExistingValue } from "./updateExistingValue.function.js"
 import { InterpolatedTemplates } from "./interpolations.js"
 import { processNewValue } from "./processNewValue.function.js"
+import { InterpolateSubject } from "./processSubjectValue.function.js"
+import { Clones } from "./Clones.type.js"
+import { checkDestroyPrevious } from "./checkDestroyPrevious.function.js"
 
 export const variablePrefix = '__tagvar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -17,7 +20,9 @@ export const escapeVariable = '--' + variablePrefix + '--'
 const prefixSearch = new RegExp(variablePrefix, 'g')
 export const escapeSearch = new RegExp(escapeVariable, 'g')
 
-export type Context = {[index: string]: any}
+export type Context = {
+  [index: string]: InterpolateSubject // ValueSubject<unknown>
+}
 export type TagMemory = Record<string, any> & {
   context: Context
   state: State
@@ -219,11 +224,11 @@ export class Tag {
 
   updateValues(values: any[]) {
     this.values = values
-    return this.updateContext(this.tagSupport.memory.context)
+    return this.updateContext( this.tagSupport.memory.context )
   }
 
   updateContext(context: Context) {
-    // const seenContext: string[] = []
+    const seenContext: string[] = []
 
     this.strings.map((_string, index) => {
       const variableName = variablePrefix + index
@@ -232,7 +237,7 @@ export class Tag {
 
       // is something already there?
       const existing = variableName in context
-      // seenContext.push(variableName)
+      seenContext.push(variableName)
 
       if(existing) {
         const existing = context[variableName]
@@ -249,15 +254,14 @@ export class Tag {
       )      
     })
 
-    /*
     // Support reduction in context
     Object.entries(context).forEach(([key, subject]) => {
       if(seenContext.includes(key)) {
         return
       }
+
       const destroyed = checkDestroyPrevious(subject, undefined as any)
     })
-    */
 
     return context
   }
@@ -295,24 +299,23 @@ export class Tag {
       forceElement: false,
       counts: {added:0, removed: 0},
     },
-  ): (ChildNode | Element)[] {
+  ): Clones {
     // this.insertBefore = insertBefore
     this.tagSupport.templater.insertBefore = insertBefore
     
     const context = this.update()
     const template = this.getTemplate()
     
-    const temporary = document.createElement('div')
-    temporary.id = 'tag-temp-holder'
+    const elementContainer = document.createElement('div')
+    elementContainer.id = 'tag-temp-holder'
     // render content with a first child that we can know is our first element
-    temporary.innerHTML = `<template id="temp-template-tag-wrap">${template.string}</template>`
+    elementContainer.innerHTML = `<template id="temp-template-tag-wrap">${template.string}</template>`
 
-    // const clonesBefore = this.clones.map(clone => clone)
-    const intClones = interpolateElement(
-      temporary,
+    const {clones, tagComponents} = interpolateElement(
+      elementContainer,
       context,
       template,
-      this, // this.ownerTag || this,
+      this, // ownerTag,
       {
         forceElement: options.forceElement,
         counts: options.counts
@@ -320,16 +323,57 @@ export class Tag {
     )
 
     this.clones.length = 0
-    const clones = buildClones(temporary, insertBefore)
-    this.clones.push( ...clones )
+    afterInterpolateElement(
+      elementContainer,
+      insertBefore,
+      this,
+      clones,
+      options,
+      context,
+    )
+    this.clones.forEach(clone => afterElmBuild(clone, options, context, this))
 
-    if( intClones.length ) {
-     this.clones = this.clones.filter(cloneFilter => !intClones.find(clone => clone === cloneFilter))
-    }
+    // Any tag components that were found should be processed AFTER the owner processes its elements
+    let isForceElement = options.forceElement
+    tagComponents.forEach(tagComponent => {    
+      subscribeToTemplate(
+        tagComponent.insertBefore, // temporary,
+        tagComponent.subject,
+        tagComponent.ownerTag,
+        clones,
+        options.counts,
+        {isForceElement}
+      )
 
-    this.clones.forEach(clone => afterElmBuild(clone, options))
+      afterInterpolateElement(
+        elementContainer,
+        insertBefore,
+        this,
+        clones,
+        options,
+        context,
+      )
+    })
   
-    return this.clones
+    // return this.clones
+    return clones
+  }
+}
+
+function afterInterpolateElement(
+  container: Element,
+  insertBefore: Element | Text | Template,
+  tag: Tag,
+  intClones: Clones,
+  options: ElementBuildOptions,
+  context: Context
+) {
+  const clones = buildClones(container, insertBefore)
+  tag.clones.push( ...clones )
+
+  // remove component clones from ownerTag
+  if( intClones.length ) {
+   tag.clones = tag.clones.filter(cloneFilter => !intClones.find(clone => clone === cloneFilter))
   }
 }
 

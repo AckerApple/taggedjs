@@ -15,7 +15,7 @@ export function updateExistingTag(
   // runBeforeRedraw(oldest.tagSupport, newest || oldest)
   runBeforeRedraw(oldest.tagSupport, oldest)
 
-  const retag = templater.wrapper()
+  const retag = templater.wrapper(tagSupport)
   
   templater.newest = retag
   tagSupport.newest = retag

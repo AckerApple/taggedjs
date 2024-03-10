@@ -47,9 +47,9 @@ export function tag<T extends any[]>(
 
     const templater: TemplaterResult = new TemplaterResult(props, childSubject)
 
-    function innerTagWrap() {
+    const innerTagWrap:Wrapper = (oldTagSetup) => {
       const originalFunction = innerTagWrap.original as unknown as TagComponent
-      const oldTagSetup = templater.tagSupport
+      // const oldTagSetup = templater.tagSupport
 
       const oldest = templater.oldest
 
@@ -65,8 +65,8 @@ export function tag<T extends any[]>(
         // tag.tagSupport = oldTagSetup
 
         oldTagSetup.mutatingRender = () => {
-          const exit = renderExistingTag(tag, templater, oldTagSetup)
-        
+          const exit = renderExistingTag(templater.oldest as Tag, templater, oldTagSetup)
+
           if(exit) {
             return tag
           }
@@ -74,6 +74,7 @@ export function tag<T extends any[]>(
           // Have owner re-render
           if(tag.ownerTag) {
             const newest = tag.ownerTag.tagSupport.render()
+            // TODO: Next line most likely not needed
             tag.ownerTag.tagSupport.newest = newest
             return tag
           }
@@ -93,6 +94,9 @@ export function tag<T extends any[]>(
       }
 
       tag.tagSupport.memory = oldTagSetup.memory
+      // ???
+      // tag.tagSupport.memory = {...oldTagSetup.memory}
+      // tag.tagSupport.memory.context = {...oldTagSetup.memory.context}
       tag.tagSupport.mutatingRender = oldTagSetup.mutatingRender
       oldTagSetup.newest = tag
 

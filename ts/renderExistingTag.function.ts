@@ -19,8 +19,6 @@ export function renderExistingTag(
   }
 
   const oldTagSupport = tag.tagSupport
-  // ???
-  // const oldTagSupport = tagSupport
   const hasChanged = hasTagSupportChanged(
     oldTagSupport,
     newTemplater.tagSupport,

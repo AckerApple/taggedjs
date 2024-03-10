@@ -6,7 +6,7 @@ export type RegularValue = string | number | undefined | boolean
 export function processRegularValue(
   value: RegularValue,
   result: DisplaySubject, // could be tag via result.tag
-  template: Template, // <template end interpolate /> (will be removed)
+  template: Element | Text | Template, // <template end interpolate /> (will be removed)
 ) {
   result.template = template
 

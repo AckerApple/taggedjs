@@ -5,17 +5,15 @@ import { TemplateRedraw, TemplaterResult } from "./templater.utils.js"
 import { isSubjectInstance, isTagArray, isTagComponent } from "./isInstance.js"
 import { bindSubjectCallback } from "./bindSubjectCallback.function.js"
 import { Tag } from "./Tag.class.js"
-import { processTag } from "./processSubjectValue.function.js"
+import { InterpolateSubject, processTag } from "./processSubjectValue.function.js"
 import { TagArraySubject, processTagArray } from "./processTagArray.js"
 import { updateExistingTagComponent } from "./updateExistingTagComponent.function.js"
 import { updateExistingTag } from "./updateExistingTag.function.js"
 import { RegularValue, processRegularValue } from "./processRegularValue.function.js"
 import { checkDestroyPrevious } from "./checkDestroyPrevious.function.js"
 
-export type ExistingSubject = Subject<Tag> | TagSubject | TagArraySubject | DisplaySubject // | TemplaterResult
-
 export function updateExistingValue(
-  subject: ExistingSubject,
+  subject: InterpolateSubject,
   value: TemplaterResult | Tag[] | TagSupport | Function | Subject<any>,
   ownerTag: Tag,
 ): void {
@@ -59,7 +57,7 @@ export function updateExistingValue(
   if(isTagArray(value)) {
     const insertBefore = subjectSubArray.template || subjectSubTag.tag?.tagSupport.templater.insertBefore
 
-    const newClones = processTagArray(
+    const nextClones = processTagArray(
       subject as TagArraySubject,
       value as any as Tag[],
       insertBefore,
@@ -70,7 +68,7 @@ export function updateExistingValue(
       }}
     )
 
-    ownerTag.clones.push(...newClones)
+    ownerTag.clones.push(...nextClones)
 
     return 
   }
@@ -94,7 +92,7 @@ export function updateExistingValue(
 
 function handleStillTag(
   existingTag: Tag,
-  existing: ExistingSubject,
+  existing: InterpolateSubject,
   value: TemplaterResult | Tag[] | TagSupport | Function | Subject<unknown> | RegularValue,
   ownerTag: Tag,
 ) {

@@ -1,13 +1,13 @@
 import { DisplaySubject, TagSubject } from "./Tag.utils.js"
 import { isTagArray, isTagComponent, isTagInstance } from "./isInstance.js"
 import { Tag } from "./Tag.class.js"
-import { destroySimpleValue } from "./processSubjectValue.function.js"
+import { InterpolateSubject, destroySimpleValue } from "./processSubjectValue.function.js"
 import { TagArraySubject } from "./processTagArray.js"
-import { ExistingSubject } from "./updateExistingValue.function.js"
 import { isLikeTags } from "./isLikeTags.function.js"
+import { Counts } from "./interpolateTemplate.js"
 
 export function checkDestroyPrevious(
-  existing: ExistingSubject, // existing.value is the old value
+  existing: InterpolateSubject, // existing.value is the old value
   newValue: unknown,
 ) {
   const existingSubArray = existing as TagArraySubject
@@ -15,7 +15,7 @@ export function checkDestroyPrevious(
   
   // no longer an array
   if (wasArray && !isTagArray(newValue)) {
-    wasArray.forEach(({tag}) => tag.destroy())
+    wasArray.forEach(({tag}) => destroyArrayTag(tag, {added:0, removed:0}))
     delete (existing as any).lastArray  
     return 1
   }
@@ -66,4 +66,21 @@ export function destroyTagMemory(
   delete (existingSubject as any).tag
   delete (existingSubject as any).tagSupport
   existingTag.destroy()
+}
+
+export function destroyArrayTag(
+  tag: Tag,
+  counts: Counts,
+) {
+  tag.children.forEach(child => child.destroy({
+    stagger: counts.removed++,
+    // byParent: false
+    // byParent: true,
+  }))
+  
+  tag.destroy({
+    stagger: counts.removed,
+    // byParent: false
+    // byParent: true,
+  })
 }

@@ -2,7 +2,7 @@
 
 import { Tag } from "./Tag.class.js"
 
-type Callback = (...args: any[]) => any & {
+export type Callback = (...args: any[]) => any & {
   isChildOverride?: true // if this is set, then a parent tag passed children to a tag/component
 }
 
@@ -40,17 +40,6 @@ export function runTagCallback(
   const sameRenderCount = renderCount === tagSupport.memory.renderCount
   
   if(tagSupport && !sameRenderCount) {    
-    // tag.tagSupport.updateState()
-    // oldest.tagSupport.memory = newest.tagSupport.memory
-    // oldest.tagSupport.memory = tag.tagSupport.memory
-    // newest.tagSupport.memory = tag.tagSupport.memory
-    // oldest.updateByTag(newest)
-    // oldest.updateByTag(tag)
-    // newest.updateByTag(tag)
-    // tag.updateByTag(newest)
-    // tagSupport.updateState()
-    // ???
-    
     return // already rendered
   }
 

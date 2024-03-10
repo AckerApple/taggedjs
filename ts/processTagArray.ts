@@ -2,28 +2,31 @@ import { Clones } from "./Clones.type.js"
 import { ArrayValueNeverSet, Tag } from "./Tag.class.js"
 import { ValueSubject } from "./ValueSubject.js"
 import { TagSupport } from "./TagSupport.class.js"
-import { Counts } from "./interpolateTemplate.js"
+import { Counts, Template } from "./interpolateTemplate.js"
 import { TemplaterResult } from "./templater.utils.js"
 import { ArrayNoKeyError } from "./errors.js"
+import { destroyArrayTag } from "./checkDestroyPrevious.function.js"
 
 export type LastArrayItem = {tag: Tag, index: number}
 export type TagArraySubject = ValueSubject<Tag[]> & {
   lastArray: LastArrayItem[]
-  template: Element
+  template: Element | Text | Template
   isChildSubject?: boolean // present when children passed as prop0 or prop1
 }
 
 export function processTagArray(
   result: TagArraySubject,
   value: Tag[], // arry of Tag classes
-  template: Element, // <template end interpolate />
+  template: Element | Text | Template, // <template end interpolate />
   ownerTag: Tag,
   options: {
     counts: Counts
     forceElement?: boolean
   },
 ): Clones {
-  const clones: Clones = []
+  // const clones: Clones = []
+  const clones: Clones = ownerTag.clones // []
+
   result.lastArray = result.lastArray || [] // {tag, index}[] populated in processTagResult
   
   result.template = template
@@ -45,14 +48,11 @@ export function processTagArray(
     if(destroyItem) {
       const last = result.lastArray[index]
       const tag: Tag = last.tag
-      
-      tag.destroy({
-        stagger: options.counts.removed,
-        byParent: false
-      })
+
+      destroyArrayTag(tag, options.counts)
 
       ++removed
-      ++options.counts.removed
+      // ++options.counts.removed
       
       return false
     }
@@ -116,7 +116,7 @@ export function processTagArray(
 }
 
 function processAddTagArrayItem(
-  before: Element,
+  before: Element | Text | Template,
   subTag: Tag,
   result: TagArraySubject,
   index: number,
@@ -125,10 +125,11 @@ function processAddTagArrayItem(
     forceElement?: boolean
   },
 ) {
-  // Added to previous array
-  result.lastArray.push({
+  const lastValue = {
     tag: subTag, index
-  })
+  }
+  // Added to previous array
+  result.lastArray.push(lastValue)
 
   const counts: Counts = {
     added: options.counts.added + index,
@@ -136,8 +137,15 @@ function processAddTagArrayItem(
   }
 
   const lastFirstChild = before // tag.clones[0] // insertBefore.lastFirstChild    
-  const nextClones = subTag.buildBeforeElement(lastFirstChild, {counts, forceElement: options.forceElement})
+  const nextClones = subTag.buildBeforeElement(
+    lastFirstChild,
+    {counts, forceElement: options.forceElement}
+  )
+  
   // subTag.clones.push(...nextClones)
+  // ;(lastValue as any).clones = nextClones
+
+
   return nextClones
 }
 

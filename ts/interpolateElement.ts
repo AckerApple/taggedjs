@@ -1,9 +1,9 @@
 import { interpolateAttributes } from "./interpolateAttributes.js"
 import { interpolateToTemplates } from "./interpolations.js"
-import { interpolateContentTemplates } from "./interpolateContentTemplates.js"
+import { InterpolatedContentTemplates, interpolateContentTemplates } from "./interpolateContentTemplates.js"
 import { Context, Tag, TagTemplate, escapeSearch, variablePrefix } from "./Tag.class.js"
 import { Clones } from "./Clones.type.js"
-import { Counts } from "./interpolateTemplate.js"
+import { Counts, InterpolateComponentResult } from "./interpolateTemplate.js"
 
 export type InterpolateOptions = {
   /** make the element go on document */
@@ -11,27 +11,30 @@ export type InterpolateOptions = {
   counts: Counts
 }
 
+/** Review elements within an element */
 export function interpolateElement(
-  element: Element,
+  container: Element,
   context: Context, // variables used to evaluate
   interpolatedTemplates: TagTemplate,
   tagOwner: Tag,
   options: InterpolateOptions,
-): Clones {
-  const clones = []
+): InterpolatedContentTemplates {
+  const clones: Clones = []
+  const tagComponents: InterpolateComponentResult[] = []
   const result = interpolatedTemplates.interpolation
-  const template = element.children[0] as HTMLTemplateElement
+  const template = container.children[0] as HTMLTemplateElement
   const children = template.content.children
 
   if(result.keys.length) {
-    const nextClones = interpolateContentTemplates(element, context, tagOwner, options, children)
+    const {clones: nextClones, tagComponents: nextTagComponents} = interpolateContentTemplates(container, context, tagOwner, options, children)
     clones.push( ...nextClones )
+    tagComponents.push( ...nextTagComponents )
   }
 
-  interpolateAttributes(element, context, tagOwner)
+  interpolateAttributes(container, context, tagOwner)
   processChildrenAttributes(children, context, tagOwner)
 
-  return clones
+  return {clones, tagComponents}
 }
 
 function processChildrenAttributes(

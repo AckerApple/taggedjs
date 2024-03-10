@@ -1,8 +1,7 @@
-import { TagSupport } from "./TagSupport.class.js"
 import { runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
 import { TemplaterResult } from "./templater.utils.js"
 import { setUse } from "./setUse.function.js"
-import { Counts } from "./interpolateTemplate.js"
+import { Counts, Template } from "./interpolateTemplate.js"
 import { Tag } from "./Tag.class.js"
 import { processTagResult } from "./processTagResult.function.js"
 import { TagSubject } from "./Tag.utils.js"
@@ -10,7 +9,7 @@ import { TagSubject } from "./Tag.utils.js"
 export function processSubjectComponent(
   value: TemplaterResult,
   subject: TagSubject,
-  template: Element,
+  template: Element | Text | Template,
   ownerTag: Tag,
   options: {counts: Counts, forceElement?: boolean},
 ) {
@@ -38,7 +37,6 @@ export function processSubjectComponent(
   providers.ownerTag = ownerTag
   
   const isFirstTime = !retag || options.forceElement
-
   if(isFirstTime) {
     if(retag) {
       // runBeforeRedraw(tagSupport, retag)
@@ -46,8 +44,9 @@ export function processSubjectComponent(
     } else {
       runBeforeRender(tagSupport, ownerTag)
     }
- 
+
     const result = templater.renderWithSupport(tagSupport, subject.tag, ownerTag)
+
     retag = result.retag
     templater.newest = retag
   }

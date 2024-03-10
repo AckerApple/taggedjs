@@ -54,7 +54,7 @@ export function applyTagUpdater(
   runBeforeRender(tagSupport, undefined as any as Tag)
 
   // Call the apps function for our tag templater
-  const tag = wrapper.wrapper()
+  const tag = wrapper.wrapper(tagSupport)
   runAfterRender(tagSupport, tag)
   
   return { tag, tagSupport }
@@ -72,6 +72,7 @@ export function addAppTagRender(
       existingTag, // newest
       {} as any, // ownerTag,
     )
+
     tag.updateByTag(retag)
     return retag
   }

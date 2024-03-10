@@ -2,43 +2,80 @@ import { Context, ElementBuildOptions, Tag, variablePrefix } from "./Tag.class.j
 import { InterpolateOptions } from "./interpolateElement.js"
 import { elementInitCheck } from "./elementInitCheck.js"
 import { Clones } from "./Clones.type.js"
-import { processSubjectValue } from "./processSubjectValue.function.js"
+import { InterpolateSubject, processSubjectValue } from "./processSubjectValue.function.js"
+import { isTagComponent } from "./isInstance.js"
+import { DisplaySubject } from "./Tag.utils.js"
+import { scanTextAreaValue } from "./scanTextAreaValue.function.js"
 
 export type Template = Element & {clone?: any}
+export type InterpolateComponentResult = {
+  subject: InterpolateSubject
+  insertBefore: Element | Text | Template
+  ownerTag: Tag
+}
+export type InterpolateTemplateResult = {
+  clones: Clones
+  tagComponent?: InterpolateComponentResult
+}
 
 export function interpolateTemplate(
-  template: Template, // <template end interpolate /> (will be removed)
+  insertBefore: Template, // <template end interpolate /> (will be removed)
   context: Context, // variable scope of {`__tagvar${index}`:'x'}
-  tag: Tag, // Tag class
+  ownerTag: Tag, // Tag class
   counts: Counts, // used for animation stagger computing
   options: InterpolateOptions,
-): Clones {
+): InterpolateTemplateResult {
   const clones: Clones = []
 
-  if ( !template.hasAttribute('end') ) {
-    return clones // only care about <template end>
+  if ( !insertBefore.hasAttribute('end') ) {
+    return {clones} // only care about <template end>
   }
 
-  const variableName = template.getAttribute('id')
+  const variableName = insertBefore.getAttribute('id')
   if(variableName?.substring(0, variablePrefix.length) !== variablePrefix) {
-    return clones // ignore, not a tagVar
+    return {clones} // ignore, not a tagVar
   }
 
   const existingSubject = context[variableName]
+  
+  if(isTagComponent(existingSubject.value)) {
+    return {clones, tagComponent: {ownerTag, subject: existingSubject, insertBefore}}
+  }
+  
   let isForceElement = options.forceElement
-  
-  const callback = (templateNewValue: any) => {
-    if(existingSubject.clone) {
-      template = existingSubject.clone
+  subscribeToTemplate(
+    insertBefore,
+    existingSubject,
+    ownerTag,
+    clones,
+    counts,
+    {isForceElement}
+  )
+
+  return {clones}
+}
+
+export function subscribeToTemplate(
+  insertBefore: Element | Text | Template,
+  subject: InterpolateSubject,
+  ownerTag: Tag,
+  clones: Clones,
+  counts: Counts, // used for animation stagger computing
+  {isForceElement}: {isForceElement?:boolean}
+): Clones {
+  const callback = (value: unknown) => {
+    const clone = (subject as DisplaySubject).clone
+    if(clone) {
+      insertBefore = clone
     }
-  
-    const {clones} = processSubjectValue(
-      templateNewValue,
-      existingSubject,
-      template,
-      tag,
+
+    const nextClones = processSubjectValue(
+      value,
+      subject,
+      insertBefore,
+      ownerTag,
       {
-        counts: {added: counts.added, removed: counts.removed},
+        counts: {...counts},
         forceElement: isForceElement,
       }
     )
@@ -47,12 +84,11 @@ export function interpolateTemplate(
       isForceElement = false // only can happen once
     }
 
-    clones.push(...clones)
+    clones.push(...nextClones)
   }
 
-  const sub = existingSubject.subscribe(callback as any)
-  tag.cloneSubs.push(sub)
-
+  const sub = subject.subscribe(callback as any)
+  ownerTag.cloneSubs.push(sub)
   return clones
 }
 
@@ -86,9 +122,16 @@ export type Counts = {
 export function afterElmBuild(
   elm: Element | ChildNode,
   options: ElementBuildOptions,
+  context: Context,
+  ownerTag: Tag,
 ) {
   if(!(elm as Element).getAttribute) {
     return
+  }
+
+  const tagName = elm.nodeName // elm.tagName
+  if(tagName==='TEXTAREA') {
+    scanTextAreaValue(elm as HTMLTextAreaElement, context, ownerTag)
   }
 
   let diff = options.counts.added
@@ -103,10 +146,12 @@ export function afterElmBuild(
     }
 
     new Array(...(elm as Element).children as any).forEach((child, index) => {
-      return afterElmBuild(child, {
+      const subOptions = {
         ...options,
        counts: options.counts,
-      })
+      }
+
+      return afterElmBuild(child, subOptions, context, ownerTag)
     })
   }
 }
