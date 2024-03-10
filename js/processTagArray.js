@@ -1,10 +1,12 @@
 import { ValueSubject } from "./ValueSubject.js";
 import { TagSupport } from "./TagSupport.class.js";
 import { ArrayNoKeyError } from "./errors.js";
+import { destroyArrayTag } from "./checkDestroyPrevious.function.js";
 export function processTagArray(result, value, // arry of Tag classes
 template, // <template end interpolate />
 ownerTag, options) {
-    const clones = [];
+    // const clones: Clones = []
+    const clones = ownerTag.clones; // []
     result.lastArray = result.lastArray || []; // {tag, index}[] populated in processTagResult
     result.template = template;
     let removed = 0;
@@ -19,12 +21,9 @@ ownerTag, options) {
         if (destroyItem) {
             const last = result.lastArray[index];
             const tag = last.tag;
-            tag.destroy({
-                stagger: options.counts.removed,
-                byParent: false
-            });
+            destroyArrayTag(tag, options.counts);
             ++removed;
-            ++options.counts.removed;
+            // ++options.counts.removed
             return false;
         }
         return true;
@@ -75,10 +74,11 @@ ownerTag, options) {
     return clones;
 }
 function processAddTagArrayItem(before, subTag, result, index, options) {
-    // Added to previous array
-    result.lastArray.push({
+    const lastValue = {
         tag: subTag, index
-    });
+    };
+    // Added to previous array
+    result.lastArray.push(lastValue);
     const counts = {
         added: options.counts.added + index,
         removed: options.counts.removed,
@@ -86,6 +86,7 @@ function processAddTagArrayItem(before, subTag, result, index, options) {
     const lastFirstChild = before; // tag.clones[0] // insertBefore.lastFirstChild    
     const nextClones = subTag.buildBeforeElement(lastFirstChild, { counts, forceElement: options.forceElement });
     // subTag.clones.push(...nextClones)
+    // ;(lastValue as any).clones = nextClones
     return nextClones;
 }
 /** compare two values. If both values are arrays then the items will be compared */

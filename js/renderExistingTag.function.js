@@ -9,8 +9,6 @@ export function renderExistingTag(tag, newTemplater, tagSupport) {
         return true;
     }
     const oldTagSupport = tag.tagSupport;
-    // ???
-    // const oldTagSupport = tagSupport
     const hasChanged = hasTagSupportChanged(oldTagSupport, newTemplater.tagSupport);
     const oldTemplater = tagSupport.templater;
     tagSupport.newest = oldTemplater.redraw(); // No change detected, just redraw me only

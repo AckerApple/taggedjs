@@ -2,19 +2,22 @@ import { interpolateAttributes } from "./interpolateAttributes.js";
 import { interpolateToTemplates } from "./interpolations.js";
 import { interpolateContentTemplates } from "./interpolateContentTemplates.js";
 import { escapeSearch, variablePrefix } from "./Tag.class.js";
-export function interpolateElement(element, context, // variables used to evaluate
+/** Review elements within an element */
+export function interpolateElement(container, context, // variables used to evaluate
 interpolatedTemplates, tagOwner, options) {
     const clones = [];
+    const tagComponents = [];
     const result = interpolatedTemplates.interpolation;
-    const template = element.children[0];
+    const template = container.children[0];
     const children = template.content.children;
     if (result.keys.length) {
-        const nextClones = interpolateContentTemplates(element, context, tagOwner, options, children);
+        const { clones: nextClones, tagComponents: nextTagComponents } = interpolateContentTemplates(container, context, tagOwner, options, children);
         clones.push(...nextClones);
+        tagComponents.push(...nextTagComponents);
     }
-    interpolateAttributes(element, context, tagOwner);
+    interpolateAttributes(container, context, tagOwner);
     processChildrenAttributes(children, context, tagOwner);
-    return clones;
+    return { clones, tagComponents };
 }
 function processChildrenAttributes(children, context, ownerTag) {
     new Array(...children).forEach(child => {

@@ -31,11 +31,11 @@ export function updateExistingValue(subject, value, ownerTag) {
     // its another tag array
     if (isTagArray(value)) {
         const insertBefore = subjectSubArray.template || subjectSubTag.tag?.tagSupport.templater.insertBefore;
-        const newClones = processTagArray(subject, value, insertBefore, ownerTag, { counts: {
+        const nextClones = processTagArray(subject, value, insertBefore, ownerTag, { counts: {
                 added: 0,
                 removed: 0,
             } });
-        ownerTag.clones.push(...newClones);
+        ownerTag.clones.push(...nextClones);
         return;
     }
     // now its a function

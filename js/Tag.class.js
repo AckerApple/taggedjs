@@ -1,10 +1,11 @@
 import { runBeforeDestroy } from "./tagRunner.js";
 import { buildClones } from "./render.js";
 import { interpolateElement, interpolateString } from "./interpolateElement.js";
-import { afterElmBuild } from "./interpolateTemplate.js";
+import { afterElmBuild, subscribeToTemplate } from "./interpolateTemplate.js";
 import { elementDestroyCheck } from "./elementDestroyCheck.function.js";
 import { updateExistingValue } from "./updateExistingValue.function.js";
 import { processNewValue } from "./processNewValue.function.js";
+import { checkDestroyPrevious } from "./checkDestroyPrevious.function.js";
 export const variablePrefix = '__tagvar';
 export const escapeVariable = '--' + variablePrefix + '--';
 const prefixSearch = new RegExp(variablePrefix, 'g');
@@ -158,14 +159,14 @@ export class Tag {
         return this.updateContext(this.tagSupport.memory.context);
     }
     updateContext(context) {
-        // const seenContext: string[] = []
+        const seenContext = [];
         this.strings.map((_string, index) => {
             const variableName = variablePrefix + index;
             const hasValue = this.values.length > index;
             const value = this.values[index];
             // is something already there?
             const existing = variableName in context;
-            // seenContext.push(variableName)
+            seenContext.push(variableName);
             if (existing) {
                 const existing = context[variableName];
                 return updateExistingValue(existing, value, this);
@@ -173,15 +174,13 @@ export class Tag {
             // 🆕 First time values below
             processNewValue(hasValue, value, context, variableName, this);
         });
-        /*
         // Support reduction in context
         Object.entries(context).forEach(([key, subject]) => {
-          if(seenContext.includes(key)) {
-            return
-          }
-          const destroyed = checkDestroyPrevious(subject, undefined as any)
-        })
-        */
+            if (seenContext.includes(key)) {
+                return;
+            }
+            const destroyed = checkDestroyPrevious(subject, undefined);
+        });
         return context;
     }
     getAppElement() {
@@ -213,24 +212,35 @@ export class Tag {
         this.tagSupport.templater.insertBefore = insertBefore;
         const context = this.update();
         const template = this.getTemplate();
-        const temporary = document.createElement('div');
-        temporary.id = 'tag-temp-holder';
+        const elementContainer = document.createElement('div');
+        elementContainer.id = 'tag-temp-holder';
         // render content with a first child that we can know is our first element
-        temporary.innerHTML = `<template id="temp-template-tag-wrap">${template.string}</template>`;
-        // const clonesBefore = this.clones.map(clone => clone)
-        const intClones = interpolateElement(temporary, context, template, this, // this.ownerTag || this,
+        elementContainer.innerHTML = `<template id="temp-template-tag-wrap">${template.string}</template>`;
+        const { clones, tagComponents } = interpolateElement(elementContainer, context, template, this, // ownerTag,
         {
             forceElement: options.forceElement,
             counts: options.counts
         });
         this.clones.length = 0;
-        const clones = buildClones(temporary, insertBefore);
-        this.clones.push(...clones);
-        if (intClones.length) {
-            this.clones = this.clones.filter(cloneFilter => !intClones.find(clone => clone === cloneFilter));
-        }
-        this.clones.forEach(clone => afterElmBuild(clone, options));
-        return this.clones;
+        afterInterpolateElement(elementContainer, insertBefore, this, clones, options, context);
+        this.clones.forEach(clone => afterElmBuild(clone, options, context, this));
+        // Any tag components that were found should be processed AFTER the owner processes its elements
+        let isForceElement = options.forceElement;
+        tagComponents.forEach(tagComponent => {
+            subscribeToTemplate(tagComponent.insertBefore, // temporary,
+            tagComponent.subject, tagComponent.ownerTag, clones, options.counts, { isForceElement });
+            afterInterpolateElement(elementContainer, insertBefore, this, clones, options, context);
+        });
+        // return this.clones
+        return clones;
+    }
+}
+function afterInterpolateElement(container, insertBefore, tag, intClones, options, context) {
+    const clones = buildClones(container, insertBefore);
+    tag.clones.push(...clones);
+    // remove component clones from ownerTag
+    if (intClones.length) {
+        tag.clones = tag.clones.filter(cloneFilter => !intClones.find(clone => clone === cloneFilter));
     }
 }
 //# sourceMappingURL=Tag.class.js.map

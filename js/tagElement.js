@@ -32,7 +32,7 @@ export function applyTagUpdater(wrapper) {
     const tagSupport = wrapper.tagSupport;
     runBeforeRender(tagSupport, undefined);
     // Call the apps function for our tag templater
-    const tag = wrapper.wrapper();
+    const tag = wrapper.wrapper(tagSupport);
     runAfterRender(tagSupport, tag);
     return { tag, tagSupport };
 }

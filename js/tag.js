@@ -20,9 +20,9 @@ export function tag(tagComponent) {
         const { childSubject, madeSubject } = kidsToTagArraySubject(children);
         childSubject.isChildSubject = true;
         const templater = new TemplaterResult(props, childSubject);
-        function innerTagWrap() {
+        const innerTagWrap = (oldTagSetup) => {
             const originalFunction = innerTagWrap.original;
-            const oldTagSetup = templater.tagSupport;
+            // const oldTagSetup = templater.tagSupport
             const oldest = templater.oldest;
             let props = oldTagSetup.propsConfig.latest;
             let castedProps = alterProps(props, templater);
@@ -33,13 +33,14 @@ export function tag(tagComponent) {
                 templater.oldest = tag;
                 // tag.tagSupport = oldTagSetup
                 oldTagSetup.mutatingRender = () => {
-                    const exit = renderExistingTag(tag, templater, oldTagSetup);
+                    const exit = renderExistingTag(templater.oldest, templater, oldTagSetup);
                     if (exit) {
                         return tag;
                     }
                     // Have owner re-render
                     if (tag.ownerTag) {
                         const newest = tag.ownerTag.tagSupport.render();
+                        // TODO: Next line most likely not needed
                         tag.ownerTag.tagSupport.newest = newest;
                         return tag;
                     }
@@ -55,6 +56,9 @@ export function tag(tagComponent) {
                 lastClonedKidValues: tag.tagSupport.propsConfig.lastClonedKidValues,
             };
             tag.tagSupport.memory = oldTagSetup.memory;
+            // ???
+            // tag.tagSupport.memory = {...oldTagSetup.memory}
+            // tag.tagSupport.memory.context = {...oldTagSetup.memory.context}
             tag.tagSupport.mutatingRender = oldTagSetup.mutatingRender;
             oldTagSetup.newest = tag;
             oldTagSetup.propsConfig = { ...tag.tagSupport.propsConfig };
@@ -80,7 +84,7 @@ export function tag(tagComponent) {
                 });
             }
             return tag;
-        }
+        };
         innerTagWrap.original = tagComponent;
         templater.tagged = true;
         templater.wrapper = innerTagWrap;

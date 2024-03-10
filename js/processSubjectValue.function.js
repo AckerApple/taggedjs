@@ -31,20 +31,14 @@ options) {
     const valueType = getValueType(value);
     switch (valueType) {
         case ValueTypes.tag:
-            return {
-                clones: processTag(value, result, template, ownerTag, options)
-            };
+            return processTag(value, result, template, ownerTag, options);
         case ValueTypes.tagArray:
             const clones = processTagArray(result, value, template, ownerTag, options);
-            return { clones };
+            return clones;
         case ValueTypes.tagComponent:
-            return {
-                clones: processSubjectComponent(value, result, template, ownerTag, options)
-            };
+            return processSubjectComponent(value, result, template, ownerTag, options);
     }
-    return {
-        clones: processRegularValue(value, result, template)
-    };
+    return processRegularValue(value, result, template);
 }
 export function processTag(value, result, // could be tag via result.tag
 template, // <template end interpolate /> (will be removed)
@@ -70,9 +64,6 @@ options) {
 export function destroySimpleValue(template, subject) {
     const clone = subject.clone;
     const parent = clone.parentNode;
-    if (clone === template) {
-        throw 'ok';
-    }
     // put the template back down
     parent.insertBefore(template, clone);
     parent.removeChild(clone);

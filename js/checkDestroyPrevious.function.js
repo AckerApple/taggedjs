@@ -7,7 +7,7 @@ newValue) {
     const wasArray = existingSubArray.lastArray;
     // no longer an array
     if (wasArray && !isTagArray(newValue)) {
-        wasArray.forEach(({ tag }) => tag.destroy());
+        wasArray.forEach(({ tag }) => destroyArrayTag(tag, { added: 0, removed: 0 }));
         delete existing.lastArray;
         return 1;
     }
@@ -46,5 +46,17 @@ export function destroyTagMemory(existingTag, existingSubject) {
     delete existingSubject.tag;
     delete existingSubject.tagSupport;
     existingTag.destroy();
+}
+export function destroyArrayTag(tag, counts) {
+    tag.children.forEach(child => child.destroy({
+        stagger: counts.removed++,
+        // byParent: false
+        // byParent: true,
+    }));
+    tag.destroy({
+        stagger: counts.removed,
+        // byParent: false
+        // byParent: true,
+    });
 }
 //# sourceMappingURL=checkDestroyPrevious.function.js.map

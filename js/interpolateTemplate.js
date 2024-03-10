@@ -1,36 +1,47 @@
 import { variablePrefix } from "./Tag.class.js";
 import { elementInitCheck } from "./elementInitCheck.js";
 import { processSubjectValue } from "./processSubjectValue.function.js";
-export function interpolateTemplate(template, // <template end interpolate /> (will be removed)
+import { isTagComponent } from "./isInstance.js";
+import { scanTextAreaValue } from "./scanTextAreaValue.function.js";
+export function interpolateTemplate(insertBefore, // <template end interpolate /> (will be removed)
 context, // variable scope of {`__tagvar${index}`:'x'}
-tag, // Tag class
+ownerTag, // Tag class
 counts, // used for animation stagger computing
 options) {
     const clones = [];
-    if (!template.hasAttribute('end')) {
-        return clones; // only care about <template end>
+    if (!insertBefore.hasAttribute('end')) {
+        return { clones }; // only care about <template end>
     }
-    const variableName = template.getAttribute('id');
+    const variableName = insertBefore.getAttribute('id');
     if (variableName?.substring(0, variablePrefix.length) !== variablePrefix) {
-        return clones; // ignore, not a tagVar
+        return { clones }; // ignore, not a tagVar
     }
     const existingSubject = context[variableName];
+    if (isTagComponent(existingSubject.value)) {
+        return { clones, tagComponent: { ownerTag, subject: existingSubject, insertBefore } };
+    }
     let isForceElement = options.forceElement;
-    const callback = (templateNewValue) => {
-        if (existingSubject.clone) {
-            template = existingSubject.clone;
+    subscribeToTemplate(insertBefore, existingSubject, ownerTag, clones, counts, { isForceElement });
+    return { clones };
+}
+export function subscribeToTemplate(insertBefore, subject, ownerTag, clones, counts, // used for animation stagger computing
+{ isForceElement }) {
+    const callback = (value) => {
+        const clone = subject.clone;
+        if (clone) {
+            insertBefore = clone;
         }
-        const { clones } = processSubjectValue(templateNewValue, existingSubject, template, tag, {
-            counts: { added: counts.added, removed: counts.removed },
+        const nextClones = processSubjectValue(value, subject, insertBefore, ownerTag, {
+            counts: { ...counts },
             forceElement: isForceElement,
         });
         if (isForceElement) {
             isForceElement = false; // only can happen once
         }
-        clones.push(...clones);
+        clones.push(...nextClones);
     };
-    const sub = existingSubject.subscribe(callback);
-    tag.cloneSubs.push(sub);
+    const sub = subject.subscribe(callback);
+    ownerTag.cloneSubs.push(sub);
     return clones;
 }
 // Function to update the value of x
@@ -47,9 +58,13 @@ export function updateBetweenTemplates(value, lastFirstChild) {
     parent.removeChild(lastFirstChild);
     return textNode;
 }
-export function afterElmBuild(elm, options) {
+export function afterElmBuild(elm, options, context, ownerTag) {
     if (!elm.getAttribute) {
         return;
+    }
+    const tagName = elm.nodeName; // elm.tagName
+    if (tagName === 'TEXTAREA') {
+        scanTextAreaValue(elm, context, ownerTag);
     }
     let diff = options.counts.added;
     if (!options.forceElement) {
@@ -61,10 +76,11 @@ export function afterElmBuild(elm, options) {
             removed: options.counts.removed,
         };
         new Array(...elm.children).forEach((child, index) => {
-            return afterElmBuild(child, {
+            const subOptions = {
                 ...options,
                 counts: options.counts,
-            });
+            };
+            return afterElmBuild(child, subOptions, context, ownerTag);
         });
     }
 }

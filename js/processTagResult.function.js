@@ -17,9 +17,6 @@ insertBefore, // <template end interpolate />
             return []; // no clones created in element already on stage
         }
     }
-    if (!insertBefore || !insertBefore.parentNode) {
-        throw new Error('bad parent already started');
-    }
     const clones = tag.buildBeforeElement(insertBefore, {
         counts,
         forceElement,

@@ -1,51 +1,42 @@
 import { interpolateTemplate } from "./interpolateTemplate.js";
-const templateSearch = new RegExp('\\s*<template interpolate end id="__tagvar(\\d{1,4})"([^>]*)></template>(\\s*)');
-/** Returns subscriptions[] that will need to be unsubscribed from when element is destroyed */
 export function interpolateContentTemplates(element, context, tag, options, children) {
     if (!children || element.tagName === 'TEMPLATE') {
-        return []; // done
+        return { clones: [], tagComponents: [] }; // done
     }
     // counting for animation stagger computing
     const counts = options.counts;
     const clones = [];
+    const tagComponents = [];
     const childArray = new Array(...children);
-    if (element.tagName === 'TEXTAREA') {
-        scanTextAreaValue(element);
-    }
     childArray.forEach(child => {
-        const nextClones = interpolateTemplate(child, context, tag, counts, options);
-        if (child.tagName === 'TEXTAREA') {
-            scanTextAreaValue(child);
-        }
+        const { clones: nextClones, tagComponent } = interpolateTemplate(child, context, tag, counts, options);
         clones.push(...nextClones);
+        if (tagComponent) {
+            tagComponents.push(tagComponent);
+            return;
+        }
         if (child.children) {
             const nextKids = new Array(...child.children);
             nextKids.forEach((subChild, index) => {
+                // IF <template end /> its a variable to be processed
                 if (isRenderEndTemplate(subChild)) {
-                    interpolateTemplate(subChild, context, tag, counts, options);
+                    const { tagComponent } = interpolateTemplate(subChild, context, tag, counts, options);
+                    if (tagComponent) {
+                        tagComponents.push(tagComponent);
+                    }
                 }
-                const nextClones = interpolateContentTemplates(subChild, context, tag, options, subChild.children);
+                const { clones: nextClones, tagComponents: nextTagComponent } = interpolateContentTemplates(subChild, context, tag, options, subChild.children);
                 clones.push(...nextClones);
+                tagComponents.push(...nextTagComponent);
             });
         }
     });
-    return clones;
+    return { clones, tagComponents };
 }
 function isRenderEndTemplate(child) {
     const isTemplate = child.tagName === 'TEMPLATE';
     return isTemplate &&
         child.getAttribute('interpolate') !== undefined &&
         child.getAttribute('end') !== undefined;
-}
-function scanTextAreaValue(textarea) {
-    const value = textarea.value;
-    if (value.search(templateSearch) >= 0) {
-        const match = value.match(/__tagvar(\d{1,4})/);
-        const result = match ? match[0] : '';
-        const token = '{' + result + '}';
-        // textarea.value = token
-        textarea.value = '';
-        textarea.setAttribute('textVarValue', token);
-    }
 }
 //# sourceMappingURL=interpolateContentTemplates.js.map

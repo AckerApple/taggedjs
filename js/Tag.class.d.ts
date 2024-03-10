@@ -4,11 +4,13 @@ import { Subscription } from "./Subject.js";
 import { Counts } from "./interpolateTemplate.js";
 import { State } from "./set.function.js";
 import { InterpolatedTemplates } from "./interpolations.js";
+import { InterpolateSubject } from "./processSubjectValue.function.js";
+import { Clones } from "./Clones.type.js";
 export declare const variablePrefix = "__tagvar";
 export declare const escapeVariable: string;
 export declare const escapeSearch: RegExp;
 export type Context = {
-    [index: string]: any;
+    [index: string]: InterpolateSubject;
 };
 export type TagMemory = Record<string, any> & {
     context: Context;
@@ -53,7 +55,7 @@ export declare class Tag {
     getAppElement(): Tag;
     /** Used during HMR only where static content itself could have been edited */
     rebuild(): void;
-    buildBeforeElement(insertBefore: Element | Text, options?: ElementBuildOptions): (ChildNode | Element)[];
+    buildBeforeElement(insertBefore: Element | Text, options?: ElementBuildOptions): Clones;
 }
 type DestroyOptions = {
     stagger: number;

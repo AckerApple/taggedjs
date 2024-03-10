@@ -33,29 +33,12 @@ export class TemplaterResult {
         }
         /* END: BEFORE RENDER */
         const templater = this;
-        const retag = templater.wrapper();
+        const retag = templater.wrapper(tagSupport);
         /* AFTER */
         runAfterRender(tagSupport, retag);
         templater.newest = retag;
         retag.ownerTag = runtimeOwnerTag;
         tagSupport.newest = retag;
-        // ???
-        // const oldest = tagSupport.oldest = tagSupport.oldest || retag
-        // oldest.tagSupport.templater = templater
-        // oldest.tagSupport.memory = retag.tagSupport.memory
-        // TODO: I think this is duplicated work of updateExistingValue?
-        /*
-        const isSameTag = existingTag && existingTag.isLikeTag(retag)
-        // If previously was a tag and seems to be same tag, then just update current tag with new values
-        if(isSameTag) {
-          existingTag.updateByTag(retag)
-          return {remit: false, retag}
-        }
-    
-        // MAYBE destroy existing tag here?
-    
-        return {remit: true, retag}
-        */
         return { remit: true, retag };
     }
 }

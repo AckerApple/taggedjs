@@ -1,17 +1,31 @@
 import { Context, ElementBuildOptions, Tag } from "./Tag.class.js";
 import { InterpolateOptions } from "./interpolateElement.js";
 import { Clones } from "./Clones.type.js";
+import { InterpolateSubject } from "./processSubjectValue.function.js";
 export type Template = Element & {
     clone?: any;
 };
-export declare function interpolateTemplate(template: Template, // <template end interpolate /> (will be removed)
+export type InterpolateComponentResult = {
+    subject: InterpolateSubject;
+    insertBefore: Element | Text | Template;
+    ownerTag: Tag;
+};
+export type InterpolateTemplateResult = {
+    clones: Clones;
+    tagComponent?: InterpolateComponentResult;
+};
+export declare function interpolateTemplate(insertBefore: Template, // <template end interpolate /> (will be removed)
 context: Context, // variable scope of {`__tagvar${index}`:'x'}
-tag: Tag, // Tag class
+ownerTag: Tag, // Tag class
 counts: Counts, // used for animation stagger computing
-options: InterpolateOptions): Clones;
+options: InterpolateOptions): InterpolateTemplateResult;
+export declare function subscribeToTemplate(insertBefore: Element | Text | Template, subject: InterpolateSubject, ownerTag: Tag, clones: Clones, counts: Counts, // used for animation stagger computing
+{ isForceElement }: {
+    isForceElement?: boolean;
+}): Clones;
 export declare function updateBetweenTemplates(value: string | undefined | boolean | number, lastFirstChild: Element | Text): Text;
 export type Counts = {
     added: number;
     removed: number;
 };
-export declare function afterElmBuild(elm: Element | ChildNode, options: ElementBuildOptions): void;
+export declare function afterElmBuild(elm: Element | ChildNode, options: ElementBuildOptions, context: Context, ownerTag: Tag): void;

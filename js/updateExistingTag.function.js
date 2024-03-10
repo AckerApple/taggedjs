@@ -5,7 +5,7 @@ export function updateExistingTag(templater, ogTag, existingSubject) {
     const newest = tagSupport.newest;
     // runBeforeRedraw(oldest.tagSupport, newest || oldest)
     runBeforeRedraw(oldest.tagSupport, oldest);
-    const retag = templater.wrapper();
+    const retag = templater.wrapper(tagSupport);
     templater.newest = retag;
     tagSupport.newest = retag;
     runAfterRender(oldest.tagSupport, oldest);
