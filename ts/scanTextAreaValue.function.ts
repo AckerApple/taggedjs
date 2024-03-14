@@ -1,6 +1,6 @@
-import { Context, Tag } from "./Tag.class.js";
-import { HowToSet } from "./interpolateAttributes.js";
-import { processAttribute } from "./processAttribute.function.js";
+import { Context, Tag } from './Tag.class'
+import { HowToSet } from './interpolateAttributes'
+import { processAttribute } from './processAttribute.function'
 
 const search = new RegExp('\\s*<template interpolate end id="__tagvar(\\d{1,4})"([^>]*)></template>(\\s*)')
 

@@ -1,10 +1,10 @@
-import { Props } from "./Props.js"
-import { Tag, TagMemory } from "./Tag.class.js"
-import { deepClone } from "./deepFunctions.js"
-import { isTagArray, isTagComponent, isTagInstance } from "./isInstance.js"
-import { StateConfigArray, getStateValue } from "./set.function.js"
-import { TagChildren } from "./tag.js"
-import { TemplaterResult, alterProps } from "./templater.utils.js"
+import { Props } from './Props'
+import { Tag, TagMemory } from './Tag.class'
+import { deepClone } from './deepFunctions'
+import { isTagArray, isTagComponent, isTagInstance } from './isInstance'
+import { StateConfigArray, getStateValue } from './set.function'
+import { TagChildren } from './tag'
+import { TemplaterResult, alterProps } from './templater.utils'
 
 export class TagSupport {
   propsConfig: {

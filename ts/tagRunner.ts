@@ -1,8 +1,8 @@
 // TODO: This should be more like `new TaggedJs().use({})`
 
-import { Tag } from "./Tag.class.js"
-import { TagSupport } from "./TagSupport.class.js"
-import { setUse } from "./setUse.function.js"
+import { Tag } from './Tag.class'
+import { TagSupport } from './TagSupport.class'
+import { setUse } from './setUse.function'
 
 // Life cycle 1
 export function runBeforeRender(

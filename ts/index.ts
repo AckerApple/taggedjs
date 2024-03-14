@@ -1,36 +1,34 @@
-/** Must use .js and NOT .ts extensions here */
+import { redrawTag } from "./redrawTag.function"
+import { tagElement } from "./tagElement"
 
-import { redrawTag } from "./redrawTag.function.js"
-import { tagElement } from "./tagElement.js"
+export * from "./ElementTargetEvent.interface"
 
-export * from "./ElementTargetEvent.interface.js"
-
-export * from "./tag.js"
-export * from "./html.js"
-export * from "./errors.js"
-export * from "./Subject.js"
-export * from "./isInstance.js"
-export * from "./ValueSubject.js"
-export * from "./watch.function.js"
-export * from "./TagSupport.class.js"
-export * from "./redrawTag.function.js"
-export * from "./interpolateElement.js"
+export * from "./tag"
+export * from "./html"
+export * from "./errors"
+export * from "./Subject"
+export * from "./isInstance"
+export * from "./ValueSubject"
+export * from "./watch.function"
+export * from "./TagSupport.class"
+export * from "./redrawTag.function"
+export * from "./interpolateElement"
 
 // TODO: export *
-export { tagElement } from "./tagElement.js"
-export { Tag } from "./Tag.class.js"
-export { runBeforeRender } from "./tagRunner.js"
-export { setUse } from "./setUse.function.js"
+export { tagElement } from "./tagElement"
+export { Tag } from "./Tag.class"
+export { runBeforeRender } from "./tagRunner"
+export { setUse } from "./setUse.function"
 
 /* hooks */
   // TODO: export *
-  export { providers } from "./providers.js"
-  export { set } from "./set.function.js"
-  export { setLet } from "./setLet.function.js"
-  export { setProp } from "./setProp.function.js"
-  export * from "./onInit.js"
-  export * from "./onDestroy.js"
-  export * from "./getCallback.js"
+  export { providers } from "./providers"
+  export { set } from "./set.function"
+  export { setLet } from "./setLet.function"
+  export { setProp } from "./setProp.function"
+  export * from "./onInit"
+  export * from "./onDestroy"
+  export * from "./getCallback"
 /* end: hooks */
 
 export const hmr = {

@@ -1,6 +1,6 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
-import { Tag } from "./Tag.class.js"
+import { Tag } from "./Tag.class"
 
 export type Callback = (...args: any[]) => any & {
   isChildOverride?: true // if this is set, then a parent tag passed children to a tag/component

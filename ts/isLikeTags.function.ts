@@ -1,4 +1,5 @@
-import { Tag } from "./Tag.class.js"
+import { Tag } from "./Tag.class"
+import { deepEqual } from "./deepFunctions"
 
 export function isLikeTags(tag0: Tag, tag1: Tag): Boolean {
   if(tag0.strings.length !== tag1.strings.length) {
@@ -14,6 +15,13 @@ export function isLikeTags(tag0: Tag, tag1: Tag): Boolean {
   if(!valuesLengthsMatch) {
     return false
   }
+
+  /*
+  const valuesMatch = deepEqual(tag0.values, tag1.values)
+  if(!valuesMatch) {
+    return false
+  }
+  */
 
   return true
 }

@@ -1,9 +1,9 @@
-import { interpolateAttributes } from "./interpolateAttributes.js"
-import { interpolateToTemplates } from "./interpolations.js"
-import { InterpolatedContentTemplates, interpolateContentTemplates } from "./interpolateContentTemplates.js"
-import { Context, Tag, TagTemplate, escapeSearch, variablePrefix } from "./Tag.class.js"
-import { Clones } from "./Clones.type.js"
-import { Counts, InterpolateComponentResult } from "./interpolateTemplate.js"
+import { interpolateAttributes } from "./interpolateAttributes"
+import { interpolateToTemplates } from "./interpolations"
+import { InterpolatedContentTemplates, interpolateContentTemplates } from "./interpolateContentTemplates"
+import { Context, Tag, TagTemplate, escapeSearch, variablePrefix } from "./Tag.class"
+import { Clones } from "./Clones.type"
+import { Counts, InterpolateComponentResult } from "./interpolateTemplate"
 
 export type InterpolateOptions = {
   /** make the element go on document */

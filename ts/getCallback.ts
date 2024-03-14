@@ -1,6 +1,6 @@
-import { TagSupport } from "./TagSupport.class.js"
-import { setUse } from "./setUse.function.js"
-import { State, StateConfigArray, getStateValue } from "./set.function.js"
+import { TagSupport } from "./TagSupport.class"
+import { setUse } from "./setUse.function"
+import { State, StateConfigArray, getStateValue } from "./set.function"
 
 type Callback = <T>(...args: unknown[]) => (T | void)
 

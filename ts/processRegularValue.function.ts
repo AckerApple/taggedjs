@@ -1,5 +1,5 @@
-import { DisplaySubject } from "./Tag.utils"
-import { Template, updateBetweenTemplates } from "./interpolateTemplate.js"
+import { DisplaySubject } from './Tag.utils'
+import { Template, updateBetweenTemplates } from './interpolateTemplate'
 
 export type RegularValue = string | number | undefined | boolean
 

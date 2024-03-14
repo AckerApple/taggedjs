@@ -1,5 +1,5 @@
-import { InputElementTargetEvent } from "./ElementTargetEvent.interface.js"
-import { Counts } from "./interpolateTemplate.js"
+import { InputElementTargetEvent } from "./ElementTargetEvent.interface"
+import { Counts } from "./interpolateTemplate"
 
 export function elementInitCheck(
   nextSibling: Element | ChildNode,

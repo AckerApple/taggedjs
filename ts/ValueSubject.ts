@@ -1,4 +1,4 @@
-import { Subject } from './Subject.js'
+import { Subject } from './Subject'
 
 export class ValueSubject<T> extends Subject<T> {
   constructor(public value: T) {

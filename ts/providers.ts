@@ -1,7 +1,7 @@
-import { Tag } from "./Tag.class.js"
-import { deepClone } from "./deepFunctions.js"
-import { TagSupport } from "./TagSupport.class.js"
-import { setUse } from "./setUse.function.js"
+import { Tag } from './Tag.class'
+import { deepClone } from './deepFunctions'
+import { TagSupport } from './TagSupport.class'
+import { setUse } from './setUse.function'
 
 export type Provider = {
   constructMethod: any

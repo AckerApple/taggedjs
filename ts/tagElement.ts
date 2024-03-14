@@ -1,9 +1,9 @@
-import { TagSupport } from "./TagSupport.class.js"
-import { runAfterRender, runBeforeRender } from "./tagRunner.js"
-import { TemplaterResult } from "./templater.utils.js"
-import { Tag } from "./Tag.class.js"
-import { TagComponent } from "./tag.js"
-import { renderExistingTag } from "./renderExistingTag.function.js"
+import { TagSupport } from './TagSupport.class'
+import { runAfterRender, runBeforeRender } from './tagRunner'
+import { TemplaterResult } from './templater.utils'
+import { Tag } from './Tag.class'
+import { TagComponent } from './tag'
+import { renderExistingTag } from './renderExistingTag.function'
 
 const appElements: {tag: Tag, element: Element}[] = []
 
@@ -25,8 +25,7 @@ export function tagElement(
 
   // have a function setup and call the tagWrapper with (props, {update, async, on})
   const result = applyTagUpdater(wrapper)
-  const {tag, tagSupport} = result
-  // wrapper.tagSupport = tagSupport
+  const {tag} = result
 
   tag.appElement = element
   tag.tagSupport.oldest = tag
@@ -56,7 +55,7 @@ export function applyTagUpdater(
   // Call the apps function for our tag templater
   const tag = wrapper.wrapper(tagSupport)
   runAfterRender(tagSupport, tag)
-  
+
   return { tag, tagSupport }
 }
 

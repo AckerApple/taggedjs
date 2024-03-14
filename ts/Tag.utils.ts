@@ -1,11 +1,10 @@
-import { TagSupport } from "./TagSupport.class.js"
-import { ValueSubject } from "./ValueSubject.js"
-import { Subject } from "./Subject.js"
-import { Tag } from "./Tag.class.js"
-import { redrawTag } from "./redrawTag.function.js"
-import { TemplaterResult } from "./templater.utils.js"
-import { bindSubjectCallback } from "./bindSubjectCallback.function.js"
-import { Template } from "./interpolateTemplate.js"
+import { TagSupport } from "./TagSupport.class"
+import { ValueSubject } from "./ValueSubject"
+import { Subject } from "./Subject"
+import { Tag } from "./Tag.class"
+import { TemplaterResult } from "./templater.utils"
+import { bindSubjectCallback } from "./bindSubjectCallback.function"
+import { Template } from "./interpolateTemplate"
 
 export type TagSubject = Subject<TemplaterResult> & {
   tagSupport: TagSupport
@@ -34,7 +33,7 @@ export function setValueRedraw(
 ) {
   // redraw does not communicate to parent
   templater.redraw = () => {
-    const existingTag = existing.tag    
+    const existingTag = templater.oldest || existing.tag
     const tagSupport = existingTag?.tagSupport || templater.tagSupport
 
     const {retag} = templater.renderWithSupport(

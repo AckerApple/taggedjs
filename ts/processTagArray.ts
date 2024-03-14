@@ -1,11 +1,11 @@
-import { Clones } from "./Clones.type.js"
-import { ArrayValueNeverSet, Tag } from "./Tag.class.js"
-import { ValueSubject } from "./ValueSubject.js"
-import { TagSupport } from "./TagSupport.class.js"
-import { Counts, Template } from "./interpolateTemplate.js"
-import { TemplaterResult } from "./templater.utils.js"
-import { ArrayNoKeyError } from "./errors.js"
-import { destroyArrayTag } from "./checkDestroyPrevious.function.js"
+import { Clones } from './Clones.type'
+import { ArrayValueNeverSet, Tag } from './Tag.class'
+import { ValueSubject } from './ValueSubject'
+import { TagSupport } from './TagSupport.class'
+import { Counts, Template } from './interpolateTemplate'
+import { TemplaterResult } from './templater.utils'
+import { ArrayNoKeyError } from './errors'
+import { destroyArrayTag } from './checkDestroyPrevious.function'
 
 export type LastArrayItem = {tag: Tag, index: number}
 export type TagArraySubject = ValueSubject<Tag[]> & {
@@ -27,8 +27,10 @@ export function processTagArray(
   // const clones: Clones = []
   const clones: Clones = ownerTag.clones // []
 
-  result.lastArray = result.lastArray || [] // {tag, index}[] populated in processTagResult
-  
+  if(!result.lastArray) {
+    result.lastArray = [] // {tag, index}[] populated in processTagResult
+  }
+
   result.template = template
 
   let removed = 0
@@ -48,11 +50,10 @@ export function processTagArray(
     if(destroyItem) {
       const last = result.lastArray[index]
       const tag: Tag = last.tag
-
       destroyArrayTag(tag, options.counts)
 
       ++removed
-      // ++options.counts.removed
+      ++options.counts.removed
       
       return false
     }
@@ -108,8 +109,7 @@ export function processTagArray(
       return []
     }
 
-    const nextClones = processAddTagArrayItem(before, subTag, result, index, options)
-    clones.push(...nextClones)
+    processAddTagArrayItem(before, subTag, result, index, options)
   })
 
   return clones
@@ -137,16 +137,11 @@ function processAddTagArrayItem(
   }
 
   const lastFirstChild = before // tag.clones[0] // insertBefore.lastFirstChild    
-  const nextClones = subTag.buildBeforeElement(
+
+  subTag.buildBeforeElement(
     lastFirstChild,
     {counts, forceElement: options.forceElement}
   )
-  
-  // subTag.clones.push(...nextClones)
-  // ;(lastValue as any).clones = nextClones
-
-
-  return nextClones
 }
 
 /** compare two values. If both values are arrays then the items will be compared */

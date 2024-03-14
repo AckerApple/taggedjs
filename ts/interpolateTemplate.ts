@@ -1,11 +1,13 @@
-import { Context, ElementBuildOptions, Tag, variablePrefix } from "./Tag.class.js"
-import { InterpolateOptions } from "./interpolateElement.js"
-import { elementInitCheck } from "./elementInitCheck.js"
-import { Clones } from "./Clones.type.js"
-import { InterpolateSubject, processSubjectValue } from "./processSubjectValue.function.js"
-import { isTagComponent } from "./isInstance.js"
-import { DisplaySubject } from "./Tag.utils.js"
-import { scanTextAreaValue } from "./scanTextAreaValue.function.js"
+import { Context, ElementBuildOptions, Tag, variablePrefix } from "./Tag.class"
+import { InterpolateOptions } from "./interpolateElement"
+import { elementInitCheck } from "./elementInitCheck"
+import { Clones } from "./Clones.type"
+import { InterpolateSubject, processSubjectValue } from "./processSubjectValue.function"
+import { isTagArray, isTagComponent } from "./isInstance"
+import { DisplaySubject, TagSubject } from "./Tag.utils"
+import { scanTextAreaValue } from "./scanTextAreaValue.function"
+import { processSubjectComponent } from "./processSubjectComponent.function"
+import { TemplaterResult } from "./templater.utils"
 
 export type Template = Element & {clone?: any}
 export type InterpolateComponentResult = {
@@ -25,6 +27,7 @@ export function interpolateTemplate(
   counts: Counts, // used for animation stagger computing
   options: InterpolateOptions,
 ): InterpolateTemplateResult {
+  // TODO: THe clones array is useless here
   const clones: Clones = []
 
   if ( !insertBefore.hasAttribute('end') ) {
@@ -37,8 +40,9 @@ export function interpolateTemplate(
   }
 
   const existingSubject = context[variableName]
-  
-  if(isTagComponent(existingSubject.value)) {
+
+  // process dynamics later
+  if(isTagComponent(existingSubject.value) || isTagArray(existingSubject.value)) {
     return {clones, tagComponent: {ownerTag, subject: existingSubject, insertBefore}}
   }
   
@@ -47,7 +51,6 @@ export function interpolateTemplate(
     insertBefore,
     existingSubject,
     ownerTag,
-    clones,
     counts,
     {isForceElement}
   )
@@ -59,17 +62,16 @@ export function subscribeToTemplate(
   insertBefore: Element | Text | Template,
   subject: InterpolateSubject,
   ownerTag: Tag,
-  clones: Clones,
   counts: Counts, // used for animation stagger computing
   {isForceElement}: {isForceElement?:boolean}
-): Clones {
+) {
   const callback = (value: unknown) => {
     const clone = (subject as DisplaySubject).clone
     if(clone) {
       insertBefore = clone
     }
 
-    const nextClones = processSubjectValue(
+    processSubjectValue(
       value,
       subject,
       insertBefore,
@@ -84,12 +86,12 @@ export function subscribeToTemplate(
       isForceElement = false // only can happen once
     }
 
-    clones.push(...nextClones)
+    // ownerTag.clones.push(...nextClones)
+    // clones.push(...nextClones)
   }
 
   const sub = subject.subscribe(callback as any)
   ownerTag.cloneSubs.push(sub)
-  return clones
 }
 
 // Function to update the value of x

@@ -1,6 +1,6 @@
-import { Tag } from "./Tag.class.js"
-import { deepClone, deepEqual } from "./deepFunctions.js"
-import { Provider } from "./providers.js"
+import { Tag } from './Tag.class'
+import { deepClone, deepEqual } from './deepFunctions'
+import { Provider } from './providers'
 
 export function providersChangeCheck(tag: Tag) {
   const providersWithChanges = tag.tagSupport.memory.providers.filter(provider =>

@@ -1,10 +1,10 @@
-import { Tag } from "./Tag.class.js"
-import { TagSupport } from "./TagSupport.class.js"
-import { isTagInstance } from "./isInstance.js"
-import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
-import { setUse } from "./setUse.function.js"
-import { Props } from "./Props.js"
-import { TagChildren } from "./tag.js"
+import { Tag } from './Tag.class'
+import { TagSupport } from './TagSupport.class'
+import { isTagInstance } from './isInstance'
+import { runAfterRender, runBeforeRedraw, runBeforeRender } from './tagRunner'
+import { setUse } from './setUse.function'
+import { Props } from './Props'
+import { TagChildren } from './tag'
 
 export type Wrapper = ((tagSupport: TagSupport) => Tag) & {
   original: () => Tag

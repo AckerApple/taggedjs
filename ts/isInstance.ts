@@ -1,6 +1,6 @@
-import { SubjectLike } from "./Subject.js"
-import { Tag } from "./Tag.class.js"
-import { TemplaterResult } from "./templater.utils.js"
+import { SubjectLike } from "./Subject"
+import { Tag } from "./Tag.class"
+import { TemplaterResult } from "./templater.utils"
 
 export function isTagComponent(value?: TemplaterResult | unknown) {
   return (value as TemplaterResult)?.isTemplater === true

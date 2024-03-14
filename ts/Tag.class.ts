@@ -1,18 +1,20 @@
-import { TagSupport } from "./TagSupport.class.js"
-import { Provider } from "./providers.js"
-import { Subscription } from "./Subject.js"
-import { runBeforeDestroy } from "./tagRunner.js"
-import { buildClones } from "./render.js"
-import { interpolateElement, interpolateString } from "./interpolateElement.js"
-import { Counts, Template, afterElmBuild, subscribeToTemplate } from "./interpolateTemplate.js"
-import { State } from "./set.function.js"
-import { elementDestroyCheck } from "./elementDestroyCheck.function.js"
-import { updateExistingValue } from "./updateExistingValue.function.js"
-import { InterpolatedTemplates } from "./interpolations.js"
-import { processNewValue } from "./processNewValue.function.js"
-import { InterpolateSubject } from "./processSubjectValue.function.js"
-import { Clones } from "./Clones.type.js"
-import { checkDestroyPrevious } from "./checkDestroyPrevious.function.js"
+import { TagSupport } from './TagSupport.class'
+import { Provider } from './providers'
+import { Subscription } from './Subject'
+import { runBeforeDestroy } from './tagRunner'
+import { buildClones } from './render'
+import { interpolateElement, interpolateString } from './interpolateElement'
+import { Counts, Template, afterElmBuild, subscribeToTemplate } from './interpolateTemplate'
+import { State } from './set.function'
+import { elementDestroyCheck } from './elementDestroyCheck.function'
+import { updateExistingValue } from './updateExistingValue.function'
+import { InterpolatedTemplates } from './interpolations'
+import { processNewValue } from './processNewValue.function'
+import { InterpolateSubject } from './processSubjectValue.function'
+import { Clones } from './Clones.type'
+import { checkDestroyPrevious } from './checkDestroyPrevious.function'
+import { TagSubject } from './Tag.utils'
+import { TagArraySubject } from './processTagArray'
 
 export const variablePrefix = '__tagvar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -82,17 +84,24 @@ export class Tag {
     }
 
     this.destroySubscriptions()
-    const promises = this.children.map((kid) => kid.destroy({...options, byParent: true}))
-    this.children.length = 0
 
     if(this.ownerTag) {
       this.ownerTag.children = this.ownerTag.children.filter(child => child !== this)
     }
 
     if( !options.byParent ) {
-      options.stagger = await this.destroyClones(options)
+      const {stagger, promise} = this.destroyClones(options)
+      options.stagger = stagger
+      
+      if(promise) {
+        await promise
+      }
+    } else {
+      this.destroyClones()
     }
 
+    const promises = this.children.map(kid => kid.destroy({stagger:0, byParent: true}))
+    this.children.length = 0
     await Promise.all(promises)
 
     return options.stagger
@@ -103,51 +112,58 @@ export class Tag {
     this.cloneSubs.length = 0
   }
 
-  async destroyClones(
+  destroyClones(
     {stagger}: DestroyOptions = {
       stagger: 0,
     }
   ) {
-    let hasPromise = false
-    const promises = this.clones.reverse().map((clone: any, index: number) => {
-      let promise: Promise<unknown> | undefined
-      
-      if( clone.ondestroy ) {
-        promise = elementDestroyCheck(clone, stagger)
-      }
-
-      const next = () => {
-        clone.parentNode?.removeChild(clone)
-
-        const ownerTag = this.ownerTag
-        if(ownerTag) {
-          // Sometimes my clones were first registered to my owner, remove them
-          ownerTag.clones = ownerTag.clones.filter(compareClone => compareClone !== clone)
-        }
-      }
-
-      if(promise instanceof Promise) {
-        hasPromise = true
-        promise.then(next)
-      } else {
-        next()
-      }
-
-
-      return promise
-    })
+    //const promises = this.clones.reverse().map(
+    const promises = this.clones.map(
+      clone => this.checkCloneRemoval(clone, stagger)
+    ).filter(x => x) // only return promises
 
     this.clones.length = 0 // tag maybe used for something else
     
-    if(hasPromise) {
-      await Promise.all(promises)
+    if(promises.length) {
+      return {promise: Promise.all(promises), stagger}
     }
 
-    return stagger
+    return {stagger}
+  }
+
+  checkCloneRemoval(
+    clone: Element | Text | ChildNode,
+    stagger: number,
+  ) {
+    let promise: Promise<unknown> | undefined
+    
+    const customElm = clone as any
+    if( customElm.ondestroy ) {
+      promise = elementDestroyCheck(customElm, stagger)
+    }
+
+    const next = () => {
+      clone.parentNode?.removeChild(clone)
+
+      const ownerTag = this.ownerTag
+      if(ownerTag) {
+        // Sometimes my clones were first registered to my owner, remove them from owner
+        ownerTag.clones = ownerTag.clones.filter(compareClone => compareClone !== clone)
+      }
+    }
+
+    if(promise instanceof Promise) {
+      return promise.then(next)
+    } else {
+      next()
+    }
+
+
+    return promise
   }
 
   updateByTag(tag: Tag) {
-    this.updateConfig(tag.strings, tag.values)    
+    this.updateConfig(tag.strings, tag.values)
     this.tagSupport.templater = tag.tagSupport.templater
     this.tagSupport.propsConfig = {...tag.tagSupport.propsConfig}
     this.tagSupport.newest = tag
@@ -260,6 +276,7 @@ export class Tag {
         return
       }
 
+      throw new Error('we here')
       const destroyed = checkDestroyPrevious(subject, undefined as any)
     })
 
@@ -299,7 +316,7 @@ export class Tag {
       forceElement: false,
       counts: {added:0, removed: 0},
     },
-  ): Clones {
+  ) {
     // this.insertBefore = insertBefore
     this.tagSupport.templater.insertBefore = insertBefore
     
@@ -311,6 +328,7 @@ export class Tag {
     // render content with a first child that we can know is our first element
     elementContainer.innerHTML = `<template id="temp-template-tag-wrap">${template.string}</template>`
 
+    // Search/replace innerHTML variables but don't interpolate tag components just yet
     const {clones, tagComponents} = interpolateElement(
       elementContainer,
       context,
@@ -322,25 +340,31 @@ export class Tag {
       }
     )
 
-    this.clones.length = 0
+    // remove old clones
+    if(this.clones.length) {
+      this.clones.forEach(clone => this.checkCloneRemoval(clone, 0))
+    }
+   
     afterInterpolateElement(
       elementContainer,
       insertBefore,
-      this,
-      clones,
-      options,
+      this, // ownerTag
+      [],
       context,
+      options,
     )
-    this.clones.forEach(clone => afterElmBuild(clone, options, context, this))
 
-    // Any tag components that were found should be processed AFTER the owner processes its elements
+    // this.clones.push(...clones)
+
+    // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
     let isForceElement = options.forceElement
-    tagComponents.forEach(tagComponent => {    
+    tagComponents.forEach(tagComponent => {
+      const preClones = this.clones.map(clone => clone)
+
       subscribeToTemplate(
         tagComponent.insertBefore, // temporary,
-        tagComponent.subject,
+        tagComponent.subject as TagSubject | TagArraySubject,
         tagComponent.ownerTag,
-        clones,
         options.counts,
         {isForceElement}
       )
@@ -349,32 +373,35 @@ export class Tag {
         elementContainer,
         insertBefore,
         this,
-        clones,
-        options,
+        preClones,
         context,
+        options,
       )
+
+        // remove component clones from ownerTag as they will belong to the components they live on
+        /*
+        if( preClones.length ) {
+          this.clones = this.clones.filter(cloneFilter => !preClones.find(clone => clone === cloneFilter))
+        }
+        */
     })
-  
-    // return this.clones
-    return clones
   }
 }
 
 function afterInterpolateElement(
   container: Element,
   insertBefore: Element | Text | Template,
-  tag: Tag,
-  intClones: Clones,
+  ownerTag: Tag,
+  preClones: Clones,
+  context: Context,
   options: ElementBuildOptions,
-  context: Context
 ) {
   const clones = buildClones(container, insertBefore)
-  tag.clones.push( ...clones )
 
-  // remove component clones from ownerTag
-  if( intClones.length ) {
-   tag.clones = tag.clones.filter(cloneFilter => !intClones.find(clone => clone === cloneFilter))
-  }
+  ownerTag.clones.push( ...clones )
+  clones.forEach(clone => afterElmBuild(clone, options, context, ownerTag))
+
+  return clones
 }
 
 type DestroyOptions = {

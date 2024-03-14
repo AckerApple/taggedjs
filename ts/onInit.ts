@@ -1,5 +1,5 @@
-import { TagSupport } from "./TagSupport.class.js"
-import { setUse } from "./setUse.function.js"
+import { TagSupport } from "./TagSupport.class"
+import { setUse } from "./setUse.function"
 
 export type OnInitCallback = () => unknown
 

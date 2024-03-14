@@ -1,6 +1,6 @@
-import { TagSupport } from "./TagSupport.class.js"
-import { TemplaterResult } from "./templater.utils.js"
-import { Tag } from "./Tag.class.js"
+import { TagSupport } from './TagSupport.class'
+import { TemplaterResult } from './templater.utils'
+import { Tag } from './Tag.class'
 
 export function redrawTag(
   tagSupport: TagSupport,

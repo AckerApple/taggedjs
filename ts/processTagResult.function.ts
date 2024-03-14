@@ -1,8 +1,8 @@
-import { Tag } from "./Tag.class.js"
-import { Clones } from "./Clones.type.js"
-import { Counts, Template } from "./interpolateTemplate.js"
-import { TagArraySubject } from "./processTagArray.js"
-import { TagSubject } from "./Tag.utils.js"
+import { Tag } from './Tag.class'
+import { Clones } from './Clones.type'
+import { Counts, Template } from './interpolateTemplate'
+import { TagArraySubject } from './processTagArray'
+import { TagSubject } from './Tag.utils'
 
 export function processTagResult(
   tag: Tag,
@@ -14,7 +14,7 @@ export function processTagResult(
     counts: Counts
     forceElement?: boolean
   }
-): Clones {
+) {
   // *if appears we already have seen
   const subjectTag = result as TagSubject
   const rTag = subjectTag.tag
@@ -25,20 +25,17 @@ export function processTagResult(
       if(result instanceof Function) {
         const newTag = result(rTag.tagSupport)
         rTag.updateByTag(newTag)
-        return []
+        return
       }
 
       rTag.updateByTag(tag)
-      
-      return [] // no clones created in element already on stage
+      return
     }    
   }
-  
-  const clones = tag.buildBeforeElement(insertBefore, {
+
+  tag.buildBeforeElement(insertBefore, {
     counts,
     forceElement,
   })
   subjectTag.tag = subjectTag.tag || tag // let reprocessing know we saw this previously as an if
-
-  return clones
 }

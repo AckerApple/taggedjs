@@ -1,5 +1,5 @@
-import { Config, GetSet, StateConfig, StateConfigItem, getStateValue, makeStateResult } from "./set.function.js"
-import { setUse } from "./setUse.function.js"
+import { Config, GetSet, StateConfigItem, getStateValue } from './set.function'
+import { setUse } from './setUse.function'
 
 /** Used for variables that need to remain the same variable during render passes */
 export function setProp <T>(

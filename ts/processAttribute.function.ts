@@ -1,7 +1,7 @@
-import { inputAttribute } from "./inputAttribute.js"
-import { isSubjectInstance } from "./isInstance.js"
-import { Context, Tag } from "./Tag.class";
-import { HowToSet } from "./interpolateAttributes";
+import { inputAttribute } from './inputAttribute'
+import { isSubjectInstance } from './isInstance'
+import { Context, Tag } from './Tag.class'
+import { HowToSet } from './interpolateAttributes'
 
 const startRegX = /^\s*{__tagvar/
 const endRegX = /}\s*$/

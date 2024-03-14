@@ -1,23 +1,24 @@
-import { DisplaySubject, TagSubject } from "./Tag.utils.js"
-import { TagSupport } from "./TagSupport.class.js"
-import { Subject } from "./Subject.js"
-import { TemplateRedraw, TemplaterResult } from "./templater.utils.js"
-import { isSubjectInstance, isTagArray, isTagComponent } from "./isInstance.js"
-import { bindSubjectCallback } from "./bindSubjectCallback.function.js"
-import { Tag } from "./Tag.class.js"
-import { InterpolateSubject, processTag } from "./processSubjectValue.function.js"
-import { TagArraySubject, processTagArray } from "./processTagArray.js"
-import { updateExistingTagComponent } from "./updateExistingTagComponent.function.js"
-import { updateExistingTag } from "./updateExistingTag.function.js"
-import { RegularValue, processRegularValue } from "./processRegularValue.function.js"
-import { checkDestroyPrevious } from "./checkDestroyPrevious.function.js"
+import { DisplaySubject, TagSubject } from './Tag.utils'
+import { TagSupport } from './TagSupport.class'
+import { Subject } from './Subject'
+import { TemplateRedraw, TemplaterResult } from './templater.utils'
+import { isSubjectInstance, isTagArray, isTagComponent, isTagInstance } from './isInstance'
+import { bindSubjectCallback } from './bindSubjectCallback.function'
+import { Tag } from './Tag.class'
+import { InterpolateSubject, processTag } from './processSubjectValue.function'
+import { TagArraySubject, processTagArray } from './processTagArray'
+import { updateExistingTagComponent } from './updateExistingTagComponent.function'
+import { updateExistingTag } from './updateExistingTag.function'
+import { RegularValue, processRegularValue } from './processRegularValue.function'
+import { checkDestroyPrevious } from './checkDestroyPrevious.function'
+
+type ExistingValue = TemplaterResult | Tag[] | TagSupport | Function | Subject<unknown> | RegularValue | Tag
 
 export function updateExistingValue(
   subject: InterpolateSubject,
-  value: TemplaterResult | Tag[] | TagSupport | Function | Subject<any>,
+  value: ExistingValue,
   ownerTag: Tag,
 ): void {
-  const subjectValue = (subject as Subject<Tag>).value // old value
   const subjectSubArray = subject as TagArraySubject
   const subjectSubTag = subject as TagSubject
   const isChildSubject = subjectSubArray.isChildSubject
@@ -27,16 +28,38 @@ export function updateExistingValue(
   if(isChildSubject) {
     value = (value as any).value // A subject contains the value
   }
+
+  const oldInsertBefore = (subject as DisplaySubject).template || subjectSubTag.tag?.tagSupport.templater.insertBefore || (subjectSubTag as DisplaySubject).clone
   
   checkDestroyPrevious(subject, value)
 
   // handle already seen tag components
   if(isComponent) {
+    if(!subjectSubTag.tag) {
+      const templater = value as TemplaterResult
+      const {retag} = templater.renderWithSupport(
+        (value as TemplaterResult).tagSupport,
+        undefined,
+        ownerTag,
+      )
+      
+      templater.newest = retag
+      templater.oldest = retag
+      subjectSubTag.tag = retag
+      subjectSubTag.tagSupport = retag.tagSupport
+
+      retag.buildBeforeElement(oldInsertBefore, {
+        forceElement: true,
+        counts: {added: 0, removed: 0},
+      })
+
+      return
+    }
+
     return updateExistingTagComponent(
       ownerTag,
       value as TemplateRedraw, // latest value
       subjectSubTag,
-      subjectValue, // old value
     )
   }
   
@@ -44,7 +67,7 @@ export function updateExistingValue(
   const subjectTag = subjectSubTag.tag
   if(subjectTag) {
     handleStillTag(
-      subjectTag as Tag,
+      subjectTag,
       subject as TagSubject | TagArraySubject,
       value,
       ownerTag
@@ -57,7 +80,7 @@ export function updateExistingValue(
   if(isTagArray(value)) {
     const insertBefore = subjectSubArray.template || subjectSubTag.tag?.tagSupport.templater.insertBefore
 
-    const nextClones = processTagArray(
+    processTagArray(
       subject as TagArraySubject,
       value as any as Tag[],
       insertBefore,
@@ -67,8 +90,6 @@ export function updateExistingValue(
         removed: 0,
       }}
     )
-
-    ownerTag.clones.push(...nextClones)
 
     return 
   }
@@ -85,6 +106,11 @@ export function updateExistingValue(
     return
   }
   
+  if(isTagInstance(value)) {
+    subjectSubTag.template = oldInsertBefore
+  }
+
+  // This will cause all other values to render
   subjectSubTag.set(value) // let ValueSubject now of newest value
 
   return
@@ -93,7 +119,7 @@ export function updateExistingValue(
 function handleStillTag(
   existingTag: Tag,
   existing: InterpolateSubject,
-  value: TemplaterResult | Tag[] | TagSupport | Function | Subject<unknown> | RegularValue,
+  value: ExistingValue,
   ownerTag: Tag,
 ) {
   const oldWrapper = existingTag.tagSupport.templater.wrapper

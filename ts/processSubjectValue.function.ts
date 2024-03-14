@@ -1,16 +1,16 @@
-import { processSubjectComponent } from "./processSubjectComponent.function.js"
-import { processTagResult } from "./processTagResult.function.js"
-import { isTagArray, isTagComponent, isTagInstance } from "./isInstance.js"
-import { TagArraySubject, processTagArray } from "./processTagArray.js"
-import { TemplaterResult } from "./templater.utils.js"
-import { TagSupport } from "./TagSupport.class.js"
-import { Clones } from "./Clones.type.js"
-import { Tag } from "./Tag.class.js"
-import { Counts, Template } from "./interpolateTemplate.js"
-import { DisplaySubject, TagSubject } from "./Tag.utils.js"
-import { ValueSubject } from "./ValueSubject.js"
-import { processRegularValue } from "./processRegularValue.function.js"
-import { Callback } from "./bindSubjectCallback.function.js"
+import { processSubjectComponent } from './processSubjectComponent.function'
+import { processTagResult } from './processTagResult.function'
+import { isTagArray, isTagComponent, isTagInstance } from './isInstance'
+import { TagArraySubject, processTagArray } from './processTagArray'
+import { TemplaterResult } from './templater.utils'
+import { TagSupport } from './TagSupport.class'
+import { Clones } from './Clones.type'
+import { Tag } from './Tag.class'
+import { Counts, Template } from './interpolateTemplate'
+import { DisplaySubject, TagSubject } from './Tag.utils'
+import { ValueSubject } from './ValueSubject'
+import { processRegularValue } from './processRegularValue.function'
+import { Callback } from './bindSubjectCallback.function'
 
 enum ValueTypes {
   tag = 'tag',
@@ -58,26 +58,27 @@ export function processSubjectValue(
   
   switch (valueType) {
     case ValueTypes.tag:
-      return processTag(
-          value,
-          result as TagSubject,
-          template,
-          ownerTag,
-          options
-        )
+      processTag(
+        value,
+        result as TagSubject,
+        template,
+        ownerTag,
+        options
+      )
+      return []
   
     case ValueTypes.tagArray:
-      const clones = processTagArray(result as TagArraySubject, value, template, ownerTag, options)
-      return clones
-      
+      return processTagArray(result as TagArraySubject, value, template, ownerTag, options)
+    
     case ValueTypes.tagComponent:
-      return processSubjectComponent(
-          value,
-          result as TagSubject,
-          template,
-          ownerTag,
-          options
-        )
+      processSubjectComponent(
+        value,
+        result as TagSubject,
+        template,
+        ownerTag,
+        options
+      )
+      return []
   }
 
   return processRegularValue(
@@ -87,6 +88,7 @@ export function processSubjectValue(
   )
 }
 
+/** Could be a regular tag or a component. Both are Tag.class */
 export function processTag(
   value: any,
   result: TagSubject, // could be tag via result.tag
@@ -106,34 +108,16 @@ export function processTag(
       ownerTag.tagSupport.render()
     }
     value.tagSupport.oldest = value.tagSupport.oldest || value
-    
     ownerTag.children.push(value as Tag)
-    value.ownerTag = ownerTag
   }
   
+  value.ownerTag = ownerTag
   result.template = template
 
-  const clones = processTagResult(
+  processTagResult(
     value,
     result, // Function will attach result.tag
     template,
     options,
   )
-
-  return clones  
-}
-
-export function destroySimpleValue(
-  template: Element | Text | Template,
-  subject: DisplaySubject,
-) {
-  const clone = subject.clone as Element
-  const parent = clone.parentNode as ParentNode
-
-  // put the template back down
-  parent.insertBefore(template, clone)
-  parent.removeChild(clone)
-  
-  delete subject.clone
-  delete subject.lastValue
 }

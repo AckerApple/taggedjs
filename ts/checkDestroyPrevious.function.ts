@@ -1,10 +1,10 @@
-import { DisplaySubject, TagSubject } from "./Tag.utils.js"
-import { isTagArray, isTagComponent, isTagInstance } from "./isInstance.js"
-import { Tag } from "./Tag.class.js"
-import { InterpolateSubject, destroySimpleValue } from "./processSubjectValue.function.js"
-import { TagArraySubject } from "./processTagArray.js"
-import { isLikeTags } from "./isLikeTags.function.js"
-import { Counts } from "./interpolateTemplate.js"
+import { DisplaySubject, TagSubject } from './Tag.utils'
+import { isTagArray, isTagComponent, isTagInstance } from './isInstance'
+import { Tag } from './Tag.class'
+import { InterpolateSubject } from './processSubjectValue.function'
+import { TagArraySubject } from './processTagArray'
+import { isLikeTags } from './isLikeTags.function'
+import { Counts, Template } from './interpolateTemplate'
 
 export function checkDestroyPrevious(
   existing: InterpolateSubject, // existing.value is the old value
@@ -43,6 +43,7 @@ export function checkDestroyPrevious(
       return false // its still a tag component
     }
 
+    // destroy old component, value is not a component
     destroyTagMemory(existingTag, tagSubject)
     return 3
   }
@@ -72,15 +73,34 @@ export function destroyArrayTag(
   tag: Tag,
   counts: Counts,
 ) {
+  /*
   tag.children.forEach(child => child.destroy({
     stagger: counts.removed++,
     // byParent: false
     // byParent: true,
   }))
-  
+  */
+
+  // tag.destroyClones({stagger:counts.removed++})
   tag.destroy({
-    stagger: counts.removed,
+    stagger: counts.removed++,
     // byParent: false
     // byParent: true,
   })
+}
+
+function destroySimpleValue(
+  template: Element | Text | Template,
+  subject: DisplaySubject,
+) {
+  const clone = subject.clone as Element
+  const parent = clone.parentNode as ParentNode
+
+  // put the template back down
+  parent.insertBefore(template, clone)
+  parent.removeChild(clone)
+  
+  delete subject.clone
+  delete subject.lastValue
+  // subject.template = template
 }

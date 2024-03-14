@@ -1,4 +1,4 @@
-import { Tag } from "./Tag.class.js"
+import { Tag } from "./Tag.class"
 
 export function html(
   strings: string[] | TemplateStringsArray,

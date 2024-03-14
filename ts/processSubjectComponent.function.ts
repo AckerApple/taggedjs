@@ -1,10 +1,10 @@
-import { runBeforeRedraw, runBeforeRender } from "./tagRunner.js"
-import { TemplaterResult } from "./templater.utils.js"
-import { setUse } from "./setUse.function.js"
-import { Counts, Template } from "./interpolateTemplate.js"
-import { Tag } from "./Tag.class.js"
-import { processTagResult } from "./processTagResult.function.js"
-import { TagSubject } from "./Tag.utils.js"
+import { runBeforeRedraw, runBeforeRender } from './tagRunner'
+import { TemplaterResult } from './templater.utils'
+import { setUse } from './setUse.function'
+import { Counts, Template } from './interpolateTemplate'
+import { Tag } from './Tag.class'
+import { processTagResult } from './processTagResult.function'
+import { TagSubject } from './Tag.utils'
 
 export function processSubjectComponent(
   value: TemplaterResult,
@@ -45,22 +45,28 @@ export function processSubjectComponent(
       runBeforeRender(tagSupport, ownerTag)
     }
 
+    const preClones = ownerTag.clones.map(clone => clone)
+
     const result = templater.renderWithSupport(tagSupport, subject.tag, ownerTag)
 
     retag = result.retag
     templater.newest = retag
+
+    if(ownerTag.clones.length > preClones.length) {
+      const myClones = ownerTag.clones.filter(fClone => !preClones.find(clone => clone === fClone))
+      retag.clones.push(...myClones)
+    }
   }
   
   ownerTag.children.push(retag)
 
+  // TODO: this line below might be duplicative of work done in renderWithSupport
   tagSupport.templater = retag.tagSupport.templater
   
-  const clones = processTagResult(
+  processTagResult(
     retag,
     subject, // The element set here will be removed from document. Also result.tag will be added in here
     template, // <template end interpolate /> (will be removed)
     options,
   )
-
-  return clones
 }

@@ -1,7 +1,7 @@
-import { Tag } from "./Tag.class.js"
-import { TagSubject } from "./Tag.utils.js"
-import { runAfterRender, runBeforeRedraw } from "./tagRunner.js"
-import { TemplaterResult } from "./templater.utils.js"
+import { Tag } from './Tag.class'
+import { TagSubject } from './Tag.utils'
+import { runAfterRender, runBeforeRedraw } from './tagRunner'
+import { TemplaterResult } from './templater.utils'
 
 export function updateExistingTag(
   templater: TemplaterResult,

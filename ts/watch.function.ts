@@ -1,4 +1,4 @@
-import { setLet } from "./setLet.function.js"
+import { setLet } from './setLet.function'
 
 export type WatchCallback = (
   currentValues: any[],

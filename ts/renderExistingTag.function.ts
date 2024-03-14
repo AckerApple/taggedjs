@@ -1,8 +1,8 @@
-import { Tag } from "./Tag.class.js"
-import { TagSupport } from "./TagSupport.class.js"
-import { hasTagSupportChanged } from "./hasTagSupportChanged.function.js"
-import { providersChangeCheck } from "./provider.utils.js"
-import { TemplateRedraw, TemplaterResult } from "./templater.utils.js"
+import { Tag } from './Tag.class'
+import { TagSupport } from './TagSupport.class'
+import { hasTagSupportChanged } from './hasTagSupportChanged.function'
+import { providersChangeCheck } from './provider.utils'
+import { TemplateRedraw, TemplaterResult } from './templater.utils'
 
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(
