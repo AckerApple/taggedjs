@@ -1,5 +1,7 @@
 /** client code */
 
+const { variablePrefix } = require("taggedjs/js/Tag.class");
+
 // do not use another import as it wont be same memory as running app
 // import { redrawTag, Tag, tagElement } from "taggedjs"
 
@@ -66,7 +68,6 @@ async function discoverTags() {
     const url = element.getAttribute('url')
     const tagName = element.getAttribute('name')
 
-    console.log(`loading tagName ${tagName}...`)
     const newApp = await import(`${url}?${Date.now()}`)
 
     /** @type {() => Tag} */
@@ -90,13 +91,13 @@ let lastTags = []
 async function updateByElement(
   app
 ) {
-  console.log('updateByElement *********')
   /** @type {TagComponent[]} */
   const oldTags = lastTags
   const oldSetUse = app.setUse
     
   const tags = await discoverTags()
 
+  // loop new tags looking for matching old
   tags.forEach(async tag => {
     const { newApp, newTemplater } = tag
     const { redrawTag } = newApp.hmr
@@ -111,28 +112,38 @@ async function updateByElement(
     // bind the old and new together
     newSetUse.memory = oldSetUse.memory
   
-    const tagChangeStates = oldTags.reduce((all, oldTag) => {
-      const newTag = newTags.find(newTag => newTag.toString() === oldTag.toString())
+    /** @type {{oldTag: Tag, newTag: Tag}[]} */
+    const tagChangeStates = oldTags.reduce((all, oldTag, loopIndex) => {
+      let newTag = newTags.find(newTag => newTag.toString() === oldTag.toString())
+      
       if(!newTag) {
+        const tagIndex = oldTag.tagIndex
+        if(tagIndex !== undefined) {
+          newTag = newTags[tagIndex]
+        }
+
         all.push({oldTag, newTag})
       }
+
       return all
     }, [])
   
-    if(!tagChangeStates) {
-      console.warn('No old tags changed')
+    if(!tagChangeStates.length) {
+      console.warn('No old tags changed', {
+        newTags, oldTags
+      })
     }
   
     const matchedTagCounts = oldTags.length === newTags.length
   
-    newTags.forEach(newTag => {
+    newTags.forEach((newTag, index) => {
       let oldTag = oldTags.find(oldTag => newTag.toString() === oldTag.toString())
   
       let tagIndex = null
       if(!oldTag && tagChangeStates[0].newTag) {
         // const tagIndex = newTag.tagSupport.templater.wrapper.tagIndex // newTag.tagIndex
         tagIndex = newTag.tagIndex
-        if(matchedTagCounts && oldTags[ tagIndex ].length === newTag.length) {
+        if( matchedTagCounts ) {
           oldTag = oldTags[ tagIndex ]
         }
       }
@@ -166,7 +177,7 @@ async function updateByElement(
         const newTag = tagChangeStates[0].newTag
         lastApp.tagSupport.templater.wrapper.original = newTag
         await lastApp.destroy()
-        lastApp = await rebuildTag( lastApp )
+        lastApp = await rebuildTag(lastApp, redrawTag)
         lastTags = newTags
         return
       }
@@ -190,16 +201,21 @@ async function rebuildTag(
   /** @type {Tag} */
   tag,
   redrawTag,
+  ownerTag,
 ) {
-  const { retag } = redrawTag(tag.tagSupport, tag.tagSupport.templater, tag)
+  /** @type {{retag: Tag}} */
+  const { retag } = redrawTag(
+    tag.tagSupport,
+    tag.tagSupport.templater,
+    tag, // existingTag
+    ownerTag, // TODO: not needed
+  )
 
-  retag.insertBefore = tag.insertBefore
+  retag.tagSupport.templater.insertBefore = tag.tagSupport.templater.insertBefore
 
   retag.rebuild()
 
   if(tag.ownerTag) {
-    // retag.ownerTag.clones.push(...retag.clones)
-    // retag.clones.length=0
     retag.ownerTag.children.push(retag)
   }
 
@@ -211,7 +227,7 @@ async function replaceTemplater(
   tag,
   /** @type {{oldTag: TagComponent, newTag: TagComponent}} */
   {oldTag, newTag},
-  redrawTag
+  redrawTag,
   ) {
   let  count = 0
   const promises = tag.values.map(async (value, index) => {
@@ -225,33 +241,23 @@ async function replaceTemplater(
     // Check to rebuild a component within an app
     if(match0 || match1) {
       const tagSupport = tag.tagSupport
+      // const tagSupport = oldTag.tagSupport
       const memory = tagSupport.memory
-      const contextSubject = memory.context[`__tagVar${index}`]
+      const context = memory.context
+      const contextSubject = context[ variablePrefix + index ]
       value.wrapper.original = newTag
+      const contextSupport = contextSubject.tag.tagSupport
+      contextSupport.templater.wrapper.original = newTag
       
-      if(!contextSubject?.tag) {
-        console.warn('potential hmr issue here')
-        return
-      }
-
-      const contextSupprt = contextSubject.tag.tagSupport
-      contextSupprt.templater.wrapper.original = newTag
       await contextSubject.tag.destroy()
-
-      destroyContextClones(contextSubject.tag.tagSupport.memory.context)
-
-      contextSubject.tag = await rebuildTag(contextSubject.tag)
-
+      // destroyContextClones(contextSubject.tag.tagSupport.memory.context)
+      
+      contextSubject.tag = await rebuildTag(contextSubject.tag, redrawTag, tag)
+      
       ++count
 
-      
       return
     }
-
-    // TODO: this might be removable
-    /*if(value.newest) {
-      count = count + await replaceTemplater(value.newest, {oldTag, newTag}, count)
-    }*/
   })
   
   await Promise.all(promises)
@@ -272,7 +278,6 @@ function rebuildApps() {
   forEachApp(element => {
     discoverTags().then(apps => {
       apps.forEach(({newApp, tagName}) => {
-        console.log(111, newApp.hmr)
         const { tagElement } = newApp.hmr
         const result = tagElement(newApp[tagName], element, {test:1})
         

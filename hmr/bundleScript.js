@@ -20,7 +20,7 @@ module.exports.run = () => {
       const newFileString = fileString.replace(/var .{1,2}=new Error\("Cannot find module '"\+(.+)\+"'"\);/g, 'return import($1);')
       fs.writeFileSync(outFilePath, newFileString)
       
-      console.log('replaced')
+      console.log('✏️ write bundle output', {outFilePath})
 
       res(stats)
     })

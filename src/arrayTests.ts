@@ -1,5 +1,5 @@
-import { animateDestroy, animateInit } from './animations.js'
-import { renderCountDiv } from './renderCount.component.js'
+import { animateDestroy, animateInit } from './animations'
+import { renderCountDiv } from './renderCount.component'
 import {html, set, setLet, tag} from 'taggedjs'
 
 const frameCount = 4
@@ -22,6 +22,10 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
     <div style="display:flex;flex-wrap:wrap;gap:1em">
       ${array0.map((item,index) => html`
         <div oninit=${animateInit} ondestroy=${animateDestroy} style="background-color:black;">
+          <button onclick=${() => {
+            array0.splice(index,1)
+          }}>remove</button>
+
           <div>
             name:${item.name}
           </div>

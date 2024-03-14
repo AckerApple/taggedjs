@@ -1,6 +1,6 @@
 import { Tag, html, setLet, tag } from "taggedjs"
-import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests.js"
-import { renderCountDiv } from "./renderCount.component.js"
+import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests"
+import { renderCountDiv } from "./renderCount.component"
 
 const childContentTest = tag((
   {legend, id}:  {legend: string, id: string},

@@ -13,27 +13,35 @@ export const tagSwitchDebug = tag(() => {
     if(selectedTag === 'undefined') {
       selectedTag = undefined
     }
+
+    if(selectedTag === 'null') {
+      selectedTag = null
+    }
   }
 
   let tagOutput: string | Tag = 'select tag below'
-
   switch (selectedTag) {
+    case null: tagOutput = 'null, select tag below'
+      break;
     case '1': tagOutput = tag1({title:'value switch'})
-    break;
+      break;
     case '2': tagOutput = tag2({title:'value switch'})
-    break;
+      break;
     case '3': tagOutput = tag3({title:'value switch'})
-    break;
+      break;
   }
 
   let tagOutput2 = html`<div id="select-tag-above">select tag above</div>`
+  console.log('selectedTag', selectedTag)
   switch (selectedTag) {
+    case null: tagOutput2 = html`<div id="select-tag-above">null, select tag above</div>`
+      break;
     case '1': tagOutput2 = tag1({title:'tag switch'})
-    break;
+      break;
     case '2': tagOutput2 = tag2({title:'tag switch'})
-    break;
+      break;
     case '3': tagOutput2 = tag3({title:'tag switch'})
-    break;
+      break;
   }
 
   ++renderCount
@@ -47,6 +55,7 @@ export const tagSwitchDebug = tag(() => {
 	    <option></option>
       <!-- TODO: implement selected attribute --->
 	    <option value="undefined" ${ selectedTag === undefined ? {selected: true} : {} }>undefined</option>
+	    <option value="null" ${ selectedTag === null ? {selected: true} : {} }>null</option>
 	    <option value="1" ${ selectedTag === '1' ? {selected: true} : {} }>tag 1</option>
 	    <option value="2" ${ selectedTag === '2' ? {selected: true} : {} }>tag 2</option>
 	    <option value="3" ${ selectedTag === '3' ? {selected: true} : {} }>tag 3</option>
@@ -72,13 +81,13 @@ export const tagSwitchDebug = tag(() => {
         <h3>Test 3.2 - ternary via prop (only 1 or 3 shows)</h3>
         <div>${ternaryPropTest({selectedTag})}</div>
       </div>
-      
+
       <div style="border:1px solid red;flex-grow:1">
         <h3>Test 4 - arraySwitching</h3>
         <div>${arraySwitching({selectedTag})}</div>
       </div>
     </div>
-    ${/*renderCountDiv({renderCount, name:'tagSwitchDebug'})*/false}
+    ${renderCountDiv({renderCount, name:'tagSwitchDebug'})}
   `
 })
 
@@ -136,7 +145,10 @@ export const arraySwitching = tag((
     case undefined:
       return html`its an undefined value`
 
-      case '1':
+    case null:
+      return html`its a null value`
+
+    case '1':
       return html`${['a'].map(x => html`${tag1({title: `array ${selectedTag} ${x}`})}`.key(x))}`
 
     case '2':

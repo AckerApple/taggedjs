@@ -6,21 +6,27 @@ const webpackConfig = require('./webpack.config.js');
 const compiler = webpack(webpackConfig);
 
 module.exports.run = () => {
+  console.log('🌎📦 bundling...')
   return new Promise((res, rej) => {
     compiler.run((err, stats) => {
       if (err) {
-        console.error('build error', error)
+        console.error('🌎📦 🔴 bundle error', err)
         return rej(err)
       }
 
-      const errors = stats.compilation.compiler._lastCompilation.errors
-      if(errors && errors.length) {
-        return rej(errors[0].message)
+      if(stats.compilation.errors.length) {
+        const error = stats.compilation.errors[0]
+        console.error('🌎📦 🔴 bundle error', error)
+        return rej(error)
       }
 
       res(stats)
-      // console.log('build done 22', )
-      // console.log('build done', stats)
+
+      const assets = stats.compilation.assets
+      console.log('🌎📦 ✅ bundled sizes in kilobytes', Object.entries(assets).reduce((all, [name, value]) => {
+        all[name] = value.size() / 1000
+        return all
+      },{}))
     })
   })
 }

@@ -1,6 +1,6 @@
-import { animateDestroy, animateInit } from "./animations.js"
-import { renderCountDiv } from "./renderCount.component.js"
-import { tagDebugProvider, upperTagDebugProvider } from "./tagJsDebug.js"
+import { animateDestroy, animateInit } from "./animations"
+import { renderCountDiv } from "./renderCount.component"
+import { tagDebugProvider, upperTagDebugProvider } from "./tagJsDebug"
 import { setLet, html, tag, providers, set } from "taggedjs"
 
 export class TagDebugProvider {

@@ -13,11 +13,15 @@ export const propsDebugMain = tag(() => {
 
   ++renderCount
 
+  const json = JSON.stringify(propsJson, null, 2)
+
   return html`
-    <textarea wrap="off" onchange=${propsJsonChanged} style="height:200px;font-size:0.6em;width:100%"
-    >${ JSON.stringify(propsJson, null, 2) }</textarea>
-    <pre>${ JSON.stringify(propsJson, null, 2) }</pre>
+    <textarea id="props-debug-textarea" wrap="off" onchange=${propsJsonChanged}
+      style="height:200px;font-size:0.6em;width:100%"
+      oninit=${() => console.log('text area init')}
+    >${ json }</textarea>
     
+    <pre>${ json }</pre>
     <div><small>(renderCount:${renderCount})</small></div>
     
     <div>

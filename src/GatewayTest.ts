@@ -1,4 +1,4 @@
-import { renderCountDiv } from "./renderCount.component.js"
+import { renderCountDiv } from "./renderCount.component"
 import { setLet, tag, html } from "taggedjs"
 
 export const GatewayTest = tag((

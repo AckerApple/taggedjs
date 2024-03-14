@@ -1,17 +1,17 @@
-import { attributeDebug } from "./attributeDebug.component.js"
-import { contentDebug } from "./ContentDebug.component.js"
-import { tableDebug } from "./tableDebug.component.js"
+import { attributeDebug } from "./attributeDebug.component"
+import { contentDebug } from "./ContentDebug.component"
+import { tableDebug } from "./tableDebug.component"
 import { html, tag, setLet, onInit } from "taggedjs"
-import { tagDebug } from "./tagJsDebug.js"
-import { tagSwitchDebug } from "./tagSwitchDebug.component.js"
-import { childTests } from "./childTests.js"
-import { runTests } from "./tests.js"
-import { renderCountDiv } from "./renderCount.component.js"
-import { counters } from "./countersDebug.js"
-import { providerDebugBase } from "./providerDebug.js"
+import { tagDebug } from "./tagJsDebug"
+import { tagSwitchDebug } from "./tagSwitchDebug.component"
+import { childTests } from "./childTests"
+import { runTests } from "./tests"
+import { renderCountDiv } from "./renderCount.component"
+import { counters } from "./countersDebug"
+import { providerDebugBase } from "./providerDebug"
 
 export const App = tag(() => {
-  console.log('render app.js')
+  console.log('render app.ts')
   let _firstState: string = setLet('app first state')(x => [_firstState, _firstState=x])
   let toggleValue: boolean = setLet(false)(x => [toggleValue, toggleValue=x])
   let renderCount: number = setLet(0)(x => [renderCount, renderCount=x])
@@ -21,7 +21,9 @@ export const App = tag(() => {
   }
 
   function runTesting(manual = true) {
+    const waitFor = 1000
     setTimeout(() => {
+      console.debug('🏃 Running tests...')
       const result = runTests()
 
       if(!manual) {
@@ -35,14 +37,12 @@ export const App = tag(() => {
 
       alert('❌ tests failed. See console for more details')
 
-    }, 3000) // cause delay to be separate from renders
+    }, waitFor) // cause delay to be separate from renders
   }
 
   ++renderCount
 
-  onInit(() => {
-    runTesting(false)
-  })
+  onInit(() => runTesting(false))
 
   const content = html`<!--app.js-->
     <h1 id="h1-app">🏷️ TaggedJs - ${2+2}</h1>

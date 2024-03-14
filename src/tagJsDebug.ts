@@ -1,9 +1,9 @@
-import { propsDebugMain } from "./PropsDebug.component.js"
-import { animateDestroy, animateInit } from "./animations.js"
-import { arrayTests } from "./arrayTests.js"
-import { intervalTester0, intervalTester1 } from "./intervalDebug.js"
+import { propsDebugMain } from "./PropsDebug.component"
+import { animateDestroy, animateInit } from "./animations"
+import { arrayTests } from "./arrayTests"
+import { intervalTester0, intervalTester1 } from "./intervalDebug"
 import { html, tag, providers, setLet } from "taggedjs"
-import { renderCountDiv } from "./renderCount.component.js"
+import { renderCountDiv } from "./renderCount.component"
 
 export function tagDebugProvider() {
   const upper = providers.create( upperTagDebugProvider as any )
@@ -32,7 +32,7 @@ export const tagDebug = tag(() => {// tagDebug.js
     ${renderCountDiv({renderCount, name: 'tagJsDebug'})}
 
     <div style="display:flex;flex-wrap:wrap;gap:1em">
-      <fieldset style="flex:2 2 20em">
+      <fieldset style="flex:4 4 40em">
         <legend>arrays</legend>
         ${arrayTests()}
       </fieldset>

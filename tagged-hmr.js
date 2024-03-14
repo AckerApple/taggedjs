@@ -1,7 +1,7 @@
-console.log('test')
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const { parseCommandLineArguments } = require('./argv.function');
 
 const app = express();
 const port = 3000;
@@ -9,14 +9,15 @@ const port = 3000;
 const rootPath = './' // '../'
 const servePath = path.join(__dirname, rootPath)
 
-console.log('📂 servePath',servePath)
+console.debug('📂 servePath',servePath)
 
 const index = path.join(__dirname, rootPath, 'index.html')
 const indexString = fs.readFileSync(index).toString()
 
 const inject = path.join(__dirname, 'hmr', 'hmr.bundle.js')
 const customScript = '<script type="module">'+ fs.readFileSync(inject).toString() +'</script>'
-const watchPath = process.env.dir ? path.join(__dirname, process.env.dir) : __dirname
+const args = parseCommandLineArguments()
+const watchPath = args.dir ? path.join(__dirname, args.dir) : __dirname
 
 const bundleScript = require(rootPath + 'bundleScript.hmr.js')
 const indexFilePath = path.join(__dirname, rootPath, 'index.html')
@@ -33,7 +34,7 @@ app.use((req, res, next) => {
   const fileName = path.basename(filePath).toLowerCase()
   const isIndex = fileName === 'index.html'
 
-  console.log(`↖️ 📄 send file ${fileName}`)
+  console.debug(`↖️ 📄 send file ${fileName}`)
 
   // Check if the flag is set for HTML modification
   if (isIndex && customScriptInjection) {
@@ -86,6 +87,7 @@ wss.on('connection', (ws) => {
   ws.send('Connected to the WebSocket endpoint');
 });
 
+console.log(`👀 Preparing to watch ${watchPath}...`)
 fs.watch(watchPath, { recursive: true }, async (eventType, filename) => {
   if(running || filename.includes('bundle.js')) {
     return

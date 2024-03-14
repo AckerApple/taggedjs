@@ -10,6 +10,9 @@ export function runTests() {
     expect(toggleTest?.innerText).toBe('toggle test true')
     toggleTest?.click()
     expect(toggleTest?.innerText).toBe('toggle test')
+    
+    const propsTextarea = document.getElementById('props-debug-textarea') as HTMLTextAreaElement
+    expect(propsTextarea.value.replace(/\s/g,'')).toBe(`{"test":33,"x":"y"}`)
   })
 
   it('counters increase', () => {
@@ -60,17 +63,18 @@ export function runTests() {
   })
 
   it('tagSwitching', () => {
+    console.log('0 - 0')
     expect(elementCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined')
     expect(elementCount('#tag-switch-dropdown')).toBe(1, 'Expected one #tag-switch-dropdown')
     expect(elementCount('#tagSwitch-1-hello')).toBe(2, 'Expected two #tagSwitch-1-hello elements')
     expect(elementCount('#tagSwitch-2-hello')).toBe(0)
     expect(elementCount('#tagSwitch-3-hello')).toBe(0)
-
+    console.log('0 - 1')
     const dropdown = document.getElementById('tag-switch-dropdown') as HTMLSelectElement
     dropdown.value = "1"
 
     ;(dropdown as any).onchange({target:dropdown})
-    
+    console.log('0 - 2')
     expectElementCount('#tagSwitch-1-hello', 5)
     expect(elementCount('#tagSwitch-2-hello')).toBe(0)
     expect(elementCount('#tagSwitch-3-hello')).toBe(0)
@@ -146,18 +150,21 @@ function testDuelCounterElements(
   [button0, display0]: [string, string], // button, display
   [button1, display1]: [string, string], // button, display
 ) {
-  const display0Element = document.querySelectorAll(display0)[0] as HTMLElement
+  let query = expectElementCount(display0, 1)
+  const display0Element = query[0] as HTMLElement
   const ip0 = display0Element.innerText
   testCounterElements(button0, display0)
   
-  let display1Element = document.querySelectorAll(display1)[0] as HTMLElement
+  query = expectElementCount(display1, 1)
+  let display1Element = query[0] as HTMLElement
   let ip1Check = display1Element.innerText
   const value = (Number(ip0) + 2).toString()
   expect(ip1Check).toBe(value, `Expected second increase provider to be increased to ${ip0} but got ${ip1Check}`)
  
   testCounterElements(button1, display1)
   
-  display1Element = document.querySelectorAll(display1)[0] as HTMLElement
+  query = expectElementCount(display1, 1)
+  display1Element = query[0] as HTMLElement
   ip1Check = display1Element.innerText
   expect(ip1Check).toBe((Number(ip0) + 4).toString(), `Expected ${display1} innerText to be ${Number(ip0) + 4} but instead it is ${ip1Check}`)
 }
@@ -200,9 +207,13 @@ function expectElementCount(
   count: number,
   message?: string
 ) {
-  const found = elementCount(query)
+//  const found = elementCount(query)
+  const elements = document.querySelectorAll(query)
+  const found = elements.length
 
   message = message || `Expected ${count} elements to match query ${query} but found ${found}`
 
   expect(found).toBe(count, message)
+
+  return elements
 }

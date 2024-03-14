@@ -4,15 +4,25 @@ const tests: Test[] = []
 
 export function it(label: string, run: () => any) {
   tests.push(() => {
-    console.debug(label)
-    run()
+    try {
+      run()
+      console.debug('✅ ' + label)
+    } catch (error) {
+      console.debug('❌ ' + label)
+      throw error
+    }
   })
 }
 
 it.only = (label: string, run: () => any) => {
   onlyTests.push(() => {
-    console.debug(label)
-    run()
+    try {
+      run()
+      console.debug('✅ ' + label)
+    } catch (error) {
+      console.debug('❌ ' + label)
+      throw error
+    }
   })
 }
 
