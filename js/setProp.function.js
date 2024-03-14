@@ -1,5 +1,5 @@
-import { getStateValue } from "./set.function.js";
-import { setUse } from "./setUse.function.js";
+import { getStateValue } from './set.function';
+import { setUse } from './setUse.function';
 /** Used for variables that need to remain the same variable during render passes */
 export function setProp(getSet) {
     const config = setUse.memory.stateConfig;

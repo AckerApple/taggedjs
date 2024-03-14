@@ -1,5 +1,5 @@
-import { hasTagSupportChanged } from "./hasTagSupportChanged.function.js";
-import { providersChangeCheck } from "./provider.utils.js";
+import { hasTagSupportChanged } from './hasTagSupportChanged.function';
+import { providersChangeCheck } from './provider.utils';
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(tag, newTemplater, tagSupport) {
     const preRenderCount = tagSupport.memory.renderCount;

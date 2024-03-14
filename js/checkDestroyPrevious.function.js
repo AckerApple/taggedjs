@@ -1,6 +1,5 @@
-import { isTagArray, isTagComponent, isTagInstance } from "./isInstance.js";
-import { destroySimpleValue } from "./processSubjectValue.function.js";
-import { isLikeTags } from "./isLikeTags.function.js";
+import { isTagArray, isTagComponent, isTagInstance } from './isInstance';
+import { isLikeTags } from './isLikeTags.function';
 export function checkDestroyPrevious(existing, // existing.value is the old value
 newValue) {
     const existingSubArray = existing;
@@ -29,6 +28,7 @@ newValue) {
         if (isValueTagComponent) {
             return false; // its still a tag component
         }
+        // destroy old component, value is not a component
         destroyTagMemory(existingTag, tagSubject);
         return 3;
     }
@@ -48,15 +48,28 @@ export function destroyTagMemory(existingTag, existingSubject) {
     existingTag.destroy();
 }
 export function destroyArrayTag(tag, counts) {
+    /*
     tag.children.forEach(child => child.destroy({
+      stagger: counts.removed++,
+      // byParent: false
+      // byParent: true,
+    }))
+    */
+    // tag.destroyClones({stagger:counts.removed++})
+    tag.destroy({
         stagger: counts.removed++,
         // byParent: false
         // byParent: true,
-    }));
-    tag.destroy({
-        stagger: counts.removed,
-        // byParent: false
-        // byParent: true,
     });
+}
+function destroySimpleValue(template, subject) {
+    const clone = subject.clone;
+    const parent = clone.parentNode;
+    // put the template back down
+    parent.insertBefore(template, clone);
+    parent.removeChild(clone);
+    delete subject.clone;
+    delete subject.lastValue;
+    // subject.template = template
 }
 //# sourceMappingURL=checkDestroyPrevious.function.js.map

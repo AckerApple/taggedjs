@@ -1,5 +1,5 @@
-import { deepClone } from "./deepFunctions.js";
-import { setUse } from "./setUse.function.js";
+import { deepClone } from './deepFunctions';
+import { setUse } from './setUse.function';
 // TODO: rename
 setUse.memory.providerConfig = {
     providers: [],

@@ -1,7 +1,7 @@
-import { TagSupport } from "./TagSupport.class.js";
-import { isTagInstance } from "./isInstance.js";
-import { runAfterRender, runBeforeRedraw, runBeforeRender } from "./tagRunner.js";
-import { setUse } from "./setUse.function.js";
+import { TagSupport } from './TagSupport.class';
+import { isTagInstance } from './isInstance';
+import { runAfterRender, runBeforeRedraw, runBeforeRender } from './tagRunner';
+import { setUse } from './setUse.function';
 export class TemplaterResult {
     tagged;
     wrapper;

@@ -1,7 +1,7 @@
-import { interpolateAttributes } from "./interpolateAttributes.js";
-import { interpolateToTemplates } from "./interpolations.js";
-import { interpolateContentTemplates } from "./interpolateContentTemplates.js";
-import { escapeSearch, variablePrefix } from "./Tag.class.js";
+import { interpolateAttributes } from "./interpolateAttributes";
+import { interpolateToTemplates } from "./interpolations";
+import { interpolateContentTemplates } from "./interpolateContentTemplates";
+import { escapeSearch, variablePrefix } from "./Tag.class";
 /** Review elements within an element */
 export function interpolateElement(container, context, // variables used to evaluate
 interpolatedTemplates, tagOwner, options) {

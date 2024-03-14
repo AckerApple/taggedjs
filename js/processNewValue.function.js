@@ -1,6 +1,6 @@
-import { getSubjectFunction, setValueRedraw } from "./Tag.utils.js";
-import { ValueSubject } from "./ValueSubject.js";
-import { isSubjectInstance, isTagComponent, isTagInstance } from "./isInstance.js";
+import { getSubjectFunction, setValueRedraw } from './Tag.utils';
+import { ValueSubject } from './ValueSubject';
+import { isSubjectInstance, isTagComponent, isTagInstance } from './isInstance';
 export function processNewValue(hasValue, value, context, variableName, ownerTag) {
     if (isTagComponent(value)) {
         const existing = context[variableName] = new ValueSubject(value);

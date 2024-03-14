@@ -1,13 +1,15 @@
-import { ValueSubject } from "./ValueSubject.js";
-import { TagSupport } from "./TagSupport.class.js";
-import { ArrayNoKeyError } from "./errors.js";
-import { destroyArrayTag } from "./checkDestroyPrevious.function.js";
+import { ValueSubject } from './ValueSubject';
+import { TagSupport } from './TagSupport.class';
+import { ArrayNoKeyError } from './errors';
+import { destroyArrayTag } from './checkDestroyPrevious.function';
 export function processTagArray(result, value, // arry of Tag classes
 template, // <template end interpolate />
 ownerTag, options) {
     // const clones: Clones = []
     const clones = ownerTag.clones; // []
-    result.lastArray = result.lastArray || []; // {tag, index}[] populated in processTagResult
+    if (!result.lastArray) {
+        result.lastArray = []; // {tag, index}[] populated in processTagResult
+    }
     result.template = template;
     let removed = 0;
     /** 🗑️ remove previous items first */
@@ -23,7 +25,7 @@ ownerTag, options) {
             const tag = last.tag;
             destroyArrayTag(tag, options.counts);
             ++removed;
-            // ++options.counts.removed
+            ++options.counts.removed;
             return false;
         }
         return true;
@@ -68,8 +70,7 @@ ownerTag, options) {
             }
             return [];
         }
-        const nextClones = processAddTagArrayItem(before, subTag, result, index, options);
-        clones.push(...nextClones);
+        processAddTagArrayItem(before, subTag, result, index, options);
     });
     return clones;
 }
@@ -84,10 +85,7 @@ function processAddTagArrayItem(before, subTag, result, index, options) {
         removed: options.counts.removed,
     };
     const lastFirstChild = before; // tag.clones[0] // insertBefore.lastFirstChild    
-    const nextClones = subTag.buildBeforeElement(lastFirstChild, { counts, forceElement: options.forceElement });
-    // subTag.clones.push(...nextClones)
-    // ;(lastValue as any).clones = nextClones
-    return nextClones;
+    subTag.buildBeforeElement(lastFirstChild, { counts, forceElement: options.forceElement });
 }
 /** compare two values. If both values are arrays then the items will be compared */
 function areLikeValues(valueA, valueB) {

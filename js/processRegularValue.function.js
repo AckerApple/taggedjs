@@ -1,4 +1,4 @@
-import { updateBetweenTemplates } from "./interpolateTemplate.js";
+import { updateBetweenTemplates } from './interpolateTemplate';
 export function processRegularValue(value, result, // could be tag via result.tag
 template) {
     result.template = template;

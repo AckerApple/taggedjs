@@ -1,10 +1,10 @@
-import { processSubjectComponent } from "./processSubjectComponent.function.js";
-import { processTagResult } from "./processTagResult.function.js";
-import { isTagArray, isTagComponent, isTagInstance } from "./isInstance.js";
-import { processTagArray } from "./processTagArray.js";
-import { TagSupport } from "./TagSupport.class.js";
-import { ValueSubject } from "./ValueSubject.js";
-import { processRegularValue } from "./processRegularValue.function.js";
+import { processSubjectComponent } from './processSubjectComponent.function';
+import { processTagResult } from './processTagResult.function';
+import { isTagArray, isTagComponent, isTagInstance } from './isInstance';
+import { processTagArray } from './processTagArray';
+import { TagSupport } from './TagSupport.class';
+import { ValueSubject } from './ValueSubject';
+import { processRegularValue } from './processRegularValue.function';
 var ValueTypes;
 (function (ValueTypes) {
     ValueTypes["tag"] = "tag";
@@ -31,15 +31,17 @@ options) {
     const valueType = getValueType(value);
     switch (valueType) {
         case ValueTypes.tag:
-            return processTag(value, result, template, ownerTag, options);
+            processTag(value, result, template, ownerTag, options);
+            return [];
         case ValueTypes.tagArray:
-            const clones = processTagArray(result, value, template, ownerTag, options);
-            return clones;
+            return processTagArray(result, value, template, ownerTag, options);
         case ValueTypes.tagComponent:
-            return processSubjectComponent(value, result, template, ownerTag, options);
+            processSubjectComponent(value, result, template, ownerTag, options);
+            return [];
     }
     return processRegularValue(value, result, template);
 }
+/** Could be a regular tag or a component. Both are Tag.class */
 export function processTag(value, result, // could be tag via result.tag
 template, // <template end interpolate /> (will be removed)
 ownerTag, // owner
@@ -54,20 +56,10 @@ options) {
         };
         value.tagSupport.oldest = value.tagSupport.oldest || value;
         ownerTag.children.push(value);
-        value.ownerTag = ownerTag;
     }
+    value.ownerTag = ownerTag;
     result.template = template;
-    const clones = processTagResult(value, result, // Function will attach result.tag
+    processTagResult(value, result, // Function will attach result.tag
     template, options);
-    return clones;
-}
-export function destroySimpleValue(template, subject) {
-    const clone = subject.clone;
-    const parent = clone.parentNode;
-    // put the template back down
-    parent.insertBefore(template, clone);
-    parent.removeChild(clone);
-    delete subject.clone;
-    delete subject.lastValue;
 }
 //# sourceMappingURL=processSubjectValue.function.js.map

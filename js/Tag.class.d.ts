@@ -1,11 +1,10 @@
-import { TagSupport } from "./TagSupport.class.js";
-import { Provider } from "./providers.js";
-import { Subscription } from "./Subject.js";
-import { Counts } from "./interpolateTemplate.js";
-import { State } from "./set.function.js";
-import { InterpolatedTemplates } from "./interpolations.js";
-import { InterpolateSubject } from "./processSubjectValue.function.js";
-import { Clones } from "./Clones.type.js";
+import { TagSupport } from './TagSupport.class';
+import { Provider } from './providers';
+import { Subscription } from './Subject';
+import { Counts } from './interpolateTemplate';
+import { State } from './set.function';
+import { InterpolatedTemplates } from './interpolations';
+import { InterpolateSubject } from './processSubjectValue.function';
 export declare const variablePrefix = "__tagvar";
 export declare const escapeVariable: string;
 export declare const escapeSearch: RegExp;
@@ -43,7 +42,14 @@ export declare class Tag {
     key(arrayValue: unknown): this;
     destroy(options?: DestroyOptions): Promise<number>;
     destroySubscriptions(): void;
-    destroyClones({ stagger }?: DestroyOptions): Promise<number>;
+    destroyClones({ stagger }?: DestroyOptions): {
+        promise: Promise<(void | undefined)[]>;
+        stagger: number;
+    } | {
+        stagger: number;
+        promise?: undefined;
+    };
+    checkCloneRemoval(clone: Element | Text | ChildNode, stagger: number): Promise<void> | undefined;
     updateByTag(tag: Tag): void;
     lastTemplateString: string | undefined;
     updateConfig(strings: string[], values: any[]): void;
@@ -55,7 +61,7 @@ export declare class Tag {
     getAppElement(): Tag;
     /** Used during HMR only where static content itself could have been edited */
     rebuild(): void;
-    buildBeforeElement(insertBefore: Element | Text, options?: ElementBuildOptions): Clones;
+    buildBeforeElement(insertBefore: Element | Text, options?: ElementBuildOptions): void;
 }
 type DestroyOptions = {
     stagger: number;

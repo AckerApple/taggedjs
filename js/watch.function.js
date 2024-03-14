@@ -1,4 +1,4 @@
-import { setLet } from "./setLet.function.js";
+import { setLet } from './setLet.function';
 /** When an item in watch array changes, callback function will be triggered */
 export function watch(currentValues, callback) {
     let previousValues = setLet(undefined)(x => [previousValues, previousValues = x]);

@@ -1,7 +1,7 @@
-import { deepClone } from "./deepFunctions.js";
-import { isTagArray, isTagComponent, isTagInstance } from "./isInstance.js";
-import { getStateValue } from "./set.function.js";
-import { alterProps } from "./templater.utils.js";
+import { deepClone } from './deepFunctions';
+import { isTagArray, isTagComponent, isTagInstance } from './isInstance';
+import { getStateValue } from './set.function';
+import { alterProps } from './templater.utils';
 export class TagSupport {
     templater;
     children;

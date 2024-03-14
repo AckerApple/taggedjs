@@ -1,5 +1,5 @@
-import { runAfterRender, runBeforeRender } from "./tagRunner.js";
-import { renderExistingTag } from "./renderExistingTag.function.js";
+import { runAfterRender, runBeforeRender } from './tagRunner';
+import { renderExistingTag } from './renderExistingTag.function';
 const appElements = [];
 export function tagElement(app, // (...args: unknown[]) => TemplaterResult,
 element, props) {
@@ -14,8 +14,7 @@ element, props) {
     const wrapper = app(props);
     // have a function setup and call the tagWrapper with (props, {update, async, on})
     const result = applyTagUpdater(wrapper);
-    const { tag, tagSupport } = result;
-    // wrapper.tagSupport = tagSupport
+    const { tag } = result;
     tag.appElement = element;
     tag.tagSupport.oldest = tag;
     addAppTagRender(tag.tagSupport, tag);

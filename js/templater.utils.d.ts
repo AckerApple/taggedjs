@@ -1,7 +1,7 @@
-import { Tag } from "./Tag.class.js";
-import { TagSupport } from "./TagSupport.class.js";
-import { Props } from "./Props.js";
-import { TagChildren } from "./tag.js";
+import { Tag } from './Tag.class';
+import { TagSupport } from './TagSupport.class';
+import { Props } from './Props';
+import { TagChildren } from './tag';
 export type Wrapper = ((tagSupport: TagSupport) => Tag) & {
     original: () => Tag;
 };

@@ -1,4 +1,4 @@
-import { processAttribute } from "./processAttribute.function.js";
+import { processAttribute } from "./processAttribute.function";
 function howToSetAttribute(element, name, value) {
     /*
     if(name === 'class'){

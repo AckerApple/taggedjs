@@ -1,13 +1,12 @@
-import { isSubjectInstance, isTagArray, isTagComponent } from "./isInstance.js";
-import { bindSubjectCallback } from "./bindSubjectCallback.function.js";
-import { processTag } from "./processSubjectValue.function.js";
-import { processTagArray } from "./processTagArray.js";
-import { updateExistingTagComponent } from "./updateExistingTagComponent.function.js";
-import { updateExistingTag } from "./updateExistingTag.function.js";
-import { processRegularValue } from "./processRegularValue.function.js";
-import { checkDestroyPrevious } from "./checkDestroyPrevious.function.js";
+import { isSubjectInstance, isTagArray, isTagComponent, isTagInstance } from './isInstance';
+import { bindSubjectCallback } from './bindSubjectCallback.function';
+import { processTag } from './processSubjectValue.function';
+import { processTagArray } from './processTagArray';
+import { updateExistingTagComponent } from './updateExistingTagComponent.function';
+import { updateExistingTag } from './updateExistingTag.function';
+import { processRegularValue } from './processRegularValue.function';
+import { checkDestroyPrevious } from './checkDestroyPrevious.function';
 export function updateExistingValue(subject, value, ownerTag) {
-    const subjectValue = subject.value; // old value
     const subjectSubArray = subject;
     const subjectSubTag = subject;
     const isChildSubject = subjectSubArray.isChildSubject;
@@ -16,11 +15,25 @@ export function updateExistingValue(subject, value, ownerTag) {
     if (isChildSubject) {
         value = value.value; // A subject contains the value
     }
+    const oldInsertBefore = subject.template || subjectSubTag.tag?.tagSupport.templater.insertBefore || subjectSubTag.clone;
     checkDestroyPrevious(subject, value);
     // handle already seen tag components
     if (isComponent) {
+        if (!subjectSubTag.tag) {
+            const templater = value;
+            const { retag } = templater.renderWithSupport(value.tagSupport, undefined, ownerTag);
+            templater.newest = retag;
+            templater.oldest = retag;
+            subjectSubTag.tag = retag;
+            subjectSubTag.tagSupport = retag.tagSupport;
+            retag.buildBeforeElement(oldInsertBefore, {
+                forceElement: true,
+                counts: { added: 0, removed: 0 },
+            });
+            return;
+        }
         return updateExistingTagComponent(ownerTag, value, // latest value
-        subjectSubTag, subjectValue);
+        subjectSubTag);
     }
     // was component but no longer
     const subjectTag = subjectSubTag.tag;
@@ -31,11 +44,10 @@ export function updateExistingValue(subject, value, ownerTag) {
     // its another tag array
     if (isTagArray(value)) {
         const insertBefore = subjectSubArray.template || subjectSubTag.tag?.tagSupport.templater.insertBefore;
-        const nextClones = processTagArray(subject, value, insertBefore, ownerTag, { counts: {
+        processTagArray(subject, value, insertBefore, ownerTag, { counts: {
                 added: 0,
                 removed: 0,
             } });
-        ownerTag.clones.push(...nextClones);
         return;
     }
     // now its a function
@@ -48,6 +60,10 @@ export function updateExistingValue(subject, value, ownerTag) {
         subjectSubTag.set(value.value); // let ValueSubject now of newest value
         return;
     }
+    if (isTagInstance(value)) {
+        subjectSubTag.template = oldInsertBefore;
+    }
+    // This will cause all other values to render
     subjectSubTag.set(value); // let ValueSubject now of newest value
     return;
 }

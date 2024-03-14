@@ -1,4 +1,4 @@
-import { runAfterRender, runBeforeRedraw } from "./tagRunner.js";
+import { runAfterRender, runBeforeRedraw } from './tagRunner';
 export function updateExistingTag(templater, ogTag, existingSubject) {
     const tagSupport = ogTag.tagSupport;
     const oldest = tagSupport.oldest;

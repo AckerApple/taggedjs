@@ -1,6 +1,6 @@
-import { InterpolatedContentTemplates } from "./interpolateContentTemplates.js";
-import { Context, Tag, TagTemplate } from "./Tag.class.js";
-import { Counts } from "./interpolateTemplate.js";
+import { InterpolatedContentTemplates } from "./interpolateContentTemplates";
+import { Context, Tag, TagTemplate } from "./Tag.class";
+import { Counts } from "./interpolateTemplate";
 export type InterpolateOptions = {
     /** make the element go on document */
     forceElement?: boolean;
@@ -9,4 +9,4 @@ export type InterpolateOptions = {
 /** Review elements within an element */
 export declare function interpolateElement(container: Element, context: Context, // variables used to evaluate
 interpolatedTemplates: TagTemplate, tagOwner: Tag, options: InterpolateOptions): InterpolatedContentTemplates;
-export declare function interpolateString(string: string): import("./interpolations.js").InterpolatedTemplates;
+export declare function interpolateString(string: string): import("./interpolations").InterpolatedTemplates;

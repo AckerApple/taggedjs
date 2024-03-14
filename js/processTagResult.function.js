@@ -11,17 +11,16 @@ insertBefore, // <template end interpolate />
             if (result instanceof Function) {
                 const newTag = result(rTag.tagSupport);
                 rTag.updateByTag(newTag);
-                return [];
+                return;
             }
             rTag.updateByTag(tag);
-            return []; // no clones created in element already on stage
+            return;
         }
     }
-    const clones = tag.buildBeforeElement(insertBefore, {
+    tag.buildBeforeElement(insertBefore, {
         counts,
         forceElement,
     });
     subjectTag.tag = subjectTag.tag || tag; // let reprocessing know we saw this previously as an if
-    return clones;
 }
 //# sourceMappingURL=processTagResult.function.js.map

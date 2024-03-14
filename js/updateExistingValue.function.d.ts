@@ -1,6 +1,9 @@
-import { TagSupport } from "./TagSupport.class.js";
-import { Subject } from "./Subject.js";
-import { TemplaterResult } from "./templater.utils.js";
-import { Tag } from "./Tag.class.js";
-import { InterpolateSubject } from "./processSubjectValue.function.js";
-export declare function updateExistingValue(subject: InterpolateSubject, value: TemplaterResult | Tag[] | TagSupport | Function | Subject<any>, ownerTag: Tag): void;
+import { TagSupport } from './TagSupport.class';
+import { Subject } from './Subject';
+import { TemplaterResult } from './templater.utils';
+import { Tag } from './Tag.class';
+import { InterpolateSubject } from './processSubjectValue.function';
+import { RegularValue } from './processRegularValue.function';
+type ExistingValue = TemplaterResult | Tag[] | TagSupport | Function | Subject<unknown> | RegularValue | Tag;
+export declare function updateExistingValue(subject: InterpolateSubject, value: ExistingValue, ownerTag: Tag): void;
+export {};

@@ -1,5 +1,5 @@
-import { setUse } from "./setUse.function.js";
-import { getStateValue } from "./set.function.js";
+import { setUse } from "./setUse.function";
+import { getStateValue } from "./set.function";
 export let getCallback = () => (callback) => () => {
     throw new Error('The real callback function was called and that should never occur');
 };

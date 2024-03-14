@@ -1,6 +1,6 @@
-import { Tag } from "./Tag.class.js";
-import { TagSupport } from "./TagSupport.class.js";
-import { Config } from "./set.function.js";
+import { Tag } from './Tag.class';
+import { TagSupport } from './TagSupport.class';
+import { Config } from './set.function';
 interface TagUse {
     beforeRender: (tagSupport: TagSupport, ownerTag: Tag) => void;
     beforeRedraw: (tagSupport: TagSupport, tag: Tag) => void;

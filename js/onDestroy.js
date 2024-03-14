@@ -1,4 +1,4 @@
-import { setUse } from "./setUse.function.js";
+import { setUse } from "./setUse.function";
 /** When undefined, it means a tag is being built for the first time so do run destroy(s) */
 let destroyCurrentTagSupport;
 export function onDestroy(callback) {

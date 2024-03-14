@@ -1,6 +1,6 @@
-import { runBeforeRedraw, runBeforeRender } from "./tagRunner.js";
-import { setUse } from "./setUse.function.js";
-import { processTagResult } from "./processTagResult.function.js";
+import { runBeforeRedraw, runBeforeRender } from './tagRunner';
+import { setUse } from './setUse.function';
+import { processTagResult } from './processTagResult.function';
 export function processSubjectComponent(value, subject, template, ownerTag, options) {
     // Check if function component is wrapped in a tag() call
     // TODO: This below check not needed in production mode
@@ -28,15 +28,20 @@ export function processSubjectComponent(value, subject, template, ownerTag, opti
         else {
             runBeforeRender(tagSupport, ownerTag);
         }
+        const preClones = ownerTag.clones.map(clone => clone);
         const result = templater.renderWithSupport(tagSupport, subject.tag, ownerTag);
         retag = result.retag;
         templater.newest = retag;
+        if (ownerTag.clones.length > preClones.length) {
+            const myClones = ownerTag.clones.filter(fClone => !preClones.find(clone => clone === fClone));
+            retag.clones.push(...myClones);
+        }
     }
     ownerTag.children.push(retag);
+    // TODO: this line below might be duplicative of work done in renderWithSupport
     tagSupport.templater = retag.tagSupport.templater;
-    const clones = processTagResult(retag, subject, // The element set here will be removed from document. Also result.tag will be added in here
+    processTagResult(retag, subject, // The element set here will be removed from document. Also result.tag will be added in here
     template, // <template end interpolate /> (will be removed)
     options);
-    return clones;
 }
 //# sourceMappingURL=processSubjectComponent.function.js.map

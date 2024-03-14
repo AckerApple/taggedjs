@@ -1,13 +1,14 @@
-import { variablePrefix } from "./Tag.class.js";
-import { elementInitCheck } from "./elementInitCheck.js";
-import { processSubjectValue } from "./processSubjectValue.function.js";
-import { isTagComponent } from "./isInstance.js";
-import { scanTextAreaValue } from "./scanTextAreaValue.function.js";
+import { variablePrefix } from "./Tag.class";
+import { elementInitCheck } from "./elementInitCheck";
+import { processSubjectValue } from "./processSubjectValue.function";
+import { isTagArray, isTagComponent } from "./isInstance";
+import { scanTextAreaValue } from "./scanTextAreaValue.function";
 export function interpolateTemplate(insertBefore, // <template end interpolate /> (will be removed)
 context, // variable scope of {`__tagvar${index}`:'x'}
 ownerTag, // Tag class
 counts, // used for animation stagger computing
 options) {
+    // TODO: THe clones array is useless here
     const clones = [];
     if (!insertBefore.hasAttribute('end')) {
         return { clones }; // only care about <template end>
@@ -17,32 +18,33 @@ options) {
         return { clones }; // ignore, not a tagVar
     }
     const existingSubject = context[variableName];
-    if (isTagComponent(existingSubject.value)) {
+    // process dynamics later
+    if (isTagComponent(existingSubject.value) || isTagArray(existingSubject.value)) {
         return { clones, tagComponent: { ownerTag, subject: existingSubject, insertBefore } };
     }
     let isForceElement = options.forceElement;
-    subscribeToTemplate(insertBefore, existingSubject, ownerTag, clones, counts, { isForceElement });
+    subscribeToTemplate(insertBefore, existingSubject, ownerTag, counts, { isForceElement });
     return { clones };
 }
-export function subscribeToTemplate(insertBefore, subject, ownerTag, clones, counts, // used for animation stagger computing
+export function subscribeToTemplate(insertBefore, subject, ownerTag, counts, // used for animation stagger computing
 { isForceElement }) {
     const callback = (value) => {
         const clone = subject.clone;
         if (clone) {
             insertBefore = clone;
         }
-        const nextClones = processSubjectValue(value, subject, insertBefore, ownerTag, {
+        processSubjectValue(value, subject, insertBefore, ownerTag, {
             counts: { ...counts },
             forceElement: isForceElement,
         });
         if (isForceElement) {
             isForceElement = false; // only can happen once
         }
-        clones.push(...nextClones);
+        // ownerTag.clones.push(...nextClones)
+        // clones.push(...nextClones)
     };
     const sub = subject.subscribe(callback);
     ownerTag.cloneSubs.push(sub);
-    return clones;
 }
 // Function to update the value of x
 export function updateBetweenTemplates(value, lastFirstChild) {

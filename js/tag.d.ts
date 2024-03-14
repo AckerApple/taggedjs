@@ -1,5 +1,5 @@
-import { Tag } from "./Tag.class.js";
-import { ValueSubject } from "./ValueSubject.js";
+import { Tag } from './Tag.class';
+import { ValueSubject } from './ValueSubject';
 export type TagChildren = ValueSubject<Tag[]>;
 export type TagChildrenInput = Tag[] | Tag | TagChildren;
 export type TagComponentArg<T extends any[]> = (...args: T) => Tag;

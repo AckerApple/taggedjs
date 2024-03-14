@@ -1,11 +1,11 @@
-import { runBeforeDestroy } from "./tagRunner.js";
-import { buildClones } from "./render.js";
-import { interpolateElement, interpolateString } from "./interpolateElement.js";
-import { afterElmBuild, subscribeToTemplate } from "./interpolateTemplate.js";
-import { elementDestroyCheck } from "./elementDestroyCheck.function.js";
-import { updateExistingValue } from "./updateExistingValue.function.js";
-import { processNewValue } from "./processNewValue.function.js";
-import { checkDestroyPrevious } from "./checkDestroyPrevious.function.js";
+import { runBeforeDestroy } from './tagRunner';
+import { buildClones } from './render';
+import { interpolateElement, interpolateString } from './interpolateElement';
+import { afterElmBuild, subscribeToTemplate } from './interpolateTemplate';
+import { elementDestroyCheck } from './elementDestroyCheck.function';
+import { updateExistingValue } from './updateExistingValue.function';
+import { processNewValue } from './processNewValue.function';
+import { checkDestroyPrevious } from './checkDestroyPrevious.function';
 export const variablePrefix = '__tagvar';
 export const escapeVariable = '--' + variablePrefix + '--';
 const prefixSearch = new RegExp(variablePrefix, 'g');
@@ -46,14 +46,21 @@ export class Tag {
             runBeforeDestroy(this.tagSupport, this);
         }
         this.destroySubscriptions();
-        const promises = this.children.map((kid) => kid.destroy({ ...options, byParent: true }));
-        this.children.length = 0;
         if (this.ownerTag) {
             this.ownerTag.children = this.ownerTag.children.filter(child => child !== this);
         }
         if (!options.byParent) {
-            options.stagger = await this.destroyClones(options);
+            const { stagger, promise } = this.destroyClones(options);
+            options.stagger = stagger;
+            if (promise) {
+                await promise;
+            }
         }
+        else {
+            this.destroyClones();
+        }
+        const promises = this.children.map(kid => kid.destroy({ stagger: 0, byParent: true }));
+        this.children.length = 0;
         await Promise.all(promises);
         return options.stagger;
     }
@@ -61,37 +68,38 @@ export class Tag {
         this.cloneSubs.forEach(cloneSub => cloneSub.unsubscribe());
         this.cloneSubs.length = 0;
     }
-    async destroyClones({ stagger } = {
+    destroyClones({ stagger } = {
         stagger: 0,
     }) {
-        let hasPromise = false;
-        const promises = this.clones.reverse().map((clone, index) => {
-            let promise;
-            if (clone.ondestroy) {
-                promise = elementDestroyCheck(clone, stagger);
-            }
-            const next = () => {
-                clone.parentNode?.removeChild(clone);
-                const ownerTag = this.ownerTag;
-                if (ownerTag) {
-                    // Sometimes my clones were first registered to my owner, remove them
-                    ownerTag.clones = ownerTag.clones.filter(compareClone => compareClone !== clone);
-                }
-            };
-            if (promise instanceof Promise) {
-                hasPromise = true;
-                promise.then(next);
-            }
-            else {
-                next();
-            }
-            return promise;
-        });
+        //const promises = this.clones.reverse().map(
+        const promises = this.clones.map(clone => this.checkCloneRemoval(clone, stagger)).filter(x => x); // only return promises
         this.clones.length = 0; // tag maybe used for something else
-        if (hasPromise) {
-            await Promise.all(promises);
+        if (promises.length) {
+            return { promise: Promise.all(promises), stagger };
         }
-        return stagger;
+        return { stagger };
+    }
+    checkCloneRemoval(clone, stagger) {
+        let promise;
+        const customElm = clone;
+        if (customElm.ondestroy) {
+            promise = elementDestroyCheck(customElm, stagger);
+        }
+        const next = () => {
+            clone.parentNode?.removeChild(clone);
+            const ownerTag = this.ownerTag;
+            if (ownerTag) {
+                // Sometimes my clones were first registered to my owner, remove them from owner
+                ownerTag.clones = ownerTag.clones.filter(compareClone => compareClone !== clone);
+            }
+        };
+        if (promise instanceof Promise) {
+            return promise.then(next);
+        }
+        else {
+            next();
+        }
+        return promise;
     }
     updateByTag(tag) {
         this.updateConfig(tag.strings, tag.values);
@@ -179,6 +187,7 @@ export class Tag {
             if (seenContext.includes(key)) {
                 return;
             }
+            throw new Error('we here');
             const destroyed = checkDestroyPrevious(subject, undefined);
         });
         return context;
@@ -216,31 +225,39 @@ export class Tag {
         elementContainer.id = 'tag-temp-holder';
         // render content with a first child that we can know is our first element
         elementContainer.innerHTML = `<template id="temp-template-tag-wrap">${template.string}</template>`;
+        // Search/replace innerHTML variables but don't interpolate tag components just yet
         const { clones, tagComponents } = interpolateElement(elementContainer, context, template, this, // ownerTag,
         {
             forceElement: options.forceElement,
             counts: options.counts
         });
-        this.clones.length = 0;
-        afterInterpolateElement(elementContainer, insertBefore, this, clones, options, context);
-        this.clones.forEach(clone => afterElmBuild(clone, options, context, this));
-        // Any tag components that were found should be processed AFTER the owner processes its elements
+        // remove old clones
+        if (this.clones.length) {
+            this.clones.forEach(clone => this.checkCloneRemoval(clone, 0));
+        }
+        afterInterpolateElement(elementContainer, insertBefore, this, // ownerTag
+        [], context, options);
+        // this.clones.push(...clones)
+        // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
         let isForceElement = options.forceElement;
         tagComponents.forEach(tagComponent => {
+            const preClones = this.clones.map(clone => clone);
             subscribeToTemplate(tagComponent.insertBefore, // temporary,
-            tagComponent.subject, tagComponent.ownerTag, clones, options.counts, { isForceElement });
-            afterInterpolateElement(elementContainer, insertBefore, this, clones, options, context);
+            tagComponent.subject, tagComponent.ownerTag, options.counts, { isForceElement });
+            afterInterpolateElement(elementContainer, insertBefore, this, preClones, context, options);
+            // remove component clones from ownerTag as they will belong to the components they live on
+            /*
+            if( preClones.length ) {
+              this.clones = this.clones.filter(cloneFilter => !preClones.find(clone => clone === cloneFilter))
+            }
+            */
         });
-        // return this.clones
-        return clones;
     }
 }
-function afterInterpolateElement(container, insertBefore, tag, intClones, options, context) {
+function afterInterpolateElement(container, insertBefore, ownerTag, preClones, context, options) {
     const clones = buildClones(container, insertBefore);
-    tag.clones.push(...clones);
-    // remove component clones from ownerTag
-    if (intClones.length) {
-        tag.clones = tag.clones.filter(cloneFilter => !intClones.find(clone => clone === cloneFilter));
-    }
+    ownerTag.clones.push(...clones);
+    clones.forEach(clone => afterElmBuild(clone, options, context, ownerTag));
+    return clones;
 }
 //# sourceMappingURL=Tag.class.js.map

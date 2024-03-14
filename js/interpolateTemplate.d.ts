@@ -1,7 +1,7 @@
-import { Context, ElementBuildOptions, Tag } from "./Tag.class.js";
-import { InterpolateOptions } from "./interpolateElement.js";
-import { Clones } from "./Clones.type.js";
-import { InterpolateSubject } from "./processSubjectValue.function.js";
+import { Context, ElementBuildOptions, Tag } from "./Tag.class";
+import { InterpolateOptions } from "./interpolateElement";
+import { Clones } from "./Clones.type";
+import { InterpolateSubject } from "./processSubjectValue.function";
 export type Template = Element & {
     clone?: any;
 };
@@ -19,10 +19,10 @@ context: Context, // variable scope of {`__tagvar${index}`:'x'}
 ownerTag: Tag, // Tag class
 counts: Counts, // used for animation stagger computing
 options: InterpolateOptions): InterpolateTemplateResult;
-export declare function subscribeToTemplate(insertBefore: Element | Text | Template, subject: InterpolateSubject, ownerTag: Tag, clones: Clones, counts: Counts, // used for animation stagger computing
+export declare function subscribeToTemplate(insertBefore: Element | Text | Template, subject: InterpolateSubject, ownerTag: Tag, counts: Counts, // used for animation stagger computing
 { isForceElement }: {
     isForceElement?: boolean;
-}): Clones;
+}): void;
 export declare function updateBetweenTemplates(value: string | undefined | boolean | number, lastFirstChild: Element | Text): Text;
 export type Counts = {
     added: number;

@@ -10,6 +10,12 @@ export function isLikeTags(tag0, tag1) {
     if (!valuesLengthsMatch) {
         return false;
     }
+    /*
+    const valuesMatch = deepEqual(tag0.values, tag1.values)
+    if(!valuesMatch) {
+      return false
+    }
+    */
     return true;
 }
 //# sourceMappingURL=isLikeTags.function.js.map

@@ -1,4 +1,4 @@
-import { deepClone, deepEqual } from "./deepFunctions.js";
+import { deepClone, deepEqual } from './deepFunctions';
 export function providersChangeCheck(tag) {
     const providersWithChanges = tag.tagSupport.memory.providers.filter(provider => !deepEqual(provider.instance, provider.clone));
     // reset clones

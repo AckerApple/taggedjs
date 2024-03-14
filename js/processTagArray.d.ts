@@ -1,7 +1,7 @@
-import { Clones } from "./Clones.type.js";
-import { Tag } from "./Tag.class.js";
-import { ValueSubject } from "./ValueSubject.js";
-import { Counts, Template } from "./interpolateTemplate.js";
+import { Clones } from './Clones.type';
+import { Tag } from './Tag.class';
+import { ValueSubject } from './ValueSubject';
+import { Counts, Template } from './interpolateTemplate';
 export type LastArrayItem = {
     tag: Tag;
     index: number;

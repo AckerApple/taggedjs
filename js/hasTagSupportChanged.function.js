@@ -1,4 +1,4 @@
-import { deepEqual } from "./deepFunctions.js";
+import { deepEqual } from "./deepFunctions";
 export function hasTagSupportChanged(oldTagSupport, newTagSupport) {
     if (oldTagSupport === newTagSupport) {
         throw new Error('something here');

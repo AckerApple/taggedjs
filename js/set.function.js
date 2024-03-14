@@ -1,5 +1,5 @@
-import { StateMismatchError } from "./errors.js";
-import { setUse } from "./setUse.function.js";
+import { StateMismatchError } from './errors';
+import { setUse } from './setUse.function';
 // TODO: rename
 setUse.memory.stateConfig = {
     array: [], // state memory on the first render
@@ -34,12 +34,14 @@ setUse({
         const config = setUse.memory.stateConfig;
         if (config.rearray.length) {
             if (config.rearray.length !== config.array.length) {
-                const message = `States lengths mismatched ${config.rearray.length} !== ${config.array.length}`;
-                const error = new StateMismatchError(message, {
+                const message = `States lengths has changed ${config.rearray.length} !== ${config.array.length}. Typically occurs when a function is intended to be wrapped with a tag() call`;
+                const details = {
                     oldStates: config.array,
                     newStates: config.rearray,
-                    component: tagSupport.templater?.wrapper.original
-                });
+                    component: tagSupport.templater?.wrapper.original,
+                };
+                const error = new StateMismatchError(message, details);
+                console.warn(message, details);
                 throw error;
             }
         }

@@ -1,16 +1,12 @@
-import { setValueRedraw } from "./Tag.utils.js";
-import { deepClone } from "./deepFunctions.js";
-import { isTagInstance } from "./isInstance.js";
-import { hasTagSupportChanged } from "./hasTagSupportChanged.function.js";
-import { destroyTagMemory } from "./checkDestroyPrevious.function.js";
-export function updateExistingTagComponent(tag, tempResult, existingSubject, subjectValue) {
+import { setValueRedraw } from './Tag.utils';
+import { deepClone } from './deepFunctions';
+import { isTagInstance } from './isInstance';
+import { hasTagSupportChanged } from './hasTagSupportChanged.function';
+import { destroyTagMemory } from './checkDestroyPrevious.function';
+export function updateExistingTagComponent(ownerTag, tempResult, existingSubject) {
     let existingTag = existingSubject.tag;
-    // previously was something else, now a tag component
-    if (!existingTag) {
-        setValueRedraw(tempResult, existingSubject, tag);
-        tempResult.redraw();
-        return;
-    }
+    //const template = existingSubject.template
+    const insertBefore = existingTag.tagSupport.templater.insertBefore;
     // tag existingTag
     const oldWrapper = existingTag.tagSupport.templater.wrapper;
     const newWrapper = tempResult.wrapper;
@@ -27,31 +23,38 @@ export function updateExistingTagComponent(tag, tempResult, existingSubject, sub
         destroyTagMemory(existingTag, existingSubject);
     }
     else {
-        const subjectTagSupport = subjectValue?.tagSupport;
+        const subjectTagSupport = existingTag.tagSupport;
         // old props may have changed, reclone first
-        let oldCloneProps = subjectTagSupport.props;
+        let oldCloneProps = subjectTagSupport.propsConfig.clonedProps;
+        const newProps = subjectTagSupport.propsConfig.latest;
         // if the new props are NOT HTML children, then clone the props for later render cycle comparing
-        if (!isTagInstance(subjectTagSupport.props)) {
-            oldCloneProps = deepClone(subjectTagSupport.props);
+        if (!isTagInstance(newProps)) {
+            oldCloneProps = deepClone(newProps);
         }
-        if (existingTag) {
-            const newTagSupport = tempResult.tagSupport;
-            const hasChanged = hasTagSupportChanged(oldTagSetup, newTagSupport);
-            if (!hasChanged) {
-                return; // its the same tag component
-            }
+        const newTagSupport = tempResult.tagSupport;
+        const hasChanged = hasTagSupportChanged(oldTagSetup, newTagSupport);
+        if (!hasChanged) {
+            return; // its the same tag component
         }
     }
-    setValueRedraw(tempResult, existingSubject, tag);
+    setValueRedraw(tempResult, existingSubject, ownerTag);
     oldTagSetup.templater = tempResult;
-    const redraw = tempResult.redraw();
-    if (!existingTag.isLikeTag(redraw)) {
-        existingTag.destroy();
-        existingSubject.tagSupport = redraw.tagSupport;
-        existingSubject.tag = redraw;
-        oldTagSetup.oldest = redraw;
+    const newTag = tempResult.redraw();
+    // detect if both the function is the same and the return is the same
+    const isLikeTag = isSameTag && existingTag.isLikeTag(newTag);
+    if (isLikeTag) {
+        existingTag.updateByTag(newTag);
     }
-    oldTagSetup.newest = redraw;
+    else {
+        existingSubject.tagSupport = newTag.tagSupport;
+        existingSubject.tag = newTag;
+        oldTagSetup.oldest = newTag;
+        // Although function looked the same it returned a different html result
+        if (isSameTag) {
+            existingTag.destroy();
+        }
+    }
+    oldTagSetup.newest = newTag;
     oldTagSetup.propsConfig = { ...tempResult.tagSupport.propsConfig };
     return;
 }

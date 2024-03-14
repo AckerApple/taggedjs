@@ -1,4 +1,4 @@
-import { interpolateTemplate } from "./interpolateTemplate.js";
+import { interpolateTemplate } from "./interpolateTemplate";
 export function interpolateContentTemplates(element, context, tag, options, children) {
     if (!children || element.tagName === 'TEMPLATE') {
         return { clones: [], tagComponents: [] }; // done

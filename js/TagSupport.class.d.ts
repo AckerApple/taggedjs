@@ -1,7 +1,7 @@
-import { Props } from "./Props.js";
-import { Tag, TagMemory } from "./Tag.class.js";
-import { TagChildren } from "./tag.js";
-import { TemplaterResult } from "./templater.utils.js";
+import { Props } from './Props';
+import { Tag, TagMemory } from './Tag.class';
+import { TagChildren } from './tag';
+import { TemplaterResult } from './templater.utils';
 export declare class TagSupport {
     templater: TemplaterResult;
     children: TagChildren;

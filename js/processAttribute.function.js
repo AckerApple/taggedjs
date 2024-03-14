@@ -1,5 +1,5 @@
-import { inputAttribute } from "./inputAttribute.js";
-import { isSubjectInstance } from "./isInstance.js";
+import { inputAttribute } from './inputAttribute';
+import { isSubjectInstance } from './isInstance';
 const startRegX = /^\s*{__tagvar/;
 const endRegX = /}\s*$/;
 function isTagVar(value) {

@@ -1,4 +1,4 @@
-import { Tag } from "./Tag.class.js";
-import { TagSubject } from "./Tag.utils.js";
-import { TemplaterResult } from "./templater.utils.js";
+import { Tag } from './Tag.class';
+import { TagSubject } from './Tag.utils';
+import { TemplaterResult } from './templater.utils';
 export declare function updateExistingTag(templater: TemplaterResult, ogTag: Tag, existingSubject: TagSubject): never[];

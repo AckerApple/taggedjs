@@ -1,4 +1,4 @@
-import { TagSubject } from "./Tag.utils.js";
-import { TemplateRedraw } from "./templater.utils.js";
-import { Tag } from "./Tag.class.js";
-export declare function updateExistingTagComponent(tag: Tag, tempResult: TemplateRedraw, existingSubject: TagSubject, subjectValue: any): void;
+import { TagSubject } from './Tag.utils';
+import { TemplateRedraw } from './templater.utils';
+import { Tag } from './Tag.class';
+export declare function updateExistingTagComponent(ownerTag: Tag, tempResult: TemplateRedraw, existingSubject: TagSubject): void;
