@@ -11,5 +11,3 @@ export declare function applyTagUpdater(wrapper: TemplaterResult): {
     tag: Tag;
     tagSupport: BaseTagSupport;
 };
-/** Overwrites arguments.tagSupport.mutatingRender */
-export declare function addAppTagRender(tagSupport: BaseTagSupport, tag: Tag): void;

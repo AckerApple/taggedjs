@@ -14,8 +14,8 @@ export declare class BaseTagSupport {
     };
     memory: TagMemory;
     constructor(templater: TemplaterResult, subject: TagSubject);
-    render(renderUp: boolean): Tag;
 }
+export declare function renderTagSupport(tagSupport: BaseTagSupport, renderUp: boolean): Tag;
 export declare class TagSupport extends BaseTagSupport {
     ownerTagSupport: TagSupport;
     templater: TemplaterResult;

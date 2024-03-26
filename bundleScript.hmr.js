@@ -9,7 +9,8 @@ module.exports.run = () => {
   return new Promise((res, rej) => {
     compiler.run((err, stats) => {
       if (err) {
-        return rej(err)
+        console.log('err55')
+        return rej({}/*err*/)
       }
 
       res(stats)

@@ -11,7 +11,8 @@ module.exports.run = () => {
   return new Promise((res, rej) => {
     compiler.run((err, stats) => {
       if (err) {
-        return rej(err)
+        console.log('err44')
+        return rej({}/*err*/)
       }
 
       const outFilePath = path.resolve(__dirname,'hmr.bundle.js')

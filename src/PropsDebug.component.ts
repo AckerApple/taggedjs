@@ -123,7 +123,7 @@ const propsDebug = tag((
     ${propFnUpdateTest({propNumber, callback: () => {
       ++propNumber
       console.log('new propNumber', propNumber)
-      console.log('new propNumber test ---', test(propNumber))
+      // console.log('new propNumber test ---', test(propNumber))
     }})}
     
     ${/*renderCountDiv({renderCount, name: 'propsDebug'})*/false}
