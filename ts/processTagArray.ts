@@ -88,16 +88,7 @@ export function processTagArray(
     if(previousSupport) {
       subTag.tagSupport.templater.global = previousSupport.templater.global
       previousSupport.templater.global.newest = subTag
-    } else {
-      subTag.tagSupport.render = () => {
-        ownerTag.tagSupport.render(
-          true,
-          // ownerTag.tagSupport,
-          // ownerTag.tagSupport.subject,
-        ) // call owner for needed updates
-        return subTag
-      }
-  
+    } else {  
       ownerTag.childTags.push(subTag)
     }
     

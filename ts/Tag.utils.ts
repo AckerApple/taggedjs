@@ -40,14 +40,21 @@ export function redrawTag(
     throw new Error('issue before event redraw')
   }
 
-  const tagSupport = templater.tagSupport || existingTag?.tagSupport
+  const tagSupport = templater.tagSupport // || existingTag?.tagSupport
+
+  if(!templater.tagSupport) {
+    throw new Error('need tag support')
+  }
 
   if(!tagSupport.templater.global.oldest) {
     throw new Error('33333')
   }
   
 
-  console.log('call for ----> renderWithSupport')
+  console.log('call for ----> renderWithSupport',{
+    tagProps: tagSupport.templater.props,
+    exNewProps: existingTag.tagSupport.templater.global.newest?.tagSupport.templater.props,
+  })
   let {retag} = renderWithSupport(
     tagSupport,
     existingTag,

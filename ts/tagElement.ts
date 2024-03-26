@@ -1,4 +1,4 @@
-import { BaseTagSupport } from './TagSupport.class'
+import { BaseTagSupport, renderTagSupport } from './TagSupport.class'
 import { runAfterRender, runBeforeRender } from './tagRunner'
 import { TemplaterResult } from './TemplaterResult.class'
 import { Tag } from './Tag.class'
@@ -32,8 +32,6 @@ export function tagElement(
 
   // TODO: is the below needed?
   tag.appElement = element
-
-  addAppTagRender(tag.tagSupport, tag)
     
   const templateElm = document.createElement('template')
   templateElm.setAttribute('id', 'app-tag-' + appElements.length)
@@ -74,22 +72,4 @@ export function applyTagUpdater(
   runAfterRender(tagSupport, tag)
 
   return { tag, tagSupport }
-}
-
-/** Overwrites arguments.tagSupport.mutatingRender */
-export function addAppTagRender(
-  tagSupport: BaseTagSupport,
-  tag: Tag,
-) {  
-  tagSupport.render = () => {    
-    const result = renderExistingTag(
-      tag,
-      tagSupport.templater,
-      tagSupport,
-      new ValueSubject<Tag>({} as Tag) as unknown as TagSubject,
-      {} as unknown as Tag, // ownerTag,
-    )
-    
-    return result.redraw
-  }
 }

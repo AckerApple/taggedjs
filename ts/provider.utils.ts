@@ -1,5 +1,6 @@
 import { Tag } from './Tag.class'
 import { TagSubject } from './Tag.utils'
+import { renderTagSupport } from './TagSupport.class'
 import { deepClone, deepEqual } from './deepFunctions'
 import { Provider } from './providers'
 
@@ -28,7 +29,8 @@ function handleProviderChanges(
     const notRendered = renderCount === tag.tagSupport.templater.global.renderCount
     if(notRendered) {
       provider.clone = deepClone(provider.instance)
-      tag.tagSupport.render(
+      renderTagSupport(
+        tag.tagSupport,
         false,
         // tag.tagSupport,
         // tag.tagSupport.subject

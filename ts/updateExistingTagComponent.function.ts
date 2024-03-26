@@ -3,7 +3,7 @@ import { TemplaterResult } from './TemplaterResult.class'
 import { Tag } from './Tag.class'
 import { hasTagSupportChanged } from './hasTagSupportChanged.function'
 import { destroyTagMemory } from './checkDestroyPrevious.function'
-import { TagSupport } from './TagSupport.class'
+import { TagSupport, renderTagSupport } from './TagSupport.class'
 import { processSubjectComponent } from './processSubjectComponent.function'
 import { State } from './set.function'
 
@@ -87,10 +87,9 @@ export function updateExistingTagComponent(
         oldState: oldTagSupport.memory.state.newest,
       })
 
-      const newTag = tempResult.tagSupport.render(
+      const newTag = renderTagSupport(
+        tempResult.tagSupport,
         false,
-        // oldTagSupport,
-        // subject,
       )
 
       const oldTag = oldGlobal.oldest as Tag
@@ -122,10 +121,9 @@ export function updateExistingTagComponent(
     newestState: tempResult.tagSupport.memory.state.newest,
     olderState: tempResult.tagSupport.subject.tag.tagSupport.memory.state.newest,
   })
-  const newTag = tempResult.tagSupport.render(
+  const newTag = renderTagSupport(
+    tempResult.tagSupport,
     false,
-    // oldTagSupport,
-    // subject,
   )
 
   const hasOldest = newTag.tagSupport.templater.global.oldest ? true : false

@@ -1,10 +1,8 @@
 import { Props } from './Props'
 import { Tag } from './Tag.class'
-import { TagSupport } from './TagSupport.class'
+import { TagSupport, renderTagSupport } from './TagSupport.class'
 import { TemplaterResult } from './TemplaterResult.class'
 import { isTagInstance } from './isInstance'
-import { renderExistingTag } from './renderExistingTag.function'
-import { getStateValue } from './set.function'
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(
@@ -36,7 +34,7 @@ export function alterProps(
       // lastTagOwner2: lastTag?.ownerTag?.tagSupport.memory.state.newest[2]?.get(),
       // equalLast: lastTag === newestOwner.tagSupport.subject.tag
       state2: newestOwner.tagSupport.memory.state.newest[2]?.get(),
-      //xx: ownerSupport.memory.state.newest[2].get()
+      ownerState2: ownerSupport.memory.state.newest[2].get(),
       equalOwnerWrap: ownerTagSupport.templater.wrapper?.original === newestOwner.tagSupport.templater.wrapper?.original,
       
       ownerOriginal: ownerTagSupport.templater.wrapper?.original,
@@ -45,14 +43,16 @@ export function alterProps(
       oldestGlobal: oldestGlobal.oldest?.hasLiveElements,
       
       equalGlobal: ownerGlobal == oldestGlobal,
+      
+      argOrg: ownerSupport.templater.wrapper.original,
       argOwner: ownerSupport.templater.global.oldest?.hasLiveElements,
     })
 
     // ??? - new
     // newestOwner.tagSupport.render(
-    ownerSupport.render(
+    renderTagSupport(
+      ownerSupport,
       true,
-      // newestOwner.tagSupport, newestOwner.tagSupport.subject
     )
     return callbackResult
   }

@@ -51,60 +51,70 @@ export class BaseTagSupport {
       this.propsConfig.clonedProps = this.propsConfig.latestCloned
     }
   }
+}
 
-  render(
-    renderUp: boolean
-    // oldTagSetup: BaseTagSupport,
-    // subject: TagSubject,
-  ): Tag {
-    const oldTagSetup = this
-    const subject = this.subject
-
-    const useTemplater = this.templater // oldTagSetup.templater // templater
-    const useTagSupport = oldTagSetup.templater.global.newest?.tagSupport as TagSupport // oldTagSetup
-    const templater = this.templater
-    // const oldest = templater.global.oldest as Tag
-
-    if(!templater.global.oldest) {
-      throw new Error('888')
-    }
-
-    const exit = renderExistingTag(
-      // templater.global.newest as Tag,
-      templater.global.oldest as Tag,
-      useTemplater,
-      useTagSupport,
-      subject,
-      oldTagSetup.templater.global.oldest as Tag,
-    )
-
-    const tag = exit.redraw
-
-    // oldest.updateByTag(exit.redraw)
-
-    // only update and no more?
-    if(exit.remit) {
-      // console.log('-- update tag', tag.tagSupport.templater.wrapper.original)
-      // oldest.updateByTag(exit.redraw)
-      return tag
-    }
+export function renderTagSupport(
+  tagSupport: BaseTagSupport,
+  renderUp: boolean,
+): Tag {
+  if(isTagInstance(tagSupport.templater)) {
+    const newTag = tagSupport.templater.global.newest as Tag
+    const ownerTag = newTag.ownerTag as Tag
     
-    // Have owner re-render
-    if(renderUp && tag.ownerTag) {    
-      const ownerTagSupport = tag.ownerTag.tagSupport
-      console.log('child is asking to render owner - render function')
-      ownerTagSupport.render(
-        true,
-        // ownerTagSupport,
-        // ownerTagSupport.subject
-      )
+    return renderTagSupport(ownerTag.tagSupport, true)
+  }
+
+  // const oldTagSetup = this
+  const subject = tagSupport.subject
+  const templater = tagSupport.templater // oldTagSetup.templater // templater
   
-      return tag
-    }
+  console.log('xxxxxxxxxxxxxxx',{
+    tempProps: templater.props,
+    exProps: subject.tag?.tagSupport.templater.global.newest?.tagSupport.templater.props,
+  })
+
+  const useTagSupport = tagSupport.templater.global.newest?.tagSupport as TagSupport // oldTagSetup
+  // const oldest = templater.global.oldest as Tag
+
+  if(!templater.global.oldest) {
+    throw new Error('888')
+  }
+
+  const exit = renderExistingTag(
+    // templater.global.newest as Tag,
+    templater.global.oldest as Tag,
+    templater,
+    useTagSupport,
+    subject,
+    tagSupport.templater.global.oldest as Tag,
+  )
+
+  const tag = exit.redraw
+
+  // oldest.updateByTag(exit.redraw)
+
+  // only update and no more?
+  if(exit.remit) {
+    // console.log('-- update tag', tag.tagSupport.templater.wrapper.original)
+    // oldest.updateByTag(exit.redraw)
+    return tag
+  }
+  
+  // Have owner re-render
+  if(renderUp && tag.ownerTag) {    
+    const ownerTagSupport = tag.ownerTag.tagSupport
+    console.log('child is asking to render owner - render function')
+    renderTagSupport(
+      ownerTagSupport,
+      true,
+    )
 
     return tag
   }
+
+  return tag
 }
+
 
 function cloneValueArray<T>(values: (T | Tag | Tag[])[]): T[] {
   return values.map((value) => {

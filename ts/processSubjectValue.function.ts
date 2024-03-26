@@ -119,15 +119,6 @@ export function processTag(
     )
 
     // asking me to render will cause my parent to render
-    tag.tagSupport.render = () => {
-      console.log('ask owner to render ***', ownerTag.tagSupport.templater.wrapper.original)
-      ownerTag.tagSupport.render(
-        true,
-        // ownerTag.tagSupport,
-        // ownerTag.tagSupport.subject
-      )
-      return tag
-    }
     ownerTag.childTags.push(tag as Tag)
   }
   

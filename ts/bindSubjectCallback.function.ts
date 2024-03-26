@@ -1,6 +1,7 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
 import { Tag } from "./Tag.class"
+import { renderTagSupport } from "./TagSupport.class"
 
 export type Callback = (...args: any[]) => any & {
   isChildOverride?: true // if this is set, then a parent tag passed children to a tag/component
@@ -43,7 +44,8 @@ export function runTagCallback(
   }
 
   console.log('click render --- ')
-  tagSupport.render(
+  renderTagSupport(
+    tagSupport,
     false,
     // tagSupport, tagSupport.subject
   )
@@ -51,7 +53,8 @@ export function runTagCallback(
   if(callbackResult instanceof Promise) {
     return callbackResult.then(() => {
       console.log('click promise render --- ')
-      tagSupport.render(
+      renderTagSupport(
+        tagSupport,
         false,
         // tagSupport, tagSupport.subject
       )

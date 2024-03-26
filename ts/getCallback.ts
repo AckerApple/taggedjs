@@ -1,4 +1,4 @@
-import { BaseTagSupport } from "./TagSupport.class"
+import { BaseTagSupport, renderTagSupport } from "./TagSupport.class"
 import { setUse } from "./setUse.function"
 import { State, StateConfigArray, getStateValue } from "./set.function"
 
@@ -66,7 +66,8 @@ function triggerStateUpdate(
   // send the oldest state changes into the newest
   updateState(oldState, newest)
   
-  tagSupport.render(
+  renderTagSupport(
+    tagSupport,
     false,
     // tagSupport,
     // tagSupport.subject
@@ -78,10 +79,9 @@ function triggerStateUpdate(
       // send the oldest state changes into the newest
       updateState(oldState, newest)
 
-      tagSupport.render(
+      renderTagSupport(
+        tagSupport,
         false,
-        // tagSupport,
-        // tagSupport.subject
       )
     })
   }

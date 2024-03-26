@@ -58,6 +58,7 @@ export function renderWithSupport(
   ownerTag?: Tag,
 ) {
   const wrapTagSupport = tagSupport // this.tagSupport
+  // const wrapTagSupport = existingTag?.tagSupport.templater.global.newest?.tagSupport || tagSupport
   // this.tagSupport = wrapTagSupport
 
   /* BEFORE RENDER */
@@ -74,6 +75,8 @@ export function renderWithSupport(
 
         wrapTagSupport: wrapTagSupport.templater.wrapper.original,
         wrapState: wrapTagSupport.memory.state.newest,
+        ttt: tagSupport.templater.props,
+        newestProps: existingTag.tagSupport.templater.global.newest?.tagSupport.templater.props,
       })
       wrapTagSupport.memory.state.newest = [...existingTag.tagSupport.memory.state.newest]
       // ??? - new
