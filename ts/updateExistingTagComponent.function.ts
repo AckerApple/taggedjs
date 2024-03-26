@@ -1,26 +1,26 @@
-import { TagSubject, setValueRedraw } from './Tag.utils'
-import { deepClone } from './deepFunctions'
-import { TemplateRedraw } from './templater.utils'
-import { isTagInstance } from './isInstance'
+import { TagSubject } from './Tag.utils'
+import { TemplaterResult } from './TemplaterResult.class'
 import { Tag } from './Tag.class'
 import { hasTagSupportChanged } from './hasTagSupportChanged.function'
 import { destroyTagMemory } from './checkDestroyPrevious.function'
-import { isLikeTags } from './isLikeTags.function'
+import { TagSupport } from './TagSupport.class'
+import { processSubjectComponent } from './processSubjectComponent.function'
+import { State } from './set.function'
 
 export function updateExistingTagComponent(
   ownerTag: Tag,
-  tempResult: TemplateRedraw,
-  existingSubject: TagSubject,
+  tempResult: TemplaterResult,
+  subject: TagSubject,
+  insertBefore: Element | Text,
 ): void {
-  let existingTag: Tag | undefined = existingSubject.tag
-  
-  //const template = existingSubject.template
-  const insertBefore = existingTag.tagSupport.templater.insertBefore
-
-  // tag existingTag
+  let existingTag: Tag | undefined = subject.tag
   const oldWrapper = existingTag.tagSupport.templater.wrapper
   const newWrapper = tempResult.wrapper
   let isSameTag = false
+
+  if(tempResult.global.oldest && !tempResult.global.oldest.hasLiveElements) {
+    throw new Error('88893434')
+  }
   
   if(oldWrapper && newWrapper) {
     const oldFunction = oldWrapper.original
@@ -28,54 +28,214 @@ export function updateExistingTagComponent(
     isSameTag = oldFunction === newFunction
   }
 
-  const latestProps = tempResult.tagSupport.propsConfig.latest
-  const oldTagSetup = existingTag.tagSupport
-  oldTagSetup.propsConfig.latest = latestProps
+  const oldTagSupport = existingTag.tagSupport
+  const oldGlobal = oldTagSupport.templater.global
+  const globalInsert = oldGlobal.insertBefore
+  const oldInsertBefore = globalInsert?.parentNode ? globalInsert : insertBefore
+
+  if(!oldInsertBefore.parentNode) {
+    throw new Error('stop here no parent node update existing tag')
+  }
 
   if(!isSameTag) {
-    destroyTagMemory(existingTag, existingSubject)
+    destroyTagMemory(oldTagSupport.templater.global.oldest as Tag, subject)
+    processSubjectComponent(tempResult, subject, oldInsertBefore, ownerTag, {
+      forceElement: false,
+      counts: {added: 0, removed: 0},
+    })
+    return
   } else {
-    const subjectTagSupport = existingTag.tagSupport
+    // const subjectTagSupport = existingTag.tagSupport
     // old props may have changed, reclone first
-
-    let oldCloneProps = subjectTagSupport.propsConfig.clonedProps
+    
+    /*
     const newProps = subjectTagSupport.propsConfig.latest
-
+    let oldCloneProps = subjectTagSupport.propsConfig.clonedProps
     // if the new props are NOT HTML children, then clone the props for later render cycle comparing
     if(!isTagInstance(newProps)) {
       oldCloneProps = deepClone( newProps )
     }
+    */
+
+    if(!tempResult.tagSupport) {
+      tempResult.tagSupport = new TagSupport(
+        oldTagSupport.ownerTagSupport,
+        tempResult,
+        subject,
+      )
+    }
+
 
     const newTagSupport = tempResult.tagSupport
-    const hasChanged = hasTagSupportChanged(oldTagSetup, newTagSupport)
+
+    /*
+    const hasStateChanged = checkStateChanged(oldTagSupport.memory.state)
+    if(hasStateChanged) {
+      console.log('support changed!!!!')
+    }
+    */
+    // const hasChanged = hasStateChanged || hasTagSupportChanged(oldTagSupport, newTagSupport, tempResult)
+    const hasChanged = hasTagSupportChanged(oldTagSupport, newTagSupport, tempResult)
     if(!hasChanged) {
+      console.log('!hasChanged', {
+        original: tempResult.wrapper.original,
+        old: oldTagSupport.propsConfig.latest,
+        new: newTagSupport.propsConfig.latest,
+        tempProps: tempResult.props,
+        equal: oldTagSupport.propsConfig.latest == newTagSupport.propsConfig.latest,
+        state: newTagSupport.memory.state.newest,
+        oldState: oldTagSupport.memory.state.newest,
+      })
+
+      const newTag = tempResult.tagSupport.render(
+        false,
+        // oldTagSupport,
+        // subject,
+      )
+
+      const oldTag = oldGlobal.oldest as Tag
+      oldTag.updateByTag(newTag)
+    
       return // its the same tag component
     }
   }
 
-  setValueRedraw(tempResult, existingSubject, ownerTag)
+  // setValueRedraw(tempResult, subject, ownerTag)
 
-  oldTagSetup.templater = tempResult
+  // ???
+  // oldTagSupport.templater = tempResult
+    
+  const oldestTag = tempResult.global.oldest as Tag // oldTagSupport.oldest as Tag // existingTag
+  const previous = tempResult.global.newest as Tag
+
+  if(!previous || !oldestTag) {
+    throw new Error('how?')
+  }
+
+  console.log('updateExistingTagComponent.function.ts - start', {
+    original: tempResult.wrapper.original,
+    props: tempResult.props,
+    oldProps: subject.tag.tagSupport.templater.props,
+    oldestProps: subject.tag.tagSupport.templater.global.oldest?.tagSupport.templater.props,
+    
+    previousState: previous.tagSupport.memory.state.newest,
+    newestState: tempResult.tagSupport.memory.state.newest,
+    olderState: tempResult.tagSupport.subject.tag.tagSupport.memory.state.newest,
+  })
+  const newTag = tempResult.tagSupport.render(
+    false,
+    // oldTagSupport,
+    // subject,
+  )
+
+  const hasOldest = newTag.tagSupport.templater.global.oldest ? true : false
+
+  console.log('updateExistingTagComponent.function.ts - done', {
+    original: tempResult.wrapper.original,
+    props: tempResult.props,
+    oldProps: subject.tag.tagSupport.templater.props,
+    oldestProps: subject.tag.tagSupport.templater.global.oldest?.tagSupport.templater.props,
+    hasOldest,
+  })
+
+  if(!hasOldest) {
+    newTag.buildBeforeElement(oldInsertBefore, {
+      forceElement: true,
+      counts: {added: 0, removed: 0}, test: false,
+    })
+
+    newTag.tagSupport.templater.global.oldest = newTag
+    newTag.tagSupport.templater.global.newest = newTag
+    oldTagSupport.templater.global.oldest = newTag
+    oldTagSupport.templater.global.newest = newTag
+
+    if(!newTag.tagSupport.templater.global.oldest) {
+      throw new Error('maybe 5')
+    }
+
+    subject.tag = newTag
+
+    oldTagSupport.templater.global.newest = newTag
+    // ???
+    // oldTagSupport.propsConfig = {...tempResult.tagSupport.propsConfig}
   
-  const newTag = tempResult.redraw() as Tag
+    return
+  }
+
+  // const newTag = tempResult.newest as Tag
+
+  if(previous && !oldestTag) {
+    throw new Error('bad elders')
+  }
+
   // detect if both the function is the same and the return is the same
-  const isLikeTag = isSameTag && existingTag.isLikeTag(newTag)
+  const isLikeTag = isSameTag && previous.isLikeTag(newTag)
+
+  if(previous && !oldestTag) {
+    throw new Error('bad elders')
+  }
 
   if(isLikeTag) {
-    existingTag.updateByTag(newTag)
+    if(!newTag.tagSupport.templater.global.oldest) {
+      throw new Error('maybe 6')
+    }
+
+    subject.tag = newTag
+    // existingTag.updateByTag(newTag)
+    oldestTag.updateByTag(newTag) // the oldest tag has element references
   } else {
-    existingSubject.tagSupport = newTag.tagSupport
-    existingSubject.tag = newTag    
-    oldTagSetup.oldest = newTag
-    
     // Although function looked the same it returned a different html result
     if(isSameTag) {
-      existingTag.destroy()
+      destroyTagMemory(existingTag, subject)
+    }
+
+    // oldTagSupport.oldest = newTag
+    if(!newTag.tagSupport.templater.global.oldest) {
+      throw new Error('maybe 7')
+    }
+
+    subject.tag = newTag
+  }
+
+  if(!oldTagSupport.templater.global.oldest) {
+    newTag.buildBeforeElement(oldTagSupport.templater.global.insertBefore as Element, {
+      forceElement: true,
+      counts: {added: 0, removed: 0}, test:false,
+    })
+
+    newTag.tagSupport.templater.global.oldest = newTag
+    oldTagSupport.templater.global.oldest = newTag
+    newTag.tagSupport.templater.global.newest = newTag
+    oldTagSupport.templater.global.newest = newTag
+
+    if(!newTag.tagSupport.templater.global.oldest) {
+      throw new Error('maybe 8')
+    }
+
+    subject.tag = newTag
+
+    if(!newTag.hasLiveElements) {
+      throw new Error('55555')
     }
   }
-  
-  oldTagSetup.newest = newTag
-  oldTagSetup.propsConfig = {...tempResult.tagSupport.propsConfig}
+
+  oldTagSupport.templater.global.newest = newTag
+  // ???
+  // oldTagSupport.propsConfig = {...tempResult.tagSupport.propsConfig}
 
   return
+}
+
+function checkStateChanged(state: State) {
+  return !state.newest.every(state => {
+    const lastValue = state.lastValue
+    const nowValue = state.get()
+    const matched = lastValue === nowValue
+
+    if(matched) {
+      return true
+    }
+
+    return false
+  })
 }

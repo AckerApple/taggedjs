@@ -1,9 +1,12 @@
-import { TagSupport } from './TagSupport.class'
+import { BaseTagSupport } from './TagSupport.class'
 import { runAfterRender, runBeforeRender } from './tagRunner'
-import { TemplaterResult } from './templater.utils'
+import { TemplaterResult } from './TemplaterResult.class'
 import { Tag } from './Tag.class'
 import { TagComponent } from './tag'
 import { renderExistingTag } from './renderExistingTag.function'
+import { Props } from './Props'
+import { ValueSubject } from './ValueSubject'
+import { TagSubject } from './Tag.utils'
 
 const appElements: {tag: Tag, element: Element}[] = []
 
@@ -27,8 +30,8 @@ export function tagElement(
   const result = applyTagUpdater(wrapper)
   const {tag} = result
 
+  // TODO: is the below needed?
   tag.appElement = element
-  tag.tagSupport.oldest = tag
 
   addAppTagRender(tag.tagSupport, tag)
     
@@ -38,6 +41,13 @@ export function tagElement(
   element.appendChild(templateElm)
   
   tag.buildBeforeElement(templateElm)
+
+  wrapper.global.oldest = tag
+  wrapper.global.newest = tag
+
+  if(!tag.hasLiveElements) {
+    throw new Error('x')
+  }
 
   ;(element as any).setUse = (app as any).original.setUse
 
@@ -49,11 +59,18 @@ export function tagElement(
 export function applyTagUpdater(
   wrapper: TemplaterResult,
 ) {
-  const tagSupport = wrapper.tagSupport
+  const subject = new ValueSubject<Tag>({} as Tag) as unknown as TagSubject
+  const tagSupport = new BaseTagSupport(wrapper, subject)
+  wrapper.tagSupport = tagSupport
   runBeforeRender(tagSupport, undefined as any as Tag)
 
   // Call the apps function for our tag templater
-  const tag = wrapper.wrapper(tagSupport)
+  const tag = wrapper.wrapper(
+    tagSupport,
+    subject,
+  )
+  // wrapper.global.oldest = tag
+  // wrapper.global.newest = tag
   runAfterRender(tagSupport, tag)
 
   return { tag, tagSupport }
@@ -61,23 +78,18 @@ export function applyTagUpdater(
 
 /** Overwrites arguments.tagSupport.mutatingRender */
 export function addAppTagRender(
-  tagSupport: TagSupport,
+  tagSupport: BaseTagSupport,
   tag: Tag,
-) {
-  tagSupport.templater.redraw = () => {
-    const existingTag = tag
-    const {retag} = tagSupport.templater.renderWithSupport(
+) {  
+  tagSupport.render = () => {    
+    const result = renderExistingTag(
+      tag,
+      tagSupport.templater,
       tagSupport,
-      existingTag, // newest
-      {} as any, // ownerTag,
+      new ValueSubject<Tag>({} as Tag) as unknown as TagSubject,
+      {} as unknown as Tag, // ownerTag,
     )
-
-    tag.updateByTag(retag)
-    return retag
-  }
-  
-  tagSupport.mutatingRender = () => {
-    renderExistingTag(tag, tagSupport.templater, tagSupport)
-    return tag
+    
+    return result.redraw
   }
 }

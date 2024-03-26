@@ -1,19 +1,23 @@
 import { Props } from "./Props"
-import { TagSupport } from "./TagSupport.class"
+import { BaseTagSupport } from "./TagSupport.class"
+import { TemplaterResult } from "./TemplaterResult.class"
 import { deepEqual } from "./deepFunctions"
 
 export function hasTagSupportChanged(
-  oldTagSupport: TagSupport,
-  newTagSupport: TagSupport,
+  oldTagSupport: BaseTagSupport,
+  newTagSupport: BaseTagSupport,
+  newTemplater: TemplaterResult,
 ) {
-  if(oldTagSupport === newTagSupport) {
-    throw new Error('something here')
+  const sameSupport = oldTagSupport === newTagSupport
+  const samePropConfig = oldTagSupport.propsConfig === newTagSupport.propsConfig
+  // const sameProps = oldTagSupport.propsConfig.latest === newTagSupport.propsConfig.latest
+  if(sameSupport || samePropConfig) {
+    throw new Error('something here - 22')
   }
-
-  const oldProps = oldTagSupport.propsConfig.latest
-  const latestProps = newTagSupport.propsConfig.latest
+  
+  const latestProps = newTemplater.props // newTagSupport.propsConfig.latest
   const oldClonedProps = oldTagSupport.propsConfig.latestCloned
-  const propsChanged = hasPropChanges(latestProps, oldClonedProps, oldProps)
+  const propsChanged = hasPropChanges(latestProps, oldClonedProps)
 
   // if no changes detected, no need to continue to rendering further tags
   if(propsChanged) {
@@ -29,14 +33,14 @@ export function hasTagSupportChanged(
 export function hasPropChanges(
   props: Props, // natural props
   pastCloneProps: Props, // previously cloned props
-  compareToProps: Props, // new props NOT cloned props
+  // newTemplater: TemplaterResult,
 ) {
+  /*
   const isCommonEqual = props === undefined && props === compareToProps
-
   if(isCommonEqual) {
     return false
   }
-  
+  */
   let castedProps: Props = props
   let castedPastProps: Props = pastCloneProps
 
@@ -94,8 +98,8 @@ export function hasPropChanges(
 }
 
 export function hasKidsChanged(
-  oldTagSupport: TagSupport,
-  newTagSupport: TagSupport,
+  oldTagSupport: BaseTagSupport,
+  newTagSupport: BaseTagSupport,
 ) {
   const oldCloneKidValues = oldTagSupport.propsConfig.lastClonedKidValues
   const newClonedKidValues = newTagSupport.propsConfig.lastClonedKidValues

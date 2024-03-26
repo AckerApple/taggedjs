@@ -1,5 +1,4 @@
 import { TagSupport } from './TagSupport.class'
-import { Provider } from './providers'
 import { Subscription } from './Subject'
 import { runBeforeDestroy } from './tagRunner'
 import { buildClones } from './render'
@@ -7,14 +6,14 @@ import { interpolateElement, interpolateString } from './interpolateElement'
 import { Counts, Template, afterElmBuild, subscribeToTemplate } from './interpolateTemplate'
 import { State } from './set.function'
 import { elementDestroyCheck } from './elementDestroyCheck.function'
-import { updateExistingValue } from './updateExistingValue.function'
 import { InterpolatedTemplates } from './interpolations'
 import { processNewValue } from './processNewValue.function'
 import { InterpolateSubject } from './processSubjectValue.function'
 import { Clones } from './Clones.type'
-import { checkDestroyPrevious } from './checkDestroyPrevious.function'
 import { TagSubject } from './Tag.utils'
 import { TagArraySubject } from './processTagArray'
+import { isSubjectInstance, isTagComponent } from './isInstance'
+import { isLikeTags } from './isLikeTags.function'
 
 export const variablePrefix = '__tagvar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -25,10 +24,9 @@ export const escapeSearch = new RegExp(escapeVariable, 'g')
 export type Context = {
   [index: string]: InterpolateSubject // ValueSubject<unknown>
 }
-export type TagMemory = Record<string, any> & {
-  context: Context
+export type TagMemory = {
+  // context: Context
   state: State
-  providers: Provider[]
 }
 
 export interface TagTemplate {
@@ -45,12 +43,14 @@ export class ArrayValueNeverSet {
 
 export class Tag {
   isTag = true
+  hasLiveElements = false
 
   clones: (Element | Text | ChildNode)[] = [] // elements on document. Needed at destroy process to know what to destroy
   cloneSubs: Subscription[] = [] // subscriptions created by clones
-  children: Tag[] = [] // tags on me
+  childTags: Tag[] = [] // tags on me
 
   tagSupport!: TagSupport
+  lastTemplateString: string | undefined = undefined // used to compare templates for updates
   
   // only present when a child of a tag
   ownerTag?: Tag
@@ -77,6 +77,10 @@ export class Tag {
       byParent: false, // Only destroy clones of direct children
     }
   ) {
+    if(!this.hasLiveElements) {
+      throw new Error('destroying wrong tag')
+    }
+
     // the isComponent check maybe able to be removed
     const isComponent = this.tagSupport ? true : false    
     if(isComponent) {
@@ -86,7 +90,7 @@ export class Tag {
     this.destroySubscriptions()
 
     if(this.ownerTag) {
-      this.ownerTag.children = this.ownerTag.children.filter(child => child !== this)
+      this.ownerTag.childTags = this.ownerTag.childTags.filter(child => child !== this)
     }
 
     if( !options.byParent ) {
@@ -100,9 +104,13 @@ export class Tag {
       this.destroyClones()
     }
 
-    const promises = this.children.map(kid => kid.destroy({stagger:0, byParent: true}))
-    this.children.length = 0
+    const promises = this.childTags.map(kid => kid.destroy({stagger:0, byParent: true}))
+    this.childTags.length = 0
     await Promise.all(promises)
+
+    this.hasLiveElements = false
+    delete this.tagSupport.templater.global.oldest
+    delete this.tagSupport.templater.global.newest
 
     return options.stagger
   }
@@ -162,21 +170,6 @@ export class Tag {
     return promise
   }
 
-  updateByTag(tag: Tag) {
-    this.updateConfig(tag.strings, tag.values)
-    this.tagSupport.templater = tag.tagSupport.templater
-    this.tagSupport.propsConfig = {...tag.tagSupport.propsConfig}
-    this.tagSupport.newest = tag
-    this.tagSupport.templater.newest = tag
-  }
-
-  lastTemplateString: string | undefined = undefined // used to compare templates for updates
-  
-  updateConfig(strings: string[], values: any[]) {
-    this.strings = strings
-    this.updateValues(values)
-  }
-
   getTemplate(): TagTemplate {
     const string = this.strings.map((string, index) => {
       const safeString = string.replace(prefixSearch, escapeVariable)
@@ -194,11 +187,12 @@ export class Tag {
       string: interpolation.string,
       strings: this.strings,
       values: this.values,
-      context: this.tagSupport?.memory.context || {},
+      context: this.tagSupport.templater.global.context || {},
     }
   }
 
   isLikeTag(tag: Tag) {
+    return isLikeTags(this, tag)
     const {string} = tag.getTemplate()
 
     // TODO: most likely remove?
@@ -234,50 +228,88 @@ export class Tag {
     return false
   }
 
+  updateByTag(tag: Tag) {
+    if(!this.tagSupport.templater.global.oldest) {
+      throw new Error('no oldest here')
+    }
+
+    if(!this.hasLiveElements) {
+      throw new Error('trying to update a tag with no elements on stage')
+    }
+
+    // ???
+    // this.tagSupport.propsConfig = {...tag.tagSupport.propsConfig}
+    this.tagSupport.templater.global.newest = tag
+
+    if(!this.tagSupport.templater.global.context) {
+      throw new Error('issue back here')
+    }
+
+    this.updateConfig(tag.strings, tag.values)
+  }
+  
+  updateConfig(strings: string[], values: any[]) {
+    this.strings = strings
+    this.updateValues(values)
+  }
+
   update() {
-    return this.updateContext( this.tagSupport.memory.context )
+    return this.updateContext( this.tagSupport.templater.global.context )
   }
 
   updateValues(values: any[]) {
     this.values = values
-    return this.updateContext( this.tagSupport.memory.context )
+    return this.updateContext( this.tagSupport.templater.global.context )
   }
 
   updateContext(context: Context) {
-    const seenContext: string[] = []
-
     this.strings.map((_string, index) => {
       const variableName = variablePrefix + index
       const hasValue = this.values.length > index
       const value = this.values[index]
 
       // is something already there?
-      const existing = variableName in context
-      seenContext.push(variableName)
+      const exists = variableName in context
 
-      if(existing) {
-        const existing = context[variableName]
-        return updateExistingValue(existing, value, this)
-      }
+      if(exists) {
+        const subject = context[variableName]
+        const tag = (subject as any).tag as Tag
 
-      // 🆕 First time values below
-      processNewValue(
-        hasValue,
-        value,
-        context,
-        variableName,
-        this,
-      )      
-    })
+        if(tag) {
+          const oldWrap = tag.tagSupport.templater.wrapper // tag versus component
+          if(oldWrap && isTagComponent(value)) {
+            const oldValueFn = oldWrap.original
+            const newValueFn = value.wrapper?.original
+            const fnMatched = oldValueFn === newValueFn
+            if(fnMatched) {
+              // ???
+              // console.log('🍎 global disconnect')
+              // value.global = tag.tagSupport.templater.global
+              value.global = tag.tagSupport.templater.global
+            }
+          }
+        }
 
-    // Support reduction in context
-    Object.entries(context).forEach(([key, subject]) => {
-      if(seenContext.includes(key)) {
+        // return updateExistingValue(subject, value, this)
+        if(isSubjectInstance(value)) {
+          // value.set(value.value)
+          return
+        }
+
+        subject.set(value)
         return
       }
 
-      throw new Error('we here')
-      const destroyed = checkDestroyPrevious(subject, undefined as any)
+      if(!hasValue) {
+        return
+      }
+
+      // 🆕 First time values below
+      context[variableName] = processNewValue(
+        hasValue,
+        value,
+        this,
+      )
     })
 
     return context
@@ -296,7 +328,7 @@ export class Tag {
   /** Used during HMR only where static content itself could have been edited */
   rebuild() {
     // const insertBefore = this.insertBefore
-    const insertBefore = this.tagSupport.templater.insertBefore
+    const insertBefore = this.tagSupport.templater.global.insertBefore
 
     if(!insertBefore) {
       const err = new Error('Cannot rebuild. Previous insertBefore element is not defined on tag')
@@ -306,30 +338,46 @@ export class Tag {
 
     this.buildBeforeElement(insertBefore, {
       forceElement: true,
-      counts: {added: 0, removed: 0},
+      counts: {added: 0, removed: 0}, test: false,
     })
   }
 
   buildBeforeElement(
     insertBefore: Element | Text,
-    options: ElementBuildOptions = {
+    options: ElementBuildOptions & {test:boolean} = {
       forceElement: false,
       counts: {added:0, removed: 0},
+      test: false
     },
   ) {
+    if(!insertBefore.parentNode) {
+      throw new Error('no parent before removing clones')
+    }
+
+    // remove old clones
+    if(this.clones.length) {
+      this.clones.forEach(clone => this.checkCloneRemoval(clone, 0))
+    }
+
     // this.insertBefore = insertBefore
-    this.tagSupport.templater.insertBefore = insertBefore
+    this.tagSupport.templater.global.insertBefore = insertBefore
     
+    // const context = this.tagSupport.memory.context // this.update()
     const context = this.update()
     const template = this.getTemplate()
-    
+
+
+    if(!insertBefore.parentNode) {
+      throw new Error('no parent before building tag')
+    }
+
     const elementContainer = document.createElement('div')
     elementContainer.id = 'tag-temp-holder'
     // render content with a first child that we can know is our first element
     elementContainer.innerHTML = `<template id="temp-template-tag-wrap">${template.string}</template>`
 
     // Search/replace innerHTML variables but don't interpolate tag components just yet
-    const {clones, tagComponents} = interpolateElement(
+    const {tagComponents} = interpolateElement(
       elementContainer,
       context,
       template,
@@ -337,14 +385,14 @@ export class Tag {
       {
         forceElement: options.forceElement,
         counts: options.counts
-      }
+      },
+      options.test,
     )
 
-    // remove old clones
-    if(this.clones.length) {
-      this.clones.forEach(clone => this.checkCloneRemoval(clone, 0))
+    if(!insertBefore.parentNode) {
+      throw new Error('no parent building tag')
     }
-   
+
     afterInterpolateElement(
       elementContainer,
       insertBefore,
@@ -366,14 +414,21 @@ export class Tag {
         tagComponent.subject as TagSubject | TagArraySubject,
         tagComponent.ownerTag,
         options.counts,
-        {isForceElement}
+        {isForceElement},
+        context,
+        tagComponent.variableName,
+        options.test
       )
+
+      if(!insertBefore.parentNode) {
+        throw new Error('no parent building tag components')
+      }
 
       afterInterpolateElement(
         elementContainer,
         insertBefore,
         this,
-        preClones,
+        [], // preClones,
         context,
         options,
       )
@@ -385,6 +440,10 @@ export class Tag {
         }
         */
     })
+
+    this.tagSupport.templater.global.oldest = this
+    this.tagSupport.templater.global.newest = this
+    this.hasLiveElements = true
   }
 }
 
@@ -396,6 +455,7 @@ function afterInterpolateElement(
   context: Context,
   options: ElementBuildOptions,
 ) {
+
   const clones = buildClones(container, insertBefore)
 
   ownerTag.clones.push( ...clones )

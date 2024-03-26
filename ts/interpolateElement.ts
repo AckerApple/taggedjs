@@ -18,6 +18,7 @@ export function interpolateElement(
   interpolatedTemplates: TagTemplate,
   tagOwner: Tag,
   options: InterpolateOptions,
+  test = false
 ): InterpolatedContentTemplates {
   const clones: Clones = []
   const tagComponents: InterpolateComponentResult[] = []
@@ -26,7 +27,9 @@ export function interpolateElement(
   const children = template.content.children
 
   if(result.keys.length) {
-    const {clones: nextClones, tagComponents: nextTagComponents} = interpolateContentTemplates(container, context, tagOwner, options, children)
+    const {clones: nextClones, tagComponents: nextTagComponents} = interpolateContentTemplates(
+      container, context, tagOwner, options, children
+    )
     clones.push( ...nextClones )
     tagComponents.push( ...nextTagComponents )
   }
@@ -42,7 +45,7 @@ function processChildrenAttributes(
   context: Context,
   ownerTag: Tag,
 ) {
-  new Array(...children as any).forEach(child => {
+  new Array(...children).forEach(child => {
     interpolateAttributes(child, context, ownerTag)
 
     if(child.children) {

@@ -5,14 +5,13 @@ export type RegularValue = string | number | undefined | boolean
 
 export function processRegularValue(
   value: RegularValue,
-  result: DisplaySubject, // could be tag via result.tag
+  subject: DisplaySubject, // could be tag via subject.tag
   template: Element | Text | Template, // <template end interpolate /> (will be removed)
 ) {
-  result.template = template
+  subject.template = template
+  const before = subject.clone || template // Either the template is on the doc OR its the first element we last put on doc
 
-  const before = result.clone || template // Either the template is on the doc OR its the first element we last put on doc
-
-  result.lastValue = value
+  subject.lastValue = value
   
   // Processing of regular values
   const clone = updateBetweenTemplates(
@@ -20,7 +19,7 @@ export function processRegularValue(
     before, // this will be removed
   )
 
-  result.clone = clone // remember single element put down, for future updates
+  subject.clone = clone // remember single element put down, for future updates
 
   return []
 }

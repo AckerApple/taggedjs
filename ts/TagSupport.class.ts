@@ -2,11 +2,16 @@ import { Props } from './Props'
 import { Tag, TagMemory } from './Tag.class'
 import { deepClone } from './deepFunctions'
 import { isTagArray, isTagComponent, isTagInstance } from './isInstance'
-import { StateConfigArray, getStateValue } from './set.function'
+import { StateConfigArray } from './set.function'
 import { TagChildren } from './tag'
-import { TemplaterResult, alterProps } from './templater.utils'
+import { TemplaterResult } from './TemplaterResult.class'
+import { alterProps } from './alterProps.function'
+import { TagSubject } from './Tag.utils'
+import { renderExistingTag } from './renderExistingTag.function'
 
-export class TagSupport {
+export class BaseTagSupport {
+  isApp = true
+
   propsConfig: {
     latest: Props // new props NOT cloned props
     // props from **constructor** are converted for comparing over renders
@@ -16,27 +21,20 @@ export class TagSupport {
   }
 
   memory: TagMemory = {
-    context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+    // context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
     state: {
       newest: [] as StateConfigArray,
     },
-    providers: [],
-    /** Indicator of re-rending. Saves from double rending something already rendered */
-    renderCount: 0,
-  }
-
-  updateState() {
-    this.memory.state.newest.forEach(newest => {
-      newest.lastValue = getStateValue(newest)
-    })
   }
 
   constructor(
     public templater: TemplaterResult,
-    public children: TagChildren, // children tags passed in as arguments
-    props?: Props,  // natural props
-  ) {
-    const latestCloned = alterProps(props, templater)
+    public subject: TagSubject,
+    ) {
+    const children: TagChildren = this.templater.children // children tags passed in as arguments
+    const props: Props = this.templater.props  // natural props
+
+    const latestCloned = deepClone(props) // alterProps(props, templater)
     this.propsConfig = {
       latest: props,
       latestCloned, // assume its HTML children and then detect
@@ -54,20 +52,58 @@ export class TagSupport {
     }
   }
 
-  // TODO: these below may not be in use
-  oldest?: Tag
-  newest?: Tag
+  render(
+    renderUp: boolean
+    // oldTagSetup: BaseTagSupport,
+    // subject: TagSubject,
+  ): Tag {
+    const oldTagSetup = this
+    const subject = this.subject
 
-  mutatingRender(): Tag {
-    const message = 'Tag function "render()" was called in sync but can only be called async'
-    console.error(message, {tagSupport: this})
-    throw new Error(message)
-  } // loaded later and only callable async
+    const useTemplater = this.templater // oldTagSetup.templater // templater
+    const useTagSupport = oldTagSetup.templater.global.newest?.tagSupport as TagSupport // oldTagSetup
+    const templater = this.templater
+    // const oldest = templater.global.oldest as Tag
 
-  render () {
-    ++this.memory.renderCount
-    return this.mutatingRender()
-  } // ensure this function still works even during deconstructing
+    if(!templater.global.oldest) {
+      throw new Error('888')
+    }
+
+    const exit = renderExistingTag(
+      // templater.global.newest as Tag,
+      templater.global.oldest as Tag,
+      useTemplater,
+      useTagSupport,
+      subject,
+      oldTagSetup.templater.global.oldest as Tag,
+    )
+
+    const tag = exit.redraw
+
+    // oldest.updateByTag(exit.redraw)
+
+    // only update and no more?
+    if(exit.remit) {
+      // console.log('-- update tag', tag.tagSupport.templater.wrapper.original)
+      // oldest.updateByTag(exit.redraw)
+      return tag
+    }
+    
+    // Have owner re-render
+    if(renderUp && tag.ownerTag) {    
+      const ownerTagSupport = tag.ownerTag.tagSupport
+      console.log('child is asking to render owner - render function')
+      ownerTagSupport.render(
+        true,
+        // ownerTagSupport,
+        // ownerTagSupport.subject
+      )
+  
+      return tag
+    }
+
+    return tag
+  }
 }
 
 function cloneValueArray<T>(values: (T | Tag | Tag[])[]): T[] {
@@ -80,7 +116,7 @@ function cloneValueArray<T>(values: (T | Tag | Tag[])[]): T[] {
 
     if(isTagComponent(tag)) {
       const tagComponent = tag as unknown as TemplaterResult
-      return deepClone(tagComponent.tagSupport.propsConfig.latestCloned)
+      return deepClone(tagComponent.props)
     }
 
     if(isTagArray(tag)) {
@@ -89,4 +125,16 @@ function cloneValueArray<T>(values: (T | Tag | Tag[])[]): T[] {
 
     return deepClone(value)
   })
+}
+
+export class TagSupport extends BaseTagSupport {
+  isApp = false
+
+  constructor(
+    public ownerTagSupport: TagSupport,
+    public templater: TemplaterResult,
+    public subject: TagSubject,
+  ) {
+    super(templater, subject)
+  }
 }

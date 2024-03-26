@@ -1,9 +1,9 @@
-import { TagSupport } from "./TagSupport.class"
+import { BaseTagSupport } from "./TagSupport.class"
 import { setUse } from "./setUse.function"
 
 export type OnInitCallback = () => unknown
 
-function setCurrentTagSupport(support: TagSupport) {
+function setCurrentTagSupport(support: BaseTagSupport) {
   setUse.memory.initCurrentSupport = support
 }
 

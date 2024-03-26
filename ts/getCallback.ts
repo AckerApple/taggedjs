@@ -1,4 +1,4 @@
-import { TagSupport } from "./TagSupport.class"
+import { BaseTagSupport } from "./TagSupport.class"
 import { setUse } from "./setUse.function"
 import { State, StateConfigArray, getStateValue } from "./set.function"
 
@@ -9,8 +9,8 @@ export let getCallback = () => (callback: Callback) => (): void => {
 }
 
 setUse({
-  beforeRender: (tagSupport: TagSupport) => initMemory(tagSupport),
-  beforeRedraw: (tagSupport: TagSupport) => initMemory(tagSupport),
+  beforeRender: (tagSupport: BaseTagSupport) => initMemory(tagSupport),
+  beforeRedraw: (tagSupport: BaseTagSupport) => initMemory(tagSupport),
   // afterRender: (tagSupport: TagSupport) => {},
 })
 
@@ -33,7 +33,7 @@ function updateState(
 type Trigger = () => void
 type CallbackMaker = (callback: Callback) => Trigger
 
-function initMemory (tagSupport: TagSupport) {
+function initMemory (tagSupport: BaseTagSupport) {
   getCallback = () => {
     const oldState: StateConfigArray = setUse.memory.stateConfig.array
 
@@ -49,7 +49,7 @@ function initMemory (tagSupport: TagSupport) {
 }
 
 function triggerStateUpdate(
-  tagSupport: TagSupport,
+  tagSupport: BaseTagSupport,
   callback: Callback,
   oldState: StateConfigArray,
   ...args: any[]
@@ -66,7 +66,11 @@ function triggerStateUpdate(
   // send the oldest state changes into the newest
   updateState(oldState, newest)
   
-  tagSupport.render()        
+  tagSupport.render(
+    false,
+    // tagSupport,
+    // tagSupport.subject
+  )
   
   // TODO: turn back on below
   if(promise instanceof Promise) {
@@ -74,7 +78,11 @@ function triggerStateUpdate(
       // send the oldest state changes into the newest
       updateState(oldState, newest)
 
-      tagSupport.render()    
+      tagSupport.render(
+        false,
+        // tagSupport,
+        // tagSupport.subject
+      )
     })
   }
 }

@@ -2,6 +2,8 @@ import { inputAttribute } from './inputAttribute'
 import { isSubjectInstance } from './isInstance'
 import { Context, Tag } from './Tag.class'
 import { HowToSet } from './interpolateAttributes'
+import { getSubjectFunction } from './Tag.utils'
+import { bindSubjectCallback } from './bindSubjectCallback.function'
 
 const startRegX = /^\s*{__tagvar/
 const endRegX = /}\s*$/
@@ -148,6 +150,10 @@ function processNameValueAttr(
   if(isSubjectInstance(result)) {
     child.removeAttribute(attrName)
     const callback = (newAttrValue: any) => {
+      if(newAttrValue instanceof Function) {
+        newAttrValue = bindSubjectCallback(newAttrValue, ownerTag)
+      }
+      
       return processAttributeSubjectValue(
         newAttrValue,
         child,
@@ -179,13 +185,15 @@ function processAttributeSubjectValue(
   howToSet: HowToSet,
 ) {
   if(newAttrValue instanceof Function) {
-    ;(child as any)[attrName] = function(...args: any[]) {
+    const fun = function(...args: any[]) {
       const result = newAttrValue(child, args)
       return result
     }
 
     // access to original function
-    ;(child as any)[attrName].tagFunction = newAttrValue
+    fun.tagFunction = newAttrValue
+
+    ;(child as any)[attrName] = fun
 
     return
   }

@@ -1,10 +1,11 @@
 import { StateMismatchError } from './errors'
-import { TagSupport } from './TagSupport.class'
+import { BaseTagSupport } from './TagSupport.class'
 import { setUse } from './setUse.function'
 
 export type StateConfig<T> = (x: T) => [T, T]
 
 export type StateConfigItem<T> = {
+  get: () => T // TODO: only a convenience, not needed, remove
   callback?: StateConfig<T>
   lastValue?: T
   defaultValue?: T
@@ -14,8 +15,9 @@ export type StateConfigItem<T> = {
 export type StateConfigArray = StateConfigItem<any>[]
 
 export type Config = {
+  tagSupport: BaseTagSupport
   array: StateConfigArray // state memory on the first render
-  rearray: StateConfigArray // state memory to be used before the next render
+  rearray?: StateConfigArray // state memory to be used before the next render
 }
 
 export type State = {
@@ -28,52 +30,25 @@ export type State = {
 // TODO: rename
 setUse.memory.stateConfig = {
   array: [] as StateConfigArray, // state memory on the first render
-  rearray: [] as StateConfigArray, // state memory to be used before the next render
+  // rearray: [] as StateConfigArray, // state memory to be used before the next render
 } as Config
 
 export type GetSet<T> = (y: T) => [T, T]
 
-export function makeStateResult<T>(
-  initValue: T,
-  push: StateConfigItem<T>,
-) {
-  // return initValue
-  const result =  (y: any) => {
-    push.callback = y || (x => [initValue, initValue = x])
-
-    return initValue
-  }
-
-  return result
-}
-
-/*
-const waitingStates: (() => unknown)[] = []
-export function onNextStateOnly(callback: () => unknown) {
-  const config: Config = setUse.memory.stateConfig
-  
-  if(!config.rearray.length) {
-    callback()
-    return
-  }
-
-  waitingStates.push(callback)
-}
-*/
-
 setUse({
-  beforeRender: (tagSupport: TagSupport) => initState(tagSupport),
-  beforeRedraw: (tagSupport: TagSupport) => initState(tagSupport),
+  beforeRender: (tagSupport: BaseTagSupport) => initState(tagSupport),
+  beforeRedraw: (tagSupport: BaseTagSupport) => initState(tagSupport),
   afterRender: (
-    tagSupport: TagSupport,
+    tagSupport: BaseTagSupport,
     // tag: Tag,
   ) => {
     const state: State = tagSupport.memory.state
     const config: Config = setUse.memory.stateConfig
+    const rearray = config.rearray as unknown as State[]
     
-    if(config.rearray.length) {
-      if(config.rearray.length !== config.array.length) {
-        const message = `States lengths has changed ${config.rearray.length} !== ${config.array.length}. Typically occurs when a function is intended to be wrapped with a tag() call`
+    if(rearray.length) {
+      if(rearray.length !== config.array.length) {
+        const message = `States lengths has changed ${rearray.length} !== ${config.array.length}. Typically occurs when a function is intended to be wrapped with a tag() call`
         const details = {
           oldStates: config.array,
           newStates: config.rearray,
@@ -85,15 +60,11 @@ setUse({
       }
     }
     
-    config.rearray = [] // clean up any previous runs
+    delete config.rearray // clean up any previous runs
 
-    state.newest = [...config.array]
+    state.newest = config.array // [...config.array]
     
-    // config.array.length = 0
     config.array = []
-
-    // waitingStates.forEach(callback => callback())
-    // waitingStates.length = 0
   }
 })
 
@@ -123,23 +94,26 @@ export function getStateValue<T>(
     throw new Error(message)
   }
 
+  state.lastValue = oldValue
+
   return oldValue
 }
 
 export class StateEchoBack {}
 
 function initState(
-  tagSupport: TagSupport
+  tagSupport: BaseTagSupport
 ) {
   const state = tagSupport.memory.state as State
   const config: Config = setUse.memory.stateConfig
   
   // TODO: This guard may no longer be needed
-  if (config.rearray.length) {
-    const message = 'last array not cleared'
+  if (config.rearray) {
+    const message = 'last state not cleared. Possibly in the middle of rendering one component and another is trying to render'
     console.error(message, {
       config,
       component: tagSupport.templater?.wrapper.original,
+      wasInMiddleOf: config.tagSupport?.templater.wrapper.original,
       state,
       expectedClearArray: config.rearray,
     })
@@ -156,8 +130,11 @@ function initState(
   config.rearray = [] // .length = 0
 
   if(state?.newest.length) {
+    state.newest.map(state => getStateValue(state))
     config.rearray.push( ...state.newest )
   }
+
+  config.tagSupport = tagSupport
 }
 
 /** Used for variables that need to remain the same variable during render passes */
@@ -166,12 +143,14 @@ export function set <T>(
 ): T {
   const config: Config = setUse.memory.stateConfig
   let getSetMethod: StateConfig<T>
-  
-  const restate = config.rearray[config.array.length]
+  const rearray = config.rearray as StateConfigArray
+
+  const restate = rearray[config.array.length]
   if(restate) {
     let oldValue = getStateValue(restate) as T
     getSetMethod = ((x: T) => [oldValue, oldValue = x])
     const push: StateConfigItem<T> = {
+      get: () => getStateValue(push) as T,
       callback: getSetMethod,
       lastValue: oldValue,
       defaultValue: restate.defaultValue,
@@ -188,6 +167,7 @@ export function set <T>(
 
   getSetMethod = ((x: T) => [initValue, initValue = x])
   const push: StateConfigItem<T> = {
+    get: () => getStateValue(push) as T,
     callback: getSetMethod,
     lastValue: initValue,
     defaultValue: initValue,

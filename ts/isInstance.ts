@@ -1,6 +1,6 @@
 import { SubjectLike } from "./Subject"
 import { Tag } from "./Tag.class"
-import { TemplaterResult } from "./templater.utils"
+import { TemplaterResult } from "./TemplaterResult.class"
 
 export function isTagComponent(value?: TemplaterResult | unknown) {
   return (value as TemplaterResult)?.isTemplater === true

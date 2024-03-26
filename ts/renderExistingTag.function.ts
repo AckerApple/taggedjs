@@ -1,36 +1,84 @@
 import { Tag } from './Tag.class'
-import { TagSupport } from './TagSupport.class'
+import { BaseTagSupport } from './TagSupport.class'
 import { hasTagSupportChanged } from './hasTagSupportChanged.function'
 import { providersChangeCheck } from './provider.utils'
-import { TemplateRedraw, TemplaterResult } from './templater.utils'
+import { TemplaterResult } from './TemplaterResult.class'
+import { TagSubject, redrawTag } from './Tag.utils'
 
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(
-  tag: Tag,
+  oldestTag: Tag, // existing tag already there
   newTemplater: TemplaterResult,
-  tagSupport: TagSupport
-): boolean {
-  const preRenderCount = tagSupport.memory.renderCount
-  providersChangeCheck(tag)
+  tagSupport: BaseTagSupport,
+  subject: TagSubject,
+  ownerTag: Tag,
+): {redraw: Tag, remit: boolean} {
 
-  // When the providers were checked, a render to myself occurred and I do not need to re-render again
-  if(preRenderCount !== tagSupport.memory.renderCount) {
-    return true
+  if(subject.tag) {
+    console.log('already the same?', newTemplater.global === subject.tag?.tagSupport.templater.global)
+    newTemplater.global = subject.tag.tagSupport.templater.global
   }
 
-  const oldTagSupport = tag.tagSupport
+  if(!oldestTag.hasLiveElements) {
+    throw new Error('1080')
+  }
+
+  const preRenderCount = tagSupport.templater.global.renderCount
+  providersChangeCheck(oldestTag)
+
+  // When the providers were checked, a render to myself occurred and I do not need to re-render again
+  if(preRenderCount !== tagSupport.templater.global.renderCount) {
+    const redraw = tagSupport.templater.global.newest as Tag
+    oldestTag.updateByTag(redraw)
+
+    return {
+      remit: true,
+      redraw
+    }
+  }
+
+  const oldTagSupport = oldestTag.tagSupport
   const hasChanged = hasTagSupportChanged(
     oldTagSupport,
     newTemplater.tagSupport,
+    newTemplater,
   )
-  
-  const oldTemplater = tagSupport.templater as TemplateRedraw
-  tagSupport.newest = oldTemplater.redraw() // No change detected, just redraw me only
-  newTemplater.newest = tagSupport.newest
 
-  if(!hasChanged) {
-    return true
+  const oldTemplater = tagSupport.templater || newTemplater
+
+  const redraw = redrawTag(
+    subject,
+    newTemplater,
+    oldestTag.ownerTag as Tag, // subject.tag.ownerTag as Tag
+  )
+
+  const oldest = tagSupport.templater.global.oldest
+  /*
+  newTemplater.global.newest = redraw
+  redraw.tagSupport.templater.global.newest = redraw
+  redraw.tagSupport.templater.global.oldest = oldest
+  tagSupport.templater.global.newest = redraw
+  newTemplater.global.newest = redraw
+  */
+  
+  if(!redraw.tagSupport.templater.global.oldest) {
+    throw new Error('8888888 - 0')
   }
 
-  return false
+  if(!oldTemplater.global.oldest) {
+    throw new Error('8888888')
+  }
+
+
+  if(newTemplater.global.oldest && !newTemplater.global.oldest.hasLiveElements) {
+    throw new Error('7777')
+  }
+
+
+  if(!hasChanged) {
+    oldest?.updateByTag(redraw)
+    return {redraw, remit:true}
+  }
+
+  return {redraw, remit:false}
 }

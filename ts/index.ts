@@ -1,4 +1,4 @@
-import { redrawTag } from "./redrawTag.function"
+// import { redrawTag } from "./redrawTag.function"
 import { tagElement } from "./tagElement"
 
 export * from "./ElementTargetEvent.interface"
@@ -11,7 +11,7 @@ export * from "./isInstance"
 export * from "./ValueSubject"
 export * from "./watch.function"
 export * from "./TagSupport.class"
-export * from "./redrawTag.function"
+// export * from "./redrawTag.function"
 export * from "./interpolateElement"
 
 // TODO: export *
@@ -32,5 +32,6 @@ export { setUse } from "./setUse.function"
 /* end: hooks */
 
 export const hmr = {
-  tagElement, redrawTag
+  tagElement,
+  // redrawTag
 }

@@ -8,13 +8,6 @@ function howToSetAttribute(
   name: string,
   value: string
 ) {
-  /*
-  if(name === 'class'){
-    value.split(' ').forEach(className => child.classList.add(className))
-    return
-  }
-  */
-
   element.setAttribute(name, value)
 }
 

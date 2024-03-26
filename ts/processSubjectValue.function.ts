@@ -1,8 +1,7 @@
 import { processSubjectComponent } from './processSubjectComponent.function'
-import { processTagResult } from './processTagResult.function'
 import { isTagArray, isTagComponent, isTagInstance } from './isInstance'
 import { TagArraySubject, processTagArray } from './processTagArray'
-import { TemplaterResult } from './templater.utils'
+import { TemplaterResult } from './TemplaterResult.class'
 import { TagSupport } from './TagSupport.class'
 import { Clones } from './Clones.type'
 import { Tag } from './Tag.class'
@@ -11,6 +10,7 @@ import { DisplaySubject, TagSubject } from './Tag.utils'
 import { ValueSubject } from './ValueSubject'
 import { processRegularValue } from './processRegularValue.function'
 import { Callback } from './bindSubjectCallback.function'
+import { Props } from './Props'
 
 enum ValueTypes {
   tag = 'tag',
@@ -49,10 +49,11 @@ export type InterpolateSubject = TagArraySubject | TagSubject | DisplaySubject |
 
 export function processSubjectValue(
   value: any,
-  result: InterpolateSubject, // could be tag via result.tag
+  subject: InterpolateSubject, // could be tag via result.tag
   template: Element | Text | Template, // <template end interpolate /> (will be removed)
   ownerTag: Tag, // owner
   options: processOptions, // {added:0, removed:0}
+  test = false
 ): Clones {
   const valueType = getValueType(value)
   
@@ -60,7 +61,7 @@ export function processSubjectValue(
     case ValueTypes.tag:
       processTag(
         value,
-        result as TagSubject,
+        subject as TagSubject,
         template,
         ownerTag,
         options
@@ -68,56 +69,86 @@ export function processSubjectValue(
       return []
   
     case ValueTypes.tagArray:
-      return processTagArray(result as TagArraySubject, value, template, ownerTag, options)
+      return processTagArray(subject as TagArraySubject, value, template, ownerTag, options)
     
     case ValueTypes.tagComponent:
       processSubjectComponent(
         value,
-        result as TagSubject,
+        subject as TagSubject,
         template,
         ownerTag,
-        options
+        options,
       )
       return []
   }
 
   return processRegularValue(
     value,
-    result as DisplaySubject,
+    subject as DisplaySubject,
     template,
   )
 }
 
 /** Could be a regular tag or a component. Both are Tag.class */
 export function processTag(
-  value: any,
-  result: TagSubject, // could be tag via result.tag
-  template: Element | Text | Template, // <template end interpolate /> (will be removed)
+  tag: Tag,
+  subject: TagSubject, // could be tag via result.tag
+  insertBefore: Element | Text | Template, // <template end interpolate /> (will be removed)
   ownerTag: Tag, // owner
   options: processOptions, // {added:0, removed:0}
 ) {
   // first time seeing this tag?
-  if(!value.tagSupport) {
-    value.tagSupport = new TagSupport(
-      {} as TemplaterResult, // the template is provided via html`` call
-      new ValueSubject([]), // no children
+  if(!tag.tagSupport) {
+    if(!isTagInstance(tag)) {
+      throw new Error('issue non-tag here')
+    }
+
+    const fakeTemplater = {
+      global:{
+        providers: [],
+        context: {},
+      },
+      children: new ValueSubject([]), // no children
+      props: {} as Props,
+    } as unknown as TemplaterResult
+
+    tag.tagSupport = new TagSupport(
+      ownerTag.tagSupport,
+      fakeTemplater, // the template is provided via html`` call
+      subject,
     )
 
     // asking me to render will cause my parent to render
-    value.tagSupport.mutatingRender = () => {
-      ownerTag.tagSupport.render()
+    tag.tagSupport.render = () => {
+      console.log('ask owner to render ***', ownerTag.tagSupport.templater.wrapper.original)
+      ownerTag.tagSupport.render(
+        true,
+        // ownerTag.tagSupport,
+        // ownerTag.tagSupport.subject
+      )
+      return tag
     }
-    value.tagSupport.oldest = value.tagSupport.oldest || value
-    ownerTag.children.push(value as Tag)
+    ownerTag.childTags.push(tag as Tag)
   }
   
-  value.ownerTag = ownerTag
-  result.template = template
+  tag.ownerTag = ownerTag
+  subject.template = insertBefore
 
-  processTagResult(
-    value,
-    result, // Function will attach result.tag
-    template,
-    options,
-  )
+  tag.buildBeforeElement(insertBefore, {
+    counts: {added:0, removed:0},
+    forceElement: true, test: false,
+  })
+
+  tag.tagSupport.templater.global.oldest = tag
+  if(!tag.lastTemplateString) {
+    throw new Error('999 - 1')
+  }
+
+  tag.tagSupport.templater.global.newest = tag
+
+  if(!tag.tagSupport.templater.global.oldest || !tag.tagSupport.templater.global.oldest.hasLiveElements) {
+    throw new Error('4711654')
+  }
+  
+  subject.tag = tag
 }

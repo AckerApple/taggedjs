@@ -32,22 +32,29 @@ export function runTagCallback(
   args: any[]
 ) {
   const tagSupport = tag.tagSupport
-  const renderCount = tagSupport ? tagSupport.memory.renderCount : 0
-  
+  const renderCount = tagSupport ? tagSupport.templater.global.renderCount : 0  
   const method = value.bind(bindTo)
   const callbackResult = method(...args)
 
-  const sameRenderCount = renderCount === tagSupport.memory.renderCount
+  const sameRenderCount = renderCount === tagSupport.templater.global.renderCount
   
   if(tagSupport && !sameRenderCount) {    
     return // already rendered
   }
 
-  tagSupport.render()
+  console.log('click render --- ')
+  tagSupport.render(
+    false,
+    // tagSupport, tagSupport.subject
+  )
 
   if(callbackResult instanceof Promise) {
     return callbackResult.then(() => {
-      tagSupport.render()
+      console.log('click promise render --- ')
+      tagSupport.render(
+        false,
+        // tagSupport, tagSupport.subject
+      )
       return 'promise-no-data-ever'
     })
   }

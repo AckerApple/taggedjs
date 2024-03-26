@@ -1,6 +1,6 @@
 import { Tag } from './Tag.class'
 import { deepClone } from './deepFunctions'
-import { TagSupport } from './TagSupport.class'
+import { BaseTagSupport } from './TagSupport.class'
 import { setUse } from './setUse.function'
 
 export type Provider = {
@@ -68,7 +68,7 @@ export const providers = {
     } as Tag
   
     while(owner.ownerTag) {
-      const ownerProviders = owner.ownerTag.tagSupport.memory.providers
+      const ownerProviders = owner.ownerTag.tagSupport.templater.global.providers
 
       const provider = ownerProviders.find(provider => {
         if(provider.constructMethod === constructor) {
@@ -93,29 +93,29 @@ export const providers = {
 
 setUse({ // providers
   beforeRender: (
-    tagSupport: TagSupport,
+    tagSupport: BaseTagSupport,
     ownerTag: Tag,
   ) => {
     run(tagSupport, ownerTag)
   },
   beforeRedraw: (
-    tagSupport: TagSupport,
+    tagSupport: BaseTagSupport,
     tag: Tag,
   ) => {
     run(tagSupport, tag.ownerTag as Tag)
   },
   afterRender: (
-    tagSupport: TagSupport,
+    tagSupport: BaseTagSupport,
     // tag: Tag
   ) => {
     const config = setUse.memory.providerConfig
-    tagSupport.memory.providers = [...config.providers]
+    tagSupport.templater.global.providers = [...config.providers]
     config.providers.length = 0
   }
 })
 
 function run(
-  tagSupport: TagSupport,
+  tagSupport: BaseTagSupport,
   ownerTag: Tag,
   // tag: Tag,
 ) {
@@ -124,8 +124,8 @@ function run(
   
   config.ownerTag = ownerTag
   
-  if(tagSupport.memory.providers.length) {
+  if(tagSupport.templater.global.providers.length) {
     config.providers.length = 0
-    config.providers.push(...tagSupport.memory.providers)
+    config.providers.push(...tagSupport.templater.global.providers)
   }
 }

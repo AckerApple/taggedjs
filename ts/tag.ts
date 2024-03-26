@@ -1,14 +1,16 @@
 import { Tag } from './Tag.class'
-import { isSubjectInstance, isTagArray, isTagInstance } from './isInstance'
+import { isSubjectInstance, isTagArray, isTagComponent, isTagInstance } from './isInstance'
 import { setUse } from './setUse.function'
-import { TemplaterResult, Wrapper, alterProps } from './templater.utils'
+import { TemplaterResult, Wrapper } from './TemplaterResult.class'
 import { ValueSubject } from './ValueSubject'
 import { runTagCallback } from './bindSubjectCallback.function'
 import { deepClone } from './deepFunctions'
 import { TagSupport } from './TagSupport.class'
 import { renderExistingTag } from './renderExistingTag.function'
+import { TagSubject } from './Tag.utils'
+import { alterProps } from './alterProps.function'
 
-export type TagChildren = ValueSubject<Tag[]>
+export type TagChildren = ValueSubject<Tag[]> & { lastArray?: Tag[] }
 export type TagChildrenInput = Tag[] | Tag | TagChildren
 export type TagComponentArg<T extends any[]> = (...args: T) => Tag;
 type FirstArgOptional<T extends any[]> = T['length'] extends 0 ? true : false;
@@ -25,7 +27,7 @@ export type TagComponent = TagComponentBase<[any?, TagChildren?]> | TagComponent
 
 let tagCount = 0
 
-/** Wraps a tag component in a state manager and always push children to last argument as any array */
+/** Wraps a tag component in a state manager and always push children to last argument as an array */
 // export function tag<T>(a: T): T;
 export function tag<T extends any[]>(
   tagComponent: TagComponentArg<T>
@@ -45,10 +47,8 @@ export function tag<T extends any[]>(
     ;(childSubject as any).isChildSubject = true
 
     const templater: TemplaterResult = new TemplaterResult(props, childSubject)
-
     const innerTagWrap: Wrapper = getTagWrap(
       templater,
-      childSubject,
       madeSubject,
     )
 
@@ -109,48 +109,74 @@ function updateComponent(
   tagComponent.tagIndex = tagCount++ // needed for things like HMR
 }
 
+/** creates/returns a function that when called then calls the original component function */
 function getTagWrap(
   templater: TemplaterResult,
-  childSubject: ValueSubject<Tag[]>,
   madeSubject: boolean
 ): Wrapper {
-  const innerTagWrap = function(oldTagSetup: TagSupport) {
+  const innerTagWrap = function(
+    oldTagSetup: TagSupport,
+    subject: TagSubject,
+  ) {
+    oldTagSetup.templater.global.newestTemplater = templater
+    ++oldTagSetup.templater.global.renderCount
+    
+    templater.global = oldTagSetup.templater.global
+    
+    const childSubject = templater.children
+    const lastArray = oldTagSetup.templater.global.oldest?.tagSupport.templater.children.lastArray
+    if(lastArray) {
+      childSubject.lastArray = lastArray
+    }
+
     const originalFunction = (innerTagWrap as any).original as unknown as TagComponent
     // const oldTagSetup = templater.tagSupport
 
-    const oldest = templater.oldest
+    const oldest = templater.global.oldest
 
-    let props = oldTagSetup.propsConfig.latest
-    let castedProps = alterProps(props, templater)
+    if(oldest && !oldest.hasLiveElements) {
+      throw new Error('issue already 22')
+    }
+
+    // ???
+    let props = templater.props
+    // let props = oldTagSetup.propsConfig.latest
+    const ownerTagSupport = oldTagSetup.ownerTagSupport
+    const oldTemplater = ownerTagSupport?.templater
+    const oldLatest = oldTemplater?.global.newest
+    const newestOwnerTemplater = oldLatest?.tagSupport.templater
+
+    if(oldLatest && !newestOwnerTemplater) {
+      throw new Error('what to do here?')
+    }
+
+    // ???
+    let castedProps = alterProps(
+      props,
+      // templater,
+      newestOwnerTemplater as TemplaterResult,
+      oldTagSetup.ownerTagSupport,
+    )
+    // let castedProps = alterProps(props, oldTagSetup.templater)
     
     // CALL ORIGINAL COMPONENT FUNCTION
     const tag = originalFunction(castedProps, childSubject)
 
-    if(oldTagSetup.mutatingRender === TagSupport.prototype.mutatingRender) {
-      oldTagSetup.oldest = tag
-      templater.oldest = tag
+    /*
+    const isFirstRun = oldTagSetup.mutatingRender === TagSupport.prototype.mutatingRender
+    if(isFirstRun) {
+      // oldTagSetup.oldest = tag
+      // templater.oldest = tag
       // tag.tagSupport = oldTagSetup
 
-      oldTagSetup.mutatingRender = () => {
-        const exit = renderExistingTag(templater.oldest as Tag, templater, oldTagSetup)
-
-        if(exit) {
-          return tag
-        }
-        
-        // Have owner re-render
-        if(tag.ownerTag) {
-          const newest = tag.ownerTag.tagSupport.render()
-          // TODO: Next line most likely not needed
-          tag.ownerTag.tagSupport.newest = newest
-          return tag
-        }
-    
-        return tag
-      }
     }
+    */
 
-    tag.tagSupport = new TagSupport(templater, oldTagSetup.children)
+    tag.tagSupport = new TagSupport(
+      oldTagSetup.ownerTagSupport,
+      templater,
+      subject,
+    )
 
     const clonedProps = deepClone(castedProps) // castedProps
     tag.tagSupport.propsConfig = {
@@ -160,17 +186,16 @@ function getTagWrap(
       lastClonedKidValues: tag.tagSupport.propsConfig.lastClonedKidValues,
     }
 
-    tag.tagSupport.memory = oldTagSetup.memory
-    // ???
-    // tag.tagSupport.memory = {...oldTagSetup.memory}
-    // tag.tagSupport.memory.context = {...oldTagSetup.memory.context}
-    tag.tagSupport.mutatingRender = oldTagSetup.mutatingRender
-    oldTagSetup.newest = tag
+    tag.tagSupport.memory = oldTagSetup.memory // state handover
+    // tag.tagSupport.mutatingRender = oldTagSetup.mutatingRender
 
+    // ???
+    /*
     oldTagSetup.propsConfig = {...tag.tagSupport.propsConfig}
     if(oldest) {
       oldest.tagSupport.propsConfig = {...tag.tagSupport.propsConfig}
     }
+    */
 
     if(madeSubject) {
       childSubject.value.forEach(kid => {
@@ -185,8 +210,12 @@ function getTagWrap(
           
           // all functions need to report to me
           kid.values[index] = function(...args: unknown[]) {
-            runTagCallback(value, tag.ownerTag as Tag, this, args)
-            // runTagCallback(value, tag, this, args)
+            runTagCallback(
+              value,
+              tag.ownerTag as Tag,
+              this, // bindTo
+              args
+            )
           }
           
           kid.values[index].isChildOverride = true

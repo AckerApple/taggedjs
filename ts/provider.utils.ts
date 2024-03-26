@@ -1,9 +1,10 @@
 import { Tag } from './Tag.class'
+import { TagSubject } from './Tag.utils'
 import { deepClone, deepEqual } from './deepFunctions'
 import { Provider } from './providers'
 
 export function providersChangeCheck(tag: Tag) {
-  const providersWithChanges = tag.tagSupport.memory.providers.filter(provider =>
+  const providersWithChanges = tag.tagSupport.templater.global.providers.filter(provider =>
     !deepEqual(provider.instance, provider.clone)
   )
 
@@ -24,10 +25,14 @@ function handleProviderChanges(
   const tagsWithProvider = getTagsWithProvider(appElement, provider)
 
   tagsWithProvider.forEach(({tag, renderCount, provider}) => {
-    const notRendered = renderCount === tag.tagSupport.memory.renderCount
+    const notRendered = renderCount === tag.tagSupport.templater.global.renderCount
     if(notRendered) {
       provider.clone = deepClone(provider.instance)
-      tag.tagSupport.render()
+      tag.tagSupport.render(
+        false,
+        // tag.tagSupport,
+        // tag.tagSupport.subject
+      )
     }
   })
 }
@@ -38,10 +43,10 @@ function getTagsWithProvider(
   memory: {
     tag: Tag
     renderCount: number
-    provider: Provider
+    provider: Provider,
   }[] = []
 ) {
-  const compare = tag.tagSupport.memory.providers
+  const compare = tag.tagSupport.templater.global.providers
 
   const hasProvider = compare.find(
     xProvider => xProvider.constructMethod === provider.constructMethod
@@ -50,12 +55,16 @@ function getTagsWithProvider(
   if(hasProvider) {
     memory.push({
       tag,
-      renderCount: tag.tagSupport.memory.renderCount,
-      provider: hasProvider
+      renderCount: tag.tagSupport.templater.global.renderCount,
+      provider: hasProvider,
     })
   }
 
-  tag.children.forEach(child => getTagsWithProvider(child, provider, memory))
+  tag.childTags.forEach(child => getTagsWithProvider(
+    child,
+    provider,
+    memory,
+  ))
 
   return memory
 }

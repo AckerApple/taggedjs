@@ -3,17 +3,19 @@ import { InterpolateOptions } from "./interpolateElement"
 import { elementInitCheck } from "./elementInitCheck"
 import { Clones } from "./Clones.type"
 import { InterpolateSubject, processSubjectValue } from "./processSubjectValue.function"
-import { isTagArray, isTagComponent } from "./isInstance"
+import { isTagArray, isTagComponent, isTagInstance } from "./isInstance"
 import { DisplaySubject, TagSubject } from "./Tag.utils"
 import { scanTextAreaValue } from "./scanTextAreaValue.function"
 import { processSubjectComponent } from "./processSubjectComponent.function"
-import { TemplaterResult } from "./templater.utils"
+import { TemplaterResult } from "./TemplaterResult.class"
+import { ExistingValue, updateExistingValue } from "./updateExistingValue.function"
 
 export type Template = Element & {clone?: any}
 export type InterpolateComponentResult = {
   subject: InterpolateSubject
   insertBefore: Element | Text | Template
   ownerTag: Tag
+  variableName: string
 }
 export type InterpolateTemplateResult = {
   clones: Clones
@@ -40,10 +42,18 @@ export function interpolateTemplate(
   }
 
   const existingSubject = context[variableName]
+  const isDynamic = isTagComponent(existingSubject.value) || isTagArray(existingSubject.value)
 
   // process dynamics later
-  if(isTagComponent(existingSubject.value) || isTagArray(existingSubject.value)) {
-    return {clones, tagComponent: {ownerTag, subject: existingSubject, insertBefore}}
+  if(isDynamic) {
+    return {
+      clones,
+      tagComponent: {
+        variableName,
+        ownerTag,
+        subject: existingSubject,
+        insertBefore
+      }}
   }
   
   let isForceElement = options.forceElement
@@ -52,7 +62,9 @@ export function interpolateTemplate(
     existingSubject,
     ownerTag,
     counts,
-    {isForceElement}
+    {isForceElement},
+    context,
+    variableName,
   )
 
   return {clones}
@@ -63,12 +75,28 @@ export function subscribeToTemplate(
   subject: InterpolateSubject,
   ownerTag: Tag,
   counts: Counts, // used for animation stagger computing
-  {isForceElement}: {isForceElement?:boolean}
+  {isForceElement}: {isForceElement?:boolean},
+  context: Context,
+  variableName: string,
+  test = false
 ) {
-  const callback = (value: unknown) => {
+  let called = false
+  const callback = (value: ExistingValue) => {
+    // const orgInsert = insertBefore
     const clone = (subject as DisplaySubject).clone
-    if(clone) {
+
+    if(clone && clone.parentNode) {
       insertBefore = clone
+    }
+
+    if(called) {
+      context[variableName] = updateExistingValue(
+        subject,
+        value,
+        ownerTag,
+        insertBefore, // needed incase type of value changed and a redraw required
+      )
+      return
     }
 
     processSubjectValue(
@@ -79,15 +107,18 @@ export function subscribeToTemplate(
       {
         counts: {...counts},
         forceElement: isForceElement,
-      }
+      },
+      test
     )
 
     if(isForceElement) {
       isForceElement = false // only can happen once
     }
 
+    // ownerTag.clones.push(...clones)
     // ownerTag.clones.push(...nextClones)
     // clones.push(...nextClones)
+    called = true
   }
 
   const sub = subject.subscribe(callback as any)
@@ -142,10 +173,12 @@ export function afterElmBuild(
   }
 
   if((elm as Element).children) {
+    /*
     const subCounts = {
       added: options.counts.added, // - diff,
       removed: options.counts.removed,
     }
+    */
 
     new Array(...(elm as Element).children as any).forEach((child, index) => {
       const subOptions = {

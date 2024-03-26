@@ -1,4 +1,4 @@
-import { Config, GetSet, StateConfig, StateConfigItem, getStateValue, makeStateResult } from './set.function'
+import { Config, GetSet, StateConfig, StateConfigArray, StateConfigItem, getStateValue } from './set.function'
 import { setUse } from './setUse.function'
 
 /** Used for variables that need to remain the same variable during render passes */
@@ -6,14 +6,16 @@ export function setLet <T>(
   defaultValue: T | (() => T),
 ): ((getSet: GetSet<T>) => T) {
   const config: Config = setUse.memory.stateConfig
+  const rearray = config.rearray as StateConfigArray
   let getSetMethod: StateConfig<T>
   
-  const restate = config.rearray[config.array.length]
+  const restate = rearray[config.array.length]
   if(restate) {
     let oldValue = getStateValue(restate) as T
 
     getSetMethod = ((x: T) => [oldValue, oldValue = x])
     const push: StateConfigItem<T> = {
+      get: () => getStateValue(push) as T,
       callback: getSetMethod,
       lastValue: oldValue,
       defaultValue: restate.defaultValue,
@@ -30,6 +32,7 @@ export function setLet <T>(
 
   getSetMethod = ((x: T) => [initValue, initValue = x])
   const push: StateConfigItem<T> = {
+    get: () => getStateValue(push) as T,
     callback: getSetMethod,
     lastValue: initValue,
     defaultValue: initValue,
@@ -37,4 +40,18 @@ export function setLet <T>(
   config.array.push(push)
   
   return makeStateResult(initValue, push)
+}
+
+function makeStateResult<T>(
+  initValue: T,
+  push: StateConfigItem<T>,
+) {
+  // return initValue
+  const result =  (y: any) => {
+    push.callback = y || (x => [initValue, initValue = x])
+
+    return initValue
+  }
+
+  return result
 }

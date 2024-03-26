@@ -2,13 +2,15 @@ import { TagSupport } from "./TagSupport.class"
 import { ValueSubject } from "./ValueSubject"
 import { Subject } from "./Subject"
 import { Tag } from "./Tag.class"
-import { TemplaterResult } from "./templater.utils"
+import { TemplaterResult, renderWithSupport } from "./TemplaterResult.class"
 import { bindSubjectCallback } from "./bindSubjectCallback.function"
 import { Template } from "./interpolateTemplate"
+import { isLikeTags } from "./isLikeTags.function"
+import { destroyTagMemory } from "./checkDestroyPrevious.function"
+import { processSubjectValue } from "./processSubjectValue.function"
 
 export type TagSubject = Subject<TemplaterResult> & {
-  tagSupport: TagSupport
-  tag: Tag
+  tag: Tag //  consider renaming to latestTag
   template: Element | Text | Template
 }
 
@@ -26,24 +28,44 @@ export function getSubjectFunction(
   return new ValueSubject( bindSubjectCallback(value, tag) )
 }
 
-export function setValueRedraw(
-  templater: TemplaterResult, // latest tag function to call for rendering
-  existing: TagSubject,
+/** for components */
+export function redrawTag(
+  subject: TagSubject,
+  templater: TemplaterResult,
   ownerTag: Tag,
 ) {
-  // redraw does not communicate to parent
-  templater.redraw = () => {
-    const existingTag = templater.oldest || existing.tag
-    const tagSupport = existingTag?.tagSupport || templater.tagSupport
+  const existingTag = subject.tag || templater.global.newest || templater.global.oldest
 
-    const {retag} = templater.renderWithSupport(
-      tagSupport,
-      existingTag,
-      ownerTag,
-    )
+  if(!templater.global.oldest) {
+    throw new Error('issue before event redraw')
+  }
 
-    existing.set(templater)
+  const tagSupport = templater.tagSupport || existingTag?.tagSupport
 
+  if(!tagSupport.templater.global.oldest) {
+    throw new Error('33333')
+  }
+  
+
+  console.log('call for ----> renderWithSupport')
+  let {retag} = renderWithSupport(
+    tagSupport,
+    existingTag,
+    subject,
+    ownerTag,
+  )
+
+  const isLikeTag = !existingTag || isLikeTags(existingTag, retag)
+  if(!isLikeTag) {
+    console.log('UNLIKE TAG DESTROY')
+    destroyTagMemory(existingTag, subject)
+
+    delete templater.global.oldest
+    delete templater.global.newest
+
+    templater.global.insertBefore = existingTag.tagSupport.templater.global.insertBefore
     return retag
   }
+
+  return retag
 }

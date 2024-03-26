@@ -1,24 +1,26 @@
-import { DisplaySubject, TagSubject } from './Tag.utils'
+import { DisplaySubject, TagSubject, getSubjectFunction } from './Tag.utils'
 import { TagSupport } from './TagSupport.class'
 import { Subject } from './Subject'
-import { TemplateRedraw, TemplaterResult } from './templater.utils'
+import { TemplaterResult } from './TemplaterResult.class'
 import { isSubjectInstance, isTagArray, isTagComponent, isTagInstance } from './isInstance'
-import { bindSubjectCallback } from './bindSubjectCallback.function'
 import { Tag } from './Tag.class'
 import { InterpolateSubject, processTag } from './processSubjectValue.function'
 import { TagArraySubject, processTagArray } from './processTagArray'
 import { updateExistingTagComponent } from './updateExistingTagComponent.function'
-import { updateExistingTag } from './updateExistingTag.function'
 import { RegularValue, processRegularValue } from './processRegularValue.function'
 import { checkDestroyPrevious } from './checkDestroyPrevious.function'
+import { ValueSubject } from './ValueSubject'
+import { processSubjectComponent } from './processSubjectComponent.function'
+import { isLikeTags } from './isLikeTags.function'
 
-type ExistingValue = TemplaterResult | Tag[] | TagSupport | Function | Subject<unknown> | RegularValue | Tag
+export type ExistingValue = TemplaterResult | Tag[] | TagSupport | Function | Subject<unknown> | RegularValue | Tag
 
 export function updateExistingValue(
   subject: InterpolateSubject,
   value: ExistingValue,
   ownerTag: Tag,
-): void {
+  insertBefore: Element | Text,
+): InterpolateSubject {
   const subjectSubArray = subject as TagArraySubject
   const subjectSubTag = subject as TagSubject
   const isChildSubject = subjectSubArray.isChildSubject
@@ -26,41 +28,59 @@ export function updateExistingValue(
   
   // If we are working with tag component 2nd argument children, the value has to be digged
   if(isChildSubject) {
-    value = (value as any).value // A subject contains the value
+    value = (value as TagSubject).value // A subject contains the value
   }
 
-  const oldInsertBefore = (subject as DisplaySubject).template || subjectSubTag.tag?.tagSupport.templater.insertBefore || (subjectSubTag as DisplaySubject).clone
-  
+  const oldInsertBefore = (subject as DisplaySubject).template || subjectSubTag.tag?.tagSupport.templater.global.insertBefore || (subjectSubTag as DisplaySubject).clone
+
   checkDestroyPrevious(subject, value)
 
   // handle already seen tag components
   if(isComponent) {
+    const templater = value as TemplaterResult
+    // When was something before component
     if(!subjectSubTag.tag) {
-      const templater = value as TemplaterResult
-      const {retag} = templater.renderWithSupport(
-        (value as TemplaterResult).tagSupport,
-        undefined,
+      processSubjectComponent(
+        templater,
+        subject as TagSubject,
+        oldInsertBefore,
         ownerTag,
+        {
+          forceElement: true,
+          counts: {added: 0, removed: 0},
+        }
       )
-      
-      templater.newest = retag
-      templater.oldest = retag
-      subjectSubTag.tag = retag
-      subjectSubTag.tagSupport = retag.tagSupport
 
-      retag.buildBeforeElement(oldInsertBefore, {
-        forceElement: true,
-        counts: {added: 0, removed: 0},
-      })
-
-      return
+      return subjectSubTag
     }
 
-    return updateExistingTagComponent(
+    if(!templater.global.oldest) {
+      const oldTag = subjectSubTag.tag
+      
+      const oldWrap = oldTag.tagSupport.templater.wrapper // tag versus component
+      if(oldWrap) {
+        if(oldWrap.original === templater.wrapper?.original) {
+          console.log('🐷 disconnected global', {
+            oldWrap: oldTag.tagSupport.templater.wrapper.original,
+            tempWrap: templater.wrapper.original,
+          })
+          templater.global = {...oldTag.tagSupport.templater.global}
+        }
+      }
+    }
+
+    console.log('call for update of existing tag', {
+      wrap: templater.wrapper.original,
+      props: templater.props,
+    })
+    updateExistingTagComponent(
       ownerTag,
-      value as TemplateRedraw, // latest value
+      templater, // latest value
       subjectSubTag,
+      insertBefore,
     )
+
+    return subjectSubTag
   }
   
   // was component but no longer
@@ -69,21 +89,19 @@ export function updateExistingValue(
     handleStillTag(
       subjectTag,
       subject as TagSubject | TagArraySubject,
-      value,
+      value as Tag,
       ownerTag
     )
 
-    return
+    return subjectSubTag
   }
 
   // its another tag array
   if(isTagArray(value)) {
-    const insertBefore = subjectSubArray.template || subjectSubTag.tag?.tagSupport.templater.insertBefore
-
     processTagArray(
       subject as TagArraySubject,
       value as any as Tag[],
-      insertBefore,
+      oldInsertBefore,
       ownerTag,
       {counts: {
         added: 0,
@@ -91,50 +109,83 @@ export function updateExistingValue(
       }}
     )
 
-    return 
+    return subject
   }
 
   // now its a function
   if(value instanceof Function) {
-    subjectSubTag.set( bindSubjectCallback(value as any, ownerTag) )
-    return
+    return getSubjectFunction(value, ownerTag)
+  }
+
+  if(isTagInstance(value)) {
+    subjectSubTag.template = oldInsertBefore
+    processTag(
+      value as Tag,
+      subjectSubTag,
+      subjectSubTag.template,
+      ownerTag,// existingTag, // tag,
+      {
+        counts: {
+          added: 0,
+          removed: 0,
+        }
+      }
+    )
+    return subjectSubTag
   }
 
   // we have been given a subject
   if(isSubjectInstance(value)) {
-    subjectSubTag.set( (value as Subject<any>).value ) // let ValueSubject now of newest value
-    return
-  }
-  
-  if(isTagInstance(value)) {
-    subjectSubTag.template = oldInsertBefore
+    return value as ValueSubject<any>
   }
 
   // This will cause all other values to render
-  subjectSubTag.set(value) // let ValueSubject now of newest value
+  processRegularValue(
+    value as RegularValue,
+    subject as DisplaySubject,
+    oldInsertBefore,
+  )
 
-  return
+  return subjectSubTag
 }
 
 function handleStillTag(
   existingTag: Tag,
-  existing: InterpolateSubject,
-  value: ExistingValue,
+  subject: InterpolateSubject,
+  value: Tag | TemplaterResult | RegularValue,
   ownerTag: Tag,
 ) {
   const oldWrapper = existingTag.tagSupport.templater.wrapper
   const newWrapper = (value as any)?.wrapper
-  const wrapMatch = oldWrapper && newWrapper && oldWrapper?.original === newWrapper?.original
+  // const wrapMatch = oldWrapper && newWrapper && oldWrapper?.original === newWrapper?.original
 
   // TODO: We shouldn't need both of these
-  const isSameTag = value && existingTag.lastTemplateString === (value as any).lastTemplateString
+  const isSameTag = value && isLikeTags(existingTag, value as Tag)
   const isSameTag2 = value && (value as any).getTemplate && existingTag.isLikeTag(value as any)
+
+  const tag = value as Tag
+
+  if(!tag.tagSupport) {
+    const fakeTemplater = {
+      global: {
+        context: {},
+        oldest: tag,
+      },
+      children: new ValueSubject<Tag[]>([]),
+    } as TemplaterResult
+    tag.tagSupport = new TagSupport(ownerTag.tagSupport, fakeTemplater, subject as TagSubject)
+  }
+
+  if(isSameTag) {
+    existingTag.updateByTag(tag)
+    return
+  }
 
   if(isSameTag || isSameTag2) {
     return processTag(
-      value,
-      existing as TagSubject,
-      (existing as any).template,
+      value as Tag,
+      subject as TagSubject,
+      (subject as TagSubject).template,
       ownerTag,// existingTag, // tag,
       {
         counts: {
@@ -144,15 +195,10 @@ function handleStillTag(
       }
     )
   }
-  
-  if(wrapMatch) {
-    return updateExistingTag(
-      value as TemplaterResult,
-      existingTag,
-      existing as TagSubject,
-    )
-  }
 
-  const subject = existing as DisplaySubject
-  return processRegularValue(value as RegularValue, subject, subject.template)
+  return processRegularValue(
+    value as RegularValue,
+    subject as DisplaySubject,
+    (subject as DisplaySubject).template
+  )
 }

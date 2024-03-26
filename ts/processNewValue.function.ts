@@ -1,24 +1,22 @@
-import { Context, Tag } from './Tag.class'
-import { TagSubject, getSubjectFunction, setValueRedraw } from './Tag.utils'
+import { Tag } from './Tag.class'
+import { TagSubject } from './Tag.utils'
 import { ValueSubject } from './ValueSubject'
 import { isSubjectInstance, isTagComponent, isTagInstance } from './isInstance'
 
 export function processNewValue(
   hasValue: boolean,
   value: any,
-  context: Context,
-  variableName: string,
   ownerTag: Tag,
 ) {
   if(isTagComponent(value)) {
-    const existing = context[variableName] = new ValueSubject(value) as TagSubject
-    setValueRedraw(value, existing, ownerTag)
-    return
+    const tagSubject = new ValueSubject(value) as TagSubject
+    // setValueRedraw(value, tagSubject, ownerTag)
+    return tagSubject
   }
 
   if(value instanceof Function) {
-    context[variableName] = getSubjectFunction(value, ownerTag)
-    return
+    // return getSubjectFunction(value, ownerTag)
+    return new ValueSubject(value)
   }
 
   if(!hasValue) {
@@ -27,15 +25,13 @@ export function processNewValue(
 
   if(isTagInstance(value)) {
     value.ownerTag = ownerTag
-    ownerTag.children.push(value)
-    context[variableName] = new ValueSubject(value)
-    return
+    ownerTag.childTags.push(value)
+    return new ValueSubject(value)
   }
 
   if(isSubjectInstance(value)) {
-    context[variableName] = value // its already a value subject
-    return
+    return value // its already a value subject
   }
 
-  context[variableName] = new ValueSubject(value)
+  return new ValueSubject(value)
 }

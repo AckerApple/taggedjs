@@ -3,19 +3,26 @@ import { ArrayValueNeverSet, Tag } from './Tag.class'
 import { ValueSubject } from './ValueSubject'
 import { TagSupport } from './TagSupport.class'
 import { Counts, Template } from './interpolateTemplate'
-import { TemplaterResult } from './templater.utils'
+import { TemplaterResult } from './TemplaterResult.class'
 import { ArrayNoKeyError } from './errors'
-import { destroyArrayTag } from './checkDestroyPrevious.function'
+import { destroyArrayTag, destroyTagSupportPast } from './checkDestroyPrevious.function'
+import { Provider } from './providers'
+import { TagSubject } from './Tag.utils'
 
-export type LastArrayItem = {tag: Tag, index: number}
+export type LastArrayItem = {
+  tag: Tag
+  index: number
+  deleted?: boolean
+}
+
 export type TagArraySubject = ValueSubject<Tag[]> & {
-  lastArray: LastArrayItem[]
+  lastArray?: LastArrayItem[]
   template: Element | Text | Template
   isChildSubject?: boolean // present when children passed as prop0 or prop1
 }
 
 export function processTagArray(
-  result: TagArraySubject,
+  subject: TagArraySubject,
   value: Tag[], // arry of Tag classes
   template: Element | Text | Template, // <template end interpolate />
   ownerTag: Tag,
@@ -26,17 +33,14 @@ export function processTagArray(
 ): Clones {
   // const clones: Clones = []
   const clones: Clones = ownerTag.clones // []
+  let lastArray = subject.lastArray = subject.lastArray || []
 
-  if(!result.lastArray) {
-    result.lastArray = [] // {tag, index}[] populated in processTagResult
-  }
-
-  result.template = template
+  subject.template = template
 
   let removed = 0
   
   /** 🗑️ remove previous items first */
-  result.lastArray = result.lastArray.filter((
+  lastArray = subject.lastArray = subject.lastArray.filter((
     item: any,
     index: number,
   ) => {
@@ -48,36 +52,53 @@ export function processTagArray(
     const destroyItem = lessLength || !areLikeValues(subArrayValue, item.tag.arrayValue)
     
     if(destroyItem) {
-      const last = result.lastArray[index]
+      const last = lastArray[index]
       const tag: Tag = last.tag
       destroyArrayTag(tag, options.counts)
+      last.deleted = true
 
       ++removed
       ++options.counts.removed
       
       return false
     }
+
     return true
   })
 
   // const masterBefore = template || (template as any).clone
-  const before = template || (template as any).clone
+  const before = template || (subject.value as any).insertBefore || (template as any).clone
 
   value.forEach((subTag, index) => {
-    const previous = result.lastArray[index]
-    const previousSupport = subTag.tagSupport || previous?.tag.tagSupport
+    const previous = lastArray[index]
+    const previousSupport = !previous?.deleted && previous?.tag.tagSupport
 
-    subTag.tagSupport = previousSupport || new TagSupport({} as TemplaterResult, new ValueSubject([]))
+    subTag.tagSupport = new TagSupport(
+      ownerTag.tagSupport,
+      {
+        global: {
+          providers: [] as Provider[],
+          context: {},
+        },
+        children: new ValueSubject<Tag[]>([]),
+      } as TemplaterResult,
+      new ValueSubject({} as Tag) as unknown as TagSubject,
+    )
     
     if(previousSupport) {
-      previousSupport.newest = subTag
+      subTag.tagSupport.templater.global = previousSupport.templater.global
+      previousSupport.templater.global.newest = subTag
     } else {
-      subTag.tagSupport.mutatingRender = () => {
-        ownerTag.tagSupport.render() // call owner for needed updates
+      subTag.tagSupport.render = () => {
+        ownerTag.tagSupport.render(
+          true,
+          // ownerTag.tagSupport,
+          // ownerTag.tagSupport.subject,
+        ) // call owner for needed updates
         return subTag
       }
   
-      ownerTag.children.push(subTag)
+      ownerTag.childTags.push(subTag)
     }
     
     subTag.ownerTag = ownerTag    
@@ -96,20 +117,23 @@ export function processTagArray(
       throw err
     }
     
-    const couldBeSame = result.lastArray.length > index
+    const couldBeSame = lastArray.length > index
     if (couldBeSame) {
 
       const isSame = areLikeValues(previous.tag.arrayValue, subTag.arrayValue)
       if (isSame) {
         subTag.tagSupport = subTag.tagSupport || previous.tag.tagSupport
-        previous.tag.updateByTag(subTag)
+        const oldest = previous.tag.tagSupport.templater.global.oldest as Tag
+        oldest.updateByTag(subTag)
         return []
       }
 
-      return []
+      processAddTagArrayItem(before, subTag, index, options, lastArray, true)
+      throw new Error('item should be back')
+      // return [] // removed: item should have been previously deleted and will be added back
     }
 
-    processAddTagArrayItem(before, subTag, result, index, options)
+    processAddTagArrayItem(before, subTag, index, options, lastArray, true)
   })
 
   return clones
@@ -118,18 +142,20 @@ export function processTagArray(
 function processAddTagArrayItem(
   before: Element | Text | Template,
   subTag: Tag,
-  result: TagArraySubject,
   index: number,
   options: {
     counts: Counts
     forceElement?: boolean
   },
+  lastArray: LastArrayItem[],
+  test: boolean,
 ) {
   const lastValue = {
     tag: subTag, index
   }
+  
   // Added to previous array
-  result.lastArray.push(lastValue)
+  lastArray.push(lastValue)
 
   const counts: Counts = {
     added: options.counts.added + index,
@@ -137,11 +163,17 @@ function processAddTagArrayItem(
   }
 
   const lastFirstChild = before // tag.clones[0] // insertBefore.lastFirstChild    
+  if(!lastFirstChild.parentNode) {
+    throw new Error('issue adding array item')
+  }
 
   subTag.buildBeforeElement(
     lastFirstChild,
-    {counts, forceElement: options.forceElement}
+    {counts, forceElement: options.forceElement, test}
   )
+
+  subTag.tagSupport.templater.global.oldest = subTag
+  subTag.tagSupport.templater.global.newest = subTag
 }
 
 /** compare two values. If both values are arrays then the items will be compared */

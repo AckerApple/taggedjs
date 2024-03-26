@@ -1,12 +1,12 @@
 // TODO: This should be more like `new TaggedJs().use({})`
 
 import { Tag } from './Tag.class'
-import { TagSupport } from './TagSupport.class'
+import { BaseTagSupport } from './TagSupport.class'
 import { setUse } from './setUse.function'
 
 // Life cycle 1
 export function runBeforeRender(
-  tagSupport: TagSupport,
+  tagSupport: BaseTagSupport,
   tagOwner: Tag,
 ) {
   setUse.tagUse.forEach(tagUse => tagUse.beforeRender(tagSupport, tagOwner))
@@ -14,7 +14,7 @@ export function runBeforeRender(
 
 // Life cycle 2
 export function runAfterRender(
-  tagSupport: TagSupport,
+  tagSupport: BaseTagSupport,
   tag: Tag,
 ) {
   setUse.tagUse.forEach(tagUse => tagUse.afterRender(tagSupport, tag))
@@ -22,7 +22,7 @@ export function runAfterRender(
 
 // Life cycle 3
 export function runBeforeRedraw(
-  tagSupport: TagSupport,
+  tagSupport: BaseTagSupport,
   tag: Tag,
 ) {
   setUse.tagUse.forEach(tagUse => tagUse.beforeRedraw(tagSupport, tag))
@@ -30,7 +30,7 @@ export function runBeforeRedraw(
 
 // Life cycle 4 - end of life
 export function runBeforeDestroy(
-  tagSupport: TagSupport,
+  tagSupport: BaseTagSupport,
   tag: Tag,
 ) {
   setUse.tagUse.forEach(tagUse => tagUse.beforeDestroy(tagSupport, tag))
