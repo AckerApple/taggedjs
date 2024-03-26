@@ -13,7 +13,9 @@ export const innerHtmlTest = tag((
   return html`<!--innerHtmlTests.js-->
     <fieldset id="innerHtmlTests-1">
       <legend>no props test</legend>
-      <div>${children}</div>
+      <div style="border:2px solid purple;">
+        ${children}
+      </div>
       <div>isSubjectInstance:${isSubjectInstance(children)}</div>
       <div>isSubjectTagArray:${isTagArray(children.value)}</div>
       <button id="innerHtmlTest-counter-button"

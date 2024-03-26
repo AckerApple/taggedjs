@@ -13,6 +13,7 @@ export const counters = tag(() => {
 
   const increaseCounter = () => {
     ++counter
+    console.log('counter increased', counter)
   }
 
   ++renderCount // for debugging
@@ -23,6 +24,7 @@ export const counters = tag(() => {
     <div>initCounter:${initCounter}</div>
     <button id="increase-counter" onclick=${increaseCounter}>counter:${counter}</button>
     <span id="counter-display">${counter}</span>
+    
     <fieldset>
       <legend>inner counter</legend>
       ${innerCounters({counter, increaseCounter})}
@@ -36,11 +38,13 @@ const innerCounters = tag(({counter, increaseCounter}) => {
 
   ++renderCount // for debugging
 
-return html`
+  console.log('inner counters', {counter, renderCount})
+
+  return html`
     <button id="inner-increase-counter" onclick=${increaseCounter}
     >counter:${counter}</button>
     <span id="inner-counter-display">${counter}</span>
-    renderCount:${renderCount}
-    ${/*renderCountDiv({renderCount, name: 'inner counters'})*/false}
+    <div>renderCount:${renderCount}</div>
+    ${renderCountDiv({renderCount, name: 'inner counters'})}
   `
 })

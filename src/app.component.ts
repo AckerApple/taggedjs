@@ -63,10 +63,10 @@ export const App = tag(() => {
 
         <fieldset id="provider-debug" style="flex:2 2 20em">
           <legend>Provider Debug</legend>
-          ${providerDebugBase()}
+          ${providerDebugBase(undefined)}
         </fieldset>
 
-        ${childTests()}
+        ${childTests(undefined)}
 
         <fieldset style="flex:2 2 20em">
           <legend>Attribute Tests</legend>
@@ -80,7 +80,7 @@ export const App = tag(() => {
 
         <fieldset style="flex:2 2 20em">
           <legend>Tag Switching</legend>
-          ${tagSwitchDebug()}
+          ${tagSwitchDebug(undefined)}
         </fieldset>
 
         <fieldset style="flex:2 2 20em">

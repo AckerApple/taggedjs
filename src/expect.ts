@@ -35,7 +35,14 @@ export function execute() {
 }
 
 function runTests(tests: Test[]) {
-  tests.forEach(test => test())
+  tests.forEach(test => {    
+    try {
+      test()
+    } catch (err) {
+      console.error(`Error testing ${test.name}`)
+      throw err
+    }
+  })
 }
 
 export function expect(expected: unknown) {

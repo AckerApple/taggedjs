@@ -9,6 +9,7 @@ export type InterpolateComponentResult = {
     subject: InterpolateSubject;
     insertBefore: Element | Text | Template;
     ownerTag: Tag;
+    variableName: string;
 };
 export type InterpolateTemplateResult = {
     clones: Clones;
@@ -22,7 +23,7 @@ options: InterpolateOptions): InterpolateTemplateResult;
 export declare function subscribeToTemplate(insertBefore: Element | Text | Template, subject: InterpolateSubject, ownerTag: Tag, counts: Counts, // used for animation stagger computing
 { isForceElement }: {
     isForceElement?: boolean;
-}): void;
+}, context: Context, variableName: string, test?: boolean): void;
 export declare function updateBetweenTemplates(value: string | undefined | boolean | number, lastFirstChild: Element | Text): Text;
 export type Counts = {
     added: number;

@@ -22,7 +22,7 @@ const childContentTest = tag((
   `
 })
 
-export const childTests = tag(() => {
+export const childTests = tag((_ = 'childTests') => {
   let renderCount = setLet(0)(x => [renderCount, renderCount = x])
   let counter = setLet(0)(x => [counter, counter = x])
 
@@ -41,7 +41,7 @@ export const childTests = tag(() => {
           onclick=${() => ++counter}
         >increase childTests inside ${counter}:${renderCount}</button>
         <span id="innerHtmlTest-childTests-display">${counter}</span>
-        ${renderCountDiv({renderCount, name: 'childTests'})}
+        ${renderCountDiv({renderCount, name: 'childTests-innerHtmlTest'})}
       `)}
 
       ${innerHtmlPropsTest(22, html`

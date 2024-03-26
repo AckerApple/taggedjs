@@ -57,7 +57,7 @@ export const tagDebug = tag(() => {// tagDebug.js
 
       <fieldset id="props-debug" style="flex:2 2 20em">
         <legend>Props Debug</legend>
-        ${propsDebugMain()}
+        ${propsDebugMain(undefined)}
       </fieldset>
     </div>
   `

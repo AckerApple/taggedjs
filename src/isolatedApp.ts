@@ -5,58 +5,70 @@ import { tagSwitchDebug } from "./tagSwitchDebug.component"
 import { propsDebugMain } from "./PropsDebug.component"
 import { providerDebugBase } from "./providerDebug"
 import { counters } from "./countersDebug"
+import { tableDebug } from "./tableDebug.component"
 
+type viewTypes = 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
 export const IsolatedApp = tag(() => {
   const stateTest = set('isolated-app-state')
   // const component = childTests() as any
   // const template = component.wrapper().getTemplate()
 
-  const view = 'tagSwitchDebug' as 'props' | 'child' | 'tagSwitchDebug'
+  const views: viewTypes[] = [
+    // 'arrays',
+    'props'
+  ]
   
   return html`<!--isolatedApp.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
 
     <div id="tagDebug-fx-wrap">
       <div style="display:flex;flex-wrap:wrap;gap:1em">
-        ${view === 'props' && html`
+        ${views.includes('props') && html`
           <fieldset style="flex:2 2 20em">
             <legend>propsDebugMain</legend>
-            ${propsDebugMain()}
+            ${propsDebugMain(undefined)}
           </fieldset>
         `}
 
-        ${/*
-        <fieldset style="flex:2 2 20em">
-          <legend>providerDebugBase</legend>
-          ${providerDebugBase()}
-        </fieldset>
-        */false}
+        ${views.includes('tableDebug') && html`
+          <fieldset style="flex:2 2 20em">
+            <legend>tableDebug</legend>
+            ${tableDebug()}
+          </fieldset>
+        `}
 
-        ${view === 'tagSwitchDebug' && html`
+        ${views.includes('providerDebug') && html`
+          <fieldset style="flex:2 2 20em">
+            <legend>providerDebugBase</legend>
+            ${providerDebugBase(undefined)}
+          </fieldset>
+        `}
+
+        ${views.includes('tagSwitchDebug') && html`
           <fieldset style="flex:2 2 20em">
             <legend>tagSwitchDebug</legend>
-            ${tagSwitchDebug()}
+            ${tagSwitchDebug(undefined)}
           </fieldset>
         `}
 
-        ${/*
-        <fieldset style="flex:2 2 20em">
-          <legend>arrays</legend>
-          ${arrayTests()}
-        </fieldset>
-        */false}
+        ${views.includes('arrays') && html`
+          <fieldset style="flex:2 2 20em">
+            <legend>arrays</legend>
+            ${arrayTests()}
+          </fieldset>
+        `}
 
-        ${/*
-        <fieldset style="flex:2 2 20em">
-          <legend>counters</legend>
-          ${counters()}
-        </fieldset>
-        */false}
+        ${views.includes('counters') && html`
+          <fieldset style="flex:2 2 20em">
+            <legend>counters</legend>
+            ${counters()}
+          </fieldset>
+        `}
 
-        ${view === 'child' && html`
+        ${views.includes('child') && html`
           <fieldset style="flex:2 2 20em">
             <legend>Children Tests</legend>
-            ${childTests()}
+            ${childTests(undefined)}
           </fieldset>
         `}
 

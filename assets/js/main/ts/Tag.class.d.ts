@@ -1,5 +1,4 @@
 import { TagSupport } from './TagSupport.class';
-import { Provider } from './providers';
 import { Subscription } from './Subject';
 import { Counts } from './interpolateTemplate';
 import { State } from './set.function';
@@ -11,10 +10,8 @@ export declare const escapeSearch: RegExp;
 export type Context = {
     [index: string]: InterpolateSubject;
 };
-export type TagMemory = Record<string, any> & {
-    context: Context;
+export type TagMemory = {
     state: State;
-    providers: Provider[];
 };
 export interface TagTemplate {
     interpolation: InterpolatedTemplates;
@@ -30,10 +27,12 @@ export declare class Tag {
     strings: string[];
     values: any[];
     isTag: boolean;
+    hasLiveElements: boolean;
     clones: (Element | Text | ChildNode)[];
     cloneSubs: Subscription[];
-    children: Tag[];
+    childTags: Tag[];
     tagSupport: TagSupport;
+    lastTemplateString: string | undefined;
     ownerTag?: Tag;
     appElement?: Element;
     arrayValue: unknown | ArrayValueNeverSet;
@@ -50,18 +49,19 @@ export declare class Tag {
         promise?: undefined;
     };
     checkCloneRemoval(clone: Element | Text | ChildNode, stagger: number): Promise<void> | undefined;
-    updateByTag(tag: Tag): void;
-    lastTemplateString: string | undefined;
-    updateConfig(strings: string[], values: any[]): void;
     getTemplate(): TagTemplate;
-    isLikeTag(tag: Tag): boolean;
+    isLikeTag(tag: Tag): boolean | Boolean;
+    updateByTag(tag: Tag): void;
+    updateConfig(strings: string[], values: any[]): void;
     update(): Context;
     updateValues(values: any[]): Context;
     updateContext(context: Context): Context;
     getAppElement(): Tag;
     /** Used during HMR only where static content itself could have been edited */
     rebuild(): void;
-    buildBeforeElement(insertBefore: Element | Text, options?: ElementBuildOptions): void;
+    buildBeforeElement(insertBefore: Element | Text, options?: ElementBuildOptions & {
+        test: boolean;
+    }): void;
 }
 type DestroyOptions = {
     stagger: number;

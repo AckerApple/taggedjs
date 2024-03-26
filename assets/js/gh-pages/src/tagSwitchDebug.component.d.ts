@@ -1,5 +1,5 @@
 type SelectedTag = null | string | undefined;
-export declare const tagSwitchDebug: import("taggedjs").TagComponentBase<[]>;
+export declare const tagSwitchDebug: import("taggedjs").TagComponentBase<[_t?: any]>;
 export declare const ternaryPropTest: import("taggedjs").TagComponentBase<[{
     selectedTag: string | undefined | null;
 }]>;

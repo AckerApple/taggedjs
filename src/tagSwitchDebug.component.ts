@@ -3,11 +3,12 @@ import { renderCountDiv } from "./renderCount.component"
 
 type SelectedTag = null | string | undefined
 
-export const tagSwitchDebug = tag(() => {
+export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
   let selectedTag = setLet(null as SelectedTag)(x => [selectedTag, selectedTag = x])
   let renderCount = setLet(0)(x => [renderCount, renderCount = x])
   
   function changeSelectedTag(event: InputElementTargetEvent) {
+    console.log('event.target', {event, target:event.target})
     selectedTag = event.target.value
 
     if(selectedTag === 'undefined') {
@@ -32,7 +33,6 @@ export const tagSwitchDebug = tag(() => {
   }
 
   let tagOutput2 = html`<div id="select-tag-above">select tag above</div>`
-  console.log('selectedTag', selectedTag)
   switch (selectedTag) {
     case null: tagOutput2 = html`<div id="select-tag-above">null, select tag above</div>`
       break;
@@ -46,9 +46,11 @@ export const tagSwitchDebug = tag(() => {
 
   ++renderCount
 
+  console.log('selectedTag', selectedTag)
+
   return html`
     <div>
-      selectedTag: ${selectedTag}
+      selectedTag: |${selectedTag == null ? 'null' : selectedTag}|
     </div>
     
     <select id="tag-switch-dropdown" onchange=${changeSelectedTag}>
@@ -66,7 +68,7 @@ export const tagSwitchDebug = tag(() => {
         <h3>Test 1 - string | Tag</h3>
         <div>${tagOutput}</div>
       </div>
-      
+
       <div style="border:1px solid blue;flex-grow:1">
         <h3>Test 2 - Tag</h3>
         <div>${tagOutput2}</div>
@@ -81,7 +83,7 @@ export const tagSwitchDebug = tag(() => {
         <h3>Test 3.2 - ternary via prop (only 1 or 3 shows)</h3>
         <div>${ternaryPropTest({selectedTag})}</div>
       </div>
-
+      
       <div style="border:1px solid red;flex-grow:1">
         <h3>Test 4 - arraySwitching</h3>
         <div>${arraySwitching({selectedTag})}</div>
@@ -149,7 +151,8 @@ export const arraySwitching = tag((
       return html`its a null value`
 
     case '1':
-      return html`${['a'].map(x => html`${tag1({title: `array ${selectedTag} ${x}`})}`.key(x))}`
+      // return html`${['a'].map(x => html`${tag1({title: `array ${selectedTag} ${x}`})}`.key(x))}`
+      return html`${tag1({title: `tag ${selectedTag}`})}`
 
     case '2':
       return html`${['b','c'].map(x => html`${tag2({title: `array ${selectedTag} ${x}`})}`.key(x))}`

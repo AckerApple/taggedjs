@@ -2,38 +2,43 @@ import { execute, expect, it } from "./expect"
 
 export function runTests() {  
   it('elements exists', () => {
+    console.log('787')
     expect(document.getElementById('h1-app')).toBeDefined()
+    console.log('787-2')
     const toggleTest = document.getElementById('toggle-test')
     expect(toggleTest).toBeDefined()
+    console.log('787-3')
     expect(toggleTest?.innerText).toBe('toggle test')
+  })
+
+  it('toggle test', () => {
+    const toggleTest = document.getElementById('toggle-test')
     toggleTest?.click()
+    console.log('787-4')
     expect(toggleTest?.innerText).toBe('toggle test true')
     toggleTest?.click()
+    console.log('787-5')
     expect(toggleTest?.innerText).toBe('toggle test')
     
     const propsTextarea = document.getElementById('props-debug-textarea') as HTMLTextAreaElement
     expect(propsTextarea.value.replace(/\s/g,'')).toBe(`{"test":33,"x":"y"}`)
+    console.log('788')
   })
 
-  it('counters increase', () => {
+  it('basic increase counter', () => {
     testCounterElements('#increase-counter', '#counter-display')
-    // testCounterElements('#increase-gateway-count', '#display-gateway-count')
-      
-    testCounterElements('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display')
-    testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display')
   })
 
-  it('testDuelCounterElements', () => {
-    testDuelCounterElements(
-      ['#childTests-button', '#childTests-display'],
-      ['#innerHtmlPropsTest-childTests-button', '#innerHtmlPropsTest-childTests-display'],
-    )
+  it('props testing', () => {
+    testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display')
 
     testDuelCounterElements(
-      ['#childTests-button', '#childTests-display'],
-      ['#innerHtmlTest-childTests-button', '#innerHtmlTest-childTests-display'],
+      ['#propsDebug-🥩-0-button', '#propsDebug-🥩-0-display'],
+      ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'],
     )
+  })
 
+  it('providers', async () => {
     testDuelCounterElements(
       ['#increase-provider-🍌-0-button', '#increase-provider-🍌-0-display'],
       ['#increase-provider-🍌-1-button', '#increase-provider-🍌-1-display'],
@@ -48,13 +53,8 @@ export function runTests() {
       ['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'],
       ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display'],
     )
-
-    testDuelCounterElements(
-      ['#propsDebug-🥩-0-button', '#propsDebug-🥩-0-display'],
-      ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'],
-    )
   })
-  
+
   it('provider debug', () => {
     testDuelCounterElements(
       ['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'],
@@ -129,10 +129,23 @@ export function runTests() {
     expect(insideElm?.innerText).toBe(outsideElm?.innerText)
     expect(indexValue).toBe((Number(insideElm?.innerText) - 2).toString())
     expect(indexValue).toBe((Number(outsideElm?.innerText) - 2).toString())
+  })
 
-  })  
+  it('child tests', () => {
+    testCounterElements('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display')
+    testDuelCounterElements(
+      ['#childTests-button', '#childTests-display'],
+      ['#innerHtmlPropsTest-childTests-button', '#innerHtmlPropsTest-childTests-display'],
+    )
+
+    testDuelCounterElements(
+      ['#childTests-button', '#childTests-display'],
+      ['#innerHtmlTest-childTests-button', '#innerHtmlTest-childTests-display'],
+    )
+  })
 
   try {
+    console.log('execute')
     execute()
     console.info('✅ all tests passed')
     return true

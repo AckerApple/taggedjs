@@ -17,7 +17,6 @@ export const animateDestroy = async ({target, stagger, capturePosition=true}: an
   }
 
   if(stagger) {
-    // setInterval(() => captureElementPosition(target),10)
     await wait(stagger * staggerBy)
   }
 
@@ -27,29 +26,6 @@ export const animateDestroy = async ({target, stagger, capturePosition=true}: an
   
   target.classList.remove('animate__animated','animate__fadeOutUp')
 }
-
-/*
-export function captureElementPosition(element: any) {
-  element.style.zIndex = element.style.zIndex || 1
-  const initialTop = element.offsetTop
-  const initialLeft = element.offsetLeft
-
-  const fix = () => {
-    const toTop = (initialTop - window.scrollY) + 'px'
-    const toLeft = (initialLeft - window.scrollX) + 'px'  
-    const toWidth = (element.clientWidth + (element.offsetWidth - element.clientWidth) + 1) + 'px'
-    const toHeight = (element.clientHeight + (element.offsetHeight - element.clientHeight) + 1) + 'px'
-
-    element.style.top = toTop
-    element.style.left = toLeft  
-    element.style.width = toWidth
-    element.style.height = toHeight
-    element.style.position = 'fixed'
-  }
-
-  fix()
-}
-*/
 
 // absolute
 export function captureElementPosition(element: any) {
@@ -70,31 +46,7 @@ export function captureElementPosition(element: any) {
   // element.style.position = 'fixed'
   // allow other elements that are being removed to have a moment to figure out where they currently sit
   setTimeout(fix, 0)
-  // fix()
 }
-/*
-// fixed
-export function captureElementPosition(element: any) {
-  element.style.zIndex = element.style.zIndex || 1
-  const toTop = element.offsetTop + 'px'
-  const toLeft = element.offsetLeft + 'px'  
-  const toWidth = (element.clientWidth + (element.offsetWidth - element.clientWidth) + 1) + 'px'
-  const toHeight = (element.clientHeight + (element.offsetHeight - element.clientHeight) + 1) + 'px'
-
-  const fix = () => {
-    element.style.top = toTop
-    element.style.left = toLeft  
-    element.style.width = toWidth
-    element.style.height = toHeight
-    element.style.position = 'fixed'
-  }
-
-  // element.style.position = 'fixed'
-  // allow other elements that are being removed to have a moment to figure out where they currently sit
-  setTimeout(fix, 0)
-  // fix()
-}
-*/
 
 function wait(time: number) {
   return new Promise((res) => {

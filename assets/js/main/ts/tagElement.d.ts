@@ -1,5 +1,5 @@
-import { TagSupport } from './TagSupport.class';
-import { TemplaterResult } from './templater.utils';
+import { BaseTagSupport } from './TagSupport.class';
+import { TemplaterResult } from './TemplaterResult.class';
 import { Tag } from './Tag.class';
 import { TagComponent } from './tag';
 export declare function tagElement(app: TagComponent, // (...args: unknown[]) => TemplaterResult,
@@ -9,7 +9,7 @@ element: HTMLElement | Element, props: unknown): {
 };
 export declare function applyTagUpdater(wrapper: TemplaterResult): {
     tag: Tag;
-    tagSupport: TagSupport;
+    tagSupport: BaseTagSupport;
 };
 /** Overwrites arguments.tagSupport.mutatingRender */
-export declare function addAppTagRender(tagSupport: TagSupport, tag: Tag): void;
+export declare function addAppTagRender(tagSupport: BaseTagSupport, tag: Tag): void;
