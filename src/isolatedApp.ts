@@ -15,7 +15,9 @@ export const IsolatedApp = tag(() => {
 
   const views: viewTypes[] = [
     // 'arrays',
-    'props'
+    'props',
+    'tagSwitchDebug',
+    'counters',
   ]
   
   return html`<!--isolatedApp.js-->

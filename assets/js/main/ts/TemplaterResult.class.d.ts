@@ -26,7 +26,6 @@ export declare class TemplaterResult {
     };
     tagSupport: BaseTagSupport;
     constructor(props: Props, children: TagChildren);
-    redraw?: (force?: boolean) => Tag;
     isTemplater: boolean;
 }
 export declare function renderWithSupport(tagSupport: BaseTagSupport, existingTag: Tag | undefined, subject: TagSubject, ownerTag?: Tag): {

@@ -2,9 +2,9 @@ import { watch, setLet, html, tag, InputElementTargetEvent, setProp } from "tagg
 import { renderCountDiv } from "./renderCount.component"
 
 export const propsDebugMain = tag((_='propsDebugMain') => {
+  let propNumber: any = setLet(0)(x => [propNumber, propNumber = x])
   let renderCount: number = setLet(0)(x => [renderCount, renderCount = x])
   let propsJson: any = setLet({test:33, x:'y'})(x => [propsJson, propsJson = x])
-  let propNumber: any = setLet(0)(x => [propNumber, propNumber = x])
 
   function propsJsonChanged(event: InputElementTargetEvent) {
     propsJson = JSON.parse(event.target.value)
@@ -15,7 +15,7 @@ export const propsDebugMain = tag((_='propsDebugMain') => {
 
   const json = JSON.stringify(propsJson, null, 2)
 
-  console.log('👑 highest prop', propNumber)
+  console.log('highest propNumber', propNumber)
 
   return html`
     <textarea id="props-debug-textarea" wrap="off" onchange=${propsJsonChanged}
@@ -40,7 +40,7 @@ export const propsDebugMain = tag((_='propsDebugMain') => {
         propsJson,
         propNumberChange: x => {
           propNumber = x
-          console.log('👑 highest prop changed', propNumber)
+          console.log('highest received new value', x)
         }
       })}
     </fieldset>
@@ -61,37 +61,24 @@ const propsDebug = tag((
 ) => {
   let renderCount: number = setLet(0)(x => [renderCount, renderCount=x])
   let propNumberChangeCount = setLet(0)(x => [propNumberChangeCount, propNumberChangeCount=x])
-  console.log('parent received arg propNumber', propNumber)
   const inProp = propNumber
   const test = (x: number): [number, number] => {
-    // console.log('setProp currently', propNumber)
     return [propNumber, propNumber = x]
   }
   propNumber = setProp(test)
 
-  if(inProp != propNumber) {
-    console.log('using new prop number', propNumber)
-  } else {
-    console.log('prop state and prop are the same', propNumber)
-  }
-
   const watchResults = watch([propNumber], () => {
     ++propNumberChangeCount
-    console.log('⌚️ prop change watch detected', propNumber, propNumberChangeCount)
   })
 
   ++renderCount
-
-  console.log('parent propNumber', {
-    propNumber,
-    propNumberChangeCount,
-    watchResults,
-  })
 
   function pasteProps(event: InputElementTargetEvent) {
     const value = JSON.parse(event.target.value)
     Object.assign(propsJson, value)
   }
+
+  console.log('parent prop number', propNumber)
 
   return html`<!--propsDebug.js-->
     <h3>Props Json</h3>
@@ -100,7 +87,8 @@ const propsDebug = tag((
     <hr />
     <h3>Props Number</h3>
     
-    <textarea style="font-size:0.6em;height:200px;width:100%;color:white;" wrap="off" disabled>${ JSON.stringify(watchResults, null, 2) }</textarea>
+    <textarea style="font-size:0.6em;height:200px;width:100%;color:white;" wrap="off" disabled
+    >${ JSON.stringify(watchResults, null, 2) }</textarea>
     
     <div>
       <button id="propsDebug-🥩-1-button" onclick=${() => propNumberChange(++propNumber)}
@@ -116,14 +104,13 @@ const propsDebug = tag((
       title="only changes number locally but if change by parent than that is the number"
     >local set propNumber ${propNumber}</button>
     
-    <div><small>(propNumberChangeCount:${propNumberChangeCount})</small></div>
+    <div><small>(propNumberChangeCount:<span id="propsDebug-🥩-change-display">${propNumberChangeCount}</span>)</small></div>
     
     <hr />
     <h3>Fn update test</h3>
     ${propFnUpdateTest({propNumber, callback: () => {
       ++propNumber
-      console.log('new propNumber', propNumber)
-      // console.log('new propNumber test ---', test(propNumber))
+      console.log('parent increase number', propNumber)
     }})}
     
     ${/*renderCountDiv({renderCount, name: 'propsDebug'})*/false}
@@ -137,12 +124,15 @@ const propFnUpdateTest = tag(({
 }) => {
   let renderCount = setLet(0)(x => [renderCount, renderCount = x])
   ++renderCount
-  console.log('put down propNumber', propNumber)
+
+  console.log('propFnUpdateTest - propNumber',propNumber)
+
   return html`
-    <button
-      title="the count here and within parent increases but not in parent parent"
+    <button id="propsOneLevelFunUpdate-🥩-button"
       onclick=${callback}
     >🥩 local & 1-parent increase ${propNumber}</button>
-    ${/*renderCountDiv({renderCount, name: 'propFnUpdateTest'})*/false}
+    <span id="propsOneLevelFunUpdate-🥩-display">${propNumber}</span>
+    ${renderCountDiv({renderCount, name: 'propFnUpdateTest'})}
+    <small style="opacity:.5">the count here and within parent increases but not in parent parent</small>
   `
 })

@@ -30,12 +30,28 @@ export function runTests() {
   })
 
   it('props testing', () => {
-    testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display')
-
     testDuelCounterElements(
       ['#propsDebug-🥩-0-button', '#propsDebug-🥩-0-display'],
       ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'],
     )
+
+    testDuelCounterElements(
+      ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'],
+      ['#propsOneLevelFunUpdate-🥩-button', '#propsOneLevelFunUpdate-🥩-display'],
+    )
+
+    expect(queryOneInnerHTML('#propsDebug-🥩-change-display')).toBe('9')
+
+    const ownerHTML = document.querySelectorAll('#propsDebug-🥩-0-display')[0].innerHTML
+    const parentHTML = document.querySelectorAll('#propsDebug-🥩-1-display')[0].innerHTML
+    const childHTML = document.querySelectorAll('#propsOneLevelFunUpdate-🥩-display')[0].innerHTML
+
+    const ownerNum = Number(ownerHTML)
+    const parentNum = Number(parentHTML)
+    const childNum = Number(childHTML)
+
+    expect(parentNum).toBe(childNum)
+    expect(ownerNum + 2).toBe(parentNum) // testing of setProp() doesn't change owner
   })
 
   it('providers', async () => {
@@ -132,6 +148,7 @@ export function runTests() {
   })
 
   it('child tests', () => {
+    testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display')
     testCounterElements('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display')
     testDuelCounterElements(
       ['#childTests-button', '#childTests-display'],
@@ -200,13 +217,14 @@ function testCounterElements(
   increaseCounters.forEach((increaseCounter, index) => {
     const counterDisplay = counterDisplays[index]
     // const counterDisplay = getByIndex(index)
-    
+    console.log('clicked 0')
     let counterValue = Number(counterDisplay?.innerText)
     increaseCounter?.click()
 
     let oldCounterValue = counterValue + 1
     counterValue = Number(counterDisplay?.innerText)
     expect(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to be value ${oldCounterValue} but is instead ${counterValue}`)
+    console.log('clicked 1')
     increaseCounter?.click()
 
     counterValue = Number(counterDisplay?.innerText)
@@ -229,4 +247,11 @@ function expectElementCount(
   expect(found).toBe(count, message)
 
   return elements
+}
+
+function queryOneInnerHTML(
+  query: string,
+  pos = 0
+) {
+  return document.querySelectorAll(query)[pos].innerHTML
 }

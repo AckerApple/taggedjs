@@ -53,8 +53,6 @@ export const App = tag(() => {
     ${renderCountDiv({name:'app', renderCount},)}
 
     <div id="tagDebug-fx-wrap">
-      ${tagDebug()}
-
       <div style="display:flex;flex-wrap:wrap;gap:1em">
         <fieldset id="counters" style="flex:2 2 20em">
           <legend>counters</legend>
@@ -87,7 +85,9 @@ export const App = tag(() => {
           <legend>Table Tests</legend>
           ${tableDebug()}
         </fieldset>
-      </div>            
+      </div>
+
+      ${tagDebug()}
     </div>
   `
 

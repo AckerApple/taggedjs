@@ -45,18 +45,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   propsDebugMain: () => (/* binding */ propsDebugMain)
 /* harmony export */ });
 /* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
+
 
 const propsDebugMain = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_ = 'propsDebugMain') => {
+    let propNumber = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [propNumber, propNumber = x]);
     let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
     let propsJson = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)({ test: 33, x: 'y' })(x => [propsJson, propsJson = x]);
-    let propNumber = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [propNumber, propNumber = x]);
     function propsJsonChanged(event) {
         propsJson = JSON.parse(event.target.value);
         return propsJson;
     }
     ++renderCount;
     const json = JSON.stringify(propsJson, null, 2);
-    console.log('👑 highest prop', propNumber);
+    console.log('highest propNumber', propNumber);
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
     <textarea id="props-debug-textarea" wrap="off" onchange=${propsJsonChanged}
       style="height:200px;font-size:0.6em;width:100%"
@@ -80,7 +82,7 @@ const propsDebugMain = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_ = 'props
         propsJson,
         propNumberChange: x => {
             propNumber = x;
-            console.log('👑 highest prop changed', propNumber);
+            console.log('highest received new value', x);
         }
     })}
     </fieldset>
@@ -90,33 +92,20 @@ const propsDebugMain = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_ = 'props
 const propsDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNumber, propsJson, propNumberChange, }) => {
     let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
     let propNumberChangeCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [propNumberChangeCount, propNumberChangeCount = x]);
-    console.log('parent received arg propNumber', propNumber);
     const inProp = propNumber;
     const test = (x) => {
-        // console.log('setProp currently', propNumber)
         return [propNumber, propNumber = x];
     };
     propNumber = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setProp)(test);
-    if (inProp != propNumber) {
-        console.log('using new prop number', propNumber);
-    }
-    else {
-        console.log('prop state and prop are the same', propNumber);
-    }
     const watchResults = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.watch)([propNumber], () => {
         ++propNumberChangeCount;
-        console.log('⌚️ prop change watch detected', propNumber, propNumberChangeCount);
     });
     ++renderCount;
-    console.log('parent propNumber', {
-        propNumber,
-        propNumberChangeCount,
-        watchResults,
-    });
     function pasteProps(event) {
         const value = JSON.parse(event.target.value);
         Object.assign(propsJson, value);
     }
+    console.log('parent prop number', propNumber);
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `<!--propsDebug.js-->
     <h3>Props Json</h3>
     <textarea style="font-size:0.6em;height:200px;width:100%" wrap="off" onchange=${pasteProps}>${JSON.stringify(propsJson, null, 2)}</textarea>
@@ -124,7 +113,8 @@ const propsDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNumber, 
     <hr />
     <h3>Props Number</h3>
     
-    <textarea style="font-size:0.6em;height:200px;width:100%;color:white;" wrap="off" disabled>${JSON.stringify(watchResults, null, 2)}</textarea>
+    <textarea style="font-size:0.6em;height:200px;width:100%;color:white;" wrap="off" disabled
+    >${JSON.stringify(watchResults, null, 2)}</textarea>
     
     <div>
       <button id="propsDebug-🥩-1-button" onclick=${() => propNumberChange(++propNumber)}
@@ -140,14 +130,13 @@ const propsDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNumber, 
       title="only changes number locally but if change by parent than that is the number"
     >local set propNumber ${propNumber}</button>
     
-    <div><small>(propNumberChangeCount:${propNumberChangeCount})</small></div>
+    <div><small>(propNumberChangeCount:<span id="propsDebug-🥩-change-display">${propNumberChangeCount}</span>)</small></div>
     
     <hr />
     <h3>Fn update test</h3>
     ${propFnUpdateTest({ propNumber, callback: () => {
             ++propNumber;
-            console.log('new propNumber', propNumber);
-            // console.log('new propNumber test ---', test(propNumber))
+            console.log('parent increase number', propNumber);
         } })}
     
     ${ /*renderCountDiv({renderCount, name: 'propsDebug'})*/false}
@@ -156,13 +145,14 @@ const propsDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNumber, 
 const propFnUpdateTest = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNumber, callback, }) => {
     let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
     ++renderCount;
-    console.log('put down propNumber', propNumber);
+    console.log('propFnUpdateTest - propNumber', propNumber);
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
-    <button
-      title="the count here and within parent increases but not in parent parent"
+    <button id="propsOneLevelFunUpdate-🥩-button"
       onclick=${callback}
     >🥩 local & 1-parent increase ${propNumber}</button>
-    ${ /*renderCountDiv({renderCount, name: 'propFnUpdateTest'})*/false}
+    <span id="propsOneLevelFunUpdate-🥩-display">${propNumber}</span>
+    ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_1__.renderCountDiv)({ renderCount, name: 'propFnUpdateTest' })}
+    <small style="opacity:.5">the count here and within parent increases but not in parent parent</small>
   `;
 });
 
@@ -294,8 +284,6 @@ const App = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
     ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_8__.renderCountDiv)({ name: 'app', renderCount })}
 
     <div id="tagDebug-fx-wrap">
-      ${(0,_tagJsDebug__WEBPACK_IMPORTED_MODULE_4__.tagDebug)()}
-
       <div style="display:flex;flex-wrap:wrap;gap:1em">
         <fieldset id="counters" style="flex:2 2 20em">
           <legend>counters</legend>
@@ -328,7 +316,9 @@ const App = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
           <legend>Table Tests</legend>
           ${(0,_tableDebug_component__WEBPACK_IMPORTED_MODULE_2__.tableDebug)()}
         </fieldset>
-      </div>            
+      </div>
+
+      ${(0,_tagJsDebug__WEBPACK_IMPORTED_MODULE_4__.tagDebug)()}
     </div>
   `;
     return content;
@@ -610,6 +600,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
     let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.setLet)(0)(x => [counter, counter = x]);
+    let propCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.setLet)(0)(x => [propCounter, propCounter = x]);
     let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.setLet)(0)(x => [renderCount, renderCount = x]);
     let initCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.setLet)(0)(x => [initCounter, initCounter = x]);
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.onInit)(() => {
@@ -620,29 +611,42 @@ const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
         ++counter;
         console.log('counter increased', counter);
     };
+    const increasePropCounter = () => {
+        ++propCounter;
+        console.log('propCounter increased', propCounter);
+    };
     ++renderCount; // for debugging
+    console.log('---- parent render ----');
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.html) `<!--counters-->
     <div>Subscriptions:${taggedjs__WEBPACK_IMPORTED_MODULE_1__.Subject.globalSubCount$}</div>
     <button onclick=${() => console.info('subs', taggedjs__WEBPACK_IMPORTED_MODULE_1__.Subject.globalSubs)}>log subs</button>
     <div>initCounter:${initCounter}</div>
-    <button id="increase-counter" onclick=${increaseCounter}>counter:${counter}</button>
-    <span id="counter-display">${counter}</span>
+
+    <button id="increase-standalone-counter"
+      onclick=${increaseCounter}
+    >counter:${counter}</button>
+    <span id="counter-standalone-display">${counter}</span>
+
+    <button id="increase-counter"
+      onclick=${increasePropCounter}
+    >propCounter:${propCounter}</button>
+    <span id="counter-display">${propCounter}</span>
     
     <fieldset>
       <legend>inner counter</legend>
-      ${innerCounters({ counter, increaseCounter })}
+      ${innerCounters({ propCounter, increasePropCounter })}
     </fieldset>
     ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_0__.renderCountDiv)({ renderCount, name: 'counters' })}
   `;
 });
-const innerCounters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(({ counter, increaseCounter }) => {
+const innerCounters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(({ propCounter, increasePropCounter, }) => {
     let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.setLet)(0)(x => [renderCount, renderCount = x]);
     ++renderCount; // for debugging
-    console.log('inner counters', { counter, renderCount });
+    console.log('---- inner counters ----', { propCounter, renderCount });
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.html) `
-    <button id="inner-increase-counter" onclick=${increaseCounter}
-    >counter:${counter}</button>
-    <span id="inner-counter-display">${counter}</span>
+    <button id="inner-increase-counter" onclick=${increasePropCounter}
+    >propCounter:${propCounter}</button>
+    <span id="inner-counter-display">${propCounter}</span>
     <div>renderCount:${renderCount}</div>
     ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_0__.renderCountDiv)({ renderCount, name: 'inner counters' })}
   `;
@@ -946,7 +950,9 @@ const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
     // const template = component.wrapper().getTemplate()
     const views = [
         // 'arrays',
-        'props'
+        'props',
+        'tagSwitchDebug',
+        'counters',
     ];
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.html) `<!--isolatedApp.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
@@ -1516,8 +1522,17 @@ function runTests() {
         testCounterElements('#increase-counter', '#counter-display');
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('props testing', () => {
-        testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display');
         testDuelCounterElements(['#propsDebug-🥩-0-button', '#propsDebug-🥩-0-display'], ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display']);
+        testDuelCounterElements(['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'], ['#propsOneLevelFunUpdate-🥩-button', '#propsOneLevelFunUpdate-🥩-display']);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(queryOneInnerHTML('#propsDebug-🥩-change-display')).toBe('9');
+        const ownerHTML = document.querySelectorAll('#propsDebug-🥩-0-display')[0].innerHTML;
+        const parentHTML = document.querySelectorAll('#propsDebug-🥩-1-display')[0].innerHTML;
+        const childHTML = document.querySelectorAll('#propsOneLevelFunUpdate-🥩-display')[0].innerHTML;
+        const ownerNum = Number(ownerHTML);
+        const parentNum = Number(parentHTML);
+        const childNum = Number(childHTML);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(parentNum).toBe(childNum);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ownerNum + 2).toBe(parentNum); // testing of setProp() doesn't change owner
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('providers', async () => {
         testDuelCounterElements(['#increase-provider-🍌-0-button', '#increase-provider-🍌-0-display'], ['#increase-provider-🍌-1-button', '#increase-provider-🍌-1-display']);
@@ -1585,6 +1600,7 @@ function runTests() {
         (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe((Number(outsideElm?.innerText) - 2).toString());
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('child tests', () => {
+        testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display');
         testCounterElements('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display');
         testDuelCounterElements(['#childTests-button', '#childTests-display'], ['#innerHtmlPropsTest-childTests-button', '#innerHtmlPropsTest-childTests-display']);
         testDuelCounterElements(['#childTests-button', '#childTests-display'], ['#innerHtmlTest-childTests-button', '#innerHtmlTest-childTests-display']);
@@ -1632,11 +1648,13 @@ function testCounterElements(counterButtonId, counterDisplayId, { elementCountEx
     increaseCounters.forEach((increaseCounter, index) => {
         const counterDisplay = counterDisplays[index];
         // const counterDisplay = getByIndex(index)
+        console.log('clicked 0');
         let counterValue = Number(counterDisplay?.innerText);
         increaseCounter?.click();
         let oldCounterValue = counterValue + 1;
         counterValue = Number(counterDisplay?.innerText);
         (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to be value ${oldCounterValue} but is instead ${counterValue}`);
+        console.log('clicked 1');
         increaseCounter?.click();
         counterValue = Number(counterDisplay?.innerText);
         ++oldCounterValue;
@@ -1650,6 +1668,9 @@ function expectElementCount(query, count, message) {
     message = message || `Expected ${count} elements to match query ${query} but found ${found}`;
     (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(found).toBe(count, message);
     return elements;
+}
+function queryOneInnerHTML(query, pos = 0) {
+    return document.querySelectorAll(query)[pos].innerHTML;
 }
 
 
@@ -1789,7 +1810,7 @@ class Tag {
         this.arrayValue = arrayValue;
         return this;
     }
-    async destroy(options = {
+    destroy(options = {
         stagger: 0,
         byParent: false, // Only destroy clones of direct children
     }) {
@@ -1801,7 +1822,13 @@ class Tag {
         if (isComponent) {
             (0,_tagRunner__WEBPACK_IMPORTED_MODULE_0__.runBeforeDestroy)(this.tagSupport, this);
         }
+        const childTags = options.byParent ? [] : getChildTagsToDestroy(this.childTags);
+        delete this.tagSupport.templater.global.oldest;
+        delete this.tagSupport.templater.global.newest;
+        this.hasLiveElements = false;
+        delete this.tagSupport.subject.tag;
         this.destroySubscriptions();
+        let mainPromise = Promise.resolve();
         if (this.ownerTag) {
             this.ownerTag.childTags = this.ownerTag.childTags.filter(child => child !== this);
         }
@@ -1809,19 +1836,16 @@ class Tag {
             const { stagger, promise } = this.destroyClones(options);
             options.stagger = stagger;
             if (promise) {
-                await promise;
+                mainPromise = promise;
             }
         }
         else {
             this.destroyClones();
         }
-        const promises = this.childTags.map(kid => kid.destroy({ stagger: 0, byParent: true }));
-        this.childTags.length = 0;
-        await Promise.all(promises);
-        this.hasLiveElements = false;
-        delete this.tagSupport.templater.global.oldest;
-        delete this.tagSupport.templater.global.newest;
-        return options.stagger;
+        return mainPromise.then(async () => {
+            const promises = childTags.map(kid => kid.destroy({ stagger: 0, byParent: true }));
+            await Promise.all(promises);
+        }).then(() => options.stagger);
     }
     destroySubscriptions() {
         this.cloneSubs.forEach(cloneSub => cloneSub.unsubscribe());
@@ -1950,10 +1974,28 @@ class Tag {
                         const newValueFn = value.wrapper?.original;
                         const fnMatched = oldValueFn === newValueFn;
                         if (fnMatched) {
-                            // ???
-                            // console.log('🍎 global disconnect')
-                            // value.global = tag.tagSupport.templater.global
-                            value.global = tag.tagSupport.templater.global;
+                            const newTemp = value;
+                            newTemp.global = tag.tagSupport.templater.global;
+                            /*
+                            const tagSubject = subject as TagSubject
+                            if(!newTemp.tagSupport) {
+                              const ownerTagSupport = tag.ownerTag?.tagSupport as TagSupport
+                              newTemp.tagSupport = new TagSupport(ownerTagSupport, newTemp, tagSubject)
+                            }
+              
+                            const redraw = renderTagSupport(newTemp.tagSupport, false)
+              
+                            if(!isLikeTags(tag, redraw)) {
+                              destroyTagMemory(tag, subject as TagSubject)
+                              newTemp.global = {...tag.tagSupport.templater.global}
+                              newTemp.global.context = {}
+                              const insertBefore = tag.tagSupport.templater.global.insertBefore as Element
+                              redraw.buildBeforeElement(insertBefore)
+                              throw new Error('clone time')
+                            } else {
+                              newTemp.global = tag.tagSupport.templater.global
+                            }
+                            */
                         }
                     }
                 }
@@ -1962,6 +2004,12 @@ class Tag {
                     // value.set(value.value)
                     return;
                 }
+                /*
+                const subTag = (subject as any).tag
+                if(subTag && !subTag.hasLiveElements) {
+                  return
+                }
+                */
                 subject.set(value);
                 return;
             }
@@ -2028,19 +2076,18 @@ class Tag {
             throw new Error('no parent building tag');
         }
         afterInterpolateElement(elementContainer, insertBefore, this, // ownerTag
-        [], context, options);
+        context, options);
         // this.clones.push(...clones)
         // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
         let isForceElement = options.forceElement;
         tagComponents.forEach(tagComponent => {
-            const preClones = this.clones.map(clone => clone);
+            // const preClones = this.clones.map(clone => clone)
             (0,_interpolateTemplate__WEBPACK_IMPORTED_MODULE_3__.subscribeToTemplate)(tagComponent.insertBefore, // temporary,
             tagComponent.subject, tagComponent.ownerTag, options.counts, { isForceElement }, context, tagComponent.variableName, options.test);
             if (!insertBefore.parentNode) {
                 throw new Error('no parent building tag components');
             }
-            afterInterpolateElement(elementContainer, insertBefore, this, [], // preClones,
-            context, options);
+            afterInterpolateElement(elementContainer, insertBefore, this, context, options);
             // remove component clones from ownerTag as they will belong to the components they live on
             /*
             if( preClones.length ) {
@@ -2050,14 +2097,35 @@ class Tag {
         });
         this.tagSupport.templater.global.oldest = this;
         this.tagSupport.templater.global.newest = this;
+        this.tagSupport.subject.tag = this;
         this.hasLiveElements = true;
     }
 }
-function afterInterpolateElement(container, insertBefore, ownerTag, preClones, context, options) {
+function afterInterpolateElement(container, insertBefore, ownerTag, 
+// preClones: Clones,
+context, options) {
     const clones = (0,_render__WEBPACK_IMPORTED_MODULE_1__.buildClones)(container, insertBefore);
     ownerTag.clones.push(...clones);
     clones.forEach(clone => (0,_interpolateTemplate__WEBPACK_IMPORTED_MODULE_3__.afterElmBuild)(clone, options, context, ownerTag));
     return clones;
+}
+function getChildTagsToDestroy(childTags, allTags = []) {
+    for (let index = childTags.length - 1; index >= 0; --index) {
+        const cTag = childTags[index];
+        // cTag.destroySubscriptions()
+        allTags.push(cTag);
+        childTags.splice(index, 1);
+        getChildTagsToDestroy(cTag.childTags, allTags);
+        /*
+        for (let iIndex = this.childTags.length - 1; iIndex >= 0; --iIndex) {
+          const iTag = this.childTags[iIndex]
+          if(cTag === iTag) {
+            this.childTags.splice(iIndex, 1)
+          }
+        }
+        */
+    }
+    return allTags;
 }
 
 
@@ -2077,10 +2145,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ValueSubject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ValueSubject */ "../main/ts/ValueSubject.ts");
 /* harmony import */ var _TemplaterResult_class__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TemplaterResult.class */ "../main/ts/TemplaterResult.class.ts");
 /* harmony import */ var _bindSubjectCallback_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./bindSubjectCallback.function */ "../main/ts/bindSubjectCallback.function.ts");
-/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
-/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./checkDestroyPrevious.function */ "../main/ts/checkDestroyPrevious.function.ts");
-
-
 
 
 
@@ -2100,20 +2164,7 @@ function redrawTag(subject, templater, ownerTag) {
     if (!tagSupport.templater.global.oldest) {
         throw new Error('33333');
     }
-    console.log('call for ----> renderWithSupport', {
-        tagProps: tagSupport.templater.props,
-        exNewProps: existingTag.tagSupport.templater.global.newest?.tagSupport.templater.props,
-    });
-    let { retag } = (0,_TemplaterResult_class__WEBPACK_IMPORTED_MODULE_1__.renderWithSupport)(tagSupport, existingTag, subject, ownerTag);
-    const isLikeTag = !existingTag || (0,_isLikeTags_function__WEBPACK_IMPORTED_MODULE_3__.isLikeTags)(existingTag, retag);
-    if (!isLikeTag) {
-        console.log('UNLIKE TAG DESTROY');
-        (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_4__.destroyTagMemory)(existingTag, subject);
-        delete templater.global.oldest;
-        delete templater.global.newest;
-        templater.global.insertBefore = existingTag.tagSupport.templater.global.insertBefore;
-        return retag;
-    }
+    let { retag, remit } = (0,_TemplaterResult_class__WEBPACK_IMPORTED_MODULE_1__.renderWithSupport)(tagSupport, existingTag, subject, ownerTag);
     return retag;
 }
 
@@ -2180,10 +2231,20 @@ function renderTagSupport(tagSupport, renderUp) {
     // const oldTagSetup = this
     const subject = tagSupport.subject;
     const templater = tagSupport.templater; // oldTagSetup.templater // templater
-    console.log('xxxxxxxxxxxxxxx', {
-        tempProps: templater.props,
-        exProps: subject.tag?.tagSupport.templater.global.newest?.tagSupport.templater.props,
-    });
+    const newest = subject.tag?.tagSupport.templater.global.newest;
+    if (newest) {
+        const nowProps = templater.props;
+        const latestProps = newest?.tagSupport.templater.props;
+        if (nowProps && latestProps && latestProps.propNumber > nowProps.propNumber) {
+            console.log('mismatched templater', {
+                original: templater.wrapper.original,
+                nowProps,
+                latestProps,
+                late: templater.global.newestTemplater.props,
+            });
+            throw new Error('the newest and what I am processing do not have the same props');
+        }
+    }
     const useTagSupport = tagSupport.templater.global.newest?.tagSupport; // oldTagSetup
     // const oldest = templater.global.oldest as Tag
     if (!templater.global.oldest) {
@@ -2191,7 +2252,7 @@ function renderTagSupport(tagSupport, renderUp) {
     }
     const exit = (0,_renderExistingTag_function__WEBPACK_IMPORTED_MODULE_2__.renderExistingTag)(
     // templater.global.newest as Tag,
-    templater.global.oldest, templater, useTagSupport, subject, tagSupport.templater.global.oldest);
+    templater.global.oldest, templater, useTagSupport, subject);
     const tag = exit.redraw;
     // oldest.updateByTag(exit.redraw)
     // only update and no more?
@@ -2201,12 +2262,19 @@ function renderTagSupport(tagSupport, renderUp) {
         return tag;
     }
     // Have owner re-render
-    if (renderUp && tag.ownerTag) {
-        const ownerTagSupport = tag.ownerTag.tagSupport;
-        console.log('child is asking to render owner - render function');
-        renderTagSupport(ownerTagSupport, true);
-        return tag;
+    // ??? - recently removed. As causes some sort of owner newest disconnect during prop testing
+    /*
+    if(renderUp && tag.ownerTag) {
+      const ownerTagSupport = tag.ownerTag.tagSupport
+      console.log('--- renderup ---', ownerTagSupport.templater.wrapper.original)
+      renderTagSupport(
+        ownerTagSupport,
+        true,
+      )
+  
+      return tag
     }
+    */
     return tag;
 }
 function cloneValueArray(values) {
@@ -2254,6 +2322,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tagRunner */ "../main/ts/tagRunner.ts");
 /* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./setUse.function */ "../main/ts/setUse.function.ts");
+/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
+/* harmony import */ var _destroyTag_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./destroyTag.function */ "../main/ts/destroyTag.function.ts");
+
+
 
 
 class TemplaterResult {
@@ -2273,7 +2345,11 @@ class TemplaterResult {
         this.props = props;
         this.children = children;
     }
-    redraw;
+    /*
+    redraw?: (
+      force?: boolean, // force children to redraw
+    ) => Tag
+    */
     isTemplater = true;
 }
 function renderWithSupport(tagSupport, existingTag, subject, ownerTag) {
@@ -2285,15 +2361,7 @@ function renderWithSupport(tagSupport, existingTag, subject, ownerTag) {
     // ++wrapTagSupport.memory.renderCount
     const runtimeOwnerTag = existingTag?.ownerTag || ownerTag;
     if (existingTag) {
-        console.log('redrawing existing tag', {
-            existingTag,
-            org: existingTag.tagSupport.templater.wrapper.original,
-            state: existingTag.tagSupport.memory.state.newest,
-            wrapTagSupport: wrapTagSupport.templater.wrapper.original,
-            wrapState: wrapTagSupport.memory.state.newest,
-            ttt: tagSupport.templater.props,
-            newestProps: existingTag.tagSupport.templater.global.newest?.tagSupport.templater.props,
-        });
+        // wrapTagSupport.templater.props = existingTag.tagSupport.templater.global.newest?.tagSupport.templater.props || wrapTagSupport.templater.props
         wrapTagSupport.memory.state.newest = [...existingTag.tagSupport.memory.state.newest];
         // ??? - new
         wrapTagSupport.templater.global = existingTag.tagSupport.templater.global;
@@ -2310,12 +2378,33 @@ function renderWithSupport(tagSupport, existingTag, subject, ownerTag) {
         providers.ownerTag = runtimeOwnerTag;
     }
     /* END: BEFORE RENDER */
-    const retag = wrapTagSupport.templater.wrapper(wrapTagSupport, subject);
+    const templater = wrapTagSupport.templater;
+    const retag = templater.wrapper(wrapTagSupport, subject);
     /* AFTER */
     (0,_tagRunner__WEBPACK_IMPORTED_MODULE_0__.runAfterRender)(wrapTagSupport, retag);
+    const isLikeTag = !existingTag || (0,_isLikeTags_function__WEBPACK_IMPORTED_MODULE_2__.isLikeTags)(existingTag, retag);
+    if (!isLikeTag) {
+        (0,_destroyTag_function__WEBPACK_IMPORTED_MODULE_3__.destroyTagMemory)(existingTag, subject);
+        delete templater.global.oldest;
+        delete templater.global.newest;
+        delete subject.tag;
+        templater.global.insertBefore = existingTag.tagSupport.templater.global.insertBefore;
+        // retag.buildBeforeElement(templater.global.insertBefore)
+        // subject.tag = retag
+        // return retag
+    }
+    /*
+    if(existingTag) {
+      if(!isLikeTags(retag,existingTag)) {
+        destroyTagMemory(existingTag, subject)
+      }
+      // throw new Error('similar but different tags')
+    }
+    */
     retag.ownerTag = runtimeOwnerTag;
     wrapTagSupport.templater.global.newest = retag;
-    subject.tag = retag;
+    // ??? - new
+    // subject.tag = retag
     if (wrapTagSupport.templater.global.oldest && !wrapTagSupport.templater.global.oldest.hasLiveElements) {
         throw new Error('56513540');
     }
@@ -2383,31 +2472,12 @@ function alterProps(props, templater, ownerSupport) {
         if (templater.global.renderCount > renderCount) {
             throw new Error('already rendered');
         }
-        const ownerTag = tag?.ownerTag;
-        const ownerTagSupport = ownerTag.tagSupport;
-        const ownerGlobal = ownerTagSupport.templater.global;
-        const newestOwner = ownerGlobal.newest;
-        const oldestGlobal = newestOwner.tagSupport.templater.global;
-        console.log('--- render parent that passed props ---', {
-            original: newestOwner.tagSupport.templater.wrapper?.original,
-            state: newestOwner.tagSupport.memory.state.newest,
-            subject: newestOwner.tagSupport.subject.tag,
-            equal: newestOwner === newestOwner.tagSupport.subject.tag,
-            // lastTagOwner2: lastTag?.ownerTag?.tagSupport.memory.state.newest[2]?.get(),
-            // equalLast: lastTag === newestOwner.tagSupport.subject.tag
-            state2: newestOwner.tagSupport.memory.state.newest[2]?.get(),
-            ownerState2: ownerSupport.memory.state.newest[2].get(),
-            equalOwnerWrap: ownerTagSupport.templater.wrapper?.original === newestOwner.tagSupport.templater.wrapper?.original,
-            ownerOriginal: ownerTagSupport.templater.wrapper?.original,
-            ownerGlobal: ownerGlobal.oldest?.hasLiveElements,
-            oldestGlobal: oldestGlobal.oldest?.hasLiveElements,
-            equalGlobal: ownerGlobal == oldestGlobal,
-            argOrg: ownerSupport.templater.wrapper.original,
-            argOwner: ownerSupport.templater.global.oldest?.hasLiveElements,
-        });
-        // ??? - new
-        // newestOwner.tagSupport.render(
-        (0,_TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(ownerSupport, true);
+        const lastestOwner = ownerSupport.templater.global.newest;
+        const newOwner = (0,_TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(lastestOwner.tagSupport, // ??? newestOwner.tagSupport, // ??? ownerSupport,
+        true);
+        if (newOwner.tagSupport.templater.global.newest != newOwner) {
+            throw new Error('newest assignment issue?');
+        }
         return callbackResult;
     }
     const isPropTag = (0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagInstance)(props);
@@ -2474,11 +2544,14 @@ function runTagCallback(value, tag, bindTo, args) {
     if (tagSupport && !sameRenderCount) {
         return; // already rendered
     }
-    console.log('click render --- ');
+    console.log('****** call back renderTagSupport', {
+        original: tagSupport.templater.wrapper.original,
+        props: tagSupport.templater.props,
+        global: tagSupport.templater.global,
+    });
     (0,_TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport, false);
     if (callbackResult instanceof Promise) {
         return callbackResult.then(() => {
-            console.log('click promise render --- ');
             (0,_TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport, false);
             return 'promise-no-data-ever';
         });
@@ -2499,34 +2572,40 @@ function runTagCallback(value, tag, bindTo, args) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   checkDestroyPrevious: () => (/* binding */ checkDestroyPrevious),
-/* harmony export */   destroyArrayTag: () => (/* binding */ destroyArrayTag),
-/* harmony export */   destroyTagMemory: () => (/* binding */ destroyTagMemory),
-/* harmony export */   destroyTagSupportPast: () => (/* binding */ destroyTagSupportPast)
+/* harmony export */   destroyArrayTag: () => (/* binding */ destroyArrayTag)
 /* harmony export */ });
 /* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./isInstance */ "../main/ts/isInstance.ts");
 /* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
+/* harmony import */ var _destroyTag_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./destroyTag.function */ "../main/ts/destroyTag.function.ts");
 
 
-function checkDestroyPrevious(existing, // existing.value is the old value
+
+function checkDestroyPrevious(subject, // existing.value is the old value
 newValue) {
-    const existingSubArray = existing;
+    const existingSubArray = subject;
     const wasArray = existingSubArray.lastArray;
     // no longer an array
     if (wasArray && !(0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isTagArray)(newValue)) {
+        // if(isTagInstance(newValue) || isTagComponent(newValue)) {
+        //   const templater = newValue as TemplaterResult
+        //   delete templater.global.oldest
+        //   delete templater.global.newest
+        //   templater.global.context = {}
+        // }
         wasArray.forEach(({ tag }) => destroyArrayTag(tag, { added: 0, removed: 0 }));
-        delete existing.lastArray;
+        delete subject.lastArray;
         return 1;
     }
-    const tagSubject = existing;
+    const tagSubject = subject;
     const existingTag = tagSubject.tag;
     // no longer tag or component?
     if (existingTag) {
         const isValueTag = (0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isTagInstance)(newValue);
-        const isSubjectTag = (0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isTagInstance)(existing.value);
+        const isSubjectTag = (0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isTagInstance)(subject.value);
         if (isSubjectTag && isValueTag) {
             const newTag = newValue;
             if (!(0,_isLikeTags_function__WEBPACK_IMPORTED_MODULE_1__.isLikeTags)(newTag, existingTag)) {
-                destroyTagMemory(existingTag, tagSubject);
+                (0,_destroyTag_function__WEBPACK_IMPORTED_MODULE_2__.destroyTagMemory)(existingTag, tagSubject);
                 return 2;
             }
             return false;
@@ -2536,10 +2615,10 @@ newValue) {
             return false; // its still a tag component
         }
         // destroy old component, value is not a component
-        destroyTagMemory(existingTag, tagSubject);
+        (0,_destroyTag_function__WEBPACK_IMPORTED_MODULE_2__.destroyTagMemory)(existingTag, tagSubject);
         return 3;
     }
-    const displaySubject = existing;
+    const displaySubject = subject;
     const hasLastValue = 'lastValue' in displaySubject;
     const lastValue = displaySubject.lastValue; // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
     // was simple value but now something bigger
@@ -2549,18 +2628,8 @@ newValue) {
     }
     return false;
 }
-function destroyTagMemory(tag, existingSubject) {
-    const oldTagSupport = tag.tagSupport;
-    destroyTagSupportPast(oldTagSupport);
-    delete existingSubject.tag;
-    tag.destroy();
-}
-function destroyTagSupportPast(oldTagSupport) {
-    delete oldTagSupport.templater.global.oldest;
-    delete oldTagSupport.templater.global.newest;
-}
 function destroyArrayTag(tag, counts) {
-    destroyTagSupportPast(tag.tagSupport);
+    (0,_destroyTag_function__WEBPACK_IMPORTED_MODULE_2__.destroyTagSupportPast)(tag.tagSupport);
     tag.destroy({
         stagger: counts.removed++,
     });
@@ -2683,6 +2752,40 @@ function isDeepEqual(obj1, obj2, visited) {
 function isSameFunctions(fn0, fn1) {
     const bothFunction = fn0 instanceof Function && fn1 instanceof Function;
     return bothFunction && fn0.toString() === fn1.toString();
+}
+
+
+/***/ }),
+
+/***/ "../main/ts/destroyTag.function.ts":
+/*!*****************************************!*\
+  !*** ../main/ts/destroyTag.function.ts ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   destroyTagMemory: () => (/* binding */ destroyTagMemory),
+/* harmony export */   destroyTagSupportPast: () => (/* binding */ destroyTagSupportPast)
+/* harmony export */ });
+function destroyTagMemory(tag, subject) {
+    const oldTagSupport = tag.tagSupport;
+    if (subject != tag.tagSupport.subject) {
+        throw new Error('fff - subjects do not match');
+    }
+    delete subject.tag;
+    delete tag.tagSupport.subject.tag;
+    // ???
+    const oldest = tag.tagSupport.templater.global.oldest;
+    oldest.destroy();
+    // tag.destroy()
+    destroyTagSupportPast(oldTagSupport);
+    // ???
+    tag.tagSupport.templater.global.context = {};
+}
+function destroyTagSupportPast(oldTagSupport) {
+    delete oldTagSupport.templater.global.oldest;
+    delete oldTagSupport.templater.global.newest;
 }
 
 
@@ -2874,11 +2977,11 @@ function hasTagSupportChanged(oldTagSupport, newTagSupport, newTemplater) {
         throw new Error('something here - 22');
     }
     const latestProps = newTemplater.props; // newTagSupport.propsConfig.latest
-    const oldClonedProps = oldTagSupport.propsConfig.latestCloned;
-    const propsChanged = hasPropChanges(latestProps, oldClonedProps);
+    const pastCloneProps = oldTagSupport.propsConfig.latestCloned;
+    const propsChanged = hasPropChanges(latestProps, pastCloneProps);
     // if no changes detected, no need to continue to rendering further tags
     if (propsChanged) {
-        return true;
+        return propsChanged;
     }
     const kidsChanged = hasKidsChanged(oldTagSupport, newTagSupport);
     // we already know props didn't change and if kids didn't either, than don't render
@@ -2897,7 +3000,7 @@ pastCloneProps) {
     // check all prop functions match
     if (typeof (props) === 'object') {
         if (!pastCloneProps) {
-            return true;
+            return 3;
         }
         castedProps = { ...props };
         castedPastProps = { ...(pastCloneProps || {}) };
@@ -2907,7 +3010,7 @@ pastCloneProps) {
             }*/
             let compare = castedPastProps[key];
             if (!(value instanceof Function)) {
-                return true; // this will be checked in deepEqual
+                return 4; // this will be checked in deepEqual
             }
             if (!(compare instanceof Function)) {
                 return false; // its a function now but was not before
@@ -2925,14 +3028,15 @@ pastCloneProps) {
             }
             delete castedProps[key]; // its a function and not needed to be compared
             delete castedPastProps[key]; // its a function and not needed to be compared
-            return true;
+            return 5;
         });
         if (!allFunctionsMatch) {
-            return true; // a change has been detected by function comparisons
+            return 6; // a change has been detected by function comparisons
         }
     }
-    const isEqual = (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepEqual)(pastCloneProps, props);
-    return !isEqual; // if equal then no changes
+    // ???
+    const isEqual = (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepEqual)(castedPastProps, castedProps);
+    return isEqual ? false : 7; // if equal then no changes
 }
 function hasKidsChanged(oldTagSupport, newTagSupport) {
     const oldCloneKidValues = oldTagSupport.propsConfig.lastClonedKidValues;
@@ -2941,7 +3045,7 @@ function hasKidsChanged(oldTagSupport, newTagSupport) {
         const x = newClonedKidValues[index];
         return set.every((item, index) => item === x[index]);
     });
-    return !everySame;
+    return everySame ? false : 9;
 }
 
 
@@ -3304,7 +3408,9 @@ function subscribeToTemplate(insertBefore, subject, ownerTag, counts, // used fo
             insertBefore = clone;
         }
         if (called) {
-            context[variableName] = (0,_updateExistingValue_function__WEBPACK_IMPORTED_MODULE_5__.updateExistingValue)(subject, value, ownerTag, insertBefore);
+            const tag = subject.tag;
+            // context[variableName] = 
+            (0,_updateExistingValue_function__WEBPACK_IMPORTED_MODULE_5__.updateExistingValue)(subject, value, ownerTag, insertBefore);
             return;
         }
         (0,_processSubjectValue_function__WEBPACK_IMPORTED_MODULE_2__.processSubjectValue)(value, subject, insertBefore, ownerTag, {
@@ -3687,7 +3793,6 @@ __webpack_require__.r(__webpack_exports__);
 function processNewValue(hasValue, value, ownerTag) {
     if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagComponent)(value)) {
         const tagSubject = new _ValueSubject__WEBPACK_IMPORTED_MODULE_0__.ValueSubject(value);
-        // setValueRedraw(value, tagSubject, ownerTag)
         return tagSubject;
     }
     if (value instanceof Function) {
@@ -3772,17 +3877,16 @@ function processSubjectComponent(templater, subject, template, ownerTag, options
     }
     // templater.oldest = subject.tag?.tagSupport.oldest || templater.oldest
     templater.global.insertBefore = template;
-    const tagSupport = templater.tagSupport;
     let retag = subject.tag;
     const providers = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.providerConfig;
     providers.ownerTag = ownerTag;
     const isRedraw = !retag || options.forceElement;
     if (isRedraw) {
         const preClones = ownerTag.clones.map(clone => clone);
-        if (!tagSupport) {
-            throw new Error('a0');
+        const result = (0,_TemplaterResult_class__WEBPACK_IMPORTED_MODULE_0__.renderWithSupport)(templater.tagSupport, subject.tag, subject, ownerTag);
+        if (result.retag.tagSupport.templater.global.newest != result.retag) {
+            throw new Error('mismatch result newest');
         }
-        const result = (0,_TemplaterResult_class__WEBPACK_IMPORTED_MODULE_0__.renderWithSupport)(tagSupport, subject.tag, subject, ownerTag);
         retag = result.retag;
         templater.global.newest = retag;
         if (ownerTag.clones.length > preClones.length) {
@@ -3897,6 +4001,9 @@ options) {
         throw new Error('4711654');
     }
     subject.tag = tag;
+    if (!tag.hasLiveElements) {
+        throw new Error('44444 - 0');
+    }
 }
 
 
@@ -4041,7 +4148,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   processTagResult: () => (/* binding */ processTagResult)
 /* harmony export */ });
-/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./checkDestroyPrevious.function */ "../main/ts/checkDestroyPrevious.function.ts");
+/* harmony import */ var _destroyTag_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./destroyTag.function */ "../main/ts/destroyTag.function.ts");
 
 function processTagResult(tag, subject, // used for recording past and current value
 insertBefore, // <template end interpolate />
@@ -4067,6 +4174,9 @@ insertBefore, // <template end interpolate />
                         throw new Error('maybe 0');
                     }
                     subjectTag.tag = newTag;
+                    if (!newTag.hasLiveElements) {
+                        throw new Error('44444 - 2');
+                    }
                     return;
                 }
                 previousTag.updateByTag(tag);
@@ -4074,25 +4184,27 @@ insertBefore, // <template end interpolate />
                     throw new Error('maybe 1');
                 }
                 subjectTag.tag = tag;
+                if (!tag.hasLiveElements) {
+                    throw new Error('44444 - 3');
+                }
                 return;
             }
-            (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_0__.destroyTagMemory)(previousTag, subject);
-            throw new Error('585');
+            (0,_destroyTag_function__WEBPACK_IMPORTED_MODULE_0__.destroyTagMemory)(previousTag, subject);
+            throw new Error('585 - think we never get here');
         }
     }
     tag.buildBeforeElement(insertBefore, {
         counts,
         forceElement, test: false,
     });
-    tag.tagSupport.templater.global.oldest = tag;
-    if (!tag.lastTemplateString) {
-        throw new Error('999 - 3');
-    }
     tag.tagSupport.templater.global.newest = tag;
     if (!tag.tagSupport.templater.global.oldest) {
         throw new Error('maybe 3');
     }
     subjectTag.tag = tag; // let reprocessing know we saw this previously as an if
+    if (!tag.hasLiveElements) {
+        throw new Error('44444 - 4');
+    }
 }
 
 
@@ -4292,14 +4404,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _hasTagSupportChanged_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./hasTagSupportChanged.function */ "../main/ts/hasTagSupportChanged.function.ts");
 /* harmony import */ var _provider_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./provider.utils */ "../main/ts/provider.utils.ts");
 /* harmony import */ var _Tag_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Tag.utils */ "../main/ts/Tag.utils.ts");
+/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
+
 
 
 
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 function renderExistingTag(oldestTag, // existing tag already there
-newTemplater, tagSupport, subject, ownerTag) {
+newTemplater, tagSupport, subject) {
     if (subject.tag) {
-        console.log('already the same?', newTemplater.global === subject.tag?.tagSupport.templater.global);
         newTemplater.global = subject.tag.tagSupport.templater.global;
     }
     if (!oldestTag.hasLiveElements) {
@@ -4308,37 +4421,41 @@ newTemplater, tagSupport, subject, ownerTag) {
     const preRenderCount = tagSupport.templater.global.renderCount;
     (0,_provider_utils__WEBPACK_IMPORTED_MODULE_1__.providersChangeCheck)(oldestTag);
     // When the providers were checked, a render to myself occurred and I do not need to re-render again
+    const latestTag = tagSupport.templater.global.newest;
     if (preRenderCount !== tagSupport.templater.global.renderCount) {
-        const redraw = tagSupport.templater.global.newest;
-        oldestTag.updateByTag(redraw);
+        oldestTag.updateByTag(latestTag);
         return {
             remit: true,
-            redraw
+            redraw: latestTag,
         };
     }
     const oldTagSupport = oldestTag.tagSupport;
     const hasChanged = (0,_hasTagSupportChanged_function__WEBPACK_IMPORTED_MODULE_0__.hasTagSupportChanged)(oldTagSupport, newTemplater.tagSupport, newTemplater);
     const oldTemplater = tagSupport.templater || newTemplater;
     const redraw = (0,_Tag_utils__WEBPACK_IMPORTED_MODULE_2__.redrawTag)(subject, newTemplater, oldestTag.ownerTag);
-    const oldest = tagSupport.templater.global.oldest;
-    /*
-    newTemplater.global.newest = redraw
-    redraw.tagSupport.templater.global.newest = redraw
-    redraw.tagSupport.templater.global.oldest = oldest
-    tagSupport.templater.global.newest = redraw
-    newTemplater.global.newest = redraw
-    */
+    const oldest = tagSupport.templater.global.oldest || oldestTag;
+    redraw.tagSupport.templater.global.oldest = oldest;
+    if (redraw != redraw.tagSupport.templater.global.newest) {
+        throw new Error('newest mismatched 22');
+    }
     if (!redraw.tagSupport.templater.global.oldest) {
         throw new Error('8888888 - 0');
     }
     if (!oldTemplater.global.oldest) {
         throw new Error('8888888');
     }
-    if (newTemplater.global.oldest && !newTemplater.global.oldest.hasLiveElements) {
-        throw new Error('7777');
+    /* ??? - new removal
+    if(newTemplater.global.oldest && !newTemplater.global.oldest.hasLiveElements) {
+      throw new Error('7777')
+    }
+    */
+    // ??? - add to ensure setProps causes lower redraw
+    if ((0,_isLikeTags_function__WEBPACK_IMPORTED_MODULE_3__.isLikeTags)(latestTag, redraw)) {
+        oldest.updateByTag(redraw);
     }
     if (!hasChanged) {
-        oldest?.updateByTag(redraw);
+        // ??? - removed in favor of always update
+        // oldest?.updateByTag(redraw)
         return { redraw, remit: true };
     }
     return { redraw, remit: false };
@@ -4420,6 +4537,7 @@ _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig = {
         }
         delete config.rearray; // clean up any previous runs
         state.newest = config.array; // [...config.array]
+        state.newest.forEach(item => item.lastValue = getStateValue(item)); // set last values
         config.array = [];
     }
 });
@@ -4441,7 +4559,7 @@ state) {
         console.error(message, { state, callback, oldState, oldValue, checkValue });
         throw new Error(message);
     }
-    state.lastValue = oldValue;
+    // state.lastValue = oldValue
     return oldValue;
 }
 class StateEchoBack {
@@ -4725,9 +4843,18 @@ function updateComponent(tagComponent) {
 /** creates/returns a function that when called then calls the original component function */
 function getTagWrap(templater, madeSubject) {
     const innerTagWrap = function (oldTagSetup, subject) {
+        const latestTemplater = oldTagSetup.templater.global.newestTemplater;
         oldTagSetup.templater.global.newestTemplater = templater;
         ++oldTagSetup.templater.global.renderCount;
         templater.global = oldTagSetup.templater.global;
+        const isPropCountTest = templater.props && typeof (templater.props) === 'object' && 'propNumber' in (templater.props || {}) && templater.wrapper.original.toString().includes('propNumber, callback');
+        if (isPropCountTest) {
+            console.log('xxxxxxx', {
+                original: templater.wrapper.original,
+                props: templater.props,
+                latestProps: latestTemplater.props,
+            });
+        }
         const childSubject = templater.children;
         const lastArray = oldTagSetup.templater.global.oldest?.tagSupport.templater.children.lastArray;
         if (lastArray) {
@@ -4750,21 +4877,9 @@ function getTagWrap(templater, madeSubject) {
             throw new Error('what to do here?');
         }
         // ???
-        let castedProps = (0,_alterProps_function__WEBPACK_IMPORTED_MODULE_7__.alterProps)(props, 
-        // templater,
-        newestOwnerTemplater, oldTagSetup.ownerTagSupport);
-        // let castedProps = alterProps(props, oldTagSetup.templater)
+        let castedProps = (0,_alterProps_function__WEBPACK_IMPORTED_MODULE_7__.alterProps)(props, newestOwnerTemplater, oldTagSetup.ownerTagSupport);
         // CALL ORIGINAL COMPONENT FUNCTION
         const tag = originalFunction(castedProps, childSubject);
-        /*
-        const isFirstRun = oldTagSetup.mutatingRender === TagSupport.prototype.mutatingRender
-        if(isFirstRun) {
-          // oldTagSetup.oldest = tag
-          // templater.oldest = tag
-          // tag.tagSupport = oldTagSetup
-    
-        }
-        */
         tag.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_6__.TagSupport(oldTagSetup.ownerTagSupport, templater, subject);
         const clonedProps = (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_5__.deepClone)(castedProps); // castedProps
         tag.tagSupport.propsConfig = {
@@ -4920,15 +5035,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   updateExistingTagComponent: () => (/* binding */ updateExistingTagComponent)
 /* harmony export */ });
 /* harmony import */ var _hasTagSupportChanged_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./hasTagSupportChanged.function */ "../main/ts/hasTagSupportChanged.function.ts");
-/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./checkDestroyPrevious.function */ "../main/ts/checkDestroyPrevious.function.ts");
-/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
-/* harmony import */ var _processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./processSubjectComponent.function */ "../main/ts/processSubjectComponent.function.ts");
+/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
+/* harmony import */ var _processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./processSubjectComponent.function */ "../main/ts/processSubjectComponent.function.ts");
+/* harmony import */ var _destroyTag_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./destroyTag.function */ "../main/ts/destroyTag.function.ts");
 
 
 
 
 function updateExistingTagComponent(ownerTag, tempResult, subject, insertBefore) {
     let existingTag = subject.tag;
+    /*
+    if(existingTag && !existingTag.hasLiveElements) {
+      throw new Error('issue already began')
+    }
+    */
     const oldWrapper = existingTag.tagSupport.templater.wrapper;
     const newWrapper = tempResult.wrapper;
     let isSameTag = false;
@@ -4948,78 +5068,37 @@ function updateExistingTagComponent(ownerTag, tempResult, subject, insertBefore)
         throw new Error('stop here no parent node update existing tag');
     }
     if (!isSameTag) {
-        (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_1__.destroyTagMemory)(oldTagSupport.templater.global.oldest, subject);
-        (0,_processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_3__.processSubjectComponent)(tempResult, subject, oldInsertBefore, ownerTag, {
+        (0,_destroyTag_function__WEBPACK_IMPORTED_MODULE_3__.destroyTagMemory)(oldTagSupport.templater.global.oldest, subject);
+        (0,_processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_2__.processSubjectComponent)(tempResult, subject, oldInsertBefore, ownerTag, {
             forceElement: false,
             counts: { added: 0, removed: 0 },
         });
         return;
     }
     else {
-        // const subjectTagSupport = existingTag.tagSupport
-        // old props may have changed, reclone first
-        /*
-        const newProps = subjectTagSupport.propsConfig.latest
-        let oldCloneProps = subjectTagSupport.propsConfig.clonedProps
-        // if the new props are NOT HTML children, then clone the props for later render cycle comparing
-        if(!isTagInstance(newProps)) {
-          oldCloneProps = deepClone( newProps )
-        }
-        */
         if (!tempResult.tagSupport) {
-            tempResult.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_2__.TagSupport(oldTagSupport.ownerTagSupport, tempResult, subject);
+            tempResult.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_1__.TagSupport(oldTagSupport.ownerTagSupport, tempResult, subject);
         }
         const newTagSupport = tempResult.tagSupport;
-        /*
-        const hasStateChanged = checkStateChanged(oldTagSupport.memory.state)
-        if(hasStateChanged) {
-          console.log('support changed!!!!')
-        }
-        */
-        // const hasChanged = hasStateChanged || hasTagSupportChanged(oldTagSupport, newTagSupport, tempResult)
         const hasChanged = (0,_hasTagSupportChanged_function__WEBPACK_IMPORTED_MODULE_0__.hasTagSupportChanged)(oldTagSupport, newTagSupport, tempResult);
         if (!hasChanged) {
-            console.log('!hasChanged', {
-                original: tempResult.wrapper.original,
-                old: oldTagSupport.propsConfig.latest,
-                new: newTagSupport.propsConfig.latest,
-                tempProps: tempResult.props,
-                equal: oldTagSupport.propsConfig.latest == newTagSupport.propsConfig.latest,
-                state: newTagSupport.memory.state.newest,
-                oldState: oldTagSupport.memory.state.newest,
-            });
-            const newTag = (0,_TagSupport_class__WEBPACK_IMPORTED_MODULE_2__.renderTagSupport)(tempResult.tagSupport, false);
-            const oldTag = oldGlobal.oldest;
-            oldTag.updateByTag(newTag);
+            const stateChanged = false;
+            if (stateChanged) {
+                const newTag = (0,_TagSupport_class__WEBPACK_IMPORTED_MODULE_1__.renderTagSupport)(tempResult.tagSupport, false);
+                const oldTag = oldGlobal.oldest;
+                oldTag.updateByTag(newTag);
+            }
             return; // its the same tag component
         }
     }
-    // setValueRedraw(tempResult, subject, ownerTag)
-    // ???
-    // oldTagSupport.templater = tempResult
     const oldestTag = tempResult.global.oldest; // oldTagSupport.oldest as Tag // existingTag
     const previous = tempResult.global.newest;
     if (!previous || !oldestTag) {
-        throw new Error('how?');
+        throw new Error('how no previous or oldest nor newest?');
     }
-    console.log('updateExistingTagComponent.function.ts - start', {
-        original: tempResult.wrapper.original,
-        props: tempResult.props,
-        oldProps: subject.tag.tagSupport.templater.props,
-        oldestProps: subject.tag.tagSupport.templater.global.oldest?.tagSupport.templater.props,
-        previousState: previous.tagSupport.memory.state.newest,
-        newestState: tempResult.tagSupport.memory.state.newest,
-        olderState: tempResult.tagSupport.subject.tag.tagSupport.memory.state.newest,
-    });
-    const newTag = (0,_TagSupport_class__WEBPACK_IMPORTED_MODULE_2__.renderTagSupport)(tempResult.tagSupport, false);
+    const newTag = (0,_TagSupport_class__WEBPACK_IMPORTED_MODULE_1__.renderTagSupport)(tempResult.tagSupport, false);
+    existingTag = subject.tag;
     const hasOldest = newTag.tagSupport.templater.global.oldest ? true : false;
-    console.log('updateExistingTagComponent.function.ts - done', {
-        original: tempResult.wrapper.original,
-        props: tempResult.props,
-        oldProps: subject.tag.tagSupport.templater.props,
-        oldestProps: subject.tag.tagSupport.templater.global.oldest?.tagSupport.templater.props,
-        hasOldest,
-    });
     if (!hasOldest) {
         newTag.buildBeforeElement(oldInsertBefore, {
             forceElement: true,
@@ -5033,9 +5112,9 @@ function updateExistingTagComponent(ownerTag, tempResult, subject, insertBefore)
             throw new Error('maybe 5');
         }
         subject.tag = newTag;
-        oldTagSupport.templater.global.newest = newTag;
-        // ???
-        // oldTagSupport.propsConfig = {...tempResult.tagSupport.propsConfig}
+        if (!newTag.hasLiveElements) {
+            throw new Error('44444 - 5');
+        }
         return;
     }
     // const newTag = tempResult.newest as Tag
@@ -5047,41 +5126,38 @@ function updateExistingTagComponent(ownerTag, tempResult, subject, insertBefore)
     if (previous && !oldestTag) {
         throw new Error('bad elders');
     }
+    let oldest = oldTagSupport.templater.global.oldest;
     if (isLikeTag) {
         if (!newTag.tagSupport.templater.global.oldest) {
             throw new Error('maybe 6');
         }
         subject.tag = newTag;
-        // existingTag.updateByTag(newTag)
+        /*
+        if(!newTag.hasLiveElements) {
+          throw new Error('44444 - 6')
+        }
+        */
         oldestTag.updateByTag(newTag); // the oldest tag has element references
     }
     else {
         // Although function looked the same it returned a different html result
-        if (isSameTag) {
-            (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_1__.destroyTagMemory)(existingTag, subject);
+        if (isSameTag && existingTag) {
+            (0,_destroyTag_function__WEBPACK_IMPORTED_MODULE_3__.destroyTagMemory)(existingTag, subject);
+            newTag.tagSupport.templater.global.context = {}; // do not share previous outputs
         }
-        // oldTagSupport.oldest = newTag
-        if (!newTag.tagSupport.templater.global.oldest) {
-            throw new Error('maybe 7');
-        }
-        subject.tag = newTag;
+        oldest = undefined;
+        // ??? - new remove
+        // subject.tag = newTag
     }
-    if (!oldTagSupport.templater.global.oldest) {
+    if (!oldest) {
         newTag.buildBeforeElement(oldTagSupport.templater.global.insertBefore, {
             forceElement: true,
             counts: { added: 0, removed: 0 }, test: false,
         });
         newTag.tagSupport.templater.global.oldest = newTag;
-        oldTagSupport.templater.global.oldest = newTag;
         newTag.tagSupport.templater.global.newest = newTag;
-        oldTagSupport.templater.global.newest = newTag;
-        if (!newTag.tagSupport.templater.global.oldest) {
-            throw new Error('maybe 8');
-        }
+        oldTagSupport.templater.global.oldest = newTag;
         subject.tag = newTag;
-        if (!newTag.hasLiveElements) {
-            throw new Error('55555');
-        }
     }
     oldTagSupport.templater.global.newest = newTag;
     // ???
@@ -5096,6 +5172,7 @@ function checkStateChanged(state) {
         if (matched) {
             return true;
         }
+        console.log('not matched', { lastValue, nowValue });
         return false;
     });
 }
@@ -5113,17 +5190,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   updateExistingValue: () => (/* binding */ updateExistingValue)
 /* harmony export */ });
-/* harmony import */ var _Tag_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Tag.utils */ "../main/ts/Tag.utils.ts");
-/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _processSubjectValue_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./processSubjectValue.function */ "../main/ts/processSubjectValue.function.ts");
-/* harmony import */ var _processTagArray__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./processTagArray */ "../main/ts/processTagArray.ts");
-/* harmony import */ var _updateExistingTagComponent_function__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./updateExistingTagComponent.function */ "../main/ts/updateExistingTagComponent.function.ts");
-/* harmony import */ var _processRegularValue_function__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./processRegularValue.function */ "../main/ts/processRegularValue.function.ts");
-/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./checkDestroyPrevious.function */ "../main/ts/checkDestroyPrevious.function.ts");
-/* harmony import */ var _ValueSubject__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./ValueSubject */ "../main/ts/ValueSubject.ts");
-/* harmony import */ var _processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./processSubjectComponent.function */ "../main/ts/processSubjectComponent.function.ts");
-/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
+/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _processSubjectValue_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./processSubjectValue.function */ "../main/ts/processSubjectValue.function.ts");
+/* harmony import */ var _processTagArray__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./processTagArray */ "../main/ts/processTagArray.ts");
+/* harmony import */ var _updateExistingTagComponent_function__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./updateExistingTagComponent.function */ "../main/ts/updateExistingTagComponent.function.ts");
+/* harmony import */ var _processRegularValue_function__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./processRegularValue.function */ "../main/ts/processRegularValue.function.ts");
+/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./checkDestroyPrevious.function */ "../main/ts/checkDestroyPrevious.function.ts");
+/* harmony import */ var _ValueSubject__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./ValueSubject */ "../main/ts/ValueSubject.ts");
+/* harmony import */ var _processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./processSubjectComponent.function */ "../main/ts/processSubjectComponent.function.ts");
+/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
+/* harmony import */ var _bindSubjectCallback_function__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./bindSubjectCallback.function */ "../main/ts/bindSubjectCallback.function.ts");
 
 
 
@@ -5139,19 +5216,24 @@ function updateExistingValue(subject, value, ownerTag, insertBefore) {
     const subjectSubArray = subject;
     const subjectSubTag = subject;
     const isChildSubject = subjectSubArray.isChildSubject;
-    const isComponent = (0,_isInstance__WEBPACK_IMPORTED_MODULE_2__.isTagComponent)(value);
+    const isComponent = (0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagComponent)(value);
     // If we are working with tag component 2nd argument children, the value has to be digged
     if (isChildSubject) {
         value = value.value; // A subject contains the value
     }
     const oldInsertBefore = subject.template || subjectSubTag.tag?.tagSupport.templater.global.insertBefore || subjectSubTag.clone;
-    (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_7__.checkDestroyPrevious)(subject, value);
+    (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_6__.checkDestroyPrevious)(subject, value);
+    /*
+    if(subjectSubTag.tag && !subjectSubTag.tag.hasLiveElements) {
+      throw new Error('cannot update tag with no live elements')
+    }
+    */
     // handle already seen tag components
     if (isComponent) {
         const templater = value;
         // When was something before component
         if (!subjectSubTag.tag) {
-            (0,_processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_9__.processSubjectComponent)(templater, subject, oldInsertBefore, ownerTag, {
+            (0,_processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_8__.processSubjectComponent)(templater, subject, oldInsertBefore, ownerTag, {
                 forceElement: true,
                 counts: { added: 0, removed: 0 },
             });
@@ -5162,19 +5244,16 @@ function updateExistingValue(subject, value, ownerTag, insertBefore) {
             const oldWrap = oldTag.tagSupport.templater.wrapper; // tag versus component
             if (oldWrap) {
                 if (oldWrap.original === templater.wrapper?.original) {
+                    templater.global = { ...oldTag.tagSupport.templater.global };
                     console.log('🐷 disconnected global', {
                         oldWrap: oldTag.tagSupport.templater.wrapper.original,
                         tempWrap: templater.wrapper.original,
+                        global: templater.global,
                     });
-                    templater.global = { ...oldTag.tagSupport.templater.global };
                 }
             }
         }
-        console.log('call for update of existing tag', {
-            wrap: templater.wrapper.original,
-            props: templater.props,
-        });
-        (0,_updateExistingTagComponent_function__WEBPACK_IMPORTED_MODULE_5__.updateExistingTagComponent)(ownerTag, templater, // latest value
+        (0,_updateExistingTagComponent_function__WEBPACK_IMPORTED_MODULE_4__.updateExistingTagComponent)(ownerTag, templater, // latest value
         subjectSubTag, insertBefore);
         return subjectSubTag;
     }
@@ -5185,8 +5264,8 @@ function updateExistingValue(subject, value, ownerTag, insertBefore) {
         return subjectSubTag;
     }
     // its another tag array
-    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_2__.isTagArray)(value)) {
-        (0,_processTagArray__WEBPACK_IMPORTED_MODULE_4__.processTagArray)(subject, value, oldInsertBefore, ownerTag, { counts: {
+    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagArray)(value)) {
+        (0,_processTagArray__WEBPACK_IMPORTED_MODULE_3__.processTagArray)(subject, value, oldInsertBefore, ownerTag, { counts: {
                 added: 0,
                 removed: 0,
             } });
@@ -5194,11 +5273,14 @@ function updateExistingValue(subject, value, ownerTag, insertBefore) {
     }
     // now its a function
     if (value instanceof Function) {
-        return (0,_Tag_utils__WEBPACK_IMPORTED_MODULE_0__.getSubjectFunction)(value, ownerTag);
+        // const newSubject = getSubjectFunction(value, ownerTag)
+        const bound = (0,_bindSubjectCallback_function__WEBPACK_IMPORTED_MODULE_10__.bindSubjectCallback)(value, ownerTag);
+        subject.set(bound);
+        return subject;
     }
-    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_2__.isTagInstance)(value)) {
+    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagInstance)(value)) {
         subjectSubTag.template = oldInsertBefore;
-        (0,_processSubjectValue_function__WEBPACK_IMPORTED_MODULE_3__.processTag)(value, subjectSubTag, subjectSubTag.template, ownerTag, // existingTag, // tag,
+        (0,_processSubjectValue_function__WEBPACK_IMPORTED_MODULE_2__.processTag)(value, subjectSubTag, subjectSubTag.template, ownerTag, // existingTag, // tag,
         {
             counts: {
                 added: 0,
@@ -5208,11 +5290,11 @@ function updateExistingValue(subject, value, ownerTag, insertBefore) {
         return subjectSubTag;
     }
     // we have been given a subject
-    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_2__.isSubjectInstance)(value)) {
+    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isSubjectInstance)(value)) {
         return value;
     }
     // This will cause all other values to render
-    (0,_processRegularValue_function__WEBPACK_IMPORTED_MODULE_6__.processRegularValue)(value, subject, oldInsertBefore);
+    (0,_processRegularValue_function__WEBPACK_IMPORTED_MODULE_5__.processRegularValue)(value, subject, oldInsertBefore);
     return subjectSubTag;
 }
 function handleStillTag(existingTag, subject, value, ownerTag) {
@@ -5220,7 +5302,7 @@ function handleStillTag(existingTag, subject, value, ownerTag) {
     const newWrapper = value?.wrapper;
     // const wrapMatch = oldWrapper && newWrapper && oldWrapper?.original === newWrapper?.original
     // TODO: We shouldn't need both of these
-    const isSameTag = value && (0,_isLikeTags_function__WEBPACK_IMPORTED_MODULE_10__.isLikeTags)(existingTag, value);
+    const isSameTag = value && (0,_isLikeTags_function__WEBPACK_IMPORTED_MODULE_9__.isLikeTags)(existingTag, value);
     const isSameTag2 = value && value.getTemplate && existingTag.isLikeTag(value);
     const tag = value;
     if (!tag.tagSupport) {
@@ -5229,16 +5311,16 @@ function handleStillTag(existingTag, subject, value, ownerTag) {
                 context: {},
                 oldest: tag,
             },
-            children: new _ValueSubject__WEBPACK_IMPORTED_MODULE_8__.ValueSubject([]),
+            children: new _ValueSubject__WEBPACK_IMPORTED_MODULE_7__.ValueSubject([]),
         };
-        tag.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_1__.TagSupport(ownerTag.tagSupport, fakeTemplater, subject);
+        tag.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.TagSupport(ownerTag.tagSupport, fakeTemplater, subject);
     }
     if (isSameTag) {
         existingTag.updateByTag(tag);
         return;
     }
     if (isSameTag || isSameTag2) {
-        return (0,_processSubjectValue_function__WEBPACK_IMPORTED_MODULE_3__.processTag)(value, subject, subject.template, ownerTag, // existingTag, // tag,
+        return (0,_processSubjectValue_function__WEBPACK_IMPORTED_MODULE_2__.processTag)(value, subject, subject.template, ownerTag, // existingTag, // tag,
         {
             counts: {
                 added: 0,
@@ -5246,7 +5328,7 @@ function handleStillTag(existingTag, subject, value, ownerTag) {
             }
         });
     }
-    return (0,_processRegularValue_function__WEBPACK_IMPORTED_MODULE_6__.processRegularValue)(value, subject, subject.template);
+    return (0,_processRegularValue_function__WEBPACK_IMPORTED_MODULE_5__.processRegularValue)(value, subject, subject.template);
 }
 
 
@@ -5267,7 +5349,6 @@ __webpack_require__.r(__webpack_exports__);
 /** When an item in watch array changes, callback function will be triggered */
 function watch(currentValues, callback) {
     let previousValues = (0,_setLet_function__WEBPACK_IMPORTED_MODULE_0__.setLet)(undefined)(x => [previousValues, previousValues = x]);
-    console.log('previousValues', { currentValues, previousValues });
     if (previousValues === undefined) {
         callback(currentValues, previousValues);
         // const result = {currentValues, previousValues}
@@ -5275,11 +5356,6 @@ function watch(currentValues, callback) {
         return currentValues;
     }
     const allExact = currentValues.every((item, index) => item === previousValues[index]);
-    console.log('allExact', {
-        allExact,
-        currentValues,
-        previousValues
-    });
     if (allExact) {
         return currentValues;
     }
