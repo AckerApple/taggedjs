@@ -78,7 +78,7 @@ export function runTests() {
     )
   })
 
-  it('tagSwitching', () => {
+  it.only('tagSwitching', () => {
     console.log('0 - 0')
     expect(elementCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined')
     expect(elementCount('#tag-switch-dropdown')).toBe(1, 'Expected one #tag-switch-dropdown')
