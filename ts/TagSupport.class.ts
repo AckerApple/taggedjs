@@ -60,7 +60,6 @@ export function renderTagSupport(
   if(isTagInstance(tagSupport.templater)) {
     const newTag = tagSupport.templater.global.newest as Tag
     const ownerTag = newTag.ownerTag as Tag
-    
     return renderTagSupport(ownerTag.tagSupport, true)
   }
 
@@ -68,10 +67,21 @@ export function renderTagSupport(
   const subject = tagSupport.subject
   const templater = tagSupport.templater // oldTagSetup.templater // templater
   
-  console.log('xxxxxxxxxxxxxxx',{
-    tempProps: templater.props,
-    exProps: subject.tag?.tagSupport.templater.global.newest?.tagSupport.templater.props,
-  })
+  const newest = subject.tag?.tagSupport.templater.global.newest
+  if(newest) {
+    const nowProps = templater.props as any
+    const latestProps = newest?.tagSupport.templater.props as any
+
+    if(nowProps && latestProps && latestProps.propNumber > nowProps.propNumber) {
+      console.log('mismatched templater', {
+        original: templater.wrapper.original,
+        nowProps,
+        latestProps,
+        late: templater.global.newestTemplater.props,
+      })
+      throw new Error('the newest and what I am processing do not have the same props')
+    }
+  }
 
   const useTagSupport = tagSupport.templater.global.newest?.tagSupport as TagSupport // oldTagSetup
   // const oldest = templater.global.oldest as Tag
@@ -86,7 +96,6 @@ export function renderTagSupport(
     templater,
     useTagSupport,
     subject,
-    tagSupport.templater.global.oldest as Tag,
   )
 
   const tag = exit.redraw
@@ -101,9 +110,11 @@ export function renderTagSupport(
   }
   
   // Have owner re-render
+  // ??? - recently removed. As causes some sort of owner newest disconnect during prop testing
+  /*
   if(renderUp && tag.ownerTag) {    
     const ownerTagSupport = tag.ownerTag.tagSupport
-    console.log('child is asking to render owner - render function')
+    console.log('--- renderup ---', ownerTagSupport.templater.wrapper.original)
     renderTagSupport(
       ownerTagSupport,
       true,
@@ -111,6 +122,7 @@ export function renderTagSupport(
 
     return tag
   }
+  */
 
   return tag
 }

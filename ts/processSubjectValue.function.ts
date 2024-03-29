@@ -142,4 +142,8 @@ export function processTag(
   }
   
   subject.tag = tag
+
+  if(!tag.hasLiveElements) {
+    throw new Error('44444 - 0')
+  }
 }

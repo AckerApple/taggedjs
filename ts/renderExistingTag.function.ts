@@ -4,6 +4,7 @@ import { hasTagSupportChanged } from './hasTagSupportChanged.function'
 import { providersChangeCheck } from './provider.utils'
 import { TemplaterResult } from './TemplaterResult.class'
 import { TagSubject, redrawTag } from './Tag.utils'
+import { isLikeTags } from './isLikeTags.function'
 
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(
@@ -11,11 +12,9 @@ export function renderExistingTag(
   newTemplater: TemplaterResult,
   tagSupport: BaseTagSupport,
   subject: TagSubject,
-  ownerTag: Tag,
 ): {redraw: Tag, remit: boolean} {
 
   if(subject.tag) {
-    console.log('already the same?', newTemplater.global === subject.tag?.tagSupport.templater.global)
     newTemplater.global = subject.tag.tagSupport.templater.global
   }
 
@@ -27,13 +26,13 @@ export function renderExistingTag(
   providersChangeCheck(oldestTag)
 
   // When the providers were checked, a render to myself occurred and I do not need to re-render again
+  const latestTag = tagSupport.templater.global.newest as Tag
   if(preRenderCount !== tagSupport.templater.global.renderCount) {
-    const redraw = tagSupport.templater.global.newest as Tag
-    oldestTag.updateByTag(redraw)
+    oldestTag.updateByTag(latestTag)
 
     return {
       remit: true,
-      redraw
+      redraw: latestTag,
     }
   }
 
@@ -52,14 +51,12 @@ export function renderExistingTag(
     oldestTag.ownerTag as Tag, // subject.tag.ownerTag as Tag
   )
 
-  const oldest = tagSupport.templater.global.oldest
-  /*
-  newTemplater.global.newest = redraw
-  redraw.tagSupport.templater.global.newest = redraw
+  const oldest = tagSupport.templater.global.oldest || oldestTag
   redraw.tagSupport.templater.global.oldest = oldest
-  tagSupport.templater.global.newest = redraw
-  newTemplater.global.newest = redraw
-  */
+
+  if(redraw != redraw.tagSupport.templater.global.newest) {
+    throw new Error('newest mismatched 22')
+  }
   
   if(!redraw.tagSupport.templater.global.oldest) {
     throw new Error('8888888 - 0')
@@ -69,14 +66,20 @@ export function renderExistingTag(
     throw new Error('8888888')
   }
 
-
+  /* ??? - new removal
   if(newTemplater.global.oldest && !newTemplater.global.oldest.hasLiveElements) {
     throw new Error('7777')
   }
+  */
 
+  // ??? - add to ensure setProps causes lower redraw
+  if(isLikeTags(latestTag, redraw)) {
+    oldest.updateByTag(redraw)
+  }
 
   if(!hasChanged) {
-    oldest?.updateByTag(redraw)
+    // ??? - removed in favor of always update
+    // oldest?.updateByTag(redraw)
     return {redraw, remit:true}
   }
 

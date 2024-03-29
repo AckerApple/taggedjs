@@ -32,8 +32,6 @@ function handleProviderChanges(
       renderTagSupport(
         tag.tagSupport,
         false,
-        // tag.tagSupport,
-        // tag.tagSupport.subject
       )
     }
   })

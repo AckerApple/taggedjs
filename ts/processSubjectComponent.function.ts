@@ -37,7 +37,6 @@ export function processSubjectComponent(
 
   // templater.oldest = subject.tag?.tagSupport.oldest || templater.oldest
   templater.global.insertBefore = template
-  const tagSupport = templater.tagSupport
   let retag = subject.tag
   
   const providers = setUse.memory.providerConfig
@@ -46,17 +45,16 @@ export function processSubjectComponent(
   const isRedraw = !retag || options.forceElement
   if(isRedraw) {
     const preClones = ownerTag.clones.map(clone => clone)
-
-    if(!tagSupport) {
-      throw new Error('a0')
-    }
-
     const result = renderWithSupport(
-      tagSupport,
+      templater.tagSupport,
       subject.tag,
       subject,
       ownerTag,
     )
+
+    if(result.retag.tagSupport.templater.global.newest != result.retag) {
+      throw new Error('mismatch result newest')
+    }
 
     retag = result.retag
     templater.global.newest = retag

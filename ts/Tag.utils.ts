@@ -1,13 +1,9 @@
-import { TagSupport } from "./TagSupport.class"
 import { ValueSubject } from "./ValueSubject"
 import { Subject } from "./Subject"
 import { Tag } from "./Tag.class"
 import { TemplaterResult, renderWithSupport } from "./TemplaterResult.class"
 import { bindSubjectCallback } from "./bindSubjectCallback.function"
 import { Template } from "./interpolateTemplate"
-import { isLikeTags } from "./isLikeTags.function"
-import { destroyTagMemory } from "./checkDestroyPrevious.function"
-import { processSubjectValue } from "./processSubjectValue.function"
 
 export type TagSubject = Subject<TemplaterResult> & {
   tag: Tag //  consider renaming to latestTag
@@ -50,29 +46,12 @@ export function redrawTag(
     throw new Error('33333')
   }
   
-
-  console.log('call for ----> renderWithSupport',{
-    tagProps: tagSupport.templater.props,
-    exNewProps: existingTag.tagSupport.templater.global.newest?.tagSupport.templater.props,
-  })
-  let {retag} = renderWithSupport(
+  let {retag, remit} = renderWithSupport(
     tagSupport,
     existingTag,
     subject,
     ownerTag,
   )
-
-  const isLikeTag = !existingTag || isLikeTags(existingTag, retag)
-  if(!isLikeTag) {
-    console.log('UNLIKE TAG DESTROY')
-    destroyTagMemory(existingTag, subject)
-
-    delete templater.global.oldest
-    delete templater.global.newest
-
-    templater.global.insertBefore = existingTag.tagSupport.templater.global.insertBefore
-    return retag
-  }
 
   return retag
 }

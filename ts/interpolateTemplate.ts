@@ -90,7 +90,10 @@ export function subscribeToTemplate(
     }
 
     if(called) {
-      context[variableName] = updateExistingValue(
+      const tag = (subject as any).tag
+
+      // context[variableName] = 
+      updateExistingValue(
         subject,
         value,
         ownerTag,

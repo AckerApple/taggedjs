@@ -118,10 +118,20 @@ function getTagWrap(
     oldTagSetup: TagSupport,
     subject: TagSubject,
   ) {
+    const latestTemplater = oldTagSetup.templater.global.newestTemplater
     oldTagSetup.templater.global.newestTemplater = templater
     ++oldTagSetup.templater.global.renderCount
     
     templater.global = oldTagSetup.templater.global
+
+    const isPropCountTest = templater.props && typeof(templater.props)==='object' && 'propNumber' in (templater.props as any || {}) && templater.wrapper.original.toString().includes('propNumber, callback')
+    if(isPropCountTest) {
+      console.log('xxxxxxx', {
+        original: templater.wrapper.original,
+        props: templater.props,
+        latestProps: latestTemplater.props,
+      })
+    }
     
     const childSubject = templater.children
     const lastArray = oldTagSetup.templater.global.oldest?.tagSupport.templater.children.lastArray
@@ -153,24 +163,12 @@ function getTagWrap(
     // ???
     let castedProps = alterProps(
       props,
-      // templater,
       newestOwnerTemplater as TemplaterResult,
       oldTagSetup.ownerTagSupport,
     )
-    // let castedProps = alterProps(props, oldTagSetup.templater)
-    
+
     // CALL ORIGINAL COMPONENT FUNCTION
     const tag = originalFunction(castedProps, childSubject)
-
-    /*
-    const isFirstRun = oldTagSetup.mutatingRender === TagSupport.prototype.mutatingRender
-    if(isFirstRun) {
-      // oldTagSetup.oldest = tag
-      // templater.oldest = tag
-      // tag.tagSupport = oldTagSetup
-
-    }
-    */
 
     tag.tagSupport = new TagSupport(
       oldTagSetup.ownerTagSupport,

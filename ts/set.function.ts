@@ -63,6 +63,7 @@ setUse({
     delete config.rearray // clean up any previous runs
 
     state.newest = config.array // [...config.array]
+    state.newest.forEach(item => item.lastValue = getStateValue(item)) // set last values
     
     config.array = []
   }
@@ -94,7 +95,7 @@ export function getStateValue<T>(
     throw new Error(message)
   }
 
-  state.lastValue = oldValue
+  // state.lastValue = oldValue
 
   return oldValue
 }

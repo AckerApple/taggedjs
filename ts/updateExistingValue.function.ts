@@ -12,6 +12,7 @@ import { checkDestroyPrevious } from './checkDestroyPrevious.function'
 import { ValueSubject } from './ValueSubject'
 import { processSubjectComponent } from './processSubjectComponent.function'
 import { isLikeTags } from './isLikeTags.function'
+import { Callback, bindSubjectCallback } from './bindSubjectCallback.function'
 
 export type ExistingValue = TemplaterResult | Tag[] | TagSupport | Function | Subject<unknown> | RegularValue | Tag
 
@@ -25,7 +26,7 @@ export function updateExistingValue(
   const subjectSubTag = subject as TagSubject
   const isChildSubject = subjectSubArray.isChildSubject
   const isComponent = isTagComponent(value)
-  
+
   // If we are working with tag component 2nd argument children, the value has to be digged
   if(isChildSubject) {
     value = (value as TagSubject).value // A subject contains the value
@@ -35,9 +36,16 @@ export function updateExistingValue(
 
   checkDestroyPrevious(subject, value)
 
+  /*
+  if(subjectSubTag.tag && !subjectSubTag.tag.hasLiveElements) {
+    throw new Error('cannot update tag with no live elements')
+  }
+  */
+
   // handle already seen tag components
   if(isComponent) {
     const templater = value as TemplaterResult
+    
     // When was something before component
     if(!subjectSubTag.tag) {
       processSubjectComponent(
@@ -56,23 +64,20 @@ export function updateExistingValue(
 
     if(!templater.global.oldest) {
       const oldTag = subjectSubTag.tag
-      
       const oldWrap = oldTag.tagSupport.templater.wrapper // tag versus component
+
       if(oldWrap) {
         if(oldWrap.original === templater.wrapper?.original) {
+          templater.global = {...oldTag.tagSupport.templater.global}
           console.log('🐷 disconnected global', {
             oldWrap: oldTag.tagSupport.templater.wrapper.original,
             tempWrap: templater.wrapper.original,
+            global: templater.global,
           })
-          templater.global = {...oldTag.tagSupport.templater.global}
         }
       }
     }
 
-    console.log('call for update of existing tag', {
-      wrap: templater.wrapper.original,
-      props: templater.props,
-    })
     updateExistingTagComponent(
       ownerTag,
       templater, // latest value
@@ -114,7 +119,10 @@ export function updateExistingValue(
 
   // now its a function
   if(value instanceof Function) {
-    return getSubjectFunction(value, ownerTag)
+    // const newSubject = getSubjectFunction(value, ownerTag)
+    const bound = bindSubjectCallback(value as Callback, ownerTag)
+    subject.set(bound)
+    return subject
   }
 
   if(isTagInstance(value)) {

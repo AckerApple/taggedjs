@@ -10,7 +10,6 @@ export function processNewValue(
 ) {
   if(isTagComponent(value)) {
     const tagSubject = new ValueSubject(value) as TagSubject
-    // setValueRedraw(value, tagSubject, ownerTag)
     return tagSubject
   }
 

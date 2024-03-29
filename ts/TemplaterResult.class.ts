@@ -7,6 +7,8 @@ import { TagChildren } from './tag'
 import { Provider } from './providers'
 import { OnDestroyCallback } from './onDestroy'
 import { TagSubject } from './Tag.utils'
+import { isLikeTags } from './isLikeTags.function'
+import { destroyTagMemory } from './destroyTag.function'
 
 export type Wrapper = ((
   tagSupport: BaseTagSupport,
@@ -44,9 +46,11 @@ export class TemplaterResult {
     public children: TagChildren,
   ) {}
 
+  /*
   redraw?: (
     force?: boolean, // force children to redraw
   ) => Tag
+  */
   isTemplater = true
 
 }
@@ -68,16 +72,7 @@ export function renderWithSupport(
     const runtimeOwnerTag = existingTag?.ownerTag || ownerTag
 
     if(existingTag) {
-      console.log('redrawing existing tag', {
-        existingTag,
-        org: existingTag.tagSupport.templater.wrapper.original,
-        state: existingTag.tagSupport.memory.state.newest,
-
-        wrapTagSupport: wrapTagSupport.templater.wrapper.original,
-        wrapState: wrapTagSupport.memory.state.newest,
-        ttt: tagSupport.templater.props,
-        newestProps: existingTag.tagSupport.templater.global.newest?.tagSupport.templater.props,
-      })
+      // wrapTagSupport.templater.props = existingTag.tagSupport.templater.global.newest?.tagSupport.templater.props || wrapTagSupport.templater.props
       wrapTagSupport.memory.state.newest = [...existingTag.tagSupport.memory.state.newest]
       // ??? - new
       wrapTagSupport.templater.global = existingTag.tagSupport.templater.global
@@ -96,15 +91,42 @@ export function renderWithSupport(
     }
   /* END: BEFORE RENDER */
   
-  const retag = wrapTagSupport.templater.wrapper(wrapTagSupport, subject)
+  const templater = wrapTagSupport.templater
+  const retag = templater.wrapper(wrapTagSupport, subject)
 
   /* AFTER */
 
   runAfterRender(wrapTagSupport, retag)
 
+  const isLikeTag = !existingTag || isLikeTags(existingTag, retag)
+  if(!isLikeTag) {
+    destroyTagMemory(existingTag, subject)
+
+    delete templater.global.oldest
+    delete templater.global.newest
+    delete (subject as any).tag
+
+    templater.global.insertBefore = existingTag.tagSupport.templater.global.insertBefore as Element
+    
+    // retag.buildBeforeElement(templater.global.insertBefore)
+    // subject.tag = retag
+
+    // return retag
+  }
+
+  /*
+  if(existingTag) {
+    if(!isLikeTags(retag,existingTag)) {
+      destroyTagMemory(existingTag, subject)
+    }
+    // throw new Error('similar but different tags')
+  }
+  */
+
   retag.ownerTag = runtimeOwnerTag
   wrapTagSupport.templater.global.newest = retag
-  subject.tag = retag
+  // ??? - new
+  // subject.tag = retag
   
   if(wrapTagSupport.templater.global.oldest && !wrapTagSupport.templater.global.oldest.hasLiveElements) {
     throw new Error('56513540')

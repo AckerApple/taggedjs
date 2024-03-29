@@ -2,7 +2,7 @@ import { Tag } from './Tag.class'
 import { Counts, Template } from './interpolateTemplate'
 import { TagArraySubject } from './processTagArray'
 import { TagSubject } from './Tag.utils'
-import { destroyTagMemory } from './checkDestroyPrevious.function'
+import { destroyTagMemory } from './destroyTag.function'
 
 export function processTagResult(
   tag: Tag,
@@ -40,6 +40,11 @@ export function processTagResult(
             throw new Error('maybe 0')
           }
           subjectTag.tag = newTag
+
+          if(!newTag.hasLiveElements) {
+            throw new Error('44444 - 2')
+          }
+        
           return
         }
 
@@ -49,22 +54,23 @@ export function processTagResult(
         }
 
         subjectTag.tag = tag
+
+        if(!tag.hasLiveElements) {
+          throw new Error('44444 - 3')
+        }
+
         return
       }
 
       destroyTagMemory(previousTag, subject as TagSubject)
-      throw new Error('585')
+      throw new Error('585 - think we never get here')
     }
   }
+
   tag.buildBeforeElement(insertBefore, {
     counts,
     forceElement, test: false,
   })
-
-  tag.tagSupport.templater.global.oldest = tag
-  if(!tag.lastTemplateString) {
-    throw new Error('999 - 3')
-  }
 
   tag.tagSupport.templater.global.newest = tag
   
@@ -73,4 +79,9 @@ export function processTagResult(
   }
 
   subjectTag.tag = tag // let reprocessing know we saw this previously as an if
+
+  if(!tag.hasLiveElements) {
+    throw new Error('44444 - 4')
+  }
+
 }

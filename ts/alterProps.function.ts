@@ -20,40 +20,16 @@ export function alterProps(
       throw new Error('already rendered')
     }
 
-    const ownerTag = tag?.ownerTag as Tag
-    const ownerTagSupport = ownerTag.tagSupport
-    const ownerGlobal = ownerTagSupport.templater.global
-    const newestOwner = ownerGlobal.newest as Tag
-    const oldestGlobal = newestOwner.tagSupport.templater.global
-
-    console.log('--- render parent that passed props ---', {
-      original: newestOwner.tagSupport.templater.wrapper?.original,
-      state: newestOwner.tagSupport.memory.state.newest,
-      subject: newestOwner.tagSupport.subject.tag,
-      equal: newestOwner === newestOwner.tagSupport.subject.tag,
-      // lastTagOwner2: lastTag?.ownerTag?.tagSupport.memory.state.newest[2]?.get(),
-      // equalLast: lastTag === newestOwner.tagSupport.subject.tag
-      state2: newestOwner.tagSupport.memory.state.newest[2]?.get(),
-      ownerState2: ownerSupport.memory.state.newest[2].get(),
-      equalOwnerWrap: ownerTagSupport.templater.wrapper?.original === newestOwner.tagSupport.templater.wrapper?.original,
-      
-      ownerOriginal: ownerTagSupport.templater.wrapper?.original,
-      
-      ownerGlobal: ownerGlobal.oldest?.hasLiveElements,
-      oldestGlobal: oldestGlobal.oldest?.hasLiveElements,
-      
-      equalGlobal: ownerGlobal == oldestGlobal,
-      
-      argOrg: ownerSupport.templater.wrapper.original,
-      argOwner: ownerSupport.templater.global.oldest?.hasLiveElements,
-    })
-
-    // ??? - new
-    // newestOwner.tagSupport.render(
-    renderTagSupport(
-      ownerSupport,
+    const lastestOwner = ownerSupport.templater.global.newest as Tag
+    const newOwner = renderTagSupport(
+      lastestOwner.tagSupport, // ??? newestOwner.tagSupport, // ??? ownerSupport,
       true,
     )
+
+    if(newOwner.tagSupport.templater.global.newest != newOwner) {
+      throw new Error('newest assignment issue?')
+    }
+
     return callbackResult
   }
   

@@ -39,24 +39,25 @@ export function runTagCallback(
 
   const sameRenderCount = renderCount === tagSupport.templater.global.renderCount
   
-  if(tagSupport && !sameRenderCount) {    
+  if(tagSupport && !sameRenderCount) {
     return // already rendered
   }
 
-  console.log('click render --- ')
+  console.log('****** call back renderTagSupport', {
+    original: tagSupport.templater.wrapper.original,
+    props: tagSupport.templater.props,
+    global: tagSupport.templater.global,
+  })
   renderTagSupport(
     tagSupport,
     false,
-    // tagSupport, tagSupport.subject
   )
 
   if(callbackResult instanceof Promise) {
     return callbackResult.then(() => {
-      console.log('click promise render --- ')
       renderTagSupport(
         tagSupport,
         false,
-        // tagSupport, tagSupport.subject
       )
       return 'promise-no-data-ever'
     })

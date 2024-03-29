@@ -1,4 +1,4 @@
-import { TagSupport } from './TagSupport.class'
+import { TagSupport, renderTagSupport } from './TagSupport.class'
 import { Subscription } from './Subject'
 import { runBeforeDestroy } from './tagRunner'
 import { buildClones } from './render'
@@ -14,6 +14,8 @@ import { TagSubject } from './Tag.utils'
 import { TagArraySubject } from './processTagArray'
 import { isSubjectInstance, isTagComponent } from './isInstance'
 import { isLikeTags } from './isLikeTags.function'
+import { TemplaterResult } from './TemplaterResult.class'
+import { destroyTagMemory } from './destroyTag.function'
 
 export const variablePrefix = '__tagvar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -71,12 +73,12 @@ export class Tag {
     return this
   }
 
-  async destroy(
+  destroy(
     options: DestroyOptions = {
       stagger: 0,
       byParent: false, // Only destroy clones of direct children
     }
-  ) {
+  ): Promise<number> {
     if(!this.hasLiveElements) {
       throw new Error('destroying wrong tag')
     }
@@ -87,7 +89,15 @@ export class Tag {
       runBeforeDestroy(this.tagSupport, this)    
     }
 
+    const childTags = options.byParent ? [] : getChildTagsToDestroy(this.childTags)
+
+    delete this.tagSupport.templater.global.oldest
+    delete this.tagSupport.templater.global.newest
+    this.hasLiveElements = false
+    delete (this.tagSupport.subject as any).tag
     this.destroySubscriptions()
+    
+    let mainPromise = Promise.resolve() as Promise<unknown> as Promise<(void | undefined)[]>
 
     if(this.ownerTag) {
       this.ownerTag.childTags = this.ownerTag.childTags.filter(child => child !== this)
@@ -98,21 +108,16 @@ export class Tag {
       options.stagger = stagger
       
       if(promise) {
-        await promise
+        mainPromise = promise
       }
     } else {
       this.destroyClones()
     }
 
-    const promises = this.childTags.map(kid => kid.destroy({stagger:0, byParent: true}))
-    this.childTags.length = 0
-    await Promise.all(promises)
-
-    this.hasLiveElements = false
-    delete this.tagSupport.templater.global.oldest
-    delete this.tagSupport.templater.global.newest
-
-    return options.stagger
+    return mainPromise.then(async () => {
+      const promises = childTags.map(kid => kid.destroy({stagger:0, byParent: true}))
+      await Promise.all(promises)
+    }).then(() => options.stagger)
   }
 
   destroySubscriptions() {
@@ -282,10 +287,28 @@ export class Tag {
             const newValueFn = value.wrapper?.original
             const fnMatched = oldValueFn === newValueFn
             if(fnMatched) {
-              // ???
-              // console.log('🍎 global disconnect')
-              // value.global = tag.tagSupport.templater.global
-              value.global = tag.tagSupport.templater.global
+              const newTemp = value as TemplaterResult
+              newTemp.global = tag.tagSupport.templater.global
+              /*
+              const tagSubject = subject as TagSubject
+              if(!newTemp.tagSupport) {
+                const ownerTagSupport = tag.ownerTag?.tagSupport as TagSupport
+                newTemp.tagSupport = new TagSupport(ownerTagSupport, newTemp, tagSubject)
+              }
+
+              const redraw = renderTagSupport(newTemp.tagSupport, false)
+
+              if(!isLikeTags(tag, redraw)) {
+                destroyTagMemory(tag, subject as TagSubject)
+                newTemp.global = {...tag.tagSupport.templater.global}
+                newTemp.global.context = {}
+                const insertBefore = tag.tagSupport.templater.global.insertBefore as Element
+                redraw.buildBeforeElement(insertBefore)
+                throw new Error('clone time')
+              } else {
+                newTemp.global = tag.tagSupport.templater.global
+              }
+              */
             }
           }
         }
@@ -295,6 +318,13 @@ export class Tag {
           // value.set(value.value)
           return
         }
+
+        /*
+        const subTag = (subject as any).tag
+        if(subTag && !subTag.hasLiveElements) {
+          return
+        }
+        */
 
         subject.set(value)
         return
@@ -397,7 +427,6 @@ export class Tag {
       elementContainer,
       insertBefore,
       this, // ownerTag
-      [],
       context,
       options,
     )
@@ -407,7 +436,7 @@ export class Tag {
     // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
     let isForceElement = options.forceElement
     tagComponents.forEach(tagComponent => {
-      const preClones = this.clones.map(clone => clone)
+      // const preClones = this.clones.map(clone => clone)
 
       subscribeToTemplate(
         tagComponent.insertBefore, // temporary,
@@ -428,7 +457,6 @@ export class Tag {
         elementContainer,
         insertBefore,
         this,
-        [], // preClones,
         context,
         options,
       )
@@ -443,6 +471,7 @@ export class Tag {
 
     this.tagSupport.templater.global.oldest = this
     this.tagSupport.templater.global.newest = this
+    this.tagSupport.subject.tag = this
     this.hasLiveElements = true
   }
 }
@@ -451,7 +480,7 @@ function afterInterpolateElement(
   container: Element,
   insertBefore: Element | Text | Template,
   ownerTag: Tag,
-  preClones: Clones,
+  // preClones: Clones,
   context: Context,
   options: ElementBuildOptions,
 ) {
@@ -472,4 +501,31 @@ type DestroyOptions = {
 export type ElementBuildOptions = {
   counts: Counts
   forceElement?: boolean
+}
+
+function getChildTagsToDestroy(
+  childTags: Tag[],
+  allTags: Tag[] = [],
+): Tag[] {
+  for (let index = childTags.length - 1; index >= 0; --index) {
+    const cTag = childTags[index]
+
+    // cTag.destroySubscriptions()
+
+    allTags.push(cTag)
+
+    childTags.splice(index, 1)
+
+    getChildTagsToDestroy(cTag.childTags, allTags)
+    /*
+    for (let iIndex = this.childTags.length - 1; iIndex >= 0; --iIndex) {
+      const iTag = this.childTags[iIndex]
+      if(cTag === iTag) {
+        this.childTags.splice(iIndex, 1)
+      }
+    }
+    */
+  }
+
+  return allTags
 }

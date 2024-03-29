@@ -5,7 +5,7 @@ import { TagSupport } from './TagSupport.class'
 import { Counts, Template } from './interpolateTemplate'
 import { TemplaterResult } from './TemplaterResult.class'
 import { ArrayNoKeyError } from './errors'
-import { destroyArrayTag, destroyTagSupportPast } from './checkDestroyPrevious.function'
+import { destroyArrayTag } from './checkDestroyPrevious.function'
 import { Provider } from './providers'
 import { TagSubject } from './Tag.utils'
 

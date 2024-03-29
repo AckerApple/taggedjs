@@ -5,29 +5,36 @@ import { InterpolateSubject } from './processSubjectValue.function'
 import { TagArraySubject } from './processTagArray'
 import { isLikeTags } from './isLikeTags.function'
 import { Counts, Template } from './interpolateTemplate'
-import { TagSupport } from './TagSupport.class'
+import { destroyTagMemory, destroyTagSupportPast } from './destroyTag.function'
+import { TemplaterResult } from './TemplaterResult.class'
 
 export function checkDestroyPrevious(
-  existing: InterpolateSubject, // existing.value is the old value
+  subject: InterpolateSubject, // existing.value is the old value
   newValue: unknown,
 ) {
-  const existingSubArray = existing as TagArraySubject
+  const existingSubArray = subject as TagArraySubject
   const wasArray = existingSubArray.lastArray
   
   // no longer an array
   if (wasArray && !isTagArray(newValue)) {
+    // if(isTagInstance(newValue) || isTagComponent(newValue)) {
+    //   const templater = newValue as TemplaterResult
+    //   delete templater.global.oldest
+    //   delete templater.global.newest
+    //   templater.global.context = {}
+    // }
     wasArray.forEach(({tag}) => destroyArrayTag(tag, {added:0, removed:0}))
-    delete (existing as TagArraySubject).lastArray  
+    delete (subject as TagArraySubject).lastArray  
     return 1
   }
 
-  const tagSubject = existing as TagSubject
+  const tagSubject = subject as TagSubject
   const existingTag = tagSubject.tag
   
   // no longer tag or component?
   if(existingTag) {
     const isValueTag = isTagInstance(newValue)
-    const isSubjectTag = isTagInstance(existing.value)
+    const isSubjectTag = isTagInstance(subject.value)
 
     if(isSubjectTag && isValueTag) {
       const newTag = newValue as Tag
@@ -49,7 +56,7 @@ export function checkDestroyPrevious(
     return 3
   }
 
-  const displaySubject = existing as DisplaySubject
+  const displaySubject = subject as DisplaySubject
   const hasLastValue = 'lastValue' in displaySubject
   const lastValue = displaySubject.lastValue // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
   // was simple value but now something bigger
@@ -59,21 +66,6 @@ export function checkDestroyPrevious(
   }
 
   return false
-}
-
-export function destroyTagMemory(
-  tag: Tag,
-  existingSubject: TagSubject,
-) {
-  const oldTagSupport = tag.tagSupport
-  destroyTagSupportPast(oldTagSupport)
-  delete (existingSubject as any).tag
-  tag.destroy()
-}
-
-export function destroyTagSupportPast(oldTagSupport: TagSupport) {
-  delete oldTagSupport.templater.global.oldest
-  delete oldTagSupport.templater.global.newest
 }
 
 export function destroyArrayTag(
