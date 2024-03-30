@@ -371,14 +371,21 @@ const arrayTests = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(function ArrayT
             index:${index}
           </div>
           
-          <div>scores:${item.scores.map((score, playerIndex) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
+          <div style="background-color:purple;padding:.5em">
+            scores:${item.scores.map((score, playerIndex) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
             <div style="border:1px solid white;"
               oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateInit} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateDestroy}
             >
-              ${scoreData({ score, playerIndex })}
-              <button id=${`score-data-${playerIndex}-${score.frame}-outside`}
-                onclick=${() => ++score.score}
-              >outer score ++${score.score}</button>
+              <fieldset>
+                <legend>
+                  <button id=${`score-data-${playerIndex}-${score.frame}-outside-button`}
+                    onclick=${() => ++score.score}
+                  >outer score button ++${score.score}</button>
+                  <span id=${`score-data-${playerIndex}-${score.frame}-outside-display`}
+                  >${score.score}</span>
+                </legend>
+                ${scoreData({ score, playerIndex })}
+              </fieldset>
             </div>
           `.key(score))}</div>
           
@@ -430,9 +437,11 @@ const scoreData = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ score, player
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
     frame:${score.frame}:
     <button
-      id=${`score-data-${playerIndex}-${score.frame}-inside`}
+      id=${`score-data-${playerIndex}-${score.frame}-inside-button`}
       onclick=${() => ++score.score}
-    >inner score ++${score.score}</button>
+    >inner score button ++${score.score}</button>
+    <span id=${`score-data-${playerIndex}-${score.frame}-inside-display`}
+    >${score.score}</span>
     <button onclick=${() => ++renderCount}>increase renderCount</button>
     ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_1__.renderCountDiv)({ renderCount, name: 'scoreData' + score.frame })}
   `;
@@ -949,10 +958,10 @@ const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
     // const component = childTests() as any
     // const template = component.wrapper().getTemplate()
     const views = [
-        // 'arrays',
-        'props',
-        'tagSwitchDebug',
-        'counters',
+        'arrays',
+        // 'props',
+        // 'tagSwitchDebug',
+        // 'counters',
     ];
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.html) `<!--isolatedApp.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
@@ -1338,7 +1347,6 @@ const tagSwitchDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_t = 'tagS
     let selectedTag = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(null)(x => [selectedTag, selectedTag = x]);
     let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
     function changeSelectedTag(event) {
-        console.log('event.target', { event, target: event.target });
         selectedTag = event.target.value;
         if (selectedTag === 'undefined') {
             selectedTag = undefined;
@@ -1580,24 +1588,26 @@ function runTests() {
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('array testing', () => {
         (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#array-test-push-item')).toBe(1);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#score-data-0-1-inside')).toBe(0);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#score-data-0-1-outside')).toBe(0);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#score-data-0-1-inside-button')).toBe(0);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#score-data-0-1-outside-button')).toBe(0);
         document.getElementById('array-test-push-item')?.click();
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#score-data-0-1-inside')).toBe(1);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#score-data-0-1-outside')).toBe(1);
-        const insideElm = document.getElementById('score-data-0-1-inside');
-        let indexValue = insideElm?.innerText;
-        const outsideElm = document.getElementById('score-data-0-1-outside');
-        const outsideValue = outsideElm?.innerText;
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#score-data-0-1-inside-button')).toBe(1);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#score-data-0-1-outside-button')).toBe(1);
+        const insideElm = document.getElementById('score-data-0-1-inside-button');
+        const insideDisplay = document.getElementById('score-data-0-1-inside-display');
+        let indexValue = insideDisplay?.innerText;
+        const outsideElm = document.getElementById('score-data-0-1-outside-button');
+        const outsideDisplay = document.getElementById('score-data-0-1-outside-display');
+        const outsideValue = outsideDisplay?.innerText;
         (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe(outsideValue);
         insideElm?.click();
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(insideElm?.innerText).toBe(outsideElm?.innerText);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe((Number(insideElm?.innerText) - 1).toString());
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe((Number(outsideElm?.innerText) - 1).toString());
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(insideDisplay?.innerText).toBe(outsideDisplay?.innerText);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe((Number(insideDisplay?.innerText) - 1).toString());
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe((Number(outsideDisplay?.innerText) - 1).toString());
         outsideElm?.click();
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(insideElm?.innerText).toBe(outsideElm?.innerText);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe((Number(insideElm?.innerText) - 2).toString());
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe((Number(outsideElm?.innerText) - 2).toString());
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(insideDisplay?.innerText).toBe(outsideDisplay?.innerText);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe((Number(insideDisplay?.innerText) - 2).toString());
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe((Number(outsideDisplay?.innerText) - 2).toString());
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('child tests', () => {
         testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display');
@@ -1828,7 +1838,7 @@ class Tag {
         this.hasLiveElements = false;
         delete this.tagSupport.subject.tag;
         this.destroySubscriptions();
-        let mainPromise = Promise.resolve();
+        let mainPromise;
         if (this.ownerTag) {
             this.ownerTag.childTags = this.ownerTag.childTags.filter(child => child !== this);
         }
@@ -1842,10 +1852,16 @@ class Tag {
         else {
             this.destroyClones();
         }
-        return mainPromise.then(async () => {
-            const promises = childTags.map(kid => kid.destroy({ stagger: 0, byParent: true }));
-            await Promise.all(promises);
-        }).then(() => options.stagger);
+        if (mainPromise) {
+            mainPromise = mainPromise.then(async () => {
+                const promises = childTags.map(kid => kid.destroy({ stagger: 0, byParent: true }));
+                return Promise.all(promises);
+            });
+        }
+        else {
+            mainPromise = Promise.all(childTags.map(kid => kid.destroy({ stagger: 0, byParent: true })));
+        }
+        return mainPromise.then(() => options.stagger);
     }
     destroySubscriptions() {
         this.cloneSubs.forEach(cloneSub => cloneSub.unsubscribe());
@@ -2206,6 +2222,7 @@ class BaseTagSupport {
         const children = this.templater.children; // children tags passed in as arguments
         const props = this.templater.props; // natural props
         const latestCloned = (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepClone)(props); // alterProps(props, templater)
+        console.log('latestCloned', latestCloned);
         this.propsConfig = {
             latest: props,
             latestCloned, // assume its HTML children and then detect
@@ -2231,18 +2248,20 @@ function renderTagSupport(tagSupport, renderUp) {
     // const oldTagSetup = this
     const subject = tagSupport.subject;
     const templater = tagSupport.templater; // oldTagSetup.templater // templater
-    const newest = subject.tag?.tagSupport.templater.global.newest;
-    if (newest) {
-        const nowProps = templater.props;
-        const latestProps = newest?.tagSupport.templater.props;
-        if (nowProps && latestProps && latestProps.propNumber > nowProps.propNumber) {
-            console.log('mismatched templater', {
-                original: templater.wrapper.original,
-                nowProps,
-                latestProps,
-                late: templater.global.newestTemplater.props,
-            });
-            throw new Error('the newest and what I am processing do not have the same props');
+    const subjectTag = subject.tag;
+    const newest = subjectTag?.tagSupport.templater.global.newest;
+    let ownerTag;
+    let selfPropChange = false;
+    if (renderUp && newest) {
+        ownerTag = newest.ownerTag;
+        if (ownerTag) {
+            const nowProps = templater.props;
+            const latestProps = newest.tagSupport.propsConfig.latestCloned;
+            selfPropChange = !(0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepEqual)(nowProps, latestProps);
+            if (selfPropChange) {
+                console.log('yyyyy', { renderUp, nowProps, latestProps });
+                // throw new Error('66 - stop')
+            }
         }
     }
     const useTagSupport = tagSupport.templater.global.newest?.tagSupport; // oldTagSetup
@@ -2261,20 +2280,24 @@ function renderTagSupport(tagSupport, renderUp) {
         // oldest.updateByTag(exit.redraw)
         return tag;
     }
+    console.log('consider rendering up to', {
+        ownerOrg: tag.ownerTag?.tagSupport.templater.wrapper?.original,
+        owner: tag.ownerTag,
+        renderUp,
+        remit: exit.remit,
+        org: tag.tagSupport.templater.wrapper.original,
+        props: tag.tagSupport.propsConfig.latest,
+        clonedProps: tag.tagSupport.propsConfig.latestCloned,
+    });
     // Have owner re-render
     // ??? - recently removed. As causes some sort of owner newest disconnect during prop testing
-    /*
-    if(renderUp && tag.ownerTag) {
-      const ownerTagSupport = tag.ownerTag.tagSupport
-      console.log('--- renderup ---', ownerTagSupport.templater.wrapper.original)
-      renderTagSupport(
-        ownerTagSupport,
-        true,
-      )
-  
-      return tag
+    // ??? - restored with condition - must render parent if I modified my props
+    if (ownerTag && selfPropChange) {
+        const ownerTagSupport = ownerTag.tagSupport;
+        console.log('--- renderup ---', ownerTagSupport.templater.wrapper?.original);
+        renderTagSupport(ownerTagSupport, true);
+        return tag;
     }
-    */
     return tag;
 }
 function cloneValueArray(values) {
@@ -2331,6 +2354,7 @@ __webpack_require__.r(__webpack_exports__);
 class TemplaterResult {
     props;
     children;
+    isTag = false; // when true, is basic tag non-component
     tagged;
     wrapper;
     global = {
@@ -2544,15 +2568,11 @@ function runTagCallback(value, tag, bindTo, args) {
     if (tagSupport && !sameRenderCount) {
         return; // already rendered
     }
-    console.log('****** call back renderTagSupport', {
-        original: tagSupport.templater.wrapper.original,
-        props: tagSupport.templater.props,
-        global: tagSupport.templater.global,
-    });
-    (0,_TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport, false);
+    (0,_TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport, true);
+    // throw new Error('after click render stop')
     if (callbackResult instanceof Promise) {
         return callbackResult.then(() => {
-            (0,_TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport, false);
+            (0,_TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport, true);
             return 'promise-no-data-ever';
         });
     }
@@ -2973,8 +2993,14 @@ function hasTagSupportChanged(oldTagSupport, newTagSupport, newTemplater) {
     const sameSupport = oldTagSupport === newTagSupport;
     const samePropConfig = oldTagSupport.propsConfig === newTagSupport.propsConfig;
     // const sameProps = oldTagSupport.propsConfig.latest === newTagSupport.propsConfig.latest
-    if (sameSupport || samePropConfig) {
-        throw new Error('something here - 22');
+    if (sameSupport) {
+        throw new Error('sameSupport - 22');
+    }
+    if (samePropConfig) {
+        throw new Error('samePropConfig - 22');
+    }
+    if (newTagSupport.templater.isTag || oldTagSupport.templater.isTag || newTemplater.isTag) {
+        throw new Error('trying to compare a basic tag');
     }
     const latestProps = newTemplater.props; // newTagSupport.propsConfig.latest
     const pastCloneProps = oldTagSupport.propsConfig.latestCloned;
@@ -4059,13 +4085,17 @@ ownerTag, options) {
     value.forEach((subTag, index) => {
         const previous = lastArray[index];
         const previousSupport = !previous?.deleted && previous?.tag.tagSupport;
-        subTag.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_1__.TagSupport(ownerTag.tagSupport, {
+        const fakeSubject = new _ValueSubject__WEBPACK_IMPORTED_MODULE_0__.ValueSubject({});
+        const fakeTemplater = {
+            isTag: true,
             global: {
                 providers: [],
                 context: {},
             },
             children: new _ValueSubject__WEBPACK_IMPORTED_MODULE_0__.ValueSubject([]),
-        }, new _ValueSubject__WEBPACK_IMPORTED_MODULE_0__.ValueSubject({}));
+        };
+        subTag.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_1__.TagSupport(ownerTag.tagSupport, fakeTemplater, fakeSubject);
+        fakeTemplater.tagSupport = subTag.tagSupport;
         if (previousSupport) {
             subTag.tagSupport.templater.global = previousSupport.templater.global;
             previousSupport.templater.global.newest = subTag;
@@ -4843,18 +4873,9 @@ function updateComponent(tagComponent) {
 /** creates/returns a function that when called then calls the original component function */
 function getTagWrap(templater, madeSubject) {
     const innerTagWrap = function (oldTagSetup, subject) {
-        const latestTemplater = oldTagSetup.templater.global.newestTemplater;
         oldTagSetup.templater.global.newestTemplater = templater;
         ++oldTagSetup.templater.global.renderCount;
         templater.global = oldTagSetup.templater.global;
-        const isPropCountTest = templater.props && typeof (templater.props) === 'object' && 'propNumber' in (templater.props || {}) && templater.wrapper.original.toString().includes('propNumber, callback');
-        if (isPropCountTest) {
-            console.log('xxxxxxx', {
-                original: templater.wrapper.original,
-                props: templater.props,
-                latestProps: latestTemplater.props,
-            });
-        }
         const childSubject = templater.children;
         const lastArray = oldTagSetup.templater.global.oldest?.tagSupport.templater.children.lastArray;
         if (lastArray) {
@@ -4878,10 +4899,10 @@ function getTagWrap(templater, madeSubject) {
         }
         // ???
         let castedProps = (0,_alterProps_function__WEBPACK_IMPORTED_MODULE_7__.alterProps)(props, newestOwnerTemplater, oldTagSetup.ownerTagSupport);
+        const clonedProps = (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_5__.deepClone)(props); // castedProps
         // CALL ORIGINAL COMPONENT FUNCTION
         const tag = originalFunction(castedProps, childSubject);
         tag.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_6__.TagSupport(oldTagSetup.ownerTagSupport, templater, subject);
-        const clonedProps = (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_5__.deepClone)(castedProps); // castedProps
         tag.tagSupport.propsConfig = {
             latest: props, // castedProps
             latestCloned: clonedProps,
@@ -5081,13 +5102,20 @@ function updateExistingTagComponent(ownerTag, tempResult, subject, insertBefore)
         }
         const newTagSupport = tempResult.tagSupport;
         const hasChanged = (0,_hasTagSupportChanged_function__WEBPACK_IMPORTED_MODULE_0__.hasTagSupportChanged)(oldTagSupport, newTagSupport, tempResult);
+        console.log('hasChanged - 0', tempResult.wrapper.original);
         if (!hasChanged) {
-            const stateChanged = false;
-            if (stateChanged) {
-                const newTag = (0,_TagSupport_class__WEBPACK_IMPORTED_MODULE_1__.renderTagSupport)(tempResult.tagSupport, false);
-                const oldTag = oldGlobal.oldest;
-                oldTag.updateByTag(newTag);
+            /*
+            const stateChanged = false
+            if(stateChanged) {
+              const newTag = renderTagSupport(
+                tempResult.tagSupport,
+                false,
+              )
+        
+              const oldTag = oldGlobal.oldest as Tag
+              oldTag.updateByTag(newTag)
             }
+            */
             return; // its the same tag component
         }
     }
@@ -5307,6 +5335,7 @@ function handleStillTag(existingTag, subject, value, ownerTag) {
     const tag = value;
     if (!tag.tagSupport) {
         const fakeTemplater = {
+            isTag: true,
             global: {
                 context: {},
                 oldest: tag,
@@ -5314,6 +5343,7 @@ function handleStillTag(existingTag, subject, value, ownerTag) {
             children: new _ValueSubject__WEBPACK_IMPORTED_MODULE_7__.ValueSubject([]),
         };
         tag.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.TagSupport(ownerTag.tagSupport, fakeTemplater, subject);
+        fakeTemplater.tagSupport = tag.tagSupport;
     }
     if (isSameTag) {
         existingTag.updateByTag(tag);

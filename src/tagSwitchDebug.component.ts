@@ -8,7 +8,6 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
   let renderCount = setLet(0)(x => [renderCount, renderCount = x])
   
   function changeSelectedTag(event: InputElementTargetEvent) {
-    console.log('event.target', {event, target:event.target})
     selectedTag = event.target.value
 
     if(selectedTag === 'undefined') {

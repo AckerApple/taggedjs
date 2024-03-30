@@ -35,14 +35,21 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
             index:${index}
           </div>
           
-          <div>scores:${item.scores.map((score, playerIndex) => html`
+          <div style="background-color:purple;padding:.5em">
+            scores:${item.scores.map((score, playerIndex) => html`
             <div style="border:1px solid white;"
               oninit=${animateInit} ondestroy=${animateDestroy}
             >
-              ${scoreData({score, playerIndex})}
-              <button id=${`score-data-${playerIndex}-${score.frame}-outside`}
-                onclick=${() => ++score.score}
-              >outer score ++${score.score}</button>
+              <fieldset>
+                <legend>
+                  <button id=${`score-data-${playerIndex}-${score.frame}-outside-button`}
+                    onclick=${() => ++score.score}
+                  >outer score button ++${score.score}</button>
+                  <span id=${`score-data-${playerIndex}-${score.frame}-outside-display`}
+                  >${score.score}</span>
+                </legend>
+                ${scoreData({score, playerIndex})}
+              </fieldset>
             </div>
           `.key(score))}</div>
           
@@ -103,9 +110,11 @@ const scoreData = tag((
   return html`
     frame:${score.frame}:
     <button
-      id=${`score-data-${playerIndex}-${score.frame}-inside`}
+      id=${`score-data-${playerIndex}-${score.frame}-inside-button`}
       onclick=${() => ++score.score}
-    >inner score ++${score.score}</button>
+    >inner score button ++${score.score}</button>
+    <span id=${`score-data-${playerIndex}-${score.frame}-inside-display`}
+    >${score.score}</span>
     <button onclick=${() => ++renderCount}>increase renderCount</button>
     ${renderCountDiv({renderCount, name:'scoreData' + score.frame})}
   `

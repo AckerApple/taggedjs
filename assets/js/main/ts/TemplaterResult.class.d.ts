@@ -11,6 +11,7 @@ export type Wrapper = ((tagSupport: BaseTagSupport, subject: TagSubject) => Tag)
 export declare class TemplaterResult {
     props: Props;
     children: TagChildren;
+    isTag: boolean;
     tagged: boolean;
     wrapper: Wrapper;
     global: {

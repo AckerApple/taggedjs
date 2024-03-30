@@ -78,7 +78,7 @@ export function runTests() {
     )
   })
 
-  it.only('tagSwitching', () => {
+  it('tagSwitching', () => {
     console.log('0 - 0')
     expect(elementCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined')
     expect(elementCount('#tag-switch-dropdown')).toBe(1, 'Expected one #tag-switch-dropdown')
@@ -124,27 +124,29 @@ export function runTests() {
 
   it('array testing', () => {
     expect(elementCount('#array-test-push-item')).toBe(1)
-    expect(elementCount('#score-data-0-1-inside')).toBe(0)
-    expect(elementCount('#score-data-0-1-outside')).toBe(0)
+    expect(elementCount('#score-data-0-1-inside-button')).toBe(0)
+    expect(elementCount('#score-data-0-1-outside-button')).toBe(0)
     document.getElementById('array-test-push-item')?.click()
-    expect(elementCount('#score-data-0-1-inside')).toBe(1)
-    expect(elementCount('#score-data-0-1-outside')).toBe(1)
+    expect(elementCount('#score-data-0-1-inside-button')).toBe(1)
+    expect(elementCount('#score-data-0-1-outside-button')).toBe(1)
     
-    const insideElm = document.getElementById('score-data-0-1-inside')
-    let indexValue = insideElm?.innerText
-    const outsideElm = document.getElementById('score-data-0-1-outside')
-    const outsideValue = outsideElm?.innerText
+    const insideElm = document.getElementById('score-data-0-1-inside-button')
+    const insideDisplay = document.getElementById('score-data-0-1-inside-display')
+    let indexValue = insideDisplay?.innerText
+    const outsideElm = document.getElementById('score-data-0-1-outside-button')
+    const outsideDisplay = document.getElementById('score-data-0-1-outside-display')
+    const outsideValue = outsideDisplay?.innerText
     expect(indexValue).toBe(outsideValue)
 
     insideElm?.click()
-    expect(insideElm?.innerText).toBe(outsideElm?.innerText)
-    expect(indexValue).toBe((Number(insideElm?.innerText) - 1).toString())
-    expect(indexValue).toBe((Number(outsideElm?.innerText) - 1).toString())
+    expect(insideDisplay?.innerText).toBe(outsideDisplay?.innerText)
+    expect(indexValue).toBe((Number(insideDisplay?.innerText) - 1).toString())
+    expect(indexValue).toBe((Number(outsideDisplay?.innerText) - 1).toString())
 
     outsideElm?.click()
-    expect(insideElm?.innerText).toBe(outsideElm?.innerText)
-    expect(indexValue).toBe((Number(insideElm?.innerText) - 2).toString())
-    expect(indexValue).toBe((Number(outsideElm?.innerText) - 2).toString())
+    expect(insideDisplay?.innerText).toBe(outsideDisplay?.innerText)
+    expect(indexValue).toBe((Number(insideDisplay?.innerText) - 2).toString())
+    expect(indexValue).toBe((Number(outsideDisplay?.innerText) - 2).toString())
   })
 
   it('child tests', () => {
