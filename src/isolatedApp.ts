@@ -14,7 +14,8 @@ export const IsolatedApp = tag(() => {
   // const template = component.wrapper().getTemplate()
 
   const views: viewTypes[] = [
-    'arrays',
+    'child',
+    // 'arrays',
     // 'props',
     // 'tagSwitchDebug',
     // 'counters',
