@@ -6,8 +6,8 @@ export function isTagComponent(value?: TemplaterResult | unknown) {
   return (value as TemplaterResult)?.isTemplater === true
 }
 
-export function isTagInstance(tag?: Tag | unknown) {
-  return (tag as Tag)?.isTag === true
+export function isTagInstance(tag?: TemplaterResult | unknown) {
+  return (tag as TemplaterResult)?.isTag === true
 }
 
 export function isSubjectInstance(

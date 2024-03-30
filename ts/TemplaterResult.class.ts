@@ -18,6 +18,7 @@ export type Wrapper = ((
 }
 
 export class TemplaterResult {
+  isTag = false // when true, is basic tag non-component
   tagged!: boolean
   wrapper!: Wrapper
 

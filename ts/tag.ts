@@ -118,20 +118,10 @@ function getTagWrap(
     oldTagSetup: TagSupport,
     subject: TagSubject,
   ) {
-    const latestTemplater = oldTagSetup.templater.global.newestTemplater
     oldTagSetup.templater.global.newestTemplater = templater
     ++oldTagSetup.templater.global.renderCount
     
     templater.global = oldTagSetup.templater.global
-
-    const isPropCountTest = templater.props && typeof(templater.props)==='object' && 'propNumber' in (templater.props as any || {}) && templater.wrapper.original.toString().includes('propNumber, callback')
-    if(isPropCountTest) {
-      console.log('xxxxxxx', {
-        original: templater.wrapper.original,
-        props: templater.props,
-        latestProps: latestTemplater.props,
-      })
-    }
     
     const childSubject = templater.children
     const lastArray = oldTagSetup.templater.global.oldest?.tagSupport.templater.children.lastArray
@@ -166,6 +156,7 @@ function getTagWrap(
       newestOwnerTemplater as TemplaterResult,
       oldTagSetup.ownerTagSupport,
     )
+    const clonedProps = deepClone(props) // castedProps
 
     // CALL ORIGINAL COMPONENT FUNCTION
     const tag = originalFunction(castedProps, childSubject)
@@ -176,7 +167,6 @@ function getTagWrap(
       subject,
     )
 
-    const clonedProps = deepClone(castedProps) // castedProps
     tag.tagSupport.propsConfig = {
       latest: props, // castedProps
       latestCloned: clonedProps,

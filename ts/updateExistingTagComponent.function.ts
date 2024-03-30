@@ -64,7 +64,9 @@ export function updateExistingTagComponent(
     const newTagSupport = tempResult.tagSupport
     const hasChanged = hasTagSupportChanged(oldTagSupport, newTagSupport, tempResult)
 
+    console.log('hasChanged - 0', tempResult.wrapper.original)
     if(!hasChanged) {
+      /*
       const stateChanged = false
       if(stateChanged) {
         const newTag = renderTagSupport(
@@ -75,6 +77,7 @@ export function updateExistingTagComponent(
         const oldTag = oldGlobal.oldest as Tag
         oldTag.updateByTag(newTag)
       }
+      */
 
       return // its the same tag component
     }

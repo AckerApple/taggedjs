@@ -97,7 +97,7 @@ export class Tag {
     delete (this.tagSupport.subject as any).tag
     this.destroySubscriptions()
     
-    let mainPromise = Promise.resolve() as Promise<unknown> as Promise<(void | undefined)[]>
+    let mainPromise: Promise<number | (number | void | undefined)[]> | undefined
 
     if(this.ownerTag) {
       this.ownerTag.childTags = this.ownerTag.childTags.filter(child => child !== this)
@@ -114,10 +114,16 @@ export class Tag {
       this.destroyClones()
     }
 
-    return mainPromise.then(async () => {
-      const promises = childTags.map(kid => kid.destroy({stagger:0, byParent: true}))
-      await Promise.all(promises)
-    }).then(() => options.stagger)
+    if(mainPromise) {
+      mainPromise = mainPromise.then(async () => {
+        const promises = childTags.map(kid => kid.destroy({stagger:0, byParent: true}))
+        return Promise.all(promises)
+      })
+    } else {
+      mainPromise = Promise.all(childTags.map(kid => kid.destroy({stagger:0, byParent: true})))
+    }
+
+    return mainPromise.then(() => options.stagger)
   }
 
   destroySubscriptions() {

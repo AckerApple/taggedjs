@@ -72,19 +72,24 @@ export function processTagArray(
   value.forEach((subTag, index) => {
     const previous = lastArray[index]
     const previousSupport = !previous?.deleted && previous?.tag.tagSupport
+    const fakeSubject = new ValueSubject({} as Tag) as unknown as TagSubject
+    const fakeTemplater = {
+      isTag: true,
+      global: {
+        providers: [] as Provider[],
+        context: {},
+      },
+      children: new ValueSubject<Tag[]>([]),
+    } as TemplaterResult
 
     subTag.tagSupport = new TagSupport(
       ownerTag.tagSupport,
-      {
-        global: {
-          providers: [] as Provider[],
-          context: {},
-        },
-        children: new ValueSubject<Tag[]>([]),
-      } as TemplaterResult,
-      new ValueSubject({} as Tag) as unknown as TagSubject,
+      fakeTemplater,
+      fakeSubject,
     )
     
+    fakeTemplater.tagSupport = subTag.tagSupport
+
     if(previousSupport) {
       subTag.tagSupport.templater.global = previousSupport.templater.global
       previousSupport.templater.global.newest = subTag

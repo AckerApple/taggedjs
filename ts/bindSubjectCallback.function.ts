@@ -43,21 +43,18 @@ export function runTagCallback(
     return // already rendered
   }
 
-  console.log('****** call back renderTagSupport', {
-    original: tagSupport.templater.wrapper.original,
-    props: tagSupport.templater.props,
-    global: tagSupport.templater.global,
-  })
   renderTagSupport(
     tagSupport,
-    false,
+    true, // renderUp - callback may have changed props so also check to render up
   )
+
+  // throw new Error('after click render stop')
 
   if(callbackResult instanceof Promise) {
     return callbackResult.then(() => {
       renderTagSupport(
         tagSupport,
-        false,
+        true,
       )
       return 'promise-no-data-ever'
     })

@@ -3,6 +3,7 @@ import { TagSupport } from "./TagSupport.class"
 import { ValueSubject } from "./ValueSubject"
 import { html } from "./html"
 import { TemplaterResult } from "./TemplaterResult.class"
+import { TagSubject } from "./Tag.utils"
 
 describe('Tag.class', () => {
   it('simple update', () => {
@@ -74,7 +75,9 @@ function getTags(
     },
     children: new ValueSubject<Tag[]>([]),
   } as TemplaterResult
-  tag0.tagSupport = new TagSupport(ownerTagSupport, templater0)
+
+  const subject = new ValueSubject(templater0) as TagSubject
+  tag0.tagSupport = new TagSupport(ownerTagSupport, templater0, subject)
 
   const templater1 = {
     global: {
@@ -83,7 +86,7 @@ function getTags(
     },
     children: new ValueSubject<Tag[]>([]),
   } as TemplaterResult
-  tag1.tagSupport = new TagSupport(ownerTagSupport, templater1)
+  tag1.tagSupport = new TagSupport(ownerTagSupport, templater1, subject)
 
   return [tag0, tag1]
 }

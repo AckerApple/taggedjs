@@ -175,13 +175,16 @@ function handleStillTag(
 
   if(!tag.tagSupport) {
     const fakeTemplater = {
+      isTag: true,
       global: {
         context: {},
         oldest: tag,
       },
       children: new ValueSubject<Tag[]>([]),
     } as TemplaterResult
+    
     tag.tagSupport = new TagSupport(ownerTag.tagSupport, fakeTemplater, subject as TagSubject)
+    fakeTemplater.tagSupport = tag.tagSupport
   }
 
   if(isSameTag) {

@@ -5,6 +5,7 @@ import { providersChangeCheck } from './provider.utils'
 import { TemplaterResult } from './TemplaterResult.class'
 import { TagSubject, redrawTag } from './Tag.utils'
 import { isLikeTags } from './isLikeTags.function'
+import { isTagInstance } from './isInstance'
 
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(

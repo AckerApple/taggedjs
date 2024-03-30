@@ -1,6 +1,6 @@
 import { Props } from './Props'
 import { Tag, TagMemory } from './Tag.class'
-import { deepClone } from './deepFunctions'
+import { deepClone, deepEqual } from './deepFunctions'
 import { isTagArray, isTagComponent, isTagInstance } from './isInstance'
 import { StateConfigArray } from './set.function'
 import { TagChildren } from './tag'
@@ -35,6 +35,7 @@ export class BaseTagSupport {
     const props: Props = this.templater.props  // natural props
 
     const latestCloned = deepClone(props) // alterProps(props, templater)
+    console.log('latestCloned',latestCloned)
     this.propsConfig = {
       latest: props,
       latestCloned, // assume its HTML children and then detect
@@ -66,20 +67,24 @@ export function renderTagSupport(
   // const oldTagSetup = this
   const subject = tagSupport.subject
   const templater = tagSupport.templater // oldTagSetup.templater // templater
-  
-  const newest = subject.tag?.tagSupport.templater.global.newest
-  if(newest) {
-    const nowProps = templater.props as any
-    const latestProps = newest?.tagSupport.templater.props as any
+  const subjectTag = subject.tag
+  const newest = subjectTag?.tagSupport.templater.global.newest as Tag
+  let ownerTag: undefined | Tag
+  let selfPropChange = false
 
-    if(nowProps && latestProps && latestProps.propNumber > nowProps.propNumber) {
-      console.log('mismatched templater', {
-        original: templater.wrapper.original,
-        nowProps,
-        latestProps,
-        late: templater.global.newestTemplater.props,
-      })
-      throw new Error('the newest and what I am processing do not have the same props')
+  if(renderUp && newest) {
+    ownerTag = newest.ownerTag
+    
+    if(ownerTag) {
+      const nowProps = templater.props as any
+      const latestProps = newest.tagSupport.propsConfig.latestCloned
+
+      selfPropChange = !deepEqual(nowProps, latestProps)
+
+      if(selfPropChange) {
+        console.log('yyyyy', {renderUp, nowProps, latestProps})
+        // throw new Error('66 - stop')
+      }
     }
   }
 
@@ -109,12 +114,21 @@ export function renderTagSupport(
     return tag
   }
   
+  console.log('consider rendering up to', {
+    ownerOrg: tag.ownerTag?.tagSupport.templater.wrapper?.original,
+    owner: tag.ownerTag,
+    renderUp,
+    remit: exit.remit,
+    org: tag.tagSupport.templater.wrapper.original,
+    props: tag.tagSupport.propsConfig.latest,
+    clonedProps: tag.tagSupport.propsConfig.latestCloned,
+  })
   // Have owner re-render
   // ??? - recently removed. As causes some sort of owner newest disconnect during prop testing
-  /*
-  if(renderUp && tag.ownerTag) {    
-    const ownerTagSupport = tag.ownerTag.tagSupport
-    console.log('--- renderup ---', ownerTagSupport.templater.wrapper.original)
+  // ??? - restored with condition - must render parent if I modified my props
+  if(ownerTag && selfPropChange) {
+    const ownerTagSupport = ownerTag.tagSupport
+    console.log('--- renderup ---', ownerTagSupport.templater.wrapper?.original)
     renderTagSupport(
       ownerTagSupport,
       true,
@@ -122,7 +136,6 @@ export function renderTagSupport(
 
     return tag
   }
-  */
 
   return tag
 }

@@ -11,8 +11,15 @@ export function hasTagSupportChanged(
   const sameSupport = oldTagSupport === newTagSupport
   const samePropConfig = oldTagSupport.propsConfig === newTagSupport.propsConfig
   // const sameProps = oldTagSupport.propsConfig.latest === newTagSupport.propsConfig.latest
-  if(sameSupport || samePropConfig) {
-    throw new Error('something here - 22')
+  if(sameSupport) {
+    throw new Error('sameSupport - 22')
+  }
+  if(samePropConfig) {
+    throw new Error('samePropConfig - 22')
+  }
+
+  if(newTagSupport.templater.isTag || oldTagSupport.templater.isTag || newTemplater.isTag) {
+    throw new Error('trying to compare a basic tag')
   }
   
   const latestProps = newTemplater.props // newTagSupport.propsConfig.latest
