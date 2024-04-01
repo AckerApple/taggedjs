@@ -4,7 +4,7 @@ import { Subject } from './Subject'
 import { TemplaterResult } from './TemplaterResult.class'
 import { isSubjectInstance, isTagArray, isTagComponent, isTagInstance } from './isInstance'
 import { Tag } from './Tag.class'
-import { InterpolateSubject, processTag } from './processSubjectValue.function'
+import { InterpolateSubject, applyFakeTemplater, processTag } from './processSubjectValue.function'
 import { TagArraySubject, processTagArray } from './processTagArray'
 import { updateExistingTagComponent } from './updateExistingTagComponent.function'
 import { RegularValue, processRegularValue } from './processRegularValue.function'
@@ -22,25 +22,11 @@ export function updateExistingValue(
   ownerTag: Tag,
   insertBefore: Element | Text,
 ): InterpolateSubject {
-  const subjectSubArray = subject as TagArraySubject
   const subjectSubTag = subject as TagSubject
-  const isChildSubject = subjectSubArray.isChildSubject
   const isComponent = isTagComponent(value)
-
-  // If we are working with tag component 2nd argument children, the value has to be digged
-  if(isChildSubject) {
-    value = (value as TagSubject).value // A subject contains the value
-  }
-
   const oldInsertBefore = (subject as DisplaySubject).template || subjectSubTag.tag?.tagSupport.templater.global.insertBefore || (subjectSubTag as DisplaySubject).clone
 
   checkDestroyPrevious(subject, value)
-
-  /*
-  if(subjectSubTag.tag && !subjectSubTag.tag.hasLiveElements) {
-    throw new Error('cannot update tag with no live elements')
-  }
-  */
 
   // handle already seen tag components
   if(isComponent) {
@@ -60,22 +46,6 @@ export function updateExistingValue(
       )
 
       return subjectSubTag
-    }
-
-    if(!templater.global.oldest) {
-      const oldTag = subjectSubTag.tag
-      const oldWrap = oldTag.tagSupport.templater.wrapper // tag versus component
-
-      if(oldWrap) {
-        if(oldWrap.original === templater.wrapper?.original) {
-          templater.global = {...oldTag.tagSupport.templater.global}
-          console.log('🐷 disconnected global', {
-            oldWrap: oldTag.tagSupport.templater.wrapper.original,
-            tempWrap: templater.wrapper.original,
-            global: templater.global,
-          })
-        }
-      }
     }
 
     updateExistingTagComponent(
@@ -132,12 +102,6 @@ export function updateExistingValue(
       subjectSubTag,
       subjectSubTag.template,
       ownerTag,// existingTag, // tag,
-      {
-        counts: {
-          added: 0,
-          removed: 0,
-        }
-      }
     )
     return subjectSubTag
   }
@@ -163,10 +127,6 @@ function handleStillTag(
   value: Tag | TemplaterResult | RegularValue,
   ownerTag: Tag,
 ) {
-  const oldWrapper = existingTag.tagSupport.templater.wrapper
-  const newWrapper = (value as any)?.wrapper
-  // const wrapMatch = oldWrapper && newWrapper && oldWrapper?.original === newWrapper?.original
-
   // TODO: We shouldn't need both of these
   const isSameTag = value && isLikeTags(existingTag, value as Tag)
   const isSameTag2 = value && (value as any).getTemplate && existingTag.isLikeTag(value as any)
@@ -174,17 +134,7 @@ function handleStillTag(
   const tag = value as Tag
 
   if(!tag.tagSupport) {
-    const fakeTemplater = {
-      isTag: true,
-      global: {
-        context: {},
-        oldest: tag,
-      },
-      children: new ValueSubject<Tag[]>([]),
-    } as TemplaterResult
-    
-    tag.tagSupport = new TagSupport(ownerTag.tagSupport, fakeTemplater, subject as TagSubject)
-    fakeTemplater.tagSupport = tag.tagSupport
+    applyFakeTemplater(tag, ownerTag, subject as TagSubject)
   }
 
   if(isSameTag) {
@@ -198,12 +148,6 @@ function handleStillTag(
       subject as TagSubject,
       (subject as TagSubject).template,
       ownerTag,// existingTag, // tag,
-      {
-        counts: {
-          added: 0,
-          removed: 0,
-        }
-      }
     )
   }
 

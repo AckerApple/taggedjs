@@ -24,7 +24,6 @@ export function processTagResult(
   const existingTag = subjectTag.tag
   const previousTag = existingTag?.tagSupport.templater.global.oldest as Tag || undefined // || tag.tagSupport.oldest // subjectTag.tag
   const justUpdate = previousTag // && !forceElement
-
   
   if(previousTag) {
     if(justUpdate) {
@@ -71,17 +70,4 @@ export function processTagResult(
     counts,
     forceElement, test: false,
   })
-
-  tag.tagSupport.templater.global.newest = tag
-  
-  if(!tag.tagSupport.templater.global.oldest) {
-    throw new Error('maybe 3')
-  }
-
-  subjectTag.tag = tag // let reprocessing know we saw this previously as an if
-
-  if(!tag.hasLiveElements) {
-    throw new Error('44444 - 4')
-  }
-
 }

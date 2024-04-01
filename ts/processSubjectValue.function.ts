@@ -64,7 +64,6 @@ export function processSubjectValue(
         subject as TagSubject,
         template,
         ownerTag,
-        options
       )
       return []
   
@@ -95,7 +94,6 @@ export function processTag(
   subject: TagSubject, // could be tag via result.tag
   insertBefore: Element | Text | Template, // <template end interpolate /> (will be removed)
   ownerTag: Tag, // owner
-  options: processOptions, // {added:0, removed:0}
 ) {
   // first time seeing this tag?
   if(!tag.tagSupport) {
@@ -103,22 +101,7 @@ export function processTag(
       throw new Error('issue non-tag here')
     }
 
-    const fakeTemplater = {
-      global:{
-        providers: [],
-        context: {},
-      },
-      children: new ValueSubject([]), // no children
-      props: {} as Props,
-    } as unknown as TemplaterResult
-
-    tag.tagSupport = new TagSupport(
-      ownerTag.tagSupport,
-      fakeTemplater, // the template is provided via html`` call
-      subject,
-    )
-
-    // asking me to render will cause my parent to render
+    applyFakeTemplater(tag, ownerTag, subject)
     ownerTag.childTags.push(tag as Tag)
   }
   
@@ -129,21 +112,40 @@ export function processTag(
     counts: {added:0, removed:0},
     forceElement: true, test: false,
   })
+}
 
-  tag.tagSupport.templater.global.oldest = tag
-  if(!tag.lastTemplateString) {
-    throw new Error('999 - 1')
+export function applyFakeTemplater(
+  tag: Tag,
+  ownerTag: Tag,
+  subject: TagSubject,
+) {
+  if(!ownerTag) {
+    throw new Error('no owner error')
   }
+  const fakeTemplater = getFakeTemplater()
 
-  tag.tagSupport.templater.global.newest = tag
+  tag.tagSupport = new TagSupport(
+    ownerTag.tagSupport,
+    fakeTemplater, // the template is provided via html`` call
+    subject,
+  )
 
-  if(!tag.tagSupport.templater.global.oldest || !tag.tagSupport.templater.global.oldest.hasLiveElements) {
-    throw new Error('4711654')
-  }
-  
-  subject.tag = tag
+  fakeTemplater.global.oldest = tag
+  fakeTemplater.global.newest = tag
+  fakeTemplater.tagSupport = tag.tagSupport
 
-  if(!tag.hasLiveElements) {
-    throw new Error('44444 - 0')
-  }
+  // asking me to render will cause my parent to render
+  tag.ownerTag = ownerTag
+}
+
+function getFakeTemplater() {
+  return {
+    global:{
+      providers: [],
+      context: {},
+    },
+    children: new ValueSubject([]), // no children
+    props: {} as Props,
+    isTag: true,
+  } as unknown as TemplaterResult
 }

@@ -1,8 +1,9 @@
 import { Props } from './Props'
 import { Tag } from './Tag.class'
-import { TagSupport, renderTagSupport } from './TagSupport.class'
+import { TagSupport } from './TagSupport.class'
 import { TemplaterResult } from './TemplaterResult.class'
 import { isTagInstance } from './isInstance'
+import { renderTagSupport } from './renderTagSupport.function'
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(
@@ -13,8 +14,6 @@ export function alterProps(
   function callback(toCall: any, callWith: any) {
     const renderCount = templater.global.renderCount
     const callbackResult = toCall(...callWith)
-
-    const tag = templater.global.newest
     
     if(templater.global.renderCount > renderCount) {
       throw new Error('already rendered')

@@ -13,12 +13,11 @@ export function destroyTagMemory(
   }
 
   delete (subject as any).tag
-  delete (tag.tagSupport.subject as any).tag
+  delete (tag.tagSupport.subject as any).tag // TODO: this line maybe not needed
 
-  // ???
+  // must destroy oldest which is tag with elements on stage
   const oldest = tag.tagSupport.templater.global.oldest as Tag
   oldest.destroy()
-  // tag.destroy()
 
   destroyTagSupportPast(oldTagSupport)
   

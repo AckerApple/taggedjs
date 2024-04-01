@@ -1,11 +1,10 @@
 import { Tag } from './Tag.class'
 import { BaseTagSupport } from './TagSupport.class'
-import { hasTagSupportChanged } from './hasTagSupportChanged.function'
 import { providersChangeCheck } from './provider.utils'
 import { TemplaterResult } from './TemplaterResult.class'
-import { TagSubject, redrawTag } from './Tag.utils'
+import { TagSubject } from './Tag.utils'
 import { isLikeTags } from './isLikeTags.function'
-import { isTagInstance } from './isInstance'
+import { redrawTag } from './redrawTag.function'
 
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(
@@ -13,8 +12,7 @@ export function renderExistingTag(
   newTemplater: TemplaterResult,
   tagSupport: BaseTagSupport,
   subject: TagSubject,
-): {redraw: Tag, remit: boolean} {
-
+): Tag {
   if(subject.tag) {
     newTemplater.global = subject.tag.tagSupport.templater.global
   }
@@ -30,22 +28,22 @@ export function renderExistingTag(
   const latestTag = tagSupport.templater.global.newest as Tag
   if(preRenderCount !== tagSupport.templater.global.renderCount) {
     oldestTag.updateByTag(latestTag)
-
-    return {
-      remit: true,
-      redraw: latestTag,
-    }
+    return latestTag
   }
 
+  /*
   const oldTagSupport = oldestTag.tagSupport
   const hasChanged = hasTagSupportChanged(
     oldTagSupport,
     newTemplater.tagSupport,
     newTemplater,
   )
+  */
 
   const oldTemplater = tagSupport.templater || newTemplater
 
+  // ??? - new
+  // const redraw = renderTagSupport(tagSupport, false)
   const redraw = redrawTag(
     subject,
     newTemplater,
@@ -67,22 +65,10 @@ export function renderExistingTag(
     throw new Error('8888888')
   }
 
-  /* ??? - new removal
-  if(newTemplater.global.oldest && !newTemplater.global.oldest.hasLiveElements) {
-    throw new Error('7777')
-  }
-  */
-
   // ??? - add to ensure setProps causes lower redraw
   if(isLikeTags(latestTag, redraw)) {
     oldest.updateByTag(redraw)
   }
 
-  if(!hasChanged) {
-    // ??? - removed in favor of always update
-    // oldest?.updateByTag(redraw)
-    return {redraw, remit:true}
-  }
-
-  return {redraw, remit:false}
+  return redraw
 }

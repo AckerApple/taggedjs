@@ -1,12 +1,11 @@
 import { Tag } from './Tag.class'
-import { isSubjectInstance, isTagArray, isTagComponent, isTagInstance } from './isInstance'
+import { isSubjectInstance, isTagArray, isTagInstance } from './isInstance'
 import { setUse } from './setUse.function'
 import { TemplaterResult, Wrapper } from './TemplaterResult.class'
 import { ValueSubject } from './ValueSubject'
 import { runTagCallback } from './bindSubjectCallback.function'
 import { deepClone } from './deepFunctions'
 import { TagSupport } from './TagSupport.class'
-import { renderExistingTag } from './renderExistingTag.function'
 import { TagSubject } from './Tag.utils'
 import { alterProps } from './alterProps.function'
 
@@ -118,13 +117,14 @@ function getTagWrap(
     oldTagSetup: TagSupport,
     subject: TagSubject,
   ) {
-    oldTagSetup.templater.global.newestTemplater = templater
-    ++oldTagSetup.templater.global.renderCount
+    const global = oldTagSetup.templater.global
+    global.newestTemplater = templater
+    ++global.renderCount
     
-    templater.global = oldTagSetup.templater.global
+    templater.global = global
     
     const childSubject = templater.children
-    const lastArray = oldTagSetup.templater.global.oldest?.tagSupport.templater.children.lastArray
+    const lastArray = global.oldest?.tagSupport.templater.children.lastArray
     if(lastArray) {
       childSubject.lastArray = lastArray
     }
@@ -175,15 +175,6 @@ function getTagWrap(
     }
 
     tag.tagSupport.memory = oldTagSetup.memory // state handover
-    // tag.tagSupport.mutatingRender = oldTagSetup.mutatingRender
-
-    // ???
-    /*
-    oldTagSetup.propsConfig = {...tag.tagSupport.propsConfig}
-    if(oldest) {
-      oldest.tagSupport.propsConfig = {...tag.tagSupport.propsConfig}
-    }
-    */
 
     if(madeSubject) {
       childSubject.value.forEach(kid => {
@@ -191,22 +182,25 @@ function getTagWrap(
           if(!(value instanceof Function)) {
             return
           }
+
+          const valuesValue = kid.values[index]
           
-          if(kid.values[index].isChildOverride) {
+          if(valuesValue.isChildOverride) {
             return // already overwritten
           }
-          
+
           // all functions need to report to me
           kid.values[index] = function(...args: unknown[]) {
+            const ownerTag = tag.ownerTag as Tag
             runTagCallback(
-              value,
-              tag.ownerTag as Tag,
+              value, // callback
+              ownerTag,
               this, // bindTo
               args
             )
           }
           
-          kid.values[index].isChildOverride = true
+          valuesValue.isChildOverride = true
         })
       })
     }

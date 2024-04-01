@@ -1,4 +1,4 @@
-import { TagSupport, renderTagSupport } from './TagSupport.class'
+import { TagSupport } from './TagSupport.class'
 import { Subscription } from './Subject'
 import { runBeforeDestroy } from './tagRunner'
 import { buildClones } from './render'
@@ -9,13 +9,11 @@ import { elementDestroyCheck } from './elementDestroyCheck.function'
 import { InterpolatedTemplates } from './interpolations'
 import { processNewValue } from './processNewValue.function'
 import { InterpolateSubject } from './processSubjectValue.function'
-import { Clones } from './Clones.type'
 import { TagSubject } from './Tag.utils'
 import { TagArraySubject } from './processTagArray'
 import { isSubjectInstance, isTagComponent } from './isInstance'
 import { isLikeTags } from './isLikeTags.function'
 import { TemplaterResult } from './TemplaterResult.class'
-import { destroyTagMemory } from './destroyTag.function'
 
 export const variablePrefix = '__tagvar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -248,10 +246,7 @@ export class Tag {
       throw new Error('trying to update a tag with no elements on stage')
     }
 
-    // ???
-    // this.tagSupport.propsConfig = {...tag.tagSupport.propsConfig}
     this.tagSupport.templater.global.newest = tag
-
     if(!this.tagSupport.templater.global.context) {
       throw new Error('issue back here')
     }
@@ -283,57 +278,7 @@ export class Tag {
       const exists = variableName in context
 
       if(exists) {
-        const subject = context[variableName]
-        const tag = (subject as any).tag as Tag
-
-        if(tag) {
-          const oldWrap = tag.tagSupport.templater.wrapper // tag versus component
-          if(oldWrap && isTagComponent(value)) {
-            const oldValueFn = oldWrap.original
-            const newValueFn = value.wrapper?.original
-            const fnMatched = oldValueFn === newValueFn
-            if(fnMatched) {
-              const newTemp = value as TemplaterResult
-              newTemp.global = tag.tagSupport.templater.global
-              /*
-              const tagSubject = subject as TagSubject
-              if(!newTemp.tagSupport) {
-                const ownerTagSupport = tag.ownerTag?.tagSupport as TagSupport
-                newTemp.tagSupport = new TagSupport(ownerTagSupport, newTemp, tagSubject)
-              }
-
-              const redraw = renderTagSupport(newTemp.tagSupport, false)
-
-              if(!isLikeTags(tag, redraw)) {
-                destroyTagMemory(tag, subject as TagSubject)
-                newTemp.global = {...tag.tagSupport.templater.global}
-                newTemp.global.context = {}
-                const insertBefore = tag.tagSupport.templater.global.insertBefore as Element
-                redraw.buildBeforeElement(insertBefore)
-                throw new Error('clone time')
-              } else {
-                newTemp.global = tag.tagSupport.templater.global
-              }
-              */
-            }
-          }
-        }
-
-        // return updateExistingValue(subject, value, this)
-        if(isSubjectInstance(value)) {
-          // value.set(value.value)
-          return
-        }
-
-        /*
-        const subTag = (subject as any).tag
-        if(subTag && !subTag.hasLiveElements) {
-          return
-        }
-        */
-
-        subject.set(value)
-        return
+        return updateContextItem(context, variableName, value)
       }
 
       if(!hasValue) {
@@ -450,9 +395,6 @@ export class Tag {
         tagComponent.ownerTag,
         options.counts,
         {isForceElement},
-        context,
-        tagComponent.variableName,
-        options.test
       )
 
       if(!insertBefore.parentNode) {
@@ -534,4 +476,35 @@ function getChildTagsToDestroy(
   }
 
   return allTags
+}
+
+function updateContextItem(
+  context: Context,
+  variableName: string,
+  value: any
+) {
+  const subject = context[variableName]
+  const tag = (subject as any).tag as Tag
+
+  if(tag) {
+    const oldWrap = tag.tagSupport.templater.wrapper // tag versus component
+    if(oldWrap && isTagComponent(value)) {
+      const oldValueFn = oldWrap.original
+      const newValueFn = value.wrapper?.original
+      const fnMatched = oldValueFn === newValueFn
+      if(fnMatched) {
+        const newTemp = value as TemplaterResult
+        newTemp.global = tag.tagSupport.templater.global
+      }
+    }
+  }
+
+  // return updateExistingValue(subject, value, this)
+  if(isSubjectInstance(value)) {
+    return
+  }
+
+  subject.set(value) // listeners will evaluate updated values to possibly update display(s)
+  
+  return
 }

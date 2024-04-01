@@ -1,8 +1,7 @@
 import { Tag } from './Tag.class'
-import { TagSubject } from './Tag.utils'
-import { renderTagSupport } from './TagSupport.class'
 import { deepClone, deepEqual } from './deepFunctions'
 import { Provider } from './providers'
+import { renderTagSupport } from './renderTagSupport.function'
 
 export function providersChangeCheck(tag: Tag) {
   const providersWithChanges = tag.tagSupport.templater.global.providers.filter(provider =>

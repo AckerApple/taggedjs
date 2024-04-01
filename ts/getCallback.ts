@@ -1,6 +1,7 @@
-import { BaseTagSupport, renderTagSupport } from "./TagSupport.class"
+import { BaseTagSupport } from "./TagSupport.class"
 import { setUse } from "./setUse.function"
 import { State, StateConfigArray, getStateValue } from "./set.function"
+import { renderTagSupport } from "./renderTagSupport.function"
 
 type Callback = <T>(...args: unknown[]) => (T | void)
 

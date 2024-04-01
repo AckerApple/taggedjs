@@ -6,7 +6,6 @@ import { TagArraySubject } from './processTagArray'
 import { isLikeTags } from './isLikeTags.function'
 import { Counts, Template } from './interpolateTemplate'
 import { destroyTagMemory, destroyTagSupportPast } from './destroyTag.function'
-import { TemplaterResult } from './TemplaterResult.class'
 
 export function checkDestroyPrevious(
   subject: InterpolateSubject, // existing.value is the old value
@@ -17,12 +16,6 @@ export function checkDestroyPrevious(
   
   // no longer an array
   if (wasArray && !isTagArray(newValue)) {
-    // if(isTagInstance(newValue) || isTagComponent(newValue)) {
-    //   const templater = newValue as TemplaterResult
-    //   delete templater.global.oldest
-    //   delete templater.global.newest
-    //   templater.global.context = {}
-    // }
     wasArray.forEach(({tag}) => destroyArrayTag(tag, {added:0, removed:0}))
     delete (subject as TagArraySubject).lastArray  
     return 1

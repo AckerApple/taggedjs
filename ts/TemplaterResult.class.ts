@@ -53,7 +53,6 @@ export class TemplaterResult {
   ) => Tag
   */
   isTemplater = true
-
 }
 
 export function renderWithSupport(
@@ -61,7 +60,7 @@ export function renderWithSupport(
   existingTag: Tag | undefined,
   subject: TagSubject,
   ownerTag?: Tag,
-) {
+): Tag {
   const wrapTagSupport = tagSupport // this.tagSupport
   // const wrapTagSupport = existingTag?.tagSupport.templater.global.newest?.tagSupport || tagSupport
   // this.tagSupport = wrapTagSupport
@@ -106,6 +105,8 @@ export function renderWithSupport(
     delete templater.global.oldest
     delete templater.global.newest
     delete (subject as any).tag
+    // delete (subject as any).lastArray
+    // delete (subject as any).lastValue
 
     templater.global.insertBefore = existingTag.tagSupport.templater.global.insertBefore as Element
     
@@ -141,5 +142,5 @@ export function renderWithSupport(
   // this.oldest = this.oldest || retag
   // wrapTagSupport.oldest = wrapTagSupport.oldest || retag
 
-  return {remit: true, retag}
+  return retag
 }

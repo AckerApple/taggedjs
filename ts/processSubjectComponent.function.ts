@@ -45,18 +45,17 @@ export function processSubjectComponent(
   const isRedraw = !retag || options.forceElement
   if(isRedraw) {
     const preClones = ownerTag.clones.map(clone => clone)
-    const result = renderWithSupport(
+    retag = renderWithSupport(
       templater.tagSupport,
       subject.tag,
       subject,
       ownerTag,
     )
 
-    if(result.retag.tagSupport.templater.global.newest != result.retag) {
+    if(retag.tagSupport.templater.global.newest != retag) {
       throw new Error('mismatch result newest')
     }
 
-    retag = result.retag
     templater.global.newest = retag
 
     if(ownerTag.clones.length > preClones.length) {

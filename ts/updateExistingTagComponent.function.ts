@@ -2,11 +2,11 @@ import { TagSubject } from './Tag.utils'
 import { TemplaterResult } from './TemplaterResult.class'
 import { Tag } from './Tag.class'
 import { hasTagSupportChanged } from './hasTagSupportChanged.function'
-import { TagSupport, renderTagSupport } from './TagSupport.class'
+import { TagSupport } from './TagSupport.class'
 import { processSubjectComponent } from './processSubjectComponent.function'
 import { destroyTagMemory } from './destroyTag.function'
-import { deepClone } from './deepFunctions'
 import { State } from './set.function'
+import { renderTagSupport } from './renderTagSupport.function'
 
 export function updateExistingTagComponent(
   ownerTag: Tag,
@@ -15,7 +15,7 @@ export function updateExistingTagComponent(
   insertBefore: Element | Text,
 ): void {
   let existingTag: Tag | undefined = subject.tag
-  
+
   /*
   if(existingTag && !existingTag.hasLiveElements) {
     throw new Error('issue already began')
@@ -64,21 +64,7 @@ export function updateExistingTagComponent(
     const newTagSupport = tempResult.tagSupport
     const hasChanged = hasTagSupportChanged(oldTagSupport, newTagSupport, tempResult)
 
-    console.log('hasChanged - 0', tempResult.wrapper.original)
     if(!hasChanged) {
-      /*
-      const stateChanged = false
-      if(stateChanged) {
-        const newTag = renderTagSupport(
-          tempResult.tagSupport,
-          false,
-        )
-  
-        const oldTag = oldGlobal.oldest as Tag
-        oldTag.updateByTag(newTag)
-      }
-      */
-
       return // its the same tag component
     }
   }
@@ -97,29 +83,15 @@ export function updateExistingTagComponent(
 
   existingTag = subject.tag
 
-  const hasOldest = newTag.tagSupport.templater.global.oldest ? true : false
+  const newOldest = newTag.tagSupport.templater.global.oldest
+  const hasOldest = newOldest ? true : false
   if(!hasOldest) {
-    newTag.buildBeforeElement(oldInsertBefore, {
-      forceElement: true,
-      counts: {added: 0, removed: 0}, test: false,
-    })
-
-    newTag.tagSupport.templater.global.oldest = newTag
-    newTag.tagSupport.templater.global.newest = newTag
-    oldTagSupport.templater.global.oldest = newTag
-    oldTagSupport.templater.global.newest = newTag
-
-    if(!newTag.tagSupport.templater.global.oldest) {
-      throw new Error('maybe 5')
-    }
-
-    subject.tag = newTag
-
-    if(!newTag.hasLiveElements) {
-      throw new Error('44444 - 5')
-    }  
+    return buildNewTag(newTag, oldInsertBefore, oldTagSupport, subject)
+  }
   
-    return
+  if(newOldest && tempResult.children.value.length) {
+    const oldKidsSub = newOldest.tagSupport.templater.children
+    oldKidsSub.set(tempResult.children.value)
   }
 
   // const newTag = tempResult.newest as Tag
@@ -163,21 +135,15 @@ export function updateExistingTagComponent(
   }
 
   if(!oldest) {
-    newTag.buildBeforeElement(oldTagSupport.templater.global.insertBefore as Element, {
-      forceElement: true,
-      counts: {added: 0, removed: 0}, test:false,
-    })
-
-    newTag.tagSupport.templater.global.oldest = newTag
-    newTag.tagSupport.templater.global.newest = newTag
-    oldTagSupport.templater.global.oldest = newTag
-
-    subject.tag = newTag
+    buildNewTag(
+      newTag,
+      oldTagSupport.templater.global.insertBefore as Element,
+      oldTagSupport,
+      subject,
+    )
   }
 
   oldTagSupport.templater.global.newest = newTag
-  // ???
-  // oldTagSupport.propsConfig = {...tempResult.tagSupport.propsConfig}
 
   return
 }
@@ -192,8 +158,35 @@ function checkStateChanged(state: State) {
       return true
     }
 
-    console.log('not matched', {lastValue, nowValue})
     return false
   })
 }
 
+function buildNewTag(
+  newTag: Tag,
+  oldInsertBefore: Element | Text,
+  oldTagSupport: TagSupport,
+  subject: TagSubject,
+) {
+  newTag.buildBeforeElement(oldInsertBefore, {
+    forceElement: true,
+    counts: {added: 0, removed: 0}, test: false,
+  })
+
+  newTag.tagSupport.templater.global.oldest = newTag
+  newTag.tagSupport.templater.global.newest = newTag
+  oldTagSupport.templater.global.oldest = newTag
+  oldTagSupport.templater.global.newest = newTag
+
+  if(!newTag.tagSupport.templater.global.oldest) {
+    throw new Error('maybe 5')
+  }
+
+  subject.tag = newTag
+
+  if(!newTag.hasLiveElements) {
+    throw new Error('44444 - 5')
+  }  
+
+  return
+}

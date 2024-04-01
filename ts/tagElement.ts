@@ -1,10 +1,8 @@
-import { BaseTagSupport, renderTagSupport } from './TagSupport.class'
+import { BaseTagSupport } from './TagSupport.class'
 import { runAfterRender, runBeforeRender } from './tagRunner'
 import { TemplaterResult } from './TemplaterResult.class'
 import { Tag } from './Tag.class'
 import { TagComponent } from './tag'
-import { renderExistingTag } from './renderExistingTag.function'
-import { Props } from './Props'
 import { ValueSubject } from './ValueSubject'
 import { TagSubject } from './Tag.utils'
 

@@ -8,6 +8,7 @@ import { ArrayNoKeyError } from './errors'
 import { destroyArrayTag } from './checkDestroyPrevious.function'
 import { Provider } from './providers'
 import { TagSubject } from './Tag.utils'
+import { applyFakeTemplater } from './processSubjectValue.function'
 
 export type LastArrayItem = {
   tag: Tag
@@ -31,7 +32,6 @@ export function processTagArray(
     forceElement?: boolean
   },
 ): Clones {
-  // const clones: Clones = []
   const clones: Clones = ownerTag.clones // []
   let lastArray = subject.lastArray = subject.lastArray || []
 
@@ -73,26 +73,16 @@ export function processTagArray(
     const previous = lastArray[index]
     const previousSupport = !previous?.deleted && previous?.tag.tagSupport
     const fakeSubject = new ValueSubject({} as Tag) as unknown as TagSubject
-    const fakeTemplater = {
-      isTag: true,
-      global: {
-        providers: [] as Provider[],
-        context: {},
-      },
-      children: new ValueSubject<Tag[]>([]),
-    } as TemplaterResult
-
-    subTag.tagSupport = new TagSupport(
-      ownerTag.tagSupport,
-      fakeTemplater,
-      fakeSubject,
-    )
     
-    fakeTemplater.tagSupport = subTag.tagSupport
+    applyFakeTemplater(subTag, ownerTag, fakeSubject)
 
     if(previousSupport) {
       subTag.tagSupport.templater.global = previousSupport.templater.global
       previousSupport.templater.global.newest = subTag
+
+      if(!subTag.ownerTag) {
+        throw new Error('no owner on newest')
+      }
     } else {  
       ownerTag.childTags.push(subTag)
     }
@@ -167,9 +157,6 @@ function processAddTagArrayItem(
     lastFirstChild,
     {counts, forceElement: options.forceElement, test}
   )
-
-  subTag.tagSupport.templater.global.oldest = subTag
-  subTag.tagSupport.templater.global.newest = subTag
 }
 
 /** compare two values. If both values are arrays then the items will be compared */

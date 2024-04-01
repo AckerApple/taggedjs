@@ -63,8 +63,6 @@ export function interpolateTemplate(
     ownerTag,
     counts,
     {isForceElement},
-    context,
-    variableName,
   )
 
   return {clones}
@@ -76,9 +74,6 @@ export function subscribeToTemplate(
   ownerTag: Tag,
   counts: Counts, // used for animation stagger computing
   {isForceElement}: {isForceElement?:boolean},
-  context: Context,
-  variableName: string,
-  test = false
 ) {
   let called = false
   const callback = (value: ExistingValue) => {
@@ -90,9 +85,6 @@ export function subscribeToTemplate(
     }
 
     if(called) {
-      const tag = (subject as any).tag
-
-      // context[variableName] = 
       updateExistingValue(
         subject,
         value,
@@ -111,7 +103,6 @@ export function subscribeToTemplate(
         counts: {...counts},
         forceElement: isForceElement,
       },
-      test
     )
 
     if(isForceElement) {
