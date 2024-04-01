@@ -45,8 +45,6 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
 
   ++renderCount
 
-  console.log('selectedTag', selectedTag)
-
   return html`
     <div>
       selectedTag: |${selectedTag == null ? 'null' : selectedTag}|

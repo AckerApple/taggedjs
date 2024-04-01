@@ -2,26 +2,6 @@ import { Tag, html, setLet, tag } from "taggedjs"
 import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests"
 import { renderCountDiv } from "./renderCount.component"
 
-const childContentTest = tag((
-  {legend, id}:  {legend: string, id: string},
-  children?: Tag[],
-) => {
-  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
-  let counter = setLet(0)(x => [counter, counter = x])
-
-  ++renderCount
-  
-  return html`
-    <fieldset id=${id} style="flex:2 2 20em">
-      <legend>${legend}</legend>
-      ${children}
-      <hr />
-      <button onclick=${() => ++counter}>increase childContentTest ${counter}</button>
-      ${renderCountDiv({renderCount, name: 'childContentTest'})}
-    </fieldset>
-  `
-})
-
 export const childTests = tag((_ = 'childTests') => {
   let renderCount = setLet(0)(x => [renderCount, renderCount = x])
   let counter = setLet(0)(x => [counter, counter = x])
@@ -39,7 +19,7 @@ export const childTests = tag((_ = 'childTests') => {
         <hr />
         <button id="innerHtmlTest-childTests-button"
           onclick=${() => ++counter}
-        >increase childTests inside ${counter}:${renderCount}</button>
+        >🐮 increase childTests inside ${counter}:${renderCount}</button>
         <span id="innerHtmlTest-childTests-display">${counter}</span>
         ${renderCountDiv({renderCount, name: 'childTests-innerHtmlTest'})}
       `)}
@@ -49,7 +29,7 @@ export const childTests = tag((_ = 'childTests') => {
         <hr />
         <button id="innerHtmlPropsTest-childTests-button"
           onclick=${() => ++counter}
-        >increase childTests inside 22 ${counter}</button>
+        >🐮 increase childTests inside 22 ${counter}</button>
         <span id="innerHtmlPropsTest-childTests-display">${counter}</span>
         ${renderCountDiv({renderCount, name: 'innerHtmlPropsTest child'})}
       `)}
@@ -72,9 +52,29 @@ export const childTests = tag((_ = 'childTests') => {
       <hr />
       <button id="childTests-button"
         onclick=${() => ++counter}
-      >increase childTests outside ${counter} - ${renderCount}</button>
+      >🐮 increase childTests outside ${counter} - ${renderCount}</button>
       <span id="childTests-display">${counter}</span>
       ${renderCountDiv({renderCount, name:'childTests'})}
+    </fieldset>
+  `
+})
+
+const childContentTest = tag((
+  {legend, id}:  {legend: string, id: string},
+  children?: Tag[],
+) => {
+  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
+  let counter = setLet(0)(x => [counter, counter = x])
+
+  ++renderCount
+  
+  return html`
+    <fieldset id=${id} style="flex:2 2 20em">
+      <legend>${legend}</legend>
+      ${children}
+      <hr />
+      <button onclick=${() => ++counter}>increase childContentTest ${counter}</button>
+      ${renderCountDiv({renderCount, name: 'childContentTest'})}
     </fieldset>
   `
 })

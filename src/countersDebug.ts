@@ -14,27 +14,30 @@ export const counters = tag(() => {
 
   const increaseCounter = () => {
     ++counter
-    console.log('counter increased', counter)
   }
 
   const increasePropCounter = () => {
     ++propCounter
-    console.log('propCounter increased', propCounter)
   }
 
   ++renderCount // for debugging
-
-  console.log('---- parent render ----')
 
   return html`<!--counters-->
     <div>Subscriptions:${(Subject as any).globalSubCount$}</div>
     <button onclick=${() => console.info('subs', (Subject as any).globalSubs)}>log subs</button>
     <div>initCounter:${initCounter}</div>
 
-    <button id="increase-standalone-counter"
+    <button id="standalone-counter"
       onclick=${increaseCounter}
-    >counter:${counter}</button>
-    <span id="counter-standalone-display">${counter}</span>
+    >stand alone counter:${counter}</button>
+    <span id="standalone-display">${counter}</span>
+
+    ${counter > 1 && html`
+      <button id="conditional-counter"
+        onclick=${increaseCounter}
+      >conditional counter:${counter}</button>
+      <span id="conditional-display">${counter}</span>
+    `}
 
     <button id="increase-counter"
       onclick=${increasePropCounter}
@@ -59,8 +62,6 @@ const innerCounters = tag(({
   let renderCount = setLet(0)(x => [renderCount, renderCount = x])
 
   ++renderCount // for debugging
-
-  console.log('---- inner counters ----', {propCounter, renderCount})
 
   return html`
     <button id="inner-increase-counter" onclick=${increasePropCounter}

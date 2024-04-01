@@ -21,6 +21,6 @@ test?: boolean): Clones;
 /** Could be a regular tag or a component. Both are Tag.class */
 export declare function processTag(tag: Tag, subject: TagSubject, // could be tag via result.tag
 insertBefore: Element | Text | Template, // <template end interpolate /> (will be removed)
-ownerTag: Tag, // owner
-options: processOptions): void;
+ownerTag: Tag): void;
+export declare function applyFakeTemplater(tag: Tag, ownerTag: Tag, subject: TagSubject): void;
 export {};

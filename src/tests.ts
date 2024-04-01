@@ -2,31 +2,29 @@ import { execute, expect, it } from "./expect"
 
 export function runTests() {  
   it('elements exists', () => {
-    console.log('787')
     expect(document.getElementById('h1-app')).toBeDefined()
-    console.log('787-2')
     const toggleTest = document.getElementById('toggle-test')
     expect(toggleTest).toBeDefined()
-    console.log('787-3')
     expect(toggleTest?.innerText).toBe('toggle test')
   })
 
   it('toggle test', () => {
     const toggleTest = document.getElementById('toggle-test')
     toggleTest?.click()
-    console.log('787-4')
     expect(toggleTest?.innerText).toBe('toggle test true')
     toggleTest?.click()
-    console.log('787-5')
     expect(toggleTest?.innerText).toBe('toggle test')
     
     const propsTextarea = document.getElementById('props-debug-textarea') as HTMLTextAreaElement
     expect(propsTextarea.value.replace(/\s/g,'')).toBe(`{"test":33,"x":"y"}`)
-    console.log('788')
   })
 
   it('basic increase counter', () => {
+    expectElementCount('#conditional-counter', 0)
     testCounterElements('#increase-counter', '#counter-display')
+    testCounterElements('#standalone-counter', '#standalone-display')
+    expectElementCount('#conditional-counter', 1)
+    testCounterElements('#conditional-counter', '#conditional-display')
   })
 
   it('props testing', () => {
@@ -79,18 +77,16 @@ export function runTests() {
   })
 
   it('tagSwitching', () => {
-    console.log('0 - 0')
     expect(elementCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined')
     expect(elementCount('#tag-switch-dropdown')).toBe(1, 'Expected one #tag-switch-dropdown')
     expect(elementCount('#tagSwitch-1-hello')).toBe(2, 'Expected two #tagSwitch-1-hello elements')
     expect(elementCount('#tagSwitch-2-hello')).toBe(0)
     expect(elementCount('#tagSwitch-3-hello')).toBe(0)
-    console.log('0 - 1')
+
     const dropdown = document.getElementById('tag-switch-dropdown') as HTMLSelectElement
     dropdown.value = "1"
 
     ;(dropdown as any).onchange({target:dropdown})
-    console.log('0 - 2')
     expectElementCount('#tagSwitch-1-hello', 5)
     expect(elementCount('#tagSwitch-2-hello')).toBe(0)
     expect(elementCount('#tagSwitch-3-hello')).toBe(0)
@@ -164,7 +160,6 @@ export function runTests() {
   })
 
   try {
-    console.log('execute')
     execute()
     console.info('✅ all tests passed')
     return true
@@ -218,15 +213,12 @@ function testCounterElements(
 
   increaseCounters.forEach((increaseCounter, index) => {
     const counterDisplay = counterDisplays[index]
-    // const counterDisplay = getByIndex(index)
-    console.log('clicked 0')
     let counterValue = Number(counterDisplay?.innerText)
     increaseCounter?.click()
 
     let oldCounterValue = counterValue + 1
     counterValue = Number(counterDisplay?.innerText)
     expect(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to be value ${oldCounterValue} but is instead ${counterValue}`)
-    console.log('clicked 1')
     increaseCounter?.click()
 
     counterValue = Number(counterDisplay?.innerText)

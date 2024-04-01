@@ -29,7 +29,4 @@ export declare class TemplaterResult {
     constructor(props: Props, children: TagChildren);
     isTemplater: boolean;
 }
-export declare function renderWithSupport(tagSupport: BaseTagSupport, existingTag: Tag | undefined, subject: TagSubject, ownerTag?: Tag): {
-    remit: boolean;
-    retag: Tag;
-};
+export declare function renderWithSupport(tagSupport: BaseTagSupport, existingTag: Tag | undefined, subject: TagSubject, ownerTag?: Tag): Tag;

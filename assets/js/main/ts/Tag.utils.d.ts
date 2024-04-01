@@ -14,6 +14,4 @@ export type DisplaySubject = Subject<RegularValue> & {
     template: Element | Text | Template;
 };
 export declare function getSubjectFunction(value: any, tag: Tag): ValueSubject<import("./bindSubjectCallback.function").Callback>;
-/** for components */
-export declare function redrawTag(subject: TagSubject, templater: TemplaterResult, ownerTag: Tag): Tag;
 export {};

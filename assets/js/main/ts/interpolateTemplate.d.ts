@@ -23,7 +23,7 @@ options: InterpolateOptions): InterpolateTemplateResult;
 export declare function subscribeToTemplate(insertBefore: Element | Text | Template, subject: InterpolateSubject, ownerTag: Tag, counts: Counts, // used for animation stagger computing
 { isForceElement }: {
     isForceElement?: boolean;
-}, context: Context, variableName: string, test?: boolean): void;
+}): void;
 export declare function updateBetweenTemplates(value: string | undefined | boolean | number, lastFirstChild: Element | Text): Text;
 export type Counts = {
     added: number;

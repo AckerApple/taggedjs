@@ -15,12 +15,9 @@ export const propsDebugMain = tag((_='propsDebugMain') => {
 
   const json = JSON.stringify(propsJson, null, 2)
 
-  console.log('highest propNumber', propNumber)
-
   return html`
     <textarea id="props-debug-textarea" wrap="off" onchange=${propsJsonChanged}
       style="height:200px;font-size:0.6em;width:100%"
-      oninit=${() => console.log('text area init')}
     >${ json }</textarea>
     
     <pre>${ json }</pre>
@@ -40,7 +37,6 @@ export const propsDebugMain = tag((_='propsDebugMain') => {
         propsJson,
         propNumberChange: x => {
           propNumber = x
-          console.log('highest received new value', x)
         }
       })}
     </fieldset>
@@ -78,8 +74,6 @@ const propsDebug = tag((
     Object.assign(propsJson, value)
   }
 
-  console.log('parent prop number', propNumber)
-
   return html`<!--propsDebug.js-->
     <h3>Props Json</h3>
     <textarea style="font-size:0.6em;height:200px;width:100%" wrap="off" onchange=${pasteProps}>${ JSON.stringify(propsJson, null, 2) }</textarea>
@@ -110,7 +104,6 @@ const propsDebug = tag((
     <h3>Fn update test</h3>
     ${propFnUpdateTest({propNumber, callback: () => {
       ++propNumber
-      console.log('parent increase number', propNumber)
     }})}
     
     ${/*renderCountDiv({renderCount, name: 'propsDebug'})*/false}
@@ -124,8 +117,6 @@ const propFnUpdateTest = tag(({
 }) => {
   let renderCount = setLet(0)(x => [renderCount, renderCount = x])
   ++renderCount
-
-  console.log('propFnUpdateTest - propNumber',propNumber)
 
   return html`
     <button id="propsOneLevelFunUpdate-🥩-button"

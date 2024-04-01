@@ -11,7 +11,6 @@ import { counters } from "./countersDebug"
 import { providerDebugBase } from "./providerDebug"
 
 export const App = tag(() => {
-  console.log('render app.ts')
   let _firstState: string = setLet('app first state')(x => [_firstState, _firstState=x])
   let toggleValue: boolean = setLet(false)(x => [toggleValue, toggleValue=x])
   let renderCount: number = setLet(0)(x => [renderCount, renderCount=x])

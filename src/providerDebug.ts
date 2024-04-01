@@ -17,8 +17,6 @@ export const providerDebugBase = tag((_x = 'providerDebugBase') => {
   let propCounter = setLet(0)(x => [propCounter, propCounter = x])
   let renderCount = setLet(0)(x => [renderCount, renderCount = x])
 
-  console.log('x.0', propCounter)
-
   if(providerClass.showDialog) {
     (document.getElementById('provider_debug_dialog') as any).showModal()
   }
@@ -61,7 +59,6 @@ export const providerDebugBase = tag((_x = 'providerDebugBase') => {
     ${providerDebug({
       propCounter,
       propCounterChange: x => {
-        console.log('x', x)
         propCounter = x
       }
     })}

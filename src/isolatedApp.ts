@@ -14,11 +14,11 @@ export const IsolatedApp = tag(() => {
   // const template = component.wrapper().getTemplate()
 
   const views: viewTypes[] = [
-    'child',
+    // 'child',
     // 'arrays',
     // 'props',
-    // 'tagSwitchDebug',
-    // 'counters',
+    'tagSwitchDebug',
+    'counters',
   ]
   
   return html`<!--isolatedApp.js-->

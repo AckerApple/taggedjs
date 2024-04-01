@@ -18,8 +18,6 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
 
   ++renderCount
 
-  console.log('array test', {x: players[0]?.scores[0]?.score})
-
   return html`<!--arrayTests.js-->
     <div style="display:flex;flex-wrap:wrap;gap:1em">
       ${players.map((item,index) => html`
@@ -105,8 +103,6 @@ const scoreData = tag((
   
   ++renderCount
 
-  console.log('inner render', score.score)
-  
   return html`
     frame:${score.frame}:
     <button

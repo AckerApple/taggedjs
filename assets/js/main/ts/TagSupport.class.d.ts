@@ -1,5 +1,5 @@
 import { Props } from './Props';
-import { Tag, TagMemory } from './Tag.class';
+import { TagMemory } from './Tag.class';
 import { TemplaterResult } from './TemplaterResult.class';
 import { TagSubject } from './Tag.utils';
 export declare class BaseTagSupport {
@@ -15,7 +15,6 @@ export declare class BaseTagSupport {
     memory: TagMemory;
     constructor(templater: TemplaterResult, subject: TagSubject);
 }
-export declare function renderTagSupport(tagSupport: BaseTagSupport, renderUp: boolean): Tag;
 export declare class TagSupport extends BaseTagSupport {
     ownerTagSupport: TagSupport;
     templater: TemplaterResult;

@@ -6,7 +6,7 @@ const webpackConfig = require('./webpack.config.js');
 const compiler = webpack(webpackConfig);
 
 module.exports.run = () => {
-  console.log('🌎📦 bundling...')
+  console.debug('🌎📦 bundling...')
   return new Promise((res, rej) => {
     compiler.run((err, stats) => {
       if (err) {
@@ -25,7 +25,7 @@ module.exports.run = () => {
       res(stats)
 
       const assets = stats.compilation.assets
-      console.log('🌎📦 ✅ bundled sizes in kilobytes', Object.entries(assets).reduce((all, [name, value]) => {
+      console.debug('🌎📦 ✅ bundled sizes in kilobytes', Object.entries(assets).reduce((all, [name, value]) => {
         all[name] = value.size() / 1000
         return all
       },{}))
