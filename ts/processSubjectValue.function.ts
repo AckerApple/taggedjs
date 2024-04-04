@@ -53,8 +53,7 @@ export function processSubjectValue(
   template: Element | Text | Template, // <template end interpolate /> (will be removed)
   ownerTag: Tag, // owner
   options: processOptions, // {added:0, removed:0}
-  test = false
-): Clones {
+) {
   const valueType = getValueType(value)
   
   switch (valueType) {
@@ -65,7 +64,7 @@ export function processSubjectValue(
         template,
         ownerTag,
       )
-      return []
+      return
   
     case ValueTypes.tagArray:
       return processTagArray(subject as TagArraySubject, value, template, ownerTag, options)
@@ -78,10 +77,10 @@ export function processSubjectValue(
         ownerTag,
         options,
       )
-      return []
+      return
   }
 
-  return processRegularValue(
+  processRegularValue(
     value,
     subject as DisplaySubject,
     template,
