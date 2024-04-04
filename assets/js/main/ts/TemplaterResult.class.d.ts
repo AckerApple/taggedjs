@@ -24,6 +24,8 @@ export declare class TemplaterResult {
         renderCount: number;
         destroyCallback?: OnDestroyCallback;
         insertBefore?: Element | Text;
+        isApp?: boolean;
+        deleted: boolean;
     };
     tagSupport: BaseTagSupport;
     constructor(props: Props, children: TagChildren);

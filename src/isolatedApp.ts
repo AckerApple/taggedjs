@@ -1,5 +1,5 @@
 import { childTests } from "./childTests"
-import { html, set, tag } from "taggedjs"
+import { Subject, ValueSubject, getCallback, html, onInit, set, setLet, tag } from "taggedjs"
 import { arrayTests } from "./arrayTests"
 import { tagSwitchDebug } from "./tagSwitchDebug.component"
 import { propsDebugMain } from "./PropsDebug.component"
@@ -17,10 +17,25 @@ export const IsolatedApp = tag(() => {
     // 'child',
     // 'arrays',
     // 'props',
-    'tagSwitchDebug',
-    'counters',
+    // 'tagSwitchDebug',
+    'providerDebug',
+    // 'counters',
   ]
   
+  let appCounter = setLet(0)(x => [appCounter, appCounter=x])
+  const appCounterSubject = set(() => new ValueSubject(appCounter))
+  const callbacks = getCallback()
+  onInit(() => {
+    console.log('app init should only run once')    
+
+    appCounterSubject.subscribe(x => {
+      callbacks((y) => {
+        console.log('callback increase counter', {appCounter, x})
+        appCounter = x as number
+      })()
+    })
+  })
+
   return html`<!--isolatedApp.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
 
@@ -64,7 +79,7 @@ export const IsolatedApp = tag(() => {
         ${views.includes('counters') && html`
           <fieldset style="flex:2 2 20em">
             <legend>counters</legend>
-            ${counters()}
+            ${counters({appCounterSubject})}
           </fieldset>
         `}
 

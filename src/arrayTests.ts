@@ -5,7 +5,11 @@ import {html, set, setLet, tag} from 'taggedjs'
 const frameCount = 4
 
 export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
-  const players: {name: string, scores: any[]}[] = set([])
+  const players: {
+    name: string
+    edit?: boolean
+    scores: any[]
+  }[] = set([])
   let renderCount: number = setLet(0)(x => [renderCount, renderCount = x])
 
   const getNewPerson = () => ({
@@ -20,21 +24,17 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
 
   return html`<!--arrayTests.js-->
     <div style="display:flex;flex-wrap:wrap;gap:1em">
-      ${players.map((item,index) => html`
+      ${players.map((player,index) => html`
         <div oninit=${animateInit} ondestroy=${animateDestroy} style="background-color:black;">
-          <button onclick=${() => {
-            players.splice(index,1)
-          }}>remove</button>
-
           <div>
-            name:${item.name}
+            name:${player.name}
           </div>
           <div>
             index:${index}
           </div>
           
           <div style="background-color:purple;padding:.5em">
-            scores:${item.scores.map((score, playerIndex) => html`
+            scores:${player.scores.map((score, playerIndex) => html`
             <div style="border:1px solid white;"
               oninit=${animateInit} ondestroy=${animateDestroy}
             >
@@ -51,14 +51,24 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
             </div>
           `.key(score))}</div>
           
-          <button onclick=${() => {
-            players.splice(index,1)
-          }}>remove</button>
+          ${player.edit && html`
+            <button onclick=${() => {
+              players.splice(index,1);
+              player.edit = !player.edit
+            }}>remove</button>
+          `}
+          ${player.edit && html`
+            <button id=${'player-remove-promise-btn-' + index} onclick=${async () => {
+              player.edit = !player.edit
+              players.splice(index,1);
+            }}>remove by promise</button>
+          `}
+          <button id=${'player-edit-btn-' + index} onclick=${() => player.edit = !player.edit}>edit</button>
           <button onclick=${() => {
             players.splice(index,0,getNewPerson())
           }}>add before</button>
         </div>
-      `.key(item))}
+      `.key(player))}
     </div>
 
     <button id="array-test-push-item" onclick=${() => {

@@ -1,4 +1,5 @@
-import { execute, expect, it } from "./expect"
+import { byId, elementCount, queryOneInnerHTML } from "./elmSelectors"
+import { describe, execute, expect, it } from "./expect"
 
 export function runTests() {  
   it('elements exists', () => {
@@ -118,31 +119,48 @@ export function runTests() {
     expectElementCount('#tagSwitch-3-hello',0)
   })
 
-  it('array testing', () => {
-    expect(elementCount('#array-test-push-item')).toBe(1)
-    expect(elementCount('#score-data-0-1-inside-button')).toBe(0)
-    expect(elementCount('#score-data-0-1-outside-button')).toBe(0)
-    document.getElementById('array-test-push-item')?.click()
-    expect(elementCount('#score-data-0-1-inside-button')).toBe(1)
-    expect(elementCount('#score-data-0-1-outside-button')).toBe(1)
-    
-    const insideElm = document.getElementById('score-data-0-1-inside-button')
-    const insideDisplay = document.getElementById('score-data-0-1-inside-display')
-    let indexValue = insideDisplay?.innerText
-    const outsideElm = document.getElementById('score-data-0-1-outside-button')
-    const outsideDisplay = document.getElementById('score-data-0-1-outside-display')
-    const outsideValue = outsideDisplay?.innerText
-    expect(indexValue).toBe(outsideValue)
+  describe('array testing', () => {
+    it('basics', () => {
+      expect(elementCount('#array-test-push-item')).toBe(1)
+      expect(elementCount('#score-data-0-1-inside-button')).toBe(0)
+      expect(elementCount('#score-data-0-1-outside-button')).toBe(0)
+      document.getElementById('array-test-push-item')?.click()
+      expect(elementCount('#score-data-0-1-inside-button')).toBe(1)
+      expect(elementCount('#score-data-0-1-outside-button')).toBe(1)
+      
+      const insideElm = document.getElementById('score-data-0-1-inside-button')
+      const insideDisplay = document.getElementById('score-data-0-1-inside-display')
+      let indexValue = insideDisplay?.innerText
+      const outsideElm = document.getElementById('score-data-0-1-outside-button')
+      const outsideDisplay = document.getElementById('score-data-0-1-outside-display')
+      const outsideValue = outsideDisplay?.innerText
+      expect(indexValue).toBe(outsideValue)
+  
+      insideElm?.click()
+      expect(insideDisplay?.innerText).toBe(outsideDisplay?.innerText)
+      expect(indexValue).toBe((Number(insideDisplay?.innerText) - 1).toString())
+      expect(indexValue).toBe((Number(outsideDisplay?.innerText) - 1).toString())
+  
+      outsideElm?.click()
+      expect(insideDisplay?.innerText).toBe(outsideDisplay?.innerText)
+      expect(indexValue).toBe((Number(insideDisplay?.innerText) - 2).toString())
+      expect(indexValue).toBe((Number(outsideDisplay?.innerText) - 2).toString())
+    })
 
-    insideElm?.click()
-    expect(insideDisplay?.innerText).toBe(outsideDisplay?.innerText)
-    expect(indexValue).toBe((Number(insideDisplay?.innerText) - 1).toString())
-    expect(indexValue).toBe((Number(outsideDisplay?.innerText) - 1).toString())
+    it('deletes', async () => {
+      expect(elementCount('#player-remove-promise-btn-0')).toBe(0)
+      expect(elementCount('#player-edit-btn-0')).toBe(1)
 
-    outsideElm?.click()
-    expect(insideDisplay?.innerText).toBe(outsideDisplay?.innerText)
-    expect(indexValue).toBe((Number(insideDisplay?.innerText) - 2).toString())
-    expect(indexValue).toBe((Number(outsideDisplay?.innerText) - 2).toString())
+      await (byId('player-edit-btn-0') as any).onclick()
+
+      expect(elementCount('#player-remove-promise-btn-0')).toBe(1)
+
+      await (byId('player-remove-promise-btn-0') as any).onclick()
+      await delay(1000) // animation
+
+      expect(elementCount('#player-remove-promise-btn-0')).toBe(0)
+      expect(elementCount('#player-edit-btn-0')).toBe(0)
+    })
   })
 
   it('child tests', () => {
@@ -167,10 +185,6 @@ export function runTests() {
     console.error('❌ tests failed: ' + (error as Error).message, error)
     return false
   }
-}
-
-function elementCount(selector: string) {
-  return document.querySelectorAll(selector).length
 }
 
 function testDuelCounterElements(
@@ -243,9 +257,6 @@ function expectElementCount(
   return elements
 }
 
-function queryOneInnerHTML(
-  query: string,
-  pos = 0
-) {
-  return document.querySelectorAll(query)[pos].innerHTML
+function delay(time: number) {
+  return new Promise((res) => setTimeout(res, time))
 }

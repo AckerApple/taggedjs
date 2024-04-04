@@ -1,14 +1,62 @@
 type Test = () => unknown
 const onlyTests: Test[] = []
-const tests: Test[] = []
+let tests: Test[] = []
+let tab = 0
+
+export function describe(label: string, run: () => any) {
+  tests.push(() => {
+    const oldTests = tests
+    tests = []
+    
+    try {
+      console.debug('  '.repeat(tab) + '👉 ' + label)
+      
+      ++tab
+      run()
+      runTests(tests)
+      
+      --tab
+    } catch (error) {
+      --tab
+      // console.debug(' '.repeat(tab) + '❌ ' + label)
+      throw error
+    } finally {
+      tests = oldTests
+    }
+  })
+}
+
+describe.only = (label: string, run: () => any) => {
+  onlyTests.push(() => {
+    const oldTests = tests
+    tests = []
+    
+    try {
+      console.debug('  '.repeat(tab) + '👉 ' + label)
+      
+      ++tab
+      
+      run()
+      runTests(tests)
+      
+      --tab
+    } catch (error) {
+      --tab
+      // console.debug(' '.repeat(tab) + '❌ ' + label)
+      throw error
+    } finally {
+      tests = oldTests
+    }
+  })
+}
 
 export function it(label: string, run: () => any) {
   tests.push(() => {
     try {
       run()
-      console.debug('✅ ' + label)
+      console.debug(' '.repeat(tab) + '✅ ' + label)
     } catch (error) {
-      console.debug('❌ ' + label)
+      console.debug(' '.repeat(tab) + '❌ ' + label)
       throw error
     }
   })

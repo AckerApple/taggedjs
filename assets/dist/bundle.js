@@ -247,6 +247,7 @@ __webpack_require__.r(__webpack_exports__);
 const App = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
     let _firstState = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)('app first state')(x => [_firstState, _firstState = x]);
     let toggleValue = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)(false)(x => [toggleValue, toggleValue = x]);
+    let appCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)(0)(x => [appCounter, appCounter = x]);
     let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)(0)(x => [renderCount, renderCount = x]);
     const toggle = () => {
         toggleValue = !toggleValue;
@@ -267,12 +268,32 @@ const App = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
         }, waitFor); // cause delay to be separate from renders
     }
     ++renderCount;
-    (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.onInit)(() => runTesting(false));
+    const callbacks = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.getCallback)();
+    const appCounterSubject = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.set)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_3__.Subject());
+    (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.onInit)(() => {
+        console.log('app init should only run once');
+        runTesting(false);
+        appCounterSubject.subscribe(x => {
+            callbacks((y) => {
+                console.log('callback increase counter', { appCounter, x });
+                appCounter = x;
+            })();
+        });
+    });
     const content = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.html) `<!--app.js-->
     <h1 id="h1-app">🏷️ TaggedJs - ${2 + 2}</h1>
 
     <button id="toggle-test" onclick=${toggle}>toggle test ${toggleValue}</button>
     <button onclick=${runTesting}>run test</button>
+
+    <div>
+      <button id="app-counter-subject-button"
+        onclick=${() => appCounterSubject.set(appCounter + 1)}
+      >🍒 ++app subject</button>
+      <span>
+        🍒 <span id="app-counter-subject-button">${appCounter}</span>
+      </span>
+    </div>
 
     ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_8__.renderCountDiv)({ name: 'app', renderCount })}
 
@@ -280,7 +301,7 @@ const App = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
       <div style="display:flex;flex-wrap:wrap;gap:1em">
         <fieldset id="counters" style="flex:2 2 20em">
           <legend>counters</legend>
-          ${(0,_countersDebug__WEBPACK_IMPORTED_MODULE_9__.counters)()}
+          ${(0,_countersDebug__WEBPACK_IMPORTED_MODULE_9__.counters)({ appCounterSubject })}
         </fieldset>
 
         <fieldset id="provider-debug" style="flex:2 2 20em">
@@ -350,21 +371,17 @@ const arrayTests = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(function ArrayT
     ++renderCount;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `<!--arrayTests.js-->
     <div style="display:flex;flex-wrap:wrap;gap:1em">
-      ${players.map((item, index) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
+      ${players.map((player, index) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
         <div oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateInit} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateDestroy} style="background-color:black;">
-          <button onclick=${() => {
-        players.splice(index, 1);
-    }}>remove</button>
-
           <div>
-            name:${item.name}
+            name:${player.name}
           </div>
           <div>
             index:${index}
           </div>
           
           <div style="background-color:purple;padding:.5em">
-            scores:${item.scores.map((score, playerIndex) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
+            scores:${player.scores.map((score, playerIndex) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
             <div style="border:1px solid white;"
               oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateInit} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateDestroy}
             >
@@ -381,14 +398,24 @@ const arrayTests = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(function ArrayT
             </div>
           `.key(score))}</div>
           
-          <button onclick=${() => {
+          ${player.edit && (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
+            <button onclick=${() => {
         players.splice(index, 1);
+        player.edit = !player.edit;
     }}>remove</button>
+          `}
+          ${player.edit && (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
+            <button id=${'player-remove-promise-btn-' + index} onclick=${async () => {
+        player.edit = !player.edit;
+        players.splice(index, 1);
+    }}>remove by promise</button>
+          `}
+          <button id=${'player-edit-btn-' + index} onclick=${() => player.edit = !player.edit}>edit</button>
           <button onclick=${() => {
         players.splice(index, 0, getNewPerson());
     }}>add before</button>
         </div>
-      `.key(item))}
+      `.key(player))}
     </div>
 
     <button id="array-test-push-item" onclick=${() => {
@@ -598,14 +625,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! taggedjs */ "../main/ts/index.ts");
 
 
-const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
+const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(({ appCounterSubject, }) => {
     let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.setLet)(0)(x => [counter, counter = x]);
     let propCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.setLet)(0)(x => [propCounter, propCounter = x]);
     let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.setLet)(0)(x => [renderCount, renderCount = x]);
     let initCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.setLet)(0)(x => [initCounter, initCounter = x]);
+    const callbacks = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.getCallback)();
+    const callbackTestSub = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.set)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_1__.Subject());
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.onInit)(() => {
         ++initCounter;
-        console.info('tagJsDebug.js: 👉 i should only ever run once');
+        console.info('countersDebug.ts: 👉 i should only ever run once');
+        callbackTestSub.subscribe(x => {
+            console.log('🥦 sub called');
+            callbacks((y) => {
+                console.log('callback increase counter', { counter, x });
+                counter = x;
+            })();
+        });
     });
     const increaseCounter = () => {
         ++counter;
@@ -615,26 +651,57 @@ const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
     };
     ++renderCount; // for debugging
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.html) `<!--counters-->
-    <div>Subscriptions:${taggedjs__WEBPACK_IMPORTED_MODULE_1__.Subject.globalSubCount$}</div>
-    <button onclick=${() => console.info('subs', taggedjs__WEBPACK_IMPORTED_MODULE_1__.Subject.globalSubs)}>log subs</button>
-    <div>initCounter:${initCounter}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:1em">
 
-    <button id="standalone-counter"
-      onclick=${increaseCounter}
-    >stand alone counter:${counter}</button>
-    <span id="standalone-display">${counter}</span>
+      <div>Subscriptions:${taggedjs__WEBPACK_IMPORTED_MODULE_1__.Subject.globalSubCount$}</div>
+      <button onclick=${() => console.info('subs', taggedjs__WEBPACK_IMPORTED_MODULE_1__.Subject.globalSubs)}>log subs</button>
+      <div>initCounter:${initCounter}</div>
+  
+      <div>
+        <button id="app-counter-subject-button"
+          onclick=${() => appCounterSubject.set(appCounterSubject.value + 1)}
+        >🍒 ++app subject</button>
+        <span>
+          🍒 <span id="app-counter-subject-button">${appCounterSubject.value}</span>
+        </span>
+      </div>
 
-    ${counter > 1 && (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.html) `
-      <button id="conditional-counter"
-        onclick=${increaseCounter}
-      >conditional counter:${counter}</button>
-      <span id="conditional-display">${counter}</span>
-    `}
+      <div>
+        <button id="standalone-counter"
+          onclick=${increaseCounter}
+        >stand alone counter:${counter}</button>
+        <span>
+          🥦 <span id="standalone-display">${counter}</span>
+        </span>
+      </div>
+  
+      ${counter > 1 && (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.html) `
+        <div>
+          <button id="conditional-counter"
+            onclick=${increaseCounter}
+          >conditional counter:${counter}</button>
+          <span>
+            🥦 <span id="conditional-display">${counter}</span>
+          </span>
+        </div>
+      `}
+  
+      <div>
+        <button id="increase-counter"
+          onclick=${increasePropCounter}
+        >propCounter:${propCounter}</button>
+        <span id="counter-display">${propCounter}</span>
+      </div>
 
-    <button id="increase-counter"
-      onclick=${increasePropCounter}
-    >propCounter:${propCounter}</button>
-    <span id="counter-display">${propCounter}</span>
+      <div>
+        <button id="subject-increase-counter"
+          onclick=${() => callbackTestSub.set(counter + 1)}
+        >subject increase:</button>
+        <span>
+          🥦 <span id="subject-counter-display">${counter}</span>
+        </span>
+      </div>
+    </div>
     
     <fieldset>
       <legend>inner counter</legend>
@@ -658,6 +725,36 @@ const innerCounters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(({ propCount
 
 /***/ }),
 
+/***/ "./src/elmSelectors.ts":
+/*!*****************************!*\
+  !*** ./src/elmSelectors.ts ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   byId: () => (/* binding */ byId),
+/* harmony export */   elementCount: () => (/* binding */ elementCount),
+/* harmony export */   lastById: () => (/* binding */ lastById),
+/* harmony export */   queryOneInnerHTML: () => (/* binding */ queryOneInnerHTML)
+/* harmony export */ });
+function elementCount(selector) {
+    return document.querySelectorAll(selector).length;
+}
+function queryOneInnerHTML(query, pos = 0) {
+    return document.querySelectorAll(query)[pos].innerHTML;
+}
+function byId(id) {
+    return document.getElementById(id);
+}
+function lastById(id) {
+    const elms = document.querySelectorAll('#' + id);
+    return elms[elms.length - 1];
+}
+
+
+/***/ }),
+
 /***/ "./src/expect.ts":
 /*!***********************!*\
   !*** ./src/expect.ts ***!
@@ -666,20 +763,64 @@ const innerCounters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(({ propCount
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   describe: () => (/* binding */ describe),
 /* harmony export */   execute: () => (/* binding */ execute),
 /* harmony export */   expect: () => (/* binding */ expect),
 /* harmony export */   it: () => (/* binding */ it)
 /* harmony export */ });
 const onlyTests = [];
-const tests = [];
+let tests = [];
+let tab = 0;
+function describe(label, run) {
+    tests.push(() => {
+        const oldTests = tests;
+        tests = [];
+        try {
+            console.debug('  '.repeat(tab) + '👉 ' + label);
+            ++tab;
+            run();
+            runTests(tests);
+            --tab;
+        }
+        catch (error) {
+            --tab;
+            // console.debug(' '.repeat(tab) + '❌ ' + label)
+            throw error;
+        }
+        finally {
+            tests = oldTests;
+        }
+    });
+}
+describe.only = (label, run) => {
+    onlyTests.push(() => {
+        const oldTests = tests;
+        tests = [];
+        try {
+            console.debug('  '.repeat(tab) + '👉 ' + label);
+            ++tab;
+            run();
+            runTests(tests);
+            --tab;
+        }
+        catch (error) {
+            --tab;
+            // console.debug(' '.repeat(tab) + '❌ ' + label)
+            throw error;
+        }
+        finally {
+            tests = oldTests;
+        }
+    });
+};
 function it(label, run) {
     tests.push(() => {
         try {
             run();
-            console.debug('✅ ' + label);
+            console.debug(' '.repeat(tab) + '✅ ' + label);
         }
         catch (error) {
-            console.debug('❌ ' + label);
+            console.debug(' '.repeat(tab) + '❌ ' + label);
             throw error;
         }
     });
@@ -955,9 +1096,22 @@ const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
         // 'child',
         // 'arrays',
         // 'props',
-        'tagSwitchDebug',
-        'counters',
+        // 'tagSwitchDebug',
+        'providerDebug',
+        // 'counters',
     ];
+    let appCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.setLet)(0)(x => [appCounter, appCounter = x]);
+    const appCounterSubject = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.set)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_1__.ValueSubject(appCounter));
+    const callbacks = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.getCallback)();
+    (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.onInit)(() => {
+        console.log('app init should only run once');
+        appCounterSubject.subscribe(x => {
+            callbacks((y) => {
+                console.log('callback increase counter', { appCounter, x });
+                appCounter = x;
+            })();
+        });
+    });
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.html) `<!--isolatedApp.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
 
@@ -1001,7 +1155,7 @@ const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
         ${views.includes('counters') && (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.html) `
           <fieldset style="flex:2 2 20em">
             <legend>counters</legend>
-            ${(0,_countersDebug__WEBPACK_IMPORTED_MODULE_6__.counters)()}
+            ${(0,_countersDebug__WEBPACK_IMPORTED_MODULE_6__.counters)({ appCounterSubject })}
           </fieldset>
         `}
 
@@ -1070,33 +1224,52 @@ const providerDebugBase = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)((_x = 'p
     </div>
 
     <div style="display:flex;gap:1em">
-      <button id="increase-provider-🍌-0-button" onclick=${() => ++provider.test}
-      >🍌 increase provider.test ${provider.test}</button>
-      <span id="increase-provider-🍌-0-display">${provider.test}</span>
+      <div>
+        <button id="increase-provider-🍌-0-button" onclick=${() => ++provider.test}
+        >🍌 increase provider.test ${provider.test}</button>
+        <span>
+          🍌 <span id="increase-provider-🍌-0-display">${provider.test}</span>
+        </span>
+      </div>
       
-      <button id="increase-provider-upper-🌹-0-button" onclick=${() => ++provider.upper.test}
-      >🌹 increase upper.provider.test ${provider.upper.test}</button>
+      <div>
+        <button id="increase-provider-upper-🌹-0-button" onclick=${() => ++provider.upper.test}
+        >🌹 increase upper.provider.test ${provider.upper.test}</button>
+        <span>
+          🌹 <span id="increase-provider-upper-🌹-0-display">${provider.upper.test}</span>
+        </span>
+      </div>
       
-      <span id="increase-provider-upper-🌹-0-display">${provider.upper.test}</span>
-      <button id="increase-provider-🍀-0-button" onclick=${() => ++providerClass.tagDebug}
-      >🍀 increase provider class ${providerClass.tagDebug}</button>
-      <span id="increase-provider-🍀-0-display">${providerClass.tagDebug}</span>
+      <div>
+        <button id="increase-provider-🍀-0-button" onclick=${() => ++providerClass.tagDebug}
+        >🍀 increase provider class ${providerClass.tagDebug}</button>
+        <span>
+          🍀 <span id="increase-provider-🍀-0-display">${providerClass.tagDebug}</span>
+        </span>
+      </div>
 
-      <button id="increase-prop-🐷-0-button" onclick=${() => ++propCounter}
-      >🐷 increase propCounter ${propCounter}</button>
-      <span id="increase-prop-🐷-0-display">${propCounter}</span>
+      <div>
+        <button id="increase-prop-🐷-0-button" onclick=${() => ++propCounter}
+        >🐷 increase propCounter ${propCounter}</button>
+        <span>
+          🐷 <span id="increase-prop-🐷-0-display">${propCounter}</span>
+        </span>
+      </div>
 
       <button onclick=${() => providerClass.showDialog = true}
       >💬 toggle dialog ${providerClass.showDialog}</button>
     </div>
 
     <hr />
-    ${providerDebug({
+
+    <div style="display:flex;flex-wrap:wrap;gap:1em">
+      ${providerDebug({
         propCounter,
         propCounterChange: x => {
             propCounter = x;
         }
     })}
+    </div>
 
     <hr />
     renderCount outer:${renderCount}
@@ -1124,28 +1297,62 @@ const providerDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(({ propCount
     const provider = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.inject(_tagJsDebug__WEBPACK_IMPORTED_MODULE_2__.tagDebugProvider);
     const upperProvider = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.inject(_tagJsDebug__WEBPACK_IMPORTED_MODULE_2__.upperTagDebugProvider);
     const providerClass = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.inject(TagDebugProvider);
-    const test = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.set)('provider debug inner test');
     let showProProps = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)(false)(x => [showProProps, showProProps = x]);
     let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)(0)(x => [renderCount, renderCount = x]);
     // let propCounter: number = setLet(0)(x => [propCounter, propCounter = x])
+    const callbacks = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.getCallback)();
+    const callbackTestSub = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.set)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_3__.Subject());
+    (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.onInit)(() => {
+        console.info('providerDebug.ts: 👉 👉 i should only ever run once');
+        callbackTestSub.subscribe(x => {
+            console.log('🍌 sub called');
+            callbacks((y) => {
+                console.log('callback increase counter', { counter: provider.test, x });
+                provider.test = x;
+            })();
+        });
+    });
     ++renderCount;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.html) `<!--providerDebug.js-->
-    <button id="increase-provider-🍌-1-button" onclick=${() => ++provider.test}
-    >🍌 increase provider.test ${provider.test}</button>
-    <span id="increase-provider-🍌-1-display">${provider.test}</span>
+    <div>
+      <button id="increase-provider-🍌-1-button" onclick=${() => ++provider.test}
+      >🍌 increase provider.test ${provider.test}</button>
+      <span>
+        🍌 <span id="increase-provider-🍌-1-display">${provider.test}</span>
+      </span>
+    </div>
     
-    <button id="increase-provider-upper-🌹-1-button" onclick=${() => ++upperProvider.test}
-    >🌹 increase upper.provider.test ${upperProvider.test}</button>
-        
-    <span id="increase-provider-upper-🌹-1-display">${upperProvider.test}</span>
-    <button id="increase-provider-🍀-1-button" onclick=${() => ++providerClass.tagDebug}
-    >🍀 increase provider class ${providerClass.tagDebug}</button>
-    <span id="increase-provider-🍀-1-display">${providerClass.tagDebug}</span>
+    <div>
+      <button id="increase-provider-upper-🌹-1-button" onclick=${() => ++upperProvider.test}
+      >🌹 increase upper.provider.test ${upperProvider.test}</button>
+      <span>
+        🌹<span id="increase-provider-upper-🌹-1-display">${upperProvider.test}</span>
+      </span>
+    </div>
+
+    <div>
+      <button id="subject-increase-counter"
+        onclick=${() => callbackTestSub.set(provider.test + 1)}
+      >🍌 subject increase:</button>
+      <span>
+        🍌 <span id="subject-counter-display">${provider.test}</span>
+      </span>
+    </div>
+    
+    <div>
+      <button id="increase-provider-🍀-1-button" onclick=${() => ++providerClass.tagDebug}
+      >🍀 increase provider class ${providerClass.tagDebug}</button>
+      <span>
+        🍀 <span id="increase-provider-🍀-1-display">${providerClass.tagDebug}</span>
+      </span>
+    </div>
 
     <div>
       <button id="increase-prop-🐷-1-button" onclick=${() => propCounterChange(++propCounter)}
       >🐷 increase propCounter ${propCounter}</button>
-      <span id="increase-prop-🐷-1-display">${propCounter}</span>
+      <span>
+        🐷 <span id="increase-prop-🐷-1-display">${propCounter}</span>
+      </span>
     </div>
 
     <button onclick=${() => providerClass.showDialog = true}
@@ -1162,9 +1369,10 @@ const providerDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(({ propCount
       </div>
     `}
 
-    <hr />
-    renderCount inner:${renderCount}
-    ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_1__.renderCountDiv)({ renderCount, name: 'providerDebugInner' })}
+    <div>
+      renderCount inner:${renderCount}
+      ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_1__.renderCountDiv)({ renderCount, name: 'providerDebugInner' })}
+    </div>
   `;
 });
 const testProviderAsProps = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)((providerClass) => {
@@ -1494,77 +1702,79 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   runTests: () => (/* binding */ runTests)
 /* harmony export */ });
-/* harmony import */ var _expect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./expect */ "./src/expect.ts");
+/* harmony import */ var _elmSelectors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./elmSelectors */ "./src/elmSelectors.ts");
+/* harmony import */ var _expect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./expect */ "./src/expect.ts");
+
 
 function runTests() {
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('elements exists', () => {
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(document.getElementById('h1-app')).toBeDefined();
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('elements exists', () => {
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(document.getElementById('h1-app')).toBeDefined();
         const toggleTest = document.getElementById('toggle-test');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(toggleTest).toBeDefined();
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(toggleTest?.innerText).toBe('toggle test');
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(toggleTest).toBeDefined();
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(toggleTest?.innerText).toBe('toggle test');
     });
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('toggle test', () => {
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('toggle test', () => {
         const toggleTest = document.getElementById('toggle-test');
         toggleTest?.click();
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(toggleTest?.innerText).toBe('toggle test true');
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(toggleTest?.innerText).toBe('toggle test true');
         toggleTest?.click();
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(toggleTest?.innerText).toBe('toggle test');
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(toggleTest?.innerText).toBe('toggle test');
         const propsTextarea = document.getElementById('props-debug-textarea');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(propsTextarea.value.replace(/\s/g, '')).toBe(`{"test":33,"x":"y"}`);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(propsTextarea.value.replace(/\s/g, '')).toBe(`{"test":33,"x":"y"}`);
     });
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('basic increase counter', () => {
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('basic increase counter', () => {
         expectElementCount('#conditional-counter', 0);
         testCounterElements('#increase-counter', '#counter-display');
         testCounterElements('#standalone-counter', '#standalone-display');
         expectElementCount('#conditional-counter', 1);
         testCounterElements('#conditional-counter', '#conditional-display');
     });
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('props testing', () => {
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('props testing', () => {
         testDuelCounterElements(['#propsDebug-🥩-0-button', '#propsDebug-🥩-0-display'], ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display']);
         testDuelCounterElements(['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'], ['#propsOneLevelFunUpdate-🥩-button', '#propsOneLevelFunUpdate-🥩-display']);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(queryOneInnerHTML('#propsDebug-🥩-change-display')).toBe('9');
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.queryOneInnerHTML)('#propsDebug-🥩-change-display')).toBe('9');
         const ownerHTML = document.querySelectorAll('#propsDebug-🥩-0-display')[0].innerHTML;
         const parentHTML = document.querySelectorAll('#propsDebug-🥩-1-display')[0].innerHTML;
         const childHTML = document.querySelectorAll('#propsOneLevelFunUpdate-🥩-display')[0].innerHTML;
         const ownerNum = Number(ownerHTML);
         const parentNum = Number(parentHTML);
         const childNum = Number(childHTML);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(parentNum).toBe(childNum);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ownerNum + 2).toBe(parentNum); // testing of setProp() doesn't change owner
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(parentNum).toBe(childNum);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(ownerNum + 2).toBe(parentNum); // testing of setProp() doesn't change owner
     });
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('providers', async () => {
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('providers', async () => {
         testDuelCounterElements(['#increase-provider-🍌-0-button', '#increase-provider-🍌-0-display'], ['#increase-provider-🍌-1-button', '#increase-provider-🍌-1-display']);
         testDuelCounterElements(['#increase-provider-upper-🌹-0-button', '#increase-provider-upper-🌹-0-display'], ['#increase-provider-upper-🌹-1-button', '#increase-provider-upper-🌹-1-display']);
         testDuelCounterElements(['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'], ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display']);
     });
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('provider debug', () => {
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('provider debug', () => {
         testDuelCounterElements(['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'], ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display']);
     });
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('tagSwitching', () => {
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#tag-switch-dropdown')).toBe(1, 'Expected one #tag-switch-dropdown');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#tagSwitch-1-hello')).toBe(2, 'Expected two #tagSwitch-1-hello elements');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#tagSwitch-2-hello')).toBe(0);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#tagSwitch-3-hello')).toBe(0);
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('tagSwitching', () => {
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined');
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tag-switch-dropdown')).toBe(1, 'Expected one #tag-switch-dropdown');
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-1-hello')).toBe(2, 'Expected two #tagSwitch-1-hello elements');
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-2-hello')).toBe(0);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-3-hello')).toBe(0);
         const dropdown = document.getElementById('tag-switch-dropdown');
         dropdown.value = "1";
         dropdown.onchange({ target: dropdown });
         expectElementCount('#tagSwitch-1-hello', 5);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#tagSwitch-2-hello')).toBe(0);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#tagSwitch-3-hello')).toBe(0);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#select-tag-above')).toBe(0);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-2-hello')).toBe(0);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-3-hello')).toBe(0);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#select-tag-above')).toBe(0);
         dropdown.value = "2";
         dropdown.onchange({ target: dropdown });
         expectElementCount('#tagSwitch-1-hello', 2);
         expectElementCount('#tagSwitch-2-hello', 4);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#tagSwitch-3-hello')).toBe(0);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#select-tag-above')).toBe(0);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-3-hello')).toBe(0);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#select-tag-above')).toBe(0);
         dropdown.value = "3";
         dropdown.onchange({ target: dropdown });
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#tagSwitch-1-hello')).toBe(0, 'Expected no hello 1s');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#tagSwitch-2-hello')).toBe(0);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-1-hello')).toBe(0, 'Expected no hello 1s');
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-2-hello')).toBe(0);
         expectElementCount('#tagSwitch-3-hello', 7);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#select-tag-above')).toBe(0);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#select-tag-above')).toBe(0);
         dropdown.value = "";
         dropdown.onchange({ target: dropdown });
         expectElementCount('#select-tag-above', 1);
@@ -1573,37 +1783,49 @@ function runTests() {
         expectElementCount('#tagSwitch-2-hello', 0);
         expectElementCount('#tagSwitch-3-hello', 0);
     });
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('array testing', () => {
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#array-test-push-item')).toBe(1);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#score-data-0-1-inside-button')).toBe(0);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#score-data-0-1-outside-button')).toBe(0);
-        document.getElementById('array-test-push-item')?.click();
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#score-data-0-1-inside-button')).toBe(1);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elementCount('#score-data-0-1-outside-button')).toBe(1);
-        const insideElm = document.getElementById('score-data-0-1-inside-button');
-        const insideDisplay = document.getElementById('score-data-0-1-inside-display');
-        let indexValue = insideDisplay?.innerText;
-        const outsideElm = document.getElementById('score-data-0-1-outside-button');
-        const outsideDisplay = document.getElementById('score-data-0-1-outside-display');
-        const outsideValue = outsideDisplay?.innerText;
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe(outsideValue);
-        insideElm?.click();
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(insideDisplay?.innerText).toBe(outsideDisplay?.innerText);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe((Number(insideDisplay?.innerText) - 1).toString());
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe((Number(outsideDisplay?.innerText) - 1).toString());
-        outsideElm?.click();
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(insideDisplay?.innerText).toBe(outsideDisplay?.innerText);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe((Number(insideDisplay?.innerText) - 2).toString());
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(indexValue).toBe((Number(outsideDisplay?.innerText) - 2).toString());
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.describe)('array testing', () => {
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('basics', () => {
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#array-test-push-item')).toBe(1);
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#score-data-0-1-inside-button')).toBe(0);
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#score-data-0-1-outside-button')).toBe(0);
+            document.getElementById('array-test-push-item')?.click();
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#score-data-0-1-inside-button')).toBe(1);
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#score-data-0-1-outside-button')).toBe(1);
+            const insideElm = document.getElementById('score-data-0-1-inside-button');
+            const insideDisplay = document.getElementById('score-data-0-1-inside-display');
+            let indexValue = insideDisplay?.innerText;
+            const outsideElm = document.getElementById('score-data-0-1-outside-button');
+            const outsideDisplay = document.getElementById('score-data-0-1-outside-display');
+            const outsideValue = outsideDisplay?.innerText;
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe(outsideValue);
+            insideElm?.click();
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(insideDisplay?.innerText).toBe(outsideDisplay?.innerText);
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(insideDisplay?.innerText) - 1).toString());
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(outsideDisplay?.innerText) - 1).toString());
+            outsideElm?.click();
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(insideDisplay?.innerText).toBe(outsideDisplay?.innerText);
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(insideDisplay?.innerText) - 2).toString());
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(outsideDisplay?.innerText) - 2).toString());
+        });
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('deletes', async () => {
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#player-remove-promise-btn-0')).toBe(0);
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#player-edit-btn-0')).toBe(1);
+            await (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.byId)('player-edit-btn-0').onclick();
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#player-remove-promise-btn-0')).toBe(1);
+            await (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.byId)('player-remove-promise-btn-0').onclick();
+            await delay(1000); // animation
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#player-remove-promise-btn-0')).toBe(0);
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#player-edit-btn-0')).toBe(0);
+        });
     });
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.it)('child tests', () => {
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('child tests', () => {
         testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display');
         testCounterElements('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display');
         testDuelCounterElements(['#childTests-button', '#childTests-display'], ['#innerHtmlPropsTest-childTests-button', '#innerHtmlPropsTest-childTests-display']);
         testDuelCounterElements(['#childTests-button', '#childTests-display'], ['#innerHtmlTest-childTests-button', '#innerHtmlTest-childTests-display']);
     });
     try {
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.execute)();
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.execute)();
         console.info('✅ all tests passed');
         return true;
     }
@@ -1611,9 +1833,6 @@ function runTests() {
         console.error('❌ tests failed: ' + error.message, error);
         return false;
     }
-}
-function elementCount(selector) {
-    return document.querySelectorAll(selector).length;
 }
 function testDuelCounterElements([button0, display0], // button, display
 [button1, display1]) {
@@ -1625,12 +1844,12 @@ function testDuelCounterElements([button0, display0], // button, display
     let display1Element = query[0];
     let ip1Check = display1Element.innerText;
     const value = (Number(ip0) + 2).toString();
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ip1Check).toBe(value, `Expected second increase provider to be increased to ${ip0} but got ${ip1Check}`);
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(ip1Check).toBe(value, `Expected second increase provider to be increased to ${ip0} but got ${ip1Check}`);
     testCounterElements(button1, display1);
     query = expectElementCount(display1, 1);
     display1Element = query[0];
     ip1Check = display1Element.innerText;
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ip1Check).toBe((Number(ip0) + 4).toString(), `Expected ${display1} innerText to be ${Number(ip0) + 4} but instead it is ${ip1Check}`);
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(ip1Check).toBe((Number(ip0) + 4).toString(), `Expected ${display1} innerText to be ${Number(ip0) + 4} but instead it is ${ip1Check}`);
 }
 /** increases counter by two */
 function testCounterElements(counterButtonId, counterDisplayId, { elementCountExpected } = {
@@ -1639,19 +1858,19 @@ function testCounterElements(counterButtonId, counterDisplayId, { elementCountEx
     // const getByIndex = (selector: string, index: number) => document.querySelectorAll(selector)[index] as unknown as HTMLElement[]
     const increaseCounters = document.querySelectorAll(counterButtonId);
     const counterDisplays = document.querySelectorAll(counterDisplayId);
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(increaseCounters.length).toBe(elementCountExpected, `Expected ${counterButtonId} to be ${elementCountExpected} elements but is instead ${increaseCounters.length}`);
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(counterDisplays.length).toBe(elementCountExpected, `Expected ${counterDisplayId} to be ${elementCountExpected} elements but is instead ${counterDisplays.length}`);
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(increaseCounters.length).toBe(elementCountExpected, `Expected ${counterButtonId} to be ${elementCountExpected} elements but is instead ${increaseCounters.length}`);
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(counterDisplays.length).toBe(elementCountExpected, `Expected ${counterDisplayId} to be ${elementCountExpected} elements but is instead ${counterDisplays.length}`);
     increaseCounters.forEach((increaseCounter, index) => {
         const counterDisplay = counterDisplays[index];
         let counterValue = Number(counterDisplay?.innerText);
         increaseCounter?.click();
         let oldCounterValue = counterValue + 1;
         counterValue = Number(counterDisplay?.innerText);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to be value ${oldCounterValue} but is instead ${counterValue}`);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to be value ${oldCounterValue} but is instead ${counterValue}`);
         increaseCounter?.click();
         counterValue = Number(counterDisplay?.innerText);
         ++oldCounterValue;
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to increase value to ${oldCounterValue} but is instead ${counterValue}`);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to increase value to ${oldCounterValue} but is instead ${counterValue}`);
     });
 }
 function expectElementCount(query, count, message) {
@@ -1659,11 +1878,11 @@ function expectElementCount(query, count, message) {
     const elements = document.querySelectorAll(query);
     const found = elements.length;
     message = message || `Expected ${count} elements to match query ${query} but found ${found}`;
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(found).toBe(count, message);
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(found).toBe(count, message);
     return elements;
 }
-function queryOneInnerHTML(query, pos = 0) {
-    return document.querySelectorAll(query)[pos].innerHTML;
+function delay(time) {
+    return new Promise((res) => setTimeout(res, time));
 }
 
 
@@ -1810,16 +2029,29 @@ class Tag {
         if (!this.hasLiveElements) {
             throw new Error('destroying wrong tag');
         }
+        const tagSupport = this.tagSupport;
+        const global = tagSupport.templater.global;
+        // removing is considered rendering. Prevents after event processing of this tag even tho possibly deleted
+        // ++this.tagSupport.templater.global.renderCount
         // the isComponent check maybe able to be removed
-        const isComponent = this.tagSupport ? true : false;
+        const isComponent = tagSupport ? true : false;
         if (isComponent) {
-            (0,_tagRunner__WEBPACK_IMPORTED_MODULE_0__.runBeforeDestroy)(this.tagSupport, this);
+            (0,_tagRunner__WEBPACK_IMPORTED_MODULE_0__.runBeforeDestroy)(tagSupport, this);
         }
         const childTags = options.byParent ? [] : getChildTagsToDestroy(this.childTags);
-        delete this.tagSupport.templater.global.oldest;
-        delete this.tagSupport.templater.global.newest;
+        // signify that no further event rendering should take place by making logic think a render occurred during event
+        // childTags.forEach(child => ++child.tagSupport.templater.global.renderCount)
+        // signify immediately child has been deleted (looked for during event processing)
+        childTags.forEach(child => {
+            const subGlobal = child.tagSupport.templater.global;
+            delete subGlobal.newest;
+            subGlobal.deleted = true;
+        });
+        delete global.oldest;
+        delete global.newest;
+        global.deleted = true;
         this.hasLiveElements = false;
-        delete this.tagSupport.subject.tag;
+        delete tagSupport.subject.tag;
         this.destroySubscriptions();
         let mainPromise;
         if (this.ownerTag) {
@@ -2001,6 +2233,10 @@ class Tag {
         if (!insertBefore.parentNode) {
             throw new Error('no parent before removing clones');
         }
+        this.tagSupport.templater.global.oldest = this;
+        this.tagSupport.templater.global.newest = this;
+        this.tagSupport.subject.tag = this;
+        this.hasLiveElements = true;
         // remove old clones
         if (this.clones.length) {
             this.clones.forEach(clone => this.checkCloneRemoval(clone, 0));
@@ -2046,10 +2282,6 @@ class Tag {
             }
             */
         });
-        this.tagSupport.templater.global.oldest = this;
-        this.tagSupport.templater.global.newest = this;
-        this.tagSupport.subject.tag = this;
-        this.hasLiveElements = true;
     }
 }
 function afterInterpolateElement(container, insertBefore, ownerTag, 
@@ -2063,18 +2295,13 @@ context, options) {
 function getChildTagsToDestroy(childTags, allTags = []) {
     for (let index = childTags.length - 1; index >= 0; --index) {
         const cTag = childTags[index];
-        // cTag.destroySubscriptions()
+        if (allTags.find(x => x === cTag)) {
+            // TODO: Lets find why a child tag is attached twice to owner
+            throw new Error('child tag registered twice for delete');
+        }
         allTags.push(cTag);
         childTags.splice(index, 1);
         getChildTagsToDestroy(cTag.childTags, allTags);
-        /*
-        for (let iIndex = this.childTags.length - 1; iIndex >= 0; --iIndex) {
-          const iTag = this.childTags[iIndex]
-          if(cTag === iTag) {
-            this.childTags.splice(iIndex, 1)
-          }
-        }
-        */
     }
     return allTags;
 }
@@ -2215,6 +2442,7 @@ class TemplaterResult {
         providers: [],
         /** Indicator of re-rending. Saves from double rending something already rendered */
         renderCount: 0,
+        deleted: false
     };
     tagSupport;
     constructor(props, children) {
@@ -2264,34 +2492,16 @@ function renderWithSupport(tagSupport, existingTag, subject, ownerTag) {
         delete templater.global.oldest;
         delete templater.global.newest;
         delete subject.tag;
-        // delete (subject as any).lastArray
-        // delete (subject as any).lastValue
         templater.global.insertBefore = existingTag.tagSupport.templater.global.insertBefore;
-        // retag.buildBeforeElement(templater.global.insertBefore)
-        // subject.tag = retag
-        // return retag
     }
-    /*
-    if(existingTag) {
-      if(!isLikeTags(retag,existingTag)) {
-        destroyTagMemory(existingTag, subject)
-      }
-      // throw new Error('similar but different tags')
-    }
-    */
     retag.ownerTag = runtimeOwnerTag;
     wrapTagSupport.templater.global.newest = retag;
-    // ??? - new
-    // subject.tag = retag
     if (wrapTagSupport.templater.global.oldest && !wrapTagSupport.templater.global.oldest.hasLiveElements) {
         throw new Error('56513540');
     }
     if (wrapTagSupport.templater.global.oldest && !wrapTagSupport.templater.global.oldest.hasLiveElements) {
         throw new Error('5555 - 10');
     }
-    // new maybe not needed
-    // this.oldest = this.oldest || retag
-    // wrapTagSupport.oldest = wrapTagSupport.oldest || retag
     return retag;
 }
 
@@ -2407,6 +2617,9 @@ function bindSubjectCallback(value, tag) {
     if (value.isChildOverride) {
         return value;
     }
+    if (!tag.ownerTag && !tag.tagSupport.templater.global.isApp) {
+        throw new Error('no ownerTag issue here');
+    }
     const subjectFunction = (element, args) => runTagCallback(value, tag, element, args);
     // link back to original. Mostly used for <div oninit ondestroy> animations
     subjectFunction.tagFunction = value;
@@ -2414,17 +2627,25 @@ function bindSubjectCallback(value, tag) {
 }
 function runTagCallback(value, tag, bindTo, args) {
     const tagSupport = tag.tagSupport;
-    const renderCount = tagSupport ? tagSupport.templater.global.renderCount : 0;
+    const renderCount = tagSupport.templater.global.renderCount;
     const method = value.bind(bindTo);
     const callbackResult = method(...args);
     const sameRenderCount = renderCount === tagSupport.templater.global.renderCount;
-    if (tagSupport && !sameRenderCount) {
-        return; // already rendered
+    // already rendered OR tag was deleted before event processing
+    if (!sameRenderCount || tagSupport.templater.global.deleted) {
+        if (callbackResult instanceof Promise) {
+            return callbackResult.then(() => {
+                return 'promise-no-data-ever'; // tag was deleted during event processing
+            });
+        }
+        return 'no-data-ever'; // already rendered
     }
     (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport, true);
-    // throw new Error('after click render stop')
     if (callbackResult instanceof Promise) {
         return callbackResult.then(() => {
+            if (tagSupport.templater.global.deleted) {
+                return 'promise-no-data-ever'; // tag was deleted during event processing
+            }
             (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport, true);
             return 'promise-no-data-ever';
         });
@@ -2770,13 +2991,17 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-let getCallback = () => (callback) => () => {
+let innerCallback = (callback) => () => {
     throw new Error('The real callback function was called and that should never occur');
 };
+const getCallback = () => innerCallback;
+const originalGetter = innerCallback; // getCallback
 (0,_setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse)({
     beforeRender: (tagSupport) => initMemory(tagSupport),
     beforeRedraw: (tagSupport) => initMemory(tagSupport),
-    // afterRender: (tagSupport: TagSupport) => {},
+    afterRender: (_tagSupport) => {
+        innerCallback = originalGetter; // prevent crossing callbacks with another tag
+    },
 });
 function updateState(stateFrom, stateTo) {
     stateFrom.forEach((state, index) => {
@@ -2789,13 +3014,10 @@ function updateState(stateFrom, stateTo) {
     });
 }
 function initMemory(tagSupport) {
-    getCallback = () => {
-        const oldState = _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.array;
-        const callbackMaker = (callback) => {
-            const trigger = (...args) => triggerStateUpdate(tagSupport, callback, oldState, ...args);
-            return trigger;
-        };
-        return callbackMaker;
+    const oldState = _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.array;
+    innerCallback = (callback) => {
+        const trigger = (...args) => triggerStateUpdate(tagSupport, callback, oldState, ...args);
+        return trigger;
     };
 }
 function triggerStateUpdate(tagSupport, callback, oldState, ...args) {
@@ -3320,9 +3542,7 @@ function afterElmBuild(elm, options, context, ownerTag) {
         (0,_scanTextAreaValue_function__WEBPACK_IMPORTED_MODULE_4__.scanTextAreaValue)(elm, context, ownerTag);
     }
     let diff = options.counts.added;
-    if (!options.forceElement) {
-        diff = (0,_elementInitCheck__WEBPACK_IMPORTED_MODULE_1__.elementInitCheck)(elm, options.counts) - diff;
-    }
+    diff = (0,_elementInitCheck__WEBPACK_IMPORTED_MODULE_1__.elementInitCheck)(elm, options.counts) - diff;
     if (elm.children) {
         /*
         const subCounts = {
@@ -3586,7 +3806,8 @@ function processNameValueAttr(attrName, result, child, ownerTag, howToSet) {
     // attach as callback?
     if (result instanceof Function) {
         const action = function (...args) {
-            return result(child, args);
+            const result2 = result(child, args);
+            return result2;
         };
         child[attrName].action = action;
         // child.addEventListener(attrName, action)
@@ -3613,8 +3834,7 @@ function processNameValueAttr(attrName, result, child, ownerTag, howToSet) {
 function processAttributeSubjectValue(newAttrValue, child, attrName, isSpecial, howToSet) {
     if (newAttrValue instanceof Function) {
         const fun = function (...args) {
-            const result = newAttrValue(child, args);
-            return result;
+            return newAttrValue(child, args);
         };
         // access to original function
         fun.tagFunction = newAttrValue;
@@ -3673,7 +3893,9 @@ function processNewValue(hasValue, value, ownerTag) {
     }
     if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagInstance)(value)) {
         value.ownerTag = ownerTag;
-        ownerTag.childTags.push(value);
+        if (ownerTag.childTags.find(x => x === value)) {
+            throw new Error('about to reattach tag already present - 2');
+        }
         return new _ValueSubject__WEBPACK_IMPORTED_MODULE_0__.ValueSubject(value);
     }
     if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isSubjectInstance)(value)) {
@@ -3761,6 +3983,9 @@ function processSubjectComponent(templater, subject, template, ownerTag, options
             const myClones = ownerTag.clones.filter(fClone => !preClones.find(clone => clone === fClone));
             retag.clones.push(...myClones);
         }
+        if (ownerTag.childTags.find(x => x === retag)) {
+            throw new Error('about to reattach tag already present');
+        }
         ownerTag.childTags.push(retag);
     }
     (0,_processTagResult_function__WEBPACK_IMPORTED_MODULE_2__.processTagResult)(retag, subject, // The element set here will be removed from document. Also result.tag will be added in here
@@ -3842,6 +4067,9 @@ ownerTag) {
             throw new Error('issue non-tag here');
         }
         applyFakeTemplater(tag, ownerTag, subject);
+        if (ownerTag.childTags.find(x => x === tag)) {
+            throw new Error('about to reattach tag already present - 5');
+        }
         ownerTag.childTags.push(tag);
     }
     tag.ownerTag = ownerTag;
@@ -3867,6 +4095,7 @@ function applyFakeTemplater(tag, ownerTag, subject) {
 function getFakeTemplater() {
     return {
         global: {
+            renderCount: 0,
             providers: [],
             context: {},
         },
@@ -3927,20 +4156,13 @@ ownerTag, options) {
     const before = template || subject.value.insertBefore || template.clone;
     value.forEach((subTag, index) => {
         const previous = lastArray[index];
-        const previousSupport = !previous?.deleted && previous?.tag.tagSupport;
+        const previousSupport = previous?.tag.tagSupport;
         const fakeSubject = new _ValueSubject__WEBPACK_IMPORTED_MODULE_0__.ValueSubject({});
         (0,_processSubjectValue_function__WEBPACK_IMPORTED_MODULE_3__.applyFakeTemplater)(subTag, ownerTag, fakeSubject);
         if (previousSupport) {
             subTag.tagSupport.templater.global = previousSupport.templater.global;
             previousSupport.templater.global.newest = subTag;
-            if (!subTag.ownerTag) {
-                throw new Error('no owner on newest');
-            }
         }
-        else {
-            ownerTag.childTags.push(subTag);
-        }
-        subTag.ownerTag = ownerTag;
         // check for html``.key()
         const keyNotSet = subTag.arrayValue;
         if (keyNotSet?.isArrayValueNeverSet) {
@@ -3968,6 +4190,7 @@ ownerTag, options) {
             // return [] // removed: item should have been previously deleted and will be added back
         }
         processAddTagArrayItem(before, subTag, index, options, lastArray, true);
+        ownerTag.childTags.push(subTag);
     });
     return clones;
 }
@@ -4082,7 +4305,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function providersChangeCheck(tag) {
-    const providersWithChanges = tag.tagSupport.templater.global.providers.filter(provider => !(0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepEqual)(provider.instance, provider.clone));
+    const global = tag.tagSupport.templater.global;
+    const providersWithChanges = global.providers.filter(provider => !(0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepEqual)(provider.instance, provider.clone));
     // reset clones
     providersWithChanges.forEach(provider => {
         const appElement = tag.getAppElement();
@@ -4093,6 +4317,9 @@ function providersChangeCheck(tag) {
 function handleProviderChanges(appElement, provider) {
     const tagsWithProvider = getTagsWithProvider(appElement, provider);
     tagsWithProvider.forEach(({ tag, renderCount, provider }) => {
+        if (tag.tagSupport.templater.global.deleted) {
+            return; // i was deleted after another tag processed
+        }
         const notRendered = renderCount === tag.tagSupport.templater.global.renderCount;
         if (notRendered) {
             provider.clone = (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepClone)(provider.instance);
@@ -4101,16 +4328,22 @@ function handleProviderChanges(appElement, provider) {
     });
 }
 function getTagsWithProvider(tag, provider, memory = []) {
-    const compare = tag.tagSupport.templater.global.providers;
+    const global = tag.tagSupport.templater.global;
+    const compare = global.providers;
     const hasProvider = compare.find(xProvider => xProvider.constructMethod === provider.constructMethod);
     if (hasProvider) {
         memory.push({
             tag,
-            renderCount: tag.tagSupport.templater.global.renderCount,
+            renderCount: global.renderCount,
             provider: hasProvider,
         });
     }
     tag.childTags.forEach(child => getTagsWithProvider(child, provider, memory));
+    memory.forEach(({ tag }) => {
+        if (tag.tagSupport.templater.global.deleted) {
+            throw new Error('do not get here - 0');
+        }
+    });
     return memory;
 }
 
@@ -4313,17 +4546,7 @@ newTemplater, tagSupport, subject) {
         oldestTag.updateByTag(latestTag);
         return latestTag;
     }
-    /*
-    const oldTagSupport = oldestTag.tagSupport
-    const hasChanged = hasTagSupportChanged(
-      oldTagSupport,
-      newTemplater.tagSupport,
-      newTemplater,
-    )
-    */
     const oldTemplater = tagSupport.templater || newTemplater;
-    // ??? - new
-    // const redraw = renderTagSupport(tagSupport, false)
     const redraw = (0,_redrawTag_function__WEBPACK_IMPORTED_MODULE_2__.redrawTag)(subject, newTemplater, oldestTag.ownerTag);
     const oldest = tagSupport.templater.global.oldest || oldestTag;
     redraw.tagSupport.templater.global.oldest = oldest;
@@ -4364,9 +4587,11 @@ __webpack_require__.r(__webpack_exports__);
 
 /** Main function used by all other callers to render/update display of a tag component */
 function renderTagSupport(tagSupport, renderUp) {
+    const global = tagSupport.templater.global;
     if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagInstance)(tagSupport.templater)) {
-        const newTag = tagSupport.templater.global.newest;
+        const newTag = global.newest;
         const ownerTag = newTag.ownerTag;
+        ++global.renderCount;
         return renderTagSupport(ownerTag.tagSupport, true);
     }
     // const oldTagSetup = this
@@ -4384,10 +4609,11 @@ function renderTagSupport(tagSupport, renderUp) {
             selfPropChange = !(0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepEqual)(nowProps, latestProps);
         }
     }
-    const useTagSupport = tagSupport.templater.global.newest?.tagSupport; // oldTagSetup
-    const tag = (0,_renderExistingTag_function__WEBPACK_IMPORTED_MODULE_2__.renderExistingTag)(
-    // templater.global.newest as Tag,
-    templater.global.oldest, templater, useTagSupport, subject);
+    const useTagSupport = global.newest?.tagSupport; // oldTagSetup
+    if (!templater.global.oldest) {
+        throw new Error('already causing trouble');
+    }
+    const tag = (0,_renderExistingTag_function__WEBPACK_IMPORTED_MODULE_2__.renderExistingTag)(templater.global.oldest, templater, useTagSupport, subject);
     /*
     const tag = exit.redraw
   
@@ -4774,7 +5000,10 @@ function kidsToTagArraySubject(children) {
         kid.arrayValue = 0;
         return { childSubject: new _ValueSubject__WEBPACK_IMPORTED_MODULE_3__.ValueSubject([kid]), madeSubject: true };
     }
-    return { childSubject: new _ValueSubject__WEBPACK_IMPORTED_MODULE_3__.ValueSubject([]), madeSubject: true };
+    return {
+        childSubject: new _ValueSubject__WEBPACK_IMPORTED_MODULE_3__.ValueSubject([]),
+        madeSubject: true
+    };
 }
 function updateResult(result, tagComponent) {
     result.isTag = true;
@@ -4889,6 +5118,7 @@ element, props) {
     const { tag } = result;
     // TODO: is the below needed?
     tag.appElement = element;
+    tag.tagSupport.templater.global.isApp = true;
     const templateElm = document.createElement('template');
     templateElm.setAttribute('id', 'app-tag-' + appElements.length);
     templateElm.setAttribute('app-tag-detail', appElements.length.toString());
@@ -5137,7 +5367,7 @@ __webpack_require__.r(__webpack_exports__);
 function updateExistingValue(subject, value, ownerTag, insertBefore) {
     const subjectSubTag = subject;
     const isComponent = (0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isTagComponent)(value);
-    const oldInsertBefore = subject.template || subjectSubTag.tag?.tagSupport.templater.global.insertBefore || subjectSubTag.clone;
+    const oldInsertBefore = subject.template || subjectSubTag.tag?.tagSupport.templater.global.insertBefore || subject.clone;
     (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_5__.checkDestroyPrevious)(subject, value);
     // handle already seen tag components
     if (isComponent) {

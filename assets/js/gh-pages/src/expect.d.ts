@@ -1,3 +1,7 @@
+export declare function describe(label: string, run: () => any): void;
+export declare namespace describe {
+    var only: (label: string, run: () => any) => void;
+}
 export declare function it(label: string, run: () => any): void;
 export declare namespace it {
     var only: (label: string, run: () => any) => void;
