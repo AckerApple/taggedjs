@@ -1,10 +1,9 @@
 {
   "name": "taggedjs",
   "private": true,
-  "version": "2.4.8",
+  "version": "2.4.10",
   "description": "tagged template reactive html",
   "main": "js/index.js",
-  "type": "module",
   "scripts": {
     "build:js": "rm -rf ./js && tsc -p tsconfig.build.json",
     "build": "npm-run-all --sequential build:js build:webpack build:dist:only build:gh-pages build:pinbowl && echo \"✅ Build completed\"",
