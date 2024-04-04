@@ -1940,11 +1940,13 @@ function processRegularValue(value, subject, // could be tag via subject.tag
 template) {
     subject.template = template;
     const before = subject.clone || template; // Either the template is on the doc OR its the first element we last put on doc
+    if (subject.lastValue === value) {
+        return; // no need to update display, its the same
+    }
     subject.lastValue = value;
     // Processing of regular values
     const clone = (0,_interpolateTemplate__WEBPACK_IMPORTED_MODULE_0__.updateBetweenTemplates)(value, before);
     subject.clone = clone; // remember single element put down, for future updates
-    return [];
 }
 
 
@@ -2059,20 +2061,19 @@ function getValueType(value) {
 function processSubjectValue(value, subject, // could be tag via result.tag
 template, // <template end interpolate /> (will be removed)
 ownerTag, // owner
-options, // {added:0, removed:0}
-test = false) {
+options) {
     const valueType = getValueType(value);
     switch (valueType) {
         case ValueTypes.tag:
             processTag(value, subject, template, ownerTag);
-            return [];
+            return;
         case ValueTypes.tagArray:
             return (0,_processTagArray__WEBPACK_IMPORTED_MODULE_2__.processTagArray)(subject, value, template, ownerTag, options);
         case ValueTypes.tagComponent:
             (0,_processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_0__.processSubjectComponent)(value, subject, template, ownerTag, options);
-            return [];
+            return;
     }
-    return (0,_processRegularValue_function__WEBPACK_IMPORTED_MODULE_5__.processRegularValue)(value, subject, template);
+    (0,_processRegularValue_function__WEBPACK_IMPORTED_MODULE_5__.processRegularValue)(value, subject, template);
 }
 /** Could be a regular tag or a component. Both are Tag.class */
 function processTag(tag, subject, // could be tag via result.tag
