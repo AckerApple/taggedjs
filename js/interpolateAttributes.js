@@ -1,11 +1,5 @@
 import { processAttribute } from "./processAttribute.function";
 function howToSetAttribute(element, name, value) {
-    /*
-    if(name === 'class'){
-      value.split(' ').forEach(className => child.classList.add(className))
-      return
-    }
-    */
     element.setAttribute(name, value);
 }
 function howToSetInputValue(element, name, value) {

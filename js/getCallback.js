@@ -1,12 +1,17 @@
 import { setUse } from "./setUse.function";
 import { getStateValue } from "./set.function";
-export let getCallback = () => (callback) => () => {
+import { renderTagSupport } from "./renderTagSupport.function";
+let innerCallback = (callback) => () => {
     throw new Error('The real callback function was called and that should never occur');
 };
+export const getCallback = () => innerCallback;
+const originalGetter = innerCallback; // getCallback
 setUse({
     beforeRender: (tagSupport) => initMemory(tagSupport),
     beforeRedraw: (tagSupport) => initMemory(tagSupport),
-    // afterRender: (tagSupport: TagSupport) => {},
+    afterRender: (_tagSupport) => {
+        innerCallback = originalGetter; // prevent crossing callbacks with another tag
+    },
 });
 function updateState(stateFrom, stateTo) {
     stateFrom.forEach((state, index) => {
@@ -19,13 +24,10 @@ function updateState(stateFrom, stateTo) {
     });
 }
 function initMemory(tagSupport) {
-    getCallback = () => {
-        const oldState = setUse.memory.stateConfig.array;
-        const callbackMaker = (callback) => {
-            const trigger = (...args) => triggerStateUpdate(tagSupport, callback, oldState, ...args);
-            return trigger;
-        };
-        return callbackMaker;
+    const oldState = setUse.memory.stateConfig.array;
+    innerCallback = (callback) => {
+        const trigger = (...args) => triggerStateUpdate(tagSupport, callback, oldState, ...args);
+        return trigger;
     };
 }
 function triggerStateUpdate(tagSupport, callback, oldState, ...args) {
@@ -37,13 +39,13 @@ function triggerStateUpdate(tagSupport, callback, oldState, ...args) {
     const promise = callback(...args);
     // send the oldest state changes into the newest
     updateState(oldState, newest);
-    tagSupport.render();
+    renderTagSupport(tagSupport, false);
     // TODO: turn back on below
     if (promise instanceof Promise) {
         promise.finally(() => {
             // send the oldest state changes into the newest
             updateState(oldState, newest);
-            tagSupport.render();
+            renderTagSupport(tagSupport, false);
         });
     }
 }

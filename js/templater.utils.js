@@ -1,57 +1,91 @@
-import { TagSupport } from './TagSupport.class';
 import { isTagInstance } from './isInstance';
 import { runAfterRender, runBeforeRedraw, runBeforeRender } from './tagRunner';
 import { setUse } from './setUse.function';
 export class TemplaterResult {
+    props;
+    children;
     tagged;
     wrapper;
-    insertBefore;
-    newest;
-    oldest;
+    global = {
+        context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+        providers: [],
+        /** Indicator of re-rending. Saves from double rending something already rendered */
+        renderCount: 0,
+    };
     tagSupport;
     constructor(props, children) {
-        this.tagSupport = new TagSupport(this, children, props);
+        this.props = props;
+        this.children = children;
     }
     redraw;
     isTemplater = true;
     renderWithSupport(tagSupport, existingTag, ownerTag) {
+        const wrapTagSupport = tagSupport; // this.tagSupport
+        // this.tagSupport = wrapTagSupport
         /* BEFORE RENDER */
         // signify to other operations that a rendering has occurred so they do not need to render again
-        ++tagSupport.memory.renderCount;
+        // ++wrapTagSupport.memory.renderCount
         const runtimeOwnerTag = existingTag?.ownerTag || ownerTag;
-        // const insertBefore = tagSupport.templater.insertBefore
         if (existingTag) {
-            tagSupport.propsConfig = { ...existingTag.tagSupport.propsConfig };
-            runBeforeRedraw(tagSupport, existingTag);
+            runBeforeRedraw(wrapTagSupport, existingTag);
         }
         else {
+            if (!wrapTagSupport) {
+                throw new Error('63521');
+            }
             // first time render
-            runBeforeRender(tagSupport, runtimeOwnerTag);
+            runBeforeRender(wrapTagSupport, runtimeOwnerTag);
             // TODO: Logic below most likely could live within providers.ts inside the runBeforeRender function
             const providers = setUse.memory.providerConfig;
             providers.ownerTag = runtimeOwnerTag;
         }
         /* END: BEFORE RENDER */
-        const templater = this;
-        const retag = templater.wrapper(tagSupport);
+        const retag = this.wrapper(wrapTagSupport);
         /* AFTER */
-        runAfterRender(tagSupport, retag);
-        templater.newest = retag;
+        runAfterRender(wrapTagSupport, retag);
         retag.ownerTag = runtimeOwnerTag;
-        tagSupport.newest = retag;
+        wrapTagSupport.templater.global.newest = retag;
+        if (this.global.oldest && !this.global.oldest.hasLiveElements) {
+            throw new Error('56513540');
+        }
+        if (wrapTagSupport.templater.global.oldest && !wrapTagSupport.templater.global.oldest.hasLiveElements) {
+            throw new Error('5555 - 10');
+        }
+        // new maybe not needed
+        // this.oldest = this.oldest || retag
+        // wrapTagSupport.oldest = wrapTagSupport.oldest || retag
         return { remit: true, retag };
     }
 }
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(props, templater) {
     function callback(toCall, callWith) {
+        const renderCount = templater.global.renderCount;
         const callbackResult = toCall(...callWith);
-        // const tag = templater.oldest as Tag
-        const tag = templater.newest;
-        // const tagSupport = tag.tagSupport
-        // const tagSupport = templater.tagSupport
-        const tagSupport = tag?.ownerTag?.tagSupport;
-        tagSupport.render();
+        const tag = templater.global.newest;
+        let tagSupport = tag?.tagSupport.ownerTagSupport;
+        if (tagSupport) {
+            tagSupport = templater.global.newest?.tagSupport || templater.global.oldest?.tagSupport || tagSupport;
+        }
+        if (templater.global.renderCount > renderCount) {
+            throw new Error('already rendered');
+        }
+        const ownerTag = tag?.ownerTag;
+        if (ownerTag) {
+            const newestOwner = ownerTag.tagSupport.templater.global.newest;
+            newestOwner.tagSupport.render();
+            return;
+        }
+        console.log('alter prop reder', {
+            original: tagSupport.templater.wrapper.original,
+            ownerTag: tag?.ownerTag,
+        });
+        const newTag = tagSupport.render(); // call owner to render
+        if (!templater.global.oldest) {
+            throw new Error('lklk');
+        }
+        templater.global.newest = newTag;
+        // templater.global.oldest = templater.global.oldest || newTag
         return callbackResult;
     }
     const isPropTag = isTagInstance(props);

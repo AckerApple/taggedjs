@@ -3,9 +3,9 @@ import { buildClones } from './render';
 import { interpolateElement, interpolateString } from './interpolateElement';
 import { afterElmBuild, subscribeToTemplate } from './interpolateTemplate';
 import { elementDestroyCheck } from './elementDestroyCheck.function';
-import { updateExistingValue } from './updateExistingValue.function';
 import { processNewValue } from './processNewValue.function';
-import { checkDestroyPrevious } from './checkDestroyPrevious.function';
+import { isSubjectInstance, isTagComponent } from './isInstance';
+import { isLikeTags } from './isLikeTags.function';
 export const variablePrefix = '__tagvar';
 export const escapeVariable = '--' + variablePrefix + '--';
 const prefixSearch = new RegExp(variablePrefix, 'g');
@@ -17,10 +17,12 @@ export class Tag {
     strings;
     values;
     isTag = true;
+    hasLiveElements = false;
     clones = []; // elements on document. Needed at destroy process to know what to destroy
     cloneSubs = []; // subscriptions created by clones
-    children = []; // tags on me
+    childTags = []; // tags on me
     tagSupport;
+    lastTemplateString = undefined; // used to compare templates for updates
     // only present when a child of a tag
     ownerTag;
     // insertBefore?: Element
@@ -36,33 +38,61 @@ export class Tag {
         this.arrayValue = arrayValue;
         return this;
     }
-    async destroy(options = {
+    destroy(options = {
         stagger: 0,
         byParent: false, // Only destroy clones of direct children
     }) {
-        // the isComponent check maybe able to be removed
-        const isComponent = this.tagSupport ? true : false;
-        if (isComponent) {
-            runBeforeDestroy(this.tagSupport, this);
+        if (!this.hasLiveElements) {
+            throw new Error('destroying wrong tag');
         }
+        const tagSupport = this.tagSupport;
+        const global = tagSupport.templater.global;
+        // removing is considered rendering. Prevents after event processing of this tag even tho possibly deleted
+        // ++this.tagSupport.templater.global.renderCount
+        // the isComponent check maybe able to be removed
+        const isComponent = tagSupport ? true : false;
+        if (isComponent) {
+            runBeforeDestroy(tagSupport, this);
+        }
+        const childTags = options.byParent ? [] : getChildTagsToDestroy(this.childTags);
+        // signify that no further event rendering should take place by making logic think a render occurred during event
+        // childTags.forEach(child => ++child.tagSupport.templater.global.renderCount)
+        // signify immediately child has been deleted (looked for during event processing)
+        childTags.forEach(child => {
+            const subGlobal = child.tagSupport.templater.global;
+            delete subGlobal.newest;
+            subGlobal.deleted = true;
+        });
+        delete global.oldest;
+        delete global.newest;
+        global.deleted = true;
+        this.hasLiveElements = false;
+        delete tagSupport.subject.tag;
         this.destroySubscriptions();
+        let mainPromise;
         if (this.ownerTag) {
-            this.ownerTag.children = this.ownerTag.children.filter(child => child !== this);
+            this.ownerTag.childTags = this.ownerTag.childTags.filter(child => child !== this);
         }
         if (!options.byParent) {
             const { stagger, promise } = this.destroyClones(options);
             options.stagger = stagger;
             if (promise) {
-                await promise;
+                mainPromise = promise;
             }
         }
         else {
             this.destroyClones();
         }
-        const promises = this.children.map(kid => kid.destroy({ stagger: 0, byParent: true }));
-        this.children.length = 0;
-        await Promise.all(promises);
-        return options.stagger;
+        if (mainPromise) {
+            mainPromise = mainPromise.then(async () => {
+                const promises = childTags.map(kid => kid.destroy({ stagger: 0, byParent: true }));
+                return Promise.all(promises);
+            });
+        }
+        else {
+            mainPromise = Promise.all(childTags.map(kid => kid.destroy({ stagger: 0, byParent: true })));
+        }
+        return mainPromise.then(() => options.stagger);
     }
     destroySubscriptions() {
         this.cloneSubs.forEach(cloneSub => cloneSub.unsubscribe());
@@ -101,18 +131,6 @@ export class Tag {
         }
         return promise;
     }
-    updateByTag(tag) {
-        this.updateConfig(tag.strings, tag.values);
-        this.tagSupport.templater = tag.tagSupport.templater;
-        this.tagSupport.propsConfig = { ...tag.tagSupport.propsConfig };
-        this.tagSupport.newest = tag;
-        this.tagSupport.templater.newest = tag;
-    }
-    lastTemplateString = undefined; // used to compare templates for updates
-    updateConfig(strings, values) {
-        this.strings = strings;
-        this.updateValues(values);
-    }
     getTemplate() {
         const string = this.strings.map((string, index) => {
             const safeString = string.replace(prefixSearch, escapeVariable);
@@ -129,10 +147,11 @@ export class Tag {
             string: interpolation.string,
             strings: this.strings,
             values: this.values,
-            context: this.tagSupport?.memory.context || {},
+            context: this.tagSupport.templater.global.context || {},
         };
     }
     isLikeTag(tag) {
+        return isLikeTags(this, tag);
         const { string } = tag.getTemplate();
         // TODO: most likely remove?
         if (!this.lastTemplateString) {
@@ -159,36 +178,45 @@ export class Tag {
         }
         return false;
     }
+    updateByTag(tag) {
+        if (!this.tagSupport.templater.global.oldest) {
+            throw new Error('no oldest here');
+        }
+        if (!this.hasLiveElements) {
+            throw new Error('trying to update a tag with no elements on stage');
+        }
+        this.tagSupport.templater.global.newest = tag;
+        if (!this.tagSupport.templater.global.context) {
+            throw new Error('issue back here');
+        }
+        this.updateConfig(tag.strings, tag.values);
+    }
+    updateConfig(strings, values) {
+        this.strings = strings;
+        this.updateValues(values);
+    }
     update() {
-        return this.updateContext(this.tagSupport.memory.context);
+        return this.updateContext(this.tagSupport.templater.global.context);
     }
     updateValues(values) {
         this.values = values;
-        return this.updateContext(this.tagSupport.memory.context);
+        return this.updateContext(this.tagSupport.templater.global.context);
     }
     updateContext(context) {
-        const seenContext = [];
         this.strings.map((_string, index) => {
             const variableName = variablePrefix + index;
             const hasValue = this.values.length > index;
             const value = this.values[index];
             // is something already there?
-            const existing = variableName in context;
-            seenContext.push(variableName);
-            if (existing) {
-                const existing = context[variableName];
-                return updateExistingValue(existing, value, this);
+            const exists = variableName in context;
+            if (exists) {
+                return updateContextItem(context, variableName, value);
             }
-            // 🆕 First time values below
-            processNewValue(hasValue, value, context, variableName, this);
-        });
-        // Support reduction in context
-        Object.entries(context).forEach(([key, subject]) => {
-            if (seenContext.includes(key)) {
+            if (!hasValue) {
                 return;
             }
-            throw new Error('we here');
-            const destroyed = checkDestroyPrevious(subject, undefined);
+            // 🆕 First time values below
+            context[variableName] = processNewValue(hasValue, value, this);
         });
         return context;
     }
@@ -202,7 +230,7 @@ export class Tag {
     /** Used during HMR only where static content itself could have been edited */
     rebuild() {
         // const insertBefore = this.insertBefore
-        const insertBefore = this.tagSupport.templater.insertBefore;
+        const insertBefore = this.tagSupport.templater.global.insertBefore;
         if (!insertBefore) {
             const err = new Error('Cannot rebuild. Previous insertBefore element is not defined on tag');
             err.tag = this;
@@ -210,41 +238,59 @@ export class Tag {
         }
         this.buildBeforeElement(insertBefore, {
             forceElement: true,
-            counts: { added: 0, removed: 0 },
+            counts: { added: 0, removed: 0 }, test: false,
         });
     }
     buildBeforeElement(insertBefore, options = {
         forceElement: false,
         counts: { added: 0, removed: 0 },
+        test: false
     }) {
+        if (!insertBefore.parentNode) {
+            throw new Error('no parent before removing clones');
+        }
+        this.tagSupport.templater.global.oldest = this;
+        this.tagSupport.templater.global.newest = this;
+        this.tagSupport.subject.tag = this;
+        this.hasLiveElements = true;
+        // remove old clones
+        if (this.clones.length) {
+            this.clones.forEach(clone => this.checkCloneRemoval(clone, 0));
+        }
         // this.insertBefore = insertBefore
-        this.tagSupport.templater.insertBefore = insertBefore;
+        this.tagSupport.templater.global.insertBefore = insertBefore;
+        // const context = this.tagSupport.memory.context // this.update()
         const context = this.update();
         const template = this.getTemplate();
+        if (!insertBefore.parentNode) {
+            throw new Error('no parent before building tag');
+        }
         const elementContainer = document.createElement('div');
         elementContainer.id = 'tag-temp-holder';
         // render content with a first child that we can know is our first element
         elementContainer.innerHTML = `<template id="temp-template-tag-wrap">${template.string}</template>`;
         // Search/replace innerHTML variables but don't interpolate tag components just yet
-        const { clones, tagComponents } = interpolateElement(elementContainer, context, template, this, // ownerTag,
+        const { tagComponents } = interpolateElement(elementContainer, context, template, this, // ownerTag,
         {
             forceElement: options.forceElement,
             counts: options.counts
-        });
-        // remove old clones
-        if (this.clones.length) {
-            this.clones.forEach(clone => this.checkCloneRemoval(clone, 0));
+        }, options.test);
+        if (!insertBefore.parentNode) {
+            throw new Error('no parent building tag');
         }
         afterInterpolateElement(elementContainer, insertBefore, this, // ownerTag
-        [], context, options);
+        context, options);
         // this.clones.push(...clones)
         // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
         let isForceElement = options.forceElement;
         tagComponents.forEach(tagComponent => {
-            const preClones = this.clones.map(clone => clone);
+            // const preClones = this.clones.map(clone => clone)
             subscribeToTemplate(tagComponent.insertBefore, // temporary,
             tagComponent.subject, tagComponent.ownerTag, options.counts, { isForceElement });
-            afterInterpolateElement(elementContainer, insertBefore, this, preClones, context, options);
+            if (!insertBefore.parentNode) {
+                throw new Error('no parent building tag components');
+            }
+            afterInterpolateElement(elementContainer, insertBefore, this, context, options);
             // remove component clones from ownerTag as they will belong to the components they live on
             /*
             if( preClones.length ) {
@@ -254,10 +300,47 @@ export class Tag {
         });
     }
 }
-function afterInterpolateElement(container, insertBefore, ownerTag, preClones, context, options) {
+function afterInterpolateElement(container, insertBefore, ownerTag, 
+// preClones: Clones,
+context, options) {
     const clones = buildClones(container, insertBefore);
     ownerTag.clones.push(...clones);
     clones.forEach(clone => afterElmBuild(clone, options, context, ownerTag));
     return clones;
+}
+function getChildTagsToDestroy(childTags, allTags = []) {
+    for (let index = childTags.length - 1; index >= 0; --index) {
+        const cTag = childTags[index];
+        if (allTags.find(x => x === cTag)) {
+            // TODO: Lets find why a child tag is attached twice to owner
+            throw new Error('child tag registered twice for delete');
+        }
+        allTags.push(cTag);
+        childTags.splice(index, 1);
+        getChildTagsToDestroy(cTag.childTags, allTags);
+    }
+    return allTags;
+}
+function updateContextItem(context, variableName, value) {
+    const subject = context[variableName];
+    const tag = subject.tag;
+    if (tag) {
+        const oldWrap = tag.tagSupport.templater.wrapper; // tag versus component
+        if (oldWrap && isTagComponent(value)) {
+            const oldValueFn = oldWrap.original;
+            const newValueFn = value.wrapper?.original;
+            const fnMatched = oldValueFn === newValueFn;
+            if (fnMatched) {
+                const newTemp = value;
+                newTemp.global = tag.tagSupport.templater.global;
+            }
+        }
+    }
+    // return updateExistingValue(subject, value, this)
+    if (isSubjectInstance(value)) {
+        return;
+    }
+    subject.set(value); // listeners will evaluate updated values to possibly update display(s)
+    return;
 }
 //# sourceMappingURL=Tag.class.js.map

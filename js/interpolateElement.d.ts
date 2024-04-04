@@ -8,5 +8,5 @@ export type InterpolateOptions = {
 };
 /** Review elements within an element */
 export declare function interpolateElement(container: Element, context: Context, // variables used to evaluate
-interpolatedTemplates: TagTemplate, tagOwner: Tag, options: InterpolateOptions): InterpolatedContentTemplates;
+interpolatedTemplates: TagTemplate, tagOwner: Tag, options: InterpolateOptions, test?: boolean): InterpolatedContentTemplates;
 export declare function interpolateString(string: string): import("./interpolations").InterpolatedTemplates;

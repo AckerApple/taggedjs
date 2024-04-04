@@ -43,7 +43,7 @@ export const providers = {
             ownerTag: config.ownerTag
         };
         while (owner.ownerTag) {
-            const ownerProviders = owner.ownerTag.tagSupport.memory.providers;
+            const ownerProviders = owner.ownerTag.tagSupport.templater.global.providers;
             const provider = ownerProviders.find(provider => {
                 if (provider.constructMethod === constructor) {
                     return true;
@@ -70,7 +70,7 @@ setUse({
     },
     afterRender: (tagSupport) => {
         const config = setUse.memory.providerConfig;
-        tagSupport.memory.providers = [...config.providers];
+        tagSupport.templater.global.providers = [...config.providers];
         config.providers.length = 0;
     }
 });
@@ -78,9 +78,9 @@ function run(tagSupport, ownerTag) {
     const config = setUse.memory.providerConfig;
     // config.currentTagSupport = tagSupport
     config.ownerTag = ownerTag;
-    if (tagSupport.memory.providers.length) {
+    if (tagSupport.templater.global.providers.length) {
         config.providers.length = 0;
-        config.providers.push(...tagSupport.memory.providers);
+        config.providers.push(...tagSupport.templater.global.providers);
     }
 }
 //# sourceMappingURL=providers.js.map

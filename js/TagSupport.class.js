@@ -1,30 +1,22 @@
 import { deepClone } from './deepFunctions';
 import { isTagArray, isTagComponent, isTagInstance } from './isInstance';
-import { getStateValue } from './set.function';
-import { alterProps } from './templater.utils';
-export class TagSupport {
+export class BaseTagSupport {
     templater;
-    children;
+    subject;
+    isApp = true;
     propsConfig;
     memory = {
-        context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+        // context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
         state: {
             newest: [],
         },
-        providers: [],
-        /** Indicator of re-rending. Saves from double rending something already rendered */
-        renderCount: 0,
     };
-    updateState() {
-        this.memory.state.newest.forEach(newest => {
-            newest.lastValue = getStateValue(newest);
-        });
-    }
-    constructor(templater, children, // children tags passed in as arguments
-    props) {
+    constructor(templater, subject) {
         this.templater = templater;
-        this.children = children;
-        const latestCloned = alterProps(props, templater);
+        this.subject = subject;
+        const children = this.templater.children; // children tags passed in as arguments
+        const props = this.templater.props; // natural props
+        const latestCloned = deepClone(props); // alterProps(props, templater)
         this.propsConfig = {
             latest: props,
             latestCloned, // assume its HTML children and then detect
@@ -40,18 +32,6 @@ export class TagSupport {
             this.propsConfig.clonedProps = this.propsConfig.latestCloned;
         }
     }
-    // TODO: these below may not be in use
-    oldest;
-    newest;
-    mutatingRender() {
-        const message = 'Tag function "render()" was called in sync but can only be called async';
-        console.error(message, { tagSupport: this });
-        throw new Error(message);
-    } // loaded later and only callable async
-    render() {
-        ++this.memory.renderCount;
-        return this.mutatingRender();
-    } // ensure this function still works even during deconstructing
 }
 function cloneValueArray(values) {
     return values.map((value) => {
@@ -61,12 +41,24 @@ function cloneValueArray(values) {
         }
         if (isTagComponent(tag)) {
             const tagComponent = tag;
-            return deepClone(tagComponent.tagSupport.propsConfig.latestCloned);
+            return deepClone(tagComponent.props);
         }
         if (isTagArray(tag)) {
             return cloneValueArray(tag);
         }
         return deepClone(value);
     });
+}
+export class TagSupport extends BaseTagSupport {
+    ownerTagSupport;
+    templater;
+    subject;
+    isApp = false;
+    constructor(ownerTagSupport, templater, subject) {
+        super(templater, subject);
+        this.ownerTagSupport = ownerTagSupport;
+        this.templater = templater;
+        this.subject = subject;
+    }
 }
 //# sourceMappingURL=TagSupport.class.js.map

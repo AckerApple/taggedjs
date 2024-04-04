@@ -4,7 +4,7 @@ import { interpolateContentTemplates } from "./interpolateContentTemplates";
 import { escapeSearch, variablePrefix } from "./Tag.class";
 /** Review elements within an element */
 export function interpolateElement(container, context, // variables used to evaluate
-interpolatedTemplates, tagOwner, options) {
+interpolatedTemplates, tagOwner, options, test = false) {
     const clones = [];
     const tagComponents = [];
     const result = interpolatedTemplates.interpolation;

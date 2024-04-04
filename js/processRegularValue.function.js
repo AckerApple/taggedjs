@@ -1,12 +1,14 @@
 import { updateBetweenTemplates } from './interpolateTemplate';
-export function processRegularValue(value, result, // could be tag via result.tag
+export function processRegularValue(value, subject, // could be tag via subject.tag
 template) {
-    result.template = template;
-    const before = result.clone || template; // Either the template is on the doc OR its the first element we last put on doc
-    result.lastValue = value;
+    subject.template = template;
+    const before = subject.clone || template; // Either the template is on the doc OR its the first element we last put on doc
+    if (subject.lastValue === value) {
+        return; // no need to update display, its the same
+    }
+    subject.lastValue = value;
     // Processing of regular values
     const clone = updateBetweenTemplates(value, before);
-    result.clone = clone; // remember single element put down, for future updates
-    return [];
+    subject.clone = clone; // remember single element put down, for future updates
 }
 //# sourceMappingURL=processRegularValue.function.js.map

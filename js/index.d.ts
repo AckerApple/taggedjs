@@ -1,4 +1,3 @@
-import { redrawTag } from "./redrawTag.function";
 import { tagElement } from "./tagElement";
 export * from "./ElementTargetEvent.interface";
 export * from "./tag";
@@ -9,7 +8,6 @@ export * from "./isInstance";
 export * from "./ValueSubject";
 export * from "./watch.function";
 export * from "./TagSupport.class";
-export * from "./redrawTag.function";
 export * from "./interpolateElement";
 export { tagElement } from "./tagElement";
 export { Tag } from "./Tag.class";
@@ -24,5 +22,4 @@ export * from "./onDestroy";
 export * from "./getCallback";
 export declare const hmr: {
     tagElement: typeof tagElement;
-    redrawTag: typeof redrawTag;
 };

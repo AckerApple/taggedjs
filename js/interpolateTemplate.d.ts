@@ -9,6 +9,7 @@ export type InterpolateComponentResult = {
     subject: InterpolateSubject;
     insertBefore: Element | Text | Template;
     ownerTag: Tag;
+    variableName: string;
 };
 export type InterpolateTemplateResult = {
     clones: Clones;

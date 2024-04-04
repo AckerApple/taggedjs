@@ -4,7 +4,7 @@ export function watch(currentValues, callback) {
     let previousValues = setLet(undefined)(x => [previousValues, previousValues = x]);
     if (previousValues === undefined) {
         callback(currentValues, previousValues);
-        const result = { currentValues, previousValues };
+        // const result = {currentValues, previousValues}
         previousValues = currentValues;
         return currentValues;
     }
@@ -13,7 +13,8 @@ export function watch(currentValues, callback) {
         return currentValues;
     }
     callback(currentValues, previousValues);
-    previousValues = currentValues;
+    previousValues.length = 0;
+    previousValues.push(...currentValues);
     return currentValues;
 }
 //# sourceMappingURL=watch.function.js.map

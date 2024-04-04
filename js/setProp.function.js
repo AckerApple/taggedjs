@@ -3,13 +3,15 @@ import { setUse } from './setUse.function';
 /** Used for variables that need to remain the same variable during render passes */
 export function setProp(getSet) {
     const config = setUse.memory.stateConfig;
+    const rearray = config.rearray;
     const [propValue] = getSet(undefined);
     getSet(propValue); // restore original value instead of undefined
-    const restate = config.rearray[config.array.length];
+    const restate = rearray[config.array.length];
     if (restate) {
         let watchValue = restate.watch;
         let oldValue = getStateValue(restate);
         const push = {
+            get: () => getStateValue(push),
             callback: getSet,
             lastValue: oldValue,
             watch: restate.watch,
@@ -24,6 +26,7 @@ export function setProp(getSet) {
         return oldValue;
     }
     const push = {
+        get: () => getStateValue(push),
         callback: getSet,
         lastValue: propValue,
         watch: propValue,

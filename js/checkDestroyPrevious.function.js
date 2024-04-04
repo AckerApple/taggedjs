@@ -1,21 +1,22 @@
 import { isTagArray, isTagComponent, isTagInstance } from './isInstance';
 import { isLikeTags } from './isLikeTags.function';
-export function checkDestroyPrevious(existing, // existing.value is the old value
+import { destroyTagMemory, destroyTagSupportPast } from './destroyTag.function';
+export function checkDestroyPrevious(subject, // existing.value is the old value
 newValue) {
-    const existingSubArray = existing;
+    const existingSubArray = subject;
     const wasArray = existingSubArray.lastArray;
     // no longer an array
     if (wasArray && !isTagArray(newValue)) {
         wasArray.forEach(({ tag }) => destroyArrayTag(tag, { added: 0, removed: 0 }));
-        delete existing.lastArray;
+        delete subject.lastArray;
         return 1;
     }
-    const tagSubject = existing;
+    const tagSubject = subject;
     const existingTag = tagSubject.tag;
     // no longer tag or component?
     if (existingTag) {
         const isValueTag = isTagInstance(newValue);
-        const isSubjectTag = isTagInstance(existing.value);
+        const isSubjectTag = isTagInstance(subject.value);
         if (isSubjectTag && isValueTag) {
             const newTag = newValue;
             if (!isLikeTags(newTag, existingTag)) {
@@ -32,7 +33,7 @@ newValue) {
         destroyTagMemory(existingTag, tagSubject);
         return 3;
     }
-    const displaySubject = existing;
+    const displaySubject = subject;
     const hasLastValue = 'lastValue' in displaySubject;
     const lastValue = displaySubject.lastValue; // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
     // was simple value but now something bigger
@@ -42,24 +43,10 @@ newValue) {
     }
     return false;
 }
-export function destroyTagMemory(existingTag, existingSubject) {
-    delete existingSubject.tag;
-    delete existingSubject.tagSupport;
-    existingTag.destroy();
-}
 export function destroyArrayTag(tag, counts) {
-    /*
-    tag.children.forEach(child => child.destroy({
-      stagger: counts.removed++,
-      // byParent: false
-      // byParent: true,
-    }))
-    */
-    // tag.destroyClones({stagger:counts.removed++})
+    destroyTagSupportPast(tag.tagSupport);
     tag.destroy({
         stagger: counts.removed++,
-        // byParent: false
-        // byParent: true,
     });
 }
 function destroySimpleValue(template, subject) {

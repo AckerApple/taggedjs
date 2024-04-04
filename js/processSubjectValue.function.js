@@ -1,5 +1,4 @@
 import { processSubjectComponent } from './processSubjectComponent.function';
-import { processTagResult } from './processTagResult.function';
 import { isTagArray, isTagComponent, isTagInstance } from './isInstance';
 import { processTagArray } from './processTagArray';
 import { TagSupport } from './TagSupport.class';
@@ -24,42 +23,68 @@ function getValueType(value) {
     }
     return ValueTypes.value;
 }
-export function processSubjectValue(value, result, // could be tag via result.tag
+export function processSubjectValue(value, subject, // could be tag via result.tag
 template, // <template end interpolate /> (will be removed)
 ownerTag, // owner
 options) {
     const valueType = getValueType(value);
     switch (valueType) {
         case ValueTypes.tag:
-            processTag(value, result, template, ownerTag, options);
-            return [];
+            processTag(value, subject, template, ownerTag);
+            return;
         case ValueTypes.tagArray:
-            return processTagArray(result, value, template, ownerTag, options);
+            return processTagArray(subject, value, template, ownerTag, options);
         case ValueTypes.tagComponent:
-            processSubjectComponent(value, result, template, ownerTag, options);
-            return [];
+            processSubjectComponent(value, subject, template, ownerTag, options);
+            return;
     }
-    return processRegularValue(value, result, template);
+    processRegularValue(value, subject, template);
 }
 /** Could be a regular tag or a component. Both are Tag.class */
-export function processTag(value, result, // could be tag via result.tag
-template, // <template end interpolate /> (will be removed)
-ownerTag, // owner
-options) {
+export function processTag(tag, subject, // could be tag via result.tag
+insertBefore, // <template end interpolate /> (will be removed)
+ownerTag) {
     // first time seeing this tag?
-    if (!value.tagSupport) {
-        value.tagSupport = new TagSupport({}, // the template is provided via html`` call
-        new ValueSubject([]));
-        // asking me to render will cause my parent to render
-        value.tagSupport.mutatingRender = () => {
-            ownerTag.tagSupport.render();
-        };
-        value.tagSupport.oldest = value.tagSupport.oldest || value;
-        ownerTag.children.push(value);
+    if (!tag.tagSupport) {
+        if (!isTagInstance(tag)) {
+            throw new Error('issue non-tag here');
+        }
+        applyFakeTemplater(tag, ownerTag, subject);
+        if (ownerTag.childTags.find(x => x === tag)) {
+            throw new Error('about to reattach tag already present - 5');
+        }
+        ownerTag.childTags.push(tag);
     }
-    value.ownerTag = ownerTag;
-    result.template = template;
-    processTagResult(value, result, // Function will attach result.tag
-    template, options);
+    tag.ownerTag = ownerTag;
+    subject.template = insertBefore;
+    tag.buildBeforeElement(insertBefore, {
+        counts: { added: 0, removed: 0 },
+        forceElement: true, test: false,
+    });
+}
+export function applyFakeTemplater(tag, ownerTag, subject) {
+    if (!ownerTag) {
+        throw new Error('no owner error');
+    }
+    const fakeTemplater = getFakeTemplater();
+    tag.tagSupport = new TagSupport(ownerTag.tagSupport, fakeTemplater, // the template is provided via html`` call
+    subject);
+    fakeTemplater.global.oldest = tag;
+    fakeTemplater.global.newest = tag;
+    fakeTemplater.tagSupport = tag.tagSupport;
+    // asking me to render will cause my parent to render
+    tag.ownerTag = ownerTag;
+}
+function getFakeTemplater() {
+    return {
+        global: {
+            renderCount: 0,
+            providers: [],
+            context: {},
+        },
+        children: new ValueSubject([]), // no children
+        props: {},
+        isTag: true,
+    };
 }
 //# sourceMappingURL=processSubjectValue.function.js.map

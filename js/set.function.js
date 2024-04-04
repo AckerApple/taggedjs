@@ -3,38 +3,18 @@ import { setUse } from './setUse.function';
 // TODO: rename
 setUse.memory.stateConfig = {
     array: [], // state memory on the first render
-    rearray: [], // state memory to be used before the next render
+    // rearray: [] as StateConfigArray, // state memory to be used before the next render
 };
-export function makeStateResult(initValue, push) {
-    // return initValue
-    const result = (y) => {
-        push.callback = y || (x => [initValue, initValue = x]);
-        return initValue;
-    };
-    return result;
-}
-/*
-const waitingStates: (() => unknown)[] = []
-export function onNextStateOnly(callback: () => unknown) {
-  const config: Config = setUse.memory.stateConfig
-  
-  if(!config.rearray.length) {
-    callback()
-    return
-  }
-
-  waitingStates.push(callback)
-}
-*/
 setUse({
     beforeRender: (tagSupport) => initState(tagSupport),
     beforeRedraw: (tagSupport) => initState(tagSupport),
     afterRender: (tagSupport) => {
         const state = tagSupport.memory.state;
         const config = setUse.memory.stateConfig;
-        if (config.rearray.length) {
-            if (config.rearray.length !== config.array.length) {
-                const message = `States lengths has changed ${config.rearray.length} !== ${config.array.length}. Typically occurs when a function is intended to be wrapped with a tag() call`;
+        const rearray = config.rearray;
+        if (rearray.length) {
+            if (rearray.length !== config.array.length) {
+                const message = `States lengths has changed ${rearray.length} !== ${config.array.length}. Typically occurs when a function is intended to be wrapped with a tag() call`;
                 const details = {
                     oldStates: config.array,
                     newStates: config.rearray,
@@ -45,12 +25,10 @@ setUse({
                 throw error;
             }
         }
-        config.rearray = []; // clean up any previous runs
-        state.newest = [...config.array];
-        // config.array.length = 0
+        delete config.rearray; // clean up any previous runs
+        state.newest = config.array; // [...config.array]
+        state.newest.forEach(item => item.lastValue = getStateValue(item)); // set last values
         config.array = [];
-        // waitingStates.forEach(callback => callback())
-        // waitingStates.length = 0
     }
 });
 export function getStateValue(
@@ -71,6 +49,7 @@ state) {
         console.error(message, { state, callback, oldState, oldValue, checkValue });
         throw new Error(message);
     }
+    // state.lastValue = oldValue
     return oldValue;
 }
 export class StateEchoBack {
@@ -79,11 +58,12 @@ function initState(tagSupport) {
     const state = tagSupport.memory.state;
     const config = setUse.memory.stateConfig;
     // TODO: This guard may no longer be needed
-    if (config.rearray.length) {
-        const message = 'last array not cleared';
+    if (config.rearray) {
+        const message = 'last state not cleared. Possibly in the middle of rendering one component and another is trying to render';
         console.error(message, {
             config,
             component: tagSupport.templater?.wrapper.original,
+            wasInMiddleOf: config.tagSupport?.templater.wrapper.original,
             state,
             expectedClearArray: config.rearray,
         });
@@ -97,18 +77,22 @@ function initState(tagSupport) {
     // TODO: this maybe redundant and not needed
     config.rearray = []; // .length = 0
     if (state?.newest.length) {
+        state.newest.map(state => getStateValue(state));
         config.rearray.push(...state.newest);
     }
+    config.tagSupport = tagSupport;
 }
 /** Used for variables that need to remain the same variable during render passes */
 export function set(defaultValue) {
     const config = setUse.memory.stateConfig;
     let getSetMethod;
-    const restate = config.rearray[config.array.length];
+    const rearray = config.rearray;
+    const restate = rearray[config.array.length];
     if (restate) {
         let oldValue = getStateValue(restate);
         getSetMethod = ((x) => [oldValue, oldValue = x]);
         const push = {
+            get: () => getStateValue(push),
             callback: getSetMethod,
             lastValue: oldValue,
             defaultValue: restate.defaultValue,
@@ -121,6 +105,7 @@ export function set(defaultValue) {
     let initValue = defaultFn();
     getSetMethod = ((x) => [initValue, initValue = x]);
     const push = {
+        get: () => getStateValue(push),
         callback: getSetMethod,
         lastValue: initValue,
         defaultValue: initValue,

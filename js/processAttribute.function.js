@@ -1,5 +1,6 @@
 import { inputAttribute } from './inputAttribute';
 import { isSubjectInstance } from './isInstance';
+import { bindSubjectCallback } from './bindSubjectCallback.function';
 const startRegX = /^\s*{__tagvar/;
 const endRegX = /}\s*$/;
 function isTagVar(value) {
@@ -63,7 +64,8 @@ function processNameValueAttr(attrName, result, child, ownerTag, howToSet) {
     // attach as callback?
     if (result instanceof Function) {
         const action = function (...args) {
-            return result(child, args);
+            const result2 = result(child, args);
+            return result2;
         };
         child[attrName].action = action;
         // child.addEventListener(attrName, action)
@@ -72,6 +74,9 @@ function processNameValueAttr(attrName, result, child, ownerTag, howToSet) {
     if (isSubjectInstance(result)) {
         child.removeAttribute(attrName);
         const callback = (newAttrValue) => {
+            if (newAttrValue instanceof Function) {
+                newAttrValue = bindSubjectCallback(newAttrValue, ownerTag);
+            }
             return processAttributeSubjectValue(newAttrValue, child, attrName, isSpecial, howToSet);
         };
         // 🗞️ Subscribe. Above callback called immediately since its a ValueSubject()
@@ -86,12 +91,12 @@ function processNameValueAttr(attrName, result, child, ownerTag, howToSet) {
 }
 function processAttributeSubjectValue(newAttrValue, child, attrName, isSpecial, howToSet) {
     if (newAttrValue instanceof Function) {
-        ;
-        child[attrName] = function (...args) {
-            const result = newAttrValue(child, args);
-            return result;
+        const fun = function (...args) {
+            return newAttrValue(child, args);
         };
-        child[attrName].tagFunction = newAttrValue;
+        // access to original function
+        fun.tagFunction = newAttrValue;
+        child[attrName] = fun;
         return;
     }
     if (isSpecial) {

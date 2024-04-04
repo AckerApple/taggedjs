@@ -1,10 +1,11 @@
 import { Props } from './Props';
-import { Tag, TagMemory } from './Tag.class';
-import { TagChildren } from './tag';
-import { TemplaterResult } from './templater.utils';
-export declare class TagSupport {
+import { TagMemory } from './Tag.class';
+import { TemplaterResult } from './TemplaterResult.class';
+import { TagSubject } from './Tag.utils';
+export declare class BaseTagSupport {
     templater: TemplaterResult;
-    children: TagChildren;
+    subject: TagSubject;
+    isApp: boolean;
     propsConfig: {
         latest: Props;
         latestCloned: Props;
@@ -12,11 +13,12 @@ export declare class TagSupport {
         clonedProps: Props;
     };
     memory: TagMemory;
-    updateState(): void;
-    constructor(templater: TemplaterResult, children: TagChildren, // children tags passed in as arguments
-    props?: Props);
-    oldest?: Tag;
-    newest?: Tag;
-    mutatingRender(): Tag;
-    render(): Tag;
+    constructor(templater: TemplaterResult, subject: TagSubject);
+}
+export declare class TagSupport extends BaseTagSupport {
+    ownerTagSupport: TagSupport;
+    templater: TemplaterResult;
+    subject: TagSubject;
+    isApp: boolean;
+    constructor(ownerTagSupport: TagSupport, templater: TemplaterResult, subject: TagSubject);
 }
