@@ -102,6 +102,11 @@ export function processTag(
     }
 
     applyFakeTemplater(tag, ownerTag, subject)
+
+    if(ownerTag.childTags.find(x => x === tag)) {
+      throw new Error('about to reattach tag already present - 5')
+    }
+
     ownerTag.childTags.push(tag as Tag)
   }
   
@@ -141,6 +146,7 @@ export function applyFakeTemplater(
 function getFakeTemplater() {
   return {
     global:{
+      renderCount: 0,
       providers: [],
       context: {},
     },

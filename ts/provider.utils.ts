@@ -4,7 +4,8 @@ import { Provider } from './providers'
 import { renderTagSupport } from './renderTagSupport.function'
 
 export function providersChangeCheck(tag: Tag) {
-  const providersWithChanges = tag.tagSupport.templater.global.providers.filter(provider =>
+  const global = tag.tagSupport.templater.global
+  const providersWithChanges = global.providers.filter(provider =>
     !deepEqual(provider.instance, provider.clone)
   )
 
@@ -25,6 +26,10 @@ function handleProviderChanges(
   const tagsWithProvider = getTagsWithProvider(appElement, provider)
 
   tagsWithProvider.forEach(({tag, renderCount, provider}) => {
+    if(tag.tagSupport.templater.global.deleted) {
+      return // i was deleted after another tag processed
+    }
+
     const notRendered = renderCount === tag.tagSupport.templater.global.renderCount
     if(notRendered) {
       provider.clone = deepClone(provider.instance)
@@ -39,14 +44,10 @@ function handleProviderChanges(
 function getTagsWithProvider(
   tag: Tag,
   provider: Provider,
-  memory: {
-    tag: Tag
-    renderCount: number
-    provider: Provider,
-  }[] = []
+  memory: TagWithProvider[] = []
 ) {
-  const compare = tag.tagSupport.templater.global.providers
-
+  const global = tag.tagSupport.templater.global
+  const compare = global.providers
   const hasProvider = compare.find(
     xProvider => xProvider.constructMethod === provider.constructMethod
   )
@@ -54,7 +55,7 @@ function getTagsWithProvider(
   if(hasProvider) {
     memory.push({
       tag,
-      renderCount: tag.tagSupport.templater.global.renderCount,
+      renderCount: global.renderCount,
       provider: hasProvider,
     })
   }
@@ -65,5 +66,17 @@ function getTagsWithProvider(
     memory,
   ))
 
+  memory.forEach(({tag}) => {
+    if(tag.tagSupport.templater.global.deleted) {
+      throw new Error('do not get here - 0')
+    }
+  })
+
   return memory
+}
+
+type TagWithProvider = {
+  tag: Tag
+  renderCount: number
+  provider: Provider,
 }

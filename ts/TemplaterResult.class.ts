@@ -32,12 +32,15 @@ export class TemplaterResult {
     renderCount: number
     destroyCallback?: OnDestroyCallback  
     insertBefore?: Element | Text
+    isApp?: boolean
+    deleted: boolean
   } = {
     newestTemplater: this,
     context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
     providers: [],
     /** Indicator of re-rending. Saves from double rending something already rendered */
     renderCount: 0,
+    deleted: false
   }
 
   tagSupport!: BaseTagSupport
@@ -105,30 +108,12 @@ export function renderWithSupport(
     delete templater.global.oldest
     delete templater.global.newest
     delete (subject as any).tag
-    // delete (subject as any).lastArray
-    // delete (subject as any).lastValue
 
-    templater.global.insertBefore = existingTag.tagSupport.templater.global.insertBefore as Element
-    
-    // retag.buildBeforeElement(templater.global.insertBefore)
-    // subject.tag = retag
-
-    // return retag
+    templater.global.insertBefore = existingTag.tagSupport.templater.global.insertBefore as Element    
   }
-
-  /*
-  if(existingTag) {
-    if(!isLikeTags(retag,existingTag)) {
-      destroyTagMemory(existingTag, subject)
-    }
-    // throw new Error('similar but different tags')
-  }
-  */
 
   retag.ownerTag = runtimeOwnerTag
   wrapTagSupport.templater.global.newest = retag
-  // ??? - new
-  // subject.tag = retag
   
   if(wrapTagSupport.templater.global.oldest && !wrapTagSupport.templater.global.oldest.hasLiveElements) {
     throw new Error('56513540')
@@ -137,10 +122,6 @@ export function renderWithSupport(
   if(wrapTagSupport.templater.global.oldest && !wrapTagSupport.templater.global.oldest.hasLiveElements) {
     throw new Error('5555 - 10')
   }
-
-  // new maybe not needed
-  // this.oldest = this.oldest || retag
-  // wrapTagSupport.oldest = wrapTagSupport.oldest || retag
 
   return retag
 }

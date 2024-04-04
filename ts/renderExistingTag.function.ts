@@ -31,19 +31,7 @@ export function renderExistingTag(
     return latestTag
   }
 
-  /*
-  const oldTagSupport = oldestTag.tagSupport
-  const hasChanged = hasTagSupportChanged(
-    oldTagSupport,
-    newTemplater.tagSupport,
-    newTemplater,
-  )
-  */
-
   const oldTemplater = tagSupport.templater || newTemplater
-
-  // ??? - new
-  // const redraw = renderTagSupport(tagSupport, false)
   const redraw = redrawTag(
     subject,
     newTemplater,

@@ -5,14 +5,19 @@ import { renderTagSupport } from "./renderTagSupport.function"
 
 type Callback = <T>(...args: unknown[]) => (T | void)
 
-export let getCallback = () => (callback: Callback) => (): void => {
+let innerCallback = (callback: Callback) => (): void => {
   throw new Error('The real callback function was called and that should never occur')
 }
+export const getCallback = () => innerCallback
+
+const originalGetter = innerCallback // getCallback
 
 setUse({
   beforeRender: (tagSupport: BaseTagSupport) => initMemory(tagSupport),
   beforeRedraw: (tagSupport: BaseTagSupport) => initMemory(tagSupport),
-  // afterRender: (tagSupport: TagSupport) => {},
+  afterRender: (_tagSupport: BaseTagSupport) => {
+    innerCallback = originalGetter // prevent crossing callbacks with another tag
+  },
 })
 
 function updateState(
@@ -22,7 +27,7 @@ function updateState(
   stateFrom.forEach((state, index) => {
     const fromValue = getStateValue(state)
     const callback = stateTo[index].callback
-    
+
     if(callback) {
       callback( fromValue ) // set the value
     }
@@ -35,17 +40,12 @@ type Trigger = () => void
 type CallbackMaker = (callback: Callback) => Trigger
 
 function initMemory (tagSupport: BaseTagSupport) {
-  getCallback = () => {
-    const oldState: StateConfigArray = setUse.memory.stateConfig.array
-
-    const callbackMaker: CallbackMaker = (
-      callback: Callback
-    ) => {
-      const trigger = (...args: any[]) => triggerStateUpdate(tagSupport, callback, oldState, ...args)
-      return trigger
-    }
-
-    return callbackMaker
+  const oldState: StateConfigArray = setUse.memory.stateConfig.array
+  innerCallback = (
+    callback: Callback
+  ) => {
+    const trigger = (...args: any[]) => triggerStateUpdate(tagSupport, callback, oldState, ...args)
+    return trigger
   }
 }
 
@@ -70,10 +70,8 @@ function triggerStateUpdate(
   renderTagSupport(
     tagSupport,
     false,
-    // tagSupport,
-    // tagSupport.subject
   )
-  
+
   // TODO: turn back on below
   if(promise instanceof Promise) {
     promise.finally(() => {

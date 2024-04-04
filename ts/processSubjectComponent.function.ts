@@ -63,6 +63,10 @@ export function processSubjectComponent(
       retag.clones.push(...myClones)
     }
     
+    if(ownerTag.childTags.find(x => x === retag)) {
+      throw new Error('about to reattach tag already present')
+    }
+
     ownerTag.childTags.push(retag)
   }
 

@@ -9,9 +9,11 @@ export function renderTagSupport(
   tagSupport: BaseTagSupport,
   renderUp: boolean,
 ): Tag {
+  const global = tagSupport.templater.global
   if(isTagInstance(tagSupport.templater)) {
-    const newTag = tagSupport.templater.global.newest as Tag
+    const newTag = global.newest as Tag
     const ownerTag = newTag.ownerTag as Tag
+    ++global.renderCount
     return renderTagSupport(ownerTag.tagSupport, true)
   }
 
@@ -34,10 +36,13 @@ export function renderTagSupport(
     }
   }
 
-  const useTagSupport = tagSupport.templater.global.newest?.tagSupport as TagSupport // oldTagSetup
+  const useTagSupport = global.newest?.tagSupport as TagSupport // oldTagSetup
+
+  if(!templater.global.oldest) {
+    throw new Error('already causing trouble')
+  }
 
   const tag = renderExistingTag(
-    // templater.global.newest as Tag,
     templater.global.oldest as Tag,
     templater,
     useTagSupport,

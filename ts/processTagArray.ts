@@ -1,12 +1,9 @@
 import { Clones } from './Clones.type'
 import { ArrayValueNeverSet, Tag } from './Tag.class'
 import { ValueSubject } from './ValueSubject'
-import { TagSupport } from './TagSupport.class'
 import { Counts, Template } from './interpolateTemplate'
-import { TemplaterResult } from './TemplaterResult.class'
 import { ArrayNoKeyError } from './errors'
 import { destroyArrayTag } from './checkDestroyPrevious.function'
-import { Provider } from './providers'
 import { TagSubject } from './Tag.utils'
 import { applyFakeTemplater } from './processSubjectValue.function'
 
@@ -71,7 +68,7 @@ export function processTagArray(
 
   value.forEach((subTag, index) => {
     const previous = lastArray[index]
-    const previousSupport = !previous?.deleted && previous?.tag.tagSupport
+    const previousSupport = previous?.tag.tagSupport
     const fakeSubject = new ValueSubject({} as Tag) as unknown as TagSubject
     
     applyFakeTemplater(subTag, ownerTag, fakeSubject)
@@ -79,16 +76,8 @@ export function processTagArray(
     if(previousSupport) {
       subTag.tagSupport.templater.global = previousSupport.templater.global
       previousSupport.templater.global.newest = subTag
-
-      if(!subTag.ownerTag) {
-        throw new Error('no owner on newest')
-      }
-    } else {  
-      ownerTag.childTags.push(subTag)
     }
     
-    subTag.ownerTag = ownerTag    
-
     // check for html``.key()
     const keyNotSet = subTag.arrayValue as ArrayValueNeverSet | undefined
     if (keyNotSet?.isArrayValueNeverSet) {
@@ -120,6 +109,8 @@ export function processTagArray(
     }
 
     processAddTagArrayItem(before, subTag, index, options, lastArray, true)
+
+    ownerTag.childTags.push(subTag)  
   })
 
   return clones

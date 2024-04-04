@@ -89,7 +89,10 @@ function kidsToTagArraySubject(
     return {childSubject: new ValueSubject([kid]), madeSubject: true}
   }
 
-  return {childSubject: new ValueSubject([]), madeSubject: true}
+  return {
+    childSubject: new ValueSubject<Tag[]>([]),
+    madeSubject: true
+  }
 }
 
 function updateResult(

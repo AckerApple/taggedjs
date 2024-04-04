@@ -24,7 +24,11 @@ export function processNewValue(
 
   if(isTagInstance(value)) {
     value.ownerTag = ownerTag
-    ownerTag.childTags.push(value)
+    
+    if(ownerTag.childTags.find(x => x === value)) {
+      throw new Error('about to reattach tag already present - 2')
+    }
+
     return new ValueSubject(value)
   }
 

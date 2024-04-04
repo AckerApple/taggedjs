@@ -3,11 +3,9 @@ import { InterpolateOptions } from "./interpolateElement"
 import { elementInitCheck } from "./elementInitCheck"
 import { Clones } from "./Clones.type"
 import { InterpolateSubject, processSubjectValue } from "./processSubjectValue.function"
-import { isTagArray, isTagComponent, isTagInstance } from "./isInstance"
-import { DisplaySubject, TagSubject } from "./Tag.utils"
+import { isTagArray, isTagComponent } from "./isInstance"
+import { DisplaySubject } from "./Tag.utils"
 import { scanTextAreaValue } from "./scanTextAreaValue.function"
-import { processSubjectComponent } from "./processSubjectComponent.function"
-import { TemplaterResult } from "./TemplaterResult.class"
 import { ExistingValue, updateExistingValue } from "./updateExistingValue.function"
 
 export type Template = Element & {clone?: any}
@@ -162,9 +160,7 @@ export function afterElmBuild(
   }
 
   let diff = options.counts.added
-  if(!options.forceElement) {
-    diff = elementInitCheck(elm, options.counts) - diff
-  }
+  diff = elementInitCheck(elm, options.counts) - diff
 
   if((elm as Element).children) {
     /*

@@ -24,7 +24,7 @@ export function updateExistingValue(
 ): InterpolateSubject {
   const subjectSubTag = subject as TagSubject
   const isComponent = isTagComponent(value)
-  const oldInsertBefore = (subject as DisplaySubject).template || subjectSubTag.tag?.tagSupport.templater.global.insertBefore || (subjectSubTag as DisplaySubject).clone
+  const oldInsertBefore = (subject as DisplaySubject).template || subjectSubTag.tag?.tagSupport.templater.global.insertBefore || (subject as DisplaySubject).clone
 
   checkDestroyPrevious(subject, value)
 

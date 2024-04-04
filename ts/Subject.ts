@@ -2,7 +2,7 @@ export type Subscription = (() => void) & {
   unsubscribe: () => any
 }
 
-type Subscriber = (value?: any) => any
+export type SubjectSubscriber<T> = (value?: T) => unknown
 
 export interface SubjectLike {
   subscribe?: (callback: (value?: any) => any) => any,
@@ -11,12 +11,12 @@ export interface SubjectLike {
 
 export class Subject<T> implements SubjectLike {
   isSubject = true
-  subscribers: Subscriber[] = []
+  subscribers: SubjectSubscriber<T>[] = []
   // unsubcount = 0 // 🔬 testing
 
   constructor(public value?: T) {}
 
-  subscribe(callback: Subscriber) {
+  subscribe(callback: SubjectSubscriber<T>) {
     this.subscribers.push(callback)
     SubjectClass.globalSubs.push(callback) // 🔬 testing
     const countSubject = SubjectClass.globalSubCount$ as {value: number}
@@ -52,8 +52,8 @@ export class Subject<T> implements SubjectLike {
 }
 
 function removeSubFromArray(
-  subscribers: Subscriber[],
-  callback: Subscriber,
+  subscribers: SubjectSubscriber<any>[],
+  callback: SubjectSubscriber<any>,
 ) {
   const index = subscribers.indexOf(callback)
   if (index !== -1) {
@@ -63,7 +63,7 @@ function removeSubFromArray(
 
 const SubjectClass = Subject as typeof Subject & {
   globalSubCount$: Subject<number>
-  globalSubs: Subscriber[]
+  globalSubs: SubjectSubscriber<any>[]
 }
 SubjectClass.globalSubs = [] // 🔬 for testing
 SubjectClass.globalSubCount$ = new Subject() // for ease of debugging

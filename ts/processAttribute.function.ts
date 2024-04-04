@@ -139,7 +139,8 @@ function processNameValueAttr(
   // attach as callback?
   if(result instanceof Function) {
     const action = function(...args: any[]) {
-      return result(child, args)
+      const result2 = result(child, args)
+      return result2
     }
     
     ;(child as any)[attrName].action = action
@@ -178,16 +179,15 @@ function processNameValueAttr(
 }
 
 function processAttributeSubjectValue(
-  newAttrValue: any,
+  newAttrValue: ((...args: unknown[]) => unknown) | string | boolean,
   child: Element,
   attrName: string,
   isSpecial: boolean,
   howToSet: HowToSet,
-) {
+) {  
   if(newAttrValue instanceof Function) {
     const fun = function(...args: any[]) {
-      const result = newAttrValue(child, args)
-      return result
+      return newAttrValue(child, args)
     }
 
     // access to original function
@@ -204,7 +204,7 @@ function processAttributeSubjectValue(
   }
 
   if(newAttrValue) {
-    howToSet(child, attrName, newAttrValue)
+    howToSet(child, attrName, newAttrValue as string)
     return
   }
 

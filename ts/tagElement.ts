@@ -30,6 +30,7 @@ export function tagElement(
 
   // TODO: is the below needed?
   tag.appElement = element
+  tag.tagSupport.templater.global.isApp = true
     
   const templateElm = document.createElement('template')
   templateElm.setAttribute('id', 'app-tag-' + appElements.length)

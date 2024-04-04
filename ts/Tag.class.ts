@@ -81,18 +81,33 @@ export class Tag {
       throw new Error('destroying wrong tag')
     }
 
+    const tagSupport = this.tagSupport
+    const global = tagSupport.templater.global
+    // removing is considered rendering. Prevents after event processing of this tag even tho possibly deleted
+    // ++this.tagSupport.templater.global.renderCount
+
     // the isComponent check maybe able to be removed
-    const isComponent = this.tagSupport ? true : false    
+    const isComponent = tagSupport ? true : false    
     if(isComponent) {
-      runBeforeDestroy(this.tagSupport, this)    
+      runBeforeDestroy(tagSupport, this)    
     }
 
     const childTags = options.byParent ? [] : getChildTagsToDestroy(this.childTags)
 
-    delete this.tagSupport.templater.global.oldest
-    delete this.tagSupport.templater.global.newest
+    // signify that no further event rendering should take place by making logic think a render occurred during event
+    // childTags.forEach(child => ++child.tagSupport.templater.global.renderCount)
+    // signify immediately child has been deleted (looked for during event processing)
+    childTags.forEach(child => {
+      const subGlobal = child.tagSupport.templater.global
+      delete subGlobal.newest
+      subGlobal.deleted = true
+    })
+
+    delete global.oldest
+    delete global.newest
+    global.deleted = true
     this.hasLiveElements = false
-    delete (this.tagSupport.subject as any).tag
+    delete (tagSupport.subject as any).tag
     this.destroySubscriptions()
     
     let mainPromise: Promise<number | (number | void | undefined)[]> | undefined
@@ -335,6 +350,11 @@ export class Tag {
       throw new Error('no parent before removing clones')
     }
 
+    this.tagSupport.templater.global.oldest = this
+    this.tagSupport.templater.global.newest = this
+    this.tagSupport.subject.tag = this
+    this.hasLiveElements = true
+
     // remove old clones
     if(this.clones.length) {
       this.clones.forEach(clone => this.checkCloneRemoval(clone, 0))
@@ -346,7 +366,6 @@ export class Tag {
     // const context = this.tagSupport.memory.context // this.update()
     const context = this.update()
     const template = this.getTemplate()
-
 
     if(!insertBefore.parentNode) {
       throw new Error('no parent before building tag')
@@ -416,11 +435,6 @@ export class Tag {
         }
         */
     })
-
-    this.tagSupport.templater.global.oldest = this
-    this.tagSupport.templater.global.newest = this
-    this.tagSupport.subject.tag = this
-    this.hasLiveElements = true
   }
 }
 
@@ -458,21 +472,16 @@ function getChildTagsToDestroy(
   for (let index = childTags.length - 1; index >= 0; --index) {
     const cTag = childTags[index]
 
-    // cTag.destroySubscriptions()
+    if(allTags.find(x => x === cTag)) {
+      // TODO: Lets find why a child tag is attached twice to owner
+      throw new Error('child tag registered twice for delete')
+    }
 
     allTags.push(cTag)
 
     childTags.splice(index, 1)
 
     getChildTagsToDestroy(cTag.childTags, allTags)
-    /*
-    for (let iIndex = this.childTags.length - 1; iIndex >= 0; --iIndex) {
-      const iTag = this.childTags[iIndex]
-      if(cTag === iTag) {
-        this.childTags.splice(iIndex, 1)
-      }
-    }
-    */
   }
 
   return allTags

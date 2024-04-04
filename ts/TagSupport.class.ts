@@ -1,13 +1,11 @@
 import { Props } from './Props'
 import { Tag, TagMemory } from './Tag.class'
-import { deepClone, deepEqual } from './deepFunctions'
+import { deepClone } from './deepFunctions'
 import { isTagArray, isTagComponent, isTagInstance } from './isInstance'
 import { StateConfigArray } from './set.function'
 import { TagChildren } from './tag'
 import { TemplaterResult } from './TemplaterResult.class'
-import { alterProps } from './alterProps.function'
 import { TagSubject } from './Tag.utils'
-import { renderExistingTag } from './renderExistingTag.function'
 
 export class BaseTagSupport {
   isApp = true

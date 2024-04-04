@@ -16,6 +16,10 @@ export function bindSubjectCallback(
     return value
   }
 
+  if(!tag.ownerTag && !tag.tagSupport.templater.global.isApp) {
+    throw new Error('no ownerTag issue here')
+  }
+
   const subjectFunction = (
     element: Element, args: any[]
   ) => runTagCallback(value, tag, element, args)
@@ -33,14 +37,21 @@ export function runTagCallback(
   args: any[]
 ) {
   const tagSupport = tag.tagSupport
-  const renderCount = tagSupport ? tagSupport.templater.global.renderCount : 0  
+  const renderCount = tagSupport.templater.global.renderCount
   const method = value.bind(bindTo)
   const callbackResult = method(...args)
 
   const sameRenderCount = renderCount === tagSupport.templater.global.renderCount
   
-  if(tagSupport && !sameRenderCount) {
-    return // already rendered
+  // already rendered OR tag was deleted before event processing
+  if(!sameRenderCount || tagSupport.templater.global.deleted) {
+    if(callbackResult instanceof Promise) {
+      return callbackResult.then(() => {
+        return 'promise-no-data-ever' // tag was deleted during event processing
+      })
+    }
+
+    return 'no-data-ever' // already rendered
   }
 
   renderTagSupport(
@@ -48,10 +59,12 @@ export function runTagCallback(
     true, // renderUp - callback may have changed props so also check to render up
   )
 
-  // throw new Error('after click render stop')
-
   if(callbackResult instanceof Promise) {
     return callbackResult.then(() => {
+      if(tagSupport.templater.global.deleted) {
+        return 'promise-no-data-ever' // tag was deleted during event processing
+      }
+
       renderTagSupport(
         tagSupport,
         true,
