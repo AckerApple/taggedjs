@@ -9,8 +9,7 @@ export function alterProps(props, templater, ownerSupport) {
             throw new Error('already rendered');
         }
         const lastestOwner = ownerSupport.templater.global.newest;
-        const newOwner = renderTagSupport(lastestOwner.tagSupport, // ??? newestOwner.tagSupport, // ??? ownerSupport,
-        true);
+        const newOwner = renderTagSupport(lastestOwner.tagSupport, true);
         if (newOwner.tagSupport.templater.global.newest != newOwner) {
             throw new Error('newest assignment issue?');
         }

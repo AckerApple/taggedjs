@@ -70,7 +70,6 @@ pastCloneProps) {
             return 6; // a change has been detected by function comparisons
         }
     }
-    // ???
     const isEqual = deepEqual(castedPastProps, castedProps);
     return isEqual ? false : 7; // if equal then no changes
 }

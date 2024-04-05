@@ -77,9 +77,7 @@ function getTagWrap(templater, madeSubject) {
         if (oldest && !oldest.hasLiveElements) {
             throw new Error('issue already 22');
         }
-        // ???
         let props = templater.props;
-        // let props = oldTagSetup.propsConfig.latest
         const ownerTagSupport = oldTagSetup.ownerTagSupport;
         const oldTemplater = ownerTagSupport?.templater;
         const oldLatest = oldTemplater?.global.newest;
@@ -87,11 +85,11 @@ function getTagWrap(templater, madeSubject) {
         if (oldLatest && !newestOwnerTemplater) {
             throw new Error('what to do here?');
         }
-        // ???
         let castedProps = alterProps(props, newestOwnerTemplater, oldTagSetup.ownerTagSupport);
         const clonedProps = deepClone(props); // castedProps
         // CALL ORIGINAL COMPONENT FUNCTION
         const tag = originalFunction(castedProps, childSubject);
+        tag.version = global.renderCount;
         tag.tagSupport = new TagSupport(oldTagSetup.ownerTagSupport, templater, subject);
         tag.tagSupport.propsConfig = {
             latest: props, // castedProps

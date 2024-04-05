@@ -6,17 +6,16 @@ export function processSubjectComponent(templater, subject, template, ownerTag, 
     // Check if function component is wrapped in a tag() call
     // TODO: This below check not needed in production mode
     if (templater.tagged !== true) {
-        let name = templater.wrapper.original.name || templater.wrapper.original.constructor?.name;
+        const original = templater.wrapper.original;
+        let name = original.name || original.constructor?.name;
         if (name === 'Function') {
             name = undefined;
         }
-        const label = name || templater.wrapper.original.toString().substring(0, 120);
+        const label = name || original.toString().substring(0, 120);
         const error = new Error(`Not a tag component. Wrap your function with tag(). Example tag(props => html\`\`) on component:\n\n${label}\n\n`);
         throw error;
     }
-    if (!templater.tagSupport) {
-        templater.tagSupport = new TagSupport(ownerTag.tagSupport, templater, subject);
-    }
+    templater.tagSupport = new TagSupport(ownerTag.tagSupport, templater, subject);
     // templater.oldest = subject.tag?.tagSupport.oldest || templater.oldest
     templater.global.insertBefore = template;
     let retag = subject.tag;
@@ -25,7 +24,8 @@ export function processSubjectComponent(templater, subject, template, ownerTag, 
     const isRedraw = !retag || options.forceElement;
     if (isRedraw) {
         const preClones = ownerTag.clones.map(clone => clone);
-        retag = renderWithSupport(templater.tagSupport, subject.tag, subject, ownerTag);
+        retag = renderWithSupport(templater.tagSupport, subject.tag, // existing tag
+        subject, ownerTag);
         if (retag.tagSupport.templater.global.newest != retag) {
             throw new Error('mismatch result newest');
         }

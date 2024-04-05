@@ -1,3 +1,4 @@
+import { TagSupport } from './TagSupport.class';
 import { isSubjectInstance, isTagArray, isTagComponent, isTagInstance } from './isInstance';
 import { applyFakeTemplater, processTag } from './processSubjectValue.function';
 import { processTagArray } from './processTagArray';
@@ -8,30 +9,33 @@ import { processSubjectComponent } from './processSubjectComponent.function';
 import { isLikeTags } from './isLikeTags.function';
 import { bindSubjectCallback } from './bindSubjectCallback.function';
 export function updateExistingValue(subject, value, ownerTag, insertBefore) {
-    const subjectSubTag = subject;
+    const subjectTag = subject;
     const isComponent = isTagComponent(value);
-    const oldInsertBefore = subject.template || subjectSubTag.tag?.tagSupport.templater.global.insertBefore || subject.clone;
+    const oldInsertBefore = subject.template || subjectTag.tag?.tagSupport.templater.global.insertBefore || subject.clone;
     checkDestroyPrevious(subject, value);
     // handle already seen tag components
     if (isComponent) {
         const templater = value;
         // When was something before component
-        if (!subjectSubTag.tag) {
-            processSubjectComponent(templater, subject, oldInsertBefore, ownerTag, {
+        if (!subjectTag.tag) {
+            processSubjectComponent(templater, subjectTag, oldInsertBefore, ownerTag, {
                 forceElement: true,
                 counts: { added: 0, removed: 0 },
             });
-            return subjectSubTag;
+            return subjectTag;
         }
+        templater.tagSupport = new TagSupport(
+        // subjectTag.tag.tagSupport.ownerTagSupport,
+        ownerTag.tagSupport, templater, subjectTag);
         updateExistingTagComponent(ownerTag, templater, // latest value
-        subjectSubTag, insertBefore);
-        return subjectSubTag;
+        subjectTag, insertBefore);
+        return subjectTag;
     }
     // was component but no longer
-    const subjectTag = subjectSubTag.tag;
-    if (subjectTag) {
-        handleStillTag(subjectTag, subject, value, ownerTag);
-        return subjectSubTag;
+    const tag = subjectTag.tag;
+    if (tag) {
+        handleStillTag(tag, subject, value, ownerTag);
+        return subjectTag;
     }
     // its another tag array
     if (isTagArray(value)) {
@@ -49,9 +53,9 @@ export function updateExistingValue(subject, value, ownerTag, insertBefore) {
         return subject;
     }
     if (isTagInstance(value)) {
-        subjectSubTag.template = oldInsertBefore;
-        processTag(value, subjectSubTag, subjectSubTag.template, ownerTag);
-        return subjectSubTag;
+        subjectTag.template = oldInsertBefore;
+        processTag(value, subjectTag, subjectTag.template, ownerTag);
+        return subjectTag;
     }
     // we have been given a subject
     if (isSubjectInstance(value)) {
@@ -59,7 +63,7 @@ export function updateExistingValue(subject, value, ownerTag, insertBefore) {
     }
     // This will cause all other values to render
     processRegularValue(value, subject, oldInsertBefore);
-    return subjectSubTag;
+    return subjectTag;
 }
 function handleStillTag(existingTag, subject, value, ownerTag) {
     // TODO: We shouldn't need both of these

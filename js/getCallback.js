@@ -2,7 +2,7 @@ import { setUse } from "./setUse.function";
 import { getStateValue } from "./set.function";
 import { renderTagSupport } from "./renderTagSupport.function";
 let innerCallback = (callback) => () => {
-    throw new Error('The real callback function was called and that should never occur');
+    throw new Error('Callback function was called immediately in sync and must instead be call async');
 };
 export const getCallback = () => innerCallback;
 const originalGetter = innerCallback; // getCallback
@@ -40,7 +40,6 @@ function triggerStateUpdate(tagSupport, callback, oldState, ...args) {
     // send the oldest state changes into the newest
     updateState(oldState, newest);
     renderTagSupport(tagSupport, false);
-    // TODO: turn back on below
     if (promise instanceof Promise) {
         promise.finally(() => {
             // send the oldest state changes into the newest

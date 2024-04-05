@@ -9,7 +9,6 @@ export function destroyTagMemory(tag, subject) {
     const oldest = tag.tagSupport.templater.global.oldest;
     oldest.destroy();
     destroyTagSupportPast(oldTagSupport);
-    // ???
     tag.tagSupport.templater.global.context = {};
 }
 export function destroyTagSupportPast(oldTagSupport) {

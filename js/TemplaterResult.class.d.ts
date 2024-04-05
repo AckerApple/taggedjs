@@ -5,6 +5,7 @@ import { TagChildren } from './tag';
 import { Provider } from './providers';
 import { OnDestroyCallback } from './onDestroy';
 import { TagSubject } from './Tag.utils';
+import { OnInitCallback } from './onInit';
 export type Wrapper = ((tagSupport: BaseTagSupport, subject: TagSubject) => Tag) & {
     original: () => Tag;
 };
@@ -22,10 +23,11 @@ export declare class TemplaterResult {
         providers: Provider[];
         /** Indicator of re-rending. Saves from double rending something already rendered */
         renderCount: number;
-        destroyCallback?: OnDestroyCallback;
         insertBefore?: Element | Text;
-        isApp?: boolean;
         deleted: boolean;
+        isApp?: boolean;
+        destroyCallback?: OnDestroyCallback;
+        init?: OnInitCallback;
     };
     tagSupport: BaseTagSupport;
     constructor(props: Props, children: TagChildren);

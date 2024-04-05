@@ -1,9 +1,8 @@
 import { hasTagSupportChanged } from './hasTagSupportChanged.function';
-import { TagSupport } from './TagSupport.class';
 import { processSubjectComponent } from './processSubjectComponent.function';
 import { destroyTagMemory } from './destroyTag.function';
 import { renderTagSupport } from './renderTagSupport.function';
-export function updateExistingTagComponent(ownerTag, tempResult, subject, insertBefore) {
+export function updateExistingTagComponent(ownerTag, templater, subject, insertBefore) {
     let existingTag = subject.tag;
     /*
     if(existingTag && !existingTag.hasLiveElements) {
@@ -11,9 +10,9 @@ export function updateExistingTagComponent(ownerTag, tempResult, subject, insert
     }
     */
     const oldWrapper = existingTag.tagSupport.templater.wrapper;
-    const newWrapper = tempResult.wrapper;
+    const newWrapper = templater.wrapper;
     let isSameTag = false;
-    if (tempResult.global.oldest && !tempResult.global.oldest.hasLiveElements) {
+    if (templater.global.oldest && !templater.global.oldest.hasLiveElements) {
         throw new Error('88893434');
     }
     if (oldWrapper && newWrapper) {
@@ -30,37 +29,34 @@ export function updateExistingTagComponent(ownerTag, tempResult, subject, insert
     }
     if (!isSameTag) {
         destroyTagMemory(oldTagSupport.templater.global.oldest, subject);
-        processSubjectComponent(tempResult, subject, oldInsertBefore, ownerTag, {
+        processSubjectComponent(templater, subject, oldInsertBefore, ownerTag, {
             forceElement: false,
             counts: { added: 0, removed: 0 },
         });
         return;
     }
     else {
-        if (!tempResult.tagSupport) {
-            tempResult.tagSupport = new TagSupport(oldTagSupport.ownerTagSupport, tempResult, subject);
-        }
-        const newTagSupport = tempResult.tagSupport;
-        const hasChanged = hasTagSupportChanged(oldTagSupport, newTagSupport, tempResult);
+        const newTagSupport = templater.tagSupport;
+        const hasChanged = hasTagSupportChanged(oldTagSupport, newTagSupport, templater);
         if (!hasChanged) {
             return; // its the same tag component
         }
     }
-    const oldestTag = tempResult.global.oldest; // oldTagSupport.oldest as Tag // existingTag
-    const previous = tempResult.global.newest;
+    const oldestTag = templater.global.oldest; // oldTagSupport.oldest as Tag // existingTag
+    const previous = templater.global.newest;
     if (!previous || !oldestTag) {
         throw new Error('how no previous or oldest nor newest?');
     }
-    const newTag = renderTagSupport(tempResult.tagSupport, false);
+    const newTag = renderTagSupport(templater.tagSupport, false);
     existingTag = subject.tag;
     const newOldest = newTag.tagSupport.templater.global.oldest;
     const hasOldest = newOldest ? true : false;
     if (!hasOldest) {
         return buildNewTag(newTag, oldInsertBefore, oldTagSupport, subject);
     }
-    if (newOldest && tempResult.children.value.length) {
+    if (newOldest && templater.children.value.length) {
         const oldKidsSub = newOldest.tagSupport.templater.children;
-        oldKidsSub.set(tempResult.children.value);
+        oldKidsSub.set(templater.children.value);
     }
     // const newTag = tempResult.newest as Tag
     if (previous && !oldestTag) {
@@ -77,12 +73,8 @@ export function updateExistingTagComponent(ownerTag, tempResult, subject, insert
             throw new Error('maybe 6');
         }
         subject.tag = newTag;
-        /*
-        if(!newTag.hasLiveElements) {
-          throw new Error('44444 - 6')
-        }
-        */
         oldestTag.updateByTag(newTag); // the oldest tag has element references
+        return;
     }
     else {
         // Although function looked the same it returned a different html result
@@ -91,8 +83,6 @@ export function updateExistingTagComponent(ownerTag, tempResult, subject, insert
             newTag.tagSupport.templater.global.context = {}; // do not share previous outputs
         }
         oldest = undefined;
-        // ??? - new remove
-        // subject.tag = newTag
     }
     if (!oldest) {
         buildNewTag(newTag, oldTagSupport.templater.global.insertBefore, oldTagSupport, subject);

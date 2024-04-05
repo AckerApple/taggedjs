@@ -16,6 +16,7 @@ export class ArrayValueNeverSet {
 export class Tag {
     strings;
     values;
+    version = 0;
     isTag = true;
     hasLiveElements = false;
     clones = []; // elements on document. Needed at destroy process to know what to destroy
@@ -325,14 +326,16 @@ function updateContextItem(context, variableName, value) {
     const subject = context[variableName];
     const tag = subject.tag;
     if (tag) {
-        const oldWrap = tag.tagSupport.templater.wrapper; // tag versus component
-        if (oldWrap && isTagComponent(value)) {
-            const oldValueFn = oldWrap.original;
-            const newValueFn = value.wrapper?.original;
-            const fnMatched = oldValueFn === newValueFn;
-            if (fnMatched) {
-                const newTemp = value;
-                newTemp.global = tag.tagSupport.templater.global;
+        const oldTemp = tag.tagSupport.templater;
+        const oldWrap = oldTemp.wrapper; // tag versus component
+        if (value.global !== oldTemp.global) {
+            if (oldWrap && isTagComponent(value)) {
+                const oldValueFn = oldWrap.original;
+                const newValueFn = value.wrapper?.original;
+                const fnMatched = oldValueFn === newValueFn;
+                if (fnMatched) {
+                    value.global = oldTemp.global;
+                }
             }
         }
     }

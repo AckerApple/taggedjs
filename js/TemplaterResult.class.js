@@ -30,16 +30,10 @@ export class TemplaterResult {
 }
 export function renderWithSupport(tagSupport, existingTag, subject, ownerTag) {
     const wrapTagSupport = tagSupport; // this.tagSupport
-    // const wrapTagSupport = existingTag?.tagSupport.templater.global.newest?.tagSupport || tagSupport
-    // this.tagSupport = wrapTagSupport
     /* BEFORE RENDER */
-    // signify to other operations that a rendering has occurred so they do not need to render again
-    // ++wrapTagSupport.memory.renderCount
     const runtimeOwnerTag = existingTag?.ownerTag || ownerTag;
     if (existingTag) {
-        // wrapTagSupport.templater.props = existingTag.tagSupport.templater.global.newest?.tagSupport.templater.props || wrapTagSupport.templater.props
         wrapTagSupport.memory.state.newest = [...existingTag.tagSupport.memory.state.newest];
-        // ??? - new
         wrapTagSupport.templater.global = existingTag.tagSupport.templater.global;
         runBeforeRedraw(wrapTagSupport, existingTag);
     }
