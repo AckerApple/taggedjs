@@ -1,4 +1,4 @@
-import { ValueSubject } from "taggedjs";
+import { Subject } from "taggedjs";
 export declare const counters: import("taggedjs").TagComponentBase<[{
-    appCounterSubject: ValueSubject<number>;
+    appCounterSubject: Subject<number>;
 }]>;

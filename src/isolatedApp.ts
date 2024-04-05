@@ -23,7 +23,7 @@ export const IsolatedApp = tag(() => {
   ]
   
   let appCounter = setLet(0)(x => [appCounter, appCounter=x])
-  const appCounterSubject = set(() => new ValueSubject(appCounter))
+  const appCounterSubject = set(() => new Subject(appCounter))
   const callbacks = getCallback()
   onInit(() => {
     console.log('app init should only run once')    

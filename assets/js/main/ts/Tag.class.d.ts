@@ -26,6 +26,7 @@ export declare class ArrayValueNeverSet {
 export declare class Tag {
     strings: string[];
     values: any[];
+    version: number;
     isTag: boolean;
     hasLiveElements: boolean;
     clones: (Element | Text | ChildNode)[];

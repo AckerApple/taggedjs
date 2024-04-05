@@ -1,15 +1,17 @@
+import { mouseOverTag } from "./mouseover.tag"
 import { renderCountDiv } from "./renderCount.component"
-import { html, tag, Subject, onInit, setLet, getCallback, set, ValueSubject } from "taggedjs"
+import { html, tag, Subject, onInit, setLet, getCallback, set } from "taggedjs"
 
 export const counters = tag(({
   appCounterSubject,
 }: {
-  appCounterSubject: ValueSubject<number>
+  appCounterSubject: Subject<number>
 }) => {  
   let counter = setLet(0)(x => [counter, counter = x])
   let propCounter = setLet(0)(x => [propCounter, propCounter = x])
   let renderCount = setLet(0)(x => [renderCount, renderCount = x])
   let initCounter = setLet(0)(x => [initCounter, initCounter = x])
+  let memory = set(() => ({counter: 0}))
 
   const callbacks = getCallback()
   const callbackTestSub = set(() => new Subject())
@@ -46,7 +48,7 @@ export const counters = tag(({
   
       <div>
         <button id="app-counter-subject-button"
-          onclick=${() => appCounterSubject.set(appCounterSubject.value + 1)}
+          onclick=${() => appCounterSubject.set((appCounterSubject.value || 0) + 1)}
         >🍒 ++app subject</button>
         <span>
           🍒 <span id="app-counter-subject-button">${appCounterSubject.value}</span>
@@ -89,6 +91,13 @@ export const counters = tag(({
         </span>
       </div>
     </div>
+
+    <div>
+      ${mouseOverTag({label: 'a-a', memory})}
+      ${mouseOverTag({label: 'b-b', memory})}
+      memory.counter:${memory.counter}
+    </div>
+
     
     <fieldset>
       <legend>inner counter</legend>

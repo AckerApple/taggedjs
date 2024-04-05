@@ -1,10 +1,13 @@
 import { animateDestroy, animateInit } from './animations'
+import { mouseOverTag } from './mouseover.tag'
 import { renderCountDiv } from './renderCount.component'
 import {html, set, setLet, tag} from 'taggedjs'
 
 const frameCount = 4
 
 export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
+  let memory = set(() => ({counter: 0}))
+
   const players: {
     name: string
     edit?: boolean
