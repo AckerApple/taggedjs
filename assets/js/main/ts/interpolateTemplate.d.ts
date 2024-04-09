@@ -24,7 +24,6 @@ export declare function subscribeToTemplate(insertBefore: Element | Text | Templ
 { isForceElement }: {
     isForceElement?: boolean;
 }): void;
-export declare function updateBetweenTemplates(value: string | undefined | boolean | number, lastFirstChild: Element | Text): Text;
 export type Counts = {
     added: number;
     removed: number;

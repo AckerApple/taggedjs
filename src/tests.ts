@@ -9,6 +9,17 @@ export function runTests() {
     expect(toggleTest?.innerText).toBe('toggle test')
   })
 
+  describe('content', () => {    
+    it('basic', () => {
+      expectMatchedHtml('#content-subject-pipe-display0', '#content-subject-pipe-display1')
+      expectMatchedHtml('#content-combineLatest-pipe-display0', '#content-combineLatest-pipe-display1')
+    })
+
+    it.skip('html', () => {
+      expectMatchedHtml('#content-combineLatest-pipeHtml-display0', '#content-combineLatest-pipeHtml-display1')
+    })
+  })
+
   it('toggle test', () => {
     const toggleTest = document.getElementById('toggle-test')
     toggleTest?.click()
@@ -22,10 +33,14 @@ export function runTests() {
 
   it('basic increase counter', () => {
     expectElementCount('#conditional-counter', 0)
-    testCounterElements('#increase-counter', '#counter-display')
+    testCounterElements('#❤️-increase-counter', '#❤️-counter-display')
+    testCounterElements('#❤️-inner-counter', '#❤️-inner-display')
     testCounterElements('#standalone-counter', '#standalone-display')
     expectElementCount('#conditional-counter', 1)
     testCounterElements('#conditional-counter', '#conditional-display')
+    
+    // test again after higher elements have had reruns
+    testCounterElements('#❤️-inner-counter', '#❤️-inner-display')
   })
 
   it('props testing', () => {
@@ -71,6 +86,18 @@ export function runTests() {
   })
 
   it('provider debug', () => {
+    testDuelCounterElements(
+      ['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'],
+      ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display'],
+    )
+
+    // change a counter in the parent element
+    testDuelCounterElements(
+      ['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'],
+      ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display'],
+    )
+
+    // now ensure that this inner tag still operates correctly even though parent just rendered but i did not from that change
     testDuelCounterElements(
       ['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'],
       ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display'],
@@ -239,6 +266,23 @@ function testCounterElements(
     ++oldCounterValue
     expect(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to increase value to ${oldCounterValue} but is instead ${counterValue}`)
   })
+}
+
+function expectMatchedHtml(
+  query0: string,
+  query1: string,
+) {
+//  const found = elementCount(query)
+  const elements0 = document.querySelectorAll(query0)
+  const elements1 = document.querySelectorAll(query1)
+
+  expect(elements0.length).toBeGreaterThan(0)
+  expect(elements1.length).toBeGreaterThan(0)
+  expect(elements0.length).toBe(elements1.length)
+
+  elements0.forEach((element0, index) =>
+    expect(element0.innerHTML).toBe(elements1[index].innerHTML)
+  )
 }
 
 function expectElementCount(

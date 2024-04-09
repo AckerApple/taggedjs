@@ -9,7 +9,7 @@ export function describe(label: string, run: () => any) {
     tests = []
     
     try {
-      console.debug('  '.repeat(tab) + '👉 ' + label)
+      console.debug('  '.repeat(tab) + '↘ ' + label)
       
       ++tab
       run()
@@ -32,7 +32,7 @@ describe.only = (label: string, run: () => any) => {
     tests = []
     
     try {
-      console.debug('  '.repeat(tab) + '👉 ' + label)
+      console.debug('  '.repeat(tab) + '↘ ' + label)
       
       ++tab
       
@@ -74,6 +74,10 @@ it.only = (label: string, run: () => any) => {
   })
 }
 
+it.skip = (label: string, run: () => any) => {
+  console.debug('⏭️ Skipped ' + label)
+}
+
 export function execute() {
   if(onlyTests.length) {
     return runTests(onlyTests)
@@ -111,6 +115,16 @@ export function expect(expected: unknown) {
 
       const message = customMessage || `Expected ${typeof(expected)} ${JSON.stringify(expected)} to be ${typeof(received)} ${JSON.stringify(received)}`
       console.error(message, {received, expected})
+      throw new Error(message)
+    },
+    toBeGreaterThan: (amount: number, customMessage?: string) => {
+      const expectNum = expected as number
+      if(!isNaN(expectNum) && expectNum > amount) {
+        return
+      }
+
+      const message = customMessage || `Expected ${typeof(expected)} ${JSON.stringify(expected)} to be greater than amount`
+      console.error(message, {amount, expected})
       throw new Error(message)
     }
   }

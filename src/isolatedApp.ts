@@ -6,20 +6,25 @@ import { propsDebugMain } from "./PropsDebug.component"
 import { providerDebugBase } from "./providerDebug"
 import { counters } from "./countersDebug"
 import { tableDebug } from "./tableDebug.component"
+import { contentDebug } from "./ContentDebug.component"
 
-type viewTypes = 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
+type viewTypes = 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
 export const IsolatedApp = tag(() => {
-  const stateTest = set('isolated-app-state')
+  // const stateTest = set('isolated-app-state') // unmask to identify state being debugged is this one 
   // const component = childTests() as any
   // const template = component.wrapper().getTemplate()
 
   const views: viewTypes[] = [
-    // 'child',
-    // 'arrays',
+    // 'content',
+    'counters',
+
     // 'props',
+    // 'providerDebug',
+    
+    // 'arrays',
     // 'tagSwitchDebug',
-    'providerDebug',
-    // 'counters',
+    
+    // 'child',
   ]
   
   let appCounter = setLet(0)(x => [appCounter, appCounter=x])
@@ -80,6 +85,13 @@ export const IsolatedApp = tag(() => {
           <fieldset style="flex:2 2 20em">
             <legend>counters</legend>
             ${counters({appCounterSubject})}
+          </fieldset>
+        `}
+
+        ${views.includes('content') && html`
+          <fieldset style="flex:2 2 20em">
+            <legend>content</legend>
+            ${contentDebug()}
           </fieldset>
         `}
 

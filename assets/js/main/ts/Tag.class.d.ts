@@ -1,5 +1,4 @@
 import { TagSupport } from './TagSupport.class';
-import { Subscription } from './Subject';
 import { Counts } from './interpolateTemplate';
 import { State } from './set.function';
 import { InterpolatedTemplates } from './interpolations';
@@ -30,7 +29,6 @@ export declare class Tag {
     isTag: boolean;
     hasLiveElements: boolean;
     clones: (Element | Text | ChildNode)[];
-    cloneSubs: Subscription[];
     childTags: Tag[];
     tagSupport: TagSupport;
     lastTemplateString: string | undefined;
@@ -49,6 +47,7 @@ export declare class Tag {
         stagger: number;
         promise?: undefined;
     };
+    /** Reviews elements for the presences of ondestroy */
     checkCloneRemoval(clone: Element | Text | ChildNode, stagger: number): Promise<void> | undefined;
     getTemplate(): TagTemplate;
     isLikeTag(tag: Tag): boolean | Boolean;
@@ -60,7 +59,7 @@ export declare class Tag {
     getAppElement(): Tag;
     /** Used during HMR only where static content itself could have been edited */
     rebuild(): void;
-    buildBeforeElement(insertBefore: Element | Text, options?: ElementBuildOptions & {
+    buildBeforeElement(insertBefore: Element | Text | ChildNode, options?: ElementBuildOptions & {
         test: boolean;
     }): void;
 }

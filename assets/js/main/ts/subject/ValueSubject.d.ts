@@ -1,4 +1,4 @@
-import { Subject } from './Subject';
+import { Subject } from './Subject.class';
 import { Subscription } from './Subject.utils';
 type ValueSubjectSubscriber<T> = (value: T, subscription: Subscription) => unknown;
 export declare class ValueSubject<T> extends Subject<T> {

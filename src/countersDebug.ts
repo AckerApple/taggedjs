@@ -21,9 +21,7 @@ export const counters = tag(({
     console.info('countersDebug.ts: 👉 i should only ever run once')
 
     callbackTestSub.subscribe(x => {
-      console.log('🥦 sub called')
       callbacks((y) => {
-        console.log('callback increase counter', {counter, x})
         counter = x as number
       })()
     })
@@ -33,9 +31,7 @@ export const counters = tag(({
     ++counter
   }
 
-  const increasePropCounter = () => {
-    ++propCounter
-  }
+  const increasePropCounter = () => ++propCounter
 
   ++renderCount // for debugging
 
@@ -76,10 +72,12 @@ export const counters = tag(({
       `}
   
       <div>
-        <button id="increase-counter"
+        <button id="❤️-increase-counter"
           onclick=${increasePropCounter}
-        >propCounter:${propCounter}</button>
-        <span id="counter-display">${propCounter}</span>
+        >❤️ propCounter:${propCounter}</button>
+        <span>
+          ❤️ <span id="❤️-counter-display">${propCounter}</span>
+          </span>
       </div>
 
       <div>
@@ -119,9 +117,11 @@ const innerCounters = tag(({
   ++renderCount // for debugging
 
   return html`
-    <button id="inner-increase-counter" onclick=${increasePropCounter}
-    >propCounter:${propCounter}</button>
-    <span id="inner-counter-display">${propCounter}</span>
+    <button id="❤️-inner-counter" onclick=${increasePropCounter}
+    >❤️ propCounter:${propCounter}</button>
+    <span>
+      ❤️ <span id="❤️-inner-display">${propCounter}</span>
+    </span>
     <div>renderCount:${renderCount}</div>
     ${renderCountDiv({renderCount, name: 'inner counters'})}
   `
