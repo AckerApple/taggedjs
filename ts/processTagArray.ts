@@ -1,5 +1,5 @@
-import { Clones, InsertBefore } from './Clones.type'
-import { ArrayValueNeverSet, Tag } from './Tag.class'
+import { Clones, InsertBefore, isRemoveTemplates } from './Clones.type'
+import { ArrayValueNeverSet, Tag, insertAfter } from './Tag.class'
 import { ValueSubject } from './subject/ValueSubject'
 import { Counts } from './interpolateTemplate'
 import { ArrayNoKeyError } from './errors'
@@ -33,7 +33,7 @@ export function processTagArray(
   let lastArray = subject.lastArray = subject.lastArray || []
 
   // ???
-  subject.insertBefore = insertBefore
+  // subject.insertBefore = insertBefore
 
   let removed = 0
   
@@ -64,8 +64,9 @@ export function processTagArray(
     return true
   })
 
+  console.log('insertBefore',insertBefore)
   // const masterBefore = template || (template as any).clone
-  const before = insertBefore || (subject.value as any).insertBefore || (insertBefore as any).clone
+  const before = insertBefore // || (subject.value as any).insertBefore || (insertBefore as any).clone
 
   value.forEach((subTag, index) => {
     const previous = lastArray[index]
@@ -104,12 +105,20 @@ export function processTagArray(
         return []
       }
 
-      processAddTagArrayItem(before, subTag, index, options, lastArray, true)
+      processAddTagArrayItem(
+        before, subTag, index, options, lastArray
+      )
       throw new Error('item should be back')
       // return [] // removed: item should have been previously deleted and will be added back
     }
 
-    processAddTagArrayItem(before, subTag, index, options, lastArray, true)
+    processAddTagArrayItem(
+      before,
+      subTag,
+      index,
+      options,
+      lastArray,
+    )
 
     ownerTag.childTags.push(subTag)  
   })
@@ -126,7 +135,6 @@ function processAddTagArrayItem(
     forceElement?: boolean
   },
   lastArray: LastArrayItem[],
-  test: boolean,
 ) {
   const lastValue = {
     tag: subTag, index
@@ -145,10 +153,21 @@ function processAddTagArrayItem(
     throw new Error('issue adding array item')
   }
 
+  console.log('lastFirstChild',lastFirstChild)
   subTag.buildBeforeElement(
     lastFirstChild,
-    {counts, forceElement: options.forceElement, test}
+    {counts, forceElement: options.forceElement}
   )
+
+  // put template back down
+  const placeholder = subTag.tagSupport.templater.global.placeholderElm as Element
+  if(!placeholder) {
+    console.log('missing', {subGlobal: subTag.tagSupport.templater.global})
+  }
+
+  if( placeholder && isRemoveTemplates ) {    
+    insertAfter(lastFirstChild, placeholder)
+  }
 }
 
 /** compare two values. If both values are arrays then the items will be compared */

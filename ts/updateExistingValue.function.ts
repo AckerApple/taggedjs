@@ -88,7 +88,7 @@ export function updateExistingValue(
     processTagArray(
       subject as TagArraySubject,
       value as any as Tag[],
-      oldInsertBefore as InsertBefore,
+      insertBefore, // oldInsertBefore as InsertBefore,
       ownerTag,
       {counts: {
         added: 0,

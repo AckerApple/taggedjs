@@ -88,7 +88,7 @@ export class Tag {
     const subject = tagSupport.subject
     
     // put back down the template tag
-    const templateTag = tagSupport.templater.global.insertBefore as Element
+    const templateTag = global.insertBefore as Element
     
     if(isRemoveTemplates) {
       const placeholder = global.placeholderElm as Element
@@ -357,16 +357,15 @@ export class Tag {
 
     this.buildBeforeElement(insertBefore, {
       forceElement: true,
-      counts: {added: 0, removed: 0}, test: false,
+      counts: {added: 0, removed: 0},
     })
   }
 
   buildBeforeElement(
     insertBefore: Element | Text | ChildNode,
-    options: ElementBuildOptions & {test:boolean} = {
+    options: ElementBuildOptions = {
       forceElement: false,
       counts: {added:0, removed: 0},
-      test: false
     },
   ) {
     if(!insertBefore.parentNode) {
@@ -382,19 +381,16 @@ export class Tag {
     
     if(isRemoveTemplates) {
       const global = this.tagSupport.templater.global
-      const placeholderElm = global.insertBefore
+      const placeholderElm = global.placeholderElm
       console.log('buildBeforeElement', {
         insertBefore,
         placeholderElm,
+        equal: insertBefore === placeholderElm
       })
+
       if(placeholderElm) {
         const parentNode = placeholderElm.parentNode as ParentNode
         
-        console.log('build put template back down', {
-          insertBefore,
-          placeholderElm,
-        })
-
         parentNode.insertBefore(
           insertBefore,
           placeholderElm,
@@ -402,6 +398,14 @@ export class Tag {
 
         this.clones.push( placeholderElm ) // put back on chopping block
         delete global.placeholderElm
+
+        console.log('build put template back down', {
+          equal: insertBefore === placeholderElm,
+          insertBefore,
+          placeholderElm,
+          iParent: insertBefore.parentNode,
+          placeParent: placeholderElm.parentNode,
+        })
       }
     }
     
@@ -482,8 +486,8 @@ export class Tag {
 
       afterInterpolateElement(
         elementContainer,
-        insertBefore,
-        this, // ownerTag
+        insertBefore, // tagComponent.insertBefore, // insertBefore,
+        tagComponent.ownerTag, // this, // ownerTag
         context,
         options,
       )
@@ -501,7 +505,6 @@ function afterInterpolateElement(
 ) {
   const ownerSupport = ownerTag.tagSupport
   const ownerGlobal = ownerSupport.templater.global
-  const subject = ownerSupport.subject
   const clones = buildClones(container, insertBefore)
   const hadBefore = isRemoveTemplates && ownerGlobal.placeholderElm
   const parentNode = hadBefore ? ownerGlobal.placeholderElm?.parentNode as ParentNode : insertBefore.parentNode as ParentNode
@@ -516,20 +519,23 @@ function afterInterpolateElement(
   if(!clones.length) {
     return clones
   }
+  
+  clones.forEach(clone => afterElmBuild(clone, options, context, ownerTag))
 
-  // insertBefore.parentNode?.removeChild(insertBefore)
-  // const clone = clones[ clones.length - 1] || insertBefore
+  let hasPopClone = false
   if(isRemoveTemplates) {
     const clone = clones.pop()
-    // subject.insertBefore = clone
-    ownerGlobal.placeholderElm = clone // insertBefore
-    console.log('clone', {clone, length: clones.length})
+
+    if(clone) {
+      hasPopClone = true
+      ownerGlobal.placeholderElm = clone // insertBefore
+      console.log('clone', {clone, length: clones.length})
+    }
   }
-  
+
   ownerTag.clones.push( ...clones )
-  clones.forEach(clone => afterElmBuild(clone, options, context, ownerTag))
   
-  if(isRemoveTemplates) {
+  if(isRemoveTemplates && hasPopClone) {
     console.log('remove child - insertBefore', {
       insertBefore,
       // clone
@@ -607,7 +613,10 @@ function updateContextItem(
 }
 
 // Function to insert element after reference element
-function insertAfter(newNode: InsertBefore, referenceNode: InsertBefore) {
+export function insertAfter(
+  newNode: InsertBefore,
+  referenceNode: InsertBefore
+) {
   const parentNode = referenceNode.parentNode as ParentNode
   parentNode.insertBefore(newNode, referenceNode.nextSibling)
 }

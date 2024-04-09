@@ -42,7 +42,7 @@ export function processTagResult(
   }
   tag.buildBeforeElement(insertBefore, {
     counts,
-    forceElement, test: false,
+    forceElement,
   })
 }
 

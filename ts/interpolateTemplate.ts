@@ -142,13 +142,6 @@ export function afterElmBuild(
   diff = elementInitCheck(elm, options.counts) - diff
 
   if((elm as Element).children) {
-    /*
-    const subCounts = {
-      added: options.counts.added, // - diff,
-      removed: options.counts.removed,
-    }
-    */
-
     new Array(...(elm as Element).children as any).forEach((child, index) => {
       const subOptions = {
         ...options,

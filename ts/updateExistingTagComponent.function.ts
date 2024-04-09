@@ -7,8 +7,7 @@ import { processSubjectComponent } from './processSubjectComponent.function'
 import { destroyTagMemory } from './destroyTag.function'
 import { State } from './set.function'
 import { renderTagSupport } from './renderTagSupport.function'
-import { InsertBefore, isRemoveTemplates } from './Clones.type'
-import { Props } from './Props'
+import { InsertBefore } from './Clones.type'
 import { callbackPropOwner } from './alterProps.function'
 
 export function updateExistingTagComponent(
@@ -34,7 +33,6 @@ export function updateExistingTagComponent(
   const globalInsert = oldGlobal.insertBefore
   const oldInsertBefore = globalInsert?.parentNode ? globalInsert : insertBefore
 
-  // const placeholderElm = isRemoveTemplates ? oldGlobal.placeholderElm : insertBefore
   if(oldGlobal.placeholderElm) {
     if(!oldGlobal.placeholderElm.parentNode) {
       throw new Error('stop here no subject parent node update existing tag')
@@ -167,7 +165,7 @@ function buildNewTag(
   console.log('oldInsertBefore', {oldInsertBefore})
   newTag.buildBeforeElement(oldInsertBefore, {
     forceElement: true,
-    counts: {added: 0, removed: 0}, test: false,
+    counts: {added: 0, removed: 0},
   })
 
   newTag.tagSupport.templater.global.oldest = newTag
