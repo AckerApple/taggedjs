@@ -1,6 +1,6 @@
 import { Tag } from './Tag.class'
 import { TagSubject } from './Tag.utils'
-import { ValueSubject } from './ValueSubject'
+import { ValueSubject } from './subject/ValueSubject'
 import { isSubjectInstance, isTagComponent, isTagInstance } from './isInstance'
 
 export function processNewValue(

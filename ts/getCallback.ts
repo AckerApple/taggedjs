@@ -6,7 +6,7 @@ import { renderTagSupport } from "./renderTagSupport.function"
 type Callback = <T>(...args: unknown[]) => (T | void)
 
 let innerCallback = (callback: Callback) => (): void => {
-  throw new Error('The real callback function was called and that should never occur')
+  throw new Error('Callback function was called immediately in sync and must instead be call async')
 }
 export const getCallback = () => innerCallback
 
@@ -72,7 +72,6 @@ function triggerStateUpdate(
     false,
   )
 
-  // TODO: turn back on below
   if(promise instanceof Promise) {
     promise.finally(() => {
       // send the oldest state changes into the newest

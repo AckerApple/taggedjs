@@ -7,7 +7,7 @@ import { destroyTagMemory } from './destroyTag.function'
 export function processTagResult(
   tag: Tag,
   subject: TagArraySubject | TagSubject | Function, // used for recording past and current value
-  insertBefore: Element | Text | Template, // <template end interpolate />
+  insertBefore: Element | Text | Template | ChildNode, // <template end interpolate />
   {
     counts, forceElement,
   }: {
@@ -25,49 +25,44 @@ export function processTagResult(
   const previousTag = existingTag?.tagSupport.templater.global.oldest as Tag || undefined // || tag.tagSupport.oldest // subjectTag.tag
   const justUpdate = previousTag // && !forceElement
   
-  if(previousTag) {
-    if(justUpdate) {
-      const areLike = previousTag.isLikeTag(tag)
+  if(previousTag && justUpdate) {
+    /*
+    const areLike = previousTag.isLikeTag(tag)
 
-      // are we just updating an if we already had?
-      if(areLike) {
-        // components
-        if(subject instanceof Function) {
-          const newTag: Tag = subject(previousTag.tagSupport)
-          previousTag.updateByTag(newTag)
-          if(!newTag.tagSupport.templater.global.oldest) {
-            throw new Error('maybe 0')
-          }
-          subjectTag.tag = newTag
-
-          if(!newTag.hasLiveElements) {
-            throw new Error('44444 - 2')
-          }
-        
-          return
-        }
-
-        previousTag.updateByTag(tag)
-        if(!tag.tagSupport.templater.global.oldest) {
-          throw new Error('maybe 1')
-        }
-
-        subjectTag.tag = tag
-
-        if(!tag.hasLiveElements) {
-          throw new Error('44444 - 3')
-        }
-
-        return
-      }
-
-      destroyTagMemory(previousTag, subject as TagSubject)
-      throw new Error('585 - think we never get here')
+    // are we just updating an if we already had?
+    if(areLike) {
+      return processTagResultUpdate(tag, subjectTag, previousTag)
     }
+    */
+    return processTagResultUpdate(tag, subjectTag, previousTag)
   }
 
+  if(insertBefore.nodeName !== 'TEMPLATE') {
+    throw new Error(';;;;')
+  }
   tag.buildBeforeElement(insertBefore, {
     counts,
     forceElement, test: false,
   })
+}
+
+
+function processTagResultUpdate(
+  tag: Tag,
+  subject: TagSubject, // used for recording past and current value
+  previousTag: Tag,
+) {
+  // components
+  if(subject instanceof Function) {
+    const newTag: Tag = subject(previousTag.tagSupport)
+    previousTag.updateByTag(newTag)
+    subject.tag = newTag
+  
+    return
+  }
+
+  previousTag.updateByTag(tag)
+  subject.tag = tag
+
+  return
 }

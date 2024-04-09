@@ -1,11 +1,11 @@
-import { Clones } from './Clones.type'
+import { Clones, InsertBefore } from './Clones.type'
 import { ArrayValueNeverSet, Tag } from './Tag.class'
-import { ValueSubject } from './ValueSubject'
-import { Counts, Template } from './interpolateTemplate'
+import { ValueSubject } from './subject/ValueSubject'
+import { Counts } from './interpolateTemplate'
 import { ArrayNoKeyError } from './errors'
 import { destroyArrayTag } from './checkDestroyPrevious.function'
 import { TagSubject } from './Tag.utils'
-import { applyFakeTemplater } from './processSubjectValue.function'
+import { applyFakeTemplater } from './processTag.function'
 
 export type LastArrayItem = {
   tag: Tag
@@ -15,14 +15,14 @@ export type LastArrayItem = {
 
 export type TagArraySubject = ValueSubject<Tag[]> & {
   lastArray?: LastArrayItem[]
-  template: Element | Text | Template
+  insertBefore: InsertBefore
   isChildSubject?: boolean // present when children passed as prop0 or prop1
 }
 
 export function processTagArray(
   subject: TagArraySubject,
   value: Tag[], // arry of Tag classes
-  template: Element | Text | Template, // <template end interpolate />
+  insertBefore: InsertBefore, // <template end interpolate />
   ownerTag: Tag,
   options: {
     counts: Counts
@@ -32,7 +32,8 @@ export function processTagArray(
   const clones: Clones = ownerTag.clones // []
   let lastArray = subject.lastArray = subject.lastArray || []
 
-  subject.template = template
+  // ???
+  subject.insertBefore = insertBefore
 
   let removed = 0
   
@@ -64,7 +65,7 @@ export function processTagArray(
   })
 
   // const masterBefore = template || (template as any).clone
-  const before = template || (subject.value as any).insertBefore || (template as any).clone
+  const before = insertBefore || (subject.value as any).insertBefore || (insertBefore as any).clone
 
   value.forEach((subTag, index) => {
     const previous = lastArray[index]
@@ -117,7 +118,7 @@ export function processTagArray(
 }
 
 function processAddTagArrayItem(
-  before: Element | Text | Template,
+  before: InsertBefore,
   subTag: Tag,
   index: number,
   options: {

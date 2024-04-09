@@ -2,12 +2,12 @@ import { Tag } from './Tag.class'
 import { isSubjectInstance, isTagArray, isTagInstance } from './isInstance'
 import { setUse } from './setUse.function'
 import { TemplaterResult, Wrapper } from './TemplaterResult.class'
-import { ValueSubject } from './ValueSubject'
 import { runTagCallback } from './bindSubjectCallback.function'
 import { deepClone } from './deepFunctions'
 import { TagSupport } from './TagSupport.class'
 import { TagSubject } from './Tag.utils'
 import { alterProps } from './alterProps.function'
+import { ValueSubject } from './subject/ValueSubject'
 
 export type TagChildren = ValueSubject<Tag[]> & { lastArray?: Tag[] }
 export type TagChildrenInput = Tag[] | Tag | TagChildren
@@ -141,9 +141,7 @@ function getTagWrap(
       throw new Error('issue already 22')
     }
 
-    // ???
     let props = templater.props
-    // let props = oldTagSetup.propsConfig.latest
     const ownerTagSupport = oldTagSetup.ownerTagSupport
     const oldTemplater = ownerTagSupport?.templater
     const oldLatest = oldTemplater?.global.newest
@@ -153,7 +151,6 @@ function getTagWrap(
       throw new Error('what to do here?')
     }
 
-    // ???
     let castedProps = alterProps(
       props,
       newestOwnerTemplater as TemplaterResult,
@@ -164,6 +161,7 @@ function getTagWrap(
     // CALL ORIGINAL COMPONENT FUNCTION
     const tag = originalFunction(castedProps, childSubject)
 
+    tag.version = global.renderCount
     tag.tagSupport = new TagSupport(
       oldTagSetup.ownerTagSupport,
       templater,

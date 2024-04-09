@@ -61,10 +61,6 @@ export function hasPropChanges(
     castedPastProps = {...(pastCloneProps || {})}
     
     const allFunctionsMatch = Object.entries(castedProps as any).every(([key,value]) => {      
-      /*if(!(key in (castedPastProps as any))) {
-        return false
-      }*/
-
       let compare = (castedPastProps as any)[key]
 
       if(!(value instanceof Function)) {
@@ -100,7 +96,6 @@ export function hasPropChanges(
     }
   }
 
-  // ???
   const isEqual = deepEqual(castedPastProps, castedProps)
   return isEqual ? false : 7 // if equal then no changes
 }

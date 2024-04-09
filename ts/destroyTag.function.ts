@@ -8,21 +8,20 @@ export function destroyTagMemory(
 ) {
   const oldTagSupport = tag.tagSupport
   
-  if(subject != tag.tagSupport.subject) {
+  if(subject != oldTagSupport.subject) {
     throw new Error('fff - subjects do not match')
   }
 
-  delete (subject as any).tag
-  delete (tag.tagSupport.subject as any).tag // TODO: this line maybe not needed
+  delete subject.tag
+  delete oldTagSupport.subject.tag // TODO: this line maybe not needed
 
   // must destroy oldest which is tag with elements on stage
-  const oldest = tag.tagSupport.templater.global.oldest as Tag
+  const oldest = oldTagSupport.templater.global.oldest as Tag
   oldest.destroy()
 
   destroyTagSupportPast(oldTagSupport)
   
-  // ???
-  tag.tagSupport.templater.global.context = {}
+  oldTagSupport.templater.global.context = {}
 }
 
 export function destroyTagSupportPast(oldTagSupport: TagSupport) {

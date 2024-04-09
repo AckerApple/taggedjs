@@ -46,7 +46,7 @@ export function processAttribute(
 
       lastValue = value
     })
-    ownerTag.cloneSubs.push(sub) // this is where unsubscribe is picked up
+    ownerTag.tagSupport.templater.global.subscriptions.push(sub) // this is where unsubscribe is picked up
     child.removeAttribute(attrName)
 
     return
@@ -168,7 +168,7 @@ function processNameValueAttr(
     const sub = result.subscribe(callback as any)
     
     // Record subscription for later unsubscribe when element destroyed
-    ownerTag.cloneSubs.push(sub)
+    ownerTag.tagSupport.templater.global.subscriptions.push(sub)
 
     return
   }

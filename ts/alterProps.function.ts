@@ -12,24 +12,7 @@ export function alterProps(
   ownerSupport: TagSupport,
 ) {
   function callback(toCall: any, callWith: any) {
-    const renderCount = templater.global.renderCount
-    const callbackResult = toCall(...callWith)
-    
-    if(templater.global.renderCount > renderCount) {
-      throw new Error('already rendered')
-    }
-
-    const lastestOwner = ownerSupport.templater.global.newest as Tag
-    const newOwner = renderTagSupport(
-      lastestOwner.tagSupport, // ??? newestOwner.tagSupport, // ??? ownerSupport,
-      true,
-    )
-
-    if(newOwner.tagSupport.templater.global.newest != newOwner) {
-      throw new Error('newest assignment issue?')
-    }
-
-    return callbackResult
+    return callbackPropOwner(toCall, callWith, templater, ownerSupport)
   }
   
   const isPropTag = isTagInstance(props)
@@ -60,9 +43,11 @@ function resetFunctionProps(
       }
 
       newProps[name] = (...args: any[]) => {
-        return callback(value, args)
+        return newProps[name].toCall(...args) // what gets called can switch over parent state changes
       }
 
+      // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
+      newProps[name].toCall = (...args: any[]) => callback(value, args)
       newProps[name].original = value
 
       return
@@ -70,4 +55,30 @@ function resetFunctionProps(
   })
 
   return newProps
+}
+
+export function callbackPropOwner(
+  toCall: (...args: any[]) => any,
+  callWith: any,
+  templater: TemplaterResult, // only used to prevent rendering double
+  ownerSupport: TagSupport,
+) {
+  const renderCount = templater.global.renderCount
+  const callbackResult = toCall(...callWith)
+  
+  if(templater.global.renderCount > renderCount) {
+    throw new Error('already rendered')
+  }
+
+  const lastestOwner = ownerSupport.templater.global.newest as Tag
+  const newOwner = renderTagSupport(
+    lastestOwner.tagSupport,
+    true,
+  )
+
+  if(newOwner.tagSupport.templater.global.newest != newOwner) {
+    throw new Error('newest assignment issue?')
+  }
+
+  return callbackResult
 }

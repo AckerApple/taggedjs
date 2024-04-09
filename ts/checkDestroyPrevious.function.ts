@@ -4,12 +4,14 @@ import { Tag } from './Tag.class'
 import { InterpolateSubject } from './processSubjectValue.function'
 import { TagArraySubject } from './processTagArray'
 import { isLikeTags } from './isLikeTags.function'
-import { Counts, Template } from './interpolateTemplate'
+import { Counts } from './interpolateTemplate'
 import { destroyTagMemory, destroyTagSupportPast } from './destroyTag.function'
+import { InsertBefore } from './Clones.type'
 
 export function checkDestroyPrevious(
   subject: InterpolateSubject, // existing.value is the old value
   newValue: unknown,
+  insertBefore: InsertBefore,
 ) {
   const existingSubArray = subject as TagArraySubject
   const wasArray = existingSubArray.lastArray
@@ -17,7 +19,7 @@ export function checkDestroyPrevious(
   // no longer an array
   if (wasArray && !isTagArray(newValue)) {
     wasArray.forEach(({tag}) => destroyArrayTag(tag, {added:0, removed:0}))
-    delete (subject as TagArraySubject).lastArray  
+    delete existingSubArray.lastArray  
     return 1
   }
 
@@ -54,7 +56,7 @@ export function checkDestroyPrevious(
   const lastValue = displaySubject.lastValue // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
   // was simple value but now something bigger
   if(hasLastValue && lastValue !== newValue) {
-    destroySimpleValue(displaySubject.template, displaySubject)
+    destroySimpleValue(insertBefore, displaySubject)
     return 4
   }
 
@@ -73,7 +75,7 @@ export function destroyArrayTag(
 }
 
 function destroySimpleValue(
-  template: Element | Text | Template,
+  template: InsertBefore,
   subject: DisplaySubject,
 ) {
   const clone = subject.clone as Element
@@ -85,5 +87,4 @@ function destroySimpleValue(
   
   delete subject.clone
   delete subject.lastValue
-  // subject.template = template
 }

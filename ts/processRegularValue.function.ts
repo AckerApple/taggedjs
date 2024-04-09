@@ -1,15 +1,17 @@
+import { InsertBefore } from './Clones.type'
 import { DisplaySubject } from './Tag.utils'
-import { Template, updateBetweenTemplates } from './interpolateTemplate'
+import { Template } from './interpolateTemplate'
+import { updateBeforeTemplate } from './updateBeforeTemplate.function'
 
 export type RegularValue = string | number | undefined | boolean
 
 export function processRegularValue(
   value: RegularValue,
   subject: DisplaySubject, // could be tag via subject.tag
-  template: Element | Text | Template, // <template end interpolate /> (will be removed)
+  insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
 ) {
-  subject.template = template
-  const before = subject.clone || template // Either the template is on the doc OR its the first element we last put on doc
+  subject.insertBefore = insertBefore
+  const before = subject.clone || insertBefore // Either the template is on the doc OR its the first element we last put on doc
 
   if(subject.lastValue === value) {
     return // no need to update display, its the same
@@ -18,7 +20,7 @@ export function processRegularValue(
   subject.lastValue = value
   
   // Processing of regular values
-  const clone = updateBetweenTemplates(
+  const clone = updateBeforeTemplate(
     value,
     before, // this will be removed
   )

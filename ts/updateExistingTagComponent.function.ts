@@ -7,29 +7,22 @@ import { processSubjectComponent } from './processSubjectComponent.function'
 import { destroyTagMemory } from './destroyTag.function'
 import { State } from './set.function'
 import { renderTagSupport } from './renderTagSupport.function'
+import { InsertBefore, isRemoveTemplates } from './Clones.type'
+import { Props } from './Props'
+import { callbackPropOwner } from './alterProps.function'
 
 export function updateExistingTagComponent(
   ownerTag: Tag,
-  tempResult: TemplaterResult,
+  templater: TemplaterResult,
   subject: TagSubject,
-  insertBefore: Element | Text,
+  insertBefore: InsertBefore,
 ): void {
-  let existingTag: Tag | undefined = subject.tag
-
-  /*
-  if(existingTag && !existingTag.hasLiveElements) {
-    throw new Error('issue already began')
-  }
-  */
+  let existingTag = subject.tag as Tag
   
   const oldWrapper = existingTag.tagSupport.templater.wrapper
-  const newWrapper = tempResult.wrapper
+  const newWrapper = templater.wrapper
   let isSameTag = false
 
-  if(tempResult.global.oldest && !tempResult.global.oldest.hasLiveElements) {
-    throw new Error('88893434')
-  }
-  
   if(oldWrapper && newWrapper) {
     const oldFunction = oldWrapper.original
     const newFunction = newWrapper.original
@@ -41,47 +34,57 @@ export function updateExistingTagComponent(
   const globalInsert = oldGlobal.insertBefore
   const oldInsertBefore = globalInsert?.parentNode ? globalInsert : insertBefore
 
-  if(!oldInsertBefore.parentNode) {
+  // const placeholderElm = isRemoveTemplates ? oldGlobal.placeholderElm : insertBefore
+  if(oldGlobal.placeholderElm) {
+    if(!oldGlobal.placeholderElm.parentNode) {
+      throw new Error('stop here no subject parent node update existing tag')
+    }
+  } else if(!oldInsertBefore.parentNode) {
     throw new Error('stop here no parent node update existing tag')
   }
 
   if(!isSameTag) {
     destroyTagMemory(oldTagSupport.templater.global.oldest as Tag, subject)
-    processSubjectComponent(tempResult, subject, oldInsertBefore, ownerTag, {
+    processSubjectComponent(templater, subject, oldInsertBefore, ownerTag, {
       forceElement: false,
       counts: {added: 0, removed: 0},
     })
     return
   } else {
-    if(!tempResult.tagSupport) {
-      tempResult.tagSupport = new TagSupport(
-        oldTagSupport.ownerTagSupport,
-        tempResult,
-        subject,
-      )
-    }
-
-    const newTagSupport = tempResult.tagSupport
-    const hasChanged = hasTagSupportChanged(oldTagSupport, newTagSupport, tempResult)
-
+    const newTagSupport = templater.tagSupport
+    const hasChanged = hasTagSupportChanged(oldTagSupport, newTagSupport, templater)
     if(!hasChanged) {
+      // if the new props are an object then implicitly since no change, the old props are an object
+      const newProps = templater.props
+      if(newProps && typeof(newProps)==='object') {
+        // const newestTag = oldTagSupport.templater.global.newest
+        // const oldProps = existingTag.tagSupport.propsConfig.latestCloned as Record<string,any> // newestTag.props as Record<string, any>
+        syncFunctionProps(
+          templater,
+          existingTag,
+          ownerTag,
+          newProps, // new
+          // oldProps, // old
+        )
+      }    
+
       return // its the same tag component
     }
   }
 
-  const oldestTag = tempResult.global.oldest as Tag // oldTagSupport.oldest as Tag // existingTag
-  const previous = tempResult.global.newest as Tag
+  const oldestTag = templater.global.oldest as Tag // oldTagSupport.oldest as Tag // existingTag
+  const previous = templater.global.newest as Tag
 
   if(!previous || !oldestTag) {
     throw new Error('how no previous or oldest nor newest?')
   }
 
   const newTag = renderTagSupport(
-    tempResult.tagSupport,
+    templater.tagSupport,
     false,
   )
 
-  existingTag = subject.tag
+  existingTag = subject.tag as Tag
 
   const newOldest = newTag.tagSupport.templater.global.oldest
   const hasOldest = newOldest ? true : false
@@ -89,9 +92,9 @@ export function updateExistingTagComponent(
     return buildNewTag(newTag, oldInsertBefore, oldTagSupport, subject)
   }
   
-  if(newOldest && tempResult.children.value.length) {
+  if(newOldest && templater.children.value.length) {
     const oldKidsSub = newOldest.tagSupport.templater.children
-    oldKidsSub.set(tempResult.children.value)
+    oldKidsSub.set(templater.children.value)
   }
 
   // const newTag = tempResult.newest as Tag
@@ -115,13 +118,9 @@ export function updateExistingTagComponent(
     }
 
     subject.tag = newTag
-    /*
-    if(!newTag.hasLiveElements) {
-      throw new Error('44444 - 6')
-    }
-    */
-
     oldestTag.updateByTag(newTag) // the oldest tag has element references
+
+    return
   } else {
     // Although function looked the same it returned a different html result
     if(isSameTag && existingTag) {
@@ -129,9 +128,6 @@ export function updateExistingTagComponent(
       newTag.tagSupport.templater.global.context = {} // do not share previous outputs
     }
     oldest = undefined
-
-    // ??? - new remove
-    // subject.tag = newTag
   }
 
   if(!oldest) {
@@ -164,10 +160,11 @@ function checkStateChanged(state: State) {
 
 function buildNewTag(
   newTag: Tag,
-  oldInsertBefore: Element | Text,
+  oldInsertBefore: Element | Text | ChildNode,
   oldTagSupport: TagSupport,
   subject: TagSubject,
 ) {
+  console.log('oldInsertBefore', {oldInsertBefore})
   newTag.buildBeforeElement(oldInsertBefore, {
     forceElement: true,
     counts: {added: 0, removed: 0}, test: false,
@@ -178,15 +175,49 @@ function buildNewTag(
   oldTagSupport.templater.global.oldest = newTag
   oldTagSupport.templater.global.newest = newTag
 
-  if(!newTag.tagSupport.templater.global.oldest) {
-    throw new Error('maybe 5')
-  }
-
   subject.tag = newTag
 
-  if(!newTag.hasLiveElements) {
-    throw new Error('44444 - 5')
-  }  
-
   return
+}
+
+function syncFunctionProps(
+  templater: TemplaterResult,
+  existingTag: Tag,
+  ownerTag: Tag,
+  newProps: Record<string, any>,
+  // oldProps: Record<string, any>,
+) {
+  existingTag = existingTag.tagSupport.templater.global.newest as Tag
+  // const templater = existingTag.tagSupport.templater
+  const priorProps = existingTag.tagSupport.propsConfig.latestCloned as Record<string, any>
+
+  const oldLatest = ownerTag.tagSupport.templater.global.newest as Tag
+  const ownerSupport = oldLatest.tagSupport
+
+  Object.entries(priorProps).forEach(([name, value]) => {
+    if(!(value instanceof Function)) {
+      return
+    }
+
+    const newOriginal = value.original
+
+    // TODO: The code below maybe irrelevant
+    const newCallback = newProps[name]
+    const original = newCallback.original
+    if(original) {
+      return // already previously converted
+    }
+
+    // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
+    priorProps[name].toCall = (...args: any[]) => {
+      return callbackPropOwner(
+        newCallback, // value, // newOriginal,
+        args,
+        templater,
+        ownerSupport,
+      )
+    }
+
+    return
+  })
 }

@@ -9,6 +9,9 @@ import { OnDestroyCallback } from './onDestroy'
 import { TagSubject } from './Tag.utils'
 import { isLikeTags } from './isLikeTags.function'
 import { destroyTagMemory } from './destroyTag.function'
+import { OnInitCallback } from './onInit'
+import { Subscription } from './subject/Subject.utils'
+import { InsertBefore } from './Clones.type'
 
 export type Wrapper = ((
   tagSupport: BaseTagSupport,
@@ -30,17 +33,26 @@ export class TemplaterResult {
     providers: Provider[]
     /** Indicator of re-rending. Saves from double rending something already rendered */
     renderCount: number
-    destroyCallback?: OnDestroyCallback  
-    insertBefore?: Element | Text
-    isApp?: boolean
     deleted: boolean
+    isApp?: boolean // root element
+    
+    // ALWAYS template tag
+    insertBefore?: InsertBefore // what element put down before
+    placeholderElm?: InsertBefore // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
+
+
+    subscriptions: Subscription[] // subscriptions created by clones
+    
+    destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
+    init?: OnInitCallback // what to run when init complete, used for onInit
   } = {
     newestTemplater: this,
     context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
     providers: [],
     /** Indicator of re-rending. Saves from double rending something already rendered */
     renderCount: 0,
-    deleted: false
+    deleted: false,
+    subscriptions: []
   }
 
   tagSupport!: BaseTagSupport
@@ -65,19 +77,12 @@ export function renderWithSupport(
   ownerTag?: Tag,
 ): Tag {
   const wrapTagSupport = tagSupport // this.tagSupport
-  // const wrapTagSupport = existingTag?.tagSupport.templater.global.newest?.tagSupport || tagSupport
-  // this.tagSupport = wrapTagSupport
 
   /* BEFORE RENDER */
-    // signify to other operations that a rendering has occurred so they do not need to render again
-    // ++wrapTagSupport.memory.renderCount
-
     const runtimeOwnerTag = existingTag?.ownerTag || ownerTag
 
     if(existingTag) {
-      // wrapTagSupport.templater.props = existingTag.tagSupport.templater.global.newest?.tagSupport.templater.props || wrapTagSupport.templater.props
       wrapTagSupport.memory.state.newest = [...existingTag.tagSupport.memory.state.newest]
-      // ??? - new
       wrapTagSupport.templater.global = existingTag.tagSupport.templater.global
       
       runBeforeRedraw(wrapTagSupport, existingTag)
@@ -107,9 +112,10 @@ export function renderWithSupport(
 
     delete templater.global.oldest
     delete templater.global.newest
-    delete (subject as any).tag
-
-    templater.global.insertBefore = existingTag.tagSupport.templater.global.insertBefore as Element    
+    delete subject.tag
+    
+    const oldGlobal = existingTag.tagSupport.templater.global
+    templater.global.insertBefore = oldGlobal.insertBefore as Element    
   }
 
   retag.ownerTag = runtimeOwnerTag

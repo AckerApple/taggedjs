@@ -24,8 +24,9 @@ export function renderTagSupport(
   const newest = subjectTag?.tagSupport.templater.global.newest as Tag
   let ownerTag: undefined | Tag
   let selfPropChange = false
+  const shouldRenderUp = renderUp && newest
 
-  if(renderUp && newest) {
+  if(shouldRenderUp) {
     ownerTag = newest.ownerTag
     
     if(ownerTag) {
@@ -49,19 +50,9 @@ export function renderTagSupport(
     subject,
   )
 
-  /*
-  const tag = exit.redraw
-
-  if(exit.remit) {
-    return tag
-  }
-  */
- 
-  // Have owner re-render
-  // ??? - recently removed. As causes some sort of owner newest disconnect during prop testing
-  // ??? - restored with condition - must render parent if I modified my props
-  if(ownerTag && selfPropChange) {
-    const ownerTagSupport = ownerTag.tagSupport
+  const renderOwner = ownerTag && selfPropChange
+  if(renderOwner) {
+    const ownerTagSupport = (ownerTag as Tag).tagSupport
     renderTagSupport(
       ownerTagSupport,
       true,

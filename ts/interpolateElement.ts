@@ -13,12 +13,11 @@ export type InterpolateOptions = {
 
 /** Review elements within an element */
 export function interpolateElement(
-  container: Element,
+  container: Element, // element containing innerHTML to review interpolations
   context: Context, // variables used to evaluate
   interpolatedTemplates: TagTemplate,
   tagOwner: Tag,
   options: InterpolateOptions,
-  test = false
 ): InterpolatedContentTemplates {
   const clones: Clones = []
   const tagComponents: InterpolateComponentResult[] = []

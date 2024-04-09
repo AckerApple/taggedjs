@@ -3,7 +3,7 @@ import { runAfterRender, runBeforeRender } from './tagRunner'
 import { TemplaterResult } from './TemplaterResult.class'
 import { Tag } from './Tag.class'
 import { TagComponent } from './tag'
-import { ValueSubject } from './ValueSubject'
+import { ValueSubject } from './subject/ValueSubject'
 import { TagSubject } from './Tag.utils'
 
 const appElements: {tag: Tag, element: Element}[] = []

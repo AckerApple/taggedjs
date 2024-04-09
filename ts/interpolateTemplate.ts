@@ -76,11 +76,12 @@ export function subscribeToTemplate(
   let called = false
   const callback = (value: ExistingValue) => {
     // const orgInsert = insertBefore
+    /*
     const clone = (subject as DisplaySubject).clone
-
     if(clone && clone.parentNode) {
       insertBefore = clone
     }
+    */
 
     if(called) {
       updateExistingValue(
@@ -114,29 +115,7 @@ export function subscribeToTemplate(
   }
 
   const sub = subject.subscribe(callback as any)
-  ownerTag.cloneSubs.push(sub)
-}
-
-// Function to update the value of x
-export function updateBetweenTemplates(
-  value: string | undefined | boolean | number,
-  lastFirstChild: Element | Text,
-) {
-  const parent = lastFirstChild.parentNode as ParentNode
-  
-  // mimic React skipping to display EXCEPT for true does display on page
-  if(value === undefined || value === false || value === null) { // || value === true
-    value = ''
-  }
-
-  // Insert the new value (never use innerHTML here)
-  const textNode = document.createTextNode(value as string) // never innerHTML
-  parent.insertBefore(textNode, lastFirstChild)
-
-  /* remove existing nodes */
-  parent.removeChild(lastFirstChild)
-  
-  return textNode
+  ownerTag.tagSupport.templater.global.subscriptions.push(sub)
 }
 
 export type Counts = {

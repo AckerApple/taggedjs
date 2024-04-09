@@ -1,5 +1,4 @@
 import { TagSupport } from './TagSupport.class'
-import { Subscription } from './Subject'
 import { runBeforeDestroy } from './tagRunner'
 import { buildClones } from './render'
 import { interpolateElement, interpolateString } from './interpolateElement'
@@ -13,7 +12,7 @@ import { TagSubject } from './Tag.utils'
 import { TagArraySubject } from './processTagArray'
 import { isSubjectInstance, isTagComponent } from './isInstance'
 import { isLikeTags } from './isLikeTags.function'
-import { TemplaterResult } from './TemplaterResult.class'
+import { InsertBefore, isRemoveTemplates } from './Clones.type'
 
 export const variablePrefix = '__tagvar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -42,11 +41,11 @@ export class ArrayValueNeverSet {
 }
 
 export class Tag {
+  version = 0
   isTag = true
   hasLiveElements = false
 
   clones: (Element | Text | ChildNode)[] = [] // elements on document. Needed at destroy process to know what to destroy
-  cloneSubs: Subscription[] = [] // subscriptions created by clones
   childTags: Tag[] = [] // tags on me
 
   tagSupport!: TagSupport
@@ -86,6 +85,28 @@ export class Tag {
     // removing is considered rendering. Prevents after event processing of this tag even tho possibly deleted
     // ++this.tagSupport.templater.global.renderCount
 
+    const subject = tagSupport.subject
+    
+    // put back down the template tag
+    const templateTag = tagSupport.templater.global.insertBefore as Element
+    
+    if(isRemoveTemplates) {
+      const placeholder = global.placeholderElm as Element
+      console.log('destroy swap', {
+        templateTag,
+        placeholder,
+        tempParent: templateTag.parentNode,
+        placeParent: placeholder?.parentNode,
+      })
+
+      if(placeholder) {
+        const parentNode = placeholder.parentNode as ParentNode
+        parentNode.insertBefore(templateTag, placeholder)
+        this.clones.push(placeholder) // setup to be deleted below
+      }
+    }
+    delete global.placeholderElm
+
     // the isComponent check maybe able to be removed
     const isComponent = tagSupport ? true : false    
     if(isComponent) {
@@ -107,7 +128,7 @@ export class Tag {
     delete global.newest
     global.deleted = true
     this.hasLiveElements = false
-    delete (tagSupport.subject as any).tag
+    delete subject.tag
     this.destroySubscriptions()
     
     let mainPromise: Promise<number | (number | void | undefined)[]> | undefined
@@ -140,8 +161,9 @@ export class Tag {
   }
 
   destroySubscriptions() {
-    this.cloneSubs.forEach(cloneSub => cloneSub.unsubscribe())
-    this.cloneSubs.length = 0
+    const global = this.tagSupport.templater.global
+    global.subscriptions.forEach(cloneSub => cloneSub.unsubscribe())
+    global.subscriptions.length = 0
   }
 
   destroyClones(
@@ -163,6 +185,7 @@ export class Tag {
     return {stagger}
   }
 
+  /** Reviews elements for the presences of ondestroy */
   checkCloneRemoval(
     clone: Element | Text | ChildNode,
     stagger: number,
@@ -189,7 +212,6 @@ export class Tag {
     } else {
       next()
     }
-
 
     return promise
   }
@@ -262,6 +284,7 @@ export class Tag {
     }
 
     this.tagSupport.templater.global.newest = tag
+
     if(!this.tagSupport.templater.global.context) {
       throw new Error('issue back here')
     }
@@ -339,7 +362,7 @@ export class Tag {
   }
 
   buildBeforeElement(
-    insertBefore: Element | Text,
+    insertBefore: Element | Text | ChildNode,
     options: ElementBuildOptions & {test:boolean} = {
       forceElement: false,
       counts: {added:0, removed: 0},
@@ -347,12 +370,46 @@ export class Tag {
     },
   ) {
     if(!insertBefore.parentNode) {
+      console.log('!!!', {
+        insertBefore,
+        myPlaceholderElm: this.tagSupport.templater.global.placeholderElm,
+        myInsertBefore: this.tagSupport.templater.global.insertBefore,
+      })
       throw new Error('no parent before removing clones')
     }
 
-    this.tagSupport.templater.global.oldest = this
-    this.tagSupport.templater.global.newest = this
-    this.tagSupport.subject.tag = this
+    const subject = this.tagSupport.subject
+    
+    if(isRemoveTemplates) {
+      const global = this.tagSupport.templater.global
+      const placeholderElm = global.insertBefore
+      console.log('buildBeforeElement', {
+        insertBefore,
+        placeholderElm,
+      })
+      if(placeholderElm) {
+        const parentNode = placeholderElm.parentNode as ParentNode
+        
+        console.log('build put template back down', {
+          insertBefore,
+          placeholderElm,
+        })
+
+        parentNode.insertBefore(
+          insertBefore,
+          placeholderElm,
+        )
+
+        this.clones.push( placeholderElm ) // put back on chopping block
+        delete global.placeholderElm
+      }
+    }
+    
+    const trueInsertBefore = insertBefore
+    const thisTemplater = this.tagSupport.templater
+    thisTemplater.global.oldest = this
+    thisTemplater.global.newest = this
+    subject.tag = this
     this.hasLiveElements = true
 
     // remove old clones
@@ -360,14 +417,13 @@ export class Tag {
       this.clones.forEach(clone => this.checkCloneRemoval(clone, 0))
     }
 
-    // this.insertBefore = insertBefore
-    this.tagSupport.templater.global.insertBefore = insertBefore
+    thisTemplater.global.insertBefore = insertBefore
     
     // const context = this.tagSupport.memory.context // this.update()
     const context = this.update()
     const template = this.getTemplate()
 
-    if(!insertBefore.parentNode) {
+    if(!trueInsertBefore.parentNode) {
       throw new Error('no parent before building tag')
     }
 
@@ -386,71 +442,100 @@ export class Tag {
         forceElement: options.forceElement,
         counts: options.counts
       },
-      options.test,
     )
 
-    if(!insertBefore.parentNode) {
+    if(!trueInsertBefore.parentNode) {
       throw new Error('no parent building tag')
     }
 
     afterInterpolateElement(
       elementContainer,
-      insertBefore,
+      trueInsertBefore, // insertBefore,
       this, // ownerTag
       context,
       options,
     )
 
-    // this.clones.push(...clones)
-
     // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
     let isForceElement = options.forceElement
     tagComponents.forEach(tagComponent => {
-      // const preClones = this.clones.map(clone => clone)
-
       subscribeToTemplate(
-        tagComponent.insertBefore, // temporary,
+        tagComponent.insertBefore,
         tagComponent.subject as TagSubject | TagArraySubject,
         tagComponent.ownerTag,
         options.counts,
         {isForceElement},
       )
 
-      if(!insertBefore.parentNode) {
+      const placeholderElm = this.tagSupport.templater.global.placeholderElm
+      if(placeholderElm) {
+        if(!placeholderElm.parentNode) {
+          throw new Error('no subject parent building tag components')
+        }
+      } else if(!insertBefore.parentNode) {
+        console.log('no parent', {
+          insertBefore,
+          subject,
+        })
         throw new Error('no parent building tag components')
       }
 
       afterInterpolateElement(
         elementContainer,
         insertBefore,
-        this,
+        this, // ownerTag
         context,
         options,
       )
-
-        // remove component clones from ownerTag as they will belong to the components they live on
-        /*
-        if( preClones.length ) {
-          this.clones = this.clones.filter(cloneFilter => !preClones.find(clone => clone === cloneFilter))
-        }
-        */
     })
   }
 }
 
 function afterInterpolateElement(
   container: Element,
-  insertBefore: Element | Text | Template,
+  insertBefore: InsertBefore,
   ownerTag: Tag,
   // preClones: Clones,
   context: Context,
   options: ElementBuildOptions,
 ) {
-
+  const ownerSupport = ownerTag.tagSupport
+  const ownerGlobal = ownerSupport.templater.global
+  const subject = ownerSupport.subject
   const clones = buildClones(container, insertBefore)
+  const hadBefore = isRemoveTemplates && ownerGlobal.placeholderElm
+  const parentNode = hadBefore ? ownerGlobal.placeholderElm?.parentNode as ParentNode : insertBefore.parentNode as ParentNode
 
+  if(hadBefore) {
+    // put the template back down
+    insertAfter(insertBefore, hadBefore)
+    delete ownerGlobal.placeholderElm
+    // throw new Error('maybe issue here?')
+  }
+
+  if(!clones.length) {
+    return clones
+  }
+
+  // insertBefore.parentNode?.removeChild(insertBefore)
+  // const clone = clones[ clones.length - 1] || insertBefore
+  if(isRemoveTemplates) {
+    const clone = clones.pop()
+    // subject.insertBefore = clone
+    ownerGlobal.placeholderElm = clone // insertBefore
+    console.log('clone', {clone, length: clones.length})
+  }
+  
   ownerTag.clones.push( ...clones )
   clones.forEach(clone => afterElmBuild(clone, options, context, ownerTag))
+  
+  if(isRemoveTemplates) {
+    console.log('remove child - insertBefore', {
+      insertBefore,
+      // clone
+    })
+    parentNode.removeChild(insertBefore)
+  }
 
   return clones
 }
@@ -496,14 +581,17 @@ function updateContextItem(
   const tag = (subject as any).tag as Tag
 
   if(tag) {
-    const oldWrap = tag.tagSupport.templater.wrapper // tag versus component
-    if(oldWrap && isTagComponent(value)) {
-      const oldValueFn = oldWrap.original
-      const newValueFn = value.wrapper?.original
-      const fnMatched = oldValueFn === newValueFn
-      if(fnMatched) {
-        const newTemp = value as TemplaterResult
-        newTemp.global = tag.tagSupport.templater.global
+    const oldTemp = tag.tagSupport.templater
+    const oldWrap = oldTemp.wrapper // tag versus component
+    if(value.global !== oldTemp.global) {
+      if(oldWrap && isTagComponent(value)) {
+        const oldValueFn = oldWrap.original
+        const newValueFn = value.wrapper?.original
+        const fnMatched = oldValueFn === newValueFn
+  
+        if(fnMatched) {
+          value.global = oldTemp.global
+        }
       }
     }
   }
@@ -516,4 +604,10 @@ function updateContextItem(
   subject.set(value) // listeners will evaluate updated values to possibly update display(s)
   
   return
+}
+
+// Function to insert element after reference element
+function insertAfter(newNode: InsertBefore, referenceNode: InsertBefore) {
+  const parentNode = referenceNode.parentNode as ParentNode
+  parentNode.insertBefore(newNode, referenceNode.nextSibling)
 }

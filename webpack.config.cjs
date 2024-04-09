@@ -1,7 +1,7 @@
 const path = require('path');
 const out = path.resolve(__dirname, 'dist');
 
-console.debug(`🖊️ Writing bundle to ${outPath}`)
+console.debug(`🖊️ Writing bundle to ${out}`)
 
 module.exports = {
   mode: 'development',

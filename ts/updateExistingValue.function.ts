@@ -1,18 +1,20 @@
 import { DisplaySubject, TagSubject, getSubjectFunction } from './Tag.utils'
 import { TagSupport } from './TagSupport.class'
-import { Subject } from './Subject'
+import { Subject } from './subject/Subject.class'
 import { TemplaterResult } from './TemplaterResult.class'
 import { isSubjectInstance, isTagArray, isTagComponent, isTagInstance } from './isInstance'
 import { Tag } from './Tag.class'
-import { InterpolateSubject, applyFakeTemplater, processTag } from './processSubjectValue.function'
+import { InterpolateSubject } from './processSubjectValue.function'
 import { TagArraySubject, processTagArray } from './processTagArray'
 import { updateExistingTagComponent } from './updateExistingTagComponent.function'
 import { RegularValue, processRegularValue } from './processRegularValue.function'
 import { checkDestroyPrevious } from './checkDestroyPrevious.function'
-import { ValueSubject } from './ValueSubject'
+import { ValueSubject } from './subject/ValueSubject'
 import { processSubjectComponent } from './processSubjectComponent.function'
 import { isLikeTags } from './isLikeTags.function'
 import { Callback, bindSubjectCallback } from './bindSubjectCallback.function'
+import { applyFakeTemplater, processTag } from './processTag.function'
+import { InsertBefore } from './Clones.type'
 
 export type ExistingValue = TemplaterResult | Tag[] | TagSupport | Function | Subject<unknown> | RegularValue | Tag
 
@@ -20,24 +22,27 @@ export function updateExistingValue(
   subject: InterpolateSubject,
   value: ExistingValue,
   ownerTag: Tag,
-  insertBefore: Element | Text,
+  insertBefore: InsertBefore,
 ): InterpolateSubject {
-  const subjectSubTag = subject as TagSubject
+  const subjectTag = subject as TagSubject
   const isComponent = isTagComponent(value)
-  const oldInsertBefore = (subject as DisplaySubject).template || subjectSubTag.tag?.tagSupport.templater.global.insertBefore || (subject as DisplaySubject).clone
+  
+  const global = subjectTag.tag?.tagSupport.templater.global
+  const placeholderElm = global?.placeholderElm || global?.insertBefore || (subject as DisplaySubject).insertBefore
+  const oldInsertBefore = placeholderElm || (subject as DisplaySubject).clone
 
-  checkDestroyPrevious(subject, value)
+  checkDestroyPrevious(subject, value, insertBefore)
 
   // handle already seen tag components
   if(isComponent) {
     const templater = value as TemplaterResult
-    
+  
     // When was something before component
-    if(!subjectSubTag.tag) {
+    if(!subjectTag.tag) {
       processSubjectComponent(
         templater,
-        subject as TagSubject,
-        oldInsertBefore,
+        subjectTag,
+        oldInsertBefore as InsertBefore,
         ownerTag,
         {
           forceElement: true,
@@ -45,30 +50,37 @@ export function updateExistingValue(
         }
       )
 
-      return subjectSubTag
+      return subjectTag
     }
+
+    templater.tagSupport = new TagSupport(
+      // subjectTag.tag.tagSupport.ownerTagSupport,
+      ownerTag.tagSupport,
+      templater,
+      subjectTag,
+    )
 
     updateExistingTagComponent(
       ownerTag,
       templater, // latest value
-      subjectSubTag,
+      subjectTag,
       insertBefore,
     )
 
-    return subjectSubTag
+    return subjectTag
   }
   
   // was component but no longer
-  const subjectTag = subjectSubTag.tag
-  if(subjectTag) {
+  const tag = subjectTag.tag
+  if(tag) {
     handleStillTag(
-      subjectTag,
+      tag,
       subject as TagSubject | TagArraySubject,
       value as Tag,
       ownerTag
     )
 
-    return subjectSubTag
+    return subjectTag
   }
 
   // its another tag array
@@ -76,7 +88,7 @@ export function updateExistingValue(
     processTagArray(
       subject as TagArraySubject,
       value as any as Tag[],
-      oldInsertBefore,
+      oldInsertBefore as InsertBefore,
       ownerTag,
       {counts: {
         added: 0,
@@ -96,14 +108,27 @@ export function updateExistingValue(
   }
 
   if(isTagInstance(value)) {
-    subjectSubTag.template = oldInsertBefore
+    // insertBefore = subjectTag.insertBefore as InsertBefore || insertBefore
+    // const insertBefore = oldInsertBefore as InsertBefore
+    // delete subjectTag.tag?.tagSupport.templater.global.placeholderElm
+    if(insertBefore.nodeName !== 'TEMPLATE') {
+      console.log('subject', {
+        insertBefore,
+        subInsertBefore: (subject as any).insertBefore,
+        clone: (subject as any).clone,
+        iParent: insertBefore.parentNode,
+        subParent: (subject as any).insertBefore.parentNode,
+      })
+      throw new Error(`expected template - ${insertBefore.nodeName}`)
+    }
+
     processTag(
       value as Tag,
-      subjectSubTag,
-      subjectSubTag.template,
-      ownerTag,// existingTag, // tag,
+      subjectTag,
+      insertBefore,
+      ownerTag, // existingTag, // tag,
     )
-    return subjectSubTag
+    return subjectTag
   }
 
   // we have been given a subject
@@ -115,10 +140,10 @@ export function updateExistingValue(
   processRegularValue(
     value as RegularValue,
     subject as DisplaySubject,
-    oldInsertBefore,
+    oldInsertBefore as InsertBefore,
   )
 
-  return subjectSubTag
+  return subjectTag
 }
 
 function handleStillTag(
@@ -143,10 +168,15 @@ function handleStillTag(
   }
 
   if(isSameTag || isSameTag2) {
+    const subjectTag = subject as TagSubject
+    const global = existingTag.tagSupport.templater.global
+    delete global.placeholderElm
+    const insertBefore = global.insertBefore as InsertBefore
+
     return processTag(
       value as Tag,
-      subject as TagSubject,
-      (subject as TagSubject).template,
+      subjectTag,
+      insertBefore,
       ownerTag,// existingTag, // tag,
     )
   }
@@ -154,6 +184,6 @@ function handleStillTag(
   return processRegularValue(
     value as RegularValue,
     subject as DisplaySubject,
-    (subject as DisplaySubject).template
+    (subject as DisplaySubject).insertBefore
   )
 }
