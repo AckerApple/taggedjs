@@ -16,12 +16,12 @@ export const IsolatedApp = tag(() => {
 
   const views: viewTypes[] = [
     // 'content',
-    'counters',
+    // 'counters',
 
     // 'props',
     // 'providerDebug',
     
-    // 'arrays',
+    'arrays',
     // 'tagSwitchDebug',
     
     // 'child',

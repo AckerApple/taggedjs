@@ -1145,10 +1145,10 @@ const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
     // const template = component.wrapper().getTemplate()
     const views = [
         // 'content',
-        'counters',
+        // 'counters',
         // 'props',
         // 'providerDebug',
-        // 'arrays',
+        'arrays',
         // 'tagSwitchDebug',
         // 'child',
     ];
@@ -2043,6 +2043,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   Tag: () => (/* binding */ Tag),
 /* harmony export */   escapeSearch: () => (/* binding */ escapeSearch),
 /* harmony export */   escapeVariable: () => (/* binding */ escapeVariable),
+/* harmony export */   insertAfter: () => (/* binding */ insertAfter),
 /* harmony export */   variablePrefix: () => (/* binding */ variablePrefix)
 /* harmony export */ });
 /* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tagRunner */ "../main/ts/tagRunner.ts");
@@ -2108,7 +2109,7 @@ class Tag {
         // ++this.tagSupport.templater.global.renderCount
         const subject = tagSupport.subject;
         // put back down the template tag
-        const templateTag = tagSupport.templater.global.insertBefore;
+        const templateTag = global.insertBefore;
         if (_Clones_type__WEBPACK_IMPORTED_MODULE_8__.isRemoveTemplates) {
             const placeholder = global.placeholderElm;
             console.log('destroy swap', {
@@ -2315,13 +2316,12 @@ class Tag {
         }
         this.buildBeforeElement(insertBefore, {
             forceElement: true,
-            counts: { added: 0, removed: 0 }, test: false,
+            counts: { added: 0, removed: 0 },
         });
     }
     buildBeforeElement(insertBefore, options = {
         forceElement: false,
         counts: { added: 0, removed: 0 },
-        test: false
     }) {
         if (!insertBefore.parentNode) {
             console.log('!!!', {
@@ -2334,20 +2334,24 @@ class Tag {
         const subject = this.tagSupport.subject;
         if (_Clones_type__WEBPACK_IMPORTED_MODULE_8__.isRemoveTemplates) {
             const global = this.tagSupport.templater.global;
-            const placeholderElm = global.insertBefore;
+            const placeholderElm = global.placeholderElm;
             console.log('buildBeforeElement', {
                 insertBefore,
                 placeholderElm,
+                equal: insertBefore === placeholderElm
             });
             if (placeholderElm) {
                 const parentNode = placeholderElm.parentNode;
-                console.log('build put template back down', {
-                    insertBefore,
-                    placeholderElm,
-                });
                 parentNode.insertBefore(insertBefore, placeholderElm);
                 this.clones.push(placeholderElm); // put back on chopping block
                 delete global.placeholderElm;
+                console.log('build put template back down', {
+                    equal: insertBefore === placeholderElm,
+                    insertBefore,
+                    placeholderElm,
+                    iParent: insertBefore.parentNode,
+                    placeParent: placeholderElm.parentNode,
+                });
             }
         }
         const trueInsertBefore = insertBefore;
@@ -2400,7 +2404,8 @@ class Tag {
                 });
                 throw new Error('no parent building tag components');
             }
-            afterInterpolateElement(elementContainer, insertBefore, this, // ownerTag
+            afterInterpolateElement(elementContainer, insertBefore, // tagComponent.insertBefore, // insertBefore,
+            tagComponent.ownerTag, // this, // ownerTag
             context, options);
         });
     }
@@ -2410,7 +2415,6 @@ function afterInterpolateElement(container, insertBefore, ownerTag,
 context, options) {
     const ownerSupport = ownerTag.tagSupport;
     const ownerGlobal = ownerSupport.templater.global;
-    const subject = ownerSupport.subject;
     const clones = (0,_render__WEBPACK_IMPORTED_MODULE_1__.buildClones)(container, insertBefore);
     const hadBefore = _Clones_type__WEBPACK_IMPORTED_MODULE_8__.isRemoveTemplates && ownerGlobal.placeholderElm;
     const parentNode = hadBefore ? ownerGlobal.placeholderElm?.parentNode : insertBefore.parentNode;
@@ -2423,17 +2427,18 @@ context, options) {
     if (!clones.length) {
         return clones;
     }
-    // insertBefore.parentNode?.removeChild(insertBefore)
-    // const clone = clones[ clones.length - 1] || insertBefore
+    clones.forEach(clone => (0,_interpolateTemplate__WEBPACK_IMPORTED_MODULE_3__.afterElmBuild)(clone, options, context, ownerTag));
+    let hasPopClone = false;
     if (_Clones_type__WEBPACK_IMPORTED_MODULE_8__.isRemoveTemplates) {
         const clone = clones.pop();
-        // subject.insertBefore = clone
-        ownerGlobal.placeholderElm = clone; // insertBefore
-        console.log('clone', { clone, length: clones.length });
+        if (clone) {
+            hasPopClone = true;
+            ownerGlobal.placeholderElm = clone; // insertBefore
+            console.log('clone', { clone, length: clones.length });
+        }
     }
     ownerTag.clones.push(...clones);
-    clones.forEach(clone => (0,_interpolateTemplate__WEBPACK_IMPORTED_MODULE_3__.afterElmBuild)(clone, options, context, ownerTag));
-    if (_Clones_type__WEBPACK_IMPORTED_MODULE_8__.isRemoveTemplates) {
+    if (_Clones_type__WEBPACK_IMPORTED_MODULE_8__.isRemoveTemplates && hasPopClone) {
         console.log('remove child - insertBefore', {
             insertBefore,
             // clone
@@ -3657,12 +3662,6 @@ function afterElmBuild(elm, options, context, ownerTag) {
     let diff = options.counts.added;
     diff = (0,_elementInitCheck__WEBPACK_IMPORTED_MODULE_1__.elementInitCheck)(elm, options.counts) - diff;
     if (elm.children) {
-        /*
-        const subCounts = {
-          added: options.counts.added, // - diff,
-          removed: options.counts.removed,
-        }
-        */
         new Array(...elm.children).forEach((child, index) => {
             const subOptions = {
                 ...options,
@@ -4210,7 +4209,7 @@ insertBefore, ownerTag) {
     }
     tag.buildBeforeElement(insertBefore, {
         counts: { added: 0, removed: 0 },
-        forceElement: true, test: false,
+        forceElement: true,
     });
 }
 function applyFakeTemplater(tag, ownerTag, subject) {
@@ -4259,10 +4258,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   processTagArray: () => (/* binding */ processTagArray)
 /* harmony export */ });
-/* harmony import */ var _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./subject/ValueSubject */ "../main/ts/subject/ValueSubject.ts");
-/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./errors */ "../main/ts/errors.ts");
-/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./checkDestroyPrevious.function */ "../main/ts/checkDestroyPrevious.function.ts");
-/* harmony import */ var _processTag_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./processTag.function */ "../main/ts/processTag.function.ts");
+/* harmony import */ var _Clones_type__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Clones.type */ "../main/ts/Clones.type.ts");
+/* harmony import */ var _Tag_class__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Tag.class */ "../main/ts/Tag.class.ts");
+/* harmony import */ var _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./subject/ValueSubject */ "../main/ts/subject/ValueSubject.ts");
+/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./errors */ "../main/ts/errors.ts");
+/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./checkDestroyPrevious.function */ "../main/ts/checkDestroyPrevious.function.ts");
+/* harmony import */ var _processTag_function__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./processTag.function */ "../main/ts/processTag.function.ts");
+
+
 
 
 
@@ -4273,7 +4276,7 @@ ownerTag, options) {
     const clones = ownerTag.clones; // []
     let lastArray = subject.lastArray = subject.lastArray || [];
     // ???
-    subject.insertBefore = insertBefore;
+    // subject.insertBefore = insertBefore
     let removed = 0;
     /** 🗑️ remove previous items first */
     lastArray = subject.lastArray = subject.lastArray.filter((item, index) => {
@@ -4286,7 +4289,7 @@ ownerTag, options) {
         if (destroyItem) {
             const last = lastArray[index];
             const tag = last.tag;
-            (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_2__.destroyArrayTag)(tag, options.counts);
+            (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_4__.destroyArrayTag)(tag, options.counts);
             last.deleted = true;
             ++removed;
             ++options.counts.removed;
@@ -4294,13 +4297,14 @@ ownerTag, options) {
         }
         return true;
     });
+    console.log('insertBefore', insertBefore);
     // const masterBefore = template || (template as any).clone
-    const before = insertBefore || subject.value.insertBefore || insertBefore.clone;
+    const before = insertBefore; // || (subject.value as any).insertBefore || (insertBefore as any).clone
     value.forEach((subTag, index) => {
         const previous = lastArray[index];
         const previousSupport = previous?.tag.tagSupport;
-        const fakeSubject = new _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_0__.ValueSubject({});
-        (0,_processTag_function__WEBPACK_IMPORTED_MODULE_3__.applyFakeTemplater)(subTag, ownerTag, fakeSubject);
+        const fakeSubject = new _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_2__.ValueSubject({});
+        (0,_processTag_function__WEBPACK_IMPORTED_MODULE_5__.applyFakeTemplater)(subTag, ownerTag, fakeSubject);
         if (previousSupport) {
             subTag.tagSupport.templater.global = previousSupport.templater.global;
             previousSupport.templater.global.newest = subTag;
@@ -4315,7 +4319,7 @@ ownerTag, options) {
             };
             const message = 'Use html`...`.key(item) instead of html`...` to template an Array';
             console.error(message, details);
-            const err = new _errors__WEBPACK_IMPORTED_MODULE_1__.ArrayNoKeyError(message, details);
+            const err = new _errors__WEBPACK_IMPORTED_MODULE_3__.ArrayNoKeyError(message, details);
             throw err;
         }
         const couldBeSame = lastArray.length > index;
@@ -4327,16 +4331,16 @@ ownerTag, options) {
                 oldest.updateByTag(subTag);
                 return [];
             }
-            processAddTagArrayItem(before, subTag, index, options, lastArray, true);
+            processAddTagArrayItem(before, subTag, index, options, lastArray);
             throw new Error('item should be back');
             // return [] // removed: item should have been previously deleted and will be added back
         }
-        processAddTagArrayItem(before, subTag, index, options, lastArray, true);
+        processAddTagArrayItem(before, subTag, index, options, lastArray);
         ownerTag.childTags.push(subTag);
     });
     return clones;
 }
-function processAddTagArrayItem(before, subTag, index, options, lastArray, test) {
+function processAddTagArrayItem(before, subTag, index, options, lastArray) {
     const lastValue = {
         tag: subTag, index
     };
@@ -4350,7 +4354,16 @@ function processAddTagArrayItem(before, subTag, index, options, lastArray, test)
     if (!lastFirstChild.parentNode) {
         throw new Error('issue adding array item');
     }
-    subTag.buildBeforeElement(lastFirstChild, { counts, forceElement: options.forceElement, test });
+    console.log('lastFirstChild', lastFirstChild);
+    subTag.buildBeforeElement(lastFirstChild, { counts, forceElement: options.forceElement });
+    // put template back down
+    const placeholder = subTag.tagSupport.templater.global.placeholderElm;
+    if (!placeholder) {
+        console.log('missing', { subGlobal: subTag.tagSupport.templater.global });
+    }
+    if (placeholder && _Clones_type__WEBPACK_IMPORTED_MODULE_0__.isRemoveTemplates) {
+        (0,_Tag_class__WEBPACK_IMPORTED_MODULE_1__.insertAfter)(lastFirstChild, placeholder);
+    }
 }
 /** compare two values. If both values are arrays then the items will be compared */
 function areLikeValues(valueA, valueB) {
@@ -4405,7 +4418,7 @@ insertBefore, // <template end interpolate />
     }
     tag.buildBeforeElement(insertBefore, {
         counts,
-        forceElement, test: false,
+        forceElement,
     });
 }
 function processTagResultUpdate(tag, subject, // used for recording past and current value
@@ -5589,7 +5602,6 @@ function updateExistingTagComponent(ownerTag, templater, subject, insertBefore) 
     const oldGlobal = oldTagSupport.templater.global;
     const globalInsert = oldGlobal.insertBefore;
     const oldInsertBefore = globalInsert?.parentNode ? globalInsert : insertBefore;
-    // const placeholderElm = isRemoveTemplates ? oldGlobal.placeholderElm : insertBefore
     if (oldGlobal.placeholderElm) {
         if (!oldGlobal.placeholderElm.parentNode) {
             throw new Error('stop here no subject parent node update existing tag');
@@ -5683,7 +5695,7 @@ function buildNewTag(newTag, oldInsertBefore, oldTagSupport, subject) {
     console.log('oldInsertBefore', { oldInsertBefore });
     newTag.buildBeforeElement(oldInsertBefore, {
         forceElement: true,
-        counts: { added: 0, removed: 0 }, test: false,
+        counts: { added: 0, removed: 0 },
     });
     newTag.tagSupport.templater.global.oldest = newTag;
     newTag.tagSupport.templater.global.newest = newTag;
@@ -5784,7 +5796,8 @@ function updateExistingValue(subject, value, ownerTag, insertBefore) {
     }
     // its another tag array
     if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagArray)(value)) {
-        (0,_processTagArray__WEBPACK_IMPORTED_MODULE_2__.processTagArray)(subject, value, oldInsertBefore, ownerTag, { counts: {
+        (0,_processTagArray__WEBPACK_IMPORTED_MODULE_2__.processTagArray)(subject, value, insertBefore, // oldInsertBefore as InsertBefore,
+        ownerTag, { counts: {
                 added: 0,
                 removed: 0,
             } });

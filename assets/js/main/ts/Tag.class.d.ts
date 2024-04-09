@@ -3,6 +3,7 @@ import { Counts } from './interpolateTemplate';
 import { State } from './set.function';
 import { InterpolatedTemplates } from './interpolations';
 import { InterpolateSubject } from './processSubjectValue.function';
+import { InsertBefore } from './Clones.type';
 export declare const variablePrefix = "__tagvar";
 export declare const escapeVariable: string;
 export declare const escapeSearch: RegExp;
@@ -59,9 +60,7 @@ export declare class Tag {
     getAppElement(): Tag;
     /** Used during HMR only where static content itself could have been edited */
     rebuild(): void;
-    buildBeforeElement(insertBefore: Element | Text | ChildNode, options?: ElementBuildOptions & {
-        test: boolean;
-    }): void;
+    buildBeforeElement(insertBefore: Element | Text | ChildNode, options?: ElementBuildOptions): void;
 }
 type DestroyOptions = {
     stagger: number;
@@ -71,4 +70,5 @@ export type ElementBuildOptions = {
     counts: Counts;
     forceElement?: boolean;
 };
+export declare function insertAfter(newNode: InsertBefore, referenceNode: InsertBefore): void;
 export {};
