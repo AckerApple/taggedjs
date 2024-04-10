@@ -31,7 +31,7 @@ export function processTag(
   
   tag.ownerTag = ownerTag
 
-  if(insertBefore.nodeName !== 'TEMPLATE') {
+  if((insertBefore as any).tagName !== 'TEMPLATE') {
     throw new Error(`;;;; - ${insertBefore.nodeName}`)
   }
 

@@ -1,5 +1,5 @@
 import { Clones, InsertBefore, isRemoveTemplates } from './Clones.type'
-import { ArrayValueNeverSet, Tag, insertAfter } from './Tag.class'
+import { Tag, insertAfter } from './Tag.class'
 import { ValueSubject } from './subject/ValueSubject'
 import { Counts } from './interpolateTemplate'
 import { ArrayNoKeyError } from './errors'
@@ -46,8 +46,9 @@ export function processTagArray(
     const at = index - removed
     const lessLength = newLength < at
     const subTag = value[index - removed]
-    const subArrayValue = subTag?.arrayValue
-    const destroyItem = lessLength || !areLikeValues(subArrayValue, item.tag.arrayValue)
+    const subArrayValue = subTag?.memory.arrayValue
+    const tag = item.tag as Tag
+    const destroyItem = lessLength || !areLikeValues(subArrayValue, tag.memory.arrayValue)
     
     if(destroyItem) {
       const last = lastArray[index]
@@ -64,7 +65,6 @@ export function processTagArray(
     return true
   })
 
-  console.log('insertBefore',insertBefore)
   // const masterBefore = template || (template as any).clone
   const before = insertBefore // || (subject.value as any).insertBefore || (insertBefore as any).clone
 
@@ -81,8 +81,8 @@ export function processTagArray(
     }
     
     // check for html``.key()
-    const keyNotSet = subTag.arrayValue as ArrayValueNeverSet | undefined
-    if (keyNotSet?.isArrayValueNeverSet) {
+    const keySet = 'arrayValue' in subTag.memory
+    if (!keySet) {
       const details = {
         template: subTag.getTemplate().string,
         array: value,
@@ -96,15 +96,21 @@ export function processTagArray(
     
     const couldBeSame = lastArray.length > index
     if (couldBeSame) {
+      const prevSupport = previous.tag.tagSupport
+      const prevGlobal = prevSupport.templater.global
+      const isSame = areLikeValues(
+        previous.tag.memory.arrayValue,
+        subTag.memory.arrayValue,
+      )
 
-      const isSame = areLikeValues(previous.tag.arrayValue, subTag.arrayValue)
       if (isSame) {
-        subTag.tagSupport = subTag.tagSupport || previous.tag.tagSupport
-        const oldest = previous.tag.tagSupport.templater.global.oldest as Tag
+        subTag.tagSupport = subTag.tagSupport || prevSupport
+        const oldest = prevGlobal.oldest as Tag
         oldest.updateByTag(subTag)
         return []
       }
 
+      // TODO: should not get here?
       processAddTagArrayItem(
         before, subTag, index, options, lastArray
       )
@@ -112,6 +118,7 @@ export function processTagArray(
       // return [] // removed: item should have been previously deleted and will be added back
     }
 
+    console.log('adding item')
     processAddTagArrayItem(
       before,
       subTag,
@@ -148,25 +155,37 @@ function processAddTagArrayItem(
     removed: options.counts.removed,
   }
 
-  const lastFirstChild = before // tag.clones[0] // insertBefore.lastFirstChild    
-  if(!lastFirstChild.parentNode) {
+  if(!before.parentNode) {
     throw new Error('issue adding array item')
   }
 
-  console.log('lastFirstChild',lastFirstChild)
   subTag.buildBeforeElement(
-    lastFirstChild,
+    before,
     {counts, forceElement: options.forceElement}
   )
 
   // put template back down
-  const placeholder = subTag.tagSupport.templater.global.placeholderElm as Element
-  if(!placeholder) {
-    console.log('missing', {subGlobal: subTag.tagSupport.templater.global})
-  }
+  const subGlobal = subTag.tagSupport.templater.global
+  const placeholder = subGlobal.placeholderElm as Element
 
-  if( placeholder && isRemoveTemplates ) {    
-    insertAfter(lastFirstChild, placeholder)
+  if( isRemoveTemplates ) {
+    if(!placeholder) {
+      console.log('why no placeholder', {
+        before, bParent: before.parentNode
+      })
+      // throw new Error('why no placeholder')
+    }
+    console.log('array template tag put back down', {
+      before,
+      placeholder,
+      bParent: before.parentNode,
+      pParent: placeholder?.parentNode,
+      clones: subTag.clones,
+    })
+
+    if(!before.parentNode) {
+      insertAfter(before, placeholder)
+    }
   }
 }
 

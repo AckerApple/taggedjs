@@ -35,10 +35,16 @@ export function updateExistingTagComponent(
 
   if(oldGlobal.placeholderElm) {
     if(!oldGlobal.placeholderElm.parentNode) {
+      console.log('xxx', {
+        insertBefore,
+        placeholderElm: oldGlobal.placeholderElm,
+        iParent: insertBefore.parentNode,
+        pParent: oldGlobal.placeholderElm.parentNode,
+      })
       throw new Error('stop here no subject parent node update existing tag')
     }
   } else if(!oldInsertBefore.parentNode) {
-    throw new Error('stop here no parent node update existing tag')
+    //throw new Error('stop here no parent node update existing tag')
   }
 
   if(!isSameTag) {
@@ -162,7 +168,6 @@ function buildNewTag(
   oldTagSupport: TagSupport,
   subject: TagSubject,
 ) {
-  console.log('oldInsertBefore', {oldInsertBefore})
   newTag.buildBeforeElement(oldInsertBefore, {
     forceElement: true,
     counts: {added: 0, removed: 0},

@@ -1,7 +1,7 @@
 import { Context, ElementBuildOptions, Tag, variablePrefix } from "./Tag.class"
 import { InterpolateOptions } from "./interpolateElement"
 import { elementInitCheck } from "./elementInitCheck"
-import { Clones } from "./Clones.type"
+import { Clones, InsertBefore } from "./Clones.type"
 import { InterpolateSubject, processSubjectValue } from "./processSubjectValue.function"
 import { isTagArray, isTagComponent } from "./isInstance"
 import { DisplaySubject } from "./Tag.utils"
@@ -67,7 +67,7 @@ export function interpolateTemplate(
 }
 
 export function subscribeToTemplate(
-  insertBefore: Element | Text | Template,
+  insertBefore: InsertBefore,
   subject: InterpolateSubject,
   ownerTag: Tag,
   counts: Counts, // used for animation stagger computing

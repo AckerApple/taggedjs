@@ -1,12 +1,12 @@
 import { DisplaySubject, TagSubject } from './Tag.utils'
 import { isTagArray, isTagComponent, isTagInstance } from './isInstance'
-import { Tag } from './Tag.class'
+import { Tag, insertAfter } from './Tag.class'
 import { InterpolateSubject } from './processSubjectValue.function'
 import { TagArraySubject } from './processTagArray'
 import { isLikeTags } from './isLikeTags.function'
 import { Counts } from './interpolateTemplate'
 import { destroyTagMemory, destroyTagSupportPast } from './destroyTag.function'
-import { InsertBefore } from './Clones.type'
+import { InsertBefore, isRemoveTemplates } from './Clones.type'
 
 export function checkDestroyPrevious(
   subject: InterpolateSubject, // existing.value is the old value
@@ -33,7 +33,14 @@ export function checkDestroyPrevious(
 
     if(isSubjectTag && isValueTag) {
       const newTag = newValue as Tag
+      
+      // its a different tag now
       if(!isLikeTags(newTag, existingTag)) {
+        console.log('!!! not same tags destroy 2')
+        // put template back down
+        if(isRemoveTemplates) {
+          restoreTagMarker(existingTag, insertBefore)
+        }
         destroyTagMemory(existingTag, tagSubject)
         return 2
       }
@@ -46,6 +53,12 @@ export function checkDestroyPrevious(
       return false // its still a tag component
     }
 
+    // put template back down
+    if(isRemoveTemplates) {
+      restoreTagMarker(existingTag, insertBefore)
+    }
+
+    console.log('!!! not same tags destroy 3')
     // destroy old component, value is not a component
     destroyTagMemory(existingTag, tagSubject)
     return 3
@@ -75,16 +88,37 @@ export function destroyArrayTag(
 }
 
 function destroySimpleValue(
-  template: InsertBefore,
+  insertBefore: InsertBefore, // always a template tag
   subject: DisplaySubject,
 ) {
   const clone = subject.clone as Element
   const parent = clone.parentNode as ParentNode
 
-  // put the template back down
-  parent.insertBefore(template, clone)
+  // 1 put the template back down
+  parent.insertBefore(insertBefore, clone)
   parent.removeChild(clone)
+
+  /*
+  console.log('put back down', {
+    insertBefore,
+    clone,
+    iParent: insertBefore.parentNode,
+    cParent: clone.parentNode,
+  })
+  */
   
   delete subject.clone
   delete subject.lastValue
+}
+
+export function restoreTagMarker(
+  existingTag: Tag,
+  insertBefore: InsertBefore,
+) {
+  const global = existingTag.tagSupport.templater.global
+  const placeholderElm = global.placeholderElm
+  if(placeholderElm) {
+    insertAfter(insertBefore, placeholderElm)
+    // delete global.placeholderElm
+  }
 }

@@ -61,6 +61,10 @@ export function processSubjectComponent(
     if(ownerTag.clones.length > preClones.length) {
       const myClones = ownerTag.clones.filter(fClone => !preClones.find(clone => clone === fClone))
       retag.clones.push(...myClones)
+
+      if(myClones.find(x => x === insertBefore)) {
+        throw new Error('way back here we add marker')
+      }
     }
     
     if(ownerTag.childTags.find(x => x === retag)) {

@@ -22,8 +22,9 @@ export function interpolateToTemplates(
     
     const noBraces = expression.substring(1, expression.length-1)
     const id = noBraces
+    const name = 'template-' + template.length
     keys.push(id)
-    return `<template interpolate end id="${id}"></template>`
+    return `<template interpolate end id="${id}" name="${name}"></template>`
   })
 
   return { string, keys }

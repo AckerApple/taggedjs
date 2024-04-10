@@ -13,6 +13,7 @@ import { TagArraySubject } from './processTagArray'
 import { isSubjectInstance, isTagComponent } from './isInstance'
 import { isLikeTags } from './isLikeTags.function'
 import { InsertBefore, isRemoveTemplates } from './Clones.type'
+import { restoreTagMarker } from './checkDestroyPrevious.function'
 
 export const variablePrefix = '__tagvar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -36,10 +37,6 @@ export interface TagTemplate {
   context: Context,
 }
 
-export class ArrayValueNeverSet {
-  isArrayValueNeverSet = true
-}
-
 export class Tag {
   version = 0
   isTag = true
@@ -55,10 +52,13 @@ export class Tag {
   ownerTag?: Tag
   // insertBefore?: Element
   appElement?: Element // only seen on this.getAppElement().appElement
-  
-  // present only when an array. Populated by this.key()
-  arrayValue: unknown | ArrayValueNeverSet = new ArrayValueNeverSet()
 
+  // present only when an array. Populated by Tag.key()
+  memory = {
+  } as {
+    arrayValue?: unknown
+  }
+  
   constructor(
     public strings: string[],
     public values: any[],
@@ -66,7 +66,7 @@ export class Tag {
 
   /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
   key(arrayValue: unknown) {
-    this.arrayValue = arrayValue
+    this.memory.arrayValue = arrayValue
     return this
   }
 
@@ -88,23 +88,16 @@ export class Tag {
     const subject = tagSupport.subject
     
     // put back down the template tag
-    const templateTag = global.insertBefore as Element
+    const insertBefore = global.insertBefore as Element
     
     if(isRemoveTemplates) {
       const placeholder = global.placeholderElm as Element
-      console.log('destroy swap', {
-        templateTag,
-        placeholder,
-        tempParent: templateTag.parentNode,
-        placeParent: placeholder?.parentNode,
-      })
-
       if(placeholder) {
-        const parentNode = placeholder.parentNode as ParentNode
-        parentNode.insertBefore(templateTag, placeholder)
-        this.clones.push(placeholder) // setup to be deleted below
+        restoreTagMarker(this, insertBefore)
+        // this.clones.push(placeholder) // setup to be deleted below
       }
     }
+
     delete global.placeholderElm
 
     // the isComponent check maybe able to be removed
@@ -116,7 +109,6 @@ export class Tag {
     const childTags = options.byParent ? [] : getChildTagsToDestroy(this.childTags)
 
     // signify that no further event rendering should take place by making logic think a render occurred during event
-    // childTags.forEach(child => ++child.tagSupport.templater.global.renderCount)
     // signify immediately child has been deleted (looked for during event processing)
     childTags.forEach(child => {
       const subGlobal = child.tagSupport.templater.global
@@ -239,39 +231,6 @@ export class Tag {
 
   isLikeTag(tag: Tag) {
     return isLikeTags(this, tag)
-    const {string} = tag.getTemplate()
-
-    // TODO: most likely remove?
-    if(!this.lastTemplateString) {
-      throw new Error('no template here')
-    }
-
-    const stringMatched = string === this.lastTemplateString
-    if(!stringMatched || tag.values.length !== this.values.length) {
-      return false
-    }
-
-    const allVarsMatch = tag.values.every((value, index)=> {
-      const compareTo = this.values[index]
-      const isFunctions = value instanceof Function && compareTo instanceof Function
-      
-      if(isFunctions) {
-        const stringMatch = value.toString() === compareTo.toString()
-        if(stringMatch) {
-          return true
-        }
-
-        return false
-      }
-
-      return true
-    })
-
-    if(allVarsMatch) {
-      return true
-    }
-
-    return false
   }
 
   updateByTag(tag: Tag) {
@@ -368,25 +327,12 @@ export class Tag {
       counts: {added:0, removed: 0},
     },
   ) {
-    if(!insertBefore.parentNode) {
-      console.log('!!!', {
-        insertBefore,
-        myPlaceholderElm: this.tagSupport.templater.global.placeholderElm,
-        myInsertBefore: this.tagSupport.templater.global.insertBefore,
-      })
-      throw new Error('no parent before removing clones')
-    }
-
     const subject = this.tagSupport.subject
+    const thisTemplater = this.tagSupport.templater
+    const global = thisTemplater.global
     
     if(isRemoveTemplates) {
-      const global = this.tagSupport.templater.global
       const placeholderElm = global.placeholderElm
-      console.log('buildBeforeElement', {
-        insertBefore,
-        placeholderElm,
-        equal: insertBefore === placeholderElm
-      })
 
       if(placeholderElm) {
         const parentNode = placeholderElm.parentNode as ParentNode
@@ -396,23 +342,16 @@ export class Tag {
           placeholderElm,
         )
 
-        this.clones.push( placeholderElm ) // put back on chopping block
+        // ??? - removed as we don't steal clones anymore
+        // this.clones.push( placeholderElm ) // put back on chopping block
         delete global.placeholderElm
-
-        console.log('build put template back down', {
-          equal: insertBefore === placeholderElm,
-          insertBefore,
-          placeholderElm,
-          iParent: insertBefore.parentNode,
-          placeParent: placeholderElm.parentNode,
-        })
       }
     }
     
     const trueInsertBefore = insertBefore
-    const thisTemplater = this.tagSupport.templater
-    thisTemplater.global.oldest = this
-    thisTemplater.global.newest = this
+    
+    global.oldest = this
+    global.newest = this
     subject.tag = this
     this.hasLiveElements = true
 
@@ -421,7 +360,7 @@ export class Tag {
       this.clones.forEach(clone => this.checkCloneRemoval(clone, 0))
     }
 
-    thisTemplater.global.insertBefore = insertBefore
+    global.insertBefore = insertBefore
     
     // const context = this.tagSupport.memory.context // this.update()
     const context = this.update()
@@ -454,7 +393,7 @@ export class Tag {
 
     afterInterpolateElement(
       elementContainer,
-      trueInsertBefore, // insertBefore,
+      trueInsertBefore, // insertBefore (will be removed)
       this, // ownerTag
       context,
       options,
@@ -463,34 +402,92 @@ export class Tag {
     // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
     let isForceElement = options.forceElement
     tagComponents.forEach(tagComponent => {
+      const tagSupport = tagComponent.ownerTag.tagSupport 
+      const tagGlobal = tagSupport.templater.global
+      const placeholderElm = tagGlobal.placeholderElm // global.placeholderElm
+      if(placeholderElm) {
+        console.log('restoreTagMarker', {
+          // insertBefore: tagComponent.insertBefore,
+          // ownerTag: tagComponent.ownerTag,
+          insertBefore,
+          ownerTag: this.ownerTag,
+          placeholderElm,
+          placeParent: placeholderElm.parentNode,
+          equal: placeholderElm.parentNode === placeholderElm,
+          insertParent: insertBefore.parentNode,
+        })
+        // restoreTagMarker(tagComponent.ownerTag, tagComponent.insertBefore)
+        // restoreTagMarker(this, insertBefore)
+        // delete global.placeholderElm
+        /*
+        if(!placeholderElm.parentNode) {
+          throw new Error('no subject parent building tag components')
+        }
+        */
+      } else if(!insertBefore.parentNode) {
+        console.log('no parent insertBefore', {
+          insertBefore,
+          global: this.tagSupport.templater.global,
+        })
+        throw new Error('no parent building tag components')
+      }
+
+      const before = tagComponent.insertBefore // insertBefore  (will be removed)
+
       subscribeToTemplate(
-        tagComponent.insertBefore,
+        before, // tagComponent.insertBefore,
         tagComponent.subject as TagSubject | TagArraySubject,
         tagComponent.ownerTag,
         options.counts,
         {isForceElement},
       )
 
-      const placeholderElm = this.tagSupport.templater.global.placeholderElm
-      if(placeholderElm) {
-        if(!placeholderElm.parentNode) {
-          throw new Error('no subject parent building tag components')
-        }
-      } else if(!insertBefore.parentNode) {
-        console.log('no parent', {
-          insertBefore,
-          subject,
-        })
-        throw new Error('no parent building tag components')
-      }
+      console.log('midway', {
+        x: tagComponent.ownerTag === this,
+        placeholderElm,
+        parent: placeholderElm?.parentNode,
+        insertBefore,
+        iParent: insertBefore.parentNode
+      })
 
-      afterInterpolateElement(
+      const clones = afterInterpolateElement(
         elementContainer,
-        insertBefore, // tagComponent.insertBefore, // insertBefore,
+        before, // (will be removed)
         tagComponent.ownerTag, // this, // ownerTag
         context,
         options,
       )
+
+      if(placeholderElm && !placeholderElm?.parentNode) {
+        const clone = clones[this.clones.length-1]
+        console.log('zzz', {
+          before,
+          bParent: before.parentNode,
+          clone,
+          cParentNode: clone?.parentNode,
+          clones: clones,
+        })
+        if(clone) {
+          restoreTagMarker(tagComponent.ownerTag, clone)
+        }
+      }
+
+
+      if(placeholderElm) {
+        if(placeholderElm.parentNode) {
+          if(!global.placeholderElm) {
+            global.placeholderElm = placeholderElm
+          }
+        }
+
+        if(this.clones.length) {
+          global.placeholderElm = this.clones[this.clones.length - 1]
+          if(insertBefore.parentNode) {
+            const parentNode = insertBefore.parentNode as ParentNode
+            parentNode.removeChild(insertBefore)
+          }
+        }
+      }
     })
   }
 }
@@ -503,44 +500,70 @@ function afterInterpolateElement(
   context: Context,
   options: ElementBuildOptions,
 ) {
-  const ownerSupport = ownerTag.tagSupport
-  const ownerGlobal = ownerSupport.templater.global
   const clones = buildClones(container, insertBefore)
-  const hadBefore = isRemoveTemplates && ownerGlobal.placeholderElm
-  const parentNode = hadBefore ? ownerGlobal.placeholderElm?.parentNode as ParentNode : insertBefore.parentNode as ParentNode
-
-  if(hadBefore) {
-    // put the template back down
-    insertAfter(insertBefore, hadBefore)
-    delete ownerGlobal.placeholderElm
-    // throw new Error('maybe issue here?')
-  }
-
   if(!clones.length) {
     return clones
   }
-  
+
+  const ownerSupport = ownerTag.tagSupport
+  const ownerGlobal = ownerSupport.templater.global
+  const hadBefore = isRemoveTemplates && ownerGlobal.placeholderElm
+  const parentNode = hadBefore ? ownerGlobal.placeholderElm?.parentNode as ParentNode : insertBefore.parentNode as ParentNode
+
+  // we could now be processing same tag but more after components being rendered
+  if(hadBefore) {
+    // 0 put the template back down
+    insertAfter(insertBefore, hadBefore)
+
+    // ??? - removed as need for arrays
+    delete ownerGlobal.placeholderElm
+  }
+
   clones.forEach(clone => afterElmBuild(clone, options, context, ownerTag))
 
   let hasPopClone = false
   if(isRemoveTemplates) {
-    const clone = clones.pop()
+    // const clone = clones.pop()
+    const clone = clones[clones.length - 1]
 
     if(clone) {
-      hasPopClone = true
-      ownerGlobal.placeholderElm = clone // insertBefore
-      console.log('clone', {clone, length: clones.length})
+      console.log('cloneclonecloneclone', {
+        tag: ownerTag,
+        clone,
+        tagName: (clone as any).tagName,
+        nodeName: (clone as any).nodeName,
+        equal: clone === insertBefore,
+        hadBefore,
+      })
+
+      const isTemplate = (clone as any).tagName === 'TEMPLATE'
+      if(isTemplate) {
+        console.log('new clone is a template', {
+          clone, parentNode: clone.parentNode,
+          insertBefore
+        })
+        // throw new Error('hmmmmm')
+      } else {
+        hasPopClone = true
+        ownerGlobal.placeholderElm = clone // insertBefore
+      }
+
     }
   }
 
+  if(clones.find(x => x === insertBefore)) {
+    throw new Error('adding marker to owner in tag class')
+  }
   ownerTag.clones.push( ...clones )
   
-  if(isRemoveTemplates && hasPopClone) {
-    console.log('remove child - insertBefore', {
-      insertBefore,
-      // clone
-    })
-    parentNode.removeChild(insertBefore)
+  if(isRemoveTemplates) {
+    if(hasPopClone) { //  || hadBefore
+      parentNode.removeChild(insertBefore) // belongs to another tag
+    }
+  
+    if(!hasPopClone && hadBefore) {
+      ownerGlobal.placeholderElm = hadBefore
+    }
   }
 
   return clones

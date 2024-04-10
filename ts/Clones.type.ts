@@ -4,4 +4,4 @@ export type InsertBefore = Element | Text | Template | ChildNode
 
 export type Clones = InsertBefore[]
 
-export const isRemoveTemplates = false
+export const isRemoveTemplates = true

@@ -2,7 +2,6 @@ import { Tag } from './Tag.class'
 import { Counts, Template } from './interpolateTemplate'
 import { TagArraySubject } from './processTagArray'
 import { TagSubject } from './Tag.utils'
-import { destroyTagMemory } from './destroyTag.function'
 
 export function processTagResult(
   tag: Tag,

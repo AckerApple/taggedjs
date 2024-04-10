@@ -11,7 +11,8 @@ import { isLikeTags } from './isLikeTags.function'
 import { destroyTagMemory } from './destroyTag.function'
 import { OnInitCallback } from './onInit'
 import { Subscription } from './subject/Subject.utils'
-import { InsertBefore } from './Clones.type'
+import { InsertBefore, isRemoveTemplates } from './Clones.type'
+import { restoreTagMarker } from './checkDestroyPrevious.function'
 
 export type Wrapper = ((
   tagSupport: BaseTagSupport,
@@ -108,26 +109,42 @@ export function renderWithSupport(
 
   const isLikeTag = !existingTag || isLikeTags(existingTag, retag)
   if(!isLikeTag) {
+    const oldGlobal = existingTag.tagSupport.templater.global
+    const insertBefore = oldGlobal.insertBefore as Element
+
+    // put template back down
+    if(isRemoveTemplates) {
+      const pParentWas = oldGlobal.placeholderElm?.parentNode
+      restoreTagMarker(existingTag, insertBefore)
+      console.log('!isLikeTags', {
+        pParentWas,
+        pParent: oldGlobal.placeholderElm?.parentNode,
+        insertBefore,
+        iParent: insertBefore.parentNode,
+        existingTag,
+        retag,
+      })
+
+      delete oldGlobal.placeholderElm
+    }
+    
     destroyTagMemory(existingTag, subject)
 
-    delete templater.global.oldest
-    delete templater.global.newest
+    const global = templater.global
+    delete global.oldest
+    delete global.newest
     delete subject.tag
     
-    const oldGlobal = existingTag.tagSupport.templater.global
-    templater.global.insertBefore = oldGlobal.insertBefore as Element    
+    if(templater.global.placeholderElm) {
+      throw new Error('place holder parent issue start here?')
+    }
+
+    console.log('insertBefore', insertBefore)
+    templater.global.insertBefore = insertBefore
   }
 
   retag.ownerTag = runtimeOwnerTag
   wrapTagSupport.templater.global.newest = retag
-  
-  if(wrapTagSupport.templater.global.oldest && !wrapTagSupport.templater.global.oldest.hasLiveElements) {
-    throw new Error('56513540')
-  }
-
-  if(wrapTagSupport.templater.global.oldest && !wrapTagSupport.templater.global.oldest.hasLiveElements) {
-    throw new Error('5555 - 10')
-  }
 
   return retag
 }

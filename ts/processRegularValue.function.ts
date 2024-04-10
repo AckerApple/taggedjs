@@ -1,6 +1,5 @@
 import { InsertBefore } from './Clones.type'
 import { DisplaySubject } from './Tag.utils'
-import { Template } from './interpolateTemplate'
 import { updateBeforeTemplate } from './updateBeforeTemplate.function'
 
 export type RegularValue = string | number | undefined | boolean

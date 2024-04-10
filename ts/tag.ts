@@ -85,7 +85,7 @@ function kidsToTagArraySubject(
 
   const kid = children as Tag
   if(kid) {
-    kid.arrayValue = 0
+    kid.memory.arrayValue = 0
     return {childSubject: new ValueSubject([kid]), madeSubject: true}
   }
 

@@ -29,7 +29,7 @@ export function updateExistingValue(
   
   const global = subjectTag.tag?.tagSupport.templater.global
   const placeholderElm = global?.placeholderElm || global?.insertBefore || (subject as DisplaySubject).insertBefore
-  const oldInsertBefore = placeholderElm || (subject as DisplaySubject).clone
+  // const oldInsertBefore = placeholderElm || (subject as DisplaySubject).clone
 
   checkDestroyPrevious(subject, value, insertBefore)
 
@@ -42,7 +42,7 @@ export function updateExistingValue(
       processSubjectComponent(
         templater,
         subjectTag,
-        oldInsertBefore as InsertBefore,
+        insertBefore, // oldInsertBefore as InsertBefore,
         ownerTag,
         {
           forceElement: true,
@@ -108,17 +108,7 @@ export function updateExistingValue(
   }
 
   if(isTagInstance(value)) {
-    // insertBefore = subjectTag.insertBefore as InsertBefore || insertBefore
-    // const insertBefore = oldInsertBefore as InsertBefore
-    // delete subjectTag.tag?.tagSupport.templater.global.placeholderElm
-    if(insertBefore.nodeName !== 'TEMPLATE') {
-      console.log('subject', {
-        insertBefore,
-        subInsertBefore: (subject as any).insertBefore,
-        clone: (subject as any).clone,
-        iParent: insertBefore.parentNode,
-        subParent: (subject as any).insertBefore.parentNode,
-      })
+    if((insertBefore as any).tagName !== 'TEMPLATE') {
       throw new Error(`expected template - ${insertBefore.nodeName}`)
     }
 
@@ -140,7 +130,8 @@ export function updateExistingValue(
   processRegularValue(
     value as RegularValue,
     subject as DisplaySubject,
-    oldInsertBefore as InsertBefore,
+    // ??? - changed to insertBefore for tag switching with template removal
+    insertBefore // oldInsertBefore as InsertBefore,
   )
 
   return subjectTag
