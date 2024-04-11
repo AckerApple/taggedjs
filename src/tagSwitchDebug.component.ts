@@ -37,7 +37,7 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
   switch (selectedTag) {
     case null: tagOutput2 = html`<div id="select-tag-above">null, select tag above</div>`
       break;
-    case "": tagOutput2 = html`<div id="empty-string-2"></div>`
+    case "": tagOutput2 = html`<div id="select-tag-above">empty-string, select tag above</div>`
       break;
     case '1': tagOutput2 = tag1({title:'tag switch'})
       break;
@@ -57,9 +57,9 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
     <select id="tag-switch-dropdown" onchange=${changeSelectedTag}>
 	    <option></option>
       <!-- TODO: implement selected attribute --->
+	    <option value="" ${ typeof(selectedTag) === 'string' && !selectedTag.length ? {selected: true} : {} }>empty-string</option>
 	    <option value="undefined" ${ selectedTag === undefined ? {selected: true} : {} }>undefined</option>
 	    <option value="null" ${ selectedTag === null ? {selected: true} : {} }>null</option>
-	    <option value="" ${ selectedTag === "" ? {selected: true} : {} }>empty-string</option>
 	    <option value="1" ${ selectedTag === '1' ? {selected: true} : {} }>tag 1</option>
 	    <option value="2" ${ selectedTag === '2' ? {selected: true} : {} }>tag 2</option>
 	    <option value="3" ${ selectedTag === '3' ? {selected: true} : {} }>tag 3</option>

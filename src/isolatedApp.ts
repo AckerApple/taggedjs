@@ -21,8 +21,8 @@ export const IsolatedApp = tag(() => {
     // 'props',
     // 'providerDebug',
     
-    'arrays',
-    // 'tagSwitchDebug',
+    // 'arrays',
+    'tagSwitchDebug',
     
     // 'child',
   ]

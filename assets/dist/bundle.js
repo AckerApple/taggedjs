@@ -1168,8 +1168,8 @@ const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
         // 'counters',
         // 'props',
         // 'providerDebug',
-        'arrays',
-        // 'tagSwitchDebug',
+        // 'arrays',
+        'tagSwitchDebug',
         // 'child',
     ];
     let appCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.setLet)(0)(x => [appCounter, appCounter = x]);
@@ -1691,7 +1691,7 @@ const tagSwitchDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_t = 'tagS
             tagOutput2 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `<div id="select-tag-above">null, select tag above</div>`;
             break;
         case "":
-            tagOutput2 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `<div id="empty-string-2"></div>`;
+            tagOutput2 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `<div id="select-tag-above">empty-string, select tag above</div>`;
             break;
         case '1':
             tagOutput2 = tag1({ title: 'tag switch' });
@@ -1712,9 +1712,9 @@ const tagSwitchDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_t = 'tagS
     <select id="tag-switch-dropdown" onchange=${changeSelectedTag}>
 	    <option></option>
       <!-- TODO: implement selected attribute --->
+	    <option value="" ${typeof (selectedTag) === 'string' && !selectedTag.length ? { selected: true } : {}}>empty-string</option>
 	    <option value="undefined" ${selectedTag === undefined ? { selected: true } : {}}>undefined</option>
 	    <option value="null" ${selectedTag === null ? { selected: true } : {}}>null</option>
-	    <option value="" ${selectedTag === "" ? { selected: true } : {}}>empty-string</option>
 	    <option value="1" ${selectedTag === '1' ? { selected: true } : {}}>tag 1</option>
 	    <option value="2" ${selectedTag === '2' ? { selected: true } : {}}>tag 2</option>
 	    <option value="3" ${selectedTag === '3' ? { selected: true } : {}}>tag 3</option>
@@ -1828,6 +1828,7 @@ __webpack_require__.r(__webpack_exports__);
 
 function runTests() {
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('elements exists', () => {
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(document.getElementsByTagName('template').length).toBe(0);
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(document.getElementById('h1-app')).toBeDefined();
         const toggleTest = document.getElementById('toggle-test');
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(toggleTest).toBeDefined();
@@ -1886,7 +1887,7 @@ function runTests() {
         // now ensure that this inner tag still operates correctly even though parent just rendered but i did not from that change
         testDuelCounterElements(['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'], ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display']);
     });
-    _expect__WEBPACK_IMPORTED_MODULE_1__.it.skip('tagSwitching', () => {
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('tagSwitching', () => {
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined');
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tag-switch-dropdown')).toBe(1, 'Expected one #tag-switch-dropdown');
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-1-hello')).toBe(2, 'Expected two #tagSwitch-1-hello elements');
@@ -1959,6 +1960,9 @@ function runTests() {
         testCounterElements('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display');
         testDuelCounterElements(['#childTests-button', '#childTests-display'], ['#innerHtmlPropsTest-childTests-button', '#innerHtmlPropsTest-childTests-display']);
         testDuelCounterElements(['#childTests-button', '#childTests-display'], ['#innerHtmlTest-childTests-button', '#innerHtmlTest-childTests-display']);
+    });
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('has no templates', () => {
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(document.getElementsByTagName('template').length).toBe(0);
     });
     try {
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.execute)();
@@ -4334,7 +4338,14 @@ ownerTag, options) {
     const clones = ownerTag.clones; // []
     let lastArray = subject.lastArray = subject.lastArray || [];
     if (subject.placeholderElm) {
-        (0,_insertAfter_function__WEBPACK_IMPORTED_MODULE_4__.insertAfter)(insertBefore, subject.placeholderElm);
+        const parentPlaceholder = subject.parentAsPlaceholder;
+        if (parentPlaceholder) {
+            parentPlaceholder.appendChild(insertBefore);
+            delete subject.placeholderElm;
+        }
+        else {
+            (0,_insertAfter_function__WEBPACK_IMPORTED_MODULE_4__.insertAfter)(insertBefore, subject.placeholderElm);
+        }
         delete subject.placeholderElm;
     }
     let removed = 0;
@@ -4402,15 +4413,26 @@ ownerTag, options) {
         ownerTag.childTags.push(subTag);
     });
     if (value.length) {
-        // const tags = subject.lastArray.map(x => x.tag)
-        // const lastClone = getLastCloneFrom(tags)
-        // const lastClone = (insertBefore as Element).previousElementSibling as Element
         const lastClone = insertBefore.previousSibling;
-        subject.placeholderElm = lastClone;
-        const parentNode = insertBefore.parentNode;
-        parentNode.removeChild(insertBefore);
+        setPlaceholderElm(lastClone, insertBefore, subject);
+    }
+    else {
+        const placeholderElm = insertBefore.previousSibling;
+        if (placeholderElm) {
+            setPlaceholderElm(placeholderElm, insertBefore, subject);
+        }
+        else {
+            const parentNode = insertBefore.parentNode;
+            setPlaceholderElm(parentNode, insertBefore, subject);
+            subject.parentAsPlaceholder = parentNode;
+        }
     }
     return clones;
+}
+function setPlaceholderElm(lastClone, insertBefore, subject) {
+    subject.placeholderElm = lastClone;
+    const parentNode = insertBefore.parentNode;
+    parentNode.removeChild(insertBefore);
 }
 function processAddTagArrayItem(before, subTag, index, options, lastArray) {
     const lastValue = {
@@ -5628,11 +5650,6 @@ function updateBeforeTemplate(value, lastFirstChild) {
     parent.insertBefore(textNode, lastFirstChild);
     /* remove existing nodes */
     parent.removeChild(lastFirstChild);
-    if (castedValue === '') {
-        console.log('xxxx', {
-            lastFirstChild, textNode, value, castedValue
-        });
-    }
     return textNode;
 }
 

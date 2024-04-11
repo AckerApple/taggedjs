@@ -1,8 +1,9 @@
 import { byId, elementCount, queryOneInnerHTML } from "./elmSelectors"
 import { describe, execute, expect, it } from "./expect"
 
-export function runTests() {  
+export function runTests() {
   it('elements exists', () => {
+    expect(document.getElementsByTagName('template').length).toBe(0)
     expect(document.getElementById('h1-app')).toBeDefined()
     const toggleTest = document.getElementById('toggle-test')
     expect(toggleTest).toBeDefined()
@@ -104,7 +105,7 @@ export function runTests() {
     )
   })
 
-  it.skip('tagSwitching', () => {
+  it('tagSwitching', () => {
     expect(elementCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined')
     expect(elementCount('#tag-switch-dropdown')).toBe(1, 'Expected one #tag-switch-dropdown')
     expect(elementCount('#tagSwitch-1-hello')).toBe(2, 'Expected two #tagSwitch-1-hello elements')
@@ -202,6 +203,10 @@ export function runTests() {
       ['#childTests-button', '#childTests-display'],
       ['#innerHtmlTest-childTests-button', '#innerHtmlTest-childTests-display'],
     )
+  })
+
+  it('has no templates', () => {
+    expect(document.getElementsByTagName('template').length).toBe(0)
   })
 
   try {
