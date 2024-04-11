@@ -12,7 +12,8 @@ export function processRegularValue(
   subject.insertBefore = insertBefore
   const before = subject.clone || insertBefore // Either the template is on the doc OR its the first element we last put on doc
 
-  if(subject.lastValue === value) {
+  // matches but also was defined at some point
+  if(subject.lastValue === value && 'lastValue' in subject) {
     return // no need to update display, its the same
   }
 

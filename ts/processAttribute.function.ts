@@ -178,8 +178,11 @@ function processNameValueAttr(
   return
 }
 
+export type NoDisplayValue = false | null | undefined
+type DisplayValue = ((...args: unknown[]) => unknown) | string | boolean
+
 function processAttributeSubjectValue(
-  newAttrValue: ((...args: unknown[]) => unknown) | string | boolean,
+  newAttrValue: DisplayValue | NoDisplayValue,
   child: Element,
   attrName: string,
   isSpecial: boolean,
@@ -208,14 +211,14 @@ function processAttributeSubjectValue(
     return
   }
 
-  const isDeadValue = newAttrValue === undefined || newAttrValue === false || newAttrValue === null
+  const isDeadValue = [undefined, false, null].includes(newAttrValue as NoDisplayValue)
   if(isDeadValue) {
     child.removeAttribute(attrName)
     return
   }
 
   // value is 0
-  howToSet(child, attrName, newAttrValue)
+  howToSet(child, attrName, newAttrValue as string)
 }
 
 /** Looking for (class | style) followed by a period */

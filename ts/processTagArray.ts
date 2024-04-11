@@ -1,11 +1,12 @@
-import { Clones, InsertBefore, isRemoveTemplates } from './Clones.type'
-import { Tag, insertAfter } from './Tag.class'
+import { Clones, InsertBefore } from './Clones.type'
+import { Tag } from './Tag.class'
 import { ValueSubject } from './subject/ValueSubject'
 import { Counts } from './interpolateTemplate'
 import { ArrayNoKeyError } from './errors'
-import { destroyArrayTag } from './checkDestroyPrevious.function'
+import { destroyArrayTag, restoreTagMarker } from './checkDestroyPrevious.function'
 import { TagSubject } from './Tag.utils'
 import { applyFakeTemplater } from './processTag.function'
+import { insertAfter } from './insertAfter.function'
 
 export type LastArrayItem = {
   tag: Tag
@@ -14,8 +15,9 @@ export type LastArrayItem = {
 }
 
 export type TagArraySubject = ValueSubject<Tag[]> & {
-  lastArray?: LastArrayItem[]
-  insertBefore: InsertBefore
+  insertBefore: InsertBefore // template tag
+  lastArray?: LastArrayItem[] // previous array that may have been processed
+  placeholderElm?: InsertBefore // The template tag never stays behind, this element lets us know where to draw back to
   isChildSubject?: boolean // present when children passed as prop0 or prop1
 }
 
@@ -32,8 +34,10 @@ export function processTagArray(
   const clones: Clones = ownerTag.clones // []
   let lastArray = subject.lastArray = subject.lastArray || []
 
-  // ???
-  // subject.insertBefore = insertBefore
+  if(subject.placeholderElm) {
+    insertAfter(insertBefore, subject.placeholderElm)
+    delete subject.placeholderElm
+  }
 
   let removed = 0
   
@@ -118,7 +122,6 @@ export function processTagArray(
       // return [] // removed: item should have been previously deleted and will be added back
     }
 
-    console.log('adding item')
     processAddTagArrayItem(
       before,
       subTag,
@@ -129,6 +132,17 @@ export function processTagArray(
 
     ownerTag.childTags.push(subTag)  
   })
+
+  if(value.length) {
+    // const tags = subject.lastArray.map(x => x.tag)
+    // const lastClone = getLastCloneFrom(tags)
+    // const lastClone = (insertBefore as Element).previousElementSibling as Element
+    const lastClone = insertBefore.previousSibling as ChildNode
+    subject.placeholderElm = lastClone
+    const parentNode = insertBefore.parentNode as ParentNode
+    
+    parentNode.removeChild(insertBefore)
+  }
 
   return clones
 }
@@ -159,34 +173,13 @@ function processAddTagArrayItem(
     throw new Error('issue adding array item')
   }
 
+  const newTempElm = document.createElement('template')
+  before.parentNode.insertBefore(newTempElm, before)
+
   subTag.buildBeforeElement(
-    before,
+    newTempElm, // before,
     {counts, forceElement: options.forceElement}
   )
-
-  // put template back down
-  const subGlobal = subTag.tagSupport.templater.global
-  const placeholder = subGlobal.placeholderElm as Element
-
-  if( isRemoveTemplates ) {
-    if(!placeholder) {
-      console.log('why no placeholder', {
-        before, bParent: before.parentNode
-      })
-      // throw new Error('why no placeholder')
-    }
-    console.log('array template tag put back down', {
-      before,
-      placeholder,
-      bParent: before.parentNode,
-      pParent: placeholder?.parentNode,
-      clones: subTag.clones,
-    })
-
-    if(!before.parentNode) {
-      insertAfter(before, placeholder)
-    }
-  }
 }
 
 /** compare two values. If both values are arrays then the items will be compared */

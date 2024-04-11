@@ -30,9 +30,10 @@ export function renderExistingTag(
   }
 
   const oldTemplater = tagSupport.templater || newTemplater
+  const toRedrawTag = subject.tag || oldTemplater.global.newest || oldTemplater.global.oldest // hmmmmmm, why not newest?
   const redraw = renderWithSupport(
     newTemplater.tagSupport,
-    subject.tag || oldTemplater.global.newest || oldTemplater.global.oldest, // hmmmmmm, why not newest?
+    toRedrawTag,
     subject,
     oldestTag.ownerTag,
   )

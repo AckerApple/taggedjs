@@ -1,26 +1,32 @@
 import { DisplaySubject, TagSubject } from './Tag.utils'
 import { isTagArray, isTagComponent, isTagInstance } from './isInstance'
-import { Tag, insertAfter } from './Tag.class'
+import { Tag } from './Tag.class'
 import { InterpolateSubject } from './processSubjectValue.function'
 import { TagArraySubject } from './processTagArray'
 import { isLikeTags } from './isLikeTags.function'
 import { Counts } from './interpolateTemplate'
 import { destroyTagMemory, destroyTagSupportPast } from './destroyTag.function'
 import { InsertBefore, isRemoveTemplates } from './Clones.type'
+import { insertAfter } from './insertAfter.function'
 
 export function checkDestroyPrevious(
   subject: InterpolateSubject, // existing.value is the old value
   newValue: unknown,
   insertBefore: InsertBefore,
 ) {
-  const existingSubArray = subject as TagArraySubject
-  const wasArray = existingSubArray.lastArray
+  const arraySubject = subject as TagArraySubject
+  const wasArray = arraySubject.lastArray
   
   // no longer an array
   if (wasArray && !isTagArray(newValue)) {
+    const placeholderElm = arraySubject.placeholderElm as Element
+    delete arraySubject.lastArray
+    delete arraySubject.placeholderElm
+    insertAfter(insertBefore, placeholderElm)
+
     wasArray.forEach(({tag}) => destroyArrayTag(tag, {added:0, removed:0}))
-    delete existingSubArray.lastArray  
-    return 1
+
+    return 'array'
   }
 
   const tagSubject = subject as TagSubject
@@ -36,7 +42,6 @@ export function checkDestroyPrevious(
       
       // its a different tag now
       if(!isLikeTags(newTag, existingTag)) {
-        console.log('!!! not same tags destroy 2')
         // put template back down
         if(isRemoveTemplates) {
           restoreTagMarker(existingTag, insertBefore)
@@ -58,10 +63,9 @@ export function checkDestroyPrevious(
       restoreTagMarker(existingTag, insertBefore)
     }
 
-    console.log('!!! not same tags destroy 3')
     // destroy old component, value is not a component
     destroyTagMemory(existingTag, tagSubject)
-    return 3
+    return 'different-tag'
   }
 
   const displaySubject = subject as DisplaySubject
@@ -97,15 +101,6 @@ function destroySimpleValue(
   // 1 put the template back down
   parent.insertBefore(insertBefore, clone)
   parent.removeChild(clone)
-
-  /*
-  console.log('put back down', {
-    insertBefore,
-    clone,
-    iParent: insertBefore.parentNode,
-    cParent: clone.parentNode,
-  })
-  */
   
   delete subject.clone
   delete subject.lastValue

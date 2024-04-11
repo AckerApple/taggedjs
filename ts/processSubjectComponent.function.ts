@@ -13,7 +13,7 @@ export function processSubjectComponent(
   insertBefore: InsertBefore,
   ownerTag: Tag,
   options: {counts: Counts, forceElement?: boolean},
-) {
+): Tag {
   // Check if function component is wrapped in a tag() call
   // TODO: This below check not needed in production mode
   if(templater.tagged !== true) {
@@ -44,34 +44,13 @@ export function processSubjectComponent(
   
   const isRedraw = !retag || options.forceElement
   if(isRedraw) {
-    const preClones = ownerTag.clones.map(clone => clone)
-    retag = renderWithSupport(
-      templater.tagSupport,
-      subject.tag, // existing tag
+    retag = redrawSubjectComponent(
+      templater,
       subject,
+      retag,
       ownerTag,
+      insertBefore,
     )
-
-    if(retag.tagSupport.templater.global.newest != retag) {
-      throw new Error('mismatch result newest')
-    }
-
-    templater.global.newest = retag
-
-    if(ownerTag.clones.length > preClones.length) {
-      const myClones = ownerTag.clones.filter(fClone => !preClones.find(clone => clone === fClone))
-      retag.clones.push(...myClones)
-
-      if(myClones.find(x => x === insertBefore)) {
-        throw new Error('way back here we add marker')
-      }
-    }
-    
-    if(ownerTag.childTags.find(x => x === retag)) {
-      throw new Error('about to reattach tag already present')
-    }
-
-    ownerTag.childTags.push(retag)
   }
 
   processTagResult(
@@ -80,4 +59,45 @@ export function processSubjectComponent(
     insertBefore, // <template end interpolate /> (will be removed)
     options,
   )
+
+  return retag
+}
+
+function redrawSubjectComponent(
+  templater: TemplaterResult,
+  subject: TagSubject,
+  retag: Tag,
+  ownerTag: Tag,
+  insertBefore: InsertBefore,
+): Tag {
+  const preClones = ownerTag.clones.map(clone => clone)
+  retag = renderWithSupport(
+    templater.tagSupport,
+    subject.tag, // existing tag
+    subject,
+    ownerTag,
+  )
+
+  if(retag.tagSupport.templater.global.newest != retag) {
+    throw new Error('mismatch result newest')
+  }
+
+  templater.global.newest = retag
+
+  if(ownerTag.clones.length > preClones.length) {
+    const myClones = ownerTag.clones.filter(fClone => !preClones.find(clone => clone === fClone))
+    retag.clones.push(...myClones)
+
+    if(myClones.find(x => x === insertBefore)) {
+      throw new Error('way back here we add marker')
+    }
+  }
+  
+  if(ownerTag.childTags.find(x => x === retag)) {
+    throw new Error('about to reattach tag already present')
+  }
+
+  ownerTag.childTags.push(retag)
+
+  return retag
 }

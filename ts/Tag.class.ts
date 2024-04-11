@@ -14,6 +14,7 @@ import { isSubjectInstance, isTagComponent } from './isInstance'
 import { isLikeTags } from './isLikeTags.function'
 import { InsertBefore, isRemoveTemplates } from './Clones.type'
 import { restoreTagMarker } from './checkDestroyPrevious.function'
+import { insertAfter } from './insertAfter.function'
 
 export const variablePrefix = '__tagvar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -92,9 +93,10 @@ export class Tag {
     
     if(isRemoveTemplates) {
       const placeholder = global.placeholderElm as Element
-      if(placeholder) {
-        restoreTagMarker(this, insertBefore)
-        // this.clones.push(placeholder) // setup to be deleted below
+      if(placeholder && !('arrayValue' in this.memory)) {
+        if(!options.byParent) {
+          restoreTagMarker(this, insertBefore)
+        }
       }
     }
 
@@ -405,30 +407,8 @@ export class Tag {
       const tagSupport = tagComponent.ownerTag.tagSupport 
       const tagGlobal = tagSupport.templater.global
       const placeholderElm = tagGlobal.placeholderElm // global.placeholderElm
-      if(placeholderElm) {
-        console.log('restoreTagMarker', {
-          // insertBefore: tagComponent.insertBefore,
-          // ownerTag: tagComponent.ownerTag,
-          insertBefore,
-          ownerTag: this.ownerTag,
-          placeholderElm,
-          placeParent: placeholderElm.parentNode,
-          equal: placeholderElm.parentNode === placeholderElm,
-          insertParent: insertBefore.parentNode,
-        })
-        // restoreTagMarker(tagComponent.ownerTag, tagComponent.insertBefore)
-        // restoreTagMarker(this, insertBefore)
-        // delete global.placeholderElm
-        /*
-        if(!placeholderElm.parentNode) {
-          throw new Error('no subject parent building tag components')
-        }
-        */
-      } else if(!insertBefore.parentNode) {
-        console.log('no parent insertBefore', {
-          insertBefore,
-          global: this.tagSupport.templater.global,
-        })
+      
+      if(!placeholderElm && !insertBefore.parentNode) {
         throw new Error('no parent building tag components')
       }
 
@@ -442,14 +422,6 @@ export class Tag {
         {isForceElement},
       )
 
-      console.log('midway', {
-        x: tagComponent.ownerTag === this,
-        placeholderElm,
-        parent: placeholderElm?.parentNode,
-        insertBefore,
-        iParent: insertBefore.parentNode
-      })
-
       const clones = afterInterpolateElement(
         elementContainer,
         before, // (will be removed)
@@ -460,13 +432,6 @@ export class Tag {
 
       if(placeholderElm && !placeholderElm?.parentNode) {
         const clone = clones[this.clones.length-1]
-        console.log('zzz', {
-          before,
-          bParent: before.parentNode,
-          clone,
-          cParentNode: clone?.parentNode,
-          clones: clones,
-        })
         if(clone) {
           restoreTagMarker(tagComponent.ownerTag, clone)
         }
@@ -481,21 +446,33 @@ export class Tag {
         }
 
         if(this.clones.length) {
-          global.placeholderElm = this.clones[this.clones.length - 1]
           if(insertBefore.parentNode) {
+            global.placeholderElm = insertBefore.previousSibling as ChildNode
             const parentNode = insertBefore.parentNode as ParentNode
             parentNode.removeChild(insertBefore)
           }
         }
       }
     })
+
+    if(!global.placeholderElm) {
+      // const clone = getLastCloneFromTags(this)
+      // const clone = (insertBefore as Element).previousElementSibling as Element
+      const clone = insertBefore.previousSibling
+
+      if(clone) {
+        const parentNode = insertBefore.parentNode as ParentNode
+        global.placeholderElm = clone
+        parentNode.removeChild(insertBefore)
+      }
+    }
   }
 }
 
 function afterInterpolateElement(
   container: Element,
   insertBefore: InsertBefore,
-  ownerTag: Tag,
+  tag: Tag,
   // preClones: Clones,
   context: Context,
   options: ElementBuildOptions,
@@ -505,7 +482,7 @@ function afterInterpolateElement(
     return clones
   }
 
-  const ownerSupport = ownerTag.tagSupport
+  const ownerSupport = tag.tagSupport
   const ownerGlobal = ownerSupport.templater.global
   const hadBefore = isRemoveTemplates && ownerGlobal.placeholderElm
   const parentNode = hadBefore ? ownerGlobal.placeholderElm?.parentNode as ParentNode : insertBefore.parentNode as ParentNode
@@ -519,50 +496,28 @@ function afterInterpolateElement(
     delete ownerGlobal.placeholderElm
   }
 
-  clones.forEach(clone => afterElmBuild(clone, options, context, ownerTag))
+  clones.forEach(clone => afterElmBuild(clone, options, context, tag))
 
-  let hasPopClone = false
+  let hasPopClone: InsertBefore | undefined
   if(isRemoveTemplates) {
-    // const clone = clones.pop()
-    const clone = clones[clones.length - 1]
+    const clone = insertBefore.previousSibling // clones[clones.length - 1]
 
     if(clone) {
-      console.log('cloneclonecloneclone', {
-        tag: ownerTag,
-        clone,
-        tagName: (clone as any).tagName,
-        nodeName: (clone as any).nodeName,
-        equal: clone === insertBefore,
-        hadBefore,
-      })
-
-      const isTemplate = (clone as any).tagName === 'TEMPLATE'
-      if(isTemplate) {
-        console.log('new clone is a template', {
-          clone, parentNode: clone.parentNode,
-          insertBefore
-        })
-        // throw new Error('hmmmmm')
-      } else {
-        hasPopClone = true
-        ownerGlobal.placeholderElm = clone // insertBefore
+      const isTemplate = (clone as any).tagName === 'TEMPLATE' && (clone as Element).hasAttribute('interpolate')
+      if(!isTemplate) {
+        hasPopClone = ownerGlobal.placeholderElm = clone // insertBefore
       }
-
     }
   }
 
   if(clones.find(x => x === insertBefore)) {
     throw new Error('adding marker to owner in tag class')
   }
-  ownerTag.clones.push( ...clones )
+  tag.clones.push( ...clones )
   
   if(isRemoveTemplates) {
     if(hasPopClone) { //  || hadBefore
       parentNode.removeChild(insertBefore) // belongs to another tag
-    }
-  
-    if(!hasPopClone && hadBefore) {
-      ownerGlobal.placeholderElm = hadBefore
     }
   }
 
@@ -633,13 +588,4 @@ function updateContextItem(
   subject.set(value) // listeners will evaluate updated values to possibly update display(s)
   
   return
-}
-
-// Function to insert element after reference element
-export function insertAfter(
-  newNode: InsertBefore,
-  referenceNode: InsertBefore
-) {
-  const parentNode = referenceNode.parentNode as ParentNode
-  parentNode.insertBefore(newNode, referenceNode.nextSibling)
 }

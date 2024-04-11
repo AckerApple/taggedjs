@@ -101,6 +101,8 @@ export function renderWithSupport(
   /* END: BEFORE RENDER */
   
   const templater = wrapTagSupport.templater
+
+  // NEW TAG CREATED HERE
   const retag = templater.wrapper(wrapTagSupport, subject)
 
   /* AFTER */
@@ -109,42 +111,33 @@ export function renderWithSupport(
 
   const isLikeTag = !existingTag || isLikeTags(existingTag, retag)
   if(!isLikeTag) {
-    const oldGlobal = existingTag.tagSupport.templater.global
-    const insertBefore = oldGlobal.insertBefore as Element
-
-    // put template back down
-    if(isRemoveTemplates) {
-      const pParentWas = oldGlobal.placeholderElm?.parentNode
-      restoreTagMarker(existingTag, insertBefore)
-      console.log('!isLikeTags', {
-        pParentWas,
-        pParent: oldGlobal.placeholderElm?.parentNode,
-        insertBefore,
-        iParent: insertBefore.parentNode,
-        existingTag,
-        retag,
-      })
-
-      delete oldGlobal.placeholderElm
-    }
-    
-    destroyTagMemory(existingTag, subject)
-
-    const global = templater.global
-    delete global.oldest
-    delete global.newest
-    delete subject.tag
-    
-    if(templater.global.placeholderElm) {
-      throw new Error('place holder parent issue start here?')
-    }
-
-    console.log('insertBefore', insertBefore)
-    templater.global.insertBefore = insertBefore
+    destroyUnlikeTags(existingTag, templater, subject)
   }
 
   retag.ownerTag = runtimeOwnerTag
   wrapTagSupport.templater.global.newest = retag
 
   return retag
+}
+
+function destroyUnlikeTags(
+  existingTag: Tag, // old
+  templater: TemplaterResult, // new
+  subject: TagSubject,
+) {
+  const oldGlobal = existingTag.tagSupport.templater.global
+  const insertBefore = oldGlobal.insertBefore as Element
+  
+  destroyTagMemory(existingTag, subject)
+
+  // ??? - new so that when a tag is destroy the unlike does not carry the destroy signifier
+  templater.global = {...templater.global} // break memory references
+  const global = templater.global
+  
+  global.insertBefore = insertBefore
+  global.deleted = false
+  
+  delete global.oldest
+  delete global.newest
+  delete subject.tag
 }

@@ -15,7 +15,7 @@ export function updateExistingTagComponent(
   templater: TemplaterResult,
   subject: TagSubject,
   insertBefore: InsertBefore,
-): void {
+): Tag {
   let existingTag = subject.tag as Tag
   
   const oldWrapper = existingTag.tagSupport.templater.wrapper
@@ -33,14 +33,10 @@ export function updateExistingTagComponent(
   const globalInsert = oldGlobal.insertBefore
   const oldInsertBefore = globalInsert?.parentNode ? globalInsert : insertBefore
 
-  if(oldGlobal.placeholderElm) {
-    if(!oldGlobal.placeholderElm.parentNode) {
-      console.log('xxx', {
-        insertBefore,
-        placeholderElm: oldGlobal.placeholderElm,
-        iParent: insertBefore.parentNode,
-        pParent: oldGlobal.placeholderElm.parentNode,
-      })
+  // const placeholderElm = ownerTag.tagSupport.templater.global.placeholderElm
+  const placeholderElm = oldGlobal.placeholderElm
+  if(placeholderElm) {
+    if(!placeholderElm.parentNode) {
       throw new Error('stop here no subject parent node update existing tag')
     }
   } else if(!oldInsertBefore.parentNode) {
@@ -49,14 +45,19 @@ export function updateExistingTagComponent(
 
   if(!isSameTag) {
     destroyTagMemory(oldTagSupport.templater.global.oldest as Tag, subject)
-    processSubjectComponent(templater, subject, oldInsertBefore, ownerTag, {
+    return processSubjectComponent(
+      templater,
+      subject,
+      // ??? - newly changed
+      insertBefore, // oldInsertBefore,
+      ownerTag, {
       forceElement: false,
       counts: {added: 0, removed: 0},
     })
-    return
   } else {
     const newTagSupport = templater.tagSupport
     const hasChanged = hasTagSupportChanged(oldTagSupport, newTagSupport, templater)
+    
     if(!hasChanged) {
       // if the new props are an object then implicitly since no change, the old props are an object
       const newProps = templater.props
@@ -72,7 +73,7 @@ export function updateExistingTagComponent(
         )
       }    
 
-      return // its the same tag component
+      return existingTag // its the same tag component
     }
   }
 
@@ -93,7 +94,13 @@ export function updateExistingTagComponent(
   const newOldest = newTag.tagSupport.templater.global.oldest
   const hasOldest = newOldest ? true : false
   if(!hasOldest) {
-    return buildNewTag(newTag, oldInsertBefore, oldTagSupport, subject)
+    return buildNewTag(
+      newTag,
+      // ??? newly changed
+      insertBefore, // oldInsertBefore,
+      oldTagSupport,
+      subject
+    )
   }
   
   if(newOldest && templater.children.value.length) {
@@ -124,7 +131,7 @@ export function updateExistingTagComponent(
     subject.tag = newTag
     oldestTag.updateByTag(newTag) // the oldest tag has element references
 
-    return
+    return newTag
   } else {
     // Although function looked the same it returned a different html result
     if(isSameTag && existingTag) {
@@ -145,7 +152,7 @@ export function updateExistingTagComponent(
 
   oldTagSupport.templater.global.newest = newTag
 
-  return
+  return newTag
 }
 
 function checkStateChanged(state: State) {
@@ -167,7 +174,7 @@ function buildNewTag(
   oldInsertBefore: Element | Text | ChildNode,
   oldTagSupport: TagSupport,
   subject: TagSubject,
-) {
+): Tag {
   newTag.buildBeforeElement(oldInsertBefore, {
     forceElement: true,
     counts: {added: 0, removed: 0},
@@ -180,7 +187,7 @@ function buildNewTag(
 
   subject.tag = newTag
 
-  return
+  return newTag
 }
 
 function syncFunctionProps(
