@@ -23,6 +23,8 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
   switch (selectedTag) {
     case null: tagOutput = 'null, select tag below'
       break;
+    case "": tagOutput = html`<div id="empty-string-1"></div>`
+      break;
     case '1': tagOutput = tag1({title:'value switch'})
       break;
     case '2': tagOutput = tag2({title:'value switch'})
@@ -35,6 +37,8 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
   switch (selectedTag) {
     case null: tagOutput2 = html`<div id="select-tag-above">null, select tag above</div>`
       break;
+    case "": tagOutput2 = html`<div id="empty-string-2"></div>`
+      break;
     case '1': tagOutput2 = tag1({title:'tag switch'})
       break;
     case '2': tagOutput2 = tag2({title:'tag switch'})
@@ -46,7 +50,7 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
   ++renderCount
 
   return html`
-    <div>
+    <div id="selectTag-wrap">
       selectedTag: |${selectedTag == null ? 'null' : selectedTag}|
     </div>
     
@@ -55,12 +59,13 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
       <!-- TODO: implement selected attribute --->
 	    <option value="undefined" ${ selectedTag === undefined ? {selected: true} : {} }>undefined</option>
 	    <option value="null" ${ selectedTag === null ? {selected: true} : {} }>null</option>
+	    <option value="" ${ selectedTag === "" ? {selected: true} : {} }>empty-string</option>
 	    <option value="1" ${ selectedTag === '1' ? {selected: true} : {} }>tag 1</option>
 	    <option value="2" ${ selectedTag === '2' ? {selected: true} : {} }>tag 2</option>
 	    <option value="3" ${ selectedTag === '3' ? {selected: true} : {} }>tag 3</option>
     </select>
 
-    <div style="display:flex;gap:1em;">
+    <div id="switch-tests-wrap" style="display:flex;gap:1em;">
       <div style="border:1px solid blue;flex-grow:1">
         <h3>Test 1 - string | Tag</h3>
         <div>${tagOutput}</div>
@@ -70,7 +75,7 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
         <h3>Test 2 - Tag</h3>
         <div>${tagOutput2}</div>
       </div>
-      
+
       <div style="border:1px solid blue;flex-grow:1">
         <h3>Test 3 - ternary (only 1 or 3 shows)</h3>
         <div>${selectedTag === '3' ? tag3({title: 'ternary simple'}) : tag1({title: 'ternary simple'})}</div>
@@ -80,10 +85,10 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
         <h3>Test 3.2 - ternary via prop (only 1 or 3 shows)</h3>
         <div>${ternaryPropTest({selectedTag})}</div>
       </div>
-      
-      <div style="border:1px solid red;flex-grow:1">
+
+      <div id="arraySwitching-test-wrap" style="border:1px solid red;flex-grow:1">
         <h3>Test 4 - arraySwitching</h3>
-        <div>${arraySwitching({selectedTag})}</div>
+        <div id="arraySwitching-wrap">${arraySwitching({selectedTag})}</div>
       </div>
     </div>
     ${renderCountDiv({renderCount, name:'tagSwitchDebug'})}
@@ -103,7 +108,7 @@ export const tag1 = tag(({title}: {title: string}) => {
   let renderCount = setLet(0)(x => [renderCount, renderCount = x])
   ++renderCount
   return html`
-    <div style="border:1px solid orange;">
+    <div id="tag1" style="border:1px solid orange;">
       <div id="tagSwitch-1-hello">Hello 1 ${title} World</div>
       <button onclick=${() => ++counter}>increase ${counter}</button>
       ${renderCountDiv({renderCount, name:'tag1'})}
@@ -116,7 +121,7 @@ export const tag2 = tag(({title}: {title: string}) => {
   let renderCount = setLet(0)(x => [renderCount, renderCount = x])
   ++renderCount
   return html`
-    <div style="border:1px solid orange;">
+    <div id="tag2" style="border:1px solid orange;">
       <div id="tagSwitch-2-hello">Hello 2 ${title} World</div>
       <button onclick=${() => ++counter}>increase ${counter}</button>
       ${renderCountDiv({renderCount, name:'tag1'})}
@@ -129,7 +134,7 @@ export const tag3 = tag(({title}: {title: string}) => {
   let renderCount = setLet(0)(x => [renderCount, renderCount = x])
   ++renderCount
   return html`
-    <div style="border:1px solid orange;">
+    <div  id="tag3" style="border:1px solid orange;">
       <div id="tagSwitch-3-hello">Hello 3 ${title} World</div>
       <button onclick=${() => ++counter}>increase ${counter}</button>
       ${renderCountDiv({renderCount, name:'tag1'})}
@@ -146,6 +151,9 @@ export const arraySwitching = tag((
 
     case null:
       return html`its a null value`
+
+    case '':
+      return html`` // tests how .previousSibling works
 
     case '1':
       // return html`${['a'].map(x => html`${tag1({title: `array ${selectedTag} ${x}`})}`.key(x))}`

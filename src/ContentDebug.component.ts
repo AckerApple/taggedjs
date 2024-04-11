@@ -11,11 +11,31 @@ export const contentDebug = tag(() => {
   return html`
     <div style="font-size:0.8em">You should see "0" here => "${0}"</div>
     <!--proof you cannot see false values -->
-    <div style="font-size:0.8em">You should see "" here => "${false}"</div>
-    <div style="font-size:0.8em">You should see "" here => "${null}"</div>
-    <div style="font-size:0.8em">You should see "" here => "${undefined}"</div>
+    <div style="font-size:0.8em">
+      <fieldset>
+        <legend>false test</legend>
+        You should see "" here => "${false}"
+      </fieldset>
+    </div>
+    <div style="font-size:0.8em">
+      <fieldset>
+        <legend>null test</legend>
+        You should see "" here => "${null}"
+      </fieldset>
+    </div>
+    <div style="font-size:0.8em">
+      <fieldset>
+        <legend>undefined test</legend>
+        You should see "" here => "${undefined}"
+      </fieldset>
+    </div>
     <!--proof you can see true booleans -->
-    <div style="font-size:0.8em">You should see "true" here => "${true}"</div>
+    <div style="font-size:0.8em">
+      <fieldset>
+        <legend>true test</legend>
+        You should see "true" here => "${true}"
+      </fieldset>
+    </div>
     <!--proof you can try to use the tagVar syntax -->
     <div style="font-size:0.8em">You should see "${'{'}22${'}'}" here => "{22}"</div>
     <div style="font-size:0.8em">You should see "${'{'}__tagVar0${'}'}" here => "{__tagVar0}"</div>

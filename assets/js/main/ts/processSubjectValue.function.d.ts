@@ -1,8 +1,8 @@
 import { TagArraySubject } from './processTagArray';
 import { TemplaterResult } from './TemplaterResult.class';
-import { Clones } from './Clones.type';
+import { Clones, InsertBefore } from './Clones.type';
 import { Tag } from './Tag.class';
-import { Counts, Template } from './interpolateTemplate';
+import { Counts } from './interpolateTemplate';
 import { DisplaySubject, TagSubject } from './Tag.utils';
 import { ValueSubject } from './subject/ValueSubject';
 import { Callback } from './bindSubjectCallback.function';
@@ -15,7 +15,7 @@ export type ClonesAndPromise = {
 };
 export type InterpolateSubject = TagArraySubject | TagSubject | DisplaySubject | ValueSubject<Callback>;
 export declare function processSubjectValue(value: any | TemplaterResult, subject: InterpolateSubject, // could be tag via result.tag
-insertBefore: Element | Text | Template, // <template end interpolate /> (will be removed)
+insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
 ownerTag: Tag, // owner
 options: processOptions): Clones | undefined;
 export {};

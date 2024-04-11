@@ -1,2 +1,3 @@
 import { InsertBefore } from "./Clones.type";
-export declare function updateBeforeTemplate(value: string | undefined | boolean | number, lastFirstChild: InsertBefore): Text;
+import { NoDisplayValue } from "./processAttribute.function";
+export declare function updateBeforeTemplate(value: string | boolean | number | NoDisplayValue, lastFirstChild: InsertBefore): Text;

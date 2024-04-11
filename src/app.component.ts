@@ -43,7 +43,7 @@ export const App = tag(() => {
   ++renderCount
 
   const callbacks = getCallback()
-  const appCounterSubject = set(() => new Subject<number>())
+  const appCounterSubject = set(() => new Subject<number>(appCounter))
 
   onInit(() => {
     console.log('app init should only run once')

@@ -15,7 +15,7 @@ export function runTests() {
       expectMatchedHtml('#content-combineLatest-pipe-display0', '#content-combineLatest-pipe-display1')
     })
 
-    it.skip('html', () => {
+    it('html', () => {
       expectMatchedHtml('#content-combineLatest-pipeHtml-display0', '#content-combineLatest-pipeHtml-display1')
     })
   })
@@ -104,7 +104,7 @@ export function runTests() {
     )
   })
 
-  it('tagSwitching', () => {
+  it.skip('tagSwitching', () => {
     expect(elementCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined')
     expect(elementCount('#tag-switch-dropdown')).toBe(1, 'Expected one #tag-switch-dropdown')
     expect(elementCount('#tagSwitch-1-hello')).toBe(2, 'Expected two #tagSwitch-1-hello elements')

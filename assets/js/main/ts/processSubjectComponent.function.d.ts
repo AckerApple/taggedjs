@@ -6,4 +6,4 @@ import { InsertBefore } from './Clones.type';
 export declare function processSubjectComponent(templater: TemplaterResult, subject: TagSubject, insertBefore: InsertBefore, ownerTag: Tag, options: {
     counts: Counts;
     forceElement?: boolean;
-}): void;
+}): Tag;

@@ -3,7 +3,6 @@ import { Counts } from './interpolateTemplate';
 import { State } from './set.function';
 import { InterpolatedTemplates } from './interpolations';
 import { InterpolateSubject } from './processSubjectValue.function';
-import { InsertBefore } from './Clones.type';
 export declare const variablePrefix = "__tagvar";
 export declare const escapeVariable: string;
 export declare const escapeSearch: RegExp;
@@ -20,9 +19,6 @@ export interface TagTemplate {
     values: unknown[];
     context: Context;
 }
-export declare class ArrayValueNeverSet {
-    isArrayValueNeverSet: boolean;
-}
 export declare class Tag {
     strings: string[];
     values: any[];
@@ -35,7 +31,9 @@ export declare class Tag {
     lastTemplateString: string | undefined;
     ownerTag?: Tag;
     appElement?: Element;
-    arrayValue: unknown | ArrayValueNeverSet;
+    memory: {
+        arrayValue?: unknown;
+    };
     constructor(strings: string[], values: any[]);
     /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
     key(arrayValue: unknown): this;
@@ -51,7 +49,7 @@ export declare class Tag {
     /** Reviews elements for the presences of ondestroy */
     checkCloneRemoval(clone: Element | Text | ChildNode, stagger: number): Promise<void> | undefined;
     getTemplate(): TagTemplate;
-    isLikeTag(tag: Tag): boolean | Boolean;
+    isLikeTag(tag: Tag): Boolean;
     updateByTag(tag: Tag): void;
     updateConfig(strings: string[], values: any[]): void;
     update(): Context;
@@ -70,5 +68,4 @@ export type ElementBuildOptions = {
     counts: Counts;
     forceElement?: boolean;
 };
-export declare function insertAfter(newNode: InsertBefore, referenceNode: InsertBefore): void;
 export {};

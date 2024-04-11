@@ -8,8 +8,9 @@ export type LastArrayItem = {
     deleted?: boolean;
 };
 export type TagArraySubject = ValueSubject<Tag[]> & {
-    lastArray?: LastArrayItem[];
     insertBefore: InsertBefore;
+    lastArray?: LastArrayItem[];
+    placeholderElm?: InsertBefore;
     isChildSubject?: boolean;
 };
 export declare function processTagArray(subject: TagArraySubject, value: Tag[], // arry of Tag classes
