@@ -323,7 +323,7 @@ export class Tag {
   }
 
   buildBeforeElement(
-    insertBefore: Element | Text | ChildNode,
+    insertBefore: InsertBefore,
     options: ElementBuildOptions = {
       forceElement: false,
       counts: {added:0, removed: 0},

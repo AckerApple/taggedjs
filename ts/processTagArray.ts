@@ -16,8 +16,10 @@ export type LastArrayItem = {
 
 export type TagArraySubject = ValueSubject<Tag[]> & {
   insertBefore: InsertBefore // template tag
-  lastArray?: LastArrayItem[] // previous array that may have been processed
   placeholderElm?: InsertBefore // The template tag never stays behind, this element lets us know where to draw back to
+  parentAsPlaceholder?: ParentNode // Used when a tag creates no content and  parent has no content
+
+  lastArray?: LastArrayItem[] // previous array that may have been processed
   isChildSubject?: boolean // present when children passed as prop0 or prop1
 }
 
@@ -35,7 +37,13 @@ export function processTagArray(
   let lastArray = subject.lastArray = subject.lastArray || []
 
   if(subject.placeholderElm) {
-    insertAfter(insertBefore, subject.placeholderElm)
+    const parentPlaceholder = subject.parentAsPlaceholder
+    if(parentPlaceholder) {
+      parentPlaceholder.appendChild(insertBefore)
+      delete subject.placeholderElm
+    } else {
+      insertAfter(insertBefore, subject.placeholderElm)
+    }
     delete subject.placeholderElm
   }
 
@@ -134,18 +142,37 @@ export function processTagArray(
   })
 
   if(value.length) {
-    // const tags = subject.lastArray.map(x => x.tag)
-    // const lastClone = getLastCloneFrom(tags)
-    // const lastClone = (insertBefore as Element).previousElementSibling as Element
     const lastClone = insertBefore.previousSibling as ChildNode
-    subject.placeholderElm = lastClone
-    const parentNode = insertBefore.parentNode as ParentNode
-    
-    parentNode.removeChild(insertBefore)
+    setPlaceholderElm(lastClone, insertBefore, subject)
+  } else {
+    const placeholderElm = insertBefore.previousSibling
+
+    if(placeholderElm) {
+      setPlaceholderElm(placeholderElm, insertBefore, subject)
+    } else {
+      const parentNode = insertBefore.parentNode as ParentNode
+      setPlaceholderElm(
+        parentNode as InsertBefore,
+        insertBefore,
+        subject
+      )
+      subject.parentAsPlaceholder = parentNode
+    }
   }
 
   return clones
 }
+
+function setPlaceholderElm(
+  lastClone: InsertBefore,
+  insertBefore: InsertBefore,
+  subject: TagArraySubject,
+) {
+  subject.placeholderElm = lastClone
+  const parentNode = insertBefore.parentNode as ParentNode
+  parentNode.removeChild(insertBefore)
+}
+
 
 function processAddTagArrayItem(
   before: InsertBefore,

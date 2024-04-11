@@ -1,6 +1,8 @@
+import { InsertBefore } from "./Clones.type"
+
 export function buildClones(
   temporary: Element,
-  insertBefore: Element | Text | ChildNode,
+  insertBefore: InsertBefore,
 ) {
   const clones = []
   const template = temporary.children[0] as HTMLTemplateElement
@@ -18,7 +20,7 @@ export function buildClones(
 
 function buildSibling(
   nextSibling: ChildNode,
-  insertBefore: Element | Text | ChildNode,
+  insertBefore: InsertBefore,
 ) {
   const parentNode = insertBefore.parentNode as ParentNode
   parentNode.insertBefore(

@@ -21,11 +21,5 @@ export function updateBeforeTemplate(
   /* remove existing nodes */
   parent.removeChild(lastFirstChild)
 
-  if(castedValue === '') {
-    console.log('xxxx', {
-      lastFirstChild, textNode, value, castedValue
-    })
-  }
-  
   return textNode
 }
