@@ -14,7 +14,8 @@ export class TemplaterResult {
         providers: [],
         /** Indicator of re-rending. Saves from double rending something already rendered */
         renderCount: 0,
-        deleted: false
+        deleted: false,
+        subscriptions: []
     };
     tagSupport;
     constructor(props, children) {
@@ -49,25 +50,31 @@ export function renderWithSupport(tagSupport, existingTag, subject, ownerTag) {
     }
     /* END: BEFORE RENDER */
     const templater = wrapTagSupport.templater;
+    // NEW TAG CREATED HERE
     const retag = templater.wrapper(wrapTagSupport, subject);
     /* AFTER */
     runAfterRender(wrapTagSupport, retag);
     const isLikeTag = !existingTag || isLikeTags(existingTag, retag);
     if (!isLikeTag) {
-        destroyTagMemory(existingTag, subject);
-        delete templater.global.oldest;
-        delete templater.global.newest;
-        delete subject.tag;
-        templater.global.insertBefore = existingTag.tagSupport.templater.global.insertBefore;
+        destroyUnlikeTags(existingTag, templater, subject);
     }
     retag.ownerTag = runtimeOwnerTag;
     wrapTagSupport.templater.global.newest = retag;
-    if (wrapTagSupport.templater.global.oldest && !wrapTagSupport.templater.global.oldest.hasLiveElements) {
-        throw new Error('56513540');
-    }
-    if (wrapTagSupport.templater.global.oldest && !wrapTagSupport.templater.global.oldest.hasLiveElements) {
-        throw new Error('5555 - 10');
-    }
     return retag;
+}
+function destroyUnlikeTags(existingTag, // old
+templater, // new
+subject) {
+    const oldGlobal = existingTag.tagSupport.templater.global;
+    const insertBefore = oldGlobal.insertBefore;
+    destroyTagMemory(existingTag, subject);
+    // ??? - new so that when a tag is destroy the unlike does not carry the destroy signifier
+    templater.global = { ...templater.global }; // break memory references
+    const global = templater.global;
+    global.insertBefore = insertBefore;
+    global.deleted = false;
+    delete global.oldest;
+    delete global.newest;
+    delete subject.tag;
 }
 //# sourceMappingURL=TemplaterResult.class.js.map

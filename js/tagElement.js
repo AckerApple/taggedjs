@@ -1,6 +1,6 @@
 import { BaseTagSupport } from './TagSupport.class';
 import { runAfterRender, runBeforeRender } from './tagRunner';
-import { ValueSubject } from './ValueSubject';
+import { ValueSubject } from './subject/ValueSubject';
 const appElements = [];
 export function tagElement(app, // (...args: unknown[]) => TemplaterResult,
 element, props) {

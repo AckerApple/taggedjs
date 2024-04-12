@@ -1,11 +1,11 @@
 import { isSubjectInstance, isTagArray, isTagInstance } from './isInstance';
 import { setUse } from './setUse.function';
 import { TemplaterResult } from './TemplaterResult.class';
-import { ValueSubject } from './ValueSubject';
 import { runTagCallback } from './bindSubjectCallback.function';
 import { deepClone } from './deepFunctions';
 import { TagSupport } from './TagSupport.class';
 import { alterProps } from './alterProps.function';
+import { ValueSubject } from './subject/ValueSubject';
 export const tags = [];
 let tagCount = 0;
 /** Wraps a tag component in a state manager and always push children to last argument as an array */
@@ -42,7 +42,7 @@ function kidsToTagArraySubject(children) {
     }
     const kid = children;
     if (kid) {
-        kid.arrayValue = 0;
+        kid.memory.arrayValue = 0;
         return { childSubject: new ValueSubject([kid]), madeSubject: true };
     }
     return {

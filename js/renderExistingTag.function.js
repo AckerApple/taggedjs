@@ -4,7 +4,8 @@ import { isLikeTags } from './isLikeTags.function';
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(oldestTag, // existing tag already there
 newTemplater, tagSupport, subject) {
-    newTemplater.global = subject.tag.tagSupport.templater.global;
+    const tag = subject.tag;
+    newTemplater.global = tag.tagSupport.templater.global;
     if (!oldestTag.hasLiveElements) {
         throw new Error('1080 - should have live elements');
     }
@@ -17,8 +18,8 @@ newTemplater, tagSupport, subject) {
         return latestTag;
     }
     const oldTemplater = tagSupport.templater || newTemplater;
-    const redraw = renderWithSupport(newTemplater.tagSupport, subject.tag || oldTemplater.global.newest || oldTemplater.global.oldest, // hmmmmmm, why not newest?
-    subject, oldestTag.ownerTag);
+    const toRedrawTag = subject.tag || oldTemplater.global.newest || oldTemplater.global.oldest; // hmmmmmm, why not newest?
+    const redraw = renderWithSupport(newTemplater.tagSupport, toRedrawTag, subject, oldestTag.ownerTag);
     const oldest = tagSupport.templater.global.oldest || oldestTag;
     redraw.tagSupport.templater.global.oldest = oldest;
     if (isLikeTags(latestTag, redraw)) {

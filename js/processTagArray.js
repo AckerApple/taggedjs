@@ -1,13 +1,24 @@
-import { ValueSubject } from './ValueSubject';
+import { ValueSubject } from './subject/ValueSubject';
 import { ArrayNoKeyError } from './errors';
 import { destroyArrayTag } from './checkDestroyPrevious.function';
-import { applyFakeTemplater } from './processSubjectValue.function';
+import { applyFakeTemplater } from './processTag.function';
+import { insertAfter } from './insertAfter.function';
 export function processTagArray(subject, value, // arry of Tag classes
-template, // <template end interpolate />
+insertBefore, // <template end interpolate />
 ownerTag, options) {
     const clones = ownerTag.clones; // []
     let lastArray = subject.lastArray = subject.lastArray || [];
-    subject.template = template;
+    if (subject.placeholderElm) {
+        const parentPlaceholder = subject.parentAsPlaceholder;
+        if (parentPlaceholder) {
+            parentPlaceholder.appendChild(insertBefore);
+            delete subject.placeholderElm;
+        }
+        else {
+            insertAfter(insertBefore, subject.placeholderElm);
+        }
+        delete subject.placeholderElm;
+    }
     let removed = 0;
     /** 🗑️ remove previous items first */
     lastArray = subject.lastArray = subject.lastArray.filter((item, index) => {
@@ -15,8 +26,9 @@ ownerTag, options) {
         const at = index - removed;
         const lessLength = newLength < at;
         const subTag = value[index - removed];
-        const subArrayValue = subTag?.arrayValue;
-        const destroyItem = lessLength || !areLikeValues(subArrayValue, item.tag.arrayValue);
+        const subArrayValue = subTag?.memory.arrayValue;
+        const tag = item.tag;
+        const destroyItem = lessLength || !areLikeValues(subArrayValue, tag.memory.arrayValue);
         if (destroyItem) {
             const last = lastArray[index];
             const tag = last.tag;
@@ -29,7 +41,7 @@ ownerTag, options) {
         return true;
     });
     // const masterBefore = template || (template as any).clone
-    const before = template || subject.value.insertBefore || template.clone;
+    const before = insertBefore; // || (subject.value as any).insertBefore || (insertBefore as any).clone
     value.forEach((subTag, index) => {
         const previous = lastArray[index];
         const previousSupport = previous?.tag.tagSupport;
@@ -40,8 +52,8 @@ ownerTag, options) {
             previousSupport.templater.global.newest = subTag;
         }
         // check for html``.key()
-        const keyNotSet = subTag.arrayValue;
-        if (keyNotSet?.isArrayValueNeverSet) {
+        const keySet = 'arrayValue' in subTag.memory;
+        if (!keySet) {
             const details = {
                 template: subTag.getTemplate().string,
                 array: value,
@@ -54,23 +66,46 @@ ownerTag, options) {
         }
         const couldBeSame = lastArray.length > index;
         if (couldBeSame) {
-            const isSame = areLikeValues(previous.tag.arrayValue, subTag.arrayValue);
+            const prevSupport = previous.tag.tagSupport;
+            const prevGlobal = prevSupport.templater.global;
+            const isSame = areLikeValues(previous.tag.memory.arrayValue, subTag.memory.arrayValue);
             if (isSame) {
-                subTag.tagSupport = subTag.tagSupport || previous.tag.tagSupport;
-                const oldest = previous.tag.tagSupport.templater.global.oldest;
+                subTag.tagSupport = subTag.tagSupport || prevSupport;
+                const oldest = prevGlobal.oldest;
                 oldest.updateByTag(subTag);
                 return [];
             }
-            processAddTagArrayItem(before, subTag, index, options, lastArray, true);
+            // TODO: should not get here?
+            processAddTagArrayItem(before, subTag, index, options, lastArray);
             throw new Error('item should be back');
             // return [] // removed: item should have been previously deleted and will be added back
         }
-        processAddTagArrayItem(before, subTag, index, options, lastArray, true);
+        processAddTagArrayItem(before, subTag, index, options, lastArray);
         ownerTag.childTags.push(subTag);
     });
+    if (value.length) {
+        const lastClone = insertBefore.previousSibling;
+        setPlaceholderElm(lastClone, insertBefore, subject);
+    }
+    else {
+        const placeholderElm = insertBefore.previousSibling;
+        if (placeholderElm) {
+            setPlaceholderElm(placeholderElm, insertBefore, subject);
+        }
+        else {
+            const parentNode = insertBefore.parentNode;
+            setPlaceholderElm(parentNode, insertBefore, subject);
+            subject.parentAsPlaceholder = parentNode;
+        }
+    }
     return clones;
 }
-function processAddTagArrayItem(before, subTag, index, options, lastArray, test) {
+function setPlaceholderElm(lastClone, insertBefore, subject) {
+    subject.placeholderElm = lastClone;
+    const parentNode = insertBefore.parentNode;
+    parentNode.removeChild(insertBefore);
+}
+function processAddTagArrayItem(before, subTag, index, options, lastArray) {
     const lastValue = {
         tag: subTag, index
     };
@@ -80,11 +115,13 @@ function processAddTagArrayItem(before, subTag, index, options, lastArray, test)
         added: options.counts.added + index,
         removed: options.counts.removed,
     };
-    const lastFirstChild = before; // tag.clones[0] // insertBefore.lastFirstChild    
-    if (!lastFirstChild.parentNode) {
+    if (!before.parentNode) {
         throw new Error('issue adding array item');
     }
-    subTag.buildBeforeElement(lastFirstChild, { counts, forceElement: options.forceElement, test });
+    const newTempElm = document.createElement('template');
+    before.parentNode.insertBefore(newTempElm, before);
+    subTag.buildBeforeElement(newTempElm, // before,
+    { counts, forceElement: options.forceElement });
 }
 /** compare two values. If both values are arrays then the items will be compared */
 function areLikeValues(valueA, valueB) {

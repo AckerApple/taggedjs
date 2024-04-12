@@ -1,19 +1,21 @@
-import { Clones } from './Clones.type';
+import { Clones, InsertBefore } from './Clones.type';
 import { Tag } from './Tag.class';
-import { ValueSubject } from './ValueSubject';
-import { Counts, Template } from './interpolateTemplate';
+import { ValueSubject } from './subject/ValueSubject';
+import { Counts } from './interpolateTemplate';
 export type LastArrayItem = {
     tag: Tag;
     index: number;
     deleted?: boolean;
 };
 export type TagArraySubject = ValueSubject<Tag[]> & {
+    insertBefore: InsertBefore;
+    placeholderElm?: InsertBefore;
+    parentAsPlaceholder?: ParentNode;
     lastArray?: LastArrayItem[];
-    template: Element | Text | Template;
     isChildSubject?: boolean;
 };
 export declare function processTagArray(subject: TagArraySubject, value: Tag[], // arry of Tag classes
-template: Element | Text | Template, // <template end interpolate />
+insertBefore: InsertBefore, // <template end interpolate />
 ownerTag: Tag, options: {
     counts: Counts;
     forceElement?: boolean;

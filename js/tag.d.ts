@@ -1,5 +1,5 @@
 import { Tag } from './Tag.class';
-import { ValueSubject } from './ValueSubject';
+import { ValueSubject } from './subject/ValueSubject';
 export type TagChildren = ValueSubject<Tag[]> & {
     lastArray?: Tag[];
 };

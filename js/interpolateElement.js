@@ -3,8 +3,9 @@ import { interpolateToTemplates } from "./interpolations";
 import { interpolateContentTemplates } from "./interpolateContentTemplates";
 import { escapeSearch, variablePrefix } from "./Tag.class";
 /** Review elements within an element */
-export function interpolateElement(container, context, // variables used to evaluate
-interpolatedTemplates, tagOwner, options, test = false) {
+export function interpolateElement(container, // element containing innerHTML to review interpolations
+context, // variables used to evaluate
+interpolatedTemplates, tagOwner, options) {
     const clones = [];
     const tagComponents = [];
     const result = interpolatedTemplates.interpolation;

@@ -1,4 +1,4 @@
-import { ValueSubject } from './ValueSubject';
+import { ValueSubject } from './subject/ValueSubject';
 import { isSubjectInstance, isTagComponent, isTagInstance } from './isInstance';
 export function processNewValue(hasValue, value, ownerTag) {
     if (isTagComponent(value)) {

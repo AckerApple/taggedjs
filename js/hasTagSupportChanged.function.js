@@ -41,9 +41,6 @@ pastCloneProps) {
         castedProps = { ...props };
         castedPastProps = { ...(pastCloneProps || {}) };
         const allFunctionsMatch = Object.entries(castedProps).every(([key, value]) => {
-            /*if(!(key in (castedPastProps as any))) {
-              return false
-            }*/
             let compare = castedPastProps[key];
             if (!(value instanceof Function)) {
                 return 4; // this will be checked in deepEqual

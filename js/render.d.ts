@@ -1,1 +1,2 @@
-export declare function buildClones(temporary: Element, insertBefore: Element | Text): ChildNode[];
+import { InsertBefore } from "./Clones.type";
+export declare function buildClones(temporary: Element, insertBefore: InsertBefore): ChildNode[];

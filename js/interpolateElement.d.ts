@@ -7,6 +7,7 @@ export type InterpolateOptions = {
     counts: Counts;
 };
 /** Review elements within an element */
-export declare function interpolateElement(container: Element, context: Context, // variables used to evaluate
-interpolatedTemplates: TagTemplate, tagOwner: Tag, options: InterpolateOptions, test?: boolean): InterpolatedContentTemplates;
+export declare function interpolateElement(container: Element, // element containing innerHTML to review interpolations
+context: Context, // variables used to evaluate
+interpolatedTemplates: TagTemplate, tagOwner: Tag, options: InterpolateOptions): InterpolatedContentTemplates;
 export declare function interpolateString(string: string): import("./interpolations").InterpolatedTemplates;

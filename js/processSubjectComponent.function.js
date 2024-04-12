@@ -2,7 +2,7 @@ import { renderWithSupport } from './TemplaterResult.class';
 import { setUse } from './setUse.function';
 import { processTagResult } from './processTagResult.function';
 import { TagSupport } from './TagSupport.class';
-export function processSubjectComponent(templater, subject, template, ownerTag, options) {
+export function processSubjectComponent(templater, subject, insertBefore, ownerTag, options) {
     // Check if function component is wrapped in a tag() call
     // TODO: This below check not needed in production mode
     if (templater.tagged !== true) {
@@ -17,30 +17,38 @@ export function processSubjectComponent(templater, subject, template, ownerTag, 
     }
     templater.tagSupport = new TagSupport(ownerTag.tagSupport, templater, subject);
     // templater.oldest = subject.tag?.tagSupport.oldest || templater.oldest
-    templater.global.insertBefore = template;
+    templater.global.insertBefore = insertBefore;
     let retag = subject.tag;
     const providers = setUse.memory.providerConfig;
     providers.ownerTag = ownerTag;
     const isRedraw = !retag || options.forceElement;
     if (isRedraw) {
-        const preClones = ownerTag.clones.map(clone => clone);
-        retag = renderWithSupport(templater.tagSupport, subject.tag, // existing tag
-        subject, ownerTag);
-        if (retag.tagSupport.templater.global.newest != retag) {
-            throw new Error('mismatch result newest');
-        }
-        templater.global.newest = retag;
-        if (ownerTag.clones.length > preClones.length) {
-            const myClones = ownerTag.clones.filter(fClone => !preClones.find(clone => clone === fClone));
-            retag.clones.push(...myClones);
-        }
-        if (ownerTag.childTags.find(x => x === retag)) {
-            throw new Error('about to reattach tag already present');
-        }
-        ownerTag.childTags.push(retag);
+        retag = redrawSubjectComponent(templater, subject, retag, ownerTag, insertBefore);
     }
     processTagResult(retag, subject, // The element set here will be removed from document. Also result.tag will be added in here
-    template, // <template end interpolate /> (will be removed)
+    insertBefore, // <template end interpolate /> (will be removed)
     options);
+    return retag;
+}
+function redrawSubjectComponent(templater, subject, retag, ownerTag, insertBefore) {
+    const preClones = ownerTag.clones.map(clone => clone);
+    retag = renderWithSupport(templater.tagSupport, subject.tag, // existing tag
+    subject, ownerTag);
+    if (retag.tagSupport.templater.global.newest != retag) {
+        throw new Error('mismatch result newest');
+    }
+    templater.global.newest = retag;
+    if (ownerTag.clones.length > preClones.length) {
+        const myClones = ownerTag.clones.filter(fClone => !preClones.find(clone => clone === fClone));
+        retag.clones.push(...myClones);
+        if (myClones.find(x => x === insertBefore)) {
+            throw new Error('way back here we add marker');
+        }
+    }
+    if (ownerTag.childTags.find(x => x === retag)) {
+        throw new Error('about to reattach tag already present');
+    }
+    ownerTag.childTags.push(retag);
+    return retag;
 }
 //# sourceMappingURL=processSubjectComponent.function.js.map

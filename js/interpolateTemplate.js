@@ -41,10 +41,12 @@ export function subscribeToTemplate(insertBefore, subject, ownerTag, counts, // 
     let called = false;
     const callback = (value) => {
         // const orgInsert = insertBefore
-        const clone = subject.clone;
-        if (clone && clone.parentNode) {
-            insertBefore = clone;
+        /*
+        const clone = (subject as DisplaySubject).clone
+        if(clone && clone.parentNode) {
+          insertBefore = clone
         }
+        */
         if (called) {
             updateExistingValue(subject, value, ownerTag, insertBefore);
             return;
@@ -62,21 +64,7 @@ export function subscribeToTemplate(insertBefore, subject, ownerTag, counts, // 
         called = true;
     };
     const sub = subject.subscribe(callback);
-    ownerTag.cloneSubs.push(sub);
-}
-// Function to update the value of x
-export function updateBetweenTemplates(value, lastFirstChild) {
-    const parent = lastFirstChild.parentNode;
-    // mimic React skipping to display EXCEPT for true does display on page
-    if (value === undefined || value === false || value === null) { // || value === true
-        value = '';
-    }
-    // Insert the new value (never use innerHTML here)
-    const textNode = document.createTextNode(value); // never innerHTML
-    parent.insertBefore(textNode, lastFirstChild);
-    /* remove existing nodes */
-    parent.removeChild(lastFirstChild);
-    return textNode;
+    ownerTag.tagSupport.templater.global.subscriptions.push(sub);
 }
 export function afterElmBuild(elm, options, context, ownerTag) {
     if (!elm.getAttribute) {
@@ -89,12 +77,6 @@ export function afterElmBuild(elm, options, context, ownerTag) {
     let diff = options.counts.added;
     diff = elementInitCheck(elm, options.counts) - diff;
     if (elm.children) {
-        /*
-        const subCounts = {
-          added: options.counts.added, // - diff,
-          removed: options.counts.removed,
-        }
-        */
         new Array(...elm.children).forEach((child, index) => {
             const subOptions = {
                 ...options,

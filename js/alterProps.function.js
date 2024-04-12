@@ -3,17 +3,7 @@ import { renderTagSupport } from './renderTagSupport.function';
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(props, templater, ownerSupport) {
     function callback(toCall, callWith) {
-        const renderCount = templater.global.renderCount;
-        const callbackResult = toCall(...callWith);
-        if (templater.global.renderCount > renderCount) {
-            throw new Error('already rendered');
-        }
-        const lastestOwner = ownerSupport.templater.global.newest;
-        const newOwner = renderTagSupport(lastestOwner.tagSupport, true);
-        if (newOwner.tagSupport.templater.global.newest != newOwner) {
-            throw new Error('newest assignment issue?');
-        }
-        return callbackResult;
+        return callbackPropOwner(toCall, callWith, templater, ownerSupport);
     }
     const isPropTag = isTagInstance(props);
     const watchProps = isPropTag ? 0 : props;
@@ -34,12 +24,28 @@ function resetFunctionProps(props, callback) {
                 return; // already previously converted
             }
             newProps[name] = (...args) => {
-                return callback(value, args);
+                return newProps[name].toCall(...args); // what gets called can switch over parent state changes
             };
+            // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
+            newProps[name].toCall = (...args) => callback(value, args);
             newProps[name].original = value;
             return;
         }
     });
     return newProps;
+}
+export function callbackPropOwner(toCall, callWith, templater, // only used to prevent rendering double
+ownerSupport) {
+    const renderCount = templater.global.renderCount;
+    const callbackResult = toCall(...callWith);
+    if (templater.global.renderCount > renderCount) {
+        throw new Error('already rendered');
+    }
+    const lastestOwner = ownerSupport.templater.global.newest;
+    const newOwner = renderTagSupport(lastestOwner.tagSupport, true);
+    if (newOwner.tagSupport.templater.global.newest != newOwner) {
+        throw new Error('newest assignment issue?');
+    }
+    return callbackResult;
 }
 //# sourceMappingURL=alterProps.function.js.map

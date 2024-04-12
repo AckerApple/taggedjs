@@ -18,7 +18,7 @@ export function processAttribute(attrName, value, child, scope, ownerTag, howToS
             processNameOnlyAttr(value, lastValue, child, ownerTag, howToSet);
             lastValue = value;
         });
-        ownerTag.cloneSubs.push(sub); // this is where unsubscribe is picked up
+        ownerTag.tagSupport.templater.global.subscriptions.push(sub); // this is where unsubscribe is picked up
         child.removeAttribute(attrName);
         return;
     }
@@ -82,7 +82,7 @@ function processNameValueAttr(attrName, result, child, ownerTag, howToSet) {
         // 🗞️ Subscribe. Above callback called immediately since its a ValueSubject()
         const sub = result.subscribe(callback);
         // Record subscription for later unsubscribe when element destroyed
-        ownerTag.cloneSubs.push(sub);
+        ownerTag.tagSupport.templater.global.subscriptions.push(sub);
         return;
     }
     howToSet(child, attrName, result);
@@ -107,7 +107,7 @@ function processAttributeSubjectValue(newAttrValue, child, attrName, isSpecial, 
         howToSet(child, attrName, newAttrValue);
         return;
     }
-    const isDeadValue = newAttrValue === undefined || newAttrValue === false || newAttrValue === null;
+    const isDeadValue = [undefined, false, null].includes(newAttrValue);
     if (isDeadValue) {
         child.removeAttribute(attrName);
         return;
