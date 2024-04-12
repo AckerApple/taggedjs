@@ -387,6 +387,40 @@ const App = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
 
 /***/ }),
 
+/***/ "./src/app.function.ts":
+/*!*****************************!*\
+  !*** ./src/app.function.ts ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   app: () => (/* binding */ app)
+/* harmony export */ });
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./app.component */ "./src/app.component.ts");
+/* harmony import */ var _isolatedApp__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./isolatedApp */ "./src/isolatedApp.ts");
+
+
+
+const app = () => {
+    console.info('attaching app to element...');
+    const element = document.getElementsByTagName('app')[0];
+    const pathname = window.location.pathname;
+    const locationSplit = pathname.split('/').filter(x => x);
+    const location = locationSplit[0]?.toLowerCase();
+    if (location && ['isolated.html', 'index-static.html'].includes(location)) {
+        console.log('IsolatedApp', _isolatedApp__WEBPACK_IMPORTED_MODULE_2__.IsolatedApp);
+        (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tagElement)(_isolatedApp__WEBPACK_IMPORTED_MODULE_2__.IsolatedApp, element, { test: 1 });
+        return;
+    }
+    console.log('App', _app_component__WEBPACK_IMPORTED_MODULE_1__.App);
+    (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tagElement)(_app_component__WEBPACK_IMPORTED_MODULE_1__.App, element, { test: 1 });
+};
+
+
+/***/ }),
+
 /***/ "./src/arrayTests.ts":
 /*!***************************!*\
   !*** ./src/arrayTests.ts ***!
@@ -6060,11 +6094,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   App: () => (/* reexport safe */ _app_component__WEBPACK_IMPORTED_MODULE_0__.App),
 /* harmony export */   IsolatedApp: () => (/* reexport safe */ _isolatedApp__WEBPACK_IMPORTED_MODULE_1__.IsolatedApp),
+/* harmony export */   app: () => (/* reexport safe */ _app_function__WEBPACK_IMPORTED_MODULE_3__.app),
 /* harmony export */   hmr: () => (/* reexport safe */ taggedjs__WEBPACK_IMPORTED_MODULE_2__.hmr)
 /* harmony export */ });
 /* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./app.component */ "./src/app.component.ts");
 /* harmony import */ var _isolatedApp__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./isolatedApp */ "./src/isolatedApp.ts");
 /* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _app_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./app.function */ "./src/app.function.ts");
+
 
 
 
@@ -6073,7 +6110,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var __webpack_exports__App = __webpack_exports__.App;
 var __webpack_exports__IsolatedApp = __webpack_exports__.IsolatedApp;
+var __webpack_exports__app = __webpack_exports__.app;
 var __webpack_exports__hmr = __webpack_exports__.hmr;
-export { __webpack_exports__App as App, __webpack_exports__IsolatedApp as IsolatedApp, __webpack_exports__hmr as hmr };
+export { __webpack_exports__App as App, __webpack_exports__IsolatedApp as IsolatedApp, __webpack_exports__app as app, __webpack_exports__hmr as hmr };
 
 //# sourceMappingURL=bundle.js.map
