@@ -54,7 +54,7 @@ export function processSubjectValue(
   options: processOptions, // {added:0, removed:0}
 ) {
   const valueType = getValueType(value)
-  
+
   switch (valueType) {
     case ValueTypes.tag:
       processTag(

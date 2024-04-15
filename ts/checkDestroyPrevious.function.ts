@@ -6,7 +6,7 @@ import { TagArraySubject } from './processTagArray'
 import { isLikeTags } from './isLikeTags.function'
 import { Counts } from './interpolateTemplate'
 import { destroyTagMemory, destroyTagSupportPast } from './destroyTag.function'
-import { InsertBefore, isRemoveTemplates } from './Clones.type'
+import { InsertBefore } from './Clones.type'
 import { insertAfter } from './insertAfter.function'
 
 export function checkDestroyPrevious(
@@ -19,9 +19,9 @@ export function checkDestroyPrevious(
   
   // no longer an array
   if (wasArray && !isTagArray(newValue)) {
-    const placeholderElm = arraySubject.placeholderElm as Element
+    const placeholderElm = arraySubject.placeholder as Text
     delete arraySubject.lastArray
-    delete arraySubject.placeholderElm
+    delete arraySubject.placeholder
     insertAfter(insertBefore, placeholderElm)
 
     wasArray.forEach(({tag}) => destroyArrayTag(tag, {added:0, removed:0}))
@@ -43,9 +43,7 @@ export function checkDestroyPrevious(
       // its a different tag now
       if(!isLikeTags(newTag, existingTag)) {
         // put template back down
-        if(isRemoveTemplates) {
-          restoreTagMarker(existingTag, insertBefore)
-        }
+        restoreTagMarker(existingTag, insertBefore)
         destroyTagMemory(existingTag, tagSubject)
         return 2
       }
@@ -59,9 +57,7 @@ export function checkDestroyPrevious(
     }
 
     // put template back down
-    if(isRemoveTemplates) {
-      restoreTagMarker(existingTag, insertBefore)
-    }
+    restoreTagMarker(existingTag, insertBefore)
 
     // destroy old component, value is not a component
     destroyTagMemory(existingTag, tagSubject)
@@ -111,9 +107,8 @@ export function restoreTagMarker(
   insertBefore: InsertBefore,
 ) {
   const global = existingTag.tagSupport.templater.global
-  const placeholderElm = global.placeholderElm
+  const placeholderElm = global.placeholder
   if(placeholderElm) {
     insertAfter(insertBefore, placeholderElm)
-    // delete global.placeholderElm
   }
 }

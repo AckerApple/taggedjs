@@ -1,12 +1,13 @@
 import { Tag } from './Tag.class'
-import { Counts, Template } from './interpolateTemplate'
+import { Counts } from './interpolateTemplate'
 import { TagArraySubject } from './processTagArray'
 import { TagSubject } from './Tag.utils'
+import { InsertBefore } from './Clones.type'
 
 export function processTagResult(
   tag: Tag,
   subject: TagArraySubject | TagSubject | Function, // used for recording past and current value
-  insertBefore: Element | Text | Template | ChildNode, // <template end interpolate />
+  insertBefore: InsertBefore, // <template end interpolate />
   {
     counts, forceElement,
   }: {
@@ -15,7 +16,7 @@ export function processTagResult(
   },
 ) {
   if(!insertBefore.parentNode) {
-    throw new Error('before here processTagResult')
+    throw new Error(`before here processTagResult ${insertBefore.nodeName}`)
   }
 
   // *if appears we already have seen
@@ -36,9 +37,13 @@ export function processTagResult(
     return processTagResultUpdate(tag, subjectTag, previousTag)
   }
 
+
+  /*
   if(insertBefore.nodeName !== 'TEMPLATE') {
-    throw new Error(';;;;')
+    throw new Error(`processTagResult.function.ts insertBefore is not template ${insertBefore.nodeName}`)
   }
+  */
+
   tag.buildBeforeElement(insertBefore, {
     counts,
     forceElement,

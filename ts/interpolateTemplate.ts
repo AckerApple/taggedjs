@@ -83,7 +83,7 @@ export function subscribeToTemplate(
     }
     */
 
-    if(called) {
+    if(called) {  
       updateExistingValue(
         subject,
         value,
@@ -92,6 +92,13 @@ export function subscribeToTemplate(
       )
       return
     }
+
+    if(!insertBefore.parentNode) {
+      throw new Error('no insert before parent node - 3')
+    }
+
+    const global = ownerTag.tagSupport.templater.global
+    const pre = global.placeholder?.parentNode
 
     processSubjectValue(
       value,

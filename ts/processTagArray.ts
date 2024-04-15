@@ -3,10 +3,9 @@ import { Tag } from './Tag.class'
 import { ValueSubject } from './subject/ValueSubject'
 import { Counts } from './interpolateTemplate'
 import { ArrayNoKeyError } from './errors'
-import { destroyArrayTag, restoreTagMarker } from './checkDestroyPrevious.function'
+import { destroyArrayTag } from './checkDestroyPrevious.function'
 import { TagSubject } from './Tag.utils'
 import { applyFakeTemplater } from './processTag.function'
-import { insertAfter } from './insertAfter.function'
 
 export type LastArrayItem = {
   tag: Tag
@@ -16,9 +15,7 @@ export type LastArrayItem = {
 
 export type TagArraySubject = ValueSubject<Tag[]> & {
   insertBefore: InsertBefore // template tag
-  placeholderElm?: InsertBefore // The template tag never stays behind, this element lets us know where to draw back to
-  parentAsPlaceholder?: ParentNode // Used when a tag creates no content and  parent has no content
-
+  placeholder?: Text // template tag
   lastArray?: LastArrayItem[] // previous array that may have been processed
   isChildSubject?: boolean // present when children passed as prop0 or prop1
 }
@@ -36,16 +33,11 @@ export function processTagArray(
   const clones: Clones = ownerTag.clones // []
   let lastArray = subject.lastArray = subject.lastArray || []
 
-  if(subject.placeholderElm) {
-    const parentPlaceholder = subject.parentAsPlaceholder
-    if(parentPlaceholder) {
-      parentPlaceholder.appendChild(insertBefore)
-      delete subject.placeholderElm
-    } else {
-      insertAfter(insertBefore, subject.placeholderElm)
-    }
-    delete subject.placeholderElm
+  if(!subject.placeholder) {
+    setPlaceholderElm(insertBefore, subject)
   }
+
+  const runtimeInsertBefore = subject.placeholder as Text // || insertBefore
 
   let removed = 0
   
@@ -76,9 +68,6 @@ export function processTagArray(
 
     return true
   })
-
-  // const masterBefore = template || (template as any).clone
-  const before = insertBefore // || (subject.value as any).insertBefore || (insertBefore as any).clone
 
   value.forEach((subTag, index) => {
     const previous = lastArray[index]
@@ -124,14 +113,14 @@ export function processTagArray(
 
       // TODO: should not get here?
       processAddTagArrayItem(
-        before, subTag, index, options, lastArray
+        runtimeInsertBefore, subTag, index, options, lastArray
       )
       throw new Error('item should be back')
       // return [] // removed: item should have been previously deleted and will be added back
     }
 
     processAddTagArrayItem(
-      before,
+      runtimeInsertBefore,
       subTag,
       index,
       options,
@@ -141,41 +130,27 @@ export function processTagArray(
     ownerTag.childTags.push(subTag)  
   })
 
-  if(value.length) {
-    const lastClone = insertBefore.previousSibling as ChildNode
-    setPlaceholderElm(lastClone, insertBefore, subject)
-  } else {
-    const placeholderElm = insertBefore.previousSibling
-
-    if(placeholderElm) {
-      setPlaceholderElm(placeholderElm, insertBefore, subject)
-    } else {
-      const parentNode = insertBefore.parentNode as ParentNode
-      setPlaceholderElm(
-        parentNode as InsertBefore,
-        insertBefore,
-        subject
-      )
-      subject.parentAsPlaceholder = parentNode
-    }
-  }
-
   return clones
 }
 
 function setPlaceholderElm(
-  lastClone: InsertBefore,
   insertBefore: InsertBefore,
   subject: TagArraySubject,
 ) {
-  subject.placeholderElm = lastClone
+  if(insertBefore.nodeName !== 'TEMPLATE') {
+    subject.placeholder = insertBefore as Text
+    return
+  }
+
+  const placeholder = subject.placeholder = document.createTextNode('')
   const parentNode = insertBefore.parentNode as ParentNode
+  parentNode.insertBefore(placeholder, insertBefore)
   parentNode.removeChild(insertBefore)
 }
 
 
 function processAddTagArrayItem(
-  before: InsertBefore,
+  before: Text,
   subTag: Tag,
   index: number,
   options: {

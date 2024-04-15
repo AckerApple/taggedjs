@@ -12,9 +12,9 @@ import { TagSubject } from './Tag.utils'
 import { TagArraySubject } from './processTagArray'
 import { isSubjectInstance, isTagComponent } from './isInstance'
 import { isLikeTags } from './isLikeTags.function'
-import { InsertBefore, isRemoveTemplates } from './Clones.type'
+import { InsertBefore } from './Clones.type'
 import { restoreTagMarker } from './checkDestroyPrevious.function'
-import { insertAfter } from './insertAfter.function'
+import { TagGlobal, TemplaterResult } from './TemplaterResult.class'
 
 export const variablePrefix = '__tagvar'
 export const escapeVariable = '--' + variablePrefix + '--'
@@ -91,8 +91,8 @@ export class Tag {
     // put back down the template tag
     const insertBefore = global.insertBefore as Element
     
-    if(isRemoveTemplates) {
-      const placeholder = global.placeholderElm as Element
+    if(insertBefore.nodeName === 'TEMPLATE') {
+      const placeholder = global.placeholder as Text
       if(placeholder && !('arrayValue' in this.memory)) {
         if(!options.byParent) {
           restoreTagMarker(this, insertBefore)
@@ -100,7 +100,7 @@ export class Tag {
       }
     }
 
-    delete global.placeholderElm
+    delete global.placeholder
 
     // the isComponent check maybe able to be removed
     const isComponent = tagSupport ? true : false    
@@ -332,25 +332,22 @@ export class Tag {
     const subject = this.tagSupport.subject
     const thisTemplater = this.tagSupport.templater
     const global = thisTemplater.global
-    
-    if(isRemoveTemplates) {
-      const placeholderElm = global.placeholderElm
+    global.insertBefore = insertBefore
 
-      if(placeholderElm) {
-        const parentNode = placeholderElm.parentNode as ParentNode
-        
-        parentNode.insertBefore(
-          insertBefore,
-          placeholderElm,
-        )
-
-        // ??? - removed as we don't steal clones anymore
-        // this.clones.push( placeholderElm ) // put back on chopping block
-        delete global.placeholderElm
+    if(!global.placeholder) {
+      if(insertBefore.nodeName !== 'TEMPLATE') {
+        throw new Error(' no template at insertBefore')
+        global.placeholder = insertBefore as Text
+      } else {
+        setTagPlaceholder(global)
       }
     }
-    
-    const trueInsertBefore = insertBefore
+
+    if(!global.placeholder?.parentNode) {
+      throw new Error('????')
+    }
+
+    const placeholderElm = global.placeholder as Text
     
     global.oldest = this
     global.newest = this
@@ -368,7 +365,7 @@ export class Tag {
     const context = this.update()
     const template = this.getTemplate()
 
-    if(!trueInsertBefore.parentNode) {
+    if(!placeholderElm.parentNode) {
       throw new Error('no parent before building tag')
     }
 
@@ -389,84 +386,76 @@ export class Tag {
       },
     )
 
-    if(!trueInsertBefore.parentNode) {
-      throw new Error('no parent building tag')
+    if(!placeholderElm.parentNode) {
+      throw new Error('no parent after building tag')
     }
 
     afterInterpolateElement(
       elementContainer,
-      trueInsertBefore, // insertBefore (will be removed)
+      placeholderElm,
       this, // ownerTag
       context,
       options,
     )
+
+    if(!global.placeholder?.parentNode) {
+      throw new Error('???? - 2')
+    }
+
 
     // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
     let isForceElement = options.forceElement
     tagComponents.forEach(tagComponent => {
       const tagSupport = tagComponent.ownerTag.tagSupport 
       const tagGlobal = tagSupport.templater.global
-      const placeholderElm = tagGlobal.placeholderElm // global.placeholderElm
+      const placeholderElm = tagGlobal.placeholder as Text // global.placeholderElm
       
       if(!placeholderElm && !insertBefore.parentNode) {
         throw new Error('no parent building tag components')
       }
 
-      const before = tagComponent.insertBefore // insertBefore  (will be removed)
+      if(!global.placeholder?.parentNode) {
+        throw new Error('???? - 3')
+      }
+  
 
       subscribeToTemplate(
-        before, // tagComponent.insertBefore,
+        tagComponent.insertBefore,
         tagComponent.subject as TagSubject | TagArraySubject,
         tagComponent.ownerTag,
         options.counts,
         {isForceElement},
       )
 
-      const clones = afterInterpolateElement(
+      if(!global.placeholder?.parentNode) {
+        throw new Error('???? - 4')
+      }
+
+      afterInterpolateElement(
         elementContainer,
-        before, // (will be removed)
+        tagComponent.insertBefore,
         tagComponent.ownerTag, // this, // ownerTag
         context,
         options,
       )
 
-      if(placeholderElm && !placeholderElm?.parentNode) {
-        const clone = clones[this.clones.length-1]
-        if(clone) {
-          restoreTagMarker(tagComponent.ownerTag, clone)
-        }
+      if(!global.placeholder?.parentNode) {
+        throw new Error('???? - 5')
       }
 
-
-      if(placeholderElm) {
-        if(placeholderElm.parentNode) {
-          if(!global.placeholderElm) {
-            global.placeholderElm = placeholderElm
-          }
-        }
-
-        if(this.clones.length) {
-          if(insertBefore.parentNode) {
-            global.placeholderElm = insertBefore.previousSibling as ChildNode
-            const parentNode = insertBefore.parentNode as ParentNode
-            parentNode.removeChild(insertBefore)
-          }
-        }
-      }
     })
-
-    if(!global.placeholderElm) {
-      // const clone = getLastCloneFromTags(this)
-      // const clone = (insertBefore as Element).previousElementSibling as Element
-      const clone = insertBefore.previousSibling
-
-      if(clone) {
-        const parentNode = insertBefore.parentNode as ParentNode
-        global.placeholderElm = clone
-        parentNode.removeChild(insertBefore)
-      }
-    }
   }
+}
+
+
+function setTagPlaceholder(
+  global: TagGlobal,
+) {
+  const insertBefore = global.insertBefore as InsertBefore
+  const placeholder = global.placeholder = document.createTextNode('')
+  const parentNode = insertBefore.parentNode as ParentNode
+  parentNode.insertBefore(placeholder, insertBefore)
+  parentNode.removeChild(insertBefore)
 }
 
 function afterInterpolateElement(
@@ -482,44 +471,8 @@ function afterInterpolateElement(
     return clones
   }
 
-  const ownerSupport = tag.tagSupport
-  const ownerGlobal = ownerSupport.templater.global
-  const hadBefore = isRemoveTemplates && ownerGlobal.placeholderElm
-  const parentNode = hadBefore ? ownerGlobal.placeholderElm?.parentNode as ParentNode : insertBefore.parentNode as ParentNode
-
-  // we could now be processing same tag but more after components being rendered
-  if(hadBefore) {
-    // 0 put the template back down
-    insertAfter(insertBefore, hadBefore)
-
-    // ??? - removed as need for arrays
-    delete ownerGlobal.placeholderElm
-  }
-
   clones.forEach(clone => afterElmBuild(clone, options, context, tag))
-
-  let hasPopClone: InsertBefore | undefined
-  if(isRemoveTemplates) {
-    const clone = insertBefore.previousSibling // clones[clones.length - 1]
-
-    if(clone) {
-      const isTemplate = (clone as any).tagName === 'TEMPLATE' && (clone as Element).hasAttribute('interpolate')
-      if(!isTemplate) {
-        hasPopClone = ownerGlobal.placeholderElm = clone // insertBefore
-      }
-    }
-  }
-
-  if(clones.find(x => x === insertBefore)) {
-    throw new Error('adding marker to owner in tag class')
-  }
   tag.clones.push( ...clones )
-  
-  if(isRemoveTemplates) {
-    if(hasPopClone) { //  || hadBefore
-      parentNode.removeChild(insertBefore) // belongs to another tag
-    }
-  }
 
   return clones
 }
@@ -566,16 +519,10 @@ function updateContextItem(
 
   if(tag) {
     const oldTemp = tag.tagSupport.templater
-    const oldWrap = oldTemp.wrapper // tag versus component
-    if(value.global !== oldTemp.global) {
-      if(oldWrap && isTagComponent(value)) {
-        const oldValueFn = oldWrap.original
-        const newValueFn = value.wrapper?.original
-        const fnMatched = oldValueFn === newValueFn
-  
-        if(fnMatched) {
-          value.global = oldTemp.global
-        }
+
+    if(value && value.global !== oldTemp.global) {
+      if( isTagComponent(value) ) {
+        shareTemplaterGlobal(oldTemp, value)
       }
     }
   }
@@ -588,4 +535,18 @@ function updateContextItem(
   subject.set(value) // listeners will evaluate updated values to possibly update display(s)
   
   return
+}
+
+function shareTemplaterGlobal(
+  oldTemp: TemplaterResult,
+  value: TemplaterResult,
+) {
+  const oldWrap = oldTemp.wrapper // tag versus component
+  const oldValueFn = oldWrap.original
+  const newValueFn = value.wrapper?.original
+  const fnMatched = oldValueFn === newValueFn
+
+  if(fnMatched) {
+    value.global = oldTemp.global
+  }
 }

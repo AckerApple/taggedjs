@@ -11,8 +11,7 @@ import { isLikeTags } from './isLikeTags.function'
 import { destroyTagMemory } from './destroyTag.function'
 import { OnInitCallback } from './onInit'
 import { Subscription } from './subject/Subject.utils'
-import { InsertBefore, isRemoveTemplates } from './Clones.type'
-import { restoreTagMarker } from './checkDestroyPrevious.function'
+import { InsertBefore } from './Clones.type'
 
 export type Wrapper = ((
   tagSupport: BaseTagSupport,
@@ -21,32 +20,34 @@ export type Wrapper = ((
   original: () => Tag
 }
 
+export type TagGlobal = {
+  newestTemplater: TemplaterResult
+  oldest?: Tag
+  newest?: Tag
+  context: Context // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+  providers: Provider[]
+  /** Indicator of re-rending. Saves from double rending something already rendered */
+  renderCount: number
+  deleted: boolean
+  isApp?: boolean // root element
+  
+  // ALWAYS template tag
+  insertBefore?: InsertBefore // what element put down before
+  placeholder?: Text // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
+
+
+  subscriptions: Subscription[] // subscriptions created by clones
+  
+  destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
+  init?: OnInitCallback // what to run when init complete, used for onInit
+}
+
 export class TemplaterResult {
   isTag = false // when true, is basic tag non-component
   tagged!: boolean
   wrapper!: Wrapper
 
-  global: {
-    newestTemplater: TemplaterResult
-    oldest?: Tag
-    newest?: Tag
-    context: Context // populated after reading interpolated.values array converted to an object {variable0, variable:1}
-    providers: Provider[]
-    /** Indicator of re-rending. Saves from double rending something already rendered */
-    renderCount: number
-    deleted: boolean
-    isApp?: boolean // root element
-    
-    // ALWAYS template tag
-    insertBefore?: InsertBefore // what element put down before
-    placeholderElm?: InsertBefore // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
-
-
-    subscriptions: Subscription[] // subscriptions created by clones
-    
-    destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
-    init?: OnInitCallback // what to run when init complete, used for onInit
-  } = {
+  global: TagGlobal = {
     newestTemplater: this,
     context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
     providers: [],

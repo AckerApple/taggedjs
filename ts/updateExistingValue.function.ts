@@ -8,7 +8,7 @@ import { InterpolateSubject } from './processSubjectValue.function'
 import { TagArraySubject, processTagArray } from './processTagArray'
 import { updateExistingTagComponent } from './updateExistingTagComponent.function'
 import { RegularValue, processRegularValue } from './processRegularValue.function'
-import { checkDestroyPrevious, restoreTagMarker } from './checkDestroyPrevious.function'
+import { checkDestroyPrevious } from './checkDestroyPrevious.function'
 import { ValueSubject } from './subject/ValueSubject'
 import { processSubjectComponent } from './processSubjectComponent.function'
 import { isLikeTags } from './isLikeTags.function'
@@ -28,11 +28,7 @@ export function updateExistingValue(
   const subjectTag = subject as TagSubject
   const isComponent = isTagComponent(value)
   
-  // const global = subjectTag.tag?.tagSupport.templater.global
-  // const placeholderElm = global?.placeholderElm || global?.insertBefore || (subject as DisplaySubject).insertBefore
-  // const oldInsertBefore = placeholderElm || (subject as DisplaySubject).clone
-
-  const destroyType = checkDestroyPrevious(subject, value, insertBefore)
+  checkDestroyPrevious(subject, value, insertBefore)
 
   // handle already seen tag components
   if(isComponent) {
@@ -40,7 +36,7 @@ export function updateExistingValue(
   
     // When was something before component
     if(!subjectTag.tag) {
-      const tag = processSubjectComponent(
+      processSubjectComponent(
         templater,
         subjectTag,
         insertBefore, // oldInsertBefore as InsertBefore,
@@ -54,13 +50,6 @@ export function updateExistingValue(
       return subjectTag
     }
 
-    // ??? - new put back down template tag before redraw
-    const placeholderElm = subjectTag.tag.tagSupport.templater.global.placeholderElm
-    if(placeholderElm) {
-      insertAfter(insertBefore, placeholderElm)
-      delete subjectTag.tag.tagSupport.templater.global.placeholderElm
-    }
-
     templater.tagSupport = new TagSupport(
       // subjectTag.tag.tagSupport.ownerTagSupport,
       ownerTag.tagSupport,
@@ -68,17 +57,12 @@ export function updateExistingValue(
       subjectTag,
     )
 
-    const tag = updateExistingTagComponent(
+    updateExistingTagComponent(
       ownerTag,
       templater, // latest value
       subjectTag,
       insertBefore,
     )
-
-    if(insertBefore.parentNode) {
-      tag.tagSupport.templater.global.placeholderElm = insertBefore.previousSibling as ChildNode
-      insertBefore.parentNode.removeChild(insertBefore)
-    }
 
     return subjectTag
   }
@@ -121,7 +105,7 @@ export function updateExistingValue(
   }
 
   if(isTagInstance(value)) {
-    if((insertBefore as any).tagName !== 'TEMPLATE') {
+    if((insertBefore as any).nodeName !== 'TEMPLATE') {
       throw new Error(`expected template - ${insertBefore.nodeName}`)
     }
 
@@ -174,7 +158,6 @@ function handleStillTag(
   if(isSameTag || isSameTag2) {
     const subjectTag = subject as TagSubject
     const global = existingTag.tagSupport.templater.global
-    delete global.placeholderElm
     const insertBefore = global.insertBefore as InsertBefore
 
     return processTag(

@@ -32,7 +32,7 @@ export function processTag(
   tag.ownerTag = ownerTag
 
   if((insertBefore as any).tagName !== 'TEMPLATE') {
-    throw new Error(`;;;; - ${insertBefore.nodeName}`)
+    throw new Error(`processTag.function.ts - insertBefore is not TEMPLATE ${(insertBefore as any).tagName}`)
   }
 
   tag.buildBeforeElement(insertBefore, {

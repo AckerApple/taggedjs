@@ -36,6 +36,9 @@ export function processSubjectComponent(
   )
 
   // templater.oldest = subject.tag?.tagSupport.oldest || templater.oldest
+  if(insertBefore.nodeName != 'TEMPLATE') {
+    throw new Error('9')
+  }
   templater.global.insertBefore = insertBefore
   let retag = subject.tag as Tag
   
