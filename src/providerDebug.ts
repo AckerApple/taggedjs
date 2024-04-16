@@ -1,7 +1,7 @@
 import { animateDestroy, animateInit } from "./animations"
 import { renderCountDiv } from "./renderCount.component"
 import { tagDebugProvider, upperTagDebugProvider } from "./tagJsDebug"
-import { setLet, html, tag, providers, set, getCallback, Subject, onInit } from "taggedjs"
+import { letState, html, tag, providers, state, callbackMaker, Subject, onInit } from "taggedjs"
 
 export class TagDebugProvider {
   tagDebug = 0
@@ -13,9 +13,9 @@ export const providerDebugBase = tag((_x = 'providerDebugBase') => {
 
   // TODO: Fix provider create typing
   const providerClass: TagDebugProvider = providers.create( TagDebugProvider as any )
-  const test = setLet('props debug base')
-  let propCounter = setLet(0)(x => [propCounter, propCounter = x])
-  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
+  const test = letState('props debug base')
+  let propCounter = letState(0)(x => [propCounter, propCounter = x])
+  let renderCount = letState(0)(x => [renderCount, renderCount = x])
 
   if(providerClass.showDialog) {
     (document.getElementById('provider_debug_dialog') as any).showModal()
@@ -116,12 +116,12 @@ const providerDebug = tag(({
   const upperProvider = providers.inject( upperTagDebugProvider )
   const providerClass = providers.inject( TagDebugProvider )
 
-  let showProProps: boolean = setLet(false)(x => [showProProps, showProProps = x])
-  let renderCount: number = setLet(0)(x => [renderCount, renderCount = x])
-  // let propCounter: number = setLet(0)(x => [propCounter, propCounter = x])
+  let showProProps: boolean = letState(false)(x => [showProProps, showProProps = x])
+  let renderCount: number = letState(0)(x => [renderCount, renderCount = x])
+  // let propCounter: number = letState(0)(x => [propCounter, propCounter = x])
 
-  const callbacks = getCallback()
-  const callbackTestSub = set(() => new Subject())
+  const callbacks = callbackMaker()
+  const callbackTestSub = state(() => new Subject())
 
   onInit(() => {
     console.info('providerDebug.ts: 👉 👉 i should only ever run once')

@@ -2,7 +2,7 @@ import { propsDebugMain } from "./PropsDebug.component"
 import { animateDestroy, animateInit } from "./animations"
 import { arrayTests } from "./arrayTests"
 import { intervalTester0, intervalTester1 } from "./intervalDebug"
-import { html, tag, providers, setLet } from "taggedjs"
+import { html, tag, providers, letState } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
 
 export function tagDebugProvider() {
@@ -21,9 +21,9 @@ export function upperTagDebugProvider() {
 }
 
 export const tagDebug = tag(() => {// tagDebug.js
-  let _firstState: string = setLet('tagJsDebug.js')(x => [_firstState, _firstState = x])
-  let showIntervals: boolean = setLet(false)(x => [showIntervals, showIntervals = x])
-  let renderCount: number = setLet(0)(x => [renderCount, renderCount = x])
+  let _firstState: string = letState('tagJsDebug.js')(x => [_firstState, _firstState = x])
+  let showIntervals: boolean = letState(false)(x => [showIntervals, showIntervals = x])
+  let renderCount: number = letState(0)(x => [renderCount, renderCount = x])
 
   ++renderCount
 

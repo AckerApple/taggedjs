@@ -1,10 +1,10 @@
 import { renderCountDiv } from "./renderCount.component"
-import { setLet, tag, html } from "taggedjs"
+import { letState, tag, html } from "taggedjs"
 
 export const GatewayTest = tag((
   props: any, // : {test:number}
 ) => {
-  let renderCount: number = setLet(0)(x => [renderCount, renderCount=x])
+  let renderCount: number = letState(0)(x => [renderCount, renderCount=x])
 
   ++renderCount
   

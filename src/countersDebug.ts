@@ -1,27 +1,27 @@
 import { mouseOverTag } from "./mouseover.tag"
 import { renderCountDiv } from "./renderCount.component"
-import { html, tag, Subject, onInit, setLet, getCallback, set } from "taggedjs"
+import { html, tag, Subject, onInit, letState, callbackMaker, state } from "taggedjs"
 
 export const counters = tag(({
   appCounterSubject,
 }: {
   appCounterSubject: Subject<number>
 }) => {  
-  let counter = setLet(0)(x => [counter, counter = x])
-  let propCounter = setLet(0)(x => [propCounter, propCounter = x])
-  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
-  let initCounter = setLet(0)(x => [initCounter, initCounter = x])
-  let memory = set(() => ({counter: 0}))
+  let counter = letState(0)(x => [counter, counter = x])
+  let propCounter = letState(0)(x => [propCounter, propCounter = x])
+  let renderCount = letState(0)(x => [renderCount, renderCount = x])
+  let initCounter = letState(0)(x => [initCounter, initCounter = x])
+  let memory = state(() => ({counter: 0}))
 
-  const callbacks = getCallback()
-  const callbackTestSub = set(() => new Subject())
+  const callback = callbackMaker()
+  const callbackTestSub = state(() => new Subject())
 
   onInit(() => {
     ++initCounter
     console.info('countersDebug.ts: 👉 i should only ever run once')
 
     callbackTestSub.subscribe(x => {
-      callbacks((y) => {
+      callback((y) => {
         counter = x as number
       })()
     })
@@ -112,7 +112,7 @@ const innerCounters = tag(({
   propCounter: number,
   increasePropCounter: () => void
 }) => {
-  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
+  let renderCount = letState(0)(x => [renderCount, renderCount = x])
 
   ++renderCount // for debugging
 

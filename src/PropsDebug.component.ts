@@ -1,10 +1,10 @@
-import { watch, setLet, html, tag, InputElementTargetEvent, setProp } from "taggedjs"
+import { watch, letState, html, tag, InputElementTargetEvent, setProp } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
 
 export const propsDebugMain = tag((_='propsDebugMain') => {
-  let propNumber: any = setLet(0)(x => [propNumber, propNumber = x])
-  let renderCount: number = setLet(0)(x => [renderCount, renderCount = x])
-  let propsJson: any = setLet({test:33, x:'y'})(x => [propsJson, propsJson = x])
+  let propNumber: any = letState(0)(x => [propNumber, propNumber = x])
+  let renderCount: number = letState(0)(x => [renderCount, renderCount = x])
+  let propsJson: any = letState({test:33, x:'y'})(x => [propsJson, propsJson = x])
 
   function propsJsonChanged(event: InputElementTargetEvent) {
     propsJson = JSON.parse(event.target.value)
@@ -55,8 +55,8 @@ const propsDebug = tag((
     propsJson: any
   }
 ) => {
-  let renderCount: number = setLet(0)(x => [renderCount, renderCount=x])
-  let propNumberChangeCount = setLet(0)(x => [propNumberChangeCount, propNumberChangeCount=x])
+  let renderCount: number = letState(0)(x => [renderCount, renderCount=x])
+  let propNumberChangeCount = letState(0)(x => [propNumberChangeCount, propNumberChangeCount=x])
   const inProp = propNumber
   const test = (x: number): [number, number] => {
     return [propNumber, propNumber = x]
@@ -115,7 +115,7 @@ const propFnUpdateTest = tag(({
 }: {
   propNumber: number, callback: Function
 }) => {
-  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
+  let renderCount = letState(0)(x => [renderCount, renderCount = x])
   ++renderCount
 
   return html`

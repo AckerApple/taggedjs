@@ -1,4 +1,4 @@
-import {html, setLet, tag} from 'taggedjs'
+import {html, letState, tag} from 'taggedjs'
 
 export const mouseOverTag = tag(({
   label, memory,
@@ -8,8 +8,8 @@ export const mouseOverTag = tag(({
     counter: number
   }
 }) => {
-  let mouseOverEditShow = setLet(false)(x => [mouseOverEditShow, mouseOverEditShow = x])
-  let edit = setLet(false)(x => [edit, edit = x])
+  let mouseOverEditShow = letState(false)(x => [mouseOverEditShow, mouseOverEditShow = x])
+  let edit = letState(false)(x => [edit, edit = x])
   return html`
     <div style="background-color:purple;padding:.2em;"
       onmouseover=${() => mouseOverEditShow = true}

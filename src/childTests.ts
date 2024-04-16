@@ -1,10 +1,10 @@
-import { Tag, html, setLet, tag } from "taggedjs"
+import { Tag, html, letState, tag } from "taggedjs"
 import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests"
 import { renderCountDiv } from "./renderCount.component"
 
 export const childTests = tag((_ = 'childTests') => {
-  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
-  let counter = setLet(0)(x => [counter, counter = x])
+  let renderCount = letState(0)(x => [renderCount, renderCount = x])
+  let counter = letState(0)(x => [counter, counter = x])
 
   ++renderCount
 
@@ -63,8 +63,8 @@ const childContentTest = tag((
   {legend, id}:  {legend: string, id: string},
   children?: Tag[],
 ) => {
-  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
-  let counter = setLet(0)(x => [counter, counter = x])
+  let renderCount = letState(0)(x => [renderCount, renderCount = x])
+  let counter = letState(0)(x => [counter, counter = x])
 
   ++renderCount
   

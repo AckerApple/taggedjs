@@ -1,5 +1,5 @@
 import { childTests } from "./childTests"
-import { Subject, ValueSubject, getCallback, html, onInit, set, setLet, tag } from "taggedjs"
+import { Subject, callbackMaker, html, onInit, letState, tag, state } from "taggedjs"
 import { arrayTests } from "./arrayTests"
 import { tagSwitchDebug } from "./tagSwitchDebug.component"
 import { propsDebugMain } from "./PropsDebug.component"
@@ -10,10 +10,6 @@ import { contentDebug } from "./ContentDebug.component"
 
 type viewTypes = 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
 export const IsolatedApp = tag(() => {
-  // const stateTest = set('isolated-app-state') // unmask to identify state being debugged is this one 
-  // const component = childTests() as any
-  // const template = component.wrapper().getTemplate()
-
   const views: viewTypes[] = [
     // 'content',
     // 'counters',
@@ -27,18 +23,18 @@ export const IsolatedApp = tag(() => {
     // 'child',
   ]
   
-  let appCounter = setLet(0)(x => [appCounter, appCounter=x])
-  const appCounterSubject = set(() => new Subject(appCounter))
-  const callbacks = getCallback()
+  let appCounter = letState(0)(x => [appCounter, appCounter=x])
+  const appCounterSubject = state(() => new Subject(appCounter))
+  const callback = callbackMaker()
   onInit(() => {
     console.log('app init should only run once')    
 
-    appCounterSubject.subscribe(x => {
-      callbacks((y) => {
+    appCounterSubject.subscribe(
+      callback((x) => {
         console.log('callback increase counter', {appCounter, x})
-        appCounter = x as number
-      })()
-    })
+        appCounter = x
+      })
+    )
   })
 
   return html`<!--isolatedApp.js-->

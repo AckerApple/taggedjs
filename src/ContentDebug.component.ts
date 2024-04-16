@@ -1,10 +1,10 @@
-import { html, tag, setLet, ValueSubject, set, combineLatest, willPromise } from "taggedjs"
+import { html, tag, letState, ValueSubject, state, combineLatest, willPromise } from "taggedjs"
 
 export const contentDebug = tag(() => {
-  const vs0 = set(() => new ValueSubject(0))
-  const vs1 = set(() => new ValueSubject(1))
+  const vs0 = state(() => new ValueSubject(0))
+  const vs1 = state(() => new ValueSubject(1))
 
-  let renderCount: number = setLet(0)(x => [renderCount, renderCount=x])
+  let renderCount: number = letState(0)(x => [renderCount, renderCount=x])
 
   ++renderCount
 

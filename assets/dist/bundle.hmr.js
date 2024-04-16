@@ -28,9 +28,9 @@ __nested_webpack_require_268__.r(__nested_webpack_exports__);
 /* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_268__(/*! taggedjs */ "../main/ts/index.ts");
 
 const contentDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
-    const vs0 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.set)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_0__.ValueSubject(0));
-    const vs1 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.set)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_0__.ValueSubject(1));
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
+    const vs0 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_0__.ValueSubject(0));
+    const vs1 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_0__.ValueSubject(1));
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]);
     ++renderCount;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
     <div style="font-size:0.8em">You should see "0" here => "${0}"</div>
@@ -99,20 +99,20 @@ const contentDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
 /*!*************************************!*\
   !*** ./src/PropsDebug.component.ts ***!
   \*************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_3826__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_3832__) => {
 
-__nested_webpack_require_3826__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_3826__.d(__nested_webpack_exports__, {
+__nested_webpack_require_3832__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_3832__.d(__nested_webpack_exports__, {
 /* harmony export */   propsDebugMain: () => (/* binding */ propsDebugMain)
 /* harmony export */ });
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_3826__(/*! taggedjs */ "../main/ts/index.ts");
-/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_3826__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_3832__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_3832__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
 
 
 const propsDebugMain = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_ = 'propsDebugMain') => {
-    let propNumber = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [propNumber, propNumber = x]);
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
-    let propsJson = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)({ test: 33, x: 'y' })(x => [propsJson, propsJson = x]);
+    let propNumber = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [propNumber, propNumber = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]);
+    let propsJson = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)({ test: 33, x: 'y' })(x => [propsJson, propsJson = x]);
     function propsJsonChanged(event) {
         propsJson = JSON.parse(event.target.value);
         return propsJson;
@@ -148,8 +148,8 @@ const propsDebugMain = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_ = 'props
   `;
 });
 const propsDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNumber, propsJson, propNumberChange, }) => {
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
-    let propNumberChangeCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [propNumberChangeCount, propNumberChangeCount = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]);
+    let propNumberChangeCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [propNumberChangeCount, propNumberChangeCount = x]);
     const inProp = propNumber;
     const test = (x) => {
         return [propNumber, propNumber = x];
@@ -199,7 +199,7 @@ const propsDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNumber, 
   `;
 });
 const propFnUpdateTest = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNumber, callback, }) => {
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]);
     ++renderCount;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
     <button id="propsOneLevelFunUpdate-🥩-button"
@@ -218,10 +218,10 @@ const propFnUpdateTest = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNu
 /*!***************************!*\
   !*** ./src/animations.ts ***!
   \***************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_8973__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_8991__) => {
 
-__nested_webpack_require_8973__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_8973__.d(__nested_webpack_exports__, {
+__nested_webpack_require_8991__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_8991__.d(__nested_webpack_exports__, {
 /* harmony export */   animateDestroy: () => (/* binding */ animateDestroy),
 /* harmony export */   animateInit: () => (/* binding */ animateInit),
 /* harmony export */   captureElementPosition: () => (/* binding */ captureElementPosition)
@@ -277,23 +277,23 @@ function wait(time) {
 /*!******************************!*\
   !*** ./src/app.component.ts ***!
   \******************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_11201__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_11219__) => {
 
-__nested_webpack_require_11201__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_11201__.d(__nested_webpack_exports__, {
+__nested_webpack_require_11219__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_11219__.d(__nested_webpack_exports__, {
 /* harmony export */   App: () => (/* binding */ App)
 /* harmony export */ });
-/* harmony import */ var _attributeDebug_component__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_11201__(/*! ./attributeDebug.component */ "./src/attributeDebug.component.ts");
-/* harmony import */ var _ContentDebug_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_11201__(/*! ./ContentDebug.component */ "./src/ContentDebug.component.ts");
-/* harmony import */ var _tableDebug_component__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_11201__(/*! ./tableDebug.component */ "./src/tableDebug.component.ts");
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_11201__(/*! taggedjs */ "../main/ts/index.ts");
-/* harmony import */ var _tagJsDebug__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_11201__(/*! ./tagJsDebug */ "./src/tagJsDebug.ts");
-/* harmony import */ var _tagSwitchDebug_component__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_11201__(/*! ./tagSwitchDebug.component */ "./src/tagSwitchDebug.component.ts");
-/* harmony import */ var _childTests__WEBPACK_IMPORTED_MODULE_6__ = __nested_webpack_require_11201__(/*! ./childTests */ "./src/childTests.ts");
-/* harmony import */ var _tests__WEBPACK_IMPORTED_MODULE_7__ = __nested_webpack_require_11201__(/*! ./tests */ "./src/tests.ts");
-/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_8__ = __nested_webpack_require_11201__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
-/* harmony import */ var _countersDebug__WEBPACK_IMPORTED_MODULE_9__ = __nested_webpack_require_11201__(/*! ./countersDebug */ "./src/countersDebug.ts");
-/* harmony import */ var _providerDebug__WEBPACK_IMPORTED_MODULE_10__ = __nested_webpack_require_11201__(/*! ./providerDebug */ "./src/providerDebug.ts");
+/* harmony import */ var _attributeDebug_component__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_11219__(/*! ./attributeDebug.component */ "./src/attributeDebug.component.ts");
+/* harmony import */ var _ContentDebug_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_11219__(/*! ./ContentDebug.component */ "./src/ContentDebug.component.ts");
+/* harmony import */ var _tableDebug_component__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_11219__(/*! ./tableDebug.component */ "./src/tableDebug.component.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_11219__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _tagJsDebug__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_11219__(/*! ./tagJsDebug */ "./src/tagJsDebug.ts");
+/* harmony import */ var _tagSwitchDebug_component__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_11219__(/*! ./tagSwitchDebug.component */ "./src/tagSwitchDebug.component.ts");
+/* harmony import */ var _childTests__WEBPACK_IMPORTED_MODULE_6__ = __nested_webpack_require_11219__(/*! ./childTests */ "./src/childTests.ts");
+/* harmony import */ var _tests__WEBPACK_IMPORTED_MODULE_7__ = __nested_webpack_require_11219__(/*! ./tests */ "./src/tests.ts");
+/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_8__ = __nested_webpack_require_11219__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
+/* harmony import */ var _countersDebug__WEBPACK_IMPORTED_MODULE_9__ = __nested_webpack_require_11219__(/*! ./countersDebug */ "./src/countersDebug.ts");
+/* harmony import */ var _providerDebug__WEBPACK_IMPORTED_MODULE_10__ = __nested_webpack_require_11219__(/*! ./providerDebug */ "./src/providerDebug.ts");
 
 
 
@@ -306,10 +306,10 @@ __nested_webpack_require_11201__.r(__nested_webpack_exports__);
 
 
 const App = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
-    let _firstState = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)('app first state')(x => [_firstState, _firstState = x]);
-    let toggleValue = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)(false)(x => [toggleValue, toggleValue = x]);
-    let appCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)(0)(x => [appCounter, appCounter = x]);
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)(0)(x => [renderCount, renderCount = x]);
+    let _firstState = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)('app first state')(x => [_firstState, _firstState = x]);
+    let toggleValue = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)(false)(x => [toggleValue, toggleValue = x]);
+    let appCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)(0)(x => [appCounter, appCounter = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)(0)(x => [renderCount, renderCount = x]);
     const toggle = () => {
         toggleValue = !toggleValue;
     };
@@ -329,8 +329,8 @@ const App = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
         }, waitFor); // cause delay to be separate from renders
     }
     ++renderCount;
-    const callbacks = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.getCallback)();
-    const appCounterSubject = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.set)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_3__.Subject(appCounter));
+    const callbacks = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.callbackMaker)();
+    const appCounterSubject = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_3__.Subject(appCounter));
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.onInit)(() => {
         console.log('app init should only run once');
         runTesting(false);
@@ -406,15 +406,15 @@ const App = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
 /*!*****************************!*\
   !*** ./src/app.function.ts ***!
   \*****************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_17135__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_17165__) => {
 
-__nested_webpack_require_17135__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_17135__.d(__nested_webpack_exports__, {
+__nested_webpack_require_17165__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_17165__.d(__nested_webpack_exports__, {
 /* harmony export */   app: () => (/* binding */ app)
 /* harmony export */ });
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_17135__(/*! taggedjs */ "../main/ts/index.ts");
-/* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_17135__(/*! ./app.component */ "./src/app.component.ts");
-/* harmony import */ var _isolatedApp__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_17135__(/*! ./isolatedApp */ "./src/isolatedApp.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_17165__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_17165__(/*! ./app.component */ "./src/app.component.ts");
+/* harmony import */ var _isolatedApp__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_17165__(/*! ./isolatedApp */ "./src/isolatedApp.ts");
 
 
 
@@ -440,23 +440,23 @@ const app = () => {
 /*!***************************!*\
   !*** ./src/arrayTests.ts ***!
   \***************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_18780__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_18810__) => {
 
-__nested_webpack_require_18780__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_18780__.d(__nested_webpack_exports__, {
+__nested_webpack_require_18810__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_18810__.d(__nested_webpack_exports__, {
 /* harmony export */   arrayTests: () => (/* binding */ arrayTests)
 /* harmony export */ });
-/* harmony import */ var _animations__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_18780__(/*! ./animations */ "./src/animations.ts");
-/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_18780__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_18780__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _animations__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_18810__(/*! ./animations */ "./src/animations.ts");
+/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_18810__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_18810__(/*! taggedjs */ "../main/ts/index.ts");
 
 
 
 const frameCount = 4;
 const arrayTests = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(function ArrayTests() {
-    let memory = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.set)(() => ({ counter: 0 }));
-    const players = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.set)([]);
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.setLet)(0)(x => [renderCount, renderCount = x]);
+    let memory = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.state)(() => ({ counter: 0 }));
+    const players = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.state)([]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.letState)(0)(x => [renderCount, renderCount = x]);
     const getNewPlayer = () => ({
         name: 'Person ' + players.length,
         scores: '0,'.repeat(/*frameCount*/ 0).split(',').map((_v, index) => ({
@@ -502,7 +502,7 @@ const arrayTests = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(function ArrayT
   `;
 });
 const scoreData = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ score, playerIndex }) => {
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.setLet)(0)(x => [renderCount, renderCount = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.letState)(0)(x => [renderCount, renderCount = x]);
     ++renderCount;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
     frame:${score.frame}:
@@ -576,17 +576,17 @@ const playersDisplay = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ players,
 /*!*****************************************!*\
   !*** ./src/attributeDebug.component.ts ***!
   \*****************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_24704__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_24742__) => {
 
-__nested_webpack_require_24704__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_24704__.d(__nested_webpack_exports__, {
+__nested_webpack_require_24742__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_24742__.d(__nested_webpack_exports__, {
 /* harmony export */   attributeDebug: () => (/* binding */ attributeDebug)
 /* harmony export */ });
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_24704__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_24742__(/*! taggedjs */ "../main/ts/index.ts");
 
 const attributeDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
-    let selected = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)('a')(x => [selected, selected = x]);
-    let isOrange = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(true)(x => [isOrange, isOrange = x]);
+    let selected = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)('a')(x => [selected, selected = x]);
+    let isOrange = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(true)(x => [isOrange, isOrange = x]);
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
     <input onchange=${(event) => selected = event.target.value} placeholder="a b or c" />
     <select id="select-sample-drop-down">
@@ -631,21 +631,21 @@ const attributeDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
 /*!***************************!*\
   !*** ./src/childTests.ts ***!
   \***************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_27056__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_27098__) => {
 
-__nested_webpack_require_27056__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_27056__.d(__nested_webpack_exports__, {
+__nested_webpack_require_27098__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_27098__.d(__nested_webpack_exports__, {
 /* harmony export */   childTests: () => (/* binding */ childTests)
 /* harmony export */ });
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_27056__(/*! taggedjs */ "../main/ts/index.ts");
-/* harmony import */ var _innerHtmlTests__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_27056__(/*! ./innerHtmlTests */ "./src/innerHtmlTests.ts");
-/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_27056__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_27098__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _innerHtmlTests__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_27098__(/*! ./innerHtmlTests */ "./src/innerHtmlTests.ts");
+/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_27098__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
 
 
 
 const childTests = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_ = 'childTests') => {
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
-    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [counter, counter = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]);
+    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [counter, counter = x]);
     ++renderCount;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
     <fieldset id="children-test" style="flex:2 2 20em">
@@ -698,8 +698,8 @@ const childTests = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_ = 'childTest
   `;
 });
 const childContentTest = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ legend, id }, children) => {
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
-    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [counter, counter = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]);
+    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [counter, counter = x]);
     ++renderCount;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
     <fieldset id=${id} style="flex:2 2 20em">
@@ -719,31 +719,31 @@ const childContentTest = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ legend
 /*!******************************!*\
   !*** ./src/countersDebug.ts ***!
   \******************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_31080__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_31130__) => {
 
-__nested_webpack_require_31080__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_31080__.d(__nested_webpack_exports__, {
+__nested_webpack_require_31130__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_31130__.d(__nested_webpack_exports__, {
 /* harmony export */   counters: () => (/* binding */ counters)
 /* harmony export */ });
-/* harmony import */ var _mouseover_tag__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_31080__(/*! ./mouseover.tag */ "./src/mouseover.tag.ts");
-/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_31080__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_31080__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _mouseover_tag__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_31130__(/*! ./mouseover.tag */ "./src/mouseover.tag.ts");
+/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_31130__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_31130__(/*! taggedjs */ "../main/ts/index.ts");
 
 
 
 const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ appCounterSubject, }) => {
-    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.setLet)(0)(x => [counter, counter = x]);
-    let propCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.setLet)(0)(x => [propCounter, propCounter = x]);
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.setLet)(0)(x => [renderCount, renderCount = x]);
-    let initCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.setLet)(0)(x => [initCounter, initCounter = x]);
-    let memory = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.set)(() => ({ counter: 0 }));
-    const callbacks = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.getCallback)();
-    const callbackTestSub = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.set)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_2__.Subject());
+    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.letState)(0)(x => [counter, counter = x]);
+    let propCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.letState)(0)(x => [propCounter, propCounter = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.letState)(0)(x => [renderCount, renderCount = x]);
+    let initCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.letState)(0)(x => [initCounter, initCounter = x]);
+    let memory = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.state)(() => ({ counter: 0 }));
+    const callback = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.callbackMaker)();
+    const callbackTestSub = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_2__.Subject());
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.onInit)(() => {
         ++initCounter;
         console.info('countersDebug.ts: 👉 i should only ever run once');
         callbackTestSub.subscribe(x => {
-            callbacks((y) => {
+            callback((y) => {
                 counter = x;
             })();
         });
@@ -823,7 +823,7 @@ const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ appCounterSubj
   `;
 });
 const innerCounters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ propCounter, increasePropCounter, }) => {
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.setLet)(0)(x => [renderCount, renderCount = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.letState)(0)(x => [renderCount, renderCount = x]);
     ++renderCount; // for debugging
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
     <button id="❤️-inner-counter" onclick=${increasePropCounter}
@@ -843,10 +843,10 @@ const innerCounters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ propCount
 /*!*****************************!*\
   !*** ./src/elmSelectors.ts ***!
   \*****************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_36243__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_36307__) => {
 
-__nested_webpack_require_36243__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_36243__.d(__nested_webpack_exports__, {
+__nested_webpack_require_36307__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_36307__.d(__nested_webpack_exports__, {
 /* harmony export */   byId: () => (/* binding */ byId),
 /* harmony export */   elementCount: () => (/* binding */ elementCount),
 /* harmony export */   lastById: () => (/* binding */ lastById),
@@ -873,10 +873,10 @@ function lastById(id) {
 /*!***********************!*\
   !*** ./src/expect.ts ***!
   \***********************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_37234__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_37298__) => {
 
-__nested_webpack_require_37234__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_37234__.d(__nested_webpack_exports__, {
+__nested_webpack_require_37298__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_37298__.d(__nested_webpack_exports__, {
 /* harmony export */   describe: () => (/* binding */ describe),
 /* harmony export */   execute: () => (/* binding */ execute),
 /* harmony export */   expect: () => (/* binding */ expect),
@@ -1008,20 +1008,20 @@ function expect(expected) {
 /*!*******************************!*\
   !*** ./src/innerHtmlTests.ts ***!
   \*******************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_41001__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_41065__) => {
 
-__nested_webpack_require_41001__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_41001__.d(__nested_webpack_exports__, {
+__nested_webpack_require_41065__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_41065__.d(__nested_webpack_exports__, {
 /* harmony export */   innerHtmlPropsTest: () => (/* binding */ innerHtmlPropsTest),
 /* harmony export */   innerHtmlTest: () => (/* binding */ innerHtmlTest)
 /* harmony export */ });
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_41001__(/*! taggedjs */ "../main/ts/index.ts");
-/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_41001__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_41065__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_41065__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
 
 
 const innerHtmlTest = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_props, children) => {
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
-    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [counter, counter = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]);
+    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [counter, counter = x]);
     ++renderCount;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `<!--innerHtmlTests.js-->
     <fieldset id="innerHtmlTests-1">
@@ -1039,8 +1039,8 @@ const innerHtmlTest = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_props, chi
   `;
 });
 const innerHtmlPropsTest = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((x, children) => {
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
-    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [counter, counter = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]);
+    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [counter, counter = x]);
     ++renderCount;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `<!--innerHtmlTests.js-->
     <fieldset id="innerHtmlTests-2">
@@ -1061,24 +1061,24 @@ const innerHtmlPropsTest = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((x, chi
 /*!******************************!*\
   !*** ./src/intervalDebug.ts ***!
   \******************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_43696__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_43768__) => {
 
-__nested_webpack_require_43696__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_43696__.d(__nested_webpack_exports__, {
+__nested_webpack_require_43768__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_43768__.d(__nested_webpack_exports__, {
 /* harmony export */   intervalTester0: () => (/* binding */ intervalTester0),
 /* harmony export */   intervalTester1: () => (/* binding */ intervalTester1)
 /* harmony export */ });
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_43696__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_43768__(/*! taggedjs */ "../main/ts/index.ts");
 
 const test0interval = 3000;
 const test1interval = 6000;
 const intervalTester0 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
-    let intervalCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [intervalCount, intervalCount = x]);
-    let intervalId = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(undefined)(x => [intervalId, intervalId = x]);
-    let intervalId2 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(undefined)(x => [intervalId2, intervalId2 = x]);
-    let renderCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCounter, renderCounter = x]);
-    let currentTime = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [currentTime, currentTime = x]);
-    const callback = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.getCallback)();
+    let intervalCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [intervalCount, intervalCount = x]);
+    let intervalId = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(undefined)(x => [intervalId, intervalId = x]);
+    let intervalId2 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(undefined)(x => [intervalId2, intervalId2 = x]);
+    let renderCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCounter, renderCounter = x]);
+    let currentTime = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [currentTime, currentTime = x]);
+    const callback = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.callbackMaker)();
     const increase = () => ++intervalCount;
     console.log('intervalId', intervalId);
     const startInterval = () => {
@@ -1134,12 +1134,12 @@ const intervalTester0 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
   `;
 });
 const intervalTester1 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
-    let intervalCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [intervalCount, intervalCount = x]);
-    let intervalId = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(undefined)(x => [intervalId, intervalId = x]);
-    let intervalId2 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(undefined)(x => [intervalId2, intervalId2 = x]);
-    let renderCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCounter, renderCounter = x]);
-    let currentTime = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [currentTime, currentTime = x]);
-    const callback = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.getCallback)();
+    let intervalCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [intervalCount, intervalCount = x]);
+    let intervalId = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(undefined)(x => [intervalId, intervalId = x]);
+    let intervalId2 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(undefined)(x => [intervalId2, intervalId2 = x]);
+    let renderCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCounter, renderCounter = x]);
+    let currentTime = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [currentTime, currentTime = x]);
+    const callback = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.callbackMaker)();
     const increase = () => ++intervalCount;
     function trackTime() {
         currentTime = 0;
@@ -1192,21 +1192,21 @@ const intervalTester1 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
 /*!****************************!*\
   !*** ./src/isolatedApp.ts ***!
   \****************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_49357__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_49453__) => {
 
-__nested_webpack_require_49357__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_49357__.d(__nested_webpack_exports__, {
+__nested_webpack_require_49453__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_49453__.d(__nested_webpack_exports__, {
 /* harmony export */   IsolatedApp: () => (/* binding */ IsolatedApp)
 /* harmony export */ });
-/* harmony import */ var _childTests__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_49357__(/*! ./childTests */ "./src/childTests.ts");
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_49357__(/*! taggedjs */ "../main/ts/index.ts");
-/* harmony import */ var _arrayTests__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_49357__(/*! ./arrayTests */ "./src/arrayTests.ts");
-/* harmony import */ var _tagSwitchDebug_component__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_49357__(/*! ./tagSwitchDebug.component */ "./src/tagSwitchDebug.component.ts");
-/* harmony import */ var _PropsDebug_component__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_49357__(/*! ./PropsDebug.component */ "./src/PropsDebug.component.ts");
-/* harmony import */ var _providerDebug__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_49357__(/*! ./providerDebug */ "./src/providerDebug.ts");
-/* harmony import */ var _countersDebug__WEBPACK_IMPORTED_MODULE_6__ = __nested_webpack_require_49357__(/*! ./countersDebug */ "./src/countersDebug.ts");
-/* harmony import */ var _tableDebug_component__WEBPACK_IMPORTED_MODULE_7__ = __nested_webpack_require_49357__(/*! ./tableDebug.component */ "./src/tableDebug.component.ts");
-/* harmony import */ var _ContentDebug_component__WEBPACK_IMPORTED_MODULE_8__ = __nested_webpack_require_49357__(/*! ./ContentDebug.component */ "./src/ContentDebug.component.ts");
+/* harmony import */ var _childTests__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_49453__(/*! ./childTests */ "./src/childTests.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_49453__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _arrayTests__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_49453__(/*! ./arrayTests */ "./src/arrayTests.ts");
+/* harmony import */ var _tagSwitchDebug_component__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_49453__(/*! ./tagSwitchDebug.component */ "./src/tagSwitchDebug.component.ts");
+/* harmony import */ var _PropsDebug_component__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_49453__(/*! ./PropsDebug.component */ "./src/PropsDebug.component.ts");
+/* harmony import */ var _providerDebug__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_49453__(/*! ./providerDebug */ "./src/providerDebug.ts");
+/* harmony import */ var _countersDebug__WEBPACK_IMPORTED_MODULE_6__ = __nested_webpack_require_49453__(/*! ./countersDebug */ "./src/countersDebug.ts");
+/* harmony import */ var _tableDebug_component__WEBPACK_IMPORTED_MODULE_7__ = __nested_webpack_require_49453__(/*! ./tableDebug.component */ "./src/tableDebug.component.ts");
+/* harmony import */ var _ContentDebug_component__WEBPACK_IMPORTED_MODULE_8__ = __nested_webpack_require_49453__(/*! ./ContentDebug.component */ "./src/ContentDebug.component.ts");
 
 
 
@@ -1217,9 +1217,6 @@ __nested_webpack_require_49357__.r(__nested_webpack_exports__);
 
 
 const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
-    // const stateTest = set('isolated-app-state') // unmask to identify state being debugged is this one 
-    // const component = childTests() as any
-    // const template = component.wrapper().getTemplate()
     const views = [
         // 'content',
         // 'counters',
@@ -1229,17 +1226,15 @@ const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
         // 'tagSwitchDebug',
         // 'child',
     ];
-    let appCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.setLet)(0)(x => [appCounter, appCounter = x]);
-    const appCounterSubject = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.set)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_1__.Subject(appCounter));
-    const callbacks = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.getCallback)();
+    let appCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.letState)(0)(x => [appCounter, appCounter = x]);
+    const appCounterSubject = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_1__.Subject(appCounter));
+    const callback = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.callbackMaker)();
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.onInit)(() => {
         console.log('app init should only run once');
-        appCounterSubject.subscribe(x => {
-            callbacks((y) => {
-                console.log('callback increase counter', { appCounter, x });
-                appCounter = x;
-            })();
-        });
+        appCounterSubject.subscribe(callback((x) => {
+            console.log('callback increase counter', { appCounter, x });
+            appCounter = x;
+        }));
     });
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.html) `<!--isolatedApp.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
@@ -1318,17 +1313,17 @@ const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
 /*!******************************!*\
   !*** ./src/mouseover.tag.ts ***!
   \******************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_55148__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_54994__) => {
 
-__nested_webpack_require_55148__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_55148__.d(__nested_webpack_exports__, {
+__nested_webpack_require_54994__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_54994__.d(__nested_webpack_exports__, {
 /* harmony export */   mouseOverTag: () => (/* binding */ mouseOverTag)
 /* harmony export */ });
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_55148__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_54994__(/*! taggedjs */ "../main/ts/index.ts");
 
 const mouseOverTag = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ label, memory, }) => {
-    let mouseOverEditShow = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(false)(x => [mouseOverEditShow, mouseOverEditShow = x]);
-    let edit = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(false)(x => [edit, edit = x]);
+    let mouseOverEditShow = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(false)(x => [mouseOverEditShow, mouseOverEditShow = x]);
+    let edit = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(false)(x => [edit, edit = x]);
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
     <div style="background-color:purple;padding:.2em;"
       onmouseover=${() => mouseOverEditShow = true}
@@ -1350,17 +1345,17 @@ const mouseOverTag = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ label, mem
 /*!******************************!*\
   !*** ./src/providerDebug.ts ***!
   \******************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_56563__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_56413__) => {
 
-__nested_webpack_require_56563__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_56563__.d(__nested_webpack_exports__, {
+__nested_webpack_require_56413__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_56413__.d(__nested_webpack_exports__, {
 /* harmony export */   TagDebugProvider: () => (/* binding */ TagDebugProvider),
 /* harmony export */   providerDebugBase: () => (/* binding */ providerDebugBase)
 /* harmony export */ });
-/* harmony import */ var _animations__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_56563__(/*! ./animations */ "./src/animations.ts");
-/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_56563__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
-/* harmony import */ var _tagJsDebug__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_56563__(/*! ./tagJsDebug */ "./src/tagJsDebug.ts");
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_56563__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _animations__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_56413__(/*! ./animations */ "./src/animations.ts");
+/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_56413__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
+/* harmony import */ var _tagJsDebug__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_56413__(/*! ./tagJsDebug */ "./src/tagJsDebug.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_56413__(/*! taggedjs */ "../main/ts/index.ts");
 
 
 
@@ -1373,9 +1368,9 @@ const providerDebugBase = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)((_x = 'p
     const provider = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.create(_tagJsDebug__WEBPACK_IMPORTED_MODULE_2__.tagDebugProvider);
     // TODO: Fix provider create typing
     const providerClass = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.create(TagDebugProvider);
-    const test = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)('props debug base');
-    let propCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)(0)(x => [propCounter, propCounter = x]);
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)(0)(x => [renderCount, renderCount = x]);
+    const test = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)('props debug base');
+    let propCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)(0)(x => [propCounter, propCounter = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)(0)(x => [renderCount, renderCount = x]);
     if (providerClass.showDialog) {
         document.getElementById('provider_debug_dialog').showModal();
     }
@@ -1465,11 +1460,11 @@ const providerDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(({ propCount
     const provider = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.inject(_tagJsDebug__WEBPACK_IMPORTED_MODULE_2__.tagDebugProvider);
     const upperProvider = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.inject(_tagJsDebug__WEBPACK_IMPORTED_MODULE_2__.upperTagDebugProvider);
     const providerClass = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.inject(TagDebugProvider);
-    let showProProps = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)(false)(x => [showProProps, showProProps = x]);
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.setLet)(0)(x => [renderCount, renderCount = x]);
-    // let propCounter: number = setLet(0)(x => [propCounter, propCounter = x])
-    const callbacks = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.getCallback)();
-    const callbackTestSub = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.set)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_3__.Subject());
+    let showProProps = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)(false)(x => [showProProps, showProProps = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)(0)(x => [renderCount, renderCount = x]);
+    // let propCounter: number = letState(0)(x => [propCounter, propCounter = x])
+    const callbacks = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.callbackMaker)();
+    const callbackTestSub = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_3__.Subject());
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.onInit)(() => {
         console.info('providerDebug.ts: 👉 👉 i should only ever run once');
         callbackTestSub.subscribe(x => {
@@ -1556,13 +1551,13 @@ const testProviderAsProps = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)((provi
 /*!**************************************!*\
   !*** ./src/renderCount.component.ts ***!
   \**************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_66160__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_66026__) => {
 
-__nested_webpack_require_66160__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_66160__.d(__nested_webpack_exports__, {
+__nested_webpack_require_66026__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_66026__.d(__nested_webpack_exports__, {
 /* harmony export */   renderCountDiv: () => (/* binding */ renderCountDiv)
 /* harmony export */ });
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_66160__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_66026__(/*! taggedjs */ "../main/ts/index.ts");
 
 const renderCountDiv = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ renderCount, name }) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `<div><small>(${name} render count ${renderCount})</small></div>`);
 
@@ -1573,16 +1568,16 @@ const renderCountDiv = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ renderCo
 /*!*************************************!*\
   !*** ./src/tableDebug.component.ts ***!
   \*************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_66969__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_66835__) => {
 
-__nested_webpack_require_66969__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_66969__.d(__nested_webpack_exports__, {
+__nested_webpack_require_66835__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_66835__.d(__nested_webpack_exports__, {
 /* harmony export */   tableDebug: () => (/* binding */ tableDebug)
 /* harmony export */ });
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_66969__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_66835__(/*! taggedjs */ "../main/ts/index.ts");
 
 const tableDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
-    let showCell = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(true)(x => [showCell, showCell = x]);
+    let showCell = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(true)(x => [showCell, showCell = x]);
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
     <div style="max-height: 800px;overflow-y: scroll;">
       <table cellPadding=${5} cellSpacing=${5} border="1">
@@ -1616,20 +1611,20 @@ const tableDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
 /*!***************************!*\
   !*** ./src/tagJsDebug.ts ***!
   \***************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_68441__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_68309__) => {
 
-__nested_webpack_require_68441__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_68441__.d(__nested_webpack_exports__, {
+__nested_webpack_require_68309__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_68309__.d(__nested_webpack_exports__, {
 /* harmony export */   tagDebug: () => (/* binding */ tagDebug),
 /* harmony export */   tagDebugProvider: () => (/* binding */ tagDebugProvider),
 /* harmony export */   upperTagDebugProvider: () => (/* binding */ upperTagDebugProvider)
 /* harmony export */ });
-/* harmony import */ var _PropsDebug_component__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_68441__(/*! ./PropsDebug.component */ "./src/PropsDebug.component.ts");
-/* harmony import */ var _animations__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_68441__(/*! ./animations */ "./src/animations.ts");
-/* harmony import */ var _arrayTests__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_68441__(/*! ./arrayTests */ "./src/arrayTests.ts");
-/* harmony import */ var _intervalDebug__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_68441__(/*! ./intervalDebug */ "./src/intervalDebug.ts");
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_68441__(/*! taggedjs */ "../main/ts/index.ts");
-/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_68441__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
+/* harmony import */ var _PropsDebug_component__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_68309__(/*! ./PropsDebug.component */ "./src/PropsDebug.component.ts");
+/* harmony import */ var _animations__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_68309__(/*! ./animations */ "./src/animations.ts");
+/* harmony import */ var _arrayTests__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_68309__(/*! ./arrayTests */ "./src/arrayTests.ts");
+/* harmony import */ var _intervalDebug__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_68309__(/*! ./intervalDebug */ "./src/intervalDebug.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_68309__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_68309__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
 
 
 
@@ -1650,9 +1645,9 @@ function upperTagDebugProvider() {
     };
 }
 const tagDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.tag)(() => {
-    let _firstState = (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.setLet)('tagJsDebug.js')(x => [_firstState, _firstState = x]);
-    let showIntervals = (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.setLet)(false)(x => [showIntervals, showIntervals = x]);
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.setLet)(0)(x => [renderCount, renderCount = x]);
+    let _firstState = (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.letState)('tagJsDebug.js')(x => [_firstState, _firstState = x]);
+    let showIntervals = (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.letState)(false)(x => [showIntervals, showIntervals = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.letState)(0)(x => [renderCount, renderCount = x]);
     ++renderCount;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.html) `<!-- tagDebug.js -->
     <h3 id="debugging">Debugging</h3>
@@ -1697,10 +1692,10 @@ const tagDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.tag)(() => {
 /*!*****************************************!*\
   !*** ./src/tagSwitchDebug.component.ts ***!
   \*****************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_72068__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_71942__) => {
 
-__nested_webpack_require_72068__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_72068__.d(__nested_webpack_exports__, {
+__nested_webpack_require_71942__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_71942__.d(__nested_webpack_exports__, {
 /* harmony export */   arraySwitching: () => (/* binding */ arraySwitching),
 /* harmony export */   tag1: () => (/* binding */ tag1),
 /* harmony export */   tag2: () => (/* binding */ tag2),
@@ -1708,13 +1703,13 @@ __nested_webpack_require_72068__.r(__nested_webpack_exports__);
 /* harmony export */   tagSwitchDebug: () => (/* binding */ tagSwitchDebug),
 /* harmony export */   ternaryPropTest: () => (/* binding */ ternaryPropTest)
 /* harmony export */ });
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_72068__(/*! taggedjs */ "../main/ts/index.ts");
-/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_72068__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_71942__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_71942__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
 
 
 const tagSwitchDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_t = 'tagSwitchDebug') => {
-    let selectedTag = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(null)(x => [selectedTag, selectedTag = x]);
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
+    let selectedTag = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(null)(x => [selectedTag, selectedTag = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]);
     function changeSelectedTag(event) {
         selectedTag = event.target.value;
         if (selectedTag === 'undefined') {
@@ -1812,8 +1807,8 @@ const ternaryPropTest = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ selecte
   `;
 });
 const tag1 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ title }) => {
-    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [counter, counter = x]);
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
+    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [counter, counter = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]);
     ++renderCount;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
     <div id="tag1" style="border:1px solid orange;">
@@ -1824,8 +1819,8 @@ const tag1 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ title }) => {
   `;
 });
 const tag2 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ title }) => {
-    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [counter, counter = x]);
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
+    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [counter, counter = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]);
     ++renderCount;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
     <div id="tag2" style="border:1px solid orange;">
@@ -1836,8 +1831,8 @@ const tag2 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ title }) => {
   `;
 });
 const tag3 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ title }) => {
-    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [counter, counter = x]);
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.setLet)(0)(x => [renderCount, renderCount = x]);
+    let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [counter, counter = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]);
     ++renderCount;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
     <div  id="tag3" style="border:1px solid orange;">
@@ -1873,14 +1868,14 @@ const arraySwitching = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ selected
 /*!**********************!*\
   !*** ./src/tests.ts ***!
   \**********************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_80655__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_80545__) => {
 
-__nested_webpack_require_80655__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_80655__.d(__nested_webpack_exports__, {
+__nested_webpack_require_80545__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_80545__.d(__nested_webpack_exports__, {
 /* harmony export */   runTests: () => (/* binding */ runTests)
 /* harmony export */ });
-/* harmony import */ var _elmSelectors__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_80655__(/*! ./elmSelectors */ "./src/elmSelectors.ts");
-/* harmony import */ var _expect__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_80655__(/*! ./expect */ "./src/expect.ts");
+/* harmony import */ var _elmSelectors__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_80545__(/*! ./elmSelectors */ "./src/elmSelectors.ts");
+/* harmony import */ var _expect__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_80545__(/*! ./expect */ "./src/expect.ts");
 
 
 function runTests() {
@@ -2094,28 +2089,13 @@ function delay(time) {
 
 /***/ }),
 
-/***/ "../main/ts/Clones.type.ts":
-/*!*********************************!*\
-  !*** ../main/ts/Clones.type.ts ***!
-  \*********************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_97747__) => {
-
-__nested_webpack_require_97747__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_97747__.d(__nested_webpack_exports__, {
-/* harmony export */   isRemoveTemplates: () => (/* binding */ isRemoveTemplates)
-/* harmony export */ });
-const isRemoveTemplates = true;
-
-
-/***/ }),
-
 /***/ "../main/ts/ElementTargetEvent.interface.ts":
 /*!**************************************************!*\
   !*** ../main/ts/ElementTargetEvent.interface.ts ***!
   \**************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_98309__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_97705__) => {
 
-__nested_webpack_require_98309__.r(__nested_webpack_exports__);
+__nested_webpack_require_97705__.r(__nested_webpack_exports__);
 
 
 
@@ -2125,28 +2105,24 @@ __nested_webpack_require_98309__.r(__nested_webpack_exports__);
 /*!*******************************!*\
   !*** ../main/ts/Tag.class.ts ***!
   \*******************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_98591__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_97987__) => {
 
-__nested_webpack_require_98591__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_98591__.d(__nested_webpack_exports__, {
+__nested_webpack_require_97987__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_97987__.d(__nested_webpack_exports__, {
 /* harmony export */   Tag: () => (/* binding */ Tag),
 /* harmony export */   escapeSearch: () => (/* binding */ escapeSearch),
 /* harmony export */   escapeVariable: () => (/* binding */ escapeVariable),
 /* harmony export */   variablePrefix: () => (/* binding */ variablePrefix)
 /* harmony export */ });
-/* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_98591__(/*! ./tagRunner */ "../main/ts/tagRunner.ts");
-/* harmony import */ var _render__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_98591__(/*! ./render */ "../main/ts/render.ts");
-/* harmony import */ var _interpolateElement__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_98591__(/*! ./interpolateElement */ "../main/ts/interpolateElement.ts");
-/* harmony import */ var _interpolateTemplate__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_98591__(/*! ./interpolateTemplate */ "../main/ts/interpolateTemplate.ts");
-/* harmony import */ var _elementDestroyCheck_function__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_98591__(/*! ./elementDestroyCheck.function */ "../main/ts/elementDestroyCheck.function.ts");
-/* harmony import */ var _processNewValue_function__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_98591__(/*! ./processNewValue.function */ "../main/ts/processNewValue.function.ts");
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_6__ = __nested_webpack_require_98591__(/*! ./isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_7__ = __nested_webpack_require_98591__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
-/* harmony import */ var _Clones_type__WEBPACK_IMPORTED_MODULE_8__ = __nested_webpack_require_98591__(/*! ./Clones.type */ "../main/ts/Clones.type.ts");
-/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_9__ = __nested_webpack_require_98591__(/*! ./checkDestroyPrevious.function */ "../main/ts/checkDestroyPrevious.function.ts");
-/* harmony import */ var _insertAfter_function__WEBPACK_IMPORTED_MODULE_10__ = __nested_webpack_require_98591__(/*! ./insertAfter.function */ "../main/ts/insertAfter.function.ts");
-
-
+/* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_97987__(/*! ./tagRunner */ "../main/ts/tagRunner.ts");
+/* harmony import */ var _render__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_97987__(/*! ./render */ "../main/ts/render.ts");
+/* harmony import */ var _interpolateElement__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_97987__(/*! ./interpolateElement */ "../main/ts/interpolateElement.ts");
+/* harmony import */ var _interpolateTemplate__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_97987__(/*! ./interpolateTemplate */ "../main/ts/interpolateTemplate.ts");
+/* harmony import */ var _elementDestroyCheck_function__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_97987__(/*! ./elementDestroyCheck.function */ "../main/ts/elementDestroyCheck.function.ts");
+/* harmony import */ var _processNewValue_function__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_97987__(/*! ./processNewValue.function */ "../main/ts/processNewValue.function.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_6__ = __nested_webpack_require_97987__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_7__ = __nested_webpack_require_97987__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
+/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_8__ = __nested_webpack_require_97987__(/*! ./checkDestroyPrevious.function */ "../main/ts/checkDestroyPrevious.function.ts");
 
 
 
@@ -2199,15 +2175,15 @@ class Tag {
         const subject = tagSupport.subject;
         // put back down the template tag
         const insertBefore = global.insertBefore;
-        if (_Clones_type__WEBPACK_IMPORTED_MODULE_8__.isRemoveTemplates) {
-            const placeholder = global.placeholderElm;
+        if (insertBefore.nodeName === 'TEMPLATE') {
+            const placeholder = global.placeholder;
             if (placeholder && !('arrayValue' in this.memory)) {
                 if (!options.byParent) {
-                    (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_9__.restoreTagMarker)(this, insertBefore);
+                    (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_8__.restoreTagMarker)(this, insertBefore);
                 }
             }
         }
-        delete global.placeholderElm;
+        delete global.placeholder;
         // the isComponent check maybe able to be removed
         const isComponent = tagSupport ? true : false;
         if (isComponent) {
@@ -2383,17 +2359,20 @@ class Tag {
         const subject = this.tagSupport.subject;
         const thisTemplater = this.tagSupport.templater;
         const global = thisTemplater.global;
-        if (_Clones_type__WEBPACK_IMPORTED_MODULE_8__.isRemoveTemplates) {
-            const placeholderElm = global.placeholderElm;
-            if (placeholderElm) {
-                const parentNode = placeholderElm.parentNode;
-                parentNode.insertBefore(insertBefore, placeholderElm);
-                // ??? - removed as we don't steal clones anymore
-                // this.clones.push( placeholderElm ) // put back on chopping block
-                delete global.placeholderElm;
+        global.insertBefore = insertBefore;
+        if (!global.placeholder) {
+            if (insertBefore.nodeName !== 'TEMPLATE') {
+                throw new Error(' no template at insertBefore');
+                global.placeholder = insertBefore;
+            }
+            else {
+                setTagPlaceholder(global);
             }
         }
-        const trueInsertBefore = insertBefore;
+        if (!global.placeholder?.parentNode) {
+            throw new Error('????');
+        }
+        const placeholderElm = global.placeholder;
         global.oldest = this;
         global.newest = this;
         subject.tag = this;
@@ -2406,7 +2385,7 @@ class Tag {
         // const context = this.tagSupport.memory.context // this.update()
         const context = this.update();
         const template = this.getTemplate();
-        if (!trueInsertBefore.parentNode) {
+        if (!placeholderElm.parentNode) {
             throw new Error('no parent before building tag');
         }
         const elementContainer = document.createElement('div');
@@ -2419,59 +2398,44 @@ class Tag {
             forceElement: options.forceElement,
             counts: options.counts
         });
-        if (!trueInsertBefore.parentNode) {
-            throw new Error('no parent building tag');
+        if (!placeholderElm.parentNode) {
+            throw new Error('no parent after building tag');
         }
-        afterInterpolateElement(elementContainer, trueInsertBefore, // insertBefore (will be removed)
-        this, // ownerTag
+        afterInterpolateElement(elementContainer, placeholderElm, this, // ownerTag
         context, options);
+        if (!global.placeholder?.parentNode) {
+            throw new Error('???? - 2');
+        }
         // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
         let isForceElement = options.forceElement;
         tagComponents.forEach(tagComponent => {
             const tagSupport = tagComponent.ownerTag.tagSupport;
             const tagGlobal = tagSupport.templater.global;
-            const placeholderElm = tagGlobal.placeholderElm; // global.placeholderElm
+            const placeholderElm = tagGlobal.placeholder; // global.placeholderElm
             if (!placeholderElm && !insertBefore.parentNode) {
                 throw new Error('no parent building tag components');
             }
-            const before = tagComponent.insertBefore; // insertBefore  (will be removed)
-            (0,_interpolateTemplate__WEBPACK_IMPORTED_MODULE_3__.subscribeToTemplate)(before, // tagComponent.insertBefore,
-            tagComponent.subject, tagComponent.ownerTag, options.counts, { isForceElement });
-            const clones = afterInterpolateElement(elementContainer, before, // (will be removed)
-            tagComponent.ownerTag, // this, // ownerTag
-            context, options);
-            if (placeholderElm && !placeholderElm?.parentNode) {
-                const clone = clones[this.clones.length - 1];
-                if (clone) {
-                    (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_9__.restoreTagMarker)(tagComponent.ownerTag, clone);
-                }
+            if (!global.placeholder?.parentNode) {
+                throw new Error('???? - 3');
             }
-            if (placeholderElm) {
-                if (placeholderElm.parentNode) {
-                    if (!global.placeholderElm) {
-                        global.placeholderElm = placeholderElm;
-                    }
-                }
-                if (this.clones.length) {
-                    if (insertBefore.parentNode) {
-                        global.placeholderElm = insertBefore.previousSibling;
-                        const parentNode = insertBefore.parentNode;
-                        parentNode.removeChild(insertBefore);
-                    }
-                }
+            (0,_interpolateTemplate__WEBPACK_IMPORTED_MODULE_3__.subscribeToTemplate)(tagComponent.insertBefore, tagComponent.subject, tagComponent.ownerTag, options.counts, { isForceElement });
+            if (!global.placeholder?.parentNode) {
+                throw new Error('???? - 4');
+            }
+            afterInterpolateElement(elementContainer, tagComponent.insertBefore, tagComponent.ownerTag, // this, // ownerTag
+            context, options);
+            if (!global.placeholder?.parentNode) {
+                throw new Error('???? - 5');
             }
         });
-        if (!global.placeholderElm) {
-            // const clone = getLastCloneFromTags(this)
-            // const clone = (insertBefore as Element).previousElementSibling as Element
-            const clone = insertBefore.previousSibling;
-            if (clone) {
-                const parentNode = insertBefore.parentNode;
-                global.placeholderElm = clone;
-                parentNode.removeChild(insertBefore);
-            }
-        }
     }
+}
+function setTagPlaceholder(global) {
+    const insertBefore = global.insertBefore;
+    const placeholder = global.placeholder = document.createTextNode('');
+    const parentNode = insertBefore.parentNode;
+    parentNode.insertBefore(placeholder, insertBefore);
+    parentNode.removeChild(insertBefore);
 }
 function afterInterpolateElement(container, insertBefore, tag, 
 // preClones: Clones,
@@ -2480,37 +2444,8 @@ context, options) {
     if (!clones.length) {
         return clones;
     }
-    const ownerSupport = tag.tagSupport;
-    const ownerGlobal = ownerSupport.templater.global;
-    const hadBefore = _Clones_type__WEBPACK_IMPORTED_MODULE_8__.isRemoveTemplates && ownerGlobal.placeholderElm;
-    const parentNode = hadBefore ? ownerGlobal.placeholderElm?.parentNode : insertBefore.parentNode;
-    // we could now be processing same tag but more after components being rendered
-    if (hadBefore) {
-        // 0 put the template back down
-        (0,_insertAfter_function__WEBPACK_IMPORTED_MODULE_10__.insertAfter)(insertBefore, hadBefore);
-        // ??? - removed as need for arrays
-        delete ownerGlobal.placeholderElm;
-    }
     clones.forEach(clone => (0,_interpolateTemplate__WEBPACK_IMPORTED_MODULE_3__.afterElmBuild)(clone, options, context, tag));
-    let hasPopClone;
-    if (_Clones_type__WEBPACK_IMPORTED_MODULE_8__.isRemoveTemplates) {
-        const clone = insertBefore.previousSibling; // clones[clones.length - 1]
-        if (clone) {
-            const isTemplate = clone.tagName === 'TEMPLATE' && clone.hasAttribute('interpolate');
-            if (!isTemplate) {
-                hasPopClone = ownerGlobal.placeholderElm = clone; // insertBefore
-            }
-        }
-    }
-    if (clones.find(x => x === insertBefore)) {
-        throw new Error('adding marker to owner in tag class');
-    }
     tag.clones.push(...clones);
-    if (_Clones_type__WEBPACK_IMPORTED_MODULE_8__.isRemoveTemplates) {
-        if (hasPopClone) { //  || hadBefore
-            parentNode.removeChild(insertBefore); // belongs to another tag
-        }
-    }
     return clones;
 }
 function getChildTagsToDestroy(childTags, allTags = []) {
@@ -2561,15 +2496,15 @@ function shareTemplaterGlobal(oldTemp, value) {
 /*!**************************************!*\
   !*** ../main/ts/TagSupport.class.ts ***!
   \**************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_118055__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_114817__) => {
 
-__nested_webpack_require_118055__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_118055__.d(__nested_webpack_exports__, {
+__nested_webpack_require_114817__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_114817__.d(__nested_webpack_exports__, {
 /* harmony export */   BaseTagSupport: () => (/* binding */ BaseTagSupport),
 /* harmony export */   TagSupport: () => (/* binding */ TagSupport)
 /* harmony export */ });
-/* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_118055__(/*! ./deepFunctions */ "../main/ts/deepFunctions.ts");
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_118055__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_114817__(/*! ./deepFunctions */ "../main/ts/deepFunctions.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_114817__(/*! ./isInstance */ "../main/ts/isInstance.ts");
 
 
 class BaseTagSupport {
@@ -2641,17 +2576,17 @@ class TagSupport extends BaseTagSupport {
 /*!*******************************************!*\
   !*** ../main/ts/TemplaterResult.class.ts ***!
   \*******************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_121348__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_118110__) => {
 
-__nested_webpack_require_121348__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_121348__.d(__nested_webpack_exports__, {
+__nested_webpack_require_118110__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_118110__.d(__nested_webpack_exports__, {
 /* harmony export */   TemplaterResult: () => (/* binding */ TemplaterResult),
 /* harmony export */   renderWithSupport: () => (/* binding */ renderWithSupport)
 /* harmony export */ });
-/* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_121348__(/*! ./tagRunner */ "../main/ts/tagRunner.ts");
-/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_121348__(/*! ./setUse.function */ "../main/ts/setUse.function.ts");
-/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_121348__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
-/* harmony import */ var _destroyTag_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_121348__(/*! ./destroyTag.function */ "../main/ts/destroyTag.function.ts");
+/* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_118110__(/*! ./tagRunner */ "../main/ts/tagRunner.ts");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_118110__(/*! ./state */ "../main/ts/state/index.ts");
+/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_118110__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
+/* harmony import */ var _destroyTag_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_118110__(/*! ./destroyTag.function */ "../main/ts/destroyTag.function.ts");
 
 
 
@@ -2699,7 +2634,7 @@ function renderWithSupport(tagSupport, existingTag, subject, ownerTag) {
         // first time render
         (0,_tagRunner__WEBPACK_IMPORTED_MODULE_0__.runBeforeRender)(wrapTagSupport, runtimeOwnerTag);
         // TODO: Logic below most likely could live within providers.ts inside the runBeforeRender function
-        const providers = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.providerConfig;
+        const providers = _state__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.providerConfig;
         providers.ownerTag = runtimeOwnerTag;
     }
     /* END: BEFORE RENDER */
@@ -2739,15 +2674,15 @@ subject) {
 /*!*****************************************!*\
   !*** ../main/ts/alterProps.function.ts ***!
   \*****************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_125511__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_122239__) => {
 
-__nested_webpack_require_125511__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_125511__.d(__nested_webpack_exports__, {
+__nested_webpack_require_122239__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_122239__.d(__nested_webpack_exports__, {
 /* harmony export */   alterProps: () => (/* binding */ alterProps),
 /* harmony export */   callbackPropOwner: () => (/* binding */ callbackPropOwner)
 /* harmony export */ });
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_125511__(/*! ./isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_125511__(/*! ./renderTagSupport.function */ "../main/ts/renderTagSupport.function.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_122239__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_122239__(/*! ./renderTagSupport.function */ "../main/ts/renderTagSupport.function.ts");
 
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
@@ -2806,14 +2741,14 @@ ownerSupport) {
 /*!**************************************************!*\
   !*** ../main/ts/bindSubjectCallback.function.ts ***!
   \**************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_128582__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_125310__) => {
 
-__nested_webpack_require_128582__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_128582__.d(__nested_webpack_exports__, {
+__nested_webpack_require_125310__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_125310__.d(__nested_webpack_exports__, {
 /* harmony export */   bindSubjectCallback: () => (/* binding */ bindSubjectCallback),
 /* harmony export */   runTagCallback: () => (/* binding */ runTagCallback)
 /* harmony export */ });
-/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_128582__(/*! ./renderTagSupport.function */ "../main/ts/renderTagSupport.function.ts");
+/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_125310__(/*! ./renderTagSupport.function */ "../main/ts/renderTagSupport.function.ts");
 /** File largely responsible for reacting to element events, such as onclick */
 
 function bindSubjectCallback(value, tag) {
@@ -2865,20 +2800,18 @@ function runTagCallback(value, tag, bindTo, args) {
 /*!***************************************************!*\
   !*** ../main/ts/checkDestroyPrevious.function.ts ***!
   \***************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_131284__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_128012__) => {
 
-__nested_webpack_require_131284__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_131284__.d(__nested_webpack_exports__, {
+__nested_webpack_require_128012__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_128012__.d(__nested_webpack_exports__, {
 /* harmony export */   checkDestroyPrevious: () => (/* binding */ checkDestroyPrevious),
 /* harmony export */   destroyArrayTag: () => (/* binding */ destroyArrayTag),
 /* harmony export */   restoreTagMarker: () => (/* binding */ restoreTagMarker)
 /* harmony export */ });
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_131284__(/*! ./isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_131284__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
-/* harmony import */ var _destroyTag_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_131284__(/*! ./destroyTag.function */ "../main/ts/destroyTag.function.ts");
-/* harmony import */ var _Clones_type__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_131284__(/*! ./Clones.type */ "../main/ts/Clones.type.ts");
-/* harmony import */ var _insertAfter_function__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_131284__(/*! ./insertAfter.function */ "../main/ts/insertAfter.function.ts");
-
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_128012__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_128012__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
+/* harmony import */ var _destroyTag_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_128012__(/*! ./destroyTag.function */ "../main/ts/destroyTag.function.ts");
+/* harmony import */ var _insertAfter_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_128012__(/*! ./insertAfter.function */ "../main/ts/insertAfter.function.ts");
 
 
 
@@ -2889,10 +2822,10 @@ newValue, insertBefore) {
     const wasArray = arraySubject.lastArray;
     // no longer an array
     if (wasArray && !(0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isTagArray)(newValue)) {
-        const placeholderElm = arraySubject.placeholderElm;
+        const placeholderElm = arraySubject.placeholder;
         delete arraySubject.lastArray;
-        delete arraySubject.placeholderElm;
-        (0,_insertAfter_function__WEBPACK_IMPORTED_MODULE_4__.insertAfter)(insertBefore, placeholderElm);
+        delete arraySubject.placeholder;
+        (0,_insertAfter_function__WEBPACK_IMPORTED_MODULE_3__.insertAfter)(insertBefore, placeholderElm);
         wasArray.forEach(({ tag }) => destroyArrayTag(tag, { added: 0, removed: 0 }));
         return 'array';
     }
@@ -2907,9 +2840,7 @@ newValue, insertBefore) {
             // its a different tag now
             if (!(0,_isLikeTags_function__WEBPACK_IMPORTED_MODULE_1__.isLikeTags)(newTag, existingTag)) {
                 // put template back down
-                if (_Clones_type__WEBPACK_IMPORTED_MODULE_3__.isRemoveTemplates) {
-                    restoreTagMarker(existingTag, insertBefore);
-                }
+                restoreTagMarker(existingTag, insertBefore);
                 (0,_destroyTag_function__WEBPACK_IMPORTED_MODULE_2__.destroyTagMemory)(existingTag, tagSubject);
                 return 2;
             }
@@ -2920,9 +2851,7 @@ newValue, insertBefore) {
             return false; // its still a tag component
         }
         // put template back down
-        if (_Clones_type__WEBPACK_IMPORTED_MODULE_3__.isRemoveTemplates) {
-            restoreTagMarker(existingTag, insertBefore);
-        }
+        restoreTagMarker(existingTag, insertBefore);
         // destroy old component, value is not a component
         (0,_destroyTag_function__WEBPACK_IMPORTED_MODULE_2__.destroyTagMemory)(existingTag, tagSubject);
         return 'different-tag';
@@ -2955,10 +2884,9 @@ subject) {
 }
 function restoreTagMarker(existingTag, insertBefore) {
     const global = existingTag.tagSupport.templater.global;
-    const placeholderElm = global.placeholderElm;
+    const placeholderElm = global.placeholder;
     if (placeholderElm) {
-        (0,_insertAfter_function__WEBPACK_IMPORTED_MODULE_4__.insertAfter)(insertBefore, placeholderElm);
-        // delete global.placeholderElm
+        (0,_insertAfter_function__WEBPACK_IMPORTED_MODULE_3__.insertAfter)(insertBefore, placeholderElm);
     }
 }
 
@@ -2969,10 +2897,10 @@ function restoreTagMarker(existingTag, insertBefore) {
 /*!***********************************!*\
   !*** ../main/ts/deepFunctions.ts ***!
   \***********************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_136183__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_132527__) => {
 
-__nested_webpack_require_136183__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_136183__.d(__nested_webpack_exports__, {
+__nested_webpack_require_132527__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_132527__.d(__nested_webpack_exports__, {
 /* harmony export */   deepClone: () => (/* binding */ deepClone),
 /* harmony export */   deepEqual: () => (/* binding */ deepEqual)
 /* harmony export */ });
@@ -3078,10 +3006,10 @@ function isSameFunctions(fn0, fn1) {
 /*!*****************************************!*\
   !*** ../main/ts/destroyTag.function.ts ***!
   \*****************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_139649__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_135993__) => {
 
-__nested_webpack_require_139649__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_139649__.d(__nested_webpack_exports__, {
+__nested_webpack_require_135993__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_135993__.d(__nested_webpack_exports__, {
 /* harmony export */   destroyTagMemory: () => (/* binding */ destroyTagMemory),
 /* harmony export */   destroyTagSupportPast: () => (/* binding */ destroyTagSupportPast)
 /* harmony export */ });
@@ -3110,10 +3038,10 @@ function destroyTagSupportPast(oldTagSupport) {
 /*!**************************************************!*\
   !*** ../main/ts/elementDestroyCheck.function.ts ***!
   \**************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_140942__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_137286__) => {
 
-__nested_webpack_require_140942__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_140942__.d(__nested_webpack_exports__, {
+__nested_webpack_require_137286__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_137286__.d(__nested_webpack_exports__, {
 /* harmony export */   elementDestroyCheck: () => (/* binding */ elementDestroyCheck)
 /* harmony export */ });
 function elementDestroyCheck(nextSibling, stagger) {
@@ -3140,10 +3068,10 @@ function elementDestroyCheck(nextSibling, stagger) {
 /*!**************************************!*\
   !*** ../main/ts/elementInitCheck.ts ***!
   \**************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_141873__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_138217__) => {
 
-__nested_webpack_require_141873__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_141873__.d(__nested_webpack_exports__, {
+__nested_webpack_require_138217__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_138217__.d(__nested_webpack_exports__, {
 /* harmony export */   elementInitCheck: () => (/* binding */ elementInitCheck)
 /* harmony export */ });
 function elementInitCheck(nextSibling, counts) {
@@ -3171,12 +3099,13 @@ function elementInitCheck(nextSibling, counts) {
 /*!****************************!*\
   !*** ../main/ts/errors.ts ***!
   \****************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_142797__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_139141__) => {
 
-__nested_webpack_require_142797__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_142797__.d(__nested_webpack_exports__, {
+__nested_webpack_require_139141__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_139141__.d(__nested_webpack_exports__, {
 /* harmony export */   ArrayNoKeyError: () => (/* binding */ ArrayNoKeyError),
 /* harmony export */   StateMismatchError: () => (/* binding */ StateMismatchError),
+/* harmony export */   SyncCallbackError: () => (/* binding */ SyncCallbackError),
 /* harmony export */   TagError: () => (/* binding */ TagError)
 /* harmony export */ });
 class TagError extends Error {
@@ -3199,71 +3128,10 @@ class StateMismatchError extends TagError {
         this.name = StateMismatchError.name;
     }
 }
-
-
-/***/ }),
-
-/***/ "../main/ts/getCallback.ts":
-/*!*********************************!*\
-  !*** ../main/ts/getCallback.ts ***!
-  \*********************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_143990__) => {
-
-__nested_webpack_require_143990__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_143990__.d(__nested_webpack_exports__, {
-/* harmony export */   getCallback: () => (/* binding */ getCallback)
-/* harmony export */ });
-/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_143990__(/*! ./setUse.function */ "../main/ts/setUse.function.ts");
-/* harmony import */ var _set_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_143990__(/*! ./set.function */ "../main/ts/set.function.ts");
-/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_143990__(/*! ./renderTagSupport.function */ "../main/ts/renderTagSupport.function.ts");
-
-
-
-let innerCallback = (callback) => () => {
-    throw new Error('Callback function was called immediately in sync and must instead be call async');
-};
-const getCallback = () => innerCallback;
-const originalGetter = innerCallback; // getCallback
-(0,_setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse)({
-    beforeRender: (tagSupport) => initMemory(tagSupport),
-    beforeRedraw: (tagSupport) => initMemory(tagSupport),
-    afterRender: (_tagSupport) => {
-        innerCallback = originalGetter; // prevent crossing callbacks with another tag
-    },
-});
-function updateState(stateFrom, stateTo) {
-    stateFrom.forEach((state, index) => {
-        const fromValue = (0,_set_function__WEBPACK_IMPORTED_MODULE_1__.getStateValue)(state);
-        const callback = stateTo[index].callback;
-        if (callback) {
-            callback(fromValue); // set the value
-        }
-        stateTo[index].lastValue = fromValue; // record the value
-    });
-}
-function initMemory(tagSupport) {
-    const oldState = _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.array;
-    innerCallback = (callback) => {
-        const trigger = (...args) => triggerStateUpdate(tagSupport, callback, oldState, ...args);
-        return trigger;
-    };
-}
-function triggerStateUpdate(tagSupport, callback, oldState, ...args) {
-    const state = tagSupport.memory.state;
-    const newest = state.newest;
-    // ensure that the oldest has the latest values first
-    updateState(newest, oldState);
-    // run the callback
-    const promise = callback(...args);
-    // send the oldest state changes into the newest
-    updateState(oldState, newest);
-    (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_2__.renderTagSupport)(tagSupport, false);
-    if (promise instanceof Promise) {
-        promise.finally(() => {
-            // send the oldest state changes into the newest
-            updateState(oldState, newest);
-            (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_2__.renderTagSupport)(tagSupport, false);
-        });
+class SyncCallbackError extends TagError {
+    constructor(message, details) {
+        super(message, 'sync-callback-error', details);
+        this.name = SyncCallbackError.name;
     }
 }
 
@@ -3274,15 +3142,15 @@ function triggerStateUpdate(tagSupport, callback, oldState, ...args) {
 /*!***************************************************!*\
   !*** ../main/ts/hasTagSupportChanged.function.ts ***!
   \***************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_147030__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_140676__) => {
 
-__nested_webpack_require_147030__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_147030__.d(__nested_webpack_exports__, {
+__nested_webpack_require_140676__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_140676__.d(__nested_webpack_exports__, {
 /* harmony export */   hasKidsChanged: () => (/* binding */ hasKidsChanged),
 /* harmony export */   hasPropChanges: () => (/* binding */ hasPropChanges),
 /* harmony export */   hasTagSupportChanged: () => (/* binding */ hasTagSupportChanged)
 /* harmony export */ });
-/* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_147030__(/*! ./deepFunctions */ "../main/ts/deepFunctions.ts");
+/* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_140676__(/*! ./deepFunctions */ "../main/ts/deepFunctions.ts");
 
 function hasTagSupportChanged(oldTagSupport, newTagSupport, newTemplater) {
     const sameSupport = oldTagSupport === newTagSupport;
@@ -3372,13 +3240,13 @@ function hasKidsChanged(oldTagSupport, newTagSupport) {
 /*!**************************!*\
   !*** ../main/ts/html.ts ***!
   \**************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_151210__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_144856__) => {
 
-__nested_webpack_require_151210__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_151210__.d(__nested_webpack_exports__, {
+__nested_webpack_require_144856__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_144856__.d(__nested_webpack_exports__, {
 /* harmony export */   html: () => (/* binding */ html)
 /* harmony export */ });
-/* harmony import */ var _Tag_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_151210__(/*! ./Tag.class */ "../main/ts/Tag.class.ts");
+/* harmony import */ var _Tag_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_144856__(/*! ./Tag.class */ "../main/ts/Tag.class.ts");
 
 function html(strings, ...values) {
     return new _Tag_class__WEBPACK_IMPORTED_MODULE_0__.Tag(strings, values);
@@ -3391,20 +3259,21 @@ function html(strings, ...values) {
 /*!***************************!*\
   !*** ../main/ts/index.ts ***!
   \***************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_151872__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_145518__) => {
 
-__nested_webpack_require_151872__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_151872__.d(__nested_webpack_exports__, {
+__nested_webpack_require_145518__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_145518__.d(__nested_webpack_exports__, {
 /* harmony export */   ArrayNoKeyError: () => (/* reexport safe */ _errors__WEBPACK_IMPORTED_MODULE_4__.ArrayNoKeyError),
 /* harmony export */   BaseTagSupport: () => (/* reexport safe */ _TagSupport_class__WEBPACK_IMPORTED_MODULE_8__.BaseTagSupport),
 /* harmony export */   StateMismatchError: () => (/* reexport safe */ _errors__WEBPACK_IMPORTED_MODULE_4__.StateMismatchError),
 /* harmony export */   Subject: () => (/* reexport safe */ _subject_index__WEBPACK_IMPORTED_MODULE_5__.Subject),
+/* harmony export */   SyncCallbackError: () => (/* reexport safe */ _errors__WEBPACK_IMPORTED_MODULE_4__.SyncCallbackError),
 /* harmony export */   Tag: () => (/* reexport safe */ _Tag_class__WEBPACK_IMPORTED_MODULE_10__.Tag),
 /* harmony export */   TagError: () => (/* reexport safe */ _errors__WEBPACK_IMPORTED_MODULE_4__.TagError),
 /* harmony export */   TagSupport: () => (/* reexport safe */ _TagSupport_class__WEBPACK_IMPORTED_MODULE_8__.TagSupport),
 /* harmony export */   ValueSubject: () => (/* reexport safe */ _subject_index__WEBPACK_IMPORTED_MODULE_5__.ValueSubject),
+/* harmony export */   callbackMaker: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.callbackMaker),
 /* harmony export */   combineLatest: () => (/* reexport safe */ _subject_index__WEBPACK_IMPORTED_MODULE_5__.combineLatest),
-/* harmony export */   getCallback: () => (/* reexport safe */ _getCallback__WEBPACK_IMPORTED_MODULE_19__.getCallback),
 /* harmony export */   hmr: () => (/* binding */ hmr),
 /* harmony export */   html: () => (/* reexport safe */ _html__WEBPACK_IMPORTED_MODULE_3__.html),
 /* harmony export */   interpolateElement: () => (/* reexport safe */ _interpolateElement__WEBPACK_IMPORTED_MODULE_9__.interpolateElement),
@@ -3413,42 +3282,34 @@ __nested_webpack_require_151872__.r(__nested_webpack_exports__);
 /* harmony export */   isTagArray: () => (/* reexport safe */ _isInstance__WEBPACK_IMPORTED_MODULE_6__.isTagArray),
 /* harmony export */   isTagComponent: () => (/* reexport safe */ _isInstance__WEBPACK_IMPORTED_MODULE_6__.isTagComponent),
 /* harmony export */   isTagInstance: () => (/* reexport safe */ _isInstance__WEBPACK_IMPORTED_MODULE_6__.isTagInstance),
-/* harmony export */   onDestroy: () => (/* reexport safe */ _onDestroy__WEBPACK_IMPORTED_MODULE_18__.onDestroy),
-/* harmony export */   onInit: () => (/* reexport safe */ _onInit__WEBPACK_IMPORTED_MODULE_17__.onInit),
-/* harmony export */   providers: () => (/* reexport safe */ _providers__WEBPACK_IMPORTED_MODULE_13__.providers),
+/* harmony export */   letState: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.letState),
+/* harmony export */   onDestroy: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.onDestroy),
+/* harmony export */   onInit: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.onInit),
+/* harmony export */   providers: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.providers),
 /* harmony export */   runBeforeRender: () => (/* reexport safe */ _tagRunner__WEBPACK_IMPORTED_MODULE_11__.runBeforeRender),
-/* harmony export */   set: () => (/* reexport safe */ _set_function__WEBPACK_IMPORTED_MODULE_14__.set),
-/* harmony export */   setLet: () => (/* reexport safe */ _setLet_function__WEBPACK_IMPORTED_MODULE_15__.setLet),
-/* harmony export */   setProp: () => (/* reexport safe */ _setProp_function__WEBPACK_IMPORTED_MODULE_16__.setProp),
-/* harmony export */   setUse: () => (/* reexport safe */ _setUse_function__WEBPACK_IMPORTED_MODULE_12__.setUse),
+/* harmony export */   setProp: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.setProp),
+/* harmony export */   setUse: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.setUse),
+/* harmony export */   state: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.state),
 /* harmony export */   tag: () => (/* reexport safe */ _tag__WEBPACK_IMPORTED_MODULE_2__.tag),
 /* harmony export */   tagElement: () => (/* reexport safe */ _tagElement__WEBPACK_IMPORTED_MODULE_0__.tagElement),
 /* harmony export */   tags: () => (/* reexport safe */ _tag__WEBPACK_IMPORTED_MODULE_2__.tags),
-/* harmony export */   watch: () => (/* reexport safe */ _watch_function__WEBPACK_IMPORTED_MODULE_7__.watch),
+/* harmony export */   watch: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.watch),
 /* harmony export */   willCallback: () => (/* reexport safe */ _subject_index__WEBPACK_IMPORTED_MODULE_5__.willCallback),
 /* harmony export */   willPromise: () => (/* reexport safe */ _subject_index__WEBPACK_IMPORTED_MODULE_5__.willPromise),
 /* harmony export */   willSubscribe: () => (/* reexport safe */ _subject_index__WEBPACK_IMPORTED_MODULE_5__.willSubscribe)
 /* harmony export */ });
-/* harmony import */ var _tagElement__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_151872__(/*! ./tagElement */ "../main/ts/tagElement.ts");
-/* harmony import */ var _ElementTargetEvent_interface__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_151872__(/*! ./ElementTargetEvent.interface */ "../main/ts/ElementTargetEvent.interface.ts");
-/* harmony import */ var _tag__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_151872__(/*! ./tag */ "../main/ts/tag.ts");
-/* harmony import */ var _html__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_151872__(/*! ./html */ "../main/ts/html.ts");
-/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_151872__(/*! ./errors */ "../main/ts/errors.ts");
-/* harmony import */ var _subject_index__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_151872__(/*! ./subject/index */ "../main/ts/subject/index.ts");
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_6__ = __nested_webpack_require_151872__(/*! ./isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _watch_function__WEBPACK_IMPORTED_MODULE_7__ = __nested_webpack_require_151872__(/*! ./watch.function */ "../main/ts/watch.function.ts");
-/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_8__ = __nested_webpack_require_151872__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
-/* harmony import */ var _interpolateElement__WEBPACK_IMPORTED_MODULE_9__ = __nested_webpack_require_151872__(/*! ./interpolateElement */ "../main/ts/interpolateElement.ts");
-/* harmony import */ var _Tag_class__WEBPACK_IMPORTED_MODULE_10__ = __nested_webpack_require_151872__(/*! ./Tag.class */ "../main/ts/Tag.class.ts");
-/* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_11__ = __nested_webpack_require_151872__(/*! ./tagRunner */ "../main/ts/tagRunner.ts");
-/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_12__ = __nested_webpack_require_151872__(/*! ./setUse.function */ "../main/ts/setUse.function.ts");
-/* harmony import */ var _providers__WEBPACK_IMPORTED_MODULE_13__ = __nested_webpack_require_151872__(/*! ./providers */ "../main/ts/providers.ts");
-/* harmony import */ var _set_function__WEBPACK_IMPORTED_MODULE_14__ = __nested_webpack_require_151872__(/*! ./set.function */ "../main/ts/set.function.ts");
-/* harmony import */ var _setLet_function__WEBPACK_IMPORTED_MODULE_15__ = __nested_webpack_require_151872__(/*! ./setLet.function */ "../main/ts/setLet.function.ts");
-/* harmony import */ var _setProp_function__WEBPACK_IMPORTED_MODULE_16__ = __nested_webpack_require_151872__(/*! ./setProp.function */ "../main/ts/setProp.function.ts");
-/* harmony import */ var _onInit__WEBPACK_IMPORTED_MODULE_17__ = __nested_webpack_require_151872__(/*! ./onInit */ "../main/ts/onInit.ts");
-/* harmony import */ var _onDestroy__WEBPACK_IMPORTED_MODULE_18__ = __nested_webpack_require_151872__(/*! ./onDestroy */ "../main/ts/onDestroy.ts");
-/* harmony import */ var _getCallback__WEBPACK_IMPORTED_MODULE_19__ = __nested_webpack_require_151872__(/*! ./getCallback */ "../main/ts/getCallback.ts");
+/* harmony import */ var _tagElement__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_145518__(/*! ./tagElement */ "../main/ts/tagElement.ts");
+/* harmony import */ var _ElementTargetEvent_interface__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_145518__(/*! ./ElementTargetEvent.interface */ "../main/ts/ElementTargetEvent.interface.ts");
+/* harmony import */ var _tag__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_145518__(/*! ./tag */ "../main/ts/tag.ts");
+/* harmony import */ var _html__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_145518__(/*! ./html */ "../main/ts/html.ts");
+/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_145518__(/*! ./errors */ "../main/ts/errors.ts");
+/* harmony import */ var _subject_index__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_145518__(/*! ./subject/index */ "../main/ts/subject/index.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_6__ = __nested_webpack_require_145518__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _state_index__WEBPACK_IMPORTED_MODULE_7__ = __nested_webpack_require_145518__(/*! ./state/index */ "../main/ts/state/index.ts");
+/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_8__ = __nested_webpack_require_145518__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
+/* harmony import */ var _interpolateElement__WEBPACK_IMPORTED_MODULE_9__ = __nested_webpack_require_145518__(/*! ./interpolateElement */ "../main/ts/interpolateElement.ts");
+/* harmony import */ var _Tag_class__WEBPACK_IMPORTED_MODULE_10__ = __nested_webpack_require_145518__(/*! ./Tag.class */ "../main/ts/Tag.class.ts");
+/* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_11__ = __nested_webpack_require_145518__(/*! ./tagRunner */ "../main/ts/tagRunner.ts");
 // import { redrawTag } from "./redrawTag.function"
 
 
@@ -3465,17 +3326,6 @@ __nested_webpack_require_151872__.r(__nested_webpack_exports__);
 
 
 
-
-/* hooks */
-// TODO: export *
-
-
-
-
-
-
-
-/* end: hooks */
 const hmr = {
     tagElement: _tagElement__WEBPACK_IMPORTED_MODULE_0__.tagElement,
     // redrawTag
@@ -3488,10 +3338,10 @@ const hmr = {
 /*!************************************!*\
   !*** ../main/ts/inputAttribute.ts ***!
   \************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_159205__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_151766__) => {
 
-__nested_webpack_require_159205__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_159205__.d(__nested_webpack_exports__, {
+__nested_webpack_require_151766__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_151766__.d(__nested_webpack_exports__, {
 /* harmony export */   inputAttribute: () => (/* binding */ inputAttribute)
 /* harmony export */ });
 function inputAttribute(name, value, element) {
@@ -3520,10 +3370,10 @@ function inputAttribute(name, value, element) {
 /*!******************************************!*\
   !*** ../main/ts/insertAfter.function.ts ***!
   \******************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_160202__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_152763__) => {
 
-__nested_webpack_require_160202__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_160202__.d(__nested_webpack_exports__, {
+__nested_webpack_require_152763__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_152763__.d(__nested_webpack_exports__, {
 /* harmony export */   insertAfter: () => (/* binding */ insertAfter)
 /* harmony export */ });
 // Function to insert element after reference element
@@ -3539,13 +3389,13 @@ function insertAfter(newNode, referenceNode) {
 /*!*******************************************!*\
   !*** ../main/ts/interpolateAttributes.ts ***!
   \*******************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_160909__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_153470__) => {
 
-__nested_webpack_require_160909__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_160909__.d(__nested_webpack_exports__, {
+__nested_webpack_require_153470__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_153470__.d(__nested_webpack_exports__, {
 /* harmony export */   interpolateAttributes: () => (/* binding */ interpolateAttributes)
 /* harmony export */ });
-/* harmony import */ var _processAttribute_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_160909__(/*! ./processAttribute.function */ "../main/ts/processAttribute.function.ts");
+/* harmony import */ var _processAttribute_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_153470__(/*! ./processAttribute.function */ "../main/ts/processAttribute.function.ts");
 
 function howToSetAttribute(element, name, value) {
     element.setAttribute(name, value);
@@ -3573,13 +3423,13 @@ function interpolateAttributes(child, scope, ownerTag) {
 /*!*************************************************!*\
   !*** ../main/ts/interpolateContentTemplates.ts ***!
   \*************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_162347__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_154908__) => {
 
-__nested_webpack_require_162347__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_162347__.d(__nested_webpack_exports__, {
+__nested_webpack_require_154908__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_154908__.d(__nested_webpack_exports__, {
 /* harmony export */   interpolateContentTemplates: () => (/* binding */ interpolateContentTemplates)
 /* harmony export */ });
-/* harmony import */ var _interpolateTemplate__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_162347__(/*! ./interpolateTemplate */ "../main/ts/interpolateTemplate.ts");
+/* harmony import */ var _interpolateTemplate__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_154908__(/*! ./interpolateTemplate */ "../main/ts/interpolateTemplate.ts");
 
 function interpolateContentTemplates(element, context, tag, options, children) {
     if (!children || element.tagName === 'TEMPLATE') {
@@ -3629,17 +3479,17 @@ function isRenderEndTemplate(child) {
 /*!****************************************!*\
   !*** ../main/ts/interpolateElement.ts ***!
   \****************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_164870__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_157431__) => {
 
-__nested_webpack_require_164870__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_164870__.d(__nested_webpack_exports__, {
+__nested_webpack_require_157431__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_157431__.d(__nested_webpack_exports__, {
 /* harmony export */   interpolateElement: () => (/* binding */ interpolateElement),
 /* harmony export */   interpolateString: () => (/* binding */ interpolateString)
 /* harmony export */ });
-/* harmony import */ var _interpolateAttributes__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_164870__(/*! ./interpolateAttributes */ "../main/ts/interpolateAttributes.ts");
-/* harmony import */ var _interpolations__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_164870__(/*! ./interpolations */ "../main/ts/interpolations.ts");
-/* harmony import */ var _interpolateContentTemplates__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_164870__(/*! ./interpolateContentTemplates */ "../main/ts/interpolateContentTemplates.ts");
-/* harmony import */ var _Tag_class__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_164870__(/*! ./Tag.class */ "../main/ts/Tag.class.ts");
+/* harmony import */ var _interpolateAttributes__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_157431__(/*! ./interpolateAttributes */ "../main/ts/interpolateAttributes.ts");
+/* harmony import */ var _interpolations__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_157431__(/*! ./interpolations */ "../main/ts/interpolations.ts");
+/* harmony import */ var _interpolateContentTemplates__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_157431__(/*! ./interpolateContentTemplates */ "../main/ts/interpolateContentTemplates.ts");
+/* harmony import */ var _Tag_class__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_157431__(/*! ./Tag.class */ "../main/ts/Tag.class.ts");
 
 
 
@@ -3683,20 +3533,20 @@ function interpolateString(string) {
 /*!*****************************************!*\
   !*** ../main/ts/interpolateTemplate.ts ***!
   \*****************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_167723__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_160284__) => {
 
-__nested_webpack_require_167723__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_167723__.d(__nested_webpack_exports__, {
+__nested_webpack_require_160284__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_160284__.d(__nested_webpack_exports__, {
 /* harmony export */   afterElmBuild: () => (/* binding */ afterElmBuild),
 /* harmony export */   interpolateTemplate: () => (/* binding */ interpolateTemplate),
 /* harmony export */   subscribeToTemplate: () => (/* binding */ subscribeToTemplate)
 /* harmony export */ });
-/* harmony import */ var _Tag_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_167723__(/*! ./Tag.class */ "../main/ts/Tag.class.ts");
-/* harmony import */ var _elementInitCheck__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_167723__(/*! ./elementInitCheck */ "../main/ts/elementInitCheck.ts");
-/* harmony import */ var _processSubjectValue_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_167723__(/*! ./processSubjectValue.function */ "../main/ts/processSubjectValue.function.ts");
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_167723__(/*! ./isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _scanTextAreaValue_function__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_167723__(/*! ./scanTextAreaValue.function */ "../main/ts/scanTextAreaValue.function.ts");
-/* harmony import */ var _updateExistingValue_function__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_167723__(/*! ./updateExistingValue.function */ "../main/ts/updateExistingValue.function.ts");
+/* harmony import */ var _Tag_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_160284__(/*! ./Tag.class */ "../main/ts/Tag.class.ts");
+/* harmony import */ var _elementInitCheck__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_160284__(/*! ./elementInitCheck */ "../main/ts/elementInitCheck.ts");
+/* harmony import */ var _processSubjectValue_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_160284__(/*! ./processSubjectValue.function */ "../main/ts/processSubjectValue.function.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_160284__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _scanTextAreaValue_function__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_160284__(/*! ./scanTextAreaValue.function */ "../main/ts/scanTextAreaValue.function.ts");
+/* harmony import */ var _updateExistingValue_function__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_160284__(/*! ./updateExistingValue.function */ "../main/ts/updateExistingValue.function.ts");
 
 
 
@@ -3750,6 +3600,9 @@ function subscribeToTemplate(insertBefore, subject, ownerTag, counts, // used fo
             (0,_updateExistingValue_function__WEBPACK_IMPORTED_MODULE_5__.updateExistingValue)(subject, value, ownerTag, insertBefore);
             return;
         }
+        if (!insertBefore.parentNode) {
+            throw new Error('no insert before parent node - 3');
+        }
         (0,_processSubjectValue_function__WEBPACK_IMPORTED_MODULE_2__.processSubjectValue)(value, subject, insertBefore, ownerTag, {
             counts: { ...counts },
             forceElement: isForceElement,
@@ -3793,10 +3646,10 @@ function afterElmBuild(elm, options, context, ownerTag) {
 /*!************************************!*\
   !*** ../main/ts/interpolations.ts ***!
   \************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_172649__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_165325__) => {
 
-__nested_webpack_require_172649__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_172649__.d(__nested_webpack_exports__, {
+__nested_webpack_require_165325__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_165325__.d(__nested_webpack_exports__, {
 /* harmony export */   interpolateReplace: () => (/* binding */ interpolateReplace),
 /* harmony export */   interpolateToTemplates: () => (/* binding */ interpolateToTemplates)
 /* harmony export */ });
@@ -3826,10 +3679,10 @@ function interpolateToTemplates(template) {
 /*!********************************!*\
   !*** ../main/ts/isInstance.ts ***!
   \********************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_174032__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_166708__) => {
 
-__nested_webpack_require_174032__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_174032__.d(__nested_webpack_exports__, {
+__nested_webpack_require_166708__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_166708__.d(__nested_webpack_exports__, {
 /* harmony export */   isSubjectInstance: () => (/* binding */ isSubjectInstance),
 /* harmony export */   isTagArray: () => (/* binding */ isTagArray),
 /* harmony export */   isTagComponent: () => (/* binding */ isTagComponent),
@@ -3855,10 +3708,10 @@ function isTagArray(value) {
 /*!*****************************************!*\
   !*** ../main/ts/isLikeTags.function.ts ***!
   \*****************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_175144__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_167820__) => {
 
-__nested_webpack_require_175144__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_175144__.d(__nested_webpack_exports__, {
+__nested_webpack_require_167820__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_167820__.d(__nested_webpack_exports__, {
 /* harmony export */   isLikeTags: () => (/* binding */ isLikeTags)
 /* harmony export */ });
 function isLikeTags(tag0, tag1) {
@@ -3894,81 +3747,19 @@ function isLikeTags(tag0, tag1) {
 
 /***/ }),
 
-/***/ "../main/ts/onDestroy.ts":
-/*!*******************************!*\
-  !*** ../main/ts/onDestroy.ts ***!
-  \*******************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_176535__) => {
-
-__nested_webpack_require_176535__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_176535__.d(__nested_webpack_exports__, {
-/* harmony export */   onDestroy: () => (/* binding */ onDestroy)
-/* harmony export */ });
-/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_176535__(/*! ./setUse.function */ "../main/ts/setUse.function.ts");
-
-/** When undefined, it means a tag is being built for the first time so do run destroy(s) */
-let destroyCurrentTagSupport;
-function onDestroy(callback) {
-    destroyCurrentTagSupport.templater.global.destroyCallback = callback;
-}
-(0,_setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse)({
-    beforeRender: tagSupport => destroyCurrentTagSupport = tagSupport,
-    beforeRedraw: tagSupport => destroyCurrentTagSupport = tagSupport,
-    beforeDestroy: (tagSupport, tag) => {
-        const callback = tagSupport.templater.global.destroyCallback;
-        if (callback) {
-            callback();
-        }
-    }
-});
-
-
-/***/ }),
-
-/***/ "../main/ts/onInit.ts":
-/*!****************************!*\
-  !*** ../main/ts/onInit.ts ***!
-  \****************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_177725__) => {
-
-__nested_webpack_require_177725__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_177725__.d(__nested_webpack_exports__, {
-/* harmony export */   onInit: () => (/* binding */ onInit)
-/* harmony export */ });
-/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_177725__(/*! ./setUse.function */ "../main/ts/setUse.function.ts");
-
-function setCurrentTagSupport(support) {
-    _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.initCurrentTemplater = support.templater;
-}
-function onInit(callback) {
-    const templater = _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.initCurrentTemplater;
-    if (!templater.global.init) {
-        ;
-        templater.global.init = callback;
-        callback(); // fire init
-    }
-}
-(0,_setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse)({
-    beforeRender: tagSupport => setCurrentTagSupport(tagSupport),
-    beforeRedraw: tagSupport => setCurrentTagSupport(tagSupport),
-});
-
-
-/***/ }),
-
 /***/ "../main/ts/processAttribute.function.ts":
 /*!***********************************************!*\
   !*** ../main/ts/processAttribute.function.ts ***!
   \***********************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_178977__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_169275__) => {
 
-__nested_webpack_require_178977__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_178977__.d(__nested_webpack_exports__, {
+__nested_webpack_require_169275__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_169275__.d(__nested_webpack_exports__, {
 /* harmony export */   processAttribute: () => (/* binding */ processAttribute)
 /* harmony export */ });
-/* harmony import */ var _inputAttribute__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_178977__(/*! ./inputAttribute */ "../main/ts/inputAttribute.ts");
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_178977__(/*! ./isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _bindSubjectCallback_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_178977__(/*! ./bindSubjectCallback.function */ "../main/ts/bindSubjectCallback.function.ts");
+/* harmony import */ var _inputAttribute__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_169275__(/*! ./inputAttribute */ "../main/ts/inputAttribute.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_169275__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _bindSubjectCallback_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_169275__(/*! ./bindSubjectCallback.function */ "../main/ts/bindSubjectCallback.function.ts");
 
 
 
@@ -4098,14 +3889,14 @@ function isSpecialAttr(attrName) {
 /*!**********************************************!*\
   !*** ../main/ts/processNewValue.function.ts ***!
   \**********************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_184771__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_175069__) => {
 
-__nested_webpack_require_184771__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_184771__.d(__nested_webpack_exports__, {
+__nested_webpack_require_175069__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_175069__.d(__nested_webpack_exports__, {
 /* harmony export */   processNewValue: () => (/* binding */ processNewValue)
 /* harmony export */ });
-/* harmony import */ var _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_184771__(/*! ./subject/ValueSubject */ "../main/ts/subject/ValueSubject.ts");
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_184771__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_175069__(/*! ./subject/ValueSubject */ "../main/ts/subject/ValueSubject.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_175069__(/*! ./isInstance */ "../main/ts/isInstance.ts");
 
 
 function processNewValue(hasValue, value, ownerTag) {
@@ -4140,13 +3931,13 @@ function processNewValue(hasValue, value, ownerTag) {
 /*!**************************************************!*\
   !*** ../main/ts/processRegularValue.function.ts ***!
   \**************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_186720__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_177018__) => {
 
-__nested_webpack_require_186720__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_186720__.d(__nested_webpack_exports__, {
+__nested_webpack_require_177018__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_177018__.d(__nested_webpack_exports__, {
 /* harmony export */   processRegularValue: () => (/* binding */ processRegularValue)
 /* harmony export */ });
-/* harmony import */ var _updateBeforeTemplate_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_186720__(/*! ./updateBeforeTemplate.function */ "../main/ts/updateBeforeTemplate.function.ts");
+/* harmony import */ var _updateBeforeTemplate_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_177018__(/*! ./updateBeforeTemplate.function */ "../main/ts/updateBeforeTemplate.function.ts");
 
 function processRegularValue(value, subject, // could be tag via subject.tag
 insertBefore) {
@@ -4169,16 +3960,16 @@ insertBefore) {
 /*!******************************************************!*\
   !*** ../main/ts/processSubjectComponent.function.ts ***!
   \******************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_188181__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_178479__) => {
 
-__nested_webpack_require_188181__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_188181__.d(__nested_webpack_exports__, {
+__nested_webpack_require_178479__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_178479__.d(__nested_webpack_exports__, {
 /* harmony export */   processSubjectComponent: () => (/* binding */ processSubjectComponent)
 /* harmony export */ });
-/* harmony import */ var _TemplaterResult_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_188181__(/*! ./TemplaterResult.class */ "../main/ts/TemplaterResult.class.ts");
-/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_188181__(/*! ./setUse.function */ "../main/ts/setUse.function.ts");
-/* harmony import */ var _processTagResult_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_188181__(/*! ./processTagResult.function */ "../main/ts/processTagResult.function.ts");
-/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_188181__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
+/* harmony import */ var _TemplaterResult_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_178479__(/*! ./TemplaterResult.class */ "../main/ts/TemplaterResult.class.ts");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_178479__(/*! ./state */ "../main/ts/state/index.ts");
+/* harmony import */ var _processTagResult_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_178479__(/*! ./processTagResult.function */ "../main/ts/processTagResult.function.ts");
+/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_178479__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
 
 
 
@@ -4198,9 +3989,12 @@ function processSubjectComponent(templater, subject, insertBefore, ownerTag, opt
     }
     templater.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_3__.TagSupport(ownerTag.tagSupport, templater, subject);
     // templater.oldest = subject.tag?.tagSupport.oldest || templater.oldest
+    if (insertBefore.nodeName != 'TEMPLATE') {
+        throw new Error('9');
+    }
     templater.global.insertBefore = insertBefore;
     let retag = subject.tag;
-    const providers = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.providerConfig;
+    const providers = _state__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.providerConfig;
     providers.ownerTag = ownerTag;
     const isRedraw = !retag || options.forceElement;
     if (isRedraw) {
@@ -4240,17 +4034,17 @@ function redrawSubjectComponent(templater, subject, retag, ownerTag, insertBefor
 /*!**************************************************!*\
   !*** ../main/ts/processSubjectValue.function.ts ***!
   \**************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_191919__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_182266__) => {
 
-__nested_webpack_require_191919__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_191919__.d(__nested_webpack_exports__, {
+__nested_webpack_require_182266__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_182266__.d(__nested_webpack_exports__, {
 /* harmony export */   processSubjectValue: () => (/* binding */ processSubjectValue)
 /* harmony export */ });
-/* harmony import */ var _processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_191919__(/*! ./processSubjectComponent.function */ "../main/ts/processSubjectComponent.function.ts");
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_191919__(/*! ./isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _processTagArray__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_191919__(/*! ./processTagArray */ "../main/ts/processTagArray.ts");
-/* harmony import */ var _processRegularValue_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_191919__(/*! ./processRegularValue.function */ "../main/ts/processRegularValue.function.ts");
-/* harmony import */ var _processTag_function__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_191919__(/*! ./processTag.function */ "../main/ts/processTag.function.ts");
+/* harmony import */ var _processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_182266__(/*! ./processSubjectComponent.function */ "../main/ts/processSubjectComponent.function.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_182266__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _processTagArray__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_182266__(/*! ./processTagArray */ "../main/ts/processTagArray.ts");
+/* harmony import */ var _processRegularValue_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_182266__(/*! ./processRegularValue.function */ "../main/ts/processRegularValue.function.ts");
+/* harmony import */ var _processTag_function__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_182266__(/*! ./processTag.function */ "../main/ts/processTag.function.ts");
 
 
 
@@ -4300,16 +4094,16 @@ options) {
 /*!*****************************************!*\
   !*** ../main/ts/processTag.function.ts ***!
   \*****************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_194832__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_185179__) => {
 
-__nested_webpack_require_194832__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_194832__.d(__nested_webpack_exports__, {
+__nested_webpack_require_185179__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_185179__.d(__nested_webpack_exports__, {
 /* harmony export */   applyFakeTemplater: () => (/* binding */ applyFakeTemplater),
 /* harmony export */   processTag: () => (/* binding */ processTag)
 /* harmony export */ });
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_194832__(/*! ./isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_194832__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
-/* harmony import */ var _subject__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_194832__(/*! ./subject */ "../main/ts/subject/index.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_185179__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_185179__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
+/* harmony import */ var _subject__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_185179__(/*! ./subject */ "../main/ts/subject/index.ts");
 
 
 
@@ -4329,7 +4123,7 @@ insertBefore, ownerTag) {
     }
     tag.ownerTag = ownerTag;
     if (insertBefore.tagName !== 'TEMPLATE') {
-        throw new Error(`;;;; - ${insertBefore.nodeName}`);
+        throw new Error(`processTag.function.ts - insertBefore is not TEMPLATE ${insertBefore.tagName}`);
     }
     tag.buildBeforeElement(insertBefore, {
         counts: { added: 0, removed: 0 },
@@ -4376,18 +4170,16 @@ function getFakeTemplater() {
 /*!*************************************!*\
   !*** ../main/ts/processTagArray.ts ***!
   \*************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_197727__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_188120__) => {
 
-__nested_webpack_require_197727__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_197727__.d(__nested_webpack_exports__, {
+__nested_webpack_require_188120__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_188120__.d(__nested_webpack_exports__, {
 /* harmony export */   processTagArray: () => (/* binding */ processTagArray)
 /* harmony export */ });
-/* harmony import */ var _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_197727__(/*! ./subject/ValueSubject */ "../main/ts/subject/ValueSubject.ts");
-/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_197727__(/*! ./errors */ "../main/ts/errors.ts");
-/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_197727__(/*! ./checkDestroyPrevious.function */ "../main/ts/checkDestroyPrevious.function.ts");
-/* harmony import */ var _processTag_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_197727__(/*! ./processTag.function */ "../main/ts/processTag.function.ts");
-/* harmony import */ var _insertAfter_function__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_197727__(/*! ./insertAfter.function */ "../main/ts/insertAfter.function.ts");
-
+/* harmony import */ var _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_188120__(/*! ./subject/ValueSubject */ "../main/ts/subject/ValueSubject.ts");
+/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_188120__(/*! ./errors */ "../main/ts/errors.ts");
+/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_188120__(/*! ./checkDestroyPrevious.function */ "../main/ts/checkDestroyPrevious.function.ts");
+/* harmony import */ var _processTag_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_188120__(/*! ./processTag.function */ "../main/ts/processTag.function.ts");
 
 
 
@@ -4397,24 +4189,10 @@ insertBefore, // <template end interpolate />
 ownerTag, options) {
     const clones = ownerTag.clones; // []
     let lastArray = subject.lastArray = subject.lastArray || [];
-    if (subject.placeholderElm) {
-        const parentPlaceholder = subject.parentAsPlaceholder;
-        if (parentPlaceholder) {
-            parentPlaceholder.appendChild(insertBefore);
-            delete subject.placeholderElm;
-        }
-        else {
-            console.log('subject', {
-                subject,
-                placeholderElm: subject.placeholderElm,
-                pParent: subject.placeholderElm.parentNode,
-                insertBefore,
-                iParent: insertBefore.parentNode,
-            });
-            (0,_insertAfter_function__WEBPACK_IMPORTED_MODULE_4__.insertAfter)(insertBefore, subject.placeholderElm);
-        }
-        delete subject.placeholderElm;
+    if (!subject.placeholder) {
+        setPlaceholderElm(insertBefore, subject);
     }
+    const runtimeInsertBefore = subject.placeholder; // || insertBefore
     let removed = 0;
     /** 🗑️ remove previous items first */
     lastArray = subject.lastArray = subject.lastArray.filter((item, index) => {
@@ -4436,8 +4214,6 @@ ownerTag, options) {
         }
         return true;
     });
-    // const masterBefore = template || (template as any).clone
-    const before = insertBefore; // || (subject.value as any).insertBefore || (insertBefore as any).clone
     value.forEach((subTag, index) => {
         const previous = lastArray[index];
         const previousSupport = previous?.tag.tagSupport;
@@ -4472,33 +4248,23 @@ ownerTag, options) {
                 return [];
             }
             // TODO: should not get here?
-            processAddTagArrayItem(before, subTag, index, options, lastArray);
+            processAddTagArrayItem(runtimeInsertBefore, subTag, index, options, lastArray);
             throw new Error('item should be back');
             // return [] // removed: item should have been previously deleted and will be added back
         }
-        processAddTagArrayItem(before, subTag, index, options, lastArray);
+        processAddTagArrayItem(runtimeInsertBefore, subTag, index, options, lastArray);
         ownerTag.childTags.push(subTag);
     });
-    if (value.length) {
-        const lastClone = insertBefore.previousSibling;
-        setPlaceholderElm(lastClone, insertBefore, subject);
-    }
-    else {
-        const placeholderElm = insertBefore.previousSibling;
-        if (placeholderElm) {
-            setPlaceholderElm(placeholderElm, insertBefore, subject);
-        }
-        else {
-            const parentNode = insertBefore.parentNode;
-            setPlaceholderElm(parentNode, insertBefore, subject);
-            subject.parentAsPlaceholder = parentNode;
-        }
-    }
     return clones;
 }
-function setPlaceholderElm(lastClone, insertBefore, subject) {
-    subject.placeholderElm = lastClone;
+function setPlaceholderElm(insertBefore, subject) {
+    if (insertBefore.nodeName !== 'TEMPLATE') {
+        subject.placeholder = insertBefore;
+        return;
+    }
+    const placeholder = subject.placeholder = document.createTextNode('');
     const parentNode = insertBefore.parentNode;
+    parentNode.insertBefore(placeholder, insertBefore);
     parentNode.removeChild(insertBefore);
 }
 function processAddTagArrayItem(before, subTag, index, options, lastArray) {
@@ -4539,17 +4305,17 @@ function areLikeValues(valueA, valueB) {
 /*!***********************************************!*\
   !*** ../main/ts/processTagResult.function.ts ***!
   \***********************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_204924__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_194121__) => {
 
-__nested_webpack_require_204924__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_204924__.d(__nested_webpack_exports__, {
+__nested_webpack_require_194121__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_194121__.d(__nested_webpack_exports__, {
 /* harmony export */   processTagResult: () => (/* binding */ processTagResult)
 /* harmony export */ });
 function processTagResult(tag, subject, // used for recording past and current value
 insertBefore, // <template end interpolate />
 { counts, forceElement, }) {
     if (!insertBefore.parentNode) {
-        throw new Error('before here processTagResult');
+        throw new Error(`before here processTagResult ${insertBefore.nodeName}`);
     }
     // *if appears we already have seen
     const subjectTag = subject;
@@ -4567,9 +4333,11 @@ insertBefore, // <template end interpolate />
         */
         return processTagResultUpdate(tag, subjectTag, previousTag);
     }
-    if (insertBefore.nodeName !== 'TEMPLATE') {
-        throw new Error(';;;;');
+    /*
+    if(insertBefore.nodeName !== 'TEMPLATE') {
+      throw new Error(`processTagResult.function.ts insertBefore is not template ${insertBefore.nodeName}`)
     }
+    */
     tag.buildBeforeElement(insertBefore, {
         counts,
         forceElement,
@@ -4592,18 +4360,411 @@ previousTag) {
 
 /***/ }),
 
-/***/ "../main/ts/provider.utils.ts":
-/*!************************************!*\
-  !*** ../main/ts/provider.utils.ts ***!
-  \************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_206862__) => {
+/***/ "../main/ts/render.ts":
+/*!****************************!*\
+  !*** ../main/ts/render.ts ***!
+  \****************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_196140__) => {
 
-__nested_webpack_require_206862__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_206862__.d(__nested_webpack_exports__, {
+__nested_webpack_require_196140__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_196140__.d(__nested_webpack_exports__, {
+/* harmony export */   buildClones: () => (/* binding */ buildClones)
+/* harmony export */ });
+function buildClones(temporary, insertBefore) {
+    const clones = [];
+    const template = temporary.children[0];
+    let nextSibling = template.content.firstChild;
+    while (nextSibling) {
+        const nextNextSibling = nextSibling.nextSibling;
+        buildSibling(nextSibling, insertBefore);
+        clones.push(nextSibling);
+        nextSibling = nextNextSibling;
+    }
+    return clones;
+}
+function buildSibling(nextSibling, insertBefore) {
+    const parentNode = insertBefore.parentNode;
+    parentNode.insertBefore(nextSibling, insertBefore);
+}
+
+
+/***/ }),
+
+/***/ "../main/ts/renderExistingTag.function.ts":
+/*!************************************************!*\
+  !*** ../main/ts/renderExistingTag.function.ts ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_197205__) => {
+
+__nested_webpack_require_197205__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_197205__.d(__nested_webpack_exports__, {
+/* harmony export */   renderExistingTag: () => (/* binding */ renderExistingTag)
+/* harmony export */ });
+/* harmony import */ var _state_provider_utils__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_197205__(/*! ./state/provider.utils */ "../main/ts/state/provider.utils.ts");
+/* harmony import */ var _TemplaterResult_class__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_197205__(/*! ./TemplaterResult.class */ "../main/ts/TemplaterResult.class.ts");
+/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_197205__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
+
+
+
+/** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
+function renderExistingTag(oldestTag, // existing tag already there
+newTemplater, tagSupport, subject) {
+    const tag = subject.tag;
+    newTemplater.global = tag.tagSupport.templater.global;
+    if (!oldestTag.hasLiveElements) {
+        throw new Error('1080 - should have live elements');
+    }
+    const preRenderCount = tagSupport.templater.global.renderCount;
+    (0,_state_provider_utils__WEBPACK_IMPORTED_MODULE_0__.providersChangeCheck)(oldestTag);
+    // When the providers were checked, a render to myself occurred and I do not need to re-render again
+    const latestTag = tagSupport.templater.global.newest;
+    if (preRenderCount !== tagSupport.templater.global.renderCount) {
+        oldestTag.updateByTag(latestTag);
+        return latestTag;
+    }
+    const oldTemplater = tagSupport.templater || newTemplater;
+    const toRedrawTag = subject.tag || oldTemplater.global.newest || oldTemplater.global.oldest; // hmmmmmm, why not newest?
+    const redraw = (0,_TemplaterResult_class__WEBPACK_IMPORTED_MODULE_1__.renderWithSupport)(newTemplater.tagSupport, toRedrawTag, subject, oldestTag.ownerTag);
+    const oldest = tagSupport.templater.global.oldest || oldestTag;
+    redraw.tagSupport.templater.global.oldest = oldest;
+    if ((0,_isLikeTags_function__WEBPACK_IMPORTED_MODULE_2__.isLikeTags)(latestTag, redraw)) {
+        subject.tag = redraw;
+        oldest.updateByTag(redraw);
+    }
+    return redraw;
+}
+
+
+/***/ }),
+
+/***/ "../main/ts/renderTagSupport.function.ts":
+/*!***********************************************!*\
+  !*** ../main/ts/renderTagSupport.function.ts ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_199757__) => {
+
+__nested_webpack_require_199757__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_199757__.d(__nested_webpack_exports__, {
+/* harmony export */   renderTagSupport: () => (/* binding */ renderTagSupport)
+/* harmony export */ });
+/* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_199757__(/*! ./deepFunctions */ "../main/ts/deepFunctions.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_199757__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _renderExistingTag_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_199757__(/*! ./renderExistingTag.function */ "../main/ts/renderExistingTag.function.ts");
+
+
+
+/** Main function used by all other callers to render/update display of a tag component */
+function renderTagSupport(tagSupport, renderUp) {
+    const global = tagSupport.templater.global;
+    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagInstance)(tagSupport.templater)) {
+        const newTag = global.newest;
+        const ownerTag = newTag.ownerTag;
+        ++global.renderCount;
+        return renderTagSupport(ownerTag.tagSupport, true);
+    }
+    // const oldTagSetup = this
+    const subject = tagSupport.subject;
+    const templater = tagSupport.templater; // oldTagSetup.templater // templater
+    const subjectTag = subject.tag;
+    const newest = subjectTag?.tagSupport.templater.global.newest;
+    let ownerTag;
+    let selfPropChange = false;
+    const shouldRenderUp = renderUp && newest;
+    if (shouldRenderUp) {
+        ownerTag = newest.ownerTag;
+        if (ownerTag) {
+            const nowProps = templater.props;
+            const latestProps = newest.tagSupport.propsConfig.latestCloned;
+            selfPropChange = !(0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepEqual)(nowProps, latestProps);
+        }
+    }
+    const useTagSupport = global.newest?.tagSupport; // oldTagSetup
+    if (!templater.global.oldest) {
+        throw new Error('already causing trouble');
+    }
+    const tag = (0,_renderExistingTag_function__WEBPACK_IMPORTED_MODULE_2__.renderExistingTag)(templater.global.oldest, templater, useTagSupport, subject);
+    const renderOwner = ownerTag && selfPropChange;
+    if (renderOwner) {
+        const ownerTagSupport = ownerTag.tagSupport;
+        renderTagSupport(ownerTagSupport, true);
+        return tag;
+    }
+    return tag;
+}
+
+
+/***/ }),
+
+/***/ "../main/ts/scanTextAreaValue.function.ts":
+/*!************************************************!*\
+  !*** ../main/ts/scanTextAreaValue.function.ts ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_202434__) => {
+
+__nested_webpack_require_202434__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_202434__.d(__nested_webpack_exports__, {
+/* harmony export */   scanTextAreaValue: () => (/* binding */ scanTextAreaValue)
+/* harmony export */ });
+/* harmony import */ var _processAttribute_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_202434__(/*! ./processAttribute.function */ "../main/ts/processAttribute.function.ts");
+
+const search = new RegExp('\\s*<template interpolate end id="__tagvar(\\d{1,4})"([^>]*)></template>(\\s*)');
+function scanTextAreaValue(textarea, context, ownerTag) {
+    const value = textarea.value;
+    if (value.search(search) >= 0) {
+        const match = value.match(/__tagvar(\d{1,4})/);
+        const token = match ? match[0] : '';
+        const dynamic = '{' + token + '}';
+        textarea.value = '';
+        textarea.setAttribute('text-var-value', dynamic);
+        const howToSet = (_elm, _name, value) => textarea.value = value;
+        (0,_processAttribute_function__WEBPACK_IMPORTED_MODULE_0__.processAttribute)('text-var-value', dynamic, // realValue, // context[token].value,
+        textarea, context, ownerTag, howToSet);
+    }
+}
+
+
+/***/ }),
+
+/***/ "../main/ts/state/callbackMaker.function.ts":
+/*!**************************************************!*\
+  !*** ../main/ts/state/callbackMaker.function.ts ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_203896__) => {
+
+__nested_webpack_require_203896__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_203896__.d(__nested_webpack_exports__, {
+/* harmony export */   callbackMaker: () => (/* binding */ callbackMaker)
+/* harmony export */ });
+/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_203896__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
+/* harmony import */ var _state_utils__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_203896__(/*! ./state.utils */ "../main/ts/state/state.utils.ts");
+/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_203896__(/*! ../renderTagSupport.function */ "../main/ts/renderTagSupport.function.ts");
+/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_203896__(/*! ../errors */ "../main/ts/errors.ts");
+
+
+
+
+let innerCallback = (callback) => (...args) => {
+    throw new _errors__WEBPACK_IMPORTED_MODULE_3__.SyncCallbackError('Callback function was called immediately in sync and must instead be call async');
+};
+const callbackMaker = () => innerCallback;
+const originalGetter = innerCallback; // callbackMaker
+(0,_setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse)({
+    beforeRender: (tagSupport) => initMemory(tagSupport),
+    beforeRedraw: (tagSupport) => initMemory(tagSupport),
+    afterRender: (_tagSupport) => {
+        innerCallback = originalGetter; // prevent crossing callbacks with another tag
+    },
+});
+function updateState(stateFrom, stateTo) {
+    stateFrom.forEach((state, index) => {
+        const fromValue = (0,_state_utils__WEBPACK_IMPORTED_MODULE_1__.getStateValue)(state);
+        const callback = stateTo[index].callback;
+        if (callback) {
+            callback(fromValue); // set the value
+        }
+        stateTo[index].lastValue = fromValue; // record the value
+    });
+}
+function initMemory(tagSupport) {
+    const oldState = _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.array;
+    innerCallback = (callback) => {
+        const trigger = (...args) => triggerStateUpdate(tagSupport, callback, oldState, ...args);
+        return trigger;
+    };
+}
+function triggerStateUpdate(tagSupport, callback, oldState, ...args) {
+    const state = tagSupport.memory.state;
+    const newest = state.newest;
+    // ensure that the oldest has the latest values first
+    updateState(newest, oldState);
+    // run the callback
+    const promise = callback(...args);
+    // send the oldest state changes into the newest
+    updateState(oldState, newest);
+    (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_2__.renderTagSupport)(tagSupport, false);
+    if (promise instanceof Promise) {
+        promise.finally(() => {
+            // send the oldest state changes into the newest
+            updateState(oldState, newest);
+            (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_2__.renderTagSupport)(tagSupport, false);
+        });
+    }
+}
+
+
+/***/ }),
+
+/***/ "../main/ts/state/index.ts":
+/*!*********************************!*\
+  !*** ../main/ts/state/index.ts ***!
+  \*********************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_207064__) => {
+
+__nested_webpack_require_207064__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_207064__.d(__nested_webpack_exports__, {
+/* harmony export */   callbackMaker: () => (/* reexport safe */ _callbackMaker_function__WEBPACK_IMPORTED_MODULE_6__.callbackMaker),
+/* harmony export */   letState: () => (/* reexport safe */ _letState_function__WEBPACK_IMPORTED_MODULE_3__.letState),
+/* harmony export */   onDestroy: () => (/* reexport safe */ _onDestroy__WEBPACK_IMPORTED_MODULE_8__.onDestroy),
+/* harmony export */   onInit: () => (/* reexport safe */ _onInit__WEBPACK_IMPORTED_MODULE_7__.onInit),
+/* harmony export */   providers: () => (/* reexport safe */ _providers__WEBPACK_IMPORTED_MODULE_5__.providers),
+/* harmony export */   setProp: () => (/* reexport safe */ _setProp_function__WEBPACK_IMPORTED_MODULE_4__.setProp),
+/* harmony export */   setUse: () => (/* reexport safe */ _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse),
+/* harmony export */   state: () => (/* reexport safe */ _state_function__WEBPACK_IMPORTED_MODULE_2__.state),
+/* harmony export */   watch: () => (/* reexport safe */ _watch_function__WEBPACK_IMPORTED_MODULE_0__.watch)
+/* harmony export */ });
+/* harmony import */ var _watch_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_207064__(/*! ./watch.function */ "../main/ts/state/watch.function.ts");
+/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_207064__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
+/* harmony import */ var _state_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_207064__(/*! ./state.function */ "../main/ts/state/state.function.ts");
+/* harmony import */ var _letState_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_207064__(/*! ./letState.function */ "../main/ts/state/letState.function.ts");
+/* harmony import */ var _setProp_function__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_207064__(/*! ./setProp.function */ "../main/ts/state/setProp.function.ts");
+/* harmony import */ var _providers__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_207064__(/*! ./providers */ "../main/ts/state/providers.ts");
+/* harmony import */ var _callbackMaker_function__WEBPACK_IMPORTED_MODULE_6__ = __nested_webpack_require_207064__(/*! ./callbackMaker.function */ "../main/ts/state/callbackMaker.function.ts");
+/* harmony import */ var _onInit__WEBPACK_IMPORTED_MODULE_7__ = __nested_webpack_require_207064__(/*! ./onInit */ "../main/ts/state/onInit.ts");
+/* harmony import */ var _onDestroy__WEBPACK_IMPORTED_MODULE_8__ = __nested_webpack_require_207064__(/*! ./onDestroy */ "../main/ts/state/onDestroy.ts");
+
+
+
+
+
+
+
+
+
+
+
+/***/ }),
+
+/***/ "../main/ts/state/letState.function.ts":
+/*!*********************************************!*\
+  !*** ../main/ts/state/letState.function.ts ***!
+  \*********************************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_209915__) => {
+
+__nested_webpack_require_209915__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_209915__.d(__nested_webpack_exports__, {
+/* harmony export */   letState: () => (/* binding */ letState)
+/* harmony export */ });
+/* harmony import */ var _state_utils__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_209915__(/*! ./state.utils */ "../main/ts/state/state.utils.ts");
+/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_209915__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
+
+
+/** Used for variables that need to remain the same variable during render passes */
+function letState(defaultValue) {
+    const config = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig;
+    const rearray = config.rearray;
+    let getSetMethod;
+    const restate = rearray[config.array.length];
+    if (restate) {
+        let oldValue = (0,_state_utils__WEBPACK_IMPORTED_MODULE_0__.getStateValue)(restate);
+        getSetMethod = ((x) => [oldValue, oldValue = x]);
+        const push = {
+            get: () => (0,_state_utils__WEBPACK_IMPORTED_MODULE_0__.getStateValue)(push),
+            callback: getSetMethod,
+            lastValue: oldValue,
+            defaultValue: restate.defaultValue,
+        };
+        config.array.push(push);
+        return makeStateResult(oldValue, push);
+    }
+    // State first time run
+    const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue;
+    let initValue = defaultFn();
+    getSetMethod = ((x) => [initValue, initValue = x]);
+    const push = {
+        get: () => (0,_state_utils__WEBPACK_IMPORTED_MODULE_0__.getStateValue)(push),
+        callback: getSetMethod,
+        lastValue: initValue,
+        defaultValue: initValue,
+    };
+    config.array.push(push);
+    return makeStateResult(initValue, push);
+}
+function makeStateResult(initValue, push) {
+    // return initValue
+    const result = (y) => {
+        push.callback = y || (x => [initValue, initValue = x]);
+        return initValue;
+    };
+    return result;
+}
+
+
+/***/ }),
+
+/***/ "../main/ts/state/onDestroy.ts":
+/*!*************************************!*\
+  !*** ../main/ts/state/onDestroy.ts ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_212204__) => {
+
+__nested_webpack_require_212204__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_212204__.d(__nested_webpack_exports__, {
+/* harmony export */   onDestroy: () => (/* binding */ onDestroy)
+/* harmony export */ });
+/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_212204__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
+
+/** When undefined, it means a tag is being built for the first time so do run destroy(s) */
+let destroyCurrentTagSupport;
+function onDestroy(callback) {
+    destroyCurrentTagSupport.templater.global.destroyCallback = callback;
+}
+(0,_setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse)({
+    beforeRender: tagSupport => destroyCurrentTagSupport = tagSupport,
+    beforeRedraw: tagSupport => destroyCurrentTagSupport = tagSupport,
+    beforeDestroy: (tagSupport, tag) => {
+        const callback = tagSupport.templater.global.destroyCallback;
+        if (callback) {
+            callback();
+        }
+    }
+});
+
+
+/***/ }),
+
+/***/ "../main/ts/state/onInit.ts":
+/*!**********************************!*\
+  !*** ../main/ts/state/onInit.ts ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_213424__) => {
+
+__nested_webpack_require_213424__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_213424__.d(__nested_webpack_exports__, {
+/* harmony export */   onInit: () => (/* binding */ onInit)
+/* harmony export */ });
+/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_213424__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
+
+function setCurrentTagSupport(support) {
+    _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.initCurrentTemplater = support.templater;
+}
+function onInit(callback) {
+    const templater = _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.initCurrentTemplater;
+    if (!templater.global.init) {
+        ;
+        templater.global.init = callback;
+        callback(); // fire init
+    }
+}
+(0,_setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse)({
+    beforeRender: tagSupport => setCurrentTagSupport(tagSupport),
+    beforeRedraw: tagSupport => setCurrentTagSupport(tagSupport),
+});
+
+
+/***/ }),
+
+/***/ "../main/ts/state/provider.utils.ts":
+/*!******************************************!*\
+  !*** ../main/ts/state/provider.utils.ts ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_214662__) => {
+
+__nested_webpack_require_214662__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_214662__.d(__nested_webpack_exports__, {
 /* harmony export */   providersChangeCheck: () => (/* binding */ providersChangeCheck)
 /* harmony export */ });
-/* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_206862__(/*! ./deepFunctions */ "../main/ts/deepFunctions.ts");
-/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_206862__(/*! ./renderTagSupport.function */ "../main/ts/renderTagSupport.function.ts");
+/* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_214662__(/*! ../deepFunctions */ "../main/ts/deepFunctions.ts");
+/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_214662__(/*! ../renderTagSupport.function */ "../main/ts/renderTagSupport.function.ts");
 
 
 function providersChangeCheck(tag) {
@@ -4652,18 +4813,18 @@ function getTagsWithProvider(tag, provider, memory = []) {
 
 /***/ }),
 
-/***/ "../main/ts/providers.ts":
-/*!*******************************!*\
-  !*** ../main/ts/providers.ts ***!
-  \*******************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_209545__) => {
+/***/ "../main/ts/state/providers.ts":
+/*!*************************************!*\
+  !*** ../main/ts/state/providers.ts ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_217371__) => {
 
-__nested_webpack_require_209545__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_209545__.d(__nested_webpack_exports__, {
+__nested_webpack_require_217371__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_217371__.d(__nested_webpack_exports__, {
 /* harmony export */   providers: () => (/* binding */ providers)
 /* harmony export */ });
-/* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_209545__(/*! ./deepFunctions */ "../main/ts/deepFunctions.ts");
-/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_209545__(/*! ./setUse.function */ "../main/ts/setUse.function.ts");
+/* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_217371__(/*! ../deepFunctions */ "../main/ts/deepFunctions.ts");
+/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_217371__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
 
 
 // TODO: rename
@@ -4753,185 +4914,147 @@ function run(tagSupport, ownerTag) {
 
 /***/ }),
 
-/***/ "../main/ts/render.ts":
-/*!****************************!*\
-  !*** ../main/ts/render.ts ***!
-  \****************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_213704__) => {
+/***/ "../main/ts/state/setProp.function.ts":
+/*!********************************************!*\
+  !*** ../main/ts/state/setProp.function.ts ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_221601__) => {
 
-__nested_webpack_require_213704__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_213704__.d(__nested_webpack_exports__, {
-/* harmony export */   buildClones: () => (/* binding */ buildClones)
+__nested_webpack_require_221601__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_221601__.d(__nested_webpack_exports__, {
+/* harmony export */   setProp: () => (/* binding */ setProp)
 /* harmony export */ });
-function buildClones(temporary, insertBefore) {
-    const clones = [];
-    const template = temporary.children[0];
-    let nextSibling = template.content.firstChild;
-    while (nextSibling) {
-        const nextNextSibling = nextSibling.nextSibling;
-        buildSibling(nextSibling, insertBefore);
-        clones.push(nextSibling);
-        nextSibling = nextNextSibling;
-    }
-    return clones;
-}
-function buildSibling(nextSibling, insertBefore) {
-    const parentNode = insertBefore.parentNode;
-    parentNode.insertBefore(nextSibling, insertBefore);
-}
+/* harmony import */ var _state_utils__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_221601__(/*! ./state.utils */ "../main/ts/state/state.utils.ts");
+/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_221601__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
 
 
-/***/ }),
-
-/***/ "../main/ts/renderExistingTag.function.ts":
-/*!************************************************!*\
-  !*** ../main/ts/renderExistingTag.function.ts ***!
-  \************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_214769__) => {
-
-__nested_webpack_require_214769__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_214769__.d(__nested_webpack_exports__, {
-/* harmony export */   renderExistingTag: () => (/* binding */ renderExistingTag)
-/* harmony export */ });
-/* harmony import */ var _provider_utils__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_214769__(/*! ./provider.utils */ "../main/ts/provider.utils.ts");
-/* harmony import */ var _TemplaterResult_class__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_214769__(/*! ./TemplaterResult.class */ "../main/ts/TemplaterResult.class.ts");
-/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_214769__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
-
-
-
-/** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
-function renderExistingTag(oldestTag, // existing tag already there
-newTemplater, tagSupport, subject) {
-    const tag = subject.tag;
-    newTemplater.global = tag.tagSupport.templater.global;
-    if (!oldestTag.hasLiveElements) {
-        throw new Error('1080 - should have live elements');
-    }
-    const preRenderCount = tagSupport.templater.global.renderCount;
-    (0,_provider_utils__WEBPACK_IMPORTED_MODULE_0__.providersChangeCheck)(oldestTag);
-    // When the providers were checked, a render to myself occurred and I do not need to re-render again
-    const latestTag = tagSupport.templater.global.newest;
-    if (preRenderCount !== tagSupport.templater.global.renderCount) {
-        oldestTag.updateByTag(latestTag);
-        return latestTag;
-    }
-    const oldTemplater = tagSupport.templater || newTemplater;
-    const toRedrawTag = subject.tag || oldTemplater.global.newest || oldTemplater.global.oldest; // hmmmmmm, why not newest?
-    const redraw = (0,_TemplaterResult_class__WEBPACK_IMPORTED_MODULE_1__.renderWithSupport)(newTemplater.tagSupport, toRedrawTag, subject, oldestTag.ownerTag);
-    const oldest = tagSupport.templater.global.oldest || oldestTag;
-    redraw.tagSupport.templater.global.oldest = oldest;
-    if ((0,_isLikeTags_function__WEBPACK_IMPORTED_MODULE_2__.isLikeTags)(latestTag, redraw)) {
-        subject.tag = redraw;
-        oldest.updateByTag(redraw);
-    }
-    return redraw;
-}
-
-
-/***/ }),
-
-/***/ "../main/ts/renderTagSupport.function.ts":
-/*!***********************************************!*\
-  !*** ../main/ts/renderTagSupport.function.ts ***!
-  \***********************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_217297__) => {
-
-__nested_webpack_require_217297__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_217297__.d(__nested_webpack_exports__, {
-/* harmony export */   renderTagSupport: () => (/* binding */ renderTagSupport)
-/* harmony export */ });
-/* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_217297__(/*! ./deepFunctions */ "../main/ts/deepFunctions.ts");
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_217297__(/*! ./isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _renderExistingTag_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_217297__(/*! ./renderExistingTag.function */ "../main/ts/renderExistingTag.function.ts");
-
-
-
-/** Main function used by all other callers to render/update display of a tag component */
-function renderTagSupport(tagSupport, renderUp) {
-    const global = tagSupport.templater.global;
-    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagInstance)(tagSupport.templater)) {
-        const newTag = global.newest;
-        const ownerTag = newTag.ownerTag;
-        ++global.renderCount;
-        return renderTagSupport(ownerTag.tagSupport, true);
-    }
-    // const oldTagSetup = this
-    const subject = tagSupport.subject;
-    const templater = tagSupport.templater; // oldTagSetup.templater // templater
-    const subjectTag = subject.tag;
-    const newest = subjectTag?.tagSupport.templater.global.newest;
-    let ownerTag;
-    let selfPropChange = false;
-    const shouldRenderUp = renderUp && newest;
-    if (shouldRenderUp) {
-        ownerTag = newest.ownerTag;
-        if (ownerTag) {
-            const nowProps = templater.props;
-            const latestProps = newest.tagSupport.propsConfig.latestCloned;
-            selfPropChange = !(0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepEqual)(nowProps, latestProps);
+/** Used for variables that need to remain the same variable during render passes */
+function setProp(getSet) {
+    const config = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig;
+    const rearray = config.rearray;
+    const [propValue] = getSet(undefined);
+    getSet(propValue); // restore original value instead of undefined
+    const restate = rearray[config.array.length];
+    if (restate) {
+        let watchValue = restate.watch;
+        let oldValue = (0,_state_utils__WEBPACK_IMPORTED_MODULE_0__.getStateValue)(restate);
+        const push = {
+            get: () => (0,_state_utils__WEBPACK_IMPORTED_MODULE_0__.getStateValue)(push),
+            callback: getSet,
+            lastValue: oldValue,
+            watch: restate.watch,
+        };
+        // has the prop value changed?
+        if (propValue != watchValue) {
+            push.watch = propValue;
+            oldValue = push.lastValue = propValue;
         }
+        config.array.push(push);
+        getSet(oldValue);
+        return oldValue;
     }
-    const useTagSupport = global.newest?.tagSupport; // oldTagSetup
-    if (!templater.global.oldest) {
-        throw new Error('already causing trouble');
-    }
-    const tag = (0,_renderExistingTag_function__WEBPACK_IMPORTED_MODULE_2__.renderExistingTag)(templater.global.oldest, templater, useTagSupport, subject);
-    const renderOwner = ownerTag && selfPropChange;
-    if (renderOwner) {
-        const ownerTagSupport = ownerTag.tagSupport;
-        renderTagSupport(ownerTagSupport, true);
-        return tag;
-    }
-    return tag;
+    const push = {
+        get: () => (0,_state_utils__WEBPACK_IMPORTED_MODULE_0__.getStateValue)(push),
+        callback: getSet,
+        lastValue: propValue,
+        watch: propValue,
+    };
+    config.array.push(push);
+    return propValue;
 }
 
 
 /***/ }),
 
-/***/ "../main/ts/scanTextAreaValue.function.ts":
-/*!************************************************!*\
-  !*** ../main/ts/scanTextAreaValue.function.ts ***!
-  \************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_219974__) => {
+/***/ "../main/ts/state/setUse.function.ts":
+/*!*******************************************!*\
+  !*** ../main/ts/state/setUse.function.ts ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_223677__) => {
 
-__nested_webpack_require_219974__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_219974__.d(__nested_webpack_exports__, {
-/* harmony export */   scanTextAreaValue: () => (/* binding */ scanTextAreaValue)
+__nested_webpack_require_223677__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_223677__.d(__nested_webpack_exports__, {
+/* harmony export */   setUse: () => (/* binding */ setUse)
 /* harmony export */ });
-/* harmony import */ var _processAttribute_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_219974__(/*! ./processAttribute.function */ "../main/ts/processAttribute.function.ts");
+const tagUse = [];
+function setUse(use) {
+    // must provide defaults
+    const useMe = {
+        beforeRender: use.beforeRender || (() => undefined),
+        beforeRedraw: use.beforeRedraw || (() => undefined),
+        afterRender: use.afterRender || (() => undefined),
+        beforeDestroy: use.beforeDestroy || (() => undefined),
+    };
+    setUse.tagUse.push(useMe);
+}
+setUse.tagUse = tagUse;
+setUse.memory = {};
 
-const search = new RegExp('\\s*<template interpolate end id="__tagvar(\\d{1,4})"([^>]*)></template>(\\s*)');
-function scanTextAreaValue(textarea, context, ownerTag) {
-    const value = textarea.value;
-    if (value.search(search) >= 0) {
-        const match = value.match(/__tagvar(\d{1,4})/);
-        const token = match ? match[0] : '';
-        const dynamic = '{' + token + '}';
-        textarea.value = '';
-        textarea.setAttribute('text-var-value', dynamic);
-        const howToSet = (_elm, _name, value) => textarea.value = value;
-        (0,_processAttribute_function__WEBPACK_IMPORTED_MODULE_0__.processAttribute)('text-var-value', dynamic, // realValue, // context[token].value,
-        textarea, context, ownerTag, howToSet);
+
+/***/ }),
+
+/***/ "../main/ts/state/state.function.ts":
+/*!******************************************!*\
+  !*** ../main/ts/state/state.function.ts ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_224572__) => {
+
+__nested_webpack_require_224572__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_224572__.d(__nested_webpack_exports__, {
+/* harmony export */   state: () => (/* binding */ state)
+/* harmony export */ });
+/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_224572__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
+/* harmony import */ var _state_utils__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_224572__(/*! ./state.utils */ "../main/ts/state/state.utils.ts");
+
+
+/** Used for variables that need to remain the same variable during render passes */
+function state(defaultValue) {
+    const config = _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig;
+    let getSetMethod;
+    const rearray = config.rearray;
+    const restate = rearray[config.array.length];
+    if (restate) {
+        let oldValue = (0,_state_utils__WEBPACK_IMPORTED_MODULE_1__.getStateValue)(restate);
+        getSetMethod = ((x) => [oldValue, oldValue = x]);
+        const push = {
+            get: () => (0,_state_utils__WEBPACK_IMPORTED_MODULE_1__.getStateValue)(push),
+            callback: getSetMethod,
+            lastValue: oldValue,
+            defaultValue: restate.defaultValue,
+        };
+        config.array.push(push);
+        return oldValue;
     }
+    // State first time run
+    const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue;
+    let initValue = defaultFn();
+    getSetMethod = ((x) => [initValue, initValue = x]);
+    const push = {
+        get: () => (0,_state_utils__WEBPACK_IMPORTED_MODULE_1__.getStateValue)(push),
+        callback: getSetMethod,
+        lastValue: initValue,
+        defaultValue: initValue,
+    };
+    config.array.push(push);
+    return initValue;
 }
 
 
 /***/ }),
 
-/***/ "../main/ts/set.function.ts":
-/*!**********************************!*\
-  !*** ../main/ts/set.function.ts ***!
-  \**********************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_221372__) => {
+/***/ "../main/ts/state/state.utils.ts":
+/*!***************************************!*\
+  !*** ../main/ts/state/state.utils.ts ***!
+  \***************************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_226600__) => {
 
-__nested_webpack_require_221372__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_221372__.d(__nested_webpack_exports__, {
+__nested_webpack_require_226600__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_226600__.d(__nested_webpack_exports__, {
 /* harmony export */   StateEchoBack: () => (/* binding */ StateEchoBack),
-/* harmony export */   getStateValue: () => (/* binding */ getStateValue),
-/* harmony export */   set: () => (/* binding */ set)
+/* harmony export */   getStateValue: () => (/* binding */ getStateValue)
 /* harmony export */ });
-/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_221372__(/*! ./errors */ "../main/ts/errors.ts");
-/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_221372__(/*! ./setUse.function */ "../main/ts/setUse.function.ts");
+/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_226600__(/*! ../errors */ "../main/ts/errors.ts");
+/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_226600__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
 
 
 // TODO: rename
@@ -5016,173 +5139,40 @@ function initState(tagSupport) {
     }
     config.tagSupport = tagSupport;
 }
-/** Used for variables that need to remain the same variable during render passes */
-function set(defaultValue) {
-    const config = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig;
-    let getSetMethod;
-    const rearray = config.rearray;
-    const restate = rearray[config.array.length];
-    if (restate) {
-        let oldValue = getStateValue(restate);
-        getSetMethod = ((x) => [oldValue, oldValue = x]);
-        const push = {
-            get: () => getStateValue(push),
-            callback: getSetMethod,
-            lastValue: oldValue,
-            defaultValue: restate.defaultValue,
-        };
-        config.array.push(push);
-        return oldValue;
-    }
-    // State first time run
-    const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue;
-    let initValue = defaultFn();
-    getSetMethod = ((x) => [initValue, initValue = x]);
-    const push = {
-        get: () => getStateValue(push),
-        callback: getSetMethod,
-        lastValue: initValue,
-        defaultValue: initValue,
-    };
-    config.array.push(push);
-    return initValue;
-}
 
 
 /***/ }),
 
-/***/ "../main/ts/setLet.function.ts":
-/*!*************************************!*\
-  !*** ../main/ts/setLet.function.ts ***!
-  \*************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_227087__) => {
+/***/ "../main/ts/state/watch.function.ts":
+/*!******************************************!*\
+  !*** ../main/ts/state/watch.function.ts ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_231167__) => {
 
-__nested_webpack_require_227087__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_227087__.d(__nested_webpack_exports__, {
-/* harmony export */   setLet: () => (/* binding */ setLet)
+__nested_webpack_require_231167__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_231167__.d(__nested_webpack_exports__, {
+/* harmony export */   watch: () => (/* binding */ watch)
 /* harmony export */ });
-/* harmony import */ var _set_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_227087__(/*! ./set.function */ "../main/ts/set.function.ts");
-/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_227087__(/*! ./setUse.function */ "../main/ts/setUse.function.ts");
+/* harmony import */ var _letState_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_231167__(/*! ./letState.function */ "../main/ts/state/letState.function.ts");
 
-
-/** Used for variables that need to remain the same variable during render passes */
-function setLet(defaultValue) {
-    const config = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig;
-    const rearray = config.rearray;
-    let getSetMethod;
-    const restate = rearray[config.array.length];
-    if (restate) {
-        let oldValue = (0,_set_function__WEBPACK_IMPORTED_MODULE_0__.getStateValue)(restate);
-        getSetMethod = ((x) => [oldValue, oldValue = x]);
-        const push = {
-            get: () => (0,_set_function__WEBPACK_IMPORTED_MODULE_0__.getStateValue)(push),
-            callback: getSetMethod,
-            lastValue: oldValue,
-            defaultValue: restate.defaultValue,
-        };
-        config.array.push(push);
-        return makeStateResult(oldValue, push);
+/** When an item in watch array changes, callback function will be triggered */
+function watch(currentValues, callback) {
+    let previousValues = (0,_letState_function__WEBPACK_IMPORTED_MODULE_0__.letState)(undefined)(x => [previousValues, previousValues = x]);
+    if (previousValues === undefined) {
+        callback(currentValues, previousValues);
+        // const result = {currentValues, previousValues}
+        previousValues = currentValues;
+        return currentValues;
     }
-    // State first time run
-    const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue;
-    let initValue = defaultFn();
-    getSetMethod = ((x) => [initValue, initValue = x]);
-    const push = {
-        get: () => (0,_set_function__WEBPACK_IMPORTED_MODULE_0__.getStateValue)(push),
-        callback: getSetMethod,
-        lastValue: initValue,
-        defaultValue: initValue,
-    };
-    config.array.push(push);
-    return makeStateResult(initValue, push);
-}
-function makeStateResult(initValue, push) {
-    // return initValue
-    const result = (y) => {
-        push.callback = y || (x => [initValue, initValue = x]);
-        return initValue;
-    };
-    return result;
-}
-
-
-/***/ }),
-
-/***/ "../main/ts/setProp.function.ts":
-/*!**************************************!*\
-  !*** ../main/ts/setProp.function.ts ***!
-  \**************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_229368__) => {
-
-__nested_webpack_require_229368__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_229368__.d(__nested_webpack_exports__, {
-/* harmony export */   setProp: () => (/* binding */ setProp)
-/* harmony export */ });
-/* harmony import */ var _set_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_229368__(/*! ./set.function */ "../main/ts/set.function.ts");
-/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_229368__(/*! ./setUse.function */ "../main/ts/setUse.function.ts");
-
-
-/** Used for variables that need to remain the same variable during render passes */
-function setProp(getSet) {
-    const config = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig;
-    const rearray = config.rearray;
-    const [propValue] = getSet(undefined);
-    getSet(propValue); // restore original value instead of undefined
-    const restate = rearray[config.array.length];
-    if (restate) {
-        let watchValue = restate.watch;
-        let oldValue = (0,_set_function__WEBPACK_IMPORTED_MODULE_0__.getStateValue)(restate);
-        const push = {
-            get: () => (0,_set_function__WEBPACK_IMPORTED_MODULE_0__.getStateValue)(push),
-            callback: getSet,
-            lastValue: oldValue,
-            watch: restate.watch,
-        };
-        // has the prop value changed?
-        if (propValue != watchValue) {
-            push.watch = propValue;
-            oldValue = push.lastValue = propValue;
-        }
-        config.array.push(push);
-        getSet(oldValue);
-        return oldValue;
+    const allExact = currentValues.every((item, index) => item === previousValues[index]);
+    if (allExact) {
+        return currentValues;
     }
-    const push = {
-        get: () => (0,_set_function__WEBPACK_IMPORTED_MODULE_0__.getStateValue)(push),
-        callback: getSet,
-        lastValue: propValue,
-        watch: propValue,
-    };
-    config.array.push(push);
-    return propValue;
+    callback(currentValues, previousValues);
+    previousValues.length = 0;
+    previousValues.push(...currentValues);
+    return currentValues;
 }
-
-
-/***/ }),
-
-/***/ "../main/ts/setUse.function.ts":
-/*!*************************************!*\
-  !*** ../main/ts/setUse.function.ts ***!
-  \*************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_231414__) => {
-
-__nested_webpack_require_231414__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_231414__.d(__nested_webpack_exports__, {
-/* harmony export */   setUse: () => (/* binding */ setUse)
-/* harmony export */ });
-const tagUse = [];
-function setUse(use) {
-    // must provide defaults
-    const useMe = {
-        beforeRender: use.beforeRender || (() => undefined),
-        beforeRedraw: use.beforeRedraw || (() => undefined),
-        afterRender: use.afterRender || (() => undefined),
-        beforeDestroy: use.beforeDestroy || (() => undefined),
-    };
-    setUse.tagUse.push(useMe);
-}
-setUse.tagUse = tagUse;
-setUse.memory = {};
 
 
 /***/ }),
@@ -5191,10 +5181,10 @@ setUse.memory = {};
 /*!*******************************************!*\
   !*** ../main/ts/subject/Subject.class.ts ***!
   \*******************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_232313__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_232590__) => {
 
-__nested_webpack_require_232313__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_232313__.d(__nested_webpack_exports__, {
+__nested_webpack_require_232590__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_232590__.d(__nested_webpack_exports__, {
 /* harmony export */   Subject: () => (/* binding */ Subject)
 /* harmony export */ });
 class Subject {
@@ -5214,8 +5204,8 @@ class Subject {
             // are we in a pipe?
             if (this.methods.length) {
                 const orgCallback = callback;
-                callback = (value, subscription) => {
-                    runPipedMethods(value, subscription, this.methods, lastValue => orgCallback(lastValue, subscription));
+                callback = (value) => {
+                    runPipedMethods(value, this.methods, lastValue => orgCallback(lastValue));
                 };
             }
             return subscribeWith(callback);
@@ -5283,12 +5273,12 @@ function getSubscription(subject, callback) {
     };
     return subscription;
 }
-function runPipedMethods(value, subscription, methods, onComplete) {
+function runPipedMethods(value, methods, onComplete) {
     const cloneMethods = [...methods];
     const firstMethod = cloneMethods.shift();
     const next = (newValue) => {
         if (cloneMethods.length) {
-            return runPipedMethods(newValue, subscription, cloneMethods, onComplete);
+            return runPipedMethods(newValue, cloneMethods, onComplete);
         }
         onComplete(newValue);
         // return newValue = next
@@ -5307,13 +5297,13 @@ function runPipedMethods(value, subscription, methods, onComplete) {
 /*!******************************************!*\
   !*** ../main/ts/subject/ValueSubject.ts ***!
   \******************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_236372__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_236579__) => {
 
-__nested_webpack_require_236372__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_236372__.d(__nested_webpack_exports__, {
+__nested_webpack_require_236579__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_236579__.d(__nested_webpack_exports__, {
 /* harmony export */   ValueSubject: () => (/* binding */ ValueSubject)
 /* harmony export */ });
-/* harmony import */ var _Subject_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_236372__(/*! ./Subject.class */ "../main/ts/subject/Subject.class.ts");
+/* harmony import */ var _Subject_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_236579__(/*! ./Subject.class */ "../main/ts/subject/Subject.class.ts");
 
 class ValueSubject extends _Subject_class__WEBPACK_IMPORTED_MODULE_0__.Subject {
     value;
@@ -5324,7 +5314,7 @@ class ValueSubject extends _Subject_class__WEBPACK_IMPORTED_MODULE_0__.Subject {
     subscribe(callback) {
         const subscription = super.subscribe(callback);
         // Call the callback immediately with the current value
-        callback(this.value, subscription);
+        callback(this.value);
         return subscription;
     }
 }
@@ -5336,13 +5326,13 @@ class ValueSubject extends _Subject_class__WEBPACK_IMPORTED_MODULE_0__.Subject {
 /*!****************************************************!*\
   !*** ../main/ts/subject/combineLatest.function.ts ***!
   \****************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_237455__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_237648__) => {
 
-__nested_webpack_require_237455__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_237455__.d(__nested_webpack_exports__, {
+__nested_webpack_require_237648__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_237648__.d(__nested_webpack_exports__, {
 /* harmony export */   combineLatest: () => (/* binding */ combineLatest)
 /* harmony export */ });
-/* harmony import */ var _Subject_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_237455__(/*! ./Subject.class */ "../main/ts/subject/Subject.class.ts");
+/* harmony import */ var _Subject_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_237648__(/*! ./Subject.class */ "../main/ts/subject/Subject.class.ts");
 
 function combineLatest(subjects) {
     const output = new _Subject_class__WEBPACK_IMPORTED_MODULE_0__.Subject();
@@ -5374,10 +5364,10 @@ function combineLatest(subjects) {
 /*!***********************************!*\
   !*** ../main/ts/subject/index.ts ***!
   \***********************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_238955__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_239148__) => {
 
-__nested_webpack_require_238955__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_238955__.d(__nested_webpack_exports__, {
+__nested_webpack_require_239148__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_239148__.d(__nested_webpack_exports__, {
 /* harmony export */   Subject: () => (/* reexport safe */ _Subject_class__WEBPACK_IMPORTED_MODULE_0__.Subject),
 /* harmony export */   ValueSubject: () => (/* reexport safe */ _ValueSubject__WEBPACK_IMPORTED_MODULE_1__.ValueSubject),
 /* harmony export */   combineLatest: () => (/* reexport safe */ _combineLatest_function__WEBPACK_IMPORTED_MODULE_2__.combineLatest),
@@ -5385,10 +5375,10 @@ __nested_webpack_require_238955__.r(__nested_webpack_exports__);
 /* harmony export */   willPromise: () => (/* reexport safe */ _will_functions__WEBPACK_IMPORTED_MODULE_3__.willPromise),
 /* harmony export */   willSubscribe: () => (/* reexport safe */ _will_functions__WEBPACK_IMPORTED_MODULE_3__.willSubscribe)
 /* harmony export */ });
-/* harmony import */ var _Subject_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_238955__(/*! ./Subject.class */ "../main/ts/subject/Subject.class.ts");
-/* harmony import */ var _ValueSubject__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_238955__(/*! ./ValueSubject */ "../main/ts/subject/ValueSubject.ts");
-/* harmony import */ var _combineLatest_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_238955__(/*! ./combineLatest.function */ "../main/ts/subject/combineLatest.function.ts");
-/* harmony import */ var _will_functions__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_238955__(/*! ./will.functions */ "../main/ts/subject/will.functions.ts");
+/* harmony import */ var _Subject_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_239148__(/*! ./Subject.class */ "../main/ts/subject/Subject.class.ts");
+/* harmony import */ var _ValueSubject__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_239148__(/*! ./ValueSubject */ "../main/ts/subject/ValueSubject.ts");
+/* harmony import */ var _combineLatest_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_239148__(/*! ./combineLatest.function */ "../main/ts/subject/combineLatest.function.ts");
+/* harmony import */ var _will_functions__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_239148__(/*! ./will.functions */ "../main/ts/subject/will.functions.ts");
 
 
 
@@ -5401,10 +5391,10 @@ __nested_webpack_require_238955__.r(__nested_webpack_exports__);
 /*!********************************************!*\
   !*** ../main/ts/subject/will.functions.ts ***!
   \********************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_240766__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_240959__) => {
 
-__nested_webpack_require_240766__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_240766__.d(__nested_webpack_exports__, {
+__nested_webpack_require_240959__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_240959__.d(__nested_webpack_exports__, {
 /* harmony export */   willCallback: () => (/* binding */ willCallback),
 /* harmony export */   willPromise: () => (/* binding */ willPromise),
 /* harmony export */   willSubscribe: () => (/* binding */ willSubscribe)
@@ -5448,21 +5438,21 @@ const willSubscribe = (callback) => {
 /*!*************************!*\
   !*** ../main/ts/tag.ts ***!
   \*************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_242278__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_242471__) => {
 
-__nested_webpack_require_242278__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_242278__.d(__nested_webpack_exports__, {
+__nested_webpack_require_242471__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_242471__.d(__nested_webpack_exports__, {
 /* harmony export */   tag: () => (/* binding */ tag),
 /* harmony export */   tags: () => (/* binding */ tags)
 /* harmony export */ });
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_242278__(/*! ./isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_242278__(/*! ./setUse.function */ "../main/ts/setUse.function.ts");
-/* harmony import */ var _TemplaterResult_class__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_242278__(/*! ./TemplaterResult.class */ "../main/ts/TemplaterResult.class.ts");
-/* harmony import */ var _bindSubjectCallback_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_242278__(/*! ./bindSubjectCallback.function */ "../main/ts/bindSubjectCallback.function.ts");
-/* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_242278__(/*! ./deepFunctions */ "../main/ts/deepFunctions.ts");
-/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_242278__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
-/* harmony import */ var _alterProps_function__WEBPACK_IMPORTED_MODULE_6__ = __nested_webpack_require_242278__(/*! ./alterProps.function */ "../main/ts/alterProps.function.ts");
-/* harmony import */ var _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_7__ = __nested_webpack_require_242278__(/*! ./subject/ValueSubject */ "../main/ts/subject/ValueSubject.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_242471__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_242471__(/*! ./state */ "../main/ts/state/index.ts");
+/* harmony import */ var _TemplaterResult_class__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_242471__(/*! ./TemplaterResult.class */ "../main/ts/TemplaterResult.class.ts");
+/* harmony import */ var _bindSubjectCallback_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_242471__(/*! ./bindSubjectCallback.function */ "../main/ts/bindSubjectCallback.function.ts");
+/* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_242471__(/*! ./deepFunctions */ "../main/ts/deepFunctions.ts");
+/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_242471__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
+/* harmony import */ var _alterProps_function__WEBPACK_IMPORTED_MODULE_6__ = __nested_webpack_require_242471__(/*! ./alterProps.function */ "../main/ts/alterProps.function.ts");
+/* harmony import */ var _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_7__ = __nested_webpack_require_242471__(/*! ./subject/ValueSubject */ "../main/ts/subject/ValueSubject.ts");
 
 
 
@@ -5521,7 +5511,7 @@ function updateResult(result, tagComponent) {
 }
 function updateComponent(tagComponent) {
     tagComponent.tags = tags;
-    tagComponent.setUse = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse;
+    tagComponent.setUse = _state__WEBPACK_IMPORTED_MODULE_1__.setUse;
     tagComponent.tagIndex = tagCount++; // needed for things like HMR
 }
 /** creates/returns a function that when called then calls the original component function */
@@ -5596,16 +5586,16 @@ function getTagWrap(templater, madeSubject) {
 /*!********************************!*\
   !*** ../main/ts/tagElement.ts ***!
   \********************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_249490__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_249649__) => {
 
-__nested_webpack_require_249490__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_249490__.d(__nested_webpack_exports__, {
+__nested_webpack_require_249649__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_249649__.d(__nested_webpack_exports__, {
 /* harmony export */   applyTagUpdater: () => (/* binding */ applyTagUpdater),
 /* harmony export */   tagElement: () => (/* binding */ tagElement)
 /* harmony export */ });
-/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_249490__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
-/* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_249490__(/*! ./tagRunner */ "../main/ts/tagRunner.ts");
-/* harmony import */ var _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_249490__(/*! ./subject/ValueSubject */ "../main/ts/subject/ValueSubject.ts");
+/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_249649__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
+/* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_249649__(/*! ./tagRunner */ "../main/ts/tagRunner.ts");
+/* harmony import */ var _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_249649__(/*! ./subject/ValueSubject */ "../main/ts/subject/ValueSubject.ts");
 
 
 
@@ -5662,33 +5652,33 @@ function applyTagUpdater(wrapper) {
 /*!*******************************!*\
   !*** ../main/ts/tagRunner.ts ***!
   \*******************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_252514__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_252673__) => {
 
-__nested_webpack_require_252514__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_252514__.d(__nested_webpack_exports__, {
+__nested_webpack_require_252673__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_252673__.d(__nested_webpack_exports__, {
 /* harmony export */   runAfterRender: () => (/* binding */ runAfterRender),
 /* harmony export */   runBeforeDestroy: () => (/* binding */ runBeforeDestroy),
 /* harmony export */   runBeforeRedraw: () => (/* binding */ runBeforeRedraw),
 /* harmony export */   runBeforeRender: () => (/* binding */ runBeforeRender)
 /* harmony export */ });
-/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_252514__(/*! ./setUse.function */ "../main/ts/setUse.function.ts");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_252673__(/*! ./state */ "../main/ts/state/index.ts");
 // TODO: This should be more like `new TaggedJs().use({})`
 
 // Life cycle 1
 function runBeforeRender(tagSupport, tagOwner) {
-    _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.beforeRender(tagSupport, tagOwner));
+    _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.beforeRender(tagSupport, tagOwner));
 }
 // Life cycle 2
 function runAfterRender(tagSupport, tag) {
-    _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.afterRender(tagSupport, tag));
+    _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.afterRender(tagSupport, tag));
 }
 // Life cycle 3
 function runBeforeRedraw(tagSupport, tag) {
-    _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.beforeRedraw(tagSupport, tag));
+    _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.beforeRedraw(tagSupport, tag));
 }
 // Life cycle 4 - end of life
 function runBeforeDestroy(tagSupport, tag) {
-    _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.beforeDestroy(tagSupport, tag));
+    _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.beforeDestroy(tagSupport, tag));
 }
 
 
@@ -5698,10 +5688,10 @@ function runBeforeDestroy(tagSupport, tag) {
 /*!***************************************************!*\
   !*** ../main/ts/updateBeforeTemplate.function.ts ***!
   \***************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_254249__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_254344__) => {
 
-__nested_webpack_require_254249__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_254249__.d(__nested_webpack_exports__, {
+__nested_webpack_require_254344__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_254344__.d(__nested_webpack_exports__, {
 /* harmony export */   updateBeforeTemplate: () => (/* binding */ updateBeforeTemplate)
 /* harmony export */ });
 // Function to update the value of x
@@ -5727,17 +5717,17 @@ function updateBeforeTemplate(value, lastFirstChild) {
 /*!*********************************************************!*\
   !*** ../main/ts/updateExistingTagComponent.function.ts ***!
   \*********************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_255440__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_255535__) => {
 
-__nested_webpack_require_255440__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_255440__.d(__nested_webpack_exports__, {
+__nested_webpack_require_255535__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_255535__.d(__nested_webpack_exports__, {
 /* harmony export */   updateExistingTagComponent: () => (/* binding */ updateExistingTagComponent)
 /* harmony export */ });
-/* harmony import */ var _hasTagSupportChanged_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_255440__(/*! ./hasTagSupportChanged.function */ "../main/ts/hasTagSupportChanged.function.ts");
-/* harmony import */ var _processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_255440__(/*! ./processSubjectComponent.function */ "../main/ts/processSubjectComponent.function.ts");
-/* harmony import */ var _destroyTag_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_255440__(/*! ./destroyTag.function */ "../main/ts/destroyTag.function.ts");
-/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_255440__(/*! ./renderTagSupport.function */ "../main/ts/renderTagSupport.function.ts");
-/* harmony import */ var _alterProps_function__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_255440__(/*! ./alterProps.function */ "../main/ts/alterProps.function.ts");
+/* harmony import */ var _hasTagSupportChanged_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_255535__(/*! ./hasTagSupportChanged.function */ "../main/ts/hasTagSupportChanged.function.ts");
+/* harmony import */ var _processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_255535__(/*! ./processSubjectComponent.function */ "../main/ts/processSubjectComponent.function.ts");
+/* harmony import */ var _destroyTag_function__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_255535__(/*! ./destroyTag.function */ "../main/ts/destroyTag.function.ts");
+/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_255535__(/*! ./renderTagSupport.function */ "../main/ts/renderTagSupport.function.ts");
+/* harmony import */ var _alterProps_function__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_255535__(/*! ./alterProps.function */ "../main/ts/alterProps.function.ts");
 
 
 
@@ -5755,17 +5745,12 @@ function updateExistingTagComponent(ownerTag, templater, subject, insertBefore) 
     }
     const oldTagSupport = existingTag.tagSupport;
     const oldGlobal = oldTagSupport.templater.global;
-    const globalInsert = oldGlobal.insertBefore;
-    const oldInsertBefore = globalInsert?.parentNode ? globalInsert : insertBefore;
     // const placeholderElm = ownerTag.tagSupport.templater.global.placeholderElm
-    const placeholderElm = oldGlobal.placeholderElm;
+    const placeholderElm = oldGlobal.placeholder;
     if (placeholderElm) {
         if (!placeholderElm.parentNode) {
             throw new Error('stop here no subject parent node update existing tag');
         }
-    }
-    else if (!oldInsertBefore.parentNode) {
-        //throw new Error('stop here no parent node update existing tag')
     }
     if (!isSameTag) {
         (0,_destroyTag_function__WEBPACK_IMPORTED_MODULE_2__.destroyTagMemory)(oldTagSupport.templater.global.oldest, subject);
@@ -5898,24 +5883,22 @@ function syncFunctionProps(templater, existingTag, ownerTag, newProps) {
 /*!**************************************************!*\
   !*** ../main/ts/updateExistingValue.function.ts ***!
   \**************************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_263340__) => {
+/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_263175__) => {
 
-__nested_webpack_require_263340__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_263340__.d(__nested_webpack_exports__, {
+__nested_webpack_require_263175__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_263175__.d(__nested_webpack_exports__, {
 /* harmony export */   updateExistingValue: () => (/* binding */ updateExistingValue)
 /* harmony export */ });
-/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_263340__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_263340__(/*! ./isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _processTagArray__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_263340__(/*! ./processTagArray */ "../main/ts/processTagArray.ts");
-/* harmony import */ var _updateExistingTagComponent_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_263340__(/*! ./updateExistingTagComponent.function */ "../main/ts/updateExistingTagComponent.function.ts");
-/* harmony import */ var _processRegularValue_function__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_263340__(/*! ./processRegularValue.function */ "../main/ts/processRegularValue.function.ts");
-/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_263340__(/*! ./checkDestroyPrevious.function */ "../main/ts/checkDestroyPrevious.function.ts");
-/* harmony import */ var _processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_6__ = __nested_webpack_require_263340__(/*! ./processSubjectComponent.function */ "../main/ts/processSubjectComponent.function.ts");
-/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_7__ = __nested_webpack_require_263340__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
-/* harmony import */ var _bindSubjectCallback_function__WEBPACK_IMPORTED_MODULE_8__ = __nested_webpack_require_263340__(/*! ./bindSubjectCallback.function */ "../main/ts/bindSubjectCallback.function.ts");
-/* harmony import */ var _processTag_function__WEBPACK_IMPORTED_MODULE_9__ = __nested_webpack_require_263340__(/*! ./processTag.function */ "../main/ts/processTag.function.ts");
-/* harmony import */ var _insertAfter_function__WEBPACK_IMPORTED_MODULE_10__ = __nested_webpack_require_263340__(/*! ./insertAfter.function */ "../main/ts/insertAfter.function.ts");
-
+/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_263175__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_263175__(/*! ./isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _processTagArray__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_263175__(/*! ./processTagArray */ "../main/ts/processTagArray.ts");
+/* harmony import */ var _updateExistingTagComponent_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_263175__(/*! ./updateExistingTagComponent.function */ "../main/ts/updateExistingTagComponent.function.ts");
+/* harmony import */ var _processRegularValue_function__WEBPACK_IMPORTED_MODULE_4__ = __nested_webpack_require_263175__(/*! ./processRegularValue.function */ "../main/ts/processRegularValue.function.ts");
+/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_5__ = __nested_webpack_require_263175__(/*! ./checkDestroyPrevious.function */ "../main/ts/checkDestroyPrevious.function.ts");
+/* harmony import */ var _processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_6__ = __nested_webpack_require_263175__(/*! ./processSubjectComponent.function */ "../main/ts/processSubjectComponent.function.ts");
+/* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_7__ = __nested_webpack_require_263175__(/*! ./isLikeTags.function */ "../main/ts/isLikeTags.function.ts");
+/* harmony import */ var _bindSubjectCallback_function__WEBPACK_IMPORTED_MODULE_8__ = __nested_webpack_require_263175__(/*! ./bindSubjectCallback.function */ "../main/ts/bindSubjectCallback.function.ts");
+/* harmony import */ var _processTag_function__WEBPACK_IMPORTED_MODULE_9__ = __nested_webpack_require_263175__(/*! ./processTag.function */ "../main/ts/processTag.function.ts");
 
 
 
@@ -5929,37 +5912,24 @@ __nested_webpack_require_263340__.r(__nested_webpack_exports__);
 function updateExistingValue(subject, value, ownerTag, insertBefore) {
     const subjectTag = subject;
     const isComponent = (0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagComponent)(value);
-    // const global = subjectTag.tag?.tagSupport.templater.global
-    // const placeholderElm = global?.placeholderElm || global?.insertBefore || (subject as DisplaySubject).insertBefore
-    // const oldInsertBefore = placeholderElm || (subject as DisplaySubject).clone
-    const destroyType = (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_5__.checkDestroyPrevious)(subject, value, insertBefore);
+    (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_5__.checkDestroyPrevious)(subject, value, insertBefore);
     // handle already seen tag components
     if (isComponent) {
         const templater = value;
         // When was something before component
         if (!subjectTag.tag) {
-            const tag = (0,_processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_6__.processSubjectComponent)(templater, subjectTag, insertBefore, // oldInsertBefore as InsertBefore,
+            (0,_processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_6__.processSubjectComponent)(templater, subjectTag, insertBefore, // oldInsertBefore as InsertBefore,
             ownerTag, {
                 forceElement: true,
                 counts: { added: 0, removed: 0 },
             });
             return subjectTag;
         }
-        // ??? - new put back down template tag before redraw
-        const placeholderElm = subjectTag.tag.tagSupport.templater.global.placeholderElm;
-        if (placeholderElm) {
-            (0,_insertAfter_function__WEBPACK_IMPORTED_MODULE_10__.insertAfter)(insertBefore, placeholderElm);
-            delete subjectTag.tag.tagSupport.templater.global.placeholderElm;
-        }
         templater.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.TagSupport(
         // subjectTag.tag.tagSupport.ownerTagSupport,
         ownerTag.tagSupport, templater, subjectTag);
-        const tag = (0,_updateExistingTagComponent_function__WEBPACK_IMPORTED_MODULE_3__.updateExistingTagComponent)(ownerTag, templater, // latest value
+        (0,_updateExistingTagComponent_function__WEBPACK_IMPORTED_MODULE_3__.updateExistingTagComponent)(ownerTag, templater, // latest value
         subjectTag, insertBefore);
-        if (insertBefore.parentNode) {
-            tag.tagSupport.templater.global.placeholderElm = insertBefore.previousSibling;
-            insertBefore.parentNode.removeChild(insertBefore);
-        }
         return subjectTag;
     }
     // was component but no longer
@@ -5985,7 +5955,7 @@ function updateExistingValue(subject, value, ownerTag, insertBefore) {
         return subject;
     }
     if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagInstance)(value)) {
-        if (insertBefore.tagName !== 'TEMPLATE') {
+        if (insertBefore.nodeName !== 'TEMPLATE') {
             throw new Error(`expected template - ${insertBefore.nodeName}`);
         }
         (0,_processTag_function__WEBPACK_IMPORTED_MODULE_9__.processTag)(value, subjectTag, insertBefore, ownerTag);
@@ -6017,45 +5987,10 @@ function handleStillTag(existingTag, subject, value, ownerTag) {
     if (isSameTag || isSameTag2) {
         const subjectTag = subject;
         const global = existingTag.tagSupport.templater.global;
-        delete global.placeholderElm;
         const insertBefore = global.insertBefore;
         return (0,_processTag_function__WEBPACK_IMPORTED_MODULE_9__.processTag)(value, subjectTag, insertBefore, ownerTag);
     }
     return (0,_processRegularValue_function__WEBPACK_IMPORTED_MODULE_4__.processRegularValue)(value, subject, subject.insertBefore);
-}
-
-
-/***/ }),
-
-/***/ "../main/ts/watch.function.ts":
-/*!************************************!*\
-  !*** ../main/ts/watch.function.ts ***!
-  \************************************/
-/***/ ((__unused_webpack_module, __nested_webpack_exports__, __nested_webpack_require_270625__) => {
-
-__nested_webpack_require_270625__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_270625__.d(__nested_webpack_exports__, {
-/* harmony export */   watch: () => (/* binding */ watch)
-/* harmony export */ });
-/* harmony import */ var _setLet_function__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_270625__(/*! ./setLet.function */ "../main/ts/setLet.function.ts");
-
-/** When an item in watch array changes, callback function will be triggered */
-function watch(currentValues, callback) {
-    let previousValues = (0,_setLet_function__WEBPACK_IMPORTED_MODULE_0__.setLet)(undefined)(x => [previousValues, previousValues = x]);
-    if (previousValues === undefined) {
-        callback(currentValues, previousValues);
-        // const result = {currentValues, previousValues}
-        previousValues = currentValues;
-        return currentValues;
-    }
-    const allExact = currentValues.every((item, index) => item === previousValues[index]);
-    if (allExact) {
-        return currentValues;
-    }
-    callback(currentValues, previousValues);
-    previousValues.length = 0;
-    previousValues.push(...currentValues);
-    return currentValues;
 }
 
 
@@ -6067,7 +6002,7 @@ function watch(currentValues, callback) {
 /******/ var __webpack_module_cache__ = {};
 /******/ 
 /******/ // The require function
-/******/ function __nested_webpack_require_271999__(moduleId) {
+/******/ function __nested_webpack_require_269351__(moduleId) {
 /******/ 	// Check if module is in cache
 /******/ 	var cachedModule = __webpack_module_cache__[moduleId];
 /******/ 	if (cachedModule !== undefined) {
@@ -6081,7 +6016,7 @@ function watch(currentValues, callback) {
 /******/ 	};
 /******/ 
 /******/ 	// Execute the module function
-/******/ 	__webpack_modules__[moduleId](module, module.exports, __nested_webpack_require_271999__);
+/******/ 	__webpack_modules__[moduleId](module, module.exports, __nested_webpack_require_269351__);
 /******/ 
 /******/ 	// Return the exports of the module
 /******/ 	return module.exports;
@@ -6091,9 +6026,9 @@ function watch(currentValues, callback) {
 /******/ /* webpack/runtime/define property getters */
 /******/ (() => {
 /******/ 	// define getter functions for harmony exports
-/******/ 	__nested_webpack_require_271999__.d = (exports, definition) => {
+/******/ 	__nested_webpack_require_269351__.d = (exports, definition) => {
 /******/ 		for(var key in definition) {
-/******/ 			if(__nested_webpack_require_271999__.o(definition, key) && !__nested_webpack_require_271999__.o(exports, key)) {
+/******/ 			if(__nested_webpack_require_269351__.o(definition, key) && !__nested_webpack_require_269351__.o(exports, key)) {
 /******/ 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
 /******/ 			}
 /******/ 		}
@@ -6102,13 +6037,13 @@ function watch(currentValues, callback) {
 /******/ 
 /******/ /* webpack/runtime/hasOwnProperty shorthand */
 /******/ (() => {
-/******/ 	__nested_webpack_require_271999__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	__nested_webpack_require_269351__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ })();
 /******/ 
 /******/ /* webpack/runtime/make namespace object */
 /******/ (() => {
 /******/ 	// define __esModule on exports
-/******/ 	__nested_webpack_require_271999__.r = (exports) => {
+/******/ 	__nested_webpack_require_269351__.r = (exports) => {
 /******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
 /******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 /******/ 		}
@@ -6123,17 +6058,17 @@ var __nested_webpack_exports__ = {};
 /*!**********************!*\
   !*** ./src/index.ts ***!
   \**********************/
-__nested_webpack_require_271999__.r(__nested_webpack_exports__);
-/* harmony export */ __nested_webpack_require_271999__.d(__nested_webpack_exports__, {
+__nested_webpack_require_269351__.r(__nested_webpack_exports__);
+/* harmony export */ __nested_webpack_require_269351__.d(__nested_webpack_exports__, {
 /* harmony export */   App: () => (/* reexport safe */ _app_component__WEBPACK_IMPORTED_MODULE_0__.App),
 /* harmony export */   IsolatedApp: () => (/* reexport safe */ _isolatedApp__WEBPACK_IMPORTED_MODULE_1__.IsolatedApp),
 /* harmony export */   app: () => (/* reexport safe */ _app_function__WEBPACK_IMPORTED_MODULE_3__.app),
 /* harmony export */   hmr: () => (/* reexport safe */ taggedjs__WEBPACK_IMPORTED_MODULE_2__.hmr)
 /* harmony export */ });
-/* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_271999__(/*! ./app.component */ "./src/app.component.ts");
-/* harmony import */ var _isolatedApp__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_271999__(/*! ./isolatedApp */ "./src/isolatedApp.ts");
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_271999__(/*! taggedjs */ "../main/ts/index.ts");
-/* harmony import */ var _app_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_271999__(/*! ./app.function */ "./src/app.function.ts");
+/* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_0__ = __nested_webpack_require_269351__(/*! ./app.component */ "./src/app.component.ts");
+/* harmony import */ var _isolatedApp__WEBPACK_IMPORTED_MODULE_1__ = __nested_webpack_require_269351__(/*! ./isolatedApp */ "./src/isolatedApp.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_2__ = __nested_webpack_require_269351__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _app_function__WEBPACK_IMPORTED_MODULE_3__ = __nested_webpack_require_269351__(/*! ./app.function */ "./src/app.function.ts");
 
 
 

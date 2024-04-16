@@ -1,15 +1,15 @@
-import { setLet, html, tag, onInit, getCallback, onDestroy } from "taggedjs"
+import { letState, html, tag, onInit, callbackMaker, onDestroy } from "taggedjs"
 
 const test0interval = 3000
 const test1interval = 6000
 
 export const intervalTester0 = tag(() => {
-  let intervalCount: number = setLet(0)(x => [intervalCount, intervalCount = x])
-  let intervalId: any = setLet(undefined)(x => [intervalId, intervalId = x])
-  let intervalId2: any = setLet(undefined)(x => [intervalId2, intervalId2 = x])
-  let renderCounter: number = setLet(0)(x => [renderCounter, renderCounter = x])
-  let currentTime: number = setLet(0)(x => [currentTime, currentTime = x])
-  const callback = getCallback()
+  let intervalCount: number = letState(0)(x => [intervalCount, intervalCount = x])
+  let intervalId: any = letState(undefined)(x => [intervalId, intervalId = x])
+  let intervalId2: any = letState(undefined)(x => [intervalId2, intervalId2 = x])
+  let renderCounter: number = letState(0)(x => [renderCounter, renderCounter = x])
+  let currentTime: number = letState(0)(x => [currentTime, currentTime = x])
+  const callback = callbackMaker()
 
   const increase = () => ++intervalCount
 
@@ -81,13 +81,13 @@ export const intervalTester0 = tag(() => {
 })
 
 export const intervalTester1 = tag(() => {  
-  let intervalCount: number = setLet(0)(x => [intervalCount, intervalCount = x])
-  let intervalId: any = setLet(undefined)(x => [intervalId, intervalId = x])
-  let intervalId2: any = setLet(undefined)(x => [intervalId2, intervalId2 = x])
-  let renderCounter: number = setLet(0)(x => [renderCounter, renderCounter = x])
-  let currentTime: number = setLet(0)(x => [currentTime, currentTime = x])
+  let intervalCount: number = letState(0)(x => [intervalCount, intervalCount = x])
+  let intervalId: any = letState(undefined)(x => [intervalId, intervalId = x])
+  let intervalId2: any = letState(undefined)(x => [intervalId2, intervalId2 = x])
+  let renderCounter: number = letState(0)(x => [renderCounter, renderCounter = x])
+  let currentTime: number = letState(0)(x => [currentTime, currentTime = x])
   
-  const callback = getCallback()
+  const callback = callbackMaker()
   const increase = () => ++intervalCount
 
   function trackTime() {

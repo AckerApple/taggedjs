@@ -1,7 +1,7 @@
 import { attributeDebug } from "./attributeDebug.component"
 import { contentDebug } from "./ContentDebug.component"
 import { tableDebug } from "./tableDebug.component"
-import { html, tag, setLet, onInit, getCallback, set, Subject, ValueSubject } from "taggedjs"
+import { html, tag, letState, onInit, state, Subject, callbackMaker } from "taggedjs"
 import { tagDebug } from "./tagJsDebug"
 import { tagSwitchDebug } from "./tagSwitchDebug.component"
 import { childTests } from "./childTests"
@@ -11,10 +11,10 @@ import { counters } from "./countersDebug"
 import { providerDebugBase } from "./providerDebug"
 
 export const App = tag(() => {
-  let _firstState = setLet('app first state')(x => [_firstState, _firstState=x])
-  let toggleValue = setLet(false)(x => [toggleValue, toggleValue=x])
-  let appCounter = setLet(0)(x => [appCounter, appCounter=x])
-  let renderCount = setLet(0)(x => [renderCount, renderCount=x])
+  let _firstState = letState('app first state')(x => [_firstState, _firstState=x])
+  let toggleValue = letState(false)(x => [toggleValue, toggleValue=x])
+  let appCounter = letState(0)(x => [appCounter, appCounter=x])
+  let renderCount = letState(0)(x => [renderCount, renderCount=x])
 
   const toggle = () => {
     toggleValue = !toggleValue
@@ -42,8 +42,8 @@ export const App = tag(() => {
 
   ++renderCount
 
-  const callbacks = getCallback()
-  const appCounterSubject = set(() => new Subject<number>(appCounter))
+  const callbacks = callbackMaker()
+  const appCounterSubject = state(() => new Subject<number>(appCounter))
 
   onInit(() => {
     console.log('app init should only run once')

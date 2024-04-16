@@ -1,7 +1,6 @@
 import { animateDestroy, animateInit } from './animations'
-import { mouseOverTag } from './mouseover.tag'
 import { renderCountDiv } from './renderCount.component'
-import {html, set, setLet, tag} from 'taggedjs'
+import {html, state, letState, tag} from 'taggedjs'
 
 const frameCount = 4
 type Player = {
@@ -11,10 +10,10 @@ type Player = {
 }
 
 export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
-  let memory = set(() => ({counter: 0}))
+  let memory = state(() => ({counter: 0}))
 
-  const players: Player[] = set([])
-  let renderCount: number = setLet(0)(x => [renderCount, renderCount = x])
+  const players: Player[] = state([])
+  let renderCount: number = letState(0)(x => [renderCount, renderCount = x])
 
   const getNewPlayer = () => ({
     name: 'Person '+players.length,
@@ -69,7 +68,7 @@ const scoreData = tag((
     score:{score: number, frame: number}
   }
 ) => {
-  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
+  let renderCount = letState(0)(x => [renderCount, renderCount = x])
   
   ++renderCount
 

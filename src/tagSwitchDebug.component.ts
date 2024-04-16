@@ -1,11 +1,11 @@
-import { html, tag, setLet, InputElementTargetEvent, Tag } from "taggedjs"
+import { html, tag, letState, InputElementTargetEvent, Tag } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
 
 type SelectedTag = null | string | undefined
 
 export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
-  let selectedTag = setLet(null as SelectedTag)(x => [selectedTag, selectedTag = x])
-  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
+  let selectedTag = letState(null as SelectedTag)(x => [selectedTag, selectedTag = x])
+  let renderCount = letState(0)(x => [renderCount, renderCount = x])
   
   function changeSelectedTag(event: InputElementTargetEvent) {
     selectedTag = event.target.value
@@ -104,8 +104,8 @@ export const ternaryPropTest = tag((
 })
 
 export const tag1 = tag(({title}: {title: string}) => {
-  let counter = setLet(0)(x => [counter, counter = x])
-  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
+  let counter = letState(0)(x => [counter, counter = x])
+  let renderCount = letState(0)(x => [renderCount, renderCount = x])
   ++renderCount
   return html`
     <div id="tag1" style="border:1px solid orange;">
@@ -117,8 +117,8 @@ export const tag1 = tag(({title}: {title: string}) => {
 })
 
 export const tag2 = tag(({title}: {title: string}) => {
-  let counter = setLet(0)(x => [counter, counter = x])
-  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
+  let counter = letState(0)(x => [counter, counter = x])
+  let renderCount = letState(0)(x => [renderCount, renderCount = x])
   ++renderCount
   return html`
     <div id="tag2" style="border:1px solid orange;">
@@ -130,8 +130,8 @@ export const tag2 = tag(({title}: {title: string}) => {
 })
 
 export const tag3 = tag(({title}: {title: string}) => {
-  let counter = setLet(0)(x => [counter, counter = x])
-  let renderCount = setLet(0)(x => [renderCount, renderCount = x])
+  let counter = letState(0)(x => [counter, counter = x])
+  let renderCount = letState(0)(x => [renderCount, renderCount = x])
   ++renderCount
   return html`
     <div  id="tag3" style="border:1px solid orange;">
