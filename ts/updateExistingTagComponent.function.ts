@@ -5,7 +5,7 @@ import { hasTagSupportChanged } from './hasTagSupportChanged.function'
 import { TagSupport } from './TagSupport.class'
 import { processSubjectComponent } from './processSubjectComponent.function'
 import { destroyTagMemory } from './destroyTag.function'
-import { State } from './set.function'
+import { State } from './state'
 import { renderTagSupport } from './renderTagSupport.function'
 import { InsertBefore } from './Clones.type'
 import { callbackPropOwner } from './alterProps.function'
@@ -30,7 +30,6 @@ export function updateExistingTagComponent(
 
   const oldTagSupport = existingTag.tagSupport
   const oldGlobal = oldTagSupport.templater.global
-  const globalInsert = oldGlobal.insertBefore
 
   // const placeholderElm = ownerTag.tagSupport.templater.global.placeholderElm
   const placeholderElm = oldGlobal.placeholder

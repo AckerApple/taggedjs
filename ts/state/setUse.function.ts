@@ -1,6 +1,6 @@
-import { Tag } from './Tag.class'
-import { BaseTagSupport } from './TagSupport.class'
-import { Config } from './set.function'
+import { Tag } from '../Tag.class'
+import { BaseTagSupport } from '../TagSupport.class'
+import { Config } from './state.utils'
 
 const tagUse: TagUse[] = []
 

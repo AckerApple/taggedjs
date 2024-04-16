@@ -28,3 +28,10 @@ export class StateMismatchError extends TagError {
     this.name = StateMismatchError.name;
   }
 }
+
+export class SyncCallbackError extends TagError {
+  constructor(message: string, details?: TagErrorDetails) {
+    super(message, 'sync-callback-error', details);
+    this.name = SyncCallbackError.name;
+  }
+}

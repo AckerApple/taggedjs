@@ -1,16 +1,36 @@
-import { BaseTagSupport } from "./TagSupport.class"
+import { BaseTagSupport } from "../TagSupport.class"
 import { setUse } from "./setUse.function"
-import { State, StateConfigArray, getStateValue } from "./set.function"
-import { renderTagSupport } from "./renderTagSupport.function"
+import { State, StateConfigArray, getStateValue } from "./state.utils"
+import { renderTagSupport } from "../renderTagSupport.function"
+import { SyncCallbackError } from "../errors"
+import { Subject } from "../subject"
+/*
+const test = () => {
+  const callback = callbackMaker()
 
-type Callback = <T>(...args: unknown[]) => (T | void)
+  testCallback(callback(x => {
+    console.log('x', x)
+  }))
 
-let innerCallback = (callback: Callback) => (): void => {
-  throw new Error('Callback function was called immediately in sync and must instead be call async')
+  new Subject(0).subscribe(callback(x => {
+    console.log('x', x)
+  }))
 }
-export const getCallback = () => innerCallback
 
-const originalGetter = innerCallback // getCallback
+function testCallback(
+  a: (a: number) => any
+) {
+  return a
+}
+*/
+type Callback<A> = <T>(...args: A[]) => (T | void)
+
+let innerCallback = <A>(callback: Callback<A>) => (...args:A[]): void => {
+  throw new SyncCallbackError('Callback function was called immediately in sync and must instead be call async')
+}
+export const callbackMaker = () => innerCallback
+
+const originalGetter = innerCallback // callbackMaker
 
 setUse({
   beforeRender: (tagSupport: BaseTagSupport) => initMemory(tagSupport),
@@ -36,13 +56,10 @@ function updateState(
   })
 }
 
-type Trigger = () => void
-type CallbackMaker = (callback: Callback) => Trigger
-
 function initMemory (tagSupport: BaseTagSupport) {
   const oldState: StateConfigArray = setUse.memory.stateConfig.array
   innerCallback = (
-    callback: Callback
+    callback: Callback<any>
   ) => {
     const trigger = (...args: any[]) => triggerStateUpdate(tagSupport, callback, oldState, ...args)
     return trigger
@@ -51,7 +68,7 @@ function initMemory (tagSupport: BaseTagSupport) {
 
 function triggerStateUpdate(
   tagSupport: BaseTagSupport,
-  callback: Callback,
+  callback: Callback<any>,
   oldState: StateConfigArray,
   ...args: any[]
 ) {

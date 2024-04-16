@@ -1,6 +1,6 @@
 import { TemplaterResult, renderWithSupport } from './TemplaterResult.class'
-import { setUse } from './setUse.function'
-import { Counts, Template } from './interpolateTemplate'
+import { setUse } from './state'
+import { Counts } from './interpolateTemplate'
 import { Tag } from './Tag.class'
 import { processTagResult } from './processTagResult.function'
 import { TagSubject } from './Tag.utils'

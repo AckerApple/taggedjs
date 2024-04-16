@@ -1,7 +1,7 @@
-import { Tag } from './Tag.class'
-import { deepClone, deepEqual } from './deepFunctions'
+import { Tag } from '../Tag.class'
+import { deepClone, deepEqual } from '../deepFunctions'
 import { Provider } from './providers'
-import { renderTagSupport } from './renderTagSupport.function'
+import { renderTagSupport } from '../renderTagSupport.function'
 
 export function providersChangeCheck(tag: Tag) {
   const global = tag.tagSupport.templater.global

@@ -2,8 +2,8 @@ import { Subject } from './Subject.class'
 import { SubjectSubscriber, Subscription } from './Subject.utils'
 
 type ValueSubjectSubscriber<T> = (
-  value: T,
-  subscription: Subscription,
+  ...value: T[]
+  // subscription: Subscription,
 ) => unknown
 
 export class ValueSubject<T> extends Subject<T> {
@@ -15,7 +15,7 @@ export class ValueSubject<T> extends Subject<T> {
     const subscription = super.subscribe(callback as SubjectSubscriber<T>)
     
     // Call the callback immediately with the current value
-    callback(this.value, subscription)
+    callback(this.value)
 
     return subscription
   }

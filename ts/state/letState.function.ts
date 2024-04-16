@@ -1,8 +1,8 @@
-import { Config, GetSet, StateConfig, StateConfigArray, StateConfigItem, getStateValue } from './set.function'
+import { Config, GetSet, StateConfig, StateConfigArray, StateConfigItem, getStateValue } from './state.utils'
 import { setUse } from './setUse.function'
 
 /** Used for variables that need to remain the same variable during render passes */
-export function setLet <T>(
+export function letState <T>(
   defaultValue: T | (() => T),
 ): ((getSet: GetSet<T>) => T) {
   const config: Config = setUse.memory.stateConfig

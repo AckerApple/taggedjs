@@ -1,6 +1,6 @@
 import { Tag } from './Tag.class'
 import { BaseTagSupport } from './TagSupport.class'
-import { providersChangeCheck } from './provider.utils'
+import { providersChangeCheck } from './state/provider.utils'
 import { TemplaterResult, renderWithSupport } from './TemplaterResult.class'
 import { TagSubject } from './Tag.utils'
 import { isLikeTags } from './isLikeTags.function'

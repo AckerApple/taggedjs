@@ -97,9 +97,6 @@ export function subscribeToTemplate(
       throw new Error('no insert before parent node - 3')
     }
 
-    const global = ownerTag.tagSupport.templater.global
-    const pre = global.placeholder?.parentNode
-
     processSubjectValue(
       value,
       subject,

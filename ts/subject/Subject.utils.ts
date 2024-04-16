@@ -7,8 +7,8 @@ export type Subscription = (() => void) & {
 }
 
 export type SubjectSubscriber<T> = (
-  value: T,
-  subscription: Subscription,
+  ...value: T[]
+  // subscription: Subscription,
 ) => unknown
 
 export interface SubjectLike<T> {

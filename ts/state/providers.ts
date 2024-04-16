@@ -1,6 +1,6 @@
-import { Tag } from './Tag.class'
-import { deepClone } from './deepFunctions'
-import { BaseTagSupport } from './TagSupport.class'
+import { Tag } from '../Tag.class'
+import { deepClone } from '../deepFunctions'
+import { BaseTagSupport } from '../TagSupport.class'
 import { setUse } from './setUse.function'
 
 export type Provider = {

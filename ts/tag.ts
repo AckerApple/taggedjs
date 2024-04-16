@@ -1,6 +1,6 @@
 import { Tag } from './Tag.class'
 import { isSubjectInstance, isTagArray, isTagInstance } from './isInstance'
-import { setUse } from './setUse.function'
+import { setUse } from './state'
 import { TemplaterResult, Wrapper } from './TemplaterResult.class'
 import { runTagCallback } from './bindSubjectCallback.function'
 import { deepClone } from './deepFunctions'

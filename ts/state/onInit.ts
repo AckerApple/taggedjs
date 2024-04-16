@@ -1,5 +1,5 @@
-import { BaseTagSupport } from "./TagSupport.class"
-import { TemplaterResult } from "./TemplaterResult.class"
+import { BaseTagSupport } from "../TagSupport.class"
+import { TemplaterResult } from "../TemplaterResult.class"
 import { setUse } from "./setUse.function"
 
 export type OnInitCallback = () => unknown

@@ -1,4 +1,4 @@
-import { setLet } from './setLet.function'
+import { letState } from './letState.function'
 
 export type WatchCallback = (
   currentValues: any[],
@@ -10,7 +10,7 @@ export function watch<T>(
   currentValues: T[],
   callback: WatchCallback
 ): T[] {
-  let previousValues = setLet(undefined as undefined | unknown[])(x => [previousValues, previousValues = x])
+  let previousValues = letState(undefined as undefined | unknown[])(x => [previousValues, previousValues = x])
 
   if(previousValues === undefined) {
     callback(currentValues, previousValues)

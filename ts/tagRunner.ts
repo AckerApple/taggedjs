@@ -2,7 +2,7 @@
 
 import { Tag } from './Tag.class'
 import { BaseTagSupport } from './TagSupport.class'
-import { setUse } from './setUse.function'
+import { setUse } from './state'
 
 // Life cycle 1
 export function runBeforeRender(

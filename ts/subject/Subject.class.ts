@@ -18,13 +18,12 @@ export class Subject<T> implements SubjectLike<T> {
         const orgCallback = callback
         callback = (
           value: any,
-          subscription: Subscription,
+          // subscription: Subscription,
         ) => {
           runPipedMethods(
             value,
-            subscription,
             this.methods,
-            lastValue => orgCallback(lastValue, subscription)
+            lastValue => orgCallback(lastValue)
           )
         }
       }
@@ -191,7 +190,6 @@ function getSubscription(
 
 function runPipedMethods(
   value: any,
-  subscription: Subscription,
   methods: OperatorFunction<any, any, any>[],
   onComplete: (lastValue: any) => any
 ) {
@@ -201,7 +199,7 @@ function runPipedMethods(
 
   const next = (newValue: any) => {
     if(cloneMethods.length) {
-      return runPipedMethods(newValue, subscription, cloneMethods, onComplete)
+      return runPipedMethods(newValue, cloneMethods, onComplete)
     }
 
     onComplete(newValue)

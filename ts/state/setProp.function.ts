@@ -1,4 +1,4 @@
-import { Config, GetSet, StateConfigArray, StateConfigItem, getStateValue } from './set.function'
+import { Config, GetSet, StateConfigArray, StateConfigItem, getStateValue } from './state.utils'
 import { setUse } from './setUse.function'
 
 /** Used for variables that need to remain the same variable during render passes */
