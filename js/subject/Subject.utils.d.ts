@@ -1,5 +1,6 @@
 export type Resolve<T> = (x: T) => any;
 export type Subscription<T> = (() => void) & {
+    callback: SubjectSubscriber<T>;
     unsubscribe: () => Subscription<T>;
     add: (sub: Subscription<T>) => Subscription<T>;
     next: (value?: T) => any;

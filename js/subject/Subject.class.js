@@ -24,8 +24,8 @@ export class Subject {
             }
             return subscribeWith(callback);
         }
-        this.subscribers.push(callback);
-        SubjectClass.globalSubs.push(callback); // 🔬 testing
+        this.subscribers.push(subscription);
+        SubjectClass.globalSubs.push(subscription); // 🔬 testing
         if (this.onSubscription) {
             this.onSubscription(subscription);
         }
@@ -34,15 +34,15 @@ export class Subject {
     set(value) {
         this.value = value;
         // Notify all subscribers with the new value
-        this.subscribers.forEach((callback) => {
-            callback.value = value;
-            callback(value);
+        this.subscribers.forEach(sub => {
+            // (sub.callback as any).value = value
+            sub.callback(value, sub);
         });
     }
     next = this.set;
     toPromise() {
         return new Promise((res, rej) => {
-            const subscription = this.subscribe(x => {
+            this.subscribe((x, subscription) => {
                 subscription.unsubscribe();
                 res(x);
             });
@@ -56,7 +56,7 @@ export class Subject {
     }
 }
 function removeSubFromArray(subscribers, callback) {
-    const index = subscribers.indexOf(callback);
+    const index = subscribers.findIndex(sub => sub.callback === callback);
     if (index !== -1) {
         subscribers.splice(index, 1);
     }
@@ -71,6 +71,7 @@ function getSubscription(subject, callback) {
     const subscription = () => {
         subscription.unsubscribe();
     };
+    subscription.callback = callback;
     subscription.subscriptions = [];
     // Return a function to unsubscribe from the BehaviorSubject
     subscription.unsubscribe = () => {

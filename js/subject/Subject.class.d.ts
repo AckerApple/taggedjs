@@ -5,7 +5,7 @@ export declare class Subject<T> implements SubjectLike<T> {
     onSubscription?: OnSubscription<T> | undefined;
     methods: OperatorFunction<any, any, any>[];
     isSubject: boolean;
-    subscribers: SubjectSubscriber<T>[];
+    subscribers: Subscription<T>[];
     subscribeWith?: (x: SubjectSubscriber<T>) => Subscription<T>;
     constructor(value?: T | undefined, onSubscription?: OnSubscription<T> | undefined);
     subscribe(callback: SubjectSubscriber<T>): Subscription<T> | Subscription<any>;
