@@ -1497,9 +1497,8 @@ function interpolateToTemplates(template) {
         }
         const noBraces = expression.substring(1, expression.length - 1);
         const id = noBraces;
-        const name = 'template-' + template.length;
         keys.push(id);
-        return `<template interpolate end id="${id}" name="${name}"></template>`;
+        return `<template interpolate end id="${id}"></template>`;
     });
     return { string, keys };
 }
@@ -3915,6 +3914,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   onDestroy: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.onDestroy),
 /* harmony export */   onInit: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.onInit),
 /* harmony export */   providers: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.providers),
+/* harmony export */   renderTagSupport: () => (/* reexport safe */ _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_12__.renderTagSupport),
 /* harmony export */   runBeforeRender: () => (/* reexport safe */ _tagRunner__WEBPACK_IMPORTED_MODULE_11__.runBeforeRender),
 /* harmony export */   setProp: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.setProp),
 /* harmony export */   setUse: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.setUse),
@@ -3939,6 +3939,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _interpolateElement__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./interpolateElement */ "./ts/interpolateElement.ts");
 /* harmony import */ var _Tag_class__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./Tag.class */ "./ts/Tag.class.ts");
 /* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./tagRunner */ "./ts/tagRunner.ts");
+/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./renderTagSupport.function */ "./ts/renderTagSupport.function.ts");
 // import { redrawTag } from "./redrawTag.function"
 
 
@@ -3952,6 +3953,7 @@ __webpack_require__.r(__webpack_exports__);
 // export * from "./redrawTag.function"
 
 // TODO: export *
+
 
 
 
@@ -3985,6 +3987,7 @@ var __webpack_exports__letState = __webpack_exports__.letState;
 var __webpack_exports__onDestroy = __webpack_exports__.onDestroy;
 var __webpack_exports__onInit = __webpack_exports__.onInit;
 var __webpack_exports__providers = __webpack_exports__.providers;
+var __webpack_exports__renderTagSupport = __webpack_exports__.renderTagSupport;
 var __webpack_exports__runBeforeRender = __webpack_exports__.runBeforeRender;
 var __webpack_exports__setProp = __webpack_exports__.setProp;
 var __webpack_exports__setUse = __webpack_exports__.setUse;
@@ -3996,6 +3999,6 @@ var __webpack_exports__watch = __webpack_exports__.watch;
 var __webpack_exports__willCallback = __webpack_exports__.willCallback;
 var __webpack_exports__willPromise = __webpack_exports__.willPromise;
 var __webpack_exports__willSubscribe = __webpack_exports__.willSubscribe;
-export { __webpack_exports__ArrayNoKeyError as ArrayNoKeyError, __webpack_exports__BaseTagSupport as BaseTagSupport, __webpack_exports__StateMismatchError as StateMismatchError, __webpack_exports__Subject as Subject, __webpack_exports__SyncCallbackError as SyncCallbackError, __webpack_exports__Tag as Tag, __webpack_exports__TagError as TagError, __webpack_exports__TagSupport as TagSupport, __webpack_exports__ValueSubject as ValueSubject, __webpack_exports__callbackMaker as callbackMaker, __webpack_exports__combineLatest as combineLatest, __webpack_exports__hmr as hmr, __webpack_exports__html as html, __webpack_exports__interpolateElement as interpolateElement, __webpack_exports__interpolateString as interpolateString, __webpack_exports__isSubjectInstance as isSubjectInstance, __webpack_exports__isTagArray as isTagArray, __webpack_exports__isTagComponent as isTagComponent, __webpack_exports__isTagInstance as isTagInstance, __webpack_exports__letState as letState, __webpack_exports__onDestroy as onDestroy, __webpack_exports__onInit as onInit, __webpack_exports__providers as providers, __webpack_exports__runBeforeRender as runBeforeRender, __webpack_exports__setProp as setProp, __webpack_exports__setUse as setUse, __webpack_exports__state as state, __webpack_exports__tag as tag, __webpack_exports__tagElement as tagElement, __webpack_exports__tags as tags, __webpack_exports__watch as watch, __webpack_exports__willCallback as willCallback, __webpack_exports__willPromise as willPromise, __webpack_exports__willSubscribe as willSubscribe };
+export { __webpack_exports__ArrayNoKeyError as ArrayNoKeyError, __webpack_exports__BaseTagSupport as BaseTagSupport, __webpack_exports__StateMismatchError as StateMismatchError, __webpack_exports__Subject as Subject, __webpack_exports__SyncCallbackError as SyncCallbackError, __webpack_exports__Tag as Tag, __webpack_exports__TagError as TagError, __webpack_exports__TagSupport as TagSupport, __webpack_exports__ValueSubject as ValueSubject, __webpack_exports__callbackMaker as callbackMaker, __webpack_exports__combineLatest as combineLatest, __webpack_exports__hmr as hmr, __webpack_exports__html as html, __webpack_exports__interpolateElement as interpolateElement, __webpack_exports__interpolateString as interpolateString, __webpack_exports__isSubjectInstance as isSubjectInstance, __webpack_exports__isTagArray as isTagArray, __webpack_exports__isTagComponent as isTagComponent, __webpack_exports__isTagInstance as isTagInstance, __webpack_exports__letState as letState, __webpack_exports__onDestroy as onDestroy, __webpack_exports__onInit as onInit, __webpack_exports__providers as providers, __webpack_exports__renderTagSupport as renderTagSupport, __webpack_exports__runBeforeRender as runBeforeRender, __webpack_exports__setProp as setProp, __webpack_exports__setUse as setUse, __webpack_exports__state as state, __webpack_exports__tag as tag, __webpack_exports__tagElement as tagElement, __webpack_exports__tags as tags, __webpack_exports__watch as watch, __webpack_exports__willCallback as willCallback, __webpack_exports__willPromise as willPromise, __webpack_exports__willSubscribe as willSubscribe };
 
 //# sourceMappingURL=bundle.js.map
