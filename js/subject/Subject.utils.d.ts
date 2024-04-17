@@ -5,7 +5,7 @@ export type Subscription<T> = (() => void) & {
     next: (value?: T) => any;
     subscriptions: Subscription<T>[];
 };
-export type SubjectSubscriber<T> = (...value: T[]) => unknown;
+export type SubjectSubscriber<T> = (value: T, subscription: Subscription<T>) => unknown;
 export interface SubjectLike<T> {
     subscribe?: (callback: SubjectSubscriber<T>) => any;
     isSubject?: boolean;

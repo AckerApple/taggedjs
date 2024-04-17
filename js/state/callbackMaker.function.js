@@ -2,7 +2,7 @@ import { setUse } from "./setUse.function";
 import { getStateValue } from "./state.utils";
 import { renderTagSupport } from "../renderTagSupport.function";
 import { SyncCallbackError } from "../errors";
-let innerCallback = (callback) => (...args) => {
+let innerCallback = (callback) => (a, b, c, d, e, f) => {
     throw new SyncCallbackError('Callback function was called immediately in sync and must instead be call async');
 };
 export const callbackMaker = () => innerCallback;

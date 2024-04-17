@@ -2374,7 +2374,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-let innerCallback = (callback) => (...args) => {
+let innerCallback = (callback) => (a, b, c, d, e, f) => {
     throw new _errors__WEBPACK_IMPORTED_MODULE_3__.SyncCallbackError('Callback function was called immediately in sync and must instead be call async');
 };
 const callbackMaker = () => innerCallback;
@@ -3032,6 +3032,7 @@ class Subject {
         this.onSubscription = onSubscription;
     }
     subscribe(callback) {
+        const subscription = getSubscription(this, callback);
         // are we within a pipe?
         const subscribeWith = this.subscribeWith;
         if (subscribeWith) {
@@ -3039,14 +3040,13 @@ class Subject {
             if (this.methods.length) {
                 const orgCallback = callback;
                 callback = (value) => {
-                    runPipedMethods(value, this.methods, lastValue => orgCallback(lastValue));
+                    runPipedMethods(value, this.methods, lastValue => orgCallback(lastValue, subscription));
                 };
             }
             return subscribeWith(callback);
         }
         this.subscribers.push(callback);
         SubjectClass.globalSubs.push(callback); // 🔬 testing
-        const subscription = getSubscription(this, callback);
         if (this.onSubscription) {
             this.onSubscription(subscription);
         }
@@ -3109,7 +3109,7 @@ function getSubscription(subject, callback) {
         return subscription;
     };
     subscription.next = (value) => {
-        callback(value);
+        callback(value, subscription);
     };
     return subscription;
 }
@@ -3154,7 +3154,7 @@ class ValueSubject extends _Subject_class__WEBPACK_IMPORTED_MODULE_0__.Subject {
     subscribe(callback) {
         const subscription = super.subscribe(callback);
         // Call the callback immediately with the current value
-        callback(this.value);
+        callback(this.value, subscription);
         return subscription;
     }
 }

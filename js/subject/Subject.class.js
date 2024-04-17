@@ -11,6 +11,7 @@ export class Subject {
         this.onSubscription = onSubscription;
     }
     subscribe(callback) {
+        const subscription = getSubscription(this, callback);
         // are we within a pipe?
         const subscribeWith = this.subscribeWith;
         if (subscribeWith) {
@@ -18,14 +19,13 @@ export class Subject {
             if (this.methods.length) {
                 const orgCallback = callback;
                 callback = (value) => {
-                    runPipedMethods(value, this.methods, lastValue => orgCallback(lastValue));
+                    runPipedMethods(value, this.methods, lastValue => orgCallback(lastValue, subscription));
                 };
             }
             return subscribeWith(callback);
         }
         this.subscribers.push(callback);
         SubjectClass.globalSubs.push(callback); // 🔬 testing
-        const subscription = getSubscription(this, callback);
         if (this.onSubscription) {
             this.onSubscription(subscription);
         }
@@ -88,7 +88,7 @@ function getSubscription(subject, callback) {
         return subscription;
     };
     subscription.next = (value) => {
-        callback(value);
+        callback(value, subscription);
     };
     return subscription;
 }
