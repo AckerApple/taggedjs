@@ -2885,25 +2885,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   getStateValue: () => (/* binding */ getStateValue)
 /* harmony export */ });
 /* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../errors */ "./ts/errors.ts");
-/* harmony import */ var _subject__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../subject */ "./ts/subject/index.ts");
-/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./setUse.function */ "./ts/state/setUse.function.ts");
-
+/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./setUse.function */ "./ts/state/setUse.function.ts");
 
 
 // TODO: rename
-_setUse_function__WEBPACK_IMPORTED_MODULE_2__.setUse.memory.stateConfig = {
+_setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig = {
     array: [], // state memory on the first render
     // rearray: [] as StateConfigArray, // state memory to be used before the next render
 };
 const beforeRender = (tagSupport) => initState(tagSupport);
-// Emits event at the end of a tag being rendered. Use stateClosed$.toPromise() to render a tag after a current tag is done rendering
-const stateClosed$ = new _subject__WEBPACK_IMPORTED_MODULE_1__.Subject();
-(0,_setUse_function__WEBPACK_IMPORTED_MODULE_2__.setUse)({
+(0,_setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse)({
     beforeRender,
     beforeRedraw: beforeRender,
     afterRender: (tagSupport) => {
         const state = tagSupport.memory.state;
-        const config = _setUse_function__WEBPACK_IMPORTED_MODULE_2__.setUse.memory.stateConfig;
+        const config = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig;
         const rearray = config.rearray;
         if (rearray.length) {
             if (rearray.length !== config.array.length) {
@@ -2922,7 +2918,6 @@ const stateClosed$ = new _subject__WEBPACK_IMPORTED_MODULE_1__.Subject();
         state.newest = config.array; // [...config.array]
         state.newest.forEach(item => item.lastValue = getStateValue(item)); // set last values
         config.array = [];
-        stateClosed$.next();
     }
 });
 function getStateValue(
@@ -2950,7 +2945,7 @@ class StateEchoBack {
 }
 function initState(tagSupport) {
     const state = tagSupport.memory.state;
-    const config = _setUse_function__WEBPACK_IMPORTED_MODULE_2__.setUse.memory.stateConfig;
+    const config = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig;
     // TODO: This guard may no longer be needed
     if (config.rearray) {
         const message = 'last state not cleared. Possibly in the middle of rendering one component and another is trying to render';
@@ -3496,11 +3491,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   runAfterRender: () => (/* binding */ runAfterRender),
 /* harmony export */   runBeforeDestroy: () => (/* binding */ runBeforeDestroy),
 /* harmony export */   runBeforeRedraw: () => (/* binding */ runBeforeRedraw),
-/* harmony export */   runBeforeRender: () => (/* binding */ runBeforeRender)
+/* harmony export */   runBeforeRender: () => (/* binding */ runBeforeRender),
+/* harmony export */   tagClosed$: () => (/* binding */ tagClosed$)
 /* harmony export */ });
 /* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./state */ "./ts/state/index.ts");
+/* harmony import */ var _subject__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./subject */ "./ts/subject/index.ts");
 // TODO: This should be more like `new TaggedJs().use({})`
 
+
+const tagClosed$ = new _subject__WEBPACK_IMPORTED_MODULE_1__.Subject();
 // Life cycle 1
 function runBeforeRender(tagSupport, tagOwner) {
     _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.beforeRender(tagSupport, tagOwner));
@@ -3508,6 +3507,8 @@ function runBeforeRender(tagSupport, tagOwner) {
 // Life cycle 2
 function runAfterRender(tagSupport, tag) {
     _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.afterRender(tagSupport, tag));
+    // Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
+    tagClosed$.next(tag);
 }
 // Life cycle 3
 function runBeforeRedraw(tagSupport, tag) {
