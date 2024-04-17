@@ -1,13 +1,17 @@
 import { StateMismatchError } from '../errors';
+import { Subject } from '../subject';
 import { setUse } from './setUse.function';
 // TODO: rename
 setUse.memory.stateConfig = {
     array: [], // state memory on the first render
     // rearray: [] as StateConfigArray, // state memory to be used before the next render
 };
+const beforeRender = (tagSupport) => initState(tagSupport);
+// Emits event at the end of a tag being rendered. Use stateClosed$.toPromise() to render a tag after a current tag is done rendering
+const stateClosed$ = new Subject();
 setUse({
-    beforeRender: (tagSupport) => initState(tagSupport),
-    beforeRedraw: (tagSupport) => initState(tagSupport),
+    beforeRender,
+    beforeRedraw: beforeRender,
     afterRender: (tagSupport) => {
         const state = tagSupport.memory.state;
         const config = setUse.memory.stateConfig;
@@ -29,6 +33,7 @@ setUse({
         state.newest = config.array; // [...config.array]
         state.newest.forEach(item => item.lastValue = getStateValue(item)); // set last values
         config.array = [];
+        stateClosed$.next();
     }
 });
 export function getStateValue(

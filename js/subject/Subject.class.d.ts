@@ -7,8 +7,8 @@ export declare class Subject<T> implements SubjectLike<T> {
     subscribeWith?: (x: SubjectSubscriber<T>) => Subscription;
     constructor(value?: T | undefined);
     subscribe(callback: SubjectSubscriber<T>): Subscription;
-    set(value: any): void;
-    next: (value: any) => void;
+    set(value?: any): void;
+    next: (value?: any) => void;
     toPromise(): Promise<T>;
     pipe(): Subject<T>;
     pipe<A, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>): Subject<A>;
