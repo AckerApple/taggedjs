@@ -3021,13 +3021,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 class Subject {
     value;
+    onSubscription;
     methods = [];
     isSubject = true;
     subscribers = [];
     subscribeWith;
     // unsubcount = 0 // 🔬 testing
-    constructor(value) {
+    constructor(value, onSubscription) {
         this.value = value;
+        this.onSubscription = onSubscription;
     }
     subscribe(callback) {
         // are we within a pipe?
@@ -3045,6 +3047,9 @@ class Subject {
         this.subscribers.push(callback);
         SubjectClass.globalSubs.push(callback); // 🔬 testing
         const subscription = getSubscription(this, callback);
+        if (this.onSubscription) {
+            this.onSubscription(subscription);
+        }
         return subscription;
     }
     set(value) {
@@ -3102,6 +3107,9 @@ function getSubscription(subject, callback) {
     subscription.add = (sub) => {
         subscription.subscriptions.push(sub);
         return subscription;
+    };
+    subscription.next = (value) => {
+        callback(value);
     };
     return subscription;
 }
@@ -3499,7 +3507,12 @@ __webpack_require__.r(__webpack_exports__);
 // TODO: This should be more like `new TaggedJs().use({})`
 
 
-const tagClosed$ = new _subject__WEBPACK_IMPORTED_MODULE_1__.Subject();
+// Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
+const tagClosed$ = new _subject__WEBPACK_IMPORTED_MODULE_1__.Subject(undefined, subscription => {
+    if (!_state__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.rearray) {
+        subscription.next(); // we are not currently processing so process now
+    }
+});
 // Life cycle 1
 function runBeforeRender(tagSupport, tagOwner) {
     _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.beforeRender(tagSupport, tagOwner));
@@ -3507,7 +3520,6 @@ function runBeforeRender(tagSupport, tagOwner) {
 // Life cycle 2
 function runAfterRender(tagSupport, tag) {
     _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.afterRender(tagSupport, tag));
-    // Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
     tagClosed$.next(tag);
 }
 // Life cycle 3

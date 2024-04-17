@@ -23,7 +23,7 @@ export type TagGlobal = {
     isApp?: boolean;
     insertBefore?: InsertBefore;
     placeholder?: Text;
-    subscriptions: Subscription[];
+    subscriptions: Subscription<any>[];
     destroyCallback?: OnDestroyCallback;
     init?: OnInitCallback;
 };

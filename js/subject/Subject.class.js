@@ -1,12 +1,14 @@
 export class Subject {
     value;
+    onSubscription;
     methods = [];
     isSubject = true;
     subscribers = [];
     subscribeWith;
     // unsubcount = 0 // 🔬 testing
-    constructor(value) {
+    constructor(value, onSubscription) {
         this.value = value;
+        this.onSubscription = onSubscription;
     }
     subscribe(callback) {
         // are we within a pipe?
@@ -24,6 +26,9 @@ export class Subject {
         this.subscribers.push(callback);
         SubjectClass.globalSubs.push(callback); // 🔬 testing
         const subscription = getSubscription(this, callback);
+        if (this.onSubscription) {
+            this.onSubscription(subscription);
+        }
         return subscription;
     }
     set(value) {
@@ -81,6 +86,9 @@ function getSubscription(subject, callback) {
     subscription.add = (sub) => {
         subscription.subscriptions.push(sub);
         return subscription;
+    };
+    subscription.next = (value) => {
+        callback(value);
     };
     return subscription;
 }

@@ -4,6 +4,6 @@ type ValueSubjectSubscriber<T> = (...value: T[]) => unknown;
 export declare class ValueSubject<T> extends Subject<T> {
     value: T;
     constructor(value: T);
-    subscribe(callback: ValueSubjectSubscriber<T>): Subscription;
+    subscribe(callback: ValueSubjectSubscriber<T>): Subscription<any> | Subscription<T>;
 }
 export {};
