@@ -54,9 +54,6 @@ export function updateExistingValue(subject, value, ownerTag, insertBefore) {
         return subject;
     }
     if (isTagInstance(value)) {
-        if (insertBefore.nodeName !== 'TEMPLATE') {
-            throw new Error(`expected template - ${insertBefore.nodeName}`);
-        }
         processTag(value, subjectTag, insertBefore, ownerTag);
         return subjectTag;
     }

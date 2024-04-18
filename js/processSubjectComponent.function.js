@@ -16,10 +16,6 @@ export function processSubjectComponent(templater, subject, insertBefore, ownerT
         throw error;
     }
     templater.tagSupport = new TagSupport(ownerTag.tagSupport, templater, subject);
-    // templater.oldest = subject.tag?.tagSupport.oldest || templater.oldest
-    if (insertBefore.nodeName != 'TEMPLATE') {
-        throw new Error('9');
-    }
     templater.global.insertBefore = insertBefore;
     let retag = subject.tag;
     const providers = setUse.memory.providerConfig;
@@ -37,19 +33,10 @@ function redrawSubjectComponent(templater, subject, retag, ownerTag, insertBefor
     const preClones = ownerTag.clones.map(clone => clone);
     retag = renderWithSupport(templater.tagSupport, subject.tag, // existing tag
     subject, ownerTag);
-    if (retag.tagSupport.templater.global.newest != retag) {
-        throw new Error('mismatch result newest');
-    }
     templater.global.newest = retag;
     if (ownerTag.clones.length > preClones.length) {
         const myClones = ownerTag.clones.filter(fClone => !preClones.find(clone => clone === fClone));
         retag.clones.push(...myClones);
-        if (myClones.find(x => x === insertBefore)) {
-            throw new Error('way back here we add marker');
-        }
-    }
-    if (ownerTag.childTags.find(x => x === retag)) {
-        throw new Error('about to reattach tag already present');
     }
     ownerTag.childTags.push(retag);
     return retag;

@@ -40,13 +40,8 @@ export class Tag {
         stagger: 0,
         byParent: false, // Only destroy clones of direct children
     }) {
-        if (!this.hasLiveElements) {
-            throw new Error('destroying wrong tag');
-        }
         const tagSupport = this.tagSupport;
         const global = tagSupport.templater.global;
-        // removing is considered rendering. Prevents after event processing of this tag even tho possibly deleted
-        // ++this.tagSupport.templater.global.renderCount
         const subject = tagSupport.subject;
         // put back down the template tag
         const insertBefore = global.insertBefore;
@@ -165,16 +160,7 @@ export class Tag {
         return isLikeTags(this, tag);
     }
     updateByTag(tag) {
-        if (!this.tagSupport.templater.global.oldest) {
-            throw new Error('no oldest here');
-        }
-        if (!this.hasLiveElements) {
-            throw new Error('trying to update a tag with no elements on stage');
-        }
         this.tagSupport.templater.global.newest = tag;
-        if (!this.tagSupport.templater.global.context) {
-            throw new Error('issue back here');
-        }
         this.updateConfig(tag.strings, tag.values);
     }
     updateConfig(strings, values) {
@@ -236,16 +222,7 @@ export class Tag {
         const global = thisTemplater.global;
         global.insertBefore = insertBefore;
         if (!global.placeholder) {
-            if (insertBefore.nodeName !== 'TEMPLATE') {
-                throw new Error(' no template at insertBefore');
-                global.placeholder = insertBefore;
-            }
-            else {
-                setTagPlaceholder(global);
-            }
-        }
-        if (!global.placeholder?.parentNode) {
-            throw new Error('????');
+            setTagPlaceholder(global);
         }
         const placeholderElm = global.placeholder;
         global.oldest = this;
@@ -260,9 +237,6 @@ export class Tag {
         // const context = this.tagSupport.memory.context // this.update()
         const context = this.update();
         const template = this.getTemplate();
-        if (!placeholderElm.parentNode) {
-            throw new Error('no parent before building tag');
-        }
         const elementContainer = document.createElement('div');
         elementContainer.id = 'tag-temp-holder';
         // render content with a first child that we can know is our first element
@@ -273,35 +247,14 @@ export class Tag {
             forceElement: options.forceElement,
             counts: options.counts
         });
-        if (!placeholderElm.parentNode) {
-            throw new Error('no parent after building tag');
-        }
         afterInterpolateElement(elementContainer, placeholderElm, this, // ownerTag
         context, options);
-        if (!global.placeholder?.parentNode) {
-            throw new Error('???? - 2');
-        }
         // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
         let isForceElement = options.forceElement;
         tagComponents.forEach(tagComponent => {
-            const tagSupport = tagComponent.ownerTag.tagSupport;
-            const tagGlobal = tagSupport.templater.global;
-            const placeholderElm = tagGlobal.placeholder; // global.placeholderElm
-            if (!placeholderElm && !insertBefore.parentNode) {
-                throw new Error('no parent building tag components');
-            }
-            if (!global.placeholder?.parentNode) {
-                throw new Error('???? - 3');
-            }
             subscribeToTemplate(tagComponent.insertBefore, tagComponent.subject, tagComponent.ownerTag, options.counts, { isForceElement });
-            if (!global.placeholder?.parentNode) {
-                throw new Error('???? - 4');
-            }
             afterInterpolateElement(elementContainer, tagComponent.insertBefore, tagComponent.ownerTag, // this, // ownerTag
             context, options);
-            if (!global.placeholder?.parentNode) {
-                throw new Error('???? - 5');
-            }
         });
     }
 }
@@ -326,10 +279,6 @@ context, options) {
 function getChildTagsToDestroy(childTags, allTags = []) {
     for (let index = childTags.length - 1; index >= 0; --index) {
         const cTag = childTags[index];
-        if (allTags.find(x => x === cTag)) {
-            // TODO: Lets find why a child tag is attached twice to owner
-            throw new Error('child tag registered twice for delete');
-        }
         allTags.push(cTag);
         childTags.splice(index, 1);
         getChildTagsToDestroy(cTag.childTags, allTags);

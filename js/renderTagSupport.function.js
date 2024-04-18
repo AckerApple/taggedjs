@@ -27,9 +27,6 @@ export function renderTagSupport(tagSupport, renderUp) {
         }
     }
     const useTagSupport = global.newest?.tagSupport; // oldTagSetup
-    if (!templater.global.oldest) {
-        throw new Error('already causing trouble');
-    }
     const tag = renderExistingTag(templater.global.oldest, templater, useTagSupport, subject);
     const renderOwner = ownerTag && selfPropChange;
     if (renderOwner) {

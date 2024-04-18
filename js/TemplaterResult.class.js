@@ -39,9 +39,6 @@ export function renderWithSupport(tagSupport, existingTag, subject, ownerTag) {
         runBeforeRedraw(wrapTagSupport, existingTag);
     }
     else {
-        if (!wrapTagSupport) {
-            throw new Error('63521');
-        }
         // first time render
         runBeforeRender(wrapTagSupport, runtimeOwnerTag);
         // TODO: Logic below most likely could live within providers.ts inside the runBeforeRender function

@@ -26,10 +26,6 @@ element, props) {
     tag.buildBeforeElement(templateElm);
     wrapper.global.oldest = tag;
     wrapper.global.newest = tag;
-    if (!tag.hasLiveElements) {
-        throw new Error('x');
-    }
-    ;
     element.setUse = app.original.setUse;
     appElements.push({ element, tag });
     return { tag, tags: app.original.tags };

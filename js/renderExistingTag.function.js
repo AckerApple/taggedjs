@@ -6,9 +6,6 @@ export function renderExistingTag(oldestTag, // existing tag already there
 newTemplater, tagSupport, subject) {
     const tag = subject.tag;
     newTemplater.global = tag.tagSupport.templater.global;
-    if (!oldestTag.hasLiveElements) {
-        throw new Error('1080 - should have live elements');
-    }
     const preRenderCount = tagSupport.templater.global.renderCount;
     providersChangeCheck(oldestTag);
     // When the providers were checked, a render to myself occurred and I do not need to re-render again

@@ -17,11 +17,6 @@ export function updateExistingTagComponent(ownerTag, templater, subject, insertB
     const oldGlobal = oldTagSupport.templater.global;
     // const placeholderElm = ownerTag.tagSupport.templater.global.placeholderElm
     const placeholderElm = oldGlobal.placeholder;
-    if (placeholderElm) {
-        if (!placeholderElm.parentNode) {
-            throw new Error('stop here no subject parent node update existing tag');
-        }
-    }
     if (!isSameTag) {
         destroyTagMemory(oldTagSupport.templater.global.oldest, subject);
         return processSubjectComponent(templater, subject, 
@@ -48,9 +43,6 @@ export function updateExistingTagComponent(ownerTag, templater, subject, insertB
     }
     const oldestTag = templater.global.oldest; // oldTagSupport.oldest as Tag // existingTag
     const previous = templater.global.newest;
-    if (!previous || !oldestTag) {
-        throw new Error('how no previous or oldest nor newest?');
-    }
     const newTag = renderTagSupport(templater.tagSupport, false);
     existingTag = subject.tag;
     const newOldest = newTag.tagSupport.templater.global.oldest;
@@ -65,20 +57,10 @@ export function updateExistingTagComponent(ownerTag, templater, subject, insertB
         const oldKidsSub = newOldest.tagSupport.templater.children;
         oldKidsSub.set(templater.children.value);
     }
-    // const newTag = tempResult.newest as Tag
-    if (previous && !oldestTag) {
-        throw new Error('bad elders');
-    }
     // detect if both the function is the same and the return is the same
     const isLikeTag = isSameTag && previous.isLikeTag(newTag);
-    if (previous && !oldestTag) {
-        throw new Error('bad elders');
-    }
     let oldest = oldTagSupport.templater.global.oldest;
     if (isLikeTag) {
-        if (!newTag.tagSupport.templater.global.oldest) {
-            throw new Error('maybe 6');
-        }
         subject.tag = newTag;
         oldestTag.updateByTag(newTag); // the oldest tag has element references
         return newTag;
@@ -140,7 +122,7 @@ function syncFunctionProps(templater, existingTag, ownerTag, newProps) {
         // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
         priorProps[name].toCall = (...args) => {
             return callbackPropOwner(newCallback, // value, // newOriginal,
-            args, templater, ownerSupport);
+            args, ownerSupport);
         };
         return;
     });

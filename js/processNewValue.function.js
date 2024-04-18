@@ -14,9 +14,6 @@ export function processNewValue(hasValue, value, ownerTag) {
     }
     if (isTagInstance(value)) {
         value.ownerTag = ownerTag;
-        if (ownerTag.childTags.find(x => x === value)) {
-            throw new Error('about to reattach tag already present - 2');
-        }
         return new ValueSubject(value);
     }
     if (isSubjectInstance(value)) {

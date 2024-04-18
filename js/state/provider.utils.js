@@ -35,11 +35,6 @@ function getTagsWithProvider(tag, provider, memory = []) {
         });
     }
     tag.childTags.forEach(child => getTagsWithProvider(child, provider, memory));
-    memory.forEach(({ tag }) => {
-        if (tag.tagSupport.templater.global.deleted) {
-            throw new Error('do not get here - 0');
-        }
-    });
     return memory;
 }
 //# sourceMappingURL=provider.utils.js.map

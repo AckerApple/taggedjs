@@ -58,17 +58,16 @@ ownerTag, options) {
         if (couldBeSame) {
             const prevSupport = previous.tag.tagSupport;
             const prevGlobal = prevSupport.templater.global;
-            const isSame = areLikeValues(previous.tag.memory.arrayValue, subTag.memory.arrayValue);
-            if (isSame) {
-                subTag.tagSupport = subTag.tagSupport || prevSupport;
-                const oldest = prevGlobal.oldest;
-                oldest.updateByTag(subTag);
-                return [];
-            }
-            // TODO: should not get here?
-            processAddTagArrayItem(runtimeInsertBefore, subTag, index, options, lastArray);
-            throw new Error('item should be back');
-            // return [] // removed: item should have been previously deleted and will be added back
+            /*
+            const isSame = areLikeValues(
+              previous.tag.memory.arrayValue,
+              subTag.memory.arrayValue,
+            )
+            */
+            subTag.tagSupport = subTag.tagSupport || prevSupport;
+            const oldest = prevGlobal.oldest;
+            oldest.updateByTag(subTag);
+            return [];
         }
         processAddTagArrayItem(runtimeInsertBefore, subTag, index, options, lastArray);
         ownerTag.childTags.push(subTag);
@@ -95,11 +94,9 @@ function processAddTagArrayItem(before, subTag, index, options, lastArray) {
         added: options.counts.added + index,
         removed: options.counts.removed,
     };
-    if (!before.parentNode) {
-        throw new Error('issue adding array item');
-    }
     const newTempElm = document.createElement('template');
-    before.parentNode.insertBefore(newTempElm, before);
+    const parent = before.parentNode;
+    parent.insertBefore(newTempElm, before);
     subTag.buildBeforeElement(newTempElm, // before,
     { counts, forceElement: options.forceElement });
 }

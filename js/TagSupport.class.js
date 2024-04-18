@@ -16,7 +16,7 @@ export class BaseTagSupport {
         this.subject = subject;
         const children = this.templater.children; // children tags passed in as arguments
         const props = this.templater.props; // natural props
-        const latestCloned = deepClone(props); // alterProps(props, templater)
+        const latestCloned = deepClone(props);
         this.propsConfig = {
             latest: props,
             latestCloned, // assume its HTML children and then detect

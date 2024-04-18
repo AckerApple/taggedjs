@@ -1,9 +1,9 @@
 import { isTagInstance } from './isInstance';
 import { renderTagSupport } from './renderTagSupport.function';
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
-export function alterProps(props, templater, ownerSupport) {
+export function alterProps(props, ownerSupport) {
     function callback(toCall, callWith) {
-        return callbackPropOwner(toCall, callWith, templater, ownerSupport);
+        return callbackPropOwner(toCall, callWith, ownerSupport);
     }
     const isPropTag = isTagInstance(props);
     const watchProps = isPropTag ? 0 : props;
@@ -34,18 +34,10 @@ function resetFunctionProps(props, callback) {
     });
     return newProps;
 }
-export function callbackPropOwner(toCall, callWith, templater, // only used to prevent rendering double
-ownerSupport) {
-    const renderCount = templater.global.renderCount;
+export function callbackPropOwner(toCall, callWith, ownerSupport) {
     const callbackResult = toCall(...callWith);
-    if (templater.global.renderCount > renderCount) {
-        throw new Error('already rendered');
-    }
     const lastestOwner = ownerSupport.templater.global.newest;
-    const newOwner = renderTagSupport(lastestOwner.tagSupport, true);
-    if (newOwner.tagSupport.templater.global.newest != newOwner) {
-        throw new Error('newest assignment issue?');
-    }
+    renderTagSupport(lastestOwner.tagSupport, true);
     return callbackResult;
 }
 //# sourceMappingURL=alterProps.function.js.map
