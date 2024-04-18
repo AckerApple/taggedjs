@@ -48,6 +48,13 @@ export class Subject {
             });
         });
     }
+    // like toPromise but faster
+    toCallback(callback) {
+        this.subscribe((x, subscription) => {
+            subscription.unsubscribe();
+            callback(x);
+        });
+    }
     pipe(...operations) {
         const subject = new Subject();
         subject.methods = operations;

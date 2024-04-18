@@ -12,6 +12,7 @@ export declare class Subject<T> implements SubjectLike<T> {
     set(value?: any): void;
     next: (value?: any) => void;
     toPromise(): Promise<T>;
+    toCallback(callback: (x: T) => any): void;
     pipe(): Subject<T>;
     pipe<A, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>): Subject<A>;
     pipe<A, B, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>, op2: OperatorFunction<A, B, RESOLVE>): Subject<B>;
