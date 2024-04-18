@@ -2212,13 +2212,8 @@ class Tag {
         stagger: 0,
         byParent: false, // Only destroy clones of direct children
     }) {
-        if (!this.hasLiveElements) {
-            throw new Error('destroying wrong tag');
-        }
         const tagSupport = this.tagSupport;
         const global = tagSupport.templater.global;
-        // removing is considered rendering. Prevents after event processing of this tag even tho possibly deleted
-        // ++this.tagSupport.templater.global.renderCount
         const subject = tagSupport.subject;
         // put back down the template tag
         const insertBefore = global.insertBefore;
@@ -2337,16 +2332,7 @@ class Tag {
         return (0,_isLikeTags_function__WEBPACK_IMPORTED_MODULE_7__.isLikeTags)(this, tag);
     }
     updateByTag(tag) {
-        if (!this.tagSupport.templater.global.oldest) {
-            throw new Error('no oldest here');
-        }
-        if (!this.hasLiveElements) {
-            throw new Error('trying to update a tag with no elements on stage');
-        }
         this.tagSupport.templater.global.newest = tag;
-        if (!this.tagSupport.templater.global.context) {
-            throw new Error('issue back here');
-        }
         this.updateConfig(tag.strings, tag.values);
     }
     updateConfig(strings, values) {
@@ -2408,16 +2394,7 @@ class Tag {
         const global = thisTemplater.global;
         global.insertBefore = insertBefore;
         if (!global.placeholder) {
-            if (insertBefore.nodeName !== 'TEMPLATE') {
-                throw new Error(' no template at insertBefore');
-                global.placeholder = insertBefore;
-            }
-            else {
-                setTagPlaceholder(global);
-            }
-        }
-        if (!global.placeholder?.parentNode) {
-            throw new Error('????');
+            setTagPlaceholder(global);
         }
         const placeholderElm = global.placeholder;
         global.oldest = this;
@@ -2432,9 +2409,6 @@ class Tag {
         // const context = this.tagSupport.memory.context // this.update()
         const context = this.update();
         const template = this.getTemplate();
-        if (!placeholderElm.parentNode) {
-            throw new Error('no parent before building tag');
-        }
         const elementContainer = document.createElement('div');
         elementContainer.id = 'tag-temp-holder';
         // render content with a first child that we can know is our first element
@@ -2445,35 +2419,14 @@ class Tag {
             forceElement: options.forceElement,
             counts: options.counts
         });
-        if (!placeholderElm.parentNode) {
-            throw new Error('no parent after building tag');
-        }
         afterInterpolateElement(elementContainer, placeholderElm, this, // ownerTag
         context, options);
-        if (!global.placeholder?.parentNode) {
-            throw new Error('???? - 2');
-        }
         // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
         let isForceElement = options.forceElement;
         tagComponents.forEach(tagComponent => {
-            const tagSupport = tagComponent.ownerTag.tagSupport;
-            const tagGlobal = tagSupport.templater.global;
-            const placeholderElm = tagGlobal.placeholder; // global.placeholderElm
-            if (!placeholderElm && !insertBefore.parentNode) {
-                throw new Error('no parent building tag components');
-            }
-            if (!global.placeholder?.parentNode) {
-                throw new Error('???? - 3');
-            }
             (0,_interpolateTemplate__WEBPACK_IMPORTED_MODULE_3__.subscribeToTemplate)(tagComponent.insertBefore, tagComponent.subject, tagComponent.ownerTag, options.counts, { isForceElement });
-            if (!global.placeholder?.parentNode) {
-                throw new Error('???? - 4');
-            }
             afterInterpolateElement(elementContainer, tagComponent.insertBefore, tagComponent.ownerTag, // this, // ownerTag
             context, options);
-            if (!global.placeholder?.parentNode) {
-                throw new Error('???? - 5');
-            }
         });
     }
 }
@@ -2498,10 +2451,6 @@ context, options) {
 function getChildTagsToDestroy(childTags, allTags = []) {
     for (let index = childTags.length - 1; index >= 0; --index) {
         const cTag = childTags[index];
-        if (allTags.find(x => x === cTag)) {
-            // TODO: Lets find why a child tag is attached twice to owner
-            throw new Error('child tag registered twice for delete');
-        }
         allTags.push(cTag);
         childTags.splice(index, 1);
         getChildTagsToDestroy(cTag.childTags, allTags);
@@ -2570,7 +2519,7 @@ class BaseTagSupport {
         this.subject = subject;
         const children = this.templater.children; // children tags passed in as arguments
         const props = this.templater.props; // natural props
-        const latestCloned = (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepClone)(props); // alterProps(props, templater)
+        const latestCloned = (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepClone)(props);
         this.propsConfig = {
             latest: props,
             latestCloned, // assume its HTML children and then detect
@@ -2675,9 +2624,6 @@ function renderWithSupport(tagSupport, existingTag, subject, ownerTag) {
         (0,_tagRunner__WEBPACK_IMPORTED_MODULE_0__.runBeforeRedraw)(wrapTagSupport, existingTag);
     }
     else {
-        if (!wrapTagSupport) {
-            throw new Error('63521');
-        }
         // first time render
         (0,_tagRunner__WEBPACK_IMPORTED_MODULE_0__.runBeforeRender)(wrapTagSupport, runtimeOwnerTag);
         // TODO: Logic below most likely could live within providers.ts inside the runBeforeRender function
@@ -2733,9 +2679,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
-function alterProps(props, templater, ownerSupport) {
+function alterProps(props, ownerSupport) {
     function callback(toCall, callWith) {
-        return callbackPropOwner(toCall, callWith, templater, ownerSupport);
+        return callbackPropOwner(toCall, callWith, ownerSupport);
     }
     const isPropTag = (0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isTagInstance)(props);
     const watchProps = isPropTag ? 0 : props;
@@ -2766,18 +2712,10 @@ function resetFunctionProps(props, callback) {
     });
     return newProps;
 }
-function callbackPropOwner(toCall, callWith, templater, // only used to prevent rendering double
-ownerSupport) {
-    const renderCount = templater.global.renderCount;
+function callbackPropOwner(toCall, callWith, ownerSupport) {
     const callbackResult = toCall(...callWith);
-    if (templater.global.renderCount > renderCount) {
-        throw new Error('already rendered');
-    }
     const lastestOwner = ownerSupport.templater.global.newest;
-    const newOwner = (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_1__.renderTagSupport)(lastestOwner.tagSupport, true);
-    if (newOwner.tagSupport.templater.global.newest != newOwner) {
-        throw new Error('newest assignment issue?');
-    }
+    (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_1__.renderTagSupport)(lastestOwner.tagSupport, true);
     return callbackResult;
 }
 
@@ -2802,9 +2740,6 @@ function bindSubjectCallback(value, tag) {
     // Is this children? No override needed
     if (value.isChildOverride) {
         return value;
-    }
-    if (!tag.ownerTag && !tag.tagSupport.templater.global.isApp) {
-        throw new Error('no ownerTag issue here');
     }
     const subjectFunction = (element, args) => runTagCallback(value, tag, element, args);
     // link back to original. Mostly used for <div oninit ondestroy> animations
@@ -3069,9 +3004,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 function destroyTagMemory(tag, subject) {
     const oldTagSupport = tag.tagSupport;
-    if (subject != oldTagSupport.subject) {
-        throw new Error('fff - subjects do not match');
-    }
     delete subject.tag;
     delete oldTagSupport.subject.tag; // TODO: this line maybe not needed
     // must destroy oldest which is tag with elements on stage
@@ -3207,18 +3139,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./deepFunctions */ "../main/ts/deepFunctions.ts");
 
 function hasTagSupportChanged(oldTagSupport, newTagSupport, newTemplater) {
-    const sameSupport = oldTagSupport === newTagSupport;
-    const samePropConfig = oldTagSupport.propsConfig === newTagSupport.propsConfig;
-    // const sameProps = oldTagSupport.propsConfig.latest === newTagSupport.propsConfig.latest
-    if (sameSupport) {
-        throw new Error('sameSupport - 22');
-    }
-    if (samePropConfig) {
-        throw new Error('samePropConfig - 22');
-    }
-    if (newTagSupport.templater.isTag || oldTagSupport.templater.isTag || newTemplater.isTag) {
-        throw new Error('trying to compare a basic tag');
-    }
     const latestProps = newTemplater.props; // newTagSupport.propsConfig.latest
     const pastCloneProps = oldTagSupport.propsConfig.latestCloned;
     const propsChanged = hasPropChanges(latestProps, pastCloneProps);
@@ -3657,9 +3577,6 @@ function subscribeToTemplate(insertBefore, subject, ownerTag, counts, // used fo
             (0,_updateExistingValue_function__WEBPACK_IMPORTED_MODULE_5__.updateExistingValue)(subject, value, ownerTag, insertBefore);
             return;
         }
-        if (!insertBefore.parentNode) {
-            throw new Error('no insert before parent node - 3');
-        }
         (0,_processSubjectValue_function__WEBPACK_IMPORTED_MODULE_2__.processSubjectValue)(value, subject, insertBefore, ownerTag, {
             counts: { ...counts },
             forceElement: isForceElement,
@@ -3969,9 +3886,6 @@ function processNewValue(hasValue, value, ownerTag) {
     }
     if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagInstance)(value)) {
         value.ownerTag = ownerTag;
-        if (ownerTag.childTags.find(x => x === value)) {
-            throw new Error('about to reattach tag already present - 2');
-        }
         return new _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_0__.ValueSubject(value);
     }
     if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isSubjectInstance)(value)) {
@@ -4044,10 +3958,6 @@ function processSubjectComponent(templater, subject, insertBefore, ownerTag, opt
         throw error;
     }
     templater.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_3__.TagSupport(ownerTag.tagSupport, templater, subject);
-    // templater.oldest = subject.tag?.tagSupport.oldest || templater.oldest
-    if (insertBefore.nodeName != 'TEMPLATE') {
-        throw new Error('9');
-    }
     templater.global.insertBefore = insertBefore;
     let retag = subject.tag;
     const providers = _state__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.providerConfig;
@@ -4065,19 +3975,10 @@ function redrawSubjectComponent(templater, subject, retag, ownerTag, insertBefor
     const preClones = ownerTag.clones.map(clone => clone);
     retag = (0,_TemplaterResult_class__WEBPACK_IMPORTED_MODULE_0__.renderWithSupport)(templater.tagSupport, subject.tag, // existing tag
     subject, ownerTag);
-    if (retag.tagSupport.templater.global.newest != retag) {
-        throw new Error('mismatch result newest');
-    }
     templater.global.newest = retag;
     if (ownerTag.clones.length > preClones.length) {
         const myClones = ownerTag.clones.filter(fClone => !preClones.find(clone => clone === fClone));
         retag.clones.push(...myClones);
-        if (myClones.find(x => x === insertBefore)) {
-            throw new Error('way back here we add marker');
-        }
-    }
-    if (ownerTag.childTags.find(x => x === retag)) {
-        throw new Error('about to reattach tag already present');
     }
     ownerTag.childTags.push(retag);
     return retag;
@@ -4157,10 +4058,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   applyFakeTemplater: () => (/* binding */ applyFakeTemplater),
 /* harmony export */   processTag: () => (/* binding */ processTag)
 /* harmony export */ });
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
-/* harmony import */ var _subject__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./subject */ "../main/ts/subject/index.ts");
-
+/* harmony import */ var _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TagSupport.class */ "../main/ts/TagSupport.class.ts");
+/* harmony import */ var _subject__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./subject */ "../main/ts/subject/index.ts");
 
 
 /** Could be a regular tag or a component. Both are Tag.class */
@@ -4168,30 +4067,18 @@ function processTag(tag, subject, // could be tag via result.tag
 insertBefore, ownerTag) {
     // first time seeing this tag?
     if (!tag.tagSupport) {
-        if (!(0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isTagInstance)(tag)) {
-            throw new Error('issue non-tag here');
-        }
         applyFakeTemplater(tag, ownerTag, subject);
-        if (ownerTag.childTags.find(x => x === tag)) {
-            throw new Error('about to reattach tag already present - 5');
-        }
         ownerTag.childTags.push(tag);
     }
     tag.ownerTag = ownerTag;
-    if (insertBefore.tagName !== 'TEMPLATE') {
-        throw new Error(`processTag.function.ts - insertBefore is not TEMPLATE ${insertBefore.tagName}`);
-    }
     tag.buildBeforeElement(insertBefore, {
         counts: { added: 0, removed: 0 },
         forceElement: true,
     });
 }
 function applyFakeTemplater(tag, ownerTag, subject) {
-    if (!ownerTag) {
-        throw new Error('no owner error');
-    }
     const fakeTemplater = getFakeTemplater();
-    tag.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_1__.TagSupport(ownerTag.tagSupport, fakeTemplater, // the template is provided via html`` call
+    tag.tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.TagSupport(ownerTag.tagSupport, fakeTemplater, // the template is provided via html`` call
     subject);
     fakeTemplater.global.oldest = tag;
     fakeTemplater.global.newest = tag;
@@ -4209,7 +4096,7 @@ function getFakeTemplater() {
             deleted: false,
             newestTemplater: {},
         },
-        children: new _subject__WEBPACK_IMPORTED_MODULE_2__.ValueSubject([]), // no children
+        children: new _subject__WEBPACK_IMPORTED_MODULE_1__.ValueSubject([]), // no children
         props: {},
         isTag: true,
         isTemplater: false,
@@ -4296,17 +4183,16 @@ ownerTag, options) {
         if (couldBeSame) {
             const prevSupport = previous.tag.tagSupport;
             const prevGlobal = prevSupport.templater.global;
-            const isSame = areLikeValues(previous.tag.memory.arrayValue, subTag.memory.arrayValue);
-            if (isSame) {
-                subTag.tagSupport = subTag.tagSupport || prevSupport;
-                const oldest = prevGlobal.oldest;
-                oldest.updateByTag(subTag);
-                return [];
-            }
-            // TODO: should not get here?
-            processAddTagArrayItem(runtimeInsertBefore, subTag, index, options, lastArray);
-            throw new Error('item should be back');
-            // return [] // removed: item should have been previously deleted and will be added back
+            /*
+            const isSame = areLikeValues(
+              previous.tag.memory.arrayValue,
+              subTag.memory.arrayValue,
+            )
+            */
+            subTag.tagSupport = subTag.tagSupport || prevSupport;
+            const oldest = prevGlobal.oldest;
+            oldest.updateByTag(subTag);
+            return [];
         }
         processAddTagArrayItem(runtimeInsertBefore, subTag, index, options, lastArray);
         ownerTag.childTags.push(subTag);
@@ -4333,11 +4219,9 @@ function processAddTagArrayItem(before, subTag, index, options, lastArray) {
         added: options.counts.added + index,
         removed: options.counts.removed,
     };
-    if (!before.parentNode) {
-        throw new Error('issue adding array item');
-    }
     const newTempElm = document.createElement('template');
-    before.parentNode.insertBefore(newTempElm, before);
+    const parent = before.parentNode;
+    parent.insertBefore(newTempElm, before);
     subTag.buildBeforeElement(newTempElm, // before,
     { counts, forceElement: options.forceElement });
 }
@@ -4370,9 +4254,6 @@ __webpack_require__.r(__webpack_exports__);
 function processTagResult(tag, subject, // used for recording past and current value
 insertBefore, // <template end interpolate />
 { counts, forceElement, }) {
-    if (!insertBefore.parentNode) {
-        throw new Error(`before here processTagResult ${insertBefore.nodeName}`);
-    }
     // *if appears we already have seen
     const subjectTag = subject;
     const existingTag = subjectTag.tag;
@@ -4389,11 +4270,6 @@ insertBefore, // <template end interpolate />
         */
         return processTagResultUpdate(tag, subjectTag, previousTag);
     }
-    /*
-    if(insertBefore.nodeName !== 'TEMPLATE') {
-      throw new Error(`processTagResult.function.ts insertBefore is not template ${insertBefore.nodeName}`)
-    }
-    */
     tag.buildBeforeElement(insertBefore, {
         counts,
         forceElement,
@@ -4467,9 +4343,6 @@ function renderExistingTag(oldestTag, // existing tag already there
 newTemplater, tagSupport, subject) {
     const tag = subject.tag;
     newTemplater.global = tag.tagSupport.templater.global;
-    if (!oldestTag.hasLiveElements) {
-        throw new Error('1080 - should have live elements');
-    }
     const preRenderCount = tagSupport.templater.global.renderCount;
     (0,_state_provider_utils__WEBPACK_IMPORTED_MODULE_0__.providersChangeCheck)(oldestTag);
     // When the providers were checked, a render to myself occurred and I do not need to re-render again
@@ -4535,9 +4408,6 @@ function renderTagSupport(tagSupport, renderUp) {
         }
     }
     const useTagSupport = global.newest?.tagSupport; // oldTagSetup
-    if (!templater.global.oldest) {
-        throw new Error('already causing trouble');
-    }
     const tag = (0,_renderExistingTag_function__WEBPACK_IMPORTED_MODULE_2__.renderExistingTag)(templater.global.oldest, templater, useTagSupport, subject);
     const renderOwner = ownerTag && selfPropChange;
     if (renderOwner) {
@@ -4858,11 +4728,6 @@ function getTagsWithProvider(tag, provider, memory = []) {
         });
     }
     tag.childTags.forEach(child => getTagsWithProvider(child, provider, memory));
-    memory.forEach(({ tag }) => {
-        if (tag.tagSupport.templater.global.deleted) {
-            throw new Error('do not get here - 0');
-        }
-    });
     return memory;
 }
 
@@ -5600,20 +5465,8 @@ function getTagWrap(templater, madeSubject) {
             childSubject.lastArray = lastArray;
         }
         const originalFunction = innerTagWrap.original;
-        // const oldTagSetup = templater.tagSupport
-        const oldest = templater.global.oldest;
-        if (oldest && !oldest.hasLiveElements) {
-            throw new Error('issue already 22');
-        }
         let props = templater.props;
-        const ownerTagSupport = oldTagSetup.ownerTagSupport;
-        const oldTemplater = ownerTagSupport?.templater;
-        const oldLatest = oldTemplater?.global.newest;
-        const newestOwnerTemplater = oldLatest?.tagSupport.templater;
-        if (oldLatest && !newestOwnerTemplater) {
-            throw new Error('what to do here?');
-        }
-        let castedProps = (0,_alterProps_function__WEBPACK_IMPORTED_MODULE_6__.alterProps)(props, newestOwnerTemplater, oldTagSetup.ownerTagSupport);
+        let castedProps = (0,_alterProps_function__WEBPACK_IMPORTED_MODULE_6__.alterProps)(props, oldTagSetup.ownerTagSupport);
         const clonedProps = (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_4__.deepClone)(props); // castedProps
         // CALL ORIGINAL COMPONENT FUNCTION
         const tag = originalFunction(castedProps, childSubject);
@@ -5697,10 +5550,6 @@ element, props) {
     tag.buildBeforeElement(templateElm);
     wrapper.global.oldest = tag;
     wrapper.global.newest = tag;
-    if (!tag.hasLiveElements) {
-        throw new Error('x');
-    }
-    ;
     element.setUse = app.original.setUse;
     appElements.push({ element, tag });
     return { tag, tags: app.original.tags };
@@ -5830,11 +5679,6 @@ function updateExistingTagComponent(ownerTag, templater, subject, insertBefore) 
     const oldGlobal = oldTagSupport.templater.global;
     // const placeholderElm = ownerTag.tagSupport.templater.global.placeholderElm
     const placeholderElm = oldGlobal.placeholder;
-    if (placeholderElm) {
-        if (!placeholderElm.parentNode) {
-            throw new Error('stop here no subject parent node update existing tag');
-        }
-    }
     if (!isSameTag) {
         (0,_destroyTag_function__WEBPACK_IMPORTED_MODULE_2__.destroyTagMemory)(oldTagSupport.templater.global.oldest, subject);
         return (0,_processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_1__.processSubjectComponent)(templater, subject, 
@@ -5861,9 +5705,6 @@ function updateExistingTagComponent(ownerTag, templater, subject, insertBefore) 
     }
     const oldestTag = templater.global.oldest; // oldTagSupport.oldest as Tag // existingTag
     const previous = templater.global.newest;
-    if (!previous || !oldestTag) {
-        throw new Error('how no previous or oldest nor newest?');
-    }
     const newTag = (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_3__.renderTagSupport)(templater.tagSupport, false);
     existingTag = subject.tag;
     const newOldest = newTag.tagSupport.templater.global.oldest;
@@ -5878,20 +5719,10 @@ function updateExistingTagComponent(ownerTag, templater, subject, insertBefore) 
         const oldKidsSub = newOldest.tagSupport.templater.children;
         oldKidsSub.set(templater.children.value);
     }
-    // const newTag = tempResult.newest as Tag
-    if (previous && !oldestTag) {
-        throw new Error('bad elders');
-    }
     // detect if both the function is the same and the return is the same
     const isLikeTag = isSameTag && previous.isLikeTag(newTag);
-    if (previous && !oldestTag) {
-        throw new Error('bad elders');
-    }
     let oldest = oldTagSupport.templater.global.oldest;
     if (isLikeTag) {
-        if (!newTag.tagSupport.templater.global.oldest) {
-            throw new Error('maybe 6');
-        }
         subject.tag = newTag;
         oldestTag.updateByTag(newTag); // the oldest tag has element references
         return newTag;
@@ -5953,7 +5784,7 @@ function syncFunctionProps(templater, existingTag, ownerTag, newProps) {
         // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
         priorProps[name].toCall = (...args) => {
             return (0,_alterProps_function__WEBPACK_IMPORTED_MODULE_4__.callbackPropOwner)(newCallback, // value, // newOriginal,
-            args, templater, ownerSupport);
+            args, ownerSupport);
         };
         return;
     });
@@ -6038,9 +5869,6 @@ function updateExistingValue(subject, value, ownerTag, insertBefore) {
         return subject;
     }
     if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagInstance)(value)) {
-        if (insertBefore.nodeName !== 'TEMPLATE') {
-            throw new Error(`expected template - ${insertBefore.nodeName}`);
-        }
         (0,_processTag_function__WEBPACK_IMPORTED_MODULE_9__.processTag)(value, subjectTag, insertBefore, ownerTag);
         return subjectTag;
     }
