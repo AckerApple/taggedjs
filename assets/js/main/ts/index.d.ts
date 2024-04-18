@@ -11,6 +11,7 @@ export * from "./interpolateElement";
 export { tagElement } from "./tagElement";
 export { Tag } from "./Tag.class";
 export { runBeforeRender } from "./tagRunner";
+export { renderTagSupport } from "./renderTagSupport.function";
 export declare const hmr: {
     tagElement: typeof tagElement;
 };

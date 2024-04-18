@@ -5,10 +5,22 @@ export const propsDebugMain = tag((_='propsDebugMain') => {
   let propNumber: any = letState(0)(x => [propNumber, propNumber = x])
   let renderCount: number = letState(0)(x => [renderCount, renderCount = x])
   let propsJson: any = letState({test:33, x:'y'})(x => [propsJson, propsJson = x])
+  let date = letState(() => new Date())(x => [date, date = x])
 
   function propsJsonChanged(event: InputElementTargetEvent) {
     propsJson = JSON.parse(event.target.value)
     return propsJson
+  }
+
+  const elmChangeDate = (event: InputElementTargetEvent) => {
+    const newDateString = event.target.value
+
+    console.log('newDateString', {
+      newDateString,
+      newDate: new Date(newDateString)
+    })
+
+    date = new Date(newDateString)
   }
 
   ++renderCount
@@ -16,7 +28,8 @@ export const propsDebugMain = tag((_='propsDebugMain') => {
   const json = JSON.stringify(propsJson, null, 2)
 
   return html`
-    <textarea id="props-debug-textarea" wrap="off" onchange=${propsJsonChanged}
+    <textarea id="props-debug-textarea" wrap="off"
+      onchange=${propsJsonChanged}
       style="height:200px;font-size:0.6em;width:100%"
     >${ json }</textarea>
     
@@ -40,7 +53,21 @@ export const propsDebugMain = tag((_='propsDebugMain') => {
         }
       })}
     </fieldset>
+
+    <fieldset>
+      <legend>date prop</legend>
+      date:${date}
+      <input type="date" value=${timestampToValues(date).date} onchange=${elmChangeDate} />
+      <hr />
+      ${propDateDebug({date})}
+    </fieldset>
     ${/*renderCountDiv({renderCount, name:'propsDebugMain'})*/false}
+  `
+})
+
+const propDateDebug = tag(({date}: {date: Date}) => {
+  return html`
+    date:${date}
   `
 })
 
@@ -127,3 +154,19 @@ const propFnUpdateTest = tag(({
     <small style="opacity:.5">the count here and within parent increases but not in parent parent</small>
   `
 })
+
+function timestampToValues(
+  timestamp: number | Date | string
+) {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  return {
+      date: `${year}-${month}-${day}`,
+      time: `${hours}:${minutes}`
+  };
+}

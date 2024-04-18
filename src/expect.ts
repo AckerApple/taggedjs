@@ -4,7 +4,7 @@ let tests: Test[] = []
 let tab = 0
 
 export function describe(label: string, run: () => any) {
-  tests.push(() => {
+  tests.push(async () => {
     const oldTests = tests
     tests = []
     
@@ -12,8 +12,8 @@ export function describe(label: string, run: () => any) {
       console.debug('  '.repeat(tab) + '↘ ' + label)
       
       ++tab
-      run()
-      runTests(tests)
+      await run()
+      await runTests(tests)
       
       --tab
     } catch (error) {
@@ -27,7 +27,7 @@ export function describe(label: string, run: () => any) {
 }
 
 describe.only = (label: string, run: () => any) => {
-  onlyTests.push(() => {
+  onlyTests.push(async () => {
     const oldTests = tests
     tests = []
     
@@ -36,8 +36,8 @@ describe.only = (label: string, run: () => any) => {
       
       ++tab
       
-      run()
-      runTests(tests)
+      await run()
+      await runTests(tests)
       
       --tab
     } catch (error) {
@@ -51,9 +51,9 @@ describe.only = (label: string, run: () => any) => {
 }
 
 export function it(label: string, run: () => any) {
-  tests.push(() => {
+  tests.push(async () => {
     try {
-      run()
+      await run()
       console.debug(' '.repeat(tab) + '✅ ' + label)
     } catch (error) {
       console.debug(' '.repeat(tab) + '❌ ' + label)
@@ -63,9 +63,9 @@ export function it(label: string, run: () => any) {
 }
 
 it.only = (label: string, run: () => any) => {
-  onlyTests.push(() => {
+  onlyTests.push(async () => {
     try {
-      run()
+      await run()
       console.debug('✅ ' + label)
     } catch (error) {
       console.debug('❌ ' + label)
@@ -78,7 +78,7 @@ it.skip = (label: string, run: () => any) => {
   console.debug('⏭️ Skipped ' + label)
 }
 
-export function execute() {
+export async function execute() {
   if(onlyTests.length) {
     return runTests(onlyTests)
   }
@@ -86,15 +86,15 @@ export function execute() {
   return runTests(tests)
 }
 
-function runTests(tests: Test[]) {
-  tests.forEach(test => {    
+async function runTests(tests: Test[]) {
+  for (const test of tests) {
     try {
-      test()
+      await test()
     } catch (err) {
       console.error(`Error testing ${test.name}`)
       throw err
     }
-  })
+  }
 }
 
 export function expect(expected: unknown) {

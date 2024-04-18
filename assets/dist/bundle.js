@@ -98,14 +98,24 @@ const propsDebugMain = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_ = 'props
     let propNumber = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [propNumber, propNumber = x]);
     let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]);
     let propsJson = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)({ test: 33, x: 'y' })(x => [propsJson, propsJson = x]);
+    let date = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(() => new Date())(x => [date, date = x]);
     function propsJsonChanged(event) {
         propsJson = JSON.parse(event.target.value);
         return propsJson;
     }
+    const elmChangeDate = (event) => {
+        const newDateString = event.target.value;
+        console.log('newDateString', {
+            newDateString,
+            newDate: new Date(newDateString)
+        });
+        date = new Date(newDateString);
+    };
     ++renderCount;
     const json = JSON.stringify(propsJson, null, 2);
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
-    <textarea id="props-debug-textarea" wrap="off" onchange=${propsJsonChanged}
+    <textarea id="props-debug-textarea" wrap="off"
+      onchange=${propsJsonChanged}
       style="height:200px;font-size:0.6em;width:100%"
     >${json}</textarea>
     
@@ -129,7 +139,20 @@ const propsDebugMain = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_ = 'props
         }
     })}
     </fieldset>
+
+    <fieldset>
+      <legend>date prop</legend>
+      date:${date}
+      <input type="date" value=${timestampToValues(date).date} onchange=${elmChangeDate} />
+      <hr />
+      ${propDateDebug({ date })}
+    </fieldset>
     ${ /*renderCountDiv({renderCount, name:'propsDebugMain'})*/false}
+  `;
+});
+const propDateDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ date }) => {
+    return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
+    date:${date}
   `;
 });
 const propsDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNumber, propsJson, propNumberChange, }) => {
@@ -195,6 +218,18 @@ const propFnUpdateTest = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNu
     <small style="opacity:.5">the count here and within parent increases but not in parent parent</small>
   `;
 });
+function timestampToValues(timestamp) {
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return {
+        date: `${year}-${month}-${day}`,
+        time: `${hours}:${minutes}`
+    };
+}
 
 
 /***/ }),
@@ -300,14 +335,14 @@ const App = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
     };
     function runTesting(manual = true) {
         const waitFor = 1000;
-        setTimeout(() => {
+        setTimeout(async () => {
             console.debug('🏃 Running tests...');
-            const result = (0,_tests__WEBPACK_IMPORTED_MODULE_7__.runTests)();
+            const result = await (0,_tests__WEBPACK_IMPORTED_MODULE_7__.runTests)();
             if (!manual) {
                 return;
             }
             if (result) {
-                alert('✅ all tests passed');
+                alert('✅ all app tests passed');
                 return;
             }
             alert('❌ tests failed. See console for more details');
@@ -854,6 +889,86 @@ function lastById(id) {
 
 /***/ }),
 
+/***/ "./src/expect.html.ts":
+/*!****************************!*\
+  !*** ./src/expect.html.ts ***!
+  \****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   expectElementCount: () => (/* binding */ expectElementCount),
+/* harmony export */   expectHTML: () => (/* binding */ expectHTML),
+/* harmony export */   expectMatchedHtml: () => (/* binding */ expectMatchedHtml),
+/* harmony export */   testCounterElements: () => (/* binding */ testCounterElements),
+/* harmony export */   testDuelCounterElements: () => (/* binding */ testDuelCounterElements)
+/* harmony export */ });
+/* harmony import */ var _expect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./expect */ "./src/expect.ts");
+
+function expectMatchedHtml(query0, query1) {
+    //  const found = elementCount(query)
+    const elements0 = document.querySelectorAll(query0);
+    const elements1 = document.querySelectorAll(query1);
+    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elements0.length).toBeGreaterThan(0);
+    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elements1.length).toBeGreaterThan(0);
+    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elements0.length).toBe(elements1.length);
+    elements0.forEach((element0, index) => (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(element0.innerHTML).toBe(elements1[index].innerHTML));
+}
+function expectHTML(query, innerHTML) {
+    const elements = document.querySelectorAll(query);
+    elements.forEach(element => (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(element.innerHTML).toBe(innerHTML, `Expected element ${query} innerHTML to be -->${innerHTML}<-- but it was -->${element.innerHTML}<--`));
+}
+function expectElementCount(query, count, message) {
+    //  const found = elementCount(query)
+    const elements = document.querySelectorAll(query);
+    const found = elements.length;
+    message = message || `Expected ${count} elements to match query ${query} but found ${found}`;
+    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(found).toBe(count, message);
+    return elements;
+}
+function testDuelCounterElements([button0, display0], // button, display
+[button1, display1]) {
+    let query = expectElementCount(display0, 1);
+    const display0Element = query[0];
+    const ip0 = display0Element.innerText;
+    testCounterElements(button0, display0);
+    query = expectElementCount(display1, 1);
+    let display1Element = query[0];
+    let ip1Check = display1Element.innerText;
+    const value = (Number(ip0) + 2).toString();
+    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ip1Check).toBe(value, `Expected second increase provider to be increased to ${ip0} but got ${ip1Check}`);
+    testCounterElements(button1, display1);
+    query = expectElementCount(display1, 1);
+    display1Element = query[0];
+    ip1Check = display1Element.innerText;
+    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ip1Check).toBe((Number(ip0) + 4).toString(), `Expected ${display1} innerText to be ${Number(ip0) + 4} but instead it is ${ip1Check}`);
+}
+/** increases counter by two */
+function testCounterElements(counterButtonId, counterDisplayId, { elementCountExpected } = {
+    elementCountExpected: 1
+}) {
+    // const getByIndex = (selector: string, index: number) => document.querySelectorAll(selector)[index] as unknown as HTMLElement[]
+    const increaseCounters = document.querySelectorAll(counterButtonId);
+    const counterDisplays = document.querySelectorAll(counterDisplayId);
+    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(increaseCounters.length).toBe(elementCountExpected, `Expected ${counterButtonId} to be ${elementCountExpected} elements but is instead ${increaseCounters.length}`);
+    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(counterDisplays.length).toBe(elementCountExpected, `Expected ${counterDisplayId} to be ${elementCountExpected} elements but is instead ${counterDisplays.length}`);
+    increaseCounters.forEach((increaseCounter, index) => {
+        const counterDisplay = counterDisplays[index];
+        let counterValue = Number(counterDisplay?.innerText);
+        increaseCounter?.click();
+        let oldCounterValue = counterValue + 1;
+        counterValue = Number(counterDisplay?.innerText);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to be value ${oldCounterValue} but is instead ${counterValue}`);
+        increaseCounter?.click();
+        counterValue = Number(counterDisplay?.innerText);
+        ++oldCounterValue;
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to increase value to ${oldCounterValue} but is instead ${counterValue}`);
+    });
+}
+
+
+/***/ }),
+
 /***/ "./src/expect.ts":
 /*!***********************!*\
   !*** ./src/expect.ts ***!
@@ -871,14 +986,14 @@ const onlyTests = [];
 let tests = [];
 let tab = 0;
 function describe(label, run) {
-    tests.push(() => {
+    tests.push(async () => {
         const oldTests = tests;
         tests = [];
         try {
             console.debug('  '.repeat(tab) + '↘ ' + label);
             ++tab;
-            run();
-            runTests(tests);
+            await run();
+            await runTests(tests);
             --tab;
         }
         catch (error) {
@@ -892,14 +1007,14 @@ function describe(label, run) {
     });
 }
 describe.only = (label, run) => {
-    onlyTests.push(() => {
+    onlyTests.push(async () => {
         const oldTests = tests;
         tests = [];
         try {
             console.debug('  '.repeat(tab) + '↘ ' + label);
             ++tab;
-            run();
-            runTests(tests);
+            await run();
+            await runTests(tests);
             --tab;
         }
         catch (error) {
@@ -913,9 +1028,9 @@ describe.only = (label, run) => {
     });
 };
 function it(label, run) {
-    tests.push(() => {
+    tests.push(async () => {
         try {
-            run();
+            await run();
             console.debug(' '.repeat(tab) + '✅ ' + label);
         }
         catch (error) {
@@ -925,9 +1040,9 @@ function it(label, run) {
     });
 }
 it.only = (label, run) => {
-    onlyTests.push(() => {
+    onlyTests.push(async () => {
         try {
-            run();
+            await run();
             console.debug('✅ ' + label);
         }
         catch (error) {
@@ -939,22 +1054,22 @@ it.only = (label, run) => {
 it.skip = (label, run) => {
     console.debug('⏭️ Skipped ' + label);
 };
-function execute() {
+async function execute() {
     if (onlyTests.length) {
         return runTests(onlyTests);
     }
     return runTests(tests);
 }
-function runTests(tests) {
-    tests.forEach(test => {
+async function runTests(tests) {
+    for (const test of tests) {
         try {
-            test();
+            await test();
         }
         catch (err) {
             console.error(`Error testing ${test.name}`);
             throw err;
         }
-    });
+    }
 }
 function expect(expected) {
     return {
@@ -1205,9 +1320,9 @@ const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
     const views = [
         // 'content',
         // 'counters',
-        // 'props',
+        'props',
         // 'providerDebug',
-        'arrays',
+        // 'arrays',
         // 'tagSwitchDebug',
         // 'child',
     ];
@@ -1216,7 +1331,7 @@ const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
     const callback = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.callbackMaker)();
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.onInit)(() => {
         console.log('app init should only run once');
-        appCounterSubject.subscribe(callback((x) => {
+        appCounterSubject.subscribe(callback(x => {
             console.log('callback increase counter', { appCounter, x });
             appCounter = x;
         }));
@@ -1861,9 +1976,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _elmSelectors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./elmSelectors */ "./src/elmSelectors.ts");
 /* harmony import */ var _expect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./expect */ "./src/expect.ts");
+/* harmony import */ var _expect_html__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./expect.html */ "./src/expect.html.ts");
 
 
-function runTests() {
+
+async function runTests() {
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('elements exists', () => {
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(document.getElementsByTagName('template').length).toBe(0);
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(document.getElementById('h1-app')).toBeDefined();
@@ -1873,11 +1990,11 @@ function runTests() {
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.describe)('content', () => {
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('basic', () => {
-            expectMatchedHtml('#content-subject-pipe-display0', '#content-subject-pipe-display1');
-            expectMatchedHtml('#content-combineLatest-pipe-display0', '#content-combineLatest-pipe-display1');
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectMatchedHtml)('#content-subject-pipe-display0', '#content-subject-pipe-display1');
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectMatchedHtml)('#content-combineLatest-pipe-display0', '#content-combineLatest-pipe-display1');
         });
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('html', () => {
-            expectMatchedHtml('#content-combineLatest-pipeHtml-display0', '#content-combineLatest-pipeHtml-display1');
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectMatchedHtml)('#content-combineLatest-pipeHtml-display0', '#content-combineLatest-pipeHtml-display1');
         });
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('toggle test', () => {
@@ -1890,18 +2007,18 @@ function runTests() {
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(propsTextarea.value.replace(/\s/g, '')).toBe(`{"test":33,"x":"y"}`);
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('basic increase counter', () => {
-        expectElementCount('#conditional-counter', 0);
-        testCounterElements('#❤️-increase-counter', '#❤️-counter-display');
-        testCounterElements('#❤️-inner-counter', '#❤️-inner-display');
-        testCounterElements('#standalone-counter', '#standalone-display');
-        expectElementCount('#conditional-counter', 1);
-        testCounterElements('#conditional-counter', '#conditional-display');
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElementCount)('#conditional-counter', 0);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#❤️-increase-counter', '#❤️-counter-display');
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#❤️-inner-counter', '#❤️-inner-display');
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#standalone-counter', '#standalone-display');
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElementCount)('#conditional-counter', 1);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#conditional-counter', '#conditional-display');
         // test again after higher elements have had reruns
-        testCounterElements('#❤️-inner-counter', '#❤️-inner-display');
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#❤️-inner-counter', '#❤️-inner-display');
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('props testing', () => {
-        testDuelCounterElements(['#propsDebug-🥩-0-button', '#propsDebug-🥩-0-display'], ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display']);
-        testDuelCounterElements(['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'], ['#propsOneLevelFunUpdate-🥩-button', '#propsOneLevelFunUpdate-🥩-display']);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#propsDebug-🥩-0-button', '#propsDebug-🥩-0-display'], ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display']);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'], ['#propsOneLevelFunUpdate-🥩-button', '#propsOneLevelFunUpdate-🥩-display']);
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.queryOneInnerHTML)('#propsDebug-🥩-change-display')).toBe('9');
         const ownerHTML = document.querySelectorAll('#propsDebug-🥩-0-display')[0].innerHTML;
         const parentHTML = document.querySelectorAll('#propsDebug-🥩-1-display')[0].innerHTML;
@@ -1913,16 +2030,16 @@ function runTests() {
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(ownerNum + 2).toBe(parentNum); // testing of setProp() doesn't change owner
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('providers', async () => {
-        testDuelCounterElements(['#increase-provider-🍌-0-button', '#increase-provider-🍌-0-display'], ['#increase-provider-🍌-1-button', '#increase-provider-🍌-1-display']);
-        testDuelCounterElements(['#increase-provider-upper-🌹-0-button', '#increase-provider-upper-🌹-0-display'], ['#increase-provider-upper-🌹-1-button', '#increase-provider-upper-🌹-1-display']);
-        testDuelCounterElements(['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'], ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display']);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-provider-🍌-0-button', '#increase-provider-🍌-0-display'], ['#increase-provider-🍌-1-button', '#increase-provider-🍌-1-display']);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-provider-upper-🌹-0-button', '#increase-provider-upper-🌹-0-display'], ['#increase-provider-upper-🌹-1-button', '#increase-provider-upper-🌹-1-display']);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'], ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display']);
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('provider debug', () => {
-        testDuelCounterElements(['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'], ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display']);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'], ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display']);
         // change a counter in the parent element
-        testDuelCounterElements(['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'], ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display']);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'], ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display']);
         // now ensure that this inner tag still operates correctly even though parent just rendered but i did not from that change
-        testDuelCounterElements(['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'], ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display']);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'], ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display']);
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('tagSwitching', () => {
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined');
@@ -1933,34 +2050,35 @@ function runTests() {
         const dropdown = document.getElementById('tag-switch-dropdown');
         dropdown.value = "1";
         dropdown.onchange({ target: dropdown });
-        expectElementCount('#tagSwitch-1-hello', 5);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElementCount)('#tagSwitch-1-hello', 5);
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-2-hello')).toBe(0);
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-3-hello')).toBe(0);
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#select-tag-above')).toBe(0);
         dropdown.value = "2";
         dropdown.onchange({ target: dropdown });
-        expectElementCount('#tagSwitch-1-hello', 2);
-        expectElementCount('#tagSwitch-2-hello', 4);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElementCount)('#tagSwitch-1-hello', 2);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElementCount)('#tagSwitch-2-hello', 4);
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-3-hello')).toBe(0);
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#select-tag-above')).toBe(0);
         dropdown.value = "3";
         dropdown.onchange({ target: dropdown });
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-1-hello')).toBe(0, 'Expected no hello 1s');
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#tagSwitch-2-hello')).toBe(0);
-        expectElementCount('#tagSwitch-3-hello', 7);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElementCount)('#tagSwitch-3-hello', 7);
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#select-tag-above')).toBe(0);
         dropdown.value = "";
         dropdown.onchange({ target: dropdown });
-        expectElementCount('#select-tag-above', 1);
-        expectElementCount('#tag-switch-dropdown', 1);
-        expectElementCount('#tagSwitch-1-hello', 2);
-        expectElementCount('#tagSwitch-2-hello', 0);
-        expectElementCount('#tagSwitch-3-hello', 0);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElementCount)('#select-tag-above', 1);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElementCount)('#tag-switch-dropdown', 1);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElementCount)('#tagSwitch-1-hello', 2);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElementCount)('#tagSwitch-2-hello', 0);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElementCount)('#tagSwitch-3-hello', 0);
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.describe)('array testing', () => {
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('basics', () => {
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('array basics', () => {
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#array-test-push-item')).toBe(1);
-            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#score-data-0-1-inside-button')).toBe(0);
+            const insideCount = (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#score-data-0-1-inside-button');
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(insideCount).toBe(0);
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#score-data-0-1-outside-button')).toBe(0);
             document.getElementById('array-test-push-item')?.click();
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elementCount)('#score-data-0-1-inside-button')).toBe(1);
@@ -1993,16 +2111,16 @@ function runTests() {
         });
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('child tests', () => {
-        testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display');
-        testCounterElements('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display');
-        testDuelCounterElements(['#childTests-button', '#childTests-display'], ['#innerHtmlPropsTest-childTests-button', '#innerHtmlPropsTest-childTests-display']);
-        testDuelCounterElements(['#childTests-button', '#childTests-display'], ['#innerHtmlTest-childTests-button', '#innerHtmlTest-childTests-display']);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display');
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display');
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#childTests-button', '#childTests-display'], ['#innerHtmlPropsTest-childTests-button', '#innerHtmlPropsTest-childTests-display']);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#childTests-button', '#childTests-display'], ['#innerHtmlTest-childTests-button', '#innerHtmlTest-childTests-display']);
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('has no templates', () => {
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(document.getElementsByTagName('template').length).toBe(0);
     });
     try {
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.execute)();
+        await (0,_expect__WEBPACK_IMPORTED_MODULE_1__.execute)();
         console.info('✅ all tests passed');
         return true;
     }
@@ -2010,62 +2128,6 @@ function runTests() {
         console.error('❌ tests failed: ' + error.message, error);
         return false;
     }
-}
-function testDuelCounterElements([button0, display0], // button, display
-[button1, display1]) {
-    let query = expectElementCount(display0, 1);
-    const display0Element = query[0];
-    const ip0 = display0Element.innerText;
-    testCounterElements(button0, display0);
-    query = expectElementCount(display1, 1);
-    let display1Element = query[0];
-    let ip1Check = display1Element.innerText;
-    const value = (Number(ip0) + 2).toString();
-    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(ip1Check).toBe(value, `Expected second increase provider to be increased to ${ip0} but got ${ip1Check}`);
-    testCounterElements(button1, display1);
-    query = expectElementCount(display1, 1);
-    display1Element = query[0];
-    ip1Check = display1Element.innerText;
-    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(ip1Check).toBe((Number(ip0) + 4).toString(), `Expected ${display1} innerText to be ${Number(ip0) + 4} but instead it is ${ip1Check}`);
-}
-/** increases counter by two */
-function testCounterElements(counterButtonId, counterDisplayId, { elementCountExpected } = {
-    elementCountExpected: 1
-}) {
-    // const getByIndex = (selector: string, index: number) => document.querySelectorAll(selector)[index] as unknown as HTMLElement[]
-    const increaseCounters = document.querySelectorAll(counterButtonId);
-    const counterDisplays = document.querySelectorAll(counterDisplayId);
-    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(increaseCounters.length).toBe(elementCountExpected, `Expected ${counterButtonId} to be ${elementCountExpected} elements but is instead ${increaseCounters.length}`);
-    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(counterDisplays.length).toBe(elementCountExpected, `Expected ${counterDisplayId} to be ${elementCountExpected} elements but is instead ${counterDisplays.length}`);
-    increaseCounters.forEach((increaseCounter, index) => {
-        const counterDisplay = counterDisplays[index];
-        let counterValue = Number(counterDisplay?.innerText);
-        increaseCounter?.click();
-        let oldCounterValue = counterValue + 1;
-        counterValue = Number(counterDisplay?.innerText);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to be value ${oldCounterValue} but is instead ${counterValue}`);
-        increaseCounter?.click();
-        counterValue = Number(counterDisplay?.innerText);
-        ++oldCounterValue;
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to increase value to ${oldCounterValue} but is instead ${counterValue}`);
-    });
-}
-function expectMatchedHtml(query0, query1) {
-    //  const found = elementCount(query)
-    const elements0 = document.querySelectorAll(query0);
-    const elements1 = document.querySelectorAll(query1);
-    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(elements0.length).toBeGreaterThan(0);
-    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(elements1.length).toBeGreaterThan(0);
-    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(elements0.length).toBe(elements1.length);
-    elements0.forEach((element0, index) => (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(element0.innerHTML).toBe(elements1[index].innerHTML));
-}
-function expectElementCount(query, count, message) {
-    //  const found = elementCount(query)
-    const elements = document.querySelectorAll(query);
-    const found = elements.length;
-    message = message || `Expected ${count} elements to match query ${query} but found ${found}`;
-    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(found).toBe(count, message);
-    return elements;
 }
 function delay(time) {
     return new Promise((res) => setTimeout(res, time));
@@ -2931,51 +2993,58 @@ function deepEqual(obj1, obj2) {
     return isDeepEqual(obj1, obj2, new WeakMap());
 }
 function isDeepEqual(obj1, obj2, visited) {
-    if (obj1 === obj2 || isSameFunctions(obj1, obj2)) {
+    const directEqual = obj1 === obj2;
+    if (directEqual || isSameFunctions(obj1, obj2)) {
         return true;
-    }
-    if (typeof obj1 !== 'object' ||
-        typeof obj2 !== 'object' ||
-        obj1 === null ||
-        obj2 === null) {
-        return false;
-    }
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
-    if (keys1.length !== keys2.length) {
-        return false;
     }
     // If obj is already visited, return the cloned reference
     if (visited.has(obj1)) {
         return true;
     }
-    // Register the cloned object to avoid cyclic references
-    visited.set(obj1, 0);
+    if (typeof obj1 === 'object' && typeof obj2 === 'object') {
+        // both are dates and were already determined not the same
+        if (obj1 instanceof Date && obj2 instanceof Date) {
+            return false;
+        }
+        // Register the cloned object to avoid cyclic references
+        visited.set(obj1, 0);
+        // Check if obj1 and obj2 are both arrays
+        if (Array.isArray(obj1) && Array.isArray(obj2)) {
+            return isArrayDeepEqual(obj1, obj2, visited);
+        }
+        else if (Array.isArray(obj1) || Array.isArray(obj2)) {
+            // One is an array, and the other is not
+            return false;
+        }
+        return isObjectDeepEqual(obj1, obj2, visited);
+    }
+    return false;
+}
+function isObjectDeepEqual(obj1, obj2, visited) {
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    if (keys1.length === 0 && keys2.length === 0) {
+        return true;
+    }
+    if (keys1.length !== keys2.length) {
+        return false;
+    }
     for (const key of keys1) {
         const keyFound = keys2.includes(key);
         if (!keyFound || !isDeepEqual(obj1[key], obj2[key], visited)) {
-            /*
-            if(isSameFunctions(obj1[key], obj2[key])) {
-              continue
-            }
-            */
             return false;
         }
     }
-    // Check if obj1 and obj2 are both arrays
-    if (Array.isArray(obj1) && Array.isArray(obj2)) {
-        if (obj1.length !== obj2.length) {
-            return false;
-        }
-        for (let i = 0; i < obj1.length; i++) {
-            if (!isDeepEqual(obj1[i], obj2[i], visited)) {
-                return false;
-            }
-        }
-    }
-    else if (Array.isArray(obj1) || Array.isArray(obj2)) {
-        // One is an array, and the other is not
+    return true;
+}
+function isArrayDeepEqual(obj1, obj2, visited) {
+    if (obj1.length !== obj2.length) {
         return false;
+    }
+    for (let i = 0; i < obj1.length; i++) {
+        if (!isDeepEqual(obj1[i], obj2[i], visited)) {
+            return false;
+        }
     }
     return true;
 }
@@ -3271,6 +3340,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   onDestroy: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.onDestroy),
 /* harmony export */   onInit: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.onInit),
 /* harmony export */   providers: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.providers),
+/* harmony export */   renderTagSupport: () => (/* reexport safe */ _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_12__.renderTagSupport),
 /* harmony export */   runBeforeRender: () => (/* reexport safe */ _tagRunner__WEBPACK_IMPORTED_MODULE_11__.runBeforeRender),
 /* harmony export */   setProp: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.setProp),
 /* harmony export */   setUse: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_7__.setUse),
@@ -3295,6 +3365,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _interpolateElement__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./interpolateElement */ "../main/ts/interpolateElement.ts");
 /* harmony import */ var _Tag_class__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./Tag.class */ "../main/ts/Tag.class.ts");
 /* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./tagRunner */ "../main/ts/tagRunner.ts");
+/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./renderTagSupport.function */ "../main/ts/renderTagSupport.function.ts");
 // import { redrawTag } from "./redrawTag.function"
 
 
@@ -3308,6 +3379,7 @@ __webpack_require__.r(__webpack_exports__);
 // export * from "./redrawTag.function"
 
 // TODO: export *
+
 
 
 
@@ -3650,9 +3722,8 @@ function interpolateToTemplates(template) {
         }
         const noBraces = expression.substring(1, expression.length - 1);
         const id = noBraces;
-        const name = 'template-' + template.length;
         keys.push(id);
-        return `<template interpolate end id="${id}" name="${name}"></template>`;
+        return `<template interpolate end id="${id}"></template>`;
     });
     return { string, keys };
 }
@@ -4528,7 +4599,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-let innerCallback = (callback) => (...args) => {
+let innerCallback = (callback) => (a, b, c, d, e, f) => {
     throw new _errors__WEBPACK_IMPORTED_MODULE_3__.SyncCallbackError('Callback function was called immediately in sync and must instead be call async');
 };
 const callbackMaker = () => innerCallback;
@@ -5047,9 +5118,10 @@ _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig = {
     array: [], // state memory on the first render
     // rearray: [] as StateConfigArray, // state memory to be used before the next render
 };
+const beforeRender = (tagSupport) => initState(tagSupport);
 (0,_setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse)({
-    beforeRender: (tagSupport) => initState(tagSupport),
-    beforeRedraw: (tagSupport) => initState(tagSupport),
+    beforeRender,
+    beforeRedraw: beforeRender,
     afterRender: (tagSupport) => {
         const state = tagSupport.memory.state;
         const config = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig;
@@ -5174,15 +5246,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 class Subject {
     value;
+    onSubscription;
     methods = [];
     isSubject = true;
     subscribers = [];
     subscribeWith;
     // unsubcount = 0 // 🔬 testing
-    constructor(value) {
+    constructor(value, onSubscription) {
         this.value = value;
+        this.onSubscription = onSubscription;
     }
     subscribe(callback) {
+        const subscription = getSubscription(this, callback);
         // are we within a pipe?
         const subscribeWith = this.subscribeWith;
         if (subscribeWith) {
@@ -5190,31 +5265,40 @@ class Subject {
             if (this.methods.length) {
                 const orgCallback = callback;
                 callback = (value) => {
-                    runPipedMethods(value, this.methods, lastValue => orgCallback(lastValue));
+                    runPipedMethods(value, this.methods, lastValue => orgCallback(lastValue, subscription));
                 };
             }
             return subscribeWith(callback);
         }
-        this.subscribers.push(callback);
-        SubjectClass.globalSubs.push(callback); // 🔬 testing
-        const subscription = getSubscription(this, callback);
+        this.subscribers.push(subscription);
+        SubjectClass.globalSubs.push(subscription); // 🔬 testing
+        if (this.onSubscription) {
+            this.onSubscription(subscription);
+        }
         return subscription;
     }
     set(value) {
         this.value = value;
         // Notify all subscribers with the new value
-        this.subscribers.forEach((callback) => {
-            callback.value = value;
-            callback(value);
+        this.subscribers.forEach(sub => {
+            // (sub.callback as any).value = value
+            sub.callback(value, sub);
         });
     }
     next = this.set;
     toPromise() {
         return new Promise((res, rej) => {
-            const subscription = this.subscribe(x => {
+            this.subscribe((x, subscription) => {
                 subscription.unsubscribe();
                 res(x);
             });
+        });
+    }
+    // like toPromise but faster
+    toCallback(callback) {
+        this.subscribe((x, subscription) => {
+            subscription.unsubscribe();
+            callback(x);
         });
     }
     pipe(...operations) {
@@ -5225,7 +5309,7 @@ class Subject {
     }
 }
 function removeSubFromArray(subscribers, callback) {
-    const index = subscribers.indexOf(callback);
+    const index = subscribers.findIndex(sub => sub.callback === callback);
     if (index !== -1) {
         subscribers.splice(index, 1);
     }
@@ -5240,6 +5324,7 @@ function getSubscription(subject, callback) {
     const subscription = () => {
         subscription.unsubscribe();
     };
+    subscription.callback = callback;
     subscription.subscriptions = [];
     // Return a function to unsubscribe from the BehaviorSubject
     subscription.unsubscribe = () => {
@@ -5255,6 +5340,9 @@ function getSubscription(subject, callback) {
     subscription.add = (sub) => {
         subscription.subscriptions.push(sub);
         return subscription;
+    };
+    subscription.next = (value) => {
+        callback(value, subscription);
     };
     return subscription;
 }
@@ -5299,7 +5387,7 @@ class ValueSubject extends _Subject_class__WEBPACK_IMPORTED_MODULE_0__.Subject {
     subscribe(callback) {
         const subscription = super.subscribe(callback);
         // Call the callback immediately with the current value
-        callback(this.value);
+        callback(this.value, subscription);
         return subscription;
     }
 }
@@ -5644,11 +5732,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   runAfterRender: () => (/* binding */ runAfterRender),
 /* harmony export */   runBeforeDestroy: () => (/* binding */ runBeforeDestroy),
 /* harmony export */   runBeforeRedraw: () => (/* binding */ runBeforeRedraw),
-/* harmony export */   runBeforeRender: () => (/* binding */ runBeforeRender)
+/* harmony export */   runBeforeRender: () => (/* binding */ runBeforeRender),
+/* harmony export */   tagClosed$: () => (/* binding */ tagClosed$)
 /* harmony export */ });
 /* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./state */ "../main/ts/state/index.ts");
+/* harmony import */ var _subject__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./subject */ "../main/ts/subject/index.ts");
 // TODO: This should be more like `new TaggedJs().use({})`
 
+
+// Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
+const tagClosed$ = new _subject__WEBPACK_IMPORTED_MODULE_1__.Subject(undefined, subscription => {
+    if (!_state__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.rearray) {
+        subscription.next(); // we are not currently processing so process now
+    }
+});
 // Life cycle 1
 function runBeforeRender(tagSupport, tagOwner) {
     _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.beforeRender(tagSupport, tagOwner));
@@ -5656,6 +5753,7 @@ function runBeforeRender(tagSupport, tagOwner) {
 // Life cycle 2
 function runAfterRender(tagSupport, tag) {
     _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.afterRender(tagSupport, tag));
+    tagClosed$.next(tag);
 }
 // Life cycle 3
 function runBeforeRedraw(tagSupport, tag) {

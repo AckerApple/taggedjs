@@ -14,10 +14,10 @@ export const IsolatedApp = tag(() => {
     // 'content',
     // 'counters',
 
-    // 'props',
+    'props',
     // 'providerDebug',
     
-    'arrays',
+    // 'arrays',
     // 'tagSwitchDebug',
     
     // 'child',
@@ -30,7 +30,7 @@ export const IsolatedApp = tag(() => {
     console.log('app init should only run once')    
 
     appCounterSubject.subscribe(
-      callback((x) => {
+      callback(x => {
         console.log('callback increase counter', {appCounter, x})
         appCounter = x
       })

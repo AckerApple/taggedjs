@@ -22,16 +22,16 @@ export const App = tag(() => {
 
   function runTesting(manual = true) {
     const waitFor = 1000
-    setTimeout(() => {
+    setTimeout(async () => {
       console.debug('🏃 Running tests...')
-      const result = runTests()
+      const result = await runTests()
 
       if(!manual) {
         return
       }
 
       if(result) {
-        alert('✅ all tests passed')
+        alert('✅ all app tests passed')
         return
       }
 
