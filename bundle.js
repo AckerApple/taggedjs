@@ -2859,12 +2859,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _letState_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./letState.function */ "./ts/state/letState.function.ts");
 
-/** When an item in watch array changes, callback function will be triggered */
+/**
+ * When an item in watch array changes, callback function will be triggered
+ * @param currentValues T[]
+ * @param callback WatchCallback
+ * @returns T[]
+ */
 function watch(currentValues, callback) {
     let previousValues = (0,_letState_function__WEBPACK_IMPORTED_MODULE_0__.letState)(undefined)(x => [previousValues, previousValues = x]);
+    // First time running watch?
     if (previousValues === undefined) {
-        callback(currentValues, previousValues);
-        // const result = {currentValues, previousValues}
+        // callback(currentValues, previousValues) // do not call during init
         previousValues = currentValues;
         return currentValues;
     }
