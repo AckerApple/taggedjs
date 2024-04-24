@@ -7,47 +7,47 @@ import { TagSubject } from "./subject.types"
 
 describe('Tag.class', () => {
   it('simple update', () => {
-    let [tag0, tag1] = getTags()
+    const {tagSupport0, tagSupport1} = getTags()
 
-    tag0.updateBy(tag1)
-    const template = tag0.getTemplate()
-    expect(template.string).toBe( tag1.getTemplate().string )
+    tagSupport0.updateBy(tagSupport1)
+    const template = tagSupport0.getTemplate()
+    expect(template.string).toBe( tagSupport1.getTemplate().string )
   })
 
   it('middle variable update', () => {
-    let [tag0, tag1] = getTags({
+    let {tagSupport0, tagSupport1} = getTags({
       html0: html`test`,
       html1: html`test ${1} test`,
     })
 
-    tag0.updateBy(tag1)
-    const template = tag0.getTemplate()
-    expect(template.string).toBe( tag1.getTemplate().string )
+    tagSupport0.updateBy(tagSupport1)
+    const template = tagSupport0.getTemplate()
+    expect(template.string).toBe( tagSupport1.getTemplate().string )
     expect(template.strings).toEqual( [ 'test ', ' test' ] )
     expect(template.values).toEqual( [ 1 ] )
   })
 
   it('end variable update', () => {
-    let [tag0, tag1] = getTags({
+    let {tagSupport0, tagSupport1} = getTags({
       html0: html`test`,
       html1: html`test end ${1}`,
     })
 
-    tag0.updateBy(tag1)
-    const template = tag0.getTemplate()
+    tagSupport0.updateBy(tagSupport1)
+    const template = tagSupport0.getTemplate()
     expect(template.string).toBe( 'test end <template interpolate end id="__tagvar0"></template>' )
     expect(template.strings).toEqual( [ 'test end ', '' ] )
     expect(template.values).toEqual( [ 1 ] )
   })
 
   it('only variable', () => {
-    let [tag0, tag1] = getTags({
+    let {tagSupport0, tagSupport1} = getTags({
       html0: html`test`,
       html1: html`${1}`,
     })
 
-    tag0.updateBy(tag1)
-    const template = tag0.getTemplate()
+    tagSupport0.updateBy(tagSupport1)
+    const template = tagSupport0.getTemplate()
     expect(template.string).toBe('<template interpolate end id="__tagvar0"></template>')
     expect(template.strings).toEqual( ['', ''] )
     expect(template.values).toEqual( [ 1 ] )
@@ -66,33 +66,31 @@ function getTags(
     children: new ValueSubject<Tag[]>([]),
   } as TemplaterResult
 
+  const templater1 = {
+    children: new ValueSubject<Tag[]>([]),
+  } as TemplaterResult
+
   const subject = new ValueSubject(templater0) as TagSubject
 
   const tag0 = new Tag(html0.strings, html0.values)
   const tag1 = new Tag(html1.strings, html1.values)
-  /*    global: {
-      context: {},
-      oldest: tag0,
-    },
-    */
-  const tagSupport0 = new TagSupport(tag0.templater, {} as any as TagSupport, html0.values)
-  const tagSupport1 = new TagSupport(tag1.templater, {} as any as TagSupport, html1.values)
-  
-  tag0.hasLiveElements = true
+
+  tag0.templater = templater0
+  tag1.templater = templater1
+  templater0.tag = tag0
+  templater1.tag = tag1
+
+  const tagSupport0 = new TagSupport(tag0.templater, {} as any as TagSupport, subject)
+  const tagSupport1 = new TagSupport(tag1.templater, {} as any as TagSupport, subject)
+
+  tagSupport0.global.oldest = tagSupport0
+  tagSupport1.global.oldest = tagSupport1
+
+  tagSupport0.hasLiveElements = true
 
   const ownerTagSupport = {} as TagSupport
 
   subject.set(templater0)
-  tag0.tagSupport = new TagSupport(ownerTagSupport, templater0, subject)
 
-  const templater1 = {
-    global: {
-      context: {},
-      oldest: tag1,
-    },
-    children: new ValueSubject<Tag[]>([]),
-  } as TemplaterResult
-  tag1.tagSupport = new TagSupport(ownerTagSupport, templater1, subject)
-
-  return [tag0, tag1]
+  return {tag0, tag1, tagSupport0, tagSupport1}
 }
