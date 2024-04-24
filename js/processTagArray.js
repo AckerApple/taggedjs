@@ -1,11 +1,13 @@
 import { ValueSubject } from './subject/ValueSubject';
 import { ArrayNoKeyError } from './errors';
 import { destroyArrayTag } from './checkDestroyPrevious.function';
-import { applyFakeTemplater } from './processTag.function';
+import { setupNewTemplater, tagFakeTemplater } from './processTag.function';
+import { TagSupport } from './TagSupport.class';
+import { isTagClass } from './isInstance';
 export function processTagArray(subject, value, // arry of Tag classes
 insertBefore, // <template end interpolate />
-ownerTag, options) {
-    const clones = ownerTag.clones; // []
+ownerSupport, options) {
+    const clones = ownerSupport.clones; // []
     let lastArray = subject.lastArray = subject.lastArray || [];
     if (!subject.placeholder) {
         setPlaceholderElm(insertBefore, subject);
@@ -17,14 +19,17 @@ ownerTag, options) {
         const newLength = value.length - 1;
         const at = index - removed;
         const lessLength = newLength < at;
-        const subTag = value[index - removed];
-        const subArrayValue = subTag?.memory.arrayValue;
-        const tag = item.tag;
-        const destroyItem = lessLength || !areLikeValues(subArrayValue, tag.memory.arrayValue);
+        const subValue = value[index - removed];
+        const subTag = subValue;
+        // const tag = subTag?.templater.tag as Tag
+        const lastTag = item.tagSupport.templater.tag;
+        const newArrayValue = subTag?.memory.arrayValue;
+        const lastArrayValue = lastTag.memory.arrayValue;
+        const destroyItem = lessLength || !areLikeValues(newArrayValue, lastArrayValue);
         if (destroyItem) {
             const last = lastArray[index];
-            const tag = last.tag;
-            destroyArrayTag(tag, options.counts);
+            const tagSupport = last.tagSupport;
+            destroyArrayTag(tagSupport, options.counts);
             last.deleted = true;
             ++removed;
             ++options.counts.removed;
@@ -32,22 +37,28 @@ ownerTag, options) {
         }
         return true;
     });
-    value.forEach((subTag, index) => {
+    value.forEach((item, index) => {
         const previous = lastArray[index];
-        const previousSupport = previous?.tag.tagSupport;
-        const fakeSubject = new ValueSubject({});
-        applyFakeTemplater(subTag, ownerTag, fakeSubject);
+        const previousSupport = previous?.tagSupport;
+        const subTag = item;
+        if (isTagClass(subTag) && !subTag.templater) {
+            tagFakeTemplater(subTag);
+        }
+        const tagSupport = new TagSupport(subTag.templater, ownerSupport, new ValueSubject(undefined));
+        // tagSupport.templater = subTag.templater
         if (previousSupport) {
-            subTag.tagSupport.templater.global = previousSupport.templater.global;
-            previousSupport.templater.global.newest = subTag;
+            setupNewTemplater(tagSupport, ownerSupport, previousSupport.subject);
+            const global = previousSupport.global;
+            tagSupport.global = global;
+            global.newest = tagSupport;
         }
         // check for html``.key()
         const keySet = 'arrayValue' in subTag.memory;
         if (!keySet) {
             const details = {
-                template: subTag.getTemplate().string,
+                template: tagSupport.getTemplate().string,
                 array: value,
-                ownerTagContent: ownerTag.lastTemplateString,
+                ownerTagContent: ownerSupport.lastTemplateString,
             };
             const message = 'Use html`...`.key(item) instead of html`...` to template an Array';
             console.error(message, details);
@@ -56,21 +67,15 @@ ownerTag, options) {
         }
         const couldBeSame = lastArray.length > index;
         if (couldBeSame) {
-            const prevSupport = previous.tag.tagSupport;
-            const prevGlobal = prevSupport.templater.global;
-            /*
-            const isSame = areLikeValues(
-              previous.tag.memory.arrayValue,
-              subTag.memory.arrayValue,
-            )
-            */
-            subTag.tagSupport = subTag.tagSupport || prevSupport;
+            const prevSupport = previous.tagSupport;
+            const prevGlobal = prevSupport.global;
+            // subTag.tagSupport = subTag.tagSupport || prevSupport
             const oldest = prevGlobal.oldest;
-            oldest.updateByTag(subTag);
+            oldest.updateBy(tagSupport);
             return [];
         }
-        processAddTagArrayItem(runtimeInsertBefore, subTag, index, options, lastArray);
-        ownerTag.childTags.push(subTag);
+        processAddTagArrayItem(runtimeInsertBefore, tagSupport, index, options, lastArray);
+        ownerSupport.childTags.push(tagSupport);
     });
     return clones;
 }
@@ -84,9 +89,9 @@ function setPlaceholderElm(insertBefore, subject) {
     parentNode.insertBefore(placeholder, insertBefore);
     parentNode.removeChild(insertBefore);
 }
-function processAddTagArrayItem(before, subTag, index, options, lastArray) {
+function processAddTagArrayItem(before, tagSupport, index, options, lastArray) {
     const lastValue = {
-        tag: subTag, index
+        tagSupport, index
     };
     // Added to previous array
     lastArray.push(lastValue);
@@ -97,7 +102,7 @@ function processAddTagArrayItem(before, subTag, index, options, lastArray) {
     const newTempElm = document.createElement('template');
     const parent = before.parentNode;
     parent.insertBefore(newTempElm, before);
-    subTag.buildBeforeElement(newTempElm, // before,
+    tagSupport.buildBeforeElement(newTempElm, // before,
     { counts, forceElement: options.forceElement });
 }
 /** compare two values. If both values are arrays then the items will be compared */

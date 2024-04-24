@@ -1,6 +1,6 @@
 import { letState } from './letState.function';
 /**
- * When an item in watch array changes, callback function will be triggered
+ * When an item in watch array changes, callback function will be triggered. Does not trigger on initial watch setup.
  * @param currentValues T[]
  * @param callback WatchCallback
  * @returns T[]

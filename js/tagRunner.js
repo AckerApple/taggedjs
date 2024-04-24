@@ -8,20 +8,20 @@ export const tagClosed$ = new Subject(undefined, subscription => {
     }
 });
 // Life cycle 1
-export function runBeforeRender(tagSupport, tagOwner) {
-    setUse.tagUse.forEach(tagUse => tagUse.beforeRender(tagSupport, tagOwner));
+export function runBeforeRender(tagSupport, ownerSupport) {
+    setUse.tagUse.forEach(tagUse => tagUse.beforeRender(tagSupport, ownerSupport));
 }
 // Life cycle 2
-export function runAfterRender(tagSupport, tag) {
-    setUse.tagUse.forEach(tagUse => tagUse.afterRender(tagSupport, tag));
-    tagClosed$.next(tag);
+export function runAfterRender(tagSupport, ownerTagSupport) {
+    setUse.tagUse.forEach(tagUse => tagUse.afterRender(tagSupport, ownerTagSupport));
+    tagClosed$.next(ownerTagSupport);
 }
 // Life cycle 3
-export function runBeforeRedraw(tagSupport, tag) {
-    setUse.tagUse.forEach(tagUse => tagUse.beforeRedraw(tagSupport, tag));
+export function runBeforeRedraw(tagSupport, ownerTagSupport) {
+    setUse.tagUse.forEach(tagUse => tagUse.beforeRedraw(tagSupport, ownerTagSupport));
 }
 // Life cycle 4 - end of life
-export function runBeforeDestroy(tagSupport, tag) {
-    setUse.tagUse.forEach(tagUse => tagUse.beforeDestroy(tagSupport, tag));
+export function runBeforeDestroy(tagSupport, ownerTagSupport) {
+    setUse.tagUse.forEach(tagUse => tagUse.beforeDestroy(tagSupport, ownerTagSupport));
 }
 //# sourceMappingURL=tagRunner.js.map

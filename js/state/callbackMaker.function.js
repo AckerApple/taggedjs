@@ -33,18 +33,17 @@ function initMemory(tagSupport) {
 }
 function triggerStateUpdate(tagSupport, callback, oldState, ...args) {
     const state = tagSupport.memory.state;
-    const newest = state.newest;
     // ensure that the oldest has the latest values first
-    updateState(newest, oldState);
+    updateState(state, oldState);
     // run the callback
     const promise = callback(...args);
     // send the oldest state changes into the newest
-    updateState(oldState, newest);
+    updateState(oldState, state);
     renderTagSupport(tagSupport, false);
     if (promise instanceof Promise) {
         promise.finally(() => {
             // send the oldest state changes into the newest
-            updateState(oldState, newest);
+            updateState(oldState, state);
             renderTagSupport(tagSupport, false);
         });
     }

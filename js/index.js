@@ -9,7 +9,7 @@ export * from "./isInstance";
 export * from "./state/index";
 export * from "./TagSupport.class";
 // export * from "./redrawTag.function"
-export * from "./interpolateElement";
+export * from "./interpolations/interpolateElement";
 // TODO: export *
 export { tagElement } from "./tagElement";
 export { Tag } from "./Tag.class";

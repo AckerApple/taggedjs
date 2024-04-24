@@ -1,11 +1,11 @@
-import { isTagInstance } from './isInstance';
+import { isTag } from './isInstance';
 import { renderTagSupport } from './renderTagSupport.function';
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(props, ownerSupport) {
     function callback(toCall, callWith) {
         return callbackPropOwner(toCall, callWith, ownerSupport);
     }
-    const isPropTag = isTagInstance(props);
+    const isPropTag = isTag(props);
     const watchProps = isPropTag ? 0 : props;
     const newProps = resetFunctionProps(watchProps, callback);
     return newProps;
@@ -36,8 +36,8 @@ function resetFunctionProps(props, callback) {
 }
 export function callbackPropOwner(toCall, callWith, ownerSupport) {
     const callbackResult = toCall(...callWith);
-    const lastestOwner = ownerSupport.templater.global.newest;
-    renderTagSupport(lastestOwner.tagSupport, true);
+    const lastestOwner = ownerSupport.global.newest;
+    renderTagSupport(lastestOwner, true);
     return callbackResult;
 }
 //# sourceMappingURL=alterProps.function.js.map
