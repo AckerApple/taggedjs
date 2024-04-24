@@ -9,7 +9,7 @@ describe('Tag.class', () => {
   it('simple update', () => {
     let [tag0, tag1] = getTags()
 
-    tag0.updateByTag(tag1)
+    tag0.updateBy(tag1)
     const template = tag0.getTemplate()
     expect(template.string).toBe( tag1.getTemplate().string )
   })
@@ -20,7 +20,7 @@ describe('Tag.class', () => {
       html1: html`test ${1} test`,
     })
 
-    tag0.updateByTag(tag1)
+    tag0.updateBy(tag1)
     const template = tag0.getTemplate()
     expect(template.string).toBe( tag1.getTemplate().string )
     expect(template.strings).toEqual( [ 'test ', ' test' ] )
@@ -33,7 +33,7 @@ describe('Tag.class', () => {
       html1: html`test end ${1}`,
     })
 
-    tag0.updateByTag(tag1)
+    tag0.updateBy(tag1)
     const template = tag0.getTemplate()
     expect(template.string).toBe( 'test end <template interpolate end id="__tagvar0"></template>' )
     expect(template.strings).toEqual( [ 'test end ', '' ] )
@@ -46,7 +46,7 @@ describe('Tag.class', () => {
       html1: html`${1}`,
     })
 
-    tag0.updateByTag(tag1)
+    tag0.updateBy(tag1)
     const template = tag0.getTemplate()
     expect(template.string).toBe('<template interpolate end id="__tagvar0"></template>')
     expect(template.strings).toEqual( ['', ''] )
@@ -62,21 +62,27 @@ function getTags(
     html1: html`testing-1482`,
   }
 ) {
-  const tag0 = new Tag(html0.strings, html0.values)
-  const tag1 = new Tag(html1.strings, html1.values)
-  
-  tag0.hasLiveElements = true
-
-  const ownerTagSupport = {} as TagSupport
   const templater0 = {
-    global: {
-      context: {},
-      oldest: tag0,
-    },
     children: new ValueSubject<Tag[]>([]),
   } as TemplaterResult
 
   const subject = new ValueSubject(templater0) as TagSubject
+
+  const tag0 = new Tag(html0.strings, html0.values)
+  const tag1 = new Tag(html1.strings, html1.values)
+  /*    global: {
+      context: {},
+      oldest: tag0,
+    },
+    */
+  const tagSupport0 = new TagSupport(tag0.templater, {} as any as TagSupport, html0.values)
+  const tagSupport1 = new TagSupport(tag1.templater, {} as any as TagSupport, html1.values)
+  
+  tag0.hasLiveElements = true
+
+  const ownerTagSupport = {} as TagSupport
+
+  subject.set(templater0)
   tag0.tagSupport = new TagSupport(ownerTagSupport, templater0, subject)
 
   const templater1 = {
