@@ -1,19 +1,21 @@
 import { expect } from "./expect"
 
 export function expectMatchedHtml(
-  query0: string,
-  query1: string,
+  ...queries: string[]
 ) {
-//  const found = elementCount(query)
-  const elements0 = document.querySelectorAll(query0)
-  const elements1 = document.querySelectorAll(query1)
+  const elements = queries.reduce((all, query) => {
+      const elements = document.querySelectorAll(query)
+      all.push(...elements)
+      return all
+    }, [] as Element[]
+  )
 
-  expect(elements0.length).toBeGreaterThan(0)
-  expect(elements1.length).toBeGreaterThan(0)
-  expect(elements0.length).toBe(elements1.length)
+  expect(elements.length).toBeGreaterThan(0)
 
-  elements0.forEach((element0, index) =>
-    expect(element0.innerHTML).toBe(elements1[index].innerHTML)
+  const lastElm = elements.pop() as Element
+  const lastHtml = lastElm.innerHTML
+  elements.every(elm =>
+    expect(lastHtml).toBe(elm.innerHTML)
   )
 }
 
@@ -27,7 +29,7 @@ export function expectHTML(
   )
 }
 
-export function expectElementCount(
+export function expectElmCount(
   query: string,
   count: number,
   message?: string
@@ -47,12 +49,12 @@ export function testDuelCounterElements(
   [button0, display0]: [string, string], // button, display
   [button1, display1]: [string, string], // button, display
 ) {
-  let query = expectElementCount(display0, 1)
+  let query = expectElmCount(display0, 1)
   const display0Element = query[0] as HTMLElement
   const ip0 = display0Element.innerText
   testCounterElements(button0, display0)
   
-  query = expectElementCount(display1, 1)
+  query = expectElmCount(display1, 1)
   let display1Element = query[0] as HTMLElement
   let ip1Check = display1Element.innerText
   const value = (Number(ip0) + 2).toString()
@@ -60,7 +62,7 @@ export function testDuelCounterElements(
  
   testCounterElements(button1, display1)
   
-  query = expectElementCount(display1, 1)
+  query = expectElmCount(display1, 1)
   display1Element = query[0] as HTMLElement
   ip1Check = display1Element.innerText
   expect(ip1Check).toBe((Number(ip0) + 4).toString(), `Expected ${display1} innerText to be ${Number(ip0) + 4} but instead it is ${ip1Check}`)

@@ -51,7 +51,12 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
 
   return html`
     <div id="selectTag-wrap">
-      selectedTag: |${selectedTag == null ? 'null' : selectedTag}|
+      selectedTag: |${
+        selectedTag === null && 'null' ||
+        selectedTag === undefined && 'undefined' ||
+        selectedTag === '' && 'empty-string' ||
+        selectedTag
+      }|
     </div>
     
     <select id="tag-switch-dropdown" onchange=${changeSelectedTag}>
@@ -70,17 +75,17 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
         <h3>Test 1 - string | Tag</h3>
         <div>${tagOutput}</div>
       </div>
-
+      
       <div style="border:1px solid blue;flex-grow:1">
         <h3>Test 2 - Tag</h3>
         <div>${tagOutput2}</div>
       </div>
-
+      
       <div style="border:1px solid blue;flex-grow:1">
         <h3>Test 3 - ternary (only 1 or 3 shows)</h3>
         <div>${selectedTag === '3' ? tag3({title: 'ternary simple'}) : tag1({title: 'ternary simple'})}</div>
       </div>
-      
+
       <div style="border:1px solid blue;flex-grow:1">
         <h3>Test 3.2 - ternary via prop (only 1 or 3 shows)</h3>
         <div>${ternaryPropTest({selectedTag})}</div>
@@ -98,8 +103,11 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
 export const ternaryPropTest = tag((
   {selectedTag}: {selectedTag: string | undefined | null}
 ) => {
+  const outTag = selectedTag === '3' ? tag3({title: 'ternaryPropTest'}) : tag1({title: 'ternaryPropTest'})
   return html`
-  <div>${selectedTag === '3' ? tag3({title: 'ternaryPropTest'}) : tag1({title: 'ternaryPropTest'})}</div>
+    <div id="ternaryPropTest-wrap">
+      ${selectedTag}:${outTag}
+    </div>
   `
 })
 

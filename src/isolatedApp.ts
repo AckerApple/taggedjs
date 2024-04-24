@@ -2,22 +2,24 @@ import { childTests } from "./childTests"
 import { Subject, callbackMaker, html, onInit, letState, tag, state } from "taggedjs"
 import { arrayTests } from "./arrayTests"
 import { tagSwitchDebug } from "./tagSwitchDebug.component"
+import { mirroring } from "./mirroring.tag"
 import { propsDebugMain } from "./PropsDebug.component"
 import { providerDebugBase } from "./providerDebug"
 import { counters } from "./countersDebug"
 import { tableDebug } from "./tableDebug.component"
 import { contentDebug } from "./ContentDebug.component"
 
-type viewTypes = 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
+type viewTypes = 'mirroring' | 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
 export const IsolatedApp = tag(() => {
   const views: viewTypes[] = [
     // 'content',
     // 'counters',
 
-    'props',
+    // 'props',
+    // 'mirroring',
     // 'providerDebug',
     
-    // 'arrays',
+    'arrays',
     // 'tagSwitchDebug',
     
     // 'child',
@@ -67,6 +69,13 @@ export const IsolatedApp = tag(() => {
           <fieldset style="flex:2 2 20em">
             <legend>tagSwitchDebug</legend>
             ${tagSwitchDebug(undefined)}
+          </fieldset>
+        `}
+
+        ${views.includes('mirroring') && html`
+          <fieldset style="flex:2 2 20em">
+            <legend>mirroring</legend>
+            ${mirroring(undefined)}
           </fieldset>
         `}
 

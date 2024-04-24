@@ -4,6 +4,7 @@ import { tableDebug } from "./tableDebug.component"
 import { html, tag, letState, onInit, state, Subject, callbackMaker } from "taggedjs"
 import { tagDebug } from "./tagJsDebug"
 import { tagSwitchDebug } from "./tagSwitchDebug.component"
+import { mirroring } from "./mirroring.tag"
 import { childTests } from "./childTests"
 import { runTests } from "./tests"
 import { renderCountDiv } from "./renderCount.component"
@@ -102,6 +103,11 @@ export const App = tag(() => {
         <fieldset style="flex:2 2 20em">
           <legend>Tag Switching</legend>
           ${tagSwitchDebug(undefined)}
+        </fieldset>
+
+        <fieldset style="flex:2 2 20em">
+          <legend>Tag Mirroring</legend>
+          ${mirroring()}
         </fieldset>
 
         <fieldset style="flex:2 2 20em">

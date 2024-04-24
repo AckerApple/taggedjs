@@ -1,10 +1,14 @@
-import { byId, elementCount, queryOneInnerHTML } from "./elmSelectors"
+import { byId, elmCount, htmlById, queryOneInnerHTML } from "./elmSelectors"
 import { describe, execute, expect, it } from "./expect"
-import { expectElementCount, expectMatchedHtml, testCounterElements, testDuelCounterElements } from "./expect.html"
+import { expectElmCount, expectMatchedHtml, testCounterElements, testDuelCounterElements } from "./expect.html"
 
 export async function runTests() {
+  it('no template tags', () => {
+    const templateTags = document.getElementsByTagName('template')
+    expect(templateTags.length).toBe(0, 'Expected no templates to be on document')
+  })
+  
   it('elements exists', () => {
-    expect(document.getElementsByTagName('template').length).toBe(0)
     expect(document.getElementById('h1-app')).toBeDefined()
     const toggleTest = document.getElementById('toggle-test')
     expect(toggleTest).toBeDefined()
@@ -34,11 +38,11 @@ export async function runTests() {
   })
 
   it('basic increase counter', () => {
-    expectElementCount('#conditional-counter', 0)
+    expectElmCount('#conditional-counter', 0)
     testCounterElements('#❤️-increase-counter', '#❤️-counter-display')
     testCounterElements('#❤️-inner-counter', '#❤️-inner-display')
     testCounterElements('#standalone-counter', '#standalone-display')
-    expectElementCount('#conditional-counter', 1)
+    expectElmCount('#conditional-counter', 1)
     testCounterElements('#conditional-counter', '#conditional-display')
     
     // test again after higher elements have had reruns
@@ -56,7 +60,9 @@ export async function runTests() {
       ['#propsOneLevelFunUpdate-🥩-button', '#propsOneLevelFunUpdate-🥩-display'],
     )
 
-    expect(queryOneInnerHTML('#propsDebug-🥩-change-display')).toBe('9')
+    // the number of times the watch counted a change happens to match that increase counter
+    const funUpdateValue = byId('propsOneLevelFunUpdate-🥩-display').innerHTML
+    expect(queryOneInnerHTML('#propsDebug-🥩-change-display')).toBe( funUpdateValue )
 
     const ownerHTML = document.querySelectorAll('#propsDebug-🥩-0-display')[0].innerHTML
     const parentHTML = document.querySelectorAll('#propsDebug-🥩-1-display')[0].innerHTML
@@ -107,56 +113,70 @@ export async function runTests() {
   })
 
   it('tagSwitching', () => {
-    expect(elementCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined')
-    expect(elementCount('#tag-switch-dropdown')).toBe(1, 'Expected one #tag-switch-dropdown')
-    expect(elementCount('#tagSwitch-1-hello')).toBe(2, 'Expected two #tagSwitch-1-hello elements')
-    expect(elementCount('#tagSwitch-2-hello')).toBe(0)
-    expect(elementCount('#tagSwitch-3-hello')).toBe(0)
+    expect(elmCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined')
+    expect(elmCount('#tag-switch-dropdown')).toBe(1, 'Expected one #tag-switch-dropdown')
+    expect(elmCount('#tagSwitch-1-hello')).toBe(2, 'Expected two #tagSwitch-1-hello elements')
+    expect(elmCount('#tagSwitch-2-hello')).toBe(0)
+    expect(elmCount('#tagSwitch-3-hello')).toBe(0)
 
     const dropdown = document.getElementById('tag-switch-dropdown') as HTMLSelectElement
     dropdown.value = "1"
 
     ;(dropdown as any).onchange({target:dropdown})
-    expectElementCount('#tagSwitch-1-hello', 5)
-    expect(elementCount('#tagSwitch-2-hello')).toBe(0)
-    expect(elementCount('#tagSwitch-3-hello')).toBe(0)
-    expect(elementCount('#select-tag-above')).toBe(0)
+    expectElmCount('#tagSwitch-1-hello', 5)
+    expect(elmCount('#tagSwitch-2-hello')).toBe(0)
+    expect(elmCount('#tagSwitch-3-hello')).toBe(0)
+    expect(elmCount('#select-tag-above')).toBe(0)
 
     dropdown.value = "2"
     ;(dropdown as any).onchange({target:dropdown})
 
-    expectElementCount('#tagSwitch-1-hello', 2)
-    expectElementCount('#tagSwitch-2-hello', 4)
-    expect(elementCount('#tagSwitch-3-hello')).toBe(0)
-    expect(elementCount('#select-tag-above')).toBe(0)
+    expectElmCount('#tagSwitch-1-hello', 2)
+    expectElmCount('#tagSwitch-2-hello', 4)
+    expect(elmCount('#tagSwitch-3-hello')).toBe(0)
+    expect(elmCount('#select-tag-above')).toBe(0)
 
     dropdown.value = "3"
     ;(dropdown as any).onchange({target:dropdown})
 
-    expect(elementCount('#tagSwitch-1-hello')).toBe(0,'Expected no hello 1s')
-    expect(elementCount('#tagSwitch-2-hello')).toBe(0)
-    expectElementCount('#tagSwitch-3-hello', 7)
-    expect(elementCount('#select-tag-above')).toBe(0)
+    expect(elmCount('#tagSwitch-1-hello')).toBe(0,'Expected no hello 1s')
+    expect(elmCount('#tagSwitch-2-hello')).toBe(0)
+    expectElmCount('#tagSwitch-3-hello', 7)
+    expect(elmCount('#select-tag-above')).toBe(0)
 
     dropdown.value = ""
     ;(dropdown as any).onchange({target:dropdown})
 
-    expectElementCount('#select-tag-above',1)
-    expectElementCount('#tag-switch-dropdown',1)
-    expectElementCount('#tagSwitch-1-hello',2)
-    expectElementCount('#tagSwitch-2-hello',0)
-    expectElementCount('#tagSwitch-3-hello',0)
+    expectElmCount('#select-tag-above',1)
+    expectElmCount('#tag-switch-dropdown',1)
+    expectElmCount('#tagSwitch-1-hello',2)
+    expectElmCount('#tagSwitch-2-hello',0)
+    expectElmCount('#tagSwitch-3-hello',0)
+  })
+
+  it('child tests', () => {
+    testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display')
+    testCounterElements('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display')
+    testDuelCounterElements(
+      ['#childTests-button', '#childTests-display'],
+      ['#innerHtmlPropsTest-childTests-button', '#innerHtmlPropsTest-childTests-display'],
+    )
+
+    testDuelCounterElements(
+      ['#childTests-button', '#childTests-display'],
+      ['#innerHtmlTest-childTests-button', '#innerHtmlTest-childTests-display'],
+    )
   })
 
   describe('array testing', () => {
     it('array basics', () => {
-      expect(elementCount('#array-test-push-item')).toBe(1)
-      const insideCount = elementCount('#score-data-0-1-inside-button')
+      expect(elmCount('#array-test-push-item')).toBe(1)
+      const insideCount = elmCount('#score-data-0-1-inside-button')
       expect(insideCount).toBe(0)
-      expect(elementCount('#score-data-0-1-outside-button')).toBe(0)
+      expect(elmCount('#score-data-0-1-outside-button')).toBe(0)
       document.getElementById('array-test-push-item')?.click()
-      expect(elementCount('#score-data-0-1-inside-button')).toBe(1)
-      expect(elementCount('#score-data-0-1-outside-button')).toBe(1)
+      expect(elmCount('#score-data-0-1-inside-button')).toBe(1)
+      expect(elmCount('#score-data-0-1-outside-button')).toBe(1)
       
       const insideElm = document.getElementById('score-data-0-1-inside-button')
       const insideDisplay = document.getElementById('score-data-0-1-inside-display')
@@ -177,35 +197,34 @@ export async function runTests() {
       expect(indexValue).toBe((Number(outsideDisplay?.innerText) - 2).toString())
     })
 
-    it('deletes', async () => {
-      expect(elementCount('#player-remove-promise-btn-0')).toBe(0)
-      expect(elementCount('#player-edit-btn-0')).toBe(1)
+    it('🗑️ deletes', async () => {
+      expect(elmCount('#player-remove-promise-btn-0')).toBe(0)
+      expect(elmCount('#player-edit-btn-0')).toBe(1)
 
       await (byId('player-edit-btn-0') as any).onclick()
 
-      expect(elementCount('#player-remove-promise-btn-0')).toBe(1)
+      expect(elmCount('#player-remove-promise-btn-0')).toBe(1)
 
       await (byId('player-remove-promise-btn-0') as any).onclick()
       await delay(1000) // animation
 
-      expect(elementCount('#player-remove-promise-btn-0')).toBe(0)
-      expect(elementCount('#player-edit-btn-0')).toBe(0)
+      expect(elmCount('#player-remove-promise-btn-0')).toBe(0)
+      expect(elmCount('#player-edit-btn-0')).toBe(0)
     })
   })
 
-  it('child tests', () => {
-    testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display')
-    testCounterElements('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display')
-    testDuelCounterElements(
-      ['#childTests-button', '#childTests-display'],
-      ['#innerHtmlPropsTest-childTests-button', '#innerHtmlPropsTest-childTests-display'],
-    )
+  it('🪞 mirror testing', async () => {
+    expectElmCount('#mirror-counter-display', 2)
+    expectElmCount('#mirror-counter-button', 2)
+    
+    const counter = Number(htmlById('mirror-counter-display'))
 
-    testDuelCounterElements(
-      ['#childTests-button', '#childTests-display'],
-      ['#innerHtmlTest-childTests-button', '#innerHtmlTest-childTests-display'],
-    )
-  })
+    byId('mirror-counter-button').click()
+
+    expect(counter + 1).toBe( Number(htmlById('mirror-counter-display')) )
+    expectElmCount('#mirror-counter-display', 2)
+    expectMatchedHtml('#mirror-counter-display')
+  })  
 
   it('has no templates', () => {
     expect(document.getElementsByTagName('template').length).toBe(0)

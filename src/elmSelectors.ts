@@ -1,5 +1,5 @@
 
-export function elementCount(selector: string) {
+export function elmCount(selector: string) {
   return document.querySelectorAll(selector).length
 }
 
@@ -12,6 +12,10 @@ export function queryOneInnerHTML(
 
 export function byId(id: string): HTMLElement {
   return document.getElementById(id) as HTMLElement
+}
+
+export function htmlById(id: string): string {
+  return (document.getElementById(id) as HTMLElement).innerHTML
 }
 
 export function lastById(id: string): Element {

@@ -10,8 +10,6 @@ type Player = {
 }
 
 export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
-  let memory = state(() => ({counter: 0}))
-
   const players: Player[] = state([])
   let renderCount: number = letState(0)(x => [renderCount, renderCount = x])
 

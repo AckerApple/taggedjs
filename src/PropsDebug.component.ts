@@ -84,7 +84,6 @@ const propsDebug = tag((
 ) => {
   let renderCount: number = letState(0)(x => [renderCount, renderCount=x])
   let propNumberChangeCount = letState(0)(x => [propNumberChangeCount, propNumberChangeCount=x])
-  const inProp = propNumber
   const test = (x: number): [number, number] => {
     return [propNumber, propNumber = x]
   }
@@ -113,7 +112,7 @@ const propsDebug = tag((
     
     <div>
       <button id="propsDebug-🥩-1-button" onclick=${() => propNumberChange(++propNumber)}
-      >🥩 propNumber ${propNumber}</button>
+      >🐄 🥩 propNumber ${propNumber}</button>
       <span id="propsDebug-🥩-1-display">${propNumber}</span>
     </div>
     <button
@@ -123,15 +122,20 @@ const propsDebug = tag((
     
     <button onclick=${() => ++propNumber}
       title="only changes number locally but if change by parent than that is the number"
-    >local set propNumber ${propNumber}</button>
+    >🐄 🥩 local set propNumber ${propNumber}</button>
     
-    <div><small>(propNumberChangeCount:<span id="propsDebug-🥩-change-display">${propNumberChangeCount}</span>)</small></div>
+    <div>
+      <small>
+        (propNumberChangeCount:<span id="propsDebug-🥩-change-display">${propNumberChangeCount}</span>)
+      </small>
+    </div>
     
     <hr />
     <h3>Fn update test</h3>
-    ${propFnUpdateTest({propNumber, callback: () => {
-      ++propNumber
-    }})}
+    ${propFnUpdateTest({
+      propNumber,
+      callback: () => ++propNumber
+    })}
     
     ${/*renderCountDiv({renderCount, name: 'propsDebug'})*/false}
   `
@@ -148,7 +152,7 @@ const propFnUpdateTest = tag(({
   return html`
     <button id="propsOneLevelFunUpdate-🥩-button"
       onclick=${callback}
-    >🥩 local & 1-parent increase ${propNumber}</button>
+    >🐄 🥩 local & 1-parent increase ${propNumber}</button>
     <span id="propsOneLevelFunUpdate-🥩-display">${propNumber}</span>
     ${renderCountDiv({renderCount, name: 'propFnUpdateTest'})}
     <small style="opacity:.5">the count here and within parent increases but not in parent parent</small>
