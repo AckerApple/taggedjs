@@ -1,14 +1,16 @@
 export type Resolve<T> = (x: T) => any
 
-export type Subscription = (() => void) & {
-  unsubscribe: () => Subscription
-  add: (sub: Subscription) => Subscription
-  subscriptions: Subscription[] // support for combing subjects
+export type Subscription<T> = (() => void) & {
+  callback: SubjectSubscriber<T>,
+  unsubscribe: () => Subscription<T>
+  add: (sub: Subscription<T>) => Subscription<T>
+  next: (value?: T) => any
+  subscriptions: Subscription<T>[] // support for combing subjects
 }
 
 export type SubjectSubscriber<T> = (
-  ...value: T[]
-  // subscription: Subscription,
+  value: T,
+  subscription: Subscription<T>, // allows immediate unsubscribe
 ) => unknown
 
 export interface SubjectLike<T> {

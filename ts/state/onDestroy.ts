@@ -9,14 +9,14 @@ let destroyCurrentTagSupport: BaseTagSupport
 export function onDestroy(
   callback: OnDestroyCallback
 ) {
-  destroyCurrentTagSupport.templater.global.destroyCallback = callback
+  destroyCurrentTagSupport.global.destroyCallback = callback
 }
 
 setUse({
   beforeRender: tagSupport => destroyCurrentTagSupport = tagSupport,
   beforeRedraw: tagSupport => destroyCurrentTagSupport = tagSupport,
   beforeDestroy: (tagSupport, tag) => {
-    const callback = tagSupport.templater.global.destroyCallback
+    const callback = tagSupport.global.destroyCallback
 
     if(callback) {
       callback()

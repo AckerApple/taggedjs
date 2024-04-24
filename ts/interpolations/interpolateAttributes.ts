@@ -1,4 +1,5 @@
-import { Context, Tag } from "./Tag.class"
+import { Context } from "../Tag.class"
+import { TagSupport } from "../TagSupport.class"
 import { processAttribute } from "./processAttribute.function"
 
 export type HowToSet = (element: Element, name: string, value: string) => any
@@ -22,7 +23,7 @@ function howToSetInputValue(
 export function interpolateAttributes(
   child: Element,
   scope: Context,
-  ownerTag: Tag,
+  ownerSupport: TagSupport,
 ) {
   const attrNames = child.getAttributeNames()
 
@@ -34,7 +35,7 @@ export function interpolateAttributes(
     }
 
     const value = child.getAttribute(attrName)
-    processAttribute(attrName, value, child, scope, ownerTag, howToSet)
+    processAttribute(attrName, value, child, scope, ownerSupport, howToSet)
 
     howToSet = howToSetAttribute // put back
   })

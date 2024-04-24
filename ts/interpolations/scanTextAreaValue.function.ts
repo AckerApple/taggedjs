@@ -1,4 +1,5 @@
-import { Context, Tag } from './Tag.class'
+import { Context } from '../Tag.class'
+import { TagSupport } from '../TagSupport.class'
 import { HowToSet } from './interpolateAttributes'
 import { processAttribute } from './processAttribute.function'
 
@@ -7,7 +8,7 @@ const search = new RegExp('\\s*<template interpolate end id="__tagvar(\\d{1,4})"
 export function scanTextAreaValue(
   textarea: HTMLTextAreaElement,
   context: Context,
-  ownerTag: Tag,
+  ownerSupport: TagSupport,
 ) {
   const value = textarea.value
   if( value.search(search) >=0 ) {
@@ -24,7 +25,7 @@ export function scanTextAreaValue(
       dynamic, // realValue, // context[token].value,
       textarea,
       context,
-      ownerTag,
+      ownerSupport,
       howToSet,
     )  
   }

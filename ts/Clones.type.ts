@@ -1,4 +1,4 @@
-import { Template } from "./interpolateTemplate"
+import { Template } from "./interpolations/interpolateTemplate"
 
 export type InsertBefore = Element | Text | Template | ChildNode
 

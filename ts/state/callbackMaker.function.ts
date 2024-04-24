@@ -1,4 +1,4 @@
-import { BaseTagSupport } from "../TagSupport.class"
+import { BaseTagSupport, TagSupport } from "../TagSupport.class"
 import { setUse } from "./setUse.function"
 import { State, StateConfigArray, getStateValue } from "./state.utils"
 import { renderTagSupport } from "../renderTagSupport.function"
@@ -9,11 +9,9 @@ const test = () => {
   const callback = callbackMaker()
 
   testCallback(callback(x => {
-    console.log('x', x)
   }))
 
   new Subject(0).subscribe(callback(x => {
-    console.log('x', x)
   }))
 }
 
@@ -23,9 +21,14 @@ function testCallback(
   return a
 }
 */
-type Callback<A> = <T>(...args: A[]) => (T | void)
+type Callback<A,B,C,D,E,F> = <T>(
+  a: A, b: B, c: C, d: D, e: E, f: F,
+) => (T | void)
 
-let innerCallback = <A>(callback: Callback<A>) => (...args:A[]): void => {
+
+let innerCallback = <A,B,C,D,E,F>(
+  callback: Callback<A,B,C,D,E,F>
+) => (a?:A, b?:B, c?:C, d?:D, e?:E, f?:F): void => {
   throw new SyncCallbackError('Callback function was called immediately in sync and must instead be call async')
 }
 export const callbackMaker = () => innerCallback
@@ -59,7 +62,7 @@ function updateState(
 function initMemory (tagSupport: BaseTagSupport) {
   const oldState: StateConfigArray = setUse.memory.stateConfig.array
   innerCallback = (
-    callback: Callback<any>
+    callback: Callback<any, any, any, any, any, any>
   ) => {
     const trigger = (...args: any[]) => triggerStateUpdate(tagSupport, callback, oldState, ...args)
     return trigger
@@ -68,34 +71,33 @@ function initMemory (tagSupport: BaseTagSupport) {
 
 function triggerStateUpdate(
   tagSupport: BaseTagSupport,
-  callback: Callback<any>,
+  callback: Callback<any, any,any, any, any, any>,
   oldState: StateConfigArray,
   ...args: any[]
 ) {
   const state = tagSupport.memory.state as State
-  const newest = state.newest
 
   // ensure that the oldest has the latest values first
-  updateState(newest, oldState)
+  updateState(state, oldState)
   
   // run the callback
-  const promise = callback(...args)
+  const promise = callback(...args as [any,any,any,any,any,any])
 
   // send the oldest state changes into the newest
-  updateState(oldState, newest)
+  updateState(oldState, state)
   
   renderTagSupport(
-    tagSupport,
+    tagSupport as TagSupport,
     false,
   )
 
   if(promise instanceof Promise) {
     promise.finally(() => {
       // send the oldest state changes into the newest
-      updateState(oldState, newest)
+      updateState(oldState, state)
 
       renderTagSupport(
-        tagSupport,
+        tagSupport as TagSupport,
         false,
       )
     })

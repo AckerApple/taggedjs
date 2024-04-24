@@ -1,15 +1,22 @@
 import { Handler, OperatorFunction, SubjectLike, SubjectSubscriber, Subscription, setHandler } from "./Subject.utils"
 
+type OnSubscription<T> = (subscription: Subscription<T>) => unknown
+
 export class Subject<T> implements SubjectLike<T> {
   methods: OperatorFunction<any, any, any>[] = []
   isSubject = true
-  subscribers: SubjectSubscriber<T>[] = []
-  subscribeWith?: (x: SubjectSubscriber<T>) => Subscription
+  subscribers: Subscription<T>[] = []
+  subscribeWith?: (x: SubjectSubscriber<T>) => Subscription<T>
   // unsubcount = 0 // 🔬 testing
 
-  constructor(public value?: T) {}
+  constructor(
+    public value?: T,
+    public onSubscription?: OnSubscription<T>
+  ) {}
 
   subscribe(callback: SubjectSubscriber<T>) {
+    const subscription = getSubscription(this, callback)
+
     // are we within a pipe?
     const subscribeWith = this.subscribeWith
     if(subscribeWith) {
@@ -23,7 +30,7 @@ export class Subject<T> implements SubjectLike<T> {
           runPipedMethods(
             value,
             this.methods,
-            lastValue => orgCallback(lastValue)
+            lastValue => orgCallback(lastValue, subscription)
           )
         }
       }
@@ -31,30 +38,41 @@ export class Subject<T> implements SubjectLike<T> {
       return subscribeWith(callback)
     }
 
-    this.subscribers.push(callback)
-    SubjectClass.globalSubs.push(callback) // 🔬 testing
-
-    const subscription = getSubscription(this, callback)
+    this.subscribers.push(subscription)
+    SubjectClass.globalSubs.push(subscription) // 🔬 testing
+    
+    if(this.onSubscription) {
+      this.onSubscription(subscription)
+    }
+    
     return subscription
   }
 
-  set(value: any) {
+  set(value?: any) {
     this.value = value
     
     // Notify all subscribers with the new value
-    this.subscribers.forEach((callback: any) => {
-      callback.value = value
-      callback(value)
+    this.subscribers.forEach(sub => {
+      // (sub.callback as any).value = value
+      sub.callback(value, sub)
     })
   }
   next = this.set
 
   toPromise(): Promise<T> {
     return new Promise((res, rej) => {
-      const subscription = this.subscribe(x => {
+      this.subscribe((x, subscription) => {
         subscription.unsubscribe()
         res(x)
       })
+    })
+  }
+
+  // like toPromise but faster
+  toCallback(callback: (x: T) => any): void {
+    this.subscribe((x, subscription) => {
+      subscription.unsubscribe()
+      callback(x)
     })
   }
 
@@ -127,7 +145,7 @@ export class Subject<T> implements SubjectLike<T> {
     ...operations: OperatorFunction<any, any, any>[]
   ): Subject<unknown>;
   pipe(...operations: OperatorFunction<any, any, any>[]): Subject<any> {
-    const subject = new Subject()
+    const subject = new Subject<T>()
     subject.methods = operations
     subject.subscribeWith = (x) => this.subscribe(x as any)
     return subject
@@ -135,10 +153,10 @@ export class Subject<T> implements SubjectLike<T> {
 }
 
 function removeSubFromArray(
-  subscribers: SubjectSubscriber<any>[],
+  subscribers: Subscription<any>[],
   callback: SubjectSubscriber<any>,
 ) {
-  const index = subscribers.indexOf(callback)
+  const index = subscribers.findIndex(sub => sub.callback === callback)
   if (index !== -1) {
     subscribers.splice(index, 1)
   }
@@ -146,23 +164,24 @@ function removeSubFromArray(
 
 const SubjectClass = Subject as typeof Subject & {
   globalSubCount$: Subject<number>
-  globalSubs: SubjectSubscriber<any>[]
+  globalSubs: Subscription<any>[]
 }
 SubjectClass.globalSubs = [] // 🔬 for testing
 SubjectClass.globalSubCount$ = new Subject() // for ease of debugging
 SubjectClass.globalSubCount$.set(0)
 
-function getSubscription(
-  subject: Subject<any>,
+function getSubscription<T>(
+  subject: Subject<T>,
   callback: SubjectSubscriber<any>
 ) {
   const countSubject = SubjectClass.globalSubCount$ as {value: number}
   SubjectClass.globalSubCount$.set( countSubject.value + 1 )
 
-  const subscription: Subscription = () => {
+  const subscription: Subscription<any> = () => {
     subscription.unsubscribe()
   }
 
+  subscription.callback = callback
   subscription.subscriptions = []
 
   // Return a function to unsubscribe from the BehaviorSubject
@@ -180,9 +199,13 @@ function getSubscription(
     return subscription
   }
 
-  subscription.add = (sub: Subscription) => {
+  subscription.add = (sub: Subscription<T>) => {
     subscription.subscriptions.push( sub )
     return subscription
+  }
+
+  subscription.next = (value: any) => {
+    callback(value, subscription)
   }
 
   return subscription

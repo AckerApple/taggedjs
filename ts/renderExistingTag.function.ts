@@ -1,50 +1,51 @@
-import { Tag } from './Tag.class'
-import { BaseTagSupport } from './TagSupport.class'
+import { BaseTagSupport, TagSupport } from './TagSupport.class'
 import { providersChangeCheck } from './state/provider.utils'
-import { TemplaterResult, renderWithSupport } from './TemplaterResult.class'
-import { TagSubject } from './Tag.utils'
+import { renderWithSupport } from './TemplaterResult.class'
+import { TagSubject } from './subject.types'
 import { isLikeTags } from './isLikeTags.function'
 
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(
-  oldestTag: Tag, // existing tag already there
-  newTemplater: TemplaterResult,
-  tagSupport: BaseTagSupport,
+  oldestSupport: TagSupport, // oldest with elements on html
+  newSupport: TagSupport, // new to be rendered
+  ownerSupport: BaseTagSupport, // ownerSupport
   subject: TagSubject,
-): Tag {
-  const tag = subject.tag as Tag
-  newTemplater.global = tag.tagSupport.templater.global
+): TagSupport {
+  const lastSupport = subject.tagSupport as TagSupport
+  const global = lastSupport.global
+  
+  // share point between renders
+  newSupport.global = global
 
-  if(!oldestTag.hasLiveElements) {
-    throw new Error('1080 - should have live elements')
-  }
-
-  const preRenderCount = tagSupport.templater.global.renderCount
-  providersChangeCheck(oldestTag)
+  const preRenderCount = global.renderCount
+  providersChangeCheck(oldestSupport)
 
   // When the providers were checked, a render to myself occurred and I do not need to re-render again
-  const latestTag = tagSupport.templater.global.newest as Tag
-  if(preRenderCount !== tagSupport.templater.global.renderCount) {
-    oldestTag.updateByTag(latestTag)
-    return latestTag
+  const prevSupport = global.newest as TagSupport
+  if(preRenderCount !== global.renderCount) {
+    oldestSupport.updateBy(prevSupport)
+    return prevSupport // already rendered during triggered events
   }
 
-  const oldTemplater = tagSupport.templater || newTemplater
-  const toRedrawTag = subject.tag || oldTemplater.global.newest || oldTemplater.global.oldest // hmmmmmm, why not newest?
-  const redraw = renderWithSupport(
-    newTemplater.tagSupport,
+  // ??? changed during mirroring - lastSupport keeps having less info than newest
+  // const toRedrawTag = lastSupport || prevSupport || tagSupport.global.oldest
+  const toRedrawTag = prevSupport || lastSupport || global.oldest
+
+  const reSupport = renderWithSupport(
+    newSupport,
     toRedrawTag,
     subject,
-    oldestTag.ownerTag,
+    // oldestSupport,
+    ownerSupport as TagSupport,
   )
 
-  const oldest = tagSupport.templater.global.oldest || oldestTag
-  redraw.tagSupport.templater.global.oldest = oldest
+  const oldest = global.oldest || oldestSupport
+  reSupport.global.oldest = oldest
 
-  if(isLikeTags(latestTag, redraw)) {
-    subject.tag = redraw
-    oldest.updateByTag(redraw)
+  if(isLikeTags(prevSupport, reSupport)) {
+    subject.tagSupport = reSupport
+    oldest.updateBy(reSupport)
   }
-
-  return redraw
+  
+  return reSupport
 }

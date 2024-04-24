@@ -1,18 +1,21 @@
 import { processSubjectComponent } from './processSubjectComponent.function'
-import { isTagArray, isTagComponent, isTagInstance } from './isInstance'
+import { isTagArray, isTagClass, isTagComponent, isTagTemplater } from './isInstance'
 import { TagArraySubject, processTagArray } from './processTagArray'
-import { TemplaterResult, Wrapper } from './TemplaterResult.class'
+import { TemplaterResult } from './TemplaterResult.class'
 import { Clones, InsertBefore } from './Clones.type'
-import { Tag } from './Tag.class'
-import { Counts, Template } from './interpolateTemplate'
-import { DisplaySubject, TagSubject } from './Tag.utils'
+import { Counts } from './interpolations/interpolateTemplate'
+import { DisplaySubject, TagSubject } from './subject.types'
 import { ValueSubject } from './subject/ValueSubject'
-import { processRegularValue } from './processRegularValue.function'
-import { Callback } from './bindSubjectCallback.function'
-import { processTag } from './processTag.function'
+import { RegularValue, processRegularValue } from './processRegularValue.function'
+import { Callback } from './interpolations/bindSubjectCallback.function'
+import { getFakeTemplater, processTag, tagFakeTemplater } from './processTag.function'
+import { TagSupport } from './TagSupport.class'
+import { Tag } from './Tag.class'
+import { Subject } from './subject'
 
 enum ValueTypes {
   tag = 'tag',
+  templater = 'templater',
   tagArray = 'tag-array',
   tagComponent = 'tag-component',
   value = 'value',
@@ -23,7 +26,11 @@ function getValueType(value: any): ValueTypes {
     return ValueTypes.tagComponent
   }
 
-  if (isTagInstance(value)) {
+  if (isTagTemplater(value)) {
+    return ValueTypes.templater
+  }
+
+  if (isTagClass(value)) {
     return ValueTypes.tag
   }
 
@@ -44,33 +51,53 @@ export type ClonesAndPromise = {
   // promise?: Promise<any>
 }
 
-export type InterpolateSubject = TagArraySubject | TagSubject | DisplaySubject | ValueSubject<Callback>
+export type InterpolateSubject = ValueSubject<undefined> | TagArraySubject | TagSubject | DisplaySubject | ValueSubject<Callback>
+
+// what can be put down with ${}
+export type TemplateValue = Tag | TemplaterResult | (Tag | TemplaterResult)[] | RegularValue | Subject<any> | Callback
+// export type ExistingValue = TemplaterResult | Tag[] | TagSupport | Function | Subject<unknown> | RegularValue | Tag
 
 export function processSubjectValue(
-  value: any | TemplaterResult,
+  value: TemplateValue,
   subject: InterpolateSubject, // could be tag via result.tag
   insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
-  ownerTag: Tag, // owner
+  ownerSupport: TagSupport, // owner
   options: processOptions, // {added:0, removed:0}
 ) {
   const valueType = getValueType(value)
 
   switch (valueType) {
-    case ValueTypes.tag:
+    case ValueTypes.templater:
       processTag(
-        value,
-        subject as TagSubject,
+        value as TemplaterResult,
         insertBefore,
-        ownerTag,
+        ownerSupport,
+        subject as TagSubject,
+      )
+      return
+
+    case ValueTypes.tag:
+      const tag = value as Tag
+      let templater = tag.templater
+
+      if(!templater) {
+        templater = tagFakeTemplater(tag)
+      }
+
+      processTag(
+        templater,
+        insertBefore,
+        ownerSupport,
+        subject as TagSubject,
       )
       return
   
     case ValueTypes.tagArray:
       return processTagArray(
         subject as TagArraySubject,
-        value,
+        value as (Tag | TemplaterResult)[],
         insertBefore,
-        ownerTag,
+        ownerSupport,
         options
       )
     
@@ -79,14 +106,14 @@ export function processSubjectValue(
         value as TemplaterResult,
         subject as TagSubject,
         insertBefore,
-        ownerTag,
+        ownerSupport,
         options,
       )
       return
   }
 
   processRegularValue(
-    value,
+    value as RegularValue,
     subject as DisplaySubject,
     insertBefore,
   )

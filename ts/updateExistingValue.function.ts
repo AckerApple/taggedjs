@@ -1,10 +1,8 @@
-import { DisplaySubject, TagSubject, getSubjectFunction } from './Tag.utils'
+import { DisplaySubject, TagSubject } from './subject.types'
 import { TagSupport } from './TagSupport.class'
-import { Subject } from './subject/Subject.class'
 import { TemplaterResult } from './TemplaterResult.class'
-import { isSubjectInstance, isTagArray, isTagComponent, isTagInstance } from './isInstance'
-import { Tag } from './Tag.class'
-import { InterpolateSubject } from './processSubjectValue.function'
+import { isSubjectInstance, isTagArray, isTagClass, isTagComponent, isTagTemplater } from './isInstance'
+import { InterpolateSubject, TemplateValue } from './processSubjectValue.function'
 import { TagArraySubject, processTagArray } from './processTagArray'
 import { updateExistingTagComponent } from './updateExistingTagComponent.function'
 import { RegularValue, processRegularValue } from './processRegularValue.function'
@@ -12,17 +10,16 @@ import { checkDestroyPrevious } from './checkDestroyPrevious.function'
 import { ValueSubject } from './subject/ValueSubject'
 import { processSubjectComponent } from './processSubjectComponent.function'
 import { isLikeTags } from './isLikeTags.function'
-import { Callback, bindSubjectCallback } from './bindSubjectCallback.function'
-import { applyFakeTemplater, processTag } from './processTag.function'
+import { Callback, bindSubjectCallback } from './interpolations/bindSubjectCallback.function'
+import { setupNewTemplater, getFakeTemplater, processTag } from './processTag.function'
 import { InsertBefore } from './Clones.type'
+import { Tag } from './Tag.class'
 import { insertAfter } from './insertAfter.function'
-
-export type ExistingValue = TemplaterResult | Tag[] | TagSupport | Function | Subject<unknown> | RegularValue | Tag
 
 export function updateExistingValue(
   subject: InterpolateSubject,
-  value: ExistingValue,
-  ownerTag: Tag,
+  value: TemplateValue,
+  ownerSupport: TagSupport,
   insertBefore: InsertBefore,
 ): InterpolateSubject {
   const subjectTag = subject as TagSubject
@@ -32,49 +29,21 @@ export function updateExistingValue(
 
   // handle already seen tag components
   if(isComponent) {
-    const templater = value as TemplaterResult
-  
-    // When was something before component
-    if(!subjectTag.tag) {
-      processSubjectComponent(
-        templater,
-        subjectTag,
-        insertBefore, // oldInsertBefore as InsertBefore,
-        ownerTag,
-        {
-          forceElement: true,
-          counts: {added: 0, removed: 0},
-        }
-      )
-
-      return subjectTag
-    }
-
-    templater.tagSupport = new TagSupport(
-      // subjectTag.tag.tagSupport.ownerTagSupport,
-      ownerTag.tagSupport,
-      templater,
-      subjectTag,
-    )
-
-    updateExistingTagComponent(
-      ownerTag,
-      templater, // latest value
+    return prepareUpdateToComponent(
+      value as TemplaterResult,
       subjectTag,
       insertBefore,
+      ownerSupport,
     )
-
-    return subjectTag
   }
   
   // was component but no longer
-  const tag = subjectTag.tag
-  if(tag) {
+  const tagSupport = subjectTag.tagSupport
+  if( tagSupport ) {
     handleStillTag(
-      tag,
-      subject as TagSubject | TagArraySubject,
-      value as Tag,
-      ownerTag
+      subject as TagSubject,
+      value as TemplaterResult,
+      ownerSupport
     )
 
     return subjectTag
@@ -84,9 +53,9 @@ export function updateExistingValue(
   if(isTagArray(value)) {
     processTagArray(
       subject as TagArraySubject,
-      value as any as Tag[],
+      value as (TemplaterResult | Tag)[],
       insertBefore, // oldInsertBefore as InsertBefore,
-      ownerTag,
+      ownerSupport,
       {counts: {
         added: 0,
         removed: 0,
@@ -96,25 +65,33 @@ export function updateExistingValue(
     return subject
   }
 
-  // now its a function
-  if(value instanceof Function) {
-    // const newSubject = getSubjectFunction(value, ownerTag)
-    const bound = bindSubjectCallback(value as Callback, ownerTag)
-    subject.set(bound)
-    return subject
+  if(isTagTemplater(value)) {
+    processTag(
+      value as TemplaterResult,
+      insertBefore,
+      ownerSupport,
+      subjectTag,
+    )
+    return subjectTag
   }
 
-  if(isTagInstance(value)) {
-    if((insertBefore as any).nodeName !== 'TEMPLATE') {
-      throw new Error(`expected template - ${insertBefore.nodeName}`)
+  if(isTagClass(value)) {
+    const tag = value as Tag
+    let templater = tag.templater
+
+    if(!templater) {
+      templater = getFakeTemplater()
+      tag.templater = templater
+      templater.tag = tag
     }
 
     processTag(
-      value as Tag,
-      subjectTag,
+      templater,
       insertBefore,
-      ownerTag, // existingTag, // tag,
+      ownerSupport,
+      subjectTag,
     )
+
     return subjectTag
   }
 
@@ -123,54 +100,145 @@ export function updateExistingValue(
     return value as ValueSubject<any>
   }
 
+  // now its a function
+  if(value instanceof Function) {
+    const bound = bindSubjectCallback(value as Callback, ownerSupport)
+    subject.set(bound)
+    return subject
+  }
+
   // This will cause all other values to render
   processRegularValue(
     value as RegularValue,
     subject as DisplaySubject,
-    // ??? - changed to insertBefore for tag switching with template removal
-    insertBefore // oldInsertBefore as InsertBefore,
+    insertBefore,
   )
 
   return subjectTag
 }
 
 function handleStillTag(
-  existingTag: Tag,
-  subject: InterpolateSubject,
-  value: Tag | TemplaterResult | RegularValue,
-  ownerTag: Tag,
+  subject: TagSubject,
+  value: Tag | TemplateValue,
+  ownerSupport: TagSupport,
 ) {
-  // TODO: We shouldn't need both of these
-  const isSameTag = value && isLikeTags(existingTag, value as Tag)
-  const isSameTag2 = value && (value as any).getTemplate && existingTag.isLikeTag(value as any)
+  const lastSupport = subject.tagSupport
+  let templater = value as TemplaterResult
+  const isClass = isTagClass(value)
 
-  const tag = value as Tag
+  if(isClass) {
+    const tag = value as Tag
+    templater = tag.templater
+    if(!templater) {
+      const children = new ValueSubject([] as Tag[])
+      templater = new TemplaterResult(undefined, children)
+      templater.tag = tag
+      tag.templater = templater
+    }
+  }
+  
+  const valueSupport = new TagSupport(
+    templater,
+    ownerSupport,
+    subject,
+  )
 
-  if(!tag.tagSupport) {
-    applyFakeTemplater(tag, ownerTag, subject as TagSubject)
+  if(isClass) {
+    valueSupport.global = lastSupport.global
+  }
+  
+  const isSameTag = value && isLikeTags(lastSupport, valueSupport)
+
+  if(isTagTemplater(value)) {
+    setupNewTemplater(valueSupport, ownerSupport, subject)
   }
 
   if(isSameTag) {
-    existingTag.updateByTag(tag)
+    lastSupport.updateBy(valueSupport)
     return
   }
 
-  if(isSameTag || isSameTag2) {
-    const subjectTag = subject as TagSubject
-    const global = existingTag.tagSupport.templater.global
+  if(isSameTag) {
+    // const subjectTag = subject as TagSubject
+    const global = lastSupport.global
     const insertBefore = global.insertBefore as InsertBefore
 
     return processTag(
-      value as Tag,
-      subjectTag,
+      templater,
       insertBefore,
-      ownerTag,// existingTag, // tag,
+      ownerSupport,
+      subject,
     )
   }
 
   return processRegularValue(
     value as RegularValue,
-    subject as DisplaySubject,
-    (subject as DisplaySubject).insertBefore
+    subject as unknown as DisplaySubject,
+    (subject as unknown as DisplaySubject).insertBefore,
   )
+}
+
+function prepareUpdateToComponent(
+  templater: TemplaterResult,
+  subjectTag: TagSubject,
+  insertBefore: InsertBefore,
+  ownerSupport: TagSupport,
+): TagSubject {
+  // When was something before component
+  if(!subjectTag.tagSupport) {
+    processSubjectComponent(
+      templater,
+      subjectTag,
+      insertBefore, // oldInsertBefore as InsertBefore,
+      ownerSupport,
+      {
+        forceElement: true,
+        counts: {added: 0, removed: 0},
+      }
+    )
+
+    return subjectTag
+  }
+  
+  const tagSupport = new TagSupport(
+    templater,
+    ownerSupport,
+    subjectTag,
+  )
+
+  // ??? new mirroring
+  const subjectSup = subjectTag.tagSupport
+  // const prevSupport = (subjectSup.global.newest || subjectSup) as TagSupport
+  const prevSupport = subjectSup.global.newest
+  if(prevSupport) {
+    const newestState = prevSupport.memory.state
+    tagSupport.memory.state = [...newestState]
+  } else {
+    const placeholder = subjectSup.global.placeholder
+    if(placeholder && !insertBefore.parentNode) {
+      insertAfter(insertBefore,placeholder)
+      delete subjectSup.global.placeholder
+    }
+    // insertBefore = subjectSup.global.placeholder || insertBefore
+
+    processSubjectComponent(
+      templater, subjectTag, insertBefore, ownerSupport,
+      {
+        forceElement: true,
+        counts: {added: 0, removed: 0},
+      }
+    )
+    return subjectTag
+  }
+  tagSupport.global = subjectSup.global
+  subjectTag.tagSupport = tagSupport
+
+  updateExistingTagComponent(
+    ownerSupport,
+    tagSupport, // latest value
+    subjectTag,
+    insertBefore,
+  )
+
+  return subjectTag
 }

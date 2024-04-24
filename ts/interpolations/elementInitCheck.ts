@@ -1,4 +1,4 @@
-import { InputElementTargetEvent } from "./ElementTargetEvent.interface"
+import { InputElementTargetEvent } from "../ElementTargetEvent.interface"
 import { Counts } from "./interpolateTemplate"
 
 export function elementInitCheck(

@@ -1,12 +1,31 @@
 import { SubjectLike } from "./subject/Subject.utils"
+import { Tag } from "./Tag.class"
 import { TemplaterResult } from "./TemplaterResult.class"
 
-export function isTagComponent(value?: TemplaterResult | unknown) {
-  return (value as TemplaterResult)?.isTemplater === true
+export function isTagComponent(
+  value?: TemplaterResult | unknown
+) {
+  return (value as TemplaterResult)?.wrapper?.original instanceof Function
 }
 
-export function isTagInstance(tag?: TemplaterResult | unknown) {
-  return (tag as TemplaterResult)?.isTag === true
+export function isTag(
+  value?: TemplaterResult | Tag | unknown
+) {
+  return isTagTemplater(value) || isTagClass(value)
+}
+
+export function isTagTemplater(
+  value?: TemplaterResult | unknown
+) {
+  const templater = value as TemplaterResult
+  return templater?.isTemplater === true && templater.wrapper === undefined
+}
+
+export function isTagClass(
+  value?: Tag | unknown
+) {
+  const templater = value as Tag
+  return templater?.isTagClass === true
 }
 
 export function isSubjectInstance(
@@ -16,5 +35,5 @@ export function isSubjectInstance(
 }
 
 export function isTagArray(value: any) {
-  return value instanceof Array && value.every(x => isTagInstance(x))
+  return value instanceof Array && value.every(x => isTagClass(x) || isTagTemplater(x))
 }

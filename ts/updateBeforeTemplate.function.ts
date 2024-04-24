@@ -1,5 +1,6 @@
 import { InsertBefore } from "./Clones.type"
-import { NoDisplayValue } from "./processAttribute.function"
+import { NoDisplayValue } from "./interpolations/processAttribute.function"
+import { isTagClass, isTagTemplater } from "./isInstance"
 
 // Function to update the value of x
 export function updateBeforeTemplate(

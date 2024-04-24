@@ -1,40 +1,69 @@
 import { Tag } from './Tag.class'
-import { TagSubject } from './Tag.utils'
+import { DisplaySubject, TagSubject } from './subject.types'
 import { ValueSubject } from './subject/ValueSubject'
-import { isSubjectInstance, isTagComponent, isTagInstance } from './isInstance'
+import { isSubjectInstance, isTagClass, isTagComponent, isTagTemplater } from './isInstance'
+import { TemplaterResult } from './TemplaterResult.class'
+import { TagSupport } from './TagSupport.class'
+import { InterpolateSubject, TemplateValue } from './processSubjectValue.function'
+import { Callback } from './interpolations/bindSubjectCallback.function'
 
 export function processNewValue(
   hasValue: boolean,
-  value: any,
-  ownerTag: Tag,
-) {
+  value: TemplateValue,
+  ownerSupport: TagSupport,
+): InterpolateSubject {
   if(isTagComponent(value)) {
     const tagSubject = new ValueSubject(value) as TagSubject
     return tagSubject
   }
 
   if(value instanceof Function) {
-    // return getSubjectFunction(value, ownerTag)
-    return new ValueSubject(value)
+    return new ValueSubject<Callback>(value)
   }
 
   if(!hasValue) {
-    return // more strings than values, stop here
+    return new ValueSubject<undefined>(undefined)
   }
 
-  if(isTagInstance(value)) {
-    value.ownerTag = ownerTag
-    
-    if(ownerTag.childTags.find(x => x === value)) {
-      throw new Error('about to reattach tag already present - 2')
-    }
-
-    return new ValueSubject(value)
+  if(isTagTemplater(value)) {
+    const templater = value as TemplaterResult
+    const tag = templater.tag as Tag
+    return processNewTag(tag, ownerSupport)
   }
 
+  if(isTagClass(value)) {
+    return processNewTag(value as Tag, ownerSupport)
+  }
+
+  // is already a value subject?
   if(isSubjectInstance(value)) {
-    return value // its already a value subject
+    return value as ValueSubject<any>
   }
 
-  return new ValueSubject(value)
+  return new ValueSubject(value) as unknown as DisplaySubject
+}
+
+function processNewTag(
+  value: Tag,
+  ownerSupport: TagSupport
+) {  
+  const tag = value as Tag
+  
+  let templater = tag.templater
+  if(!templater) {
+    const children = new ValueSubject([] as Tag[])
+    templater = new TemplaterResult(undefined, children)
+    templater.tag = tag
+    tag.templater = templater
+  }
+
+  const subject = new ValueSubject(templater) as TagSubject
+
+  const tagSupport = subject.tagSupport = new TagSupport(
+    templater,
+    ownerSupport,
+    subject
+  )
+
+  return subject
 }

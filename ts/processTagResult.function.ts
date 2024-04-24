@@ -1,11 +1,12 @@
 import { Tag } from './Tag.class'
-import { Counts } from './interpolateTemplate'
+import { Counts } from './interpolations/interpolateTemplate'
 import { TagArraySubject } from './processTagArray'
-import { TagSubject } from './Tag.utils'
+import { TagSubject } from './subject.types'
 import { InsertBefore } from './Clones.type'
+import { TagSupport } from './TagSupport.class'
 
 export function processTagResult(
-  tag: Tag,
+  tagSupport: TagSupport,
   subject: TagArraySubject | TagSubject | Function, // used for recording past and current value
   insertBefore: InsertBefore, // <template end interpolate />
   {
@@ -15,36 +16,17 @@ export function processTagResult(
     forceElement?: boolean
   },
 ) {
-  if(!insertBefore.parentNode) {
-    throw new Error(`before here processTagResult ${insertBefore.nodeName}`)
-  }
-
   // *if appears we already have seen
   const subjectTag = subject as TagSubject
-  const existingTag = subjectTag.tag
-  const previousTag = existingTag?.tagSupport.templater.global.oldest as Tag || undefined // || tag.tagSupport.oldest // subjectTag.tag
-  const justUpdate = previousTag // && !forceElement
+  const lastSupport = subjectTag.tagSupport
+  const prevSupport = lastSupport?.global.oldest || undefined // || tag.tagSupport.oldest // subjectTag.tag
+  const justUpdate = prevSupport // && !forceElement
   
-  if(previousTag && justUpdate) {
-    /*
-    const areLike = previousTag.isLikeTag(tag)
-
-    // are we just updating an if we already had?
-    if(areLike) {
-      return processTagResultUpdate(tag, subjectTag, previousTag)
-    }
-    */
-    return processTagResultUpdate(tag, subjectTag, previousTag)
+  if(prevSupport && justUpdate) {
+    return processTagResultUpdate(tagSupport, subjectTag, prevSupport)
   }
 
-
-  /*
-  if(insertBefore.nodeName !== 'TEMPLATE') {
-    throw new Error(`processTagResult.function.ts insertBefore is not template ${insertBefore.nodeName}`)
-  }
-  */
-
-  tag.buildBeforeElement(insertBefore, {
+  tagSupport.buildBeforeElement(insertBefore, {
     counts,
     forceElement,
   })
@@ -52,21 +34,21 @@ export function processTagResult(
 
 
 function processTagResultUpdate(
-  tag: Tag,
-  subject: TagSubject, // used for recording past and current value
-  previousTag: Tag,
+  tagSupport: TagSupport,
+  subject: TagSubject | ((x: TagSupport) => TagSupport), // used for recording past and current value
+  prevSupport: TagSupport,
 ) {
   // components
   if(subject instanceof Function) {
-    const newTag: Tag = subject(previousTag.tagSupport)
-    previousTag.updateByTag(newTag)
-    subject.tag = newTag
-  
+    const newSupport = subject(prevSupport)
+    prevSupport.updateBy(newSupport)
+    // we have to store previous states somewhere, put on the function given
+    ;(subject as unknown as TagSubject).tagSupport = newSupport
     return
   }
 
-  previousTag.updateByTag(tag)
-  subject.tag = tag
+  prevSupport.updateBy(tagSupport)
+  subject.tagSupport = tagSupport
 
   return
 }

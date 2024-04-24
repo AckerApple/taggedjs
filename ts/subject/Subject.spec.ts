@@ -1,5 +1,5 @@
 import { Subject } from "./Subject.class"
-import { Resolve } from "./Subject.utils"
+import { Resolve, Subscription } from "./Subject.utils"
 import { combineLatest } from "./combineLatest.function"
 import { willCallback, willPromise, willSubscribe } from "./will.functions"
 
@@ -15,8 +15,78 @@ describe('Subject', () => {
     subject.set(22)
 
     expect(x).toBe(22)
+    expect(subject.value).toBe(22)
   })
 
+  it('Subscription - next', () => {
+    const subject = new Subject(0)
+    let x: number = 0
+
+    const subscription = subject.subscribe(y => x = y)
+
+    expect(x).toBe(0)
+
+    subscription.next(22)
+
+    expect(x).toBe(22)
+  })
+
+  it('onSubscribe', () => {
+    let subscription: Subscription<number> | undefined = undefined
+
+    const subject = new Subject(0, (sub) => subscription = sub)
+    let x: number = 0
+    
+    expect(subscription).toBeUndefined()
+
+    subject.subscribe(y => x = y)
+    
+    expect(subscription).toBeDefined()
+    expect(x).toBe(0)
+
+    subject.set(22)
+
+    expect(x).toBe(22)
+  })
+
+  it('onSubscribe - toPromise', async () => {
+    let subscription: Subscription<number> | undefined = undefined
+
+    const subject = new Subject(0, (sub) => subscription = sub)
+    let x: number = 0
+    
+    expect(subscription).toBeUndefined()
+
+    const promise = subject.toPromise()
+    
+    expect(subscription).toBeDefined()
+    expect(x).toBe(0)
+
+    subject.set(22)
+
+    x = await promise
+
+    expect(x).toBe(22)
+  })
+
+  it('onSubscribe - toCallback', () => {
+    let subscription: Subscription<number> | undefined = undefined
+
+    const subject = new Subject(0, (sub) => subscription = sub)
+    let x: number = 0
+    
+    expect(subscription).toBeUndefined()
+
+    subject.toCallback(y => x = y)
+    
+    expect(subscription).toBeDefined()
+    expect(x).toBe(0)
+
+    subject.set(22)
+
+    expect(x).toBe(22)
+  })
+  
   describe('pipes', () => {
     it('pipe', () => {
       const subject = new Subject(0)

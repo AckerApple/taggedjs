@@ -1,18 +1,19 @@
-import { Context, ElementBuildOptions, Tag, variablePrefix } from "./Tag.class"
+import { Context, ElementBuildOptions, Tag, variablePrefix } from "../Tag.class"
 import { InterpolateOptions } from "./interpolateElement"
 import { elementInitCheck } from "./elementInitCheck"
-import { Clones, InsertBefore } from "./Clones.type"
-import { InterpolateSubject, processSubjectValue } from "./processSubjectValue.function"
-import { isTagArray, isTagComponent } from "./isInstance"
-import { DisplaySubject } from "./Tag.utils"
+import { Clones, InsertBefore } from "../Clones.type"
+import { InterpolateSubject, TemplateValue, processSubjectValue } from "../processSubjectValue.function"
+import { isTagArray, isTagComponent } from "../isInstance"
 import { scanTextAreaValue } from "./scanTextAreaValue.function"
-import { ExistingValue, updateExistingValue } from "./updateExistingValue.function"
+import { updateExistingValue } from "../updateExistingValue.function"
+import { TagSupport } from "../TagSupport.class"
+import { TemplaterResult } from "../TemplaterResult.class"
 
 export type Template = Element & {clone?: any}
 export type InterpolateComponentResult = {
   subject: InterpolateSubject
   insertBefore: Element | Text | Template
-  ownerTag: Tag
+  ownerSupport: TagSupport
   variableName: string
 }
 export type InterpolateTemplateResult = {
@@ -23,7 +24,7 @@ export type InterpolateTemplateResult = {
 export function interpolateTemplate(
   insertBefore: Template, // <template end interpolate /> (will be removed)
   context: Context, // variable scope of {`__tagvar${index}`:'x'}
-  ownerTag: Tag, // Tag class
+  ownerSupport: TagSupport, // Tag class
   counts: Counts, // used for animation stagger computing
   options: InterpolateOptions,
 ): InterpolateTemplateResult {
@@ -48,7 +49,7 @@ export function interpolateTemplate(
       clones,
       tagComponent: {
         variableName,
-        ownerTag,
+        ownerSupport,
         subject: existingSubject,
         insertBefore
       }}
@@ -58,7 +59,7 @@ export function interpolateTemplate(
   subscribeToTemplate(
     insertBefore,
     existingSubject,
-    ownerTag,
+    ownerSupport,
     counts,
     {isForceElement},
   )
@@ -69,39 +70,29 @@ export function interpolateTemplate(
 export function subscribeToTemplate(
   insertBefore: InsertBefore,
   subject: InterpolateSubject,
-  ownerTag: Tag,
+  ownerSupport: TagSupport,
   counts: Counts, // used for animation stagger computing
   {isForceElement}: {isForceElement?:boolean},
 ) {
   let called = false
-  const callback = (value: ExistingValue) => {
-    // const orgInsert = insertBefore
-    /*
-    const clone = (subject as DisplaySubject).clone
-    if(clone && clone.parentNode) {
-      insertBefore = clone
-    }
-    */
-
+  const callback = (value: TemplateValue) => {
     if(called) {  
       updateExistingValue(
         subject,
         value,
-        ownerTag,
+        ownerSupport,
         insertBefore, // needed incase type of value changed and a redraw required
       )
       return
     }
 
-    if(!insertBefore.parentNode) {
-      throw new Error('no insert before parent node - 3')
-    }
+    const templater = value as TemplaterResult
 
     processSubjectValue(
-      value,
+      templater,
       subject,
       insertBefore,
-      ownerTag,
+      ownerSupport,
       {
         counts: {...counts},
         forceElement: isForceElement,
@@ -112,14 +103,11 @@ export function subscribeToTemplate(
       isForceElement = false // only can happen once
     }
 
-    // ownerTag.clones.push(...clones)
-    // ownerTag.clones.push(...nextClones)
-    // clones.push(...nextClones)
     called = true
   }
 
   const sub = subject.subscribe(callback as any)
-  ownerTag.tagSupport.templater.global.subscriptions.push(sub)
+  ownerSupport.global.subscriptions.push(sub)
 }
 
 export type Counts = {
@@ -131,7 +119,7 @@ export function afterElmBuild(
   elm: Element | ChildNode,
   options: ElementBuildOptions,
   context: Context,
-  ownerTag: Tag,
+  ownerSupport: TagSupport,
 ) {
   if(!(elm as Element).getAttribute) {
     return
@@ -139,7 +127,7 @@ export function afterElmBuild(
 
   const tagName = elm.nodeName // elm.tagName
   if(tagName==='TEXTAREA') {
-    scanTextAreaValue(elm as HTMLTextAreaElement, context, ownerTag)
+    scanTextAreaValue(elm as HTMLTextAreaElement, context, ownerSupport)
   }
 
   let diff = options.counts.added
@@ -152,7 +140,7 @@ export function afterElmBuild(
        counts: options.counts,
       }
 
-      return afterElmBuild(child, subOptions, context, ownerTag)
+      return afterElmBuild(child, subOptions, context, ownerSupport)
     })
   }
 }

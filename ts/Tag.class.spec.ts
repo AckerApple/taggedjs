@@ -3,7 +3,7 @@ import { TagSupport } from "./TagSupport.class"
 import { ValueSubject } from "./subject/ValueSubject"
 import { html } from "./html"
 import { TemplaterResult } from "./TemplaterResult.class"
-import { TagSubject } from "./Tag.utils"
+import { TagSubject } from "./subject.types"
 
 describe('Tag.class', () => {
   it('simple update', () => {

@@ -1,7 +1,6 @@
-import { isTagInstance } from './isInstance'
 import { InsertBefore } from './Clones.type'
 import { Tag } from './Tag.class'
-import { TagSubject } from './Tag.utils'
+import { TagSubject } from './subject.types'
 import { TagSupport } from './TagSupport.class'
 import { TemplaterResult, Wrapper } from './TemplaterResult.class'
 import { ValueSubject } from './subject'
@@ -9,80 +8,68 @@ import { Props } from './Props'
 
 /** Could be a regular tag or a component. Both are Tag.class */
 export function processTag(
-  tag: Tag,
-  subject: TagSubject, // could be tag via result.tag
+  templater: TemplaterResult,
   insertBefore: InsertBefore,
-  ownerTag: Tag, // owner
+  ownerSupport: TagSupport, // owner
+  subject: TagSubject, // could be tag via result.tag
 ) {
+  let tagSupport: TagSupport = subject.tagSupport
+  
   // first time seeing this tag?
-  if(!tag.tagSupport) {
-    if(!isTagInstance(tag)) {
-      throw new Error('issue non-tag here')
-    }
+  if(!tagSupport) {
+    tagSupport = new TagSupport(
+      templater,
+      ownerSupport,
+      subject,
+    )
+  
+    setupNewTemplater(tagSupport, ownerSupport, subject)
 
-    applyFakeTemplater(tag, ownerTag, subject)
-
-    if(ownerTag.childTags.find(x => x === tag)) {
-      throw new Error('about to reattach tag already present - 5')
-    }
-
-    ownerTag.childTags.push(tag as Tag)
+    ownerSupport.childTags.push(tagSupport)
   }
   
-  tag.ownerTag = ownerTag
+  subject.tagSupport = tagSupport
+  tagSupport.ownerTagSupport = ownerSupport
 
-  if((insertBefore as any).tagName !== 'TEMPLATE') {
-    throw new Error(`processTag.function.ts - insertBefore is not TEMPLATE ${(insertBefore as any).tagName}`)
-  }
-
-  tag.buildBeforeElement(insertBefore, {
-    counts: {added:0, removed:0},
-    forceElement: true,
-  })
+  tagSupport.buildBeforeElement(
+    insertBefore, {
+      counts: {added:0, removed:0},
+      forceElement: true,
+    }
+  )
 }
 
-export function applyFakeTemplater(
-  tag: Tag,
-  ownerTag: Tag,
+export function setupNewTemplater(
+  tagSupport: TagSupport,
+  ownerSupport: TagSupport,
   subject: TagSubject,
 ) {
-  if(!ownerTag) {
-    throw new Error('no owner error')
-  }
-  const fakeTemplater = getFakeTemplater()
-
-  tag.tagSupport = new TagSupport(
-    ownerTag.tagSupport,
-    fakeTemplater, // the template is provided via html`` call
-    subject,
-  )
-
-  fakeTemplater.global.oldest = tag
-  fakeTemplater.global.newest = tag
-  fakeTemplater.tagSupport = tag.tagSupport
+  tagSupport.global.oldest = tagSupport
+  tagSupport.global.newest = tagSupport
 
   // asking me to render will cause my parent to render
-  tag.ownerTag = ownerTag
+  tagSupport.ownerTagSupport = ownerSupport
+  subject.tagSupport = tagSupport
 }
 
-function getFakeTemplater() {
-  return {
-    global:{
-      renderCount: 0,
-      providers: [],
-      context: {},
-      subscriptions: [],
-      deleted: false,
-      
-      newestTemplater: {} as TemplaterResult,
-    },
+export function tagFakeTemplater(
+  tag: Tag
+) {
+  const templater = getFakeTemplater()
+  templater.tag = tag
+  tag.templater = templater
+
+  return templater
+}
+
+export function getFakeTemplater() {
+  return  {
     children: new ValueSubject<Tag[]>([]), // no children
     props: {} as Props,
     
     isTag: true,
     isTemplater: false,
     tagged: false,
-    wrapper: (() => undefined) as unknown as Wrapper,
-    tagSupport: {} as TagSupport,
+    // wrapper: (() => undefined) as unknown as Wrapper,
   } as TemplaterResult
 }

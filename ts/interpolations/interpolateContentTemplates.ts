@@ -1,5 +1,5 @@
-import { Clones } from "./Clones.type"
-import { Tag } from "./Tag.class"
+import { Clones } from "../Clones.type"
+import { TagSupport } from "../TagSupport.class"
 import { InterpolateOptions } from "./interpolateElement"
 import { InterpolateComponentResult, Template, interpolateTemplate } from "./interpolateTemplate"
 
@@ -11,7 +11,7 @@ export type InterpolatedContentTemplates = {
 export function interpolateContentTemplates(
   element: Element,
   context: any,
-  tag: Tag,
+  tagSupport: TagSupport,
   options: InterpolateOptions,
   children: HTMLCollection,
 ): InterpolatedContentTemplates {
@@ -29,7 +29,7 @@ export function interpolateContentTemplates(
     const {clones: nextClones, tagComponent} = interpolateTemplate(
       child as Template,
       context,
-      tag,
+      tagSupport,
       counts,
       options,
     )
@@ -50,7 +50,7 @@ export function interpolateContentTemplates(
           const {tagComponent} = interpolateTemplate(
             subChild as Template,
             context,
-            tag,
+            tagSupport,
             counts,
             options,
           )
@@ -63,7 +63,7 @@ export function interpolateContentTemplates(
         const {clones:nextClones, tagComponents: nextTagComponent} = interpolateContentTemplates(
           subChild,
           context,
-          tag,
+          tagSupport,
           options,
           subChild.children
         )

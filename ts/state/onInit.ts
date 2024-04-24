@@ -1,19 +1,18 @@
-import { BaseTagSupport } from "../TagSupport.class"
-import { TemplaterResult } from "../TemplaterResult.class"
+import { BaseTagSupport, TagSupport } from "../TagSupport.class"
 import { setUse } from "./setUse.function"
 
 export type OnInitCallback = () => unknown
 
-function setCurrentTagSupport(support: BaseTagSupport) {
-  setUse.memory.initCurrentTemplater = support.templater
+function setCurrentTagSupport(support: BaseTagSupport | TagSupport) {
+  setUse.memory.initCurrentSupport = support as TagSupport
 }
 
 export function onInit(
   callback: OnInitCallback
 ) {
-  const templater = setUse.memory.initCurrentTemplater as TemplaterResult
-  if(!(templater.global as any).init) {
-    ;(templater.global as any).init = callback
+  const tagSupport = setUse.memory.initCurrentSupport
+  if(!tagSupport.global.init) {
+    tagSupport.global.init = callback
     callback() // fire init
   }
 }

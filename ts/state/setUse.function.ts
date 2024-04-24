@@ -1,27 +1,30 @@
-import { Tag } from '../Tag.class'
-import { BaseTagSupport } from '../TagSupport.class'
+import { BaseTagSupport, TagSupport } from '../TagSupport.class'
+import { ProviderConfig } from './providers'
 import { Config } from './state.utils'
 
 const tagUse: TagUse[] = []
 
 interface TagUse {
   // runs only one time at creation of component html elements
-  beforeRender: (tagSupport: BaseTagSupport, ownerTag: Tag) => void
+  beforeRender: (tagSupport: BaseTagSupport, ownerTag?: TagSupport) => void
   
   // runs every render
-  beforeRedraw: (tagSupport: BaseTagSupport, tag: Tag) => void
+  beforeRedraw: (tagSupport: BaseTagSupport, tag: TagSupport) => void
   
   // runs every render
-  afterRender: (tagSupport: BaseTagSupport, tag: Tag) => void
+  afterRender: (tagSupport: BaseTagSupport, tag: TagSupport) => void
   
-  beforeDestroy: (tagSupport: BaseTagSupport, tag: Tag) => void
+  beforeDestroy: (tagSupport: BaseTagSupport, tag: TagSupport) => void
 }
 
 export type UseOptions = {
-  beforeRender?: (tagSupport: BaseTagSupport, ownerTag: Tag) => void
-  beforeRedraw?: (tagSupport: BaseTagSupport, tag: Tag) => void
-  afterRender?: (tagSupport: BaseTagSupport, tag: Tag) => void
-  beforeDestroy?: (tagSupport: BaseTagSupport, tag: Tag) => void
+  beforeRender?: (
+    tagSupport: BaseTagSupport,
+    ownerTag?: TagSupport, // not defined on tagElement app
+  ) => void
+  beforeRedraw?: (tagSupport: BaseTagSupport, tag: TagSupport) => void
+  afterRender?: (tagSupport: BaseTagSupport, tag: TagSupport) => void
+  beforeDestroy?: (tagSupport: BaseTagSupport, tag: TagSupport) => void
 }
 
 export function setUse(use: UseOptions) {
@@ -37,4 +40,8 @@ export function setUse(use: UseOptions) {
 }
 
 setUse.tagUse = tagUse
-setUse.memory = {} as (Record<string,any> & {stateConfig: Config})
+setUse.memory = {} as (Record<string,any> & {
+  stateConfig: Config
+  providerConfig: ProviderConfig
+  initCurrentSupport: TagSupport
+})

@@ -1,5 +1,6 @@
 import { StateMismatchError } from '../errors'
 import { BaseTagSupport } from '../TagSupport.class'
+import { Wrapper } from '../TemplaterResult.class'
 import { setUse } from './setUse.function'
 
 export type StateConfig<T> = (x: T) => [T, T]
@@ -20,12 +21,7 @@ export type Config = {
   rearray?: StateConfigArray // state memory to be used before the next render
 }
 
-export type State = {
-  newest: StateConfigArray
-  // update: () => any
-  // oldest?: StateConfigArray
-  // config: Config
-}
+export type State = StateConfigArray
 
 // TODO: rename
 setUse.memory.stateConfig = {
@@ -35,24 +31,28 @@ setUse.memory.stateConfig = {
 
 export type GetSet<T> = (y: T) => [T, T]
 
+const beforeRender = (tagSupport: BaseTagSupport) => initState(tagSupport)
+
 setUse({
-  beforeRender: (tagSupport: BaseTagSupport) => initState(tagSupport),
-  beforeRedraw: (tagSupport: BaseTagSupport) => initState(tagSupport),
+  beforeRender,
+  beforeRedraw: beforeRender,
   afterRender: (
     tagSupport: BaseTagSupport,
     // tag: Tag,
   ) => {
-    const state: State = tagSupport.memory.state
+    const memory = tagSupport.memory
+    const state: State = memory.state
     const config: Config = setUse.memory.stateConfig
     const rearray = config.rearray as unknown as State[]
     
     if(rearray.length) {
       if(rearray.length !== config.array.length) {
         const message = `States lengths has changed ${rearray.length} !== ${config.array.length}. Typically occurs when a function is intended to be wrapped with a tag() call`
+        const wrapper = tagSupport.templater?.wrapper as Wrapper
         const details = {
           oldStates: config.array,
           newStates: config.rearray,
-          component: tagSupport.templater?.wrapper.original,
+          tagFunction: wrapper.original,
         }
         const error = new StateMismatchError(message,details)
         console.warn(message,details)
@@ -62,13 +62,12 @@ setUse({
     
     delete config.rearray // clean up any previous runs
 
-    state.newest = config.array // [...config.array]
-    state.newest.forEach(item => item.lastValue = getStateValue(item)) // set last values
+    memory.state = config.array // [...config.array]
+    memory.state.forEach(item => item.lastValue = getStateValue(item)) // set last values
     
     config.array = []
   }
 })
-
 
 export function getStateValue<T>(
   // state: StateConfig,
@@ -105,23 +104,26 @@ export class StateEchoBack {}
 function initState(
   tagSupport: BaseTagSupport
 ) {
-  const state = tagSupport.memory.state as State
+  const memory = tagSupport.memory
+  const state = memory.state as State
   const config: Config = setUse.memory.stateConfig
   
   // TODO: This guard may no longer be needed
   if (config.rearray) {
+    const wrapper = tagSupport.templater?.wrapper as Wrapper
+    const wasWrapper = config.tagSupport?.templater.wrapper as Wrapper
     const message = 'last state not cleared. Possibly in the middle of rendering one component and another is trying to render'
     console.error(message, {
       config,
-      component: tagSupport.templater?.wrapper.original,
-      wasInMiddleOf: config.tagSupport?.templater.wrapper.original,
+      tagFunction: wrapper.original,
+      wasInMiddleOf: wasWrapper.original,
       state,
       expectedClearArray: config.rearray,
     })
 
     throw new StateMismatchError(message, {
       config,
-      component: tagSupport.templater?.wrapper.original,
+      tagFunction: wrapper.original,
       state,
       expectedClearArray: config.rearray,
     })
@@ -130,9 +132,9 @@ function initState(
   // TODO: this maybe redundant and not needed
   config.rearray = [] // .length = 0
 
-  if(state?.newest.length) {
-    state.newest.map(state => getStateValue(state))
-    config.rearray.push( ...state.newest )
+  if(state?.length) {
+    state.forEach(state => getStateValue(state))
+    config.rearray.push( ...state )
   }
 
   config.tagSupport = tagSupport

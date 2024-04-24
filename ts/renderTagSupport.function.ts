@@ -1,58 +1,54 @@
-import { Tag } from './Tag.class'
-import { BaseTagSupport, TagSupport } from './TagSupport.class'
+import { TagSupport } from './TagSupport.class'
 import { deepEqual } from './deepFunctions'
-import { isTagInstance } from './isInstance'
 import { renderExistingTag } from './renderExistingTag.function'
 
 /** Main function used by all other callers to render/update display of a tag component */
 export function renderTagSupport(
-  tagSupport: BaseTagSupport,
+  tagSupport: TagSupport,
   renderUp: boolean,
-): Tag {
-  const global = tagSupport.templater.global
-  if(isTagInstance(tagSupport.templater)) {
-    const newTag = global.newest as Tag
-    const ownerTag = newTag.ownerTag as Tag
+): TagSupport {
+  const global = tagSupport.global
+  const templater = tagSupport.templater
+  
+  // is it just a vanilla tag, not component?
+  
+  if( !templater.wrapper ) {// || isTagTemplater(templater) 
+    const newTag = global.newest as TagSupport
+    const ownerTag = newTag.ownerTagSupport as TagSupport
     ++global.renderCount
-    return renderTagSupport(ownerTag.tagSupport, true)
+    return renderTagSupport(ownerTag, true)
   }
 
-  // const oldTagSetup = this
   const subject = tagSupport.subject
-  const templater = tagSupport.templater // oldTagSetup.templater // templater
-  const subjectTag = subject.tag
-  const newest = subjectTag?.tagSupport.templater.global.newest as Tag
-  let ownerTag: undefined | Tag
+  const newest = global.newest
+  
+  let ownerSupport: undefined | TagSupport
   let selfPropChange = false
   const shouldRenderUp = renderUp && newest
 
   if(shouldRenderUp) {
-    ownerTag = newest.ownerTag
-    
-    if(ownerTag) {
+    ownerSupport = newest.ownerTagSupport
+    if(ownerSupport) {
       const nowProps = templater.props as any
-      const latestProps = newest.tagSupport.propsConfig.latestCloned
-
+      const latestProps = newest.propsConfig.latestCloned
       selfPropChange = !deepEqual(nowProps, latestProps)
     }
   }
 
-  const useTagSupport = global.newest?.tagSupport as TagSupport // oldTagSetup
-
-  if(!templater.global.oldest) {
-    throw new Error('already causing trouble')
-  }
+  // const useTagSupport = global.newest as TagSupport // oldTagSetup
+  const oldest = tagSupport.global.oldest as TagSupport
 
   const tag = renderExistingTag(
-    templater.global.oldest as Tag,
-    templater,
-    useTagSupport,
+    oldest,
+    tagSupport as TagSupport,
+    ownerSupport as TagSupport, // useTagSupport,
     subject,
   )
 
-  const renderOwner = ownerTag && selfPropChange
-  if(renderOwner) {
-    const ownerTagSupport = (ownerTag as Tag).tagSupport
+  const renderOwner = ownerSupport && selfPropChange
+  if(renderOwner) {  
+    const ownerTagSupport = ownerSupport as TagSupport
+    
     renderTagSupport(
       ownerTagSupport,
       true,

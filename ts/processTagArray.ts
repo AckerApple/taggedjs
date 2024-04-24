@@ -1,14 +1,17 @@
 import { Clones, InsertBefore } from './Clones.type'
 import { Tag } from './Tag.class'
 import { ValueSubject } from './subject/ValueSubject'
-import { Counts } from './interpolateTemplate'
+import { Counts } from './interpolations/interpolateTemplate'
 import { ArrayNoKeyError } from './errors'
 import { destroyArrayTag } from './checkDestroyPrevious.function'
-import { TagSubject } from './Tag.utils'
-import { applyFakeTemplater } from './processTag.function'
+import { setupNewTemplater, tagFakeTemplater } from './processTag.function'
+import { TagSupport } from './TagSupport.class'
+import { TemplaterResult } from './TemplaterResult.class'
+import { isTagClass } from './isInstance'
+import { TagSubject } from './subject.types'
 
 export type LastArrayItem = {
-  tag: Tag
+  tagSupport: TagSupport
   index: number
   deleted?: boolean
 }
@@ -22,15 +25,15 @@ export type TagArraySubject = ValueSubject<Tag[]> & {
 
 export function processTagArray(
   subject: TagArraySubject,
-  value: Tag[], // arry of Tag classes
+  value: (TemplaterResult | Tag)[], // arry of Tag classes
   insertBefore: InsertBefore, // <template end interpolate />
-  ownerTag: Tag,
+  ownerSupport: TagSupport,
   options: {
     counts: Counts
     forceElement?: boolean
   },
 ): Clones {
-  const clones: Clones = ownerTag.clones // []
+  const clones: Clones = ownerSupport.clones // []
   let lastArray = subject.lastArray = subject.lastArray || []
 
   if(!subject.placeholder) {
@@ -43,21 +46,25 @@ export function processTagArray(
   
   /** 🗑️ remove previous items first */
   lastArray = subject.lastArray = subject.lastArray.filter((
-    item: any,
+    item: LastArrayItem,
     index: number,
   ) => {
     const newLength = value.length-1
     const at = index - removed
     const lessLength = newLength < at
-    const subTag = value[index - removed]
-    const subArrayValue = subTag?.memory.arrayValue
-    const tag = item.tag as Tag
-    const destroyItem = lessLength || !areLikeValues(subArrayValue, tag.memory.arrayValue)
+    const subValue = value[index - removed]
+    const subTag = subValue as Tag | undefined
+
+    // const tag = subTag?.templater.tag as Tag
+    const lastTag = item.tagSupport.templater.tag as Tag
+    const newArrayValue = subTag?.memory.arrayValue
+    const lastArrayValue = lastTag.memory.arrayValue
+    const destroyItem = lessLength || !areLikeValues(newArrayValue, lastArrayValue)
     
     if(destroyItem) {
       const last = lastArray[index]
-      const tag: Tag = last.tag
-      destroyArrayTag(tag, options.counts)
+      const tagSupport = last.tagSupport
+      destroyArrayTag(tagSupport, options.counts)
       last.deleted = true
 
       ++removed
@@ -69,25 +76,37 @@ export function processTagArray(
     return true
   })
 
-  value.forEach((subTag, index) => {
+  value.forEach((item, index) => {
     const previous = lastArray[index]
-    const previousSupport = previous?.tag.tagSupport
-    const fakeSubject = new ValueSubject({} as Tag) as unknown as TagSubject
+    const previousSupport = previous?.tagSupport
+    const subTag = item as Tag
+
+    if(isTagClass(subTag) && !subTag.templater) {
+      tagFakeTemplater(subTag)
+    }
+
+    const tagSupport: TagSupport = new TagSupport(
+      subTag.templater,
+      ownerSupport,
+      new ValueSubject(undefined) as unknown as TagSubject
+    )
     
-    applyFakeTemplater(subTag, ownerTag, fakeSubject)
+    // tagSupport.templater = subTag.templater
 
     if(previousSupport) {
-      subTag.tagSupport.templater.global = previousSupport.templater.global
-      previousSupport.templater.global.newest = subTag
+      setupNewTemplater(tagSupport as TagSupport, ownerSupport, previousSupport.subject)
+      const global = previousSupport.global
+      tagSupport.global = global
+      global.newest = tagSupport
     }
     
     // check for html``.key()
     const keySet = 'arrayValue' in subTag.memory
     if (!keySet) {
       const details = {
-        template: subTag.getTemplate().string,
+        template: tagSupport.getTemplate().string,
         array: value,
-        ownerTagContent: ownerTag.lastTemplateString,
+        ownerTagContent: ownerSupport.lastTemplateString,
       }
       const message = 'Use html`...`.key(item) instead of html`...` to template an Array'
       console.error(message, details)
@@ -97,37 +116,24 @@ export function processTagArray(
     
     const couldBeSame = lastArray.length > index
     if (couldBeSame) {
-      const prevSupport = previous.tag.tagSupport
-      const prevGlobal = prevSupport.templater.global
-      const isSame = areLikeValues(
-        previous.tag.memory.arrayValue,
-        subTag.memory.arrayValue,
-      )
-
-      if (isSame) {
-        subTag.tagSupport = subTag.tagSupport || prevSupport
-        const oldest = prevGlobal.oldest as Tag
-        oldest.updateByTag(subTag)
-        return []
-      }
-
-      // TODO: should not get here?
-      processAddTagArrayItem(
-        runtimeInsertBefore, subTag, index, options, lastArray
-      )
-      throw new Error('item should be back')
-      // return [] // removed: item should have been previously deleted and will be added back
+      const prevSupport = previous.tagSupport
+      const prevGlobal = prevSupport.global
+      
+      // subTag.tagSupport = subTag.tagSupport || prevSupport
+      const oldest = prevGlobal.oldest as TagSupport
+      oldest.updateBy(tagSupport)
+      return []
     }
 
     processAddTagArrayItem(
       runtimeInsertBefore,
-      subTag,
+      tagSupport,
       index,
       options,
       lastArray,
     )
 
-    ownerTag.childTags.push(subTag)  
+    ownerSupport.childTags.push(tagSupport)  
   })
 
   return clones
@@ -151,7 +157,7 @@ function setPlaceholderElm(
 
 function processAddTagArrayItem(
   before: Text,
-  subTag: Tag,
+  tagSupport: TagSupport,
   index: number,
   options: {
     counts: Counts
@@ -160,7 +166,7 @@ function processAddTagArrayItem(
   lastArray: LastArrayItem[],
 ) {
   const lastValue = {
-    tag: subTag, index
+    tagSupport, index
   }
   
   // Added to previous array
@@ -171,14 +177,11 @@ function processAddTagArrayItem(
     removed: options.counts.removed,
   }
 
-  if(!before.parentNode) {
-    throw new Error('issue adding array item')
-  }
-
   const newTempElm = document.createElement('template')
-  before.parentNode.insertBefore(newTempElm, before)
+  const parent = before.parentNode as ParentNode
+  parent.insertBefore(newTempElm, before)
 
-  subTag.buildBeforeElement(
+  tagSupport.buildBeforeElement(
     newTempElm, // before,
     {counts, forceElement: options.forceElement}
   )

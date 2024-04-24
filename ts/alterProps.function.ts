@@ -1,21 +1,21 @@
 import { Props } from './Props'
-import { Tag } from './Tag.class'
 import { TagSupport } from './TagSupport.class'
-import { TemplaterResult } from './TemplaterResult.class'
-import { isTagInstance } from './isInstance'
+import { isTag } from './isInstance'
 import { renderTagSupport } from './renderTagSupport.function'
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(
   props: Props,
-  templater: TemplaterResult,
   ownerSupport: TagSupport,
 ) {
-  function callback(toCall: any, callWith: any) {
-    return callbackPropOwner(toCall, callWith, templater, ownerSupport)
+  function callback(
+    toCall: (...args: any[]) => any,
+    callWith: unknown[]
+  ) {
+    return callbackPropOwner(toCall, callWith, ownerSupport)
   }
   
-  const isPropTag = isTagInstance(props)
+  const isPropTag = isTag(props)
   const watchProps = isPropTag ? 0 : props
   const newProps = resetFunctionProps(watchProps, callback)
 
@@ -60,25 +60,15 @@ function resetFunctionProps(
 export function callbackPropOwner(
   toCall: (...args: any[]) => any,
   callWith: any,
-  templater: TemplaterResult, // only used to prevent rendering double
   ownerSupport: TagSupport,
 ) {
-  const renderCount = templater.global.renderCount
   const callbackResult = toCall(...callWith)
-  
-  if(templater.global.renderCount > renderCount) {
-    throw new Error('already rendered')
-  }
+  const lastestOwner = ownerSupport.global.newest as TagSupport
 
-  const lastestOwner = ownerSupport.templater.global.newest as Tag
-  const newOwner = renderTagSupport(
-    lastestOwner.tagSupport,
+  renderTagSupport(
+    lastestOwner,
     true,
   )
-
-  if(newOwner.tagSupport.templater.global.newest != newOwner) {
-    throw new Error('newest assignment issue?')
-  }
 
   return callbackResult
 }

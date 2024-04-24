@@ -1,6 +1,6 @@
 import { Tag } from '../Tag.class'
 import { deepClone } from '../deepFunctions'
-import { BaseTagSupport } from '../TagSupport.class'
+import { BaseTagSupport, TagSupport } from '../TagSupport.class'
 import { setUse } from './setUse.function'
 
 export type Provider = {
@@ -11,12 +11,14 @@ export type Provider = {
 
 type ProviderConstructor<T> = (new (...args: any[]) => T) | (() => T)
 
-// TODO: rename
+export type ProviderConfig = {
+  providers: Provider[]
+  ownerSupport?: TagSupport
+}
+
 setUse.memory.providerConfig = {
   providers: [] as Provider[],
-
-  //currentTagSupport: undefined as TagSupport | undefined,
-  ownerTag: undefined as Tag | undefined,
+  ownerSupport: undefined,
 }
 
 function get(constructMethod: Function) {
@@ -64,11 +66,11 @@ export const providers = {
 
     const config = setUse.memory.providerConfig
     let owner = {
-      ownerTag: config.ownerTag
-    } as Tag
+      ownerTagSupport: config.ownerSupport
+    } as TagSupport
   
-    while(owner.ownerTag) {
-      const ownerProviders = owner.ownerTag.tagSupport.templater.global.providers
+    while(owner.ownerTagSupport) {
+      const ownerProviders = owner.ownerTagSupport.global.providers
 
       const provider = ownerProviders.find(provider => {
         if(provider.constructMethod === constructor) {
@@ -82,7 +84,7 @@ export const providers = {
         return provider.instance
       }
 
-      owner = owner.ownerTag // cause reloop
+      owner = owner.ownerTagSupport // cause reloop
     }
     
     const msg = `Could not inject provider: ${constructor.name} ${constructor}`
@@ -94,38 +96,35 @@ export const providers = {
 setUse({ // providers
   beforeRender: (
     tagSupport: BaseTagSupport,
-    ownerTag: Tag,
+    ownerSupport?: TagSupport,
   ) => {
-    run(tagSupport, ownerTag)
+    run(tagSupport, ownerSupport)
   },
   beforeRedraw: (
     tagSupport: BaseTagSupport,
-    tag: Tag,
+    newTagSupport: TagSupport,
   ) => {
-    run(tagSupport, tag.ownerTag as Tag)
+    run(tagSupport, newTagSupport.ownerTagSupport)
   },
   afterRender: (
     tagSupport: BaseTagSupport,
     // tag: Tag
   ) => {
     const config = setUse.memory.providerConfig
-    tagSupport.templater.global.providers = [...config.providers]
+    tagSupport.global.providers = [...config.providers]
     config.providers.length = 0
   }
 })
 
 function run(
   tagSupport: BaseTagSupport,
-  ownerTag: Tag,
-  // tag: Tag,
+  ownerSupport?: TagSupport,
 ) {
-  const config = setUse.memory.providerConfig
-  // config.currentTagSupport = tagSupport
+  const config = setUse.memory.providerConfig  
+  config.ownerSupport = ownerSupport
   
-  config.ownerTag = ownerTag
-  
-  if(tagSupport.templater.global.providers.length) {
+  if(tagSupport.global.providers.length) {
     config.providers.length = 0
-    config.providers.push(...tagSupport.templater.global.providers)
+    config.providers.push(...tagSupport.global.providers)
   }
 }

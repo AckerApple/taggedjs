@@ -1,9 +1,9 @@
 import { inputAttribute } from './inputAttribute'
-import { isSubjectInstance } from './isInstance'
-import { Context, Tag } from './Tag.class'
+import { isSubjectInstance } from '../isInstance'
+import { Context, Tag } from '../Tag.class'
 import { HowToSet } from './interpolateAttributes'
-import { getSubjectFunction } from './Tag.utils'
 import { bindSubjectCallback } from './bindSubjectCallback.function'
+import { TagSupport } from '../TagSupport.class'
 
 const startRegX = /^\s*{__tagvar/
 const endRegX = /}\s*$/
@@ -16,7 +16,7 @@ export function processAttribute(
   value: string | null,
   child: Element,
   scope: Context,
-  ownerTag: Tag,
+  ownerSupport: TagSupport,
   howToSet: HowToSet,
 ) {
   if ( isTagVar(value) ) {  
@@ -25,7 +25,7 @@ export function processAttribute(
       value as string,
       child,
       scope,
-      ownerTag,
+      ownerSupport,
       howToSet,
     )
   }
@@ -40,13 +40,13 @@ export function processAttribute(
         value,
         lastValue,
         child,
-        ownerTag,
+        ownerSupport,
         howToSet,
       )
 
       lastValue = value
     })
-    ownerTag.tagSupport.templater.global.subscriptions.push(sub) // this is where unsubscribe is picked up
+    ownerSupport.global.subscriptions.push(sub) // this is where unsubscribe is picked up
     child.removeAttribute(attrName)
 
     return
@@ -64,12 +64,18 @@ function processScopedNameValueAttr(
   value: string, // {__tagVarN}
   child: Element,
   scope: Context,
-  ownerTag: Tag,
+  ownerSupport: TagSupport,
   howToSet: HowToSet
 ) {
   // get the code inside the brackets like "variable0" or "{variable0}"
   const result = getContextValueByVarString(scope, value)
-  return processNameValueAttr(attrName, result, child, ownerTag, howToSet)
+  return processNameValueAttr(
+    attrName,
+    result,
+    child,
+    ownerSupport,
+    howToSet
+  )
 }
 
 function getContextValueByVarString(
@@ -83,7 +89,7 @@ function processNameOnlyAttr(
   attrValue: string | Record<string, any>,
   lastValue: string | Record<string, any> | undefined,
   child: Element,
-  ownerTag: Tag,
+  ownerSupport: TagSupport,
   howToSet: HowToSet,
 ) {
   if(lastValue && lastValue != attrValue) {
@@ -105,7 +111,7 @@ function processNameOnlyAttr(
       attrValue as string,
       '',
       child,
-      ownerTag,
+      ownerSupport,
       howToSet,
     )
 
@@ -118,7 +124,7 @@ function processNameOnlyAttr(
         name,
         value,
         child,
-        ownerTag,
+        ownerSupport,
         howToSet,
       )
     )
@@ -131,7 +137,7 @@ function processNameValueAttr(
   attrName: string,
   result: any,
   child: Element,
-  ownerTag: Tag,
+  ownerSupport: TagSupport,
   howToSet: HowToSet
 ) {
   const isSpecial = isSpecialAttr(attrName)
@@ -150,9 +156,9 @@ function processNameValueAttr(
   // Most every variable comes in here since everything is made a ValueSubject
   if(isSubjectInstance(result)) {
     child.removeAttribute(attrName)
-    const callback = (newAttrValue: any) => {
-      if(newAttrValue instanceof Function) {
-        newAttrValue = bindSubjectCallback(newAttrValue, ownerTag)
+    const callback = (newAttrValue: any) => {      
+      if(newAttrValue instanceof Function) {      
+        newAttrValue = bindSubjectCallback(newAttrValue, ownerSupport)
       }
       
       return processAttributeSubjectValue(
@@ -168,7 +174,7 @@ function processNameValueAttr(
     const sub = result.subscribe(callback as any)
     
     // Record subscription for later unsubscribe when element destroyed
-    ownerTag.tagSupport.templater.global.subscriptions.push(sub)
+    ownerSupport.global.subscriptions.push(sub)
 
     return
   }

@@ -1,12 +1,12 @@
 import { Context, Tag } from './Tag.class'
-import { BaseTagSupport } from './TagSupport.class'
+import { BaseTagSupport, TagSupport } from './TagSupport.class'
 import { runAfterRender, runBeforeRedraw, runBeforeRender } from './tagRunner'
 import { setUse } from './state'
 import { Props } from './Props'
 import { TagChildren } from './tag'
 import { Provider } from './state/providers'
 import { OnDestroyCallback } from './state/onDestroy'
-import { TagSubject } from './Tag.utils'
+import { TagSubject, WasTagSubject } from './subject.types'
 import { isLikeTags } from './isLikeTags.function'
 import { destroyTagMemory } from './destroyTag.function'
 import { OnInitCallback } from './state/onInit'
@@ -16,14 +16,13 @@ import { InsertBefore } from './Clones.type'
 export type Wrapper = ((
   tagSupport: BaseTagSupport,
   subject: TagSubject,
-) => Tag) & {
+) => TagSupport) & {
   original: () => Tag
 }
 
 export type TagGlobal = {
-  newestTemplater: TemplaterResult
-  oldest?: Tag
-  newest?: Tag
+  oldest?: TagSupport
+  newest?: TagSupport
   context: Context // populated after reading interpolated.values array converted to an object {variable0, variable:1}
   providers: Provider[]
   /** Indicator of re-rending. Saves from double rending something already rendered */
@@ -36,109 +35,97 @@ export type TagGlobal = {
   placeholder?: Text // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
 
 
-  subscriptions: Subscription[] // subscriptions created by clones
+  subscriptions: Subscription<any>[] // subscriptions created by clones
   
   destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
   init?: OnInitCallback // what to run when init complete, used for onInit
 }
 
 export class TemplaterResult {
-  isTag = false // when true, is basic tag non-component
+  isTemplater = true
   tagged!: boolean
-  wrapper!: Wrapper
-
-  global: TagGlobal = {
-    newestTemplater: this,
-    context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
-    providers: [],
-    /** Indicator of re-rending. Saves from double rending something already rendered */
-    renderCount: 0,
-    deleted: false,
-    subscriptions: []
-  }
-
-  tagSupport!: BaseTagSupport
+  wrapper?: Wrapper
+  
+  tag?: Tag
 
   constructor(
     public props: Props,
     public children: TagChildren,
-  ) {}
-
-  /*
-  redraw?: (
-    force?: boolean, // force children to redraw
-  ) => Tag
-  */
-  isTemplater = true
+  ) {}  
 }
 
 export function renderWithSupport(
-  tagSupport: BaseTagSupport,
-  existingTag: Tag | undefined,
-  subject: TagSubject,
-  ownerTag?: Tag,
-): Tag {
-  const wrapTagSupport = tagSupport // this.tagSupport
-
+  tagSupport: BaseTagSupport, // new
+  lastSupport: TagSupport | undefined, // previous
+  subject: TagSubject, // events & memory
+  ownerSupport?: TagSupport, // who to report to
+): TagSupport {
   /* BEFORE RENDER */
-    const runtimeOwnerTag = existingTag?.ownerTag || ownerTag
+    const lastOwnerSupport = lastSupport?.ownerTagSupport
+    const runtimeOwnerSupport: TagSupport | undefined = lastOwnerSupport || ownerSupport
 
-    if(existingTag) {
-      wrapTagSupport.memory.state.newest = [...existingTag.tagSupport.memory.state.newest]
-      wrapTagSupport.templater.global = existingTag.tagSupport.templater.global
-      
-      runBeforeRedraw(wrapTagSupport, existingTag)
+    if(lastSupport) {
+      const lastState = lastSupport.memory.state
+      const memory = tagSupport.memory
+      memory.state = [...lastState]
+      tagSupport.global = lastSupport.global
+
+      runBeforeRedraw(tagSupport, lastSupport)
     } else {
-      if(!wrapTagSupport) {
-        throw new Error('63521')
-      }
       // first time render
-      runBeforeRender(wrapTagSupport, runtimeOwnerTag as Tag)
+      runBeforeRender(tagSupport, runtimeOwnerSupport)
 
       // TODO: Logic below most likely could live within providers.ts inside the runBeforeRender function
       const providers = setUse.memory.providerConfig
-      providers.ownerTag = runtimeOwnerTag
+      providers.ownerSupport = runtimeOwnerSupport
     }
   /* END: BEFORE RENDER */
   
-  const templater = wrapTagSupport.templater
+  const templater = tagSupport.templater
+
+  const subTag = subject.tagSupport
 
   // NEW TAG CREATED HERE
-  const retag = templater.wrapper(wrapTagSupport, subject)
+  const wrapper = templater.wrapper as Wrapper
+  const reSupport = wrapper(tagSupport, subject)
 
   /* AFTER */
 
-  runAfterRender(wrapTagSupport, retag)
+  runAfterRender(tagSupport, reSupport)
 
-  const isLikeTag = !existingTag || isLikeTags(existingTag, retag)
+  const isLikeTag = !lastSupport || isLikeTags(lastSupport, reSupport)
   if(!isLikeTag) {
-    destroyUnlikeTags(existingTag, templater, subject)
+    destroyUnlikeTags(
+      lastSupport,
+      reSupport,
+      subject,
+    )
   }
 
-  retag.ownerTag = runtimeOwnerTag
-  wrapTagSupport.templater.global.newest = retag
+  reSupport.ownerTagSupport = (ownerSupport || lastOwnerSupport) as TagSupport
+  tagSupport.global.newest = reSupport
 
-  return retag
+  return reSupport
 }
 
 function destroyUnlikeTags(
-  existingTag: Tag, // old
-  templater: TemplaterResult, // new
+  lastSupport: TagSupport, // old
+  reSupport: TagSupport, // new
   subject: TagSubject,
 ) {
-  const oldGlobal = existingTag.tagSupport.templater.global
+  const oldGlobal = lastSupport.global
   const insertBefore = oldGlobal.insertBefore as Element
   
-  destroyTagMemory(existingTag, subject)
+  destroyTagMemory(lastSupport, subject)
 
-  // ??? - new so that when a tag is destroy the unlike does not carry the destroy signifier
-  templater.global = {...templater.global} // break memory references
-  const global = templater.global
+  // when a tag is destroyed, disconnect the globals
+  reSupport.global = {...oldGlobal} // break memory references
+  const global = reSupport.global
   
   global.insertBefore = insertBefore
   global.deleted = false
   
   delete global.oldest
   delete global.newest
-  delete subject.tag
+  delete (subject as WasTagSubject).tagSupport
 }

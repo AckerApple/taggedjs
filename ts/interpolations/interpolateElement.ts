@@ -1,9 +1,10 @@
 import { interpolateAttributes } from "./interpolateAttributes"
 import { interpolateToTemplates } from "./interpolations"
 import { InterpolatedContentTemplates, interpolateContentTemplates } from "./interpolateContentTemplates"
-import { Context, Tag, TagTemplate, escapeSearch, variablePrefix } from "./Tag.class"
-import { Clones } from "./Clones.type"
+import { Context, TagTemplate, escapeSearch, variablePrefix } from "../Tag.class"
+import { Clones } from "../Clones.type"
 import { Counts, InterpolateComponentResult } from "./interpolateTemplate"
+import { TagSupport } from "../TagSupport.class"
 
 export type InterpolateOptions = {
   /** make the element go on document */
@@ -16,7 +17,7 @@ export function interpolateElement(
   container: Element, // element containing innerHTML to review interpolations
   context: Context, // variables used to evaluate
   interpolatedTemplates: TagTemplate,
-  tagOwner: Tag,
+  ownerSupport: TagSupport,
   options: InterpolateOptions,
 ): InterpolatedContentTemplates {
   const clones: Clones = []
@@ -27,14 +28,18 @@ export function interpolateElement(
 
   if(result.keys.length) {
     const {clones: nextClones, tagComponents: nextTagComponents} = interpolateContentTemplates(
-      container, context, tagOwner, options, children
+      container,
+      context,
+      ownerSupport,
+      options,
+      children
     )
     clones.push( ...nextClones )
     tagComponents.push( ...nextTagComponents )
   }
 
-  interpolateAttributes(container, context, tagOwner)
-  processChildrenAttributes(children, context, tagOwner)
+  interpolateAttributes(container, context, ownerSupport)
+  processChildrenAttributes(children, context, ownerSupport)
 
   return {clones, tagComponents}
 }
@@ -42,13 +47,13 @@ export function interpolateElement(
 function processChildrenAttributes(
   children: HTMLCollection,
   context: Context,
-  ownerTag: Tag,
+  ownerSupport: TagSupport,
 ) {
   new Array(...children).forEach(child => {
-    interpolateAttributes(child, context, ownerTag)
+    interpolateAttributes(child, context, ownerSupport)
 
     if(child.children) {
-      processChildrenAttributes(child.children, context, ownerTag)
+      processChildrenAttributes(child.children, context, ownerSupport)
     }
   })
 }

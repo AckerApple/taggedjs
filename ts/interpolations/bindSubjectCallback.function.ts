@@ -1,7 +1,8 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
-import { Tag } from "./Tag.class"
-import { renderTagSupport } from "./renderTagSupport.function"
+import { Tag } from "../Tag.class"
+import { TagSupport } from "../TagSupport.class"
+import { renderTagSupport } from "../renderTagSupport.function"
 
 export type Callback = (...args: any[]) => any & {
   isChildOverride?: true // if this is set, then a parent tag passed children to a tag/component
@@ -9,20 +10,16 @@ export type Callback = (...args: any[]) => any & {
 
 export function bindSubjectCallback(
   value: Callback,
-  tag: Tag,
+  tagSupport: TagSupport,
 ) {
   // Is this children? No override needed
   if((value as any).isChildOverride) {
     return value
   }
 
-  if(!tag.ownerTag && !tag.tagSupport.templater.global.isApp) {
-    throw new Error('no ownerTag issue here')
-  }
-
   const subjectFunction = (
     element: Element, args: any[]
-  ) => runTagCallback(value, tag, element, args)
+  ) => runTagCallback(value, tagSupport, element, args)
 
   // link back to original. Mostly used for <div oninit ondestroy> animations
   subjectFunction.tagFunction = value
@@ -32,19 +29,18 @@ export function bindSubjectCallback(
 
 export function runTagCallback(
   value: Callback,
-  tag: Tag,
+  tagSupport: TagSupport,
   bindTo: unknown,
   args: any[]
 ) {
-  const tagSupport = tag.tagSupport
-  const renderCount = tagSupport.templater.global.renderCount
+  const renderCount = tagSupport.global.renderCount
   const method = value.bind(bindTo)
   const callbackResult = method(...args)
 
-  const sameRenderCount = renderCount === tagSupport.templater.global.renderCount
+  const sameRenderCount = renderCount === tagSupport.global.renderCount
   
   // already rendered OR tag was deleted before event processing
-  if(!sameRenderCount || tagSupport.templater.global.deleted) {
+  if(!sameRenderCount || tagSupport.global.deleted) {
     if(callbackResult instanceof Promise) {
       return callbackResult.then(() => {
         return 'promise-no-data-ever' // tag was deleted during event processing
@@ -61,7 +57,7 @@ export function runTagCallback(
 
   if(callbackResult instanceof Promise) {
     return callbackResult.then(() => {
-      if(tagSupport.templater.global.deleted) {
+      if(tagSupport.global.deleted) {
         return 'promise-no-data-ever' // tag was deleted during event processing
       }
 

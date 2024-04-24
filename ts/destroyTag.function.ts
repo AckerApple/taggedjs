@@ -1,30 +1,23 @@
-import { TagSubject } from './Tag.utils'
-import { Tag } from './Tag.class'
+import { TagSubject, WasTagSubject } from './subject.types'
 import { TagSupport } from './TagSupport.class'
 
 export function destroyTagMemory(
-  tag: Tag,
+  oldTagSupport: TagSupport,
   subject: TagSubject,
 ) {
-  const oldTagSupport = tag.tagSupport
-  
-  if(subject != oldTagSupport.subject) {
-    throw new Error('fff - subjects do not match')
-  }
-
-  delete subject.tag
-  delete oldTagSupport.subject.tag // TODO: this line maybe not needed
+  delete (subject as WasTagSubject).tagSupport
+  delete (oldTagSupport.subject as WasTagSubject).tagSupport // TODO: this line maybe not needed
 
   // must destroy oldest which is tag with elements on stage
-  const oldest = oldTagSupport.templater.global.oldest as Tag
+  const oldest = oldTagSupport.global.oldest as TagSupport
   oldest.destroy()
 
   destroyTagSupportPast(oldTagSupport)
   
-  oldTagSupport.templater.global.context = {}
+  oldTagSupport.global.context = {}
 }
 
 export function destroyTagSupportPast(oldTagSupport: TagSupport) {
-  delete oldTagSupport.templater.global.oldest
-  delete oldTagSupport.templater.global.newest
+  delete oldTagSupport.global.oldest
+  delete oldTagSupport.global.newest
 }

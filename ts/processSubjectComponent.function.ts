@@ -1,9 +1,8 @@
-import { TemplaterResult, renderWithSupport } from './TemplaterResult.class'
+import { TemplaterResult, Wrapper, renderWithSupport } from './TemplaterResult.class'
 import { setUse } from './state'
-import { Counts } from './interpolateTemplate'
-import { Tag } from './Tag.class'
+import { Counts } from './interpolations/interpolateTemplate'
 import { processTagResult } from './processTagResult.function'
-import { TagSubject } from './Tag.utils'
+import { TagSubject } from './subject.types'
 import { TagSupport } from './TagSupport.class'
 import { InsertBefore } from './Clones.type'
 
@@ -11,13 +10,14 @@ export function processSubjectComponent(
   templater: TemplaterResult,
   subject: TagSubject,
   insertBefore: InsertBefore,
-  ownerTag: Tag,
+  ownerSupport: TagSupport,
   options: {counts: Counts, forceElement?: boolean},
-): Tag {
+): TagSupport {
   // Check if function component is wrapped in a tag() call
   // TODO: This below check not needed in production mode
   if(templater.tagged !== true) {
-    const original = templater.wrapper.original
+    const wrapper = templater.wrapper as Wrapper
+    const original = wrapper.original
     let name: string | undefined = original.name || original.constructor?.name
 
     if(name === 'Function') {
@@ -29,78 +29,63 @@ export function processSubjectComponent(
     throw error
   }
 
-  templater.tagSupport = new TagSupport(
-    ownerTag.tagSupport,
+  const tagSupport = new TagSupport(
     templater,
+    ownerSupport,
     subject,
   )
 
-  // templater.oldest = subject.tag?.tagSupport.oldest || templater.oldest
-  if(insertBefore.nodeName != 'TEMPLATE') {
-    throw new Error('9')
-  }
-  templater.global.insertBefore = insertBefore
-  let retag = subject.tag as Tag
+  let reSupport = subject.tagSupport
+  const global = tagSupport.global = reSupport?.global || tagSupport.global
+  global.insertBefore = insertBefore
   
   const providers = setUse.memory.providerConfig
-  providers.ownerTag = ownerTag
+  providers.ownerSupport = ownerSupport
   
-  const isRedraw = !retag || options.forceElement
-  if(isRedraw) {
-    retag = redrawSubjectComponent(
-      templater,
+  const isRender = !reSupport || options.forceElement
+  if(isRender) {
+    const support = reSupport || tagSupport
+    reSupport = renderSubjectComponent(
       subject,
-      retag,
-      ownerTag,
-      insertBefore,
+      support,
+      ownerSupport,
     )
   }
 
   processTagResult(
-    retag,
+    reSupport,
     subject, // The element set here will be removed from document. Also result.tag will be added in here
     insertBefore, // <template end interpolate /> (will be removed)
     options,
   )
 
-  return retag
+  return reSupport
 }
 
-function redrawSubjectComponent(
-  templater: TemplaterResult,
+function renderSubjectComponent(
   subject: TagSubject,
-  retag: Tag,
-  ownerTag: Tag,
-  insertBefore: InsertBefore,
-): Tag {
-  const preClones = ownerTag.clones.map(clone => clone)
-  retag = renderWithSupport(
-    templater.tagSupport,
-    subject.tag, // existing tag
+  reSupport: TagSupport,
+  ownerSupport: TagSupport,
+): TagSupport {
+  const preClones = ownerSupport.clones.map(clone => clone)
+  
+  reSupport = renderWithSupport(
+    reSupport,
+    subject.tagSupport, // existing tag
     subject,
-    ownerTag,
+    ownerSupport,
   )
 
-  if(retag.tagSupport.templater.global.newest != retag) {
-    throw new Error('mismatch result newest')
+  reSupport.global.newest = reSupport
+  // ??? - mirroring add 0
+  // reSupport.ownerTagSupport = ownerSupport
+
+  if(ownerSupport.clones.length > preClones.length) {
+    const myClones = ownerSupport.clones.filter(fClone => !preClones.find(clone => clone === fClone))
+    reSupport.clones.push(...myClones)
   }
 
-  templater.global.newest = retag
+  ownerSupport.childTags.push(reSupport)
 
-  if(ownerTag.clones.length > preClones.length) {
-    const myClones = ownerTag.clones.filter(fClone => !preClones.find(clone => clone === fClone))
-    retag.clones.push(...myClones)
-
-    if(myClones.find(x => x === insertBefore)) {
-      throw new Error('way back here we add marker')
-    }
-  }
-  
-  if(ownerTag.childTags.find(x => x === retag)) {
-    throw new Error('about to reattach tag already present')
-  }
-
-  ownerTag.childTags.push(retag)
-
-  return retag
+  return reSupport
 }

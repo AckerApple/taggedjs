@@ -1,14 +1,16 @@
 import { InsertBefore } from "./Clones.type"
-import { Tag } from "./Tag.class"
+import { TagSupport } from "./TagSupport.class"
 import { TemplaterResult } from "./TemplaterResult.class"
-import { bindSubjectCallback } from "./bindSubjectCallback.function"
-import { Template } from "./interpolateTemplate"
+import { bindSubjectCallback } from "./interpolations/bindSubjectCallback.function"
+import { Template } from "./interpolations/interpolateTemplate"
 import { Subject } from "./subject/Subject.class"
 import { ValueSubject } from "./subject/ValueSubject"
 
+export type WasTagSubject = Subject<TemplaterResult> & {
+  tagSupport?: TagSupport
+}
 export type TagSubject = Subject<TemplaterResult> & {
-  tag?: Tag //  consider renaming to latestTag
-  // insertBefore?: Element | Text | Template | ChildNode
+  tagSupport: TagSupport
 }
 
 type RegularValue = string | number | boolean
@@ -16,11 +18,4 @@ export type DisplaySubject = Subject<RegularValue> & {
   lastValue?: RegularValue
   clone?: Element | Text | Template
   insertBefore: InsertBefore
-}
-
-export function getSubjectFunction(
-  value: any,
-  tag: Tag,
-) {
-  return new ValueSubject( bindSubjectCallback(value, tag) )
 }

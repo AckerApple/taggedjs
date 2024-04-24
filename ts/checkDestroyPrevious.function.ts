@@ -1,13 +1,13 @@
-import { DisplaySubject, TagSubject } from './Tag.utils'
-import { isTagArray, isTagComponent, isTagInstance } from './isInstance'
-import { Tag } from './Tag.class'
+import { DisplaySubject, TagSubject } from './subject.types'
+import { isTag, isTagArray, isTagComponent } from './isInstance'
 import { InterpolateSubject } from './processSubjectValue.function'
 import { TagArraySubject } from './processTagArray'
 import { isLikeTags } from './isLikeTags.function'
-import { Counts } from './interpolateTemplate'
+import { Counts } from './interpolations/interpolateTemplate'
 import { destroyTagMemory, destroyTagSupportPast } from './destroyTag.function'
 import { InsertBefore } from './Clones.type'
 import { insertAfter } from './insertAfter.function'
+import { TagSupport } from './TagSupport.class'
 
 export function checkDestroyPrevious(
   subject: InterpolateSubject, // existing.value is the old value
@@ -24,27 +24,27 @@ export function checkDestroyPrevious(
     delete arraySubject.placeholder
     insertAfter(insertBefore, placeholderElm)
 
-    wasArray.forEach(({tag}) => destroyArrayTag(tag, {added:0, removed:0}))
+    wasArray.forEach(({tagSupport}) => destroyArrayTag(tagSupport, {added:0, removed:0}))
 
     return 'array'
   }
 
   const tagSubject = subject as TagSubject
-  const existingTag = tagSubject.tag
+  const lastSupport = tagSubject.tagSupport
   
   // no longer tag or component?
-  if(existingTag) {
-    const isValueTag = isTagInstance(newValue)
-    const isSubjectTag = isTagInstance(subject.value)
+  if(lastSupport) {
+    const isValueTag = isTag(newValue)
+    const isSubjectTag = isTag(subject.value)
 
     if(isSubjectTag && isValueTag) {
-      const newTag = newValue as Tag
+      const newTag = newValue as TagSupport
       
       // its a different tag now
-      if(!isLikeTags(newTag, existingTag)) {
+      if(!isLikeTags(newTag, lastSupport)) {
         // put template back down
-        restoreTagMarker(existingTag, insertBefore)
-        destroyTagMemory(existingTag, tagSubject)
+        restoreTagMarker(lastSupport, insertBefore)
+        destroyTagMemory(lastSupport, tagSubject)
         return 2
       }
 
@@ -57,10 +57,10 @@ export function checkDestroyPrevious(
     }
 
     // put template back down
-    restoreTagMarker(existingTag, insertBefore)
+    restoreTagMarker(lastSupport, insertBefore)
 
     // destroy old component, value is not a component
-    destroyTagMemory(existingTag, tagSubject)
+    destroyTagMemory(lastSupport, tagSubject)
     return 'different-tag'
   }
 
@@ -70,21 +70,25 @@ export function checkDestroyPrevious(
   // was simple value but now something bigger
   if(hasLastValue && lastValue !== newValue) {
     destroySimpleValue(insertBefore, displaySubject)
-    return 4
+    return 'changed-simple-value'
   }
 
   return false
 }
 
 export function destroyArrayTag(
-  tag: Tag,
+  tagSupport: TagSupport,
   counts: Counts,
 ) {
-  destroyTagSupportPast(tag.tagSupport)
+  destroyTagSupportPast(tagSupport)
 
-  tag.destroy({
+  tagSupport.destroy({
     stagger: counts.removed++,
   })
+
+  const insertBefore = tagSupport.global.insertBefore as Element
+  const parentNode = insertBefore.parentNode as ParentNode
+  parentNode.removeChild(insertBefore)
 }
 
 function destroySimpleValue(
@@ -93,6 +97,7 @@ function destroySimpleValue(
 ) {
   const clone = subject.clone as Element
   const parent = clone.parentNode as ParentNode
+  
 
   // 1 put the template back down
   parent.insertBefore(insertBefore, clone)
@@ -103,10 +108,10 @@ function destroySimpleValue(
 }
 
 export function restoreTagMarker(
-  existingTag: Tag,
+  lastSupport: TagSupport,
   insertBefore: InsertBefore,
 ) {
-  const global = existingTag.tagSupport.templater.global
+  const global = lastSupport.global
   const placeholderElm = global.placeholder
   if(placeholderElm) {
     insertAfter(insertBefore, placeholderElm)
