@@ -17,7 +17,7 @@ export const providers = {
             return existing.instance;
         }
         // Providers with provider requirements just need to use providers.create() and providers.inject()
-        const instance = constructMethod.constructor ? new constructMethod() : constructMethod();
+        const instance = 'prototype' in constructMethod ? new constructMethod() : constructMethod();
         const config = setUse.memory.providerConfig;
         config.providers.push({
             constructMethod,
