@@ -456,11 +456,9 @@ const app = () => {
     const locationSplit = pathname.split('/').filter(x => x);
     const location = locationSplit[0]?.toLowerCase();
     if (location && ['isolated.html', 'index-static.html'].includes(location)) {
-        console.log('IsolatedApp', _isolatedApp__WEBPACK_IMPORTED_MODULE_2__.IsolatedApp);
         (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tagElement)(_isolatedApp__WEBPACK_IMPORTED_MODULE_2__.IsolatedApp, element, { test: 1 });
         return;
     }
-    console.log('App', _app_component__WEBPACK_IMPORTED_MODULE_1__.App);
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tagElement)(_app_component__WEBPACK_IMPORTED_MODULE_1__.App, element, { test: 1 });
 };
 
@@ -698,10 +696,18 @@ const childTests = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_ = 'childTest
         <hr />
         <button id="innerHtmlPropsTest-childTests-button"
           onclick=${() => ++counter}
-        >🐮 increase childTests inside 22 ${counter}</button>
+        >🐮 increase childTests inside ${counter}</button>
         <span id="innerHtmlPropsTest-childTests-display">${counter}</span>
         ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_2__.renderCountDiv)({ renderCount, name: 'innerHtmlPropsTest child' })}
       `)}
+
+      ${childAsPropTest({ child: (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
+        hello child as prop test
+        <button id="child-as-prop-test-button"
+          onclick=${() => ++counter}
+        >🐮 child as prop ${counter}</button>
+        <span id="child-as-prop-test-display">${counter}</span>
+      ` })}
 
       ${ /*childContentTest({legend: 'Inner Test', id:'children-inner-test'}, html`
       ${innerHtmlTest(html`
@@ -741,6 +747,14 @@ const childContentTest = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ legend
     </fieldset>
   `;
 });
+function childAsPropTest({ child }) {
+    return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
+    <fieldset>
+      <legend>child as prop</legend>
+      ${child}
+    </fieldset>
+  `;
+}
 
 
 /***/ }),
@@ -954,22 +968,30 @@ function expectElmCount(query, count, message) {
     (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(found).toBe(count, message);
     return elements;
 }
-function testDuelCounterElements([button0, display0], // button, display
-[button1, display1]) {
+function testDuelCounterElements(...sets
+// [button0, display0]: [string, string], // button, display
+// [button1, display1]: [string, string], // button, display
+) {
+    const [button0, display0] = sets.shift();
     let query = expectElmCount(display0, 1);
     const display0Element = query[0];
     const ip0 = display0Element.innerText;
     testCounterElements(button0, display0);
-    query = expectElmCount(display1, 1);
-    let display1Element = query[0];
-    let ip1Check = display1Element.innerText;
-    const value = (Number(ip0) + 2).toString();
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ip1Check).toBe(value, `Expected second increase provider to be increased to ${ip0} but got ${ip1Check}`);
-    testCounterElements(button1, display1);
-    query = expectElmCount(display1, 1);
-    display1Element = query[0];
-    ip1Check = display1Element.innerText;
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ip1Check).toBe((Number(ip0) + 4).toString(), `Expected ${display1} innerText to be ${Number(ip0) + 4} but instead it is ${ip1Check}`);
+    let increase = 2;
+    sets.forEach(([button1, display1]) => {
+        query = expectElmCount(display1, 1);
+        let display1Element = query[0];
+        let ip1Check = display1Element.innerText;
+        const value = (Number(ip0) + increase).toString();
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ip1Check).toBe(value, `Expected second increase provider to be increased to ${ip0} but got ${ip1Check}`);
+        testCounterElements(button1, display1);
+        query = expectElmCount(display1, 1);
+        display1Element = query[0];
+        ip1Check = display1Element.innerText;
+        const secondIncrease = increase + 2;
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ip1Check).toBe((Number(ip0) + secondIncrease).toString(), `Expected ${display1} innerText to be ${Number(ip0) + secondIncrease} but instead it is ${ip1Check}`);
+        increase = increase + 2;
+    });
 }
 /** increases counter by two */
 function testCounterElements(counterButtonId, counterDisplayId, { elementCountExpected } = {
@@ -1353,9 +1375,9 @@ const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
         // 'props',
         // 'mirroring',
         // 'providerDebug',
-        'arrays',
+        // 'arrays',
         // 'tagSwitchDebug',
-        // 'child',
+        'child',
     ];
     let appCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.letState)(0)(x => [appCounter, appCounter = x]);
     const appCounterSubject = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_1__.Subject(appCounter));
@@ -1538,10 +1560,12 @@ class TagDebugProvider {
     tagDebug = 0;
     showDialog = false;
 }
+const ProviderFunc = () => ({ counter: 0 });
 const providerDebugBase = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)((_x = 'providerDebugBase') => {
     const provider = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.create(_tagJsDebug__WEBPACK_IMPORTED_MODULE_2__.tagDebugProvider);
     // TODO: Fix provider create typing
     const providerClass = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.create(TagDebugProvider);
+    taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.create(ProviderFunc); // test that an arrow function can be a provider
     const test = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)('props debug base');
     let propCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)(0)(x => [propCounter, propCounter = x]);
     let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)(0)(x => [renderCount, renderCount = x]);
@@ -1634,6 +1658,7 @@ const providerDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(({ propCount
     const provider = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.inject(_tagJsDebug__WEBPACK_IMPORTED_MODULE_2__.tagDebugProvider);
     const upperProvider = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.inject(_tagJsDebug__WEBPACK_IMPORTED_MODULE_2__.upperTagDebugProvider);
     const providerClass = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.inject(TagDebugProvider);
+    const funcProvider = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.inject(ProviderFunc); // test that an arrow function can be a provider
     let showProProps = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)(false)(x => [showProProps, showProProps = x]);
     let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)(0)(x => [renderCount, renderCount = x]);
     // let propCounter: number = letState(0)(x => [propCounter, propCounter = x])
@@ -1642,9 +1667,7 @@ const providerDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(({ propCount
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.onInit)(() => {
         console.info('providerDebug.ts: 👉 👉 i should only ever run once');
         callbackTestSub.subscribe(x => {
-            console.log('🍌 sub called');
             callbacks((y) => {
-                console.log('callback increase counter', { counter: provider.test, x });
                 provider.test = x;
             })();
         });
@@ -1664,6 +1687,14 @@ const providerDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(({ propCount
       >🌹 increase upper.provider.test ${upperProvider.test}</button>
       <span>
         🌹<span id="increase-provider-upper-🌹-1-display">${upperProvider.test}</span>
+      </span>
+    </div>
+
+    <div>
+      <button id="increase-arrow-provider-⚡️-1-button" onclick=${() => ++funcProvider.counter}
+      >⚡️ increase upper.provider.test ${funcProvider.counter}</button>
+      <span>
+      ⚡️<span id="increase-arrow-provider-⚡️-1-display">${funcProvider.counter}</span>
       </span>
     </div>
 
@@ -2162,7 +2193,7 @@ async function runTests() {
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('child tests', () => {
         (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display');
         (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display');
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#childTests-button', '#childTests-display'], ['#innerHtmlPropsTest-childTests-button', '#innerHtmlPropsTest-childTests-display']);
+        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#childTests-button', '#childTests-display'], ['#child-as-prop-test-button', '#child-as-prop-test-display'], ['#innerHtmlPropsTest-childTests-button', '#innerHtmlPropsTest-childTests-display']);
         (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#childTests-button', '#childTests-display'], ['#innerHtmlTest-childTests-button', '#innerHtmlTest-childTests-display']);
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.describe)('array testing', () => {
@@ -2190,7 +2221,7 @@ async function runTests() {
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(insideDisplay?.innerText) - 2).toString());
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(outsideDisplay?.innerText) - 2).toString());
         });
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('deletes', async () => {
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('🗑️ deletes', async () => {
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elmCount)('#player-remove-promise-btn-0')).toBe(0);
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elmCount)('#player-edit-btn-0')).toBe(1);
             await (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.byId)('player-edit-btn-0').onclick();
@@ -4959,7 +4990,7 @@ const providers = {
             return existing.instance;
         }
         // Providers with provider requirements just need to use providers.create() and providers.inject()
-        const instance = constructMethod.constructor ? new constructMethod() : constructMethod();
+        const instance = 'prototype' in constructMethod ? new constructMethod() : constructMethod();
         const config = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.providerConfig;
         config.providers.push({
             constructMethod,

@@ -29,10 +29,18 @@ export const childTests = tag((_ = 'childTests') => {
         <hr />
         <button id="innerHtmlPropsTest-childTests-button"
           onclick=${() => ++counter}
-        >🐮 increase childTests inside 22 ${counter}</button>
+        >🐮 increase childTests inside ${counter}</button>
         <span id="innerHtmlPropsTest-childTests-display">${counter}</span>
         ${renderCountDiv({renderCount, name: 'innerHtmlPropsTest child'})}
       `)}
+
+      ${childAsPropTest({child: html`
+        hello child as prop test
+        <button id="child-as-prop-test-button"
+          onclick=${() => ++counter}
+        >🐮 child as prop ${counter}</button>
+        <span id="child-as-prop-test-display">${counter}</span>
+      `})}
 
       ${/*childContentTest({legend: 'Inner Test', id:'children-inner-test'}, html`
         ${innerHtmlTest(html`
@@ -78,3 +86,12 @@ const childContentTest = tag((
     </fieldset>
   `
 })
+
+function childAsPropTest({child}: {child:Tag}) {
+  return html`
+    <fieldset>
+      <legend>child as prop</legend>
+      ${child}
+    </fieldset>
+  `
+}

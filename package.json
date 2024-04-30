@@ -1,7 +1,8 @@
 {
   "scripts": {
     "save": "git add . && git commit -m \"patch\" && git push",
-    "start": "run-p start:hmr",
+    "start": "echo \"❌ BROKEN. Use open live server\"",
+    "start:old": "run-p start:hmr",
     "start:hmr": "node tagged-hmr.js --dir \"./src\"",
     "build": "run-s build:bundle build:hmr",
     "build:bundle": "node runBundleScript.js",

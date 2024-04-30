@@ -14,12 +14,6 @@ export const propsDebugMain = tag((_='propsDebugMain') => {
 
   const elmChangeDate = (event: InputElementTargetEvent) => {
     const newDateString = event.target.value
-
-    console.log('newDateString', {
-      newDateString,
-      newDate: new Date(newDateString)
-    })
-
     date = new Date(newDateString)
   }
 

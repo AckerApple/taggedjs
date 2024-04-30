@@ -8,11 +8,14 @@ export class TagDebugProvider {
   showDialog = false
 }
 
+const ProviderFunc = () => ({counter: 0})
+
 export const providerDebugBase = tag((_x = 'providerDebugBase') => {
   const provider = providers.create( tagDebugProvider as any ) as any
 
   // TODO: Fix provider create typing
   const providerClass: TagDebugProvider = providers.create( TagDebugProvider as any )
+  providers.create(ProviderFunc) // test that an arrow function can be a provider
   const test = letState('props debug base')
   let propCounter = letState(0)(x => [propCounter, propCounter = x])
   let renderCount = letState(0)(x => [renderCount, renderCount = x])
@@ -115,6 +118,7 @@ const providerDebug = tag(({
   const provider = providers.inject( tagDebugProvider )
   const upperProvider = providers.inject( upperTagDebugProvider )
   const providerClass = providers.inject( TagDebugProvider )
+  const funcProvider = providers.inject(ProviderFunc) // test that an arrow function can be a provider
 
   let showProProps: boolean = letState(false)(x => [showProProps, showProProps = x])
   let renderCount: number = letState(0)(x => [renderCount, renderCount = x])
@@ -127,9 +131,7 @@ const providerDebug = tag(({
     console.info('providerDebug.ts: 👉 👉 i should only ever run once')
 
     callbackTestSub.subscribe(x => {
-      console.log('🍌 sub called')
       callbacks((y) => {
-        console.log('callback increase counter', {counter: provider.test, x})
         provider.test = x as number
       })()
     })
@@ -151,6 +153,14 @@ const providerDebug = tag(({
       >🌹 increase upper.provider.test ${upperProvider.test}</button>
       <span>
         🌹<span id="increase-provider-upper-🌹-1-display">${upperProvider.test}</span>
+      </span>
+    </div>
+
+    <div>
+      <button id="increase-arrow-provider-⚡️-1-button" onclick=${() => ++funcProvider.counter}
+      >⚡️ increase upper.provider.test ${funcProvider.counter}</button>
+      <span>
+      ⚡️<span id="increase-arrow-provider-⚡️-1-display">${funcProvider.counter}</span>
       </span>
     </div>
 

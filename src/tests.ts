@@ -159,6 +159,7 @@ export async function runTests() {
     testCounterElements('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display')
     testDuelCounterElements(
       ['#childTests-button', '#childTests-display'],
+      ['#child-as-prop-test-button', '#child-as-prop-test-display'],
       ['#innerHtmlPropsTest-childTests-button', '#innerHtmlPropsTest-childTests-display'],
     )
 

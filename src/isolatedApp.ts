@@ -19,10 +19,10 @@ export const IsolatedApp = tag(() => {
     // 'mirroring',
     // 'providerDebug',
     
-    'arrays',
+    // 'arrays',
     // 'tagSwitchDebug',
     
-    // 'child',
+    'child',
   ]
   
   let appCounter = letState(0)(x => [appCounter, appCounter=x])

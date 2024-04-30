@@ -46,26 +46,34 @@ export function expectElmCount(
 }
 
 export function testDuelCounterElements(
-  [button0, display0]: [string, string], // button, display
-  [button1, display1]: [string, string], // button, display
+  ... sets: [string, string][]
+  // [button0, display0]: [string, string], // button, display
+  // [button1, display1]: [string, string], // button, display
 ) {
+  const [button0, display0] = sets.shift() as [string, string]
   let query = expectElmCount(display0, 1)
   const display0Element = query[0] as HTMLElement
   const ip0 = display0Element.innerText
   testCounterElements(button0, display0)
   
-  query = expectElmCount(display1, 1)
-  let display1Element = query[0] as HTMLElement
-  let ip1Check = display1Element.innerText
-  const value = (Number(ip0) + 2).toString()
-  expect(ip1Check).toBe(value, `Expected second increase provider to be increased to ${ip0} but got ${ip1Check}`)
- 
-  testCounterElements(button1, display1)
-  
-  query = expectElmCount(display1, 1)
-  display1Element = query[0] as HTMLElement
-  ip1Check = display1Element.innerText
-  expect(ip1Check).toBe((Number(ip0) + 4).toString(), `Expected ${display1} innerText to be ${Number(ip0) + 4} but instead it is ${ip1Check}`)
+  let increase = 2
+  sets.forEach(([button1, display1]) => {    
+    query = expectElmCount(display1, 1)
+    let display1Element = query[0] as HTMLElement
+    let ip1Check = display1Element.innerText
+    const value = (Number(ip0) + increase).toString()
+    expect(ip1Check).toBe(value, `Expected second increase provider to be increased to ${ip0} but got ${ip1Check}`)
+   
+    testCounterElements(button1, display1)
+    
+    query = expectElmCount(display1, 1)
+    display1Element = query[0] as HTMLElement
+    ip1Check = display1Element.innerText
+    const secondIncrease = increase + 2
+    expect(ip1Check).toBe((Number(ip0) + secondIncrease).toString(), `Expected ${display1} innerText to be ${Number(ip0) + secondIncrease} but instead it is ${ip1Check}`)
+
+    increase = increase + 2
+  })
 }
 
 /** increases counter by two */
