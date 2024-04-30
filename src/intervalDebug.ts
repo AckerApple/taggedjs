@@ -9,11 +9,9 @@ export const intervalTester0 = tag(() => {
   let intervalId2: any = letState(undefined)(x => [intervalId2, intervalId2 = x])
   let renderCounter: number = letState(0)(x => [renderCounter, renderCounter = x])
   let currentTime: number = letState(0)(x => [currentTime, currentTime = x])
+  
   const callback = callbackMaker()
-
   const increase = () => ++intervalCount
-
-  console.log('intervalId', intervalId)
 
   const startInterval = () => {
     console.info('interval test 0 started...')
