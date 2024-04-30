@@ -99,7 +99,7 @@ export const counters = tag(({
     ${sharedMemory && html`
       <fieldset>
         <legend>shared memory</legend>
-        <div style="display:flex;flex-wrap:wrap;gap:.5em">
+        <div class.bold.text-blue=${true} style="display:flex;flex-wrap:wrap;gap:.5em">
           ${mouseOverTag({label: 'a-a-😻', memory})}
           ${mouseOverTag({label: 'b-b-😻', memory})}
         </div>

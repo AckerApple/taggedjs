@@ -1,4 +1,4 @@
-import { animateDestroy, animateInit } from "./animations"
+import { fadeInDown, fadeOutUp } from "./animations"
 import { renderCountDiv } from "./renderCount.component"
 import { tagDebugProvider, upperTagDebugProvider } from "./tagJsDebug"
 import { letState, html, tag, providers, state, callbackMaker, Subject, onInit } from "taggedjs"
@@ -196,7 +196,7 @@ const providerDebug = tag(({
     >${showProProps ? 'hide' : 'show'} provider as props</button>
     
     ${showProProps && html`
-      <div oninit=${animateInit} ondestroy=${animateDestroy}>
+      <div oninit=${fadeInDown} ondestroy=${fadeOutUp}>
         <hr />
         <h3>Provider as Props</h3>
         ${testProviderAsProps(providerClass)}

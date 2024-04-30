@@ -1,5 +1,86 @@
 /******/ var __webpack_modules__ = ({
 
+/***/ "./node_modules/taggedjs-animate/js/createFx.function.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/taggedjs-animate/js/createFx.function.js ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   captureElementPosition: () => (/* binding */ captureElementPosition),
+/* harmony export */   createFx: () => (/* binding */ createFx)
+/* harmony export */ });
+function createFx({ fxIn, fxOut, staggerBy = 300, }) {
+    return {
+        in: (input) => animateInit({ fxName: fxIn, staggerBy, ...input }),
+        out: (input) => animateDestroy({ fxName: fxOut, staggerBy, capturePosition: true, ...input }),
+    };
+}
+const animateInit = async ({ target, stagger, staggerBy, fxName = 'fadeInDown' }) => {
+    target.style.opacity = '0';
+    if (stagger) {
+        await wait(stagger * staggerBy);
+    }
+    target.style.opacity = '1';
+    target.classList.add('animate__animated', 'animate__' + fxName);
+};
+const animateDestroy = async ({ target, stagger, capturePosition = true, fxName = 'fadeOutUp', staggerBy }) => {
+    if (capturePosition) {
+        captureElementPosition(target);
+    }
+    if (stagger) {
+        await wait(stagger * staggerBy);
+    }
+    target.classList.add('animate__animated', 'animate__' + fxName);
+    await wait(1000); // don't allow remove from stage until animation completed
+    target.classList.remove('animate__animated', 'animate__' + fxName);
+};
+// absolute
+function captureElementPosition(element) {
+    element.style.zIndex = element.style.zIndex || 1;
+    const toTop = element.offsetTop + 'px';
+    const toLeft = element.offsetLeft + 'px';
+    const toWidth = (element.clientWidth + (element.offsetWidth - element.clientWidth) + 1) + 'px';
+    const toHeight = (element.clientHeight + (element.offsetHeight - element.clientHeight) + 1) + 'px';
+    const fix = () => {
+        element.style.top = toTop;
+        element.style.left = toLeft;
+        element.style.width = toWidth;
+        element.style.height = toHeight;
+        element.style.position = 'absolute';
+    };
+    // element.style.position = 'fixed'
+    // allow other elements that are being removed to have a moment to figure out where they currently sit
+    setTimeout(fix, 0);
+}
+function wait(time) {
+    return new Promise((res) => {
+        setTimeout(res, time);
+    });
+}
+//# sourceMappingURL=createFx.function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/taggedjs-animate/js/index.js":
+/*!***************************************************!*\
+  !*** ./node_modules/taggedjs-animate/js/index.js ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   fadeInDown: () => (/* binding */ fadeInDown),
+/* harmony export */   fadeOutUp: () => (/* binding */ fadeOutUp)
+/* harmony export */ });
+/* harmony import */ var _createFx_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./createFx.function */ "./node_modules/taggedjs-animate/js/createFx.function.js");
+
+const { in: fadeInDown, out: fadeOutUp } = (0,_createFx_function__WEBPACK_IMPORTED_MODULE_0__.createFx)({ fxIn: 'fadeInDown', fxOut: 'fadeOutUp' });
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
 /***/ "./src/ContentDebug.component.ts":
 /*!***************************************!*\
   !*** ./src/ContentDebug.component.ts ***!
@@ -105,10 +186,6 @@ const propsDebugMain = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)((_ = 'props
     }
     const elmChangeDate = (event) => {
         const newDateString = event.target.value;
-        console.log('newDateString', {
-            newDateString,
-            newDate: new Date(newDateString)
-        });
         date = new Date(newDateString);
     };
     ++renderCount;
@@ -246,53 +323,11 @@ function timestampToValues(timestamp) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   animateDestroy: () => (/* binding */ animateDestroy),
-/* harmony export */   animateInit: () => (/* binding */ animateInit),
-/* harmony export */   captureElementPosition: () => (/* binding */ captureElementPosition)
+/* harmony export */   fadeInDown: () => (/* reexport safe */ taggedjs_animate__WEBPACK_IMPORTED_MODULE_0__.fadeInDown),
+/* harmony export */   fadeOutUp: () => (/* reexport safe */ taggedjs_animate__WEBPACK_IMPORTED_MODULE_0__.fadeOutUp)
 /* harmony export */ });
-const staggerBy = 300;
-const animateInit = async ({ target, stagger }) => {
-    target.style.opacity = 0;
-    if (stagger) {
-        await wait(stagger * staggerBy);
-    }
-    target.style.opacity = 1;
-    target.classList.add('animate__animated', 'animate__fadeInDown');
-};
-const animateDestroy = async ({ target, stagger, capturePosition = true }) => {
-    if (capturePosition) {
-        captureElementPosition(target);
-    }
-    if (stagger) {
-        await wait(stagger * staggerBy);
-    }
-    target.classList.add('animate__animated', 'animate__fadeOutUp');
-    await wait(1000); // don't allow remove from stage until animation completed
-    target.classList.remove('animate__animated', 'animate__fadeOutUp');
-};
-// absolute
-function captureElementPosition(element) {
-    element.style.zIndex = element.style.zIndex || 1;
-    const toTop = element.offsetTop + 'px';
-    const toLeft = element.offsetLeft + 'px';
-    const toWidth = (element.clientWidth + (element.offsetWidth - element.clientWidth) + 1) + 'px';
-    const toHeight = (element.clientHeight + (element.offsetHeight - element.clientHeight) + 1) + 'px';
-    const fix = () => {
-        element.style.top = toTop;
-        element.style.left = toLeft;
-        element.style.width = toWidth;
-        element.style.height = toHeight;
-        element.style.position = 'absolute';
-    };
-    // element.style.position = 'fixed'
-    // allow other elements that are being removed to have a moment to figure out where they currently sit
-    setTimeout(fix, 0);
-}
-function wait(time) {
-    return new Promise((res) => {
-        setTimeout(res, time);
-    });
-}
+/* harmony import */ var taggedjs_animate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! taggedjs-animate */ "./node_modules/taggedjs-animate/js/index.js");
+
 
 
 /***/ }),
@@ -521,7 +556,7 @@ const arrayTests = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(function ArrayT
     }}>push 9 items</button>
 
     ${players.length > 0 && (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
-      <button oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateInit} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateDestroy} onclick=${() => {
+      <button oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeInDown} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeOutUp} onclick=${() => {
         players.length = 0;
     }}>remove all</button>
     `}
@@ -546,7 +581,7 @@ const scoreData = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ score, player
 });
 const playersDisplay = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ players, getNewPlayer, }) => {
     const playersContent = players.map((player, index) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
-    <div oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateInit} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateDestroy} style="background-color:black;">
+    <div oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeInDown} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeOutUp} style="background-color:black;">
       <div>
         name:${player.name}
       </div>
@@ -557,7 +592,7 @@ const playersDisplay = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ players,
       <div style="background-color:purple;padding:.5em">
         scores:${player.scores.map((score, playerIndex) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
         <div style="border:1px solid white;"
-          oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateInit} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateDestroy}
+          oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeInDown} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeOutUp}
         >
           <fieldset>
             <legend>
@@ -860,7 +895,7 @@ const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ appCounterSubj
     ${sharedMemory && (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
       <fieldset>
         <legend>shared memory</legend>
-        <div style="display:flex;flex-wrap:wrap;gap:.5em">
+        <div class.bold.text-blue=${true} style="display:flex;flex-wrap:wrap;gap:.5em">
           ${(0,_mouseover_tag__WEBPACK_IMPORTED_MODULE_0__.mouseOverTag)({ label: 'a-a-😻', memory })}
           ${(0,_mouseover_tag__WEBPACK_IMPORTED_MODULE_0__.mouseOverTag)({ label: 'b-b-😻', memory })}
         </div>
@@ -1230,7 +1265,6 @@ const intervalTester0 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
     let currentTime = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [currentTime, currentTime = x]);
     const callback = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.callbackMaker)();
     const increase = () => ++intervalCount;
-    console.log('intervalId', intervalId);
     const startInterval = () => {
         console.info('interval test 0 started...');
         trackTime();
@@ -1730,7 +1764,7 @@ const providerDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(({ propCount
     >${showProProps ? 'hide' : 'show'} provider as props</button>
     
     ${showProProps && (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.html) `
-      <div oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateInit} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.animateDestroy}>
+      <div oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeInDown} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeOutUp}>
         <hr />
         <h3>Provider as Props</h3>
         ${testProviderAsProps(providerClass)}
@@ -1825,11 +1859,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   upperTagDebugProvider: () => (/* binding */ upperTagDebugProvider)
 /* harmony export */ });
 /* harmony import */ var _PropsDebug_component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PropsDebug.component */ "./src/PropsDebug.component.ts");
-/* harmony import */ var _animations__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./animations */ "./src/animations.ts");
-/* harmony import */ var _arrayTests__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./arrayTests */ "./src/arrayTests.ts");
-/* harmony import */ var _intervalDebug__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./intervalDebug */ "./src/intervalDebug.ts");
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! taggedjs */ "../main/ts/index.ts");
-/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
+/* harmony import */ var _arrayTests__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./arrayTests */ "./src/arrayTests.ts");
+/* harmony import */ var _intervalDebug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./intervalDebug */ "./src/intervalDebug.ts");
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _renderCount_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./renderCount.component */ "./src/renderCount.component.ts");
+/* harmony import */ var _animations__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./animations */ "./src/animations.ts");
 
 
 
@@ -1837,7 +1871,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function tagDebugProvider() {
-    const upper = taggedjs__WEBPACK_IMPORTED_MODULE_4__.providers.create(upperTagDebugProvider);
+    const upper = taggedjs__WEBPACK_IMPORTED_MODULE_3__.providers.create(upperTagDebugProvider);
     return {
         upper,
         test: 0
@@ -1849,19 +1883,19 @@ function upperTagDebugProvider() {
         test: 0
     };
 }
-const tagDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.tag)(() => {
-    let _firstState = (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.letState)('tagJsDebug.js')(x => [_firstState, _firstState = x]);
-    let showIntervals = (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.letState)(false)(x => [showIntervals, showIntervals = x]);
-    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.letState)(0)(x => [renderCount, renderCount = x]);
+const tagDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
+    let _firstState = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)('tagJsDebug.js')(x => [_firstState, _firstState = x]);
+    let showIntervals = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)(false)(x => [showIntervals, showIntervals = x]);
+    let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.letState)(0)(x => [renderCount, renderCount = x]);
     ++renderCount;
-    return (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.html) `<!-- tagDebug.js -->
+    return (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.html) `<!-- tagDebug.js -->
     <h3 id="debugging">Debugging</h3>
-    ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_5__.renderCountDiv)({ renderCount, name: 'tagJsDebug' })}
+    ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_4__.renderCountDiv)({ renderCount, name: 'tagJsDebug' })}
 
     <div style="display:flex;flex-wrap:wrap;gap:1em">
       <fieldset style="flex:4 4 40em">
         <legend>arrays</legend>
-        ${(0,_arrayTests__WEBPACK_IMPORTED_MODULE_2__.arrayTests)()}
+        ${(0,_arrayTests__WEBPACK_IMPORTED_MODULE_1__.arrayTests)()}
       </fieldset>
     
       <fieldset id="debug-intervals" style="flex:2 2 20em">
@@ -1873,11 +1907,11 @@ const tagDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.tag)(() => {
           onclick=${() => showIntervals = !showIntervals}
         >hide/show</button>
 
-        ${showIntervals && (0,taggedjs__WEBPACK_IMPORTED_MODULE_4__.html) `
-          <div oninit=${_animations__WEBPACK_IMPORTED_MODULE_1__.animateInit} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_1__.animateDestroy}>
-            <div>${(0,_intervalDebug__WEBPACK_IMPORTED_MODULE_3__.intervalTester0)()}</div>
+        ${showIntervals && (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.html) `
+          <div oninit=${_animations__WEBPACK_IMPORTED_MODULE_5__.fadeInDown} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_5__.fadeOutUp}>
+            <div>${(0,_intervalDebug__WEBPACK_IMPORTED_MODULE_2__.intervalTester0)()}</div>
             <hr />
-            <div>${(0,_intervalDebug__WEBPACK_IMPORTED_MODULE_3__.intervalTester1)()}</div>
+            <div>${(0,_intervalDebug__WEBPACK_IMPORTED_MODULE_2__.intervalTester1)()}</div>
           </div>
         `}
       </fieldset>

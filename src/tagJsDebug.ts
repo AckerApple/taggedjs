@@ -1,9 +1,9 @@
 import { propsDebugMain } from "./PropsDebug.component"
-import { animateDestroy, animateInit } from "./animations"
 import { arrayTests } from "./arrayTests"
 import { intervalTester0, intervalTester1 } from "./intervalDebug"
 import { html, tag, providers, letState } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
+import { fadeInDown, fadeOutUp } from "./animations"
 
 export function tagDebugProvider() {
   const upper = providers.create( upperTagDebugProvider as any )
@@ -47,7 +47,7 @@ export const tagDebug = tag(() => {// tagDebug.js
         >hide/show</button>
 
         ${showIntervals && html`
-          <div oninit=${animateInit} ondestroy=${animateDestroy}>
+          <div oninit=${fadeInDown} ondestroy=${fadeOutUp}>
             <div>${intervalTester0()}</div>
             <hr />
             <div>${intervalTester1()}</div>

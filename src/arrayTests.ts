@@ -1,4 +1,4 @@
-import { animateDestroy, animateInit } from './animations'
+import { fadeInDown, fadeOutUp } from './animations'
 import { renderCountDiv } from './renderCount.component'
 import {html, state, letState, tag} from 'taggedjs'
 
@@ -51,7 +51,7 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
     }}>push 9 items</button>
 
     ${players.length > 0 && html`
-      <button oninit=${animateInit} ondestroy=${animateDestroy} onclick=${() => {
+      <button oninit=${fadeInDown} ondestroy=${fadeOutUp} onclick=${() => {
         players.length = 0
       }}>remove all</button>
     `}
@@ -90,7 +90,7 @@ const playersDisplay = tag(({
   getNewPlayer: () => Player
 }) => {
   const playersContent = players.map((player,index) => html`
-    <div oninit=${animateInit} ondestroy=${animateDestroy} style="background-color:black;">
+    <div oninit=${fadeInDown} ondestroy=${fadeOutUp} style="background-color:black;">
       <div>
         name:${player.name}
       </div>
@@ -101,7 +101,7 @@ const playersDisplay = tag(({
       <div style="background-color:purple;padding:.5em">
         scores:${player.scores.map((score, playerIndex) => html`
         <div style="border:1px solid white;"
-          oninit=${animateInit} ondestroy=${animateDestroy}
+          oninit=${fadeInDown} ondestroy=${fadeOutUp}
         >
           <fieldset>
             <legend>

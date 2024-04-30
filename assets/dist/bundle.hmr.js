@@ -1517,6 +1517,7 @@ const mouseOverTag = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ label, mem
     <div style="background-color:purple;padding:.2em;flex:1"
       onmouseover=${() => mouseOverEditShow = true}
       onmouseout=${() => mouseOverEditShow = false}
+      class.bold=${true}
     >
       mouseover - ${label}:${memory.counter}:${mouseOverEditShow || 'false'}
       <button onclick=${() => ++memory.counter}>++counter</button>
