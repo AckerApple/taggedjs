@@ -70,6 +70,9 @@ subject, insertBefore) {
         buildNewTag(newSupport, lastSupport.global.insertBefore, lastSupport, subject);
     }
     lastSupport.global.newest = newSupport;
+    if (!lastSupport.global.oldest) {
+        throw new Error('333333');
+    }
     return newSupport;
 }
 function buildNewTag(newSupport, oldInsertBefore, oldTagSupport, subject) {
