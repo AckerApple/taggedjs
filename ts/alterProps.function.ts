@@ -2,7 +2,7 @@ import { Props } from './Props'
 import { TagSupport } from './TagSupport.class'
 import { isTag } from './isInstance'
 import { renderTagSupport } from './renderTagSupport.function'
-import { tagClosed$ } from './tagRunner'
+import { isInCycle, tagClosed$ } from './tagRunner'
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(
@@ -42,7 +42,7 @@ function resetFunctionProps(
 
       // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
       newProps[name].toCall = (...args: any[]) => {
-        callbackPropOwner(value, args, ownerSupport)
+        return callbackPropOwner(value, args, ownerSupport)
       }
       newProps[name].original = value
 
@@ -58,18 +58,23 @@ export function callbackPropOwner(
   callWith: any,
   ownerSupport: TagSupport,
 ) {
-  // signify that a render will be taking place. This prevents breaking state
-  // ownerSupport.childTags.forEach(childTag => ++childTag.global.renderCount)
-  // ++ownerSupport.global.renderCount
-
-  // if a tag is currently rendering, render after it otherwise render now
-  tagClosed$.toCallback(() => {
-    toCall(...callWith)
+  const run = () => {
+    const result = toCall(...callWith)
     
     const lastestOwner = ownerSupport.global.newest as TagSupport
     renderTagSupport(
       lastestOwner,
       true,
     )
-  })
+
+    return result
+  }
+
+  if(!isInCycle()) {
+    return run()
+  }
+
+  // if a tag is currently rendering, render after it otherwise render now
+  // return tagClosed$.toPromise().then(run)
+  return tagClosed$.toCallback(run)
 }
