@@ -1,4 +1,6 @@
 ### TODO NOW: Before Mega-aide
+- Remove the destroy call that gets added on tagElement
+  - its used for HMR
 - HTML Tables
 - routing
 - Upgrade state to support both named and array state memory

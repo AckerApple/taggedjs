@@ -1,4 +1,4 @@
-import { Config, GetSet, StateConfigArray, StateConfigItem, getStateValue } from './state.utils'
+import { Config, GetSet, State, StateConfigItem, getStateValue } from './state.utils'
 import { setUse } from './setUse.function'
 
 /** Used for variables that need to remain the same variable during render passes */
@@ -6,7 +6,7 @@ export function setProp <T>(
   getSet: GetSet<any>
 ): T {
   const config: Config = setUse.memory.stateConfig
-  const rearray = config.rearray as StateConfigArray
+  const rearray = config.rearray as State
 
   const [propValue] = getSet(undefined as T)
   getSet(propValue) // restore original value instead of undefined

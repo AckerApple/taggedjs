@@ -1,4 +1,3 @@
-import { Tag } from '../Tag.class'
 import { deepClone } from '../deepFunctions'
 import { BaseTagSupport, TagSupport } from '../TagSupport.class'
 import { setUse } from './setUse.function'
@@ -27,12 +26,12 @@ function get(constructMethod: Function) {
   return providers.find(provider => provider.constructMethod === constructMethod)
 }
 
-type functionProvider = <T>() => T
-type classProvider = new <T>(...args: any[]) => T
+type functionProvider<T> = () => T
+type classProvider<T> = new (...args: any[]) => T
 
 export const providers = {
   create: <T>(
-    constructMethod: classProvider | functionProvider
+    constructMethod: classProvider<T> | functionProvider<T>
   ): T => {
     const existing = get(constructMethod)
     if(existing) {
@@ -41,7 +40,7 @@ export const providers = {
     }
 
     // Providers with provider requirements just need to use providers.create() and providers.inject()
-    const instance: T = constructMethod.constructor ? new (constructMethod as classProvider)() : (constructMethod as functionProvider)()
+    const instance: T = 'prototype' in constructMethod ? new (constructMethod as classProvider<T>)() : (constructMethod as functionProvider<T>)()
     
     const config = setUse.memory.providerConfig
     config.providers.push({

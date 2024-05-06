@@ -11,7 +11,9 @@ import { ValueSubject } from './subject/ValueSubject'
 
 export type TagChildren = ValueSubject<Tag[]> & { lastArray?: Tag[] }
 export type TagChildrenInput = Tag[] | Tag | TagChildren
-export type TagComponentArg<T extends any[]> = (...args: T) => Tag;
+export type TagComponentArg<T extends any[]> = ((...args: T) => Tag) & {
+  lastResult?: TagWrapper<T>
+};
 type FirstArgOptional<T extends any[]> = T['length'] extends 0 ? true : false;
 
 // export type TagComponent = TagComponentArg<[any?, TagChildren?]>
@@ -25,6 +27,14 @@ export const tags: TagComponentBase<any>[] = []
 export type TagComponent = TagComponentBase<[any?, TagChildren?]> | TagComponentBase<[]>
 
 let tagCount = 0
+
+type TagWrapper<T> = ((
+  props?: T | Tag | Tag[],
+  children?: TagChildrenInput
+) => TemplaterResult) & {
+  original: (...args: any[]) => any
+  isTag: boolean
+}
 
 /** Wraps a tag component in a state manager and always push children to last argument as an array */
 // export function tag<T>(a: T): T;
@@ -55,13 +65,13 @@ export function tag<T extends any[]>(
       madeSubject,
     )
 
-    innerTagWrap.original = tagComponent
+    innerTagWrap.original = tagComponent.lastResult?.original || tagComponent 
     
     templater.tagged = true
     templater.wrapper = innerTagWrap as Wrapper
 
     return templater
-  }) // we override the function provided and pretend original is what's returned
+  }) as TagWrapper<T>// we override the function provided and pretend original is what's returned
 
   updateResult(result, tagComponent as unknown as TagComponent)
 
@@ -101,7 +111,7 @@ function kidsToTagArraySubject(
 }
 
 function updateResult(
-  result: any,
+  result: TagWrapper<any>,
   tagComponent: TagComponent
 ) {
   result.isTag = true
@@ -114,6 +124,7 @@ function updateComponent(
   tagComponent.tags = tags
   tagComponent.setUse = setUse
   tagComponent.tagIndex = tagCount++ // needed for things like HMR
+  tagComponent.lastResult = tagComponent
 }
 
 /** creates/returns a function that when called then calls the original component function

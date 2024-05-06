@@ -17,6 +17,12 @@ function howToSetInputValue(
   name: string,
   value: string
 ) {
+  /*
+  if((element as any)[name] === value) {
+    return // its already the value we are setting
+  }
+  */
+
   (element as any)[name] = value
 }
 

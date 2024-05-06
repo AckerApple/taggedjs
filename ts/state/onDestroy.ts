@@ -1,21 +1,23 @@
-import { BaseTagSupport } from "../TagSupport.class"
+import { BaseTagSupport, TagSupport } from "../TagSupport.class"
 import { setUse } from "./setUse.function"
 
 export type OnDestroyCallback = () => unknown
 
-/** When undefined, it means a tag is being built for the first time so do run destroy(s) */
-let destroyCurrentTagSupport: BaseTagSupport
+function setCurrentTagSupport(support: BaseTagSupport | TagSupport) {
+  setUse.memory.destroyCurrentSupport = support as TagSupport
+}
 
 export function onDestroy(
   callback: OnDestroyCallback
 ) {
-  destroyCurrentTagSupport.global.destroyCallback = callback
+  const tagSupport = setUse.memory.destroyCurrentSupport as TagSupport
+  tagSupport.global.destroyCallback = callback
 }
 
 setUse({
-  beforeRender: tagSupport => destroyCurrentTagSupport = tagSupport,
-  beforeRedraw: tagSupport => destroyCurrentTagSupport = tagSupport,
-  beforeDestroy: (tagSupport, tag) => {
+  beforeRender: tagSupport => setCurrentTagSupport(tagSupport),
+  beforeRedraw: tagSupport => setCurrentTagSupport(tagSupport),
+  beforeDestroy: (tagSupport) => {
     const callback = tagSupport.global.destroyCallback
 
     if(callback) {
@@ -23,3 +25,4 @@ setUse({
     }
   }
 })
+

@@ -14,7 +14,7 @@ const appElements: {
 export function tagElement(
   app: TagComponent, // (...args: unknown[]) => TemplaterResult,
   element: HTMLElement | Element,
-  props: unknown,
+  props?: unknown,
 ): {
   tagSupport: TagSupport
   tags: TagComponent[]
@@ -42,6 +42,12 @@ export function tagElement(
   templateElm.setAttribute('id', 'app-tag-' + appElements.length)
   templateElm.setAttribute('app-tag-detail', appElements.length.toString())
   element.appendChild(templateElm)
+  ;(element as any).destroy = async () => {
+    await tagSupport.destroy()
+    const insertBefore = tagSupport.global.insertBefore as Element
+    const parentNode = insertBefore.parentNode as ParentNode
+    parentNode.removeChild(insertBefore)
+  }
   
   tagSupport.buildBeforeElement(templateElm)
 

@@ -4,7 +4,7 @@ import { renderExistingTag } from './renderExistingTag.function'
 
 /** Main function used by all other callers to render/update display of a tag component */
 export function renderTagSupport(
-  tagSupport: TagSupport,
+  tagSupport: TagSupport, // must be latest/newest state render
   renderUp: boolean,
 ): TagSupport {
   const global = tagSupport.global
@@ -13,34 +13,30 @@ export function renderTagSupport(
   // is it just a vanilla tag, not component?
   
   if( !templater.wrapper ) {// || isTagTemplater(templater) 
-    const newTag = global.newest as TagSupport
-    const ownerTag = newTag.ownerTagSupport as TagSupport
+    const ownerTag = tagSupport.ownerTagSupport as TagSupport
     ++global.renderCount
     return renderTagSupport(ownerTag, true)
   }
 
   const subject = tagSupport.subject
-  const newest = global.newest
   
   let ownerSupport: undefined | TagSupport
   let selfPropChange = false
-  const shouldRenderUp = renderUp && newest
+  const shouldRenderUp = renderUp && tagSupport
 
   if(shouldRenderUp) {
-    ownerSupport = newest.ownerTagSupport
+    ownerSupport = tagSupport.ownerTagSupport
     if(ownerSupport) {
       const nowProps = templater.props as any
-      const latestProps = newest.propsConfig.latestCloned
+      const latestProps = tagSupport.propsConfig.latestCloned
       selfPropChange = !deepEqual(nowProps, latestProps)
     }
   }
 
-  // const useTagSupport = global.newest as TagSupport // oldTagSetup
   const oldest = tagSupport.global.oldest as TagSupport
-
   const tag = renderExistingTag(
     oldest,
-    tagSupport as TagSupport,
+    tagSupport,
     ownerSupport as TagSupport, // useTagSupport,
     subject,
   )

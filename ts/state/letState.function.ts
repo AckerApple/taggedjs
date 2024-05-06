@@ -1,4 +1,4 @@
-import { Config, GetSet, StateConfig, StateConfigArray, StateConfigItem, getStateValue } from './state.utils'
+import { Config, GetSet, StateConfig, State, StateConfigItem, getStateValue } from './state.utils'
 import { setUse } from './setUse.function'
 
 /** Used for variables that need to remain the same variable during render passes */
@@ -6,10 +6,11 @@ export function letState <T>(
   defaultValue: T | (() => T),
 ): ((getSet: GetSet<T>) => T) {
   const config: Config = setUse.memory.stateConfig
-  const rearray = config.rearray as StateConfigArray
-  let getSetMethod: StateConfig<T>
-  
+  const rearray = config.rearray as State
+  let getSetMethod: StateConfig<T>  
+
   const restate = rearray[config.array.length]
+  
   if(restate) {
     let oldValue = getStateValue(restate) as T
 

@@ -30,7 +30,6 @@ export function processTag(
   
   subject.tagSupport = tagSupport
   tagSupport.ownerTagSupport = ownerSupport
-
   tagSupport.buildBeforeElement(
     insertBefore, {
       counts: {added:0, removed:0},

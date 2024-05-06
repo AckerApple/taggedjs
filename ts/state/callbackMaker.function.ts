@@ -1,26 +1,9 @@
 import { BaseTagSupport, TagSupport } from "../TagSupport.class"
 import { setUse } from "./setUse.function"
-import { State, StateConfigArray, getStateValue } from "./state.utils"
+import { State, getStateValue } from "./state.utils"
 import { renderTagSupport } from "../renderTagSupport.function"
 import { SyncCallbackError } from "../errors"
-import { Subject } from "../subject"
-/*
-const test = () => {
-  const callback = callbackMaker()
 
-  testCallback(callback(x => {
-  }))
-
-  new Subject(0).subscribe(callback(x => {
-  }))
-}
-
-function testCallback(
-  a: (a: number) => any
-) {
-  return a
-}
-*/
 type Callback<A,B,C,D,E,F> = <T>(
   a: A, b: B, c: C, d: D, e: E, f: F,
 ) => (T | void)
@@ -44,8 +27,8 @@ setUse({
 })
 
 function updateState(
-  stateFrom: StateConfigArray,
-  stateTo: StateConfigArray,
+  stateFrom: State,
+  stateTo: State,
 ) {
   stateFrom.forEach((state, index) => {
     const fromValue = getStateValue(state)
@@ -60,7 +43,7 @@ function updateState(
 }
 
 function initMemory (tagSupport: BaseTagSupport) {
-  const oldState: StateConfigArray = setUse.memory.stateConfig.array
+  const oldState: State = setUse.memory.stateConfig.array
   innerCallback = (
     callback: Callback<any, any, any, any, any, any>
   ) => {
@@ -72,7 +55,7 @@ function initMemory (tagSupport: BaseTagSupport) {
 function triggerStateUpdate(
   tagSupport: BaseTagSupport,
   callback: Callback<any, any,any, any, any, any>,
-  oldState: StateConfigArray,
+  oldState: State,
   ...args: any[]
 ) {
   const state = tagSupport.memory.state as State

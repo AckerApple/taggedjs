@@ -2,29 +2,23 @@ import { Props } from './Props'
 import { TagSupport } from './TagSupport.class'
 import { isTag } from './isInstance'
 import { renderTagSupport } from './renderTagSupport.function'
+import { tagClosed$ } from './tagRunner'
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(
   props: Props,
   ownerSupport: TagSupport,
 ) {
-  function callback(
-    toCall: (...args: any[]) => any,
-    callWith: unknown[]
-  ) {
-    return callbackPropOwner(toCall, callWith, ownerSupport)
-  }
-  
   const isPropTag = isTag(props)
   const watchProps = isPropTag ? 0 : props
-  const newProps = resetFunctionProps(watchProps, callback)
+  const newProps = resetFunctionProps(watchProps, ownerSupport)
 
   return newProps
 }
 
 function resetFunctionProps(
   props: any,
-  callback: (toCall: any, callWith: any) => unknown,
+  ownerSupport: TagSupport,
 ) {
   if(typeof(props)!=='object') {
     return props
@@ -47,7 +41,9 @@ function resetFunctionProps(
       }
 
       // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
-      newProps[name].toCall = (...args: any[]) => callback(value, args)
+      newProps[name].toCall = (...args: any[]) => {
+        callbackPropOwner(value, args, ownerSupport)
+      }
       newProps[name].original = value
 
       return
@@ -58,17 +54,22 @@ function resetFunctionProps(
 }
 
 export function callbackPropOwner(
-  toCall: (...args: any[]) => any,
+  toCall: Function,
   callWith: any,
   ownerSupport: TagSupport,
 ) {
-  const callbackResult = toCall(...callWith)
-  const lastestOwner = ownerSupport.global.newest as TagSupport
+  // signify that a render will be taking place. This prevents breaking state
+  // ownerSupport.childTags.forEach(childTag => ++childTag.global.renderCount)
+  // ++ownerSupport.global.renderCount
 
-  renderTagSupport(
-    lastestOwner,
-    true,
-  )
-
-  return callbackResult
+  // if a tag is currently rendering, render after it otherwise render now
+  tagClosed$.toCallback(() => {
+    toCall(...callWith)
+    
+    const lastestOwner = ownerSupport.global.newest as TagSupport
+    renderTagSupport(
+      lastestOwner,
+      true,
+    )
+  })
 }

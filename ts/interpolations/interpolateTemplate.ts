@@ -1,4 +1,4 @@
-import { Context, ElementBuildOptions, Tag, variablePrefix } from "../Tag.class"
+import { Context, ElementBuildOptions, variablePrefix } from "../Tag.class"
 import { InterpolateOptions } from "./interpolateElement"
 import { elementInitCheck } from "./elementInitCheck"
 import { Clones, InsertBefore } from "../Clones.type"

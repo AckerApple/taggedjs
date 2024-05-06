@@ -1,5 +1,5 @@
 import { StateMismatchError } from '../errors'
-import { BaseTagSupport } from '../TagSupport.class'
+import { BaseTagSupport, TagSupport } from '../TagSupport.class'
 import { Wrapper } from '../TemplaterResult.class'
 import { setUse } from './setUse.function'
 
@@ -13,20 +13,17 @@ export type StateConfigItem<T> = {
   watch?: T // when this value changes, the state becomes this value
 }
 
-export type StateConfigArray = StateConfigItem<any>[]
-
 export type Config = {
   tagSupport: BaseTagSupport
-  array: StateConfigArray // state memory on the first render
-  rearray?: StateConfigArray // state memory to be used before the next render
+  array: State // state memory on the first render
+  rearray?: State // state memory to be used before the next render
 }
 
-export type State = StateConfigArray
+export type State = StateConfigItem<any>[]
 
-// TODO: rename
 setUse.memory.stateConfig = {
-  array: [] as StateConfigArray, // state memory on the first render
-  // rearray: [] as StateConfigArray, // state memory to be used before the next render
+  array: [] as State, // state memory on the first render
+  // rearray: [] as State,
 } as Config
 
 export type GetSet<T> = (y: T) => [T, T]
@@ -38,10 +35,9 @@ setUse({
   beforeRedraw: beforeRender,
   afterRender: (
     tagSupport: BaseTagSupport,
-    // tag: Tag,
   ) => {
     const memory = tagSupport.memory
-    const state: State = memory.state
+    // const state: State = memory.state
     const config: Config = setUse.memory.stateConfig
     const rearray = config.rearray as unknown as State[]
     
@@ -70,7 +66,6 @@ setUse({
 })
 
 export function getStateValue<T>(
-  // state: StateConfig,
   state: StateConfigItem<T>,
 ) {
   const callback = state.callback
@@ -110,32 +105,43 @@ function initState(
   
   // TODO: This guard may no longer be needed
   if (config.rearray) {
-    const wrapper = tagSupport.templater?.wrapper as Wrapper
-    const wasWrapper = config.tagSupport?.templater.wrapper as Wrapper
-    const message = 'last state not cleared. Possibly in the middle of rendering one component and another is trying to render'
-    console.error(message, {
-      config,
-      tagFunction: wrapper.original,
-      wasInMiddleOf: wasWrapper.original,
-      state,
-      expectedClearArray: config.rearray,
-    })
-
-    throw new StateMismatchError(message, {
-      config,
-      tagFunction: wrapper.original,
-      state,
-      expectedClearArray: config.rearray,
-    })
+    checkStateMismatch(tagSupport, config, state)
   }
 
-  // TODO: this maybe redundant and not needed
-  config.rearray = [] // .length = 0
-
+  config.rearray = []
   if(state?.length) {
     state.forEach(state => getStateValue(state))
     config.rearray.push( ...state )
   }
 
   config.tagSupport = tagSupport
+}
+
+function checkStateMismatch(
+  tagSupport: BaseTagSupport,
+  config: Config,
+  state: State,
+) {
+  const wrapper = tagSupport.templater?.wrapper as Wrapper
+  const wasWrapper = config.tagSupport?.templater.wrapper as Wrapper
+  const message = 'last state not cleared. Possibly in the middle of rendering one component and another is trying to render'
+
+  if(!wasWrapper) {
+    return // its not a component or was not a component before
+  }
+
+  console.error(message, {
+    config,
+    tagFunction: wrapper.original,
+    wasInMiddleOf: wasWrapper.original,
+    state,
+    expectedClearArray: config.rearray,
+  })
+
+  throw new StateMismatchError(message, {
+    config,
+    tagFunction: wrapper.original,
+    state,
+    expectedClearArray: config.rearray,
+  })
 }

@@ -1,10 +1,11 @@
-import { TemplaterResult, Wrapper, renderWithSupport } from './TemplaterResult.class'
+import { TemplaterResult, Wrapper } from './TemplaterResult.class'
 import { setUse } from './state'
 import { Counts } from './interpolations/interpolateTemplate'
 import { processTagResult } from './processTagResult.function'
 import { TagSubject } from './subject.types'
 import { TagSupport } from './TagSupport.class'
 import { InsertBefore } from './Clones.type'
+import { renderSubjectComponent } from './renderSubjectComponent.function'
 
 export function processSubjectComponent(
   templater: TemplaterResult,
@@ -62,30 +63,3 @@ export function processSubjectComponent(
   return reSupport
 }
 
-function renderSubjectComponent(
-  subject: TagSubject,
-  reSupport: TagSupport,
-  ownerSupport: TagSupport,
-): TagSupport {
-  const preClones = ownerSupport.clones.map(clone => clone)
-  
-  reSupport = renderWithSupport(
-    reSupport,
-    subject.tagSupport, // existing tag
-    subject,
-    ownerSupport,
-  )
-
-  reSupport.global.newest = reSupport
-  // ??? - mirroring add 0
-  // reSupport.ownerTagSupport = ownerSupport
-
-  if(ownerSupport.clones.length > preClones.length) {
-    const myClones = ownerSupport.clones.filter(fClone => !preClones.find(clone => clone === fClone))
-    reSupport.clones.push(...myClones)
-  }
-
-  ownerSupport.childTags.push(reSupport)
-
-  return reSupport
-}

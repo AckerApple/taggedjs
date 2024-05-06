@@ -1,5 +1,5 @@
 import { setUse } from './setUse.function'
-import { Config, StateConfig, StateConfigArray, StateConfigItem, getStateValue } from './state.utils'
+import { Config, StateConfig, State, StateConfigItem, getStateValue } from './state.utils'
 
 /** Used for variables that need to remain the same variable during render passes */
 export function state <T>(
@@ -7,7 +7,7 @@ export function state <T>(
 ): T {
   const config: Config = setUse.memory.stateConfig
   let getSetMethod: StateConfig<T>
-  const rearray = config.rearray as StateConfigArray
+  const rearray = config.rearray as State
 
   const restate = rearray[config.array.length]
   if(restate) {

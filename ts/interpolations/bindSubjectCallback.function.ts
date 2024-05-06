@@ -36,7 +36,6 @@ export function runTagCallback(
   const renderCount = tagSupport.global.renderCount
   const method = value.bind(bindTo)
   const callbackResult = method(...args)
-
   const sameRenderCount = renderCount === tagSupport.global.renderCount
   
   // already rendered OR tag was deleted before event processing
@@ -55,16 +54,21 @@ export function runTagCallback(
     true, // renderUp - callback may have changed props so also check to render up
   )
 
+  // tagSupport.global.newest = newest
+
   if(callbackResult instanceof Promise) {
     return callbackResult.then(() => {
       if(tagSupport.global.deleted) {
         return 'promise-no-data-ever' // tag was deleted during event processing
       }
 
-      renderTagSupport(
+      const newest = renderTagSupport(
         tagSupport,
         true,
       )
+
+      tagSupport.global.newest = newest
+
       return 'promise-no-data-ever'
     })
   }

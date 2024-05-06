@@ -2,7 +2,7 @@ import { Props } from './Props'
 import { Context, ElementBuildOptions, Tag, TagMemory, TagTemplate, escapeVariable, variablePrefix } from './Tag.class'
 import { deepClone } from './deepFunctions'
 import { isTagClass, isTagComponent, isTagTemplater } from './isInstance'
-import { StateConfigArray } from './state'
+import { State } from './state'
 import { TagChildren } from './tag'
 import { TagGlobal, TemplaterResult } from './TemplaterResult.class'
 import { TagSubject, WasTagSubject } from './subject.types'
@@ -19,6 +19,7 @@ import { interpolateElement, interpolateString } from './interpolations/interpol
 import { subscribeToTemplate } from './interpolations/interpolateTemplate'
 import { afterInterpolateElement } from './afterInterpolateElement.function'
 import { TagArraySubject } from './processTagArray'
+import { renderSubjectComponent } from './renderSubjectComponent.function'
 
 const prefixSearch = new RegExp(variablePrefix, 'g')
 
@@ -35,8 +36,7 @@ export class BaseTagSupport {
 
   // stays with current render
   memory: TagMemory = {
-    // context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
-    state: [] as StateConfigArray,
+    state: [] as State,
   }
 
   // travels with all rerenderings
@@ -102,7 +102,7 @@ export class TagSupport extends BaseTagSupport {
   ): Promise<number> {
     const global = this.global
     const subject = this.subject
-    
+  
     // put back down the template tag
     const insertBefore = global.insertBefore as Element
     
@@ -110,15 +110,13 @@ export class TagSupport extends BaseTagSupport {
       const placeholder = global.placeholder as Text
       if(placeholder && !('arrayValue' in this.memory)) {
         if(!options.byParent) {
-          restoreTagMarker(this, insertBefore)
+          restoreTagMarker(this)
         }
       }
     }
 
-    delete global.placeholder
-
     // the isComponent check maybe able to be removed
-    const isComponent = isTagComponent(this) ? true : false    
+    const isComponent = isTagComponent(this.templater) ? true : false    
     if(isComponent) {
       runBeforeDestroy(this, this)    
     }
@@ -131,13 +129,21 @@ export class TagSupport extends BaseTagSupport {
       const subGlobal = child.global
       delete subGlobal.newest
       subGlobal.deleted = true
+      // delete subGlobal.placeholder
+      // restoreTagMarker(child)
     })
 
+    // data reset
+    delete global.placeholder
+    delete (subject as WasTagSubject).tagSupport
+    global.context = {}
     delete global.oldest
     delete global.newest
     global.deleted = true
+    this.childTags.length = 0
     this.hasLiveElements = false
     delete (subject as WasTagSubject).tagSupport
+    
     this.destroySubscriptions()
     
     let mainPromise: Promise<number | (number | void | undefined)[]> | undefined
@@ -302,14 +308,16 @@ export class TagSupport extends BaseTagSupport {
 
     // remove old clones
     if(this.clones.length) {
-      this.clones.forEach(clone => this.checkCloneRemoval(clone, 0))
+      // this.destroyClones()
+      // this.clones.forEach(clone => this.checkCloneRemoval(clone, 0))
     }
 
     global.insertBefore = insertBefore
     
     const context = this.update()
     const template = this.getTemplate()
-
+    
+    const isForceElement = options.forceElement
     const elementContainer = document.createElement('div')
     elementContainer.id = 'tag-temp-holder'
     // render content with a first child that we can know is our first element
@@ -336,7 +344,6 @@ export class TagSupport extends BaseTagSupport {
     )
 
     // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
-    let isForceElement = options.forceElement
     tagComponents.forEach(tagComponent => {
       subscribeToTemplate(
         tagComponent.insertBefore,
@@ -349,7 +356,7 @@ export class TagSupport extends BaseTagSupport {
       afterInterpolateElement(
         elementContainer,
         tagComponent.insertBefore,
-        tagComponent.ownerSupport, // this, // ownerTag
+        tagComponent.ownerSupport,
         context,
         options,
       )
@@ -364,7 +371,6 @@ export class TagSupport extends BaseTagSupport {
     const string = strings.map((string, index) => {
       const safeString = string.replace(prefixSearch, escapeVariable)
       const endString = safeString + (values.length > index ? `{${variablePrefix}${index}}` : '')
-      // const trimString = index === 0 || index === this.strings.length-1 ? endString.trim() : endString
       const trimString = endString.replace(/>\s*/g,'>').replace(/\s*</g,'<')
       return trimString
     }).join('')
@@ -373,7 +379,6 @@ export class TagSupport extends BaseTagSupport {
     this.lastTemplateString = interpolation.string
     return {
       interpolation,
-      // string,
       string: interpolation.string,
       strings,
       values,
@@ -382,20 +387,19 @@ export class TagSupport extends BaseTagSupport {
   }
 
   /** Used during HMR only where static content itself could have been edited */
-  rebuild() {
-    // const insertBefore = this.insertBefore
-    const insertBefore = this.global.insertBefore
+  async rebuild() {
+    delete this.strings // seek the templater strings instead now
+    delete this.values // seek the templater strings instead now
 
-    if(!insertBefore) {
-      const err = new Error('Cannot rebuild. Previous insertBefore element is not defined on tag')
-      ;(err as any).tag = this
-      throw err
-    }
+    restoreTagMarkers(this)
 
-    this.buildBeforeElement(insertBefore, {
+    const newSupport = renderSubjectComponent(this.subject, this, this.ownerTagSupport)
+    await this.destroy()
+    newSupport.buildBeforeElement(this.global.insertBefore as Element,{
       forceElement: true,
-      counts: {added: 0, removed: 0},
+      counts: {added:0, removed: 0},
     })
+    return newSupport
   }
 
   getAppElement() {
@@ -407,4 +411,9 @@ export class TagSupport extends BaseTagSupport {
 
     return tag
   }
+}
+
+function restoreTagMarkers(support: TagSupport) {
+  restoreTagMarker(support)
+  support.childTags.forEach(childTag => restoreTagMarkers(childTag.global.oldest as TagSupport))
 }

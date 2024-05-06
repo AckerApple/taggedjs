@@ -43,7 +43,7 @@ export function checkDestroyPrevious(
       // its a different tag now
       if(!isLikeTags(newTag, lastSupport)) {
         // put template back down
-        restoreTagMarker(lastSupport, insertBefore)
+        restoreTagMarker(lastSupport)
         destroyTagMemory(lastSupport, tagSubject)
         return 2
       }
@@ -57,7 +57,7 @@ export function checkDestroyPrevious(
     }
 
     // put template back down
-    restoreTagMarker(lastSupport, insertBefore)
+    restoreTagMarker(lastSupport)
 
     // destroy old component, value is not a component
     destroyTagMemory(lastSupport, tagSubject)
@@ -109,11 +109,12 @@ function destroySimpleValue(
 
 export function restoreTagMarker(
   lastSupport: TagSupport,
-  insertBefore: InsertBefore,
 ) {
+  const insertBefore = lastSupport.global.insertBefore as Element
   const global = lastSupport.global
   const placeholderElm = global.placeholder
   if(placeholderElm) {
     insertAfter(insertBefore, placeholderElm)
+    delete global.placeholder
   }
 }
