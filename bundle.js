@@ -484,7 +484,7 @@ function resetFunctionProps(props, ownerSupport) {
             };
             // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
             newProps[name].toCall = (...args) => {
-                callbackPropOwner(value, args, ownerSupport);
+                return callbackPropOwner(value, args, ownerSupport);
             };
             newProps[name].original = value;
             return;
@@ -493,15 +493,19 @@ function resetFunctionProps(props, ownerSupport) {
     return newProps;
 }
 function callbackPropOwner(toCall, callWith, ownerSupport) {
-    // signify that a render will be taking place. This prevents breaking state
-    // ownerSupport.childTags.forEach(childTag => ++childTag.global.renderCount)
-    // ++ownerSupport.global.renderCount
-    // if a tag is currently rendering, render after it otherwise render now
-    _tagRunner__WEBPACK_IMPORTED_MODULE_2__.tagClosed$.toCallback(() => {
-        toCall(...callWith);
+    const run = () => {
+        const result = toCall(...callWith);
+        console.log('up here', result);
         const lastestOwner = ownerSupport.global.newest;
         (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_1__.renderTagSupport)(lastestOwner, true);
-    });
+        return result;
+    };
+    if (!(0,_tagRunner__WEBPACK_IMPORTED_MODULE_2__.isInCycle)()) {
+        return run();
+    }
+    // if a tag is currently rendering, render after it otherwise render now
+    // return tagClosed$.toPromise().then(run)
+    return _tagRunner__WEBPACK_IMPORTED_MODULE_2__.tagClosed$.toCallback(run);
 }
 
 
@@ -1034,6 +1038,7 @@ function runTagCallback(value, tagSupport, bindTo, args) {
     const method = value.bind(bindTo);
     const callbackResult = method(...args);
     const sameRenderCount = renderCount === tagSupport.global.renderCount;
+    console.log('callbackResult', callbackResult);
     // already rendered OR tag was deleted before event processing
     if (!sameRenderCount || tagSupport.global.deleted) {
         if (callbackResult instanceof Promise) {
@@ -3536,6 +3541,7 @@ function runWrapper(templater) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   isInCycle: () => (/* binding */ isInCycle),
 /* harmony export */   runAfterRender: () => (/* binding */ runAfterRender),
 /* harmony export */   runBeforeDestroy: () => (/* binding */ runBeforeDestroy),
 /* harmony export */   runBeforeRedraw: () => (/* binding */ runBeforeRedraw),
@@ -3549,10 +3555,13 @@ __webpack_require__.r(__webpack_exports__);
 
 // Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
 const tagClosed$ = new _subject__WEBPACK_IMPORTED_MODULE_1__.Subject(undefined, subscription => {
-    if (!_state__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.rearray) {
+    if (!isInCycle()) {
         subscription.next(); // we are not currently processing so process now
     }
 });
+function isInCycle() {
+    return _state__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.rearray;
+}
 // Life cycle 1
 function runBeforeRender(tagSupport, ownerSupport) {
     _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.beforeRender(tagSupport, ownerSupport));
