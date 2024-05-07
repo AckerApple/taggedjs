@@ -19,7 +19,8 @@ const customScript = '<script type="module">'+ fs.readFileSync(inject).toString(
 const args = parseCommandLineArguments()
 const watchPath = args.dir ? path.join(__dirname, args.dir) : __dirname
 
-const bundleScript = require(rootPath + 'bundleScript.hmr.js')
+// const bundleScript = require(rootPath + 'bundleScript.hmr.js')
+const bundleScript = require(rootPath + 'bundleScript.js')
 const indexFilePath = path.join(__dirname, rootPath, 'index.html')
 
 // Custom middleware for serving static files
@@ -138,7 +139,9 @@ async function runBundle() {
     console.log('🏗️ making bundle...')
     await bundleScript.run()
     running = false
-  })
+  }).catch(error =>
+    console.error('Error bundling', error)
+  )
 
   await promise
 

@@ -11,10 +11,10 @@ export class TagDebugProvider {
 const ProviderFunc = () => ({counter: 0})
 
 export const providerDebugBase = tag((_x = 'providerDebugBase') => {
-  const provider = providers.create( tagDebugProvider as any ) as any
+  // This provider, has a provider
+  const provider = providers.create( tagDebugProvider )
 
-  // TODO: Fix provider create typing
-  const providerClass: TagDebugProvider = providers.create( TagDebugProvider as any )
+  const providerClass: TagDebugProvider = providers.create( TagDebugProvider )
   providers.create(ProviderFunc) // test that an arrow function can be a provider
   const test = letState('props debug base')
   let propCounter = letState(0)(x => [propCounter, propCounter = x])
@@ -37,7 +37,7 @@ export const providerDebugBase = tag((_x = 'providerDebugBase') => {
       <strong>providerClass</strong>:${providerClass.tagDebug || '?'}
     </div>
 
-    <div style="display:flex;gap:1em">
+    <div style="display:flex;flex-wrap:wrap;gap:1em">
       <div>
         <button id="increase-provider-🍌-0-button" onclick=${() => ++provider.test}
         >🍌 increase provider.test ${provider.test}</button>

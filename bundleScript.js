@@ -18,7 +18,7 @@ module.exports.run = () => {
         const error = stats.compilation.errors[0]
         console.error('🌎📦 🔴 compilation bundle error',
           error.message,
-          error.module._errors,
+          error.module?._errors,
         )
         return rej({}/*error*/)
       }

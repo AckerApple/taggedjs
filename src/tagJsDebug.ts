@@ -6,7 +6,7 @@ import { renderCountDiv } from "./renderCount.component"
 import { fadeInDown, fadeOutUp } from "./animations"
 
 export function tagDebugProvider() {
-  const upper = providers.create( upperTagDebugProvider as any )
+  const upper = providers.create( upperTagDebugProvider )
   return {
     upper,
     test: 0

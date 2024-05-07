@@ -6,7 +6,7 @@ export const counters = tag(({
   appCounterSubject,
 }: {
   appCounterSubject: Subject<number>
-}) => {  
+}) => {
   let counter = letState(0)(x => [counter, counter = x])
   let propCounter = letState(0)(x => [propCounter, propCounter = x])
   let renderCount = letState(0)(x => [renderCount, renderCount = x])
@@ -43,7 +43,7 @@ export const counters = tag(({
   return html`<!--counters-->
     <div style="display:flex;flex-wrap:wrap;gap:1em">
       ${testBasics && html`
-        <div>Subscriptions:${(Subject as any).globalSubCount$}</div>
+        <div>👉 Subscriptions:${(Subject as any).globalSubCount$}</div>
         <button onclick=${() => console.info('subs', (Subject as any).globalSubs)}>log subs</button>
         <div>initCounter:${initCounter}</div>
     

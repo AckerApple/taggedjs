@@ -1,5 +1,8 @@
 export declare function tagDebugProvider(): {
-    upper: unknown;
+    upper: {
+        name: string;
+        test: number;
+    };
     test: number;
 };
 export declare function upperTagDebugProvider(): {

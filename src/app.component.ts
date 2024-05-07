@@ -1,7 +1,7 @@
 import { attributeDebug } from "./attributeDebug.component"
 import { contentDebug } from "./ContentDebug.component"
 import { tableDebug } from "./tableDebug.component"
-import { html, tag, letState, onInit, state, Subject, callbackMaker } from "taggedjs"
+import { html, tag, letState, onInit, state, Subject, callbackMaker, onDestroy } from "taggedjs"
 import { tagDebug } from "./tagJsDebug"
 import { tagSwitchDebug } from "./tagSwitchDebug.component"
 import { mirroring } from "./mirroring.tag"
@@ -16,14 +16,21 @@ export const App = tag(() => {
   let toggleValue = letState(false)(x => [toggleValue, toggleValue=x])
   let appCounter = letState(0)(x => [appCounter, appCounter=x])
   let renderCount = letState(0)(x => [renderCount, renderCount=x])
+  let testTimeout = letState(null)(x => [testTimeout, testTimeout=x])
 
   const toggle = () => {
     toggleValue = !toggleValue
   }
 
+  // if I am destroyed before my test runs, prevent test from running
+  onDestroy(() => {
+    clearTimeout(testTimeout as any)
+    testTimeout = null
+  })
+
   function runTesting(manual = true) {
     const waitFor = 1000
-    setTimeout(async () => {
+    testTimeout = setTimeout(async () => {
       console.debug('🏃 Running tests...')
       const result = await runTests()
 
@@ -38,7 +45,7 @@ export const App = tag(() => {
 
       alert('❌ tests failed. See console for more details')
 
-    }, waitFor) // cause delay to be separate from renders
+    }, waitFor) as any // cause delay to be separate from renders
   }
 
   ++renderCount
@@ -53,7 +60,7 @@ export const App = tag(() => {
 
     appCounterSubject.subscribe(x => {
       callbacks((y) => {
-        console.log('callback increase counter', {appCounter, x})
+        console.log('app callback increase counter', {appCounter, x})
         appCounter = x as number
       })()
     })

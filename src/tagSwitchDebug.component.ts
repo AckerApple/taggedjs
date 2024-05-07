@@ -70,7 +70,7 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
 	    <option value="3" ${ selectedTag === '3' ? {selected: true} : {} }>tag 3</option>
     </select>
 
-    <div id="switch-tests-wrap" style="display:flex;gap:1em;">
+    <div id="switch-tests-wrap" style="display:flex;flex-wrap:wrap;gap:1em;">
       <div style="border:1px solid blue;flex-grow:1">
         <h3>Test 1 - string | Tag</h3>
         <div>${tagOutput}</div>

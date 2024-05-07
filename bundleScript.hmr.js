@@ -12,7 +12,7 @@ module.exports.run = () => {
         console.log('err55')
         return rej({}/*err*/)
       }
-
+      console.log('stats', stats)
       res(stats)
     })
   })

@@ -15,14 +15,14 @@ export const IsolatedApp = tag(() => {
     // 'content',
     // 'counters',
 
-    // 'props',
+    'props',
     // 'mirroring',
     // 'providerDebug',
     
     // 'arrays',
     // 'tagSwitchDebug',
     
-    'child',
+    // 'child',
   ]
   
   let appCounter = letState(0)(x => [appCounter, appCounter=x])

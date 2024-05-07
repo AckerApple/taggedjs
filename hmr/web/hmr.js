@@ -1,15 +1,22 @@
 /** client code */
 
-const { variablePrefix } = require("taggedjs/js/Tag.class");
+/** @type {TagSupport | undefined} */
+let lastApp;
 
-// do not use another import as it wont be same memory as running app
-// import { redrawTag, Tag, tagElement } from "taggedjs"
+// 🟠 Warning: avoid direct imports due to bundle workflow (old bundle and new bundle do not mix well)
+// const { renderWithSupport, renderTagSupport } = require("taggedjs");
+
+const { variablePrefix } = require("taggedjs/js/Tag.class");
 
 reconnect()
 
 /**
  * @typedef {import("taggedjs").TagComponent} TagComponent
  * @typedef {import("taggedjs").Tag} Tag
+ * @typedef {import("taggedjs").TagSupport} TagSupport
+ * @typedef {import("taggedjs").tagElement} tagElement
+ * @typedef {import("taggedjs").renderWithSupport} renderWithSupport
+ * @typedef {import("taggedjs").renderTagSupport} renderTagSupport
  */
 
 function reconnect() {
@@ -100,12 +107,25 @@ async function updateByElement(
   // loop new tags looking for matching old
   tags.forEach(async tag => {
     const { newApp, newTemplater } = tag
-    const { redrawTag } = newApp.hmr
+    
+    /** @type {{renderTagSupport: renderTagSupport, renderWithSupport: renderWithSupport}} */
+    const hmr = newApp.hmr
+    
+    const {
+      renderWithSupport,
+      renderTagSupport,
+    } = hmr
     
     /** @type {TagComponent[]} */
     const newTags = newTemplater.wrapper.original.tags
     const newSetUse = newTemplater.wrapper.original.setUse
-    oldSetUse.tagUse = newSetUse.tagUse
+    
+    oldSetUse.tagUse.length = 0
+    // oldSetUse.tagUse = newSetUse.tagUse
+    oldSetUse.tagUse.push(
+      ...newSetUse.tagUse,
+    )
+    
     // update old middleware to use new memory
     Object.assign(oldSetUse.memory, newSetUse.memory)
     
@@ -113,7 +133,7 @@ async function updateByElement(
     newSetUse.memory = oldSetUse.memory
   
     /** @type {{oldTag: Tag, newTag: Tag}[]} */
-    const tagChangeStates = oldTags.reduce((all, oldTag, loopIndex) => {
+    const tagChangeStates = oldTags.reduce((all, oldTag) => {
       let newTag = newTags.find(newTag => newTag.toString() === oldTag.toString())
       
       if(!newTag) {
@@ -136,12 +156,11 @@ async function updateByElement(
   
     const matchedTagCounts = oldTags.length === newTags.length
   
-    newTags.forEach((newTag, index) => {
+    newTags.forEach((newTag) => {
       let oldTag = oldTags.find(oldTag => newTag.toString() === oldTag.toString())
   
       let tagIndex = null
       if(!oldTag && tagChangeStates[0].newTag) {
-        // const tagIndex = newTag.tagSupport.templater.wrapper.tagIndex // newTag.tagIndex
         tagIndex = newTag.tagIndex
         if( matchedTagCounts ) {
           oldTag = oldTags[ tagIndex ]
@@ -167,22 +186,25 @@ async function updateByElement(
     })
   
     if(tagChangeStates.length) {
-      const compareTag = tagChangeStates[0].oldTag
+      const {oldTag, newTag} = tagChangeStates[0]
       
       // Check to rebuild the MAIN APP
-      const oldTemplater = lastApp.tagSupport.templater
-      const match0 = oldTemplater.wrapper.original === compareTag
-      const match1 = oldTemplater.wrapper.original.toString() === compareTag.toString()
+      const oldTemplater = lastApp.templater
+      const match0 = oldTemplater.wrapper.original === oldTag
+      const match1 = oldTemplater.wrapper.original.toString() === oldTag.toString()
+
       if(match0 || match1) {
-        const newTag = tagChangeStates[0].newTag
-        lastApp.tagSupport.templater.wrapper.original = newTag
-        await lastApp.destroy()
-        lastApp = await rebuildTag(lastApp, redrawTag)
+        lastApp.templater.wrapper.original = newTag
+        lastApp.ownerTagSupport = {clones:[], childTags:[]}
+        lastApp.rebuild().then(x => lastApp = x)
+
         lastTags = newTags
         return
       }
   
-      const count = await replaceTemplater(lastApp, tagChangeStates[0], redrawTag)
+      const count = await replaceTemplater(
+        lastApp, tagChangeStates[0], {renderWithSupport, renderTagSupport}
+      )
       
       if(count <= 0) {
         console.warn('✋ No components were updated', tagChangeStates[0])
@@ -193,43 +215,23 @@ async function updateByElement(
   
     lastTags = newTags
   
-    console.info('✅ ✅ ✅ rebuilt', )
+    console.info('✅ ✅ ✅ rebuilt')
   })
 }
 
-async function rebuildTag(
-  /** @type {Tag} */
-  tag,
-  redrawTag,
-  ownerTag,
-) {
-  /** @type {{retag: Tag}} */
-  const { retag } = redrawTag(
-    tag.tagSupport,
-    tag.tagSupport.templater,
-    tag, // existingTag
-    ownerTag, // TODO: not needed
-  )
-
-  retag.tagSupport.templater.insertBefore = tag.tagSupport.templater.insertBefore
-
-  retag.rebuild()
-
-  if(tag.ownerTag) {
-    retag.ownerTag.children.push(retag)
-  }
-
-  return retag
-}
-
 async function replaceTemplater(
-  /** @type {Tag} */
-  tag,
+  /** @type {TagSupport} */
+  ownerTagSupport,
   /** @type {{oldTag: TagComponent, newTag: TagComponent}} */
   {oldTag, newTag},
-  redrawTag,
+  /** @type {{renderWithSupport:renderWithSupport, renderTagSupport:renderTagSupport}} */
+  {
+    renderWithSupport,
+    renderTagSupport,
+  }
   ) {
   let  count = 0
+  const tag = ownerTagSupport.templater.tag
   const promises = tag.values.map(async (value, index) => {
     if(!value || !value.isTemplater) {
       return
@@ -240,19 +242,16 @@ async function replaceTemplater(
 
     // Check to rebuild a component within an app
     if(match0 || match1) {
-      const tagSupport = tag.tagSupport
-      // const tagSupport = oldTag.tagSupport
-      const memory = tagSupport.memory
-      const context = memory.context
+      const global = ownerTagSupport.global
+      const context = global.context
       const contextSubject = context[ variablePrefix + index ]
+      
+      // replace the developer function that may have been updated
       value.wrapper.original = newTag
-      const contextSupport = contextSubject.tag.tagSupport
-      contextSupport.templater.wrapper.original = newTag
-      
-      await contextSubject.tag.destroy()
-      // destroyContextClones(contextSubject.tag.tagSupport.memory.context)
-      
-      contextSubject.tag = await rebuildTag(contextSubject.tag, redrawTag, tag)
+
+      updateSubject(
+        contextSubject, newTag, oldTag, renderTagSupport
+      )
       
       ++count
 
@@ -262,8 +261,11 @@ async function replaceTemplater(
   
   await Promise.all(promises)
 
-  const subPromises = tag.children.map(async child => {
-    count = count + await replaceTemplater(child, {oldTag, newTag}, redrawTag)
+  const subPromises = ownerTagSupport.childTags.map(async child => {
+    count = count + await replaceTemplater(
+      child, {oldTag, newTag},
+      {renderWithSupport, renderTagSupport}
+    )
   })
 
   await Promise.all(subPromises)
@@ -271,33 +273,51 @@ async function replaceTemplater(
   return count
 }
 
-/** @type {Tag | undefined} */
-let lastApp;
+/** Used to switch out the wrappers of a subject and then render */
+async function updateSubject(
+  contextSubject,
+  /** @type {TagComponent} */
+  newTag,
+  /** @type {TagComponent} */
+  oldTag,
+  /** @type {renderTagSupport} */
+  renderTagSupport
+) {
+  /** @type {TagSupport} */
+  const contextSupport = contextSubject.tagSupport
+  
+  const oldest = contextSupport.global.oldest
+  const newest = contextSupport.global.newest
+  
+  contextSupport.templater.wrapper.original = newTag
+  newest.templater.wrapper.original = newTag
+  oldest.templater.wrapper.original = newTag
+  oldTag.original = newTag // everytime an old owner tag redraws, it will use the new function
+
+  return await renderTagSupport(
+    oldest,
+    false
+  )
+}
 
 function rebuildApps() {
   forEachApp(element => {
     discoverTags().then(apps => {
       apps.forEach(({newApp, tagName}) => {
+        /** @type {{tagElement: tagElement}} */
         const { tagElement } = newApp.hmr
+        
+        if(element.destroy) {
+          element.destroy()
+        }
+
         const result = tagElement(newApp[tagName], element, {test:1})
         
         lastTags = result.tags
-        lastApp = result.tag
+        lastApp = result.tagSupport
   
         return result
       })
     })
-  })
-}
-
-function destroyContextClones(context) {
-  Object.values(context).forEach(context => {
-    if(context.clone) {
-      delete context.clone
-    }
-
-    if(context.tag) {
-      destroyContextClones(context.tag.tagSupport.memory.context)
-    }
   })
 }
