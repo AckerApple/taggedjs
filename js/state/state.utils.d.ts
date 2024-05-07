@@ -8,7 +8,7 @@ export type StateConfigItem<T> = {
     watch?: T;
 };
 export type Config = {
-    tagSupport: BaseTagSupport;
+    tagSupport?: BaseTagSupport;
     array: State;
     rearray?: State;
 };

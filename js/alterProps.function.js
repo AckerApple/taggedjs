@@ -1,6 +1,8 @@
+import { deepClone, deepEqual } from './deepFunctions';
 import { isTag } from './isInstance';
 import { renderTagSupport } from './renderTagSupport.function';
-import { isInCycle, tagClosed$ } from './tagRunner';
+import { setUse } from './state';
+import { isInCycle } from './tagRunner';
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(props, ownerSupport) {
     const isPropTag = isTag(props);
@@ -17,8 +19,8 @@ function resetFunctionProps(props, ownerSupport) {
     // const newProps = {...props} 
     Object.entries(newProps).forEach(([name, value]) => {
         if (value instanceof Function) {
-            const original = newProps[name].original;
-            if (original) {
+            const toCall = newProps[name].toCall;
+            if (toCall) {
                 return; // already previously converted
             }
             newProps[name] = (...args) => {
@@ -35,17 +37,31 @@ function resetFunctionProps(props, ownerSupport) {
     return newProps;
 }
 export function callbackPropOwner(toCall, callWith, ownerSupport) {
+    // const renderCount = ownerSupport.global.renderCount
+    const cycle = isInCycle();
+    const result = toCall(...callWith);
     const run = () => {
-        const result = toCall(...callWith);
         const lastestOwner = ownerSupport.global.newest;
-        renderTagSupport(lastestOwner, true);
+        if (cycle) {
+            // appears a prop function was called sync/immediately so lets see if owner changed state
+            const allMatched = lastestOwner.memory.state.every(state => {
+                const lastValue = state.lastValue;
+                const get = state.get();
+                const equal = deepEqual(deepClone(lastValue), get);
+                return equal;
+            });
+            if (allMatched) {
+                return result; // owner did not change
+            }
+        }
+        const newest = renderTagSupport(lastestOwner, true);
+        lastestOwner.global.newest = newest;
         return result;
     };
-    if (!isInCycle()) {
+    if (!cycle) {
         return run();
     }
-    // if a tag is currently rendering, render after it otherwise render now
-    // return tagClosed$.toPromise().then(run)
-    return tagClosed$.toCallback(run);
+    setUse.memory.tagClosed$.toCallback(run);
+    return result;
 }
 //# sourceMappingURL=alterProps.function.js.map

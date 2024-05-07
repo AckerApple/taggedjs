@@ -28,6 +28,7 @@ setUse({
             }
         }
         delete config.rearray; // clean up any previous runs
+        delete config.tagSupport;
         memory.state = config.array; // [...config.array]
         memory.state.forEach(item => item.lastValue = getStateValue(item)); // set last values
         config.array = [];

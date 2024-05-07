@@ -24,14 +24,14 @@ export function runTagCallback(value, tagSupport, bindTo, args) {
         }
         return 'no-data-ever'; // already rendered
     }
-    renderTagSupport(tagSupport, true);
-    // tagSupport.global.newest = newest
+    const newest = renderTagSupport(tagSupport.global.newest, true);
+    tagSupport.global.newest = newest;
     if (callbackResult instanceof Promise) {
         return callbackResult.then(() => {
             if (tagSupport.global.deleted) {
                 return 'promise-no-data-ever'; // tag was deleted during event processing
             }
-            const newest = renderTagSupport(tagSupport, true);
+            const newest = renderTagSupport(tagSupport.global.newest, true);
             tagSupport.global.newest = newest;
             return 'promise-no-data-ever';
         });
