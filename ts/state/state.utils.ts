@@ -14,7 +14,7 @@ export type StateConfigItem<T> = {
 }
 
 export type Config = {
-  tagSupport: BaseTagSupport
+  tagSupport?: BaseTagSupport
   array: State // state memory on the first render
   rearray?: State // state memory to be used before the next render
 }
@@ -57,6 +57,7 @@ setUse({
     }
     
     delete config.rearray // clean up any previous runs
+    delete config.tagSupport
 
     memory.state = config.array // [...config.array]
     memory.state.forEach(item => item.lastValue = getStateValue(item)) // set last values

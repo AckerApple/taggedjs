@@ -184,7 +184,7 @@ function prepareUpdateToComponent(
   insertBefore: InsertBefore,
   ownerSupport: TagSupport,
 ): TagSubject {
-  // When was something before component
+  // When last value was not a component
   if(!subjectTag.tagSupport) {
     processSubjectComponent(
       templater,
@@ -206,9 +206,7 @@ function prepareUpdateToComponent(
     subjectTag,
   )
 
-  // ??? new mirroring
   const subjectSup = subjectTag.tagSupport
-  // const prevSupport = (subjectSup.global.newest || subjectSup) as TagSupport
   const prevSupport = subjectSup.global.newest
   if(prevSupport) {
     const newestState = prevSupport.memory.state
@@ -219,7 +217,6 @@ function prepareUpdateToComponent(
       insertAfter(insertBefore,placeholder)
       delete subjectSup.global.placeholder
     }
-    // insertBefore = subjectSup.global.placeholder || insertBefore
 
     processSubjectComponent(
       templater, subjectTag, insertBefore, ownerSupport,

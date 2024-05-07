@@ -4,13 +4,13 @@ import { setUse } from "./setUse.function"
 export type OnInitCallback = () => unknown
 
 function setCurrentTagSupport(support: BaseTagSupport | TagSupport) {
-  setUse.memory.initCurrentSupport = support as TagSupport
+  setUse.memory.currentSupport = support as TagSupport
 }
 
 export function onInit(
   callback: OnInitCallback
 ) {
-  const tagSupport = setUse.memory.initCurrentSupport
+  const tagSupport = setUse.memory.currentSupport
   if(!tagSupport.global.init) {
     tagSupport.global.init = callback
     callback() // fire init

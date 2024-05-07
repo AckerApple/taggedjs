@@ -1,6 +1,7 @@
 import { deepClone } from '../deepFunctions'
 import { BaseTagSupport, TagSupport } from '../TagSupport.class'
 import { setUse } from './setUse.function'
+import { state } from './state.function'
 
 export type Provider = {
   constructMethod: any
@@ -36,18 +37,30 @@ export const providers = {
     const existing = get(constructMethod)
     if(existing) {
       existing.clone = deepClone(existing.instance)
-      return existing.instance
+
+      // fake calling state the same number of previous times
+      for (let x=0; x < (existing as any).stateDiff; ++x) {
+        state((existing as any).stateDiff)
+      }
+
+      return state((existing as any).stateDiff)
     }
 
+    const oldStateCount = setUse.memory.stateConfig.array.length
     // Providers with provider requirements just need to use providers.create() and providers.inject()
     const instance: T = 'prototype' in constructMethod ? new (constructMethod as classProvider<T>)() : (constructMethod as functionProvider<T>)()
+
+    const stateDiff = setUse.memory.stateConfig.array.length - oldStateCount
     
     const config = setUse.memory.providerConfig
     config.providers.push({
       constructMethod,
       instance,
-      clone: deepClone(instance)
-    })
+      clone: deepClone(instance),
+      stateDiff,
+    } as any)
+
+    state(() => instance) // tie provider to a state for rendering change checking
     
     return instance
   },

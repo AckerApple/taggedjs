@@ -1,6 +1,5 @@
 import { isSubjectInstance, isTagComponent } from './isInstance'
 import { TemplateValue } from './processSubjectValue.function'
-import { ValueSubject } from './subject'
 import { TagSubject } from './subject.types'
 import { Context, Tag } from './Tag.class'
 import { TagSupport } from './TagSupport.class'
@@ -33,7 +32,7 @@ export function updateContextItem(
   }
 
   if(isSubjectInstance(value)) {
-    return
+    return // emits on its own
   }
 
   // listeners will evaluate updated values to possibly update display(s)

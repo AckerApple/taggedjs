@@ -1,8 +1,10 @@
 import { Props } from './Props'
 import { TagSupport } from './TagSupport.class'
+import { deepClone, deepEqual } from './deepFunctions'
 import { isTag } from './isInstance'
 import { renderTagSupport } from './renderTagSupport.function'
-import { isInCycle, tagClosed$ } from './tagRunner'
+import { setUse } from './state'
+import { isInCycle } from './tagRunner'
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(
@@ -30,9 +32,9 @@ function resetFunctionProps(
 
   Object.entries(newProps).forEach(([name, value]) => {
     if(value instanceof Function) {
-      const original = newProps[name].original
+      const toCall = newProps[name].toCall
       
-      if(original) {
+      if(toCall) {
         return // already previously converted
       }
 
@@ -58,23 +60,46 @@ export function callbackPropOwner(
   callWith: any,
   ownerSupport: TagSupport,
 ) {
+  // const renderCount = ownerSupport.global.renderCount
+  const cycle = isInCycle()
+
+  const result = toCall(...callWith)
   const run = () => {
-    const result = toCall(...callWith)
-    
     const lastestOwner = ownerSupport.global.newest as TagSupport
-    renderTagSupport(
+
+    if(cycle) {
+      // appears a prop function was called sync/immediately so lets see if owner changed state
+      const allMatched = lastestOwner.memory.state.every(state => {
+        const lastValue = state.lastValue
+        const get = state.get()
+        const equal = deepEqual(
+          deepClone(lastValue),
+          get,
+        )
+  
+        return equal
+      })
+    
+      if(allMatched) {
+        return result // owner did not change
+      }
+    }
+
+    const newest = renderTagSupport(
       lastestOwner,
       true,
     )
 
+    lastestOwner.global.newest = newest
+
     return result
   }
 
-  if(!isInCycle()) {
+  if(!cycle) {
     return run()
   }
+  
+  setUse.memory.tagClosed$.toCallback(run)
 
-  // if a tag is currently rendering, render after it otherwise render now
-  // return tagClosed$.toPromise().then(run)
-  return tagClosed$.toCallback(run)
+  return result
 }

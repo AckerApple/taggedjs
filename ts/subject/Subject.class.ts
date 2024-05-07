@@ -68,12 +68,13 @@ export class Subject<T> implements SubjectLike<T> {
     })
   }
 
-  // like toPromise but faster
-  toCallback(callback: (x: T) => any): void {
+  /** like toPromise but faster */
+  toCallback(callback: (x: T) => any) {
     this.subscribe((x, subscription) => {
       subscription.unsubscribe()
       callback(x)
     })
+    return this
   }
 
   /* tslint:disable:max-line-length */

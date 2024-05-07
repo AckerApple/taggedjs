@@ -43,5 +43,5 @@ setUse.tagUse = tagUse
 setUse.memory = {} as (Record<string,any> & {
   stateConfig: Config
   providerConfig: ProviderConfig
-  initCurrentSupport: TagSupport
+  currentSupport: TagSupport // tag being rendered
 })

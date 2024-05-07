@@ -49,12 +49,12 @@ export function runTagCallback(
     return 'no-data-ever' // already rendered
   }
 
-  renderTagSupport(
-    tagSupport,
+  const newest = renderTagSupport(
+    tagSupport.global.newest as TagSupport,
     true, // renderUp - callback may have changed props so also check to render up
   )
 
-  // tagSupport.global.newest = newest
+  tagSupport.global.newest = newest
 
   if(callbackResult instanceof Promise) {
     return callbackResult.then(() => {
@@ -63,7 +63,7 @@ export function runTagCallback(
       }
 
       const newest = renderTagSupport(
-        tagSupport,
+        tagSupport.global.newest as TagSupport,
         true,
       )
 

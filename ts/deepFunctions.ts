@@ -74,7 +74,7 @@ function isDeepEqual(
   if(typeof obj1 === 'object' && typeof obj2 === 'object') {
     // both are dates and were already determined not the same
     if(obj1 instanceof Date && obj2 instanceof Date) {
-      return false
+      return obj1.getTime() === obj2.getTime()
     }
 
     // Register the cloned object to avoid cyclic references

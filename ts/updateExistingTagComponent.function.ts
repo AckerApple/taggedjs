@@ -117,9 +117,6 @@ export function updateExistingTagComponent(
   }
 
   lastSupport.global.newest = newSupport
-  if(!lastSupport.global.oldest) {
-    throw new Error('333333')
-  }
 
   return newSupport
 }
