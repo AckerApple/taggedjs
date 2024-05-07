@@ -11,7 +11,7 @@ export function alterProps(props, ownerSupport) {
     return newProps;
 }
 function resetFunctionProps(props, ownerSupport) {
-    if (typeof (props) !== 'object') {
+    if (typeof (props) !== 'object' || !ownerSupport) {
         return props;
     }
     const newProps = props;

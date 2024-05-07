@@ -32,7 +32,6 @@ function shareTemplaterGlobal(oldTagSupport, tagSupport) {
     const fnMatched = oldValueFn === newValueFn;
     if (fnMatched) {
         tagSupport.global = oldTagSupport.global;
-        // ??? new mirroring transfer state
         const newest = oldTagSupport.global.newest;
         if (newest) {
             const prevState = newest.memory.state;

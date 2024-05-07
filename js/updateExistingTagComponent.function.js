@@ -6,8 +6,6 @@ import { callbackPropOwner } from './alterProps.function';
 import { isLikeTags } from './isLikeTags.function';
 export function updateExistingTagComponent(ownerSupport, tagSupport, // lastest
 subject, insertBefore) {
-    // ??? changed during mirroring
-    // let lastSupport = subject.tagSupport
     let lastSupport = subject.tagSupport?.global.newest; // || subject.tagSupport
     let oldestTag = lastSupport.global.oldest;
     const oldWrapper = lastSupport.templater.wrapper;

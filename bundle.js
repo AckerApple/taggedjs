@@ -453,21 +453,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   alterProps: () => (/* binding */ alterProps),
 /* harmony export */   callbackPropOwner: () => (/* binding */ callbackPropOwner)
 /* harmony export */ });
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./isInstance */ "./ts/isInstance.ts");
-/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./renderTagSupport.function */ "./ts/renderTagSupport.function.ts");
-/* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tagRunner */ "./ts/tagRunner.ts");
+/* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./deepFunctions */ "./ts/deepFunctions.ts");
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./isInstance */ "./ts/isInstance.ts");
+/* harmony import */ var _renderTagSupport_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./renderTagSupport.function */ "./ts/renderTagSupport.function.ts");
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./state */ "./ts/state/index.ts");
+/* harmony import */ var _tagRunner__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tagRunner */ "./ts/tagRunner.ts");
+
+
 
 
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 function alterProps(props, ownerSupport) {
-    const isPropTag = (0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isTag)(props);
+    const isPropTag = (0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTag)(props);
     const watchProps = isPropTag ? 0 : props;
     const newProps = resetFunctionProps(watchProps, ownerSupport);
     return newProps;
 }
 function resetFunctionProps(props, ownerSupport) {
-    if (typeof (props) !== 'object') {
+    if (typeof (props) !== 'object' || !ownerSupport) {
         return props;
     }
     const newProps = props;
@@ -475,8 +479,8 @@ function resetFunctionProps(props, ownerSupport) {
     // const newProps = {...props} 
     Object.entries(newProps).forEach(([name, value]) => {
         if (value instanceof Function) {
-            const original = newProps[name].original;
-            if (original) {
+            const toCall = newProps[name].toCall;
+            if (toCall) {
                 return; // already previously converted
             }
             newProps[name] = (...args) => {
@@ -493,19 +497,32 @@ function resetFunctionProps(props, ownerSupport) {
     return newProps;
 }
 function callbackPropOwner(toCall, callWith, ownerSupport) {
+    // const renderCount = ownerSupport.global.renderCount
+    const cycle = (0,_tagRunner__WEBPACK_IMPORTED_MODULE_4__.isInCycle)();
+    const result = toCall(...callWith);
     const run = () => {
-        const result = toCall(...callWith);
-        console.log('up here', result);
         const lastestOwner = ownerSupport.global.newest;
-        (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_1__.renderTagSupport)(lastestOwner, true);
+        if (cycle) {
+            // appears a prop function was called sync/immediately so lets see if owner changed state
+            const allMatched = lastestOwner.memory.state.every(state => {
+                const lastValue = state.lastValue;
+                const get = state.get();
+                const equal = (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepEqual)((0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepClone)(lastValue), get);
+                return equal;
+            });
+            if (allMatched) {
+                return result; // owner did not change
+            }
+        }
+        const newest = (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_2__.renderTagSupport)(lastestOwner, true);
+        lastestOwner.global.newest = newest;
         return result;
     };
-    if (!(0,_tagRunner__WEBPACK_IMPORTED_MODULE_2__.isInCycle)()) {
+    if (!cycle) {
         return run();
     }
-    // if a tag is currently rendering, render after it otherwise render now
-    // return tagClosed$.toPromise().then(run)
-    return _tagRunner__WEBPACK_IMPORTED_MODULE_2__.tagClosed$.toCallback(run);
+    _state__WEBPACK_IMPORTED_MODULE_3__.setUse.memory.tagClosed$.toCallback(run);
+    return result;
 }
 
 
@@ -711,7 +728,7 @@ function isDeepEqual(obj1, obj2, visited) {
     if (typeof obj1 === 'object' && typeof obj2 === 'object') {
         // both are dates and were already determined not the same
         if (obj1 instanceof Date && obj2 instanceof Date) {
-            return false;
+            return obj1.getTime() === obj2.getTime();
         }
         // Register the cloned object to avoid cyclic references
         visited.set(obj1, 0);
@@ -1038,7 +1055,6 @@ function runTagCallback(value, tagSupport, bindTo, args) {
     const method = value.bind(bindTo);
     const callbackResult = method(...args);
     const sameRenderCount = renderCount === tagSupport.global.renderCount;
-    console.log('callbackResult', callbackResult);
     // already rendered OR tag was deleted before event processing
     if (!sameRenderCount || tagSupport.global.deleted) {
         if (callbackResult instanceof Promise) {
@@ -1048,14 +1064,14 @@ function runTagCallback(value, tagSupport, bindTo, args) {
         }
         return 'no-data-ever'; // already rendered
     }
-    (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport, true);
-    // tagSupport.global.newest = newest
+    const newest = (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport.global.newest, true);
+    tagSupport.global.newest = newest;
     if (callbackResult instanceof Promise) {
         return callbackResult.then(() => {
             if (tagSupport.global.deleted) {
                 return 'promise-no-data-ever'; // tag was deleted during event processing
             }
-            const newest = (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport, true);
+            const newest = (0,_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport.global.newest, true);
             tagSupport.global.newest = newest;
             return 'promise-no-data-ever';
         });
@@ -2599,10 +2615,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./setUse.function */ "./ts/state/setUse.function.ts");
 
 function setCurrentTagSupport(support) {
-    _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.initCurrentSupport = support;
+    _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.currentSupport = support;
 }
 function onInit(callback) {
-    const tagSupport = _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.initCurrentSupport;
+    const tagSupport = _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.currentSupport;
     if (!tagSupport.global.init) {
         tagSupport.global.init = callback;
         callback(); // fire init
@@ -2683,6 +2699,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../deepFunctions */ "./ts/deepFunctions.ts");
 /* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./setUse.function */ "./ts/state/setUse.function.ts");
+/* harmony import */ var _state_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./state.function */ "./ts/state/state.function.ts");
+
 
 
 _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.providerConfig = {
@@ -2699,16 +2717,24 @@ const providers = {
         const existing = get(constructMethod);
         if (existing) {
             existing.clone = (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepClone)(existing.instance);
-            return existing.instance;
+            // fake calling state the same number of previous times
+            for (let x = 0; x < existing.stateDiff; ++x) {
+                (0,_state_function__WEBPACK_IMPORTED_MODULE_2__.state)(existing.stateDiff);
+            }
+            return (0,_state_function__WEBPACK_IMPORTED_MODULE_2__.state)(existing.stateDiff);
         }
+        const oldStateCount = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig.array.length;
         // Providers with provider requirements just need to use providers.create() and providers.inject()
         const instance = 'prototype' in constructMethod ? new constructMethod() : constructMethod();
+        const stateDiff = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig.array.length - oldStateCount;
         const config = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.providerConfig;
         config.providers.push({
             constructMethod,
             instance,
-            clone: (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepClone)(instance)
+            clone: (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepClone)(instance),
+            stateDiff,
         });
+        (0,_state_function__WEBPACK_IMPORTED_MODULE_2__.state)(() => instance); // tie provider to a state for rendering change checking
         return instance;
     },
     /**
@@ -2940,6 +2966,7 @@ const beforeRender = (tagSupport) => initState(tagSupport);
             }
         }
         delete config.rearray; // clean up any previous runs
+        delete config.tagSupport;
         memory.state = config.array; // [...config.array]
         memory.state.forEach(item => item.lastValue = getStateValue(item)); // set last values
         config.array = [];
@@ -3105,12 +3132,13 @@ class Subject {
             });
         });
     }
-    // like toPromise but faster
+    /** like toPromise but faster */
     toCallback(callback) {
         this.subscribe((x, subscription) => {
             subscription.unsubscribe();
             callback(x);
         });
+        return this;
     }
     pipe(...operations) {
         const subject = new Subject();
@@ -3545,8 +3573,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   runAfterRender: () => (/* binding */ runAfterRender),
 /* harmony export */   runBeforeDestroy: () => (/* binding */ runBeforeDestroy),
 /* harmony export */   runBeforeRedraw: () => (/* binding */ runBeforeRedraw),
-/* harmony export */   runBeforeRender: () => (/* binding */ runBeforeRender),
-/* harmony export */   tagClosed$: () => (/* binding */ tagClosed$)
+/* harmony export */   runBeforeRender: () => (/* binding */ runBeforeRender)
 /* harmony export */ });
 /* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./state */ "./ts/state/index.ts");
 /* harmony import */ var _subject__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./subject */ "./ts/subject/index.ts");
@@ -3554,13 +3581,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 // Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
-const tagClosed$ = new _subject__WEBPACK_IMPORTED_MODULE_1__.Subject(undefined, subscription => {
+_state__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.tagClosed$ = new _subject__WEBPACK_IMPORTED_MODULE_1__.Subject(undefined, subscription => {
     if (!isInCycle()) {
         subscription.next(); // we are not currently processing so process now
     }
 });
 function isInCycle() {
-    return _state__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.rearray;
+    return _state__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.tagSupport;
 }
 // Life cycle 1
 function runBeforeRender(tagSupport, ownerSupport) {
@@ -3569,7 +3596,7 @@ function runBeforeRender(tagSupport, ownerSupport) {
 // Life cycle 2
 function runAfterRender(tagSupport, ownerTagSupport) {
     _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.afterRender(tagSupport, ownerTagSupport));
-    tagClosed$.next(ownerTagSupport);
+    _state__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.tagClosed$.next(ownerTagSupport);
 }
 // Life cycle 3
 function runBeforeRedraw(tagSupport, ownerTagSupport) {
@@ -3642,7 +3669,7 @@ function updateContextItem(context, variableName, value) {
         }
     }
     if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isSubjectInstance)(value)) {
-        return;
+        return; // emits on its own
     }
     // listeners will evaluate updated values to possibly update display(s)
     subject.set(value);
@@ -3658,7 +3685,6 @@ function shareTemplaterGlobal(oldTagSupport, tagSupport) {
     const fnMatched = oldValueFn === newValueFn;
     if (fnMatched) {
         tagSupport.global = oldTagSupport.global;
-        // ??? new mirroring transfer state
         const newest = oldTagSupport.global.newest;
         if (newest) {
             const prevState = newest.memory.state;
@@ -3758,9 +3784,6 @@ subject, insertBefore) {
         buildNewTag(newSupport, lastSupport.global.insertBefore, lastSupport, subject);
     }
     lastSupport.global.newest = newSupport;
-    if (!lastSupport.global.oldest) {
-        throw new Error('333333');
-    }
     return newSupport;
 }
 function buildNewTag(newSupport, oldInsertBefore, oldTagSupport, subject) {
@@ -3925,7 +3948,7 @@ function handleStillTag(subject, value, ownerSupport) {
     return (0,_processRegularValue_function__WEBPACK_IMPORTED_MODULE_5__.processRegularValue)(value, subject, subject.insertBefore);
 }
 function prepareUpdateToComponent(templater, subjectTag, insertBefore, ownerSupport) {
-    // When was something before component
+    // When last value was not a component
     if (!subjectTag.tagSupport) {
         (0,_processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_8__.processSubjectComponent)(templater, subjectTag, insertBefore, // oldInsertBefore as InsertBefore,
         ownerSupport, {
@@ -3935,9 +3958,7 @@ function prepareUpdateToComponent(templater, subjectTag, insertBefore, ownerSupp
         return subjectTag;
     }
     const tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.TagSupport(templater, ownerSupport, subjectTag);
-    // ??? new mirroring
     const subjectSup = subjectTag.tagSupport;
-    // const prevSupport = (subjectSup.global.newest || subjectSup) as TagSupport
     const prevSupport = subjectSup.global.newest;
     if (prevSupport) {
         const newestState = prevSupport.memory.state;
@@ -3949,7 +3970,6 @@ function prepareUpdateToComponent(templater, subjectTag, insertBefore, ownerSupp
             (0,_insertAfter_function__WEBPACK_IMPORTED_MODULE_12__.insertAfter)(insertBefore, placeholder);
             delete subjectSup.global.placeholder;
         }
-        // insertBefore = subjectSup.global.placeholder || insertBefore
         (0,_processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_8__.processSubjectComponent)(templater, subjectTag, insertBefore, ownerSupport, {
             forceElement: true,
             counts: { added: 0, removed: 0 },
