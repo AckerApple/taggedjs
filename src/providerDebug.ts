@@ -1,6 +1,5 @@
 import { fadeInDown, fadeOutUp } from "./animations"
 import { renderCountDiv } from "./renderCount.component"
-import { tagDebugProvider, upperTagDebugProvider } from "./tagJsDebug"
 import { letState, html, tag, providers, state, callbackMaker, Subject, onInit } from "taggedjs"
 
 export class TagDebugProvider {
@@ -10,12 +9,29 @@ export class TagDebugProvider {
 
 const ProviderFunc = () => ({counter: 0})
 
+
+export function tagDebugProvider() {
+  const upper = providers.create( upperTagDebugProvider )
+  return {
+    upper,
+    test: 0
+  }
+}
+
+export function upperTagDebugProvider() {
+  return {
+    name: 'upperTagDebugProvider',
+    test: 0
+  }
+}
+
 export const providerDebugBase = tag((_x = 'providerDebugBase') => {
-  // This provider, has a provider
+  // providerDebugBase, has provider
+  
+  providers.create(ProviderFunc) // test that an arrow function can be a provider
+  const providerClass: TagDebugProvider = providers.create( TagDebugProvider )
   const provider = providers.create( tagDebugProvider )
 
-  const providerClass: TagDebugProvider = providers.create( TagDebugProvider )
-  providers.create(ProviderFunc) // test that an arrow function can be a provider
   const test = letState('props debug base')
   let propCounter = letState(0)(x => [propCounter, propCounter = x])
   let renderCount = letState(0)(x => [renderCount, renderCount = x])
@@ -28,18 +44,19 @@ export const providerDebugBase = tag((_x = 'providerDebugBase') => {
 
   return html`
     <div>
-      <strong>testValue</strong>:${provider.test}
+      <strong>provider.test sugar-daddy-77</strong>:${provider.test}
     </div>
     <div>
-      <strong>upperTest</strong>:${provider.upper?.test || '?'}
+      <strong>provider.upper?.test</strong>:${provider.upper?.test || '?'}
     </div>
     <div>
-      <strong>providerClass</strong>:${providerClass.tagDebug || '?'}
+      <strong>providerClass.tagDebug</strong>:${providerClass.tagDebug || '?'}
     </div>
 
     <div style="display:flex;flex-wrap:wrap;gap:1em">
       <div>
-        <button id="increase-provider-🍌-0-button" onclick=${() => ++provider.test}
+        <button id="increase-provider-🍌-0-button"
+          onclick=${() => ++provider.test}
         >🍌 increase provider.test ${provider.test}</button>
         <span>
           🍌 <span id="increase-provider-🍌-0-display">${provider.test}</span>
@@ -86,7 +103,7 @@ export const providerDebugBase = tag((_x = 'providerDebugBase') => {
     </div>
 
     <hr />
-    renderCount outer:${renderCount}
+    renderCount outer:<span name="render_count_outer">${renderCount}</span>${renderCount}
     ${renderCountDiv({renderCount, name:'providerDebugBase'})}
 
     <dialog id="provider_debug_dialog" style="padding:0"
@@ -115,10 +132,10 @@ const providerDebug = tag(({
   propCounter: number,
   propCounterChange: (x: number) => unknown
 }) => {
-  const provider = providers.inject( tagDebugProvider )
-  const upperProvider = providers.inject( upperTagDebugProvider )
-  const providerClass = providers.inject( TagDebugProvider )
   const funcProvider = providers.inject(ProviderFunc) // test that an arrow function can be a provider
+  const provider = providers.inject( tagDebugProvider )
+  const providerClass = providers.inject( TagDebugProvider )
+  const upperProvider = providers.inject( upperTagDebugProvider )
 
   let showProProps: boolean = letState(false)(x => [showProProps, showProProps = x])
   let renderCount: number = letState(0)(x => [renderCount, renderCount = x])

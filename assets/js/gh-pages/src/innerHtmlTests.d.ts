@@ -1,3 +1,7 @@
-import { Tag, ValueSubject, TagChildren } from "taggedjs";
-export declare const innerHtmlTest: import("taggedjs").TagComponentBase<[_props: unknown, children: TagChildren]>;
-export declare const innerHtmlPropsTest: import("taggedjs").TagComponentBase<[x: number, children: ValueSubject<Tag[]>]>;
+import { Tag } from "taggedjs";
+export declare const innerHtmlTest: ((_props: unknown, b: number) => Tag) & {
+    original: Function;
+};
+export declare const innerHtmlPropsTest: ((x: number) => Tag) & {
+    original: Function;
+};

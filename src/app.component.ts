@@ -10,6 +10,7 @@ import { runTests } from "./tests"
 import { renderCountDiv } from "./renderCount.component"
 import { counters } from "./countersDebug"
 import { providerDebugBase } from "./providerDebug"
+import { watchTesting } from "./watchTesting.tag"
 
 export const App = tag(() => {
   let _firstState = letState('app first state')(x => [_firstState, _firstState=x])
@@ -88,6 +89,11 @@ export const App = tag(() => {
         <fieldset id="counters" style="flex:2 2 20em">
           <legend>counters</legend>
           ${counters({appCounterSubject})}
+        </fieldset>
+
+        <fieldset id="counters" style="flex:2 2 20em">
+          <legend>⌚️ watch testing</legend>
+          ${watchTesting()}
         </fieldset>
 
         <fieldset id="provider-debug" style="flex:2 2 20em">

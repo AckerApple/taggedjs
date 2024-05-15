@@ -1,7 +1,7 @@
 import { InterpolatedContentTemplates } from "./interpolateContentTemplates";
-import { Context, TagTemplate } from "../Tag.class";
+import { Context, TagTemplate } from "../tag/Tag.class";
 import { Counts } from "./interpolateTemplate";
-import { TagSupport } from "../TagSupport.class";
+import { TagSupport } from "../tag/TagSupport.class";
 export type InterpolateOptions = {
     /** make the element go on document */
     forceElement?: boolean;

@@ -78,6 +78,11 @@ it.skip = (label: string, run: () => any) => {
   console.debug('⏭️ Skipped ' + label)
 }
 
+function clearTests() {
+  onlyTests.length = 0
+  tests.length = 0
+}
+
 export async function execute() {
   if(onlyTests.length) {
     return runTests(onlyTests)
@@ -92,9 +97,11 @@ async function runTests(tests: Test[]) {
       await test()
     } catch (err) {
       console.error(`Error testing ${test.name}`)
+      clearTests()
       throw err
     }
   }
+  clearTests()
 }
 
 export function expect(expected: unknown) {

@@ -1,1 +1,3 @@
-export declare const mirroring: import("taggedjs").TagComponentBase<[]>;
+export declare const mirroring: (() => import("taggedjs").Tag) & {
+    original: Function;
+};

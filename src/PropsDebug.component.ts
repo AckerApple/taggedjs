@@ -1,83 +1,68 @@
-import { watch, letState, html, tag, InputElementTargetEvent, setProp } from "taggedjs"
+import { watch, letState, html, tag, InputElementTargetEvent, onInit } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
+import { watchTesting } from "./watchTesting.tag"
 
-export const propsDebugMain = tag((_='propsDebugMain') => {
-  let propNumber: any = letState(0)(x => [propNumber, propNumber = x])
-  let renderCount: number = letState(0)(x => [renderCount, renderCount = x])
-  let propsJson: any = letState({test:33, x:'y'})(x => [propsJson, propsJson = x])
-  let date = letState(() => new Date())(x => [date, date = x])
-  let syncPropNumber: any = letState(0)(x => [syncPropNumber, syncPropNumber = x])
+export const propsDebugMain = tag((_='propsDebugMain') => (
+  propNumber = letState(0)(x => [propNumber, propNumber = x]),
+  renderCount = letState(0)(x => [renderCount, renderCount = x]),
+  propsJson = letState({test:33, x:'y'})(x => [propsJson, propsJson = x]),
+  date = letState(() => new Date())(x => [date, date = x]),
+  syncPropNumber = letState(0)(x => [syncPropNumber, syncPropNumber = x]),
+  json = JSON.stringify(propsJson, null, 2),
+) => html`
+  <textarea id="props-debug-textarea" wrap="off"
+    onchange=${event => propsJson = JSON.parse(event.target.value)}
+    style="height:200px;font-size:0.6em;width:100%"
+  >${ json }</textarea>
+  
+  <pre>${ json }</pre>
+  <div><small>(renderCount:${++renderCount})</small></div>
+  
+  <div>
+    <button id="propsDebug-🥩-0-button"
+      onclick=${() => ++propNumber}
+    >🥩 propNumber ${propNumber}</button>
+    <span id="propsDebug-🥩-0-display">${propNumber}</span>
+  </div>
+  
+  <fieldset>
+    <legend>child</legend>
+    ${propsDebug({
+      propNumber,
+      propsJson,
+      propNumberChange: x => {
+        propNumber = x
+      }
+    })}
+  </fieldset>
 
-  function propsJsonChanged(event: InputElementTargetEvent) {
-    propsJson = JSON.parse(event.target.value)
-    return propsJson
-  }
+  <fieldset>
+    <legend>sync props callback</legend>
+    🥡 syncPropNumber: <span id="sync-prop-number-display">${syncPropNumber}</span>
+    <button onclick=${() => ++syncPropNumber}>🥡 ++</button>
+    <hr />
+    ${syncPropDebug({
+      syncPropNumber,
+      propNumberChange: x => {
+        syncPropNumber = x
+      },
+      nothingTest: x => x
+    })}
+  </fieldset>
 
-  const elmChangeDate = (event: InputElementTargetEvent) => {
-    const newDateString = event.target.value
-    date = new Date(newDateString)
-  }
-
-  ++renderCount
-
-  const json = JSON.stringify(propsJson, null, 2)
-
-  return html`
-    <textarea id="props-debug-textarea" wrap="off"
-      onchange=${propsJsonChanged}
-      style="height:200px;font-size:0.6em;width:100%"
-    >${ json }</textarea>
-    
-    <pre>${ json }</pre>
-    <div><small>(renderCount:${renderCount})</small></div>
-    
-    <div>
-      <button id="propsDebug-🥩-0-button"
-        onclick=${() => ++propNumber}
-      >🥩 propNumber ${propNumber}</button>
-      <span id="propsDebug-🥩-0-display">${propNumber}</span>
-    </div>
-    
-    <fieldset>
-      <legend>child</legend>
-      ${propsDebug({
-        propNumber,
-        propsJson,
-        propNumberChange: x => {
-          propNumber = x
-        }
-      })}
-    </fieldset>
-
-    <fieldset>
-      <legend>sync props callback</legend>
-      🥡 syncPropNumber: <span id="sync-prop-number-display">${syncPropNumber}</span>
-      <button onclick=${() => ++syncPropNumber}>🥡 ++</button>
-      <hr />
-      ${syncPropDebug({
-        syncPropNumber,
-        propNumberChange: x => {
-          syncPropNumber = x
-        },
-        nothingTest: x => x
-      })}
-    </fieldset>
-
-    <fieldset>
-      <legend>date prop</legend>
-      date:${date}
-      <input type="date" value=${timestampToValues(date).date} onchange=${elmChangeDate} />
-      <hr />
-      ${propDateDebug({date})}
-    </fieldset>
-  `
-})
-
-const propDateDebug = tag(({date}: {date: Date}) => {
-  return html`
+  <fieldset>
+    <legend>date prop</legend>
     date:${date}
-  `
-})
+    <input type="date" value=${timestampToValues(date).date} onchange=${event => {
+      const newDateString = event.target.value
+      date = new Date(newDateString)
+    }} />
+    <hr />
+    ${propDateDebug({date})}
+  </fieldset>
+`)
+
+const propDateDebug = tag(({date}: {date: Date}) => html`date:${date}`)
 
 /** Tests calling a property that is a function immediately which should cause rendering */
 const syncPropDebug = tag((
@@ -122,63 +107,55 @@ const propsDebug = tag((
     propNumberChange: (x: number) => unknown,
     propsJson: any
   }
-) => {
-  let renderCount: number = letState(0)(x => [renderCount, renderCount=x])
-  let propNumberChangeCount = letState(0)(x => [propNumberChangeCount, propNumberChangeCount=x])
-  const test = (x: number): [number, number] => {
-    return [propNumber, propNumber = x]
-  }
-  propNumber = setProp(test)
+) => (
+  renderCount = letState(0)(x => [renderCount, renderCount=x]),
+  propNumberChangeCount = letState(0)(x => [propNumberChangeCount, propNumberChangeCount=x]),
+  myPropNumber = letState(propNumber)(x => [myPropNumber, myPropNumber=x]),
+  _ = watch([propNumber], () => myPropNumber = propNumber),
+  watchResults = watch([myPropNumber], () => ++propNumberChangeCount),
+) => html`<!--propsDebug.js-->
+  <h3>Props Json</h3>
+  <textarea style="font-size:0.6em;height:200px;width:100%" wrap="off"
+    onchange=${event=> {
+      const value = JSON.parse(event.target.value)
+      Object.assign(propsJson, value)
+    }}
+  >${ JSON.stringify(propsJson, null, 2) }</textarea>
+  <pre>${ JSON.stringify(propsJson, null, 2) }</pre>
+  <hr />
+  
+  <h3>Props Number</h3>
+  <textarea style="font-size:0.6em;height:200px;width:100%;color:white;" wrap="off" disabled
+  >${ JSON.stringify(watchResults, null, 2) }</textarea>
+  
+  <div>
+    <button id="propsDebug-🥩-1-button" onclick=${() => propNumberChange(++myPropNumber)}
+    >🐄 🥩 propNumber ${myPropNumber}</button>
+    <span id="propsDebug-🥩-1-display">${myPropNumber}</span>
+  </div>
+  <button
+    title="test of increasing render count and nothing else"
+    onclick=${() => ++renderCount}
+  >renderCount ${++renderCount}</button>
+  
+  <button onclick=${() => ++myPropNumber}
+    title="only changes number locally but if change by parent than that is the number"
+  >🐄 🥩 local set propNumber ${myPropNumber}</button>
+  
+  <div>
+    <small>
+      (propNumberChangeCount:<span id="propsDebug-🥩-change-display">${propNumberChangeCount}</span>)
+    </small>
+  </div>
+  
+  <hr />
 
-  const watchResults = watch([propNumber], () => {
-    ++propNumberChangeCount
-  })
-
-  ++renderCount
-
-  function pasteProps(event: InputElementTargetEvent) {
-    const value = JSON.parse(event.target.value)
-    Object.assign(propsJson, value)
-  }
-
-  return html`<!--propsDebug.js-->
-    <h3>Props Json</h3>
-    <textarea style="font-size:0.6em;height:200px;width:100%" wrap="off" onchange=${pasteProps}>${ JSON.stringify(propsJson, null, 2) }</textarea>
-    <pre>${ JSON.stringify(propsJson, null, 2) }</pre>
-    <hr />
-    <h3>Props Number</h3>
-    
-    <textarea style="font-size:0.6em;height:200px;width:100%;color:white;" wrap="off" disabled
-    >${ JSON.stringify(watchResults, null, 2) }</textarea>
-    
-    <div>
-      <button id="propsDebug-🥩-1-button" onclick=${() => propNumberChange(++propNumber)}
-      >🐄 🥩 propNumber ${propNumber}</button>
-      <span id="propsDebug-🥩-1-display">${propNumber}</span>
-    </div>
-    <button
-      title="test of increasing render count and nothing else"
-      onclick=${() => ++renderCount}
-    >renderCount ${renderCount}</button>
-    
-    <button onclick=${() => ++propNumber}
-      title="only changes number locally but if change by parent than that is the number"
-    >🐄 🥩 local set propNumber ${propNumber}</button>
-    
-    <div>
-      <small>
-        (propNumberChangeCount:<span id="propsDebug-🥩-change-display">${propNumberChangeCount}</span>)
-      </small>
-    </div>
-    
-    <hr />
-    <h3>Fn update test</h3>
-    ${propFnUpdateTest({
-      propNumber,
-      callback: () => ++propNumber
-    })}    
-  `
-})
+  <h3>Fn update test</h3>
+  ${propFnUpdateTest({
+    propNumber: myPropNumber,
+    callback: () => ++myPropNumber
+  })}    
+`)
 
 const propFnUpdateTest = tag(({
   propNumber, callback,

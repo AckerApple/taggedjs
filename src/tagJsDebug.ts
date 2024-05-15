@@ -5,21 +5,6 @@ import { html, tag, providers, letState } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
 import { fadeInDown, fadeOutUp } from "./animations"
 
-export function tagDebugProvider() {
-  const upper = providers.create( upperTagDebugProvider )
-  return {
-    upper,
-    test: 0
-  }
-}
-
-export function upperTagDebugProvider() {
-  return {
-    name: 'upperTagDebugProvider',
-    test: 0
-  }
-}
-
 export const tagDebug = tag(() => {// tagDebug.js
   let _firstState: string = letState('tagJsDebug.js')(x => [_firstState, _firstState = x])
   let showIntervals: boolean = letState(false)(x => [showIntervals, showIntervals = x])

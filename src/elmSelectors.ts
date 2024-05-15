@@ -10,6 +10,20 @@ export function queryOneInnerHTML(
   return document.querySelectorAll(query)[pos].innerHTML
 }
 
+export function click(
+  query: string
+) {
+  return document.querySelectorAll(query).forEach(elm => (elm as HTMLElement).click())
+}
+
+export function html(
+  query: string
+) {
+  let html = ''
+  document.querySelectorAll(query).forEach(elm => html = html + elm.innerHTML)
+  return html
+}
+
 export function byId(id: string): HTMLElement {
   return document.getElementById(id) as HTMLElement
 }

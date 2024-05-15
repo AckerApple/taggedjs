@@ -1,4 +1,4 @@
-import { byId, elmCount, htmlById, queryOneInnerHTML } from "./elmSelectors"
+import { byId, click, elmCount, html, htmlById, queryOneInnerHTML } from "./elmSelectors"
 import { describe, execute, expect, it } from "./expect"
 import { expectElmCount, expectHTML, expectMatchedHtml, testCounterElements, testDuelCounterElements } from "./expect.html"
 
@@ -9,10 +9,15 @@ export async function runTests() {
   })
   
   it('elements exists', () => {
-    expect(document.getElementById('h1-app')).toBeDefined()
-    const toggleTest = document.getElementById('toggle-test')
+    expect(byId('h1-app')).toBeDefined()
+    const counterInput = byId('set-main-counter-input') as HTMLInputElement
+    expect(counterInput).toBeDefined()
+    const toggleTest = byId('toggle-test')
     expect(toggleTest).toBeDefined()
     expect(toggleTest?.innerText).toBe('toggle test')
+    
+    counterInput.value = '0'
+    ;(counterInput as any).onkeyup({target: counterInput})
   })
 
   describe('content', () => {    
@@ -33,7 +38,7 @@ export async function runTests() {
     toggleTest.click()
     expect(toggleTest?.innerText).toBe('toggle test')
     
-    const propsTextarea = document.getElementById('props-debug-textarea') as HTMLTextAreaElement
+    const propsTextarea = byId('props-debug-textarea') as HTMLTextAreaElement
     expect(propsTextarea.value.replace(/\s/g,'')).toBe(`{"test":33,"x":"y"}`)
   })
 
@@ -50,7 +55,7 @@ export async function runTests() {
   })
 
   describe('props', () => {    
-    it('basics', () => {
+    it('test duels', () => {
       testDuelCounterElements(
         ['#propsDebug-🥩-0-button', '#propsDebug-🥩-0-display'],
         ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'],
@@ -60,14 +65,19 @@ export async function runTests() {
         ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'],
         ['#propsOneLevelFunUpdate-🥩-button', '#propsOneLevelFunUpdate-🥩-display'],
       )
-  
+    })
+
+    it('basics', () => {
       // the number of times the watch counted a change happens to match that increase counter
       const funUpdateValue = byId('propsOneLevelFunUpdate-🥩-display').innerHTML
-      expect(queryOneInnerHTML('#propsDebug-🥩-change-display')).toBe( funUpdateValue )
+      const changed = queryOneInnerHTML('#propsDebug-🥩-change-display')
+      
+      // test that watch runs onInit
+      expect(changed).toBe( (Number(funUpdateValue) + 1).toString() )
   
-      const ownerHTML = document.querySelectorAll('#propsDebug-🥩-0-display')[0].innerHTML
-      const parentHTML = document.querySelectorAll('#propsDebug-🥩-1-display')[0].innerHTML
-      const childHTML = document.querySelectorAll('#propsOneLevelFunUpdate-🥩-display')[0].innerHTML
+      const ownerHTML = byId('propsDebug-🥩-0-display').innerHTML
+      const parentHTML = byId('propsDebug-🥩-1-display').innerHTML
+      const childHTML = byId('propsOneLevelFunUpdate-🥩-display').innerHTML
   
       const ownerNum = Number(ownerHTML)
       const parentNum = Number(parentHTML)
@@ -75,6 +85,8 @@ export async function runTests() {
   
       expect(parentNum).toBe(childNum)
       expect(ownerNum + 2).toBe(parentNum) // testing of setProp() doesn't change owner
+
+      byId('propsDebug-🥩-1-button').click()
     })
 
     it('props as functions', () => {
@@ -205,15 +217,15 @@ export async function runTests() {
       const insideCount = elmCount('#score-data-0-1-inside-button')
       expect(insideCount).toBe(0)
       expect(elmCount('#score-data-0-1-outside-button')).toBe(0)
-      document.getElementById('array-test-push-item')?.click()
+      byId('array-test-push-item')?.click()
       expect(elmCount('#score-data-0-1-inside-button')).toBe(1)
       expect(elmCount('#score-data-0-1-outside-button')).toBe(1)
       
-      const insideElm = document.getElementById('score-data-0-1-inside-button')
-      const insideDisplay = document.getElementById('score-data-0-1-inside-display')
+      const insideElm = byId('score-data-0-1-inside-button')
+      const insideDisplay = byId('score-data-0-1-inside-display')
       let indexValue = insideDisplay?.innerText
-      const outsideElm = document.getElementById('score-data-0-1-outside-button')
-      const outsideDisplay = document.getElementById('score-data-0-1-outside-display')
+      const outsideElm = byId('score-data-0-1-outside-button')
+      const outsideDisplay = byId('score-data-0-1-outside-display')
       const outsideValue = outsideDisplay?.innerText
       expect(indexValue).toBe(outsideValue)
   
@@ -256,6 +268,48 @@ export async function runTests() {
     expectElmCount('#mirror-counter-display', 2)
     expectMatchedHtml('#mirror-counter-display')
   })  
+
+  it('⌚️ watch tests', () => {
+    const startCount = Number(htmlById('watch-testing-num-display'))
+
+    expectMatchedHtml('#watch-testing-num-display', '#🍄-slowChangeCount')
+    expect(html('#🍄-watchPropNumSlow')).toBe('') // this display is only displays after init cycle
+    
+    click('#watch-testing-num-button')
+    
+    expectMatchedHtml('#watch-testing-num-display', '#🍄-slowChangeCount')
+    expectMatchedHtml('#🍄-watchPropNumSlow', '#🍄-slowChangeCount')
+    
+    expect(html('#🍄‍🟫-subjectChangeCount')).toBe( (startCount + 2).toString() )
+    expectMatchedHtml('#🍄‍🟫-subjectChangeCount', '#🍄‍🟫-watchPropNumSubject')
+
+    // starts at "false"
+    expect(html('#🦷-truthChange')).toBe('false')
+    expect(html('#🦷-watchTruth')).toBe('false')
+    
+    const truthStartCount = Number(html('#🦷-truthChangeCount'))
+
+    click('#🦷-truthChange-button')
+
+    // its been changed to "true", that causes a change watch count increase
+    expect(html('#🦷-truthChange')).toBe('true')
+    expect(html('#🦷-watchTruth')).toBe('true')
+    expect(html('#🦷-truthChangeCount')).toBe( (truthStartCount + 1).toString() )
+
+    click('#🦷-truthChange-button')
+
+    // its been changed to back to "false", that does NOT cause a change watch count increase
+    expect(html('#🦷-truthChange')).toBe('false')
+    expect(html('#🦷-watchTruth')).toBe('true')
+    expect(html('#🦷-truthChangeCount')).toBe( (truthStartCount + 1).toString() )
+
+    click('#🦷-truthChange-button')
+
+    // its been changed to "true", that causes a change watch count increase
+    expect(html('#🦷-truthChange')).toBe('true')
+    expect(html('#🦷-watchTruth')).toBe('true')
+    expect(html('#🦷-truthChangeCount')).toBe( (truthStartCount + 2).toString() )
+  })
 
   it('has no templates', () => {
     expect(document.getElementsByTagName('template').length).toBe(0)

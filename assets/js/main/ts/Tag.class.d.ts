@@ -1,7 +1,7 @@
 import { Counts } from './interpolations/interpolateTemplate';
 import { State } from './state';
 import { InterpolatedTemplates } from './interpolations/interpolations';
-import { InterpolateSubject } from './processSubjectValue.function';
+import { InterpolateSubject } from './tag/update/processSubjectValue.function';
 import { TemplaterResult } from './TemplaterResult.class';
 export declare const variablePrefix = "__tagvar";
 export declare const escapeVariable: string;

@@ -1,1 +1,3 @@
-export declare const arrayTests: import("taggedjs").TagComponentBase<[]>;
+export declare const arrayTests: (() => import("taggedjs").Tag) & {
+    original: Function;
+};

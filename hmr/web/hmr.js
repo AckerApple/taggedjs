@@ -7,17 +7,23 @@ let lastApp;
 // const { renderWithSupport, renderTagSupport } = require("taggedjs");
 
 const { variablePrefix } = require("taggedjs/js/Tag.class");
+const { updateSubject } = require("./updateSubject.function");
 
 reconnect()
 
 /**
+ * @typedef {import("taggedjs").renderTagOnly} renderTagOnly
  * @typedef {import("taggedjs").TagComponent} TagComponent
+ * @typedef {import("taggedjs").TagWrapper} TagWrapper
  * @typedef {import("taggedjs").Tag} Tag
  * @typedef {import("taggedjs").TagSupport} TagSupport
  * @typedef {import("taggedjs").tagElement} tagElement
  * @typedef {import("taggedjs").renderWithSupport} renderWithSupport
  * @typedef {import("taggedjs").renderTagSupport} renderTagSupport
+ * @typedef {import("taggedjs/js/state/providers").Provider} Provider
  */
+
+/** @typedef {{renderTagOnly: renderTagOnly, renderTagSupport: renderTagSupport, renderWithSupport: renderWithSupport}} HmrImport */
 
 function reconnect() {
   const socket = new WebSocket('ws://localhost:3000');
@@ -95,12 +101,16 @@ async function discoverTags() {
 /** @type {TagComponent{}} */
 let lastTags = []
 
+/**
+ * 
+ * @param {Element} app 
+ */
 async function updateByElement(
   app
 ) {
   /** @type {TagComponent[]} */
   const oldTags = lastTags
-  const oldSetUse = app.setUse
+  const oldSetUse = app.setUse // placed on element by tagElement command
     
   const tags = await discoverTags()
 
@@ -108,17 +118,19 @@ async function updateByElement(
   tags.forEach(async tag => {
     const { newApp, newTemplater } = tag
     
-    /** @type {{renderTagSupport: renderTagSupport, renderWithSupport: renderWithSupport}} */
+    /** @type {HmrImport} */
     const hmr = newApp.hmr
-    
-    const {
-      renderWithSupport,
-      renderTagSupport,
-    } = hmr
-    
+        
     /** @type {TagComponent[]} */
-    const newTags = newTemplater.wrapper.original.tags
-    const newSetUse = newTemplater.wrapper.original.setUse
+    // const newTags = newTemplater.wrapper.original.tags
+    /** @type {TagWrapper<any>[]} */
+    const newTags = newTemplater.wrapper.parentWrap.original.tags
+    const newSetUse = newTemplater.wrapper.parentWrap.original.setUse
+
+    // console.log('newTags', {newTags, oldTags})
+
+    // providers have to remain the way they were
+    newSetUse.memory.providerConfig = oldSetUse.memory.providerConfig
     
     oldSetUse.tagUse.length = 0
     // oldSetUse.tagUse = newSetUse.tagUse
@@ -134,8 +146,10 @@ async function updateByElement(
   
     /** @type {{oldTag: Tag, newTag: Tag}[]} */
     const tagChangeStates = oldTags.reduce((all, oldTag) => {
-      let newTag = newTags.find(newTag => newTag.toString() === oldTag.toString())
-      
+      let newTag = newTags
+        .map(newTag => newTag.original)
+        .find(newTag => newTag.toString() === oldTag.original.toString())
+
       if(!newTag) {
         const tagIndex = oldTag.tagIndex
         if(tagIndex !== undefined) {
@@ -153,11 +167,13 @@ async function updateByElement(
         newTags, oldTags
       })
     }
+
+    console.log('tagChangeStates', tagChangeStates)
   
     const matchedTagCounts = oldTags.length === newTags.length
   
     newTags.forEach((newTag) => {
-      let oldTag = oldTags.find(oldTag => newTag.toString() === oldTag.toString())
+      let oldTag = oldTags.map(oldTag => oldTag.original).find(oldTag => newTag.original.toString() === oldTag.toString())
   
       let tagIndex = null
       if(!oldTag && tagChangeStates[0].newTag) {
@@ -172,9 +188,9 @@ async function updateByElement(
           const message = 'HMR has two tags'
   
           console.warn(message, {
-            first: tagChangeStates[0].newTag,
-            second: newTag,
-            equal: newTag === tagChangeStates[0].newTag,
+            first: tagChangeStates[0].newTag.original,
+            second: newTag.original,
+            equal: newTag.original === tagChangeStates[0].newTag.original,
             oldTags,
             newTags,
             tagIndex,
@@ -187,25 +203,32 @@ async function updateByElement(
   
     if(tagChangeStates.length) {
       const {oldTag, newTag} = tagChangeStates[0]
+
+      console.log('oldTag', {
+        oldTag,
+        oldTagOrg: oldTag.original,
+        newTag,
+        newTagOrg: newTag.original,
+      })
       
       // Check to rebuild the MAIN APP
-      const oldTemplater = lastApp.templater
-      const match0 = oldTemplater.wrapper.original === oldTag
-      const match1 = oldTemplater.wrapper.original.toString() === oldTag.toString()
-
-      if(match0 || match1) {
-        lastApp.templater.wrapper.original = newTag
+      const isAppChanged = hasAppRelatedTo(lastApp, oldTag.original)
+      if(isAppChanged) {
+        lastApp.templater.wrapper.parentWrap.original = newTag.original
         lastApp.ownerTagSupport = {clones:[], childTags:[]}
         lastApp.rebuild().then(x => lastApp = x)
-
         lastTags = newTags
         return
       }
-  
+
+      // rebuild tag that has an owner
       const count = await replaceTemplater(
-        lastApp, tagChangeStates[0], {renderWithSupport, renderTagSupport}
+        lastApp, tagChangeStates[0], hmr
       )
-      
+
+      oldTag.original = newTag.original
+      newTag.compareTo = newTag.original.toString()
+
       if(count <= 0) {
         console.warn('✋ No components were updated', tagChangeStates[0])
       } else {
@@ -219,17 +242,18 @@ async function updateByElement(
   })
 }
 
+/**
+ * 
+ * @param {TagSupport} ownerTagSupport 
+ * @param {{oldTag: TagComponent, newTag: TagComponent}} param1 
+ * @param {HmrImport} hmr 
+ * @returns {Promise<number>}
+ */
 async function replaceTemplater(
-  /** @type {TagSupport} */
   ownerTagSupport,
-  /** @type {{oldTag: TagComponent, newTag: TagComponent}} */
   {oldTag, newTag},
-  /** @type {{renderWithSupport:renderWithSupport, renderTagSupport:renderTagSupport}} */
-  {
-    renderWithSupport,
-    renderTagSupport,
-  }
-  ) {
+  hmr
+) {
   let  count = 0
   const tag = ownerTagSupport.templater.tag
   const promises = tag.values.map(async (value, index) => {
@@ -237,20 +261,17 @@ async function replaceTemplater(
       return
     }
 
-    const match0 = value.wrapper.original === oldTag
-    const match1 = value.wrapper.original.toString() === oldTag.toString()
+    const wrapper = value.wrapper
+    const isWrapping = wrapperHasTagMethod(wrapper, oldTag)
 
     // Check to rebuild a component within an app
-    if(match0 || match1) {
+    if(isWrapping) {
       const global = ownerTagSupport.global
       const context = global.context
       const contextSubject = context[ variablePrefix + index ]
       
-      // replace the developer function that may have been updated
-      value.wrapper.original = newTag
-
       updateSubject(
-        contextSubject, newTag, oldTag, renderTagSupport
+        contextSubject, newTag, oldTag, hmr
       )
       
       ++count
@@ -264,40 +285,13 @@ async function replaceTemplater(
   const subPromises = ownerTagSupport.childTags.map(async child => {
     count = count + await replaceTemplater(
       child, {oldTag, newTag},
-      {renderWithSupport, renderTagSupport}
+      hmr
     )
   })
 
   await Promise.all(subPromises)
 
   return count
-}
-
-/** Used to switch out the wrappers of a subject and then render */
-async function updateSubject(
-  contextSubject,
-  /** @type {TagComponent} */
-  newTag,
-  /** @type {TagComponent} */
-  oldTag,
-  /** @type {renderTagSupport} */
-  renderTagSupport
-) {
-  /** @type {TagSupport} */
-  const contextSupport = contextSubject.tagSupport
-  
-  const oldest = contextSupport.global.oldest
-  const newest = contextSupport.global.newest
-  
-  contextSupport.templater.wrapper.original = newTag
-  newest.templater.wrapper.original = newTag
-  oldest.templater.wrapper.original = newTag
-  oldTag.original = newTag // everytime an old owner tag redraws, it will use the new function
-
-  return await renderTagSupport(
-    oldest,
-    false
-  )
 }
 
 function rebuildApps() {
@@ -308,6 +302,7 @@ function rebuildApps() {
         const { tagElement } = newApp.hmr
         
         if(element.destroy) {
+          console.log('destroyed along the way')
           element.destroy()
         }
 
@@ -320,4 +315,37 @@ function rebuildApps() {
       })
     })
   })
+}
+
+/**
+ * 
+ * @param {TagSupport} lastApp 
+ * @param {TagSupport} oldTag 
+ * @returns {boolean}
+ */
+function hasAppRelatedTo(lastApp, oldTag) {
+  const oldTemplater = lastApp.templater
+  
+  const match0 = oldTemplater.wrapper.parentWrap.original === oldTag
+  if(match0) return match0
+
+  const match1 = oldTemplater.wrapper.parentWrap.original.toString() === oldTag.toString()
+  return match1
+}
+
+function wrapperHasTagMethod(
+  wrapper,
+  oldTag,
+) {
+  const ogFun = wrapper.parentWrap.original
+  
+  const match0 = ogFun === oldTag.original
+  if(match0) return match0
+
+  const match1 = ogFun.toString() === oldTag.original.toString()
+  if(match1) return match1
+
+  // const match2 = ogFun.compareTo === oldTag.original.toString()
+  const match2 = wrapper.parentWrap.compareTo === oldTag.original.toString()
+  return match2
 }

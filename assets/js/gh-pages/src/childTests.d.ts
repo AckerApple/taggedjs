@@ -1,1 +1,4 @@
-export declare const childTests: import("taggedjs").TagComponentBase<[_?: any]>;
+import { Tag } from "taggedjs";
+export declare const childTests: ((_?: string) => (renderCount?: number, counter?: number) => Tag) & {
+    original: Function;
+};

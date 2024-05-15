@@ -75,7 +75,11 @@ export const counters = tag(({
             </span>
           </div>
         `}
-    
+
+        <input id="set-main-counter-input"
+          onkeyup=${e => (counter = Number(e.target.value) || 0)}
+        />
+
         <div>
           <button id="❤️-increase-counter"
             onclick=${increasePropCounter}

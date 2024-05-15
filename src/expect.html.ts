@@ -1,5 +1,6 @@
 import { expect } from "./expect"
 
+/* all elements in each query must have the same html */
 export function expectMatchedHtml(
   ...queries: string[]
 ) {
@@ -10,12 +11,12 @@ export function expectMatchedHtml(
     }, [] as Element[]
   )
 
-  expect(elements.length).toBeGreaterThan(0)
+  expect(elements.length).toBeGreaterThan(0, 'Expected elements to be present in expectMatchedHtml() query but found none')
 
   const lastElm = elements.pop() as Element
   const lastHtml = lastElm.innerHTML
   elements.every(elm =>
-    expect(lastHtml).toBe(elm.innerHTML)
+    expect(lastHtml).toBe(elm.innerHTML, `expectMatchedHtml unmatched html - queries: ${queries.join(' - ')}`)
   )
 }
 

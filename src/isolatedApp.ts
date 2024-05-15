@@ -8,14 +8,16 @@ import { providerDebugBase } from "./providerDebug"
 import { counters } from "./countersDebug"
 import { tableDebug } from "./tableDebug.component"
 import { contentDebug } from "./ContentDebug.component"
+import { watchTesting } from "./watchTesting.tag"
 
-type viewTypes = 'mirroring' | 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
+type viewTypes = 'watchTesting' | 'mirroring' | 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
 export const IsolatedApp = tag(() => {
   const views: viewTypes[] = [
     // 'content',
     // 'counters',
+    'watchTesting',
 
-    'props',
+    // 'props',
     // 'mirroring',
     // 'providerDebug',
     
@@ -33,7 +35,6 @@ export const IsolatedApp = tag(() => {
 
     appCounterSubject.subscribe(
       callback(x => {
-        console.log('callback increase counter', {appCounter, x})
         appCounter = x
       })
     )
@@ -48,6 +49,13 @@ export const IsolatedApp = tag(() => {
           <fieldset style="flex:2 2 20em">
             <legend>propsDebugMain</legend>
             ${propsDebugMain(undefined)}
+          </fieldset>
+        `}
+
+        ${views.includes('watchTesting') && html`
+          <fieldset style="flex:2 2 20em">
+            <legend>watchTesting</legend>
+            ${watchTesting()}
           </fieldset>
         `}
 
@@ -75,7 +83,7 @@ export const IsolatedApp = tag(() => {
         ${views.includes('mirroring') && html`
           <fieldset style="flex:2 2 20em">
             <legend>mirroring</legend>
-            ${mirroring(undefined)}
+            ${mirroring()}
           </fieldset>
         `}
 

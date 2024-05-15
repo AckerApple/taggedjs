@@ -1,4 +1,4 @@
-import { BaseTagSupport } from '../TagSupport.class';
+import { BaseTagSupport } from '../tag/TagSupport.class';
 export type StateConfig<T> = (x: T) => [T, T];
 export type StateConfigItem<T> = {
     get: () => T;
