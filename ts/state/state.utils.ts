@@ -1,5 +1,5 @@
 import { StateMismatchError } from '../errors'
-import { BaseTagSupport, TagSupport } from '../TagSupport.class'
+import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class'
 import { Wrapper } from '../TemplaterResult.class'
 import { setUse } from './setUse.function'
 
@@ -43,12 +43,12 @@ setUse({
     
     if(rearray.length) {
       if(rearray.length !== config.array.length) {
-        const message = `States lengths has changed ${rearray.length} !== ${config.array.length}. Typically occurs when a function is intended to be wrapped with a tag() call`
+        const message = `States lengths have changed ${rearray.length} !== ${config.array.length}. State tracking requires the same amount of function calls every render. Typically this errors is thrown when a state like function call occurs only for certain conditions or when a function is intended to be wrapped with a tag() call`
         const wrapper = tagSupport.templater?.wrapper as Wrapper
         const details = {
           oldStates: config.array,
           newStates: config.rearray,
-          tagFunction: wrapper.original,
+          tagFunction: wrapper.parentWrap.original,
         }
         const error = new StateMismatchError(message,details)
         console.warn(message,details)
@@ -133,15 +133,15 @@ function checkStateMismatch(
 
   console.error(message, {
     config,
-    tagFunction: wrapper.original,
-    wasInMiddleOf: wasWrapper.original,
+    tagFunction: wrapper.parentWrap.original,
+    wasInMiddleOf: wasWrapper.parentWrap.original,
     state,
     expectedClearArray: config.rearray,
   })
 
   throw new StateMismatchError(message, {
     config,
-    tagFunction: wrapper.original,
+    tagFunction: wrapper.parentWrap.original,
     state,
     expectedClearArray: config.rearray,
   })

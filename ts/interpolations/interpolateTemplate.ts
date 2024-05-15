@@ -1,13 +1,14 @@
-import { Context, ElementBuildOptions, variablePrefix } from "../Tag.class"
+import { Context, ElementBuildOptions, variablePrefix } from "../tag/Tag.class"
 import { InterpolateOptions } from "./interpolateElement"
 import { elementInitCheck } from "./elementInitCheck"
-import { Clones, InsertBefore } from "../Clones.type"
-import { InterpolateSubject, TemplateValue, processSubjectValue } from "../processSubjectValue.function"
+import { Clones, InsertBefore } from "./Clones.type"
+import { InterpolateSubject, TemplateValue, processSubjectValue } from "../tag/update/processSubjectValue.function"
 import { isTagArray, isTagComponent } from "../isInstance"
 import { scanTextAreaValue } from "./scanTextAreaValue.function"
-import { updateExistingValue } from "../updateExistingValue.function"
-import { TagSupport } from "../TagSupport.class"
+import { updateExistingValue } from "../tag/update/updateExistingValue.function"
+import { TagSupport } from "../tag/TagSupport.class"
 import { TemplaterResult } from "../TemplaterResult.class"
+import { swapInsertBefore } from "../tag/setTagPlaceholder.function"
 
 export type Template = Element & {clone?: any}
 export type InterpolateComponentResult = {
@@ -75,8 +76,8 @@ export function subscribeToTemplate(
   {isForceElement}: {isForceElement?:boolean},
 ) {
   let called = false
-  const callback = (value: TemplateValue) => {
-    if(called) {  
+  const onValue = (value: TemplateValue) => {
+    if(called) {
       updateExistingValue(
         subject,
         value,
@@ -106,7 +107,24 @@ export function subscribeToTemplate(
     called = true
   }
 
+  let mutatingCallback = onValue
+
+  const callback = (value: TemplateValue) => mutatingCallback(value)
   const sub = subject.subscribe(callback as any)
+  
+  // on subscribe, the Subject did NOT emit immediately. Lets pull the template off the document
+  if(insertBefore.parentNode) {
+    const clone = subject.clone = swapInsertBefore(insertBefore)
+    mutatingCallback = v => {
+      const parentNode = clone.parentNode as ParentNode
+      parentNode.insertBefore(insertBefore, clone)
+      parentNode.removeChild(clone)
+      delete subject.clone
+      mutatingCallback = onValue // all future calls will just produce value
+      onValue(v) // calls for rending
+    }
+  }
+  
   ownerSupport.global.subscriptions.push(sub)
 }
 

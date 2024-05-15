@@ -1,10 +1,10 @@
 import { interpolateAttributes } from "./interpolateAttributes"
 import { interpolateToTemplates } from "./interpolations"
 import { InterpolatedContentTemplates, interpolateContentTemplates } from "./interpolateContentTemplates"
-import { Context, TagTemplate, escapeSearch, variablePrefix } from "../Tag.class"
-import { Clones } from "../Clones.type"
+import { Context, TagTemplate, escapeSearch, variablePrefix } from "../tag/Tag.class"
+import { Clones } from "./Clones.type"
 import { Counts, InterpolateComponentResult } from "./interpolateTemplate"
-import { TagSupport } from "../TagSupport.class"
+import { TagSupport } from "../tag/TagSupport.class"
 
 export type InterpolateOptions = {
   /** make the element go on document */

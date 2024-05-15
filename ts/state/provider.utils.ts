@@ -1,8 +1,8 @@
-import { Tag } from '../Tag.class'
+import { Tag } from '../tag/Tag.class'
 import { deepClone, deepEqual } from '../deepFunctions'
 import { Provider } from './providers'
-import { renderTagSupport } from '../renderTagSupport.function'
-import { TagSupport } from '../TagSupport.class'
+import { renderTagSupport } from '../tag/render/renderTagSupport.function'
+import { TagSupport } from '../tag/TagSupport.class'
 
 export function providersChangeCheck(
   tagSupport: TagSupport
@@ -14,19 +14,19 @@ export function providersChangeCheck(
 
   // reset clones
   providersWithChanges.forEach(provider => {
-    const appElement = tagSupport.getAppElement()
+    const appSupport = tagSupport.getAppTagSupport()
 
-    handleProviderChanges(appElement, provider)
+    handleProviderChanges(appSupport, provider)
 
     provider.clone = deepClone(provider.instance)
   })
 }
 
 function handleProviderChanges(
-  appElement: TagSupport,
+  appSupport: TagSupport,
   provider: Provider,
 ) {
-  const tagsWithProvider = getTagsWithProvider(appElement, provider)
+  const tagsWithProvider = getTagsWithProvider(appSupport, provider)
 
   tagsWithProvider.forEach(({tagSupport, renderCount, provider}) => {
     if(tagSupport.global.deleted) {
@@ -36,7 +36,7 @@ function handleProviderChanges(
     const notRendered = renderCount === tagSupport.global.renderCount
     if(notRendered) {
       provider.clone = deepClone(provider.instance)
-      renderTagSupport(
+      return renderTagSupport(
         tagSupport,
         false,
       )
@@ -52,7 +52,7 @@ function getTagsWithProvider(
   const global = tagSupport.global
   const compare = global.providers
   const hasProvider = compare.find(
-    xProvider => xProvider.constructMethod === provider.constructMethod
+    xProvider => xProvider.constructMethod.compareTo === provider.constructMethod.compareTo
   )
   
   if(hasProvider) {

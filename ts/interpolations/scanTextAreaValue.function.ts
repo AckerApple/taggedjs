@@ -1,5 +1,5 @@
-import { Context } from '../Tag.class'
-import { TagSupport } from '../TagSupport.class'
+import { Context } from '../tag/Tag.class'
+import { TagSupport } from '../tag/TagSupport.class'
 import { HowToSet } from './interpolateAttributes'
 import { processAttribute } from './processAttribute.function'
 

@@ -1,4 +1,4 @@
-import { InsertBefore } from "./Clones.type"
+import { InsertBefore } from "./interpolations/Clones.type"
 import { NoDisplayValue } from "./interpolations/processAttribute.function"
 import { isTagClass, isTagTemplater } from "./isInstance"
 

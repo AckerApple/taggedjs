@@ -1,7 +1,7 @@
-import { BaseTagSupport, TagSupport } from "../TagSupport.class"
+import { BaseTagSupport, TagSupport } from "../tag/TagSupport.class"
 import { setUse } from "./setUse.function"
 import { State, getStateValue } from "./state.utils"
-import { renderTagSupport } from "../renderTagSupport.function"
+import { renderTagSupport } from "../tag/render/renderTagSupport.function"
 import { SyncCallbackError } from "../errors"
 
 type Callback<A,B,C,D,E,F> = <T>(

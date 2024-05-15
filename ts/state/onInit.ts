@@ -1,4 +1,4 @@
-import { BaseTagSupport, TagSupport } from "../TagSupport.class"
+import { BaseTagSupport, TagSupport } from "../tag/TagSupport.class"
 import { setUse } from "./setUse.function"
 
 export type OnInitCallback = () => unknown

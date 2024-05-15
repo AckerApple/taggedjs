@@ -1,14 +1,14 @@
 import { Props } from './Props'
-import { TagSupport } from './TagSupport.class'
+import { TagSupport } from './tag/TagSupport.class'
 import { deepClone, deepEqual } from './deepFunctions'
 import { isTag } from './isInstance'
-import { renderTagSupport } from './renderTagSupport.function'
+import { renderTagSupport } from './tag/render/renderTagSupport.function'
 import { setUse } from './state'
-import { isInCycle } from './tagRunner'
+import { isInCycle } from './tag/tagRunner'
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(
-  props: Props,
+  props: unknown,
   ownerSupport: TagSupport,
 ) {
   const isPropTag = isTag(props)
@@ -22,7 +22,7 @@ function resetFunctionProps(
   props: any,
   ownerSupport: TagSupport,
 ) {
-  if(typeof(props)!=='object') {
+  if(typeof(props)!=='object' || !ownerSupport) {
     return props
   }
 

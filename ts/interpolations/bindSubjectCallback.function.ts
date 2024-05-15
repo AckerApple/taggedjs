@@ -1,8 +1,8 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
-import { Tag } from "../Tag.class"
-import { TagSupport } from "../TagSupport.class"
-import { renderTagSupport } from "../renderTagSupport.function"
+import { Tag } from "../tag/Tag.class"
+import { TagSupport } from "../tag/TagSupport.class"
+import { renderTagSupport } from "../tag/render/renderTagSupport.function"
 
 export type Callback = (...args: any[]) => any & {
   isChildOverride?: true // if this is set, then a parent tag passed children to a tag/component
@@ -45,7 +45,6 @@ export function runTagCallback(
         return 'promise-no-data-ever' // tag was deleted during event processing
       })
     }
-
     return 'no-data-ever' // already rendered
   }
 

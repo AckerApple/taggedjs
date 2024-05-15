@@ -1,4 +1,4 @@
-import { InsertBefore } from "./Clones.type"
+import { InsertBefore } from "./interpolations/Clones.type"
 
 export function buildClones(
   temporary: Element,

@@ -1,4 +1,8 @@
 ### TODO NOW: Before Mega-aide
+- Perform subject children as
+  - ${tagCall({a,b,c}).html``}
+- allow multiple arguments
+  - ${dump(value, options)}
 - Remove the destroy call that gets added on tagElement
   - its used for HMR
 - HTML Tables

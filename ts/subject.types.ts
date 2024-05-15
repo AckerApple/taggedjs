@@ -1,10 +1,8 @@
-import { InsertBefore } from "./Clones.type"
-import { TagSupport } from "./TagSupport.class"
+import { InsertBefore } from "./interpolations/Clones.type"
+import { TagSupport } from "./tag/TagSupport.class"
 import { TemplaterResult } from "./TemplaterResult.class"
-import { bindSubjectCallback } from "./interpolations/bindSubjectCallback.function"
 import { Template } from "./interpolations/interpolateTemplate"
 import { Subject } from "./subject/Subject.class"
-import { ValueSubject } from "./subject/ValueSubject"
 
 export type WasTagSubject = Subject<TemplaterResult> & {
   tagSupport?: TagSupport

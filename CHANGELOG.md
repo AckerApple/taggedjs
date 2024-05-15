@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+### v2.6.0 - 5-2024
+- `watch()` fires on init. Use `watch.noInit()` if needed
+
 ### v2.5.0 - 5-2024
 - Added HMR support
 - Fix ability to pass a function as a prop and call that prop immediately

@@ -1,19 +1,24 @@
-import { Context, Tag } from './Tag.class'
-import { BaseTagSupport, TagSupport } from './TagSupport.class'
+import { Context, Tag } from './tag/Tag.class'
+import { BaseTagSupport, TagSupport } from './tag/TagSupport.class'
 import { Props } from './Props'
-import { TagChildren } from './tag'
+import { TagChildren, TagWrapper, kidsToTagArraySubject } from './tag/tag'
 import { Provider } from './state/providers'
 import { OnDestroyCallback } from './state/onDestroy'
 import { TagSubject, WasTagSubject } from './subject.types'
 import { OnInitCallback } from './state/onInit'
 import { Subscription } from './subject/Subject.utils'
-import { InsertBefore } from './Clones.type'
+import { InsertBefore } from './interpolations/Clones.type'
+import { TagValues, html } from './tag/html'
+import { ValueSubject } from './subject'
+
+export type OriginalFunction = (() => Tag) & {compareTo: string}
 
 export type Wrapper = ((
   tagSupport: BaseTagSupport,
   subject: TagSubject,
 ) => TagSupport) & {
-  original: () => Tag
+  // original: OriginalFunction
+  parentWrap: TagWrapper<any>
 }
 
 export type TagGlobal = {
@@ -41,11 +46,30 @@ export class TemplaterResult {
   isTemplater = true
   tagged!: boolean
   wrapper?: Wrapper
+
+  madeChildIntoSubject = false
   
   tag?: Tag
+  children: TagChildren = new ValueSubject([] as Tag[])
 
-  constructor(
-    public props: Props,
-    public children: TagChildren,
-  ) {}  
+  constructor(public props: Props) {}
+
+  html(
+    strings: string[] | TemplateStringsArray,
+    ...values: TagValues
+  ) {
+    // this.children = html(strings, values) as any
+
+    // const children = html(strings, values)
+    const children = new Tag(strings as string[], values)
+    const { childSubject, madeSubject } = kidsToTagArraySubject(children)
+    ;(childSubject as any).isChildSubject = true
+    // ;(this.children as any).isChildSubject = true
+    
+    // this.children.set( childSubject.value )
+    this.children = childSubject
+    
+    this.madeChildIntoSubject = madeSubject
+    return this
+  }
 }

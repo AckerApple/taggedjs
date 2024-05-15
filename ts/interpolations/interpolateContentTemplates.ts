@@ -1,5 +1,5 @@
-import { Clones } from "../Clones.type"
-import { TagSupport } from "../TagSupport.class"
+import { Clones } from "./Clones.type"
+import { TagSupport } from "../tag/TagSupport.class"
 import { InterpolateOptions } from "./interpolateElement"
 import { InterpolateComponentResult, Template, interpolateTemplate } from "./interpolateTemplate"
 

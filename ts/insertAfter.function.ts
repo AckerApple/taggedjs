@@ -1,4 +1,4 @@
-import { InsertBefore } from "./Clones.type"
+import { InsertBefore } from "./interpolations/Clones.type"
 
 // Function to insert element after reference element
 export function insertAfter(

@@ -1,11 +1,11 @@
 import { SubjectLike } from "./subject/Subject.utils"
-import { Tag } from "./Tag.class"
+import { Tag } from "./tag/Tag.class"
 import { TemplaterResult } from "./TemplaterResult.class"
 
 export function isTagComponent(
   value?: TemplaterResult | unknown
 ) {
-  return (value as TemplaterResult)?.wrapper?.original instanceof Function
+  return (value as TemplaterResult)?.wrapper?.parentWrap.original instanceof Function
 }
 
 export function isTag(
