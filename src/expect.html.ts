@@ -99,11 +99,11 @@ export function testCounterElements(
 
     let oldCounterValue = counterValue + 1
     counterValue = Number(counterDisplay?.innerText)
-    expect(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to be value ${oldCounterValue} but is instead ${counterValue}`)
+    expect(oldCounterValue).toBe(counterValue, `Counter test 1 of 2 expected ${counterDisplayId} to be value ${oldCounterValue} but it is ${counterValue}`)
     increaseCounter?.click()
 
     counterValue = Number(counterDisplay?.innerText)
     ++oldCounterValue
-    expect(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to increase value to ${oldCounterValue} but is instead ${counterValue}`)
+    expect(oldCounterValue).toBe(counterValue, `Counter test 2 of 2 expected ${counterDisplayId} to increase value to ${oldCounterValue} but it is ${counterValue}`)
   })
 }

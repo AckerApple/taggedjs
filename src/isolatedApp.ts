@@ -14,8 +14,8 @@ type viewTypes = 'watchTesting' | 'mirroring' | 'content' | 'arrays' | 'counters
 export const IsolatedApp = tag(() => {
   const views: viewTypes[] = [
     // 'content',
-    // 'counters',
-    'watchTesting',
+    'counters',
+    // 'watchTesting',
 
     // 'props',
     // 'mirroring',
@@ -42,6 +42,15 @@ export const IsolatedApp = tag(() => {
 
   return html`<!--isolatedApp.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
+
+    <div>
+      <button id="app-counter-subject-button"
+        onclick=${() => appCounterSubject.set(appCounter + 1)}
+      >🍒 ++app subject</button>
+      <span>
+        🍒 <span id="app-counter-subject-button">${appCounter}</span>
+      </span>
+    </div>
 
     <div id="tagDebug-fx-wrap">
       <div style="display:flex;flex-wrap:wrap;gap:1em">

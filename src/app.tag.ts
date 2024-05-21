@@ -59,12 +59,9 @@ export const App = tag(() => {
     
     runTesting(false)
 
-    appCounterSubject.subscribe(x => {
-      callbacks((y) => {
-        console.log('app callback increase counter', {appCounter, x})
-        appCounter = x as number
-      })()
-    })
+    appCounterSubject.subscribe(
+      callbacks(y => appCounter = y)
+    )
   })
 
   const content = html`<!--app.js-->

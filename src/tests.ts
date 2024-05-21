@@ -3,6 +3,10 @@ import { describe, execute, expect, it } from "./expect"
 import { expectElmCount, expectHTML, expectMatchedHtml, testCounterElements, testDuelCounterElements } from "./expect.html"
 
 export async function runTests() {
+  const slowCount = html('#🍄-slowChangeCount')
+  // tests can be run multiple times. Only the first time will this expect below work
+  const firstRun = slowCount === '0'
+
   it('no template tags', () => {
     const templateTags = document.getElementsByTagName('template')
     expect(templateTags.length).toBe(0, 'Expected no templates to be on document')
@@ -42,16 +46,45 @@ export async function runTests() {
     expect(propsTextarea.value.replace(/\s/g,'')).toBe(`{"test":33,"x":"y"}`)
   })
 
-  it('basic increase counter', () => {
-    expectElmCount('#conditional-counter', 0)
-    testCounterElements('#❤️-increase-counter', '#❤️-counter-display')
-    testCounterElements('#❤️-inner-counter', '#❤️-inner-display')
-    testCounterElements('#standalone-counter', '#standalone-display')
-    expectElmCount('#conditional-counter', 1)
-    testCounterElements('#conditional-counter', '#conditional-display')
-    
-    // test again after higher elements have had reruns
-    testCounterElements('#❤️-inner-counter', '#❤️-inner-display')
+  describe('counters', () => {    
+    it('basics', () => {
+      const beforeRenderCount = Number(html('#counters_render_count'))
+      const beforeInnerRenderCount = Number(html('#inner_counters_render_count'))
+
+      expectElmCount('#conditional-counter', 0)
+
+      testCounterElements('#❤️-increase-counter', '#❤️-counter-display')
+
+      expect(html('#counters_render_count')).toBe( (beforeRenderCount + 2).toString() )
+      // the parent changed a value passed to child as a prop
+      expect(html('#inner_counters_render_count')).toBe( (beforeInnerRenderCount + 2).toString() )
+
+      testCounterElements('#❤️-inner-counter', '#❤️-inner-display')
+
+      expect(html('#counters_render_count')).toBe( (beforeRenderCount + 4).toString() )
+      // the child changed a value passed from parent as a prop
+      expect(html('#inner_counters_render_count')).toBe( (beforeInnerRenderCount + 4).toString() )
+
+      testCounterElements('#standalone-counter', '#standalone-display')
+
+      expect(html('#counters_render_count')).toBe( (beforeRenderCount + (firstRun ? 6 : 8)).toString() )
+      // the child was not rendered again because props did not change so value should be less
+      expect(html('#inner_counters_render_count')).toBe( (beforeInnerRenderCount + 4).toString() )
+
+      expectElmCount('#conditional-counter', 1)
+      testCounterElements('#conditional-counter', '#conditional-display')
+      
+      // test again after higher elements have had reruns
+      testCounterElements('#❤️-inner-counter', '#❤️-inner-display')
+
+      if(firstRun) {
+        expect(html('#🪈-pipedSubject')).toBe('')
+      }
+      
+      click('#🥦-subject-increase-counter')
+
+      expect(html('#🪈-pipedSubject')).toBe( html('#🥦-subject-counter-display') )
+    })
   })
 
   describe('props', () => {    
@@ -273,7 +306,20 @@ export async function runTests() {
     const startCount = Number(htmlById('watch-testing-num-display'))
 
     expectMatchedHtml('#watch-testing-num-display', '#🍄-slowChangeCount')
-    expect(html('#🍄-watchPropNumSlow')).toBe('') // this display is only displays after init cycle
+    
+    // always starts at "false"
+    expect(html('#🦷-truthChange')).toBe('false')
+        
+    if(firstRun) {
+      expect(html('#🍄-watchPropNumSlow')).toBe('')
+      expect(html('#🦷-watchTruth')).toBe('false')
+      expect(html('#🦷-watchTruthAsSub')).toBe('undefined')
+    } else {
+      expect(html('#🍄-watchPropNumSlow')).toBe( slowCount )
+      expect( Number(html('#🦷-watchTruth')) ).toBeGreaterThan( Number(slowCount) )
+      expect(html('#🦷-watchTruthAsSub')).toBe( html('#🦷-truthSubChangeCount') )
+    }
+
     
     click('#watch-testing-num-button')
     
@@ -282,33 +328,37 @@ export async function runTests() {
     
     expect(html('#🍄‍🟫-subjectChangeCount')).toBe( (startCount + 2).toString() )
     expectMatchedHtml('#🍄‍🟫-subjectChangeCount', '#🍄‍🟫-watchPropNumSubject')
-
-    // starts at "false"
-    expect(html('#🦷-truthChange')).toBe('false')
-    expect(html('#🦷-watchTruth')).toBe('false')
     
     const truthStartCount = Number(html('#🦷-truthChangeCount'))
 
     click('#🦷-truthChange-button')
 
+    let newCount = (truthStartCount + 1).toString()
     // its been changed to "true", that causes a change watch count increase
     expect(html('#🦷-truthChange')).toBe('true')
-    expect(html('#🦷-watchTruth')).toBe('true')
-    expect(html('#🦷-truthChangeCount')).toBe( (truthStartCount + 1).toString() )
+    expect(html('#🦷-watchTruth')).toBe( newCount )
+    expect(html('#🦷-truthChangeCount')).toBe( newCount )
 
     click('#🦷-truthChange-button')
 
+    newCount = (truthStartCount + 1).toString()
     // its been changed to back to "false", that does NOT cause a change watch count increase
     expect(html('#🦷-truthChange')).toBe('false')
-    expect(html('#🦷-watchTruth')).toBe('true')
-    expect(html('#🦷-truthChangeCount')).toBe( (truthStartCount + 1).toString() )
+    expect(html('#🦷-watchTruth')).toBe(newCount)
+    expect(html('#🦷-truthChangeCount')).toBe( newCount )
 
     click('#🦷-truthChange-button')
 
     // its been changed to "true", that causes a change watch count increase
+    newCount = (truthStartCount + 2).toString()
     expect(html('#🦷-truthChange')).toBe('true')
-    expect(html('#🦷-watchTruth')).toBe('true')
-    expect(html('#🦷-truthChangeCount')).toBe( (truthStartCount + 2).toString() )
+    expect(html('#🦷-watchTruth')).toBe(newCount)
+    expect(html('#🦷-truthChangeCount')).toBe( newCount )
+
+    click('#🦷-truthChange-button') // reset so tests can pass every time
+    click('#🦷-reset-button') // reset so tests can pass every time
+
+    expect(html('#🦷-watchTruthAsSub')).toBe(html('#🦷-watchTruth'))
   })
 
   it('has no templates', () => {
@@ -316,8 +366,10 @@ export async function runTests() {
   })
 
   try {
+    const start = Date.now() //performance.now()
     await execute()
-    console.info('✅ all tests passed')
+    const time = Date.now() - start // performance.now() - start
+    console.info(`✅ all tests passed in ${time}ms`)
     return true
   } catch (error: unknown) {
     console.error('❌ tests failed: ' + (error as Error).message, error)

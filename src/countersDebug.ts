@@ -1,9 +1,9 @@
 import { mouseOverTag } from "./mouseover.tag"
 import { renderCountDiv } from "./renderCount.component"
-import { html, tag, Subject, onInit, letState, callbackMaker, state } from "taggedjs"
+import { html, tag, Subject, onInit, letState, callbackMaker, state, ValueSubject, callback } from "taggedjs"
 
 export const counters = tag(({
-  appCounterSubject,
+  appCounterSubject
 }: {
   appCounterSubject: Subject<number>
 }) => {
@@ -12,23 +12,26 @@ export const counters = tag(({
   let renderCount = letState(0)(x => [renderCount, renderCount = x])
   let initCounter = letState(0)(x => [initCounter, initCounter = x])
   let memory = state(() => ({counter: 0}))
+  
+  const callbacks = callbackMaker()
+  const callbackTestSub = state(() => new Subject(counter))
 
-  const callback = callbackMaker()
-  const callbackTestSub = state(() => new Subject())
+  const pipedSubject0 = state(() => new ValueSubject('222'))
+  const pipedSubject1 = Subject.all([pipedSubject0, callbackTestSub]).pipe(callback(x => counter))
 
   onInit(() => {
     ++initCounter
     console.info('countersDebug.ts: 👉 i should only ever run once')
 
-    callbackTestSub.subscribe(x => {
-      callback((y) => {
-        counter = x as number
-      })()
-    })
+    callbackTestSub.subscribe(
+      callbacks(y => counter = y)
+    )
   })
 
+  // State as a callback only needed so pipedSubject1 has the latest value
   const increaseCounter = () => {
     ++counter
+    pipedSubject0.next('333-' + counter)
   }
 
   const increasePropCounter = () => ++propCounter
@@ -90,15 +93,26 @@ export const counters = tag(({
         </div>
 
         <div>
-          <button id="subject-increase-counter"
+          <button id="🥦-subject-increase-counter"
             onclick=${() => callbackTestSub.set(counter + 1)}
           >subject increase:</button>
           <span>
-            🥦 <span id="subject-counter-display">${counter}</span>
+            🥦 <span id="🥦-subject-counter-display">${counter}</span>
+            🥦 <span id="subject-counter-subject-display">${callbackTestSub}</span>
           </span>
         </div>
       `}
     </div>
+
+    <fieldset>
+      <legend>🪈 pipedSubject</legend>
+      <div>
+        <small>
+          <span id="🪈-pipedSubject">${pipedSubject1}</span>
+        </small>
+      </div>
+    </fieldset>
+
 
     ${sharedMemory && html`
       <fieldset>
@@ -140,6 +154,6 @@ const innerCounters = tag(({
       ❤️ <span id="❤️-inner-display">${propCounter}</span>
     </span>
     <div>renderCount:${renderCount}</div>
-    ${renderCountDiv({renderCount, name: 'inner counters'})}
+    ${renderCountDiv({renderCount, name: 'inner_counters'})}
   `
 })

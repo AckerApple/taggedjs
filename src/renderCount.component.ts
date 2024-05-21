@@ -5,4 +5,4 @@ export const renderCountDiv = tag((
     renderCount: number
     name: string
   }
-) => html`<div><small>(${name} render count <span name=${name+'_render_count'}>${renderCount}</span>)</small></div>`)
+) => html`<div><small>(${name} render count <span id=${name+'_render_count'}>${renderCount}</span>)</small></div>`)

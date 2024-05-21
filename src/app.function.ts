@@ -1,5 +1,5 @@
 import { tagElement } from "taggedjs"
-import { App } from "./app.component"
+import { App } from "./app.tag"
 import { IsolatedApp } from "./isolatedApp"
 
 export const app = () => {// app.ts

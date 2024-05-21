@@ -53,8 +53,10 @@ describe.only = (label: string, run: () => any) => {
 export function it(label: string, run: () => any) {
   tests.push(async () => {
     try {
+      const start = Date.now()
       await run()
-      console.debug(' '.repeat(tab) + '✅ ' + label)
+      const time = Date.now() - start
+      console.debug(' '.repeat(tab) + `✅ ${label} - ${time}ms`)
     } catch (error) {
       console.debug(' '.repeat(tab) + '❌ ' + label)
       throw error
@@ -65,8 +67,10 @@ export function it(label: string, run: () => any) {
 it.only = (label: string, run: () => any) => {
   onlyTests.push(async () => {
     try {
+      const start = Date.now()
       await run()
-      console.debug('✅ ' + label)
+      const time = Date.now() - start
+      console.debug(`✅ ${label} - ${time}ms`)
     } catch (error) {
       console.debug('❌ ' + label)
       throw error
@@ -131,6 +135,16 @@ export function expect(expected: unknown) {
       }
 
       const message = customMessage || `Expected ${typeof(expected)} ${JSON.stringify(expected)} to be greater than amount`
+      console.error(message, {amount, expected})
+      throw new Error(message)
+    },
+    toBeLessThan: (amount: number, customMessage?: string) => {
+      const expectNum = expected as number
+      if(!isNaN(expectNum) && expectNum < amount) {
+        return
+      }
+
+      const message = customMessage || `Expected ${typeof(expected)} ${JSON.stringify(expected)} to be less than amount`
       console.error(message, {amount, expected})
       throw new Error(message)
     }

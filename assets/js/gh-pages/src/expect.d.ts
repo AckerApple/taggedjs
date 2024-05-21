@@ -12,4 +12,5 @@ export declare function expect(expected: unknown): {
     toBeDefined: () => void;
     toBe: (received: unknown, customMessage?: string) => void;
     toBeGreaterThan: (amount: number, customMessage?: string) => void;
+    toBeLessThan: (amount: number, customMessage?: string) => void;
 };

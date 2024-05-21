@@ -336,10 +336,42 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./src/app.component.ts":
-/*!******************************!*\
-  !*** ./src/app.component.ts ***!
-  \******************************/
+/***/ "./src/app.function.ts":
+/*!*****************************!*\
+  !*** ./src/app.function.ts ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   app: () => (/* binding */ app)
+/* harmony export */ });
+/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! taggedjs */ "../main/ts/index.ts");
+/* harmony import */ var _app_tag__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./app.tag */ "./src/app.tag.ts");
+/* harmony import */ var _isolatedApp__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./isolatedApp */ "./src/isolatedApp.ts");
+
+
+
+const app = () => {
+    console.info('attaching app to element...');
+    const element = document.getElementsByTagName('app')[0];
+    const pathname = window.location.pathname;
+    const locationSplit = pathname.split('/').filter(x => x);
+    const location = locationSplit[0]?.toLowerCase();
+    if (location && ['isolated.html', 'index-static.html'].includes(location)) {
+        (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tagElement)(_isolatedApp__WEBPACK_IMPORTED_MODULE_2__.IsolatedApp, element, { test: 1 });
+        return;
+    }
+    (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tagElement)(_app_tag__WEBPACK_IMPORTED_MODULE_1__.App, element, { test: 1 });
+};
+
+
+/***/ }),
+
+/***/ "./src/app.tag.ts":
+/*!************************!*\
+  !*** ./src/app.tag.ts ***!
+  \************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -407,12 +439,7 @@ const App = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.onInit)(() => {
         console.log('app init should only run once');
         runTesting(false);
-        appCounterSubject.subscribe(x => {
-            callbacks((y) => {
-                console.log('app callback increase counter', { appCounter, x });
-                appCounter = x;
-            })();
-        });
+        appCounterSubject.subscribe(callbacks(y => appCounter = y));
     });
     const content = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.html) `<!--app.js-->
     <h1 id="h1-app">🏷️ TaggedJs - ${2 + 2}</h1>
@@ -481,38 +508,6 @@ const App = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
   `;
     return content;
 });
-
-
-/***/ }),
-
-/***/ "./src/app.function.ts":
-/*!*****************************!*\
-  !*** ./src/app.function.ts ***!
-  \*****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   app: () => (/* binding */ app)
-/* harmony export */ });
-/* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! taggedjs */ "../main/ts/index.ts");
-/* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./app.component */ "./src/app.component.ts");
-/* harmony import */ var _isolatedApp__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./isolatedApp */ "./src/isolatedApp.ts");
-
-
-
-const app = () => {
-    console.info('attaching app to element...');
-    const element = document.getElementsByTagName('app')[0];
-    const pathname = window.location.pathname;
-    const locationSplit = pathname.split('/').filter(x => x);
-    const location = locationSplit[0]?.toLowerCase();
-    if (location && ['isolated.html', 'index-static.html'].includes(location)) {
-        (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tagElement)(_isolatedApp__WEBPACK_IMPORTED_MODULE_2__.IsolatedApp, element, { test: 1 });
-        return;
-    }
-    (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tagElement)(_app_component__WEBPACK_IMPORTED_MODULE_1__.App, element, { test: 1 });
-};
 
 
 /***/ }),
@@ -812,25 +807,25 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ appCounterSubject, }) => {
+const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ appCounterSubject }) => {
     let counter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.letState)(0)(x => [counter, counter = x]);
     let propCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.letState)(0)(x => [propCounter, propCounter = x]);
     let renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.letState)(0)(x => [renderCount, renderCount = x]);
     let initCounter = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.letState)(0)(x => [initCounter, initCounter = x]);
     let memory = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.state)(() => ({ counter: 0 }));
-    const callback = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.callbackMaker)();
-    const callbackTestSub = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_2__.Subject());
+    const callbacks = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.callbackMaker)();
+    const callbackTestSub = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_2__.Subject(counter));
+    const pipedSubject0 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_2__.ValueSubject('222'));
+    const pipedSubject1 = taggedjs__WEBPACK_IMPORTED_MODULE_2__.Subject.all([pipedSubject0, callbackTestSub]).pipe((0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.callback)(x => counter));
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.onInit)(() => {
         ++initCounter;
         console.info('countersDebug.ts: 👉 i should only ever run once');
-        callbackTestSub.subscribe(x => {
-            callback((y) => {
-                counter = x;
-            })();
-        });
+        callbackTestSub.subscribe(callbacks(y => counter = y));
     });
+    // State as a callback only needed so pipedSubject1 has the latest value
     const increaseCounter = () => {
         ++counter;
+        pipedSubject0.next('333-' + counter);
     };
     const increasePropCounter = () => ++propCounter;
     ++renderCount; // for debugging
@@ -888,15 +883,26 @@ const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ appCounterSubj
         </div>
 
         <div>
-          <button id="subject-increase-counter"
+          <button id="🥦-subject-increase-counter"
             onclick=${() => callbackTestSub.set(counter + 1)}
           >subject increase:</button>
           <span>
-            🥦 <span id="subject-counter-display">${counter}</span>
+            🥦 <span id="🥦-subject-counter-display">${counter}</span>
+            🥦 <span id="subject-counter-subject-display">${callbackTestSub}</span>
           </span>
         </div>
       `}
     </div>
+
+    <fieldset>
+      <legend>🪈 pipedSubject</legend>
+      <div>
+        <small>
+          <span id="🪈-pipedSubject">${pipedSubject1}</span>
+        </small>
+      </div>
+    </fieldset>
+
 
     ${sharedMemory && (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
       <fieldset>
@@ -929,7 +935,7 @@ const innerCounters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ propCount
       ❤️ <span id="❤️-inner-display">${propCounter}</span>
     </span>
     <div>renderCount:${renderCount}</div>
-    ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_1__.renderCountDiv)({ renderCount, name: 'inner counters' })}
+    ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_1__.renderCountDiv)({ renderCount, name: 'inner_counters' })}
   `;
 });
 
@@ -1060,11 +1066,11 @@ function testCounterElements(counterButtonId, counterDisplayId, { elementCountEx
         increaseCounter?.click();
         let oldCounterValue = counterValue + 1;
         counterValue = Number(counterDisplay?.innerText);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to be value ${oldCounterValue} but is instead ${counterValue}`);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(oldCounterValue).toBe(counterValue, `Counter test 1 of 2 expected ${counterDisplayId} to be value ${oldCounterValue} but it is ${counterValue}`);
         increaseCounter?.click();
         counterValue = Number(counterDisplay?.innerText);
         ++oldCounterValue;
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(oldCounterValue).toBe(counterValue, `Expected element(s) ${counterDisplayId} to increase value to ${oldCounterValue} but is instead ${counterValue}`);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(oldCounterValue).toBe(counterValue, `Counter test 2 of 2 expected ${counterDisplayId} to increase value to ${oldCounterValue} but it is ${counterValue}`);
     });
 }
 
@@ -1132,8 +1138,10 @@ describe.only = (label, run) => {
 function it(label, run) {
     tests.push(async () => {
         try {
+            const start = Date.now();
             await run();
-            console.debug(' '.repeat(tab) + '✅ ' + label);
+            const time = Date.now() - start;
+            console.debug(' '.repeat(tab) + `✅ ${label} - ${time}ms`);
         }
         catch (error) {
             console.debug(' '.repeat(tab) + '❌ ' + label);
@@ -1144,8 +1152,10 @@ function it(label, run) {
 it.only = (label, run) => {
     onlyTests.push(async () => {
         try {
+            const start = Date.now();
             await run();
-            console.debug('✅ ' + label);
+            const time = Date.now() - start;
+            console.debug(`✅ ${label} - ${time}ms`);
         }
         catch (error) {
             console.debug('❌ ' + label);
@@ -1203,6 +1213,15 @@ function expect(expected) {
                 return;
             }
             const message = customMessage || `Expected ${typeof (expected)} ${JSON.stringify(expected)} to be greater than amount`;
+            console.error(message, { amount, expected });
+            throw new Error(message);
+        },
+        toBeLessThan: (amount, customMessage) => {
+            const expectNum = expected;
+            if (!isNaN(expectNum) && expectNum < amount) {
+                return;
+            }
+            const message = customMessage || `Expected ${typeof (expected)} ${JSON.stringify(expected)} to be less than amount`;
             console.error(message, { amount, expected });
             throw new Error(message);
         }
@@ -1428,8 +1447,8 @@ __webpack_require__.r(__webpack_exports__);
 const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
     const views = [
         // 'content',
-        // 'counters',
-        'watchTesting',
+        'counters',
+        // 'watchTesting',
         // 'props',
         // 'mirroring',
         // 'providerDebug',
@@ -1448,6 +1467,15 @@ const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
     });
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.html) `<!--isolatedApp.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
+
+    <div>
+      <button id="app-counter-subject-button"
+        onclick=${() => appCounterSubject.set(appCounter + 1)}
+      >🍒 ++app subject</button>
+      <span>
+        🍒 <span id="app-counter-subject-button">${appCounter}</span>
+      </span>
+    </div>
 
     <div id="tagDebug-fx-wrap">
       <div style="display:flex;flex-wrap:wrap;gap:1em">
@@ -1842,7 +1870,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! taggedjs */ "../main/ts/index.ts");
 
-const renderCountDiv = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ renderCount, name }) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `<div><small>(${name} render count <span name=${name + '_render_count'}>${renderCount}</span>)</small></div>`);
+const renderCountDiv = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ renderCount, name }) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `<div><small>(${name} render count <span id=${name + '_render_count'}>${renderCount}</span>)</small></div>`);
 
 
 /***/ }),
@@ -2155,6 +2183,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 async function runTests() {
+    const slowCount = (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🍄-slowChangeCount');
+    // tests can be run multiple times. Only the first time will this expect below work
+    const firstRun = slowCount === '0';
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('no template tags', () => {
         const templateTags = document.getElementsByTagName('template');
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(templateTags.length).toBe(0, 'Expected no templates to be on document');
@@ -2187,15 +2218,33 @@ async function runTests() {
         const propsTextarea = (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.byId)('props-debug-textarea');
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(propsTextarea.value.replace(/\s/g, '')).toBe(`{"test":33,"x":"y"}`);
     });
-    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('basic increase counter', () => {
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElmCount)('#conditional-counter', 0);
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#❤️-increase-counter', '#❤️-counter-display');
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#❤️-inner-counter', '#❤️-inner-display');
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#standalone-counter', '#standalone-display');
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElmCount)('#conditional-counter', 1);
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#conditional-counter', '#conditional-display');
-        // test again after higher elements have had reruns
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#❤️-inner-counter', '#❤️-inner-display');
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.describe)('counters', () => {
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('basics', () => {
+            const beforeRenderCount = Number((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#counters_render_count'));
+            const beforeInnerRenderCount = Number((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#inner_counters_render_count'));
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElmCount)('#conditional-counter', 0);
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#❤️-increase-counter', '#❤️-counter-display');
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#counters_render_count')).toBe((beforeRenderCount + 2).toString());
+            // the parent changed a value passed to child as a prop
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#inner_counters_render_count')).toBe((beforeInnerRenderCount + 2).toString());
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#❤️-inner-counter', '#❤️-inner-display');
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#counters_render_count')).toBe((beforeRenderCount + 4).toString());
+            // the child changed a value passed from parent as a prop
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#inner_counters_render_count')).toBe((beforeInnerRenderCount + 4).toString());
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#standalone-counter', '#standalone-display');
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#counters_render_count')).toBe((beforeRenderCount + (firstRun ? 6 : 8)).toString());
+            // the child was not rendered again because props did not change so value should be less
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#inner_counters_render_count')).toBe((beforeInnerRenderCount + 4).toString());
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElmCount)('#conditional-counter', 1);
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#conditional-counter', '#conditional-display');
+            // test again after higher elements have had reruns
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#❤️-inner-counter', '#❤️-inner-display');
+            if (firstRun) {
+                (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🪈-pipedSubject')).toBe('');
+            }
+            (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.click)('#🥦-subject-increase-counter');
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🪈-pipedSubject')).toBe((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🥦-subject-counter-display'));
+        });
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.describe)('props', () => {
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('test duels', () => {
@@ -2341,38 +2390,54 @@ async function runTests() {
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('⌚️ watch tests', () => {
         const startCount = Number((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.htmlById)('watch-testing-num-display'));
         (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectMatchedHtml)('#watch-testing-num-display', '#🍄-slowChangeCount');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🍄-watchPropNumSlow')).toBe(''); // this display is only displays after init cycle
+        // always starts at "false"
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-truthChange')).toBe('false');
+        if (firstRun) {
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🍄-watchPropNumSlow')).toBe('');
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-watchTruth')).toBe('false');
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-watchTruthAsSub')).toBe('undefined');
+        }
+        else {
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🍄-watchPropNumSlow')).toBe(slowCount);
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(Number((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-watchTruth'))).toBeGreaterThan(Number(slowCount));
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-watchTruthAsSub')).toBe((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-truthSubChangeCount'));
+        }
         (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.click)('#watch-testing-num-button');
         (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectMatchedHtml)('#watch-testing-num-display', '#🍄-slowChangeCount');
         (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectMatchedHtml)('#🍄-watchPropNumSlow', '#🍄-slowChangeCount');
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🍄‍🟫-subjectChangeCount')).toBe((startCount + 2).toString());
         (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectMatchedHtml)('#🍄‍🟫-subjectChangeCount', '#🍄‍🟫-watchPropNumSubject');
-        // starts at "false"
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-truthChange')).toBe('false');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-watchTruth')).toBe('false');
         const truthStartCount = Number((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-truthChangeCount'));
         (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.click)('#🦷-truthChange-button');
+        let newCount = (truthStartCount + 1).toString();
         // its been changed to "true", that causes a change watch count increase
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-truthChange')).toBe('true');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-watchTruth')).toBe('true');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-truthChangeCount')).toBe((truthStartCount + 1).toString());
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-watchTruth')).toBe(newCount);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-truthChangeCount')).toBe(newCount);
         (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.click)('#🦷-truthChange-button');
+        newCount = (truthStartCount + 1).toString();
         // its been changed to back to "false", that does NOT cause a change watch count increase
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-truthChange')).toBe('false');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-watchTruth')).toBe('true');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-truthChangeCount')).toBe((truthStartCount + 1).toString());
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-watchTruth')).toBe(newCount);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-truthChangeCount')).toBe(newCount);
         (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.click)('#🦷-truthChange-button');
         // its been changed to "true", that causes a change watch count increase
+        newCount = (truthStartCount + 2).toString();
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-truthChange')).toBe('true');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-watchTruth')).toBe('true');
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-truthChangeCount')).toBe((truthStartCount + 2).toString());
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-watchTruth')).toBe(newCount);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-truthChangeCount')).toBe(newCount);
+        (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.click)('#🦷-truthChange-button'); // reset so tests can pass every time
+        (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.click)('#🦷-reset-button'); // reset so tests can pass every time
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-watchTruthAsSub')).toBe((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🦷-watchTruth'));
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('has no templates', () => {
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(document.getElementsByTagName('template').length).toBe(0);
     });
     try {
+        const start = Date.now(); //performance.now()
         await (0,_expect__WEBPACK_IMPORTED_MODULE_1__.execute)();
-        console.info('✅ all tests passed');
+        const time = Date.now() - start; // performance.now() - start
+        console.info(`✅ all tests passed in ${time}ms`);
         return true;
     }
     catch (error) {
@@ -2401,7 +2466,15 @@ __webpack_require__.r(__webpack_exports__);
 
 const watchTesting = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => (stateNum = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [stateNum, stateNum = x]), stateNumChangeCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [stateNumChangeCount, stateNumChangeCount = x]), _ = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.watch)([stateNum], () => ++stateNumChangeCount), slowChangeCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [slowChangeCount, slowChangeCount = x]), watchPropNumSlow = taggedjs__WEBPACK_IMPORTED_MODULE_0__.watch.noInit([stateNum], () => ++slowChangeCount), subjectChangeCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [subjectChangeCount, subjectChangeCount = x]), watchPropNumSubject = taggedjs__WEBPACK_IMPORTED_MODULE_0__.watch.asSubject([stateNum], () => {
     return ++subjectChangeCount;
-}), truthChange = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(false)(x => [truthChange, truthChange = x]), truthChangeCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [truthChangeCount, truthChangeCount = x]), watchTruth = taggedjs__WEBPACK_IMPORTED_MODULE_0__.watch.truthy([truthChange], () => ++truthChangeCount)) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
+}), truthChange = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(false)(x => [truthChange, truthChange = x]), truthChangeCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [truthChangeCount, truthChangeCount = x]), watchTruth = taggedjs__WEBPACK_IMPORTED_MODULE_0__.watch.truthy([truthChange], () => ++truthChangeCount), truthSubChangeCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [truthSubChangeCount, truthSubChangeCount = x]), watchTruthAsSub = taggedjs__WEBPACK_IMPORTED_MODULE_0__.watch.truthy.asSubject([truthChange], () => {
+    ++truthSubChangeCount;
+    return truthChange;
+}).pipe(x => {
+    if (x === undefined) {
+        return 'undefined';
+    }
+    return x ? truthSubChangeCount : truthSubChangeCount;
+})) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
   stateNum:<span id="watch-testing-num-display">${stateNum}</span>
   <button id="watch-testing-num-button" type="button"
     onclick=${() => ++stateNum}
@@ -2444,21 +2517,37 @@ const watchTesting = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => (stateN
         <span id="🦷-truthChange">${truthChange ? 'true' : 'false'}</span>
       </small>
     </div>
-    <div>
-      <small>
-        watchTruth:<span id="🦷-watchTruth">${watchTruth ? 'true' : 'false'}</span>
-      </small>
-    </div>
-    <div>
-      <small>
-        (truthChangeCount:<span id="🦷-truthChangeCount">${truthChangeCount}</span>)
-      </small>
-    </div>
+    <fieldset>
+      <legend>simple truth</legend>      
+      <div>
+        <small>
+          watchTruth:<span id="🦷-watchTruth">${watchTruth || 'false'}</span>
+        </small>
+      </div>
+      <div>
+        <small>
+          (truthChangeCount:<span id="🦷-truthChangeCount">${truthChangeCount}</span>)
+        </small>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>truth subject</legend>      
+      <div>
+        <small>
+        watchTruthAsSub:<span id="🦷-watchTruthAsSub">${watchTruthAsSub}</span>
+        </small>
+      </div>
+      <div>
+        <small>
+          (truthSubChangeCount:<span id="🦷-truthSubChangeCount">${truthSubChangeCount}</span>)
+        </small>
+      </div>
+    </fieldset>
+
     <button id="🦷-truthChange-button" type="button"
       onclick=${() => truthChange = !truthChange}
-    >toggle ${truthChange}</button>
-  </fieldset>
-`);
+    >toggle to ${truthChange ? 'true' : 'false'}</button>
+  </fieldset>`);
 
 
 /***/ }),
@@ -2491,13 +2580,8 @@ class TemplaterResult {
         this.props = props;
     }
     html(strings, ...values) {
-        // this.children = html(strings, values) as any
-        // const children = html(strings, values)
         const children = new _tag_Tag_class__WEBPACK_IMPORTED_MODULE_0__.Tag(strings, values);
         const { childSubject, madeSubject } = (0,_tag_tag__WEBPACK_IMPORTED_MODULE_1__.kidsToTagArraySubject)(children);
-        childSubject.isChildSubject = true;
-        // ;(this.children as any).isChildSubject = true
-        // this.children.set( childSubject.value )
         this.children = childSubject;
         this.madeChildIntoSubject = madeSubject;
         return this;
@@ -2522,7 +2606,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./isInstance */ "../main/ts/isInstance.ts");
 /* harmony import */ var _tag_render_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tag/render/renderTagSupport.function */ "../main/ts/tag/render/renderTagSupport.function.ts");
 /* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./state */ "../main/ts/state/index.ts");
-/* harmony import */ var _tag_tagRunner__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tag/tagRunner */ "../main/ts/tag/tagRunner.ts");
+/* harmony import */ var _tag_getSupportInCycle_function__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./tag/getSupportInCycle.function */ "../main/ts/tag/getSupportInCycle.function.ts");
 
 
 
@@ -2535,11 +2619,10 @@ function alterProps(props, ownerSupport) {
     const newProps = resetFunctionProps(watchProps, ownerSupport);
     return newProps;
 }
-function resetFunctionProps(props, ownerSupport) {
-    if (typeof (props) !== 'object' || !ownerSupport) {
-        return props;
+function resetFunctionProps(newProps, ownerSupport) {
+    if (typeof (newProps) !== 'object' || !ownerSupport) {
+        return newProps;
     }
-    const newProps = props;
     // BELOW: Do not clone because if first argument is object, the memory ref back is lost
     // const newProps = {...props} 
     Object.entries(newProps).forEach(([name, value]) => {
@@ -2563,7 +2646,7 @@ function resetFunctionProps(props, ownerSupport) {
 }
 function callbackPropOwner(toCall, callWith, ownerSupport) {
     // const renderCount = ownerSupport.global.renderCount
-    const cycle = (0,_tag_tagRunner__WEBPACK_IMPORTED_MODULE_4__.isInCycle)();
+    const cycle = (0,_tag_getSupportInCycle_function__WEBPACK_IMPORTED_MODULE_4__.getSupportInCycle)();
     const result = toCall(...callWith);
     const run = () => {
         const lastestOwner = ownerSupport.global.newest;
@@ -2769,6 +2852,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TagError: () => (/* reexport safe */ _errors__WEBPACK_IMPORTED_MODULE_2__.TagError),
 /* harmony export */   TagSupport: () => (/* reexport safe */ _tag_TagSupport_class__WEBPACK_IMPORTED_MODULE_6__.TagSupport),
 /* harmony export */   ValueSubject: () => (/* reexport safe */ _subject_index__WEBPACK_IMPORTED_MODULE_5__.ValueSubject),
+/* harmony export */   callback: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.callback),
 /* harmony export */   callbackMaker: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.callbackMaker),
 /* harmony export */   children: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.children),
 /* harmony export */   combineLatest: () => (/* reexport safe */ _subject_index__WEBPACK_IMPORTED_MODULE_5__.combineLatest),
@@ -2927,12 +3011,14 @@ function bindSubjectCallback(value, tagSupport) {
     return subjectFunction;
 }
 function runTagCallback(value, tagSupport, bindTo, args) {
-    const renderCount = tagSupport.global.renderCount;
+    const myGlobal = tagSupport.global;
+    const renderCount = myGlobal.renderCount;
     const method = value.bind(bindTo);
     const callbackResult = method(...args);
-    const sameRenderCount = renderCount === tagSupport.global.renderCount;
+    const sameRenderCount = renderCount === myGlobal.renderCount;
+    const skipRender = !sameRenderCount || myGlobal.deleted;
     // already rendered OR tag was deleted before event processing
-    if (!sameRenderCount || tagSupport.global.deleted) {
+    if (skipRender) {
         if (callbackResult instanceof Promise) {
             return callbackResult.then(() => {
                 return 'promise-no-data-ever'; // tag was deleted during event processing
@@ -2940,15 +3026,15 @@ function runTagCallback(value, tagSupport, bindTo, args) {
         }
         return 'no-data-ever'; // already rendered
     }
-    const newest = (0,_tag_render_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport.global.newest, true);
-    tagSupport.global.newest = newest;
+    const newest = (0,_tag_render_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(myGlobal.newest, true);
+    myGlobal.newest = newest;
     if (callbackResult instanceof Promise) {
         return callbackResult.then(() => {
-            if (tagSupport.global.deleted) {
+            if (myGlobal.deleted) {
                 return 'promise-no-data-ever'; // tag was deleted during event processing
             }
-            const newest = (0,_tag_render_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(tagSupport.global.newest, true);
-            tagSupport.global.newest = newest;
+            const newest = (0,_tag_render_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_0__.renderTagSupport)(myGlobal.newest, true);
+            myGlobal.newest = newest;
             return 'promise-no-data-ever';
         });
     }
@@ -3517,6 +3603,7 @@ function isTagClass(value) {
     const templater = value;
     return templater?.isTagClass === true;
 }
+// isSubjectLike
 function isSubjectInstance(subject) {
     return (subject?.isSubject === true || subject?.subscribe) ? true : false; // subject?.isSubject === true || 
 }
@@ -3565,61 +3652,82 @@ function buildSibling(nextSibling, insertBefore) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   callback: () => (/* binding */ callback),
 /* harmony export */   callbackMaker: () => (/* binding */ callbackMaker)
 /* harmony export */ });
 /* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
-/* harmony import */ var _state_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./state.utils */ "../main/ts/state/state.utils.ts");
-/* harmony import */ var _tag_render_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../tag/render/renderTagSupport.function */ "../main/ts/tag/render/renderTagSupport.function.ts");
-/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../errors */ "../main/ts/errors.ts");
+/* harmony import */ var _tag_render_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../tag/render/renderTagSupport.function */ "../main/ts/tag/render/renderTagSupport.function.ts");
+/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../errors */ "../main/ts/errors.ts");
+/* harmony import */ var _syncStates_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./syncStates.function */ "../main/ts/state/syncStates.function.ts");
+/* harmony import */ var _tag_getSupportInCycle_function__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../tag/getSupportInCycle.function */ "../main/ts/tag/getSupportInCycle.function.ts");
+
 
 
 
 
 let innerCallback = (callback) => (a, b, c, d, e, f) => {
-    throw new _errors__WEBPACK_IMPORTED_MODULE_3__.SyncCallbackError('Callback function was called immediately in sync and must instead be call async');
+    throw new _errors__WEBPACK_IMPORTED_MODULE_2__.SyncCallbackError('Callback function was called immediately in sync and must instead be call async');
 };
 const callbackMaker = () => innerCallback;
 const originalGetter = innerCallback; // callbackMaker
 (0,_setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse)({
     beforeRender: (tagSupport) => initMemory(tagSupport),
     beforeRedraw: (tagSupport) => initMemory(tagSupport),
-    afterRender: (_tagSupport) => {
+    afterRender: (tagSupport) => {
+        ;
+        tagSupport.global.callbackMaker = true;
         innerCallback = originalGetter; // prevent crossing callbacks with another tag
     },
 });
-function updateState(stateFrom, stateTo) {
-    stateFrom.forEach((state, index) => {
-        const fromValue = (0,_state_utils__WEBPACK_IMPORTED_MODULE_1__.getStateValue)(state);
-        const callback = stateTo[index].callback;
-        if (callback) {
-            callback(fromValue); // set the value
+function callback(callback) {
+    const tagSupport = (0,_tag_getSupportInCycle_function__WEBPACK_IMPORTED_MODULE_4__.getSupportInCycle)();
+    if (!tagSupport) {
+        const error = new _errors__WEBPACK_IMPORTED_MODULE_2__.SyncCallbackError('callback() was called outside of synchronous rendering. Use `callback = callbackMaker()` to create a callback that could be called out of sync with rendering');
+        throw error;
+    }
+    const oldState = _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.array;
+    const trigger = (...args) => {
+        const callbackMaker = tagSupport.global.callbackMaker;
+        if (callbackMaker) {
+            return triggerStateUpdate(tagSupport, callback, oldState, ...args);
         }
-        stateTo[index].lastValue = fromValue; // record the value
-    });
+        return callback(...args);
+    };
+    return trigger;
 }
 function initMemory(tagSupport) {
     const oldState = _setUse_function__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.array;
     innerCallback = (callback) => {
-        const trigger = (...args) => triggerStateUpdate(tagSupport, callback, oldState, ...args);
+        const trigger = (...args) => {
+            const callbackMaker = tagSupport.global.callbackMaker;
+            if (callbackMaker) {
+                return triggerStateUpdate(tagSupport, callback, oldState, ...args);
+            }
+            return callback(...args);
+        };
         return trigger;
     };
 }
 function triggerStateUpdate(tagSupport, callback, oldState, ...args) {
     const state = tagSupport.memory.state;
+    // oldState = (tagSupport.global.oldest as TagSupport).memory.state
     // ensure that the oldest has the latest values first
-    updateState(state, oldState);
+    (0,_syncStates_function__WEBPACK_IMPORTED_MODULE_3__.syncStates)(state, oldState);
     // run the callback
-    const promise = callback(...args);
+    const maybePromise = callback(...args);
+    // const maybePromise = callback(...args as [any,any,any,any,any,any])
     // send the oldest state changes into the newest
-    updateState(oldState, state);
-    (0,_tag_render_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_2__.renderTagSupport)(tagSupport, false);
-    if (promise instanceof Promise) {
-        promise.finally(() => {
+    (0,_syncStates_function__WEBPACK_IMPORTED_MODULE_3__.syncStates)(oldState, state);
+    (0,_tag_render_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_1__.renderTagSupport)(tagSupport, false);
+    if (maybePromise instanceof Promise) {
+        maybePromise.finally(() => {
             // send the oldest state changes into the newest
-            updateState(oldState, state);
-            (0,_tag_render_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_2__.renderTagSupport)(tagSupport, false);
+            (0,_syncStates_function__WEBPACK_IMPORTED_MODULE_3__.syncStates)(oldState, state);
+            (0,_tag_render_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_1__.renderTagSupport)(tagSupport, false);
         });
     }
+    // return undefined as T
+    return maybePromise;
 }
 
 
@@ -3661,6 +3769,7 @@ function children() {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   callback: () => (/* reexport safe */ _callbackMaker_function__WEBPACK_IMPORTED_MODULE_5__.callback),
 /* harmony export */   callbackMaker: () => (/* reexport safe */ _callbackMaker_function__WEBPACK_IMPORTED_MODULE_5__.callbackMaker),
 /* harmony export */   children: () => (/* reexport safe */ _children__WEBPACK_IMPORTED_MODULE_8__.children),
 /* harmony export */   letState: () => (/* reexport safe */ _letState_function__WEBPACK_IMPORTED_MODULE_3__.letState),
@@ -4022,6 +4131,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
 /* harmony import */ var _state_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./state.utils */ "../main/ts/state/state.utils.ts");
+/* harmony import */ var _syncStates_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./syncStates.function */ "../main/ts/state/syncStates.function.ts");
+
 
 
 /** Used for variables that need to remain the same variable during render passes */
@@ -4045,6 +4156,22 @@ function state(defaultValue) {
     // State first time run
     const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue;
     let initValue = defaultFn();
+    // the state is actually intended to be a function
+    if (initValue instanceof Function) {
+        const oldState = config.array;
+        const tagSupport = config.tagSupport;
+        const original = initValue;
+        initValue = ((...args) => {
+            const global = tagSupport.global;
+            const newest = global.newest;
+            const newState = newest.memory.state;
+            (0,_syncStates_function__WEBPACK_IMPORTED_MODULE_2__.syncStates)(newState, oldState);
+            const result = original(...args);
+            (0,_syncStates_function__WEBPACK_IMPORTED_MODULE_2__.syncStates)(oldState, newState);
+            return result;
+        });
+        initValue.original = original;
+    }
     getSetMethod = ((x) => [initValue, initValue = x]);
     const push = {
         get: () => (0,_state_utils__WEBPACK_IMPORTED_MODULE_1__.getStateValue)(push),
@@ -4101,9 +4228,12 @@ const beforeRender = (tagSupport) => initState(tagSupport);
                 throw error;
             }
         }
+        const cTagConfig = config.tagSupport;
         delete config.rearray; // clean up any previous runs
         delete config.tagSupport;
-        memory.state = config.array; // [...config.array]
+        memory.state.length = 0;
+        memory.state.push(...config.array);
+        // memory.state = config.array // [...config.array]
         memory.state.forEach(item => item.lastValue = getStateValue(item)); // set last values
         config.array = [];
     }
@@ -4134,9 +4264,11 @@ function initState(tagSupport) {
     const state = memory.state;
     const config = _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.stateConfig;
     // TODO: This guard may no longer be needed
+    /*
     if (config.rearray) {
-        checkStateMismatch(tagSupport, config, state);
+      checkStateMismatch(tagSupport, config, state)
     }
+    */
     config.rearray = [];
     if (state?.length) {
         state.forEach(state => getStateValue(state));
@@ -4144,25 +4276,58 @@ function initState(tagSupport) {
     }
     config.tagSupport = tagSupport;
 }
-function checkStateMismatch(tagSupport, config, state) {
-    const wrapper = tagSupport.templater?.wrapper;
-    const wasWrapper = config.tagSupport?.templater.wrapper;
-    const message = 'last state not cleared. Possibly in the middle of rendering one component and another is trying to render';
-    if (!wasWrapper) {
-        return; // its not a component or was not a component before
-    }
-    console.error(message, {
-        config,
-        tagFunction: wrapper.parentWrap.original,
-        wasInMiddleOf: wasWrapper.parentWrap.original,
-        state,
-        expectedClearArray: config.rearray,
-    });
-    throw new _errors__WEBPACK_IMPORTED_MODULE_0__.StateMismatchError(message, {
-        config,
-        tagFunction: wrapper.parentWrap.original,
-        state,
-        expectedClearArray: config.rearray,
+/*
+function checkStateMismatch(
+  tagSupport: BaseTagSupport,
+  config: Config,
+  state: State,
+) {
+  const wrapper = tagSupport.templater?.wrapper as Wrapper
+  const wasWrapper = config.tagSupport?.templater.wrapper as Wrapper
+  const message = 'last state not cleared. Possibly in the middle of rendering one component and another is trying to render'
+
+  if(!wasWrapper) {
+    return // its not a component or was not a component before
+  }
+
+  console.error(message, {
+    config,
+    tagFunction: wrapper.parentWrap.original,
+    wasInMiddleOf: wasWrapper.parentWrap.original,
+    state,
+    expectedClearArray: config.rearray,
+  })
+
+  throw new StateMismatchError(message, {
+    config,
+    tagFunction: wrapper.parentWrap.original,
+    state,
+    expectedClearArray: config.rearray,
+  })
+}
+*/
+
+
+/***/ }),
+
+/***/ "../main/ts/state/syncStates.function.ts":
+/*!***********************************************!*\
+  !*** ../main/ts/state/syncStates.function.ts ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   syncStates: () => (/* binding */ syncStates)
+/* harmony export */ });
+function syncStates(stateFrom, stateTo) {
+    stateFrom.forEach((state, index) => {
+        const fromValue = state.get();
+        const callback = stateTo[index].callback;
+        if (callback) {
+            callback(fromValue); // set the value
+        }
+        stateTo[index].lastValue = fromValue; // record the value
     });
 }
 
@@ -4180,7 +4345,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   watch: () => (/* binding */ watch)
 /* harmony export */ });
 /* harmony import */ var _subject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../subject */ "../main/ts/subject/index.ts");
-/* harmony import */ var _state_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./state.function */ "../main/ts/state/state.function.ts");
+/* harmony import */ var _tag_getSupportInCycle_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../tag/getSupportInCycle.function */ "../main/ts/tag/getSupportInCycle.function.ts");
+/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
+/* harmony import */ var _state_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./state.function */ "../main/ts/state/state.function.ts");
+/* harmony import */ var _syncStates_function__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./syncStates.function */ "../main/ts/state/syncStates.function.ts");
+
+
+
 
 
 /**
@@ -4189,21 +4360,9 @@ __webpack_require__.r(__webpack_exports__);
  * @param callback WatchCallback
  * @returns T[]
  */
-const watch = (currentValues, callback) => {
+const watch = ((currentValues, callback) => {
     return setupWatch(currentValues, callback);
-};
-/** When an item in watch array changes, callback function will be triggered. Does not trigger on initial watch setup. */
-watch.noInit = (currentValues, callback) => {
-    return undefined; // this is a fake function... See defineProperty(watch)
-};
-/** When an item in watch array changes and all values are truthy then callback function will be triggered */
-watch.truthy = (currentValues, callback) => {
-    return undefined; // this is a fake function... See defineProperty(watch)
-};
-/** When an item in watch array changes, callback function will be triggered */
-watch.asSubject = (currentValues, callback) => {
-    return undefined; // this is a fake function... See defineProperty(watch)
-};
+});
 const defaultFinally = (x) => x;
 function newWatch(setup) {
     const method = (currentValues, callback) => {
@@ -4213,9 +4372,15 @@ function newWatch(setup) {
     defineOnMethod(() => method, method);
     return method;
 }
-/** puts above functionality together */
+/**
+ * puts above functionality together
+ * @param currentValues values being watched
+ * @param callback (currentValue, previousValues) => resolveToValue
+ * @param param2
+ * @returns
+ */
 const setupWatch = (currentValues, callback, { init, before = () => true, final = defaultFinally, } = {}) => {
-    let previous = (0,_state_function__WEBPACK_IMPORTED_MODULE_1__.state)({
+    let previous = (0,_state_function__WEBPACK_IMPORTED_MODULE_3__.state)({
         pastResult: undefined,
         values: undefined,
     });
@@ -4256,13 +4421,42 @@ function defineOnMethod(getWatch, attachTo) {
     });
     Object.defineProperty(attachTo, 'asSubject', {
         get() {
-            const watch = getWatch();
-            const subject = (0,_state_function__WEBPACK_IMPORTED_MODULE_1__.state)(() => new _subject__WEBPACK_IMPORTED_MODULE_0__.Subject());
-            watch.setup.final = (x) => {
-                subject.set(x);
+            const oldWatch = getWatch();
+            const method = (currentValues, callback) => {
+                const originalState = (0,_state_function__WEBPACK_IMPORTED_MODULE_3__.state)(() => (0,_tag_getSupportInCycle_function__WEBPACK_IMPORTED_MODULE_1__.getSupportInCycle)().memory.state);
+                const subject = (0,_state_function__WEBPACK_IMPORTED_MODULE_3__.state)(() => new _subject__WEBPACK_IMPORTED_MODULE_0__.ValueSubject(undefined));
+                setupWatch(currentValues, (currentValues, previousValues) => {
+                    const setTo = callback(currentValues, previousValues);
+                    if (originalState.length) {
+                        const newestState = _setUse_function__WEBPACK_IMPORTED_MODULE_2__.setUse.memory.stateConfig.array;
+                        (0,_syncStates_function__WEBPACK_IMPORTED_MODULE_4__.syncStates)(newestState, originalState);
+                    }
+                    subject.set(setTo);
+                }, oldWatch.setup);
                 return subject;
             };
-            return watch;
+            method.setup = oldWatch.setup;
+            defineOnMethod(() => method, method);
+            return method;
+            /*
+            method.setup = setup
+          
+            defineOnMethod(() => method as any, method)
+            
+            return method as any
+      
+            
+            const oldWatch = getWatch()
+            const watch = newWatch( oldWatch.setup )
+            // const watch = getWatch()
+            
+            const subject = state(() => new Subject())
+            watch.setup.final = (x: any) => {
+              subject.set(x)
+              return subject
+            }
+            return watch
+            */
         },
     });
     Object.defineProperty(attachTo, 'truthy', {
@@ -4272,6 +4466,7 @@ function defineOnMethod(getWatch, attachTo) {
             return watch;
         },
     });
+    return attachTo;
 }
 defineOnMethod(() => newWatch({}), watch);
 
@@ -4288,6 +4483,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Subject: () => (/* binding */ Subject)
 /* harmony export */ });
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _combineLatest_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./combineLatest.function */ "../main/ts/subject/combineLatest.function.ts");
+/* harmony import */ var _subject_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./subject.utils */ "../main/ts/subject/subject.utils.ts");
+
+
+
 class Subject {
     value;
     onSubscription;
@@ -4301,7 +4502,7 @@ class Subject {
         this.onSubscription = onSubscription;
     }
     subscribe(callback) {
-        const subscription = getSubscription(this, callback);
+        const subscription = (0,_subject_utils__WEBPACK_IMPORTED_MODULE_2__.getSubscription)(this, callback);
         // are we within a pipe?
         const subscribeWith = this.subscribeWith;
         if (subscribeWith) {
@@ -4309,13 +4510,15 @@ class Subject {
             if (this.methods.length) {
                 const orgCallback = callback;
                 callback = (value) => {
-                    runPipedMethods(value, this.methods, lastValue => orgCallback(lastValue, subscription));
+                    (0,_subject_utils__WEBPACK_IMPORTED_MODULE_2__.runPipedMethods)(value, this.methods, lastValue => orgCallback(lastValue, subscription));
                 };
             }
             return subscribeWith(callback);
         }
         this.subscribers.push(subscription);
-        SubjectClass.globalSubs.push(subscription); // 🔬 testing
+        // Subject.globalSubs.push(subscription) // 🔬 testing
+        const count = Subject.globalSubCount$.value;
+        Subject.globalSubCount$.set(count + 1); // 🔬 testing
         if (this.onSubscription) {
             this.onSubscription(subscription);
         }
@@ -4329,6 +4532,7 @@ class Subject {
             sub.callback(value, sub);
         });
     }
+    // next() is available for rxjs compatibility
     next = this.set;
     toPromise() {
         return new Promise((res, rej) => {
@@ -4352,61 +4556,31 @@ class Subject {
         subject.subscribeWith = (x) => this.subscribe(x);
         return subject;
     }
-}
-function removeSubFromArray(subscribers, callback) {
-    const index = subscribers.findIndex(sub => sub.callback === callback);
-    if (index !== -1) {
-        subscribers.splice(index, 1);
+    static all(args) {
+        const switched = args.map(arg => {
+            if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isSubjectInstance)(arg))
+                return arg;
+            // Call the callback immediately with the current value
+            const x = new Subject(arg, subscription => {
+                subscription.next(arg);
+                return subscription;
+            });
+            return x;
+        });
+        return (0,_combineLatest_function__WEBPACK_IMPORTED_MODULE_1__.combineLatest)(switched);
     }
+    static globalSubCount$ = new Subject(0); // for ease of debugging
 }
-const SubjectClass = Subject;
-SubjectClass.globalSubs = []; // 🔬 for testing
-SubjectClass.globalSubCount$ = new Subject(); // for ease of debugging
-SubjectClass.globalSubCount$.set(0);
-function getSubscription(subject, callback) {
-    const countSubject = SubjectClass.globalSubCount$;
-    SubjectClass.globalSubCount$.set(countSubject.value + 1);
-    const subscription = () => {
-        subscription.unsubscribe();
-    };
-    subscription.callback = callback;
-    subscription.subscriptions = [];
-    // Return a function to unsubscribe from the BehaviorSubject
-    subscription.unsubscribe = () => {
-        removeSubFromArray(subject.subscribers, callback); // each will be called when update comes in
-        removeSubFromArray(SubjectClass.globalSubs, callback); // 🔬 testing
-        SubjectClass.globalSubCount$.set(countSubject.value - 1);
-        // any double unsubscribes will be ignored
-        subscription.unsubscribe = () => subscription;
-        // unsubscribe from any combined subjects
-        subscription.subscriptions.forEach(subscription => subscription.unsubscribe());
-        return subscription;
-    };
-    subscription.add = (sub) => {
-        subscription.subscriptions.push(sub);
-        return subscription;
-    };
-    subscription.next = (value) => {
-        callback(value, subscription);
-    };
-    return subscription;
+/*
+export const Subject = (<T>(value?: T, onSubscription?: OnSubscription<T>) => {
+  return new Subject(value, onSubscription)
+}) as (<T>(value?: T, onSubscription?: OnSubscription<T>) => Subject<T>) & {
+  globalSubCount$: Subject<number>
+  // globalSubs: Subscription<any>[]
+  all: <T>(...args: (T | Subject<T>)[]) => Subject<T>[]
 }
-function runPipedMethods(value, methods, onComplete) {
-    const cloneMethods = [...methods];
-    const firstMethod = cloneMethods.shift();
-    const next = (newValue) => {
-        if (cloneMethods.length) {
-            return runPipedMethods(newValue, cloneMethods, onComplete);
-        }
-        onComplete(newValue);
-        // return newValue = next
-    };
-    let handler = next;
-    const setHandler = (x) => handler = x;
-    const pipeUtils = { setHandler, next };
-    const methodResponse = firstMethod(value, pipeUtils);
-    handler(methodResponse);
-}
+*/
+// Subject.globalSubs = [] // 🔬 for testing
 
 
 /***/ }),
@@ -4460,9 +4634,17 @@ function combineLatest(subjects) {
         const setValue = (x, index) => {
             valuesSeen[index] = true;
             values[index] = x;
-            if (valuesSeen.length === subjects.length && valuesSeen.every(x => x)) {
-                callback(values, subscription);
+            const countMatched = valuesSeen.length === subjects.length;
+            if (!countMatched) {
+                return;
             }
+            for (let index = valuesSeen.length - 1; index >= 0; --index) {
+                if (!valuesSeen[index]) {
+                    return;
+                }
+            }
+            // everyone has reported values
+            callback(values, subscription);
         };
         const clones = [...subjects];
         const firstSub = clones.shift();
@@ -4501,6 +4683,73 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
+/***/ }),
+
+/***/ "../main/ts/subject/subject.utils.ts":
+/*!*******************************************!*\
+  !*** ../main/ts/subject/subject.utils.ts ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   getSubscription: () => (/* binding */ getSubscription),
+/* harmony export */   runPipedMethods: () => (/* binding */ runPipedMethods)
+/* harmony export */ });
+/* harmony import */ var _Subject_class__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Subject.class */ "../main/ts/subject/Subject.class.ts");
+
+function removeSubFromArray(subscribers, callback) {
+    const index = subscribers.findIndex(sub => sub.callback === callback);
+    if (index !== -1) {
+        subscribers.splice(index, 1);
+    }
+}
+function getSubscription(subject, callback) {
+    const countSubject = _Subject_class__WEBPACK_IMPORTED_MODULE_0__.Subject.globalSubCount$;
+    _Subject_class__WEBPACK_IMPORTED_MODULE_0__.Subject.globalSubCount$.set(countSubject.value + 1);
+    const subscription = () => {
+        subscription.unsubscribe();
+    };
+    subscription.callback = callback;
+    subscription.subscriptions = [];
+    // Return a function to unsubscribe from the BehaviorSubject
+    subscription.unsubscribe = () => {
+        removeSubFromArray(subject.subscribers, callback); // each will be called when update comes in
+        // removeSubFromArray(Subject.globalSubs, callback) // 🔬 testing
+        _Subject_class__WEBPACK_IMPORTED_MODULE_0__.Subject.globalSubCount$.set(countSubject.value - 1);
+        // any double unsubscribes will be ignored
+        subscription.unsubscribe = () => subscription;
+        // unsubscribe from any combined subjects
+        subscription.subscriptions.forEach(subscription => subscription.unsubscribe());
+        return subscription;
+    };
+    subscription.add = (sub) => {
+        subscription.subscriptions.push(sub);
+        return subscription;
+    };
+    subscription.next = (value) => {
+        callback(value, subscription);
+    };
+    return subscription;
+}
+function runPipedMethods(value, methods, onComplete) {
+    const cloneMethods = [...methods];
+    const firstMethod = cloneMethods.shift();
+    const next = (newValue) => {
+        if (cloneMethods.length) {
+            return runPipedMethods(newValue, cloneMethods, onComplete);
+        }
+        onComplete(newValue);
+        // return newValue = next
+    };
+    let handler = next;
+    const setHandler = (x) => handler = x;
+    const pipeUtils = { setHandler, next };
+    const methodResponse = firstMethod(value, pipeUtils);
+    handler(methodResponse);
+}
 
 
 /***/ }),
@@ -4643,11 +4892,15 @@ class BaseTagSupport {
     subject;
     isApp = true;
     appElement; // only seen on this.getAppTagSupport().appElement
+    strings;
+    values;
+    lastTemplateString = undefined; // used to compare templates for updates
     propsConfig;
     // stays with current render
     memory = {
         state: [],
     };
+    clones = []; // elements on document. Needed at destroy process to know what to destroy
     // travels with all rerenderings
     global = {
         context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
@@ -4655,8 +4908,9 @@ class BaseTagSupport {
         /** Indicator of re-rending. Saves from double rending something already rendered */
         renderCount: 0,
         deleted: false,
-        subscriptions: []
+        subscriptions: [],
     };
+    hasLiveElements = false;
     constructor(templater, subject) {
         this.templater = templater;
         this.subject = subject;
@@ -4672,180 +4926,6 @@ class BaseTagSupport {
                 return cloneValues;
             })
         };
-    }
-}
-class TagSupport extends BaseTagSupport {
-    templater;
-    ownerTagSupport;
-    subject;
-    version;
-    isApp = false;
-    hasLiveElements = false;
-    childTags = []; // tags on me
-    clones = []; // elements on document. Needed at destroy process to know what to destroy
-    // may not be needed anymore?
-    strings;
-    values;
-    lastTemplateString = undefined; // used to compare templates for updates
-    constructor(templater, // at runtime rendering of a tag, it needs to be married to a new TagSupport()
-    ownerTagSupport, subject, version = 0) {
-        super(templater, subject);
-        this.templater = templater;
-        this.ownerTagSupport = ownerTagSupport;
-        this.subject = subject;
-        this.version = version;
-    }
-    destroy(options = {
-        stagger: 0,
-        byParent: false, // Only destroy clones of direct children
-    }) {
-        const global = this.global;
-        const subject = this.subject;
-        if (subject.clone) {
-            throw new Error('maybe issue here?');
-        }
-        // put back down the template tag
-        const insertBefore = global.insertBefore;
-        if (insertBefore.nodeName === 'TEMPLATE') {
-            const placeholder = global.placeholder;
-            if (placeholder && !('arrayValue' in this.memory)) {
-                if (!options.byParent) {
-                    (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_4__.restoreTagMarker)(this);
-                }
-            }
-        }
-        // the isComponent check maybe able to be removed
-        const isComponent = (0,_isInstance__WEBPACK_IMPORTED_MODULE_2__.isTagComponent)(this.templater) ? true : false;
-        if (isComponent) {
-            (0,_tagRunner__WEBPACK_IMPORTED_MODULE_5__.runBeforeDestroy)(this, this);
-        }
-        const childTags = options.byParent ? [] : (0,_destroy_support__WEBPACK_IMPORTED_MODULE_6__.getChildTagsToDestroy)(this.childTags);
-        // signify that no further event rendering should take place by making logic think a render occurred during event
-        // signify immediately child has been deleted (looked for during event processing)
-        childTags.forEach(child => {
-            const subGlobal = child.global;
-            delete subGlobal.newest;
-            subGlobal.deleted = true;
-            // delete subGlobal.placeholder
-            // restoreTagMarker(child)
-        });
-        this.destroySubscriptions();
-        let mainPromise;
-        if (this.ownerTagSupport) {
-            this.ownerTagSupport.childTags = this.ownerTagSupport.childTags.filter(child => child !== this);
-        }
-        if (!options.byParent) {
-            const { stagger, promise } = this.destroyClones(options);
-            options.stagger = stagger;
-            if (promise) {
-                mainPromise = promise;
-            }
-        }
-        else {
-            this.destroyClones();
-        }
-        // data reset
-        delete global.placeholder;
-        global.context = {};
-        delete global.oldest;
-        delete global.newest;
-        global.deleted = true;
-        this.childTags.length = 0;
-        this.hasLiveElements = false;
-        delete subject.tagSupport;
-        if (mainPromise) {
-            mainPromise = mainPromise.then(async () => {
-                const promises = childTags.map(kid => kid.destroy({ stagger: 0, byParent: true }));
-                return Promise.all(promises);
-            });
-        }
-        else {
-            mainPromise = Promise.all(childTags.map(kid => kid.destroy({ stagger: 0, byParent: true })));
-        }
-        return mainPromise.then(() => options.stagger);
-    }
-    destroySubscriptions() {
-        const global = this.global;
-        global.subscriptions.forEach(cloneSub => cloneSub.unsubscribe());
-        global.subscriptions.length = 0;
-    }
-    destroyClones({ stagger } = {
-        stagger: 0,
-    }) {
-        //const promises = this.clones.reverse().map(
-        const promises = this.clones.map(clone => this.checkCloneRemoval(clone, stagger)).filter(x => x); // only return promises
-        this.clones.length = 0; // tag maybe used for something else
-        const oldContext = this.global.context;
-        Object.values(oldContext).forEach(value => {
-            const clone = value.clone;
-            if (clone && clone.parentNode) {
-                // throw new Error('maybe issue here too?')
-                clone.parentNode.removeChild(clone);
-            }
-        });
-        if (promises.length) {
-            return { promise: Promise.all(promises), stagger };
-        }
-        return { stagger };
-    }
-    /** Reviews elements for the presences of ondestroy */
-    checkCloneRemoval(clone, stagger) {
-        let promise;
-        const customElm = clone;
-        if (customElm.ondestroy) {
-            promise = (0,_elementDestroyCheck_function__WEBPACK_IMPORTED_MODULE_7__.elementDestroyCheck)(customElm, stagger);
-        }
-        const next = () => {
-            clone.parentNode?.removeChild(clone);
-            const ownerSupport = this.ownerTagSupport;
-            if (ownerSupport) {
-                // Sometimes my clones were first registered to my owner, remove them from owner
-                ownerSupport.clones = ownerSupport.clones.filter(compareClone => compareClone !== clone);
-            }
-        };
-        if (promise instanceof Promise) {
-            return promise.then(next);
-        }
-        else {
-            next();
-        }
-        return promise;
-    }
-    update() {
-        return this.updateContext(this.global.context);
-    }
-    updateBy(tagSupport) {
-        const tempTag = tagSupport.templater.tag;
-        this.updateConfig(tempTag.strings, tempTag.values);
-    }
-    updateConfig(strings, values) {
-        this.strings = strings;
-        this.updateValues(values);
-    }
-    updateValues(values) {
-        this.values = values;
-        return this.updateContext(this.global.context);
-    }
-    updateContext(context) {
-        const thisTag = this.templater.tag;
-        const strings = this.strings || thisTag.strings;
-        const values = this.values || thisTag.values;
-        strings.map((_string, index) => {
-            const variableName = _Tag_class__WEBPACK_IMPORTED_MODULE_0__.variablePrefix + index;
-            const hasValue = values.length > index;
-            const value = values[index];
-            // is something already there?
-            const exists = variableName in context;
-            if (exists) {
-                return (0,_update_updateContextItem_function__WEBPACK_IMPORTED_MODULE_8__.updateContextItem)(context, variableName, value);
-            }
-            if (!hasValue) {
-                return;
-            }
-            // 🆕 First time values below
-            context[variableName] = (0,_update_processNewValue_function__WEBPACK_IMPORTED_MODULE_9__.processNewValue)(hasValue, value, this);
-        });
-        return context;
     }
     /** Function that kicks off actually putting tags down as HTML elements */
     buildBeforeElement(insertBefore, options = {
@@ -4909,6 +4989,181 @@ class TagSupport extends BaseTagSupport {
             values,
             context: this.global.context || {},
         };
+    }
+    update() {
+        return this.updateContext(this.global.context);
+    }
+    updateContext(context) {
+        const thisTag = this.templater.tag;
+        const strings = this.strings || thisTag.strings;
+        const values = this.values || thisTag.values;
+        strings.map((_string, index) => {
+            const variableName = _Tag_class__WEBPACK_IMPORTED_MODULE_0__.variablePrefix + index;
+            const hasValue = values.length > index;
+            const value = values[index];
+            // is something already there?
+            const exists = variableName in context;
+            if (exists) {
+                return (0,_update_updateContextItem_function__WEBPACK_IMPORTED_MODULE_8__.updateContextItem)(context, variableName, value);
+            }
+            if (!hasValue) {
+                return;
+            }
+            // 🆕 First time values below
+            context[variableName] = (0,_update_processNewValue_function__WEBPACK_IMPORTED_MODULE_9__.processNewValue)(hasValue, value, this);
+        });
+        return context;
+    }
+}
+class TagSupport extends BaseTagSupport {
+    templater;
+    ownerTagSupport;
+    subject;
+    version;
+    isApp = false;
+    childTags = []; // tags on me
+    constructor(templater, // at runtime rendering of a tag, it needs to be married to a new TagSupport()
+    ownerTagSupport, subject, version = 0) {
+        super(templater, subject);
+        this.templater = templater;
+        this.ownerTagSupport = ownerTagSupport;
+        this.subject = subject;
+        this.version = version;
+    }
+    destroy(options = {
+        stagger: 0,
+        byParent: false, // Only destroy clones of direct children
+    }) {
+        const global = this.global;
+        const subject = this.subject;
+        if (subject.clone) {
+            throw new Error('maybe issue here?');
+        }
+        // put back down the template tag
+        const insertBefore = global.insertBefore;
+        if (insertBefore.nodeName === 'TEMPLATE') {
+            const placeholder = global.placeholder;
+            if (placeholder && !('arrayValue' in this.memory)) {
+                if (!options.byParent) {
+                    (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_4__.restoreTagMarker)(this);
+                }
+            }
+        }
+        // the isComponent check maybe able to be removed
+        const isComponent = (0,_isInstance__WEBPACK_IMPORTED_MODULE_2__.isTagComponent)(this.templater) ? true : false;
+        if (isComponent) {
+            (0,_tagRunner__WEBPACK_IMPORTED_MODULE_5__.runBeforeDestroy)(this, this);
+        }
+        const childTags = options.byParent ? [] : (0,_destroy_support__WEBPACK_IMPORTED_MODULE_6__.getChildTagsToDestroy)(this.childTags);
+        // signify that no further event rendering should take place by making logic think a render occurred during event
+        // signify immediately child has been deleted (looked for during event processing)
+        childTags.forEach(child => {
+            const subGlobal = child.global;
+            delete subGlobal.newest;
+            subGlobal.deleted = true;
+        });
+        this.destroySubscriptions();
+        let mainPromise;
+        if (this.ownerTagSupport) {
+            this.ownerTagSupport.childTags = this.ownerTagSupport.childTags.filter(child => child !== this);
+        }
+        if (!options.byParent) {
+            const { stagger, promise } = this.destroyClones(options);
+            options.stagger = stagger;
+            if (promise) {
+                mainPromise = promise;
+            }
+        }
+        else {
+            this.destroyClones();
+        }
+        // data reset
+        delete global.placeholder;
+        global.context = {};
+        delete global.oldest;
+        delete global.newest;
+        global.deleted = true;
+        this.childTags.length = 0;
+        this.hasLiveElements = false;
+        delete subject.tagSupport;
+        if (mainPromise) {
+            mainPromise = mainPromise.then(async () => {
+                const promises = childTags.map(kid => kid.destroy({ stagger: 0, byParent: true }));
+                return Promise.all(promises);
+            });
+        }
+        else {
+            mainPromise = Promise.all(childTags.map(kid => kid.destroy({ stagger: 0, byParent: true })));
+        }
+        return mainPromise.then(() => options.stagger);
+    }
+    destroySubscriptions() {
+        const global = this.global;
+        global.subscriptions.forEach(cloneSub => cloneSub.unsubscribe());
+        global.subscriptions.length = 0;
+    }
+    destroyClones({ stagger } = {
+        stagger: 0,
+    }) {
+        const oldClones = [...this.clones];
+        this.clones.length = 0; // tag maybe used for something else
+        const promises = oldClones.map(clone => this.checkCloneRemoval(clone, stagger)).filter(x => x); // only return promises
+        const oldContext = this.global.context;
+        Object.values(oldContext).forEach(value => {
+            const clone = value.clone;
+            if (clone && clone.parentNode) {
+                clone.parentNode.removeChild(clone);
+            }
+        });
+        if (promises.length) {
+            return { promise: Promise.all(promises), stagger };
+        }
+        return { stagger };
+    }
+    /** Reviews elements for the presences of ondestroy */
+    checkCloneRemoval(clone, stagger) {
+        let promise;
+        const customElm = clone;
+        if (customElm.ondestroy) {
+            promise = (0,_elementDestroyCheck_function__WEBPACK_IMPORTED_MODULE_7__.elementDestroyCheck)(customElm, stagger);
+        }
+        const next = () => {
+            const parentNode = clone.parentNode;
+            if (parentNode) {
+                /*
+                const stillHas = Array.from(parentNode.children).includes(clone as Element)
+                if(stillHas) {
+                  console.log('stillHas', {clone})
+                  parentNode.removeChild(clone)
+                }
+                */
+                parentNode.removeChild(clone);
+            }
+            const ownerSupport = this.ownerTagSupport;
+            if (ownerSupport) {
+                // Sometimes my clones were first registered to my owner, remove them from owner
+                ownerSupport.clones = ownerSupport.clones.filter(compareClone => compareClone !== clone);
+            }
+        };
+        if (promise instanceof Promise) {
+            return promise.then(next);
+        }
+        else {
+            next();
+        }
+        return promise;
+    }
+    updateBy(tagSupport) {
+        const tempTag = tagSupport.templater.tag;
+        this.updateConfig(tempTag.strings, tempTag.values);
+    }
+    updateConfig(strings, values) {
+        this.strings = strings;
+        this.updateValues(values);
+    }
+    updateValues(values) {
+        this.values = values;
+        return this.updateContext(this.global.context);
     }
     /** Used during HMR only where static content itself could have been edited */
     async rebuild() {
@@ -5154,32 +5409,43 @@ function elementDestroyCheck(nextSibling, stagger) {
 
 /***/ }),
 
-/***/ "../main/ts/tag/hasTagSupportChanged.function.ts":
-/*!*******************************************************!*\
-  !*** ../main/ts/tag/hasTagSupportChanged.function.ts ***!
-  \*******************************************************/
+/***/ "../main/ts/tag/getSupportInCycle.function.ts":
+/*!****************************************************!*\
+  !*** ../main/ts/tag/getSupportInCycle.function.ts ***!
+  \****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   hasKidsChanged: () => (/* binding */ hasKidsChanged),
-/* harmony export */   hasPropChanges: () => (/* binding */ hasPropChanges),
-/* harmony export */   hasTagSupportChanged: () => (/* binding */ hasTagSupportChanged)
+/* harmony export */   getSupportInCycle: () => (/* binding */ getSupportInCycle)
+/* harmony export */ });
+/* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../state */ "../main/ts/state/index.ts");
+
+function getSupportInCycle() {
+    return _state__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.tagSupport;
+}
+
+
+/***/ }),
+
+/***/ "../main/ts/tag/hasPropChanges.function.ts":
+/*!*************************************************!*\
+  !*** ../main/ts/tag/hasPropChanges.function.ts ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   hasPropChanges: () => (/* binding */ hasPropChanges)
 /* harmony export */ });
 /* harmony import */ var _deepFunctions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../deepFunctions */ "../main/ts/deepFunctions.ts");
 
-function hasTagSupportChanged(oldTagSupport, newTagSupport, newTemplater) {
-    const latestProps = newTemplater.props; // newTagSupport.propsConfig.latest
-    const pastCloneProps = oldTagSupport.propsConfig.latestCloned;
-    const propsChanged = hasPropChanges(latestProps, pastCloneProps);
-    // if no changes detected, no need to continue to rendering further tags
-    if (propsChanged) {
-        return propsChanged;
-    }
-    const kidsChanged = hasKidsChanged(oldTagSupport, newTagSupport);
-    // we already know props didn't change and if kids didn't either, than don't render
-    return kidsChanged;
-}
+/**
+ *
+ * @param props
+ * @param pastCloneProps
+ * @returns WHEN number then props have changed. WHEN false props have not changed
+ */
 function hasPropChanges(props, // natural props
 pastCloneProps) {
     /*
@@ -5223,13 +5489,12 @@ pastCloneProps) {
     }
     // const isEqual = deepEqual(castedPastProps, castedProps)
     // return isEqual ? false : 7 // if equal then no changes
-    return 7;
+    return false;
 }
 /** returning a number means true good comparison */
 function compareProps(value, compare, onDelete) {
     if (!(value instanceof Function)) {
         return (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_0__.deepEqual)(value, compare) ? 4 : false;
-        return 4; // this will be checked in deepEqual
     }
     const compareFn = compare;
     if (!(compareFn instanceof Function)) {
@@ -5244,11 +5509,43 @@ function compareProps(value, compare, onDelete) {
     if (original) {
         value = value.original;
     }
-    if (value.toString() !== compareFn.toString()) {
-        return false; // both are function but not the same
+    const valueString = value.toString();
+    const compareString = compare.toString();
+    if (valueString === compareString) {
+        onDelete();
+        return 3; // both are function the same
     }
     onDelete();
     return 5;
+}
+
+
+/***/ }),
+
+/***/ "../main/ts/tag/hasTagSupportChanged.function.ts":
+/*!*******************************************************!*\
+  !*** ../main/ts/tag/hasTagSupportChanged.function.ts ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   hasKidsChanged: () => (/* binding */ hasKidsChanged),
+/* harmony export */   hasTagSupportChanged: () => (/* binding */ hasTagSupportChanged)
+/* harmony export */ });
+/* harmony import */ var _hasPropChanges_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./hasPropChanges.function */ "../main/ts/tag/hasPropChanges.function.ts");
+
+function hasTagSupportChanged(oldTagSupport, newTagSupport, newTemplater) {
+    const latestProps = newTemplater.props; // newTagSupport.propsConfig.latest
+    const pastCloneProps = oldTagSupport.propsConfig.latestCloned;
+    const propsChanged = (0,_hasPropChanges_function__WEBPACK_IMPORTED_MODULE_0__.hasPropChanges)(latestProps, pastCloneProps);
+    // if no changes detected, no need to continue to rendering further tags
+    if (propsChanged) {
+        return propsChanged;
+    }
+    const kidsChanged = hasKidsChanged(oldTagSupport, newTagSupport);
+    // we already know props didn't change and if kids didn't either, than don't render
+    return kidsChanged;
 }
 function hasKidsChanged(oldTagSupport, newTagSupport) {
     const oldCloneKidValues = oldTagSupport.propsConfig.lastClonedKidValues;
@@ -5372,6 +5669,19 @@ subject) {
         return prevSupport; // already rendered during triggered events
     }
     const toRedrawTag = prevSupport || lastSupport || global.oldest;
+    /*
+    if(oldestSupport === newSupport) {
+      newSupport = new TagSupport(
+        newSupport.templater,
+        newSupport.ownerTagSupport,
+        newSupport.subject,
+      )
+  
+      newSupport.memory = {...oldestSupport.memory}
+      newSupport.memory.state = [...oldestSupport.memory.state]
+      newSupport.global = oldestSupport.global
+    }
+    */
     const reSupport = (0,_renderWithSupport_function__WEBPACK_IMPORTED_MODULE_2__.renderWithSupport)(newSupport, toRedrawTag, subject, ownerSupport);
     const oldest = global.oldest || oldestSupport;
     reSupport.global.oldest = oldest;
@@ -5429,29 +5739,31 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function renderTagOnly(tagSupport, // new
-lastSupport, subject, ownerSupport) {
-    const oldRenderCount = tagSupport.global.renderCount;
-    beforeWithRender(tagSupport, ownerSupport, lastSupport);
-    const templater = tagSupport.templater;
+function renderTagOnly(newTagSupport, lastSupport, subject, ownerSupport) {
+    const oldRenderCount = newTagSupport.global.renderCount;
+    beforeWithRender(newTagSupport, ownerSupport, lastSupport);
+    const templater = newTagSupport.templater;
     // NEW TAG CREATED HERE
     const wrapper = templater.wrapper;
-    let reSupport = wrapper(tagSupport, subject);
+    let reSupport = wrapper(newTagSupport, subject);
     /* AFTER */
-    (0,_tagRunner__WEBPACK_IMPORTED_MODULE_0__.runAfterRender)(tagSupport, ownerSupport);
+    (0,_tagRunner__WEBPACK_IMPORTED_MODULE_0__.runAfterRender)(newTagSupport, ownerSupport);
     // When we rendered, only 1 render should have taken place OTHERWISE rendering caused another render and that is the latest instead
     if (reSupport.global.renderCount > oldRenderCount + 1) {
-        return tagSupport.global.newest;
+        return newTagSupport.global.newest;
     }
-    tagSupport.global.newest = reSupport;
+    newTagSupport.global.newest = reSupport;
     return reSupport;
 }
-function beforeWithRender(tagSupport, ownerSupport, lastSupport) {
+function beforeWithRender(tagSupport, // new
+ownerSupport, lastSupport) {
     const lastOwnerSupport = lastSupport?.ownerTagSupport;
     const runtimeOwnerSupport = lastOwnerSupport || ownerSupport;
     if (lastSupport) {
         const lastState = lastSupport.memory.state;
         const memory = tagSupport.memory;
+        // memory.state.length = 0
+        // memory.state.push(...lastState)
         memory.state = [...lastState];
         tagSupport.global = lastSupport.global;
         (0,_tagRunner__WEBPACK_IMPORTED_MODULE_0__.runBeforeRedraw)(tagSupport, lastSupport);
@@ -5536,10 +5848,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function renderWithSupport(tagSupport, lastSupport, // previous
+function renderWithSupport(newTagSupport, lastSupport, // previous
 subject, // events & memory
 ownerSupport) {
-    const reSupport = (0,_renderTagOnly_function__WEBPACK_IMPORTED_MODULE_2__.renderTagOnly)(tagSupport, lastSupport, subject, ownerSupport);
+    const reSupport = (0,_renderTagOnly_function__WEBPACK_IMPORTED_MODULE_2__.renderTagOnly)(newTagSupport, lastSupport, subject, ownerSupport);
     const isLikeTag = !lastSupport || (0,_isLikeTags_function__WEBPACK_IMPORTED_MODULE_0__.isLikeTags)(lastSupport, reSupport);
     if (!isLikeTag) {
         destroyUnlikeTags(lastSupport, reSupport, subject);
@@ -5680,8 +5992,8 @@ function updateComponent(tagComponent) {
  */
 function getTagWrap(templater, result) {
     // this function gets called by taggedjs
-    const innerTagWrap = function (oldTagSetup, subject) {
-        const global = oldTagSetup.global;
+    const wrapper = function (newTagSupport, subject) {
+        const global = newTagSupport.global;
         ++global.renderCount;
         const childSubject = templater.children;
         const lastArray = global.oldest?.templater.children.lastArray;
@@ -5691,7 +6003,7 @@ function getTagWrap(templater, result) {
         // result.original
         const originalFunction = result.original; // (innerTagWrap as any).original as unknown as TagComponent
         let props = templater.props;
-        let castedProps = props.map(props => (0,_alterProps_function__WEBPACK_IMPORTED_MODULE_6__.alterProps)(props, oldTagSetup.ownerTagSupport));
+        let castedProps = props.map(props => (0,_alterProps_function__WEBPACK_IMPORTED_MODULE_6__.alterProps)(props, newTagSupport.ownerTagSupport));
         const latestCloned = props.map(props => (0,_deepFunctions__WEBPACK_IMPORTED_MODULE_4__.deepClone)(props)); // castedProps
         // CALL ORIGINAL COMPONENT FUNCTION
         let tag = originalFunction(...castedProps);
@@ -5700,14 +6012,14 @@ function getTagWrap(templater, result) {
         }
         tag.templater = templater;
         templater.tag = tag;
-        const tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_5__.TagSupport(templater, oldTagSetup.ownerTagSupport, subject, global.renderCount);
+        const tagSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_5__.TagSupport(templater, newTagSupport.ownerTagSupport, subject, global.renderCount);
         tagSupport.global = global;
         tagSupport.propsConfig = {
             latest: props,
             latestCloned,
             lastClonedKidValues: tagSupport.propsConfig.lastClonedKidValues,
         };
-        tagSupport.memory = oldTagSetup.memory; // state handover
+        tagSupport.memory = newTagSupport.memory; // state handover
         if (templater.madeChildIntoSubject) {
             childSubject.value.forEach(kid => {
                 kid.values.forEach((value, index) => {
@@ -5731,7 +6043,7 @@ function getTagWrap(templater, result) {
         }
         return tagSupport;
     };
-    return innerTagWrap;
+    return wrapper;
 }
 
 
@@ -5798,6 +6110,7 @@ function runWrapper(templater) {
     let newSupport = {};
     const subject = new _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_2__.ValueSubject(newSupport);
     newSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.BaseTagSupport(templater, subject);
+    // newSupport.ownerTagSupport = newSupport
     subject.set(templater);
     subject.tagSupport = newSupport;
     (0,_tagRunner__WEBPACK_IMPORTED_MODULE_1__.runBeforeRender)(newSupport, undefined);
@@ -5819,7 +6132,6 @@ function runWrapper(templater) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   isInCycle: () => (/* binding */ isInCycle),
 /* harmony export */   runAfterRender: () => (/* binding */ runAfterRender),
 /* harmony export */   runBeforeDestroy: () => (/* binding */ runBeforeDestroy),
 /* harmony export */   runBeforeRedraw: () => (/* binding */ runBeforeRedraw),
@@ -5827,18 +6139,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../state */ "../main/ts/state/index.ts");
 /* harmony import */ var _subject__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../subject */ "../main/ts/subject/index.ts");
+/* harmony import */ var _getSupportInCycle_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./getSupportInCycle.function */ "../main/ts/tag/getSupportInCycle.function.ts");
 // TODO: This should be more like `new TaggedJs().use({})`
+
 
 
 // Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
 _state__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.tagClosed$ = new _subject__WEBPACK_IMPORTED_MODULE_1__.Subject(undefined, subscription => {
-    if (!isInCycle()) {
+    if (!(0,_getSupportInCycle_function__WEBPACK_IMPORTED_MODULE_2__.getSupportInCycle)()) {
         subscription.next(); // we are not currently processing so process now
     }
 });
-function isInCycle() {
-    return _state__WEBPACK_IMPORTED_MODULE_0__.setUse.memory.stateConfig.tagSupport;
-}
 // Life cycle 1
 function runBeforeRender(tagSupport, ownerSupport) {
     _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.beforeRender(tagSupport, ownerSupport));
@@ -6368,7 +6679,9 @@ function shareTemplaterGlobal(oldTagSupport, tagSupport) {
         const newest = oldTagSupport.global.newest;
         if (newest) {
             const prevState = newest.memory.state;
-            tagSupport.memory.state = [...prevState];
+            tagSupport.memory.state.length = 0;
+            tagSupport.memory.state.push(...prevState);
+            // tagSupport.memory.state = [...prevState]
         }
     }
 }
@@ -6426,9 +6739,7 @@ subject, insertBefore) {
         if (!hasChanged) {
             // if the new props are an object then implicitly since no change, the old props are an object
             const newProps = templater.props;
-            if (newProps && typeof (newProps) === 'object') {
-                syncFunctionProps(lastSupport, ownerSupport, newProps);
-            }
+            syncFunctionProps(lastSupport, ownerSupport, newProps);
             return lastSupport; // its the same tag component
         }
     }
@@ -6478,24 +6789,30 @@ function buildNewTag(newSupport, oldInsertBefore, oldTagSupport, subject) {
     subject.tagSupport = newSupport;
     return newSupport;
 }
-function syncFunctionProps(lastSupport, ownerSupport, newProps) {
+function syncFunctionProps(lastSupport, ownerSupport, newPropsArray) {
     lastSupport = lastSupport.global.newest || lastSupport;
     const priorPropConfig = lastSupport.propsConfig;
-    const priorProps = priorPropConfig.latestCloned;
+    const priorPropsArray = priorPropConfig.latestCloned;
     const prevSupport = ownerSupport.global.newest;
-    priorProps.forEach((item) => {
-        Object.entries(item).forEach(([name, value]) => {
+    newPropsArray.forEach((argPosition, index) => {
+        if (typeof (argPosition) !== 'object') {
+            return;
+        }
+        const priorProps = priorPropsArray[index];
+        if (typeof (priorProps) !== 'object') {
+            return;
+        }
+        Object.entries(argPosition).forEach(([name, value]) => {
             if (!(value instanceof Function)) {
                 return;
             }
-            // TODO: The code below maybe irrelevant
-            const newCallback = newProps[name];
-            const original = newCallback.original;
+            const newCallback = argPosition[name]; // || value
+            const original = newCallback instanceof Function && newCallback.toCall;
             if (original) {
                 return; // already previously converted
             }
             // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
-            item[name].toCall = (...args) => {
+            priorProps[name].toCall = (...args) => {
                 return (0,_alterProps_function__WEBPACK_IMPORTED_MODULE_4__.callbackPropOwner)(newCallback, // value, // newOriginal,
                 args, prevSupport);
             };
@@ -6641,7 +6958,9 @@ function prepareUpdateToComponent(templater, subjectTag, insertBefore, ownerSupp
     const prevSupport = subjectSup.global.newest;
     if (prevSupport) {
         const newestState = prevSupport.memory.state;
-        tagSupport.memory.state = [...newestState];
+        // tagSupport.memory.state = [...newestState]
+        tagSupport.memory.state.length = 0;
+        tagSupport.memory.state.push(...newestState);
     }
     else {
         const placeholder = subjectSup.global.placeholder;
@@ -6758,12 +7077,12 @@ var __webpack_exports__ = {};
   \**********************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   App: () => (/* reexport safe */ _app_component__WEBPACK_IMPORTED_MODULE_0__.App),
+/* harmony export */   App: () => (/* reexport safe */ _app_tag__WEBPACK_IMPORTED_MODULE_0__.App),
 /* harmony export */   IsolatedApp: () => (/* reexport safe */ _isolatedApp__WEBPACK_IMPORTED_MODULE_1__.IsolatedApp),
 /* harmony export */   app: () => (/* reexport safe */ _app_function__WEBPACK_IMPORTED_MODULE_3__.app),
 /* harmony export */   hmr: () => (/* reexport safe */ taggedjs__WEBPACK_IMPORTED_MODULE_2__.hmr)
 /* harmony export */ });
-/* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./app.component */ "./src/app.component.ts");
+/* harmony import */ var _app_tag__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./app.tag */ "./src/app.tag.ts");
 /* harmony import */ var _isolatedApp__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./isolatedApp */ "./src/isolatedApp.ts");
 /* harmony import */ var taggedjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! taggedjs */ "../main/ts/index.ts");
 /* harmony import */ var _app_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./app.function */ "./src/app.function.ts");

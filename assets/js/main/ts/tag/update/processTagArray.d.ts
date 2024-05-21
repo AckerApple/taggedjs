@@ -13,7 +13,6 @@ export type TagArraySubject = ValueSubject<Tag[]> & {
     insertBefore: InsertBefore;
     placeholder?: Text;
     lastArray?: LastArrayItem[];
-    isChildSubject?: boolean;
 };
 export declare function processTagArray(subject: TagArraySubject, value: (TemplaterResult | Tag)[], // arry of Tag classes
 insertBefore: InsertBefore, // <template end interpolate />

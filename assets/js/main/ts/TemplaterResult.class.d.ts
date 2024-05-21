@@ -6,7 +6,7 @@ import { Provider } from './state/providers';
 import { OnDestroyCallback } from './state/onDestroy';
 import { TagSubject } from './subject.types';
 import { OnInitCallback } from './state/onInit';
-import { Subscription } from './subject/Subject.utils';
+import { Subscription } from './subject/subject.utils';
 import { InsertBefore } from './interpolations/Clones.type';
 import { TagValues } from './tag/html';
 export type OriginalFunction = (() => Tag) & {
