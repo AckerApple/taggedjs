@@ -1,9 +1,9 @@
-import { hasTagSupportChanged } from './hasTagSupportChanged.function';
-import { processSubjectComponent } from './processSubjectComponent.function';
+import { hasTagSupportChanged } from './tag/hasTagSupportChanged.function';
+import { processSubjectComponent } from './tag/update/processSubjectComponent.function';
 import { destroyTagMemory } from './destroyTag.function';
 import { renderTagSupport } from './renderTagSupport.function';
 import { callbackPropOwner } from './alterProps.function';
-import { isLikeTags } from './isLikeTags.function';
+import { isLikeTags } from './tag/isLikeTags.function';
 export function updateExistingTagComponent(ownerSupport, tagSupport, // lastest
 subject, insertBefore) {
     let lastSupport = subject.tagSupport?.global.newest; // || subject.tagSupport

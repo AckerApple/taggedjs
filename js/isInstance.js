@@ -1,5 +1,5 @@
 export function isTagComponent(value) {
-    return value?.wrapper?.original instanceof Function;
+    return value?.wrapper?.parentWrap.original instanceof Function;
 }
 export function isTag(value) {
     return isTagTemplater(value) || isTagClass(value);
@@ -12,6 +12,7 @@ export function isTagClass(value) {
     const templater = value;
     return templater?.isTagClass === true;
 }
+// isSubjectLike
 export function isSubjectInstance(subject) {
     return (subject?.isSubject === true || subject?.subscribe) ? true : false; // subject?.isSubject === true || 
 }

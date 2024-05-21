@@ -1,5 +1,5 @@
 import { Props } from "./Props";
-import { BaseTagSupport } from "./TagSupport.class";
+import { BaseTagSupport } from "./tag/TagSupport.class";
 import { TemplaterResult } from "./TemplaterResult.class";
 export declare function hasTagSupportChanged(oldTagSupport: BaseTagSupport, newTagSupport: BaseTagSupport, newTemplater: TemplaterResult): number | false;
 export declare function hasPropChanges(props: Props, // natural props

@@ -4,9 +4,9 @@ import { Clones, InsertBefore } from './Clones.type';
 import { Counts } from './interpolations/interpolateTemplate';
 import { DisplaySubject, TagSubject } from './subject.types';
 import { ValueSubject } from './subject/ValueSubject';
-import { RegularValue } from './processRegularValue.function';
+import { RegularValue } from './tag/update/processRegularValue.function';
 import { Callback } from './interpolations/bindSubjectCallback.function';
-import { TagSupport } from './TagSupport.class';
+import { TagSupport } from './tag/TagSupport.class';
 import { Tag } from './Tag.class';
 import { Subject } from './subject';
 type processOptions = {

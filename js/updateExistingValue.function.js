@@ -1,15 +1,15 @@
-import { TagSupport } from './TagSupport.class';
+import { TagSupport } from './tag/TagSupport.class';
 import { TemplaterResult } from './TemplaterResult.class';
 import { isSubjectInstance, isTagArray, isTagClass, isTagComponent, isTagTemplater } from './isInstance';
-import { processTagArray } from './processTagArray';
+import { processTagArray } from './tag/update/processTagArray';
 import { updateExistingTagComponent } from './updateExistingTagComponent.function';
-import { processRegularValue } from './processRegularValue.function';
+import { processRegularValue } from './tag/update/processRegularValue.function';
 import { checkDestroyPrevious } from './checkDestroyPrevious.function';
 import { ValueSubject } from './subject/ValueSubject';
-import { processSubjectComponent } from './processSubjectComponent.function';
-import { isLikeTags } from './isLikeTags.function';
+import { processSubjectComponent } from './tag/update/processSubjectComponent.function';
+import { isLikeTags } from './tag/isLikeTags.function';
 import { bindSubjectCallback } from './interpolations/bindSubjectCallback.function';
-import { setupNewTemplater, getFakeTemplater, processTag } from './processTag.function';
+import { setupNewTemplater, getFakeTemplater, processTag } from './tag/update/processTag.function';
 import { insertAfter } from './insertAfter.function';
 export function updateExistingValue(subject, value, ownerSupport, insertBefore) {
     const subjectTag = subject;

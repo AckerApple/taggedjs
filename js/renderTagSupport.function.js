@@ -1,5 +1,5 @@
 import { deepEqual } from './deepFunctions';
-import { renderExistingTag } from './renderExistingTag.function';
+import { renderExistingTag } from './tag/render/renderExistingTag.function';
 /** Main function used by all other callers to render/update display of a tag component */
 export function renderTagSupport(tagSupport, // must be latest/newest state render
 renderUp) {

@@ -1,7 +1,7 @@
-import { processSubjectComponent } from './processSubjectComponent.function';
+import { processSubjectComponent } from './tag/update/processSubjectComponent.function';
 import { isTagArray, isTagClass, isTagComponent, isTagTemplater } from './isInstance';
 import { processTagArray } from './processTagArray';
-import { processRegularValue } from './processRegularValue.function';
+import { processRegularValue } from './tag/update/processRegularValue.function';
 import { processTag, tagFakeTemplater } from './processTag.function';
 var ValueTypes;
 (function (ValueTypes) {

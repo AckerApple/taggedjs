@@ -1,3 +1,6 @@
+import { isSubjectInstance } from "../isInstance";
+import { combineLatest } from "./combineLatest.function";
+import { getSubscription, runPipedMethods } from "./subject.utils";
 export class Subject {
     value;
     onSubscription;
@@ -25,7 +28,9 @@ export class Subject {
             return subscribeWith(callback);
         }
         this.subscribers.push(subscription);
-        SubjectClass.globalSubs.push(subscription); // 🔬 testing
+        // Subject.globalSubs.push(subscription) // 🔬 testing
+        const count = Subject.globalSubCount$.value;
+        Subject.globalSubCount$.set(count + 1); // 🔬 testing
         if (this.onSubscription) {
             this.onSubscription(subscription);
         }
@@ -39,6 +44,7 @@ export class Subject {
             sub.callback(value, sub);
         });
     }
+    // next() is available for rxjs compatibility
     next = this.set;
     toPromise() {
         return new Promise((res, rej) => {
@@ -62,59 +68,29 @@ export class Subject {
         subject.subscribeWith = (x) => this.subscribe(x);
         return subject;
     }
-}
-function removeSubFromArray(subscribers, callback) {
-    const index = subscribers.findIndex(sub => sub.callback === callback);
-    if (index !== -1) {
-        subscribers.splice(index, 1);
+    static all(args) {
+        const switched = args.map(arg => {
+            if (isSubjectInstance(arg))
+                return arg;
+            // Call the callback immediately with the current value
+            const x = new Subject(arg, subscription => {
+                subscription.next(arg);
+                return subscription;
+            });
+            return x;
+        });
+        return combineLatest(switched);
     }
+    static globalSubCount$ = new Subject(0); // for ease of debugging
 }
-const SubjectClass = Subject;
-SubjectClass.globalSubs = []; // 🔬 for testing
-SubjectClass.globalSubCount$ = new Subject(); // for ease of debugging
-SubjectClass.globalSubCount$.set(0);
-function getSubscription(subject, callback) {
-    const countSubject = SubjectClass.globalSubCount$;
-    SubjectClass.globalSubCount$.set(countSubject.value + 1);
-    const subscription = () => {
-        subscription.unsubscribe();
-    };
-    subscription.callback = callback;
-    subscription.subscriptions = [];
-    // Return a function to unsubscribe from the BehaviorSubject
-    subscription.unsubscribe = () => {
-        removeSubFromArray(subject.subscribers, callback); // each will be called when update comes in
-        removeSubFromArray(SubjectClass.globalSubs, callback); // 🔬 testing
-        SubjectClass.globalSubCount$.set(countSubject.value - 1);
-        // any double unsubscribes will be ignored
-        subscription.unsubscribe = () => subscription;
-        // unsubscribe from any combined subjects
-        subscription.subscriptions.forEach(subscription => subscription.unsubscribe());
-        return subscription;
-    };
-    subscription.add = (sub) => {
-        subscription.subscriptions.push(sub);
-        return subscription;
-    };
-    subscription.next = (value) => {
-        callback(value, subscription);
-    };
-    return subscription;
+/*
+export const Subject = (<T>(value?: T, onSubscription?: OnSubscription<T>) => {
+  return new Subject(value, onSubscription)
+}) as (<T>(value?: T, onSubscription?: OnSubscription<T>) => Subject<T>) & {
+  globalSubCount$: Subject<number>
+  // globalSubs: Subscription<any>[]
+  all: <T>(...args: (T | Subject<T>)[]) => Subject<T>[]
 }
-function runPipedMethods(value, methods, onComplete) {
-    const cloneMethods = [...methods];
-    const firstMethod = cloneMethods.shift();
-    const next = (newValue) => {
-        if (cloneMethods.length) {
-            return runPipedMethods(newValue, cloneMethods, onComplete);
-        }
-        onComplete(newValue);
-        // return newValue = next
-    };
-    let handler = next;
-    const setHandler = (x) => handler = x;
-    const pipeUtils = { setHandler, next };
-    const methodResponse = firstMethod(value, pipeUtils);
-    handler(methodResponse);
-}
+*/
+// Subject.globalSubs = [] // 🔬 for testing
 //# sourceMappingURL=Subject.class.js.map

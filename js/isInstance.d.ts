@@ -1,5 +1,5 @@
-import { SubjectLike } from "./subject/Subject.utils";
-import { Tag } from "./Tag.class";
+import { SubjectLike } from "./subject/subject.utils";
+import { Tag } from "./tag/Tag.class";
 import { TemplaterResult } from "./TemplaterResult.class";
 export declare function isTagComponent(value?: TemplaterResult | unknown): boolean;
 export declare function isTag(value?: TemplaterResult | Tag | unknown): boolean;

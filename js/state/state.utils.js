@@ -15,21 +15,24 @@ setUse({
         const rearray = config.rearray;
         if (rearray.length) {
             if (rearray.length !== config.array.length) {
-                const message = `States lengths has changed ${rearray.length} !== ${config.array.length}. Typically occurs when a function is intended to be wrapped with a tag() call`;
+                const message = `States lengths have changed ${rearray.length} !== ${config.array.length}. State tracking requires the same amount of function calls every render. Typically this errors is thrown when a state like function call occurs only for certain conditions or when a function is intended to be wrapped with a tag() call`;
                 const wrapper = tagSupport.templater?.wrapper;
                 const details = {
                     oldStates: config.array,
                     newStates: config.rearray,
-                    tagFunction: wrapper.original,
+                    tagFunction: wrapper.parentWrap.original,
                 };
                 const error = new StateMismatchError(message, details);
                 console.warn(message, details);
                 throw error;
             }
         }
+        const cTagConfig = config.tagSupport;
         delete config.rearray; // clean up any previous runs
         delete config.tagSupport;
-        memory.state = config.array; // [...config.array]
+        memory.state.length = 0;
+        memory.state.push(...config.array);
+        // memory.state = config.array // [...config.array]
         memory.state.forEach(item => item.lastValue = getStateValue(item)); // set last values
         config.array = [];
     }
@@ -60,9 +63,11 @@ function initState(tagSupport) {
     const state = memory.state;
     const config = setUse.memory.stateConfig;
     // TODO: This guard may no longer be needed
+    /*
     if (config.rearray) {
-        checkStateMismatch(tagSupport, config, state);
+      checkStateMismatch(tagSupport, config, state)
     }
+    */
     config.rearray = [];
     if (state?.length) {
         state.forEach(state => getStateValue(state));
@@ -70,25 +75,34 @@ function initState(tagSupport) {
     }
     config.tagSupport = tagSupport;
 }
-function checkStateMismatch(tagSupport, config, state) {
-    const wrapper = tagSupport.templater?.wrapper;
-    const wasWrapper = config.tagSupport?.templater.wrapper;
-    const message = 'last state not cleared. Possibly in the middle of rendering one component and another is trying to render';
-    if (!wasWrapper) {
-        return; // its not a component or was not a component before
-    }
-    console.error(message, {
-        config,
-        tagFunction: wrapper.original,
-        wasInMiddleOf: wasWrapper.original,
-        state,
-        expectedClearArray: config.rearray,
-    });
-    throw new StateMismatchError(message, {
-        config,
-        tagFunction: wrapper.original,
-        state,
-        expectedClearArray: config.rearray,
-    });
+/*
+function checkStateMismatch(
+  tagSupport: BaseTagSupport,
+  config: Config,
+  state: State,
+) {
+  const wrapper = tagSupport.templater?.wrapper as Wrapper
+  const wasWrapper = config.tagSupport?.templater.wrapper as Wrapper
+  const message = 'last state not cleared. Possibly in the middle of rendering one component and another is trying to render'
+
+  if(!wasWrapper) {
+    return // its not a component or was not a component before
+  }
+
+  console.error(message, {
+    config,
+    tagFunction: wrapper.parentWrap.original,
+    wasInMiddleOf: wasWrapper.parentWrap.original,
+    state,
+    expectedClearArray: config.rearray,
+  })
+
+  throw new StateMismatchError(message, {
+    config,
+    tagFunction: wrapper.parentWrap.original,
+    state,
+    expectedClearArray: config.rearray,
+  })
 }
+*/
 //# sourceMappingURL=state.utils.js.map

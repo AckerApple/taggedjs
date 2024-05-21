@@ -1,7 +1,7 @@
 import { interpolateAttributes } from "./interpolateAttributes";
 import { interpolateToTemplates } from "./interpolations";
 import { interpolateContentTemplates } from "./interpolateContentTemplates";
-import { escapeSearch, variablePrefix } from "../Tag.class";
+import { escapeSearch, variablePrefix } from "../tag/Tag.class";
 /** Review elements within an element */
 export function interpolateElement(container, // element containing innerHTML to review interpolations
 context, // variables used to evaluate

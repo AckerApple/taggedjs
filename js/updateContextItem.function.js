@@ -1,5 +1,5 @@
 import { isSubjectInstance, isTagComponent } from './isInstance';
-import { TagSupport } from './TagSupport.class';
+import { TagSupport } from './tag/TagSupport.class';
 export function updateContextItem(context, variableName, value) {
     const subject = context[variableName];
     const tagSubject = subject;

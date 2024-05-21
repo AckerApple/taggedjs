@@ -1,4 +1,4 @@
-import { BaseTagSupport } from './TagSupport.class';
+import { BaseTagSupport } from './tag/TagSupport.class';
 import { runAfterRender, runBeforeRender } from './tagRunner';
 import { ValueSubject } from './subject/ValueSubject';
 const appElements = [];
