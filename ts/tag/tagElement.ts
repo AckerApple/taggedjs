@@ -10,8 +10,14 @@ const appElements: {
   element: Element
 }[] = []
 
+/**
+ * 
+ * @param app taggedjs tag
+ * @param element HTMLElement
+ * @param props object
+ * @returns 
+ */
 export function tagElement(
-  // app: TagComponent, // (...args: unknown[]) => TemplaterResult,
   app: TagMaker, // (...args: unknown[]) => TemplaterResult,
   element: HTMLElement | Element,
   props?: unknown,
@@ -28,7 +34,7 @@ export function tagElement(
   }
 
   // Create the app which returns [props, runOneTimeFunction]
-  const wrapper = (app as any)(props) as unknown as TemplaterResult
+  const wrapper = app(props) as unknown as TemplaterResult
 
   // have a function setup and call the tagWrapper with (props, {update, async, on})
   const tagSupport = runWrapper(wrapper)
@@ -79,8 +85,6 @@ export function runWrapper(
     templater,
     subject,
   ) as TagSupport
-  
-  // newSupport.ownerTagSupport = newSupport
 
   subject.set( templater )
   

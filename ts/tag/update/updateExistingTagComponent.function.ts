@@ -144,7 +144,6 @@ function syncFunctionProps(
   lastSupport: TagSupport,
   ownerSupport: TagSupport,
   newPropsArray: any[],
-  // oldProps: Record<string, any>,
 ) {
   lastSupport = lastSupport.global.newest || lastSupport as TagSupport
   const priorPropConfig = lastSupport.propsConfig
