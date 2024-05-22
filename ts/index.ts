@@ -23,3 +23,5 @@ export const hmr = {
   tagElement, renderWithSupport, renderTagSupport,
   renderTagOnly,
 }
+
+export { Wrapper } from './TemplaterResult.class'
