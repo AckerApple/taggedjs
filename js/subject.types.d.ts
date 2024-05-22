@@ -9,10 +9,9 @@ export type WasTagSubject = Subject<TemplaterResult> & {
 export type TagSubject = Subject<TemplaterResult> & {
     tagSupport: TagSupport;
 };
-type RegularValue = string | number | boolean;
+export type RegularValue = string | number | boolean;
 export type DisplaySubject = Subject<RegularValue> & {
     lastValue?: RegularValue;
     clone?: Element | Text | Template;
     insertBefore: InsertBefore;
 };
-export {};
