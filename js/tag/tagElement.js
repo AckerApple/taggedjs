@@ -2,9 +2,14 @@ import { BaseTagSupport } from './TagSupport.class';
 import { runAfterRender, runBeforeRender } from './tagRunner';
 import { ValueSubject } from '../subject/ValueSubject';
 const appElements = [];
-export function tagElement(
-// app: TagComponent, // (...args: unknown[]) => TemplaterResult,
-app, // (...args: unknown[]) => TemplaterResult,
+/**
+ *
+ * @param app taggedjs tag
+ * @param element HTMLElement
+ * @param props object
+ * @returns
+ */
+export function tagElement(app, // (...args: unknown[]) => TemplaterResult,
 element, props) {
     const appElmIndex = appElements.findIndex(appElm => appElm.element === element);
     if (appElmIndex >= 0) {
@@ -47,7 +52,6 @@ export function runWrapper(templater) {
     let newSupport = {};
     const subject = new ValueSubject(newSupport);
     newSupport = new BaseTagSupport(templater, subject);
-    // newSupport.ownerTagSupport = newSupport
     subject.set(templater);
     subject.tagSupport = newSupport;
     runBeforeRender(newSupport, undefined);

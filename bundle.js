@@ -3472,9 +3472,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const appElements = [];
-function tagElement(
-// app: TagComponent, // (...args: unknown[]) => TemplaterResult,
-app, // (...args: unknown[]) => TemplaterResult,
+/**
+ *
+ * @param app taggedjs tag
+ * @param element HTMLElement
+ * @param props object
+ * @returns
+ */
+function tagElement(app, // (...args: unknown[]) => TemplaterResult,
 element, props) {
     const appElmIndex = appElements.findIndex(appElm => appElm.element === element);
     if (appElmIndex >= 0) {
@@ -3517,7 +3522,6 @@ function runWrapper(templater) {
     let newSupport = {};
     const subject = new _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_2__.ValueSubject(newSupport);
     newSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.BaseTagSupport(templater, subject);
-    // newSupport.ownerTagSupport = newSupport
     subject.set(templater);
     subject.tagSupport = newSupport;
     (0,_tagRunner__WEBPACK_IMPORTED_MODULE_1__.runBeforeRender)(newSupport, undefined);
