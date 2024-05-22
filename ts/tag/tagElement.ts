@@ -41,7 +41,11 @@ export function tagElement(
   const templateElm = document.createElement('template')
   templateElm.setAttribute('id', 'app-tag-' + appElements.length)
   templateElm.setAttribute('app-tag-detail', appElements.length.toString())
-  element.appendChild(templateElm)
+  
+  const fragment = document.createDocumentFragment()
+  fragment.appendChild(templateElm)
+  // element.appendChild(templateElm)
+
   ;(element as any).destroy = async () => {
     await tagSupport.destroy()
     const insertBefore = tagSupport.global.insertBefore as Element
@@ -57,6 +61,7 @@ export function tagElement(
   ;(element as any).setUse = (app as any).original.setUse
 
   appElements.push({element, tagSupport})
+  element.appendChild(fragment)
 
   return {
     tagSupport,
@@ -74,6 +79,8 @@ export function runWrapper(
     templater,
     subject,
   ) as TagSupport
+  
+  // newSupport.ownerTagSupport = newSupport
 
   subject.set( templater )
   

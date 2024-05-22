@@ -6,36 +6,36 @@ import { TagSubject } from '../../subject.types'
 import { Wrapper } from '../../TemplaterResult.class'
 
 export function renderTagOnly(
-  tagSupport: TagSupport, // new
+  newTagSupport: TagSupport,
   lastSupport: TagSupport | undefined,
   subject: TagSubject,
   ownerSupport?: TagSupport,
 ): TagSupport {
-  const oldRenderCount = tagSupport.global.renderCount
+  const oldRenderCount = newTagSupport.global.renderCount
 
-  beforeWithRender(tagSupport, ownerSupport, lastSupport)
+  beforeWithRender(newTagSupport, ownerSupport, lastSupport)
   
-  const templater = tagSupport.templater
+  const templater = newTagSupport.templater
 
   // NEW TAG CREATED HERE
   const wrapper = templater.wrapper as Wrapper
-  let reSupport = wrapper(tagSupport, subject)
+  let reSupport = wrapper(newTagSupport, subject)
   /* AFTER */
 
-  runAfterRender(tagSupport, ownerSupport)
+  runAfterRender(newTagSupport, ownerSupport)
 
   // When we rendered, only 1 render should have taken place OTHERWISE rendering caused another render and that is the latest instead
   if(reSupport.global.renderCount > oldRenderCount + 1) {
-    return tagSupport.global.newest as TagSupport
+    return newTagSupport.global.newest as TagSupport
   }
   
-  tagSupport.global.newest = reSupport
+  newTagSupport.global.newest = reSupport
 
   return reSupport
 }
 
 function beforeWithRender(
-  tagSupport: BaseTagSupport,
+  tagSupport: BaseTagSupport, // new
   ownerSupport?: TagSupport,
   lastSupport?: TagSupport,
 ) {
@@ -45,6 +45,8 @@ function beforeWithRender(
   if(lastSupport) {
     const lastState = lastSupport.memory.state
     const memory = tagSupport.memory
+    // memory.state.length = 0
+    // memory.state.push(...lastState)
     memory.state = [...lastState]
     tagSupport.global = lastSupport.global
 

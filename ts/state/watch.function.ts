@@ -1,30 +1,45 @@
-import { Subject } from '../subject'
+import { Subject, ValueSubject } from '../subject'
+import { TagSupport } from '../tag/TagSupport.class'
+import { getSupportInCycle } from '../tag/getSupportInCycle.function'
+import { setUse } from './setUse.function'
 import { state } from './state.function'
+import { syncStates } from './syncStates.function'
 
 export type WatchCallback<T> = (
   currentValues: any[],
   previousValues: any[] | undefined // first run this is undefined
 ) => T | ((currentValues: any[]) => T) | (() => T)
 
+type WatchOperators<T> = {
+  setup: WatchSetup<T>,
+  /** When an item in watch array changes, callback function will be triggered. Does not trigger on initial watch setup. */
+  noInit: (<T>(
+    currentValues: any[],
+    callback: WatchCallback<T>
+  ) => T | undefined) & MasterWatch<T>
+  
+  /** When an item in watch array changes, callback function will be triggered */
+  asSubject: (<T>(
+    currentValues: any[],
+    callback: WatchCallback<T>
+  ) => Subject<T>) & MasterWatch<T>
+  
+  /** When an item in watch array changes and all values are truthy then callback function will be triggered */
+  truthy: (<T>(
+    currentValues: any[],
+    callback: WatchCallback<T>
+  ) => T | undefined) & MasterWatch<T>
+}
 
 type WatchResult<T> = ((
   currentValues: any[],
   callback: WatchCallback<T>
-) => T) & {
-  setup: WatchSetup<T>,
-  noInit: (
-    currentValues: any[],
-    callback: WatchCallback<T>
-  ) => T | undefined,
-  asSubject: (
-    currentValues: any[],
-    callback: WatchCallback<T>
-  ) => Subject<T>
-  truthy: (
-    currentValues: any[],
-    callback: WatchCallback<T>
-  ) => T | undefined
-}
+) => T) & WatchOperators<T>
+
+type MasterWatch<T> = ((
+  currentValues: any[],
+  callback: WatchCallback<T>
+) => T) & WatchOperators<T>
 
 /**
  * When an item in watch array changes, callback function will be triggered. Triggers on initial watch setup. TIP: try watch.noInit()
@@ -32,36 +47,12 @@ type WatchResult<T> = ((
  * @param callback WatchCallback
  * @returns T[]
  */
-export const watch = <T>(
+export const watch = (<T>(
   currentValues: any[],
   callback: WatchCallback<T>
 ): T => {
   return setupWatch(currentValues, callback)
-}
-
-/** When an item in watch array changes, callback function will be triggered. Does not trigger on initial watch setup. */
-watch.noInit = <T>(
-  currentValues: any[],
-  callback: WatchCallback<T>
-): T | undefined => {
-  return undefined // this is a fake function... See defineProperty(watch)
-}
-
-/** When an item in watch array changes and all values are truthy then callback function will be triggered */
-watch.truthy = <T>(
-  currentValues: any[],
-  callback: WatchCallback<T>
-): Subject<T> => {
-  return undefined as any // this is a fake function... See defineProperty(watch)
-}
-
-/** When an item in watch array changes, callback function will be triggered */
-watch.asSubject = <T>(
-  currentValues: any[],
-  callback: WatchCallback<T>
-): Subject<T> => {
-  return undefined as any // this is a fake function... See defineProperty(watch)
-}
+}) as MasterWatch<any>
 
 const defaultFinally = <T>(x: T) => x
 
@@ -88,7 +79,13 @@ function newWatch<T, R>(
   return method as any
 }
 
-/** puts above functionality together */
+/**
+ * puts above functionality together
+ * @param currentValues values being watched
+ * @param callback (currentValue, previousValues) => resolveToValue
+ * @param param2 
+ * @returns 
+ */
 const setupWatch = <T, R>(
   currentValues: any[],
   callback: WatchCallback<T>,
@@ -139,10 +136,10 @@ const setupWatch = <T, R>(
   return previous.pastResult
 }
 
-function defineOnMethod(
+function defineOnMethod<R>(
   getWatch: () => WatchResult<unknown>,
-  attachTo: any
-) {  
+  attachTo: R
+): R {  
   Object.defineProperty(attachTo, 'noInit', {
     get() {
       const watch = getWatch()
@@ -153,13 +150,60 @@ function defineOnMethod(
 
   Object.defineProperty(attachTo, 'asSubject', {
     get() {
-      const watch = getWatch()
+      const oldWatch = getWatch()
+      
+      const method = <T>(
+        currentValues: any[],
+        callback: WatchCallback<T>  
+      ) => {
+        const originalState = state(() => (getSupportInCycle() as TagSupport).memory.state)
+        const subject = state(() => new ValueSubject<any>(undefined))
+        
+        setupWatch(
+          currentValues,
+          (currentValues, previousValues) => {
+            const setTo = callback(currentValues, previousValues)
+            
+            if(originalState.length) {
+              const newestState = setUse.memory.stateConfig.array
+              syncStates(
+                newestState,
+                originalState,
+              )
+            }
+
+            subject.set( setTo )
+          },
+          oldWatch.setup
+        )
+
+        return subject
+      }
+
+      method.setup = oldWatch.setup
+
+      defineOnMethod(() => method as any, method)
+      
+      return method
+      /*
+      method.setup = setup
+    
+      defineOnMethod(() => method as any, method)
+      
+      return method as any
+
+      
+      const oldWatch = getWatch()
+      const watch = newWatch( oldWatch.setup )
+      // const watch = getWatch()
+      
       const subject = state(() => new Subject())
       watch.setup.final = (x: any) => {
         subject.set(x)
         return subject
       }
       return watch
+      */
     },
   })
 
@@ -170,6 +214,8 @@ function defineOnMethod(
       return watch
     },
   })
+
+  return attachTo
 }
 
 defineOnMethod(() => newWatch({}), watch)

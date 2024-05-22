@@ -5,13 +5,13 @@ import { TagSubject, WasTagSubject } from '../../subject.types'
 import { renderTagOnly } from './renderTagOnly.function'
 
 export function renderWithSupport(
-  tagSupport: TagSupport,
+  newTagSupport: TagSupport,
   lastSupport: TagSupport | undefined, // previous
   subject: TagSubject, // events & memory
   ownerSupport?: TagSupport, // who to report to
 ): TagSupport {
   const reSupport = renderTagOnly(
-    tagSupport, lastSupport, subject, ownerSupport,
+    newTagSupport, lastSupport, subject, ownerSupport,
   )
 
   const isLikeTag = !lastSupport || isLikeTags(lastSupport, reSupport)

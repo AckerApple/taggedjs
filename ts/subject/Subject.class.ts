@@ -1,6 +1,9 @@
-import { Handler, OperatorFunction, SubjectLike, SubjectSubscriber, Subscription, setHandler } from "./Subject.utils"
+import { isSubjectInstance } from "../isInstance"
+import { ValueSubject } from "./ValueSubject"
+import { combineLatest } from "./combineLatest.function"
+import { OperatorFunction, SubjectLike, SubjectSubscriber, Subscription, getSubscription, runPipedMethods } from "./subject.utils"
 
-type OnSubscription<T> = (subscription: Subscription<T>) => unknown
+export type OnSubscription<T> = (subscription: Subscription<T>) => unknown
 
 export class Subject<T> implements SubjectLike<T> {
   methods: OperatorFunction<any, any, any>[] = []
@@ -39,7 +42,9 @@ export class Subject<T> implements SubjectLike<T> {
     }
 
     this.subscribers.push(subscription)
-    SubjectClass.globalSubs.push(subscription) // 🔬 testing
+    // Subject.globalSubs.push(subscription) // 🔬 testing
+    const count = Subject.globalSubCount$.value as number
+    Subject.globalSubCount$.set(count + 1) // 🔬 testing
     
     if(this.onSubscription) {
       this.onSubscription(subscription)
@@ -57,6 +62,7 @@ export class Subject<T> implements SubjectLike<T> {
       sub.callback(value, sub)
     })
   }
+  // next() is available for rxjs compatibility
   next = this.set
 
   toPromise(): Promise<T> {
@@ -151,89 +157,28 @@ export class Subject<T> implements SubjectLike<T> {
     subject.subscribeWith = (x) => this.subscribe(x as any)
     return subject
   }
-}
 
-function removeSubFromArray(
-  subscribers: Subscription<any>[],
-  callback: SubjectSubscriber<any>,
-) {
-  const index = subscribers.findIndex(sub => sub.callback === callback)
-  if (index !== -1) {
-    subscribers.splice(index, 1)
-  }
-}
+  static all<A, B, C, D, E, F>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D, Subject<E> | E, Subject<F> | F]): Subject<[A,B,C,D,E,F]>
+  static all<A, B, C, D, E>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D, Subject<E> | E]): Subject<[A,B,C,D,E]>
+  static all<A, B, C, D>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D]): Subject<[A,B,C,D]>
+  static all<A, B, C>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C]): Subject<[A,B,C]>
+  static all<A, B>(args: [Subject<A> | A, Subject<B> | B]): Subject<[A,B]>
+  static all<A>(args: [Subject<A> | A]): Subject<[A]>
+  static all(args: any[]): Subject<any> {
+    const switched = args.map(arg => {
+      if(isSubjectInstance(arg)) return arg;
 
-const SubjectClass = Subject as typeof Subject & {
-  globalSubCount$: Subject<number>
-  globalSubs: Subscription<any>[]
-}
-SubjectClass.globalSubs = [] // 🔬 for testing
-SubjectClass.globalSubCount$ = new Subject() // for ease of debugging
-SubjectClass.globalSubCount$.set(0)
+      // Call the callback immediately with the current value
+      const x = new Subject(arg, subscription => {
+        subscription.next(arg)
+        return subscription    
+      })
 
-function getSubscription<T>(
-  subject: Subject<T>,
-  callback: SubjectSubscriber<any>
-) {
-  const countSubject = SubjectClass.globalSubCount$ as {value: number}
-  SubjectClass.globalSubCount$.set( countSubject.value + 1 )
+      return x
+    })
 
-  const subscription: Subscription<any> = () => {
-    subscription.unsubscribe()
+    return combineLatest(switched as Subject<any>[]) as any
   }
 
-  subscription.callback = callback
-  subscription.subscriptions = []
-
-  // Return a function to unsubscribe from the BehaviorSubject
-  subscription.unsubscribe = () => {
-    removeSubFromArray(subject.subscribers, callback) // each will be called when update comes in
-    removeSubFromArray(SubjectClass.globalSubs, callback) // 🔬 testing
-    SubjectClass.globalSubCount$.set( countSubject.value - 1 )
-    
-    // any double unsubscribes will be ignored
-    subscription.unsubscribe = () => subscription
-
-    // unsubscribe from any combined subjects
-    subscription.subscriptions.forEach(subscription => subscription.unsubscribe())
-    
-    return subscription
-  }
-
-  subscription.add = (sub: Subscription<T>) => {
-    subscription.subscriptions.push( sub )
-    return subscription
-  }
-
-  subscription.next = (value: any) => {
-    callback(value, subscription)
-  }
-
-  return subscription
-}
-
-function runPipedMethods(
-  value: any,
-  methods: OperatorFunction<any, any, any>[],
-  onComplete: (lastValue: any) => any
-) {
-  const cloneMethods = [...methods]
-  
-  const firstMethod = cloneMethods.shift() as OperatorFunction<any, any, any>
-
-  const next = (newValue: any) => {
-    if(cloneMethods.length) {
-      return runPipedMethods(newValue, cloneMethods, onComplete)
-    }
-
-    onComplete(newValue)
-    // return newValue = next
-  }
-
-  let handler: Handler<any> = next
-
-  const setHandler: setHandler<any> = (x: Handler<any>) => handler = x
-  const pipeUtils = {setHandler, next}
-  const methodResponse = firstMethod(value, pipeUtils)
-  handler(methodResponse)
+  static globalSubCount$ = new Subject<number>(0) // for ease of debugging
 }

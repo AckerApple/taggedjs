@@ -59,7 +59,9 @@ function shareTemplaterGlobal(
     const newest = oldTagSupport.global.newest as TagSupport
     if(newest) {
       const prevState = newest.memory.state
-      tagSupport.memory.state = [...prevState]
+      tagSupport.memory.state.length = 0
+      tagSupport.memory.state.push(...prevState)
+      // tagSupport.memory.state = [...prevState]
     }
   }
 }

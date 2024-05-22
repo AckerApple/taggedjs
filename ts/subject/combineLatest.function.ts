@@ -1,5 +1,5 @@
 import { Subject } from "./Subject.class"
-import { SubjectSubscriber, Subscription } from "./Subject.utils"
+import { SubjectSubscriber, Subscription } from "./subject.utils"
 
 export function combineLatest(
   subjects: Subject<any>[],
@@ -14,10 +14,20 @@ export function combineLatest(
     const setValue = (x: any, index: number) => {
       valuesSeen[index] = true
       values[index] = x
+      const countMatched = valuesSeen.length === subjects.length
 
-      if(valuesSeen.length === subjects.length && valuesSeen.every(x => x)) {
-        callback(values, subscription)
+      if(!countMatched) {
+        return
       }
+
+      for (let index = valuesSeen.length - 1; index >= 0; --index) {
+        if(!valuesSeen[index]) {
+          return
+        }
+      }
+
+      // everyone has reported values
+      callback(values, subscription)
     }
 
     const clones = [...subjects]

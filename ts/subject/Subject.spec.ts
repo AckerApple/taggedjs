@@ -1,5 +1,5 @@
 import { Subject } from "./Subject.class"
-import { Resolve, Subscription } from "./Subject.utils"
+import { Resolve, Subscription } from "./subject.utils"
 import { combineLatest } from "./combineLatest.function"
 import { willCallback, willPromise, willSubscribe } from "./will.functions"
 
@@ -240,6 +240,53 @@ describe('Subject', () => {
         x => {
           expect(x).toBeDefined()
           expect(x.length).toBe(2)
+          ++z
+          return 33
+        }
+      )
+  
+      let y: number = 0
+      let z: number = 0
+      combined.subscribe(x => y = x)
+  
+      subject1.set(1)
+      subject2.set(2)
+  
+      expect(y).toBe(33)
+      expect(z).toBe(1)
+    })
+  })
+
+  describe('Subject.all', () => {
+    it('basic', () => {
+      const subject1 = new Subject(0)
+      const subject2 = new Subject(0)
+  
+      const combined = Subject.all([
+        subject1, subject2, 'something-else'
+      ])
+  
+      let y = [0,0] as (string | number)[]
+      combined.subscribe(x => y = x)
+  
+      subject1.set(1)
+      subject2.set(2)
+  
+      expect(y[0]).toBe(1)
+      expect(y[1]).toBe(2)
+    })
+
+    it('complex', async () => {
+      const subject1 = new Subject(0)
+      const subject2 = new Subject(0)
+  
+      const combined = Subject.all([
+        subject1, subject2, 'something-else'
+      ]).pipe(
+        x => {
+          expect(x).toBeDefined()
+          expect(x.length).toBe(3)
+          expect(x[2]).toBe('something-else')
           ++z
           return 33
         }

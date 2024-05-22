@@ -1,17 +1,10 @@
 ### TODO NOW: Before Mega-aide
-- Perform subject children as
-  - ${tagCall({a,b,c}).html``}
-- allow multiple arguments
-  - ${dump(value, options)}
 - Remove the destroy call that gets added on tagElement
   - its used for HMR
-- HTML Tables
 - routing
-- Upgrade state to support both named and array state memory
+- ? Upgrade state to support both named and array state memory
   - helps with HMR
   - Can fix `state mismatch` error
-- Test tag switch ${ trueFalse ? tagOne() : tagTwo() }
-- All logging must go through subscriptions
 - Production mode
   - Remove guards like state checks
 
@@ -21,14 +14,11 @@
   - html`...${subscribe(directory$, directory => {})}`
   - html`...${async(directoryPromise, directory => {})}`
 
-### Extra testing
-- Test switching a components return string
-  - return x ? html`.0.` : html`.1.`
-
 ### Before wider audience
-- remove console.errors
+- All logging must go through subscriptions
+  - we still have console.warn and console.error
   - maybe have a subject that emits logs?
-- Hot reloading
+- Hot reloading handle state changes better
 - How to load styles other than just inline & non-dynamic style tag that effects entire page
 - Ability to produce one time HTML files
   - Then rehydrate with actual JavaScript
@@ -41,23 +31,35 @@
 ## Documentations
 
 ### TaggedJs differences from React
-- Use ``` html`` ``` instead of `()` to define HTML content
-  - `() => (<div></div>)` - React (19 chars)
-  - ```() => html`<div></div>` ``` - TaggedJs (23 chars)
+
+In many cases, since TaggedJs is natively compatible with browser vanilla Javascript, React is a few characters less.
+
+- TaggedJs uses ``` html`` ``` instead of `()` to define HTML content
+  - `return (<div></div>)`
+  - ```return html`<div></div>` ```
 - Components render as `${component()}` instead of `<component />`
-  - `() => (<div><component /></div>)` - ReactJs (32 chars)
-  - ```() => html`<div>${component()}</div>` ``` - TaggedJs (37 chars)
+  - `return (<div><component /></div>)`
+  - ```return html`<div>${component()}</div>` ```
 - The boolean `true` will render to screen
 - Render template syntax is `${}` instead of `{}`
-  - `<div onclick={handler}></div>` - ReactJs (29 chars)
-  - `<div onclick=${handler}></div>` - TaggedJs (30 chars)
+  - `<div onclick={handler}></div>`
+  - `<div onclick=${handler}></div>`
+  - and
+  - `<div>{value}</div>`
+  - `<div>${value}</div>`
 - `className` is just `class`
-  - `<div className={'flex'}></div>` - React (30 chars)
-  - `<div class=${'flex'}></div>` - TaggedJs (27 chars)
+  - `<div className={'flex'}></div>`
+  - `<div class=${'flex'}></div>`
+
+### Children
+
 - innerHTML can be the 1st or 2nd argument
   - `<div>${component(html`<small>hello world</small>`)}</div>`
-  - `<div>${component({ x: y }, html`<small>hello world</small>`)}</div>`
+  - `<div>${component({ x: y }).html`<small>hello world</small>`}</div>`
   - The component always has fixed arguments for this of `component = (props, {children})`
+
+### Hooks
+
 - React has `useEffect(fn, [...watch])` and TaggedJs has `watch([...watch], fn)`
   
 
@@ -66,6 +68,7 @@
 - You can have multiple root elements in TaggedJs
   - You don't need `<></>`
   - In React this will fail `() => (<div>Hello</div><div>World</div>)
+    - Errors due to needing a master wrapping element
   - In TaggedJs this will work `() => html`<div>Hello</div><div>World</div>`
 - You can have components with single argument inputs:
   - instead of  `Hello <something x=3> World`

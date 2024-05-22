@@ -20,7 +20,6 @@ export type TagArraySubject = ValueSubject<Tag[]> & {
   insertBefore: InsertBefore // template tag
   placeholder?: Text // template tag
   lastArray?: LastArrayItem[] // previous array that may have been processed
-  isChildSubject?: boolean // present when children passed as prop0 or prop1
 }
 
 export function processTagArray(
@@ -177,14 +176,17 @@ function processAddTagArrayItem(
     removed: options.counts.removed,
   }
 
+  const fragment = document.createDocumentFragment()
   const newTempElm = document.createElement('template')
-  const parent = before.parentNode as ParentNode
-  parent.insertBefore(newTempElm, before)
+  fragment.appendChild(newTempElm)
 
   tagSupport.buildBeforeElement(
     newTempElm, // before,
     {counts, forceElement: options.forceElement}
   )
+
+  const parent = before.parentNode as ParentNode
+  parent.insertBefore(fragment, before)
 }
 
 /** compare two values. If both values are arrays then the items will be compared */

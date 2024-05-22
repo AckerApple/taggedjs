@@ -1,10 +1,9 @@
-import { Props } from './Props'
 import { TagSupport } from './tag/TagSupport.class'
 import { deepClone, deepEqual } from './deepFunctions'
 import { isTag } from './isInstance'
 import { renderTagSupport } from './tag/render/renderTagSupport.function'
 import { setUse } from './state'
-import { isInCycle } from './tag/tagRunner'
+import { getSupportInCycle } from './tag/getSupportInCycle.function'
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProps(
@@ -19,14 +18,13 @@ export function alterProps(
 }
 
 function resetFunctionProps(
-  props: any,
+  newProps: any,
   ownerSupport: TagSupport,
 ) {
-  if(typeof(props)!=='object' || !ownerSupport) {
-    return props
+  if(typeof(newProps)!=='object' || !ownerSupport) {
+    return newProps
   }
 
-  const newProps = props
   // BELOW: Do not clone because if first argument is object, the memory ref back is lost
   // const newProps = {...props} 
 
@@ -61,7 +59,7 @@ export function callbackPropOwner(
   ownerSupport: TagSupport,
 ) {
   // const renderCount = ownerSupport.global.renderCount
-  const cycle = isInCycle()
+  const cycle = getSupportInCycle()
 
   const result = toCall(...callWith)
   const run = () => {

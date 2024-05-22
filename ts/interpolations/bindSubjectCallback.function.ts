@@ -1,6 +1,5 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
-import { Tag } from "../tag/Tag.class"
 import { TagSupport } from "../tag/TagSupport.class"
 import { renderTagSupport } from "../tag/render/renderTagSupport.function"
 
@@ -31,15 +30,17 @@ export function runTagCallback(
   value: Callback,
   tagSupport: TagSupport,
   bindTo: unknown,
-  args: any[]
+  args: any[],
 ) {
-  const renderCount = tagSupport.global.renderCount
+  const myGlobal = tagSupport.global
+  const renderCount = myGlobal.renderCount
   const method = value.bind(bindTo)
   const callbackResult = method(...args)
-  const sameRenderCount = renderCount === tagSupport.global.renderCount
+  const sameRenderCount = renderCount === myGlobal.renderCount
+  const skipRender = !sameRenderCount || myGlobal.deleted
   
   // already rendered OR tag was deleted before event processing
-  if(!sameRenderCount || tagSupport.global.deleted) {
+  if(skipRender) {
     if(callbackResult instanceof Promise) {
       return callbackResult.then(() => {
         return 'promise-no-data-ever' // tag was deleted during event processing
@@ -49,24 +50,24 @@ export function runTagCallback(
   }
 
   const newest = renderTagSupport(
-    tagSupport.global.newest as TagSupport,
+    myGlobal.newest as TagSupport,
     true, // renderUp - callback may have changed props so also check to render up
   )
 
-  tagSupport.global.newest = newest
+  myGlobal.newest = newest
 
   if(callbackResult instanceof Promise) {
     return callbackResult.then(() => {
-      if(tagSupport.global.deleted) {
+      if(myGlobal.deleted) {
         return 'promise-no-data-ever' // tag was deleted during event processing
       }
 
       const newest = renderTagSupport(
-        tagSupport.global.newest as TagSupport,
+        myGlobal.newest as TagSupport,
         true,
       )
 
-      tagSupport.global.newest = newest
+      myGlobal.newest = newest
 
       return 'promise-no-data-ever'
     })

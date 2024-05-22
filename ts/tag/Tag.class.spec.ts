@@ -4,6 +4,7 @@ import { ValueSubject } from "../subject/ValueSubject"
 import { html } from "./html"
 import { TemplaterResult } from "../TemplaterResult.class"
 import { TagSubject } from "../subject.types"
+import { Props } from "../Props"
 
 describe('Tag.class', () => {
   it('simple update', () => {
@@ -64,10 +65,12 @@ function getTags(
 ) {
   const templater0 = {
     children: new ValueSubject<Tag[]>([]),
+    props: [] as Props,
   } as TemplaterResult
 
   const templater1 = {
     children: new ValueSubject<Tag[]>([]),
+    props: [] as Props,
   } as TemplaterResult
 
   const subject = new ValueSubject(templater0) as TagSubject

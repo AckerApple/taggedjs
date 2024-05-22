@@ -1,5 +1,5 @@
 import { Subject } from './Subject.class'
-import { SubjectSubscriber, Subscription } from './Subject.utils'
+import { SubjectSubscriber, Subscription } from './subject.utils'
 
 type ValueSubjectSubscriber<T> = (
   value: T,

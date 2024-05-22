@@ -3,17 +3,14 @@
 import { BaseTagSupport, TagSupport } from './TagSupport.class'
 import { setUse } from '../state'
 import { Subject } from '../subject'
+import { getSupportInCycle } from './getSupportInCycle.function'
 
 // Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
 setUse.memory.tagClosed$ = new Subject<TagSupport>(undefined, subscription => {
-  if( !isInCycle() ) {
+  if( !getSupportInCycle() ) {
     subscription.next() // we are not currently processing so process now
   }
 })
-
-export function isInCycle() {
-  return setUse.memory.stateConfig.tagSupport
-}
 
 // Life cycle 1
 export function runBeforeRender(

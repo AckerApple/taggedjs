@@ -6,10 +6,11 @@ import { Provider } from './state/providers'
 import { OnDestroyCallback } from './state/onDestroy'
 import { TagSubject, WasTagSubject } from './subject.types'
 import { OnInitCallback } from './state/onInit'
-import { Subscription } from './subject/Subject.utils'
+import { Subscription } from './subject/subject.utils'
 import { InsertBefore } from './interpolations/Clones.type'
 import { TagValues, html } from './tag/html'
 import { ValueSubject } from './subject'
+import { State } from './state'
 
 export type OriginalFunction = (() => Tag) & {compareTo: string}
 
@@ -58,15 +59,8 @@ export class TemplaterResult {
     strings: string[] | TemplateStringsArray,
     ...values: TagValues
   ) {
-    // this.children = html(strings, values) as any
-
-    // const children = html(strings, values)
     const children = new Tag(strings as string[], values)
     const { childSubject, madeSubject } = kidsToTagArraySubject(children)
-    ;(childSubject as any).isChildSubject = true
-    // ;(this.children as any).isChildSubject = true
-    
-    // this.children.set( childSubject.value )
     this.children = childSubject
     
     this.madeChildIntoSubject = madeSubject

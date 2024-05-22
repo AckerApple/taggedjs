@@ -6,7 +6,7 @@ import { InterpolateSubject, TemplateValue } from './processSubjectValue.functio
 import { TagArraySubject, processTagArray } from './processTagArray'
 import { updateExistingTagComponent } from './updateExistingTagComponent.function'
 import { RegularValue, processRegularValue } from './processRegularValue.function'
-import { checkDestroyPrevious } from '../checkDestroyPrevious.function'
+import { checkDestroyPrevious, restoreTagMarker } from '../checkDestroyPrevious.function'
 import { ValueSubject } from '../../subject/ValueSubject'
 import { processSubjectComponent } from './processSubjectComponent.function'
 import { isLikeTags } from '../isLikeTags.function'
@@ -14,7 +14,6 @@ import { Callback, bindSubjectCallback } from '../../interpolations/bindSubjectC
 import { setupNewTemplater, getFakeTemplater, processTag } from './processTag.function'
 import { InsertBefore } from '../../interpolations/Clones.type'
 import { Tag } from '../Tag.class'
-import { insertAfter } from '../../insertAfter.function'
 
 export function updateExistingValue(
   subject: InterpolateSubject,
@@ -209,13 +208,18 @@ function prepareUpdateToComponent(
   const prevSupport = subjectSup.global.newest
   if(prevSupport) {
     const newestState = prevSupport.memory.state
-    tagSupport.memory.state = [...newestState]
+    // tagSupport.memory.state = [...newestState]
+    tagSupport.memory.state.length = 0
+    tagSupport.memory.state.push(...newestState)
   } else {
+    restoreTagMarker(subjectSup)
+    /*
     const placeholder = subjectSup.global.placeholder
     if(placeholder && !insertBefore.parentNode) {
       insertAfter(insertBefore,placeholder)
       delete subjectSup.global.placeholder
     }
+    */
 
     processSubjectComponent(
       templater, subjectTag, insertBefore, ownerSupport,

@@ -1,4 +1,4 @@
-import { SubjectLike } from "./subject/Subject.utils"
+import { SubjectLike } from "./subject/subject.utils"
 import { Tag } from "./tag/Tag.class"
 import { TemplaterResult } from "./TemplaterResult.class"
 
@@ -28,6 +28,7 @@ export function isTagClass(
   return templater?.isTagClass === true
 }
 
+// isSubjectLike
 export function isSubjectInstance(
   subject?: SubjectLike<any> | any
 ): Boolean {

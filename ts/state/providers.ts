@@ -33,16 +33,15 @@ export const providers = {
   create: <T>(
     constructMethod: Construct<T>
   ): T => {
-    const cm = constructMethod as ConstructMethod<T>
-    const compareTo = cm.compareTo = cm.compareTo || cm.toString()
     const stateDiffMemory = state(() => ({stateDiff: 0, provider: undefined as any as Provider}))
 
+    // mimic how many states were called the first time
     if(stateDiffMemory.stateDiff) {
       for(let x = stateDiffMemory.stateDiff; x > 0; --x){
         state(undefined)
       }
       const result = state(undefined) as T
-      stateDiffMemory.provider.constructMethod.compareTo = compareTo
+      // stateDiffMemory.provider.constructMethod.compareTo = compareTo
       return result
     }
 
@@ -70,6 +69,9 @@ export const providers = {
       return instance
     })
 
+    const cm = constructMethod as ConstructMethod<T>
+    // const compareTo = cm.compareTo = cm.compareTo || cm.toString()
+    const compareTo = cm.compareTo = cm.toString()
     stateDiffMemory.provider.constructMethod.compareTo = compareTo
 
     return result

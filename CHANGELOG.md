@@ -1,7 +1,14 @@
 ## CHANGELOG
 
-### v2.6.0 - 5-2024
-- `watch()` fires on init. Use `watch.noInit()` if needed
+### v2.5.6 - 5-2024
+- `watch()` now fires on init. Use `watch.noInit()` if needed
+  - not considering breaking change due to no public audience
+- Added `watch.asSubject()`
+- Added `watch.noInit()`
+- Added `watch.truthy()`
+- Added `callback()`
+- Added optional state maker `const aTag = tag((...props...) => (...state...) => html)`
+- `setProp(x => [format, format = x])` is now `letProp(format)(x => [format, format = x])`
 
 ### v2.5.0 - 5-2024
 - Added HMR support

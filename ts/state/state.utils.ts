@@ -56,10 +56,13 @@ setUse({
       }
     }
     
+    const cTagConfig = config.tagSupport as any as TagSupport
     delete config.rearray // clean up any previous runs
     delete config.tagSupport
 
-    memory.state = config.array // [...config.array]
+    memory.state.length = 0
+    memory.state.push(...config.array)
+    // memory.state = config.array // [...config.array]
     memory.state.forEach(item => item.lastValue = getStateValue(item)) // set last values
     
     config.array = []
@@ -75,9 +78,7 @@ export function getStateValue<T>(
     return state.defaultValue
   }
 
-  const oldState = callback(StateEchoBack as any) // get value and set to undefined
-  const [oldValue] = oldState
-  const [checkValue] = callback( oldValue ) // set back to original value
+  const [value,checkValue] = getCallbackValue(callback)
 
   if(checkValue !== StateEchoBack) {
     const message = 'State property not used correctly. Second item in array is not setting value as expected.\n\n' +
@@ -85,14 +86,12 @@ export function getStateValue<T>(
     'For "const" state use `const name = state(default)()`\n\n' +
     'Problem state:\n' + (callback ? callback.toString() : JSON.stringify(state)) +'\n'
     
-    console.error(message, {state, callback, oldState, oldValue, checkValue})
+    console.error(message, {state, callback, value, checkValue})
     
     throw new Error(message)
   }
 
-  // state.lastValue = oldValue
-
-  return oldValue
+  return value
 }
 
 export class StateEchoBack {}
@@ -105,9 +104,11 @@ function initState(
   const config: Config = setUse.memory.stateConfig
   
   // TODO: This guard may no longer be needed
+  /*
   if (config.rearray) {
     checkStateMismatch(tagSupport, config, state)
   }
+  */
 
   config.rearray = []
   if(state?.length) {
@@ -118,6 +119,7 @@ function initState(
   config.tagSupport = tagSupport
 }
 
+/*
 function checkStateMismatch(
   tagSupport: BaseTagSupport,
   config: Config,
@@ -145,4 +147,14 @@ function checkStateMismatch(
     state,
     expectedClearArray: config.rearray,
   })
+}
+*/
+
+export function getCallbackValue<T>(
+  callback: StateConfig<T>
+): [T, T] {
+  const oldState = callback(StateEchoBack as any) // get value and set to undefined
+  const [value] = oldState
+  const [checkValue] = callback( value ) // set back to original value
+  return [value, checkValue]
 }

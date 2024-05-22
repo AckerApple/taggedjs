@@ -7,24 +7,19 @@ export function buildClones(
   const clones = []
   const template = temporary.children[0] as HTMLTemplateElement
   let nextSibling = template.content.firstChild
-  
+  const fragment = document.createDocumentFragment()
+    
   while (nextSibling) {
-    const nextNextSibling = nextSibling.nextSibling
-    buildSibling(nextSibling, insertBefore)
+    const nextNextSibling = nextSibling.nextSibling as ChildNode
     clones.push(nextSibling)
+    fragment.appendChild(nextSibling)
     nextSibling = nextNextSibling
   }
 
-  return clones
-}
+  if(insertBefore.parentNode) {
+    const parentNode = insertBefore.parentNode as ParentNode
+    parentNode.insertBefore(fragment, insertBefore)
+  }
 
-function buildSibling(
-  nextSibling: ChildNode,
-  insertBefore: InsertBefore,
-) {
-  const parentNode = insertBefore.parentNode as ParentNode
-  parentNode.insertBefore(
-    nextSibling,
-    insertBefore
-  )
+  return clones
 }

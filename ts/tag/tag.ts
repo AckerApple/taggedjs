@@ -132,11 +132,11 @@ function getTagWrap(
   result: TagWrapper<any>
 ): Wrapper {
   // this function gets called by taggedjs
-  const innerTagWrap = function(
-    oldTagSetup: TagSupport,
+  const wrapper = function(
+    newTagSupport: TagSupport,
     subject: TagSubject,
   ): TagSupport {
-    const global = oldTagSetup.global
+    const global = newTagSupport.global
     ++global.renderCount
         
     const childSubject = templater.children
@@ -151,7 +151,7 @@ function getTagWrap(
     let props = templater.props
     let castedProps = props.map(props => alterProps(
       props,
-      oldTagSetup.ownerTagSupport,
+      newTagSupport.ownerTagSupport,
     ))
     const latestCloned = props.map(props => deepClone(props)) // castedProps
 
@@ -167,7 +167,7 @@ function getTagWrap(
 
     const tagSupport = new TagSupport(
       templater,
-      oldTagSetup.ownerTagSupport,
+      newTagSupport.ownerTagSupport,
       subject,
       global.renderCount
     )
@@ -180,7 +180,7 @@ function getTagWrap(
       lastClonedKidValues: tagSupport.propsConfig.lastClonedKidValues,
     }
 
-    tagSupport.memory = oldTagSetup.memory // state handover
+    tagSupport.memory = newTagSupport.memory // state handover
 
     if( templater.madeChildIntoSubject ) {
       childSubject.value.forEach(kid => {
@@ -214,5 +214,5 @@ function getTagWrap(
     return tagSupport
   }
 
-  return innerTagWrap as Wrapper
+  return wrapper as Wrapper
 }

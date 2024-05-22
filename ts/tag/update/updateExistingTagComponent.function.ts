@@ -51,13 +51,11 @@ export function updateExistingTagComponent(
     if(!hasChanged) {
       // if the new props are an object then implicitly since no change, the old props are an object
       const newProps = templater.props
-      if(newProps && typeof(newProps)==='object') {
-        syncFunctionProps(
-          lastSupport,
-          ownerSupport,
-          newProps,
-        )
-      }    
+      syncFunctionProps(
+        lastSupport,
+        ownerSupport,
+        newProps, // resetProps,
+      )
 
       return lastSupport // its the same tag component
     }
@@ -145,29 +143,38 @@ function buildNewTag(
 function syncFunctionProps(
   lastSupport: TagSupport,
   ownerSupport: TagSupport,
-  newProps: Record<string, any>,
+  newPropsArray: any[],
   // oldProps: Record<string, any>,
 ) {
   lastSupport = lastSupport.global.newest || lastSupport as TagSupport
   const priorPropConfig = lastSupport.propsConfig
-  const priorProps = priorPropConfig.latestCloned as (Record<string, any>)[]
+  const priorPropsArray = priorPropConfig.latestCloned
   const prevSupport = ownerSupport.global.newest as TagSupport
 
-  priorProps.forEach((item) => {
-    Object.entries(item).forEach(([name, value]) => {
+  newPropsArray.forEach((argPosition, index) => {
+    if(typeof(argPosition) !== 'object') {
+      return
+    }
+
+    const priorProps = priorPropsArray[index] as Record<string, any>
+
+    if(typeof(priorProps) !== 'object') {
+      return
+    }
+
+    Object.entries(argPosition).forEach(([name, value]) => {
       if(!(value instanceof Function)) {
         return
       }
   
-      // TODO: The code below maybe irrelevant
-      const newCallback = newProps[name]
-      const original = newCallback.original
+      const newCallback = argPosition[name] // || value
+      const original = newCallback instanceof Function && newCallback.toCall
       if(original) {
         return // already previously converted
       }
   
       // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
-      item[name].toCall = (...args: any[]) => {
+      priorProps[name].toCall = (...args: any[]) => {
         return callbackPropOwner(
           newCallback, // value, // newOriginal,
           args,

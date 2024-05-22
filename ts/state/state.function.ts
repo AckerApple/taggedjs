@@ -1,5 +1,7 @@
+import { TagSupport } from '../tag/TagSupport.class'
 import { setUse } from './setUse.function'
 import { Config, StateConfig, State, StateConfigItem, getStateValue } from './state.utils'
+import { syncStates } from './syncStates.function'
 
 /** Used for variables that need to remain the same variable during render passes */
 export function state <T>(
@@ -28,6 +30,29 @@ export function state <T>(
   // State first time run
   const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue
   let initValue = defaultFn()
+
+  // the state is actually intended to be a function
+  if(initValue instanceof Function) {
+    const oldState = config.array
+    const tagSupport = config.tagSupport as TagSupport
+    const original = initValue
+    
+    initValue = ((...args: any[]) => {
+      const global = tagSupport.global
+      const newest = global.newest as TagSupport
+      const newState = newest.memory.state
+      
+      syncStates(newState, oldState)
+
+      const result = original(...args)
+      
+      syncStates(oldState, newState)
+      
+      return result
+    }) as any
+
+    ;(initValue as any).original = original
+  }
 
   getSetMethod = ((x: T) => [initValue, initValue = x])
   const push: StateConfigItem<T> = {
