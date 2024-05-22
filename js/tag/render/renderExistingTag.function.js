@@ -19,19 +19,6 @@ subject) {
         return prevSupport; // already rendered during triggered events
     }
     const toRedrawTag = prevSupport || lastSupport || global.oldest;
-    /*
-    if(oldestSupport === newSupport) {
-      newSupport = new TagSupport(
-        newSupport.templater,
-        newSupport.ownerTagSupport,
-        newSupport.subject,
-      )
-  
-      newSupport.memory = {...oldestSupport.memory}
-      newSupport.memory.state = [...oldestSupport.memory.state]
-      newSupport.global = oldestSupport.global
-    }
-    */
     const reSupport = renderWithSupport(newSupport, toRedrawTag, subject, ownerSupport);
     const oldest = global.oldest || oldestSupport;
     reSupport.global.oldest = oldest;

@@ -1,5 +1,5 @@
 import { OperatorFunction, SubjectLike, SubjectSubscriber, Subscription } from "./subject.utils";
-type OnSubscription<T> = (subscription: Subscription<T>) => unknown;
+export type OnSubscription<T> = (subscription: Subscription<T>) => unknown;
 export declare class Subject<T> implements SubjectLike<T> {
     value?: T | undefined;
     onSubscription?: OnSubscription<T> | undefined;
@@ -33,4 +33,3 @@ export declare class Subject<T> implements SubjectLike<T> {
     static all<A>(args: [Subject<A> | A]): Subject<[A]>;
     static globalSubCount$: Subject<number>;
 }
-export {};

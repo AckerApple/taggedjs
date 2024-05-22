@@ -7,15 +7,14 @@ setUse.memory.providerConfig = {
 };
 export const providers = {
     create: (constructMethod) => {
-        const cm = constructMethod;
-        const compareTo = cm.compareTo = cm.compareTo || cm.toString();
         const stateDiffMemory = state(() => ({ stateDiff: 0, provider: undefined }));
+        // mimic how many states were called the first time
         if (stateDiffMemory.stateDiff) {
             for (let x = stateDiffMemory.stateDiff; x > 0; --x) {
                 state(undefined);
             }
             const result = state(undefined);
-            stateDiffMemory.provider.constructMethod.compareTo = compareTo;
+            // stateDiffMemory.provider.constructMethod.compareTo = compareTo
             return result;
         }
         const result = state(() => {
@@ -37,6 +36,9 @@ export const providers = {
             stateDiffMemory.stateDiff = stateDiff;
             return instance;
         });
+        const cm = constructMethod;
+        // const compareTo = cm.compareTo = cm.compareTo || cm.toString()
+        const compareTo = cm.compareTo = cm.toString();
         stateDiffMemory.provider.constructMethod.compareTo = compareTo;
         return result;
     },

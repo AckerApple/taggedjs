@@ -24,7 +24,8 @@ element, props) {
     const templateElm = document.createElement('template');
     templateElm.setAttribute('id', 'app-tag-' + appElements.length);
     templateElm.setAttribute('app-tag-detail', appElements.length.toString());
-    element.appendChild(templateElm);
+    const fragment = document.createDocumentFragment();
+    fragment.appendChild(templateElm);
     element.destroy = async () => {
         await tagSupport.destroy();
         const insertBefore = tagSupport.global.insertBefore;
@@ -36,6 +37,7 @@ element, props) {
     tagSupport.global.newest = tagSupport;
     element.setUse = app.original.setUse;
     appElements.push({ element, tagSupport });
+    element.appendChild(fragment);
     return {
         tagSupport,
         tags: app.original.tags,

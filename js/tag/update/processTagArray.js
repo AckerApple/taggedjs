@@ -99,11 +99,13 @@ function processAddTagArrayItem(before, tagSupport, index, options, lastArray) {
         added: options.counts.added + index,
         removed: options.counts.removed,
     };
+    const fragment = document.createDocumentFragment();
     const newTempElm = document.createElement('template');
-    const parent = before.parentNode;
-    parent.insertBefore(newTempElm, before);
+    fragment.appendChild(newTempElm);
     tagSupport.buildBeforeElement(newTempElm, // before,
     { counts, forceElement: options.forceElement });
+    const parent = before.parentNode;
+    parent.insertBefore(fragment, before);
 }
 /** compare two values. If both values are arrays then the items will be compared */
 function areLikeValues(valueA, valueB) {

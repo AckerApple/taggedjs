@@ -48,14 +48,17 @@ function initMemory(tagSupport) {
 }
 function triggerStateUpdate(tagSupport, callback, oldState, ...args) {
     const state = tagSupport.memory.state;
-    // oldState = (tagSupport.global.oldest as TagSupport).memory.state
     // ensure that the oldest has the latest values first
     syncStates(state, oldState);
     // run the callback
     const maybePromise = callback(...args);
-    // const maybePromise = callback(...args as [any,any,any,any,any,any])
     // send the oldest state changes into the newest
     syncStates(oldState, state);
+    /*
+    if(tagSupport.global.deleted) {
+      return maybePromise // While running callback the tag was deleted. Often that happens
+    }
+    */
     renderTagSupport(tagSupport, false);
     if (maybePromise instanceof Promise) {
         maybePromise.finally(() => {

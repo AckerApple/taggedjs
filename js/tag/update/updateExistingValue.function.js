@@ -4,12 +4,11 @@ import { isSubjectInstance, isTagArray, isTagClass, isTagComponent, isTagTemplat
 import { processTagArray } from './processTagArray';
 import { updateExistingTagComponent } from './updateExistingTagComponent.function';
 import { processRegularValue } from './processRegularValue.function';
-import { checkDestroyPrevious } from '../checkDestroyPrevious.function';
+import { checkDestroyPrevious, restoreTagMarker } from '../checkDestroyPrevious.function';
 import { processSubjectComponent } from './processSubjectComponent.function';
 import { isLikeTags } from '../isLikeTags.function';
 import { bindSubjectCallback } from '../../interpolations/bindSubjectCallback.function';
 import { setupNewTemplater, getFakeTemplater, processTag } from './processTag.function';
-import { insertAfter } from '../../insertAfter.function';
 export function updateExistingValue(subject, value, ownerSupport, insertBefore) {
     const subjectTag = subject;
     const isComponent = isTagComponent(value);
@@ -115,11 +114,14 @@ function prepareUpdateToComponent(templater, subjectTag, insertBefore, ownerSupp
         tagSupport.memory.state.push(...newestState);
     }
     else {
-        const placeholder = subjectSup.global.placeholder;
-        if (placeholder && !insertBefore.parentNode) {
-            insertAfter(insertBefore, placeholder);
-            delete subjectSup.global.placeholder;
+        restoreTagMarker(subjectSup);
+        /*
+        const placeholder = subjectSup.global.placeholder
+        if(placeholder && !insertBefore.parentNode) {
+          insertAfter(insertBefore,placeholder)
+          delete subjectSup.global.placeholder
         }
+        */
         processSubjectComponent(templater, subjectTag, insertBefore, ownerSupport, {
             forceElement: true,
             counts: { added: 0, removed: 0 },

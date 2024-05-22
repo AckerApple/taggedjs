@@ -71,12 +71,6 @@ export class BaseTagSupport {
         global.newest = this;
         subject.tagSupport = this;
         this.hasLiveElements = true;
-        // remove old clones
-        if (this.clones.length) {
-            // this.destroyClones()
-            // this.clones.forEach(clone => this.checkCloneRemoval(clone, 0))
-        }
-        global.insertBefore = insertBefore;
         const context = this.update();
         const template = this.getTemplate();
         const isForceElement = options.forceElement;
@@ -162,12 +156,23 @@ export class TagSupport extends BaseTagSupport {
         stagger: 0,
         byParent: false, // Only destroy clones of direct children
     }) {
+        const firstDestroy = !options.byParent;
         const global = this.global;
         const subject = this.subject;
-        if (subject.clone) {
-            throw new Error('maybe issue here?');
+        const childTags = options.byParent ? [] : getChildTagsToDestroy(this.childTags);
+        if (firstDestroy && isTagComponent(this.templater)) {
+            runBeforeDestroy(this, this);
         }
-        // put back down the template tag
+        // signify immediately child has been deleted (looked for during event processing)
+        childTags.forEach(child => {
+            const subGlobal = child.global;
+            delete subGlobal.newest;
+            subGlobal.deleted = true;
+            if (isTagComponent(child.templater)) {
+                runBeforeDestroy(child, child);
+            }
+        });
+        // HTML DOM manipulation. Put back down the template tag
         const insertBefore = global.insertBefore;
         if (insertBefore.nodeName === 'TEMPLATE') {
             const placeholder = global.placeholder;
@@ -177,25 +182,12 @@ export class TagSupport extends BaseTagSupport {
                 }
             }
         }
-        // the isComponent check maybe able to be removed
-        const isComponent = isTagComponent(this.templater) ? true : false;
-        if (isComponent) {
-            runBeforeDestroy(this, this);
-        }
-        const childTags = options.byParent ? [] : getChildTagsToDestroy(this.childTags);
-        // signify that no further event rendering should take place by making logic think a render occurred during event
-        // signify immediately child has been deleted (looked for during event processing)
-        childTags.forEach(child => {
-            const subGlobal = child.global;
-            delete subGlobal.newest;
-            subGlobal.deleted = true;
-        });
         this.destroySubscriptions();
         let mainPromise;
         if (this.ownerTagSupport) {
             this.ownerTagSupport.childTags = this.ownerTagSupport.childTags.filter(child => child !== this);
         }
-        if (!options.byParent) {
+        if (firstDestroy) {
             const { stagger, promise } = this.destroyClones(options);
             options.stagger = stagger;
             if (promise) {
@@ -258,13 +250,6 @@ export class TagSupport extends BaseTagSupport {
         const next = () => {
             const parentNode = clone.parentNode;
             if (parentNode) {
-                /*
-                const stillHas = Array.from(parentNode.children).includes(clone as Element)
-                if(stillHas) {
-                  console.log('stillHas', {clone})
-                  parentNode.removeChild(clone)
-                }
-                */
                 parentNode.removeChild(clone);
             }
             const ownerSupport = this.ownerTagSupport;

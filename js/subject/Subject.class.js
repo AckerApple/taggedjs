@@ -83,14 +83,4 @@ export class Subject {
     }
     static globalSubCount$ = new Subject(0); // for ease of debugging
 }
-/*
-export const Subject = (<T>(value?: T, onSubscription?: OnSubscription<T>) => {
-  return new Subject(value, onSubscription)
-}) as (<T>(value?: T, onSubscription?: OnSubscription<T>) => Subject<T>) & {
-  globalSubCount$: Subject<number>
-  // globalSubs: Subscription<any>[]
-  all: <T>(...args: (T | Subject<T>)[]) => Subject<T>[]
-}
-*/
-// Subject.globalSubs = [] // 🔬 for testing
 //# sourceMappingURL=Subject.class.js.map

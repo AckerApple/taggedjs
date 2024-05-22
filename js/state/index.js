@@ -1,6 +1,7 @@
 export * from "./watch.function";
 export { setUse } from "./setUse.function";
 export { state } from "./state.function";
+export * from "./subject.function";
 export { letState } from "./letState.function";
 export { providers } from "./providers";
 export * from "./callbackMaker.function";
