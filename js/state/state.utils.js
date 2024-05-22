@@ -42,19 +42,16 @@ export function getStateValue(state) {
     if (!callback) {
         return state.defaultValue;
     }
-    const oldState = callback(StateEchoBack); // get value and set to undefined
-    const [oldValue] = oldState;
-    const [checkValue] = callback(oldValue); // set back to original value
+    const [value, checkValue] = getCallbackValue(callback);
     if (checkValue !== StateEchoBack) {
         const message = 'State property not used correctly. Second item in array is not setting value as expected.\n\n' +
             'For "let" state use `let name = state(default)(x => [name, name = x])`\n\n' +
             'For "const" state use `const name = state(default)()`\n\n' +
             'Problem state:\n' + (callback ? callback.toString() : JSON.stringify(state)) + '\n';
-        console.error(message, { state, callback, oldState, oldValue, checkValue });
+        console.error(message, { state, callback, value, checkValue });
         throw new Error(message);
     }
-    // state.lastValue = oldValue
-    return oldValue;
+    return value;
 }
 export class StateEchoBack {
 }
@@ -105,4 +102,10 @@ function checkStateMismatch(
   })
 }
 */
+export function getCallbackValue(callback) {
+    const oldState = callback(StateEchoBack); // get value and set to undefined
+    const [value] = oldState;
+    const [checkValue] = callback(value); // set back to original value
+    return [value, checkValue];
+}
 //# sourceMappingURL=state.utils.js.map

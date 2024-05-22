@@ -1128,13 +1128,14 @@ function children() {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   callback: () => (/* reexport safe */ _callbackMaker_function__WEBPACK_IMPORTED_MODULE_6__.callback),
-/* harmony export */   callbackMaker: () => (/* reexport safe */ _callbackMaker_function__WEBPACK_IMPORTED_MODULE_6__.callbackMaker),
-/* harmony export */   children: () => (/* reexport safe */ _children__WEBPACK_IMPORTED_MODULE_9__.children),
-/* harmony export */   letState: () => (/* reexport safe */ _letState_function__WEBPACK_IMPORTED_MODULE_4__.letState),
-/* harmony export */   onDestroy: () => (/* reexport safe */ _onDestroy__WEBPACK_IMPORTED_MODULE_8__.onDestroy),
-/* harmony export */   onInit: () => (/* reexport safe */ _onInit__WEBPACK_IMPORTED_MODULE_7__.onInit),
-/* harmony export */   providers: () => (/* reexport safe */ _providers__WEBPACK_IMPORTED_MODULE_5__.providers),
+/* harmony export */   callback: () => (/* reexport safe */ _callbackMaker_function__WEBPACK_IMPORTED_MODULE_7__.callback),
+/* harmony export */   callbackMaker: () => (/* reexport safe */ _callbackMaker_function__WEBPACK_IMPORTED_MODULE_7__.callbackMaker),
+/* harmony export */   children: () => (/* reexport safe */ _children__WEBPACK_IMPORTED_MODULE_10__.children),
+/* harmony export */   letProp: () => (/* reexport safe */ _letProp_function__WEBPACK_IMPORTED_MODULE_4__.letProp),
+/* harmony export */   letState: () => (/* reexport safe */ _letState_function__WEBPACK_IMPORTED_MODULE_5__.letState),
+/* harmony export */   onDestroy: () => (/* reexport safe */ _onDestroy__WEBPACK_IMPORTED_MODULE_9__.onDestroy),
+/* harmony export */   onInit: () => (/* reexport safe */ _onInit__WEBPACK_IMPORTED_MODULE_8__.onInit),
+/* harmony export */   providers: () => (/* reexport safe */ _providers__WEBPACK_IMPORTED_MODULE_6__.providers),
 /* harmony export */   setUse: () => (/* reexport safe */ _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse),
 /* harmony export */   state: () => (/* reexport safe */ _state_function__WEBPACK_IMPORTED_MODULE_2__.state),
 /* harmony export */   subject: () => (/* reexport safe */ _subject_function__WEBPACK_IMPORTED_MODULE_3__.subject),
@@ -1144,12 +1145,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./setUse.function */ "./ts/state/setUse.function.ts");
 /* harmony import */ var _state_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./state.function */ "./ts/state/state.function.ts");
 /* harmony import */ var _subject_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./subject.function */ "./ts/state/subject.function.ts");
-/* harmony import */ var _letState_function__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./letState.function */ "./ts/state/letState.function.ts");
-/* harmony import */ var _providers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./providers */ "./ts/state/providers.ts");
-/* harmony import */ var _callbackMaker_function__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./callbackMaker.function */ "./ts/state/callbackMaker.function.ts");
-/* harmony import */ var _onInit__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./onInit */ "./ts/state/onInit.ts");
-/* harmony import */ var _onDestroy__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./onDestroy */ "./ts/state/onDestroy.ts");
-/* harmony import */ var _children__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./children */ "./ts/state/children.ts");
+/* harmony import */ var _letProp_function__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./letProp.function */ "./ts/state/letProp.function.ts");
+/* harmony import */ var _letState_function__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./letState.function */ "./ts/state/letState.function.ts");
+/* harmony import */ var _providers__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./providers */ "./ts/state/providers.ts");
+/* harmony import */ var _callbackMaker_function__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./callbackMaker.function */ "./ts/state/callbackMaker.function.ts");
+/* harmony import */ var _onInit__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./onInit */ "./ts/state/onInit.ts");
+/* harmony import */ var _onDestroy__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./onDestroy */ "./ts/state/onDestroy.ts");
+/* harmony import */ var _children__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./children */ "./ts/state/children.ts");
 
 
 
@@ -1160,6 +1162,38 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
+
+/***/ }),
+
+/***/ "./ts/state/letProp.function.ts":
+/*!**************************************!*\
+  !*** ./ts/state/letProp.function.ts ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   letProp: () => (/* binding */ letProp)
+/* harmony export */ });
+/* harmony import */ var _letState_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./letState.function */ "./ts/state/letState.function.ts");
+/* harmony import */ var _watch_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./watch.function */ "./ts/state/watch.function.ts");
+
+
+/**
+ * Enables the ability to maintain a change to a props value until the prop itself changes
+ * @param prop typically the name of an existing prop
+ * @returns immediately call the returned function: letProp(y)(x => [y, y=x])
+ */
+function letProp(prop) {
+    return getSetProp => {
+        let myProp = (0,_letState_function__WEBPACK_IMPORTED_MODULE_0__.letState)(prop)(getSetProp);
+        (0,_watch_function__WEBPACK_IMPORTED_MODULE_1__.watch)([prop], () => getSetProp(myProp = prop));
+        getSetProp(myProp);
+        return myProp;
+    };
+}
 
 
 /***/ }),
@@ -1559,6 +1593,7 @@ function state(defaultValue) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   StateEchoBack: () => (/* binding */ StateEchoBack),
+/* harmony export */   getCallbackValue: () => (/* binding */ getCallbackValue),
 /* harmony export */   getStateValue: () => (/* binding */ getStateValue)
 /* harmony export */ });
 /* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../errors */ "./ts/errors.ts");
@@ -1607,19 +1642,16 @@ function getStateValue(state) {
     if (!callback) {
         return state.defaultValue;
     }
-    const oldState = callback(StateEchoBack); // get value and set to undefined
-    const [oldValue] = oldState;
-    const [checkValue] = callback(oldValue); // set back to original value
+    const [value, checkValue] = getCallbackValue(callback);
     if (checkValue !== StateEchoBack) {
         const message = 'State property not used correctly. Second item in array is not setting value as expected.\n\n' +
             'For "let" state use `let name = state(default)(x => [name, name = x])`\n\n' +
             'For "const" state use `const name = state(default)()`\n\n' +
             'Problem state:\n' + (callback ? callback.toString() : JSON.stringify(state)) + '\n';
-        console.error(message, { state, callback, oldState, oldValue, checkValue });
+        console.error(message, { state, callback, value, checkValue });
         throw new Error(message);
     }
-    // state.lastValue = oldValue
-    return oldValue;
+    return value;
 }
 class StateEchoBack {
 }
@@ -1670,6 +1702,12 @@ function checkStateMismatch(
   })
 }
 */
+function getCallbackValue(callback) {
+    const oldState = callback(StateEchoBack); // get value and set to undefined
+    const [value] = oldState;
+    const [checkValue] = callback(value); // set back to original value
+    return [value, checkValue];
+}
 
 
 /***/ }),
@@ -4474,6 +4512,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   isTagComponent: () => (/* reexport safe */ _isInstance__WEBPACK_IMPORTED_MODULE_3__.isTagComponent),
 /* harmony export */   isTagTemplater: () => (/* reexport safe */ _isInstance__WEBPACK_IMPORTED_MODULE_3__.isTagTemplater),
 /* harmony export */   kidsToTagArraySubject: () => (/* reexport safe */ _tag_tag__WEBPACK_IMPORTED_MODULE_0__.kidsToTagArraySubject),
+/* harmony export */   letProp: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.letProp),
 /* harmony export */   letState: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.letState),
 /* harmony export */   onDestroy: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.onDestroy),
 /* harmony export */   onInit: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.onInit),
@@ -4559,6 +4598,7 @@ var __webpack_exports__isTagClass = __webpack_exports__.isTagClass;
 var __webpack_exports__isTagComponent = __webpack_exports__.isTagComponent;
 var __webpack_exports__isTagTemplater = __webpack_exports__.isTagTemplater;
 var __webpack_exports__kidsToTagArraySubject = __webpack_exports__.kidsToTagArraySubject;
+var __webpack_exports__letProp = __webpack_exports__.letProp;
 var __webpack_exports__letState = __webpack_exports__.letState;
 var __webpack_exports__onDestroy = __webpack_exports__.onDestroy;
 var __webpack_exports__onInit = __webpack_exports__.onInit;
@@ -4576,6 +4616,6 @@ var __webpack_exports__watch = __webpack_exports__.watch;
 var __webpack_exports__willCallback = __webpack_exports__.willCallback;
 var __webpack_exports__willPromise = __webpack_exports__.willPromise;
 var __webpack_exports__willSubscribe = __webpack_exports__.willSubscribe;
-export { __webpack_exports__ArrayNoKeyError as ArrayNoKeyError, __webpack_exports__BaseTagSupport as BaseTagSupport, __webpack_exports__StateMismatchError as StateMismatchError, __webpack_exports__Subject as Subject, __webpack_exports__SyncCallbackError as SyncCallbackError, __webpack_exports__Tag as Tag, __webpack_exports__TagError as TagError, __webpack_exports__TagSupport as TagSupport, __webpack_exports__ValueSubject as ValueSubject, __webpack_exports__callback as callback, __webpack_exports__callbackMaker as callbackMaker, __webpack_exports__children as children, __webpack_exports__combineLatest as combineLatest, __webpack_exports__hmr as hmr, __webpack_exports__html as html, __webpack_exports__interpolateElement as interpolateElement, __webpack_exports__interpolateString as interpolateString, __webpack_exports__isLikeValueSets as isLikeValueSets, __webpack_exports__isSubjectInstance as isSubjectInstance, __webpack_exports__isTag as isTag, __webpack_exports__isTagArray as isTagArray, __webpack_exports__isTagClass as isTagClass, __webpack_exports__isTagComponent as isTagComponent, __webpack_exports__isTagTemplater as isTagTemplater, __webpack_exports__kidsToTagArraySubject as kidsToTagArraySubject, __webpack_exports__letState as letState, __webpack_exports__onDestroy as onDestroy, __webpack_exports__onInit as onInit, __webpack_exports__providers as providers, __webpack_exports__renderTagSupport as renderTagSupport, __webpack_exports__renderWithSupport as renderWithSupport, __webpack_exports__runBeforeRender as runBeforeRender, __webpack_exports__setUse as setUse, __webpack_exports__state as state, __webpack_exports__subject as subject, __webpack_exports__tag as tag, __webpack_exports__tagElement as tagElement, __webpack_exports__tags as tags, __webpack_exports__watch as watch, __webpack_exports__willCallback as willCallback, __webpack_exports__willPromise as willPromise, __webpack_exports__willSubscribe as willSubscribe };
+export { __webpack_exports__ArrayNoKeyError as ArrayNoKeyError, __webpack_exports__BaseTagSupport as BaseTagSupport, __webpack_exports__StateMismatchError as StateMismatchError, __webpack_exports__Subject as Subject, __webpack_exports__SyncCallbackError as SyncCallbackError, __webpack_exports__Tag as Tag, __webpack_exports__TagError as TagError, __webpack_exports__TagSupport as TagSupport, __webpack_exports__ValueSubject as ValueSubject, __webpack_exports__callback as callback, __webpack_exports__callbackMaker as callbackMaker, __webpack_exports__children as children, __webpack_exports__combineLatest as combineLatest, __webpack_exports__hmr as hmr, __webpack_exports__html as html, __webpack_exports__interpolateElement as interpolateElement, __webpack_exports__interpolateString as interpolateString, __webpack_exports__isLikeValueSets as isLikeValueSets, __webpack_exports__isSubjectInstance as isSubjectInstance, __webpack_exports__isTag as isTag, __webpack_exports__isTagArray as isTagArray, __webpack_exports__isTagClass as isTagClass, __webpack_exports__isTagComponent as isTagComponent, __webpack_exports__isTagTemplater as isTagTemplater, __webpack_exports__kidsToTagArraySubject as kidsToTagArraySubject, __webpack_exports__letProp as letProp, __webpack_exports__letState as letState, __webpack_exports__onDestroy as onDestroy, __webpack_exports__onInit as onInit, __webpack_exports__providers as providers, __webpack_exports__renderTagSupport as renderTagSupport, __webpack_exports__renderWithSupport as renderWithSupport, __webpack_exports__runBeforeRender as runBeforeRender, __webpack_exports__setUse as setUse, __webpack_exports__state as state, __webpack_exports__subject as subject, __webpack_exports__tag as tag, __webpack_exports__tagElement as tagElement, __webpack_exports__tags as tags, __webpack_exports__watch as watch, __webpack_exports__willCallback as willCallback, __webpack_exports__willPromise as willPromise, __webpack_exports__willSubscribe as willSubscribe };
 
 //# sourceMappingURL=bundle.js.map
