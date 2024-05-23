@@ -65,9 +65,11 @@ export class Subject {
         return this;
     }
     pipe(...operations) {
-        const subject = new Subject();
+        const subject = new Subject(this.value);
         subject.methods = operations;
         subject.subscribeWith = (x) => this.subscribe(x);
+        subject.set = x => this.set(x);
+        subject.next = subject.set;
         return subject;
     }
     static all(args) {

@@ -54,6 +54,9 @@ newValue, insertBefore) {
         if (isValueTagComponent) {
             return false; // its still a tag component
         }
+        if (newValue && newValue.oneRender) {
+            return false;
+        }
         // put template back down
         restoreTagMarker(lastSupport);
         // destroy old component, value is not a component

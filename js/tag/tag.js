@@ -6,11 +6,11 @@ import { deepClone } from '../deepFunctions';
 import { TagSupport } from './TagSupport.class';
 import { alterProps } from '../alterProps.function';
 import { ValueSubject } from '../subject/ValueSubject';
-// export const tags: TagComponentBase<any>[] = []
-export const tags = [];
+import { tags } from './tag.utils';
 let tagCount = 0;
-/** Wraps a tag component in a state manager and always push children to last argument as an array */
-// export function tag<T>(a: T): T;
+/** Wraps a function tag in a state manager and calls wrapped function on event cycles
+ * For single rendering, no event cycles, use: tag.renderOnce = (props) => html``
+ */
 export function tag(tagComponent) {
     /** function developer triggers */
     const parentWrap = (function tagWrapper(...props) {
@@ -33,6 +33,15 @@ export function tag(tagComponent) {
     tags.push(parentWrap);
     return parentWrap;
 }
+/** Used to create a tag component that renders once and has no addition rendering cycles */
+tag.oneRender = (...props) => {
+    throw new Error('Do not call function tag.oneRender but instead set it as: `tag.oneRender = (props) => html`` `');
+};
+Object.defineProperty(tag, 'oneRender', {
+    set(oneRenderFunction) {
+        oneRenderFunction.oneRender = true;
+    },
+});
 export function kidsToTagArraySubject(children) {
     if (isSubjectInstance(children)) {
         return { childSubject: children, madeSubject: false };

@@ -6,9 +6,7 @@ subject) {
     let tagSupport = subject.tagSupport;
     // first time seeing this tag?
     if (!tagSupport) {
-        tagSupport = new TagSupport(templater, ownerSupport, subject);
-        setupNewTemplater(tagSupport, ownerSupport, subject);
-        ownerSupport.childTags.push(tagSupport);
+        tagSupport = newTagSupportByTemplater(templater, ownerSupport, subject);
     }
     subject.tagSupport = tagSupport;
     tagSupport.ownerTagSupport = ownerSupport;
@@ -41,5 +39,11 @@ export function getFakeTemplater() {
         html: () => fake
     };
     return fake;
+}
+export function newTagSupportByTemplater(templater, ownerSupport, subject) {
+    const tagSupport = new TagSupport(templater, ownerSupport, subject);
+    setupNewTemplater(tagSupport, ownerSupport, subject);
+    ownerSupport.childTags.push(tagSupport);
+    return tagSupport;
 }
 //# sourceMappingURL=processTag.function.js.map
