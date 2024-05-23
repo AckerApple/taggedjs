@@ -76,7 +76,10 @@ export function getSubscription<T>(
     subscription.unsubscribe = () => subscription
 
     // unsubscribe from any combined subjects
-    subscription.subscriptions.forEach(subscription => subscription.unsubscribe())
+    const subscriptions = subscription.subscriptions
+    for (let index = subscriptions.length - 1; index >= 0; --index) {
+      subscriptions[index].unsubscribe()
+    }
     
     return subscription
   }
@@ -108,7 +111,6 @@ export function runPipedMethods(
     }
 
     onComplete(newValue)
-    // return newValue = next
   }
 
   let handler: Handler<any> = next

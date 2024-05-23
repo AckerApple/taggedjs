@@ -5,7 +5,7 @@ import { Context, ElementBuildOptions } from '../tag/Tag.class'
 import { TagSupport } from '../tag/TagSupport.class'
 
 export function afterInterpolateElement(
-  container: Element,
+  container: DocumentFragment,
   insertBefore: InsertBefore,
   tagSupport: TagSupport,
   context: Context,
@@ -16,8 +16,11 @@ export function afterInterpolateElement(
     return clones
   }
 
-  clones.forEach(clone => afterElmBuild(clone, options, context, tagSupport))
-  tagSupport.clones.push( ...clones )
+  for (let index = clones.length - 1; index >= 0; --index) {
+    const clone = clones[index]
+    afterElmBuild(clone, options, context, tagSupport)
+    tagSupport.clones.push( clone )
+  }
 
   return clones
 }

@@ -1,5 +1,3 @@
-// TODO: This should be more like `new TaggedJs().use({})`
-
 import { BaseTagSupport, TagSupport } from './TagSupport.class'
 import { setUse } from '../state'
 import { Subject } from '../subject'
@@ -17,7 +15,11 @@ export function runBeforeRender(
   tagSupport: BaseTagSupport,
   ownerSupport?: TagSupport,
 ) {
-  setUse.tagUse.forEach(tagUse => tagUse.beforeRender(tagSupport, ownerSupport))
+  const tagUse = setUse.tagUse
+  const length = tagUse.length
+  for (let index=0; index < length; ++index) {
+    tagUse[index].beforeRender(tagSupport, ownerSupport)
+  }
 }
 
 // Life cycle 2
@@ -25,7 +27,12 @@ export function runAfterRender(
   tagSupport: BaseTagSupport,
   ownerTagSupport?: TagSupport,
 ) {
-  setUse.tagUse.forEach(tagUse => tagUse.afterRender(tagSupport, ownerTagSupport))
+  const tagUse = setUse.tagUse
+  const length = tagUse.length
+  for (let index=0; index < length; ++index) {
+    tagUse[index].afterRender(tagSupport, ownerTagSupport)
+  }
+
   setUse.memory.tagClosed$.next(ownerTagSupport)
 }
 
@@ -34,7 +41,11 @@ export function runBeforeRedraw(
   tagSupport: BaseTagSupport,
   ownerTagSupport: TagSupport,
 ) {
-  setUse.tagUse.forEach(tagUse => tagUse.beforeRedraw(tagSupport, ownerTagSupport))
+  const tagUse = setUse.tagUse
+  const length = tagUse.length
+  for (let index=0; index < length; ++index) {
+    tagUse[index].beforeRedraw(tagSupport, ownerTagSupport)
+  }
 }
 
 // Life cycle 4 - end of life
@@ -42,5 +53,9 @@ export function runBeforeDestroy(
   tagSupport: BaseTagSupport,
   ownerTagSupport: TagSupport,
 ) {
-  setUse.tagUse.forEach(tagUse => tagUse.beforeDestroy(tagSupport, ownerTagSupport))
+  const tagUse = setUse.tagUse
+  const length = tagUse.length
+  for (let index=0; index < length; ++index) {
+    tagUse[index].beforeDestroy(tagSupport, ownerTagSupport)
+  }
 }

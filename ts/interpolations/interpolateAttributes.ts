@@ -17,12 +17,6 @@ function howToSetInputValue(
   name: string,
   value: string
 ) {
-  /*
-  if((element as any)[name] === value) {
-    return // its already the value we are setting
-  }
-  */
-
   (element as any)[name] = value
 }
 
@@ -35,7 +29,8 @@ export function interpolateAttributes(
 
   let howToSet = howToSetAttribute
 
-  attrNames.forEach(attrName => {
+  for (let index = 0; index < attrNames.length; ++index) {
+    const attrName = attrNames[index]
     if(child.nodeName === 'INPUT' && attrName === 'value') {
       howToSet = howToSetInputValue
     }
@@ -44,5 +39,5 @@ export function interpolateAttributes(
     processAttribute(attrName, value, child, scope, ownerSupport, howToSet)
 
     howToSet = howToSetAttribute // put back
-  })
+  }
 }

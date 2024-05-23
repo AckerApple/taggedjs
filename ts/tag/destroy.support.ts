@@ -1,6 +1,4 @@
-import { Tag } from './Tag.class'
 import { TagSupport } from './TagSupport.class'
-
 
 export type DestroyOptions = {
   stagger: number

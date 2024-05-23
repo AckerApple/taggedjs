@@ -74,7 +74,9 @@ export function processTagArray(
     return true
   })
 
-  value.forEach((item, index) => {
+  const length = value.length
+  for (let index=0; index < length; ++index) {
+    const item = value[index]
     const previous = lastArray[index]
     const previousSupport = previous?.tagSupport
     const subTag = item as Tag
@@ -88,8 +90,6 @@ export function processTagArray(
       ownerSupport,
       new ValueSubject(undefined) as unknown as TagSubject
     )
-    
-    // tagSupport.templater = subTag.templater
 
     if(previousSupport) {
       setupNewTemplater(tagSupport as TagSupport, ownerSupport, previousSupport.subject)
@@ -119,7 +119,8 @@ export function processTagArray(
       // subTag.tagSupport = subTag.tagSupport || prevSupport
       const oldest = prevGlobal.oldest as TagSupport
       oldest.updateBy(tagSupport)
-      return []
+      // return []
+      continue
     }
 
     processAddTagArrayItem(
@@ -131,7 +132,7 @@ export function processTagArray(
     )
 
     ownerSupport.childTags.push(tagSupport)  
-  })
+  }
 
   return clones
 }

@@ -1,7 +1,7 @@
 import { InsertBefore } from "./interpolations/Clones.type"
 
 export function buildClones(
-  temporary: Element,
+  temporary: DocumentFragment,
   insertBefore: InsertBefore,
 ) {
   const clones = []

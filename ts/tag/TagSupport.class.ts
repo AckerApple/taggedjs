@@ -17,7 +17,6 @@ import { setTagPlaceholder } from './setTagPlaceholder.function'
 import { interpolateElement, interpolateString } from '../interpolations/interpolateElement'
 import { subscribeToTemplate } from '../interpolations/interpolateTemplate'
 import { afterInterpolateElement } from '../interpolations/afterInterpolateElement.function'
-import { TagArraySubject } from './update/processTagArray'
 import { renderSubjectComponent } from './render/renderSubjectComponent.function'
 
 const prefixSearch = new RegExp(variablePrefix, 'g')
@@ -100,7 +99,7 @@ export class BaseTagSupport {
     const context = this.update()
     const template = this.getTemplate()
     
-    const elementContainer = document.createDocumentFragment() as any
+    const elementContainer = document.createDocumentFragment()
     const tempDraw = document.createElement('template')
     tempDraw.innerHTML = template.string
     elementContainer.appendChild(tempDraw)
@@ -125,10 +124,13 @@ export class BaseTagSupport {
     )
 
     // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
-    tagComponents.forEach(tagComponent => {
+    const length = tagComponents.length
+    for (let index=0; index < length; ++index) {
+      const tagComponent = tagComponents[index]
+      
       subscribeToTemplate(
         tagComponent.insertBefore,
-        tagComponent.subject as TagSubject | TagArraySubject,
+        tagComponent.subject,
         tagComponent.ownerSupport,
         options.counts,
       )
@@ -140,7 +142,7 @@ export class BaseTagSupport {
         context,
         options,
       )
-    })
+    }
   }
 
   getTemplate(): TagTemplate {
@@ -232,7 +234,8 @@ export class TagSupport extends BaseTagSupport {
     this.destroySubscriptions()
     
     // signify immediately child has been deleted (looked for during event processing)
-    childTags.forEach(child => {
+    for (let index = childTags.length - 1; index >= 0; --index) {
+      const child = childTags[index]
       const subGlobal = child.global
       delete subGlobal.newest
       subGlobal.deleted = true
@@ -240,7 +243,7 @@ export class TagSupport extends BaseTagSupport {
       if(isTagComponent(child.templater)) {
         runBeforeDestroy(child, child)
       }
-    })
+    }
 
     // HTML DOM manipulation. Put back down the template tag
     const insertBefore = global.insertBefore as Element
@@ -294,9 +297,11 @@ export class TagSupport extends BaseTagSupport {
   }
 
   destroySubscriptions() {
-    const global = this.global
-    global.subscriptions.forEach(cloneSub => cloneSub.unsubscribe())
-    global.subscriptions.length = 0
+    const subs = this.global.subscriptions
+    for (let index = subs.length - 1; index >= 0; --index) {
+      subs[index].unsubscribe()
+    }
+    subs.length = 0
   }
 
   destroyClones(
@@ -313,12 +318,13 @@ export class TagSupport extends BaseTagSupport {
 
     // check subjects that may have clones attached to them
     const oldContext = this.global.context
-    Object.values(oldContext).forEach(value => {
-      const clone = (value as any).clone
-      if(clone && clone.parentNode) {
+    for(const name in oldContext){
+      const value = oldContext[name]
+      const clone = value.clone
+      if(clone?.parentNode) {
         clone.parentNode.removeChild(clone)
       }
-    })
+    }
     
     if(promises.length) {
       return {promise: Promise.all(promises), stagger}
@@ -376,21 +382,6 @@ export class TagSupport extends BaseTagSupport {
     return this.updateContext( this.global.context )
   }
 
-  /** Used during HMR only where static content itself could have been edited */
-  async rebuild() {
-    delete this.strings // seek the templater strings instead now
-    delete this.values // seek the templater strings instead now
-
-    restoreTagMarkers(this)
-
-    const newSupport = renderSubjectComponent(this.subject, this, this.ownerTagSupport)
-    await this.destroy()
-    newSupport.buildBeforeElement(this.global.insertBefore as Element,{
-      counts: {added:0, removed: 0},
-    })
-    return newSupport
-  }
-
   getAppTagSupport() {
     let tag: TagSupport = this
     
@@ -404,5 +395,8 @@ export class TagSupport extends BaseTagSupport {
 
 function restoreTagMarkers(support: TagSupport) {
   restoreTagMarker(support)
-  support.childTags.forEach(childTag => restoreTagMarkers(childTag.global.oldest as TagSupport))
+  const childTags = support.childTags
+  for (let index = childTags.length - 1; index >= 0; --index) {
+    restoreTagMarkers(childTags[index].global.oldest as TagSupport)
+  }
 }

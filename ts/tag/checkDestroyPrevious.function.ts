@@ -42,7 +42,11 @@ export function checkDestroyPrevious(
     delete arraySubject.placeholder
     insertAfter(insertBefore, placeholderElm)
 
-    wasArray.forEach(({tagSupport}) => destroyArrayTag(tagSupport, {added:0, removed:0}))
+    
+    for (let index = wasArray.length - 1; index >= 0; --index) {
+      const {tagSupport} = wasArray[index]
+      destroyArrayTag(tagSupport, {added:0, removed:0})
+    }
 
     return 'array'
   }

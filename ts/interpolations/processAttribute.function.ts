@@ -96,9 +96,9 @@ function processNameOnlyAttr(
     if(typeof(lastValue) === 'string') {
       child.removeAttribute(lastValue as string)
     } else if(lastValue instanceof Object) {
-      Object.entries(lastValue).forEach(([name]) =>
+      for (const name in lastValue) {
         child.removeAttribute(name)
-      )
+      }
     }
   }
 
@@ -119,17 +119,15 @@ function processNameOnlyAttr(
   }
 
   if(attrValue instanceof Object) {
-    Object.entries(attrValue).forEach(([name, value]) =>
+    for (const name in attrValue) {
       processNameValueAttr(
         name,
-        value,
+        attrValue[name],
         child,
         ownerSupport,
         howToSet,
       )
-    )
-
-    return
+    }
   }
 }
 
@@ -142,7 +140,6 @@ function processNameValueAttr(
 ) {
   const isSpecial = isSpecialAttr(attrName)
 
-  // attach as callback?
   if(result instanceof Function) {
     const action = function(...args: any[]) {
       const result2 = result(child, args)
@@ -150,7 +147,6 @@ function processNameValueAttr(
     }
     
     ;(child as any)[attrName].action = action
-    // child.addEventListener(attrName, action)
   }
 
   // Most every variable comes in here since everything is made a ValueSubject

@@ -28,27 +28,27 @@ function resetFunctionProps(
   // BELOW: Do not clone because if first argument is object, the memory ref back is lost
   // const newProps = {...props} 
 
-  Object.entries(newProps).forEach(([name, value]) => {
-    if(value instanceof Function) {
-      const toCall = newProps[name].toCall
-      
-      if(toCall) {
-        return // already previously converted
-      }
-
-      newProps[name] = (...args: any[]) => {
-        return newProps[name].toCall(...args) // what gets called can switch over parent state changes
-      }
-
-      // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
-      newProps[name].toCall = (...args: any[]) => {
-        return callbackPropOwner(value, args, ownerSupport)
-      }
-      newProps[name].original = value
-
-      return
+  for(const name in newProps){
+    const value = newProps[name]
+    if(!(value instanceof Function)) {
+      continue
     }
-  })
+
+    const toCall = newProps[name].toCall
+    
+    if(toCall) {
+      continue // already previously converted
+    }
+
+    newProps[name] = (...args: any[]) =>
+      newProps[name].toCall(...args) // what gets called can switch over parent state changes
+
+    // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
+    newProps[name].toCall = (...args: any[]) =>
+      callbackPropOwner(value, args, ownerSupport)
+
+    newProps[name].original = value
+  }
 
   return newProps
 }

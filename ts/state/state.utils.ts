@@ -1,5 +1,5 @@
 import { StateMismatchError } from '../errors'
-import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class'
+import { BaseTagSupport } from '../tag/TagSupport.class'
 import { Wrapper } from '../TemplaterResult.class'
 import { setUse } from './setUse.function'
 
@@ -37,7 +37,6 @@ setUse({
     tagSupport: BaseTagSupport,
   ) => {
     const memory = tagSupport.memory
-    // const state: State = memory.state
     const config: Config = setUse.memory.stateConfig
     const rearray = config.rearray as unknown as State[]
     
@@ -56,14 +55,16 @@ setUse({
       }
     }
     
-    const cTagConfig = config.tagSupport as any as TagSupport
     delete config.rearray // clean up any previous runs
     delete config.tagSupport
 
     memory.state.length = 0
     memory.state.push(...config.array)
-    // memory.state = config.array // [...config.array]
-    memory.state.forEach(item => item.lastValue = getStateValue(item)) // set last values
+    const state = memory.state
+    for (let index = state.length - 1; index >= 0; --index) {
+      const item = state[index]
+      item.lastValue = getStateValue(item) // set last values
+    }
     
     config.array = []
   }
@@ -103,7 +104,7 @@ function initState(
   const state = memory.state as State
   const config: Config = setUse.memory.stateConfig
   
-  // TODO: This guard may no longer be needed
+  // TODO: The following two blocks of code are state protects, have a production mode that removes this checks
   /*
   if (config.rearray) {
     checkStateMismatch(tagSupport, config, state)
@@ -111,8 +112,11 @@ function initState(
   */
 
   config.rearray = []
-  if(state?.length) {
-    state.forEach(state => getStateValue(state))
+  const stateLength = state?.length
+  if(stateLength) {
+    for (let index=0; index < stateLength; ++index) {
+      getStateValue(state[index])
+    }
     config.rearray.push( ...state )
   }
 

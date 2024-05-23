@@ -4,7 +4,8 @@ export function syncStates(
   stateFrom: State,
   stateTo: State,
 ) {
-  stateFrom.forEach((state, index) => {
+  for (let index = stateFrom.length - 1; index >= 0; --index) {
+    const state = stateFrom[index]
     const fromValue = state.get()
     const callback = stateTo[index].callback
 
@@ -13,5 +14,5 @@ export function syncStates(
     }
     
     stateTo[index].lastValue = fromValue // record the value
-  })
+  }
 }

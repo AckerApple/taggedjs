@@ -177,16 +177,20 @@ function getTagWrap(
     tagSupport.memory = newTagSupport.memory // state handover
 
     if( templater.madeChildIntoSubject ) {
-      childSubject.value.forEach(kid => {
-        kid.values.forEach((value, index) => {            
+      const value = childSubject.value
+      for (let index = value.length - 1; index >= 0; --index) {
+        const kid = value[index]
+        const values = kid.values
+        for (let index = values.length - 1; index >= 0; --index) {
+          const value = values[index]
           if(!(value instanceof Function)) {
-            return
+            continue
           }
 
           const valuesValue = kid.values[index]
           
           if(valuesValue.isChildOverride) {
-            return // already overwritten
+            continue // already overwritten
           }
 
           // all functions need to report to me
@@ -201,8 +205,8 @@ function getTagWrap(
           }
           
           valuesValue.isChildOverride = true
-        })
-      })
+        }
+      }
     }
 
     return tagSupport

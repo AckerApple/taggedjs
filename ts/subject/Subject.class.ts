@@ -57,16 +57,18 @@ export class Subject<T> implements SubjectLike<T> {
     this.value = value
     
     // Notify all subscribers with the new value
-    this.subscribers.forEach(sub => {
-      // (sub.callback as any).value = value
+    const subs = [...this.subscribers] // subs may change as we call callbacks
+    const length = subs.length
+    for (let index=0; index < length; ++index) {
+      const sub = subs[index]
       sub.callback(value, sub)
-    })
+    }
   }
   // next() is available for rxjs compatibility
   next = this.set
 
   toPromise(): Promise<T> {
-    return new Promise((res, rej) => {
+    return new Promise(res => {
       this.subscribe((x, subscription) => {
         subscription.unsubscribe()
         res(x)
