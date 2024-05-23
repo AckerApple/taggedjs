@@ -1,6 +1,6 @@
 import { InsertBefore } from '../../interpolations/Clones.type'
 import { DisplaySubject } from '../../subject.types'
-import { updateBeforeTemplate } from '../../updateBeforeTemplate.function'
+import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function'
 
 export type RegularValue = string | number | undefined | boolean
 
@@ -18,12 +18,37 @@ export function processRegularValue(
   }
 
   subject.lastValue = value
+  const castedValue = castTextValue(value)
+  
+  // replace existing string?
+  const oldClone = subject.clone
+  if(oldClone) {
+    oldClone.textContent = castedValue
+    return
+  }
   
   // Processing of regular values
   const clone = updateBeforeTemplate(
-    value,
+    castedValue,
     before, // this will be removed
   )
 
   subject.clone = clone // remember single element put down, for future updates
+}
+
+export function processFirstRegularValue(
+  value: RegularValue,
+  subject: DisplaySubject, // could be tag via subject.tag
+  insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
+) {
+  subject.lastValue = value
+  const castedValue = castTextValue(value)
+   
+  // Processing of regular values
+  const clone = updateBeforeTemplate(
+    castedValue,
+    insertBefore, // this will be removed
+  )
+
+  subject.clone = clone // remember single element put down, for future updates 
 }

@@ -4,7 +4,7 @@ import { ValueSubject } from '../../subject/ValueSubject'
 import { isSubjectInstance, isTagClass, isTagComponent, isTagTemplater } from '../../isInstance'
 import { TemplaterResult } from '../../TemplaterResult.class'
 import { TagSupport } from '../TagSupport.class'
-import { InterpolateSubject, TemplateValue } from './processSubjectValue.function'
+import { InterpolateSubject, TemplateValue } from './processFirstSubject.utils'
 import { Callback } from '../../interpolations/bindSubjectCallback.function'
 
 export function processNewValue(

@@ -1,6 +1,6 @@
 import { DisplaySubject, TagSubject } from '../subject.types'
 import { isTag, isTagArray, isTagComponent } from '../isInstance'
-import { InterpolateSubject } from './update/processSubjectValue.function'
+import { InterpolateSubject } from './update/processFirstSubject.utils'
 import { TagArraySubject } from './update/processTagArray'
 import { isLikeTags } from './isLikeTags.function'
 import { Counts } from '../interpolations/interpolateTemplate'
@@ -69,11 +69,19 @@ export function checkDestroyPrevious(
   const lastValue = displaySubject.lastValue // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
   // was simple value but now something bigger
   if(hasLastValue && lastValue !== newValue) {
+    const newType = typeof(newValue)
+    if( isSimpleType(newType) && typeof(lastValue) === newType ) {
+      return false
+    }
     destroySimpleValue(insertBefore, displaySubject)
     return 'changed-simple-value'
   }
 
   return false
+}
+
+export function isSimpleType(value: any) {
+  return ['string','number','boolean'].includes(value)
 }
 
 export function destroyArrayTag(

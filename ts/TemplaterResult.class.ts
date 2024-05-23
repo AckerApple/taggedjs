@@ -4,13 +4,12 @@ import { Props } from './Props'
 import { TagChildren, TagWrapper, kidsToTagArraySubject } from './tag/tag'
 import { Provider } from './state/providers'
 import { OnDestroyCallback } from './state/onDestroy'
-import { TagSubject, WasTagSubject } from './subject.types'
+import { TagSubject } from './subject.types'
 import { OnInitCallback } from './state/onInit'
 import { Subscription } from './subject/subject.utils'
 import { InsertBefore } from './interpolations/Clones.type'
-import { TagValues, html } from './tag/html'
+import { TagValues } from './tag/html'
 import { ValueSubject } from './subject'
-import { State } from './state'
 
 export type OriginalFunction = (() => Tag) & {compareTo: string}
 

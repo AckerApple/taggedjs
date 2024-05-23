@@ -1,5 +1,5 @@
 import { isSubjectInstance, isTagComponent } from '../../isInstance'
-import { TemplateValue } from './processSubjectValue.function'
+import { TemplateValue } from './processFirstSubject.utils'
 import { TagSubject } from '../../subject.types'
 import { Context, Tag } from '../Tag.class'
 import { TagSupport } from '../TagSupport.class'

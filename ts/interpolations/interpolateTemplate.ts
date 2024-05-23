@@ -2,7 +2,8 @@ import { Context, ElementBuildOptions, variablePrefix } from "../tag/Tag.class"
 import { InterpolateOptions } from "./interpolateElement"
 import { elementInitCheck } from "./elementInitCheck"
 import { Clones, InsertBefore } from "./Clones.type"
-import { InterpolateSubject, TemplateValue, processSubjectValue } from "../tag/update/processSubjectValue.function"
+import { InterpolateSubject, TemplateValue } from "../tag/update/processFirstSubject.utils"
+import { processFirstSubjectValue } from "../tag/update/processFirstSubjectValue.function"
 import { isTagArray, isTagComponent } from "../isInstance"
 import { scanTextAreaValue } from "./scanTextAreaValue.function"
 import { updateExistingValue } from "../tag/update/updateExistingValue.function"
@@ -89,7 +90,7 @@ export function subscribeToTemplate(
 
     const templater = value as TemplaterResult
 
-    processSubjectValue(
+    processFirstSubjectValue(
       templater,
       subject,
       insertBefore,

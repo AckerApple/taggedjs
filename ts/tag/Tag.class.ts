@@ -1,9 +1,8 @@
 import { Counts } from '../interpolations/interpolateTemplate'
 import { State } from '../state'
 import { InterpolatedTemplates } from '../interpolations/interpolations'
-import { InterpolateSubject } from './update/processSubjectValue.function'
+import { InterpolateSubject } from './update/processFirstSubject.utils'
 import { TemplaterResult } from '../TemplaterResult.class'
-import { InputElementTargetEvent } from '../interpolations/ElementTargetEvent.interface'
 import { TagValues } from './html'
 
 export const variablePrefix = '__tagvar'

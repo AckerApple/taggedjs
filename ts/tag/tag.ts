@@ -11,18 +11,12 @@ import { ValueSubject } from '../subject/ValueSubject'
 
 export type TagChildren = ValueSubject<Tag[]> & { lastArray?: Tag[] }
 export type TagChildrenInput = Tag[] | Tag | TagChildren
-/*
-export type TagComponentArg<T extends any[]> = (
-  (...args: T) => Tag | ((...args: T) => (...args: any[]) => Tag)
-)
-*/
 
 type FirstArgOptional<T extends any[]> = T['length'] extends 0 ? true : false;
 
 // export type TagComponent = TagComponentArg<[any?, TagChildren?]>
 export type TagComponentBase<T extends any[]> = (
   arg: FirstArgOptional<T> extends true ? (T[0] | void) : T[0],
-  // props: FirstParameter<T>,
   children?: TagChildrenInput
 ) => Tag
 
