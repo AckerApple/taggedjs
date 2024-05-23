@@ -1,13 +1,14 @@
 import { processSubjectComponent } from './processSubjectComponent.function'
 import { TagArraySubject, processTagArray } from './processTagArray'
-import { TemplaterResult } from '../../TemplaterResult.class'
+import { TemplaterResult, Wrapper } from '../../TemplaterResult.class'
 import { InsertBefore } from '../../interpolations/Clones.type'
 import { DisplaySubject, TagSubject } from '../../subject.types'
 import { RegularValue, processFirstRegularValue } from './processRegularValue.function'
-import { processTag, tagFakeTemplater } from './processTag.function'
+import { newTagSupportByTemplater, processTag, tagFakeTemplater } from './processTag.function'
 import { TagSupport } from '../TagSupport.class'
 import { Tag } from '../Tag.class'
 import { InterpolateSubject, TemplateValue, ValueTypes, getValueType, processOptions } from './processFirstSubject.utils'
+import { renderTagOnly } from '../render/renderTagOnly.function'
 
 export function processFirstSubjectValue(
   value: TemplateValue,
@@ -62,6 +63,37 @@ export function processFirstSubjectValue(
         options,
       )
       return
+    
+    case ValueTypes.function:
+      const v = value as Wrapper
+      if((v as any).oneRender) {
+        const templater = new TemplaterResult([])
+        const tagSupport = newTagSupportByTemplater(
+          templater, ownerSupport, subject as TagSubject
+        )
+
+        let tag: Tag
+        const wrap = () => {
+          templater.tag = tag || ((v as any)())
+          return tagSupport
+        }
+        // const wrap = () => ((v as any)())
+
+        templater.wrapper = wrap as any
+        wrap.parentWrap = wrap
+        wrap.oneRender = true
+        ;(wrap.parentWrap as any).original = v
+        
+        renderTagOnly(tagSupport, tagSupport, subject as TagSubject, ownerSupport)
+        // call inner function
+        // templater.tag = (v as any)() as Tag
+        
+        processTag(
+          templater, insertBefore, ownerSupport, subject as TagSubject
+        )
+        return
+      }
+      break
   }
 
   processFirstRegularValue(

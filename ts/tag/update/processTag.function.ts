@@ -17,15 +17,7 @@ export function processTag(
   
   // first time seeing this tag?
   if(!tagSupport) {
-    tagSupport = new TagSupport(
-      templater,
-      ownerSupport,
-      subject,
-    )
-  
-    setupNewTemplater(tagSupport, ownerSupport, subject)
-
-    ownerSupport.childTags.push(tagSupport)
+    tagSupport = newTagSupportByTemplater(templater, ownerSupport, subject)
   }
   
   subject.tagSupport = tagSupport
@@ -76,4 +68,22 @@ export function getFakeTemplater() {
   } as TemplaterResult
 
   return fake
+}
+
+export function newTagSupportByTemplater(
+  templater: TemplaterResult,
+  ownerSupport: TagSupport,
+  subject: TagSubject,
+) {
+  const tagSupport = new TagSupport(
+    templater,
+    ownerSupport,
+    subject,
+  )
+
+  setupNewTemplater(tagSupport, ownerSupport, subject)
+
+  ownerSupport.childTags.push(tagSupport)
+
+  return tagSupport
 }

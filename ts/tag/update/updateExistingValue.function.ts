@@ -39,6 +39,10 @@ export function updateExistingValue(
   // was component but no longer
   const tagSupport = subjectTag.tagSupport
   if( tagSupport ) {
+    if(valueType === ValueTypes.function) {
+      return subjectTag // its a oneRender tag
+    }
+
     handleStillTag(
       subject as TagSubject,
       value as TemplaterResult,
@@ -88,7 +92,7 @@ export function updateExistingValue(
         ownerSupport,
         subjectTag,
       )
-  
+
       return subjectTag
 
     case ValueTypes.subject:
@@ -101,6 +105,7 @@ export function updateExistingValue(
       if(!subject.clone) {
         subject.clone = swapInsertBefore(insertBefore)
       }
+
       return subject
   }
 

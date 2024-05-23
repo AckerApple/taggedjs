@@ -1,7 +1,7 @@
 import { BaseTagSupport, TagSupport } from './TagSupport.class'
 import { runAfterRender, runBeforeRender } from './tagRunner'
 import { TemplaterResult, Wrapper } from '../TemplaterResult.class'
-import { TagComponent, TagMaker} from './tag'
+import { TagComponent, TagMaker} from './tag.utils'
 import { ValueSubject } from '../subject/ValueSubject'
 import { TagSubject } from '../subject.types'
 

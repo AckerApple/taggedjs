@@ -1,20 +1,36 @@
-import { OnSubscription, Subject } from "../subject";
+import { OnSubscription, Subject, ValueSubject } from "../subject";
 import { TagSupport } from "../tag/TagSupport.class";
 import { getSupportInCycle } from "../tag/getSupportInCycle.function";
 import { setUse } from "./setUse.function";
 import { state } from "./state.function";
 import { syncStates } from "./syncStates.function";
 
+/** Create a Subject that on updates will sync state values to keep chained functions using latest variables */
 export function subject<T>(
   value?: T,
   onSubscription?: OnSubscription<T>
 ) {
   const oldestState = state(() => setUse.memory.stateConfig.array)
   const nowTagSupport = getSupportInCycle() as TagSupport
-  return new Subject(value, onSubscription).pipe(x => {
-    syncStates(nowTagSupport.memory.state, oldestState)
-    return x
+  return state(() => {
+    const subject = new Subject(value, onSubscription).pipe(x => {
+      syncStates(nowTagSupport.memory.state, oldestState)
+      return x
+    })
+    return subject
   })
+}
+
+subject.value = <T>(value: T) => {
+  const oldestState = state(() => setUse.memory.stateConfig.array)
+  const nowTagSupport = getSupportInCycle() as TagSupport
+  return state(() => {
+    const subject = new ValueSubject(value).pipe(x => {
+      syncStates(nowTagSupport.memory.state, oldestState)
+      return x
+    })
+    return subject
+  })  
 }
 
 function all<A, B, C, D, E, F>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D, Subject<E> | E, Subject<F> | F]): Subject<[A,B,C,D,E,F]>

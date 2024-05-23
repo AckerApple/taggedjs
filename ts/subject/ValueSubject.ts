@@ -1,5 +1,5 @@
 import { Subject } from './Subject.class'
-import { SubjectSubscriber, Subscription } from './subject.utils'
+import { OperatorFunction, SubjectSubscriber, Subscription } from './subject.utils'
 
 type ValueSubjectSubscriber<T> = (
   value: T,

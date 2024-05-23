@@ -152,9 +152,15 @@ function processNameValueAttr(
   // Most every variable comes in here since everything is made a ValueSubject
   if(isSubjectInstance(result)) {
     child.removeAttribute(attrName)
-    const callback = (newAttrValue: any) => {      
-      if(newAttrValue instanceof Function) {      
-        newAttrValue = bindSubjectCallback(newAttrValue, ownerSupport)
+    const callback = (newAttrValue: any) => {            
+      // should the function be wrapped so every time its called we re-render?
+      if(newAttrValue instanceof Function) {
+        const wrapper = ownerSupport.templater.wrapper
+        const parentWrap = wrapper?.parentWrap
+        const oneRender = parentWrap?.oneRender
+        if(!oneRender) {
+          newAttrValue = bindSubjectCallback(newAttrValue, ownerSupport)
+        } 
       }
       
       return processAttributeSubjectValue(

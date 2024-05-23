@@ -154,9 +154,11 @@ export class Subject<T> implements SubjectLike<T> {
     ...operations: OperatorFunction<any, any, any>[]
   ): Subject<unknown>;
   pipe(...operations: OperatorFunction<any, any, any>[]): Subject<any> {
-    const subject = new Subject<T>()
+    const subject = new Subject(this.value)
     subject.methods = operations
     subject.subscribeWith = (x) => this.subscribe(x as any)
+    subject.set = x => this.set(x)
+    subject.next = subject.set
     return subject
   }
 

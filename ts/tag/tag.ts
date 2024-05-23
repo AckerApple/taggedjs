@@ -8,37 +8,14 @@ import { TagSupport } from './TagSupport.class'
 import { TagSubject } from '../subject.types'
 import { alterProps } from '../alterProps.function'
 import { ValueSubject } from '../subject/ValueSubject'
-
-export type TagChildren = ValueSubject<Tag[]> & { lastArray?: Tag[] }
-export type TagChildrenInput = Tag[] | Tag | TagChildren
-
-type FirstArgOptional<T extends any[]> = T['length'] extends 0 ? true : false;
-
-// export type TagComponent = TagComponentArg<[any?, TagChildren?]>
-export type TagComponentBase<T extends any[]> = (
-  arg: FirstArgOptional<T> extends true ? (T[0] | void) : T[0],
-  children?: TagChildrenInput
-) => Tag
-
-// export const tags: TagComponentBase<any>[] = []
-export const tags: TagWrapper<any>[] = []
-export type TagComponent = TagComponentBase<[any?, TagChildren?]> | TagComponentBase<[]>
+import { TagChildrenInput, TagComponent, TagWrapper, tags } from './tag.utils'
 
 let tagCount = 0
 
-export type TagWrapper<T> = ((
-  ...props: T[]
-) => TemplaterResult) & {
-  original: (...args: any[]) => any
-  compareTo: string
-  isTag: boolean
-}
-
-export type TagMaker = ((...args: any[]) => Tag) | ((...args: any[]) => (...args: any[]) => Tag)
-
-/** Wraps a tag component in a state manager and always push children to last argument as an array */
-// export function tag<T>(a: T): T;
-export function tag<T>(
+/** Wraps a function tag in a state manager and calls wrapped function on event cycles
+ * For single rendering, no event cycles, use: tag.renderOnce = (props) => html``
+ */
+export function tag<T extends Function>(
   tagComponent: T
 ): T & {original: Function} {
   /** function developer triggers */
@@ -74,6 +51,17 @@ export function tag<T>(
 
   return parentWrap as unknown as (T & {original: Function})
 }
+
+/** Used to create a tag component that renders once and has no addition rendering cycles */
+tag.oneRender = (...props: any[]): (Tag | ((...args: any[]) => Tag)) => {
+  throw new Error('Do not call function tag.oneRender but instead set it as: `tag.oneRender = (props) => html`` `')
+}
+
+Object.defineProperty(tag, 'oneRender', {
+  set(oneRenderFunction: Function) {
+    (oneRenderFunction as any).oneRender = true
+  },
+})
 
 export function kidsToTagArraySubject(
   children?: TagChildrenInput

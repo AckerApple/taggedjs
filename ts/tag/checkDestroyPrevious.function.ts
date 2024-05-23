@@ -78,6 +78,11 @@ export function checkDestroyPrevious(
       return false // its still a tag component
     }
 
+
+    if(newValue && (newValue as any).oneRender) {
+      return false
+    }
+
     // put template back down
     restoreTagMarker(lastSupport)
 

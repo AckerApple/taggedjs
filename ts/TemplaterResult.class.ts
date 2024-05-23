@@ -1,7 +1,8 @@
 import { Context, Tag } from './tag/Tag.class'
 import { BaseTagSupport, TagSupport } from './tag/TagSupport.class'
 import { Props } from './Props'
-import { TagChildren, TagWrapper, kidsToTagArraySubject } from './tag/tag'
+import { kidsToTagArraySubject } from './tag/tag'
+import { TagChildren, TagWrapper } from './tag/tag.utils'
 import { Provider } from './state/providers'
 import { OnDestroyCallback } from './state/onDestroy'
 import { TagSubject } from './subject.types'
@@ -17,7 +18,6 @@ export type Wrapper = ((
   tagSupport: BaseTagSupport,
   subject: TagSubject,
 ) => TagSupport) & {
-  // original: OriginalFunction
   parentWrap: TagWrapper<any>
 }
 

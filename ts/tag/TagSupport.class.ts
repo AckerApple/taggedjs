@@ -17,7 +17,6 @@ import { setTagPlaceholder } from './setTagPlaceholder.function'
 import { interpolateElement, interpolateString } from '../interpolations/interpolateElement'
 import { subscribeToTemplate } from '../interpolations/interpolateTemplate'
 import { afterInterpolateElement } from '../interpolations/afterInterpolateElement.function'
-import { renderSubjectComponent } from './render/renderSubjectComponent.function'
 
 const prefixSearch = new RegExp(variablePrefix, 'g')
 
