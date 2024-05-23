@@ -9,19 +9,20 @@ import { Callback } from '../../interpolations/bindSubjectCallback.function';
 import { Tag } from '../Tag.class';
 import { Subject } from '../../subject';
 export declare enum ValueTypes {
+    unknown = "unknown",
     tag = "tag",
     templater = "templater",
     tagArray = "tag-array",
     tagComponent = "tag-component",
-    value = "value",
+    subject = "subject",
     date = "date",
     string = "string",
     boolean = "boolean",
+    function = "function",
     undefined = "undefined"
 }
 export declare function getValueType(value: any): ValueTypes;
 export type processOptions = {
-    forceElement?: boolean;
     counts: Counts;
 };
 export type ClonesAndPromise = {

@@ -21,10 +21,7 @@ context: Context, // variable scope of {`__tagvar${index}`:'x'}
 ownerSupport: TagSupport, // Tag class
 counts: Counts, // used for animation stagger computing
 options: InterpolateOptions): InterpolateTemplateResult;
-export declare function subscribeToTemplate(insertBefore: InsertBefore, subject: InterpolateSubject, ownerSupport: TagSupport, counts: Counts, // used for animation stagger computing
-{ isForceElement }: {
-    isForceElement?: boolean;
-}): void;
+export declare function subscribeToTemplate(insertBefore: InsertBefore, subject: InterpolateSubject, ownerSupport: TagSupport, counts: Counts): void;
 export type Counts = {
     added: number;
     removed: number;

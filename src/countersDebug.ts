@@ -47,6 +47,10 @@ export const counters = tag(({
   return html`<!--counters-->
     <div style="display:flex;flex-wrap:wrap;gap:1em">
       ${testBasics && html`
+        ${() => {
+          console.log('i was called')
+          return '22'
+        }}
         <div>👉 Subscriptions:${(Subject as any).globalSubCount$}</div>
         <button onclick=${() => console.info('subs', (Subject as any).globalSubs)}>log subs</button>
         <div>initCounter:${initCounter}</div>

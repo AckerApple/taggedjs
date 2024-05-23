@@ -5,5 +5,4 @@ import { TagSupport } from '../TagSupport.class';
 import { InsertBefore } from '../../interpolations/Clones.type';
 export declare function processSubjectComponent(templater: TemplaterResult, subject: TagSubject, insertBefore: InsertBefore, ownerSupport: TagSupport, options: {
     counts: Counts;
-    forceElement?: boolean;
 }): TagSupport;

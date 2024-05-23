@@ -39,5 +39,4 @@ export declare class Tag {
 }
 export type ElementBuildOptions = {
     counts: Counts;
-    forceElement?: boolean;
 };
