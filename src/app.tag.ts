@@ -55,7 +55,7 @@ export const App = tag(() => {
   const appCounterSubject = state(() => new Subject<number>(appCounter))
 
   onInit(() => {
-    console.log('app init should only run once')
+    console.info('1️⃣ app init should only run once')
     
     runTesting(false)
 

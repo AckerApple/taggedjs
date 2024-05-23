@@ -1,6 +1,6 @@
 import { mouseOverTag } from "./mouseover.tag"
 import { renderCountDiv } from "./renderCount.component"
-import { html, tag, Subject, onInit, letState, callbackMaker, state, ValueSubject, callback } from "taggedjs"
+import { html, tag, Subject, onInit, letState, callbackMaker, state, ValueSubject, callback, subject } from "taggedjs"
 
 export const counters = tag(({
   appCounterSubject
@@ -18,6 +18,7 @@ export const counters = tag(({
 
   const pipedSubject0 = state(() => new ValueSubject('222'))
   const pipedSubject1 = Subject.all([pipedSubject0, callbackTestSub]).pipe(callback(x => counter))
+  const pipedSubject2 = subject.all([pipedSubject0, callbackTestSub]).pipe(x => counter)
 
   onInit(() => {
     ++initCounter
@@ -105,7 +106,7 @@ export const counters = tag(({
     </div>
 
     <fieldset>
-      <legend>🪈 pipedSubject</legend>
+      <legend>🪈 pipedSubject 1</legend>
       <div>
         <small>
           <span id="🪈-pipedSubject">${pipedSubject1}</span>
@@ -113,6 +114,14 @@ export const counters = tag(({
       </div>
     </fieldset>
 
+    <fieldset>
+      <legend>🪈 pipedSubject 2</legend>
+      <div>
+        <small>
+          <span id="🪈-pipedSubject-2">${pipedSubject2}</span>
+        </small>
+      </div>
+    </fieldset>
 
     ${sharedMemory && html`
       <fieldset>

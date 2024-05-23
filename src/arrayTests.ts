@@ -51,9 +51,10 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
     }}>push 9 items</button>
 
     ${players.length > 0 && html`
-      <button oninit=${fadeInDown} ondestroy=${fadeOutUp} onclick=${() => {
-        players.length = 0
-      }}>remove all</button>
+      <button oninit=${fadeInDown} ondestroy=${fadeOutUp}
+        style="--animate-duration: .1s;"
+        onclick=${() => players.length = 0}
+      >remove all</button>
     `}
 
     ${renderCountDiv({renderCount, name: 'arrayTests.ts'})}
@@ -90,7 +91,9 @@ const playersDisplay = tag(({
   getNewPlayer: () => Player
 }) => {
   const playersContent = players.map((player,index) => html`
-    <div oninit=${fadeInDown} ondestroy=${fadeOutUp} style="background-color:black;">
+    <div oninit=${fadeInDown} ondestroy=${fadeOutUp}
+      style="background-color:black;--animate-duration: .1s;"
+    >
       <div>
         name:${player.name}
       </div>
@@ -100,7 +103,7 @@ const playersDisplay = tag(({
       
       <div style="background-color:purple;padding:.5em">
         scores:${player.scores.map((score, playerIndex) => html`
-        <div style="border:1px solid white;"
+        <div style="border:1px solid white;--animate-duration: .1s;"
           oninit=${fadeInDown} ondestroy=${fadeOutUp}
         >
           <fieldset>

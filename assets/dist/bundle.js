@@ -248,7 +248,11 @@ const syncPropDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ syncPropN
     </div>
   `;
 });
-const propsDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNumber, propsJson, propNumberChange, }) => (renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]), propNumberChangeCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [propNumberChangeCount, propNumberChangeCount = x]), myPropNumber = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(propNumber)(x => [myPropNumber, myPropNumber = x]), _ = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.watch)([propNumber], () => myPropNumber = propNumber), watchResults = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.watch)([myPropNumber], () => ++propNumberChangeCount)) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `<!--propsDebug.js-->
+const propsDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNumber, propsJson, propNumberChange, }) => (renderCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [renderCount, renderCount = x]), propNumberChangeCount = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(0)(x => [propNumberChangeCount, propNumberChangeCount = x]), 
+// poor way to update an argument
+myPropNumber = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letState)(propNumber)(x => [myPropNumber, myPropNumber = x]), _ = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.watch)([propNumber], () => myPropNumber = propNumber), watchResults = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.watch)([myPropNumber], () => ++propNumberChangeCount), 
+// simple way to locally only update an argument
+__ = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.letProp)(propNumber)(x => [propNumber, propNumber = x])) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `<!--propsDebug.js-->
   <h3>Props Json</h3>
   <textarea style="font-size:0.6em;height:200px;width:100%" wrap="off"
     onchange=${event => {
@@ -268,6 +272,13 @@ const propsDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNumber, 
     >🐄 🥩 propNumber ${myPropNumber}</button>
     <span id="propsDebug-🥩-1-display">${myPropNumber}</span>
   </div>
+
+  <div>
+    <button id="propsDebug-🥩-2-button" onclick=${() => ++propNumber}
+    >🐄 🥩 local set propNumber ${propNumber}</button>
+    <span id="propsDebug-🥩-2-display">${propNumber}</span>
+  </div>
+
   <button
     title="test of increasing render count and nothing else"
     onclick=${() => ++renderCount}
@@ -275,7 +286,7 @@ const propsDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(({ propNumber, 
   
   <button onclick=${() => ++myPropNumber}
     title="only changes number locally but if change by parent than that is the number"
-  >🐄 🥩 local set propNumber ${myPropNumber}</button>
+  >🐄 🥩 local set myPropNumber ${myPropNumber}</button>
   
   <div>
     <small>
@@ -359,10 +370,16 @@ const app = () => {
     const locationSplit = pathname.split('/').filter(x => x);
     const location = locationSplit[0]?.toLowerCase();
     if (location && ['isolated.html', 'index-static.html'].includes(location)) {
+        const start = Date.now();
         (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tagElement)(_isolatedApp__WEBPACK_IMPORTED_MODULE_2__.IsolatedApp, element, { test: 1 });
+        const end = Date.now() - start;
+        console.info(`⏱️ isolated render in ${end}ms`);
         return;
     }
+    const start = Date.now();
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tagElement)(_app_tag__WEBPACK_IMPORTED_MODULE_1__.App, element, { test: 1 });
+    const end = Date.now() - start;
+    console.info(`⏱️ rendered in ${end}ms`);
 };
 
 
@@ -437,7 +454,7 @@ const App = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.tag)(() => {
     const callbacks = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.callbackMaker)();
     const appCounterSubject = (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_3__.Subject(appCounter));
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_3__.onInit)(() => {
-        console.log('app init should only run once');
+        console.info('1️⃣ app init should only run once');
         runTesting(false);
         appCounterSubject.subscribe(callbacks(y => appCounter = y));
     });
@@ -568,9 +585,10 @@ const arrayTests = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(function ArrayT
     }}>push 9 items</button>
 
     ${players.length > 0 && (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
-      <button oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeInDown} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeOutUp} onclick=${() => {
-        players.length = 0;
-    }}>remove all</button>
+      <button oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeInDown} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeOutUp}
+        style="--animate-duration: .1s;"
+        onclick=${() => players.length = 0}
+      >remove all</button>
     `}
 
     ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_1__.renderCountDiv)({ renderCount, name: 'arrayTests.ts' })}
@@ -593,7 +611,9 @@ const scoreData = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ score, player
 });
 const playersDisplay = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ players, getNewPlayer, }) => {
     const playersContent = players.map((player, index) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
-    <div oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeInDown} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeOutUp} style="background-color:black;">
+    <div oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeInDown} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeOutUp}
+      style="background-color:black;--animate-duration: .1s;"
+    >
       <div>
         name:${player.name}
       </div>
@@ -603,7 +623,7 @@ const playersDisplay = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ players,
       
       <div style="background-color:purple;padding:.5em">
         scores:${player.scores.map((score, playerIndex) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
-        <div style="border:1px solid white;"
+        <div style="border:1px solid white;--animate-duration: .1s;"
           oninit=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeInDown} ondestroy=${_animations__WEBPACK_IMPORTED_MODULE_0__.fadeOutUp}
         >
           <fieldset>
@@ -817,6 +837,7 @@ const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ appCounterSubj
     const callbackTestSub = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_2__.Subject(counter));
     const pipedSubject0 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_2__.ValueSubject('222'));
     const pipedSubject1 = taggedjs__WEBPACK_IMPORTED_MODULE_2__.Subject.all([pipedSubject0, callbackTestSub]).pipe((0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.callback)(x => counter));
+    const pipedSubject2 = taggedjs__WEBPACK_IMPORTED_MODULE_2__.subject.all([pipedSubject0, callbackTestSub]).pipe(x => counter);
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.onInit)(() => {
         ++initCounter;
         console.info('countersDebug.ts: 👉 i should only ever run once');
@@ -895,7 +916,7 @@ const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ appCounterSubj
     </div>
 
     <fieldset>
-      <legend>🪈 pipedSubject</legend>
+      <legend>🪈 pipedSubject 1</legend>
       <div>
         <small>
           <span id="🪈-pipedSubject">${pipedSubject1}</span>
@@ -903,6 +924,14 @@ const counters = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ appCounterSubj
       </div>
     </fieldset>
 
+    <fieldset>
+      <legend>🪈 pipedSubject 2</legend>
+      <div>
+        <small>
+          <span id="🪈-pipedSubject-2">${pipedSubject2}</span>
+        </small>
+      </div>
+    </fieldset>
 
     ${sharedMemory && (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
       <fieldset>
@@ -1012,14 +1041,13 @@ function expectMatchedHtml(...queries) {
     (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(elements.length).toBeGreaterThan(0, 'Expected elements to be present in expectMatchedHtml() query but found none');
     const lastElm = elements.pop();
     const lastHtml = lastElm.innerHTML;
-    elements.every(elm => (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(lastHtml).toBe(elm.innerHTML, `expectMatchedHtml unmatched html - queries: ${queries.join(' - ')}`));
+    elements.every(elm => (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(lastHtml).toBe(elm.innerHTML, () => `expectMatchedHtml unmatched html - queries: ${queries.join(' - ')}`));
 }
 function expectHTML(query, innerHTML) {
     const elements = document.querySelectorAll(query);
-    elements.forEach(element => (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(element.innerHTML).toBe(innerHTML, `Expected element ${query} innerHTML to be -->${innerHTML}<-- but it was -->${element.innerHTML}<--`));
+    elements.forEach(element => (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(element.innerHTML).toBe(innerHTML, () => `Expected element ${query} innerHTML to be -->${innerHTML}<-- but it was -->${element.innerHTML}<--`));
 }
 function expectElmCount(query, count, message) {
-    //  const found = elementCount(query)
     const elements = document.querySelectorAll(query);
     const found = elements.length;
     message = message || `Expected ${count} elements to match query ${query} but found ${found}`;
@@ -1032,46 +1060,51 @@ function testDuelCounterElements(...sets
 ) {
     const [button0, display0] = sets.shift();
     let query = expectElmCount(display0, 1);
+    let buttonQuery = expectElmCount(button0, 1);
     const display0Element = query[0];
     const ip0 = display0Element.innerText;
-    testCounterElements(button0, display0);
+    testCounterSelectedElements(buttonQuery, query, { elementCountExpected: 1 }, button0, display0);
     let increase = 2;
     sets.forEach(([button1, display1]) => {
         query = expectElmCount(display1, 1);
+        buttonQuery = expectElmCount(button1, 1);
         let display1Element = query[0];
         let ip1Check = display1Element.innerText;
         const value = (Number(ip0) + increase).toString();
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ip1Check).toBe(value, `Expected second increase provider to be increased to ${ip0} but got ${ip1Check}`);
-        testCounterElements(button1, display1);
-        query = expectElmCount(display1, 1);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ip1Check).toBe(value, () => `Expected second increase provider to be increased to ${ip0} but got ${ip1Check}`);
+        testCounterSelectedElements(buttonQuery, query, { elementCountExpected: 1 }, button0, display0);
         display1Element = query[0];
         ip1Check = display1Element.innerText;
         const secondIncrease = increase + 2;
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ip1Check).toBe((Number(ip0) + secondIncrease).toString(), `Expected ${display1} innerText to be ${Number(ip0) + secondIncrease} but instead it is ${ip1Check}`);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(ip1Check).toBe((Number(ip0) + secondIncrease).toString(), () => `Expected ${display1} innerText to be ${Number(ip0) + secondIncrease} but instead it is ${ip1Check}`);
         increase = increase + 2;
+    });
+}
+function testCounterSelectedElements(counterButtons, counterDisplays, { elementCountExpected } = {
+    elementCountExpected: 1
+}, counterButtonId, counterDisplayId) {
+    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(counterButtons.length).toBe(elementCountExpected, () => `Expected ${counterButtonId} to be ${elementCountExpected} elements but is instead ${counterButtons.length}`);
+    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(counterDisplays.length).toBe(elementCountExpected, () => `Expected ${counterDisplayId} to be ${elementCountExpected} elements but is instead ${counterDisplays.length}`);
+    counterButtons.forEach((increaseCounter, index) => {
+        const counterDisplay = counterDisplays[index];
+        let counterValue = Number(counterDisplay?.innerText);
+        increaseCounter.click();
+        let oldCounterValue = counterValue + 1;
+        counterValue = Number(counterDisplay?.innerText);
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(oldCounterValue).toBe(counterValue, () => `Counter test 1 of 2 expected ${counterDisplayId} to be value ${oldCounterValue} but it is ${counterValue}`);
+        increaseCounter.click();
+        counterValue = Number(counterDisplay?.innerText);
+        ++oldCounterValue;
+        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(oldCounterValue).toBe(counterValue, () => `Counter test 2 of 2 expected ${counterDisplayId} to increase value to ${oldCounterValue} but it is ${counterValue}`);
     });
 }
 /** increases counter by two */
 function testCounterElements(counterButtonId, counterDisplayId, { elementCountExpected } = {
     elementCountExpected: 1
 }) {
-    // const getByIndex = (selector: string, index: number) => document.querySelectorAll(selector)[index] as unknown as HTMLElement[]
     const increaseCounters = document.querySelectorAll(counterButtonId);
     const counterDisplays = document.querySelectorAll(counterDisplayId);
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(increaseCounters.length).toBe(elementCountExpected, `Expected ${counterButtonId} to be ${elementCountExpected} elements but is instead ${increaseCounters.length}`);
-    (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(counterDisplays.length).toBe(elementCountExpected, `Expected ${counterDisplayId} to be ${elementCountExpected} elements but is instead ${counterDisplays.length}`);
-    increaseCounters.forEach((increaseCounter, index) => {
-        const counterDisplay = counterDisplays[index];
-        let counterValue = Number(counterDisplay?.innerText);
-        increaseCounter?.click();
-        let oldCounterValue = counterValue + 1;
-        counterValue = Number(counterDisplay?.innerText);
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(oldCounterValue).toBe(counterValue, `Counter test 1 of 2 expected ${counterDisplayId} to be value ${oldCounterValue} but it is ${counterValue}`);
-        increaseCounter?.click();
-        counterValue = Number(counterDisplay?.innerText);
-        ++oldCounterValue;
-        (0,_expect__WEBPACK_IMPORTED_MODULE_0__.expect)(oldCounterValue).toBe(counterValue, `Counter test 2 of 2 expected ${counterDisplayId} to increase value to ${oldCounterValue} but it is ${counterValue}`);
-    });
+    return testCounterSelectedElements(increaseCounters, counterDisplays, { elementCountExpected }, counterButtonId, counterDisplayId);
 }
 
 
@@ -1203,6 +1236,9 @@ function expect(expected) {
             if (expected === received) {
                 return;
             }
+            if (customMessage instanceof Function) {
+                customMessage = customMessage();
+            }
             const message = customMessage || `Expected ${typeof (expected)} ${JSON.stringify(expected)} to be ${typeof (received)} ${JSON.stringify(received)}`;
             console.error(message, { received, expected });
             throw new Error(message);
@@ -1306,7 +1342,7 @@ const intervalTester0 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
     const callback = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.callbackMaker)();
     const increase = () => ++intervalCount;
     const startInterval = () => {
-        console.info('interval test 0 started...');
+        console.info('🟢 interval test 0 started...');
         trackTime();
         intervalId = setInterval(callback(() => {
             increase();
@@ -1325,10 +1361,9 @@ const intervalTester0 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
             currentTime = currentTime + 500;
             if (currentTime >= test0interval) {
                 currentTime = 0;
-                console.log('interval tick');
             }
         }), 500);
-        console.log('▶️ interval started');
+        console.info('▶️ interval started');
     }
     const toggle = () => {
         if (intervalId || intervalId2) {
@@ -1379,13 +1414,13 @@ const intervalTester1 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
         clearInterval(intervalId2);
         intervalId = undefined;
         intervalId2 = undefined;
-        console.info('interval 1 stopped');
+        console.info('🔴 interval 1 stopped');
     };
     function toggleInterval() {
         if (intervalId) {
             return destroy();
         }
-        console.info('interval test 1 started...');
+        console.info('🟢 interval test 1 started...');
         trackTime();
         intervalId = setInterval(callback(() => {
             increase();
@@ -1393,7 +1428,7 @@ const intervalTester1 = (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.tag)(() => {
         }), test1interval);
     }
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.onInit)(toggleInterval);
-    (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.onDestroy)(toggleInterval);
+    (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.onDestroy)(destroy);
     ++renderCounter;
     return (0,taggedjs__WEBPACK_IMPORTED_MODULE_0__.html) `
     <div>interval type 2 with ${test1interval}ms</div>
@@ -1447,9 +1482,9 @@ __webpack_require__.r(__webpack_exports__);
 const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
     const views = [
         // 'content',
-        'counters',
+        // 'counters',
         // 'watchTesting',
-        // 'props',
+        'props',
         // 'mirroring',
         // 'providerDebug',
         // 'arrays',
@@ -1460,7 +1495,7 @@ const IsolatedApp = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.tag)(() => {
     const appCounterSubject = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.state)(() => new taggedjs__WEBPACK_IMPORTED_MODULE_1__.Subject(appCounter));
     const callback = (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.callbackMaker)();
     (0,taggedjs__WEBPACK_IMPORTED_MODULE_1__.onInit)(() => {
-        console.log('app init should only run once');
+        console.info('1️⃣ app init should only run once');
         appCounterSubject.subscribe(callback(x => {
             appCounter = x;
         }));
@@ -1739,27 +1774,30 @@ const providerDebugBase = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)((_x = 'p
     </div>
 
     <hr />
-    renderCount outer:<span name="render_count_outer">${renderCount}</span>${renderCount}
+    renderCount outer:<span name="render_count_outer">${renderCount}</span>
     ${(0,_renderCount_component__WEBPACK_IMPORTED_MODULE_1__.renderCountDiv)({ renderCount, name: 'providerDebugBase' })}
 
-    <dialog id="provider_debug_dialog" style="padding:0"
-      onmousedown="var r = this.getBoundingClientRect();(r.top<=event.clientY&&event.clientY<=r.top+r.height&&r.left<=event.clientX&&event.clientX<=r.left+r.width) || this.close()"
-      ondragstart="const {e,dt,t} = {t:this,e:event,dt:event.dataTransfer};const d=t.drag=t.drag||{x:0,y:0};d.initX=d.x;d.startX=event.clientX-t.offsetLeft;d.startY=event.clientY-t.offsetTop;t.ondragover=e.target.ondragover=(e)=>e.preventDefault();dt.effectAllowed='move';dt.dropEffect='move'"
-      ondrag="const {t,e,dt,d}={e:event,dt:event.dataTransfer,d:this.drag}; if(e.clientX===0) return;d.x = d.x + e.offsetX - d.startX; d.y = d.y + e.offsetY - d.startY; this.style.left = d.x + 'px'; this.style.top = d.y+'px';"
-      ondragend="const {t,e,d}={t:this,e:event,d:this.drag};if (d.initX === d.x) {d.x=d.x+e.offsetX-(d.startX-d.x);d.y=d.y+e.offsetY-(d.startY-d.y);this.style.transform=translate3d(d.x+'px', d.y+'px', 0)};this.draggable=false"
-      onclose=${() => providerClass.showDialog = false}
-    >
-      <div style="padding:.25em" onmousedown="this.parentNode.draggable=true"
-      >dialog title</div>
-      ${providerClass.showDialog ? (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
-        <textarea wrap="off">${JSON.stringify(providerClass, null, 2)}</textarea>
-      ` : 'no dialog'}
-      <div style="padding:.25em">
-        <button type="button" onclick="provider_debug_dialog.close()">🅧 close</button>
-      </div>
-    </dialog>
+    ${dialog(providerClass)}
   `;
 });
+const dialog = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)((providerClass) => (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
+  <dialog id="provider_debug_dialog" style="padding:0"
+    onmousedown="var r = this.getBoundingClientRect();(r.top<=event.clientY&&event.clientY<=r.top+r.height&&r.left<=event.clientX&&event.clientX<=r.left+r.width) || this.close()"
+    ondragstart="const {e,dt,t} = {t:this,e:event,dt:event.dataTransfer};const d=t.drag=t.drag||{x:0,y:0};d.initX=d.x;d.startX=event.clientX-t.offsetLeft;d.startY=event.clientY-t.offsetTop;t.ondragover=e.target.ondragover=(e)=>e.preventDefault();dt.effectAllowed='move';dt.dropEffect='move'"
+    ondrag="const {t,e,dt,d}={e:event,dt:event.dataTransfer,d:this.drag}; if(e.clientX===0) return;d.x = d.x + e.offsetX - d.startX; d.y = d.y + e.offsetY - d.startY; this.style.left = d.x + 'px'; this.style.top = d.y+'px';"
+    ondragend="const {t,e,d}={t:this,e:event,d:this.drag};if (d.initX === d.x) {d.x=d.x+e.offsetX-(d.startX-d.x);d.y=d.y+e.offsetY-(d.startY-d.y);this.style.transform=translate3d(d.x+'px', d.y+'px', 0)};this.draggable=false"
+    onclose=${() => providerClass.showDialog = false}
+  >
+    <div style="padding:.25em" onmousedown="this.parentNode.draggable=true"
+    >dialog title</div>
+    ${providerClass.showDialog ? (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.html) `
+      <textarea wrap="off">${JSON.stringify(providerClass, null, 2)}</textarea>
+    ` : 'no dialog'}
+    <div style="padding:.25em">
+      <button type="button" onclick="provider_debug_dialog.close()">🅧 close</button>
+    </div>
+  </dialog>
+`);
 const providerDebug = (0,taggedjs__WEBPACK_IMPORTED_MODULE_2__.tag)(({ propCounter, propCounterChange, }) => {
     const funcProvider = taggedjs__WEBPACK_IMPORTED_MODULE_2__.providers.inject(ProviderFunc); // test that an arrow function can be a provider
     const provider = taggedjs__WEBPACK_IMPORTED_MODULE_2__.providers.inject(tagDebugProvider);
@@ -2196,7 +2234,7 @@ async function runTests() {
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(counterInput).toBeDefined();
         const toggleTest = (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.byId)('toggle-test');
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(toggleTest).toBeDefined();
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(toggleTest?.innerText).toBe('toggle test');
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(toggleTest.innerText).toBe('toggle test');
         counterInput.value = '0';
         counterInput.onkeyup({ target: counterInput });
     });
@@ -2212,9 +2250,9 @@ async function runTests() {
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('toggle test', () => {
         const toggleTest = (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.byId)('toggle-test');
         toggleTest.click();
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(toggleTest?.innerText).toBe('toggle test true');
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(toggleTest.innerText).toBe('toggle test true');
         toggleTest.click();
-        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(toggleTest?.innerText).toBe('toggle test');
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(toggleTest.innerText).toBe('toggle test');
         const propsTextarea = (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.byId)('props-debug-textarea');
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(propsTextarea.value.replace(/\s/g, '')).toBe(`{"test":33,"x":"y"}`);
     });
@@ -2241,15 +2279,26 @@ async function runTests() {
             (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testCounterElements)('#❤️-inner-counter', '#❤️-inner-display');
             if (firstRun) {
                 (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🪈-pipedSubject')).toBe('');
+                (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🪈-pipedSubject-2')).toBe('');
             }
             (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.click)('#🥦-subject-increase-counter');
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🪈-pipedSubject')).toBe((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🥦-subject-counter-display'));
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🪈-pipedSubject-2')).toBe((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#🥦-subject-counter-display'));
         });
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.describe)('props', () => {
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('test duels', () => {
             (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#propsDebug-🥩-0-button', '#propsDebug-🥩-0-display'], ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display']);
             (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'], ['#propsOneLevelFunUpdate-🥩-button', '#propsOneLevelFunUpdate-🥩-display']);
+        });
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('letProp', () => {
+            // local and outside currently match
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectMatchedHtml)('#propsDebug-🥩-0-display', '#propsDebug-🥩-2-display');
+            const propCounter = Number((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#propsDebug-🥩-0-display'));
+            (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.click)('#propsDebug-🥩-2-button');
+            // outer should not have changed
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#propsDebug-🥩-0-display')).toBe(propCounter.toString());
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.html)('#propsDebug-🥩-2-display')).toBe((propCounter + 1).toString());
         });
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('basics', () => {
             // the number of times the watch counted a change happens to match that increase counter
@@ -2278,17 +2327,19 @@ async function runTests() {
             (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectMatchedHtml)('#sync-prop-counter-display', '#nothing-prop-counter-display');
         });
     });
-    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('providers', async () => {
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-provider-🍌-0-button', '#increase-provider-🍌-0-display'], ['#increase-provider-🍌-1-button', '#increase-provider-🍌-1-display']);
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-provider-upper-🌹-0-button', '#increase-provider-upper-🌹-0-display'], ['#increase-provider-upper-🌹-1-button', '#increase-provider-upper-🌹-1-display']);
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'], ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display']);
-    });
-    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('provider debug', () => {
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'], ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display']);
-        // change a counter in the parent element
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'], ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display']);
-        // now ensure that this inner tag still operates correctly even though parent just rendered but i did not from that change
-        (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'], ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display']);
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.describe)('providers', () => {
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('basics', () => {
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-provider-🍌-0-button', '#increase-provider-🍌-0-display'], ['#increase-provider-🍌-1-button', '#increase-provider-🍌-1-display']);
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-provider-upper-🌹-0-button', '#increase-provider-upper-🌹-0-display'], ['#increase-provider-upper-🌹-1-button', '#increase-provider-upper-🌹-1-display']);
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'], ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display']);
+        });
+        (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('inner outer debug', () => {
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'], ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display']);
+            // change a counter in the parent element
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'], ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display']);
+            // now ensure that this inner tag still operates correctly even though parent just rendered but i did not from that change
+            (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.testDuelCounterElements)(['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'], ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display']);
+        });
     });
     (0,_expect__WEBPACK_IMPORTED_MODULE_1__.describe)('tagSwitching', () => {
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('0', () => {
@@ -2348,24 +2399,24 @@ async function runTests() {
             const insideCount = (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elmCount)('#score-data-0-1-inside-button');
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(insideCount).toBe(0);
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elmCount)('#score-data-0-1-outside-button')).toBe(0);
-            (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.byId)('array-test-push-item')?.click();
+            (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.byId)('array-test-push-item').click();
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elmCount)('#score-data-0-1-inside-button')).toBe(1);
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elmCount)('#score-data-0-1-outside-button')).toBe(1);
             const insideElm = (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.byId)('score-data-0-1-inside-button');
             const insideDisplay = (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.byId)('score-data-0-1-inside-display');
-            let indexValue = insideDisplay?.innerText;
+            let indexValue = insideDisplay.innerText;
             const outsideElm = (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.byId)('score-data-0-1-outside-button');
             const outsideDisplay = (0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.byId)('score-data-0-1-outside-display');
-            const outsideValue = outsideDisplay?.innerText;
+            const outsideValue = outsideDisplay.innerText;
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe(outsideValue);
-            insideElm?.click();
-            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(insideDisplay?.innerText).toBe(outsideDisplay?.innerText);
-            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(insideDisplay?.innerText) - 1).toString());
-            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(outsideDisplay?.innerText) - 1).toString());
-            outsideElm?.click();
-            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(insideDisplay?.innerText).toBe(outsideDisplay?.innerText);
-            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(insideDisplay?.innerText) - 2).toString());
-            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(outsideDisplay?.innerText) - 2).toString());
+            insideElm.click();
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(insideDisplay.innerText).toBe(outsideDisplay.innerText);
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(insideDisplay.innerText) - 1).toString());
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(outsideDisplay.innerText) - 1).toString());
+            outsideElm.click();
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(insideDisplay.innerText).toBe(outsideDisplay.innerText);
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(insideDisplay.innerText) - 2).toString());
+            (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)(indexValue).toBe((Number(outsideDisplay.innerText) - 2).toString());
         });
         (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('🗑️ deletes', async () => {
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elmCount)('#player-remove-promise-btn-0')).toBe(0);
@@ -2378,7 +2429,7 @@ async function runTests() {
             (0,_expect__WEBPACK_IMPORTED_MODULE_1__.expect)((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.elmCount)('#player-edit-btn-0')).toBe(0);
         });
     });
-    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('🪞 mirror testing', async () => {
+    (0,_expect__WEBPACK_IMPORTED_MODULE_1__.it)('🪞 mirror testing', () => {
         (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElmCount)('#mirror-counter-display', 2);
         (0,_expect_html__WEBPACK_IMPORTED_MODULE_2__.expectElmCount)('#mirror-counter-button', 2);
         const counter = Number((0,_elmSelectors__WEBPACK_IMPORTED_MODULE_0__.htmlById)('mirror-counter-display'));
@@ -2868,6 +2919,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   isTagComponent: () => (/* reexport safe */ _isInstance__WEBPACK_IMPORTED_MODULE_3__.isTagComponent),
 /* harmony export */   isTagTemplater: () => (/* reexport safe */ _isInstance__WEBPACK_IMPORTED_MODULE_3__.isTagTemplater),
 /* harmony export */   kidsToTagArraySubject: () => (/* reexport safe */ _tag_tag__WEBPACK_IMPORTED_MODULE_0__.kidsToTagArraySubject),
+/* harmony export */   letProp: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.letProp),
 /* harmony export */   letState: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.letState),
 /* harmony export */   onDestroy: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.onDestroy),
 /* harmony export */   onInit: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.onInit),
@@ -2877,6 +2929,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   runBeforeRender: () => (/* reexport safe */ _tag_tagRunner__WEBPACK_IMPORTED_MODULE_11__.runBeforeRender),
 /* harmony export */   setUse: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.setUse),
 /* harmony export */   state: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.state),
+/* harmony export */   subject: () => (/* reexport safe */ _state_index__WEBPACK_IMPORTED_MODULE_4__.subject),
 /* harmony export */   tag: () => (/* reexport safe */ _tag_tag__WEBPACK_IMPORTED_MODULE_0__.tag),
 /* harmony export */   tagElement: () => (/* reexport safe */ _tag_tagElement__WEBPACK_IMPORTED_MODULE_9__.tagElement),
 /* harmony export */   tags: () => (/* reexport safe */ _tag_tag__WEBPACK_IMPORTED_MODULE_0__.tags),
@@ -3271,7 +3324,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _tag_Tag_class__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../tag/Tag.class */ "../main/ts/tag/Tag.class.ts");
 /* harmony import */ var _elementInitCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./elementInitCheck */ "../main/ts/interpolations/elementInitCheck.ts");
-/* harmony import */ var _tag_update_processSubjectValue_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../tag/update/processSubjectValue.function */ "../main/ts/tag/update/processSubjectValue.function.ts");
+/* harmony import */ var _tag_update_processFirstSubjectValue_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../tag/update/processFirstSubjectValue.function */ "../main/ts/tag/update/processFirstSubjectValue.function.ts");
 /* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../isInstance */ "../main/ts/isInstance.ts");
 /* harmony import */ var _scanTextAreaValue_function__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./scanTextAreaValue.function */ "../main/ts/interpolations/scanTextAreaValue.function.ts");
 /* harmony import */ var _tag_update_updateExistingValue_function__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../tag/update/updateExistingValue.function */ "../main/ts/tag/update/updateExistingValue.function.ts");
@@ -3324,7 +3377,7 @@ function subscribeToTemplate(insertBefore, subject, ownerSupport, counts, // use
             return;
         }
         const templater = value;
-        (0,_tag_update_processSubjectValue_function__WEBPACK_IMPORTED_MODULE_2__.processSubjectValue)(templater, subject, insertBefore, ownerSupport, {
+        (0,_tag_update_processFirstSubjectValue_function__WEBPACK_IMPORTED_MODULE_2__.processFirstSubjectValue)(templater, subject, insertBefore, ownerSupport, {
             counts: { ...counts },
             forceElement: isForceElement,
         });
@@ -3628,17 +3681,18 @@ function buildClones(temporary, insertBefore) {
     const clones = [];
     const template = temporary.children[0];
     let nextSibling = template.content.firstChild;
+    const fragment = document.createDocumentFragment();
     while (nextSibling) {
         const nextNextSibling = nextSibling.nextSibling;
-        buildSibling(nextSibling, insertBefore);
         clones.push(nextSibling);
+        fragment.appendChild(nextSibling);
         nextSibling = nextNextSibling;
     }
+    if (insertBefore.parentNode) {
+        const parentNode = insertBefore.parentNode;
+        parentNode.insertBefore(fragment, insertBefore);
+    }
     return clones;
-}
-function buildSibling(nextSibling, insertBefore) {
-    const parentNode = insertBefore.parentNode;
-    parentNode.insertBefore(nextSibling, insertBefore);
 }
 
 
@@ -3710,14 +3764,17 @@ function initMemory(tagSupport) {
 }
 function triggerStateUpdate(tagSupport, callback, oldState, ...args) {
     const state = tagSupport.memory.state;
-    // oldState = (tagSupport.global.oldest as TagSupport).memory.state
     // ensure that the oldest has the latest values first
     (0,_syncStates_function__WEBPACK_IMPORTED_MODULE_3__.syncStates)(state, oldState);
     // run the callback
     const maybePromise = callback(...args);
-    // const maybePromise = callback(...args as [any,any,any,any,any,any])
     // send the oldest state changes into the newest
     (0,_syncStates_function__WEBPACK_IMPORTED_MODULE_3__.syncStates)(oldState, state);
+    /*
+    if(tagSupport.global.deleted) {
+      return maybePromise // While running callback the tag was deleted. Often that happens
+    }
+    */
     (0,_tag_render_renderTagSupport_function__WEBPACK_IMPORTED_MODULE_1__.renderTagSupport)(tagSupport, false);
     if (maybePromise instanceof Promise) {
         maybePromise.finally(() => {
@@ -3769,26 +3826,30 @@ function children() {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   callback: () => (/* reexport safe */ _callbackMaker_function__WEBPACK_IMPORTED_MODULE_5__.callback),
-/* harmony export */   callbackMaker: () => (/* reexport safe */ _callbackMaker_function__WEBPACK_IMPORTED_MODULE_5__.callbackMaker),
-/* harmony export */   children: () => (/* reexport safe */ _children__WEBPACK_IMPORTED_MODULE_8__.children),
-/* harmony export */   letState: () => (/* reexport safe */ _letState_function__WEBPACK_IMPORTED_MODULE_3__.letState),
-/* harmony export */   onDestroy: () => (/* reexport safe */ _onDestroy__WEBPACK_IMPORTED_MODULE_7__.onDestroy),
-/* harmony export */   onInit: () => (/* reexport safe */ _onInit__WEBPACK_IMPORTED_MODULE_6__.onInit),
-/* harmony export */   providers: () => (/* reexport safe */ _providers__WEBPACK_IMPORTED_MODULE_4__.providers),
+/* harmony export */   callback: () => (/* reexport safe */ _callbackMaker_function__WEBPACK_IMPORTED_MODULE_7__.callback),
+/* harmony export */   callbackMaker: () => (/* reexport safe */ _callbackMaker_function__WEBPACK_IMPORTED_MODULE_7__.callbackMaker),
+/* harmony export */   children: () => (/* reexport safe */ _children__WEBPACK_IMPORTED_MODULE_10__.children),
+/* harmony export */   letProp: () => (/* reexport safe */ _letProp_function__WEBPACK_IMPORTED_MODULE_4__.letProp),
+/* harmony export */   letState: () => (/* reexport safe */ _letState_function__WEBPACK_IMPORTED_MODULE_5__.letState),
+/* harmony export */   onDestroy: () => (/* reexport safe */ _onDestroy__WEBPACK_IMPORTED_MODULE_9__.onDestroy),
+/* harmony export */   onInit: () => (/* reexport safe */ _onInit__WEBPACK_IMPORTED_MODULE_8__.onInit),
+/* harmony export */   providers: () => (/* reexport safe */ _providers__WEBPACK_IMPORTED_MODULE_6__.providers),
 /* harmony export */   setUse: () => (/* reexport safe */ _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse),
 /* harmony export */   state: () => (/* reexport safe */ _state_function__WEBPACK_IMPORTED_MODULE_2__.state),
+/* harmony export */   subject: () => (/* reexport safe */ _subject_function__WEBPACK_IMPORTED_MODULE_3__.subject),
 /* harmony export */   watch: () => (/* reexport safe */ _watch_function__WEBPACK_IMPORTED_MODULE_0__.watch)
 /* harmony export */ });
 /* harmony import */ var _watch_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./watch.function */ "../main/ts/state/watch.function.ts");
 /* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
 /* harmony import */ var _state_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./state.function */ "../main/ts/state/state.function.ts");
-/* harmony import */ var _letState_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./letState.function */ "../main/ts/state/letState.function.ts");
-/* harmony import */ var _providers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./providers */ "../main/ts/state/providers.ts");
-/* harmony import */ var _callbackMaker_function__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./callbackMaker.function */ "../main/ts/state/callbackMaker.function.ts");
-/* harmony import */ var _onInit__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./onInit */ "../main/ts/state/onInit.ts");
-/* harmony import */ var _onDestroy__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./onDestroy */ "../main/ts/state/onDestroy.ts");
-/* harmony import */ var _children__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./children */ "../main/ts/state/children.ts");
+/* harmony import */ var _subject_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./subject.function */ "../main/ts/state/subject.function.ts");
+/* harmony import */ var _letProp_function__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./letProp.function */ "../main/ts/state/letProp.function.ts");
+/* harmony import */ var _letState_function__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./letState.function */ "../main/ts/state/letState.function.ts");
+/* harmony import */ var _providers__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./providers */ "../main/ts/state/providers.ts");
+/* harmony import */ var _callbackMaker_function__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./callbackMaker.function */ "../main/ts/state/callbackMaker.function.ts");
+/* harmony import */ var _onInit__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./onInit */ "../main/ts/state/onInit.ts");
+/* harmony import */ var _onDestroy__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./onDestroy */ "../main/ts/state/onDestroy.ts");
+/* harmony import */ var _children__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./children */ "../main/ts/state/children.ts");
 
 
 
@@ -3798,6 +3859,39 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
+
+
+/***/ }),
+
+/***/ "../main/ts/state/letProp.function.ts":
+/*!********************************************!*\
+  !*** ../main/ts/state/letProp.function.ts ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   letProp: () => (/* binding */ letProp)
+/* harmony export */ });
+/* harmony import */ var _letState_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./letState.function */ "../main/ts/state/letState.function.ts");
+/* harmony import */ var _watch_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./watch.function */ "../main/ts/state/watch.function.ts");
+
+
+/**
+ * Enables the ability to maintain a change to a props value until the prop itself changes
+ * @param prop typically the name of an existing prop
+ * @returns immediately call the returned function: letProp(y)(x => [y, y=x])
+ */
+function letProp(prop) {
+    return getSetProp => {
+        let myProp = (0,_letState_function__WEBPACK_IMPORTED_MODULE_0__.letState)(prop)(getSetProp);
+        (0,_watch_function__WEBPACK_IMPORTED_MODULE_1__.watch)([prop], () => getSetProp(myProp = prop));
+        getSetProp(myProp);
+        return myProp;
+    };
+}
 
 
 /***/ }),
@@ -3999,15 +4093,14 @@ _setUse_function__WEBPACK_IMPORTED_MODULE_1__.setUse.memory.providerConfig = {
 };
 const providers = {
     create: (constructMethod) => {
-        const cm = constructMethod;
-        const compareTo = cm.compareTo = cm.compareTo || cm.toString();
         const stateDiffMemory = (0,_state_function__WEBPACK_IMPORTED_MODULE_2__.state)(() => ({ stateDiff: 0, provider: undefined }));
+        // mimic how many states were called the first time
         if (stateDiffMemory.stateDiff) {
             for (let x = stateDiffMemory.stateDiff; x > 0; --x) {
                 (0,_state_function__WEBPACK_IMPORTED_MODULE_2__.state)(undefined);
             }
             const result = (0,_state_function__WEBPACK_IMPORTED_MODULE_2__.state)(undefined);
-            stateDiffMemory.provider.constructMethod.compareTo = compareTo;
+            // stateDiffMemory.provider.constructMethod.compareTo = compareTo
             return result;
         }
         const result = (0,_state_function__WEBPACK_IMPORTED_MODULE_2__.state)(() => {
@@ -4029,6 +4122,9 @@ const providers = {
             stateDiffMemory.stateDiff = stateDiff;
             return instance;
         });
+        const cm = constructMethod;
+        // const compareTo = cm.compareTo = cm.compareTo || cm.toString()
+        const compareTo = cm.compareTo = cm.toString();
         stateDiffMemory.provider.constructMethod.compareTo = compareTo;
         return result;
     },
@@ -4195,6 +4291,7 @@ function state(defaultValue) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   StateEchoBack: () => (/* binding */ StateEchoBack),
+/* harmony export */   getCallbackValue: () => (/* binding */ getCallbackValue),
 /* harmony export */   getStateValue: () => (/* binding */ getStateValue)
 /* harmony export */ });
 /* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../errors */ "../main/ts/errors.ts");
@@ -4243,19 +4340,16 @@ function getStateValue(state) {
     if (!callback) {
         return state.defaultValue;
     }
-    const oldState = callback(StateEchoBack); // get value and set to undefined
-    const [oldValue] = oldState;
-    const [checkValue] = callback(oldValue); // set back to original value
+    const [value, checkValue] = getCallbackValue(callback);
     if (checkValue !== StateEchoBack) {
         const message = 'State property not used correctly. Second item in array is not setting value as expected.\n\n' +
             'For "let" state use `let name = state(default)(x => [name, name = x])`\n\n' +
             'For "const" state use `const name = state(default)()`\n\n' +
             'Problem state:\n' + (callback ? callback.toString() : JSON.stringify(state)) + '\n';
-        console.error(message, { state, callback, oldState, oldValue, checkValue });
+        console.error(message, { state, callback, value, checkValue });
         throw new Error(message);
     }
-    // state.lastValue = oldValue
-    return oldValue;
+    return value;
 }
 class StateEchoBack {
 }
@@ -4306,6 +4400,53 @@ function checkStateMismatch(
   })
 }
 */
+function getCallbackValue(callback) {
+    const oldState = callback(StateEchoBack); // get value and set to undefined
+    const [value] = oldState;
+    const [checkValue] = callback(value); // set back to original value
+    return [value, checkValue];
+}
+
+
+/***/ }),
+
+/***/ "../main/ts/state/subject.function.ts":
+/*!********************************************!*\
+  !*** ../main/ts/state/subject.function.ts ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   subject: () => (/* binding */ subject)
+/* harmony export */ });
+/* harmony import */ var _subject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../subject */ "../main/ts/subject/index.ts");
+/* harmony import */ var _tag_getSupportInCycle_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../tag/getSupportInCycle.function */ "../main/ts/tag/getSupportInCycle.function.ts");
+/* harmony import */ var _setUse_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./setUse.function */ "../main/ts/state/setUse.function.ts");
+/* harmony import */ var _state_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./state.function */ "../main/ts/state/state.function.ts");
+/* harmony import */ var _syncStates_function__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./syncStates.function */ "../main/ts/state/syncStates.function.ts");
+
+
+
+
+
+function subject(value, onSubscription) {
+    const oldestState = (0,_state_function__WEBPACK_IMPORTED_MODULE_3__.state)(() => _setUse_function__WEBPACK_IMPORTED_MODULE_2__.setUse.memory.stateConfig.array);
+    const nowTagSupport = (0,_tag_getSupportInCycle_function__WEBPACK_IMPORTED_MODULE_1__.getSupportInCycle)();
+    return new _subject__WEBPACK_IMPORTED_MODULE_0__.Subject(value, onSubscription).pipe(x => {
+        (0,_syncStates_function__WEBPACK_IMPORTED_MODULE_4__.syncStates)(nowTagSupport.memory.state, oldestState);
+        return x;
+    });
+}
+function all(args) {
+    const oldestState = (0,_state_function__WEBPACK_IMPORTED_MODULE_3__.state)(() => _setUse_function__WEBPACK_IMPORTED_MODULE_2__.setUse.memory.stateConfig.array);
+    const nowTagSupport = (0,_tag_getSupportInCycle_function__WEBPACK_IMPORTED_MODULE_1__.getSupportInCycle)();
+    return _subject__WEBPACK_IMPORTED_MODULE_0__.Subject.all(args).pipe(x => {
+        (0,_syncStates_function__WEBPACK_IMPORTED_MODULE_4__.syncStates)(nowTagSupport.memory.state, oldestState);
+        return x;
+    });
+}
+subject.all = all;
 
 
 /***/ }),
@@ -4571,16 +4712,6 @@ class Subject {
     }
     static globalSubCount$ = new Subject(0); // for ease of debugging
 }
-/*
-export const Subject = (<T>(value?: T, onSubscription?: OnSubscription<T>) => {
-  return new Subject(value, onSubscription)
-}) as (<T>(value?: T, onSubscription?: OnSubscription<T>) => Subject<T>) & {
-  globalSubCount$: Subject<number>
-  // globalSubs: Subscription<any>[]
-  all: <T>(...args: (T | Subject<T>)[]) => Subject<T>[]
-}
-*/
-// Subject.globalSubs = [] // 🔬 for testing
 
 
 /***/ }),
@@ -4943,12 +5074,6 @@ class BaseTagSupport {
         global.newest = this;
         subject.tagSupport = this;
         this.hasLiveElements = true;
-        // remove old clones
-        if (this.clones.length) {
-            // this.destroyClones()
-            // this.clones.forEach(clone => this.checkCloneRemoval(clone, 0))
-        }
-        global.insertBefore = insertBefore;
         const context = this.update();
         const template = this.getTemplate();
         const isForceElement = options.forceElement;
@@ -5034,12 +5159,23 @@ class TagSupport extends BaseTagSupport {
         stagger: 0,
         byParent: false, // Only destroy clones of direct children
     }) {
+        const firstDestroy = !options.byParent;
         const global = this.global;
         const subject = this.subject;
-        if (subject.clone) {
-            throw new Error('maybe issue here?');
+        const childTags = options.byParent ? [] : (0,_destroy_support__WEBPACK_IMPORTED_MODULE_6__.getChildTagsToDestroy)(this.childTags);
+        if (firstDestroy && (0,_isInstance__WEBPACK_IMPORTED_MODULE_2__.isTagComponent)(this.templater)) {
+            (0,_tagRunner__WEBPACK_IMPORTED_MODULE_5__.runBeforeDestroy)(this, this);
         }
-        // put back down the template tag
+        // signify immediately child has been deleted (looked for during event processing)
+        childTags.forEach(child => {
+            const subGlobal = child.global;
+            delete subGlobal.newest;
+            subGlobal.deleted = true;
+            if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_2__.isTagComponent)(child.templater)) {
+                (0,_tagRunner__WEBPACK_IMPORTED_MODULE_5__.runBeforeDestroy)(child, child);
+            }
+        });
+        // HTML DOM manipulation. Put back down the template tag
         const insertBefore = global.insertBefore;
         if (insertBefore.nodeName === 'TEMPLATE') {
             const placeholder = global.placeholder;
@@ -5049,25 +5185,12 @@ class TagSupport extends BaseTagSupport {
                 }
             }
         }
-        // the isComponent check maybe able to be removed
-        const isComponent = (0,_isInstance__WEBPACK_IMPORTED_MODULE_2__.isTagComponent)(this.templater) ? true : false;
-        if (isComponent) {
-            (0,_tagRunner__WEBPACK_IMPORTED_MODULE_5__.runBeforeDestroy)(this, this);
-        }
-        const childTags = options.byParent ? [] : (0,_destroy_support__WEBPACK_IMPORTED_MODULE_6__.getChildTagsToDestroy)(this.childTags);
-        // signify that no further event rendering should take place by making logic think a render occurred during event
-        // signify immediately child has been deleted (looked for during event processing)
-        childTags.forEach(child => {
-            const subGlobal = child.global;
-            delete subGlobal.newest;
-            subGlobal.deleted = true;
-        });
         this.destroySubscriptions();
         let mainPromise;
         if (this.ownerTagSupport) {
             this.ownerTagSupport.childTags = this.ownerTagSupport.childTags.filter(child => child !== this);
         }
-        if (!options.byParent) {
+        if (firstDestroy) {
             const { stagger, promise } = this.destroyClones(options);
             options.stagger = stagger;
             if (promise) {
@@ -5130,13 +5253,6 @@ class TagSupport extends BaseTagSupport {
         const next = () => {
             const parentNode = clone.parentNode;
             if (parentNode) {
-                /*
-                const stillHas = Array.from(parentNode.children).includes(clone as Element)
-                if(stillHas) {
-                  console.log('stillHas', {clone})
-                  parentNode.removeChild(clone)
-                }
-                */
                 parentNode.removeChild(clone);
             }
             const ownerSupport = this.ownerTagSupport;
@@ -5204,6 +5320,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   checkDestroyPrevious: () => (/* binding */ checkDestroyPrevious),
 /* harmony export */   destroyArrayTag: () => (/* binding */ destroyArrayTag),
+/* harmony export */   isSimpleType: () => (/* binding */ isSimpleType),
 /* harmony export */   restoreTagMarker: () => (/* binding */ restoreTagMarker)
 /* harmony export */ });
 /* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../isInstance */ "../main/ts/isInstance.ts");
@@ -5259,10 +5376,17 @@ newValue, insertBefore) {
     const lastValue = displaySubject.lastValue; // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
     // was simple value but now something bigger
     if (hasLastValue && lastValue !== newValue) {
+        const newType = typeof (newValue);
+        if (isSimpleType(newType) && typeof (lastValue) === newType) {
+            return false;
+        }
         destroySimpleValue(insertBefore, displaySubject);
         return 'changed-simple-value';
     }
     return false;
+}
+function isSimpleType(value) {
+    return ['string', 'number', 'boolean'].includes(value);
 }
 function destroyArrayTag(tagSupport, counts) {
     (0,_destroyTag_function__WEBPACK_IMPORTED_MODULE_2__.destroyTagSupportPast)(tagSupport);
@@ -5669,19 +5793,6 @@ subject) {
         return prevSupport; // already rendered during triggered events
     }
     const toRedrawTag = prevSupport || lastSupport || global.oldest;
-    /*
-    if(oldestSupport === newSupport) {
-      newSupport = new TagSupport(
-        newSupport.templater,
-        newSupport.ownerTagSupport,
-        newSupport.subject,
-      )
-  
-      newSupport.memory = {...oldestSupport.memory}
-      newSupport.memory.state = [...oldestSupport.memory.state]
-      newSupport.global = oldestSupport.global
-    }
-    */
     const reSupport = (0,_renderWithSupport_function__WEBPACK_IMPORTED_MODULE_2__.renderWithSupport)(newSupport, toRedrawTag, subject, ownerSupport);
     const oldest = global.oldest || oldestSupport;
     reSupport.global.oldest = oldest;
@@ -6067,9 +6178,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const appElements = [];
-function tagElement(
-// app: TagComponent, // (...args: unknown[]) => TemplaterResult,
-app, // (...args: unknown[]) => TemplaterResult,
+/**
+ *
+ * @param app taggedjs tag
+ * @param element HTMLElement
+ * @param props object
+ * @returns
+ */
+function tagElement(app, // (...args: unknown[]) => TemplaterResult,
 element, props) {
     const appElmIndex = appElements.findIndex(appElm => appElm.element === element);
     if (appElmIndex >= 0) {
@@ -6089,7 +6205,8 @@ element, props) {
     const templateElm = document.createElement('template');
     templateElm.setAttribute('id', 'app-tag-' + appElements.length);
     templateElm.setAttribute('app-tag-detail', appElements.length.toString());
-    element.appendChild(templateElm);
+    const fragment = document.createDocumentFragment();
+    fragment.appendChild(templateElm);
     element.destroy = async () => {
         await tagSupport.destroy();
         const insertBefore = tagSupport.global.insertBefore;
@@ -6101,6 +6218,7 @@ element, props) {
     tagSupport.global.newest = tagSupport;
     element.setUse = app.original.setUse;
     appElements.push({ element, tagSupport });
+    element.appendChild(fragment);
     return {
         tagSupport,
         tags: app.original.tags,
@@ -6110,7 +6228,6 @@ function runWrapper(templater) {
     let newSupport = {};
     const subject = new _subject_ValueSubject__WEBPACK_IMPORTED_MODULE_2__.ValueSubject(newSupport);
     newSupport = new _TagSupport_class__WEBPACK_IMPORTED_MODULE_0__.BaseTagSupport(templater, subject);
-    // newSupport.ownerTagSupport = newSupport
     subject.set(templater);
     subject.tagSupport = newSupport;
     (0,_tagRunner__WEBPACK_IMPORTED_MODULE_1__.runBeforeRender)(newSupport, undefined);
@@ -6166,6 +6283,109 @@ function runBeforeRedraw(tagSupport, ownerTagSupport) {
 // Life cycle 4 - end of life
 function runBeforeDestroy(tagSupport, ownerTagSupport) {
     _state__WEBPACK_IMPORTED_MODULE_0__.setUse.tagUse.forEach(tagUse => tagUse.beforeDestroy(tagSupport, ownerTagSupport));
+}
+
+
+/***/ }),
+
+/***/ "../main/ts/tag/update/processFirstSubject.utils.ts":
+/*!**********************************************************!*\
+  !*** ../main/ts/tag/update/processFirstSubject.utils.ts ***!
+  \**********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ValueTypes: () => (/* binding */ ValueTypes),
+/* harmony export */   getValueType: () => (/* binding */ getValueType)
+/* harmony export */ });
+/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../isInstance */ "../main/ts/isInstance.ts");
+/* harmony import */ var _checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../checkDestroyPrevious.function */ "../main/ts/tag/checkDestroyPrevious.function.ts");
+
+
+var ValueTypes;
+(function (ValueTypes) {
+    ValueTypes["tag"] = "tag";
+    ValueTypes["templater"] = "templater";
+    ValueTypes["tagArray"] = "tag-array";
+    ValueTypes["tagComponent"] = "tag-component";
+    ValueTypes["value"] = "value";
+    ValueTypes["date"] = "date";
+    ValueTypes["string"] = "string";
+    ValueTypes["boolean"] = "boolean";
+    ValueTypes["undefined"] = "undefined";
+})(ValueTypes || (ValueTypes = {}));
+function getValueType(value) {
+    if (value === undefined || value === null) {
+        return ValueTypes.undefined;
+    }
+    const type = typeof (value);
+    if ((0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_1__.isSimpleType)(type)) {
+        return type;
+    }
+    if (value instanceof Date) {
+        return ValueTypes.date;
+    }
+    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isTagTemplater)(value)) {
+        return ValueTypes.templater;
+    }
+    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isTagClass)(value)) {
+        return ValueTypes.tag;
+    }
+    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_0__.isTagArray)(value)) {
+        return ValueTypes.tagArray;
+    }
+    return ValueTypes.tagComponent;
+}
+// export type ExistingValue = TemplaterResult | Tag[] | TagSupport | Function | Subject<unknown> | RegularValue | Tag
+
+
+/***/ }),
+
+/***/ "../main/ts/tag/update/processFirstSubjectValue.function.ts":
+/*!******************************************************************!*\
+  !*** ../main/ts/tag/update/processFirstSubjectValue.function.ts ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   processFirstSubjectValue: () => (/* binding */ processFirstSubjectValue)
+/* harmony export */ });
+/* harmony import */ var _processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./processSubjectComponent.function */ "../main/ts/tag/update/processSubjectComponent.function.ts");
+/* harmony import */ var _processTagArray__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./processTagArray */ "../main/ts/tag/update/processTagArray.ts");
+/* harmony import */ var _processRegularValue_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./processRegularValue.function */ "../main/ts/tag/update/processRegularValue.function.ts");
+/* harmony import */ var _processTag_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./processTag.function */ "../main/ts/tag/update/processTag.function.ts");
+/* harmony import */ var _processFirstSubject_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./processFirstSubject.utils */ "../main/ts/tag/update/processFirstSubject.utils.ts");
+
+
+
+
+
+function processFirstSubjectValue(value, subject, // could be tag via result.tag
+insertBefore, // <template end interpolate /> (will be removed)
+ownerSupport, // owner
+options) {
+    const valueType = (0,_processFirstSubject_utils__WEBPACK_IMPORTED_MODULE_4__.getValueType)(value);
+    switch (valueType) {
+        case _processFirstSubject_utils__WEBPACK_IMPORTED_MODULE_4__.ValueTypes.templater:
+            (0,_processTag_function__WEBPACK_IMPORTED_MODULE_3__.processTag)(value, insertBefore, ownerSupport, subject);
+            return;
+        case _processFirstSubject_utils__WEBPACK_IMPORTED_MODULE_4__.ValueTypes.tag:
+            const tag = value;
+            let templater = tag.templater;
+            if (!templater) {
+                templater = (0,_processTag_function__WEBPACK_IMPORTED_MODULE_3__.tagFakeTemplater)(tag);
+            }
+            (0,_processTag_function__WEBPACK_IMPORTED_MODULE_3__.processTag)(templater, insertBefore, ownerSupport, subject);
+            return;
+        case _processFirstSubject_utils__WEBPACK_IMPORTED_MODULE_4__.ValueTypes.tagArray:
+            return (0,_processTagArray__WEBPACK_IMPORTED_MODULE_1__.processTagArray)(subject, value, insertBefore, ownerSupport, options);
+        case _processFirstSubject_utils__WEBPACK_IMPORTED_MODULE_4__.ValueTypes.tagComponent:
+            (0,_processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_0__.processSubjectComponent)(value, subject, insertBefore, ownerSupport, options);
+            return;
+    }
+    (0,_processRegularValue_function__WEBPACK_IMPORTED_MODULE_2__.processFirstRegularValue)(value, subject, insertBefore);
 }
 
 
@@ -6238,6 +6458,7 @@ function processNewTag(value, ownerSupport) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   processFirstRegularValue: () => (/* binding */ processFirstRegularValue),
 /* harmony export */   processRegularValue: () => (/* binding */ processRegularValue)
 /* harmony export */ });
 /* harmony import */ var _updateBeforeTemplate_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../updateBeforeTemplate.function */ "../main/ts/updateBeforeTemplate.function.ts");
@@ -6251,9 +6472,24 @@ insertBefore) {
         return; // no need to update display, its the same
     }
     subject.lastValue = value;
+    const castedValue = (0,_updateBeforeTemplate_function__WEBPACK_IMPORTED_MODULE_0__.castTextValue)(value);
+    // replace existing string?
+    const oldClone = subject.clone;
+    if (oldClone) {
+        oldClone.textContent = castedValue;
+        return;
+    }
     // Processing of regular values
-    const clone = (0,_updateBeforeTemplate_function__WEBPACK_IMPORTED_MODULE_0__.updateBeforeTemplate)(value, before);
+    const clone = (0,_updateBeforeTemplate_function__WEBPACK_IMPORTED_MODULE_0__.updateBeforeTemplate)(castedValue, before);
     subject.clone = clone; // remember single element put down, for future updates
+}
+function processFirstRegularValue(value, subject, // could be tag via subject.tag
+insertBefore) {
+    subject.lastValue = value;
+    const castedValue = (0,_updateBeforeTemplate_function__WEBPACK_IMPORTED_MODULE_0__.castTextValue)(value);
+    // Processing of regular values
+    const clone = (0,_updateBeforeTemplate_function__WEBPACK_IMPORTED_MODULE_0__.updateBeforeTemplate)(castedValue, insertBefore);
+    subject.clone = clone; // remember single element put down, for future updates 
 }
 
 
@@ -6306,79 +6542,6 @@ function processSubjectComponent(templater, subject, insertBefore, ownerSupport,
     insertBefore, // <template end interpolate /> (will be removed)
     options);
     return reSupport;
-}
-
-
-/***/ }),
-
-/***/ "../main/ts/tag/update/processSubjectValue.function.ts":
-/*!*************************************************************!*\
-  !*** ../main/ts/tag/update/processSubjectValue.function.ts ***!
-  \*************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   processSubjectValue: () => (/* binding */ processSubjectValue)
-/* harmony export */ });
-/* harmony import */ var _processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./processSubjectComponent.function */ "../main/ts/tag/update/processSubjectComponent.function.ts");
-/* harmony import */ var _isInstance__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../isInstance */ "../main/ts/isInstance.ts");
-/* harmony import */ var _processTagArray__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./processTagArray */ "../main/ts/tag/update/processTagArray.ts");
-/* harmony import */ var _processRegularValue_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./processRegularValue.function */ "../main/ts/tag/update/processRegularValue.function.ts");
-/* harmony import */ var _processTag_function__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./processTag.function */ "../main/ts/tag/update/processTag.function.ts");
-
-
-
-
-
-var ValueTypes;
-(function (ValueTypes) {
-    ValueTypes["tag"] = "tag";
-    ValueTypes["templater"] = "templater";
-    ValueTypes["tagArray"] = "tag-array";
-    ValueTypes["tagComponent"] = "tag-component";
-    ValueTypes["value"] = "value";
-})(ValueTypes || (ValueTypes = {}));
-function getValueType(value) {
-    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagComponent)(value)) {
-        return ValueTypes.tagComponent;
-    }
-    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagTemplater)(value)) {
-        return ValueTypes.templater;
-    }
-    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagClass)(value)) {
-        return ValueTypes.tag;
-    }
-    if ((0,_isInstance__WEBPACK_IMPORTED_MODULE_1__.isTagArray)(value)) {
-        return ValueTypes.tagArray;
-    }
-    return ValueTypes.value;
-}
-// export type ExistingValue = TemplaterResult | Tag[] | TagSupport | Function | Subject<unknown> | RegularValue | Tag
-function processSubjectValue(value, subject, // could be tag via result.tag
-insertBefore, // <template end interpolate /> (will be removed)
-ownerSupport, // owner
-options) {
-    const valueType = getValueType(value);
-    switch (valueType) {
-        case ValueTypes.templater:
-            (0,_processTag_function__WEBPACK_IMPORTED_MODULE_4__.processTag)(value, insertBefore, ownerSupport, subject);
-            return;
-        case ValueTypes.tag:
-            const tag = value;
-            let templater = tag.templater;
-            if (!templater) {
-                templater = (0,_processTag_function__WEBPACK_IMPORTED_MODULE_4__.tagFakeTemplater)(tag);
-            }
-            (0,_processTag_function__WEBPACK_IMPORTED_MODULE_4__.processTag)(templater, insertBefore, ownerSupport, subject);
-            return;
-        case ValueTypes.tagArray:
-            return (0,_processTagArray__WEBPACK_IMPORTED_MODULE_2__.processTagArray)(subject, value, insertBefore, ownerSupport, options);
-        case ValueTypes.tagComponent:
-            (0,_processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_0__.processSubjectComponent)(value, subject, insertBefore, ownerSupport, options);
-            return;
-    }
-    (0,_processRegularValue_function__WEBPACK_IMPORTED_MODULE_3__.processRegularValue)(value, subject, insertBefore);
 }
 
 
@@ -6565,11 +6728,13 @@ function processAddTagArrayItem(before, tagSupport, index, options, lastArray) {
         added: options.counts.added + index,
         removed: options.counts.removed,
     };
+    const fragment = document.createDocumentFragment();
     const newTempElm = document.createElement('template');
-    const parent = before.parentNode;
-    parent.insertBefore(newTempElm, before);
+    fragment.appendChild(newTempElm);
     tagSupport.buildBeforeElement(newTempElm, // before,
     { counts, forceElement: options.forceElement });
+    const parent = before.parentNode;
+    parent.insertBefore(fragment, before);
 }
 /** compare two values. If both values are arrays then the items will be compared */
 function areLikeValues(valueA, valueB) {
@@ -6845,8 +7010,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _isLikeTags_function__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../isLikeTags.function */ "../main/ts/tag/isLikeTags.function.ts");
 /* harmony import */ var _interpolations_bindSubjectCallback_function__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../interpolations/bindSubjectCallback.function */ "../main/ts/interpolations/bindSubjectCallback.function.ts");
 /* harmony import */ var _processTag_function__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./processTag.function */ "../main/ts/tag/update/processTag.function.ts");
-/* harmony import */ var _insertAfter_function__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../insertAfter.function */ "../main/ts/insertAfter.function.ts");
-
 
 
 
@@ -6963,11 +7126,14 @@ function prepareUpdateToComponent(templater, subjectTag, insertBefore, ownerSupp
         tagSupport.memory.state.push(...newestState);
     }
     else {
-        const placeholder = subjectSup.global.placeholder;
-        if (placeholder && !insertBefore.parentNode) {
-            (0,_insertAfter_function__WEBPACK_IMPORTED_MODULE_11__.insertAfter)(insertBefore, placeholder);
-            delete subjectSup.global.placeholder;
+        (0,_checkDestroyPrevious_function__WEBPACK_IMPORTED_MODULE_6__.restoreTagMarker)(subjectSup);
+        /*
+        const placeholder = subjectSup.global.placeholder
+        if(placeholder && !insertBefore.parentNode) {
+          insertAfter(insertBefore,placeholder)
+          delete subjectSup.global.placeholder
         }
+        */
         (0,_processSubjectComponent_function__WEBPACK_IMPORTED_MODULE_7__.processSubjectComponent)(templater, subjectTag, insertBefore, ownerSupport, {
             forceElement: true,
             counts: { added: 0, removed: 0 },
@@ -6992,22 +7158,26 @@ function prepareUpdateToComponent(templater, subjectTag, insertBefore, ownerSupp
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   castTextValue: () => (/* binding */ castTextValue),
 /* harmony export */   updateBeforeTemplate: () => (/* binding */ updateBeforeTemplate)
 /* harmony export */ });
 // Function to update the value of x
-function updateBeforeTemplate(value, lastFirstChild) {
+function updateBeforeTemplate(value, // value should be casted before calling here
+lastFirstChild) {
     const parent = lastFirstChild.parentNode;
-    let castedValue = value;
-    // mimic React skipping to display EXCEPT for true does display on page
-    if ([undefined, false, null].includes(value)) { // || value === true
-        castedValue = '';
-    }
     // Insert the new value (never use innerHTML here)
-    const textNode = document.createTextNode(castedValue); // never innerHTML
+    const textNode = document.createTextNode(value); // never innerHTML
     parent.insertBefore(textNode, lastFirstChild);
     /* remove existing nodes */
     parent.removeChild(lastFirstChild);
     return textNode;
+}
+function castTextValue(value) {
+    // mimic React skipping to display EXCEPT for true does display on page
+    if ([undefined, false, null].includes(value)) { // || value === true
+        return '';
+    }
+    return value;
 }
 
 

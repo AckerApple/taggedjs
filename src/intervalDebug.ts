@@ -14,7 +14,7 @@ export const intervalTester0 = tag(() => {
   const increase = () => ++intervalCount
 
   const startInterval = () => {
-    console.info('interval test 0 started...')
+    console.info('🟢 interval test 0 started...')
     trackTime()
 
     intervalId = setInterval(callback(() => {
@@ -38,11 +38,10 @@ export const intervalTester0 = tag(() => {
 
       if(currentTime >= test0interval) {
         currentTime = 0
-        console.log('interval tick')
       }      
     }), 500)
 
-    console.log('▶️ interval started')
+    console.info('▶️ interval started')
   }
 
   const toggle = () => {
@@ -105,7 +104,7 @@ export const intervalTester1 = tag(() => {
     clearInterval(intervalId2)
     intervalId = undefined
     intervalId2 = undefined
-    console.info('interval 1 stopped')
+    console.info('🔴 interval 1 stopped')
   }
 
   function toggleInterval() {
@@ -113,7 +112,7 @@ export const intervalTester1 = tag(() => {
       return destroy()
     }
 
-    console.info('interval test 1 started...')
+    console.info('🟢 interval test 1 started...')
     trackTime()
     intervalId = setInterval(callback(() => {
       increase()
@@ -122,7 +121,7 @@ export const intervalTester1 = tag(() => {
   }
 
   onInit(toggleInterval)
-  onDestroy(toggleInterval)
+  onDestroy(destroy)
 
   ++renderCounter
 

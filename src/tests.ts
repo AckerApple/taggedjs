@@ -18,7 +18,7 @@ export async function runTests() {
     expect(counterInput).toBeDefined()
     const toggleTest = byId('toggle-test')
     expect(toggleTest).toBeDefined()
-    expect(toggleTest?.innerText).toBe('toggle test')
+    expect(toggleTest.innerText).toBe('toggle test')
     
     counterInput.value = '0'
     ;(counterInput as any).onkeyup({target: counterInput})
@@ -38,9 +38,9 @@ export async function runTests() {
   it('toggle test', () => {
     const toggleTest = byId('toggle-test')
     toggleTest.click()
-    expect(toggleTest?.innerText).toBe('toggle test true')
+    expect(toggleTest.innerText).toBe('toggle test true')
     toggleTest.click()
-    expect(toggleTest?.innerText).toBe('toggle test')
+    expect(toggleTest.innerText).toBe('toggle test')
     
     const propsTextarea = byId('props-debug-textarea') as HTMLTextAreaElement
     expect(propsTextarea.value.replace(/\s/g,'')).toBe(`{"test":33,"x":"y"}`)
@@ -79,11 +79,13 @@ export async function runTests() {
 
       if(firstRun) {
         expect(html('#🪈-pipedSubject')).toBe('')
+        expect(html('#🪈-pipedSubject-2')).toBe('')
       }
       
       click('#🥦-subject-increase-counter')
 
       expect(html('#🪈-pipedSubject')).toBe( html('#🥦-subject-counter-display') )
+      expect(html('#🪈-pipedSubject-2')).toBe( html('#🥦-subject-counter-display') )
     })
   })
 
@@ -98,6 +100,18 @@ export async function runTests() {
         ['#propsDebug-🥩-1-button', '#propsDebug-🥩-1-display'],
         ['#propsOneLevelFunUpdate-🥩-button', '#propsOneLevelFunUpdate-🥩-display'],
       )
+    })
+
+    it('letProp', () => {
+      // local and outside currently match
+      expectMatchedHtml('#propsDebug-🥩-0-display', '#propsDebug-🥩-2-display')
+      const propCounter = Number(html('#propsDebug-🥩-0-display'))
+      
+      click('#propsDebug-🥩-2-button')
+
+      // outer should not have changed
+      expect(html('#propsDebug-🥩-0-display')).toBe( propCounter.toString() )
+      expect(html('#propsDebug-🥩-2-display')).toBe( (propCounter + 1).toString() )      
     })
 
     it('basics', () => {
@@ -137,41 +151,43 @@ export async function runTests() {
     })
   })
 
-  it('providers', async () => {
-    testDuelCounterElements(
-      ['#increase-provider-🍌-0-button', '#increase-provider-🍌-0-display'],
-      ['#increase-provider-🍌-1-button', '#increase-provider-🍌-1-display'],
-    )
-
-    testDuelCounterElements(
-      ['#increase-provider-upper-🌹-0-button', '#increase-provider-upper-🌹-0-display'],
-      ['#increase-provider-upper-🌹-1-button', '#increase-provider-upper-🌹-1-display'],
-    )
-
-    testDuelCounterElements(
-      ['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'],
-      ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display'],
-    )
-  })
-
-  it('provider debug', () => {
-    testDuelCounterElements(
-      ['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'],
-      ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display'],
-    )
-
-    // change a counter in the parent element
-    testDuelCounterElements(
-      ['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'],
-      ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display'],
-    )
-
-    // now ensure that this inner tag still operates correctly even though parent just rendered but i did not from that change
-    testDuelCounterElements(
-      ['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'],
-      ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display'],
-    )
-  })
+  describe('providers', () => {
+    it('basics', () => {
+      testDuelCounterElements(
+        ['#increase-provider-🍌-0-button', '#increase-provider-🍌-0-display'],
+        ['#increase-provider-🍌-1-button', '#increase-provider-🍌-1-display'],
+      )
+  
+      testDuelCounterElements(
+        ['#increase-provider-upper-🌹-0-button', '#increase-provider-upper-🌹-0-display'],
+        ['#increase-provider-upper-🌹-1-button', '#increase-provider-upper-🌹-1-display'],
+      )
+  
+      testDuelCounterElements(
+        ['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'],
+        ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display'],
+      )
+    })
+  
+    it('inner outer debug', () => {
+      testDuelCounterElements(
+        ['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'],
+        ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display'],
+      )
+  
+      // change a counter in the parent element
+      testDuelCounterElements(
+        ['#increase-provider-🍀-0-button', '#increase-provider-🍀-0-display'],
+        ['#increase-provider-🍀-1-button', '#increase-provider-🍀-1-display'],
+      )
+  
+      // now ensure that this inner tag still operates correctly even though parent just rendered but i did not from that change
+      testDuelCounterElements(
+        ['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'],
+        ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display'],
+      )
+    })
+  })  
 
   describe('tagSwitching', () => {
     it('0', () => {
@@ -250,27 +266,27 @@ export async function runTests() {
       const insideCount = elmCount('#score-data-0-1-inside-button')
       expect(insideCount).toBe(0)
       expect(elmCount('#score-data-0-1-outside-button')).toBe(0)
-      byId('array-test-push-item')?.click()
+      byId('array-test-push-item').click()
       expect(elmCount('#score-data-0-1-inside-button')).toBe(1)
       expect(elmCount('#score-data-0-1-outside-button')).toBe(1)
       
       const insideElm = byId('score-data-0-1-inside-button')
       const insideDisplay = byId('score-data-0-1-inside-display')
-      let indexValue = insideDisplay?.innerText
+      let indexValue = insideDisplay.innerText
       const outsideElm = byId('score-data-0-1-outside-button')
       const outsideDisplay = byId('score-data-0-1-outside-display')
-      const outsideValue = outsideDisplay?.innerText
+      const outsideValue = outsideDisplay.innerText
       expect(indexValue).toBe(outsideValue)
   
-      insideElm?.click()
-      expect(insideDisplay?.innerText).toBe(outsideDisplay?.innerText)
-      expect(indexValue).toBe((Number(insideDisplay?.innerText) - 1).toString())
-      expect(indexValue).toBe((Number(outsideDisplay?.innerText) - 1).toString())
+      insideElm.click()
+      expect(insideDisplay.innerText).toBe(outsideDisplay.innerText)
+      expect(indexValue).toBe((Number(insideDisplay.innerText) - 1).toString())
+      expect(indexValue).toBe((Number(outsideDisplay.innerText) - 1).toString())
   
-      outsideElm?.click()
-      expect(insideDisplay?.innerText).toBe(outsideDisplay?.innerText)
-      expect(indexValue).toBe((Number(insideDisplay?.innerText) - 2).toString())
-      expect(indexValue).toBe((Number(outsideDisplay?.innerText) - 2).toString())
+      outsideElm.click()
+      expect(insideDisplay.innerText).toBe(outsideDisplay.innerText)
+      expect(indexValue).toBe((Number(insideDisplay.innerText) - 2).toString())
+      expect(indexValue).toBe((Number(outsideDisplay.innerText) - 2).toString())
     })
 
     it('🗑️ deletes', async () => {
@@ -289,7 +305,7 @@ export async function runTests() {
     })
   })
 
-  it('🪞 mirror testing', async () => {
+  it('🪞 mirror testing', () => {
     expectElmCount('#mirror-counter-display', 2)
     expectElmCount('#mirror-counter-button', 2)
     
@@ -320,7 +336,6 @@ export async function runTests() {
       expect(html('#🦷-watchTruthAsSub')).toBe( html('#🦷-truthSubChangeCount') )
     }
 
-    
     click('#watch-testing-num-button')
     
     expectMatchedHtml('#watch-testing-num-display', '#🍄-slowChangeCount')

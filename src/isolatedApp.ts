@@ -14,10 +14,10 @@ type viewTypes = 'watchTesting' | 'mirroring' | 'content' | 'arrays' | 'counters
 export const IsolatedApp = tag(() => {
   const views: viewTypes[] = [
     // 'content',
-    'counters',
+    // 'counters',
     // 'watchTesting',
 
-    // 'props',
+    'props',
     // 'mirroring',
     // 'providerDebug',
     
@@ -31,7 +31,7 @@ export const IsolatedApp = tag(() => {
   const appCounterSubject = state(() => new Subject(appCounter))
   const callback = callbackMaker()
   onInit(() => {
-    console.log('app init should only run once')    
+    console.info('1️⃣ app init should only run once')    
 
     appCounterSubject.subscribe(
       callback(x => {

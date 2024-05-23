@@ -1,4 +1,4 @@
-import { watch, letState, html, tag, InputElementTargetEvent, onInit } from "taggedjs"
+import { watch, letState, html, tag, InputElementTargetEvent, onInit, letProp } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
 import { watchTesting } from "./watchTesting.tag"
 
@@ -110,9 +110,14 @@ const propsDebug = tag((
 ) => (
   renderCount = letState(0)(x => [renderCount, renderCount=x]),
   propNumberChangeCount = letState(0)(x => [propNumberChangeCount, propNumberChangeCount=x]),
+
+  // poor way to update an argument
   myPropNumber = letState(propNumber)(x => [myPropNumber, myPropNumber=x]),
   _ = watch([propNumber], () => myPropNumber = propNumber),
   watchResults = watch([myPropNumber], () => ++propNumberChangeCount),
+
+  // simple way to locally only update an argument
+  __ = letProp(propNumber)(x => [propNumber, propNumber = x]),
 ) => html`<!--propsDebug.js-->
   <h3>Props Json</h3>
   <textarea style="font-size:0.6em;height:200px;width:100%" wrap="off"
@@ -133,6 +138,13 @@ const propsDebug = tag((
     >🐄 🥩 propNumber ${myPropNumber}</button>
     <span id="propsDebug-🥩-1-display">${myPropNumber}</span>
   </div>
+
+  <div>
+    <button id="propsDebug-🥩-2-button" onclick=${() => ++propNumber}
+    >🐄 🥩 local set propNumber ${propNumber}</button>
+    <span id="propsDebug-🥩-2-display">${propNumber}</span>
+  </div>
+
   <button
     title="test of increasing render count and nothing else"
     onclick=${() => ++renderCount}
@@ -140,7 +152,7 @@ const propsDebug = tag((
   
   <button onclick=${() => ++myPropNumber}
     title="only changes number locally but if change by parent than that is the number"
-  >🐄 🥩 local set propNumber ${myPropNumber}</button>
+  >🐄 🥩 local set myPropNumber ${myPropNumber}</button>
   
   <div>
     <small>

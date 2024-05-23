@@ -119,14 +119,18 @@ export function expect(expected: unknown) {
       console.error(message, {expected})
       throw new Error(message)
     },
-    toBe: (received: unknown, customMessage?: string) => {
+    toBe: (received: unknown, customMessage?: string | Function) => {
       if(expected === received) {
         return
       }
 
+      if(customMessage instanceof Function) {
+        customMessage = customMessage()
+      }
+
       const message = customMessage || `Expected ${typeof(expected)} ${JSON.stringify(expected)} to be ${typeof(received)} ${JSON.stringify(received)}`
       console.error(message, {received, expected})
-      throw new Error(message)
+      throw new Error(message as string)
     },
     toBeGreaterThan: (amount: number, customMessage?: string) => {
       const expectNum = expected as number

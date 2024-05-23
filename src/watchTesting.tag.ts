@@ -1,5 +1,4 @@
-import { watch, letState, html, tag, InputElementTargetEvent, onInit, state, ValueSubject } from "taggedjs"
-import { renderCountDiv } from "./renderCount.component"
+import { watch, letState, html, tag } from "taggedjs"
 
 export const watchTesting = tag(() => (
   stateNum = letState(0)(x => [stateNum, stateNum=x]),
