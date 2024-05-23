@@ -12,7 +12,7 @@ export function processSubjectComponent(
   subject: TagSubject,
   insertBefore: InsertBefore,
   ownerSupport: TagSupport,
-  options: {counts: Counts, forceElement?: boolean},
+  options: {counts: Counts},
 ): TagSupport {
   // Check if function component is wrapped in a tag() call
   // TODO: This below check not needed in production mode
@@ -43,7 +43,7 @@ export function processSubjectComponent(
   const providers = setUse.memory.providerConfig
   providers.ownerSupport = ownerSupport
   
-  const isRender = !reSupport || options.forceElement
+  const isRender = !reSupport
   if(isRender) {
     const support = reSupport || tagSupport
     reSupport = renderSubjectComponent(

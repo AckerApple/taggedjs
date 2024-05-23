@@ -50,7 +50,6 @@ export function tagElement(
   
   const fragment = document.createDocumentFragment()
   fragment.appendChild(templateElm)
-  // element.appendChild(templateElm)
 
   ;(element as any).destroy = async () => {
     await tagSupport.destroy()

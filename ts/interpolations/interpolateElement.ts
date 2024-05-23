@@ -7,14 +7,12 @@ import { Counts, InterpolateComponentResult } from "./interpolateTemplate"
 import { TagSupport } from "../tag/TagSupport.class"
 
 export type InterpolateOptions = {
-  /** make the element go on document */
-  forceElement?: boolean
   counts: Counts
 }
 
 /** Review elements within an element */
 export function interpolateElement(
-  container: Element, // element containing innerHTML to review interpolations
+  container: DocumentFragment, // element containing innerHTML to review interpolations
   context: Context, // variables used to evaluate
   interpolatedTemplates: TagTemplate,
   ownerSupport: TagSupport,
@@ -28,7 +26,6 @@ export function interpolateElement(
 
   if(result.keys.length) {
     const {clones: nextClones, tagComponents: nextTagComponents} = interpolateContentTemplates(
-      container,
       context,
       ownerSupport,
       options,
@@ -38,7 +35,7 @@ export function interpolateElement(
     tagComponents.push( ...nextTagComponents )
   }
 
-  interpolateAttributes(container, context, ownerSupport)
+  interpolateAttributes(template, context, ownerSupport)
   processChildrenAttributes(children, context, ownerSupport)
 
   return {clones, tagComponents}
@@ -49,13 +46,14 @@ function processChildrenAttributes(
   context: Context,
   ownerSupport: TagSupport,
 ) {
-  new Array(...children).forEach(child => {
+  for (let index=children.length-1; index >= 0; --index) {
+    const child = children[index]
     interpolateAttributes(child, context, ownerSupport)
-
+  
     if(child.children) {
       processChildrenAttributes(child.children, context, ownerSupport)
     }
-  })
+  }
 }
 
 export function interpolateString(string: string) {

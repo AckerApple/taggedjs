@@ -1,7 +1,7 @@
 import { isSubjectInstance, isTagComponent } from '../../isInstance'
 import { TemplateValue } from './processFirstSubject.utils'
 import { TagSubject } from '../../subject.types'
-import { Context, Tag } from '../Tag.class'
+import { Context } from '../Tag.class'
 import { TagSupport } from '../TagSupport.class'
 import { TemplaterResult, Wrapper } from '../../TemplaterResult.class'
 

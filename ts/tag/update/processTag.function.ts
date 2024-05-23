@@ -33,7 +33,6 @@ export function processTag(
   tagSupport.buildBeforeElement(
     insertBefore, {
       counts: {added:0, removed:0},
-      forceElement: true,
     }
   )
 }

@@ -42,7 +42,6 @@ export function updateExistingTagComponent(
       insertBefore,
       ownerSupport,
       {
-        forceElement: false,
         counts: {added: 0, removed: 0},
       }
     )
@@ -127,7 +126,6 @@ function buildNewTag(
   subject: TagSubject,
 ) {
   newSupport.buildBeforeElement(oldInsertBefore, {
-    forceElement: true,
     counts: {added: 0, removed: 0},
   })
 

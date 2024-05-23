@@ -9,23 +9,18 @@ export type InterpolatedContentTemplates = {
 }
 
 export function interpolateContentTemplates(
-  element: Element,
   context: any,
   tagSupport: TagSupport,
   options: InterpolateOptions,
   children: HTMLCollection,
 ): InterpolatedContentTemplates {
-  if ( !children || element.tagName === 'TEMPLATE' ) {
-    return {clones:[], tagComponents: []} // done
-  }
-
   // counting for animation stagger computing
   const counts = options.counts
   const clones: Clones = []
   const tagComponents: InterpolateComponentResult[] = []
-  const childArray = new Array(...children)
-
-  childArray.forEach(child => {
+  const childLength = children.length
+  for (let index=childLength-1; index >= 0; --index) {
+    const child = children[index]
     const {clones: nextClones, tagComponent} = interpolateTemplate(
       child as Template,
       context,
@@ -38,13 +33,12 @@ export function interpolateContentTemplates(
 
     if(tagComponent) {
       tagComponents.push(tagComponent)
-      return
+      continue
     }
       
     if ( child.children ) {      
-      const nextKids = new Array(...child.children)
-      nextKids.forEach((subChild, index) => {
-
+      for (let index = child.children.length - 1; index >= 0; --index) {
+        const subChild = child.children[index]
         // IF <template end /> its a variable to be processed
         if ( isRenderEndTemplate(subChild) ) {
           const {tagComponent} = interpolateTemplate(
@@ -61,7 +55,6 @@ export function interpolateContentTemplates(
         }
 
         const {clones:nextClones, tagComponents: nextTagComponent} = interpolateContentTemplates(
-          subChild,
           context,
           tagSupport,
           options,
@@ -70,9 +63,9 @@ export function interpolateContentTemplates(
 
         clones.push( ...nextClones )
         tagComponents.push( ...nextTagComponent )
-      })
+      }
     }
-  })
+  }
 
   return {clones, tagComponents}
 }

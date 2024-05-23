@@ -29,7 +29,6 @@ export function processTagArray(
   ownerSupport: TagSupport,
   options: {
     counts: Counts
-    forceElement?: boolean
   },
 ): Clones {
   const clones: Clones = ownerSupport.clones // []
@@ -105,7 +104,6 @@ export function processTagArray(
       const details = {
         template: tagSupport.getTemplate().string,
         array: value,
-        ownerTagContent: ownerSupport.lastTemplateString,
       }
       const message = 'Use html`...`.key(item) instead of html`...` to template an Array'
       console.error(message, details)
@@ -160,7 +158,6 @@ function processAddTagArrayItem(
   index: number,
   options: {
     counts: Counts
-    forceElement?: boolean
   },
   lastArray: LastArrayItem[],
 ) {
@@ -182,7 +179,7 @@ function processAddTagArrayItem(
 
   tagSupport.buildBeforeElement(
     newTempElm, // before,
-    {counts, forceElement: options.forceElement}
+    {counts}
   )
 
   const parent = before.parentNode as ParentNode

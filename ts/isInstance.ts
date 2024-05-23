@@ -2,12 +2,6 @@ import { SubjectLike } from "./subject/subject.utils"
 import { Tag } from "./tag/Tag.class"
 import { TemplaterResult } from "./TemplaterResult.class"
 
-export function isTagComponent(
-  value?: TemplaterResult | unknown
-) {
-  return (value as TemplaterResult)?.wrapper?.parentWrap.original instanceof Function
-}
-
 export function isTag(
   value?: TemplaterResult | Tag | unknown
 ) {
@@ -19,6 +13,13 @@ export function isTagTemplater(
 ) {
   const templater = value as TemplaterResult
   return templater?.isTemplater === true && templater.wrapper === undefined
+}
+
+// TODO: whats the difference between isTagClass and isTagComponent
+export function isTagComponent(
+  value?: TemplaterResult | unknown
+) {
+  return (value as TemplaterResult)?.wrapper?.parentWrap.original instanceof Function
 }
 
 export function isTagClass(

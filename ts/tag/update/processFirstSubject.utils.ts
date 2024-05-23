@@ -1,4 +1,4 @@
-import { isTagArray, isTagClass, isTagTemplater } from '../../isInstance'
+import { isSubjectInstance, isTagArray, isTagClass, isTagComponent, isTagTemplater } from '../../isInstance'
 import { TagArraySubject } from './processTagArray'
 import { TemplaterResult } from '../../TemplaterResult.class'
 import { Clones } from '../../interpolations/Clones.type'
@@ -12,11 +12,12 @@ import { Subject } from '../../subject'
 import { isSimpleType } from '../checkDestroyPrevious.function'
 
 export enum ValueTypes {
+  unknown = 'unknown',
   tag = 'tag',
   templater = 'templater',
   tagArray = 'tag-array',
   tagComponent = 'tag-component',
-  value = 'value',
+  subject = 'subject',
   
   date = 'date',
   string = 'string',
@@ -30,13 +31,21 @@ export function getValueType(value: any): ValueTypes {
     return ValueTypes.undefined
   }
 
+  if(value instanceof Date) {
+    return ValueTypes.date
+  }
+
+  if(value instanceof Function) {
+    return ValueTypes.function
+  }
+
   const type = typeof(value)
-  if(isSimpleType(type) || type === 'function') {
+  if(isSimpleType(type)) {
     return type as ValueTypes
   }
 
-  if(value instanceof Date) {
-    return ValueTypes.date
+  if(isTagComponent(value)) {
+    return ValueTypes.tagComponent
   }
 
   if (isTagTemplater(value)) {
@@ -51,17 +60,19 @@ export function getValueType(value: any): ValueTypes {
     return ValueTypes.tagArray
   }
 
-  return ValueTypes.tagComponent
+  if(isSubjectInstance(value)) {
+    return ValueTypes.subject
+  }
+
+  return ValueTypes.unknown
 }
 
 export type processOptions = {
-  forceElement?: boolean
   counts: Counts // used to count stagger
 }
 
 export type ClonesAndPromise = {
   clones: Clones
-  // promise?: Promise<any>
 }
 
 export type InterpolateSubject = (ValueSubject<undefined> | TagArraySubject | TagSubject | DisplaySubject | ValueSubject<Callback>) & {
@@ -70,4 +81,3 @@ export type InterpolateSubject = (ValueSubject<undefined> | TagArraySubject | Ta
 
 // what can be put down with ${}
 export type TemplateValue = Tag | TemplaterResult | (Tag | TemplaterResult)[] | RegularValue | Subject<any> | Callback
-// export type ExistingValue = TemplaterResult | Tag[] | TagSupport | Function | Subject<unknown> | RegularValue | Tag

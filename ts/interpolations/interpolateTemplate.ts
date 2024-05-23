@@ -57,13 +57,11 @@ export function interpolateTemplate(
       }}
   }
   
-  let isForceElement = options.forceElement
   subscribeToTemplate(
     insertBefore,
     existingSubject,
     ownerSupport,
     counts,
-    {isForceElement},
   )
 
   return {clones}
@@ -74,7 +72,6 @@ export function subscribeToTemplate(
   subject: InterpolateSubject,
   ownerSupport: TagSupport,
   counts: Counts, // used for animation stagger computing
-  {isForceElement}: {isForceElement?:boolean},
 ) {
   let called = false
   const onValue = (value: TemplateValue) => {
@@ -97,13 +94,8 @@ export function subscribeToTemplate(
       ownerSupport,
       {
         counts: {...counts},
-        forceElement: isForceElement,
       },
     )
-
-    if(isForceElement) {
-      isForceElement = false // only can happen once
-    }
 
     called = true
   }
@@ -153,13 +145,15 @@ export function afterElmBuild(
   diff = elementInitCheck(elm, options.counts) - diff
 
   if((elm as Element).children) {
-    new Array(...(elm as Element).children as any).forEach((child, index) => {
+    const children = (elm as Element).children as any
+    for (let index = children.length - 1; index >= 0; --index) {
+      const child = children[index]
       const subOptions = {
         ...options,
        counts: options.counts,
       }
-
+  
       return afterElmBuild(child, subOptions, context, ownerSupport)
-    })
+    }
   }
 }

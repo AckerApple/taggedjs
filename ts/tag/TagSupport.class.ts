@@ -29,7 +29,6 @@ export class BaseTagSupport {
 
   strings?: string[]
   values?: any[]
-  lastTemplateString: string | undefined = undefined // used to compare templates for updates
 
   propsConfig: {
     latest: Props // new props NOT cloned props
@@ -79,7 +78,6 @@ export class BaseTagSupport {
   buildBeforeElement(
     insertBefore: InsertBefore,
     options: ElementBuildOptions = {
-      forceElement: false,
       counts: {added:0, removed: 0},
     },
   ) {
@@ -98,15 +96,14 @@ export class BaseTagSupport {
 
     subject.tagSupport = this as any as TagSupport
     this.hasLiveElements = true
-    
+
     const context = this.update()
     const template = this.getTemplate()
     
-    const isForceElement = options.forceElement
-    const elementContainer = document.createElement('div')
-    elementContainer.id = 'tag-temp-holder'
-    // render content with a first child that we can know is our first element
-    elementContainer.innerHTML = `<template id="temp-template-tag-wrap">${template.string}</template>`
+    const elementContainer = document.createDocumentFragment() as any
+    const tempDraw = document.createElement('template')
+    tempDraw.innerHTML = template.string
+    elementContainer.appendChild(tempDraw)
 
     // Search/replace innerHTML variables but don't interpolate tag components just yet
     const {tagComponents} = interpolateElement(
@@ -115,7 +112,6 @@ export class BaseTagSupport {
       template,
       this as any as TagSupport, // ownerSupport,
       {
-        forceElement: options.forceElement,
         counts: options.counts
       },
     )
@@ -135,7 +131,6 @@ export class BaseTagSupport {
         tagComponent.subject as TagSubject | TagArraySubject,
         tagComponent.ownerSupport,
         options.counts,
-        {isForceElement},
       )
 
       afterInterpolateElement(
@@ -161,7 +156,6 @@ export class BaseTagSupport {
     }).join('')
 
     const interpolation = interpolateString(string)
-    this.lastTemplateString = interpolation.string
     return {
       interpolation,
       string: interpolation.string,
@@ -181,8 +175,12 @@ export class BaseTagSupport {
     const values = this.values || thisTag.values
 
     strings.map((_string, index) => {
-      const variableName = variablePrefix + index
       const hasValue = values.length > index
+      if(!hasValue) {
+        return
+      }
+
+      const variableName = variablePrefix + index
       const value = values[index]
 
       // is something already there?
@@ -192,13 +190,8 @@ export class BaseTagSupport {
         return updateContextItem(context, variableName, value)
       }
 
-      if(!hasValue) {
-        return
-      }
-
       // 🆕 First time values below
       context[variableName] = processNewValue(
-        hasValue,
         value,
         this as any as TagSupport,
       )
@@ -235,6 +228,8 @@ export class TagSupport extends BaseTagSupport {
     if(firstDestroy && isTagComponent(this.templater)) {
       runBeforeDestroy(this, this)
     }
+
+    this.destroySubscriptions()
     
     // signify immediately child has been deleted (looked for during event processing)
     childTags.forEach(child => {
@@ -258,9 +253,7 @@ export class TagSupport extends BaseTagSupport {
         }
       }
     }
-    
-    this.destroySubscriptions()
-    
+        
     let mainPromise: Promise<number | (number | void | undefined)[]> | undefined
 
     if(this.ownerTagSupport) {
@@ -318,7 +311,7 @@ export class TagSupport extends BaseTagSupport {
       clone => this.checkCloneRemoval(clone, stagger)
     ).filter(x => x) // only return promises
 
-
+    // check subjects that may have clones attached to them
     const oldContext = this.global.context
     Object.values(oldContext).forEach(value => {
       const clone = (value as any).clone
@@ -393,7 +386,6 @@ export class TagSupport extends BaseTagSupport {
     const newSupport = renderSubjectComponent(this.subject, this, this.ownerTagSupport)
     await this.destroy()
     newSupport.buildBeforeElement(this.global.insertBefore as Element,{
-      forceElement: true,
       counts: {added:0, removed: 0},
     })
     return newSupport

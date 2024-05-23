@@ -14,6 +14,24 @@ export function checkDestroyPrevious(
   newValue: unknown,
   insertBefore: InsertBefore,
 ) {
+  const displaySubject = subject as DisplaySubject
+  const hasLastValue = 'lastValue' in displaySubject
+  const lastValue = displaySubject.lastValue // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
+  // was simple value but now something bigger
+  if(hasLastValue && lastValue !== newValue) {
+    const newType = typeof(newValue)
+    if( isSimpleType(newType) && typeof(lastValue) === newType ) {
+      return false
+    }
+
+    if(newValue instanceof Function && (lastValue as any) instanceof Function) {
+      return false
+    }
+
+    destroySimpleValue(insertBefore, displaySubject)
+    return 'changed-simple-value'
+  }
+
   const arraySubject = subject as TagArraySubject
   const wasArray = arraySubject.lastArray
   
@@ -62,19 +80,6 @@ export function checkDestroyPrevious(
     // destroy old component, value is not a component
     destroyTagMemory(lastSupport)
     return 'different-tag'
-  }
-
-  const displaySubject = subject as DisplaySubject
-  const hasLastValue = 'lastValue' in displaySubject
-  const lastValue = displaySubject.lastValue // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
-  // was simple value but now something bigger
-  if(hasLastValue && lastValue !== newValue) {
-    const newType = typeof(newValue)
-    if( isSimpleType(newType) && typeof(lastValue) === newType ) {
-      return false
-    }
-    destroySimpleValue(insertBefore, displaySubject)
-    return 'changed-simple-value'
   }
 
   return false
