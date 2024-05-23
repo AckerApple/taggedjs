@@ -22,7 +22,6 @@ export class BaseTagSupport {
     appElement; // only seen on this.getAppTagSupport().appElement
     strings;
     values;
-    lastTemplateString = undefined; // used to compare templates for updates
     propsConfig;
     // stays with current render
     memory = {
@@ -57,7 +56,6 @@ export class BaseTagSupport {
     }
     /** Function that kicks off actually putting tags down as HTML elements */
     buildBeforeElement(insertBefore, options = {
-        forceElement: false,
         counts: { added: 0, removed: 0 },
     }) {
         const subject = this.subject;
@@ -73,22 +71,20 @@ export class BaseTagSupport {
         this.hasLiveElements = true;
         const context = this.update();
         const template = this.getTemplate();
-        const isForceElement = options.forceElement;
-        const elementContainer = document.createElement('div');
-        elementContainer.id = 'tag-temp-holder';
-        // render content with a first child that we can know is our first element
-        elementContainer.innerHTML = `<template id="temp-template-tag-wrap">${template.string}</template>`;
+        const elementContainer = document.createDocumentFragment();
+        const tempDraw = document.createElement('template');
+        tempDraw.innerHTML = template.string;
+        elementContainer.appendChild(tempDraw);
         // Search/replace innerHTML variables but don't interpolate tag components just yet
         const { tagComponents } = interpolateElement(elementContainer, context, template, this, // ownerSupport,
         {
-            forceElement: options.forceElement,
             counts: options.counts
         });
         afterInterpolateElement(elementContainer, placeholderElm, this, // ownerSupport
         context, options);
         // Any tag components that were found should be processed AFTER the owner processes its elements. Avoid double processing of elements attributes like (oninit)=${}
         tagComponents.forEach(tagComponent => {
-            subscribeToTemplate(tagComponent.insertBefore, tagComponent.subject, tagComponent.ownerSupport, options.counts, { isForceElement });
+            subscribeToTemplate(tagComponent.insertBefore, tagComponent.subject, tagComponent.ownerSupport, options.counts);
             afterInterpolateElement(elementContainer, tagComponent.insertBefore, tagComponent.ownerSupport, context, options);
         });
     }
@@ -103,7 +99,6 @@ export class BaseTagSupport {
             return trimString;
         }).join('');
         const interpolation = interpolateString(string);
-        this.lastTemplateString = interpolation.string;
         return {
             interpolation,
             string: interpolation.string,
@@ -120,19 +115,19 @@ export class BaseTagSupport {
         const strings = this.strings || thisTag.strings;
         const values = this.values || thisTag.values;
         strings.map((_string, index) => {
-            const variableName = variablePrefix + index;
             const hasValue = values.length > index;
+            if (!hasValue) {
+                return;
+            }
+            const variableName = variablePrefix + index;
             const value = values[index];
             // is something already there?
             const exists = variableName in context;
             if (exists) {
                 return updateContextItem(context, variableName, value);
             }
-            if (!hasValue) {
-                return;
-            }
             // 🆕 First time values below
-            context[variableName] = processNewValue(hasValue, value, this);
+            context[variableName] = processNewValue(value, this);
         });
         return context;
     }
@@ -163,6 +158,7 @@ export class TagSupport extends BaseTagSupport {
         if (firstDestroy && isTagComponent(this.templater)) {
             runBeforeDestroy(this, this);
         }
+        this.destroySubscriptions();
         // signify immediately child has been deleted (looked for during event processing)
         childTags.forEach(child => {
             const subGlobal = child.global;
@@ -182,7 +178,6 @@ export class TagSupport extends BaseTagSupport {
                 }
             }
         }
-        this.destroySubscriptions();
         let mainPromise;
         if (this.ownerTagSupport) {
             this.ownerTagSupport.childTags = this.ownerTagSupport.childTags.filter(child => child !== this);
@@ -228,6 +223,7 @@ export class TagSupport extends BaseTagSupport {
         const oldClones = [...this.clones];
         this.clones.length = 0; // tag maybe used for something else
         const promises = oldClones.map(clone => this.checkCloneRemoval(clone, stagger)).filter(x => x); // only return promises
+        // check subjects that may have clones attached to them
         const oldContext = this.global.context;
         Object.values(oldContext).forEach(value => {
             const clone = value.clone;
@@ -286,7 +282,6 @@ export class TagSupport extends BaseTagSupport {
         const newSupport = renderSubjectComponent(this.subject, this, this.ownerTagSupport);
         await this.destroy();
         newSupport.buildBeforeElement(this.global.insertBefore, {
-            forceElement: true,
             counts: { added: 0, removed: 0 },
         });
         return newSupport;

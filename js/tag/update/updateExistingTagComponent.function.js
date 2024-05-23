@@ -23,7 +23,6 @@ subject, insertBefore) {
         const oldestSupport = lastSupport.global.oldest;
         destroyTagMemory(oldestSupport);
         return processSubjectComponent(templater, subject, insertBefore, ownerSupport, {
-            forceElement: false,
             counts: { added: 0, removed: 0 },
         });
     }
@@ -72,7 +71,6 @@ subject, insertBefore) {
 }
 function buildNewTag(newSupport, oldInsertBefore, oldTagSupport, subject) {
     newSupport.buildBeforeElement(oldInsertBefore, {
-        forceElement: true,
         counts: { added: 0, removed: 0 },
     });
     newSupport.global.oldest = newSupport;

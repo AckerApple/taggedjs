@@ -1,7 +1,7 @@
 import { Counts } from '../interpolations/interpolateTemplate';
 import { State } from '../state';
 import { InterpolatedTemplates } from '../interpolations/interpolations';
-import { InterpolateSubject } from './update/processSubjectValue.function';
+import { InterpolateSubject } from './update/processFirstSubject.utils';
 import { TemplaterResult } from '../TemplaterResult.class';
 import { TagValues } from './html';
 export declare const variablePrefix = "__tagvar";
@@ -39,5 +39,4 @@ export declare class Tag {
 }
 export type ElementBuildOptions = {
     counts: Counts;
-    forceElement?: boolean;
 };

@@ -1,6 +1,6 @@
 import { variablePrefix } from "../tag/Tag.class";
 import { elementInitCheck } from "./elementInitCheck";
-import { processSubjectValue } from "../tag/update/processSubjectValue.function";
+import { processFirstSubjectValue } from "../tag/update/processFirstSubjectValue.function";
 import { isTagArray, isTagComponent } from "../isInstance";
 import { scanTextAreaValue } from "./scanTextAreaValue.function";
 import { updateExistingValue } from "../tag/update/updateExistingValue.function";
@@ -33,12 +33,10 @@ options) {
             }
         };
     }
-    let isForceElement = options.forceElement;
-    subscribeToTemplate(insertBefore, existingSubject, ownerSupport, counts, { isForceElement });
+    subscribeToTemplate(insertBefore, existingSubject, ownerSupport, counts);
     return { clones };
 }
-export function subscribeToTemplate(insertBefore, subject, ownerSupport, counts, // used for animation stagger computing
-{ isForceElement }) {
+export function subscribeToTemplate(insertBefore, subject, ownerSupport, counts) {
     let called = false;
     const onValue = (value) => {
         if (called) {
@@ -46,13 +44,9 @@ export function subscribeToTemplate(insertBefore, subject, ownerSupport, counts,
             return;
         }
         const templater = value;
-        processSubjectValue(templater, subject, insertBefore, ownerSupport, {
+        processFirstSubjectValue(templater, subject, insertBefore, ownerSupport, {
             counts: { ...counts },
-            forceElement: isForceElement,
         });
-        if (isForceElement) {
-            isForceElement = false; // only can happen once
-        }
         called = true;
     };
     let mutatingCallback = onValue;
@@ -83,13 +77,15 @@ export function afterElmBuild(elm, options, context, ownerSupport) {
     let diff = options.counts.added;
     diff = elementInitCheck(elm, options.counts) - diff;
     if (elm.children) {
-        new Array(...elm.children).forEach((child, index) => {
+        const children = elm.children;
+        for (let index = children.length - 1; index >= 0; --index) {
+            const child = children[index];
             const subOptions = {
                 ...options,
                 counts: options.counts,
             };
             return afterElmBuild(child, subOptions, context, ownerSupport);
-        });
+        }
     }
 }
 //# sourceMappingURL=interpolateTemplate.js.map

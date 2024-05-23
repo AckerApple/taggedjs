@@ -22,7 +22,7 @@ export function processSubjectComponent(templater, subject, insertBefore, ownerS
     global.insertBefore = insertBefore;
     const providers = setUse.memory.providerConfig;
     providers.ownerSupport = ownerSupport;
-    const isRender = !reSupport || options.forceElement;
+    const isRender = !reSupport;
     if (isRender) {
         const support = reSupport || tagSupport;
         reSupport = renderSubjectComponent(subject, support, ownerSupport);

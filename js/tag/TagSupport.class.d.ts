@@ -12,7 +12,6 @@ export declare class BaseTagSupport {
     appElement?: Element;
     strings?: string[];
     values?: any[];
-    lastTemplateString: string | undefined;
     propsConfig: {
         latest: Props;
         latestCloned: Props;

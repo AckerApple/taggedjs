@@ -6,4 +6,4 @@ export type InterpolatedContentTemplates = {
     clones: Clones;
     tagComponents: InterpolateComponentResult[];
 };
-export declare function interpolateContentTemplates(element: Element, context: any, tagSupport: TagSupport, options: InterpolateOptions, children: HTMLCollection): InterpolatedContentTemplates;
+export declare function interpolateContentTemplates(context: any, tagSupport: TagSupport, options: InterpolateOptions, children: HTMLCollection): InterpolatedContentTemplates;

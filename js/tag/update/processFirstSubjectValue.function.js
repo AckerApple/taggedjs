@@ -1,9 +1,9 @@
 import { processSubjectComponent } from './processSubjectComponent.function';
 import { processTagArray } from './processTagArray';
-import { processRegularValue } from './processRegularValue.function';
+import { processFirstRegularValue } from './processRegularValue.function';
 import { processTag, tagFakeTemplater } from './processTag.function';
 import { ValueTypes, getValueType } from './processFirstSubject.utils';
-export function processSubjectValue(value, subject, // could be tag via result.tag
+export function processFirstSubjectValue(value, subject, // could be tag via result.tag
 insertBefore, // <template end interpolate /> (will be removed)
 ownerSupport, // owner
 options) {
@@ -26,6 +26,6 @@ options) {
             processSubjectComponent(value, subject, insertBefore, ownerSupport, options);
             return;
     }
-    processRegularValue(value, subject, insertBefore);
+    processFirstRegularValue(value, subject, insertBefore);
 }
-//# sourceMappingURL=processSubjectValue.function.js.map
+//# sourceMappingURL=processFirstSubjectValue.function.js.map

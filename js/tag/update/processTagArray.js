@@ -58,7 +58,6 @@ ownerSupport, options) {
             const details = {
                 template: tagSupport.getTemplate().string,
                 array: value,
-                ownerTagContent: ownerSupport.lastTemplateString,
             };
             const message = 'Use html`...`.key(item) instead of html`...` to template an Array';
             console.error(message, details);
@@ -103,7 +102,7 @@ function processAddTagArrayItem(before, tagSupport, index, options, lastArray) {
     const newTempElm = document.createElement('template');
     fragment.appendChild(newTempElm);
     tagSupport.buildBeforeElement(newTempElm, // before,
-    { counts, forceElement: options.forceElement });
+    { counts });
     const parent = before.parentNode;
     parent.insertBefore(fragment, before);
 }

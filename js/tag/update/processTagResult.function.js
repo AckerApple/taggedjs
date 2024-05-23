@@ -1,17 +1,16 @@
 export function processTagResult(tagSupport, subject, // used for recording past and current value
 insertBefore, // <template end interpolate />
-{ counts, forceElement, }) {
+{ counts, }) {
     // *if appears we already have seen
     const subjectTag = subject;
     const lastSupport = subjectTag.tagSupport;
-    const prevSupport = lastSupport?.global.oldest || undefined; // || tag.tagSupport.oldest // subjectTag.tag
-    const justUpdate = prevSupport; // && !forceElement
+    const prevSupport = lastSupport?.global.oldest || undefined;
+    const justUpdate = prevSupport;
     if (prevSupport && justUpdate) {
         return processTagResultUpdate(tagSupport, subjectTag, prevSupport);
     }
     tagSupport.buildBeforeElement(insertBefore, {
         counts,
-        forceElement,
     });
 }
 function processTagResultUpdate(tagSupport, subject, // used for recording past and current value

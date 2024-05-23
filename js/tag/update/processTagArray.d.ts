@@ -18,5 +18,4 @@ export declare function processTagArray(subject: TagArraySubject, value: (Templa
 insertBefore: InsertBefore, // <template end interpolate />
 ownerSupport: TagSupport, options: {
     counts: Counts;
-    forceElement?: boolean;
 }): Clones;
