@@ -21,6 +21,7 @@ export enum ValueTypes {
   date = 'date',
   string = 'string',
   boolean = 'boolean',
+  function = 'function',
   undefined = 'undefined',
 }
 
@@ -30,7 +31,7 @@ export function getValueType(value: any): ValueTypes {
   }
 
   const type = typeof(value)
-  if(isSimpleType(type)) {
+  if(isSimpleType(type) || type === 'function') {
     return type as ValueTypes
   }
 
