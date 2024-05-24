@@ -68,6 +68,7 @@ export function processFirstSubjectValue(
       const v = value as Wrapper
       if((v as any).oneRender) {
         const templater = new TemplaterResult([])
+        templater.tagJsType = 'oneRender'
         const tagSupport = newTagSupportByTemplater(
           templater, ownerSupport, subject as TagSubject
         )

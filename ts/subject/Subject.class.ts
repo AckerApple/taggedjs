@@ -1,5 +1,4 @@
 import { isSubjectInstance } from "../isInstance"
-import { ValueSubject } from "./ValueSubject"
 import { combineLatest } from "./combineLatest.function"
 import { OperatorFunction, SubjectLike, SubjectSubscriber, Subscription, getSubscription, runPipedMethods } from "./subject.utils"
 
@@ -10,12 +9,23 @@ export class Subject<T> implements SubjectLike<T> {
   isSubject = true
   subscribers: Subscription<T>[] = []
   subscribeWith?: (x: SubjectSubscriber<T>) => Subscription<T>
-  // unsubcount = 0 // 🔬 testing
+  _value?: T
 
   constructor(
-    public value?: T,
+    value?: T,
     public onSubscription?: OnSubscription<T>
-  ) {}
+  ) {
+    this._value = value
+  }
+
+  get value() {
+    return this._value
+  }
+
+  set value(newValue) {
+    this._value = newValue;
+    this.set(newValue)
+  }
 
   subscribe(callback: SubjectSubscriber<T>) {
     const subscription = getSubscription(this, callback)
@@ -54,7 +64,7 @@ export class Subject<T> implements SubjectLike<T> {
   }
 
   set(value?: any) {
-    this.value = value
+    this._value = value
     
     // Notify all subscribers with the new value
     const subs = [...this.subscribers] // subs may change as we call callbacks
@@ -154,7 +164,7 @@ export class Subject<T> implements SubjectLike<T> {
     ...operations: OperatorFunction<any, any, any>[]
   ): Subject<unknown>;
   pipe(...operations: OperatorFunction<any, any, any>[]): Subject<any> {
-    const subject = new Subject(this.value)
+    const subject = new Subject(this._value)
     subject.methods = operations
     subject.subscribeWith = (x) => this.subscribe(x as any)
     subject.set = x => this.set(x)

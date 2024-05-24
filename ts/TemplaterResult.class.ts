@@ -43,7 +43,7 @@ export type TagGlobal = {
 }
 
 export class TemplaterResult {
-  isTemplater = true
+  tagJsType = 'templater'
   tagged!: boolean
   wrapper?: Wrapper
 

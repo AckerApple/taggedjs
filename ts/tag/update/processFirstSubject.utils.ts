@@ -1,4 +1,4 @@
-import { isSubjectInstance, isTagArray, isTagClass, isTagComponent, isTagTemplater } from '../../isInstance'
+import { isSubjectInstance, isTagArray } from '../../isInstance'
 import { TagArraySubject } from './processTagArray'
 import { TemplaterResult } from '../../TemplaterResult.class'
 import { Clones } from '../../interpolations/Clones.type'
@@ -13,10 +13,12 @@ import { isSimpleType } from '../checkDestroyPrevious.function'
 
 export enum ValueTypes {
   unknown = 'unknown',
-  tag = 'tag',
+  
+  tag = 'tag', // this one might be bad
   templater = 'templater',
-  tagArray = 'tag-array',
   tagComponent = 'tag-component',
+  
+  tagArray = 'tag-array',
   subject = 'subject',
   
   date = 'date',
@@ -31,37 +33,42 @@ export function getValueType(value: any): ValueTypes {
     return ValueTypes.undefined
   }
 
-  if(value instanceof Date) {
-    return ValueTypes.date
-  }
-
+  const type = typeof(value)
+  
   if(value instanceof Function) {
     return ValueTypes.function
   }
+  
+  if(type === 'object') {
+    if(value instanceof Date) {
+      return ValueTypes.date
+    }
+  
+    if(isSimpleType(type)) {
+      return type as ValueTypes
+    }
 
-  const type = typeof(value)
-  if(isSimpleType(type)) {
-    return type as ValueTypes
-  }
 
-  if(isTagComponent(value)) {
-    return ValueTypes.tagComponent
-  }
+    const tagJsType = value.tagJsType
+    if(tagJsType) {
+      const included = [
+        ValueTypes.tagComponent,
+        ValueTypes.templater,
+        ValueTypes.tag,
+      ].includes(tagJsType)
+  
+      if(included) {
+        return tagJsType
+      }
+    }
 
-  if (isTagTemplater(value)) {
-    return ValueTypes.templater
-  }
-
-  if (isTagClass(value)) {
-    return ValueTypes.tag
-  }
-
-  if (isTagArray(value)) {
-    return ValueTypes.tagArray
-  }
-
-  if(isSubjectInstance(value)) {
-    return ValueTypes.subject
+    if (isTagArray(value)) {
+      return ValueTypes.tagArray
+    }
+  
+    if(isSubjectInstance(value)) {
+      return ValueTypes.subject
+    }
   }
 
   return ValueTypes.unknown

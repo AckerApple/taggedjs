@@ -60,7 +60,7 @@ export function getFakeTemplater() {
     props: [] as Props,
     
     isTag: true,
-    isTemplater: false,
+    tagJsType: 'templater',
     tagged: false,
     
     madeChildIntoSubject: false,

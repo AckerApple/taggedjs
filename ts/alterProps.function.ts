@@ -1,6 +1,6 @@
 import { TagSupport } from './tag/TagSupport.class'
 import { deepClone, deepEqual } from './deepFunctions'
-import { isTag } from './isInstance'
+import { isStaticTag } from './isInstance'
 import { renderTagSupport } from './tag/render/renderTagSupport.function'
 import { setUse } from './state'
 import { getSupportInCycle } from './tag/getSupportInCycle.function'
@@ -10,7 +10,7 @@ export function alterProps(
   props: unknown,
   ownerSupport: TagSupport,
 ) {
-  const isPropTag = isTag(props)
+  const isPropTag = isStaticTag(props)
   const watchProps = isPropTag ? 0 : props
   const newProps = resetFunctionProps(watchProps, ownerSupport)
 

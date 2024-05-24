@@ -1,32 +1,34 @@
 import { SubjectLike } from "./subject/subject.utils"
 import { Tag } from "./tag/Tag.class"
+import { ValueTypes } from "./tag/update/processFirstSubject.utils"
 import { TemplaterResult } from "./TemplaterResult.class"
 
-export function isTag(
+export function isStaticTag(
   value?: TemplaterResult | Tag | unknown
 ) {
-  return isTagTemplater(value) || isTagClass(value)
+  return [
+    ValueTypes.tag,
+    ValueTypes.templater,
+  ].includes( (value as any)?.tagJsType )
 }
 
 export function isTagTemplater(
   value?: TemplaterResult | unknown
 ) {
-  const templater = value as TemplaterResult
-  return templater?.isTemplater === true && templater.wrapper === undefined
+  return (value as TemplaterResult)?.tagJsType === ValueTypes.templater
 }
 
 // TODO: whats the difference between isTagClass and isTagComponent
 export function isTagComponent(
   value?: TemplaterResult | unknown
 ) {
-  return (value as TemplaterResult)?.wrapper?.parentWrap.original instanceof Function
+  return (value as TemplaterResult)?.tagJsType === ValueTypes.tagComponent
 }
 
 export function isTagClass(
   value?: Tag | unknown
 ) {
-  const templater = value as Tag
-  return templater?.isTagClass === true
+  return (value as Tag)?.tagJsType === ValueTypes.tag
 }
 
 // isSubjectLike
@@ -36,6 +38,8 @@ export function isSubjectInstance(
   return (subject?.isSubject === true || subject?.subscribe) ? true : false // subject?.isSubject === true || 
 }
 
-export function isTagArray(value: any) {
-  return value instanceof Array && value.every(x => isTagClass(x) || isTagTemplater(x))
+export function isTagArray(value: unknown) {
+  return value instanceof Array && value.every(x => [
+    ValueTypes.tag, ValueTypes.templater, ValueTypes.tag, ValueTypes.tagComponent
+  ].includes( x?.tagJsType ))
 }

@@ -24,7 +24,9 @@ export function updateContextItem(
           subject as TagSubject,
         )
         
+        // TODO: Need to review if this is used
         if(isTagComponent(tagSupport)) {
+          console.warn('👉 deprecated code is being used #shareTemplaterGlobal 👈')
           shareTemplaterGlobal(tagSupport, newSupport)
         }
       }

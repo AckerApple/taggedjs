@@ -1,6 +1,6 @@
 import { DisplaySubject, TagSubject } from '../subject.types'
-import { isTag, isTagArray, isTagComponent } from '../isInstance'
-import { InterpolateSubject } from './update/processFirstSubject.utils'
+import { isStaticTag } from '../isInstance'
+import { InterpolateSubject, ValueTypes, getValueType } from './update/processFirstSubject.utils'
 import { TagArraySubject } from './update/processTagArray'
 import { isLikeTags } from './isLikeTags.function'
 import { Counts } from '../interpolations/interpolateTemplate'
@@ -17,8 +17,10 @@ export function checkDestroyPrevious(
   const displaySubject = subject as DisplaySubject
   const hasLastValue = 'lastValue' in displaySubject
   const lastValue = displaySubject.lastValue // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
+
   // was simple value but now something bigger
   if(hasLastValue && lastValue !== newValue) {
+    // below is faster than using getValueType
     const newType = typeof(newValue)
     if( isSimpleType(newType) && typeof(lastValue) === newType ) {
       return false
@@ -32,11 +34,12 @@ export function checkDestroyPrevious(
     return 'changed-simple-value'
   }
 
+  const valueType = getValueType(newValue)
   const arraySubject = subject as TagArraySubject
   const wasArray = arraySubject.lastArray
   
   // no longer an array
-  if (wasArray && !isTagArray(newValue)) {
+  if (wasArray && valueType!==ValueTypes.tagArray) {
     const placeholderElm = arraySubject.placeholder as Text
     delete arraySubject.lastArray
     delete arraySubject.placeholder
@@ -56,8 +59,8 @@ export function checkDestroyPrevious(
   
   // no longer tag or component?
   if(lastSupport) {
-    const isValueTag = isTag(newValue)
-    const isSubjectTag = isTag(subject.value)
+    const isValueTag = isStaticTag(newValue)
+    const isSubjectTag = isStaticTag(subject.value)
 
     if(isSubjectTag && isValueTag) {
       const newTag = newValue as TagSupport
@@ -73,8 +76,7 @@ export function checkDestroyPrevious(
       return false
     }
 
-    const isValueTagComponent = isTagComponent(newValue)
-    if(isValueTagComponent) {
+    if(valueType === ValueTypes.tagComponent) {
       return false // its still a tag component
     }
 

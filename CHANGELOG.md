@@ -7,8 +7,9 @@
 - Added `watch.noInit()`
 - Added `watch.truthy()`
 - Added `callback()`
-- Added optional state maker `const aTag = tag((...props...) => (...state...) => html)`
+- Added optional state maker `const aTag = tag((...props...) => (...state...) => html``)`
 - `setProp(x => [format, format = x])` is now `letProp(format)(x => [format, format = x])`
+- oneRender tags now with `const someTag = (...props...) => tag.oneRender = (...state...) => html`` `
 
 ### v2.5.0 - 5-2024
 - Added HMR support

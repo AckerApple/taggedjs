@@ -9,6 +9,7 @@ import { TagSubject } from '../subject.types'
 import { alterProps } from '../alterProps.function'
 import { ValueSubject } from '../subject/ValueSubject'
 import { TagChildrenInput, TagComponent, TagWrapper, tags } from './tag.utils'
+import { ValueTypes } from './update/processFirstSubject.utils'
 
 let tagCount = 0
 
@@ -23,6 +24,7 @@ export function tag<T extends Function>(
     ...props: (T | Tag | Tag[])[]
   ): TemplaterResult {
     const templater: TemplaterResult = new TemplaterResult(props)
+    templater.tagJsType = ValueTypes.tagComponent
     
     // attach memory back to original function that contains developer display logic
     const innerTagWrap: Wrapper = getTagWrap(
