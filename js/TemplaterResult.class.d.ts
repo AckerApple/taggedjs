@@ -32,7 +32,7 @@ export type TagGlobal = {
 };
 export declare class TemplaterResult {
     props: Props;
-    isTemplater: boolean;
+    tagJsType: string;
     tagged: boolean;
     wrapper?: Wrapper;
     madeChildIntoSubject: boolean;

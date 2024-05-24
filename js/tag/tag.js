@@ -7,6 +7,7 @@ import { TagSupport } from './TagSupport.class';
 import { alterProps } from '../alterProps.function';
 import { ValueSubject } from '../subject/ValueSubject';
 import { tags } from './tag.utils';
+import { ValueTypes } from './update/processFirstSubject.utils';
 let tagCount = 0;
 /** Wraps a function tag in a state manager and calls wrapped function on event cycles
  * For single rendering, no event cycles, use: tag.renderOnce = (props) => html``
@@ -15,6 +16,7 @@ export function tag(tagComponent) {
     /** function developer triggers */
     const parentWrap = (function tagWrapper(...props) {
         const templater = new TemplaterResult(props);
+        templater.tagJsType = ValueTypes.tagComponent;
         // attach memory back to original function that contains developer display logic
         const innerTagWrap = getTagWrap(templater, parentWrap);
         if (!innerTagWrap.parentWrap) {

@@ -31,6 +31,7 @@ options) {
             const v = value;
             if (v.oneRender) {
                 const templater = new TemplaterResult([]);
+                templater.tagJsType = 'oneRender';
                 const tagSupport = newTagSupportByTemplater(templater, ownerSupport, subject);
                 let tag;
                 const wrap = () => {

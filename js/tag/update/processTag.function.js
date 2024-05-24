@@ -33,7 +33,7 @@ export function getFakeTemplater() {
         // props: {} as Props,
         props: [],
         isTag: true,
-        isTemplater: false,
+        tagJsType: 'templater',
         tagged: false,
         madeChildIntoSubject: false,
         html: () => fake

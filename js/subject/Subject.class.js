@@ -2,16 +2,22 @@ import { isSubjectInstance } from "../isInstance";
 import { combineLatest } from "./combineLatest.function";
 import { getSubscription, runPipedMethods } from "./subject.utils";
 export class Subject {
-    value;
     onSubscription;
     methods = [];
     isSubject = true;
     subscribers = [];
     subscribeWith;
-    // unsubcount = 0 // 🔬 testing
+    _value;
     constructor(value, onSubscription) {
-        this.value = value;
         this.onSubscription = onSubscription;
+        this._value = value;
+    }
+    get value() {
+        return this._value;
+    }
+    set value(newValue) {
+        this._value = newValue;
+        this.set(newValue);
     }
     subscribe(callback) {
         const subscription = getSubscription(this, callback);
@@ -37,7 +43,7 @@ export class Subject {
         return subscription;
     }
     set(value) {
-        this.value = value;
+        this._value = value;
         // Notify all subscribers with the new value
         const subs = [...this.subscribers]; // subs may change as we call callbacks
         const length = subs.length;
@@ -65,7 +71,7 @@ export class Subject {
         return this;
     }
     pipe(...operations) {
-        const subject = new Subject(this.value);
+        const subject = new Subject(this._value);
         subject.methods = operations;
         subject.subscribeWith = (x) => this.subscribe(x);
         subject.set = x => this.set(x);
