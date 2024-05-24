@@ -1,6 +1,3 @@
-export declare const propsDebugMain: ((_?: string) => (propNumber?: number, renderCount?: number, propsJson?: {
-    test: number;
-    x: string;
-}, date?: Date, syncPropNumber?: number, json?: string) => import("taggedjs").Tag) & {
+export declare const propsDebugMain: ((_?: any) => (propNumber?: any, renderCount?: any, propsJson?: any, date?: any, syncPropNumber?: any, json?: any) => import("taggedjs").Tag) & {
     original: Function;
 };

@@ -1,4 +1,5 @@
 export { App } from "./app.tag"
-export { IsolatedApp } from "./isolatedApp"
+import IsolatedApp from "./isolatedApp"
+export { IsolatedApp }
 export { hmr } from "taggedjs"
 export { app } from './app.function'

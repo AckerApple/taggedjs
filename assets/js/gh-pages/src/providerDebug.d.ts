@@ -13,6 +13,6 @@ export declare function upperTagDebugProvider(): {
     name: string;
     test: number;
 };
-export declare const providerDebugBase: ((_x?: string) => import("taggedjs").Tag) & {
+export declare const providerDebugBase: ((_x?: any) => import("taggedjs").Tag) & {
     original: Function;
 };

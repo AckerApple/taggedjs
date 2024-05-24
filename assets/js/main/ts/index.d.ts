@@ -24,4 +24,4 @@ export declare const hmr: {
     renderTagSupport: typeof renderTagSupport;
     renderTagOnly: typeof renderTagOnly;
 };
-export { Wrapper } from './TemplaterResult.class';
+export { Wrapper } from './tag/TemplaterResult.class';

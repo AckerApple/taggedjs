@@ -1,6 +1,6 @@
 import { Tag } from "taggedjs";
 type SelectedTag = null | string | undefined;
-export declare const tagSwitchDebug: ((_t?: string) => Tag) & {
+export declare const tagSwitchDebug: ((_t?: any) => Tag) & {
     original: Function;
 };
 export declare const ternaryPropTest: (({ selectedTag }: {

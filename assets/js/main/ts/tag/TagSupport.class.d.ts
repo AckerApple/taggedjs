@@ -1,6 +1,6 @@
 import { Props } from '../Props';
 import { Context, ElementBuildOptions, TagMemory, TagTemplate } from './Tag.class';
-import { TagGlobal, TemplaterResult } from '../TemplaterResult.class';
+import { TagGlobal, TemplaterResult } from './TemplaterResult.class';
 import { TagSubject } from '../subject.types';
 import { DestroyOptions } from './destroy.support';
 import { InsertBefore } from '../interpolations/Clones.type';

@@ -1,5 +1,5 @@
 import { TagArraySubject } from './processTagArray';
-import { TemplaterResult } from '../../TemplaterResult.class';
+import { TemplaterResult } from '../TemplaterResult.class';
 import { Clones } from '../../interpolations/Clones.type';
 import { Counts, Template } from '../../interpolations/interpolateTemplate';
 import { DisplaySubject, TagSubject } from '../../subject.types';

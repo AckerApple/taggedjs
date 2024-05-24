@@ -1,6 +1,6 @@
 import { InsertBefore } from "./interpolations/Clones.type";
 import { TagSupport } from "./tag/TagSupport.class";
-import { TemplaterResult } from "./TemplaterResult.class";
+import { TemplaterResult } from "./tag/TemplaterResult.class";
 import { Template } from "./interpolations/interpolateTemplate";
 import { Subject } from "./subject/Subject.class";
 import { ValueSubject } from "./subject/ValueSubject";

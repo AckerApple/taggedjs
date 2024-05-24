@@ -1,4 +1,4 @@
 import { Tag } from "taggedjs";
-export declare const childTests: ((_?: string) => (renderCount?: number, counter?: number) => Tag) & {
+export declare const childTests: ((_?: string) => (renderCount?: any, counter?: any) => Tag) & {
     original: Function;
 };

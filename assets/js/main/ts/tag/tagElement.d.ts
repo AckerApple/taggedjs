@@ -1,5 +1,5 @@
 import { TagSupport } from './TagSupport.class';
-import { TemplaterResult } from '../TemplaterResult.class';
+import { TemplaterResult } from './TemplaterResult.class';
 import { TagComponent, TagMaker } from './tag.utils';
 /**
  *
