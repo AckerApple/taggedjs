@@ -1,9 +1,10 @@
-const path = require('path');
-
-const out = path.resolve(__dirname, 'assets', 'dist');
+const path = require('path')
+const TerserPlugin = require('terser-webpack-plugin')
+const CompressionPlugin = require('compression-webpack-plugin')
+const out = path.resolve(__dirname, 'assets', 'dist')
 
 module.exports = {
-  mode: 'development',
+  mode: 'production', // development
   devtool: 'source-map',
   entry: './src/index.ts', // Entry point of your TypeScript application
   output: {
@@ -31,4 +32,16 @@ module.exports = {
       },
     ],
   },
+  optimization: {
+      minimize: true,
+      minimizer: [new TerserPlugin()],
+      splitChunks: {
+          chunks: 'all',
+      },
+  },
+  plugins: [
+      new CompressionPlugin({
+          algorithm: 'gzip',
+      }),
+  ]
 }

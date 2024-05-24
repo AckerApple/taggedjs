@@ -1,13 +1,15 @@
 import { OperatorFunction, SubjectLike, SubjectSubscriber, Subscription } from "./subject.utils";
 export type OnSubscription<T> = (subscription: Subscription<T>) => unknown;
 export declare class Subject<T> implements SubjectLike<T> {
-    value?: T | undefined;
     onSubscription?: OnSubscription<T> | undefined;
     methods: OperatorFunction<any, any, any>[];
     isSubject: boolean;
     subscribers: Subscription<T>[];
     subscribeWith?: (x: SubjectSubscriber<T>) => Subscription<T>;
-    constructor(value?: T | undefined, onSubscription?: OnSubscription<T> | undefined);
+    _value?: T;
+    constructor(value?: T, onSubscription?: OnSubscription<T> | undefined);
+    get value(): T | undefined;
+    set value(newValue: T | undefined);
     subscribe(callback: SubjectSubscriber<T>): Subscription<T> | Subscription<any>;
     set(value?: any): void;
     next: (value?: any) => void;

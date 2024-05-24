@@ -11,6 +11,7 @@ import { renderCountDiv } from "./renderCount.component"
 import { counters } from "./countersDebug"
 import { providerDebugBase } from "./providerDebug"
 import { watchTesting } from "./watchTesting.tag"
+import { oneRender } from "./oneRender.tag"
 
 export const App = tag(() => {
   let _firstState = letState('app first state')(x => [_firstState, _firstState=x])
@@ -123,6 +124,11 @@ export const App = tag(() => {
         <fieldset style="flex:2 2 20em">
           <legend>Table Tests</legend>
           ${tableDebug()}
+        </fieldset>
+
+        <fieldset style="flex:2 2 20em">
+          <legend>oneRender</legend>
+          ${oneRender()}
         </fieldset>
       </div>
 

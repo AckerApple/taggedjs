@@ -9,15 +9,17 @@ import { counters } from "./countersDebug"
 import { tableDebug } from "./tableDebug.component"
 import { contentDebug } from "./ContentDebug.component"
 import { watchTesting } from "./watchTesting.tag"
+import { oneRender } from "./oneRender.tag"
+import { renderCountDiv } from "./renderCount.component"
 
-type viewTypes = 'watchTesting' | 'mirroring' | 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
+type viewTypes = 'oneRender' | 'watchTesting' | 'mirroring' | 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
 export const IsolatedApp = tag(() => {
   const views: viewTypes[] = [
-    // 'content',
+    'content',
     // 'counters',
     // 'watchTesting',
-
-    'props',
+    'oneRender',
+    // 'props',
     // 'mirroring',
     // 'providerDebug',
     
@@ -27,6 +29,7 @@ export const IsolatedApp = tag(() => {
     // 'child',
   ]
   
+  let renderCount = letState(0)(x => [renderCount, renderCount = x])
   let appCounter = letState(0)(x => [appCounter, appCounter=x])
   const appCounterSubject = state(() => new Subject(appCounter))
   const callback = callbackMaker()
@@ -39,6 +42,8 @@ export const IsolatedApp = tag(() => {
       })
     )
   })
+
+  ++renderCount
 
   return html`<!--isolatedApp.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
@@ -54,6 +59,13 @@ export const IsolatedApp = tag(() => {
 
     <div id="tagDebug-fx-wrap">
       <div style="display:flex;flex-wrap:wrap;gap:1em">
+        ${views.includes('oneRender') && html`
+          <fieldset style="flex:2 2 20em">
+            <legend>oneRender</legend>
+            ${oneRender()}
+          </fieldset>
+        `}
+
         ${views.includes('props') && html`
           <fieldset style="flex:2 2 20em">
             <legend>propsDebugMain</legend>
@@ -130,6 +142,7 @@ export const IsolatedApp = tag(() => {
           */ false
         }
       </div>
+      ${renderCountDiv({renderCount, name:'isolatedApp'})}
     </div>
   `
 })
