@@ -1,6 +1,6 @@
-import { runBeforeRedraw, runBeforeRender } from '../tagRunner';
-import { setUse } from '../../state';
-import { runAfterRender } from '../tagRunner';
+import { runBeforeRedraw, runBeforeRender } from '../tagRunner.js';
+import { setUse } from '../../state/index.js';
+import { runAfterRender } from '../tagRunner.js';
 export function renderTagOnly(newTagSupport, lastSupport, subject, ownerSupport) {
     const oldRenderCount = newTagSupport.global.renderCount;
     beforeWithRender(newTagSupport, ownerSupport, lastSupport);

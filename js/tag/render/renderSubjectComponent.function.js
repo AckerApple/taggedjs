@@ -1,4 +1,4 @@
-import { renderWithSupport } from './renderWithSupport.function';
+import { renderWithSupport } from './renderWithSupport.function.js';
 export function renderSubjectComponent(subject, reSupport, ownerSupport) {
     const preClones = ownerSupport.clones.map(clone => clone);
     reSupport = renderWithSupport(reSupport, subject.tagSupport, // existing tag

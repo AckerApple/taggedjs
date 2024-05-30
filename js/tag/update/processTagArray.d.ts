@@ -1,9 +1,9 @@
-import { Clones, InsertBefore } from '../../interpolations/Clones.type';
-import { Tag } from '../Tag.class';
-import { ValueSubject } from '../../subject/ValueSubject';
-import { Counts } from '../../interpolations/interpolateTemplate';
-import { TagSupport } from '../TagSupport.class';
-import { TemplaterResult } from '../../TemplaterResult.class';
+import { Clones, InsertBefore } from '../../interpolations/Clones.type.js';
+import { Tag } from '../Tag.class.js';
+import { ValueSubject } from '../../subject/ValueSubject.js';
+import { Counts } from '../../interpolations/interpolateTemplate.js';
+import { TagSupport } from '../TagSupport.class.js';
+import { TemplaterResult } from '../TemplaterResult.class.js';
 export type LastArrayItem = {
     tagSupport: TagSupport;
     index: number;

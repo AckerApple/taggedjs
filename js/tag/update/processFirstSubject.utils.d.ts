@@ -1,26 +1,14 @@
-import { TagArraySubject } from './processTagArray';
-import { TemplaterResult } from '../../TemplaterResult.class';
-import { Clones } from '../../interpolations/Clones.type';
-import { Counts, Template } from '../../interpolations/interpolateTemplate';
-import { DisplaySubject, TagSubject } from '../../subject.types';
-import { ValueSubject } from '../../subject/ValueSubject';
-import { RegularValue } from './processRegularValue.function';
-import { Callback } from '../../interpolations/bindSubjectCallback.function';
-import { Tag } from '../Tag.class';
-import { Subject } from '../../subject';
-export declare enum ValueTypes {
-    unknown = "unknown",
-    tag = "tag",// this one might be bad
-    templater = "templater",
-    tagComponent = "tag-component",
-    tagArray = "tag-array",
-    subject = "subject",
-    date = "date",
-    string = "string",
-    boolean = "boolean",
-    function = "function",
-    undefined = "undefined"
-}
+import { TagArraySubject } from './processTagArray.js';
+import { TemplaterResult } from '../TemplaterResult.class.js';
+import { Clones } from '../../interpolations/Clones.type.js';
+import { Counts, Template } from '../../interpolations/interpolateTemplate.js';
+import { DisplaySubject, TagSubject } from '../../subject.types.js';
+import { ValueSubject } from '../../subject/ValueSubject.js';
+import { RegularValue } from './processRegularValue.function.js';
+import { Callback } from '../../interpolations/bindSubjectCallback.function.js';
+import { Tag } from '../Tag.class.js';
+import { Subject } from '../../subject/index.js';
+import { ValueTypes } from '../ValueTypes.enum.js';
 export declare function getValueType(value: any): ValueTypes;
 export type processOptions = {
     counts: Counts;

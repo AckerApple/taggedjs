@@ -1,6 +1,6 @@
-import { BaseTagSupport } from './TagSupport.class';
-import { runAfterRender, runBeforeRender } from './tagRunner';
-import { ValueSubject } from '../subject/ValueSubject';
+import { BaseTagSupport } from './TagSupport.class.js';
+import { runAfterRender, runBeforeRender } from './tagRunner.js';
+import { ValueSubject } from '../subject/ValueSubject.js';
 const appElements = [];
 /**
  *
@@ -52,7 +52,7 @@ export function runWrapper(templater) {
     let newSupport = {};
     const subject = new ValueSubject(newSupport);
     newSupport = new BaseTagSupport(templater, subject);
-    subject.set(templater);
+    subject.next(templater);
     subject.tagSupport = newSupport;
     runBeforeRender(newSupport, undefined);
     // Call the apps function for our tag templater

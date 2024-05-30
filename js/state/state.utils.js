@@ -1,5 +1,5 @@
-import { StateMismatchError } from '../errors';
-import { setUse } from './setUse.function';
+import { StateMismatchError } from '../errors.js';
+import { setUse } from './setUse.function.js';
 setUse.memory.stateConfig = {
     array: [], // state memory on the first render
     // rearray: [] as State,

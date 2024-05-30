@@ -1,4 +1,4 @@
-import { interpolateTemplate } from "./interpolateTemplate";
+import { interpolateTemplate } from './interpolateTemplate.js';
 export function interpolateContentTemplates(context, tagSupport, options, children) {
     // counting for animation stagger computing
     const counts = options.counts;

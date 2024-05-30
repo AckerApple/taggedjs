@@ -1,6 +1,6 @@
-import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class';
-import { ProviderConfig } from './providers';
-import { Config } from './state.utils';
+import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js';
+import { ProviderConfig } from './providers.js';
+import { Config } from './state.utils.js';
 interface TagUse {
     beforeRender: (tagSupport: BaseTagSupport, ownerTag?: TagSupport) => void;
     beforeRedraw: (tagSupport: BaseTagSupport, tag: TagSupport) => void;

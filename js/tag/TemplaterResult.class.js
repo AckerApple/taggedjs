@@ -1,12 +1,12 @@
-import { Tag } from './tag/Tag.class';
-import { kidsToTagArraySubject } from './tag/tag';
-import { ValueSubject } from './subject';
+import { Tag } from './Tag.class.js';
+import { ValueSubject } from '../subject/index.js';
+import { kidsToTagArraySubject } from './kidsToTagArraySubject.function.js';
 export class TemplaterResult {
     props;
     tagJsType = 'templater';
     tagged;
     wrapper;
-    madeChildIntoSubject = false;
+    madeChildIntoSubject;
     tag;
     children = new ValueSubject([]);
     constructor(props) {
@@ -14,9 +14,8 @@ export class TemplaterResult {
     }
     html(strings, ...values) {
         const children = new Tag(strings, values);
-        const { childSubject, madeSubject } = kidsToTagArraySubject(children);
+        const childSubject = kidsToTagArraySubject(children, this);
         this.children = childSubject;
-        this.madeChildIntoSubject = madeSubject;
         return this;
     }
 }

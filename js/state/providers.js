@@ -1,6 +1,6 @@
-import { deepClone } from '../deepFunctions';
-import { setUse } from './setUse.function';
-import { state } from './state.function';
+import { deepClone } from '../deepFunctions.js';
+import { setUse } from './setUse.function.js';
+import { state } from './state.function.js';
 setUse.memory.providerConfig = {
     providers: [],
     ownerSupport: undefined,

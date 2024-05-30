@@ -1,1 +1,1 @@
-export declare function getSupportInCycle(): import("./TagSupport.class").BaseTagSupport | undefined;
+export declare function getSupportInCycle(): import("./TagSupport.class.js").BaseTagSupport | undefined;

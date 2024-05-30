@@ -1,8 +1,8 @@
-import { ValueSubject } from '../subject';
-import { getSupportInCycle } from '../tag/getSupportInCycle.function';
-import { setUse } from './setUse.function';
-import { state } from './state.function';
-import { syncStates } from './syncStates.function';
+import { ValueSubject } from '../subject/index.js';
+import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
+import { setUse } from './setUse.function.js';
+import { state } from './state.function.js';
+import { syncStates } from './syncStates.function.js';
 /**
  * When an item in watch array changes, callback function will be triggered. Triggers on initial watch setup. TIP: try watch.noInit()
  * @param currentValues T[]
@@ -80,32 +80,13 @@ function defineOnMethod(getWatch, attachTo) {
                         const newestState = setUse.memory.stateConfig.array;
                         syncStates(newestState, originalState);
                     }
-                    subject.set(setTo);
+                    subject.next(setTo);
                 }, oldWatch.setup);
                 return subject;
             };
             method.setup = oldWatch.setup;
             defineOnMethod(() => method, method);
             return method;
-            /*
-            method.setup = setup
-          
-            defineOnMethod(() => method as any, method)
-            
-            return method as any
-      
-            
-            const oldWatch = getWatch()
-            const watch = newWatch( oldWatch.setup )
-            // const watch = getWatch()
-            
-            const subject = state(() => new Subject())
-            watch.setup.final = (x: any) => {
-              subject.set(x)
-              return subject
-            }
-            return watch
-            */
         },
     });
     Object.defineProperty(attachTo, 'truthy', {

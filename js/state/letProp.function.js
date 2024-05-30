@@ -1,5 +1,5 @@
-import { letState } from "./letState.function";
-import { watch } from "./watch.function";
+import { letState } from './letState.function.js';
+import { watch } from './watch.function.js';
 /**
  * Enables the ability to maintain a change to a props value until the prop itself changes
  * @param prop typically the name of an existing prop

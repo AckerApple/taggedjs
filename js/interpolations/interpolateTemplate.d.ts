@@ -1,8 +1,8 @@
-import { Context, ElementBuildOptions } from "../tag/Tag.class";
-import { InterpolateOptions } from "./interpolateElement";
-import { Clones, InsertBefore } from "./Clones.type";
-import { InterpolateSubject } from "../tag/update/processFirstSubject.utils";
-import { TagSupport } from "../tag/TagSupport.class";
+import { Context, ElementBuildOptions } from '../tag/Tag.class.js';
+import { InterpolateOptions } from './interpolateElement.js';
+import { Clones, InsertBefore } from './Clones.type.js';
+import { InterpolateSubject } from '../tag/update/processFirstSubject.utils.js';
+import { TagSupport } from '../tag/TagSupport.class.js';
 export type Template = Element & {
     clone?: any;
 };

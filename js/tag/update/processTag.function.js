@@ -1,5 +1,5 @@
-import { TagSupport } from '../TagSupport.class';
-import { ValueSubject } from '../../subject';
+import { TagSupport } from '../TagSupport.class.js';
+import { ValueSubject } from '../../subject/index.js';
 /** Could be a regular tag or a component. Both are Tag.class */
 export function processTag(templater, insertBefore, ownerSupport, // owner
 subject) {
@@ -13,13 +13,6 @@ subject) {
     tagSupport.buildBeforeElement(insertBefore, {
         counts: { added: 0, removed: 0 },
     });
-}
-export function setupNewTemplater(tagSupport, ownerSupport, subject) {
-    tagSupport.global.oldest = tagSupport;
-    tagSupport.global.newest = tagSupport;
-    // asking me to render will cause my parent to render
-    tagSupport.ownerTagSupport = ownerSupport;
-    subject.tagSupport = tagSupport;
 }
 export function tagFakeTemplater(tag) {
     const templater = getFakeTemplater();
@@ -35,7 +28,7 @@ export function getFakeTemplater() {
         isTag: true,
         tagJsType: 'templater',
         tagged: false,
-        madeChildIntoSubject: false,
+        madeChildIntoSubject: false, // TODO this can be removed
         html: () => fake
     };
     return fake;
@@ -45,5 +38,12 @@ export function newTagSupportByTemplater(templater, ownerSupport, subject) {
     setupNewTemplater(tagSupport, ownerSupport, subject);
     ownerSupport.childTags.push(tagSupport);
     return tagSupport;
+}
+export function setupNewTemplater(tagSupport, ownerSupport, subject) {
+    tagSupport.global.oldest = tagSupport;
+    tagSupport.global.newest = tagSupport;
+    // asking me to render will cause my parent to render
+    tagSupport.ownerTagSupport = ownerSupport;
+    subject.tagSupport = tagSupport;
 }
 //# sourceMappingURL=processTag.function.js.map

@@ -1,8 +1,9 @@
 {
   "name": "taggedjs",
-  "version": "2.5.14",
+  "version": "2.5.15",
   "description": "tagged template reactive html",
   "main": "js/index.js",
+  "type": "module",
   "keywords": [
     "react",
     "angular",

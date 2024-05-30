@@ -1,5 +1,5 @@
-import { deepClone, deepEqual } from '../deepFunctions';
-import { renderTagSupport } from '../tag/render/renderTagSupport.function';
+import { deepClone, deepEqual } from '../deepFunctions.js';
+import { renderTagSupport } from '../tag/render/renderTagSupport.function.js';
 export function providersChangeCheck(tagSupport) {
     const global = tagSupport.global;
     const providersWithChanges = global.providers.filter(provider => !deepEqual(provider.instance, provider.clone));

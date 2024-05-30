@@ -1,5 +1,6 @@
-import { deepClone } from '../deepFunctions';
-import { ValueTypes, getValueType } from './update/processFirstSubject.utils';
+import { deepClone } from '../deepFunctions.js';
+import { getValueType } from './update/processFirstSubject.utils.js';
+import { ValueTypes } from './ValueTypes.enum.js';
 export function cloneValueArray(values) {
     return values.map((value) => {
         const tag = value;

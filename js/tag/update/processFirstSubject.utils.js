@@ -1,19 +1,6 @@
-import { isSubjectInstance, isTagArray } from '../../isInstance';
-import { isSimpleType } from '../checkDestroyPrevious.function';
-export var ValueTypes;
-(function (ValueTypes) {
-    ValueTypes["unknown"] = "unknown";
-    ValueTypes["tag"] = "tag";
-    ValueTypes["templater"] = "templater";
-    ValueTypes["tagComponent"] = "tag-component";
-    ValueTypes["tagArray"] = "tag-array";
-    ValueTypes["subject"] = "subject";
-    ValueTypes["date"] = "date";
-    ValueTypes["string"] = "string";
-    ValueTypes["boolean"] = "boolean";
-    ValueTypes["function"] = "function";
-    ValueTypes["undefined"] = "undefined";
-})(ValueTypes || (ValueTypes = {}));
+import { isSubjectInstance, isTagArray } from '../../isInstance.js';
+import { isSimpleType } from '../checkDestroyPrevious.function.js';
+import { ValueTypes } from '../ValueTypes.enum.js';
 export function getValueType(value) {
     if (value === undefined || value === null) {
         return ValueTypes.undefined;

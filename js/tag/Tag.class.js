@@ -1,4 +1,4 @@
-import { ValueTypes } from './update/processFirstSubject.utils';
+import { ValueTypes } from './ValueTypes.enum.js';
 export const variablePrefix = '__tagvar';
 export const escapeVariable = '--' + variablePrefix + '--';
 export const escapeSearch = new RegExp(escapeVariable, 'g');

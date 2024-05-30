@@ -1,17 +1,17 @@
-import { escapeVariable, variablePrefix } from './Tag.class';
-import { deepClone } from '../deepFunctions';
-import { isTagComponent } from '../isInstance';
-import { cloneValueArray } from './cloneValueArray.function';
-import { restoreTagMarker } from './checkDestroyPrevious.function';
-import { runBeforeDestroy } from './tagRunner';
-import { getChildTagsToDestroy } from './destroy.support';
-import { elementDestroyCheck } from './elementDestroyCheck.function';
-import { updateContextItem } from './update/updateContextItem.function';
-import { processNewValue } from './update/processNewValue.function';
-import { setTagPlaceholder } from './setTagPlaceholder.function';
-import { interpolateElement, interpolateString } from '../interpolations/interpolateElement';
-import { subscribeToTemplate } from '../interpolations/interpolateTemplate';
-import { afterInterpolateElement } from '../interpolations/afterInterpolateElement.function';
+import { escapeVariable, variablePrefix } from './Tag.class.js';
+import { deepClone } from '../deepFunctions.js';
+import { isTagComponent } from '../isInstance.js';
+import { cloneValueArray } from './cloneValueArray.function.js';
+import { restoreTagMarker } from './checkDestroyPrevious.function.js';
+import { runBeforeDestroy } from './tagRunner.js';
+import { getChildTagsToDestroy } from './destroy.support.js';
+import { elementDestroyCheck } from './elementDestroyCheck.function.js';
+import { updateContextItem } from './update/updateContextItem.function.js';
+import { processNewValue } from './update/processNewValue.function.js';
+import { setTagPlaceholder } from './setTagPlaceholder.function.js';
+import { interpolateElement, interpolateString } from '../interpolations/interpolateElement.js';
+import { subscribeToTemplate } from '../interpolations/interpolateTemplate.js';
+import { afterInterpolateElement } from '../interpolations/afterInterpolateElement.function.js';
 const prefixSearch = new RegExp(variablePrefix, 'g');
 /** used only for apps, otherwise use TagSupport */
 export class BaseTagSupport {
@@ -37,6 +37,7 @@ export class BaseTagSupport {
         subscriptions: [],
     };
     hasLiveElements = false;
+    childTags = []; // tags on me
     constructor(templater, subject) {
         this.templater = templater;
         this.subject = subject;
@@ -132,6 +133,18 @@ export class BaseTagSupport {
         });
         return context;
     }
+    updateBy(tagSupport) {
+        const tempTag = tagSupport.templater.tag;
+        this.updateConfig(tempTag.strings, tempTag.values);
+    }
+    updateConfig(strings, values) {
+        this.strings = strings;
+        this.updateValues(values);
+    }
+    updateValues(values) {
+        this.values = values;
+        return this.updateContext(this.global.context);
+    }
 }
 export class TagSupport extends BaseTagSupport {
     templater;
@@ -139,7 +152,6 @@ export class TagSupport extends BaseTagSupport {
     subject;
     version;
     isApp = false;
-    childTags = []; // tags on me
     constructor(templater, // at runtime rendering of a tag, it needs to be married to a new TagSupport()
     ownerTagSupport, subject, version = 0) {
         super(templater, subject);
@@ -266,18 +278,6 @@ export class TagSupport extends BaseTagSupport {
             next();
         }
         return promise;
-    }
-    updateBy(tagSupport) {
-        const tempTag = tagSupport.templater.tag;
-        this.updateConfig(tempTag.strings, tempTag.values);
-    }
-    updateConfig(strings, values) {
-        this.strings = strings;
-        this.updateValues(values);
-    }
-    updateValues(values) {
-        this.values = values;
-        return this.updateContext(this.global.context);
     }
     getAppTagSupport() {
         let tag = this;

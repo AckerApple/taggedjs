@@ -1,6 +1,6 @@
-import { setUse } from '../state';
-import { Subject } from '../subject';
-import { getSupportInCycle } from './getSupportInCycle.function';
+import { setUse } from '../state/index.js';
+import { Subject } from '../subject/index.js';
+import { getSupportInCycle } from './getSupportInCycle.function.js';
 // Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
 setUse.memory.tagClosed$ = new Subject(undefined, subscription => {
     if (!getSupportInCycle()) {

@@ -1,10 +1,10 @@
-import { variablePrefix } from "../tag/Tag.class";
-import { elementInitCheck } from "./elementInitCheck";
-import { processFirstSubjectValue } from "../tag/update/processFirstSubjectValue.function";
-import { isTagArray, isTagComponent } from "../isInstance";
-import { scanTextAreaValue } from "./scanTextAreaValue.function";
-import { updateExistingValue } from "../tag/update/updateExistingValue.function";
-import { swapInsertBefore } from "../tag/setTagPlaceholder.function";
+import { variablePrefix } from '../tag/Tag.class.js';
+import { elementInitCheck } from './elementInitCheck.js';
+import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue.function.js';
+import { isTagArray, isTagComponent } from '../isInstance.js';
+import { scanTextAreaValue } from './scanTextAreaValue.function.js';
+import { updateExistingValue } from '../tag/update/updateExistingValue.function.js';
+import { swapInsertBefore } from '../tag/setTagPlaceholder.function.js';
 export function interpolateTemplate(insertBefore, // <template end interpolate /> (will be removed)
 context, // variable scope of {`__tagvar${index}`:'x'}
 ownerSupport, // Tag class
@@ -20,7 +20,7 @@ options) {
         return { clones }; // ignore, not a tagVar
     }
     const existingSubject = context[variableName];
-    const isDynamic = isTagComponent(existingSubject.value) || isTagArray(existingSubject.value);
+    const isDynamic = isTagComponent(existingSubject._value) || isTagArray(existingSubject.value);
     // process dynamics later
     if (isDynamic) {
         return {

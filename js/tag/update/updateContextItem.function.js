@@ -1,5 +1,5 @@
-import { isSubjectInstance, isTagComponent } from '../../isInstance';
-import { TagSupport } from '../TagSupport.class';
+import { isSubjectInstance, isTagComponent } from '../../isInstance.js';
+import { TagSupport } from '../TagSupport.class.js';
 export function updateContextItem(context, variableName, value) {
     const subject = context[variableName];
     const tagSubject = subject;
@@ -21,7 +21,7 @@ export function updateContextItem(context, variableName, value) {
         return; // emits on its own
     }
     // listeners will evaluate updated values to possibly update display(s)
-    subject.set(value);
+    subject.next(value);
     return;
 }
 function shareTemplaterGlobal(oldTagSupport, tagSupport) {

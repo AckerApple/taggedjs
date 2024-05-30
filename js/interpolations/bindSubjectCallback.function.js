@@ -1,5 +1,5 @@
 /** File largely responsible for reacting to element events, such as onclick */
-import { renderTagSupport } from "../tag/render/renderTagSupport.function";
+import { renderTagSupport } from '../tag/render/renderTagSupport.function.js';
 export function bindSubjectCallback(value, tagSupport) {
     // Is this children? No override needed
     if (value.isChildOverride) {

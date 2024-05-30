@@ -1,7 +1,7 @@
-import { Clones } from "./Clones.type";
-import { TagSupport } from "../tag/TagSupport.class";
-import { InterpolateOptions } from "./interpolateElement";
-import { InterpolateComponentResult } from "./interpolateTemplate";
+import { Clones } from './Clones.type.js';
+import { TagSupport } from '../tag/TagSupport.class.js';
+import { InterpolateOptions } from './interpolateElement.js';
+import { InterpolateComponentResult } from './interpolateTemplate.js';
 export type InterpolatedContentTemplates = {
     clones: Clones;
     tagComponents: InterpolateComponentResult[];

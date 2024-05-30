@@ -1,10 +1,10 @@
-import { isStaticTag } from '../isInstance';
-import { ValueTypes, getValueType } from './update/processFirstSubject.utils';
-import { isLikeTags } from './isLikeTags.function';
-import { destroyTagMemory, destroyTagSupportPast } from './destroyTag.function';
-import { insertAfter } from '../insertAfter.function';
+import { isStaticTag } from '../isInstance.js';
+import { isLikeTags } from './isLikeTags.function.js';
+import { destroyTagMemory, destroyTagSupportPast } from './destroyTag.function.js';
+import { insertAfter } from '../insertAfter.function.js';
+import { ValueTypes } from './ValueTypes.enum.js';
 export function checkDestroyPrevious(subject, // existing.value is the old value
-newValue, insertBefore) {
+newValue, insertBefore, valueType) {
     const displaySubject = subject;
     const hasLastValue = 'lastValue' in displaySubject;
     const lastValue = displaySubject.lastValue; // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
@@ -21,7 +21,6 @@ newValue, insertBefore) {
         destroySimpleValue(insertBefore, displaySubject);
         return 'changed-simple-value';
     }
-    const valueType = getValueType(newValue);
     const arraySubject = subject;
     const wasArray = arraySubject.lastArray;
     // no longer an array
@@ -41,7 +40,7 @@ newValue, insertBefore) {
     // no longer tag or component?
     if (lastSupport) {
         const isValueTag = isStaticTag(newValue);
-        const isSubjectTag = isStaticTag(subject.value);
+        const isSubjectTag = isStaticTag(subject._value);
         if (isSubjectTag && isValueTag) {
             const newTag = newValue;
             // its a different tag now

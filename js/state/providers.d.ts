@@ -1,4 +1,4 @@
-import { TagSupport } from '../tag/TagSupport.class';
+import { TagSupport } from '../tag/TagSupport.class.js';
 export type Provider = {
     constructMethod: any;
     instance: any;

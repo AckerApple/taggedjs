@@ -1,4 +1,4 @@
-import { hasPropChanges } from "./hasPropChanges.function";
+import { hasPropChanges } from './hasPropChanges.function.js';
 export function hasTagSupportChanged(oldTagSupport, newTagSupport, newTemplater) {
     const latestProps = newTemplater.props; // newTagSupport.propsConfig.latest
     const pastCloneProps = oldTagSupport.propsConfig.latestCloned;

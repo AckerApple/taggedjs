@@ -1,6 +1,6 @@
-import { isLikeTags } from '../isLikeTags.function';
-import { destroyTagMemory } from '../destroyTag.function';
-import { renderTagOnly } from './renderTagOnly.function';
+import { isLikeTags } from '../isLikeTags.function.js';
+import { destroyTagMemory } from '../destroyTag.function.js';
+import { renderTagOnly } from './renderTagOnly.function.js';
 export function renderWithSupport(newTagSupport, lastSupport, // previous
 subject, // events & memory
 ownerSupport) {

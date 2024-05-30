@@ -1,8 +1,8 @@
-import { setUse } from "./setUse.function";
-import { renderTagSupport } from "../tag/render/renderTagSupport.function";
-import { SyncCallbackError } from "../errors";
-import { syncStates } from "./syncStates.function";
-import { getSupportInCycle } from "../tag/getSupportInCycle.function";
+import { setUse } from './setUse.function.js';
+import { renderTagSupport } from '../tag/render/renderTagSupport.function.js';
+import { SyncCallbackError } from '../errors.js';
+import { syncStates } from './syncStates.function.js';
+import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
 let innerCallback = (callback) => (a, b, c, d, e, f) => {
     throw new SyncCallbackError('Callback function was called immediately in sync and must instead be call async');
 };

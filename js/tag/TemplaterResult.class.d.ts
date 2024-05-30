@@ -1,14 +1,14 @@
-import { Context, Tag } from './tag/Tag.class';
-import { BaseTagSupport, TagSupport } from './tag/TagSupport.class';
-import { Props } from './Props';
-import { TagChildren, TagWrapper } from './tag/tag.utils';
-import { Provider } from './state/providers';
-import { OnDestroyCallback } from './state/onDestroy';
-import { TagSubject } from './subject.types';
-import { OnInitCallback } from './state/onInit';
-import { Subscription } from './subject/subject.utils';
-import { InsertBefore } from './interpolations/Clones.type';
-import { TagValues } from './tag/html';
+import { Context, Tag } from './Tag.class.js';
+import { BaseTagSupport, TagSupport } from './TagSupport.class.js';
+import { Props } from '../Props.js';
+import { TagChildren, TagWrapper } from './tag.utils.js';
+import { Provider } from '../state/providers.js';
+import { OnDestroyCallback } from '../state/onDestroy.js';
+import { TagSubject } from '../subject.types.js';
+import { OnInitCallback } from '../state/onInit.js';
+import { Subscription } from '../subject/subject.utils.js';
+import { InsertBefore } from '../interpolations/Clones.type.js';
+import { TagValues } from './html.js';
 export type OriginalFunction = (() => Tag) & {
     compareTo: string;
 };
@@ -35,7 +35,7 @@ export declare class TemplaterResult {
     tagJsType: string;
     tagged: boolean;
     wrapper?: Wrapper;
-    madeChildIntoSubject: boolean;
+    madeChildIntoSubject?: boolean;
     tag?: Tag;
     children: TagChildren;
     constructor(props: Props);

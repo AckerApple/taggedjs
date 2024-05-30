@@ -1,9 +1,9 @@
-import { ValueSubject } from '../../subject/ValueSubject';
-import { ArrayNoKeyError } from '../../errors';
-import { destroyArrayTag } from '../checkDestroyPrevious.function';
-import { setupNewTemplater, tagFakeTemplater } from './processTag.function';
-import { TagSupport } from '../TagSupport.class';
-import { isTagClass } from '../../isInstance';
+import { ValueSubject } from '../../subject/ValueSubject.js';
+import { ArrayNoKeyError } from '../../errors.js';
+import { destroyArrayTag } from '../checkDestroyPrevious.function.js';
+import { setupNewTemplater, tagFakeTemplater } from './processTag.function.js';
+import { TagSupport } from '../TagSupport.class.js';
+import { isTagClass } from '../../isInstance.js';
 export function processTagArray(subject, value, // arry of Tag classes
 insertBefore, // <template end interpolate />
 ownerSupport, options) {

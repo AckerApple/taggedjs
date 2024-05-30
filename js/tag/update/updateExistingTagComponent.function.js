@@ -1,9 +1,9 @@
-import { hasTagSupportChanged } from '../hasTagSupportChanged.function';
-import { processSubjectComponent } from './processSubjectComponent.function';
-import { destroyTagMemory } from '../destroyTag.function';
-import { renderTagSupport } from '../render/renderTagSupport.function';
-import { callbackPropOwner } from '../../alterProps.function';
-import { isLikeTags } from '../isLikeTags.function';
+import { hasTagSupportChanged } from '../hasTagSupportChanged.function.js';
+import { processSubjectComponent } from './processSubjectComponent.function.js';
+import { destroyTagMemory } from '../destroyTag.function.js';
+import { renderTagSupport } from '../render/renderTagSupport.function.js';
+import { callbackPropOwner } from '../../alterProps.function.js';
+import { isLikeTags } from '../isLikeTags.function.js';
 export function updateExistingTagComponent(ownerSupport, tagSupport, // lastest
 subject, insertBefore) {
     let lastSupport = subject.tagSupport?.global.newest; // || subject.tagSupport
@@ -42,9 +42,9 @@ subject, insertBefore) {
     if (!hasOldest) {
         return buildNewTag(newSupport, insertBefore, lastSupport, subject);
     }
-    if (newOldest && templater.children.value.length) {
+    if (newOldest && templater.children._value.length) {
         const oldKidsSub = newOldest.templater.children;
-        oldKidsSub.set(templater.children.value);
+        oldKidsSub.next(templater.children._value);
     }
     // detect if both the function is the same and the return is the same
     const isLikeTag = isSameTag && isLikeTags(previous, newSupport);

@@ -1,7 +1,7 @@
-import { setUse } from '../../state';
-import { processTagResult } from './processTagResult.function';
-import { TagSupport } from '../TagSupport.class';
-import { renderSubjectComponent } from '../render/renderSubjectComponent.function';
+import { setUse } from '../../state/index.js';
+import { processTagResult } from './processTagResult.function.js';
+import { TagSupport } from '../TagSupport.class.js';
+import { renderSubjectComponent } from '../render/renderSubjectComponent.function.js';
 export function processSubjectComponent(templater, subject, insertBefore, ownerSupport, options) {
     // Check if function component is wrapped in a tag() call
     // TODO: This below check not needed in production mode

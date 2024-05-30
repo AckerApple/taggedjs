@@ -1,6 +1,6 @@
-import { providersChangeCheck } from '../../state/provider.utils';
-import { isLikeTags } from '../isLikeTags.function';
-import { renderWithSupport } from './renderWithSupport.function';
+import { providersChangeCheck } from '../../state/provider.utils.js';
+import { isLikeTags } from '../isLikeTags.function.js';
+import { renderWithSupport } from './renderWithSupport.function.js';
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(oldestSupport, // oldest with elements on html
 newSupport, // new to be rendered
