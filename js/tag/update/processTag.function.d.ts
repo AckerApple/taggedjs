@@ -1,4 +1,4 @@
-import { InsertBefore } from '../../interpolations/Clones.type.js';
+import { InsertBefore } from '../../interpolations/InsertBefore.type.js';
 import { Tag } from '../Tag.class.js';
 import { TagSubject } from '../../subject.types.js';
 import { TagSupport } from '../TagSupport.class.js';

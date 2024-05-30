@@ -3,7 +3,7 @@ import { Context, ElementBuildOptions, TagMemory, TagTemplate } from './Tag.clas
 import { TagGlobal, TemplaterResult } from './TemplaterResult.class.js';
 import { TagSubject } from '../subject.types.js';
 import { DestroyOptions } from './destroy.support.js';
-import { InsertBefore } from '../interpolations/Clones.type.js';
+import { InsertBefore } from '../interpolations/InsertBefore.type.js';
 /** used only for apps, otherwise use TagSupport */
 export declare class BaseTagSupport {
     templater: TemplaterResult;

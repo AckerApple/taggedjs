@@ -1,2 +1,2 @@
-import { InsertBefore } from './interpolations/Clones.type.js';
+import { InsertBefore } from './interpolations/InsertBefore.type.js';
 export declare function insertAfter(newNode: InsertBefore, referenceNode: InsertBefore): void;

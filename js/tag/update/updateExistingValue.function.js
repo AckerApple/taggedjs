@@ -1,7 +1,6 @@
 import { TagSupport } from '../TagSupport.class.js';
 import { TemplaterResult } from '../TemplaterResult.class.js';
 import { isTagClass, isTagTemplater } from '../../isInstance.js';
-import { getValueType } from './processFirstSubject.utils.js';
 import { processTagArray } from './processTagArray.js';
 import { updateExistingTagComponent } from './updateExistingTagComponent.function.js';
 import { processRegularValue } from './processRegularValue.function.js';
@@ -11,6 +10,7 @@ import { isLikeTags } from '../isLikeTags.function.js';
 import { setupNewTemplater, getFakeTemplater, processTag } from './processTag.function.js';
 import { swapInsertBefore } from '../setTagPlaceholder.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
+import { getValueType } from '../getValueType.function.js';
 export function updateExistingValue(subject, value, ownerSupport, insertBefore) {
     const subjectTag = subject;
     const valueType = getValueType(value);

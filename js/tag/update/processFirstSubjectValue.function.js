@@ -1,11 +1,11 @@
 import { processSubjectComponent } from './processSubjectComponent.function.js';
 import { processTagArray } from './processTagArray.js';
-import { TemplaterResult } from '../TemplaterResult.class.js';
 import { processFirstRegularValue } from './processRegularValue.function.js';
-import { newTagSupportByTemplater, processTag, tagFakeTemplater } from './processTag.function.js';
-import { getValueType } from './processFirstSubject.utils.js';
+import { processTag, tagFakeTemplater } from './processTag.function.js';
 import { renderTagOnly } from '../render/renderTagOnly.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
+import { oneRenderToTagSupport } from './oneRenderToTagSupport.function.js';
+import { getValueType } from '../getValueType.function.js';
 export function processFirstSubjectValue(value, subject, // could be tag via result.tag
 insertBefore, // <template end interpolate /> (will be removed)
 ownerSupport, // owner
@@ -39,20 +39,5 @@ options) {
             break;
     }
     processFirstRegularValue(value, subject, insertBefore);
-}
-export function oneRenderToTagSupport(wrapper, subject, ownerSupport) {
-    const templater = new TemplaterResult([]);
-    templater.tagJsType = 'oneRender';
-    const tagSupport = newTagSupportByTemplater(templater, ownerSupport, subject);
-    let tag;
-    const wrap = () => {
-        templater.tag = tag || (wrapper());
-        return tagSupport;
-    };
-    templater.wrapper = wrap;
-    wrap.parentWrap = wrap;
-    wrap.oneRender = true;
-    wrap.parentWrap.original = wrapper;
-    return tagSupport;
 }
 //# sourceMappingURL=processFirstSubjectValue.function.js.map

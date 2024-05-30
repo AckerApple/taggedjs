@@ -1,4 +1,4 @@
-import { Clones, InsertBefore } from '../../interpolations/Clones.type.js';
+import { InsertBefore } from '../../interpolations/InsertBefore.type.js';
 import { Tag } from '../Tag.class.js';
 import { ValueSubject } from '../../subject/ValueSubject.js';
 import { Counts } from '../../interpolations/interpolateTemplate.js';
@@ -18,4 +18,4 @@ export declare function processTagArray(subject: TagArraySubject, value: (Templa
 insertBefore: InsertBefore, // <template end interpolate />
 ownerSupport: TagSupport, options: {
     counts: Counts;
-}): Clones;
+}): InsertBefore[];

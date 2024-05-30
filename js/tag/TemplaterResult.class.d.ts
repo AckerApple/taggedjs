@@ -7,7 +7,7 @@ import { OnDestroyCallback } from '../state/onDestroy.js';
 import { TagSubject } from '../subject.types.js';
 import { OnInitCallback } from '../state/onInit.js';
 import { Subscription } from '../subject/subject.utils.js';
-import { InsertBefore } from '../interpolations/Clones.type.js';
+import { InsertBefore } from '../interpolations/InsertBefore.type.js';
 import { TagValues } from './html.js';
 export type OriginalFunction = (() => Tag) & {
     compareTo: string;

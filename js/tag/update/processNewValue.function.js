@@ -1,8 +1,8 @@
 import { ValueSubject } from '../../subject/ValueSubject.js';
 import { TemplaterResult } from '../TemplaterResult.class.js';
 import { TagSupport } from '../TagSupport.class.js';
-import { getValueType } from './processFirstSubject.utils.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
+import { getValueType } from '../getValueType.function.js';
 export function processNewValue(value, ownerSupport) {
     const valueType = getValueType(value);
     switch (valueType) {

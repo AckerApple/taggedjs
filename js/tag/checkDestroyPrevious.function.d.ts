@@ -1,6 +1,6 @@
 import { InterpolateSubject } from './update/processFirstSubject.utils.js';
 import { Counts } from '../interpolations/interpolateTemplate.js';
-import { InsertBefore } from '../interpolations/Clones.type.js';
+import { InsertBefore } from '../interpolations/InsertBefore.type.js';
 import { TagSupport } from './TagSupport.class.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 export declare function checkDestroyPrevious(subject: InterpolateSubject, // existing.value is the old value
