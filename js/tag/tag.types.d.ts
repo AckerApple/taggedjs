@@ -9,5 +9,5 @@ export type RouteProps = {
     query: RouteQuery;
 };
 export type ToTag = (...props: any[]) => StateToTag | Tag;
-export type StateToTag = (...state: any[]) => Tag;
+export type StateToTag = () => Tag;
 export type RouteTag = (extraProps?: Record<string, any>) => Tag;
