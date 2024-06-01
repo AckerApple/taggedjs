@@ -72,13 +72,14 @@ function defineOnMethod(getWatch, attachTo) {
         get() {
             const oldWatch = getWatch();
             const method = (currentValues, callback) => {
-                const originalState = state(() => getSupportInCycle().memory.state);
+                const firstSupport = state(() => getSupportInCycle());
                 const subject = state(() => new ValueSubject(undefined));
                 setupWatch(currentValues, (currentValues, previousValues) => {
+                    const nowTagSupport = getSupportInCycle();
                     const setTo = callback(currentValues, previousValues);
-                    if (originalState.length) {
+                    if (nowTagSupport !== firstSupport) {
                         const newestState = setUse.memory.stateConfig.array;
-                        syncStates(newestState, originalState);
+                        syncStates(newestState, firstSupport.memory.state);
                     }
                     subject.next(setTo);
                 }, oldWatch.setup);

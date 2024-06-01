@@ -6,7 +6,7 @@ export function destroyTagMemory(oldTagSupport) {
     oldTagSupport.global.context = {};
 }
 export function destroyTagSupportPast(oldTagSupport) {
-    delete oldTagSupport.global.oldest;
+    delete oldTagSupport.global.oldest; // TODO: This appears redundant of oldest.destroy() which clears global already
     delete oldTagSupport.global.newest;
 }
 //# sourceMappingURL=destroyTag.function.js.map

@@ -9,15 +9,17 @@ import { OnInitCallback } from '../state/onInit.js';
 import { Subscription } from '../subject/subject.utils.js';
 import { InsertBefore } from '../interpolations/InsertBefore.type.js';
 import { TagValues } from './html.js';
+import { Subject } from '../subject/index.js';
 export type OriginalFunction = (() => Tag) & {
     compareTo: string;
 };
-export type Wrapper = ((tagSupport: BaseTagSupport, subject: TagSubject) => TagSupport) & {
+export type Wrapper = ((tagSupport: BaseTagSupport | TagSupport, subject: TagSubject) => TagSupport) & {
     parentWrap: TagWrapper<any>;
 };
 export type TagGlobal = {
-    oldest?: TagSupport;
-    newest?: TagSupport;
+    destroy$: Subject<any>;
+    oldest: BaseTagSupport | TagSupport;
+    newest?: BaseTagSupport | TagSupport;
     context: Context;
     providers: Provider[];
     /** Indicator of re-rending. Saves from double rending something already rendered */

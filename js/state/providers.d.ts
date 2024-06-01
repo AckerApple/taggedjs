@@ -1,4 +1,4 @@
-import { TagSupport } from '../tag/TagSupport.class.js';
+import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js';
 export type Provider = {
     constructMethod: any;
     instance: any;
@@ -8,7 +8,7 @@ export type Provider = {
 type ProviderConstructor<T> = (new (...args: any[]) => T) | (() => T);
 export type ProviderConfig = {
     providers: Provider[];
-    ownerSupport?: TagSupport;
+    ownerSupport?: TagSupport | BaseTagSupport;
 };
 type functionProvider<T> = () => T;
 type classProvider<T> = new (...args: any[]) => T;

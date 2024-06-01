@@ -12,6 +12,7 @@ import { setTagPlaceholder } from './setTagPlaceholder.function.js';
 import { interpolateElement, interpolateString } from '../interpolations/interpolateElement.js';
 import { subscribeToTemplate } from '../interpolations/interpolateTemplate.js';
 import { afterInterpolateElement } from '../interpolations/afterInterpolateElement.function.js';
+import { Subject } from '../subject/Subject.class.js';
 const prefixSearch = new RegExp(variablePrefix, 'g');
 /** used only for apps, otherwise use TagSupport */
 export class BaseTagSupport {
@@ -29,12 +30,14 @@ export class BaseTagSupport {
     clones = []; // elements on document. Needed at destroy process to know what to destroy
     // travels with all rerenderings
     global = {
+        destroy$: new Subject(),
         context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
         providers: [],
         /** Indicator of re-rending. Saves from double rending something already rendered */
         renderCount: 0,
         deleted: false,
         subscriptions: [],
+        oldest: this
     };
     hasLiveElements = false;
     childTags = []; // tags on me
@@ -145,21 +148,6 @@ export class BaseTagSupport {
         this.values = values;
         return this.updateContext(this.global.context);
     }
-}
-export class TagSupport extends BaseTagSupport {
-    templater;
-    ownerTagSupport;
-    subject;
-    version;
-    isApp = false;
-    constructor(templater, // at runtime rendering of a tag, it needs to be married to a new TagSupport()
-    ownerTagSupport, subject, version = 0) {
-        super(templater, subject);
-        this.templater = templater;
-        this.ownerTagSupport = ownerTagSupport;
-        this.subject = subject;
-        this.version = version;
-    }
     destroy(options = {
         stagger: 0,
         byParent: false, // Only destroy clones of direct children
@@ -169,6 +157,7 @@ export class TagSupport extends BaseTagSupport {
         const subject = this.subject;
         const childTags = options.byParent ? [] : getChildTagsToDestroy(this.childTags);
         if (firstDestroy && isTagComponent(this.templater)) {
+            global.destroy$.next();
             runBeforeDestroy(this, this);
         }
         this.destroySubscriptions();
@@ -193,8 +182,9 @@ export class TagSupport extends BaseTagSupport {
             }
         }
         let mainPromise;
-        if (this.ownerTagSupport) {
-            this.ownerTagSupport.childTags = this.ownerTagSupport.childTags.filter(child => child !== this);
+        const ownerTagSupport = this.ownerTagSupport;
+        if (ownerTagSupport) {
+            ownerTagSupport.childTags = ownerTagSupport.childTags.filter(child => child !== this);
         }
         if (firstDestroy) {
             const { stagger, promise } = this.destroyClones(options);
@@ -209,7 +199,7 @@ export class TagSupport extends BaseTagSupport {
         // data reset
         delete global.placeholder;
         global.context = {};
-        delete global.oldest;
+        delete global.oldest; // may not be needed
         delete global.newest;
         global.deleted = true;
         this.childTags.length = 0;
@@ -225,13 +215,6 @@ export class TagSupport extends BaseTagSupport {
             mainPromise = Promise.all(childTags.map(kid => kid.destroy({ stagger: 0, byParent: true })));
         }
         return mainPromise.then(() => options.stagger);
-    }
-    destroySubscriptions() {
-        const subs = this.global.subscriptions;
-        for (let index = subs.length - 1; index >= 0; --index) {
-            subs[index].unsubscribe();
-        }
-        subs.length = 0;
     }
     destroyClones({ stagger } = {
         stagger: 0,
@@ -278,6 +261,28 @@ export class TagSupport extends BaseTagSupport {
             next();
         }
         return promise;
+    }
+    destroySubscriptions() {
+        const subs = this.global.subscriptions;
+        for (let index = subs.length - 1; index >= 0; --index) {
+            subs[index].unsubscribe();
+        }
+        subs.length = 0;
+    }
+}
+export class TagSupport extends BaseTagSupport {
+    templater;
+    ownerTagSupport;
+    subject;
+    version;
+    isApp = false;
+    constructor(templater, // at runtime rendering of a tag, it needs to be married to a new TagSupport()
+    ownerTagSupport, subject, version = 0) {
+        super(templater, subject);
+        this.templater = templater;
+        this.ownerTagSupport = ownerTagSupport;
+        this.subject = subject;
+        this.version = version;
     }
     getAppTagSupport() {
         let tag = this;

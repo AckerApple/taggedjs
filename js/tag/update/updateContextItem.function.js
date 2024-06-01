@@ -39,7 +39,6 @@ function shareTemplaterGlobal(oldTagSupport, tagSupport) {
             const prevState = newest.memory.state;
             tagSupport.memory.state.length = 0;
             tagSupport.memory.state.push(...prevState);
-            // tagSupport.memory.state = [...prevState]
         }
     }
 }

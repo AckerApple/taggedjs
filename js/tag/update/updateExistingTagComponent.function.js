@@ -2,7 +2,7 @@ import { hasTagSupportChanged } from '../hasTagSupportChanged.function.js';
 import { processSubjectComponent } from './processSubjectComponent.function.js';
 import { destroyTagMemory } from '../destroyTag.function.js';
 import { renderTagSupport } from '../render/renderTagSupport.function.js';
-import { callbackPropOwner } from '../../alterProps.function.js';
+import { callbackPropOwner } from '../../alterProp.function.js';
 import { isLikeTags } from '../isLikeTags.function.js';
 export function updateExistingTagComponent(ownerSupport, tagSupport, // lastest
 subject, insertBefore) {
@@ -106,7 +106,8 @@ function syncFunctionProps(lastSupport, ownerSupport, newPropsArray) {
             // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
             priorProps[name].toCall = (...args) => {
                 return callbackPropOwner(newCallback, // value, // newOriginal,
-                args, prevSupport);
+                args, prevSupport, // ??? <= ownerSupport
+                []);
             };
         }
     }

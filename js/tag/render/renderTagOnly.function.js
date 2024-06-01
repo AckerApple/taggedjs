@@ -1,9 +1,9 @@
 import { runBeforeRedraw, runBeforeRender } from '../tagRunner.js';
 import { setUse } from '../../state/index.js';
 import { runAfterRender } from '../tagRunner.js';
-export function renderTagOnly(newTagSupport, lastSupport, subject, ownerSupport) {
+export function renderTagOnly(newTagSupport, prevSupport, subject, ownerSupport) {
     const oldRenderCount = newTagSupport.global.renderCount;
-    beforeWithRender(newTagSupport, ownerSupport, lastSupport);
+    beforeWithRender(newTagSupport, ownerSupport, prevSupport);
     const templater = newTagSupport.templater;
     // NEW TAG CREATED HERE
     const wrapper = templater.wrapper;
@@ -18,17 +18,18 @@ export function renderTagOnly(newTagSupport, lastSupport, subject, ownerSupport)
     return reSupport;
 }
 function beforeWithRender(tagSupport, // new
-ownerSupport, lastSupport) {
-    const lastOwnerSupport = lastSupport?.ownerTagSupport;
-    const runtimeOwnerSupport = lastOwnerSupport || ownerSupport;
-    if (lastSupport) {
-        const lastState = lastSupport.memory.state;
-        const memory = tagSupport.memory;
-        // memory.state.length = 0
-        // memory.state.push(...lastState)
-        memory.state = [...lastState];
-        tagSupport.global = lastSupport.global;
-        runBeforeRedraw(tagSupport, lastSupport);
+parentSupport, prevSupport) {
+    const lastOwnerSupport = prevSupport?.ownerTagSupport;
+    const runtimeOwnerSupport = lastOwnerSupport || parentSupport;
+    if (prevSupport) {
+        if (prevSupport !== tagSupport) {
+            const lastState = prevSupport.memory.state;
+            const memory = tagSupport.memory;
+            tagSupport.global = prevSupport.global;
+            memory.state.length = 0;
+            memory.state.push(...lastState);
+        }
+        runBeforeRedraw(tagSupport, prevSupport);
     }
     else {
         // first time render

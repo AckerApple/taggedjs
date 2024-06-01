@@ -1,11 +1,13 @@
 import { runTagCallback } from '../interpolations/bindSubjectCallback.function.js';
 import { deepClone } from '../deepFunctions.js';
 import { TagSupport } from './TagSupport.class.js';
-import { alterProps } from '../alterProps.function.js';
+import { alterProp } from '../alterProp.function.js';
+import { setUse } from '../state/setUse.function.js';
 /** creates/returns a function that when called then calls the original component function
  * Gets used as templater.wrapper()
  */
 export function getTagWrap(templater, result) {
+    const stateArray = setUse.memory.stateConfig.array;
     // this function gets called by taggedjs
     const wrapper = function (newTagSupport, subject) {
         const global = newTagSupport.global;
@@ -18,7 +20,7 @@ export function getTagWrap(templater, result) {
         // result.original
         const originalFunction = result.original; // (innerTagWrap as any).original as unknown as TagComponent
         let props = templater.props;
-        let castedProps = props.map(props => alterProps(props, newTagSupport.ownerTagSupport));
+        let castedProps = props.map(prop => alterProp(prop, newTagSupport.ownerTagSupport, stateArray, newTagSupport));
         const latestCloned = props.map(props => deepClone(props)); // castedProps
         // CALL ORIGINAL COMPONENT FUNCTION
         let tag = originalFunction(...castedProps);
@@ -34,7 +36,8 @@ export function getTagWrap(templater, result) {
             latestCloned,
             lastClonedKidValues: tagSupport.propsConfig.lastClonedKidValues,
         };
-        tagSupport.memory = newTagSupport.memory; // state handover
+        const nowState = setUse.memory.stateConfig.array;
+        tagSupport.memory.state.push(...nowState);
         if (templater.madeChildIntoSubject) {
             const value = childSubject.value;
             for (let index = value.length - 1; index >= 0; --index) {

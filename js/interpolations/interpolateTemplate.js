@@ -76,15 +76,15 @@ export function afterElmBuild(elm, options, context, ownerSupport) {
     }
     let diff = options.counts.added;
     diff = elementInitCheck(elm, options.counts) - diff;
-    if (elm.children) {
-        const children = elm.children;
+    const children = elm.children;
+    if (children) {
         for (let index = children.length - 1; index >= 0; --index) {
             const child = children[index];
             const subOptions = {
                 ...options,
                 counts: options.counts,
             };
-            return afterElmBuild(child, subOptions, context, ownerSupport);
+            afterElmBuild(child, subOptions, context, ownerSupport);
         }
     }
 }

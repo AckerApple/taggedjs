@@ -24,7 +24,7 @@ subject) {
     const global = reSupport.global;
     global.insertBefore = insertBefore;
     global.deleted = false;
-    delete global.oldest;
+    delete global.oldest; // TODO, maybe set global oldest to replacement instead of destroying it?
     delete global.newest;
     delete subject.tagSupport;
 }

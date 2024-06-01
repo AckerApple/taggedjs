@@ -28,20 +28,10 @@ export declare class BaseTagSupport {
     getTemplate(): TagTemplate;
     update(): Context;
     updateContext(context: Context): Context;
-    updateBy(tagSupport: TagSupport): void;
+    updateBy(tagSupport: BaseTagSupport | TagSupport): void;
     updateConfig(strings: string[], values: any[]): void;
     updateValues(values: any[]): Context;
-}
-export declare class TagSupport extends BaseTagSupport {
-    templater: TemplaterResult;
-    ownerTagSupport: TagSupport;
-    subject: TagSubject;
-    version: number;
-    isApp: boolean;
-    constructor(templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new TagSupport()
-    ownerTagSupport: TagSupport, subject: TagSubject, version?: number);
     destroy(options?: DestroyOptions): Promise<number>;
-    destroySubscriptions(): void;
     destroyClones({ stagger }?: DestroyOptions): {
         promise: Promise<(void | undefined)[]>;
         stagger: number;
@@ -51,5 +41,15 @@ export declare class TagSupport extends BaseTagSupport {
     };
     /** Reviews elements for the presences of ondestroy */
     checkCloneRemoval(clone: Element | Text | ChildNode, stagger: number): Promise<void> | undefined;
+    destroySubscriptions(): void;
+}
+export declare class TagSupport extends BaseTagSupport {
+    templater: TemplaterResult;
+    ownerTagSupport: TagSupport;
+    subject: TagSubject;
+    version: number;
+    isApp: boolean;
+    constructor(templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new TagSupport()
+    ownerTagSupport: TagSupport, subject: TagSubject, version?: number);
     getAppTagSupport(): TagSupport;
 }
