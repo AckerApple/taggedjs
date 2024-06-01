@@ -14,6 +14,10 @@ export default tag(() => (
   showChild = letState(true)(x => [showChild, showChild = x]),
   somethingElse = letState('a')(x => [somethingElse, somethingElse = x]),
   _ = ++renderCount,
+  addArrayItem = () => {
+    array = array.map(x => x);array.push('push'+array.length)
+    console.log('array', array, array.length)
+  },
 ) => html`
   <button id="fun-parent-button" onclick=${myFunction}>++parent</button><span id="fun_in_prop_display">${counter}</span>
   ${renderCountDiv({renderCount, name:'funInProps_tag_parent'})}
@@ -22,7 +26,7 @@ export default tag(() => (
   </div>
   <button id="toggle-fun-in-child" type="button" onclick=${() => showChild = !showChild}>toggle child</button>
   array length: ${array.length}
-  <button onclick=${() => {array = array.map(x => x);array.push('push'+array.length)}}>reset add</button>
+  <button onclick=${addArrayItem}>reset add</button>
   <hr />
   ${showChild && funInPropsChild({myFunction, array, child: {myChildFunction: myFunction}}, main, myFunction)}
 `)
