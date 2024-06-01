@@ -859,19 +859,21 @@ var e,t={d:(e,n)=>{for(var o in n)t.o(n,o)&&!t.o(e,o)&&Object.defineProperty(e,o
     onclick=${()=>{t.next(++e)}}
   >++👍👍</button>
   ${xt({renderCount:n,name:"insideMultiRender"})}
-`))),Rn={function:()=>++Rn.count,count:0},Fn=ft((()=>(e=D(0)((t=>[e,e=t])),t=(()=>++e),n=D(0)((e=>[n,n=e])),o=D(!0)((e=>[o,o=e])),r=D("a")((e=>[r,r=e])),s=++n)=>bt`
-  <button id="fun-parent-button" onclick=${t}>++parent</button><span id="fun_in_prop_display">${e}</span>
-  ${xt({renderCount:n,name:"funInProps_tag_parent"})}
+`))),Rn={function:()=>++Rn.count,count:0},Fn=ft((()=>(e=D([])((t=>[e,e=t])),t=D(0)((e=>[t,t=e])),n=(()=>++t),o=D(0)((e=>[o,o=e])),r=D(!0)((e=>[r,r=e])),s=D("a")((e=>[s,s=e])),i=++o)=>bt`
+  <button id="fun-parent-button" onclick=${n}>++parent</button><span id="fun_in_prop_display">${t}</span>
+  ${xt({renderCount:o,name:"funInProps_tag_parent"})}
   <div>
     <strong>main:</strong><span id="main_wrap_state">${Rn.function.toCall?"taggjedjs-wrapped":"nowrap"}</span>:${Rn.count}
   </div>
-  <button id="toggle-fun-in-child" type="button" onclick=${()=>o=!o}>toggle child</button>
+  <button id="toggle-fun-in-child" type="button" onclick=${()=>r=!r}>toggle child</button>
+  array length: ${e.length}
+  <button onclick="() => {array = array.map(x => x);array.push('push'+array.length)}">reset add</button>
   <hr />
-  ${o&&Hn({myFunction:t,child:{myChildFunction:t}},Rn,t)}
-`)),Hn=ft((({myFunction:e,child:t},n,o)=>(r=D("other")((e=>[r,r=e])),s=D(0)((e=>[s,s=e])),i=D(0)((e=>[i,i=e])),a=++i)=>bt`
+  ${r&&Hn({myFunction:n,array:e,child:{myChildFunction:n}},Rn,n)}
+`)),Hn=ft((({myFunction:e,child:t,array:n},o,r)=>(s=D("other")((e=>[s,s=e])),i=D(0)((e=>[i,i=e])),a=D(0)((e=>[a,a=e])),l=++a)=>bt`
   <div>
-    <strong>mainFunction:</strong>${n.function.toCall?"taggjedjs-wrapped":"nowrap"}:
-    <span>${n.count}</span>
+    <strong>mainFunction:</strong>${o.function.toCall?"taggjedjs-wrapped":"nowrap"}:
+    <span>${o.count}</span>
   </div>
   <div>
     <strong>childFunction:</strong>${t.myChildFunction.toCall?"taggjedjs-wrapped":"nowrap"}
@@ -882,12 +884,14 @@ var e,t={d:(e,n)=>{for(var o in n)t.o(n,o)&&!t.o(e,o)&&Object.defineProperty(e,o
 
   <button id="fun_in_prop1" onclick=${e}>++object argument</button>
   <button id="fun_in_prop2" onclick=${t.myChildFunction}>++child.myChildFunction</button>
-  <button id="fun_in_prop3" onclick=${o}>++argument</button>
+  <button id="fun_in_prop3" onclick=${r}>++argument</button>
   <button onclick=${Rn.function}>++main</button>
-  <button onclick=${()=>++s}>++me</button>
+  <button onclick=${()=>++i}>++me</button>
   
-  <span>${s}</span>
-  ${xt({renderCount:i,name:"funInProps_tag_child"})}
+  child array length: ${n.length}
+  
+  <span>${i}</span>
+  ${xt({renderCount:a,name:"funInProps_tag_child"})}
 `)),On=ft((()=>{let e=D("app first state")((t=>[e,e=t])),t=D(!1)((e=>[t,t=e])),n=D(0)((e=>[n,n=e])),o=D(0)((e=>[o,o=e])),r=D(null)((e=>[r,r=e]));function s(e=!0){r=setTimeout((async()=>{console.debug("🏃 Running tests...");const t=await vn();e&&(t?alert("✅ all app tests passed"):alert("❌ tests failed. See console for more details"))}),2e3)}ne((()=>{clearTimeout(r),r=null})),++o;const i=Q(),a=C((()=>new u(n)));te((()=>{console.info("1️⃣ app init should only run once"),s(!1),a.subscribe(i((e=>n=e)))}));return bt`<!--app.js-->
     <h1 id="h1-app">🏷️ TaggedJs - ${4}</h1>
 

@@ -7,6 +7,7 @@ const main = {
 }
 
 export default tag(() => (
+  array = letState([] as string[])(x => [array, array = x]),
   counter = letState(0)(x => [counter, counter = x]),
   myFunction = () => ++counter,
   renderCount = letState(0)(x => [renderCount, renderCount = x]),
@@ -20,12 +21,16 @@ export default tag(() => (
     <strong>main:</strong><span id="main_wrap_state">${(main.function as any).toCall ? 'taggjedjs-wrapped' : 'nowrap'}</span>:${main.count}
   </div>
   <button id="toggle-fun-in-child" type="button" onclick=${() => showChild = !showChild}>toggle child</button>
+  array length: ${array.length}
+  <button onclick=${() => {array = array.map(x => x);array.push('push'+array.length)}}>reset add</button>
   <hr />
-  ${showChild && funInPropsChild({myFunction, child: {myChildFunction: myFunction}}, main, myFunction)}
+  ${showChild && funInPropsChild({myFunction, array, child: {myChildFunction: myFunction}}, main, myFunction)}
 `)
 
 const funInPropsChild = tag((
-  {myFunction, child}: {myFunction: () => any, child: {myChildFunction: () => any}},
+  {myFunction, child, array}: {
+    array: unknown[], myFunction: () => any, child: {myChildFunction: () => any}
+  },
   mainProp: typeof main,
   myFunction3: () => any
 ) => (
@@ -50,6 +55,8 @@ const funInPropsChild = tag((
   <button id="fun_in_prop3" onclick=${myFunction3}>++argument</button>
   <button onclick=${main.function}>++main</button>
   <button onclick=${() => ++counter}>++me</button>
+  
+  child array length: ${array.length}
   
   <span>${counter}</span>
   ${renderCountDiv({renderCount, name:'funInProps_tag_child'})}
