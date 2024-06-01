@@ -1,5 +1,5 @@
-import { fadeInDown, fadeOutUp } from "./animations"
-import { renderCountDiv } from "./renderCount.component"
+import { fadeInDown, fadeOutUp } from "./animations.js"
+import { renderCountDiv } from "./renderCount.component.js"
 import { letState, html, tag, providers, state, callbackMaker, Subject, onInit } from "taggedjs"
 
 export class TagDebugProvider {
@@ -187,7 +187,7 @@ const providerDebug = tag(({
 
     <div>
       <button id="subject-increase-counter"
-        onclick=${() => callbackTestSub.set(provider.test + 1)}
+        onclick=${() => callbackTestSub.set = provider.test + 1}
       >🍌 subject increase:</button>
       <span>
         🍌 <span id="subject-counter-display">${provider.test}</span>

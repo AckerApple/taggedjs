@@ -1,16 +1,16 @@
-import { childTests } from "../childTests"
 import { Subject, callbackMaker, html, onInit, letState, tag, state } from "taggedjs"
-import { arrayTests } from "../arrayTests"
-import { tagSwitchDebug } from "../tagSwitchDebug.component"
-import { mirroring } from "../mirroring.tag"
-import { propsDebugMain } from "../PropsDebug.component"
-import { providerDebugBase } from "../providerDebug"
-import { counters } from "../countersDebug"
-import { tableDebug } from "../tableDebug.component"
-import { contentDebug } from "../ContentDebug.component"
-import { watchTesting } from "../watchTesting.tag"
-import { oneRender } from "../oneRender.tag"
-import { renderCountDiv } from "../renderCount.component"
+import { childTests } from "../childTests.js"
+import { arrayTests } from "../arrayTests.js"
+import { tagSwitchDebug } from "../tagSwitchDebug.component.js"
+import { mirroring } from "../mirroring.tag.js"
+import { propsDebugMain } from "../PropsDebug.tag.js"
+import { providerDebugBase } from "../providerDebug.js"
+import { counters } from "../countersDebug.js"
+import { tableDebug } from "../tableDebug.component.js"
+import { contentDebug } from "../ContentDebug.component.js"
+import { watchTesting } from "../watchTesting.tag.js"
+import { oneRender } from "../oneRender.tag.js"
+import { renderCountDiv } from "../renderCount.component.js"
 
 type viewTypes = 'oneRender' | 'watchTesting' | 'mirroring' | 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
 
@@ -51,10 +51,10 @@ export default tag.route = tag(() => () => {
 
     <div>
       <button id="app-counter-subject-button"
-        onclick=${() => appCounterSubject.set(appCounter + 1)}
+        onclick=${() => appCounterSubject.set = appCounter + 1}
       >🍒 ++app subject</button>
       <span>
-        🍒 <span id="app-counter-subject-button">${appCounter}</span>
+        🍒 <span id="app-counter-subject-display">${appCounter}</span>
       </span>
     </div>
 

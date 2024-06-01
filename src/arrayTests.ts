@@ -1,5 +1,5 @@
-import { fadeInDown, fadeOutUp } from './animations'
-import { renderCountDiv } from './renderCount.component'
+import { fadeInDown, fadeOutUp } from './animations.js'
+import { renderCountDiv } from './renderCount.component.js'
 import {html, state, letState, tag} from 'taggedjs'
 
 const frameCount = 4

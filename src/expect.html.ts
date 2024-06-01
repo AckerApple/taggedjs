@@ -95,43 +95,52 @@ function testCounterSelectedElements(
   {elementCountExpected} = {
     elementCountExpected: 1
   },
-  counterButtonId: string,
-  counterDisplayId: string,
+  counterButtonSelect: string,
+  counterDisplaySelect: string,
 ) {
-  expect(counterButtons.length).toBe(elementCountExpected, () => `Expected ${counterButtonId} to be ${elementCountExpected} elements but is instead ${counterButtons.length}`)
-  expect(counterDisplays.length).toBe(elementCountExpected, ()=> `Expected ${counterDisplayId} to be ${elementCountExpected} elements but is instead ${counterDisplays.length}`)
+  expect(counterButtons.length).toBe(elementCountExpected, () => `Expected ${counterButtonSelect} to be ${elementCountExpected} elements but is instead ${counterButtons.length}`)
+  expect(counterDisplays.length).toBe(elementCountExpected, ()=> `Expected ${counterDisplaySelect} to be ${elementCountExpected} elements but is instead ${counterDisplays.length}`)
 
-  counterButtons.forEach((increaseCounter, index) => {
-    const counterDisplay = counterDisplays[index]
+  counterButtons.forEach((increaseCounter, index: number) => {
+    const counterDisplay = document.querySelectorAll(counterDisplaySelect)[index] as HTMLElement // counterDisplays[index]
+
+    expect(document.body.contains(counterDisplay)).toBe(true, `The selected element ${counterDisplaySelect} is no longer an element on the document body before clicking ${counterButtonSelect}`)
+
     let counterValue = Number(counterDisplay?.innerText)
     increaseCounter.click()
 
+    expect(counterDisplay).toBeDefined()
+    expect(document.body.contains(counterDisplay)).toBe(true, `The selected element ${counterDisplaySelect} is no longer an element on the document body after clicking ${counterButtonSelect}`)
+
     let oldCounterValue = counterValue + 1
-    counterValue = Number(counterDisplay?.innerText)
-    expect(oldCounterValue).toBe(counterValue, () => `Counter test 1 of 2 expected ${counterDisplayId} to be value ${oldCounterValue} but it is ${counterValue}`)
+    counterValue = Number(counterDisplay.innerText)
+    expect(document.body.contains(counterDisplay)).toBe(true)
+    expect(oldCounterValue).toBe(counterValue, () => `Counter test 1 of 2 expected ${counterDisplaySelect} to be value ${oldCounterValue} but it is ${counterValue}`)
     increaseCounter.click()
 
     counterValue = Number(counterDisplay?.innerText)
     ++oldCounterValue
-    expect(oldCounterValue).toBe(counterValue, () => `Counter test 2 of 2 expected ${counterDisplayId} to increase value to ${oldCounterValue} but it is ${counterValue}`)
+    expect(oldCounterValue).toBe(counterValue, () => `Counter test 2 of 2 expected ${counterDisplaySelect} to increase value to ${oldCounterValue} but it is ${counterValue}`)
   })
 
 }
 
 /** increases counter by two */
 export function testCounterElements(
-  counterButtonId: string,
-  counterDisplayId: string,
+  counterButtonSelect: string,
+  counterDisplaySelect: string,
   {elementCountExpected} = {
     elementCountExpected: 1
   }
 ) {
-  const increaseCounters = document.querySelectorAll(counterButtonId) as unknown as HTMLElement[]
-  const counterDisplays = document.querySelectorAll(counterDisplayId) as unknown as HTMLElement[]
+  const increaseCounters = document.querySelectorAll(counterButtonSelect) as unknown as HTMLElement[]
+  const counterDisplays = document.querySelectorAll(counterDisplaySelect) as unknown as HTMLElement[]
 
   return testCounterSelectedElements(
-    increaseCounters, counterDisplays, {elementCountExpected},
-    counterButtonId,
-    counterDisplayId,
+    increaseCounters,
+    counterDisplays,
+    {elementCountExpected},
+    counterButtonSelect,
+    counterDisplaySelect,
   )
 }

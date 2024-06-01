@@ -1,4 +1,4 @@
-import { propsDebugMain } from "./PropsDebug.component"
+import { propsDebugMain } from "./PropsDebug.tag"
 import { arrayTests } from "./arrayTests"
 import { intervalTester0, intervalTester1 } from "./intervalDebug"
 import { html, tag, providers, letState } from "taggedjs"
@@ -13,9 +13,6 @@ export const tagDebug = tag(() => {// tagDebug.js
   ++renderCount
 
   return html`<!-- tagDebug.js -->
-    <h3 id="debugging">Debugging</h3>
-    ${renderCountDiv({renderCount, name: 'tagJsDebug'})}
-
     <div style="display:flex;flex-wrap:wrap;gap:1em">
       <fieldset style="flex:4 4 40em">
         <legend>arrays</legend>

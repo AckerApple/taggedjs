@@ -3,7 +3,7 @@ import { Subject, callbackMaker, html, onInit, letState, tag, state } from "tagg
 import { arrayTests } from "./arrayTests"
 import { tagSwitchDebug } from "./tagSwitchDebug.component"
 import { mirroring } from "./mirroring.tag"
-import { propsDebugMain } from "./PropsDebug.component"
+import { propsDebugMain } from "./PropsDebug.tag"
 import { providerDebugBase } from "./providerDebug"
 import { counters } from "./countersDebug"
 import { tableDebug } from "./tableDebug.component"
@@ -11,16 +11,18 @@ import { contentDebug } from "./ContentDebug.component"
 import { watchTesting } from "./watchTesting.tag"
 import { oneRender } from "./oneRender.tag"
 import { renderCountDiv } from "./renderCount.component"
+import funInPropsTag from "./funInProps.tag"
 
-type viewTypes = 'oneRender' | 'watchTesting' | 'mirroring' | 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
+type viewTypes = 'funInPropsTag' | 'oneRender' | 'watchTesting' | 'mirroring' | 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
 
 export default tag(() => {
   const views: viewTypes[] = [
-    'content',
+    // 'content',
     // 'counters',
     // 'watchTesting',
-    'oneRender',
-    // 'props',
+    // 'oneRender',
+    'props',
+    'funInPropsTag',
     // 'mirroring',
     // 'providerDebug',
     
@@ -51,10 +53,10 @@ export default tag(() => {
 
     <div>
       <button id="app-counter-subject-button"
-        onclick=${() => appCounterSubject.set(appCounter + 1)}
+        onclick=${() => appCounterSubject.set = appCounter + 1}
       >🍒 ++app subject</button>
       <span>
-        🍒 <span id="app-counter-subject-button">${appCounter}</span>
+        🍒 <span id="app-counter-subject-display">${appCounter}</span>
       </span>
     </div>
 
@@ -134,6 +136,13 @@ export default tag(() => {
           <fieldset style="flex:2 2 20em">
             <legend>Children Tests</legend>
             ${childTests(undefined)}
+          </fieldset>
+        `}
+
+        ${views.includes('funInPropsTag') && html`
+          <fieldset style="flex:2 2 20em">
+            <legend>funInPropsTag</legend>
+            ${funInPropsTag()}
           </fieldset>
         `}
 

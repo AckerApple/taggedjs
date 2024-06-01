@@ -1,5 +1,5 @@
-import { html, letState, state, subject, tag, ValueSubject } from "taggedjs"
-import { renderCountDiv } from "./renderCount.component"
+import { html, letState, Subject, subject, tag, ValueSubject } from "taggedjs"
+import { renderCountDiv } from "./renderCount.component.js"
 
 /** this tag renders only once */
 export const oneRender = () => tag.oneRender = (
@@ -7,12 +7,15 @@ export const oneRender = () => tag.oneRender = (
   renderCount = letState(0)(x => [renderCount, renderCount = x]), // state can be used but it never updates
 ) => {
   ++renderCount
+
+  const x = Subject.all([0, 'all', 4])
+  
+
   return html`
+    ${x.pipe(x => JSON.stringify(x))}elias
     <span>👍<span id="👍-counter-display">${counter}</span></span>
     <button type="button" id="👍-counter-button"
-      onclick=${() => {
-        ++counter.value
-      }}
+      onclick=${() => ++counter.value}
     >++👍</button>
     ${renderCountDiv({renderCount, name:'oneRender_tag_ts'})}
     <hr />
@@ -23,7 +26,7 @@ export const oneRender = () => tag.oneRender = (
 /** this tag renders on every event but should not cause parent to re-render */
 const insideMultiRender = tag(() => (
   counter = letState(0)(x => [counter, counter = x]),
-  counter$ = subject.value(0),
+  counter$ = subject(0),
   renderCount = letState(0)(x => [renderCount, renderCount = x]), // state can be used but it never updates
 ) => {
   ++renderCount
@@ -34,8 +37,7 @@ const insideMultiRender = tag(() => (
   <br />
   <button type="button" id="👍👍-counter-button"
     onclick=${() => {
-      ++counter
-      counter$.set(counter)
+      counter$.next(++counter)
     }}
   >++👍👍</button>
   ${renderCountDiv({renderCount, name:'insideMultiRender'})}

@@ -1,12 +1,16 @@
-import { mouseOverTag } from "./mouseover.tag"
-import { renderCountDiv } from "./renderCount.component"
+import { mouseOverTag } from "./mouseover.tag.js"
+import { renderCountDiv } from "./renderCount.component.js"
 import { html, tag, Subject, onInit, letState, callbackMaker, state, ValueSubject, callback, subject } from "taggedjs"
+
+const loadStartTime = Date.now()
 
 export const counters = tag(({
   appCounterSubject
 }: {
   appCounterSubject: Subject<number>
-}) => {
+}) => (
+  readStartTime = state(() => Date.now()),
+) => {
   let counter = letState(0)(x => [counter, counter = x])
   let propCounter = letState(0)(x => [propCounter, propCounter = x])
   let renderCount = letState(0)(x => [renderCount, renderCount = x])
@@ -53,17 +57,17 @@ export const counters = tag(({
     
         <div>
           <button id="app-counter-subject-button"
-            onclick=${() => appCounterSubject.set((appCounterSubject.value || 0) + 1)}
+            onclick=${() => appCounterSubject.next((appCounterSubject.value || 0) + 1)}
           >🍒 ++app subject</button>
           <span>
-            🍒 <span id="app-counter-subject-button">${appCounterSubject.value}</span>
+            🍒 <span id="app-counter-subject-display">${appCounterSubject.value}</span>
           </span>
         </div>
 
         <div>
           <button id="standalone-counter"
             onclick=${increaseCounter}
-          >stand alone counter:${counter}</button>
+          >stand alone counters:${counter}</button>
           <span>
             🥦 <span id="standalone-display">${counter}</span>
           </span>
@@ -95,7 +99,7 @@ export const counters = tag(({
 
         <div>
           <button id="🥦-subject-increase-counter"
-            onclick=${() => callbackTestSub.set(counter + 1)}
+            onclick=${() => callbackTestSub.next(counter + 1)}
           >subject increase:</button>
           <span>
             🥦 <span id="🥦-subject-counter-display">${counter}</span>
@@ -142,6 +146,12 @@ export const counters = tag(({
       </fieldset>
     `}
     ${displayRenderCounters && renderCountDiv({renderCount, name: 'counters'})}
+    <div style="font-size:0.8em;opacity:0.8">
+      ⌚️ page load to display in&nbsp;<span oninit=${event => event.target.innerText = (Date.now()-loadStartTime).toString()}>-</span>ms
+    </div>
+    <div style="font-size:0.8em;opacity:0.8">
+      ⌚️ read in&nbsp;<span oninit=${event => event.target.innerText = (Date.now()-readStartTime).toString()}>-</span>ms
+    </div>
   `
 })
 

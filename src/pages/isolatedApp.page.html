@@ -1,0 +1,154 @@
+
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <title>TaggedJs</title>
+      <meta charset="UTF-8" />
+      <meta name="viewport"
+        content="viewport-fit=cover, width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+      <meta name="apple-mobile-web-app-title" content="TaggedJs" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+      <!-- emoji as favicon -->
+      <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏷️</text></svg>" />
+      <link href="animate.min.css" type="text/css" rel="stylesheet" />
+      <link href="document.css" type="text/css" rel="stylesheet" />
+    </head>
+
+    <body>
+      <noscript style="color:red">Javascript is required but is turned off on your device</noscript>
+      <table cellPadding="0" cellSpacing="0" border="0" style="width: 100%;height: 100%;">
+        <tr>
+          <td valign="center" style="text-align: center;">
+            <!--isolatedApp.js-->
+    <h1 id="app">🏷️ TaggedJs - isolated</h1>
+
+    <div>
+      <button id="app-counter-subject-button"
+        onclick="() => appCounterSubject.set = appCounter + 1"
+      >🍒 ++app subject</button>
+      <span>
+        🍒 <span id="app-counter-subject-display">0</span>
+      </span>
+    </div>
+
+    <div id="tagDebug-fx-wrap">
+      <div style="display:flex;flex-wrap:wrap;gap:1em">
+        
+          <fieldset style="flex:2 2 20em">
+            <legend>oneRender</legend>
+            
+    <span>👍<span id="👍-counter-display">0</span></span>
+    <button type="button" id="👍-counter-button"
+      onclick="() => ++counter.value"
+    >++👍</button>
+    <div><small>(oneRender_tag_ts render count <span id=oneRender_tag_ts_render_count>1</span>)</small></div>
+    <hr />
+    
+  <span>👍👍 sub counter-subject-display:<span id="👍👍-counter-subject-display">0</span></span>
+  <br />
+  <span>👍👍 sub counter<span id="👍👍-counter-display">0</span></span>
+  <br />
+  <button type="button" id="👍👍-counter-button"
+    onclick="() => {
+        counter$.next(++counter);
+    }"
+  >++👍👍</button>
+  <div><small>(insideMultiRender render count <span id=insideMultiRender_render_count>1</span>)</small></div>
+
+  
+          </fieldset>
+        
+
+        false
+
+        false
+
+        false
+
+        false
+
+        false
+
+        false
+
+        false
+
+        false
+
+        
+          <fieldset style="flex:2 2 20em">
+            <legend>content</legend>
+            
+    <div style="font-size:0.8em">You should see "0" here => "0"</div>
+    <!--proof you cannot see false values -->
+    <div style="font-size:0.8em">
+      <fieldset>
+        <legend>false test</legend>
+        You should see "" here => "false"
+      </fieldset>
+    </div>
+    <div style="font-size:0.8em">
+      <fieldset>
+        <legend>null test</legend>
+        You should see "" here => ""
+      </fieldset>
+    </div>
+    <div style="font-size:0.8em">
+      <fieldset>
+        <legend>undefined test</legend>
+        You should see "" here => ""
+      </fieldset>
+    </div>
+    <!--proof you can see true booleans -->
+    <div style="font-size:0.8em">
+      <fieldset>
+        <legend>true test</legend>
+        You should see "true" here => "true"
+      </fieldset>
+    </div>
+    <!--proof you can try to use the tagVar syntax -->
+    <div style="font-size:0.8em">You should see "{22}" here => "{22}"</div>
+    <div style="font-size:0.8em">You should see "{__tagVar0}" here => "{__tagVar0}"</div>
+    <div style="font-size:0.8em">should be a safe string no html "&lt;div&gt;hello&lt;/div&gt;" here => "<div>hello</div>"</div>
+    <div style="display:flex;flex-wrap:wrap;gap:1em">
+      <fieldset style="flex:1">
+        <legend>value subject</legend>
+        0 === 0
+      </fieldset>
+      
+      <fieldset style="flex:1">
+        <legend>piped subject</legend>        
+        <span id="content-subject-pipe-display0">55</span> ===
+        <span id="content-subject-pipe-display1">0</span>
+      </fieldset>
+      
+      <fieldset style="flex:1">
+        <legend>combineLatest</legend>
+        <span id="content-combineLatest-pipe-display0">1</span> ===
+        <span id="content-combineLatest-pipe-display1"></span>
+      </fieldset>
+      
+      <fieldset style="flex:1">
+        <legend>combineLatest piped html</legend>
+        <span id="content-combineLatest-pipeHtml-display0"><b>bold 77</b></span> ===
+        <span id="content-combineLatest-pipeHtml-display1"></span>
+      </fieldset>
+    </div>
+    (render count 1)
+  
+          </fieldset>
+        
+
+        false
+
+        false
+      </div>
+      <div><small>(isolatedApp render count <span id=isolatedApp_render_count>1</span>)</small></div>
+    </div>
+  
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>

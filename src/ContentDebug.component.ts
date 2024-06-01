@@ -40,7 +40,7 @@ export const contentDebug = tag(() => {
     <div style="font-size:0.8em">You should see "${'{'}22${'}'}" here => "{22}"</div>
     <div style="font-size:0.8em">You should see "${'{'}__tagVar0${'}'}" here => "{__tagVar0}"</div>
     <div style="font-size:0.8em">should be a safe string no html "&lt;div&gt;hello&lt;/div&gt;" here => "${'<div>hello</div>'}"</div>
-    <div style="display:flex;flex-wrap:wrap;gap;1em">
+    <div style="display:flex;flex-wrap:wrap;gap:1em">
       <fieldset style="flex:1">
         <legend>value subject</legend>
         0 === ${vs0}

@@ -1,6 +1,6 @@
-import { children, Tag, TagChildren, html, letState, tag } from "taggedjs"
-import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests"
-import { renderCountDiv } from "./renderCount.component"
+import { children, Tag, html, letState, tag } from "taggedjs"
+import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests.js"
+import { renderCountDiv } from "./renderCount.component.js"
 
 const test22 = tag((a:number, b:number) => html`
   <fieldset>

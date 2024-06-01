@@ -1,1 +1,1 @@
-export { fadeInDown, fadeOutUp } from "taggedjs-animate"
+export { fadeInDown, fadeOutUp } from "taggedjs-animate-css"

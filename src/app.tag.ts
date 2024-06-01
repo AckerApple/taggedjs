@@ -12,6 +12,7 @@ import { counters } from "./countersDebug"
 import { providerDebugBase } from "./providerDebug"
 import { watchTesting } from "./watchTesting.tag"
 import { oneRender } from "./oneRender.tag"
+import funInPropsTag from "./funInProps.tag"
 
 export const App = tag(() => {
   let _firstState = letState('app first state')(x => [_firstState, _firstState=x])
@@ -31,7 +32,7 @@ export const App = tag(() => {
   })
 
   function runTesting(manual = true) {
-    const waitFor = 1000
+    const waitFor = 2000
     testTimeout = setTimeout(async () => {
       console.debug('🏃 Running tests...')
       const result = await runTests()
@@ -73,10 +74,10 @@ export const App = tag(() => {
 
     <div>
       <button id="app-counter-subject-button"
-        onclick=${() => appCounterSubject.set(appCounter + 1)}
+        onclick=${() => appCounterSubject.set = appCounter + 1}
       >🍒 ++app subject</button>
       <span>
-        🍒 <span id="app-counter-subject-button">${appCounter}</span>
+        🍒 <span id="app-counter-subject-display">${appCounter}</span>
       </span>
     </div>
 
@@ -129,6 +130,11 @@ export const App = tag(() => {
         <fieldset style="flex:2 2 20em">
           <legend>oneRender</legend>
           ${oneRender()}
+        </fieldset>
+
+        <fieldset>
+          <legend>functions in props</legend>
+          ${funInPropsTag()}
         </fieldset>
       </div>
 

@@ -1,5 +1,5 @@
 import { html, tag, letState, InputElementTargetEvent, Tag } from "taggedjs"
-import { renderCountDiv } from "./renderCount.component"
+import { renderCountDiv } from "./renderCount.component.js"
 
 type SelectedTag = null | string | undefined
 

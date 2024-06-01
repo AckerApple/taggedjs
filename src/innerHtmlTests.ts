@@ -1,4 +1,4 @@
-import { html, letState, tag, Tag, ValueSubject, isSubjectInstance, isTagArray, TagChildren, children } from "taggedjs"
+import { html, letState, tag, isSubjectInstance, isTagArray, children } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
 
 export const innerHtmlTest = tag((

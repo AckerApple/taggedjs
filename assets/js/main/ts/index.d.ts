@@ -1,6 +1,4 @@
-export * from "./tag/tag";
-export * from "./tag/tag.utils";
-export * from "./tag/html";
+export * from "./tag/index";
 export * from "./errors";
 export * from "./isInstance";
 export * from "./state/index";
