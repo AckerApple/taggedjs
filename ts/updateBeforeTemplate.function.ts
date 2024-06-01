@@ -1,5 +1,5 @@
-import { InsertBefore } from "./interpolations/Clones.type"
-import { NoDisplayValue } from "./interpolations/processAttribute.function"
+import { InsertBefore } from'./interpolations/InsertBefore.type.js'
+import { NoDisplayValue } from'./interpolations/processAttribute.function.js'
 
 // Function to update the value of x
 export function updateBeforeTemplate(

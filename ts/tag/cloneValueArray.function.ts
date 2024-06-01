@@ -1,13 +1,14 @@
-import { Tag } from './Tag.class'
-import { deepClone } from '../deepFunctions'
-import { TemplaterResult } from '../TemplaterResult.class'
-import { ValueTypes, getValueType } from './update/processFirstSubject.utils'
+import { Tag } from './Tag.class.js'
+import { deepClone } from '../deepFunctions.js'
+import { TemplaterResult } from './TemplaterResult.class.js'
+import { ValueTypes } from './ValueTypes.enum.js'
+import { getValueType } from './getValueType.function.js'
 
 export function cloneValueArray<T>(values: (T | Tag | Tag[])[]): T[] {
   return values.map((value) => {
     const tag = value as Tag
 
-    switch(getValueType(value)) {
+    switch( getValueType(value) ) {
       case ValueTypes.tagComponent:
         const tagComponent = value as TemplaterResult
         return deepClone(tagComponent.props)

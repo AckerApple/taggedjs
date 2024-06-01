@@ -1,5 +1,5 @@
-import { Subject } from "./Subject.class"
-import { OperatorFunction, PipeUtils, SubjectLike } from "./subject.utils"
+import { Subject } from './Subject.class.js'
+import { OperatorFunction, PipeUtils, SubjectLike } from './subject.utils.js'
 
 
 type WillCallback<T, R> = (lastValue: T, resolve: (result: R) => void) => void;

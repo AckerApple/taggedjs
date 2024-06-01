@@ -1,4 +1,7 @@
 {
+  "moduleNameMapper": {
+    "^(.*).js$": "$1"
+  },
   "restoreMocks": true,
   "clearMocks": true,
   "resetMocks": true,

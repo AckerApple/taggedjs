@@ -1,7 +1,8 @@
-import { StateMismatchError } from '../errors'
-import { BaseTagSupport } from '../tag/TagSupport.class'
-import { Wrapper } from '../TemplaterResult.class'
-import { setUse } from './setUse.function'
+import { StateMismatchError } from '../errors.js'
+import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js'
+import { Wrapper } from '../tag/TemplaterResult.class.js'
+import { setUse } from'./setUse.function.js'
+import { syncStates } from './syncStates.function.js'
 
 export type StateConfig<T> = (x: T) => [T, T]
 
@@ -14,7 +15,7 @@ export type StateConfigItem<T> = {
 }
 
 export type Config = {
-  tagSupport?: BaseTagSupport
+  tagSupport?: BaseTagSupport | TagSupport
   array: State // state memory on the first render
   rearray?: State // state memory to be used before the next render
 }
@@ -28,13 +29,13 @@ setUse.memory.stateConfig = {
 
 export type GetSet<T> = (y: T) => [T, T]
 
-const beforeRender = (tagSupport: BaseTagSupport) => initState(tagSupport)
+const beforeRender = (tagSupport: TagSupport | BaseTagSupport) => initState(tagSupport)
 
 setUse({
   beforeRender,
   beforeRedraw: beforeRender,
   afterRender: (
-    tagSupport: BaseTagSupport,
+    tagSupport: TagSupport | BaseTagSupport,
   ) => {
     const memory = tagSupport.memory
     const config: Config = setUse.memory.stateConfig
@@ -65,7 +66,7 @@ setUse({
       const item = state[index]
       item.lastValue = getStateValue(item) // set last values
     }
-    
+
     config.array = []
   }
 })
@@ -82,7 +83,7 @@ export function getStateValue<T>(
   const [value,checkValue] = getCallbackValue(callback)
 
   if(checkValue !== StateEchoBack) {
-    const message = 'State property not used correctly. Second item in array is not setting value as expected.\n\n' +
+    const message = 'letState function incorrectly used. Second item in array is not setting expected value.\n\n' +
     'For "let" state use `let name = state(default)(x => [name, name = x])`\n\n' +
     'For "const" state use `const name = state(default)()`\n\n' +
     'Problem state:\n' + (callback ? callback.toString() : JSON.stringify(state)) +'\n'
@@ -98,18 +99,11 @@ export function getStateValue<T>(
 export class StateEchoBack {}
 
 function initState(
-  tagSupport: BaseTagSupport
+  tagSupport: TagSupport | BaseTagSupport
 ) {
   const memory = tagSupport.memory
   const state = memory.state as State
   const config: Config = setUse.memory.stateConfig
-  
-  // TODO: The following two blocks of code are state protects, have a production mode that removes this checks
-  /*
-  if (config.rearray) {
-    checkStateMismatch(tagSupport, config, state)
-  }
-  */
 
   config.rearray = []
   const stateLength = state?.length
@@ -122,37 +116,6 @@ function initState(
 
   config.tagSupport = tagSupport
 }
-
-/*
-function checkStateMismatch(
-  tagSupport: BaseTagSupport,
-  config: Config,
-  state: State,
-) {
-  const wrapper = tagSupport.templater?.wrapper as Wrapper
-  const wasWrapper = config.tagSupport?.templater.wrapper as Wrapper
-  const message = 'last state not cleared. Possibly in the middle of rendering one component and another is trying to render'
-
-  if(!wasWrapper) {
-    return // its not a component or was not a component before
-  }
-
-  console.error(message, {
-    config,
-    tagFunction: wrapper.parentWrap.original,
-    wasInMiddleOf: wasWrapper.parentWrap.original,
-    state,
-    expectedClearArray: config.rearray,
-  })
-
-  throw new StateMismatchError(message, {
-    config,
-    tagFunction: wrapper.parentWrap.original,
-    state,
-    expectedClearArray: config.rearray,
-  })
-}
-*/
 
 export function getCallbackValue<T>(
   callback: StateConfig<T>

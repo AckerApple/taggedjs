@@ -1,9 +1,9 @@
-import { Subject, ValueSubject } from '../subject'
-import { TagSupport } from '../tag/TagSupport.class'
-import { getSupportInCycle } from '../tag/getSupportInCycle.function'
-import { setUse } from './setUse.function'
-import { state } from './state.function'
-import { syncStates } from './syncStates.function'
+import { Subject, ValueSubject } from'../subject/index.js'
+import { TagSupport } from '../tag/TagSupport.class.js'
+import { getSupportInCycle } from'../tag/getSupportInCycle.function.js'
+import { setUse } from'./setUse.function.js'
+import { state } from'./state.function.js'
+import { syncStates } from'./syncStates.function.js'
 
 export type WatchCallback<T> = (
   currentValues: any[],
@@ -156,23 +156,24 @@ function defineOnMethod<R>(
         currentValues: any[],
         callback: WatchCallback<T>  
       ) => {
-        const originalState = state(() => (getSupportInCycle() as TagSupport).memory.state)
+        const firstSupport = state(() => (getSupportInCycle() as TagSupport))
         const subject = state(() => new ValueSubject<any>(undefined))
         
         setupWatch(
           currentValues,
           (currentValues, previousValues) => {
+            const nowTagSupport = getSupportInCycle()
             const setTo = callback(currentValues, previousValues)
-            
-            if(originalState.length) {
+
+            if(nowTagSupport !== firstSupport) {
               const newestState = setUse.memory.stateConfig.array
               syncStates(
                 newestState,
-                originalState,
+                firstSupport.memory.state,
               )
             }
 
-            subject.set( setTo )
+            subject.next(setTo)
           },
           oldWatch.setup
         )
@@ -185,25 +186,6 @@ function defineOnMethod<R>(
       defineOnMethod(() => method as any, method)
       
       return method
-      /*
-      method.setup = setup
-    
-      defineOnMethod(() => method as any, method)
-      
-      return method as any
-
-      
-      const oldWatch = getWatch()
-      const watch = newWatch( oldWatch.setup )
-      // const watch = getWatch()
-      
-      const subject = state(() => new Subject())
-      watch.setup.final = (x: any) => {
-        subject.set(x)
-        return subject
-      }
-      return watch
-      */
     },
   })
 

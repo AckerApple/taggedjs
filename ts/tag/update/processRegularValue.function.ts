@@ -1,6 +1,6 @@
-import { InsertBefore } from '../../interpolations/Clones.type'
+import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
 import { DisplaySubject } from '../../subject.types'
-import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function'
+import { castTextValue, updateBeforeTemplate } from'../../updateBeforeTemplate.function.js'
 
 export type RegularValue = string | number | undefined | boolean
 

@@ -1,15 +1,18 @@
-import { Tag } from '../Tag.class'
-import { DisplaySubject, TagSubject } from '../../subject.types'
-import { ValueSubject } from '../../subject/ValueSubject'
-import { TemplaterResult } from '../../TemplaterResult.class'
-import { TagSupport } from '../TagSupport.class'
-import { InterpolateSubject, TemplateValue, ValueTypes, getValueType } from './processFirstSubject.utils'
+import { Tag } from '../Tag.class.js'
+import { DisplaySubject, TagSubject } from '../../subject.types.js'
+import { ValueSubject } from '../../subject/ValueSubject.js'
+import { TemplaterResult } from '../TemplaterResult.class.js'
+import { TagSupport } from '../TagSupport.class.js'
+import { InterpolateSubject, TemplateValue } from './processFirstSubject.utils.js'
+import { ValueTypes } from '../ValueTypes.enum.js'
+import { getValueType } from '../getValueType.function.js'
 
 export function processNewValue(
   value: TemplateValue,
   ownerSupport: TagSupport,
 ): InterpolateSubject {
   const valueType = getValueType(value)
+  
   switch (valueType) {
     case ValueTypes.tagComponent:
       const tagSubject = new ValueSubject(value) as TagSubject

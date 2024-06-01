@@ -1,10 +1,10 @@
-import { Tag } from "./Tag.class"
-import { TagSupport } from "./TagSupport.class"
-import { ValueSubject } from "../subject/ValueSubject"
-import { html } from "./html"
-import { TemplaterResult } from "../TemplaterResult.class"
-import { TagSubject } from "../subject.types"
-import { Props } from "../Props"
+import { Tag } from './Tag.class.js'
+import { TagSupport } from './TagSupport.class.js'
+import { ValueSubject } from '../subject/ValueSubject.js'
+import { html } from './html.js'
+import { TemplaterResult } from './TemplaterResult.class.js'
+import { TagSubject } from '../subject.types.js'
+import { Props } from '../Props.js'
 
 describe('Tag.class', () => {
   it('simple update', () => {
@@ -93,7 +93,7 @@ function getTags(
 
   const ownerTagSupport = {} as TagSupport
 
-  subject.set(templater0)
+  subject.next(templater0)
 
   return {tag0, tag1, tagSupport0, tagSupport1}
 }

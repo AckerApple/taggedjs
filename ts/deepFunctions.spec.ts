@@ -1,4 +1,4 @@
-import { deepClone, deepEqual } from "./deepFunctions"
+import { deepClone, deepEqual } from './deepFunctions.js'
 
 describe('deepFunctions', () => {
   it('empty object', () => {

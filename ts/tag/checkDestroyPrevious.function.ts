@@ -1,18 +1,20 @@
-import { DisplaySubject, TagSubject } from '../subject.types'
-import { isStaticTag } from '../isInstance'
-import { InterpolateSubject, ValueTypes, getValueType } from './update/processFirstSubject.utils'
-import { TagArraySubject } from './update/processTagArray'
-import { isLikeTags } from './isLikeTags.function'
-import { Counts } from '../interpolations/interpolateTemplate'
-import { destroyTagMemory, destroyTagSupportPast } from './destroyTag.function'
-import { InsertBefore } from '../interpolations/Clones.type'
-import { insertAfter } from '../insertAfter.function'
-import { TagSupport } from './TagSupport.class'
+import { DisplaySubject, TagSubject } from '../subject.types.js'
+import { isStaticTag } from'../isInstance.js'
+import { InterpolateSubject } from './update/processFirstSubject.utils.js'
+import { TagArraySubject } from'./update/processTagArray.js'
+import { isLikeTags } from'./isLikeTags.function.js'
+import { Counts } from'../interpolations/interpolateTemplate.js'
+import { destroyTagMemory, destroyTagSupportPast } from'./destroyTag.function.js'
+import { InsertBefore } from'../interpolations/InsertBefore.type.js'
+import { insertAfter } from'../insertAfter.function.js'
+import { BaseTagSupport, TagSupport } from './TagSupport.class.js'
+import { ValueTypes } from './ValueTypes.enum.js'
 
 export function checkDestroyPrevious(
   subject: InterpolateSubject, // existing.value is the old value
   newValue: unknown,
   insertBefore: InsertBefore,
+  valueType: ValueTypes,
 ) {
   const displaySubject = subject as DisplaySubject
   const hasLastValue = 'lastValue' in displaySubject
@@ -34,7 +36,6 @@ export function checkDestroyPrevious(
     return 'changed-simple-value'
   }
 
-  const valueType = getValueType(newValue)
   const arraySubject = subject as TagArraySubject
   const wasArray = arraySubject.lastArray
   
@@ -60,7 +61,7 @@ export function checkDestroyPrevious(
   // no longer tag or component?
   if(lastSupport) {
     const isValueTag = isStaticTag(newValue)
-    const isSubjectTag = isStaticTag(subject.value)
+    const isSubjectTag = isStaticTag(subject._value)
 
     if(isSubjectTag && isValueTag) {
       const newTag = newValue as TagSupport
@@ -132,7 +133,7 @@ function destroySimpleValue(
 }
 
 export function restoreTagMarker(
-  lastSupport: TagSupport,
+  lastSupport: BaseTagSupport | TagSupport,
 ) {
   const insertBefore = lastSupport.global.insertBefore as Element
   const global = lastSupport.global

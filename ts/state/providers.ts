@@ -1,7 +1,7 @@
-import { deepClone } from '../deepFunctions'
-import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class'
-import { setUse } from './setUse.function'
-import { state } from './state.function'
+import { deepClone } from '../deepFunctions.js'
+import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js'
+import { setUse } from'./setUse.function.js'
+import { state } from'./state.function.js'
 
 export type Provider = {
   constructMethod: any
@@ -14,7 +14,7 @@ type ProviderConstructor<T> = (new (...args: any[]) => T) | (() => T)
 
 export type ProviderConfig = {
   providers: Provider[]
-  ownerSupport?: TagSupport
+  ownerSupport?: TagSupport | BaseTagSupport
 }
 
 setUse.memory.providerConfig = {
@@ -122,19 +122,19 @@ export const providers = {
 
 setUse({ // providers
   beforeRender: (
-    tagSupport: BaseTagSupport,
-    ownerSupport?: TagSupport,
+    tagSupport: TagSupport | BaseTagSupport,
+    ownerSupport?: TagSupport | BaseTagSupport,
   ) => {
     run(tagSupport, ownerSupport)
   },
   beforeRedraw: (
-    tagSupport: BaseTagSupport,
-    newTagSupport: TagSupport,
+    tagSupport: TagSupport | BaseTagSupport,
+    newTagSupport: TagSupport | BaseTagSupport,
   ) => {
-    run(tagSupport, newTagSupport.ownerTagSupport)
+    run(tagSupport, (newTagSupport as TagSupport).ownerTagSupport)
   },
   afterRender: (
-    tagSupport: BaseTagSupport,
+    tagSupport: TagSupport | BaseTagSupport,
     // tag: Tag
   ) => {
     const config = setUse.memory.providerConfig
@@ -144,8 +144,8 @@ setUse({ // providers
 })
 
 function run(
-  tagSupport: BaseTagSupport,
-  ownerSupport?: TagSupport,
+  tagSupport: TagSupport | BaseTagSupport,
+  ownerSupport?: TagSupport | BaseTagSupport,
 ) {
   const config = setUse.memory.providerConfig  
   config.ownerSupport = ownerSupport

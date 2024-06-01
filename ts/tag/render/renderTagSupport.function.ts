@@ -1,20 +1,19 @@
-import { TagSupport } from '../TagSupport.class'
-import { deepEqual } from '../../deepFunctions'
-import { renderExistingTag } from './renderExistingTag.function'
-import { Props } from '../../Props'
+import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
+import { deepEqual } from '../../deepFunctions.js'
+import { renderExistingTag } from'./renderExistingTag.function.js'
+import { Props } from '../../Props.js'
 
 /** Main function used by all other callers to render/update display of a tag component */
 export function renderTagSupport(
-  tagSupport: TagSupport, // must be latest/newest state render
+  tagSupport: TagSupport | BaseTagSupport, // must be latest/newest state render
   renderUp: boolean,
 ): TagSupport {
   const global = tagSupport.global
   const templater = tagSupport.templater
   
   // is it just a vanilla tag, not component?
-  
   if( !templater.wrapper ) {// || isTagTemplater(templater) 
-    const ownerTag = tagSupport.ownerTagSupport as TagSupport
+    const ownerTag = (tagSupport as TagSupport).ownerTagSupport
     ++global.renderCount
     return renderTagSupport(ownerTag, true)
   }
@@ -26,7 +25,7 @@ export function renderTagSupport(
   const shouldRenderUp = renderUp && tagSupport
 
   if(shouldRenderUp) {
-    ownerSupport = tagSupport.ownerTagSupport
+    ownerSupport = (tagSupport as TagSupport).ownerTagSupport
     if(ownerSupport) {
       const nowProps = templater.props as Props
       const latestProps = tagSupport.propsConfig.latestCloned

@@ -1,9 +1,9 @@
-import { BaseTagSupport, TagSupport } from './TagSupport.class'
-import { runAfterRender, runBeforeRender } from './tagRunner'
-import { TemplaterResult, Wrapper } from '../TemplaterResult.class'
-import { TagComponent, TagMaker} from './tag.utils'
-import { ValueSubject } from '../subject/ValueSubject'
-import { TagSubject } from '../subject.types'
+import { BaseTagSupport, TagSupport } from './TagSupport.class.js'
+import { runAfterRender, runBeforeRender } from'./tagRunner.js'
+import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
+import { TagComponent, TagMaker} from './tag.utils.js'
+import { ValueSubject } from'../subject/ValueSubject.js'
+import { TagSubject } from '../subject.types.js'
 
 const appElements: {
   tagSupport: TagSupport
@@ -77,15 +77,15 @@ export function tagElement(
 export function runWrapper(
   templater: TemplaterResult,
 ) {
-  let newSupport = {} as TagSupport
-  const subject = new ValueSubject<TagSupport>(newSupport) as unknown as TagSubject
+  let newSupport = {} as BaseTagSupport
+  const subject = new ValueSubject(newSupport as any as TemplaterResult) as TagSubject
     
   newSupport = new BaseTagSupport(
     templater,
     subject,
-  ) as TagSupport
+  )
 
-  subject.set( templater )
+  subject.next( templater )
   
   subject.tagSupport = newSupport
   

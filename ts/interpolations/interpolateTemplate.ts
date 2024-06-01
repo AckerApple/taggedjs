@@ -1,15 +1,15 @@
-import { Context, ElementBuildOptions, variablePrefix } from "../tag/Tag.class"
-import { InterpolateOptions } from "./interpolateElement"
-import { elementInitCheck } from "./elementInitCheck"
-import { Clones, InsertBefore } from "./Clones.type"
-import { InterpolateSubject, TemplateValue } from "../tag/update/processFirstSubject.utils"
-import { processFirstSubjectValue } from "../tag/update/processFirstSubjectValue.function"
-import { isTagArray, isTagComponent } from "../isInstance"
-import { scanTextAreaValue } from "./scanTextAreaValue.function"
-import { updateExistingValue } from "../tag/update/updateExistingValue.function"
-import { TagSupport } from "../tag/TagSupport.class"
-import { TemplaterResult } from "../TemplaterResult.class"
-import { swapInsertBefore } from "../tag/setTagPlaceholder.function"
+import { Context, ElementBuildOptions, variablePrefix } from '../tag/Tag.class.js'
+import { InterpolateOptions } from './interpolateElement.js'
+import { elementInitCheck } from './elementInitCheck.js'
+import { InsertBefore } from './InsertBefore.type.js'
+import { InterpolateSubject, TemplateValue } from '../tag/update/processFirstSubject.utils.js'
+import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue.function.js'
+import { isTagArray, isTagComponent } from '../isInstance.js'
+import { scanTextAreaValue } from './scanTextAreaValue.function.js'
+import { updateExistingValue } from '../tag/update/updateExistingValue.function.js'
+import { TagSupport } from '../tag/TagSupport.class.js'
+import { TemplaterResult } from '../tag/TemplaterResult.class.js'
+import { swapInsertBefore } from '../tag/setTagPlaceholder.function.js'
 
 export type Template = Element & {clone?: any}
 export type InterpolateComponentResult = {
@@ -19,7 +19,7 @@ export type InterpolateComponentResult = {
   variableName: string
 }
 export type InterpolateTemplateResult = {
-  clones: Clones
+  clones: InsertBefore[]
   tagComponent?: InterpolateComponentResult
 }
 
@@ -31,7 +31,7 @@ export function interpolateTemplate(
   options: InterpolateOptions,
 ): InterpolateTemplateResult {
   // TODO: THe clones array is useless here
-  const clones: Clones = []
+  const clones: InsertBefore[] = []
 
   if ( !insertBefore.hasAttribute('end') ) {
     return {clones} // only care about <template end>
@@ -43,7 +43,7 @@ export function interpolateTemplate(
   }
 
   const existingSubject = context[variableName]
-  const isDynamic = isTagComponent(existingSubject.value) || isTagArray(existingSubject.value)
+  const isDynamic = isTagComponent(existingSubject._value) || isTagArray(existingSubject.value)
 
   // process dynamics later
   if(isDynamic) {
@@ -144,16 +144,17 @@ export function afterElmBuild(
   let diff = options.counts.added
   diff = elementInitCheck(elm, options.counts) - diff
 
-  if((elm as Element).children) {
-    const children = (elm as Element).children as any
+  const children = (elm as Element).children as HTMLCollection
+
+  if(children) {
     for (let index = children.length - 1; index >= 0; --index) {
       const child = children[index]
       const subOptions = {
         ...options,
        counts: options.counts,
       }
-  
-      return afterElmBuild(child, subOptions, context, ownerSupport)
+
+      afterElmBuild(child, subOptions, context, ownerSupport)
     }
   }
 }

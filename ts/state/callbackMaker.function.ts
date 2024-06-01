@@ -1,12 +1,11 @@
-import { BaseTagSupport, TagSupport } from "../tag/TagSupport.class"
-import { setUse } from "./setUse.function"
-import { State } from "./state.utils"
-import { renderTagSupport } from "../tag/render/renderTagSupport.function"
-import { SyncCallbackError } from "../errors"
-import { syncStates } from "./syncStates.function"
-import { getSupportInCycle } from "../tag/getSupportInCycle.function"
+import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js'
+import { setUse } from './setUse.function.js'
+import { State } from './state.utils.js'
+import { SyncCallbackError } from '../errors.js'
+import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
+import callbackStateUpdate from './callbackStateUpdate.function.js'
 
-type Callback<A,B,C,D,E,F, T> = (
+export type Callback<A,B,C,D,E,F, T> = (
   a: A, b: B, c: C, d: D, e: E, f: F,
 ) => T
 
@@ -21,9 +20,9 @@ export const callbackMaker = () => innerCallback
 const originalGetter = innerCallback // callbackMaker
 
 setUse({
-  beforeRender: (tagSupport: BaseTagSupport) => initMemory(tagSupport),
-  beforeRedraw: (tagSupport: BaseTagSupport) => initMemory(tagSupport),
-  afterRender: (tagSupport: BaseTagSupport) => {
+  beforeRender: tagSupport => initMemory(tagSupport),
+  beforeRedraw: tagSupport => initMemory(tagSupport),
+  afterRender: tagSupport => {
     ;(tagSupport.global as any).callbackMaker = true
     innerCallback = originalGetter // prevent crossing callbacks with another tag
   },
@@ -44,7 +43,7 @@ export function callback<A,B,C,D,E,F, T>(
     const callbackMaker = (tagSupport.global as any).callbackMaker
     
     if(callbackMaker) {
-      return triggerStateUpdate(tagSupport, callback, oldState, ...args)
+      return callbackStateUpdate(tagSupport, callback, oldState, ...args)
     }
 
     return (callback as any)(...args)
@@ -53,7 +52,7 @@ export function callback<A,B,C,D,E,F, T>(
   return trigger
 }
 
-function initMemory (tagSupport: BaseTagSupport) {
+function initMemory (tagSupport: TagSupport | BaseTagSupport) {
   const oldState: State = setUse.memory.stateConfig.array
   innerCallback = (
     callback: Callback<any, any, any, any, any, any, any>
@@ -62,7 +61,7 @@ function initMemory (tagSupport: BaseTagSupport) {
       const callbackMaker = (tagSupport.global as any).callbackMaker
       
       if(callbackMaker) {
-        return triggerStateUpdate(tagSupport, callback, oldState, ...args)
+        return callbackStateUpdate(tagSupport, callback, oldState, ...args)
       }
 
       return (callback as any)(...args)
@@ -70,48 +69,4 @@ function initMemory (tagSupport: BaseTagSupport) {
 
     return trigger
   }
-}
-
-function triggerStateUpdate<T>(
-  tagSupport: BaseTagSupport,
-  callback: Callback<any, any,any, any, any, any, T>,
-  oldState: State,
-  ...args: any[]
-): T {
-  const state = tagSupport.memory.state  
-
-  // ensure that the oldest has the latest values first
-  syncStates(state, oldState)
-  
-  // run the callback
-  const maybePromise = callback(...args as [any,any,any,any,any,any])
-
-  // send the oldest state changes into the newest
-  syncStates(oldState, state)
-  
-  /*
-  if(tagSupport.global.deleted) {
-    return maybePromise // While running callback the tag was deleted. Often that happens
-  }
-  */
-
-  renderTagSupport(
-    tagSupport as TagSupport,
-    false,
-  )
-
-  if(maybePromise instanceof Promise) {
-    maybePromise.finally(() => {
-      // send the oldest state changes into the newest
-      syncStates(oldState, state)
-
-      renderTagSupport(
-        tagSupport as TagSupport,
-        false,
-      )
-    })
-  }
-
-  // return undefined as T
-  return maybePromise
 }

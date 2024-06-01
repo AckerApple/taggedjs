@@ -1,5 +1,14 @@
 ## CHANGELOG
 
+### v2.5.18 - 5-2024
+- fix functions as argument props
+- fix nested textareas
+
+### v2.5.14 - 5-2024
+- `new Subject(0).set(1)` is now replaced by one of the following:
+  - `new Subject(0).next(2)`
+  - `new Subject(0).set = 1` which is a setter that calls next() auto
+
 ### v2.5.6 - 5-2024
 - `watch()` now fires on init. Use `watch.noInit()` if needed
   - not considering breaking change due to no public audience

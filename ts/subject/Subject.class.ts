@@ -1,34 +1,32 @@
-import { isSubjectInstance } from "../isInstance"
-import { combineLatest } from "./combineLatest.function"
-import { OperatorFunction, SubjectLike, SubjectSubscriber, Subscription, getSubscription, runPipedMethods } from "./subject.utils"
+import { isSubjectInstance } from '../isInstance.js'
+import { combineLatest } from './combineLatest.function.js'
+import { OperatorFunction, SubjectLike, SubjectSubscriber, Subscription, getSubscription, runPipedMethods } from './subject.utils.js'
 
 export type OnSubscription<T> = (subscription: Subscription<T>) => unknown
 
 export class Subject<T> implements SubjectLike<T> {
+  // private?
   methods: OperatorFunction<any, any, any>[] = []
   isSubject = true
+  // private?
   subscribers: Subscription<T>[] = []
   subscribeWith?: (x: SubjectSubscriber<T>) => Subscription<T>
-  _value?: T
+  public _value?: T
+
+  // this is overwritten by constructor at runtime. However having it helps editors know of its existence
+  set!: T // `subject.set = x` equal to `subject.next(x)`
 
   constructor(
-    value?: T,
+    public value?: T,
+    // private?
     public onSubscription?: OnSubscription<T>
   ) {
     this._value = value
-  }
-
-  get value() {
-    return this._value
-  }
-
-  set value(newValue) {
-    this._value = newValue;
-    this.set(newValue)
+    defineValueOn(this)
   }
 
   subscribe(callback: SubjectSubscriber<T>) {
-    const subscription = getSubscription(this, callback)
+    const subscription = getSubscription(this, callback, this.subscribers)
 
     // are we within a pipe?
     const subscribeWith = this.subscribeWith
@@ -54,7 +52,7 @@ export class Subject<T> implements SubjectLike<T> {
     this.subscribers.push(subscription)
     // Subject.globalSubs.push(subscription) // 🔬 testing
     const count = Subject.globalSubCount$.value as number
-    Subject.globalSubCount$.set(count + 1) // 🔬 testing
+    Subject.globalSubCount$.next(count + 1) // 🔬 testing
     
     if(this.onSubscription) {
       this.onSubscription(subscription)
@@ -63,9 +61,14 @@ export class Subject<T> implements SubjectLike<T> {
     return subscription
   }
 
-  set(value?: any) {
+  next(value?: any) {
     this._value = value
-    
+    this.emit()
+  }
+  
+  emit() {
+    const value = this._value as any
+
     // Notify all subscribers with the new value
     const subs = [...this.subscribers] // subs may change as we call callbacks
     const length = subs.length
@@ -74,8 +77,6 @@ export class Subject<T> implements SubjectLike<T> {
       sub.callback(value, sub)
     }
   }
-  // next() is available for rxjs compatibility
-  next = this.set
 
   toPromise(): Promise<T> {
     return new Promise(res => {
@@ -165,11 +166,14 @@ export class Subject<T> implements SubjectLike<T> {
   ): Subject<unknown>;
   pipe(...operations: OperatorFunction<any, any, any>[]): Subject<any> {
     const subject = new Subject(this._value)
-    subject.methods = operations
+    subject.setMethods(operations)
     subject.subscribeWith = (x) => this.subscribe(x as any)
-    subject.set = x => this.set(x)
-    subject.next = subject.set
+    subject.next = x => this.next(x)
     return subject
+  }
+
+  setMethods(operations: OperatorFunction<any, any, any>[]) {
+    this.methods = operations
   }
 
   static all<A, B, C, D, E, F>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D, Subject<E> | E, Subject<F> | F]): Subject<[A,B,C,D,E,F]>
@@ -195,4 +199,27 @@ export class Subject<T> implements SubjectLike<T> {
   }
 
   static globalSubCount$ = new Subject<number>(0) // for ease of debugging
+}
+
+export function defineValueOn(subject: Subject<any>) {
+  Object.defineProperty(subject, 'value', {
+    // supports subject.value = x
+    set(value) {
+      subject._value = value
+      subject.emit()
+    },
+    
+    // supports subject.value
+    get() {
+      return subject._value
+    }
+  })
+
+  Object.defineProperty(subject, 'set', {
+    // supports subject.set = x
+    set: (value) => subject.next(value),
+    
+    // supports subject.set(x)
+    get: () => (x: any) => subject.next(x),
+  })
 }

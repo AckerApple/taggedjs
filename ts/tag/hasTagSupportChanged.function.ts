@@ -1,6 +1,6 @@
-import { BaseTagSupport } from "./TagSupport.class"
-import { TemplaterResult } from "../TemplaterResult.class"
-import { hasPropChanges } from "./hasPropChanges.function"
+import { BaseTagSupport } from './TagSupport.class.js'
+import { TemplaterResult } from './TemplaterResult.class.js'
+import { hasPropChanges } from'./hasPropChanges.function.js'
 
 export function hasTagSupportChanged(
   oldTagSupport: BaseTagSupport,

@@ -1,5 +1,5 @@
-import { Subject } from "./Subject.class"
-import { SubjectSubscriber, Subscription } from "./subject.utils"
+import { Subject } from './Subject.class.js'
+import { SubjectSubscriber, Subscription } from './subject.utils.js'
 
 export function combineLatest(
   subjects: Subject<any>[],

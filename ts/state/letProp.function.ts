@@ -1,6 +1,6 @@
-import { letState } from "./letState.function"
-import { GetSet } from "./state.utils"
-import { watch } from "./watch.function"
+import { letState } from'./letState.function.js'
+import { GetSet } from './state.utils.js'
+import { watch } from'./watch.function.js'
 
 /**
  * Enables the ability to maintain a change to a props value until the prop itself changes

@@ -1,21 +1,21 @@
-import { TagSubject } from '../../subject.types'
-import { hasTagSupportChanged } from '../hasTagSupportChanged.function'
-import { TagSupport } from '../TagSupport.class'
-import { processSubjectComponent } from './processSubjectComponent.function'
-import { destroyTagMemory } from '../destroyTag.function'
-import { renderTagSupport } from '../render/renderTagSupport.function'
-import { InsertBefore } from '../../interpolations/Clones.type'
-import { callbackPropOwner } from '../../alterProps.function'
-import { isLikeTags } from '../isLikeTags.function'
+import { TagSubject } from '../../subject.types.js'
+import { hasTagSupportChanged } from'../hasTagSupportChanged.function.js'
+import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
+import { processSubjectComponent } from'./processSubjectComponent.function.js'
+import { destroyTagMemory } from'../destroyTag.function.js'
+import { renderTagSupport } from'../render/renderTagSupport.function.js'
+import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
+import { callbackPropOwner } from'../../alterProp.function.js'
+import { isLikeTags } from'../isLikeTags.function.js'
 
 export function updateExistingTagComponent(
   ownerSupport: TagSupport,
   tagSupport: TagSupport, // lastest
   subject: TagSubject,
   insertBefore: InsertBefore,
-): TagSupport {
+): TagSupport | BaseTagSupport {
   let lastSupport = subject.tagSupport?.global.newest as TagSupport // || subject.tagSupport
-  let oldestTag = lastSupport.global.oldest
+  let oldestTag: TagSupport | BaseTagSupport | undefined = lastSupport.global.oldest
   
   const oldWrapper = lastSupport.templater.wrapper
   const newWrapper = tagSupport.templater.wrapper
@@ -45,7 +45,11 @@ export function updateExistingTagComponent(
       }
     )
   } else {
-    const hasChanged = hasTagSupportChanged(lastSupport, tagSupport, templater)    
+    const hasChanged = hasTagSupportChanged(
+      lastSupport as unknown as BaseTagSupport,
+      tagSupport as unknown as BaseTagSupport,
+      templater
+    )
     if(!hasChanged) {
       // if the new props are an object then implicitly since no change, the old props are an object
       const newProps = templater.props
@@ -79,9 +83,9 @@ export function updateExistingTagComponent(
     )
   }
   
-  if(newOldest && templater.children.value.length) {
+  if(newOldest && templater.children._value.length) {
     const oldKidsSub = newOldest.templater.children
-    oldKidsSub.set(templater.children.value)
+    oldKidsSub.next(templater.children._value)
   }
 
   // detect if both the function is the same and the return is the same
@@ -90,7 +94,7 @@ export function updateExistingTagComponent(
   if(isLikeTag) {
     subject.tagSupport = newSupport
     
-    ;(oldestTag as TagSupport).updateBy(newSupport) // the oldest tag has element references
+    oldestTag.updateBy(newSupport) // the oldest tag has element references
 
     return newSupport
   } else {
@@ -138,8 +142,8 @@ function buildNewTag(
 }
 
 function syncFunctionProps(
-  lastSupport: TagSupport,
-  ownerSupport: TagSupport,
+  lastSupport: BaseTagSupport | TagSupport,
+  ownerSupport: BaseTagSupport | TagSupport,
   newPropsArray: any[],
 ) {
   lastSupport = lastSupport.global.newest || lastSupport as TagSupport
@@ -177,7 +181,8 @@ function syncFunctionProps(
         return callbackPropOwner(
           newCallback, // value, // newOriginal,
           args,
-          prevSupport,
+          prevSupport, // ??? <= ownerSupport
+          [],
         )
       }
     }

@@ -5,6 +5,7 @@ const pack = require('../package.json')
 delete pack.scripts
 delete pack.devDependencies
 delete pack.private
+pack.type = 'module'
 
 const write = JSON.stringify(pack, null, 2)
 

@@ -1,9 +1,9 @@
-import { OnSubscription, Subject, ValueSubject } from "../subject";
-import { TagSupport } from "../tag/TagSupport.class";
-import { getSupportInCycle } from "../tag/getSupportInCycle.function";
-import { setUse } from "./setUse.function";
-import { state } from "./state.function";
-import { syncStates } from "./syncStates.function";
+import { TagSupport } from '../tag/TagSupport.class.js'
+import { OnSubscription, Subject, ValueSubject } from '../subject/index.js'
+import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
+import { setUse } from './setUse.function.js'
+import { state } from './state.function.js'
+import { syncStates } from './syncStates.function.js'
 
 /** Create a Subject that on updates will sync state values to keep chained functions using latest variables */
 export function subject<T>(
@@ -21,7 +21,7 @@ export function subject<T>(
   })
 }
 
-subject.value = <T>(value: T) => {
+subject._value = <T>(value: T) => {
   const oldestState = state(() => setUse.memory.stateConfig.array)
   const nowTagSupport = getSupportInCycle() as TagSupport
   return state(() => {

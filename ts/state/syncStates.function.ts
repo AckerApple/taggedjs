@@ -1,4 +1,4 @@
-import { State } from "./state.utils"
+import { State } from './state.utils'
 
 export function syncStates(
   stateFrom: State,

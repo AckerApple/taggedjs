@@ -1,14 +1,14 @@
-import { Clones, InsertBefore } from '../../interpolations/Clones.type'
-import { Tag } from '../Tag.class'
-import { ValueSubject } from '../../subject/ValueSubject'
-import { Counts } from '../../interpolations/interpolateTemplate'
-import { ArrayNoKeyError } from '../../errors'
-import { destroyArrayTag } from '../checkDestroyPrevious.function'
-import { setupNewTemplater, tagFakeTemplater } from './processTag.function'
-import { TagSupport } from '../TagSupport.class'
-import { TemplaterResult } from '../../TemplaterResult.class'
-import { isTagClass } from '../../isInstance'
-import { TagSubject } from '../../subject.types'
+import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
+import { Tag } from '../Tag.class.js'
+import { ValueSubject } from '../../subject/ValueSubject.js'
+import { Counts } from '../../interpolations/interpolateTemplate.js'
+import { ArrayNoKeyError } from '../../errors.js'
+import { destroyArrayTag } from '../checkDestroyPrevious.function.js'
+import { setupNewTemplater, tagFakeTemplater } from './processTag.function.js'
+import { TagSupport } from '../TagSupport.class.js'
+import { TemplaterResult } from '../TemplaterResult.class.js'
+import { isTagClass } from '../../isInstance.js'
+import { TagSubject } from '../../subject.types.js'
 
 export type LastArrayItem = {
   tagSupport: TagSupport
@@ -30,8 +30,8 @@ export function processTagArray(
   options: {
     counts: Counts
   },
-): Clones {
-  const clones: Clones = ownerSupport.clones // []
+): InsertBefore[] {
+  const clones: InsertBefore[] = ownerSupport.clones // []
   let lastArray = subject.lastArray = subject.lastArray || []
 
   if(!subject.placeholder) {

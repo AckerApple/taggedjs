@@ -1,6 +1,6 @@
-import { Context } from "../tag/Tag.class"
-import { TagSupport } from "../tag/TagSupport.class"
-import { processAttribute } from "./processAttribute.function"
+import { Context } from '../tag/Tag.class.js'
+import { TagSupport } from '../tag/TagSupport.class.js'
+import { processAttribute } from './processAttribute.function.js'
 
 export type HowToSet = (element: Element, name: string, value: string) => any
 

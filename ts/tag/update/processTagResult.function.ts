@@ -1,11 +1,11 @@
-import { Counts } from '../../interpolations/interpolateTemplate'
-import { TagArraySubject } from './processTagArray'
-import { TagSubject } from '../../subject.types'
-import { InsertBefore } from '../../interpolations/Clones.type'
-import { TagSupport } from '../TagSupport.class'
+import { Counts } from'../../interpolations/interpolateTemplate.js'
+import { TagArraySubject } from'./processTagArray.js'
+import { TagSubject } from '../../subject.types.js'
+import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
+import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
 
 export function processTagResult(
-  tagSupport: TagSupport,
+  tagSupport: BaseTagSupport | TagSupport,
   subject: TagArraySubject | TagSubject | Function, // used for recording past and current value
   insertBefore: InsertBefore, // <template end interpolate />
   {
@@ -31,9 +31,9 @@ export function processTagResult(
 
 
 function processTagResultUpdate(
-  tagSupport: TagSupport,
-  subject: TagSubject | ((x: TagSupport) => TagSupport), // used for recording past and current value
-  prevSupport: TagSupport,
+  tagSupport: BaseTagSupport | TagSupport,
+  subject: TagSubject | ((x: BaseTagSupport | TagSupport) => TagSupport), // used for recording past and current value
+  prevSupport: BaseTagSupport | TagSupport,
 ) {
   // components
   if(subject instanceof Function) {

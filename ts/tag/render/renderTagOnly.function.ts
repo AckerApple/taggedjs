@@ -1,19 +1,19 @@
-import { BaseTagSupport, TagSupport } from '../TagSupport.class'
-import { runBeforeRedraw, runBeforeRender } from '../tagRunner'
-import { setUse } from '../../state'
-import { runAfterRender } from '../tagRunner'
-import { TagSubject } from '../../subject.types'
-import { Wrapper } from '../../TemplaterResult.class'
+import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
+import { runBeforeRedraw, runBeforeRender } from'../tagRunner.js'
+import { setUse } from'../../state/index.js'
+import { runAfterRender } from'../tagRunner.js'
+import { TagSubject } from '../../subject.types.js'
+import { Wrapper } from '../TemplaterResult.class.js'
 
 export function renderTagOnly(
-  newTagSupport: TagSupport,
-  lastSupport: TagSupport | undefined,
+  newTagSupport: TagSupport | BaseTagSupport,
+  prevSupport: TagSupport | BaseTagSupport | undefined,
   subject: TagSubject,
-  ownerSupport?: TagSupport,
+  ownerSupport?: TagSupport | BaseTagSupport,
 ): TagSupport {
   const oldRenderCount = newTagSupport.global.renderCount
 
-  beforeWithRender(newTagSupport, ownerSupport, lastSupport)
+  beforeWithRender(newTagSupport, ownerSupport, prevSupport)
   
   const templater = newTagSupport.templater
 
@@ -35,22 +35,23 @@ export function renderTagOnly(
 }
 
 function beforeWithRender(
-  tagSupport: BaseTagSupport, // new
-  ownerSupport?: TagSupport,
-  lastSupport?: TagSupport,
+  tagSupport: BaseTagSupport | TagSupport, // new
+  parentSupport?: TagSupport | BaseTagSupport,
+  prevSupport?: TagSupport | BaseTagSupport,
 ) {
-  const lastOwnerSupport = lastSupport?.ownerTagSupport
-  const runtimeOwnerSupport: TagSupport | undefined = lastOwnerSupport || ownerSupport
+  const lastOwnerSupport = (prevSupport as TagSupport)?.ownerTagSupport
+  const runtimeOwnerSupport: TagSupport | undefined = lastOwnerSupport || parentSupport
 
-  if(lastSupport) {
-    const lastState = lastSupport.memory.state
-    const memory = tagSupport.memory
-    // memory.state.length = 0
-    // memory.state.push(...lastState)
-    memory.state = [...lastState]
-    tagSupport.global = lastSupport.global
+  if(prevSupport) {
+    if(prevSupport !== tagSupport) {
+      const lastState = prevSupport.memory.state
+      const memory = tagSupport.memory
+      tagSupport.global = prevSupport.global
+      memory.state.length = 0
+      memory.state.push(...lastState)
+    }
 
-    runBeforeRedraw(tagSupport, lastSupport)
+    runBeforeRedraw(tagSupport, prevSupport)
   } else {
     // first time render
     runBeforeRender(tagSupport, runtimeOwnerSupport)

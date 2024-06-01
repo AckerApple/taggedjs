@@ -1,4 +1,5 @@
-import { Subject } from "./Subject.class"
+import { Subject } from './Subject.class.js'
+import { ValueSubject } from './ValueSubject.js'
 
 export type Resolve<T> = (x: T) => any
 
@@ -54,10 +55,11 @@ function removeSubFromArray(
 
 export function getSubscription<T>(
   subject: Subject<T>,
-  callback: SubjectSubscriber<any>
+  callback: SubjectSubscriber<any>,
+  subscribers: Subscription<T>[],
 ) {
-  const countSubject = Subject.globalSubCount$ as {value: number}
-  Subject.globalSubCount$.set( countSubject.value + 1 )
+  const countSubject = Subject.globalSubCount$ as ValueSubject<number>
+  Subject.globalSubCount$.next( countSubject._value + 1 )
 
   const subscription: Subscription<any> = () => {
     subscription.unsubscribe()
@@ -68,9 +70,9 @@ export function getSubscription<T>(
 
   // Return a function to unsubscribe from the BehaviorSubject
   subscription.unsubscribe = () => {
-    removeSubFromArray(subject.subscribers, callback) // each will be called when update comes in
+    removeSubFromArray(subscribers, callback) // each will be called when update comes in
     // removeSubFromArray(Subject.globalSubs, callback) // 🔬 testing
-    Subject.globalSubCount$.set( countSubject.value - 1 )
+    Subject.globalSubCount$.next( countSubject._value - 1 )
     
     // any double unsubscribes will be ignored
     subscription.unsubscribe = () => subscription

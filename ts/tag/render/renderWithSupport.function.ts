@@ -1,12 +1,12 @@
-import { TagSupport } from '../TagSupport.class'
-import { isLikeTags } from '../isLikeTags.function'
-import { destroyTagMemory } from '../destroyTag.function'
-import { TagSubject, WasTagSubject } from '../../subject.types'
-import { renderTagOnly } from './renderTagOnly.function'
+import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
+import { isLikeTags } from'../isLikeTags.function.js'
+import { destroyTagMemory } from'../destroyTag.function.js'
+import { TagSubject, WasTagSubject } from '../../subject.types.js'
+import { renderTagOnly } from'./renderTagOnly.function.js'
 
 export function renderWithSupport(
-  newTagSupport: TagSupport,
-  lastSupport: TagSupport | undefined, // previous
+  newTagSupport: TagSupport | BaseTagSupport,
+  lastSupport: TagSupport | BaseTagSupport | undefined, // previous
   subject: TagSubject, // events & memory
   ownerSupport?: TagSupport, // who to report to
 ): TagSupport {
@@ -23,14 +23,14 @@ export function renderWithSupport(
     )
   }
 
-  const lastOwnerSupport = lastSupport?.ownerTagSupport
+  const lastOwnerSupport = (lastSupport as TagSupport)?.ownerTagSupport
   reSupport.ownerTagSupport = (ownerSupport || lastOwnerSupport) as TagSupport
 
   return reSupport
 }
 
 function destroyUnlikeTags(
-  lastSupport: TagSupport, // old
+  lastSupport: TagSupport | BaseTagSupport, // old
   reSupport: TagSupport, // new
   subject: TagSubject,
 ) {
@@ -46,7 +46,7 @@ function destroyUnlikeTags(
   global.insertBefore = insertBefore
   global.deleted = false
   
-  delete global.oldest
+  delete (global as any).oldest // TODO, maybe set global oldest to replacement instead of destroying it?
   delete global.newest
   delete (subject as WasTagSubject).tagSupport
 }

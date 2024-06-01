@@ -1,10 +1,10 @@
-import { Tag } from "./Tag.class"
-import { TagSupport } from "./TagSupport.class"
-import { TemplaterResult } from "../TemplaterResult.class"
+import { Tag } from './Tag.class.js'
+import { BaseTagSupport, TagSupport } from './TagSupport.class.js'
+import { TemplaterResult } from './TemplaterResult.class.js'
 
 export function isLikeTags(
-  tagSupport0: TagSupport | Tag, // new
-  tagSupport1: TagSupport, // previous
+  tagSupport0: BaseTagSupport | TagSupport | Tag, // new
+  tagSupport1: TagSupport | BaseTagSupport, // previous
 ): Boolean {
   const templater0 = tagSupport0.templater as TemplaterResult | undefined
   const templater1 = tagSupport1.templater as TemplaterResult

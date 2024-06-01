@@ -1,10 +1,10 @@
-import { interpolateAttributes } from "./interpolateAttributes"
-import { interpolateToTemplates } from "./interpolations"
-import { InterpolatedContentTemplates, interpolateContentTemplates } from "./interpolateContentTemplates"
-import { Context, TagTemplate, escapeSearch, variablePrefix } from "../tag/Tag.class"
-import { Clones } from "./Clones.type"
-import { Counts, InterpolateComponentResult } from "./interpolateTemplate"
-import { TagSupport } from "../tag/TagSupport.class"
+import { interpolateAttributes } from './interpolateAttributes.js'
+import { interpolateToTemplates } from './interpolations.js'
+import { InterpolatedContentTemplates, interpolateContentTemplates } from './interpolateContentTemplates.js'
+import { Context, TagTemplate, escapeSearch, variablePrefix } from '../tag/Tag.class.js'
+import { Counts, InterpolateComponentResult } from './interpolateTemplate.js'
+import { TagSupport } from '../tag/TagSupport.class.js'
+import { InsertBefore } from './InsertBefore.type.js'
 
 export type InterpolateOptions = {
   counts: Counts
@@ -18,7 +18,7 @@ export function interpolateElement(
   ownerSupport: TagSupport,
   options: InterpolateOptions,
 ): InterpolatedContentTemplates {
-  const clones: Clones = []
+  const clones: InsertBefore[] = []
   const tagComponents: InterpolateComponentResult[] = []
   const result = interpolatedTemplates.interpolation
   const template = container.children[0] as HTMLTemplateElement

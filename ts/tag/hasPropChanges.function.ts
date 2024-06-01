@@ -1,5 +1,5 @@
-import { Props } from "../Props"
-import { deepEqual } from "../deepFunctions"
+import { Props } from '../Props.js'
+import { deepEqual } from '../deepFunctions.js'
 
 /**
  * 

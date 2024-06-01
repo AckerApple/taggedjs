@@ -1,7 +1,7 @@
-import { TagSupport } from '../tag/TagSupport.class'
-import { setUse } from './setUse.function'
-import { Config, StateConfig, State, StateConfigItem, getStateValue } from './state.utils'
-import { syncStates } from './syncStates.function'
+import { TagSupport } from '../tag/TagSupport.class.js'
+import { setUse } from './setUse.function.js'
+import { Config, StateConfig, State, StateConfigItem, getStateValue } from './state.utils.js'
+import { syncStates } from './syncStates.function.js'
 
 /** Used for variables that need to remain the same variable during render passes */
 export function state <T>(

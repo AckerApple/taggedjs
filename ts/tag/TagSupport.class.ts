@@ -1,22 +1,23 @@
-import { Props } from '../Props'
-import { Context, ElementBuildOptions, Tag, TagMemory, TagTemplate, escapeVariable, variablePrefix } from './Tag.class'
-import { deepClone } from '../deepFunctions'
-import { isTagComponent } from '../isInstance'
-import { State } from '../state'
-import { TagGlobal, TemplaterResult } from '../TemplaterResult.class'
-import { TagSubject, WasTagSubject } from '../subject.types'
-import { cloneValueArray } from './cloneValueArray.function'
-import { restoreTagMarker } from './checkDestroyPrevious.function'
-import { runBeforeDestroy } from './tagRunner'
-import { DestroyOptions, getChildTagsToDestroy } from './destroy.support'
-import { elementDestroyCheck } from './elementDestroyCheck.function'
-import { updateContextItem } from './update/updateContextItem.function'
-import { processNewValue } from './update/processNewValue.function'
-import { InsertBefore } from '../interpolations/Clones.type'
-import { setTagPlaceholder } from './setTagPlaceholder.function'
-import { interpolateElement, interpolateString } from '../interpolations/interpolateElement'
-import { subscribeToTemplate } from '../interpolations/interpolateTemplate'
-import { afterInterpolateElement } from '../interpolations/afterInterpolateElement.function'
+import { Props } from '../Props.js'
+import { Context, ElementBuildOptions, Tag, TagMemory, TagTemplate, escapeVariable, variablePrefix } from './Tag.class.js'
+import { deepClone } from '../deepFunctions.js'
+import { isTagComponent } from '../isInstance.js'
+import { State } from '../state/index.js'
+import { TagGlobal, TemplaterResult } from './TemplaterResult.class.js'
+import { TagSubject, WasTagSubject } from '../subject.types.js'
+import { cloneValueArray } from './cloneValueArray.function.js'
+import { restoreTagMarker } from './checkDestroyPrevious.function.js'
+import { runBeforeDestroy } from './tagRunner.js'
+import { DestroyOptions, getChildTagsToDestroy } from './destroy.support.js'
+import { elementDestroyCheck } from './elementDestroyCheck.function.js'
+import { updateContextItem } from './update/updateContextItem.function.js'
+import { processNewValue } from './update/processNewValue.function.js'
+import { InsertBefore } from '../interpolations/InsertBefore.type.js'
+import { setTagPlaceholder } from './setTagPlaceholder.function.js'
+import { interpolateElement, interpolateString } from '../interpolations/interpolateElement.js'
+import { subscribeToTemplate } from '../interpolations/interpolateTemplate.js'
+import { afterInterpolateElement } from '../interpolations/afterInterpolateElement.function.js'
+import { Subject } from '../subject/Subject.class.js'
 
 const prefixSearch = new RegExp(variablePrefix, 'g')
 
@@ -43,15 +44,18 @@ export class BaseTagSupport {
 
   // travels with all rerenderings
   global: TagGlobal = {
+    destroy$: new Subject<this>(),
     context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
     providers: [],
     /** Indicator of re-rending. Saves from double rending something already rendered */
     renderCount: 0,
     deleted: false,
     subscriptions: [],
+    oldest: this
   }
 
   hasLiveElements = false
+  childTags: TagSupport[] = [] // tags on me
 
   constructor(
     public templater: TemplaterResult,
@@ -200,21 +204,23 @@ export class BaseTagSupport {
 
     return context
   }
-}
 
-export class TagSupport extends BaseTagSupport {
-  isApp = false
-  childTags: TagSupport[] = [] // tags on me
+  updateBy(tagSupport: BaseTagSupport | TagSupport) {  
+    const tempTag = tagSupport.templater.tag as Tag
+    this.updateConfig(tempTag.strings, tempTag.values)
+  }
   
-  constructor(
-    public templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new TagSupport()
-    public ownerTagSupport: TagSupport,
-    public subject: TagSubject,
-    public version: number = 0
-  ) {
-    super(templater, subject)
+  updateConfig(strings: string[], values: any[]) {
+    this.strings = strings
+    this.updateValues(values)
+  }
+  
+  updateValues(values: any[]) {
+    this.values = values
+    return this.updateContext( this.global.context )
   }
 
+  
   destroy(
     options: DestroyOptions = {
       stagger: 0,
@@ -227,6 +233,7 @@ export class TagSupport extends BaseTagSupport {
     const childTags = options.byParent ? [] : getChildTagsToDestroy(this.childTags)
 
     if(firstDestroy && isTagComponent(this.templater)) {
+      global.destroy$.next()
       runBeforeDestroy(this, this)
     }
 
@@ -258,8 +265,9 @@ export class TagSupport extends BaseTagSupport {
         
     let mainPromise: Promise<number | (number | void | undefined)[]> | undefined
 
-    if(this.ownerTagSupport) {
-      this.ownerTagSupport.childTags = this.ownerTagSupport.childTags.filter(child => child !== this)
+    const ownerTagSupport = (this as unknown as TagSupport).ownerTagSupport
+    if(ownerTagSupport) {
+      ownerTagSupport.childTags = ownerTagSupport.childTags.filter(child => child !== this as unknown as TagSupport)
     }
 
     if( firstDestroy ) {
@@ -276,7 +284,7 @@ export class TagSupport extends BaseTagSupport {
     // data reset
     delete global.placeholder
     global.context = {}
-    delete global.oldest
+    delete (global as any).oldest // may not be needed
     delete global.newest
     global.deleted = true
     this.childTags.length = 0
@@ -293,14 +301,6 @@ export class TagSupport extends BaseTagSupport {
     }
 
     return mainPromise.then(() => options.stagger)
-  }
-
-  destroySubscriptions() {
-    const subs = this.global.subscriptions
-    for (let index = subs.length - 1; index >= 0; --index) {
-      subs[index].unsubscribe()
-    }
-    subs.length = 0
   }
 
   destroyClones(
@@ -350,7 +350,7 @@ export class TagSupport extends BaseTagSupport {
         parentNode.removeChild(clone)
       }
 
-      const ownerSupport = this.ownerTagSupport
+      const ownerSupport = (this as unknown as TagSupport).ownerTagSupport
       if(ownerSupport) {
         // Sometimes my clones were first registered to my owner, remove them from owner
         ownerSupport.clones = ownerSupport.clones.filter(compareClone => compareClone !== clone)
@@ -366,19 +366,25 @@ export class TagSupport extends BaseTagSupport {
     return promise
   }
 
-  updateBy(tagSupport: TagSupport) {  
-    const tempTag = tagSupport.templater.tag as Tag
-    this.updateConfig(tempTag.strings, tempTag.values)
+  destroySubscriptions() {
+    const subs = this.global.subscriptions
+    for (let index = subs.length - 1; index >= 0; --index) {
+      subs[index].unsubscribe()
+    }
+    subs.length = 0
   }
+}
+
+export class TagSupport extends BaseTagSupport {
+  isApp = false
   
-  updateConfig(strings: string[], values: any[]) {
-    this.strings = strings
-    this.updateValues(values)
-  }
-  
-  updateValues(values: any[]) {
-    this.values = values
-    return this.updateContext( this.global.context )
+  constructor(
+    public templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new TagSupport()
+    public ownerTagSupport: TagSupport,
+    public subject: TagSubject,
+    public version: number = 0
+  ) {
+    super(templater, subject)
   }
 
   getAppTagSupport() {
@@ -392,8 +398,8 @@ export class TagSupport extends BaseTagSupport {
   }
 }
 
-function restoreTagMarkers(support: TagSupport) {
-  restoreTagMarker(support)
+function restoreTagMarkers(support: BaseTagSupport | TagSupport) {
+  restoreTagMarker(support as BaseTagSupport)
   const childTags = support.childTags
   for (let index = childTags.length - 1; index >= 0; --index) {
     restoreTagMarkers(childTags[index].global.oldest as TagSupport)

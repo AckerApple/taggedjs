@@ -1,9 +1,9 @@
-import { inputAttribute } from './inputAttribute'
-import { isSubjectInstance } from '../isInstance'
-import { Context, Tag } from '../tag/Tag.class'
-import { HowToSet } from './interpolateAttributes'
-import { bindSubjectCallback } from './bindSubjectCallback.function'
-import { TagSupport } from '../tag/TagSupport.class'
+import { inputAttribute } from './inputAttribute.js'
+import { isSubjectInstance } from '../isInstance.js'
+import { Context, Tag } from '../tag/Tag.class.js'
+import { HowToSet } from './interpolateAttributes.js'
+import { bindSubjectCallback } from './bindSubjectCallback.function.js'
+import { TagSupport } from '../tag/TagSupport.class.js'
 
 const startRegX = /^\s*{__tagvar/
 const endRegX = /}\s*$/

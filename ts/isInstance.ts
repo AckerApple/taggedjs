@@ -1,7 +1,7 @@
-import { SubjectLike } from "./subject/subject.utils"
-import { Tag } from "./tag/Tag.class"
-import { ValueTypes } from "./tag/update/processFirstSubject.utils"
-import { TemplaterResult } from "./TemplaterResult.class"
+import { SubjectLike } from './subject/subject.utils.js'
+import { Tag } from './tag/Tag.class.js'
+import { TemplaterResult } from './tag/TemplaterResult.class.js'
+import { ValueTypes } from './tag/ValueTypes.enum.js'
 
 export function isStaticTag(
   value?: TemplaterResult | Tag | unknown

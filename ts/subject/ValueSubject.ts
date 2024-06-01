@@ -1,5 +1,5 @@
-import { Subject } from './Subject.class'
-import { SubjectSubscriber, Subscription } from './subject.utils'
+import { Subject, defineValueOn } from './Subject.class.js'
+import { SubjectSubscriber, Subscription } from './subject.utils.js'
 
 type ValueSubjectSubscriber<T> = (
   value: T,
@@ -7,19 +7,12 @@ type ValueSubjectSubscriber<T> = (
 ) => unknown
 
 export class ValueSubject<T> extends Subject<T> {
-  declare _value: T
+  declare public _value: T
 
-  constructor(value: T) {
+  constructor(public value: T) {
     super(value)
-  }
 
-  get value() {
-    return this._value
-  }
-
-  set value(newValue) {
-    this._value = newValue;
-    this.set(newValue)
+    defineValueOn(this)
   }
 
   subscribe(callback: ValueSubjectSubscriber<T>) {

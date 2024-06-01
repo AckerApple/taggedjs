@@ -1,7 +1,8 @@
 const path = require('path');
 const out = path.resolve(__dirname, 'dist');
 const TerserPlugin = require('terser-webpack-plugin')
-const CompressionPlugin = require('compression-webpack-plugin')
+const CompressionPlugin = require('compression-webpack-plugin');
+const { ResolveTsForJsPlugin } = require('./ResolveTsForJsPlugin.class.cjs');
 console.debug(`🖊️ Writing bundle to ${out}`)
 
 module.exports = {
@@ -21,7 +22,7 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     alias: {
-      taggedjs: path.resolve(__dirname, '../main/ts'),
+      // taggedjs: path.resolve(__dirname, '../main/ts'),
     }
   },
   module: {
@@ -41,6 +42,7 @@ module.exports = {
       },
   },
   plugins: [
+      new ResolveTsForJsPlugin(),
       new CompressionPlugin({
           algorithm: 'gzip',
       }),

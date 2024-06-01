@@ -1,10 +1,10 @@
-import { Clones } from "./Clones.type"
-import { TagSupport } from "../tag/TagSupport.class"
-import { InterpolateOptions } from "./interpolateElement"
-import { InterpolateComponentResult, Template, interpolateTemplate } from "./interpolateTemplate"
+import { TagSupport } from '../tag/TagSupport.class.js'
+import { InsertBefore } from './InsertBefore.type.js'
+import { InterpolateOptions } from'./interpolateElement.js'
+import { InterpolateComponentResult, Template, interpolateTemplate } from'./interpolateTemplate.js'
 
 export type InterpolatedContentTemplates = {
-  clones: Clones
+  clones: InsertBefore[]
   tagComponents: InterpolateComponentResult[]
 }
 
@@ -16,7 +16,7 @@ export function interpolateContentTemplates(
 ): InterpolatedContentTemplates {
   // counting for animation stagger computing
   const counts = options.counts
-  const clones: Clones = []
+  const clones: InsertBefore[] = []
   const tagComponents: InterpolateComponentResult[] = []
   const childLength = children.length
   for (let index=childLength-1; index >= 0; --index) {

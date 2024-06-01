@@ -1,5 +1,5 @@
-import { InsertBefore } from '../interpolations/Clones.type'
-import { TagGlobal } from '../TemplaterResult.class'
+import { InsertBefore } from'../interpolations/InsertBefore.type.js'
+import { TagGlobal } from './TemplaterResult.class.js'
 
 export function setTagPlaceholder(
   global: TagGlobal,

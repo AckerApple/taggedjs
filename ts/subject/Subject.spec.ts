@@ -1,7 +1,25 @@
-import { Subject } from "./Subject.class"
-import { Resolve, Subscription } from "./subject.utils"
-import { combineLatest } from "./combineLatest.function"
-import { willCallback, willPromise, willSubscribe } from "./will.functions"
+import { Subject } from './Subject.class.js'
+import { Resolve, Subscription } from './subject.utils.js'
+import { combineLatest } from'./combineLatest.function.js'
+import { willCallback, willPromise, willSubscribe } from './will.functions.js'
+import { ValueSubject } from './ValueSubject.js'
+
+describe('ValueSubject', () => {
+  it('basic', () => {
+    const subject = new ValueSubject(0)
+    let x: number = 0
+
+    subject.subscribe(y => x = y)
+
+    expect(x).toBe(0)
+
+    subject.next(22)
+
+    expect(x).toBe(22)
+    expect(subject.value).toBe(22)
+    expect(subject._value).toBe(22)
+  })
+})
 
 describe('Subject', () => {
   it('basic', () => {
@@ -12,10 +30,11 @@ describe('Subject', () => {
 
     expect(x).toBe(0)
 
-    subject.set(22)
+    subject.next(22)
 
     expect(x).toBe(22)
     expect(subject.value).toBe(22)
+    expect(subject._value).toBe(22)
   })
 
   it('Subscription - next', () => {
@@ -44,7 +63,7 @@ describe('Subject', () => {
     expect(subscription).toBeDefined()
     expect(x).toBe(0)
 
-    subject.set(22)
+    subject.set = 22
 
     expect(x).toBe(22)
   })
@@ -62,7 +81,7 @@ describe('Subject', () => {
     expect(subscription).toBeDefined()
     expect(x).toBe(0)
 
-    subject.set(22)
+    subject.set = 22
 
     x = await promise
 
@@ -82,7 +101,7 @@ describe('Subject', () => {
     expect(subscription).toBeDefined()
     expect(x).toBe(0)
 
-    subject.set(22)
+    subject.set = 22
 
     expect(x).toBe(22)
   })
@@ -109,7 +128,7 @@ describe('Subject', () => {
   
       expect(x).toBe(0)
   
-      subject.set(22)
+      subject.set = 22
   
       expect(x).toBe(33)
     })
@@ -136,7 +155,7 @@ describe('Subject', () => {
   
       expect(x).toBe(0)
 
-      setTimeout(() => subject.set(22), 1)
+      setTimeout(() => subject.set = 22, 1)
 
       x = await piped.toPromise()
     
@@ -168,7 +187,7 @@ describe('Subject', () => {
   
       expect(x).toBe(0)
 
-      setTimeout(() => subject.set(22), 1)
+      setTimeout(() => subject.next(22), 1)
 
       x = await piped.toPromise()
     
@@ -189,7 +208,7 @@ describe('Subject', () => {
           const subject = new Subject<number>()
 
           setTimeout(() => {
-            subject.set(44)
+            subject.next(44)
           }, 1)  
 
           return subject
@@ -202,7 +221,7 @@ describe('Subject', () => {
   
       expect(x).toBe(0)
 
-      setTimeout(() => subject.set(22), 1)
+      setTimeout(() => subject.next(22), 1)
 
       x = await piped.toPromise()
     
@@ -223,9 +242,12 @@ describe('Subject', () => {
       let y = [0,0]
       combined.subscribe(x => y = x)
   
-      subject1.set(1)
-      subject2.set(2)
+      subject1.value = 1
+      subject2.value = 2
   
+      expect(subject1._value).toBe(1)
+      expect(subject2._value).toBe(2)
+
       expect(y[0]).toBe(1)
       expect(y[1]).toBe(2)
     })
@@ -249,8 +271,8 @@ describe('Subject', () => {
       let z: number = 0
       combined.subscribe(x => y = x)
   
-      subject1.set(1)
-      subject2.set(2)
+      subject1.set = 1
+      subject2.set = 2
   
       expect(y).toBe(33)
       expect(z).toBe(1)
@@ -269,8 +291,14 @@ describe('Subject', () => {
       let y = [0,0] as (string | number)[]
       combined.subscribe(x => y = x)
   
-      subject1.set(1)
-      subject2.set(2)
+      subject1.next(1)
+      subject2.next(2)
+
+      expect(subject1._value).toBe(1)
+      expect(subject2._value).toBe(2)
+
+      expect(subject1.value).toBe(1)
+      expect(subject2.value).toBe(2)
   
       expect(y[0]).toBe(1)
       expect(y[1]).toBe(2)
@@ -296,8 +324,11 @@ describe('Subject', () => {
       let z: number = 0
       combined.subscribe(x => y = x)
   
-      subject1.set(1)
-      subject2.set(2)
+      subject1.value = 1
+      subject2.value = 2
+
+      expect(subject1._value).toBe(1)
+      expect(subject2._value).toBe(2)
   
       expect(y).toBe(33)
       expect(z).toBe(1)

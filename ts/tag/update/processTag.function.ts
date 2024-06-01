@@ -1,10 +1,10 @@
-import { InsertBefore } from '../../interpolations/Clones.type'
-import { Tag } from '../Tag.class'
-import { TagSubject } from '../../subject.types'
-import { TagSupport } from '../TagSupport.class'
-import { TemplaterResult, Wrapper } from '../../TemplaterResult.class'
-import { ValueSubject } from '../../subject'
-import { Props } from '../../Props'
+import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
+import { Tag } from '../Tag.class.js'
+import { TagSubject } from '../../subject.types.js'
+import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
+import { TemplaterResult } from '../TemplaterResult.class.js'
+import { ValueSubject } from '../../subject/index.js'
+import { Props } from '../../Props.js'
 
 /** Could be a regular tag or a component. Both are Tag.class */
 export function processTag(
@@ -13,7 +13,7 @@ export function processTag(
   ownerSupport: TagSupport, // owner
   subject: TagSubject, // could be tag via result.tag
 ) {
-  let tagSupport: TagSupport = subject.tagSupport
+  let tagSupport = subject.tagSupport as any as TagSupport
   
   // first time seeing this tag?
   if(!tagSupport) {
@@ -27,19 +27,6 @@ export function processTag(
       counts: {added:0, removed:0},
     }
   )
-}
-
-export function setupNewTemplater(
-  tagSupport: TagSupport,
-  ownerSupport: TagSupport,
-  subject: TagSubject,
-) {
-  tagSupport.global.oldest = tagSupport
-  tagSupport.global.newest = tagSupport
-
-  // asking me to render will cause my parent to render
-  tagSupport.ownerTagSupport = ownerSupport
-  subject.tagSupport = tagSupport
 }
 
 export function tagFakeTemplater(
@@ -62,8 +49,7 @@ export function getFakeTemplater() {
     isTag: true,
     tagJsType: 'templater',
     tagged: false,
-    
-    madeChildIntoSubject: false,
+    madeChildIntoSubject: false, // TODO this can be removed
     html: () => fake
   } as TemplaterResult
 
@@ -86,4 +72,17 @@ export function newTagSupportByTemplater(
   ownerSupport.childTags.push(tagSupport)
 
   return tagSupport
+}
+
+export function setupNewTemplater(
+  tagSupport: TagSupport,
+  ownerSupport: TagSupport,
+  subject: TagSubject,
+) {
+  tagSupport.global.oldest = tagSupport
+  tagSupport.global.newest = tagSupport
+
+  // asking me to render will cause my parent to render
+  tagSupport.ownerTagSupport = ownerSupport
+  subject.tagSupport = tagSupport
 }

@@ -1,10 +1,10 @@
-import { deepClone, deepEqual } from '../deepFunctions'
-import { Provider } from './providers'
-import { renderTagSupport } from '../tag/render/renderTagSupport.function'
-import { TagSupport } from '../tag/TagSupport.class'
+import { deepClone, deepEqual } from '../deepFunctions.js'
+import { Provider } from './providers.js'
+import { renderTagSupport } from'../tag/render/renderTagSupport.function.js'
+import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js'
 
 export function providersChangeCheck(
-  tagSupport: TagSupport
+  tagSupport: TagSupport | BaseTagSupport
 ) {
   const global = tagSupport.global
   const providersWithChanges = global.providers.filter(provider =>
@@ -14,7 +14,7 @@ export function providersChangeCheck(
   // reset clones
   for (let index = providersWithChanges.length - 1; index >= 0; --index) {
     const provider = providersWithChanges[index]
-    const appSupport = tagSupport.getAppTagSupport()
+    const appSupport = (tagSupport as TagSupport).getAppTagSupport()
 
     handleProviderChanges(appSupport, provider)
 

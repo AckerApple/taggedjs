@@ -1,19 +1,21 @@
-import { DisplaySubject, TagSubject } from '../../subject.types'
-import { TagSupport } from '../TagSupport.class'
-import { TemplaterResult } from '../../TemplaterResult.class'
-import { isTagClass, isTagTemplater } from '../../isInstance'
-import { InterpolateSubject, TemplateValue, ValueTypes, getValueType } from './processFirstSubject.utils'
-import { TagArraySubject, processTagArray } from './processTagArray'
-import { updateExistingTagComponent } from './updateExistingTagComponent.function'
-import { RegularValue, processRegularValue } from './processRegularValue.function'
-import { checkDestroyPrevious, restoreTagMarker } from '../checkDestroyPrevious.function'
-import { ValueSubject } from '../../subject/ValueSubject'
-import { processSubjectComponent } from './processSubjectComponent.function'
-import { isLikeTags } from '../isLikeTags.function'
-import { setupNewTemplater, getFakeTemplater, processTag } from './processTag.function'
-import { InsertBefore } from '../../interpolations/Clones.type'
-import { Tag } from '../Tag.class'
-import { swapInsertBefore } from '../setTagPlaceholder.function'
+import { DisplaySubject, TagSubject } from '../../subject.types.js'
+import { TagSupport } from '../TagSupport.class.js'
+import { TemplaterResult } from '../TemplaterResult.class.js'
+import { isTagClass, isTagTemplater } from '../../isInstance.js'
+import { InterpolateSubject, TemplateValue } from './processFirstSubject.utils.js'
+import { TagArraySubject, processTagArray } from './processTagArray.js'
+import { updateExistingTagComponent } from './updateExistingTagComponent.function.js'
+import { RegularValue, processRegularValue } from './processRegularValue.function.js'
+import { checkDestroyPrevious, restoreTagMarker } from '../checkDestroyPrevious.function.js'
+import { ValueSubject } from '../../subject/ValueSubject.js'
+import { processSubjectComponent } from './processSubjectComponent.function.js'
+import { isLikeTags } from '../isLikeTags.function.js'
+import { setupNewTemplater, getFakeTemplater, processTag } from './processTag.function.js'
+import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
+import { Tag } from '../Tag.class.js'
+import { swapInsertBefore } from '../setTagPlaceholder.function.js'
+import { ValueTypes } from '../ValueTypes.enum.js'
+import { getValueType } from '../getValueType.function.js'
 
 export function updateExistingValue(
   subject: InterpolateSubject,
@@ -24,7 +26,9 @@ export function updateExistingValue(
   const subjectTag = subject as TagSubject
   const valueType = getValueType(value)
   
-  checkDestroyPrevious(subject, value, insertBefore)
+  checkDestroyPrevious(
+    subject, value, insertBefore, valueType
+  )
 
   // handle already seen tag components
   if(valueType === ValueTypes.tagComponent) {
@@ -100,8 +104,6 @@ export function updateExistingValue(
 
     // now its a useless function (we don't automatically call functions)
     case ValueTypes.function:
-      // const bound = bindSubjectCallback(value as Callback, ownerSupport)
-      // subject.set(bound)
       if(!subject.clone) {
         subject.clone = swapInsertBefore(insertBefore)
       }

@@ -1,5 +1,5 @@
-import { BaseTagSupport, TagSupport } from "../tag/TagSupport.class"
-import { setUse } from "./setUse.function"
+import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js'
+import { setUse } from'./setUse.function.js'
 
 function setCurrentTagSupport(support: BaseTagSupport | TagSupport) {
   setUse.memory.childrenCurrentSupport = support as TagSupport

@@ -1,14 +1,17 @@
-import { processSubjectComponent } from './processSubjectComponent.function'
-import { TagArraySubject, processTagArray } from './processTagArray'
-import { TemplaterResult, Wrapper } from '../../TemplaterResult.class'
-import { InsertBefore } from '../../interpolations/Clones.type'
-import { DisplaySubject, TagSubject } from '../../subject.types'
-import { RegularValue, processFirstRegularValue } from './processRegularValue.function'
-import { newTagSupportByTemplater, processTag, tagFakeTemplater } from './processTag.function'
-import { TagSupport } from '../TagSupport.class'
-import { Tag } from '../Tag.class'
-import { InterpolateSubject, TemplateValue, ValueTypes, getValueType, processOptions } from './processFirstSubject.utils'
-import { renderTagOnly } from '../render/renderTagOnly.function'
+import { processSubjectComponent } from './processSubjectComponent.function.js'
+import { TagArraySubject, processTagArray } from './processTagArray.js'
+import { TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
+import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
+import { DisplaySubject, TagSubject } from '../../subject.types.js'
+import { RegularValue, processFirstRegularValue } from './processRegularValue.function.js'
+import { processTag, tagFakeTemplater } from './processTag.function.js'
+import { TagSupport } from '../TagSupport.class.js'
+import { Tag } from '../Tag.class.js'
+import { InterpolateSubject, TemplateValue, processOptions } from './processFirstSubject.utils.js'
+import { renderTagOnly } from '../render/renderTagOnly.function.js'
+import { ValueTypes } from '../ValueTypes.enum.js'
+import { oneRenderToTagSupport } from './oneRenderToTagSupport.function.js'
+import { getValueType } from '../getValueType.function.js'
 
 export function processFirstSubjectValue(
   value: TemplateValue,
@@ -67,30 +70,16 @@ export function processFirstSubjectValue(
     case ValueTypes.function:
       const v = value as Wrapper
       if((v as any).oneRender) {
-        const templater = new TemplaterResult([])
-        templater.tagJsType = 'oneRender'
-        const tagSupport = newTagSupportByTemplater(
-          templater, ownerSupport, subject as TagSubject
+        const tagSupport = oneRenderToTagSupport(
+          v,
+          subject as TagSubject,
+          ownerSupport,
         )
-
-        let tag: Tag
-        const wrap = () => {
-          templater.tag = tag || ((v as any)())
-          return tagSupport
-        }
-        // const wrap = () => ((v as any)())
-
-        templater.wrapper = wrap as any
-        wrap.parentWrap = wrap
-        wrap.oneRender = true
-        ;(wrap.parentWrap as any).original = v
         
         renderTagOnly(tagSupport, tagSupport, subject as TagSubject, ownerSupport)
-        // call inner function
-        // templater.tag = (v as any)() as Tag
         
         processTag(
-          templater, insertBefore, ownerSupport, subject as TagSubject
+          tagSupport.templater, insertBefore, ownerSupport, subject as TagSubject
         )
         return
       }

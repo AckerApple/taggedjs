@@ -1,8 +1,8 @@
-import { buildClones } from '../render'
-import { afterElmBuild } from './interpolateTemplate'
-import { InsertBefore } from './Clones.type'
-import { Context, ElementBuildOptions } from '../tag/Tag.class'
-import { TagSupport } from '../tag/TagSupport.class'
+import { buildClones } from '../render.js'
+import { afterElmBuild } from './interpolateTemplate.js'
+import { InsertBefore } from './InsertBefore.type.js'
+import { Context, ElementBuildOptions } from '../tag/Tag.class.js'
+import { TagSupport } from '../tag/TagSupport.class.js'
 
 export function afterInterpolateElement(
   container: DocumentFragment,

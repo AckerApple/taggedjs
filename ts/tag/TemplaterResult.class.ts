@@ -1,29 +1,30 @@
-import { Context, Tag } from './tag/Tag.class'
-import { BaseTagSupport, TagSupport } from './tag/TagSupport.class'
-import { Props } from './Props'
-import { kidsToTagArraySubject } from './tag/tag'
-import { TagChildren, TagWrapper } from './tag/tag.utils'
-import { Provider } from './state/providers'
-import { OnDestroyCallback } from './state/onDestroy'
-import { TagSubject } from './subject.types'
-import { OnInitCallback } from './state/onInit'
-import { Subscription } from './subject/subject.utils'
-import { InsertBefore } from './interpolations/Clones.type'
-import { TagValues } from './tag/html'
-import { ValueSubject } from './subject'
+import { Context, Tag } from './Tag.class.js'
+import { BaseTagSupport, TagSupport } from './TagSupport.class.js'
+import { Props } from '../Props.js'
+import { TagChildren, TagWrapper } from './tag.utils.js'
+import { Provider } from '../state/providers.js'
+import { OnDestroyCallback } from '../state/onDestroy.js'
+import { TagSubject } from '../subject.types.js'
+import { OnInitCallback } from '../state/onInit.js'
+import { Subscription } from '../subject/subject.utils.js'
+import { InsertBefore } from '../interpolations/InsertBefore.type.js'
+import { TagValues } from './html.js'
+import { Subject, ValueSubject } from '../subject/index.js'
+import { kidsToTagArraySubject } from './kidsToTagArraySubject.function.js'
 
 export type OriginalFunction = (() => Tag) & {compareTo: string}
 
 export type Wrapper = ((
-  tagSupport: BaseTagSupport,
+  tagSupport: BaseTagSupport | TagSupport,
   subject: TagSubject,
 ) => TagSupport) & {
   parentWrap: TagWrapper<any>
 }
 
 export type TagGlobal = {
-  oldest?: TagSupport
-  newest?: TagSupport
+  destroy$: Subject<any>
+  oldest: BaseTagSupport | TagSupport
+  newest?: BaseTagSupport | TagSupport
   context: Context // populated after reading interpolated.values array converted to an object {variable0, variable:1}
   providers: Provider[]
   /** Indicator of re-rending. Saves from double rending something already rendered */
@@ -47,7 +48,7 @@ export class TemplaterResult {
   tagged!: boolean
   wrapper?: Wrapper
 
-  madeChildIntoSubject = false
+  madeChildIntoSubject?: boolean
   
   tag?: Tag
   children: TagChildren = new ValueSubject([] as Tag[])
@@ -59,10 +60,8 @@ export class TemplaterResult {
     ...values: TagValues
   ) {
     const children = new Tag(strings as string[], values)
-    const { childSubject, madeSubject } = kidsToTagArraySubject(children)
+    const childSubject = kidsToTagArraySubject(children, this)
     this.children = childSubject
-    
-    this.madeChildIntoSubject = madeSubject
     return this
   }
 }

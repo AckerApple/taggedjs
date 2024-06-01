@@ -1,9 +1,9 @@
-import { isSubjectInstance, isTagComponent } from '../../isInstance'
-import { TemplateValue } from './processFirstSubject.utils'
-import { TagSubject } from '../../subject.types'
-import { Context } from '../Tag.class'
-import { TagSupport } from '../TagSupport.class'
-import { TemplaterResult, Wrapper } from '../../TemplaterResult.class'
+import { isSubjectInstance, isTagComponent } from '../../isInstance.js'
+import { TemplateValue } from './processFirstSubject.utils.js'
+import { TagSubject } from '../../subject.types.js'
+import { Context } from '../Tag.class.js'
+import { TagSupport } from '../TagSupport.class.js'
+import { TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
 
 export function updateContextItem(
   context: Context,
@@ -12,7 +12,7 @@ export function updateContextItem(
 ) {
   const subject = context[variableName]
   const tagSubject = subject as TagSubject
-  const tagSupport = tagSubject.tagSupport
+  const tagSupport = tagSubject.tagSupport as TagSupport
 
   if(tagSupport) {
     if(value) {
@@ -38,7 +38,7 @@ export function updateContextItem(
   }
 
   // listeners will evaluate updated values to possibly update display(s)
-  subject.set(value)
+  subject.next(value)
   
   return
 }
@@ -63,7 +63,6 @@ function shareTemplaterGlobal(
       const prevState = newest.memory.state
       tagSupport.memory.state.length = 0
       tagSupport.memory.state.push(...prevState)
-      // tagSupport.memory.state = [...prevState]
     }
   }
 }

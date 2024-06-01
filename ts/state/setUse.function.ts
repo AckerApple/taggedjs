@@ -1,30 +1,30 @@
-import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class'
-import { ProviderConfig } from './providers'
-import { Config } from './state.utils'
+import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js'
+import { ProviderConfig } from './providers.js'
+import { Config } from './state.utils.js'
 
 const tagUse: TagUse[] = []
 
 interface TagUse {
   // runs only one time at creation of component html elements
-  beforeRender: (tagSupport: BaseTagSupport, ownerTag?: TagSupport) => void
+  beforeRender: (tagSupport: BaseTagSupport | TagSupport, ownerTag?: TagSupport | BaseTagSupport) => void
   
   // runs every render
-  beforeRedraw: (tagSupport: BaseTagSupport, tag: TagSupport) => void
+  beforeRedraw: (tagSupport: BaseTagSupport | TagSupport, tag: TagSupport | BaseTagSupport) => void
   
   // runs every render
-  afterRender: (tagSupport: BaseTagSupport, ownerTagSupport?: TagSupport) => void
+  afterRender: (tagSupport: BaseTagSupport | TagSupport, ownerTagSupport?: TagSupport | BaseTagSupport) => void
   
-  beforeDestroy: (tagSupport: BaseTagSupport, tag: TagSupport) => void
+  beforeDestroy: (tagSupport: BaseTagSupport | TagSupport, tag: TagSupport | BaseTagSupport) => void
 }
 
 export type UseOptions = {
   beforeRender?: (
-    tagSupport: BaseTagSupport,
-    ownerTag?: TagSupport, // not defined on tagElement app
+    tagSupport: TagSupport | BaseTagSupport,
+    ownerTag?: TagSupport | BaseTagSupport, // not defined on tagElement app
   ) => void
-  beforeRedraw?: (tagSupport: BaseTagSupport, tag: TagSupport) => void
-  afterRender?: (tagSupport: BaseTagSupport, ownerTagSupport?: TagSupport) => void
-  beforeDestroy?: (tagSupport: BaseTagSupport, tag: TagSupport) => void
+  beforeRedraw?: (tagSupport: BaseTagSupport | TagSupport, tag: TagSupport | BaseTagSupport) => void
+  afterRender?: (tagSupport: BaseTagSupport | TagSupport, ownerTagSupport?: TagSupport | BaseTagSupport) => void
+  beforeDestroy?: (tagSupport: BaseTagSupport | TagSupport, tag: TagSupport | BaseTagSupport) => void
 }
 
 export function setUse(use: UseOptions) {

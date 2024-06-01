@@ -1,11 +1,11 @@
-import { TemplaterResult, Wrapper } from '../../TemplaterResult.class'
-import { setUse } from '../../state'
-import { Counts } from '../../interpolations/interpolateTemplate'
-import { processTagResult } from './processTagResult.function'
-import { TagSubject } from '../../subject.types'
-import { TagSupport } from '../TagSupport.class'
-import { InsertBefore } from '../../interpolations/Clones.type'
-import { renderSubjectComponent } from '../render/renderSubjectComponent.function'
+import { TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
+import { setUse } from'../../state/index.js'
+import { Counts } from'../../interpolations/interpolateTemplate.js'
+import { processTagResult } from'./processTagResult.function.js'
+import { TagSubject } from '../../subject.types.js'
+import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
+import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
+import { renderSubjectComponent } from'../render/renderSubjectComponent.function.js'
 
 export function processSubjectComponent(
   templater: TemplaterResult,
@@ -13,7 +13,7 @@ export function processSubjectComponent(
   insertBefore: InsertBefore,
   ownerSupport: TagSupport,
   options: {counts: Counts},
-): TagSupport {
+): BaseTagSupport | TagSupport {
   // Check if function component is wrapped in a tag() call
   // TODO: This below check not needed in production mode
   if(templater.tagged !== true) {

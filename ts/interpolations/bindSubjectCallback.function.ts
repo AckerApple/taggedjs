@@ -1,7 +1,7 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
-import { TagSupport } from "../tag/TagSupport.class"
-import { renderTagSupport } from "../tag/render/renderTagSupport.function"
+import { TagSupport } from '../tag/TagSupport.class.js'
+import { renderTagSupport } from'../tag/render/renderTagSupport.function.js'
 
 export type Callback = (...args: any[]) => any & {
   isChildOverride?: true // if this is set, then a parent tag passed children to a tag/component
