@@ -26,15 +26,19 @@ export function runTagCallback(value, tagSupport, bindTo, args) {
         }
         return 'no-data-ever'; // already rendered
     }
-    const newest = renderTagSupport(myGlobal.newest, true);
+    const last = myGlobal.newest;
+    if (myGlobal.deleted || last.global.deleted) {
+        throw new Error('look no further2');
+    }
+    const newest = renderTagSupport(last, true);
     myGlobal.newest = newest;
     if (callbackResult instanceof Promise) {
         return callbackResult.then(() => {
             if (myGlobal.deleted) {
                 return 'promise-no-data-ever'; // tag was deleted during event processing
             }
-            const newest = renderTagSupport(myGlobal.newest, true);
-            myGlobal.newest = newest;
+            const newInPromise = renderTagSupport(myGlobal.newest, true);
+            myGlobal.newest = newInPromise;
             return 'promise-no-data-ever';
         });
     }

@@ -40,6 +40,8 @@ export declare class TemplaterResult {
     madeChildIntoSubject?: boolean;
     tag?: Tag;
     children: TagChildren;
+    arrayValue?: unknown;
     constructor(props: Props);
+    key(arrayValue: unknown): this;
     html(strings: string[] | TemplateStringsArray, ...values: TagValues): this;
 }

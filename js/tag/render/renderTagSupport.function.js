@@ -5,13 +5,20 @@ export function renderTagSupport(tagSupport, // must be latest/newest state rend
 renderUp) {
     const global = tagSupport.global;
     const templater = tagSupport.templater;
+    if (tagSupport.global.deleted) {
+        throw new Error('look no further');
+    }
     // is it just a vanilla tag, not component?
     if (!templater.wrapper) { // || isTagTemplater(templater) 
         const ownerTag = tagSupport.ownerTagSupport;
         ++global.renderCount;
+        if (ownerTag.global.deleted) {
+            return tagSupport;
+        }
         return renderTagSupport(ownerTag, true);
     }
     const subject = tagSupport.subject;
+    const oldest = tagSupport.global.oldest;
     let ownerSupport;
     let selfPropChange = false;
     const shouldRenderUp = renderUp && tagSupport;
@@ -23,7 +30,6 @@ renderUp) {
             selfPropChange = !nowProps.every((props, index) => deepEqual(props, latestProps[index]));
         }
     }
-    const oldest = tagSupport.global.oldest;
     const tag = renderExistingTag(oldest, tagSupport, ownerSupport, // useTagSupport,
     subject);
     const renderOwner = ownerSupport && selfPropChange;

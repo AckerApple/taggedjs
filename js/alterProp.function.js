@@ -14,7 +14,7 @@ export function alterProp(prop, ownerSupport, stateArray, newTagSupport) {
     }
     return checkProp(prop, ownerSupport, stateArray, newTagSupport);
 }
-function checkProp(value, ownerSupport, stateArray, newTagSupport, index, newProp, seen = []) {
+export function checkProp(value, ownerSupport, stateArray, newTagSupport, index, newProp, seen = []) {
     if (value instanceof Function) {
         return getPropWrap(value, ownerSupport, stateArray, newTagSupport, index, newProp);
     }
@@ -40,7 +40,7 @@ function checkProp(value, ownerSupport, stateArray, newTagSupport, index, newPro
     }
     return value;
 }
-function getPropWrap(value, ownerSupport, stateArray, newTagSupport, name, newProp) {
+export function getPropWrap(value, ownerSupport, stateArray, newTagSupport, name, newProp) {
     const toCall = value.toCall;
     if (toCall) {
         return value; // already previously converted

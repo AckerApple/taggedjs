@@ -29,6 +29,7 @@ export function getTagWrap(templater, result) {
         }
         tag.templater = templater;
         templater.tag = tag;
+        tag.memory.arrayValue = templater.arrayValue; // tag component could have been used in array.map
         const tagSupport = new TagSupport(templater, newTagSupport.ownerTagSupport, subject, global.renderCount);
         tagSupport.global = global;
         tagSupport.propsConfig = {

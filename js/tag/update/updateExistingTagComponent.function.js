@@ -4,9 +4,10 @@ import { destroyTagMemory } from '../destroyTag.function.js';
 import { renderTagSupport } from '../render/renderTagSupport.function.js';
 import { callbackPropOwner } from '../../alterProp.function.js';
 import { isLikeTags } from '../isLikeTags.function.js';
+import { setUse } from '../../state/setUse.function.js';
 export function updateExistingTagComponent(ownerSupport, tagSupport, // lastest
 subject, insertBefore) {
-    let lastSupport = subject.tagSupport?.global.newest; // || subject.tagSupport
+    let lastSupport = subject.tagSupport?.global.newest;
     let oldestTag = lastSupport.global.oldest;
     const oldWrapper = lastSupport.templater.wrapper;
     const newWrapper = tagSupport.templater.wrapper;
@@ -28,9 +29,8 @@ subject, insertBefore) {
     else {
         const hasChanged = hasTagSupportChanged(lastSupport, tagSupport, templater);
         if (!hasChanged) {
-            // if the new props are an object then implicitly since no change, the old props are an object
             const newProps = templater.props;
-            syncFunctionProps(lastSupport, ownerSupport, newProps);
+            syncFunctionProps(tagSupport, lastSupport, ownerSupport, newProps);
             return lastSupport; // its the same tag component
         }
     }
@@ -79,37 +79,52 @@ function buildNewTag(newSupport, oldInsertBefore, oldTagSupport, subject) {
     subject.tagSupport = newSupport;
     return newSupport;
 }
-function syncFunctionProps(lastSupport, ownerSupport, newPropsArray) {
+function syncFunctionProps(newSupport, lastSupport, ownerSupport, newPropsArray) {
     lastSupport = lastSupport.global.newest || lastSupport;
-    const priorPropConfig = lastSupport.propsConfig;
-    const priorPropsArray = priorPropConfig.latestCloned;
-    const prevSupport = ownerSupport.global.newest;
+    const stateArray = setUse.memory.stateConfig.array;
     for (let index = newPropsArray.length - 1; index >= 0; --index) {
-        const argPosition = newPropsArray[index];
-        if (typeof (argPosition) !== 'object') {
-            return;
-        }
-        const priorProps = priorPropsArray[index];
-        if (typeof (priorProps) !== 'object') {
-            return;
-        }
-        for (const name in argPosition) {
-            const value = argPosition[name];
-            if (!(value instanceof Function)) {
-                continue;
-            }
-            const newCallback = argPosition[name]; // || value
-            const original = newCallback instanceof Function && newCallback.toCall;
-            if (original) {
-                continue; // already previously converted
-            }
-            // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
-            priorProps[name].toCall = (...args) => {
-                return callbackPropOwner(newCallback, // value, // newOriginal,
-                args, prevSupport, // ??? <= ownerSupport
-                []);
-            };
-        }
+        const prop = newPropsArray[index];
+        const priorPropConfig = lastSupport.propsConfig;
+        const priorPropsArray = priorPropConfig.latestCloned;
+        const priorProp = priorPropsArray[index];
+        newPropsArray[index] = syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport);
     }
+}
+function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, index, propOwner, seen = []) {
+    if (priorProp instanceof Function) {
+        if (prop.toCall) {
+            return prop;
+        }
+        const ownerGlobal = ownerSupport.global;
+        const prevOwnerSupport = ownerGlobal.newest;
+        const oldOwnerState = ownerGlobal.oldest.memory.state;
+        priorProp.toCall = (...args) => {
+            return callbackPropOwner(prop, args, prevOwnerSupport, prevOwnerSupport.memory.state);
+        };
+        // The newer needs to be wrapped to trigger renders
+        // return result
+        return prop;
+    }
+    if (seen.includes(prop)) {
+        return prop;
+    }
+    seen.push(prop);
+    if (typeof (prop) !== 'object' || !prop) {
+        return prop; // no children to crawl through
+    }
+    if (prop instanceof Array) {
+        prop.forEach((x, index) => prop[index] = syncPriorPropFunction(priorProp[index], x, newSupport, ownerSupport, index, prop, seen));
+        return prop;
+    }
+    for (const name in prop) {
+        const subValue = prop[name];
+        const result = syncPriorPropFunction(priorProp[name], subValue, newSupport, ownerSupport, name, prop, seen);
+        const hasSetter = typeof (result) === 'object' || Object.getOwnPropertyDescriptor(prop, name)?.set;
+        if (hasSetter) {
+            continue;
+        }
+        prop[name] = result;
+    }
+    return prop;
 }
 //# sourceMappingURL=updateExistingTagComponent.function.js.map

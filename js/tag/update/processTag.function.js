@@ -29,17 +29,19 @@ export function getFakeTemplater() {
         tagJsType: 'templater',
         tagged: false,
         madeChildIntoSubject: false, // TODO this can be removed
-        html: () => fake
+        html: () => fake,
+        key: () => fake,
     };
     return fake;
 }
+/** Create TagSupport for a tag component */
 export function newTagSupportByTemplater(templater, ownerSupport, subject) {
     const tagSupport = new TagSupport(templater, ownerSupport, subject);
-    setupNewTemplater(tagSupport, ownerSupport, subject);
+    setupNewSupport(tagSupport, ownerSupport, subject);
     ownerSupport.childTags.push(tagSupport);
     return tagSupport;
 }
-export function setupNewTemplater(tagSupport, ownerSupport, subject) {
+export function setupNewSupport(tagSupport, ownerSupport, subject) {
     tagSupport.global.oldest = tagSupport;
     tagSupport.global.newest = tagSupport;
     // asking me to render will cause my parent to render

@@ -8,5 +8,6 @@ export declare function processTag(templater: TemplaterResult, insertBefore: Ins
 subject: TagSubject): void;
 export declare function tagFakeTemplater(tag: Tag): TemplaterResult;
 export declare function getFakeTemplater(): TemplaterResult;
+/** Create TagSupport for a tag component */
 export declare function newTagSupportByTemplater(templater: TemplaterResult, ownerSupport: TagSupport, subject: TagSubject): TagSupport;
-export declare function setupNewTemplater(tagSupport: TagSupport, ownerSupport: TagSupport, subject: TagSubject): void;
+export declare function setupNewSupport(tagSupport: TagSupport, ownerSupport: TagSupport, subject: TagSubject): void;

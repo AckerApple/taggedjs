@@ -9,8 +9,13 @@ export class TemplaterResult {
     madeChildIntoSubject;
     tag;
     children = new ValueSubject([]);
+    arrayValue; // used for tag components used in arrays
     constructor(props) {
         this.props = props;
+    }
+    key(arrayValue) {
+        this.arrayValue = arrayValue;
+        return this;
     }
     html(strings, ...values) {
         const children = new Tag(strings, values);
