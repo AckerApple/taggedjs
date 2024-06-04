@@ -20,9 +20,8 @@ export default function callbackStateUpdate<T>(
 
   // send the oldest state changes into the newest
   syncStates(oldState, state)
-
   renderTagSupport(
-    tagSupport,
+    tagSupport, // tagSupport.global.newest as TagSupport,
     false,
   )
 
@@ -32,7 +31,7 @@ export default function callbackStateUpdate<T>(
       syncStates(oldState, state)
 
       renderTagSupport(
-        tagSupport as TagSupport,
+        tagSupport, // tagSupport.global.newest as TagSupport,
         false,
       )
     })

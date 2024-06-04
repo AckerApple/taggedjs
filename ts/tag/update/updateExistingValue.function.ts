@@ -10,7 +10,7 @@ import { checkDestroyPrevious, restoreTagMarker } from '../checkDestroyPrevious.
 import { ValueSubject } from '../../subject/ValueSubject.js'
 import { processSubjectComponent } from './processSubjectComponent.function.js'
 import { isLikeTags } from '../isLikeTags.function.js'
-import { setupNewTemplater, getFakeTemplater, processTag } from './processTag.function.js'
+import { getFakeTemplater, processTag, setupNewSupport } from './processTag.function.js'
 import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
 import { Tag } from '../Tag.class.js'
 import { swapInsertBefore } from '../setTagPlaceholder.function.js'
@@ -153,7 +153,7 @@ function handleStillTag(
   const isSameTag = value && isLikeTags(lastSupport, valueSupport)
 
   if(isTagTemplater(value)) {
-    setupNewTemplater(valueSupport, ownerSupport, subject)
+    setupNewSupport(valueSupport, ownerSupport, subject)
   }
 
   if(isSameTag) {

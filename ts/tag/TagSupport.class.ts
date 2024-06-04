@@ -18,6 +18,7 @@ import { interpolateElement, interpolateString } from '../interpolations/interpo
 import { subscribeToTemplate } from '../interpolations/interpolateTemplate.js'
 import { afterInterpolateElement } from '../interpolations/afterInterpolateElement.function.js'
 import { Subject } from '../subject/Subject.class.js'
+import { castProps } from '../alterProp.function.js'
 
 const prefixSearch = new RegExp(variablePrefix, 'g')
 
@@ -33,6 +34,7 @@ export class BaseTagSupport {
     latest: Props // new props NOT cloned props
     latestCloned: Props
     lastClonedKidValues: unknown[][]
+    castProps?: Props // props that had functions wrapped
   }
 
   // stays with current render
@@ -60,15 +62,21 @@ export class BaseTagSupport {
   constructor(
     public templater: TemplaterResult,
     public subject: TagSubject,
+    castedProps?: Props
   ) {
-    const children = templater.children // children tags passed in as arguments
-    const kidValue = children.value
     const props = templater.props  // natural props
+    this.propsConfig = this.clonePropsBy(props, castedProps)
+  }
+
+  clonePropsBy(props: Props, castedProps?: Props) {
+    const children = this.templater.children // children tags passed in as arguments
+    const kidValue = children.value
 
     const latestCloned = props.map(props => deepClone(props))
-    this.propsConfig = {
+    return this.propsConfig = {
       latest: props,
       latestCloned, // assume its HTML children and then detect
+      castProps: castedProps, //?? castProps(props, this, this.memory.state),
       lastClonedKidValues: kidValue.map(kid => {
         const cloneValues = cloneValueArray(kid.values)
         return cloneValues
@@ -382,9 +390,10 @@ export class TagSupport extends BaseTagSupport {
     public templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new TagSupport()
     public ownerTagSupport: TagSupport,
     public subject: TagSubject,
+    castedProps?: Props,
     public version: number = 0
   ) {
-    super(templater, subject)
+    super(templater, subject, castedProps)
   }
 
   getAppTagSupport() {

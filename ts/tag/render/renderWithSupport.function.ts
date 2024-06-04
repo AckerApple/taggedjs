@@ -21,6 +21,8 @@ export function renderWithSupport(
       reSupport,
       subject,
     )
+
+    reSupport.global.oldest = reSupport
   }
 
   const lastOwnerSupport = (lastSupport as TagSupport)?.ownerTagSupport
@@ -46,7 +48,7 @@ function destroyUnlikeTags(
   global.insertBefore = insertBefore
   global.deleted = false
   
-  delete (global as any).oldest // TODO, maybe set global oldest to replacement instead of destroying it?
-  delete global.newest
-  delete (subject as WasTagSubject).tagSupport
+  global.oldest = reSupport
+  global.newest = reSupport
+  ;(subject as WasTagSubject).tagSupport = reSupport
 }

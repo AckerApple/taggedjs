@@ -16,8 +16,6 @@ export function renderSubjectComponent(
     ownerSupport,
   )
 
-  reSupport.global.newest = reSupport
-
   if(ownerSupport.clones.length > preClones.length) {
     const myClones = ownerSupport.clones.filter(fClone => !preClones.find(clone => clone === fClone))
     reSupport.clones.push(...myClones)

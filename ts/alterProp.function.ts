@@ -1,18 +1,31 @@
-import { TagSupport } from './tag/TagSupport.class.js'
+import { BaseTagSupport, TagSupport } from './tag/TagSupport.class.js'
 import { deepClone, deepEqual } from './deepFunctions.js'
 import { isStaticTag } from './isInstance.js'
 import { renderTagSupport } from './tag/render/renderTagSupport.function.js'
 import { State, setUse } from './state/index.js'
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { syncStates } from './state/syncStates.function.js'
+import { Props } from './Props.js'
+
+export function castProps(
+  props: Props,
+  newTagSupport: BaseTagSupport | TagSupport,
+  stateArray: State,
+) {
+  return props.map(prop => alterProp(
+    prop,
+    (newTagSupport as TagSupport).ownerTagSupport,
+    stateArray,
+    newTagSupport,
+  ))
+}
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProp(
   prop: unknown,
-  ownerSupport: TagSupport,
+  ownerSupport: BaseTagSupport | TagSupport,
   stateArray: State,
-  newTagSupport: TagSupport,
-  // seen: any[] = [],
+  newTagSupport: BaseTagSupport | TagSupport,
 ) {
   if(isStaticTag(prop) || !prop) {
     return prop
@@ -25,11 +38,11 @@ export function alterProp(
   return checkProp(prop, ownerSupport, stateArray, newTagSupport)
 }
 
-function checkProp(
+export function checkProp(
   value: any,
-  ownerSupport: TagSupport,
+  ownerSupport: BaseTagSupport | TagSupport,
   stateArray: State,
-  newTagSupport: TagSupport,
+  newTagSupport: BaseTagSupport | TagSupport,
   index?: string | number,
   newProp?: any,
   seen: any[] = [],
@@ -48,16 +61,24 @@ function checkProp(
   }
 
   if(value instanceof Array) {
-    value.forEach((x, index) => value[index] = checkProp(x, ownerSupport, stateArray, newTagSupport, index, value, seen))
+    for (let index = value.length - 1; index >= 0; --index) {
+      const x = value[index]
+      value[index] = checkProp(
+        x, ownerSupport, stateArray, newTagSupport, index, value, seen
+      )
+    }
+
     return value
   }
 
 
   for(const name in value){
     const subValue = value[name]
-    const result = checkProp(subValue, ownerSupport, stateArray, newTagSupport, name, value, seen)
+    const result = checkProp(
+      subValue, ownerSupport, stateArray, newTagSupport, name, value, seen
+    )
     
-    const hasSetter = typeof(result) === 'object' || Object.getOwnPropertyDescriptor(value, name)?.set
+    const hasSetter = Object.getOwnPropertyDescriptor(value, name)?.set
     if(hasSetter) {
       continue
     }
@@ -68,11 +89,11 @@ function checkProp(
   return value
 }
 
-function getPropWrap(
+export function getPropWrap(
   value: any,
-  ownerSupport: TagSupport,
+  ownerSupport: BaseTagSupport | TagSupport,
   stateArray: State,
-  newTagSupport: TagSupport,
+  newTagSupport: BaseTagSupport | TagSupport,
   name?: string | number,
   newProp?: any,
 ) {
@@ -84,8 +105,12 @@ function getPropWrap(
 
   const wrap = (...args: any[]) => wrap.toCall(...args) // what gets called can switch over parent state changes
   // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
-  wrap.toCall = (...args: any[]) => callbackPropOwner(value, args, ownerSupport, stateArray)
+  wrap.toCall = (...args: any[]) => {
+    return callbackPropOwner(wrap.prop, args, ownerSupport, wrap.stateArray)
+  }
   wrap.original = value
+  wrap.prop = value
+  wrap.stateArray = stateArray
 
   // copy data properties that maybe on source function
   Object.assign(wrap, value)
@@ -102,23 +127,23 @@ function getPropWrap(
 export function callbackPropOwner(
   toCall: Function,
   callWith: any,
-  ownerSupport: TagSupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
-  stateArray: State,
+  ownerSupport: BaseTagSupport | TagSupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
+  oldState: State,
 ) {
   const newest = ownerSupport.global.newest as TagSupport
-  const newState = newest.memory.state
+  //const newState = newest.memory.state
   const noCycle = getSupportInCycle() === undefined
-  const sync = noCycle && stateArray.length === newState.length
+  //const sync = noCycle && oldState.length === newState.length
   
-  if(sync) {
-    syncStates(newState, stateArray)
-  }
+  //if(sync) {
+  //  syncStates(newState, oldState)
+  //}
   
   const result = toCall(...callWith)
 
-  if(sync) {
-    syncStates(stateArray, newState)
-  }
+  // if(sync) {
+  //   syncStates(oldState, newState)
+  // }
   
   const run = () => {    
     // are we in a rendering cycle? then its being called by alterProps

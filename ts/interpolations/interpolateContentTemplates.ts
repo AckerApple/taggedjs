@@ -21,15 +21,14 @@ export function interpolateContentTemplates(
   const childLength = children.length
   for (let index=childLength-1; index >= 0; --index) {
     const child = children[index]
-    const {clones: nextClones, tagComponent} = interpolateTemplate(
+    const tagComponent = interpolateTemplate(
       child as Template,
       context,
       tagSupport,
       counts,
-      options,
     )
 
-    clones.push(...nextClones)
+    // clones.push(...nextClones)
 
     if(tagComponent) {
       tagComponents.push(tagComponent)
@@ -41,12 +40,11 @@ export function interpolateContentTemplates(
         const subChild = child.children[index]
         // IF <template end /> its a variable to be processed
         if ( isRenderEndTemplate(subChild) ) {
-          const {tagComponent} = interpolateTemplate(
+          const tagComponent = interpolateTemplate(
             subChild as Template,
             context,
             tagSupport,
             counts,
-            options,
           )
 
           if(tagComponent) {

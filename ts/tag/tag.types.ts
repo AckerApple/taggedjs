@@ -13,6 +13,6 @@ export type RouteProps = {
   query: RouteQuery
 }
 
-export type ToTag = (...props: any[]) => StateToTag | Tag
-export type StateToTag = () => Tag // Warn: do not data type arguments, let them be inferred
+export type ToTag = (...props: any[]) => StateToTag | Tag | null
+export type StateToTag = () => Tag | null // Warn: do not data type arguments, let them be inferred
 export type RouteTag = (extraProps?: Record<string, any>) => Tag

@@ -14,7 +14,7 @@ import { oneRenderToTagSupport } from './oneRenderToTagSupport.function.js'
 import { getValueType } from '../getValueType.function.js'
 
 export function processFirstSubjectValue(
-  value: TemplateValue,
+  value: TemplateValue | Tag,
   subject: InterpolateSubject, // could be tag via result.tag
   insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
   ownerSupport: TagSupport, // owner

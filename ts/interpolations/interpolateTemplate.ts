@@ -18,28 +18,20 @@ export type InterpolateComponentResult = {
   ownerSupport: TagSupport
   variableName: string
 }
-export type InterpolateTemplateResult = {
-  clones: InsertBefore[]
-  tagComponent?: InterpolateComponentResult
-}
 
 export function interpolateTemplate(
   insertBefore: Template, // <template end interpolate /> (will be removed)
   context: Context, // variable scope of {`__tagvar${index}`:'x'}
   ownerSupport: TagSupport, // Tag class
   counts: Counts, // used for animation stagger computing
-  options: InterpolateOptions,
-): InterpolateTemplateResult {
-  // TODO: THe clones array is useless here
-  const clones: InsertBefore[] = []
-
+): InterpolateComponentResult | undefined {
   if ( !insertBefore.hasAttribute('end') ) {
-    return {clones} // only care about <template end>
+    return // only care about <template end>
   }
 
   const variableName = insertBefore.getAttribute('id')
   if(variableName?.substring(0, variablePrefix.length) !== variablePrefix) {
-    return {clones} // ignore, not a tagVar
+    return // ignore, not a tagVar
   }
 
   const existingSubject = context[variableName]
@@ -48,13 +40,11 @@ export function interpolateTemplate(
   // process dynamics later
   if(isDynamic) {
     return {
-      clones,
-      tagComponent: {
-        variableName,
-        ownerSupport,
-        subject: existingSubject,
-        insertBefore
-      }}
+      variableName,
+      ownerSupport,
+      subject: existingSubject,
+      insertBefore
+    }
   }
   
   subscribeToTemplate(
@@ -64,7 +54,7 @@ export function interpolateTemplate(
     counts,
   )
 
-  return {clones}
+  return
 }
 
 export function subscribeToTemplate(

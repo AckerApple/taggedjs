@@ -4,11 +4,12 @@ import { ValueSubject } from '../../subject/ValueSubject.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { ArrayNoKeyError } from '../../errors.js'
 import { destroyArrayTag } from '../checkDestroyPrevious.function.js'
-import { setupNewTemplater, tagFakeTemplater } from './processTag.function.js'
+import { newTagSupportByTemplater, setupNewSupport, tagFakeTemplater } from './processTag.function.js'
 import { TagSupport } from '../TagSupport.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { isTagClass } from '../../isInstance.js'
 import { TagSubject } from '../../subject.types.js'
+import { renderTagOnly } from '../render/renderTagOnly.function.js'
 
 export type LastArrayItem = {
   tagSupport: TagSupport
@@ -50,24 +51,36 @@ export function processTagArray(
     const newLength = value.length-1
     const at = index - removed
     const lessLength = newLength < at
-    const subValue = value[index - removed]
-    const subTag = subValue as Tag | undefined
+
+    if(lessLength) {
+      destroyArrayItem(lastArray, index, options)
+      ++removed
+      return false
+    }
+
+    const subTag = value[index - removed] as Tag | TemplaterResult | undefined
+    const tagClass = isTagClass(subTag)
+
+    let tag = subTag as Tag
+    let templater = (subTag as Tag).templater
+    let prevArrayValue: unknown
+
+    if(tagClass) {
+      prevArrayValue = tag.memory.arrayValue
+    } else {
+      templater = subTag as TemplaterResult
+      tag = templater.tag as Tag
+      prevArrayValue = templater.arrayValue
+    }
 
     // const tag = subTag?.templater.tag as Tag
     const lastTag = item.tagSupport.templater.tag as Tag
-    const newArrayValue = subTag?.memory.arrayValue
     const lastArrayValue = lastTag.memory.arrayValue
-    const destroyItem = lessLength || !areLikeValues(newArrayValue, lastArrayValue)
+    const destroyItem = !areLikeValues(prevArrayValue, lastArrayValue)
     
     if(destroyItem) {
-      const last = lastArray[index]
-      const tagSupport = last.tagSupport
-      destroyArrayTag(tagSupport, options.counts)
-      last.deleted = true
-
+      destroyArrayItem(lastArray, index, options)
       ++removed
-      ++options.counts.removed
-      
       return false
     }
 
@@ -79,27 +92,40 @@ export function processTagArray(
     const item = value[index]
     const previous = lastArray[index]
     const previousSupport = previous?.tagSupport
-    const subTag = item as Tag
+    const subTag = item as Tag | TemplaterResult
+    const tagClass = isTagClass(subTag)
+    const itemSubject = new ValueSubject(undefined) as unknown as TagSubject
 
-    if(isTagClass(subTag) && !subTag.templater) {
-      tagFakeTemplater(subTag)
+    let templater = (subTag as Tag).templater
+    let tagSupport: TagSupport
+
+    if(tagClass) {
+      if(!templater) {
+        templater = tagFakeTemplater(subTag as Tag)
+      }
+      
+      tagSupport = new TagSupport(
+        templater,
+        ownerSupport,
+        itemSubject
+      )
+    } else {
+      templater = subTag as TemplaterResult
+      tagSupport = setupNewTemplater(
+        templater, ownerSupport, itemSubject
+      )
     }
 
-    const tagSupport: TagSupport = new TagSupport(
-      subTag.templater,
-      ownerSupport,
-      new ValueSubject(undefined) as unknown as TagSubject
-    )
-
     if(previousSupport) {
-      setupNewTemplater(tagSupport as TagSupport, ownerSupport, previousSupport.subject)
+      setupNewSupport(tagSupport as TagSupport, ownerSupport, previousSupport.subject)
       const global = previousSupport.global
       tagSupport.global = global
       global.newest = tagSupport
     }
     
     // check for html``.key()
-    const keySet = 'arrayValue' in subTag.memory
+    const tag = templater.tag || subTag as Tag
+    const keySet = 'arrayValue' in tag.memory
     if (!keySet) {
       const details = {
         template: tagSupport.getTemplate().string,
@@ -119,7 +145,6 @@ export function processTagArray(
       // subTag.tagSupport = subTag.tagSupport || prevSupport
       const oldest = prevGlobal.oldest as TagSupport
       oldest.updateBy(tagSupport)
-      // return []
       continue
     }
 
@@ -151,7 +176,6 @@ function setPlaceholderElm(
   parentNode.insertBefore(placeholder, insertBefore)
   parentNode.removeChild(insertBefore)
 }
-
 
 function processAddTagArrayItem(
   before: Text,
@@ -200,4 +224,29 @@ function areLikeValues(valueA: unknown, valueB: unknown): Boolean {
   }
 
   return false
+}
+
+function setupNewTemplater(
+  templater: TemplaterResult,
+  ownerSupport: TagSupport,
+  itemSubject: TagSubject
+) {
+  const tagSupport = newTagSupportByTemplater(templater, ownerSupport, itemSubject)
+  renderTagOnly(tagSupport, tagSupport, itemSubject, ownerSupport)
+  return tagSupport
+}
+
+function destroyArrayItem(
+  lastArray: LastArrayItem[],
+  index: number,
+  options: {
+    counts: Counts
+  }
+) {
+  const last = lastArray[index]
+  const tagSupport = last.tagSupport
+  destroyArrayTag(tagSupport, options.counts)
+  last.deleted = true
+
+  ++options.counts.removed
 }

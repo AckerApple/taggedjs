@@ -49,8 +49,8 @@ export class Tag {
     return this
   }
 
-  // TODO: Is this just a fake function that can be data typed?
   children?: {strings: string[] | TemplateStringsArray, values: TagValues}
+
   html(
     strings: string[] | TemplateStringsArray,
     ...values: TagValues

@@ -52,8 +52,14 @@ export class TemplaterResult {
   
   tag?: Tag
   children: TagChildren = new ValueSubject([] as Tag[])
+  arrayValue?: unknown // used for tag components used in arrays
 
   constructor(public props: Props) {}
+
+  key (arrayValue: unknown) {
+    this.arrayValue = arrayValue
+    return this
+  }
 
   html(
     strings: string[] | TemplateStringsArray,

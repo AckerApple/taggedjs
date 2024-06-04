@@ -7,18 +7,22 @@ import { Props } from '../../Props.js'
 export function renderTagSupport(
   tagSupport: TagSupport | BaseTagSupport, // must be latest/newest state render
   renderUp: boolean,
-): TagSupport {
+): TagSupport | BaseTagSupport {
   const global = tagSupport.global
   const templater = tagSupport.templater
-  
+
   // is it just a vanilla tag, not component?
   if( !templater.wrapper ) {// || isTagTemplater(templater) 
     const ownerTag = (tagSupport as TagSupport).ownerTagSupport
     ++global.renderCount
-    return renderTagSupport(ownerTag, true)
+    if(ownerTag.global.deleted) {
+      return tagSupport
+    }
+    return renderTagSupport(ownerTag.global.newest as TagSupport, true)
   }
 
   const subject = tagSupport.subject
+  const oldest = tagSupport.global.oldest
   
   let ownerSupport: undefined | TagSupport
   let selfPropChange = false
@@ -29,22 +33,19 @@ export function renderTagSupport(
     if(ownerSupport) {
       const nowProps = templater.props as Props
       const latestProps = tagSupport.propsConfig.latestCloned
-      selfPropChange = !nowProps.every((props, index) => deepEqual(props, latestProps[index]))
+      selfPropChange = !deepEqual(nowProps, latestProps)
     }
   }
 
-  const oldest = tagSupport.global.oldest as TagSupport
   const tag = renderExistingTag(
     oldest,
     tagSupport,
     ownerSupport as TagSupport, // useTagSupport,
     subject,
   )
-
-  const renderOwner = ownerSupport && selfPropChange
-  if(renderOwner) {  
-    const ownerTagSupport = ownerSupport as TagSupport
-    
+  
+  if(ownerSupport && selfPropChange) {
+    const ownerTagSupport = ownerSupport.global.newest as TagSupport
     renderTagSupport(
       ownerTagSupport,
       true,

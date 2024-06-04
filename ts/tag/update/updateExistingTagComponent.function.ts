@@ -5,8 +5,10 @@ import { processSubjectComponent } from'./processSubjectComponent.function.js'
 import { destroyTagMemory } from'../destroyTag.function.js'
 import { renderTagSupport } from'../render/renderTagSupport.function.js'
 import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
-import { callbackPropOwner } from'../../alterProp.function.js'
+import { castProps } from'../../alterProp.function.js'
 import { isLikeTags } from'../isLikeTags.function.js'
+import { Props } from '../../Props.js'
+import { hasPropChanges } from '../hasPropChanges.function.js'
 
 export function updateExistingTagComponent(
   ownerSupport: TagSupport,
@@ -14,7 +16,7 @@ export function updateExistingTagComponent(
   subject: TagSubject,
   insertBefore: InsertBefore,
 ): TagSupport | BaseTagSupport {
-  let lastSupport = subject.tagSupport?.global.newest as TagSupport // || subject.tagSupport
+  let lastSupport = subject.tagSupport?.global.newest as BaseTagSupport | TagSupport
   let oldestTag: TagSupport | BaseTagSupport | undefined = lastSupport.global.oldest
   
   const oldWrapper = lastSupport.templater.wrapper
@@ -50,20 +52,29 @@ export function updateExistingTagComponent(
       tagSupport as unknown as BaseTagSupport,
       templater
     )
+    // everyhing has matched, no display needs updating.
     if(!hasChanged) {
-      // if the new props are an object then implicitly since no change, the old props are an object
       const newProps = templater.props
-      syncFunctionProps(
+
+      // update function refs to use latest references
+      const castedProps = syncFunctionProps(
+        tagSupport,
         lastSupport,
         ownerSupport,
-        newProps, // resetProps,
+        newProps,
       )
+
+      // When new tagSupport actually makes call to real function, use these pre casted props
+      tagSupport.propsConfig.castProps = castedProps
+      
+      // update support to think it has different cloned props
+      lastSupport.propsConfig.latestCloned = tagSupport.propsConfig.latestCloned
+      lastSupport.propsConfig.lastClonedKidValues = tagSupport.propsConfig.lastClonedKidValues
 
       return lastSupport // its the same tag component
     }
   }
 
-  
   const previous = lastSupport.global.newest as TagSupport
   const newSupport = renderTagSupport(
     tagSupport,
@@ -93,9 +104,7 @@ export function updateExistingTagComponent(
 
   if(isLikeTag) {
     subject.tagSupport = newSupport
-    
-    oldestTag.updateBy(newSupport) // the oldest tag has element references
-
+    oldestTag.updateBy(newSupport)
     return newSupport
   } else {
     // Although function looked the same it returned a different html result
@@ -106,7 +115,6 @@ export function updateExistingTagComponent(
     oldestTag = undefined
   }
   
-
   if(!oldestTag) {
     lastSupport = newSupport
     buildNewTag(
@@ -123,9 +131,9 @@ export function updateExistingTagComponent(
 }
 
 function buildNewTag(
-  newSupport: TagSupport,
+  newSupport: BaseTagSupport | TagSupport,
   oldInsertBefore: Element | Text | ChildNode,
-  oldTagSupport: TagSupport,
+  oldTagSupport: BaseTagSupport | TagSupport,
   subject: TagSubject,
 ) {
   newSupport.buildBeforeElement(oldInsertBefore, {
@@ -142,49 +150,107 @@ function buildNewTag(
 }
 
 function syncFunctionProps(
+  newSupport: BaseTagSupport | TagSupport,
   lastSupport: BaseTagSupport | TagSupport,
   ownerSupport: BaseTagSupport | TagSupport,
-  newPropsArray: any[],
-) {
-  lastSupport = lastSupport.global.newest || lastSupport as TagSupport
-  const priorPropConfig = lastSupport.propsConfig
-  const priorPropsArray = priorPropConfig.latestCloned
-  const prevSupport = ownerSupport.global.newest as TagSupport
+  newPropsArray: any[], // templater.props
+): Props {
+  const newest = lastSupport.global.newest
 
-  for (let index = newPropsArray.length - 1; index >= 0; --index) {
-    const argPosition = newPropsArray[index]
-    if(typeof(argPosition) !== 'object') {
-      return
-    }
-
-    const priorProps = priorPropsArray[index] as Record<string, any>
-
-    if (typeof(priorProps) !== 'object') {
-      return
-    }
-
-    for (const name in argPosition) {
-      const value = argPosition[name]
-
-      if(!(value instanceof Function)) {
-        continue
-      }
-  
-      const newCallback = argPosition[name] // || value
-      const original = newCallback instanceof Function && newCallback.toCall
-      if(original) {
-        continue // already previously converted
-      }
-  
-      // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
-      priorProps[name].toCall = (...args: any[]) => {
-        return callbackPropOwner(
-          newCallback, // value, // newOriginal,
-          args,
-          prevSupport, // ??? <= ownerSupport
-          [],
-        )
-      }
-    }
+  if(!newest) {
+    // const state = ownerSupport.global.oldest.memory.state
+    const state = ownerSupport.memory.state
+    newPropsArray.length = 0
+    const castedProps = castProps(newPropsArray, newSupport, state)
+    newPropsArray.push( ...castedProps )
+    newSupport.propsConfig.castProps = castedProps
+    return newPropsArray
   }
+
+  lastSupport = newest || lastSupport as TagSupport
+
+  const priorPropConfig = lastSupport.propsConfig
+  const priorPropsArray = priorPropConfig.castProps as Props
+
+  const newArray = []
+  for (let index = newPropsArray.length - 1; index >= 0; --index) {
+    const prop = newPropsArray[index]
+    const priorProp = priorPropsArray[index]
+
+    const newValue = syncPriorPropFunction(
+      priorProp, prop, newSupport, ownerSupport,
+    )
+
+    newArray.push(newValue)
+  }
+
+  newSupport.propsConfig.castProps = newArray
+
+  return newArray
+}
+
+function syncPriorPropFunction(
+  priorProp: any,
+  prop: any,
+  newSupport: BaseTagSupport | TagSupport,
+  ownerSupport: BaseTagSupport | TagSupport,
+  seen: any[] = [],
+) {
+  if(priorProp instanceof Function) {
+    // the prop i am receiving, is already being monitored/controlled by another parent
+    if(prop.toCall) {
+      priorProp.toCall = prop.toCall
+      return prop
+    }
+    
+    const ownerGlobal = ownerSupport.global
+    const oldOwnerState = (ownerGlobal.newest as TagSupport).memory.state
+
+    priorProp.prop = prop
+    priorProp.stateArray = oldOwnerState
+
+    return priorProp
+  }
+
+  // prevent infinite recursion
+  if(seen.includes(prop)) {
+    return prop
+  }
+  seen.push(prop)
+
+  if(typeof(prop)!=='object' || !prop) {
+    return prop // no children to crawl through
+  }
+
+  if(prop instanceof Array) {
+    for (let index = prop.length - 1; index >= 0; --index) {
+      const x = prop[index]
+      prop[index] = syncPriorPropFunction(
+        priorProp[index], x, newSupport, ownerSupport, seen,
+      )
+    }
+
+    return prop
+  }
+
+  if(priorProp === undefined) {
+    return prop
+  }
+
+  for(const name in prop){
+    const subValue = (prop as any)[name]
+    const result = syncPriorPropFunction(
+      priorProp[name], subValue, newSupport, ownerSupport, seen,
+    )
+    
+    const hasSetter = Object.getOwnPropertyDescriptor(prop, name)?.set
+    if(hasSetter) {
+      continue
+    }
+
+    prop[name] = result
+  }
+  
+  return prop
+
 }

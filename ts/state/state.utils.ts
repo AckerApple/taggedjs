@@ -2,7 +2,6 @@ import { StateMismatchError } from '../errors.js'
 import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js'
 import { Wrapper } from '../tag/TemplaterResult.class.js'
 import { setUse } from'./setUse.function.js'
-import { syncStates } from './syncStates.function.js'
 
 export type StateConfig<T> = (x: T) => [T, T]
 

@@ -30,9 +30,6 @@ export function runAfterRender(
   const tagUse = setUse.tagUse
   const length = tagUse.length
   for (let index=0; index < length; ++index) {
-    if(!tagSupport.global.oldest) {
-      throw new Error('stop here')
-    }
     tagUse[index].afterRender(tagSupport, ownerTagSupport)
   }
 

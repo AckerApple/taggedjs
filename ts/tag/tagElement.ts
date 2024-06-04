@@ -39,7 +39,6 @@ export function tagElement(
   // have a function setup and call the tagWrapper with (props, {update, async, on})
   const tagSupport = runWrapper(wrapper)
   
-  // TODO: is the below needed?
   tagSupport.appElement = element
   tagSupport.isApp = true
   tagSupport.global.isApp = true

@@ -4,7 +4,7 @@ import { InterpolateSubject } from './update/processFirstSubject.utils.js'
 import { TagArraySubject } from'./update/processTagArray.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { Counts } from'../interpolations/interpolateTemplate.js'
-import { destroyTagMemory, destroyTagSupportPast } from'./destroyTag.function.js'
+import { destroyTagMemory } from'./destroyTag.function.js'
 import { InsertBefore } from'../interpolations/InsertBefore.type.js'
 import { insertAfter } from'../insertAfter.function.js'
 import { BaseTagSupport, TagSupport } from './TagSupport.class.js'
@@ -105,8 +105,6 @@ export function destroyArrayTag(
   tagSupport: TagSupport,
   counts: Counts,
 ) {
-  destroyTagSupportPast(tagSupport)
-
   tagSupport.destroy({
     stagger: counts.removed++,
   })

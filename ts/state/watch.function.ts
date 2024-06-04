@@ -151,14 +151,13 @@ function defineOnMethod<R>(
   Object.defineProperty(attachTo, 'asSubject', {
     get() {
       const oldWatch = getWatch()
+      const firstSupport = state(() => (getSupportInCycle() as TagSupport))
+      const subject = state(() => new ValueSubject<any>(undefined))
       
       const method = <T>(
         currentValues: any[],
         callback: WatchCallback<T>  
       ) => {
-        const firstSupport = state(() => (getSupportInCycle() as TagSupport))
-        const subject = state(() => new ValueSubject<any>(undefined))
-        
         setupWatch(
           currentValues,
           (currentValues, previousValues) => {
