@@ -8,6 +8,6 @@ export type RouteProps = {
     paramSubject: ValueSubject<string>;
     query: RouteQuery;
 };
-export type ToTag = (...props: any[]) => StateToTag | Tag;
-export type StateToTag = () => Tag;
+export type ToTag = (...props: any[]) => StateToTag | Tag | null;
+export type StateToTag = () => Tag | null;
 export type RouteTag = (extraProps?: Record<string, any>) => Tag;

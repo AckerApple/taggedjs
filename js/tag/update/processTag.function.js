@@ -10,6 +10,7 @@ subject) {
     }
     subject.tagSupport = tagSupport;
     tagSupport.ownerTagSupport = ownerSupport;
+    // ++tagSupport.global.renderCount
     tagSupport.buildBeforeElement(insertBefore, {
         counts: { added: 0, removed: 0 },
     });
@@ -28,7 +29,6 @@ export function getFakeTemplater() {
         isTag: true,
         tagJsType: 'templater',
         tagged: false,
-        madeChildIntoSubject: false, // TODO this can be removed
         html: () => fake,
         key: () => fake,
     };

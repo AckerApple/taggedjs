@@ -1,6 +1,6 @@
 import { isStaticTag } from '../isInstance.js';
 import { isLikeTags } from './isLikeTags.function.js';
-import { destroyTagMemory, destroyTagSupportPast } from './destroyTag.function.js';
+import { destroyTagMemory } from './destroyTag.function.js';
 import { insertAfter } from '../insertAfter.function.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 export function checkDestroyPrevious(subject, // existing.value is the old value
@@ -70,7 +70,6 @@ export function isSimpleType(value) {
     return ['string', 'number', 'boolean'].includes(value);
 }
 export function destroyArrayTag(tagSupport, counts) {
-    destroyTagSupportPast(tagSupport);
     tagSupport.destroy({
         stagger: counts.removed++,
     });

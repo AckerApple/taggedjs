@@ -16,13 +16,20 @@ export declare class BaseTagSupport {
         latest: Props;
         latestCloned: Props;
         lastClonedKidValues: unknown[][];
+        castProps?: Props;
     };
     memory: TagMemory;
     clones: (Element | Text | ChildNode)[];
     global: TagGlobal;
     hasLiveElements: boolean;
     childTags: TagSupport[];
-    constructor(templater: TemplaterResult, subject: TagSubject);
+    constructor(templater: TemplaterResult, subject: TagSubject, castedProps?: Props);
+    clonePropsBy(props: Props, castedProps?: Props): {
+        latest: Props;
+        latestCloned: any[];
+        castProps: Props | undefined;
+        lastClonedKidValues: any[][];
+    };
     /** Function that kicks off actually putting tags down as HTML elements */
     buildBeforeElement(insertBefore: InsertBefore, options?: ElementBuildOptions): void;
     getTemplate(): TagTemplate;
@@ -50,6 +57,6 @@ export declare class TagSupport extends BaseTagSupport {
     version: number;
     isApp: boolean;
     constructor(templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new TagSupport()
-    ownerTagSupport: TagSupport, subject: TagSubject, version?: number);
+    ownerTagSupport: TagSupport, subject: TagSubject, castedProps?: Props, version?: number);
     getAppTagSupport(): TagSupport;
 }

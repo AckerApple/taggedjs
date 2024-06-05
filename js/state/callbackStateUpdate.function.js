@@ -8,12 +8,14 @@ export default function callbackStateUpdate(tagSupport, callback, oldState, ...a
     const maybePromise = callback(...args);
     // send the oldest state changes into the newest
     syncStates(oldState, state);
-    renderTagSupport(tagSupport, false);
+    renderTagSupport(tagSupport, // tagSupport.global.newest as TagSupport,
+    false);
     if (maybePromise instanceof Promise) {
         maybePromise.finally(() => {
             // send the oldest state changes into the newest
             syncStates(oldState, state);
-            renderTagSupport(tagSupport, false);
+            renderTagSupport(tagSupport, // tagSupport.global.newest as TagSupport,
+            false);
         });
     }
     // return undefined as T

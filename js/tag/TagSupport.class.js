@@ -41,16 +41,20 @@ export class BaseTagSupport {
     };
     hasLiveElements = false;
     childTags = []; // tags on me
-    constructor(templater, subject) {
+    constructor(templater, subject, castedProps) {
         this.templater = templater;
         this.subject = subject;
-        const children = templater.children; // children tags passed in as arguments
-        const kidValue = children.value;
         const props = templater.props; // natural props
+        this.propsConfig = this.clonePropsBy(props, castedProps);
+    }
+    clonePropsBy(props, castedProps) {
+        const children = this.templater.children; // children tags passed in as arguments
+        const kidValue = children.value;
         const latestCloned = props.map(props => deepClone(props));
-        this.propsConfig = {
+        return this.propsConfig = {
             latest: props,
             latestCloned, // assume its HTML children and then detect
+            castProps: castedProps, //?? castProps(props, this, this.memory.state),
             lastClonedKidValues: kidValue.map(kid => {
                 const cloneValues = cloneValueArray(kid.values);
                 return cloneValues;
@@ -277,8 +281,8 @@ export class TagSupport extends BaseTagSupport {
     version;
     isApp = false;
     constructor(templater, // at runtime rendering of a tag, it needs to be married to a new TagSupport()
-    ownerTagSupport, subject, version = 0) {
-        super(templater, subject);
+    ownerTagSupport, subject, castedProps, version = 0) {
+        super(templater, subject, castedProps);
         this.templater = templater;
         this.ownerTagSupport = ownerTagSupport;
         this.subject = subject;

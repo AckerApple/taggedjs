@@ -8,6 +8,7 @@ ownerSupport) {
     const isLikeTag = !lastSupport || isLikeTags(lastSupport, reSupport);
     if (!isLikeTag) {
         destroyUnlikeTags(lastSupport, reSupport, subject);
+        reSupport.global.oldest = reSupport;
     }
     const lastOwnerSupport = lastSupport?.ownerTagSupport;
     reSupport.ownerTagSupport = (ownerSupport || lastOwnerSupport);
@@ -24,8 +25,8 @@ subject) {
     const global = reSupport.global;
     global.insertBefore = insertBefore;
     global.deleted = false;
-    delete global.oldest; // TODO, maybe set global oldest to replacement instead of destroying it?
-    delete global.newest;
-    delete subject.tagSupport;
+    global.oldest = reSupport;
+    global.newest = reSupport;
+    subject.tagSupport = reSupport;
 }
 //# sourceMappingURL=renderWithSupport.function.js.map

@@ -18,7 +18,6 @@ export class Tag {
         this.memory.arrayValue = arrayValue;
         return this;
     }
-    // TODO: Is this just a fake function that can be data typed?
     children;
     html(strings, ...values) {
         this.children = { strings, values };

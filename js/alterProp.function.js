@@ -3,7 +3,9 @@ import { isStaticTag } from './isInstance.js';
 import { renderTagSupport } from './tag/render/renderTagSupport.function.js';
 import { setUse } from './state/index.js';
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js';
-import { syncStates } from './state/syncStates.function.js';
+export function castProps(props, newTagSupport, stateArray) {
+    return props.map(prop => alterProp(prop, newTagSupport.ownerTagSupport, stateArray, newTagSupport));
+}
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProp(prop, ownerSupport, stateArray, newTagSupport) {
     if (isStaticTag(prop) || !prop) {
@@ -26,13 +28,16 @@ export function checkProp(value, ownerSupport, stateArray, newTagSupport, index,
         return value; // no children to crawl through
     }
     if (value instanceof Array) {
-        value.forEach((x, index) => value[index] = checkProp(x, ownerSupport, stateArray, newTagSupport, index, value, seen));
+        for (let index = value.length - 1; index >= 0; --index) {
+            const x = value[index];
+            value[index] = checkProp(x, ownerSupport, stateArray, newTagSupport, index, value, seen);
+        }
         return value;
     }
     for (const name in value) {
         const subValue = value[name];
         const result = checkProp(subValue, ownerSupport, stateArray, newTagSupport, name, value, seen);
-        const hasSetter = typeof (result) === 'object' || Object.getOwnPropertyDescriptor(value, name)?.set;
+        const hasSetter = Object.getOwnPropertyDescriptor(value, name)?.set;
         if (hasSetter) {
             continue;
         }
@@ -47,8 +52,12 @@ export function getPropWrap(value, ownerSupport, stateArray, newTagSupport, name
     }
     const wrap = (...args) => wrap.toCall(...args); // what gets called can switch over parent state changes
     // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
-    wrap.toCall = (...args) => callbackPropOwner(value, args, ownerSupport, stateArray);
+    wrap.toCall = (...args) => {
+        return callbackPropOwner(wrap.prop, args, ownerSupport, wrap.stateArray);
+    };
     wrap.original = value;
+    wrap.prop = value;
+    wrap.stateArray = stateArray;
     // copy data properties that maybe on source function
     Object.assign(wrap, value);
     if (name) {
@@ -59,18 +68,18 @@ export function getPropWrap(value, ownerSupport, stateArray, newTagSupport, name
 }
 /** Function shared by alterProps() and updateExistingTagComponent... TODO: May want to have to functions to reduce cycle checking?  */
 export function callbackPropOwner(toCall, callWith, ownerSupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
-stateArray) {
+oldState) {
     const newest = ownerSupport.global.newest;
-    const newState = newest.memory.state;
+    //const newState = newest.memory.state
     const noCycle = getSupportInCycle() === undefined;
-    const sync = noCycle && stateArray.length === newState.length;
-    if (sync) {
-        syncStates(newState, stateArray);
-    }
+    //const sync = noCycle && oldState.length === newState.length
+    //if(sync) {
+    //  syncStates(newState, oldState)
+    //}
     const result = toCall(...callWith);
-    if (sync) {
-        syncStates(stateArray, newState);
-    }
+    // if(sync) {
+    //   syncStates(oldState, newState)
+    // }
     const run = () => {
         // are we in a rendering cycle? then its being called by alterProps
         if (noCycle === false) {

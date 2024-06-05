@@ -95,7 +95,6 @@ ownerSupport, options) {
             // subTag.tagSupport = subTag.tagSupport || prevSupport
             const oldest = prevGlobal.oldest;
             oldest.updateBy(tagSupport);
-            // return []
             continue;
         }
         processAddTagArrayItem(runtimeInsertBefore, tagSupport, index, options, lastArray);

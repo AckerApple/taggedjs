@@ -2,9 +2,8 @@ import { hasTagSupportChanged } from '../hasTagSupportChanged.function.js';
 import { processSubjectComponent } from './processSubjectComponent.function.js';
 import { destroyTagMemory } from '../destroyTag.function.js';
 import { renderTagSupport } from '../render/renderTagSupport.function.js';
-import { callbackPropOwner } from '../../alterProp.function.js';
+import { castProps } from '../../alterProp.function.js';
 import { isLikeTags } from '../isLikeTags.function.js';
-import { setUse } from '../../state/setUse.function.js';
 export function updateExistingTagComponent(ownerSupport, tagSupport, // lastest
 subject, insertBefore) {
     let lastSupport = subject.tagSupport?.global.newest;
@@ -28,9 +27,16 @@ subject, insertBefore) {
     }
     else {
         const hasChanged = hasTagSupportChanged(lastSupport, tagSupport, templater);
+        // everyhing has matched, no display needs updating.
         if (!hasChanged) {
             const newProps = templater.props;
-            syncFunctionProps(tagSupport, lastSupport, ownerSupport, newProps);
+            // update function refs to use latest references
+            const castedProps = syncFunctionProps(tagSupport, lastSupport, ownerSupport, newProps);
+            // When new tagSupport actually makes call to real function, use these pre casted props
+            tagSupport.propsConfig.castProps = castedProps;
+            // update support to think it has different cloned props
+            lastSupport.propsConfig.latestCloned = tagSupport.propsConfig.latestCloned;
+            lastSupport.propsConfig.lastClonedKidValues = tagSupport.propsConfig.lastClonedKidValues;
             return lastSupport; // its the same tag component
         }
     }
@@ -50,7 +56,7 @@ subject, insertBefore) {
     const isLikeTag = isSameTag && isLikeTags(previous, newSupport);
     if (isLikeTag) {
         subject.tagSupport = newSupport;
-        oldestTag.updateBy(newSupport); // the oldest tag has element references
+        oldestTag.updateBy(newSupport);
         return newSupport;
     }
     else {
@@ -80,31 +86,43 @@ function buildNewTag(newSupport, oldInsertBefore, oldTagSupport, subject) {
     return newSupport;
 }
 function syncFunctionProps(newSupport, lastSupport, ownerSupport, newPropsArray) {
-    lastSupport = lastSupport.global.newest || lastSupport;
-    const stateArray = setUse.memory.stateConfig.array;
+    const newest = lastSupport.global.newest;
+    if (!newest) {
+        // const state = ownerSupport.global.oldest.memory.state
+        const state = ownerSupport.memory.state;
+        newPropsArray.length = 0;
+        const castedProps = castProps(newPropsArray, newSupport, state);
+        newPropsArray.push(...castedProps);
+        newSupport.propsConfig.castProps = castedProps;
+        return newPropsArray;
+    }
+    lastSupport = newest || lastSupport;
+    const priorPropConfig = lastSupport.propsConfig;
+    const priorPropsArray = priorPropConfig.castProps;
+    const newArray = [];
     for (let index = newPropsArray.length - 1; index >= 0; --index) {
         const prop = newPropsArray[index];
-        const priorPropConfig = lastSupport.propsConfig;
-        const priorPropsArray = priorPropConfig.latestCloned;
         const priorProp = priorPropsArray[index];
-        newPropsArray[index] = syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport);
+        const newValue = syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport);
+        newArray.push(newValue);
     }
+    newSupport.propsConfig.castProps = newArray;
+    return newArray;
 }
-function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, index, propOwner, seen = []) {
+function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, seen = []) {
     if (priorProp instanceof Function) {
+        // the prop i am receiving, is already being monitored/controlled by another parent
         if (prop.toCall) {
+            priorProp.toCall = prop.toCall;
             return prop;
         }
         const ownerGlobal = ownerSupport.global;
-        const prevOwnerSupport = ownerGlobal.newest;
-        const oldOwnerState = ownerGlobal.oldest.memory.state;
-        priorProp.toCall = (...args) => {
-            return callbackPropOwner(prop, args, prevOwnerSupport, prevOwnerSupport.memory.state);
-        };
-        // The newer needs to be wrapped to trigger renders
-        // return result
-        return prop;
+        const oldOwnerState = ownerGlobal.newest.memory.state;
+        priorProp.prop = prop;
+        priorProp.stateArray = oldOwnerState;
+        return priorProp;
     }
+    // prevent infinite recursion
     if (seen.includes(prop)) {
         return prop;
     }
@@ -113,13 +131,19 @@ function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, index,
         return prop; // no children to crawl through
     }
     if (prop instanceof Array) {
-        prop.forEach((x, index) => prop[index] = syncPriorPropFunction(priorProp[index], x, newSupport, ownerSupport, index, prop, seen));
+        for (let index = prop.length - 1; index >= 0; --index) {
+            const x = prop[index];
+            prop[index] = syncPriorPropFunction(priorProp[index], x, newSupport, ownerSupport, seen);
+        }
+        return prop;
+    }
+    if (priorProp === undefined) {
         return prop;
     }
     for (const name in prop) {
         const subValue = prop[name];
-        const result = syncPriorPropFunction(priorProp[name], subValue, newSupport, ownerSupport, name, prop, seen);
-        const hasSetter = typeof (result) === 'object' || Object.getOwnPropertyDescriptor(prop, name)?.set;
+        const result = syncPriorPropFunction(priorProp[name], subValue, newSupport, ownerSupport, seen);
+        const hasSetter = Object.getOwnPropertyDescriptor(prop, name)?.set;
         if (hasSetter) {
             continue;
         }

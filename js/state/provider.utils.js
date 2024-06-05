@@ -21,7 +21,7 @@ function handleProviderChanges(appSupport, provider) {
         const notRendered = renderCount === tagSupport.global.renderCount;
         if (notRendered) {
             provider.clone = deepClone(provider.instance);
-            renderTagSupport(tagSupport, false);
+            renderTagSupport(tagSupport.global.newest, false);
             continue;
         }
     }

@@ -1,8 +1,10 @@
 import { runTagCallback } from '../interpolations/bindSubjectCallback.function.js';
 import { deepClone } from '../deepFunctions.js';
 import { TagSupport } from './TagSupport.class.js';
-import { alterProp } from '../alterProp.function.js';
+import { castProps } from '../alterProp.function.js';
 import { setUse } from '../state/setUse.function.js';
+import { ValueTypes } from './ValueTypes.enum.js';
+import { html } from './html.js';
 /** creates/returns a function that when called then calls the original component function
  * Gets used as templater.wrapper()
  */
@@ -20,23 +22,23 @@ export function getTagWrap(templater, result) {
         // result.original
         const originalFunction = result.original; // (innerTagWrap as any).original as unknown as TagComponent
         let props = templater.props;
-        let castedProps = props.map(prop => alterProp(prop, newTagSupport.ownerTagSupport, stateArray, newTagSupport));
+        // When defined, this must be an update where my new props have already been made for me
+        const preCastedProps = newTagSupport.propsConfig.castProps;
+        const castedProps = preCastedProps || castProps(props, newTagSupport, stateArray);
         const latestCloned = props.map(props => deepClone(props)); // castedProps
         // CALL ORIGINAL COMPONENT FUNCTION
         let tag = originalFunction(...castedProps);
         if (tag instanceof Function) {
             tag = tag();
         }
+        if (!tag || tag.tagJsType !== ValueTypes.tag) {
+            tag = html `${tag}`; // component returned a non-component value
+        }
         tag.templater = templater;
         templater.tag = tag;
         tag.memory.arrayValue = templater.arrayValue; // tag component could have been used in array.map
-        const tagSupport = new TagSupport(templater, newTagSupport.ownerTagSupport, subject, global.renderCount);
+        const tagSupport = new TagSupport(templater, newTagSupport.ownerTagSupport, subject, castedProps, global.renderCount);
         tagSupport.global = global;
-        tagSupport.propsConfig = {
-            latest: props,
-            latestCloned,
-            lastClonedKidValues: tagSupport.propsConfig.lastClonedKidValues,
-        };
         const nowState = setUse.memory.stateConfig.array;
         tagSupport.memory.state.push(...nowState);
         if (templater.madeChildIntoSubject) {

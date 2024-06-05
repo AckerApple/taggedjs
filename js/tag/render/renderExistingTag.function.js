@@ -21,8 +21,6 @@ subject) {
     const toRedrawTag = prevSupport || lastSupport || global.oldest;
     const reSupport = renderWithSupport(newSupport, toRedrawTag, subject, ownerSupport);
     const oldest = global.oldest || oldestSupport;
-    reSupport.global.oldest = oldest;
-    // TODO: renderWithSupport already does an isLikeTags compare
     if (isLikeTags(prevSupport, reSupport)) {
         subject.tagSupport = reSupport;
         oldest.updateBy(reSupport);
