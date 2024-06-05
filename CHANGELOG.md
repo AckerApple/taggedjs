@@ -1,8 +1,9 @@
 ## CHANGELOG
 
-### v2.5.18 - 5-2024
-- fix functions as argument props
-- fix nested textareas
+### v2.5.19 - 5-2024
+- fixed functions as argument props
+- fixed nested textareas
+- fixed rendering up from non-tag component
 
 ### v2.5.14 - 5-2024
 - `new Subject(0).set(1)` is now replaced by one of the following:

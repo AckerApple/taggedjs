@@ -1,6 +1,7 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
 import { TagSupport } from '../tag/TagSupport.class.js'
+import { TagGlobal } from '../tag/TemplaterResult.class.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { renderTagSupport } from'../tag/render/renderTagSupport.function.js'
 
@@ -39,7 +40,7 @@ export function runTagCallback(
   const callbackResult = method(...args)
   const sameRenderCount = renderCount === myGlobal.renderCount
   const last = myGlobal.newest as TagSupport
-  const skipRender = !sameRenderCount || myGlobal.deleted // || last.global.deleted
+  const skipRender = !sameRenderCount
   
   // already rendered OR tag was deleted before event processing
   if(skipRender) {
@@ -54,16 +55,21 @@ export function runTagCallback(
   // If we are NOT a component than we need to render my owner instead
   if(tagSupport.templater.tagJsType === ValueTypes.templater) {
     const owner = last.ownerTagSupport
-    if(owner.global.deleted) {
-      return
-    }
-
     const newest = owner.global.newest as TagSupport
-    renderTagSupport(
-      newest,
-      false, // renderUp - callback may have changed props so also check to render up
-    )
-    return
+    return renderCallbackSupport(newest, callbackResult, owner.global)
+  }
+
+  return renderCallbackSupport(last, callbackResult, last.global)
+}
+
+
+function renderCallbackSupport(
+  last: TagSupport,
+  callbackResult: any,
+  global: TagGlobal,
+) {
+  if(global.deleted) {
+    return 'no-data-ever' // || last.global.deleted
   }
 
   const newest = renderTagSupport(
@@ -71,25 +77,24 @@ export function runTagCallback(
     true, // renderUp - callback may have changed props so also check to render up
   )
 
-  myGlobal.newest = newest
+  global.newest = newest
 
   if(callbackResult instanceof Promise) {
     return callbackResult.then(() => {
-      if(myGlobal.deleted) {
+      if(global.deleted) {
         return 'promise-no-data-ever' // tag was deleted during event processing
       }
 
       const newInPromise = renderTagSupport(
-        myGlobal.newest as TagSupport,
+        global.newest as TagSupport,
         true,
       )
 
-      myGlobal.newest = newInPromise
+      global.newest = newInPromise
 
       return 'promise-no-data-ever'
     })
   }
 
-  // Caller always expects a Promise
   return 'no-data-ever'
 }

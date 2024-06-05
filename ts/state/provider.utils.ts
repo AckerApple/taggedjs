@@ -38,7 +38,7 @@ function handleProviderChanges(
     if(notRendered) {
       provider.clone = deepClone(provider.instance)
       renderTagSupport(
-        tagSupport,
+        tagSupport.global.newest as TagSupport,
         false,
       )
       continue
