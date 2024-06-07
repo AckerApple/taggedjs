@@ -60,16 +60,27 @@ export function subscribeToTemplate(insertBefore, subject, ownerSupport, counts)
     }
     ownerSupport.global.subscriptions.push(sub);
 }
+/** This is the function that enhances elements such as [class.something] and [style.color] OR it fixes elements that alter innerHTML */
 export function afterElmBuild(elm, options, context, ownerSupport) {
     if (!elm.getAttribute) {
         return;
     }
+    // Elements that alter innerHTML
     const tagName = elm.nodeName; // elm.tagName
     if (tagName === 'TEXTAREA') {
         scanTextAreaValue(elm, context, ownerSupport);
     }
     let diff = options.counts.added;
     diff = elementInitCheck(elm, options.counts) - diff;
+    const hasFocusFun = elm.focus;
+    if (hasFocusFun) {
+        if (elm.hasAttribute('autofocus')) {
+            elm.focus();
+        }
+        if (elm.hasAttribute('autoselect')) {
+            elm.select();
+        }
+    }
     const children = elm.children;
     if (children) {
         for (let index = children.length - 1; index >= 0; --index) {

@@ -1,5 +1,4 @@
 import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js';
-import { ProviderConfig } from './providers.js';
 import { Config } from './state.utils.js';
 interface TagUse {
     beforeRender: (tagSupport: BaseTagSupport | TagSupport, ownerTag?: TagSupport | BaseTagSupport) => void;
@@ -20,7 +19,6 @@ export declare namespace setUse {
 }
 type UseMemory = (Record<string, any> & {
     stateConfig: Config;
-    providerConfig: ProviderConfig;
     currentSupport: TagSupport;
 });
 export {};

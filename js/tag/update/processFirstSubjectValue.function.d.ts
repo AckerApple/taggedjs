@@ -5,4 +5,4 @@ import { InterpolateSubject, TemplateValue, processOptions } from './processFirs
 export declare function processFirstSubjectValue(value: TemplateValue | Tag, subject: InterpolateSubject, // could be tag via result.tag
 insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
 ownerSupport: TagSupport, // owner
-options: processOptions): InsertBefore[] | undefined;
+options: processOptions): import("../TagSupport.class.js").BaseTagSupport | InsertBefore[] | undefined;

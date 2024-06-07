@@ -76,6 +76,8 @@ function handleStillTag(subject, value, ownerSupport) {
         }
     }
     const valueSupport = new TagSupport(templater, ownerSupport, subject);
+    // ??? new
+    // subject.tagSupport = valueSupport
     if (isClass) {
         valueSupport.global = lastSupport.global;
     }

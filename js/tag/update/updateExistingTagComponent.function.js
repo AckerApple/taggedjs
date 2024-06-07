@@ -5,9 +5,8 @@ import { renderTagSupport } from '../render/renderTagSupport.function.js';
 import { castProps } from '../../alterProp.function.js';
 import { isLikeTags } from '../isLikeTags.function.js';
 export function updateExistingTagComponent(ownerSupport, tagSupport, // lastest
-subject, insertBefore) {
+subject, insertBefore, renderUp = false) {
     let lastSupport = subject.tagSupport?.global.newest;
-    let oldestTag = lastSupport.global.oldest;
     const oldWrapper = lastSupport.templater.wrapper;
     const newWrapper = tagSupport.templater.wrapper;
     let isSameTag = false;
@@ -21,9 +20,10 @@ subject, insertBefore) {
     if (!isSameTag) {
         const oldestSupport = lastSupport.global.oldest;
         destroyTagMemory(oldestSupport);
-        return processSubjectComponent(templater, subject, insertBefore, ownerSupport, {
+        const newSupport = processSubjectComponent(templater, subject, insertBefore, ownerSupport, {
             counts: { added: 0, removed: 0 },
         });
+        return newSupport;
     }
     else {
         const hasChanged = hasTagSupportChanged(lastSupport, tagSupport, templater);
@@ -40,39 +40,56 @@ subject, insertBefore) {
             return lastSupport; // its the same tag component
         }
     }
-    const previous = lastSupport.global.newest;
-    const newSupport = renderTagSupport(tagSupport, false);
-    lastSupport = subject.tagSupport;
-    const newOldest = newSupport.global.oldest;
-    const hasOldest = newOldest ? true : false;
-    if (!hasOldest) {
-        return buildNewTag(newSupport, insertBefore, lastSupport, subject);
+    const oldest = lastSupport.global.oldest;
+    if (tagSupport.global.locked) {
+        tagSupport.global.blocked.push(tagSupport);
+        return tagSupport;
     }
-    if (newOldest && templater.children._value.length) {
-        const oldKidsSub = newOldest.templater.children;
+    const previous = lastSupport.global.newest;
+    const newSupport = renderTagSupport(tagSupport, renderUp);
+    return afterTagRender(subject, oldest, templater, previous, newSupport, isSameTag);
+}
+function afterTagRender(subject, oldest, templater, previous, newSupport, isSameTag) {
+    let lastSupport = subject.tagSupport;
+    // const oldest = newSupport.global.oldest
+    /*
+    const hasOldest = oldest ? true : false
+    if(!hasOldest) {
+      return buildNewTag(
+        newSupport,
+        insertBefore,
+        lastSupport,
+        subject
+      )
+    }
+    */
+    if (oldest && templater.children._value.length) {
+        const oldKidsSub = oldest.templater.children;
         oldKidsSub.next(templater.children._value);
     }
     // detect if both the function is the same and the return is the same
     const isLikeTag = isSameTag && isLikeTags(previous, newSupport);
     if (isLikeTag) {
+        const oldestTag = lastSupport.global.oldest;
         subject.tagSupport = newSupport;
         oldestTag.updateBy(newSupport);
         return newSupport;
     }
-    else {
-        // Although function looked the same it returned a different html result
-        if (isSameTag && lastSupport) {
-            destroyTagMemory(lastSupport);
-            newSupport.global.context = {}; // do not share previous outputs
+    // Although function looked the same it returned a different html result
+    if (isSameTag && lastSupport) {
+        if (!previous.global.deleted) {
+            destroyTagMemory(previous);
         }
-        oldestTag = undefined;
+        /*
+        const insertBefore = (previous.global.insertBefore as any)
+        if(insertBefore.parentNode) {
+          insertBefore.parentNode.removeChild(insertBefore)
+        }
+        */
+        newSupport.global.context = {}; // do not share previous outputs
+        // delete newSupport.global.deleted
     }
-    if (!oldestTag) {
-        lastSupport = newSupport;
-        buildNewTag(newSupport, lastSupport.global.insertBefore, lastSupport, subject);
-    }
-    lastSupport.global.newest = newSupport;
-    return newSupport;
+    return buildNewTag(newSupport, newSupport.global.insertBefore, newSupport, subject);
 }
 function buildNewTag(newSupport, oldInsertBefore, oldTagSupport, subject) {
     newSupport.buildBeforeElement(oldInsertBefore, {
@@ -83,6 +100,7 @@ function buildNewTag(newSupport, oldInsertBefore, oldTagSupport, subject) {
     oldTagSupport.global.oldest = newSupport;
     oldTagSupport.global.newest = newSupport;
     subject.tagSupport = newSupport;
+    subject.tagSupport.ownerTagSupport.global.childTags.push(newSupport);
     return newSupport;
 }
 function syncFunctionProps(newSupport, lastSupport, ownerSupport, newPropsArray) {
@@ -150,5 +168,18 @@ function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, seen =
         prop[name] = result;
     }
     return prop;
+}
+export function moveProviders(lastSupport, newSupport) {
+    const destroy$ = lastSupport.global.destroy$;
+    lastSupport.global.providers.forEach(provider => {
+        provider.children.forEach((child, index) => {
+            const wasSameGlobals = lastSupport.global.destroy$ === child.global.destroy$;
+            if (wasSameGlobals) {
+                provider.children.splice(index, 1);
+                provider.children.push(newSupport);
+                return;
+            }
+        });
+    });
 }
 //# sourceMappingURL=updateExistingTagComponent.function.js.map

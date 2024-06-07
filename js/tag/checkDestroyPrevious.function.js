@@ -41,13 +41,14 @@ newValue, insertBefore, valueType) {
     if (lastSupport) {
         const isValueTag = isStaticTag(newValue);
         const isSubjectTag = isStaticTag(subject._value);
+        const newTag = newValue;
         if (isSubjectTag && isValueTag) {
-            const newTag = newValue;
             // its a different tag now
             if (!isLikeTags(newTag, lastSupport)) {
                 // put template back down
                 restoreTagMarker(lastSupport);
                 destroyTagMemory(lastSupport);
+                // delete lastSupport.global.deleted // ???
                 return 2;
             }
             return false;
@@ -62,6 +63,7 @@ newValue, insertBefore, valueType) {
         restoreTagMarker(lastSupport);
         // destroy old component, value is not a component
         destroyTagMemory(lastSupport);
+        // delete lastSupport.global.deleted // ???
         return 'different-tag';
     }
     return false;

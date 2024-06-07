@@ -11,8 +11,8 @@ import { html } from './html.js';
 export function getTagWrap(templater, result) {
     const stateArray = setUse.memory.stateConfig.array;
     // this function gets called by taggedjs
-    const wrapper = function (newTagSupport, subject) {
-        const global = newTagSupport.global;
+    const wrapper = function (lastTagSupport, subject) {
+        const global = lastTagSupport.global;
         ++global.renderCount;
         const childSubject = templater.children;
         const lastArray = global.oldest?.templater.children.lastArray;
@@ -23,8 +23,8 @@ export function getTagWrap(templater, result) {
         const originalFunction = result.original; // (innerTagWrap as any).original as unknown as TagComponent
         let props = templater.props;
         // When defined, this must be an update where my new props have already been made for me
-        const preCastedProps = newTagSupport.propsConfig.castProps;
-        const castedProps = preCastedProps || castProps(props, newTagSupport, stateArray);
+        const preCastedProps = lastTagSupport.propsConfig.castProps;
+        const castedProps = preCastedProps || castProps(props, lastTagSupport, stateArray);
         const latestCloned = props.map(props => deepClone(props)); // castedProps
         // CALL ORIGINAL COMPONENT FUNCTION
         let tag = originalFunction(...castedProps);
@@ -37,7 +37,7 @@ export function getTagWrap(templater, result) {
         tag.templater = templater;
         templater.tag = tag;
         tag.memory.arrayValue = templater.arrayValue; // tag component could have been used in array.map
-        const tagSupport = new TagSupport(templater, newTagSupport.ownerTagSupport, subject, castedProps, global.renderCount);
+        const tagSupport = new TagSupport(templater, lastTagSupport.ownerTagSupport, subject, castedProps, global.renderCount);
         tagSupport.global = global;
         const nowState = setUse.memory.stateConfig.array;
         tagSupport.memory.state.push(...nowState);

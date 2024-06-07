@@ -35,12 +35,12 @@ export class BaseTagSupport {
         providers: [],
         /** Indicator of re-rending. Saves from double rending something already rendered */
         renderCount: 0,
-        deleted: false,
         subscriptions: [],
-        oldest: this
+        oldest: this,
+        blocked: [], // renders that did not occur because an event was processing
+        childTags: [], // tags on me
     };
     hasLiveElements = false;
-    childTags = []; // tags on me
     constructor(templater, subject, castedProps) {
         this.templater = templater;
         this.subject = subject;
@@ -123,7 +123,7 @@ export class BaseTagSupport {
         const thisTag = this.templater.tag;
         const strings = this.strings || thisTag.strings;
         const values = this.values || thisTag.values;
-        strings.map((_string, index) => {
+        strings.forEach((_string, index) => {
             const hasValue = values.length > index;
             if (!hasValue) {
                 return;
@@ -133,6 +133,13 @@ export class BaseTagSupport {
             // is something already there?
             const exists = variableName in context;
             if (exists) {
+                if (this.global.deleted) {
+                    const valueSupport = (value && value.tagSupport);
+                    if (valueSupport) {
+                        valueSupport.destroy();
+                        return context; // item was deleted, no need to emit
+                    }
+                }
                 return updateContextItem(context, variableName, value);
             }
             // 🆕 First time values below
@@ -159,7 +166,7 @@ export class BaseTagSupport {
         const firstDestroy = !options.byParent;
         const global = this.global;
         const subject = this.subject;
-        const childTags = options.byParent ? [] : getChildTagsToDestroy(this.childTags);
+        const childTags = options.byParent ? [] : getChildTagsToDestroy(this.global.childTags);
         if (firstDestroy && isTagComponent(this.templater)) {
             global.destroy$.next();
             runBeforeDestroy(this, this);
@@ -175,8 +182,10 @@ export class BaseTagSupport {
                 runBeforeDestroy(child, child);
             }
         }
+        let mainPromise;
         // HTML DOM manipulation. Put back down the template tag
         const insertBefore = global.insertBefore;
+        // FIRST DOM Manipulation to cause painting cycle
         if (insertBefore.nodeName === 'TEMPLATE') {
             const placeholder = global.placeholder;
             if (placeholder && !('arrayValue' in this.memory)) {
@@ -184,11 +193,6 @@ export class BaseTagSupport {
                     restoreTagMarker(this);
                 }
             }
-        }
-        let mainPromise;
-        const ownerTagSupport = this.ownerTagSupport;
-        if (ownerTagSupport) {
-            ownerTagSupport.childTags = ownerTagSupport.childTags.filter(child => child !== this);
         }
         if (firstDestroy) {
             const { stagger, promise } = this.destroyClones(options);
@@ -205,9 +209,7 @@ export class BaseTagSupport {
         global.context = {};
         delete global.oldest; // may not be needed
         delete global.newest;
-        global.deleted = true;
-        this.childTags.length = 0;
-        this.hasLiveElements = false;
+        this.global.childTags.length = 0;
         delete subject.tagSupport;
         if (mainPromise) {
             mainPromise = mainPromise.then(async () => {
@@ -298,7 +300,7 @@ export class TagSupport extends BaseTagSupport {
 }
 function restoreTagMarkers(support) {
     restoreTagMarker(support);
-    const childTags = support.childTags;
+    const childTags = support.global.childTags;
     for (let index = childTags.length - 1; index >= 0; --index) {
         restoreTagMarkers(childTags[index].global.oldest);
     }

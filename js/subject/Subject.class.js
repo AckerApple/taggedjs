@@ -36,9 +36,6 @@ export class Subject {
             return subscribeWith(callback);
         }
         this.subscribers.push(subscription);
-        // Subject.globalSubs.push(subscription) // 🔬 testing
-        const count = Subject.globalSubCount$.value;
-        Subject.globalSubCount$.next(count + 1); // 🔬 testing
         if (this.onSubscription) {
             this.onSubscription(subscription);
         }
@@ -68,7 +65,7 @@ export class Subject {
     }
     /** like toPromise but faster */
     toCallback(callback) {
-        this.subscribe((x, subscription) => {
+        const subscription = this.subscribe((x, _subscription) => {
             subscription.unsubscribe();
             callback(x);
         });

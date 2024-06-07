@@ -29,8 +29,14 @@ export function checkProp(value, ownerSupport, stateArray, newTagSupport, index,
     }
     if (value instanceof Array) {
         for (let index = value.length - 1; index >= 0; --index) {
-            const x = value[index];
-            value[index] = checkProp(x, ownerSupport, stateArray, newTagSupport, index, value, seen);
+            const subValue = value[index];
+            value[index] = checkProp(subValue, ownerSupport, stateArray, newTagSupport, index, value, seen);
+            if (subValue instanceof Function) {
+                if (subValue.toCall) {
+                    continue;
+                }
+                afterCheckProp(index, subValue, value, newTagSupport);
+            }
         }
         return value;
     }
@@ -42,13 +48,27 @@ export function checkProp(value, ownerSupport, stateArray, newTagSupport, index,
             continue;
         }
         value[name] = result;
+        if (result instanceof Function) {
+            if (subValue.toCall) {
+                continue;
+            }
+            afterCheckProp(name, subValue, value, newTagSupport);
+        }
     }
     return value;
 }
+function afterCheckProp(index, pastValue, newProp, newTagSupport) {
+    if (pastValue?.toCall) {
+        return; // already been done
+    }
+    // restore object to have original function on destroy
+    newTagSupport.global.destroy$.toCallback(() => newProp[index] = pastValue);
+}
 export function getPropWrap(value, ownerSupport, stateArray, newTagSupport, name, newProp) {
     const toCall = value.toCall;
+    // already previously converted by a parent?
     if (toCall) {
-        return value; // already previously converted
+        return value;
     }
     const wrap = (...args) => wrap.toCall(...args); // what gets called can switch over parent state changes
     // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
@@ -60,10 +80,6 @@ export function getPropWrap(value, ownerSupport, stateArray, newTagSupport, name
     wrap.stateArray = stateArray;
     // copy data properties that maybe on source function
     Object.assign(wrap, value);
-    if (name) {
-        // restore object to have original function on destroy
-        newTagSupport.global.destroy$.toCallback(() => newProp[name] = value);
-    }
     return wrap;
 }
 /** Function shared by alterProps() and updateExistingTagComponent... TODO: May want to have to functions to reduce cycle checking?  */

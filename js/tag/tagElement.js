@@ -49,6 +49,7 @@ element, props) {
 }
 export function runWrapper(templater) {
     let newSupport = {};
+    // TODO: A fake subject may become a problem
     const subject = new ValueSubject(newSupport);
     newSupport = new BaseTagSupport(templater, subject);
     subject.next(templater);

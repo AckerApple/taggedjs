@@ -20,4 +20,5 @@ export type Counts = {
     added: number;
     removed: number;
 };
+/** This is the function that enhances elements such as [class.something] and [style.color] OR it fixes elements that alter innerHTML */
 export declare function afterElmBuild(elm: Element | ChildNode, options: ElementBuildOptions, context: Context, ownerSupport: TagSupport): void;

@@ -7,7 +7,6 @@ export function renderSubjectComponent(subject, reSupport, ownerSupport) {
         const myClones = ownerSupport.clones.filter(fClone => !preClones.find(clone => clone === fClone));
         reSupport.clones.push(...myClones);
     }
-    ownerSupport.childTags.push(reSupport);
     return reSupport;
 }
 //# sourceMappingURL=renderSubjectComponent.function.js.map

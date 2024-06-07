@@ -30,6 +30,7 @@ function processNewTag(value, ownerSupport) {
     }
     const subject = new ValueSubject(templater);
     subject.tagSupport = new TagSupport(templater, ownerSupport, subject);
+    ownerSupport.global.childTags.push(subject.tagSupport);
     return subject;
 }
 //# sourceMappingURL=processNewValue.function.js.map

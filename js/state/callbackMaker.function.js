@@ -16,6 +16,7 @@ setUse({
         innerCallback = originalGetter; // prevent crossing callbacks with another tag
     },
 });
+/** Wrap a function that will be called back. After the wrapper and function are called, a rendering cycle will update display */
 export function callback(callback) {
     const tagSupport = getSupportInCycle();
     if (!tagSupport) {

@@ -14,6 +14,10 @@ renderUp) {
         }
         return renderTagSupport(ownerTag.global.newest, true);
     }
+    if (tagSupport.global.locked) {
+        tagSupport.global.blocked.push(tagSupport);
+        return tagSupport;
+    }
     const subject = tagSupport.subject;
     const oldest = tagSupport.global.oldest;
     let ownerSupport;

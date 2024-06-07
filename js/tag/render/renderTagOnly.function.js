@@ -1,5 +1,4 @@
 import { runBeforeRedraw, runBeforeRender } from '../tagRunner.js';
-import { setUse } from '../../state/index.js';
 import { runAfterRender } from '../tagRunner.js';
 export function renderTagOnly(newTagSupport, prevSupport, subject, ownerSupport) {
     const oldRenderCount = newTagSupport.global.renderCount;
@@ -10,11 +9,14 @@ export function renderTagOnly(newTagSupport, prevSupport, subject, ownerSupport)
     let reSupport = wrapper(newTagSupport, subject);
     /* AFTER */
     runAfterRender(newTagSupport, ownerSupport);
+    newTagSupport.global.newest = reSupport;
+    if (!prevSupport && ownerSupport) {
+        ownerSupport.global.childTags.push(reSupport);
+    }
     // When we rendered, only 1 render should have taken place OTHERWISE rendering caused another render and that is the latest instead
     if (reSupport.global.renderCount > oldRenderCount + 1) {
         return newTagSupport.global.newest;
     }
-    newTagSupport.global.newest = reSupport;
     return reSupport;
 }
 function beforeWithRender(tagSupport, // new
@@ -29,14 +31,9 @@ parentSupport, prevSupport) {
             memory.state.length = 0;
             memory.state.push(...lastState);
         }
-        runBeforeRedraw(tagSupport, prevSupport);
+        return runBeforeRedraw(tagSupport, prevSupport);
     }
-    else {
-        // first time render
-        runBeforeRender(tagSupport, runtimeOwnerSupport);
-        // TODO: Logic below most likely could live within providers.ts inside the runBeforeRender function
-        const providers = setUse.memory.providerConfig;
-        providers.ownerSupport = runtimeOwnerSupport;
-    }
+    // first time render
+    return runBeforeRender(tagSupport, runtimeOwnerSupport);
 }
 //# sourceMappingURL=renderTagOnly.function.js.map

@@ -8,7 +8,7 @@ export type WasTagSubject = Subject<TemplaterResult> & {
     tagSupport?: BaseTagSupport | TagSupport;
 };
 export type TagSubject = ValueSubject<TemplaterResult> & {
-    tagSupport: BaseTagSupport | TagSupport;
+    tagSupport: TagSupport;
 };
 export type RegularValue = string | number | boolean;
 export type DisplaySubject = Subject<RegularValue> & {

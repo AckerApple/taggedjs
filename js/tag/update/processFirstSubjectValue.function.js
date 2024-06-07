@@ -26,8 +26,8 @@ options) {
         case ValueTypes.tagArray:
             return processTagArray(subject, value, insertBefore, ownerSupport, options);
         case ValueTypes.tagComponent:
-            processSubjectComponent(value, subject, insertBefore, ownerSupport, options);
-            return;
+            const newSupport = processSubjectComponent(value, subject, insertBefore, ownerSupport, options);
+            return newSupport;
         case ValueTypes.function:
             const v = value;
             if (v.oneRender) {

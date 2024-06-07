@@ -3,9 +3,9 @@ import { Tag } from '../Tag.class.js';
 import { TagSubject } from '../../subject.types.js';
 import { TagSupport } from '../TagSupport.class.js';
 import { TemplaterResult } from '../TemplaterResult.class.js';
-/** Could be a regular tag or a component. Both are Tag.class */
+/** When first time render, adds to owner childTags */
 export declare function processTag(templater: TemplaterResult, insertBefore: InsertBefore, ownerSupport: TagSupport, // owner
-subject: TagSubject): void;
+subject: TagSubject): TagSupport;
 export declare function tagFakeTemplater(tag: Tag): TemplaterResult;
 export declare function getFakeTemplater(): TemplaterResult;
 /** Create TagSupport for a tag component */

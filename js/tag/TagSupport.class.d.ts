@@ -22,7 +22,6 @@ export declare class BaseTagSupport {
     clones: (Element | Text | ChildNode)[];
     global: TagGlobal;
     hasLiveElements: boolean;
-    childTags: TagSupport[];
     constructor(templater: TemplaterResult, subject: TagSubject, castedProps?: Props);
     clonePropsBy(props: Props, castedProps?: Props): {
         latest: Props;

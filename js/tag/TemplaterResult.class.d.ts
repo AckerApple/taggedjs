@@ -24,13 +24,16 @@ export type TagGlobal = {
     providers: Provider[];
     /** Indicator of re-rending. Saves from double rending something already rendered */
     renderCount: number;
-    deleted: boolean;
+    deleted?: true;
     isApp?: boolean;
     insertBefore?: InsertBefore;
     placeholder?: Text;
     subscriptions: Subscription<any>[];
     destroyCallback?: OnDestroyCallback;
     init?: OnInitCallback;
+    locked?: true;
+    blocked: (BaseTagSupport | TagSupport)[];
+    childTags: TagSupport[];
 };
 export declare class TemplaterResult {
     props: Props;

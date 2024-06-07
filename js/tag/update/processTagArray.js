@@ -69,6 +69,7 @@ ownerSupport, options) {
             templater = subTag;
             tagSupport = setupNewTemplater(templater, ownerSupport, itemSubject);
         }
+        // share global between old and new
         if (previousSupport) {
             setupNewSupport(tagSupport, ownerSupport, previousSupport.subject);
             const global = previousSupport.global;
@@ -92,13 +93,12 @@ ownerSupport, options) {
         if (couldBeSame) {
             const prevSupport = previous.tagSupport;
             const prevGlobal = prevSupport.global;
-            // subTag.tagSupport = subTag.tagSupport || prevSupport
             const oldest = prevGlobal.oldest;
             oldest.updateBy(tagSupport);
             continue;
         }
         processAddTagArrayItem(runtimeInsertBefore, tagSupport, index, options, lastArray);
-        ownerSupport.childTags.push(tagSupport);
+        ownerSupport.global.childTags.push(tagSupport);
     }
     return clones;
 }

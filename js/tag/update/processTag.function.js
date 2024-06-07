@@ -1,6 +1,6 @@
 import { TagSupport } from '../TagSupport.class.js';
 import { ValueSubject } from '../../subject/index.js';
-/** Could be a regular tag or a component. Both are Tag.class */
+/** When first time render, adds to owner childTags */
 export function processTag(templater, insertBefore, ownerSupport, // owner
 subject) {
     let tagSupport = subject.tagSupport;
@@ -14,6 +14,7 @@ subject) {
     tagSupport.buildBeforeElement(insertBefore, {
         counts: { added: 0, removed: 0 },
     });
+    return tagSupport;
 }
 export function tagFakeTemplater(tag) {
     const templater = getFakeTemplater();
@@ -38,7 +39,7 @@ export function getFakeTemplater() {
 export function newTagSupportByTemplater(templater, ownerSupport, subject) {
     const tagSupport = new TagSupport(templater, ownerSupport, subject);
     setupNewSupport(tagSupport, ownerSupport, subject);
-    ownerSupport.childTags.push(tagSupport);
+    ownerSupport.global.childTags.push(tagSupport);
     return tagSupport;
 }
 export function setupNewSupport(tagSupport, ownerSupport, subject) {
