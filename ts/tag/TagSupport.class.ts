@@ -18,7 +18,6 @@ import { interpolateElement, interpolateString } from '../interpolations/interpo
 import { subscribeToTemplate } from '../interpolations/interpolateTemplate.js'
 import { afterInterpolateElement } from '../interpolations/afterInterpolateElement.function.js'
 import { Subject } from '../subject/Subject.class.js'
-import { castProps } from '../alterProp.function.js'
 
 const prefixSearch = new RegExp(variablePrefix, 'g')
 
@@ -246,7 +245,6 @@ export class BaseTagSupport {
   ): Promise<number> {
     const firstDestroy = !options.byParent
     const global = this.global
-    const subject = this.subject
     const childTags = options.byParent ? [] : getChildTagsToDestroy(this.global.childTags)
 
     if(firstDestroy && isTagComponent(this.templater)) {
@@ -270,18 +268,9 @@ export class BaseTagSupport {
         
     let mainPromise: Promise<number | (number | void | undefined)[]> | undefined
 
-    // HTML DOM manipulation. Put back down the template tag
-    const insertBefore = global.insertBefore as Element
-
+    
     // FIRST DOM Manipulation to cause painting cycle
-    if(insertBefore.nodeName === 'TEMPLATE') {
-      const placeholder = global.placeholder as Text
-      if(placeholder && !('arrayValue' in this.memory)) {
-        if(!options.byParent) {
-          restoreTagMarker(this)
-        }
-      }
-    }
+    checkRestoreTagMarker(this, options)
     
     if( firstDestroy ) {
       const {stagger, promise} = this.destroyClones(options)
@@ -295,12 +284,7 @@ export class BaseTagSupport {
     }
 
     // data reset
-    delete global.placeholder
-    global.context = {}
-    delete (global as any).oldest // may not be needed
-    delete global.newest
-    this.global.childTags.length = 0
-    delete (subject as WasTagSubject).tagSupport
+    resetTagSupport(this)
 
     if(mainPromise) {
       mainPromise = mainPromise.then(async () => {
@@ -410,10 +394,30 @@ export class TagSupport extends BaseTagSupport {
   }
 }
 
-function restoreTagMarkers(support: BaseTagSupport | TagSupport) {
-  restoreTagMarker(support as BaseTagSupport)
-  const childTags = support.global.childTags
-  for (let index = childTags.length - 1; index >= 0; --index) {
-    restoreTagMarkers(childTags[index].global.oldest as TagSupport)
-  }
+export function checkRestoreTagMarker(
+  support: BaseTagSupport | TagSupport,
+  options: DestroyOptions,
+) {
+  const global = support.global
+  // HTML DOM manipulation. Put back down the template tag
+  const insertBefore = global.insertBefore as Element
+  if(insertBefore.nodeName === 'TEMPLATE') {
+    const placeholder = global.placeholder as Text
+    if(placeholder && !('arrayValue' in support.memory)) {
+      if(!options.byParent) {
+        restoreTagMarker(support)
+      }
+    }
+  }  
+}
+
+export function resetTagSupport(support: BaseTagSupport | TagSupport) {
+  const global = support.global
+  delete global.placeholder
+  global.context = {}
+  delete (global as any).oldest // may not be needed
+  delete global.newest
+  support.global.childTags.length = 0
+  const subject = support.subject
+  delete (subject as WasTagSubject).tagSupport
 }
