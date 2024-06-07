@@ -19,7 +19,6 @@ export declare class BaseTagSupport {
         castProps?: Props;
     };
     memory: TagMemory;
-    clones: (Element | Text | ChildNode)[];
     global: TagGlobal;
     hasLiveElements: boolean;
     constructor(templater: TemplaterResult, subject: TagSubject, castedProps?: Props);
