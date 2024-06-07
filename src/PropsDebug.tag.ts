@@ -1,13 +1,12 @@
-import { watch, letState, html, tag, letProp } from "taggedjs"
+import { watch, letState, html, tag, letProp, state } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component.js"
-import funInPropsTag from "./funInProps.tag.js"
 
 export const propsDebugMain = tag((_='propsDebugMain') => (
+  syncPropNumber = letState(0)(x => [syncPropNumber, syncPropNumber = x]),
   propNumber = letState(0)(x => [propNumber, propNumber = x]),
   renderCount = letState(0)(x => [renderCount, renderCount = x]),
   propsJson = letState({test:33, x:'y'})(x => [propsJson, propsJson = x]),
   date = letState(() => new Date())(x => [date, date = x]),
-  syncPropNumber = letState(0)(x => [syncPropNumber, syncPropNumber = x]),
   json = JSON.stringify(propsJson, null, 2),
 ) => html`
   <div style="display:flex;flex-wrap:wrap" id="textareawrap">
@@ -42,13 +41,12 @@ export const propsDebugMain = tag((_='propsDebugMain') => (
     <legend>sync props callback</legend>
     🥡 syncPropNumber: <span id="sync-prop-number-display">${syncPropNumber}</span>
     <button onclick=${() => ++syncPropNumber}>🥡 ++</button>
+    ${renderCountDiv({renderCount, name: 'sync_props_callback'})}
     <hr />
     ${syncPropDebug({
       syncPropNumber,
-      propNumberChange: x => {
-        syncPropNumber = x
-      },
-      nothingTest: x => x
+      propNumberChange: x => syncPropNumber = x,
+      parentTest: x => x
     })}
   </fieldset>
 
@@ -71,14 +69,18 @@ const syncPropDebug = tag((
   {
     syncPropNumber,
     propNumberChange,
-    nothingTest,
+    parentTest,
   }: {
     syncPropNumber: number
     propNumberChange: (x: number) => any
-    nothingTest: <T>(x: T) => T
+    parentTest: <T>(x: T) => T
   }
 ) => {
+  state('string forced')
   let counter = letState(0)(x => [counter, counter = x])
+  let renderCount = letState(0)(x => [renderCount, renderCount = x])
+
+  ++renderCount
 
   if(syncPropNumber % 2 === 1) {
     propNumberChange(syncPropNumber = syncPropNumber + 1)
@@ -86,16 +88,17 @@ const syncPropDebug = tag((
   
   return html`<!--syncPropDebug-->
     <div>
-      🥡 syncPropNumber:<span id="sync-prop-child-display">${syncPropNumber}</span>
+      🥡 child syncPropNumber:<span id="sync-prop-child-display">${syncPropNumber}</span>
       <button id="sync-prop-child-button" onclick=${() => propNumberChange(++syncPropNumber)}>🥡 ++</button>
     </div>
     <div>
       <div>
         counter:<span id="sync-prop-counter-display">${counter}</span>
       </div>
-      nothingTest<span id="nothing-prop-counter-display">${nothingTest(counter)}</span>
-      <button id="nothing-prop-counter-button" onclick=${() => nothingTest(++counter)}>++</button>
+      parentTest<span id="nothing-prop-counter-display">${parentTest(counter)}</span>
+      <button id="nothing-prop-counter-button" onclick=${() => parentTest(++counter)}>++</button>
     </div>
+    ${renderCountDiv({renderCount, name: 'child_sync_props_callback'})}
   `
 })
 

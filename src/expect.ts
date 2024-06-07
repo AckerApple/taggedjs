@@ -26,6 +26,10 @@ export function describe(label: string, run: () => any) {
   })
 }
 
+describe.skip = (label: string, run: () => any) => {
+  console.debug('⏭️ Skipped ' + label)
+}
+
 describe.only = (label: string, run: () => any) => {
   onlyTests.push(async () => {
     const oldTests = tests
@@ -110,14 +114,18 @@ async function runTests(tests: Test[]) {
 
 export function expect(expected: unknown) {
   return {
-    toBeDefined: () => {
+    toBeDefined: (customMessage?: string | Function) => {
       if(expected !== undefined && expected !== null) {
         return
       }
 
-      const message = `Expected ${JSON.stringify(expected)} to be defined`
+      if(customMessage instanceof Function) {
+        customMessage = customMessage()
+      }
+
+      const message = customMessage || `Expected ${JSON.stringify(expected)} to be defined`
       console.error(message, {expected})
-      throw new Error(message)
+      throw new Error(message as string)
     },
     toBe: (received: unknown, customMessage?: string | Function) => {
       if(expected === received) {

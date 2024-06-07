@@ -130,8 +130,6 @@ async function updateByElement(
     const newTags: TaggedFunction<any>[] = original.tags
     const newSetUse = original.setUse
 
-    // console.log('newTags', {newTags, oldTags})
-
     // providers have to remain the way they were
     newSetUse.memory.providerConfig = oldSetUse.memory.providerConfig
     
@@ -279,7 +277,7 @@ async function replaceTemplater(
   
   await Promise.all(promises)
 
-  const subPromises = ownerTagSupport.childTags.map(async child => {
+  const subPromises = ownerTagSupport.global.childTags.map(async child => {
     count = count + await replaceTemplater(
       child, {oldTag, newTag},
       hmr

@@ -3,24 +3,37 @@ export function elmCount(selector: string) {
   return document.querySelectorAll(selector).length
 }
 
-export function queryOneInnerHTML(
-  query: string,
-  pos = 0
+export function query(
+  query: string
 ) {
-  return document.querySelectorAll(query)[pos].innerHTML
+  return document.querySelectorAll(query)
+}
+
+export function focus(
+  q: string
+) {
+  return query(q).forEach(elm => (elm as HTMLElement).focus())
 }
 
 export function click(
-  query: string
+  q: string
 ) {
-  return document.querySelectorAll(query).forEach(elm => (elm as HTMLElement).click())
+  return query(q).forEach(elm => (elm as HTMLElement).click())
+}
+
+export function clickOne(
+  q: string,
+  index = 0,
+) {
+  const element = query(q)[index] as HTMLElement
+  return element.click()
 }
 
 export function html(
-  query: string
+  q: string
 ) {
   let html = ''
-  document.querySelectorAll(query).forEach(elm => html = html + elm.innerHTML)
+  query(q).forEach(elm => html = html + elm.innerHTML)
   return html
 }
 

@@ -1,8 +1,5 @@
-import { propsDebugMain } from "./PropsDebug.tag"
-import { arrayTests } from "./arrayTests"
 import { intervalTester0, intervalTester1 } from "./intervalDebug"
-import { html, tag, providers, letState } from "taggedjs"
-import { renderCountDiv } from "./renderCount.component"
+import { html, tag, letState } from "taggedjs"
 import { fadeInDown, fadeOutUp } from "./animations"
 
 export const tagDebug = tag(() => {// tagDebug.js
@@ -13,12 +10,7 @@ export const tagDebug = tag(() => {// tagDebug.js
   ++renderCount
 
   return html`<!-- tagDebug.js -->
-    <div style="display:flex;flex-wrap:wrap;gap:1em">
-      <fieldset style="flex:4 4 40em">
-        <legend>arrays</legend>
-        ${arrayTests()}
-      </fieldset>
-    
+    <div style="display:flex;flex-wrap:wrap;gap:1em">    
       <fieldset id="debug-intervals" style="flex:2 2 20em">
         <legend>
           Interval Testing
@@ -35,11 +27,6 @@ export const tagDebug = tag(() => {// tagDebug.js
             <div>${intervalTester1()}</div>
           </div>
         `}
-      </fieldset>
-
-      <fieldset id="props-debug" style="flex:2 2 20em">
-        <legend>Props Debug</legend>
-        ${propsDebugMain(undefined)}
       </fieldset>
     </div>
   `

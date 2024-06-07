@@ -13,6 +13,9 @@ import { providerDebugBase } from "./providerDebug"
 import { watchTesting } from "./watchTesting.tag"
 import { oneRender } from "./oneRender.tag"
 import funInPropsTag from "./funInProps.tag"
+import {App as todo} from "./todo/app"
+import { propsDebugMain } from "./PropsDebug.tag"
+import { arrayTests } from "./arrayTests"
 
 export const App = tag(() => {
   let _firstState = letState('app first state')(x => [_firstState, _firstState=x])
@@ -100,6 +103,11 @@ export const App = tag(() => {
           ${providerDebugBase(undefined)}
         </fieldset>
 
+        <fieldset id="props-debug" style="flex:2 2 20em">
+          <legend>Props Debug</legend>
+          ${propsDebugMain(undefined)}
+        </fieldset>
+
         ${childTests(undefined)}
 
         <fieldset style="flex:2 2 20em">
@@ -118,6 +126,11 @@ export const App = tag(() => {
         </fieldset>
 
         <fieldset style="flex:2 2 20em">
+          <legend>arrays</legend>
+          ${arrayTests()}
+        </fieldset>
+
+        <fieldset style="flex:2 2 20em">
           <legend>Tag Mirroring</legend>
           ${mirroring()}
         </fieldset>
@@ -132,9 +145,14 @@ export const App = tag(() => {
           ${oneRender()}
         </fieldset>
 
-        <fieldset>
+        <fieldset style="flex:2 2 20em">
           <legend>functions in props</legend>
           ${funInPropsTag()}
+        </fieldset>
+
+        <fieldset style="flex:2 2 20em">
+          <legend>todo</legend>
+          ${todo()}
         </fieldset>
       </div>
 

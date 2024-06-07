@@ -1,4 +1,4 @@
-import { html, letState, tag } from "taggedjs";
+import { ElementTargetEvent, InputElementTargetEvent, html, letState, tag } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
 
 const main = {
@@ -14,10 +14,8 @@ export default tag(() => (
   showChild = letState(true)(x => [showChild, showChild = x]),
   somethingElse = letState('a')(x => [somethingElse, somethingElse = x]),
   _ = ++renderCount,
-  addArrayItem = () => {
-    array = array.map(x => x);array.push('push'+array.length)
-    console.log('array', array, array.length)
-  },
+  addArrayItem = (x?: string) => {array = array.map(x => x);array.push(typeof(x) === 'string' ? x : 'push'+array.length)},
+  deleteItem = (item: string) => array = array.filter(x => x !== item)
 ) => html`
   <button id="fun-parent-button" onclick=${myFunction}>++parent</button><span id="fun_in_prop_display">${counter}</span>
   ${renderCountDiv({renderCount, name:'funInProps_tag_parent'})}
@@ -28,12 +26,38 @@ export default tag(() => (
   array length: ${array.length}
   <button onclick=${addArrayItem}>reset add</button>
   <hr />
-  ${showChild && funInPropsChild({myFunction, array, child: {myChildFunction: myFunction}}, main, myFunction)}
+  ${showChild && funInPropsChild({
+    myFunction, array, addArrayItem, deleteItem,
+    child: {myChildFunction: myFunction}
+  }, main, myFunction)}
+  ${addArrayComponent(addArrayItem)}
+`)
+
+const addArrayComponent = tag((
+  addArrayItem: (x: any) => any
+) => (
+  renderCount = letState(0)(x => [renderCount, renderCount=x]),
+  _ = ++renderCount,
+  handleKeyDown = (e: InputElementTargetEvent & KeyboardEvent) => {
+    if (e.key === "Enter") {
+        const value = e.target.value.trim();
+        addArrayItem(value)
+        e.target.value = "";
+    }
+  },
+) => html`
+  <input type="text" onkeydown=${handleKeyDown} onchange=${e => {addArrayItem(e.target.value);e.target.value=''}} />
+  <button type="button" onclick=${addArrayItem}>add by outside</button>
+  ${renderCountDiv({renderCount, name:'addArrayComponent'})}
 `)
 
 const funInPropsChild = tag((
-  {myFunction, child, array}: {
-    array: unknown[], myFunction: () => any, child: {myChildFunction: () => any}
+  {addArrayItem, myFunction, deleteItem, child, array}: {
+    array: unknown[],
+    addArrayItem: (x: any) => any,
+    myFunction: () => any,
+    deleteItem: (x: string) => any,
+    child: {myChildFunction: () => any}
   },
   mainProp: typeof main,
   myFunction3: () => any
@@ -60,8 +84,20 @@ const funInPropsChild = tag((
   <button onclick=${main.function}>++main</button>
   <button onclick=${() => ++counter}>++me</button>
   
-  child array length: ${array.length}
+  <div>
+    child array length: ${array.length}
+    ${array.map(item => arrayFunTag(item, deleteItem).key(item))}
+    <button onclick=${addArrayItem}>addArrayItem</button>
+  </div>
   
-  <span>${counter}</span>
+  <div>
+    counter:<span>${counter}</span>
+  </div>
   ${renderCountDiv({renderCount, name:'funInProps_tag_child'})}
+`)
+
+const arrayFunTag = tag((item, deleteItem) => html`
+  <div style="border:1px solid black;">
+    ${item}<button type="button" onclick=${() => deleteItem(item)}>delete</button>
+  </div>
 `)

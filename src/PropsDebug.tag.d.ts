@@ -1,4 +1,4 @@
-export declare const propsDebugMain: import("taggedjs").TaggedFunction<(_?: any) => (propNumber?: number, renderCount?: number, propsJson?: {
+export declare const propsDebugMain: import("taggedjs").TaggedFunction<(_?: any) => (syncPropNumber?: number, propNumber?: number, renderCount?: number, propsJson?: {
     test: number;
     x: string;
-}, date?: Date, syncPropNumber?: number, json?: string) => import("taggedjs").Tag>;
+}, date?: Date, json?: string) => import("taggedjs").Tag>;

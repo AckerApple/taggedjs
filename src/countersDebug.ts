@@ -11,6 +11,7 @@ export const counters = tag(({
 }) => (
   readStartTime = state(() => Date.now()),
 ) => {
+  state('countersDebug state')
   let counter = letState(0)(x => [counter, counter = x])
   let propCounter = letState(0)(x => [propCounter, propCounter = x])
   let renderCount = letState(0)(x => [renderCount, renderCount = x])
@@ -97,18 +98,21 @@ export const counters = tag(({
             </span>
         </div>
 
-        <div>
-          <button id="🥦-subject-increase-counter"
-            onclick=${() => callbackTestSub.next(counter + 1)}
-          >subject increase:</button>
-          <span>
-            🥦 <span id="🥦-subject-counter-display">${counter}</span>
-            🥦 <span id="subject-counter-subject-display">${callbackTestSub}</span>
-          </span>
-        </div>
+        ${/*
+          <div>
+            <button id="🥦-subject-increase-counter"
+              onclick=${() => callbackTestSub.next(counter + 1)}
+            >subject increase:</button>
+            <span>
+              🥦 <span id="🥦-subject-counter-display">${counter}</span>
+              🥦 <span id="subject-counter-subject-display">${callbackTestSub}</span>
+            </span>
+          </div>
+        */false}
       `}
     </div>
 
+    ${/*
     <fieldset>
       <legend>🪈 pipedSubject 1</legend>
       <div>
@@ -126,6 +130,7 @@ export const counters = tag(({
         </small>
       </div>
     </fieldset>
+    */false}
 
     ${sharedMemory && html`
       <fieldset>

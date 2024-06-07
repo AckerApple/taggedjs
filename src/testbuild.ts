@@ -34,7 +34,7 @@ const html = templaterToHtml(templater)
 const fileSavePath = './pages/isolatedApp.page.html'
 const fullFileSavePath = path.join(__dirname, fileSavePath)
 fs.writeFileSync(fullFileSavePath, html)
-console.log(`💾 wrote ${fileSavePath}`)
+console.debug(`💾 wrote ${fileSavePath}`)
 
 function templaterToSupport(
   templater: TemplaterResult,

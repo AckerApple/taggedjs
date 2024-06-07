@@ -12,30 +12,68 @@ import { watchTesting } from "./watchTesting.tag"
 import { oneRender } from "./oneRender.tag"
 import { renderCountDiv } from "./renderCount.component"
 import funInPropsTag from "./funInProps.tag"
+import {App as todo} from "./todo/app"
+import { runTests } from "./isolatedApp.test"
 
-type viewTypes = 'funInPropsTag' | 'oneRender' | 'watchTesting' | 'mirroring' | 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
+export enum ViewTypes {
+  Todo = 'todo',
+  FunInPropsTag = 'funInPropsTag',
+  OneRender = 'oneRender',
+  WatchTesting = 'watchTesting',
+  Mirroring = 'mirroring',
+  Content = 'content',
+  Arrays = 'arrays',
+  Counters = 'counters',
+  TableDebug = 'tableDebug',
+  Props = 'props',
+  Child = 'child',
+  TagSwitchDebug = 'tagSwitchDebug',
+  ProviderDebug = 'providerDebug'
+}
+const viewTypes = Object.values(ViewTypes)
+
+const storage = getScopedStorage()
+
+function getScopedStorage(): {
+  autoTest: boolean, views: ViewTypes[]
+} {
+  const string = localStorage.taggedjs || JSON.stringify({autoTest: true, views: []})
+  return JSON.parse(string)
+}
+
+function saveScopedStorage() {
+  localStorage.taggedjs = JSON.stringify(storage)
+}
 
 export default tag(() => {
-  const views: viewTypes[] = [
-    // 'content',
-    // 'counters',
-    // 'watchTesting',
-    // 'oneRender',
-    'props',
-    'funInPropsTag',
-    // 'mirroring',
-    // 'providerDebug',
-    
-    // 'arrays',
-    // 'tagSwitchDebug',
-    
-    // 'child',
-  ]
-  
+  state('isolated app state')
   let renderCount = letState(0)(x => [renderCount, renderCount = x])
   let appCounter = letState(0)(x => [appCounter, appCounter=x])
+  let testTimeout = letState(null)(x => [testTimeout, testTimeout=x])
   const appCounterSubject = state(() => new Subject(appCounter))
   const callback = callbackMaker()
+
+  function runTesting(manual = true) {
+    const waitFor = 2000
+
+    testTimeout = setTimeout(async () => {
+      console.debug('🏃 Running tests...')
+      const result = await runTests(storage.views)
+
+      if(!manual) {
+        return
+      }
+
+      if(result) {
+        alert('✅ all app tests passed')
+        return
+      }
+
+      alert('❌ tests failed. See console for more details')
+
+    }, waitFor) as any // cause delay to be separate from renders
+  }
+
   onInit(() => {
     console.info('1️⃣ app init should only run once')    
 
@@ -44,7 +82,30 @@ export default tag(() => {
         appCounter = x
       })
     )
+
+    if(storage.autoTest) {
+      runTesting(false)
+    }
   })
+
+  function toggleViewType(type: ViewTypes) {
+    if(storage.views.includes(type)) {
+      (storage.views = storage.views.filter(x => x !== type))
+    } else {
+      storage.views.push(type)
+      
+      if(storage.autoTest) {
+        runTesting()
+      }  
+    }
+
+    saveScopedStorage()    
+  }
+
+  function toggleAutoTesting() {
+    storage.autoTest = storage.autoTest = !storage.autoTest
+    saveScopedStorage()
+  }
 
   ++renderCount
 
@@ -58,91 +119,116 @@ export default tag(() => {
       <span>
         🍒 <span id="app-counter-subject-display">${appCounter}</span>
       </span>
+      auto testing <input type="checkbox" ${storage.autoTest ? 'checked': null} onchange=${toggleAutoTesting} />
+      <button type="button" onclick=${() => runTesting(true)}>run tests</button>
+    </div>
+
+    <div>
+      <h3>Sections</h3>
+      <div style="display:flex;gap:1em;flex-wrap:wrap;margin:1em;">
+        ${viewTypes.map(type => html`
+          <div>
+            <input type="checkbox"
+              id=${'view-type-' + type} name=${'view-type-' + type}
+              ${storage.views.includes(type) && 'checked'}
+              onclick=${() => toggleViewType(type)}
+            />
+            <label for=${'view-type-' + type}>&nbsp;${type}</label>
+          </div>
+        `.key(type))}
+      </div>
     </div>
 
     <div id="tagDebug-fx-wrap">
       <div style="display:flex;flex-wrap:wrap;gap:1em">
-        ${views.includes('oneRender') && html`
+        ${storage.views.includes(ViewTypes.OneRender) && html`
           <fieldset style="flex:2 2 20em">
             <legend>oneRender</legend>
             ${oneRender()}
           </fieldset>
         `}
 
-        ${views.includes('props') && html`
+        ${storage.views.includes(ViewTypes.Props) && html`
           <fieldset style="flex:2 2 20em">
             <legend>propsDebugMain</legend>
             ${propsDebugMain(undefined)}
           </fieldset>
         `}
 
-        ${views.includes('watchTesting') && html`
+        ${storage.views.includes(ViewTypes.WatchTesting) && html`
           <fieldset style="flex:2 2 20em">
             <legend>watchTesting</legend>
             ${watchTesting()}
           </fieldset>
         `}
 
-        ${views.includes('tableDebug') && html`
+        ${storage.views.includes(ViewTypes.TableDebug) && html`
           <fieldset style="flex:2 2 20em">
             <legend>tableDebug</legend>
             ${tableDebug()}
           </fieldset>
         `}
 
-        ${views.includes('providerDebug') && html`
+        ${storage.views.includes(ViewTypes.ProviderDebug) && html`
           <fieldset style="flex:2 2 20em">
             <legend>providerDebugBase</legend>
             ${providerDebugBase(undefined)}
           </fieldset>
         `}
 
-        ${views.includes('tagSwitchDebug') && html`
+        ${storage.views.includes(ViewTypes.TagSwitchDebug) && html`
           <fieldset style="flex:2 2 20em">
             <legend>tagSwitchDebug</legend>
             ${tagSwitchDebug(undefined)}
           </fieldset>
         `}
 
-        ${views.includes('mirroring') && html`
+        ${storage.views.includes(ViewTypes.Mirroring) && html`
           <fieldset style="flex:2 2 20em">
             <legend>mirroring</legend>
             ${mirroring()}
           </fieldset>
         `}
 
-        ${views.includes('arrays') && html`
+        ${storage.views.includes(ViewTypes.Arrays) && html`
           <fieldset style="flex:2 2 20em">
             <legend>arrays</legend>
             ${arrayTests()}
           </fieldset>
         `}
 
-        ${views.includes('counters') && html`
+        ${storage.views.includes(ViewTypes.Counters) && html`
           <fieldset style="flex:2 2 20em">
             <legend>counters</legend>
             ${counters({appCounterSubject})}
           </fieldset>
         `}
 
-        ${views.includes('content') && html`
+        ${storage.views.includes(ViewTypes.Content) && html`
           <fieldset style="flex:2 2 20em">
             <legend>content</legend>
             ${contentDebug()}
           </fieldset>
         `}
 
-        ${views.includes('child') && html`
+        ${storage.views.includes(ViewTypes.Child) && html`
           <fieldset style="flex:2 2 20em">
             <legend>Children Tests</legend>
             ${childTests(undefined)}
           </fieldset>
         `}
 
-        ${views.includes('funInPropsTag') && html`
+        ${storage.views.includes(ViewTypes.FunInPropsTag) && html`
           <fieldset style="flex:2 2 20em">
             <legend>funInPropsTag</legend>
             ${funInPropsTag()}
+          </fieldset>
+        `}
+
+        ${storage.views.includes(ViewTypes.Todo) && html`
+          <fieldset style="flex:2 2 20em">
+            <legend>todo</legend>
+            ${todo()}
           </fieldset>
         `}
 

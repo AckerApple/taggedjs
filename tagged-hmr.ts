@@ -66,13 +66,13 @@ app.use((req, res, next) => {
 });
 
 const server = app.listen(port, () => {
-  console.log(`🏃 Server is running on http://localhost:${port}`);
-  console.log(`Serving path:${servePath}`);
+  console.debug(`🏃 Server is running on http://localhost:${port}`);
+  console.debug(`Serving path:${servePath}`);
 });
 
 
 if(watchPath) {
-  console.log('👀 Watching path', watchPath)
+  console.debug('👀 Watching path', watchPath)
 }
 
 import { WebSocketServer, WebSocket } from 'ws'
@@ -88,11 +88,11 @@ wss.on('close', (ws: WebSocket) => {
 
 wss.on('connection', (ws: WebSocket) => {
   connections.push(ws)
-  console.log('wss connected')
+  console.debug('wss connected')
   ws.send('Connected to the WebSocket endpoint');
 });
 
-console.log(`👀 Preparing to watch ${watchPath}...`)
+console.debug(`👀 Preparing to watch ${watchPath}...`)
 fs.watch(watchPath, { recursive: true }, async (eventType, filename) => {
   const ignore = running || !filename
   if(ignore) {
@@ -107,20 +107,22 @@ fs.watch(watchPath, { recursive: true }, async (eventType, filename) => {
     }
   }
 
-  console.log('📄 file changed', filename)
+  console.debug('📄 file changed', filename)
 
   await runBundle()
-  
-  const messageObject = {
-    type:'file-change',
-    filename:filename,
-    changed: eventType,
-  }
-
-  connections.forEach(ws => {    
-    ws.send(JSON.stringify(messageObject))
-    console.log('💬 sent bundle changed message')
-  })
+    .then(() => {
+      const messageObject = {
+        type:'file-change',
+        filename:filename,
+        changed: eventType,
+      }
+    
+      connections.forEach(ws => {    
+        ws.send(JSON.stringify(messageObject))
+        console.debug('💬 sent bundle changed message')
+      })
+    })
+    .catch((error: Error) => console.error(error))
 });
 
 
@@ -149,7 +151,7 @@ function sendFile(
 async function runBundle() {
   running = true
   promise = promise.then(async () => {
-    console.log('🏗️ making bundle...')
+    console.debug('🏗️ making bundle...')
     await bundleScript.run()
     running = false
   }).catch(error =>
@@ -158,9 +160,9 @@ async function runBundle() {
 
   await promise
 
-  console.log('✅ 🏗️ bundle made')
+  console.debug('✅ 🏗️ bundle made')
 
 }
 
-console.log('🏗️ making first bundle...')
+console.debug('🏗️ making first bundle...')
 runBundle()

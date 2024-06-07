@@ -65,7 +65,7 @@ export async function updateSubject(
   // connect child to owner
   reSupport.ownerTagSupport = owner
   // connect owner to child
-  owner.childTags.push(reSupport)  
+  owner.global.childTags.push(reSupport)  
 
   providers.forEach((provider, index) => {
     prevConstructors[index].compareTo = provider.constructMethod.compareTo
@@ -75,7 +75,7 @@ export async function updateSubject(
 
   await oldest.destroy()
 
-  oldest.global.deleted = false
+  delete oldest.global.deleted
   delete (reSupport.global as any).oldest // TODO this maybe redundant of oldest.destroy()
   delete reSupport.global.newest
 

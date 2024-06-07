@@ -34,7 +34,7 @@ export const childTests = tag((_: string = 'childTests') => (
       <hr />
       <button id="innerHtmlTest-childTests-button"
         onclick=${() => ++counter}
-      >🐮 increase childTests inside ${counter}:${renderCount}</button>
+      >🐮 (A) increase childTests inside ${counter}:${renderCount}</button>
       <span id="innerHtmlTest-childTests-display">${counter}</span>
       ${renderCountDiv({renderCount, name: 'childTests-innerHtmlTest'})}
     `}
@@ -45,7 +45,7 @@ export const childTests = tag((_: string = 'childTests') => (
       <hr />
       <button id="innerHtmlPropsTest-childTests-button"
         onclick=${() => ++counter}
-      >🐮 increase childTests inside ${counter}</button>
+      >🐮 (B) increase childTests inside ${counter}</button>
       <span id="innerHtmlPropsTest-childTests-display">${counter}</span>
       ${renderCountDiv({renderCount, name: 'innerHtmlPropsTest child'})}
     `}
