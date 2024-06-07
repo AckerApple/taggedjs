@@ -1,19 +1,4 @@
-// import { useCallback } from "react";
-
 import { html } from "taggedjs";
-
-const sanitize = (string: string) => {
-    const map: any = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#x27;",
-        "/": "&#x2F;",
-    };
-    const reg = /[&<>"'/]/gi;
-    return string.replace(reg, (match: any) => map[match]);
-};
 
 const hasValidMin = (value: any, min: any) => {
     return value.length >= min;
@@ -32,7 +17,7 @@ export function Input({ onSubmit, placeholder, label, defaultValue, onBlur }: an
             if (!hasValidMin(value, 2))
                 return;
 
-            onSubmit(sanitize(value));
+            onSubmit(value);
             e.target.value = "";
         }
     };
