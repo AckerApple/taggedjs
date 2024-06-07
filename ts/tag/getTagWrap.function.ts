@@ -23,10 +23,10 @@ export function getTagWrap(
 
   // this function gets called by taggedjs
   const wrapper = function(
-    newTagSupport: TagSupport,
+    lastTagSupport: TagSupport,
     subject: TagSubject,
   ): TagSupport {
-    const global = newTagSupport.global
+    const global = lastTagSupport.global
     ++global.renderCount
         
     const childSubject = templater.children
@@ -41,8 +41,8 @@ export function getTagWrap(
     let props = templater.props
 
     // When defined, this must be an update where my new props have already been made for me
-    const preCastedProps = newTagSupport.propsConfig.castProps
-    const castedProps = preCastedProps || castProps(props, newTagSupport, stateArray)
+    const preCastedProps = lastTagSupport.propsConfig.castProps
+    const castedProps = preCastedProps || castProps(props, lastTagSupport, stateArray)
     const latestCloned = props.map(props => deepClone(props)) // castedProps
 
     // CALL ORIGINAL COMPONENT FUNCTION
@@ -62,7 +62,7 @@ export function getTagWrap(
 
     const tagSupport = new TagSupport(
       templater,
-      newTagSupport.ownerTagSupport,
+      lastTagSupport.ownerTagSupport,
       subject,
       castedProps,
       global.renderCount

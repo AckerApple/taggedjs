@@ -4,8 +4,9 @@ import { TagSubject } from '../../subject.types.js'
 import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
 import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
 
+/** checks if previous support exists on subject or as a last global support. If first render, calls builder. Otherwise calls tagSupport.updateBy() */
 export function processTagResult(
-  tagSupport: BaseTagSupport | TagSupport,
+  tagSupport: TagSupport,
   subject: TagArraySubject | TagSubject | Function, // used for recording past and current value
   insertBefore: InsertBefore, // <template end interpolate />
   {
@@ -27,11 +28,13 @@ export function processTagResult(
   tagSupport.buildBeforeElement(insertBefore, {
     counts,
   })
+
+  return tagSupport
 }
 
 
 function processTagResultUpdate(
-  tagSupport: BaseTagSupport | TagSupport,
+  tagSupport: TagSupport,
   subject: TagSubject | ((x: BaseTagSupport | TagSupport) => TagSupport), // used for recording past and current value
   prevSupport: BaseTagSupport | TagSupport,
 ) {
@@ -41,11 +44,11 @@ function processTagResultUpdate(
     prevSupport.updateBy(newSupport)
     // we have to store previous states somewhere, put on the function given
     ;(subject as unknown as TagSubject).tagSupport = newSupport
-    return
+    return newSupport
   }
 
   prevSupport.updateBy(tagSupport)
   subject.tagSupport = tagSupport
 
-  return
+  return tagSupport
 }

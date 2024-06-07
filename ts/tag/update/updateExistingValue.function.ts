@@ -146,6 +146,9 @@ function handleStillTag(
     subject,
   )
 
+  // ??? new
+  // subject.tagSupport = valueSupport
+
   if(isClass) {
     valueSupport.global = lastSupport.global
   }
@@ -223,8 +226,10 @@ function prepareUpdateToComponent(
         counts: {added: 0, removed: 0},
       }
     )
+
     return subjectTag
   }
+
   tagSupport.global = subjectSup.global
   subjectTag.tagSupport = tagSupport
 

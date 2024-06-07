@@ -14,7 +14,7 @@ export function getChildTagsToDestroy(
 
     allTags.push(cTag)
     childTags.splice(index, 1)
-    getChildTagsToDestroy(cTag.childTags, allTags)
+    getChildTagsToDestroy(cTag.global.childTags, allTags)
   }
 
   return allTags

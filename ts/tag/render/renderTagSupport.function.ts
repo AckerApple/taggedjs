@@ -4,10 +4,10 @@ import { renderExistingTag } from'./renderExistingTag.function.js'
 import { Props } from '../../Props.js'
 
 /** Main function used by all other callers to render/update display of a tag component */
-export function renderTagSupport(
-  tagSupport: TagSupport | BaseTagSupport, // must be latest/newest state render
+export function renderTagSupport<T extends TagSupport | BaseTagSupport>(
+  tagSupport: T, // must be latest/newest state render
   renderUp: boolean,
-): TagSupport | BaseTagSupport {
+): T {
   const global = tagSupport.global
   const templater = tagSupport.templater
 
@@ -18,7 +18,12 @@ export function renderTagSupport(
     if(ownerTag.global.deleted) {
       return tagSupport
     }
-    return renderTagSupport(ownerTag.global.newest as TagSupport, true)
+    return renderTagSupport(ownerTag.global.newest as TagSupport, true) as T
+  }
+
+  if(tagSupport.global.locked) {
+    tagSupport.global.blocked.push(tagSupport)
+    return tagSupport
   }
 
   const subject = tagSupport.subject
@@ -51,8 +56,8 @@ export function renderTagSupport(
       true,
     )
 
-    return tag
+    return tag as T
   }
 
-  return tag
+  return tag as T
 }

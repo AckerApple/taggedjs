@@ -1,8 +1,8 @@
 import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
-import { providersChangeCheck } from '../../state/provider.utils.js'
 import { TagSubject } from '../../subject.types.js'
 import { isLikeTags } from'../isLikeTags.function.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
+import { providersChangeCheck } from '../../state/providersChangeCheck.function.js'
 
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(
@@ -19,11 +19,13 @@ export function renderExistingTag(
 
   const preRenderCount = global.renderCount
   providersChangeCheck(oldestSupport)
-
+  
   // When the providers were checked, a render to myself occurred and I do not need to re-render again
   const prevSupport = global.newest as TagSupport
-  if(preRenderCount !== global.renderCount) {
-    oldestSupport.updateBy(prevSupport)
+  const justUpdate = preRenderCount !== global.renderCount
+
+  if(justUpdate) {
+    oldestSupport.global.oldest.updateBy(prevSupport)
     return prevSupport // already rendered during triggered events
   }
 

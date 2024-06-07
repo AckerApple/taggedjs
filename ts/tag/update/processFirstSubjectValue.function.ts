@@ -58,14 +58,14 @@ export function processFirstSubjectValue(
       )
     
     case ValueTypes.tagComponent:
-      processSubjectComponent(
+      const newSupport = processSubjectComponent(
         value as TemplaterResult,
         subject as TagSubject,
         insertBefore,
         ownerSupport,
         options,
       )
-      return
+      return newSupport
     
     case ValueTypes.function:
       const v = value as Wrapper

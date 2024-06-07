@@ -29,7 +29,7 @@ export type TagGlobal = {
   providers: Provider[]
   /** Indicator of re-rending. Saves from double rending something already rendered */
   renderCount: number
-  deleted: boolean
+  deleted?: true
   isApp?: boolean // root element
   
   // ALWAYS template tag
@@ -41,6 +41,11 @@ export type TagGlobal = {
   
   destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
   init?: OnInitCallback // what to run when init complete, used for onInit
+  
+  locked?: true
+  blocked: (BaseTagSupport | TagSupport)[], // renders that did not occur because an event was processing
+  
+  childTags: TagSupport[], // tags on me
 }
 
 export class TemplaterResult {

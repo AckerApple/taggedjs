@@ -7,6 +7,7 @@ import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
 import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
 import { renderSubjectComponent } from'../render/renderSubjectComponent.function.js'
 
+/** create new support, connects globals to old support if one, and  */
 export function processSubjectComponent(
   templater: TemplaterResult,
   subject: TagSubject,
@@ -37,14 +38,12 @@ export function processSubjectComponent(
   )
 
   let reSupport = subject.tagSupport
+
   const global = tagSupport.global = reSupport?.global || tagSupport.global
   global.insertBefore = insertBefore
   
-  const providers = setUse.memory.providerConfig
-  providers.ownerSupport = ownerSupport
-  
   const isRender = !reSupport
-  if(isRender) {
+  if(isRender) {    
     const support = reSupport || tagSupport
     reSupport = renderSubjectComponent(
       subject,
@@ -53,12 +52,15 @@ export function processSubjectComponent(
     )
   }
 
-  processTagResult(
+  const newSupport = processTagResult(
     reSupport,
     subject, // The element set here will be removed from document. Also result.tag will be added in here
     insertBefore, // <template end interpolate /> (will be removed)
     options,
   )
+
+  // subject.tagSupport = newSupport
+  ownerSupport.global.childTags.push(newSupport as TagSupport)
 
   return reSupport
 }

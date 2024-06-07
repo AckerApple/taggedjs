@@ -116,6 +116,7 @@ export function processTagArray(
       )
     }
 
+    // share global between old and new
     if(previousSupport) {
       setupNewSupport(tagSupport as TagSupport, ownerSupport, previousSupport.subject)
       const global = previousSupport.global
@@ -141,9 +142,7 @@ export function processTagArray(
     if (couldBeSame) {
       const prevSupport = previous.tagSupport
       const prevGlobal = prevSupport.global
-      
-      // subTag.tagSupport = subTag.tagSupport || prevSupport
-      const oldest = prevGlobal.oldest as TagSupport
+      const oldest = prevGlobal.oldest as TagSupport  
       oldest.updateBy(tagSupport)
       continue
     }
@@ -156,7 +155,7 @@ export function processTagArray(
       lastArray,
     )
 
-    ownerSupport.childTags.push(tagSupport)  
+    ownerSupport.global.childTags.push(tagSupport)  
   }
 
   return clones

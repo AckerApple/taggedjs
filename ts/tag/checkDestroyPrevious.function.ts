@@ -63,14 +63,15 @@ export function checkDestroyPrevious(
     const isValueTag = isStaticTag(newValue)
     const isSubjectTag = isStaticTag(subject._value)
 
+    const newTag = newValue as TagSupport
     if(isSubjectTag && isValueTag) {
-      const newTag = newValue as TagSupport
       
       // its a different tag now
       if(!isLikeTags(newTag, lastSupport)) {
         // put template back down
         restoreTagMarker(lastSupport)
         destroyTagMemory(lastSupport)
+        // delete lastSupport.global.deleted // ???
         return 2
       }
 
@@ -91,6 +92,7 @@ export function checkDestroyPrevious(
 
     // destroy old component, value is not a component
     destroyTagMemory(lastSupport)
+    // delete lastSupport.global.deleted // ???
     return 'different-tag'
   }
 

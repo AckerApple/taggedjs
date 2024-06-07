@@ -8,16 +8,16 @@ import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
 import { castProps } from'../../alterProp.function.js'
 import { isLikeTags } from'../isLikeTags.function.js'
 import { Props } from '../../Props.js'
-import { hasPropChanges } from '../hasPropChanges.function.js'
+import { TemplaterResult } from '../TemplaterResult.class.js'
 
 export function updateExistingTagComponent(
   ownerSupport: TagSupport,
   tagSupport: TagSupport, // lastest
   subject: TagSubject,
   insertBefore: InsertBefore,
+  renderUp = false,
 ): TagSupport | BaseTagSupport {
   let lastSupport = subject.tagSupport?.global.newest as BaseTagSupport | TagSupport
-  let oldestTag: TagSupport | BaseTagSupport | undefined = lastSupport.global.oldest
   
   const oldWrapper = lastSupport.templater.wrapper
   const newWrapper = tagSupport.templater.wrapper
@@ -37,7 +37,7 @@ export function updateExistingTagComponent(
     const oldestSupport = lastSupport.global.oldest as TagSupport
     destroyTagMemory(oldestSupport)
   
-    return processSubjectComponent(
+    const newSupport = processSubjectComponent(
       templater,
       subject,
       insertBefore,
@@ -46,6 +46,8 @@ export function updateExistingTagComponent(
         counts: {added: 0, removed: 0},
       }
     )
+
+    return newSupport
   } else {
     const hasChanged = hasTagSupportChanged(
       lastSupport as unknown as BaseTagSupport,
@@ -59,7 +61,7 @@ export function updateExistingTagComponent(
       // update function refs to use latest references
       const castedProps = syncFunctionProps(
         tagSupport,
-        lastSupport,
+        lastSupport as TagSupport,
         ownerSupport,
         newProps,
       )
@@ -75,16 +77,36 @@ export function updateExistingTagComponent(
     }
   }
 
+  const oldest = lastSupport.global.oldest
+
+  if(tagSupport.global.locked) {
+    tagSupport.global.blocked.push(tagSupport)
+  
+    return tagSupport
+  }
+
   const previous = lastSupport.global.newest as TagSupport
   const newSupport = renderTagSupport(
     tagSupport,
-    false,
+    renderUp,
   )
 
-  lastSupport = subject.tagSupport as TagSupport
+  return afterTagRender(subject, oldest, templater, previous, newSupport, isSameTag)
+}
 
-  const newOldest = newSupport.global.oldest
-  const hasOldest = newOldest ? true : false
+function afterTagRender(
+  subject: TagSubject,
+  oldest: BaseTagSupport | TagSupport,
+  templater: TemplaterResult,
+  previous: TagSupport,
+  newSupport: TagSupport,
+  isSameTag: boolean,
+) {
+  let lastSupport = subject.tagSupport
+
+  // const oldest = newSupport.global.oldest
+  /*
+  const hasOldest = oldest ? true : false
   if(!hasOldest) {
     return buildNewTag(
       newSupport,
@@ -93,9 +115,10 @@ export function updateExistingTagComponent(
       subject
     )
   }
-  
-  if(newOldest && templater.children._value.length) {
-    const oldKidsSub = newOldest.templater.children
+  */
+
+  if(oldest && templater.children._value.length) {
+    const oldKidsSub = oldest.templater.children
     oldKidsSub.next(templater.children._value)
   }
 
@@ -103,35 +126,37 @@ export function updateExistingTagComponent(
   const isLikeTag = isSameTag && isLikeTags(previous, newSupport)
 
   if(isLikeTag) {
-    subject.tagSupport = newSupport
+    const oldestTag = lastSupport.global.oldest
+    subject.tagSupport = newSupport as TagSupport
     oldestTag.updateBy(newSupport)
     return newSupport
-  } else {
-    // Although function looked the same it returned a different html result
-    if(isSameTag && lastSupport) {
-      destroyTagMemory(lastSupport)
-      newSupport.global.context = {} // do not share previous outputs
+  }
+
+  // Although function looked the same it returned a different html result
+  if(isSameTag && lastSupport) {
+    if(!previous.global.deleted) {
+      destroyTagMemory(previous)
     }
-    oldestTag = undefined
-  }
-  
-  if(!oldestTag) {
-    lastSupport = newSupport
-    buildNewTag(
-      newSupport,
-      lastSupport.global.insertBefore as Element,
-      lastSupport,
-      subject,
-    )
+    /*
+    const insertBefore = (previous.global.insertBefore as any)
+    if(insertBefore.parentNode) {
+      insertBefore.parentNode.removeChild(insertBefore)
+    }
+    */
+    newSupport.global.context = {} // do not share previous outputs
+    // delete newSupport.global.deleted
   }
 
-  lastSupport.global.newest = newSupport
-
-  return newSupport
+  return buildNewTag(
+    newSupport,
+    newSupport.global.insertBefore as Element,
+    newSupport,
+    subject,
+  )
 }
 
 function buildNewTag(
-  newSupport: BaseTagSupport | TagSupport,
+  newSupport: TagSupport,
   oldInsertBefore: Element | Text | ChildNode,
   oldTagSupport: BaseTagSupport | TagSupport,
   subject: TagSubject,
@@ -144,18 +169,20 @@ function buildNewTag(
   newSupport.global.newest = newSupport
   oldTagSupport.global.oldest = newSupport
   oldTagSupport.global.newest = newSupport
+  
   subject.tagSupport = newSupport
+  subject.tagSupport.ownerTagSupport.global.childTags.push(newSupport)
 
   return newSupport
 }
 
 function syncFunctionProps(
-  newSupport: BaseTagSupport | TagSupport,
-  lastSupport: BaseTagSupport | TagSupport,
+  newSupport: TagSupport,
+  lastSupport: TagSupport,
   ownerSupport: BaseTagSupport | TagSupport,
   newPropsArray: any[], // templater.props
 ): Props {
-  const newest = lastSupport.global.newest
+  const newest = lastSupport.global.newest as TagSupport
 
   if(!newest) {
     // const state = ownerSupport.global.oldest.memory.state
@@ -253,4 +280,21 @@ function syncPriorPropFunction(
   
   return prop
 
+}
+
+export function moveProviders(
+  lastSupport: TagSupport,
+  newSupport: TagSupport,
+) {
+  const destroy$ = lastSupport.global.destroy$
+  lastSupport.global.providers.forEach(provider => {
+    provider.children.forEach((child, index) => {
+      const wasSameGlobals = lastSupport.global.destroy$ === child.global.destroy$
+      if(wasSameGlobals) {
+        provider.children.splice(index, 1)
+        provider.children.push(newSupport)
+        return
+      }
+    })
+  })
 }

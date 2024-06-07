@@ -8,18 +8,15 @@ export type Provider = {
   instance: any
   clone: any
   stateDiff: number
+  owner: TagSupport // create at
+  children: TagSupport[] // injected into
 }
 
 type ProviderConstructor<T> = (new (...args: any[]) => T) | (() => T)
 
-export type ProviderConfig = {
+type ProviderConfig = {
   providers: Provider[]
   ownerSupport?: TagSupport | BaseTagSupport
-}
-
-setUse.memory.providerConfig = {
-  providers: [] as Provider[],
-  ownerSupport: undefined,
 }
 
 type functionProvider<T> = () => T
@@ -41,7 +38,6 @@ export const providers = {
         state(undefined)
       }
       const result = state(undefined) as T
-      // stateDiffMemory.provider.constructMethod.compareTo = compareTo
       return result
     }
 
@@ -52,18 +48,20 @@ export const providers = {
       // Providers with provider requirements just need to use providers.create() and providers.inject()
       const instance: T = 'prototype' in constructMethod ? new (constructMethod as classProvider<T>)() : (constructMethod as functionProvider<T>)()
   
+      const tagSupport = stateConfig.tagSupport as TagSupport
       const stateDiff = stateConfig.array.length - oldStateCount
       
-      const config = memory.providerConfig
-      const provider = {
+      const provider: Provider = {
         constructMethod,
         instance,
         clone: deepClone(instance),
         stateDiff,
-      } as Provider
+        owner: tagSupport,
+        children: [],
+      }
 
       stateDiffMemory.provider = provider
-      config.providers.push(provider)
+      tagSupport.global.providers.push(provider)
       stateDiffMemory.stateDiff = stateDiff
 
       return instance
@@ -85,28 +83,33 @@ export const providers = {
   inject: <T>(constructor: ProviderConstructor<T>): T => {
     // find once, return same every time after
     return state(() => {
-      const config = setUse.memory.providerConfig
+      const memory = setUse.memory
       const cm = constructor as ConstructMethod<T>
       const compareTo = cm.compareTo = cm.compareTo || constructor.toString()
+      const tagSupport = memory.stateConfig.tagSupport as TagSupport
+      const providers: Provider[] = []
 
       let owner = {
-        ownerTagSupport: config.ownerSupport
+        ownerTagSupport: tagSupport.ownerTagSupport
       } as TagSupport
     
       while(owner.ownerTagSupport) {
         const ownerProviders = owner.ownerTagSupport.global.providers
   
         const provider = ownerProviders.find(provider => {
+          providers.push(provider as Provider)
           const constructorMatch = provider.constructMethod.compareTo === compareTo
           
           if(constructorMatch) {
             return true
           }
         })
-  
+
         if(provider) {
           provider.clone = deepClone(provider.instance) // keep a copy of the latest before any change occur
-          config.providers.push(provider)
+          const tagSupport = memory.stateConfig.tagSupport as TagSupport
+          tagSupport.global.providers.push(provider)
+          provider.children.push(tagSupport)
           return provider.instance
         }
   
@@ -114,44 +117,8 @@ export const providers = {
       }
       
       const msg = `Could not inject provider: ${constructor.name} ${constructor}`
-      console.warn(`${msg}. Available providers`, config.providers)
+      console.warn(`${msg}. Available providers`, providers)
       throw new Error(msg)  
     })
-  }
-}
-
-setUse({ // providers
-  beforeRender: (
-    tagSupport: TagSupport | BaseTagSupport,
-    ownerSupport?: TagSupport | BaseTagSupport,
-  ) => {
-    run(tagSupport, ownerSupport)
-  },
-  beforeRedraw: (
-    tagSupport: TagSupport | BaseTagSupport,
-    newTagSupport: TagSupport | BaseTagSupport,
-  ) => {
-    run(tagSupport, (newTagSupport as TagSupport).ownerTagSupport)
-  },
-  afterRender: (
-    tagSupport: TagSupport | BaseTagSupport,
-    // tag: Tag
-  ) => {
-    const config = setUse.memory.providerConfig
-    tagSupport.global.providers = [...config.providers]
-    config.providers.length = 0
-  }
-})
-
-function run(
-  tagSupport: TagSupport | BaseTagSupport,
-  ownerSupport?: TagSupport | BaseTagSupport,
-) {
-  const config = setUse.memory.providerConfig  
-  config.ownerSupport = ownerSupport
-  
-  if(tagSupport.global.providers.length) {
-    config.providers.length = 0
-    config.providers.push(...tagSupport.global.providers)
   }
 }

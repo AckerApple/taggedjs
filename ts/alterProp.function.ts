@@ -62,10 +62,19 @@ export function checkProp(
 
   if(value instanceof Array) {
     for (let index = value.length - 1; index >= 0; --index) {
-      const x = value[index]
+      const subValue = value[index]
+  
       value[index] = checkProp(
-        x, ownerSupport, stateArray, newTagSupport, index, value, seen
+        subValue, ownerSupport, stateArray, newTagSupport, index, value, seen
       )
+
+      if(subValue instanceof Function) {
+        if(subValue.toCall) {
+          continue
+        }
+  
+        afterCheckProp(index, subValue, value, newTagSupport)
+      }
     }
 
     return value
@@ -84,9 +93,30 @@ export function checkProp(
     }
     
     value[name] = result
+    if(result instanceof Function) {
+      if(subValue.toCall) {
+        continue
+      }
+  
+      afterCheckProp(name, subValue, value, newTagSupport)
+    }
   }
   
   return value
+}
+
+function afterCheckProp(
+  index: string | number,
+  pastValue: any,
+  newProp: any,
+  newTagSupport: BaseTagSupport | TagSupport
+) {
+  if(pastValue?.toCall) {
+    return // already been done
+  }
+
+  // restore object to have original function on destroy
+  newTagSupport.global.destroy$.toCallback(() => newProp[index] = pastValue)
 }
 
 export function getPropWrap(
@@ -98,9 +128,10 @@ export function getPropWrap(
   newProp?: any,
 ) {
   const toCall = value.toCall
-    
+
+  // already previously converted by a parent?
   if(toCall) {
-    return value // already previously converted
+    return value
   }
 
   const wrap = (...args: any[]) => wrap.toCall(...args) // what gets called can switch over parent state changes
@@ -114,11 +145,6 @@ export function getPropWrap(
 
   // copy data properties that maybe on source function
   Object.assign(wrap, value)
-
-  if(name) {
-    // restore object to have original function on destroy
-    newTagSupport.global.destroy$.toCallback(() => newProp[name] = value)
-  }
 
   return wrap
 }

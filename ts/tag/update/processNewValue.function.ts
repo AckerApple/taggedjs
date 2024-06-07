@@ -54,5 +54,7 @@ function processNewTag(
     subject
   )
 
+  ownerSupport.global.childTags.push(subject.tagSupport as TagSupport)
+
   return subject
 }

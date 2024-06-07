@@ -51,13 +51,13 @@ export class BaseTagSupport {
     providers: [],
     /** Indicator of re-rending. Saves from double rending something already rendered */
     renderCount: 0,
-    deleted: false,
     subscriptions: [],
-    oldest: this
+    oldest: this,
+    blocked: [], // renders that did not occur because an event was processing
+    childTags: [], // tags on me
   }
 
   hasLiveElements = false
-  childTags: TagSupport[] = [] // tags on me
 
   constructor(
     public templater: TemplaterResult,
@@ -187,7 +187,7 @@ export class BaseTagSupport {
     const strings = this.strings || thisTag.strings
     const values = this.values || thisTag.values
 
-    strings.map((_string, index) => {
+    strings.forEach((_string, index) => {
       const hasValue = values.length > index
       if(!hasValue) {
         return
@@ -200,6 +200,15 @@ export class BaseTagSupport {
       const exists = variableName in context
 
       if(exists) {
+        
+        if(this.global.deleted) {
+          const valueSupport = (value && value.tagSupport) as TagSupport
+          if(valueSupport) {
+            valueSupport.destroy()
+            return context // item was deleted, no need to emit
+          }
+        }
+
         return updateContextItem(context, variableName, value)
       }
 
@@ -238,7 +247,7 @@ export class BaseTagSupport {
     const firstDestroy = !options.byParent
     const global = this.global
     const subject = this.subject
-    const childTags = options.byParent ? [] : getChildTagsToDestroy(this.childTags)
+    const childTags = options.byParent ? [] : getChildTagsToDestroy(this.global.childTags)
 
     if(firstDestroy && isTagComponent(this.templater)) {
       global.destroy$.next()
@@ -258,10 +267,13 @@ export class BaseTagSupport {
         runBeforeDestroy(child, child)
       }
     }
+        
+    let mainPromise: Promise<number | (number | void | undefined)[]> | undefined
 
     // HTML DOM manipulation. Put back down the template tag
     const insertBefore = global.insertBefore as Element
 
+    // FIRST DOM Manipulation to cause painting cycle
     if(insertBefore.nodeName === 'TEMPLATE') {
       const placeholder = global.placeholder as Text
       if(placeholder && !('arrayValue' in this.memory)) {
@@ -270,14 +282,7 @@ export class BaseTagSupport {
         }
       }
     }
-        
-    let mainPromise: Promise<number | (number | void | undefined)[]> | undefined
-
-    const ownerTagSupport = (this as unknown as TagSupport).ownerTagSupport
-    if(ownerTagSupport) {
-      ownerTagSupport.childTags = ownerTagSupport.childTags.filter(child => child !== this as unknown as TagSupport)
-    }
-
+    
     if( firstDestroy ) {
       const {stagger, promise} = this.destroyClones(options)
       options.stagger = stagger
@@ -294,9 +299,7 @@ export class BaseTagSupport {
     global.context = {}
     delete (global as any).oldest // may not be needed
     delete global.newest
-    global.deleted = true
-    this.childTags.length = 0
-    this.hasLiveElements = false
+    this.global.childTags.length = 0
     delete (subject as WasTagSubject).tagSupport
 
     if(mainPromise) {
@@ -409,7 +412,7 @@ export class TagSupport extends BaseTagSupport {
 
 function restoreTagMarkers(support: BaseTagSupport | TagSupport) {
   restoreTagMarker(support as BaseTagSupport)
-  const childTags = support.childTags
+  const childTags = support.global.childTags
   for (let index = childTags.length - 1; index >= 0; --index) {
     restoreTagMarkers(childTags[index].global.oldest as TagSupport)
   }

@@ -1,5 +1,4 @@
 import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js'
-import { ProviderConfig } from './providers.js'
 import { Config } from './state.utils.js'
 
 const tagUse: TagUse[] = []
@@ -44,6 +43,5 @@ setUse.memory = {} as UseMemory
 
 type UseMemory = (Record<string,any> & {
   stateConfig: Config
-  providerConfig: ProviderConfig
   currentSupport: TagSupport // tag being rendered
 })

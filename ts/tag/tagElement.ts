@@ -50,6 +50,7 @@ export function tagElement(
   const fragment = document.createDocumentFragment()
   fragment.appendChild(templateElm)
 
+  // enables hmr destroy so it can control entire app
   ;(element as any).destroy = async () => {
     await tagSupport.destroy()
     const insertBefore = tagSupport.global.insertBefore as Element
@@ -77,6 +78,8 @@ export function runWrapper(
   templater: TemplaterResult,
 ) {
   let newSupport = {} as BaseTagSupport
+
+  // TODO: A fake subject may become a problem
   const subject = new ValueSubject(newSupport as any as TemplaterResult) as TagSubject
     
   newSupport = new BaseTagSupport(
@@ -85,8 +88,7 @@ export function runWrapper(
   )
 
   subject.next( templater )
-  
-  subject.tagSupport = newSupport
+  subject.tagSupport = newSupport as TagSupport
   
   runBeforeRender(newSupport, undefined as unknown as TagSupport)
 

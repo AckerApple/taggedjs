@@ -28,6 +28,7 @@ setUse({
   },
 })
 
+/** Wrap a function that will be called back. After the wrapper and function are called, a rendering cycle will update display */
 export function callback<A,B,C,D,E,F, T>(
   callback: Callback<A, B, C, D, E, F, T>
 ): () => T {

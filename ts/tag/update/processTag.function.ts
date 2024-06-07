@@ -6,13 +6,13 @@ import { TemplaterResult } from '../TemplaterResult.class.js'
 import { ValueSubject } from '../../subject/index.js'
 import { Props } from '../../Props.js'
 
-/** Could be a regular tag or a component. Both are Tag.class */
+/** When first time render, adds to owner childTags */
 export function processTag(
   templater: TemplaterResult,
   insertBefore: InsertBefore,
   ownerSupport: TagSupport, // owner
   subject: TagSubject, // could be tag via result.tag
-) {
+): TagSupport {
   let tagSupport = subject.tagSupport as any as TagSupport
   
   // first time seeing this tag?
@@ -28,6 +28,8 @@ export function processTag(
       counts: {added:0, removed:0},
     }
   )
+
+  return tagSupport
 }
 
 export function tagFakeTemplater(
@@ -70,8 +72,7 @@ export function newTagSupportByTemplater(
   )
 
   setupNewSupport(tagSupport, ownerSupport, subject)
-
-  ownerSupport.childTags.push(tagSupport)
+  ownerSupport.global.childTags.push(tagSupport)
 
   return tagSupport
 }

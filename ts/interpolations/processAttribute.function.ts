@@ -1,6 +1,6 @@
-import { inputAttribute } from './inputAttribute.js'
+import { specialAttribute } from './specialAttribute.js'
 import { isSubjectInstance } from '../isInstance.js'
-import { Context, Tag } from '../tag/Tag.class.js'
+import { Context } from '../tag/Tag.class.js'
 import { HowToSet } from './interpolateAttributes.js'
 import { bindSubjectCallback } from './bindSubjectCallback.function.js'
 import { TagSupport } from '../tag/TagSupport.class.js'
@@ -13,7 +13,7 @@ function isTagVar(value: string | null) {
 
 export function processAttribute(
   attrName: string,
-  value: string | null,
+  value: string | null, // current attribute value by using .getAttribute
   child: Element,
   scope: Context,
   ownerSupport: TagSupport,
@@ -36,6 +36,10 @@ export function processAttribute(
 
     // the above callback gets called immediately since its a ValueSubject()
     const sub = contextValueSubject.subscribe((value: any) => {
+      if(value === lastValue) {
+        return // value did not change
+      }
+
       processNameOnlyAttr(
         value,
         lastValue,
@@ -55,7 +59,7 @@ export function processAttribute(
   // Non dynamic
   const isSpecial = isSpecialAttr(attrName)
   if (isSpecial) {
-    return inputAttribute(attrName, value, child)
+    return specialAttribute(attrName, value, child)
   }
 }
 
@@ -152,16 +156,27 @@ function processNameValueAttr(
   // Most every variable comes in here since everything is made a ValueSubject
   if(isSubjectInstance(result)) {
     child.removeAttribute(attrName)
-    const callback = (newAttrValue: any) => {            
+    let lastValue: any;
+
+    const callback = (newAttrValue: any) => {
       // should the function be wrapped so every time its called we re-render?
       if(newAttrValue instanceof Function) {
-        const wrapper = ownerSupport.templater.wrapper
-        const parentWrap = wrapper?.parentWrap
-        const oneRender = parentWrap?.oneRender
-        if(!oneRender) {
-          newAttrValue = bindSubjectCallback(newAttrValue, ownerSupport)
-        } 
+        return callbackFun(
+          ownerSupport,
+          newAttrValue,
+          child,
+          attrName,
+          isSpecial,
+          howToSet,
+        )
       }
+
+      // TODO: we maybe able to block higher before instance of check
+      if(lastValue === newAttrValue) {
+        return lastValue
+      }
+
+      lastValue = newAttrValue
       
       return processAttributeSubjectValue(
         newAttrValue,
@@ -195,7 +210,7 @@ function processAttributeSubjectValue(
   attrName: string,
   isSpecial: boolean,
   howToSet: HowToSet,
-) {  
+) {
   if(newAttrValue instanceof Function) {
     const fun = function(...args: any[]) {
       return newAttrValue(child, args)
@@ -204,13 +219,17 @@ function processAttributeSubjectValue(
     // access to original function
     fun.tagFunction = newAttrValue
 
+    if(attrName === 'ondoubleclick') {
+      attrName = 'ondblclick'
+    }
+
     ;(child as any)[attrName] = fun
 
     return
   }
 
   if (isSpecial) {
-    inputAttribute(attrName, newAttrValue, child)
+    specialAttribute(attrName, newAttrValue, child)
     return
   }
 
@@ -234,4 +253,28 @@ function isSpecialAttr(
   attrName: string | String
 ) {
   return attrName.search(/^(class|style)(\.)/) >= 0
+}
+
+function callbackFun(
+  ownerSupport: TagSupport,
+  newAttrValue: any,
+  child: Element,
+  attrName: string,
+  isSpecial: boolean,
+  howToSet: HowToSet,
+) {
+  const wrapper = ownerSupport.templater.wrapper
+  const parentWrap = wrapper?.parentWrap
+  const oneRender = parentWrap?.oneRender
+  if(!oneRender) {
+    newAttrValue = bindSubjectCallback(newAttrValue, ownerSupport)
+  }
+  
+  return processAttributeSubjectValue(
+    newAttrValue,
+    child,
+    attrName,
+    isSpecial,
+    howToSet,
+  )  
 }

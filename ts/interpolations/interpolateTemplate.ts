@@ -116,6 +116,7 @@ export type Counts = {
   removed: number // increased when item removed from array
 }
 
+/** This is the function that enhances elements such as [class.something] and [style.color] OR it fixes elements that alter innerHTML */
 export function afterElmBuild(
   elm: Element | ChildNode,
   options: ElementBuildOptions,
@@ -126,6 +127,7 @@ export function afterElmBuild(
     return
   }
 
+  // Elements that alter innerHTML
   const tagName = elm.nodeName // elm.tagName
   if(tagName==='TEXTAREA') {
     scanTextAreaValue(elm as HTMLTextAreaElement, context, ownerSupport)
@@ -134,8 +136,18 @@ export function afterElmBuild(
   let diff = options.counts.added
   diff = elementInitCheck(elm, options.counts) - diff
 
-  const children = (elm as Element).children as HTMLCollection
+  const hasFocusFun = (elm as any).focus
+  if(hasFocusFun) {
+    if((elm as any).hasAttribute('autofocus')) {
+      (elm as any).focus()
+    }
 
+    if((elm as any).hasAttribute('autoselect')) {
+      (elm as any).select()
+    }
+  }
+
+  const children = (elm as Element).children as HTMLCollection
   if(children) {
     for (let index = children.length - 1; index >= 0; --index) {
       const child = children[index]

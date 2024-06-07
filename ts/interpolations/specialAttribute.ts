@@ -1,4 +1,4 @@
-export function inputAttribute(
+export function specialAttribute(
   name: string,
   value: any,
   element: Element,

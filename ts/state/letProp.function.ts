@@ -14,9 +14,7 @@ export function letProp<T>(
     let myProp = letState(prop)(getSetProp)
     
     watch([prop], () => getSetProp(myProp = prop))
-    
-    getSetProp(myProp)
-    
+    getSetProp(myProp) // always reset to my value and right await so that the old prop value never slips through
     return myProp
   }
 }

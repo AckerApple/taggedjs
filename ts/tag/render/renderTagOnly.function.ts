@@ -1,6 +1,5 @@
 import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
 import { runBeforeRedraw, runBeforeRender } from'../tagRunner.js'
-import { setUse } from'../../state/index.js'
 import { runAfterRender } from'../tagRunner.js'
 import { TagSubject } from '../../subject.types.js'
 import { Wrapper } from '../TemplaterResult.class.js'
@@ -23,13 +22,16 @@ export function renderTagOnly(
   /* AFTER */
 
   runAfterRender(newTagSupport, ownerSupport)
+    
+  newTagSupport.global.newest = reSupport
+  if(!prevSupport && ownerSupport) {
+    ownerSupport.global.childTags.push(reSupport)
+  }
 
   // When we rendered, only 1 render should have taken place OTHERWISE rendering caused another render and that is the latest instead
   if(reSupport.global.renderCount > oldRenderCount + 1) {
     return newTagSupport.global.newest as TagSupport
   }
-  
-  newTagSupport.global.newest = reSupport
 
   return reSupport
 }
@@ -51,13 +53,9 @@ function beforeWithRender(
       memory.state.push(...lastState)
     }
 
-    runBeforeRedraw(tagSupport, prevSupport)
-  } else {
-    // first time render
-    runBeforeRender(tagSupport, runtimeOwnerSupport)
-
-    // TODO: Logic below most likely could live within providers.ts inside the runBeforeRender function
-    const providers = setUse.memory.providerConfig
-    providers.ownerSupport = runtimeOwnerSupport
+    return runBeforeRedraw(tagSupport, prevSupport)
   }
+
+  // first time render
+  return runBeforeRender(tagSupport, runtimeOwnerSupport)
 }

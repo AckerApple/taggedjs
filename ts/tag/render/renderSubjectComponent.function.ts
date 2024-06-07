@@ -21,7 +21,5 @@ export function renderSubjectComponent(
     reSupport.clones.push(...myClones)
   }
 
-  ownerSupport.childTags.push(reSupport as TagSupport)
-
   return reSupport as TagSupport
 }

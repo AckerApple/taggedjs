@@ -58,4 +58,19 @@ export function runBeforeDestroy(
   for (let index=0; index < length; ++index) {
     tagUse[index].beforeDestroy(tagSupport as BaseTagSupport, ownerTagSupport as TagSupport)
   }
+
+  tagSupport.global.deleted = true
+  tagSupport.hasLiveElements = false
+
+  // remove me from my parents
+  if(ownerTagSupport) {
+    ownerTagSupport.global.childTags = ownerTagSupport.global.childTags.filter(child => child !== tagSupport.global.oldest as unknown as TagSupport)
+
+    const global = tagSupport.global
+    global.providers.forEach(provider => provider.children.forEach((child, index) => {
+      if(child.global === global) {
+        provider.children.splice(index, 1)
+      }
+    }))
+  }
 }

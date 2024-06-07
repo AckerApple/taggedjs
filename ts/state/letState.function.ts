@@ -1,7 +1,7 @@
 import { Config, GetSet, StateConfig, State, StateConfigItem, getStateValue } from './state.utils.js'
 import { setUse } from './setUse.function.js'
 
-/** Used for variables that need to remain the same variable during render passes */
+/** Used for variables that need to remain the same variable during render passes. If defaultValue is a function it is called only once, its return value is first state, and let value can changed */
 export function letState <T>(
   defaultValue: T | (() => T),
 ): ((getSet: GetSet<T>) => T) {

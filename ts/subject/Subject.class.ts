@@ -50,9 +50,6 @@ export class Subject<T> implements SubjectLike<T> {
     }
 
     this.subscribers.push(subscription)
-    // Subject.globalSubs.push(subscription) // 🔬 testing
-    const count = Subject.globalSubCount$.value as number
-    Subject.globalSubCount$.next(count + 1) // 🔬 testing
     
     if(this.onSubscription) {
       this.onSubscription(subscription)
@@ -89,7 +86,7 @@ export class Subject<T> implements SubjectLike<T> {
 
   /** like toPromise but faster */
   toCallback(callback: (x: T) => any) {
-    this.subscribe((x, subscription) => {
+    const subscription = this.subscribe((x, _subscription) => {
       subscription.unsubscribe()
       callback(x)
     })
