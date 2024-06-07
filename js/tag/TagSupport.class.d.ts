@@ -59,3 +59,5 @@ export declare class TagSupport extends BaseTagSupport {
     ownerTagSupport: TagSupport, subject: TagSubject, castedProps?: Props, version?: number);
     getAppTagSupport(): TagSupport;
 }
+export declare function checkRestoreTagMarker(support: BaseTagSupport | TagSupport, options: DestroyOptions): void;
+export declare function resetTagSupport(support: BaseTagSupport | TagSupport): void;
