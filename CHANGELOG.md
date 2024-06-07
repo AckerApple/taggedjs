@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### v2.5.22 - 6-2024
+### v2.5.23 - 6-2024
 - fixed functions as argument props
 - fixed nested textareas
 - fixed rendering up from non-tag component
@@ -11,6 +11,7 @@
 - Fixed child to parent referencing aka support.global.childTags
 - Reduced amount of tags traveled for providers and corrected its scoping
 - Created concept of soft delete to better handle a tag that has different outputs but same providers
+- Move tracking of items placed down into a global scope
 
 ### v2.5.14 - 5-2024
 - `new Subject(0).set(1)` is now replaced by one of the following:

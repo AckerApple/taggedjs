@@ -46,6 +46,7 @@ export type TagGlobal = {
   blocked: (BaseTagSupport | TagSupport)[], // renders that did not occur because an event was processing
   
   childTags: TagSupport[], // tags on me
+  clones: (Element | Text | ChildNode)[],
 }
 
 export class TemplaterResult {

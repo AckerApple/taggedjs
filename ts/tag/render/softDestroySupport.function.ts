@@ -18,7 +18,6 @@ export function softDestroySupport(
     subGlobal.deleted = true
   })
 
-
   checkRestoreTagMarker(lastSupport, options)
 
   resetTagSupport(lastSupport)

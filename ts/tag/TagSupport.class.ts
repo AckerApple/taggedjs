@@ -41,8 +41,6 @@ export class BaseTagSupport {
     state: [] as State,
   }
 
-  clones: (Element | Text | ChildNode)[] = [] // elements on document. Needed at destroy process to know what to destroy
-
   // travels with all rerenderings
   global: TagGlobal = {
     destroy$: new Subject<this>(),
@@ -54,6 +52,7 @@ export class BaseTagSupport {
     oldest: this,
     blocked: [], // renders that did not occur because an event was processing
     childTags: [], // tags on me
+    clones: [], // elements on document. Needed at destroy process to know what to destroy
   }
 
   hasLiveElements = false
@@ -303,8 +302,8 @@ export class BaseTagSupport {
       stagger: 0,
     }
   ) {
-    const oldClones = [...this.clones]
-    this.clones.length = 0 // tag maybe used for something else
+    const oldClones = [...this.global.clones]
+    this.global.clones.length = 0 // tag maybe used for something else
 
     const promises = oldClones.map(
       clone => this.checkCloneRemoval(clone, stagger)
@@ -348,7 +347,7 @@ export class BaseTagSupport {
       const ownerSupport = (this as unknown as TagSupport).ownerTagSupport
       if(ownerSupport) {
         // Sometimes my clones were first registered to my owner, remove them from owner
-        ownerSupport.clones = ownerSupport.clones.filter(compareClone => compareClone !== clone)
+        ownerSupport.global.clones = ownerSupport.global.clones.filter(compareClone => compareClone !== clone)
       }
     }
 

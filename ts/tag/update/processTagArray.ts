@@ -32,7 +32,7 @@ export function processTagArray(
     counts: Counts
   },
 ): InsertBefore[] {
-  const clones: InsertBefore[] = ownerSupport.clones // []
+  const clones: InsertBefore[] = ownerSupport.global.clones // []
   let lastArray = subject.lastArray = subject.lastArray || []
 
   if(!subject.placeholder) {
