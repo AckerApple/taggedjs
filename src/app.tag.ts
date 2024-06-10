@@ -77,7 +77,7 @@ export const App = tag(() => {
 
     <div>
       <button id="app-counter-subject-button"
-        onclick=${() => appCounterSubject.set = appCounter + 1}
+        onclick=${() => appCounterSubject.next(appCounter + 1)}
       >🍒 ++app subject</button>
       <span>
         🍒 <span id="app-counter-subject-display">${appCounter}</span>

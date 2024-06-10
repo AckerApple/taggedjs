@@ -233,7 +233,7 @@ const providerDebug = tag(({
 
     <div>
       <button id="subject-increase-counter"
-        onclick=${() => callbackTestSub.set = provider.test + 1}
+        onclick=${() => callbackTestSub.next(provider.test + 1)}
       >🍌 subject increase:</button>
       <span>
         🍌 <span id="subject-counter-display">${provider.test}</span>
