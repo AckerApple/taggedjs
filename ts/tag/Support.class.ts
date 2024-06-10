@@ -131,8 +131,13 @@ export class BaseSupport {
     const string = strings.map((string, index) => {
       const safeString = string.replace(prefixSearch, escapeVariable)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       //const endString = safeString + (values.length > index ? `{variablePrefix}{index}` : '')
       const endString = safeString + (values.length > index ? '{' + variablePrefix + index.toString() + '}' : empty)
+=======
+      // const endString = safeString + (values.length > index ? variablePrefix + index.toString() : empty)
+      const endString = safeString + (values.length > index ? `${variablePrefix}${index}` : empty)
+>>>>>>> Stashed changes
 =======
       // const endString = safeString + (values.length > index ? variablePrefix + index.toString() : empty)
       const endString = safeString + (values.length > index ? `${variablePrefix}${index}` : empty)

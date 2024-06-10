@@ -64,7 +64,11 @@ describe('Subject', () => {
     expect(x).toBe(0)
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     subject.next(22)
+=======
+    subject.set(22)
+>>>>>>> Stashed changes
 =======
     subject.set(22)
 >>>>>>> Stashed changes
@@ -86,7 +90,11 @@ describe('Subject', () => {
     expect(x).toBe(0)
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     subject.next(22)
+=======
+    subject.set(22)
+>>>>>>> Stashed changes
 =======
     subject.set(22)
 >>>>>>> Stashed changes
@@ -110,7 +118,11 @@ describe('Subject', () => {
     expect(x).toBe(0)
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     subject.next(22)
+=======
+    subject.set(22)
+>>>>>>> Stashed changes
 =======
     subject.set(22)
 >>>>>>> Stashed changes
@@ -141,7 +153,11 @@ describe('Subject', () => {
       expect(x).toBe(0)
   
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       subject.next(22)
+=======
+      subject.set(22)
+>>>>>>> Stashed changes
 =======
       subject.set(22)
 >>>>>>> Stashed changes
@@ -172,7 +188,11 @@ describe('Subject', () => {
       expect(x).toBe(0)
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       setTimeout(() => subject.next(22), 1)
+=======
+      setTimeout(() => subject.set(22), 1)
+>>>>>>> Stashed changes
 =======
       setTimeout(() => subject.set(22), 1)
 >>>>>>> Stashed changes
@@ -292,8 +312,13 @@ describe('Subject', () => {
       combined.subscribe(x => y = x)
   
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       subject1.next(1)
       subject2.next(2)
+=======
+      subject1.set(1)
+      subject2.set(2)
+>>>>>>> Stashed changes
 =======
       subject1.set(1)
       subject2.set(2)
