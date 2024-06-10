@@ -63,7 +63,7 @@ describe('Subject', () => {
     expect(subscription).toBeDefined()
     expect(x).toBe(0)
 
-    subject.set = 22
+    subject.next(22)
 
     expect(x).toBe(22)
   })
@@ -81,7 +81,7 @@ describe('Subject', () => {
     expect(subscription).toBeDefined()
     expect(x).toBe(0)
 
-    subject.set = 22
+    subject.next(22)
 
     x = await promise
 
@@ -101,7 +101,7 @@ describe('Subject', () => {
     expect(subscription).toBeDefined()
     expect(x).toBe(0)
 
-    subject.set = 22
+    subject.next(22)
 
     expect(x).toBe(22)
   })
@@ -128,7 +128,7 @@ describe('Subject', () => {
   
       expect(x).toBe(0)
   
-      subject.set = 22
+      subject.next(22)
   
       expect(x).toBe(33)
     })
@@ -155,7 +155,7 @@ describe('Subject', () => {
   
       expect(x).toBe(0)
 
-      setTimeout(() => subject.set = 22, 1)
+      setTimeout(() => subject.next(22), 1)
 
       x = await piped.toPromise()
     
@@ -271,8 +271,8 @@ describe('Subject', () => {
       let z: number = 0
       combined.subscribe(x => y = x)
   
-      subject1.set = 1
-      subject2.set = 2
+      subject1.next(1)
+      subject2.next(2)
   
       expect(y).toBe(33)
       expect(z).toBe(1)

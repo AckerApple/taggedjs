@@ -13,9 +13,6 @@ export class Subject<T> implements SubjectLike<T> {
   subscribeWith?: (x: SubjectSubscriber<T>) => Subscription<T>
   public _value?: T
 
-  // this is overwritten by constructor at runtime. However having it helps editors know of its existence
-  set!: T // `subject.set = x` equal to `subject.next(x)`
-
   constructor(
     public value?: T,
     // private?
@@ -62,6 +59,7 @@ export class Subject<T> implements SubjectLike<T> {
     this._value = value
     this.emit()
   }
+  set = this.next
   
   emit() {
     const value = this._value as any
@@ -210,13 +208,5 @@ export function defineValueOn(subject: Subject<any>) {
     get() {
       return subject._value
     }
-  })
-
-  Object.defineProperty(subject, 'set', {
-    // supports subject.set = x
-    set: (value) => subject.next(value),
-    
-    // supports subject.set(x)
-    get: () => (x: any) => subject.next(x),
   })
 }

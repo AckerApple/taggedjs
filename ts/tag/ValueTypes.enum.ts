@@ -1,3 +1,7 @@
+export const empty = ''
+
+// export const textNode = document.createTextNode('')
+
 export enum ValueTypes {
   unknown = 'unknown',
   
@@ -11,6 +15,7 @@ export enum ValueTypes {
   
   date = 'date',
   string = 'string',
+  number = 'number',
   boolean = 'boolean',
   function = 'function',
   undefined = 'undefined',

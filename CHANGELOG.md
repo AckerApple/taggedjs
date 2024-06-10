@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### v2.5.24 - 6-2024
+- performance
+- Change away from `new Subject().set = x` back to `new Subject().set(x)`
+
 ### v2.5.23 - 6-2024
 - fixed functions as argument props
 - fixed nested textareas

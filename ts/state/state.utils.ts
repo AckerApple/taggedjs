@@ -4,6 +4,10 @@ import { Wrapper } from '../tag/TemplaterResult.class.js'
 import { setUse } from'./setUse.function.js'
 
 export type StateConfig<T> = (x: T) => [T, T]
+const badLetState = 'letState function incorrectly used. Second item in array is not setting expected value.\n\n' +
+'For "let" state use `let name = state(default)(x => [name, name = x])`\n\n' +
+'For "const" state use `const name = state(default)()`\n\n' +
+'Problem state:\n'
 
 export type StateConfigItem<T> = {
   get: () => T // TODO: only a convenience, not needed, remove
@@ -81,10 +85,7 @@ export function getStateValue<T>(
   const [value,checkValue] = getCallbackValue(callback)
 
   if(checkValue !== StateEchoBack) {
-    const message = 'letState function incorrectly used. Second item in array is not setting expected value.\n\n' +
-    'For "let" state use `let name = state(default)(x => [name, name = x])`\n\n' +
-    'For "const" state use `const name = state(default)()`\n\n' +
-    'Problem state:\n' + (callback ? callback.toString() : JSON.stringify(state)) +'\n'
+    const message = badLetState + (callback ? callback.toString() : JSON.stringify(state)) +'\n'
     
     console.error(message, {state, callback, value, checkValue})
     

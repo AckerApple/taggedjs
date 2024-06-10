@@ -9,7 +9,7 @@
     "build:js": "rm -rf js && mkdir js && tsc -p tsconfig.build.json",
     "build": "npm-run-all --sequential build:js build:webpack build:dist:only build:gh-pages build:pinbowl && echo \"✅ Build completed\"",
     "build:webpack": "npx webpack",
-    "build:gh-pages": "cp -R js/. ../gh-pages/node_modules/taggedjs/js && cd ../gh-pages && npm run build && echo \"🔬 Built gh-pages\"",
+    "build:gh-pages": "cp -R dist/. ../gh-pages/node_modules/taggedjs && cd ../gh-pages && npm run build && echo \"🔬 Built gh-pages\"",
     "build:watch:gh-pages": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:dist:only && npm run build:gh-pages'",
     "build:dist": "run-s build:js build:webpack build:dist:only",
     "build:dist:only": "cp README.MD ./dist/README.md && npm run build:dist:pack && rm -rf ./dist/js && cp -R js ./dist && cp -R ./dist/. ../dist",
@@ -52,6 +52,7 @@
     "terser-webpack-plugin": "^5.3.10",
     "ts-jest": "^29.1.2",
     "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4"
