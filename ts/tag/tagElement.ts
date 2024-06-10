@@ -6,6 +6,7 @@ import { ValueSubject } from'../subject/ValueSubject.js'
 import { TagSubject } from '../subject.types.js'
 import { TagJsSubject } from './update/TagJsSubject.class.js'
 import { setTagPlaceholder } from './setTagPlaceholder.function.js'
+import { textNode } from './ValueTypes.enum.js'
 
 const appElements: {
   support: Support
@@ -41,7 +42,7 @@ export function tagElement(
 
   // const fragment = document.createDocumentFragment()
   const template = document.createElement('template')
-  const placeholder = document.createTextNode('')
+  const placeholder = textNode.cloneNode(false) as Text
   const support = runWrapper(wrapper, template, placeholder)
   const global = support.subject.global
   

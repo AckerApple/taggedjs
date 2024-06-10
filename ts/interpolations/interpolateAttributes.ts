@@ -20,6 +20,9 @@ function howToSetInputValue(
   (element as any)[name] = value
 }
 
+const INPUT = 'INPUT'
+const valueS = 'value'
+
 export function interpolateAttributes(
   child: Element,
   scope: Context,
@@ -31,7 +34,7 @@ export function interpolateAttributes(
 
   for (let index = 0; index < attrNames.length; ++index) {
     const attrName = attrNames[index]
-    if(child.nodeName === 'INPUT' && attrName === 'value') {
+    if(child.nodeName === INPUT && attrName === valueS) {
       howToSet = howToSetInputValue
     }
 

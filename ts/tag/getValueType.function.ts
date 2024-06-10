@@ -13,7 +13,7 @@ export function getValueType(value: any): ValueTypes {
     return ValueTypes.function
   }
   
-  if(type === 'object') {
+  if(type === ValueTypes.object) {
     if(value instanceof Date) {
       return ValueTypes.date
     }

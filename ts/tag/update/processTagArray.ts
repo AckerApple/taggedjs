@@ -10,6 +10,7 @@ import { isTagClass } from '../../isInstance.js'
 import { TagSubject } from '../../subject.types.js'
 import { renderTagOnly } from '../render/renderTagOnly.function.js'
 import { TagJsSubject } from './TagJsSubject.class.js'
+import { textNode } from '../ValueTypes.enum.js'
 
 export type LastArrayItem = {
   support: Support
@@ -179,7 +180,7 @@ function setPlaceholderElm(
   insertBefore: InsertBefore,
   subject: TagArraySubject,
 ) {
-  const placeholder = subject.global.placeholder = document.createTextNode('')
+  const placeholder = subject.global.placeholder = textNode.cloneNode(false) as Text
   const parentNode = insertBefore.parentNode as ParentNode
   parentNode.insertBefore(placeholder, insertBefore)
   parentNode.removeChild(insertBefore)

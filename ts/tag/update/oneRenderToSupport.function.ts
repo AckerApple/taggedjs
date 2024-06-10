@@ -3,6 +3,7 @@ import { TagSubject } from '../../subject.types.js'
 import { newSupportByTemplater } from './processTag.function.js'
 import { Support } from '../Support.class.js'
 import { Tag } from '../Tag.class.js'
+import { ValueTypes } from '../ValueTypes.enum.js'
 
 export function oneRenderToSupport(
   wrapper: Wrapper,
@@ -10,7 +11,7 @@ export function oneRenderToSupport(
   ownerSupport: Support, // owner
 ) {
   const templater = new TemplaterResult([])
-  templater.tagJsType = 'oneRender'
+  templater.tagJsType = ValueTypes.oneRender
   const support = newSupportByTemplater(
     templater, ownerSupport, subject
   )

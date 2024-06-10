@@ -4,9 +4,11 @@ import { Context } from '../tag/Tag.class.js'
 import { HowToSet } from './interpolateAttributes.js'
 import { bindSubjectCallback } from './bindSubjectCallback.function.js'
 import { Support } from '../tag/Support.class.js'
+import { ValueTypes, empty } from '../tag/ValueTypes.enum.js'
 
 const startRegX = /^\s*{__tagvar/
 const endRegX = /}\s*$/
+const ondoubleclick = 'ondoubleclick'
 function isTagVar(value: string | null) {
   return value && value.search(startRegX) >= 0 && value.search(endRegX) >= 0
 }
@@ -86,7 +88,7 @@ function getContextValueByVarString(
   scope: Context,
   value: string,
 ) {
-  const code = value.replace('{','').split('').reverse().join('').replace('}','').split('').reverse().join('')
+  const code = value.replace('{',empty).split(empty).reverse().join(empty).replace('}',empty).split(empty).reverse().join(empty)
   return scope[code]
 }
 function processNameOnlyAttr(
@@ -97,7 +99,7 @@ function processNameOnlyAttr(
   howToSet: HowToSet,
 ) {
   if(lastValue && lastValue != attrValue) {
-    if(typeof(lastValue) === 'string') {
+    if(typeof(lastValue) === ValueTypes.string) {
       child.removeAttribute(lastValue as string)
     } else if(lastValue instanceof Object) {
       for (const name in lastValue) {
@@ -106,14 +108,14 @@ function processNameOnlyAttr(
     }
   }
 
-  if(typeof(attrValue) === 'string') {
+  if(typeof(attrValue) === ValueTypes.string) {
     if(!attrValue.length) {
       return
     }
 
     processNameValueAttr(
       attrValue as string,
-      '',
+      empty,
       child,
       ownerSupport,
       howToSet,
@@ -219,7 +221,7 @@ function processAttributeSubjectValue(
     // access to original function
     fun.tagFunction = newAttrValue
 
-    if(attrName === 'ondoubleclick') {
+    if(attrName === ondoubleclick) {
       attrName = 'ondblclick'
     }
 

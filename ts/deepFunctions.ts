@@ -1,3 +1,5 @@
+import { ValueTypes } from './tag/ValueTypes.enum.js';
+
 export function deepClone(
   obj: any,
 ) {
@@ -9,7 +11,7 @@ function makeDeepClone(
   visited: WeakMap<any, any>
 ) {
   // If obj is a primitive type or null, return it directly
-  if (obj === null || typeof obj !== 'object') {
+  if (obj === null || typeof obj !== ValueTypes.object) {
     return obj;
   }
 
@@ -71,7 +73,7 @@ function isDeepEqual(
     return true
   }
   
-  if(typeof obj1 === 'object' && typeof obj2 === 'object') {
+  if(typeof obj1 === ValueTypes.object && typeof obj2 === ValueTypes.object) {
     // both are dates and were already determined not the same
     if(obj1 instanceof Date && obj2 instanceof Date) {
       return obj1.getTime() === obj2.getTime()

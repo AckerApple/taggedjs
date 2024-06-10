@@ -1,5 +1,6 @@
 import { InsertBefore } from'./interpolations/InsertBefore.type.js'
 import { NoDisplayValue } from'./interpolations/processAttribute.function.js'
+import { empty } from './tag/ValueTypes.enum.js'
 
 // Function to update the value of x
 export function updateBeforeTemplate(
@@ -25,7 +26,7 @@ export function castTextValue(
 ) {
   // mimic React skipping to display EXCEPT for true does display on page
   if([undefined,false,null].includes(value as NoDisplayValue)) { // || value === true
-    return ''
+    return empty
   }
 
   return value as string

@@ -11,12 +11,11 @@ import { DestroyOptions, getChildTagsToDestroy } from './destroy.support.js'
 import { elementDestroyCheck } from './elementDestroyCheck.function.js'
 import { updateContextItem } from './update/updateContextItem.function.js'
 import { processNewValue } from './update/processNewValue.function.js'
-import { interpolateElement, interpolateString } from '../interpolations/interpolateElement.js'
+import { interpolateElement } from '../interpolations/interpolateElement.js'
 import { afterInterpolateElement } from '../interpolations/afterInterpolateElement.function.js'
-// import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
 import { TagJsSubject } from './update/TagJsSubject.class.js'
-// import { interpolateString } from '../interpolations/interpolations.js'
 import { empty } from './ValueTypes.enum.js'
+import { interpolateString } from '../interpolations/interpolations.js'
 
 const prefixSearch = new RegExp(variablePrefix, 'g')
 
@@ -130,23 +129,12 @@ export class BaseSupport {
 
     const string = strings.map((string, index) => {
       const safeString = string.replace(prefixSearch, escapeVariable)
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-      //const endString = safeString + (values.length > index ? `{variablePrefix}{index}` : '')
       const endString = safeString + (values.length > index ? '{' + variablePrefix + index.toString() + '}' : empty)
-=======
-      // const endString = safeString + (values.length > index ? variablePrefix + index.toString() : empty)
-      const endString = safeString + (values.length > index ? `${variablePrefix}${index}` : empty)
->>>>>>> Stashed changes
-=======
-      // const endString = safeString + (values.length > index ? variablePrefix + index.toString() : empty)
-      const endString = safeString + (values.length > index ? `${variablePrefix}${index}` : empty)
->>>>>>> Stashed changes
       // ??? new removed
       //const trimString = endString.replace(/>\s*/g,'>').replace(/\s*</g,'<')
       //return trimString
       return endString
-    }).join('')
+    }).join(empty)
 
     const interpolation = interpolateString(string)
     const run: TagTemplate = {

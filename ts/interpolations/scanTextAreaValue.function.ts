@@ -2,8 +2,10 @@ import { Context } from '../tag/Tag.class.js'
 import { Support } from '../tag/Support.class.js'
 import { HowToSet } from './interpolateAttributes.js'
 import { processAttribute } from './processAttribute.function.js'
+import { empty } from '../tag/ValueTypes.enum.js'
 
 const search = new RegExp('\\s*<template interpolate end id="__tagvar(\\d{1,4})"([^>]*)></template>(\\s*)')
+const underTagVarMatch = /__tagvar(\d{1,4})/
 
 export function scanTextAreaValue(
   textarea: HTMLTextAreaElement,
@@ -12,10 +14,10 @@ export function scanTextAreaValue(
 ) {
   const value = textarea.value
   if( value.search(search) >=0 ) {
-    const match = value.match(/__tagvar(\d{1,4})/);
-    const token = match ? match[0] : ''
+    const match = value.match(underTagVarMatch);
+    const token = match ? match[0] : empty
     const dynamic = '{' + token + '}'
-    textarea.value = ''
+    textarea.value = empty
     textarea.setAttribute('text-var-value', dynamic)
 
     const howToSet: HowToSet = (_elm, _name, value: string) => textarea.value = value

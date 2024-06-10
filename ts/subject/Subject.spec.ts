@@ -62,16 +62,7 @@ describe('Subject', () => {
     
     expect(subscription).toBeDefined()
     expect(x).toBe(0)
-
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
     subject.next(22)
-=======
-    subject.set(22)
->>>>>>> Stashed changes
-=======
-    subject.set(22)
->>>>>>> Stashed changes
 
     expect(x).toBe(22)
   })
@@ -89,15 +80,10 @@ describe('Subject', () => {
     expect(subscription).toBeDefined()
     expect(x).toBe(0)
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
     subject.next(22)
-=======
     subject.set(22)
->>>>>>> Stashed changes
-=======
     subject.set(22)
->>>>>>> Stashed changes
+    subject.set(22)
 
     x = await promise
 
@@ -117,15 +103,10 @@ describe('Subject', () => {
     expect(subscription).toBeDefined()
     expect(x).toBe(0)
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
     subject.next(22)
-=======
     subject.set(22)
->>>>>>> Stashed changes
-=======
     subject.set(22)
->>>>>>> Stashed changes
+    subject.set(22)
 
     expect(x).toBe(22)
   })
@@ -151,17 +132,8 @@ describe('Subject', () => {
       })
   
       expect(x).toBe(0)
-  
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-      subject.next(22)
-=======
-      subject.set(22)
->>>>>>> Stashed changes
-=======
-      subject.set(22)
->>>>>>> Stashed changes
-  
+
+      subject.next(22)  
       expect(x).toBe(33)
     })
 
@@ -186,17 +158,7 @@ describe('Subject', () => {
       )
   
       expect(x).toBe(0)
-
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
       setTimeout(() => subject.next(22), 1)
-=======
-      setTimeout(() => subject.set(22), 1)
->>>>>>> Stashed changes
-=======
-      setTimeout(() => subject.set(22), 1)
->>>>>>> Stashed changes
-
       x = await piped.toPromise()
     
       expect(x).toBe(55)
@@ -310,19 +272,9 @@ describe('Subject', () => {
       let y: number = 0
       let z: number = 0
       combined.subscribe(x => y = x)
-  
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
       subject1.next(1)
       subject2.next(2)
-=======
-      subject1.set(1)
-      subject2.set(2)
->>>>>>> Stashed changes
-=======
-      subject1.set(1)
-      subject2.set(2)
->>>>>>> Stashed changes
   
       expect(y).toBe(33)
       expect(z).toBe(1)

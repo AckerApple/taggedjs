@@ -11,6 +11,7 @@ import { InsertBefore } from '../interpolations/InsertBefore.type.js'
 import { TagValues } from './html.js'
 import { Subject, ValueSubject } from '../subject/index.js'
 import { kidsToTagArraySubject } from './kidsToTagArraySubject.function.js'
+import { ValueTypes } from './ValueTypes.enum.js'
 
 export type OriginalFunction = (() => Tag) & {compareTo: string}
 
@@ -51,7 +52,7 @@ export type TagGlobal = {
 }
 
 export class TemplaterResult {
-  tagJsType = 'templater'
+  tagJsType = ValueTypes.templater
   tagged!: boolean
   wrapper?: Wrapper
 

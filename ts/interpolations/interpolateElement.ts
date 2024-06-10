@@ -1,5 +1,4 @@
 import { interpolateAttributes } from './interpolateAttributes.js'
-import { interpolateToTemplates } from './interpolations.js'
 import { interpolateContentTemplates } from './interpolateContentTemplates.js'
 import { Context, TagTemplate, escapeSearch, variablePrefix } from '../tag/Tag.class.js'
 import { Counts, InterpolateComponentResult, Template } from './interpolateTemplate.js'
@@ -53,10 +52,4 @@ function processChildrenAttributes(
       processChildrenAttributes(child.children, context, ownerSupport)
     }
   }
-}
-
-export function interpolateString(string: string) {
-  const result = interpolateToTemplates(string)
-  result.string = result.string.replace(escapeSearch, variablePrefix)
-  return result
 }

@@ -1,5 +1,6 @@
 import { Props } from '../Props.js'
 import { deepEqual } from '../deepFunctions.js'
+import { ValueTypes } from './ValueTypes.enum.js'
 
 /**
  * 
@@ -22,7 +23,7 @@ export function hasPropChanges(
   let castedPastProps: Props = pastCloneProps
 
   // check all prop functions match
-  if(typeof(props) === 'object') {
+  if(typeof(props) === ValueTypes.object) {
     if(!pastCloneProps) {
       return 3
     }
@@ -33,7 +34,7 @@ export function hasPropChanges(
     const allFunctionsMatch = castedProps.every((value, index) => {      
       let compare = castedPastProps[index]
 
-      if(value && typeof(value) === 'object') {
+      if(value && typeof(value) === ValueTypes.object) {
         const subCastedProps = {...value}
         const subCompareProps = {...compare || {}} as any
         const matched = Object.entries(subCastedProps).every(([key, value]) =>

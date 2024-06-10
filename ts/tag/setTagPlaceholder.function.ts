@@ -1,5 +1,6 @@
 import { InsertBefore } from'../interpolations/InsertBefore.type.js'
 import { TagGlobal } from './TemplaterResult.class.js'
+import { textNode } from './ValueTypes.enum.js'
 
 export function setTagPlaceholder(
   global: TagGlobal,
@@ -11,7 +12,7 @@ export function setTagPlaceholder(
 export function swapInsertBefore(
   insertBefore: InsertBefore
 ) {
-  const placeholder = document.createTextNode('')
+  const placeholder = textNode.cloneNode(false) as Text
   const parentNode = insertBefore.parentNode as ParentNode
   parentNode.insertBefore(placeholder, insertBefore)
   parentNode.removeChild(insertBefore)
