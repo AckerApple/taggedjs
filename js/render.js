@@ -5,14 +5,27 @@ export function buildClones(temporary, insertBefore) {
     const fragment = document.createDocumentFragment();
     while (nextSibling) {
         const nextNextSibling = nextSibling.nextSibling;
-        clones.push(nextSibling);
         fragment.appendChild(nextSibling);
+        // ??? new
+        /*
+        if(nextSibling.nodeName === 'TEMPLATE') {
+          const hasAttribute = (nextSibling as any).hasAttribute
+          if(hasAttribute && (nextSibling as any).hasAttribute('interpolate')) {
+            nextSibling = nextNextSibling
+            continue // we don't record position keepers
+          }
+        }
+        */
+        clones.push(nextSibling);
         nextSibling = nextNextSibling;
     }
-    if (insertBefore.parentNode) {
-        const parentNode = insertBefore.parentNode;
-        parentNode.insertBefore(fragment, insertBefore);
+    // swap out our template for an empty-string placeholder
+    /*
+    if(insertBefore.parentNode) {
+      const parentNode = insertBefore.parentNode as ParentNode
+      parentNode.insertBefore(fragment, insertBefore)
     }
+    */
     return clones;
 }
 //# sourceMappingURL=render.js.map

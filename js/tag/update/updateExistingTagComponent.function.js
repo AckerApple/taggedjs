@@ -1,14 +1,15 @@
-import { hasTagSupportChanged } from '../hasTagSupportChanged.function.js';
+import { hasSupportChanged } from '../hasSupportChanged.function.js';
 import { processSubjectComponent } from './processSubjectComponent.function.js';
 import { destroyTagMemory } from '../destroyTag.function.js';
-import { renderTagSupport } from '../render/renderTagSupport.function.js';
+import { renderSupport } from '../render/renderSupport.function.js';
 import { castProps } from '../../alterProp.function.js';
 import { isLikeTags } from '../isLikeTags.function.js';
-export function updateExistingTagComponent(ownerSupport, tagSupport, // lastest
+import { softDestroySupport } from '../render/softDestroySupport.function.js';
+export function updateExistingTagComponent(ownerSupport, support, // lastest
 subject, insertBefore, renderUp = false) {
-    let lastSupport = subject.tagSupport?.global.newest;
+    let lastSupport = subject.global.newest;
     const oldWrapper = lastSupport.templater.wrapper;
-    const newWrapper = tagSupport.templater.wrapper;
+    const newWrapper = support.templater.wrapper;
     let isSameTag = false;
     if (oldWrapper && newWrapper) {
         const oldFunction = oldWrapper.parentWrap.original;
@@ -16,9 +17,9 @@ subject, insertBefore, renderUp = false) {
         // string compare both functions
         isSameTag = oldFunction === newFunction;
     }
-    const templater = tagSupport.templater;
+    const templater = support.templater;
     if (!isSameTag) {
-        const oldestSupport = lastSupport.global.oldest;
+        const oldestSupport = subject.global.oldest;
         destroyTagMemory(oldestSupport);
         const newSupport = processSubjectComponent(templater, subject, insertBefore, ownerSupport, {
             counts: { added: 0, removed: 0 },
@@ -26,31 +27,31 @@ subject, insertBefore, renderUp = false) {
         return newSupport;
     }
     else {
-        const hasChanged = hasTagSupportChanged(lastSupport, tagSupport, templater);
+        const hasChanged = hasSupportChanged(lastSupport, support, templater);
         // everyhing has matched, no display needs updating.
         if (!hasChanged) {
             const newProps = templater.props;
             // update function refs to use latest references
-            const castedProps = syncFunctionProps(tagSupport, lastSupport, ownerSupport, newProps);
-            // When new tagSupport actually makes call to real function, use these pre casted props
-            tagSupport.propsConfig.castProps = castedProps;
+            const castedProps = syncFunctionProps(support, lastSupport, ownerSupport, newProps);
+            // When new support actually makes call to real function, use these pre casted props
+            support.propsConfig.castProps = castedProps;
             // update support to think it has different cloned props
-            lastSupport.propsConfig.latestCloned = tagSupport.propsConfig.latestCloned;
-            lastSupport.propsConfig.lastClonedKidValues = tagSupport.propsConfig.lastClonedKidValues;
+            lastSupport.propsConfig.latestCloned = support.propsConfig.latestCloned;
+            lastSupport.propsConfig.lastClonedKidValues = support.propsConfig.lastClonedKidValues;
             return lastSupport; // its the same tag component
         }
     }
-    const oldest = lastSupport.global.oldest;
-    if (tagSupport.global.locked) {
-        tagSupport.global.blocked.push(tagSupport);
-        return tagSupport;
+    const oldest = subject.global.oldest;
+    if (subject.global.locked) {
+        subject.global.blocked.push(support);
+        return support;
     }
-    const previous = lastSupport.global.newest;
-    const newSupport = renderTagSupport(tagSupport, renderUp);
+    const previous = subject.global.newest;
+    const newSupport = renderSupport(support, renderUp);
     return afterTagRender(subject, oldest, templater, previous, newSupport, isSameTag);
 }
 function afterTagRender(subject, oldest, templater, previous, newSupport, isSameTag) {
-    let lastSupport = subject.tagSupport;
+    let lastSupport = subject.support;
     // const oldest = newSupport.global.oldest
     /*
     const hasOldest = oldest ? true : false
@@ -70,44 +71,42 @@ function afterTagRender(subject, oldest, templater, previous, newSupport, isSame
     // detect if both the function is the same and the return is the same
     const isLikeTag = isSameTag && isLikeTags(previous, newSupport);
     if (isLikeTag) {
-        const oldestTag = lastSupport.global.oldest;
-        subject.tagSupport = newSupport;
+        const oldestTag = subject.global.oldest;
+        subject.support = newSupport;
         oldestTag.updateBy(newSupport);
         return newSupport;
     }
     // Although function looked the same it returned a different html result
     if (isSameTag && lastSupport) {
-        if (!previous.global.deleted) {
-            destroyTagMemory(previous);
+        const preGlobal = previous.subject.global;
+        if (!preGlobal.deleted) {
+            // destroyTagMemory(previous)
+            softDestroySupport(previous);
         }
-        /*
-        const insertBefore = (previous.global.insertBefore as any)
-        if(insertBefore.parentNode) {
-          insertBefore.parentNode.removeChild(insertBefore)
-        }
-        */
-        newSupport.global.context = {}; // do not share previous outputs
-        // delete newSupport.global.deleted
+        subject.global.context = {}; // do not share previous outputs
     }
-    return buildNewTag(newSupport, newSupport.global.insertBefore, newSupport, subject);
+    return buildNewTag(newSupport, subject);
 }
-function buildNewTag(newSupport, oldInsertBefore, oldTagSupport, subject) {
-    newSupport.buildBeforeElement(oldInsertBefore, {
+function buildNewTag(newSupport, subject) {
+    const fragment = newSupport.buildBeforeElement(undefined, {
         counts: { added: 0, removed: 0 },
     });
-    newSupport.global.oldest = newSupport;
-    newSupport.global.newest = newSupport;
-    oldTagSupport.global.oldest = newSupport;
-    oldTagSupport.global.newest = newSupport;
-    subject.tagSupport = newSupport;
-    subject.tagSupport.ownerTagSupport.global.childTags.push(newSupport);
+    // ??? new
+    const placeholder = subject.global.placeholder;
+    const parentNode = placeholder.parentNode;
+    parentNode.insertBefore(fragment, placeholder);
+    subject.global.oldest = newSupport;
+    subject.global.newest = newSupport;
+    subject.global.oldest = newSupport;
+    subject.global.newest = newSupport;
+    subject.support = newSupport;
+    newSupport.ownerSupport.subject.global.childTags.push(newSupport);
     return newSupport;
 }
 function syncFunctionProps(newSupport, lastSupport, ownerSupport, newPropsArray) {
-    const newest = lastSupport.global.newest;
+    const newest = lastSupport.subject.global.newest;
     if (!newest) {
-        // const state = ownerSupport.global.oldest.memory.state
-        const state = ownerSupport.memory.state;
+        const state = ownerSupport.state;
         newPropsArray.length = 0;
         const castedProps = castProps(newPropsArray, newSupport, state);
         newPropsArray.push(...castedProps);
@@ -134,8 +133,8 @@ function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, seen =
             priorProp.toCall = prop.toCall;
             return prop;
         }
-        const ownerGlobal = ownerSupport.global;
-        const oldOwnerState = ownerGlobal.newest.memory.state;
+        const ownerGlobal = ownerSupport.subject.global;
+        const oldOwnerState = ownerGlobal.newest.state;
         priorProp.prop = prop;
         priorProp.stateArray = oldOwnerState;
         return priorProp;
@@ -170,10 +169,10 @@ function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, seen =
     return prop;
 }
 export function moveProviders(lastSupport, newSupport) {
-    const destroy$ = lastSupport.global.destroy$;
-    lastSupport.global.providers.forEach(provider => {
+    const global = lastSupport.subject.global;
+    global.providers.forEach(provider => {
         provider.children.forEach((child, index) => {
-            const wasSameGlobals = lastSupport.global.destroy$ === child.global.destroy$;
+            const wasSameGlobals = global.destroy$ === child.subject.global.destroy$;
             if (wasSameGlobals) {
                 provider.children.splice(index, 1);
                 provider.children.push(newSupport);

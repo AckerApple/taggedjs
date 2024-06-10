@@ -6,10 +6,10 @@ import { syncStates } from './syncStates.function.js';
 /** Create a Subject that on updates will sync state values to keep chained functions using latest variables */
 export function subject(value, onSubscription) {
     const oldestState = state(() => setUse.memory.stateConfig.array);
-    const nowTagSupport = getSupportInCycle();
+    const nowSupport = getSupportInCycle();
     return state(() => {
         const subject = new Subject(value, onSubscription).pipe(x => {
-            syncStates(nowTagSupport.memory.state, oldestState);
+            syncStates(nowSupport.state, oldestState);
             return x;
         });
         return subject;
@@ -17,10 +17,10 @@ export function subject(value, onSubscription) {
 }
 subject._value = (value) => {
     const oldestState = state(() => setUse.memory.stateConfig.array);
-    const nowTagSupport = getSupportInCycle();
+    const nowSupport = getSupportInCycle();
     return state(() => {
         const subject = new ValueSubject(value).pipe(x => {
-            syncStates(nowTagSupport.memory.state, oldestState);
+            syncStates(nowSupport.state, oldestState);
             return x;
         });
         return subject;
@@ -28,9 +28,9 @@ subject._value = (value) => {
 };
 function all(args) {
     const oldestState = state(() => setUse.memory.stateConfig.array);
-    const nowTagSupport = getSupportInCycle();
+    const nowSupport = getSupportInCycle();
     return Subject.all(args).pipe(x => {
-        syncStates(nowTagSupport.memory.state, oldestState);
+        syncStates(nowSupport.state, oldestState);
         return x;
     });
 }

@@ -8,45 +8,45 @@ setUse.memory.tagClosed$ = new Subject(undefined, subscription => {
     }
 });
 // Life cycle 1
-export function runBeforeRender(tagSupport, ownerSupport) {
+export function runBeforeRender(support, ownerSupport) {
     const tagUse = setUse.tagUse;
     const length = tagUse.length;
     for (let index = 0; index < length; ++index) {
-        tagUse[index].beforeRender(tagSupport, ownerSupport);
+        tagUse[index].beforeRender(support, ownerSupport);
     }
 }
 // Life cycle 2
-export function runAfterRender(tagSupport, ownerTagSupport) {
+export function runAfterRender(support, ownerSupport) {
     const tagUse = setUse.tagUse;
     const length = tagUse.length;
     for (let index = 0; index < length; ++index) {
-        tagUse[index].afterRender(tagSupport, ownerTagSupport);
+        tagUse[index].afterRender(support, ownerSupport);
     }
-    setUse.memory.tagClosed$.next(ownerTagSupport);
+    setUse.memory.tagClosed$.next(ownerSupport);
 }
 // Life cycle 3
-export function runBeforeRedraw(tagSupport, ownerTagSupport) {
+export function runBeforeRedraw(support, ownerSupport) {
     const tagUse = setUse.tagUse;
     const length = tagUse.length;
     for (let index = 0; index < length; ++index) {
-        tagUse[index].beforeRedraw(tagSupport, ownerTagSupport);
+        tagUse[index].beforeRedraw(support, ownerSupport);
     }
 }
 // Life cycle 4 - end of life
-export function runBeforeDestroy(tagSupport, ownerTagSupport) {
+export function runBeforeDestroy(support, ownerSupport) {
     const tagUse = setUse.tagUse;
     const length = tagUse.length;
     for (let index = 0; index < length; ++index) {
-        tagUse[index].beforeDestroy(tagSupport, ownerTagSupport);
+        tagUse[index].beforeDestroy(support, ownerSupport);
     }
-    tagSupport.global.deleted = true;
-    tagSupport.hasLiveElements = false;
+    support.subject.global.deleted = true;
+    support.hasLiveElements = false;
     // remove me from my parents
-    if (ownerTagSupport) {
-        ownerTagSupport.global.childTags = ownerTagSupport.global.childTags.filter(child => child !== tagSupport.global.oldest);
-        const global = tagSupport.global;
+    if (ownerSupport) {
+        ownerSupport.subject.global.childTags = ownerSupport.subject.global.childTags.filter(child => child !== support.subject.global.oldest);
+        const global = support.subject.global;
         global.providers.forEach(provider => provider.children.forEach((child, index) => {
-            if (child.global === global) {
+            if (child.subject.global === global) {
                 provider.children.splice(index, 1);
             }
         }));

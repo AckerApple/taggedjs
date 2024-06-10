@@ -1,31 +1,35 @@
-/** checks if previous support exists on subject or as a last global support. If first render, calls builder. Otherwise calls tagSupport.updateBy() */
-export function processTagResult(tagSupport, subject, // used for recording past and current value
-insertBefore, // <template end interpolate />
-{ counts, }) {
+/** checks if previous support exists on subject or as a last global support. If first render, calls builder. Otherwise calls support.updateBy() */
+export function processTagResult(support, subject, // used for recording past and current value
+{ counts, }, fragment) {
     // *if appears we already have seen
     const subjectTag = subject;
-    const lastSupport = subjectTag.tagSupport;
-    const prevSupport = lastSupport?.global.oldest || undefined;
+    const lastSupport = subjectTag.support;
+    const prevSupport = lastSupport?.subject.global.oldest || undefined;
     const justUpdate = prevSupport;
     if (prevSupport && justUpdate) {
-        return processTagResultUpdate(tagSupport, subjectTag, prevSupport);
+        return processTagResultUpdate(support, subjectTag, prevSupport);
     }
-    tagSupport.buildBeforeElement(insertBefore, {
-        counts,
-    });
-    return tagSupport;
+    const newFragment = support.buildBeforeElement(fragment, { counts });
+    //if(fragment) {
+    //  fragment.appendChild(newFragment)
+    //} else {
+    const placeholder = subject.global.placeholder;
+    const parentNode = placeholder.parentNode;
+    parentNode.insertBefore(newFragment, placeholder);
+    //}
+    return support;
 }
-function processTagResultUpdate(tagSupport, subject, // used for recording past and current value
+function processTagResultUpdate(support, subject, // used for recording past and current value
 prevSupport) {
     // components
     if (subject instanceof Function) {
         const newSupport = subject(prevSupport);
         prevSupport.updateBy(newSupport);
-        subject.tagSupport = newSupport;
+        subject.support = newSupport;
         return newSupport;
     }
-    prevSupport.updateBy(tagSupport);
-    subject.tagSupport = tagSupport;
-    return tagSupport;
+    prevSupport.updateBy(support);
+    subject.support = support;
+    return support;
 }
 //# sourceMappingURL=processTagResult.function.js.map

@@ -3,7 +3,7 @@ export function getChildTagsToDestroy(childTags, allTags = []) {
         const cTag = childTags[index];
         allTags.push(cTag);
         childTags.splice(index, 1);
-        getChildTagsToDestroy(cTag.global.childTags, allTags);
+        getChildTagsToDestroy(cTag.subject.global.childTags, allTags);
     }
     return allTags;
 }

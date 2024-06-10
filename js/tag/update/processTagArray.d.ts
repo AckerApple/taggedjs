@@ -1,21 +1,25 @@
 import { InsertBefore } from '../../interpolations/InsertBefore.type.js';
-import { Tag } from '../Tag.class.js';
-import { ValueSubject } from '../../subject/ValueSubject.js';
+import { Tag, TagTemplate } from '../Tag.class.js';
 import { Counts } from '../../interpolations/interpolateTemplate.js';
-import { TagSupport } from '../TagSupport.class.js';
+import { Support } from '../Support.class.js';
 import { TemplaterResult } from '../TemplaterResult.class.js';
+import { TagJsSubject } from './TagJsSubject.class.js';
 export type LastArrayItem = {
-    tagSupport: TagSupport;
+    support: Support;
     index: number;
     deleted?: boolean;
 };
-export type TagArraySubject = ValueSubject<Tag[]> & {
+type LastArrayMeta = {
+    array: LastArrayItem[];
+    lastRun?: TagTemplate;
+};
+export type TagArraySubject = TagJsSubject<Tag[]> & {
     insertBefore: InsertBefore;
-    placeholder?: Text;
-    lastArray?: LastArrayItem[];
+    lastArray?: LastArrayMeta;
 };
 export declare function processTagArray(subject: TagArraySubject, value: (TemplaterResult | Tag)[], // arry of Tag classes
 insertBefore: InsertBefore, // <template end interpolate />
-ownerSupport: TagSupport, options: {
+ownerSupport: Support, options: {
     counts: Counts;
-}): InsertBefore[];
+}, fragment?: DocumentFragment): InsertBefore[];
+export {};

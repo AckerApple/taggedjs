@@ -1,15 +1,15 @@
 import { Counts } from '../interpolations/interpolateTemplate.js';
 import { State } from '../state/index.js';
 import { InterpolatedTemplates } from '../interpolations/interpolations.js';
-import { InterpolateSubject } from './update/processFirstSubject.utils.js';
 import { TemplaterResult } from './TemplaterResult.class.js';
 import { TagValues } from './html.js';
 import { ValueTypes } from './ValueTypes.enum.js';
+import { TagJsSubject } from './update/TagJsSubject.class.js';
 export declare const variablePrefix = "__tagvar";
 export declare const escapeVariable: string;
 export declare const escapeSearch: RegExp;
 export type Context = {
-    [index: string]: InterpolateSubject;
+    [index: string]: TagJsSubject<any>;
 };
 export type TagMemory = {
     state: State;
@@ -19,7 +19,6 @@ export interface TagTemplate {
     string: string;
     strings: string[];
     values: unknown[];
-    context: Context;
 }
 export declare class Tag {
     strings: string[];

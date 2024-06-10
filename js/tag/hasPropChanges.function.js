@@ -20,21 +20,17 @@ pastCloneProps) {
         if (!pastCloneProps) {
             return 3;
         }
-        // castedProps = {...props}
         castedProps = [...props];
-        // castedPastProps = {...(pastCloneProps || {})}
         castedPastProps = [...(pastCloneProps || [])];
         const allFunctionsMatch = castedProps.every((value, index) => {
             let compare = castedPastProps[index];
             if (value && typeof (value) === 'object') {
                 const subCastedProps = { ...value };
                 const subCompareProps = { ...compare || {} };
-                const matched = Object.entries(subCastedProps).every(([key, value]) => {
-                    return compareProps(value, subCompareProps[key], () => {
-                        delete subCastedProps[key]; // its a function and not needed to be compared
-                        delete subCompareProps[key]; // its a function and not needed to be compared
-                    });
-                });
+                const matched = Object.entries(subCastedProps).every(([key, value]) => compareProps(value, subCompareProps[key], () => {
+                    delete subCastedProps[key]; // its a function and not needed to be compared
+                    delete subCompareProps[key]; // its a function and not needed to be compared
+                }));
                 return matched;
             }
             return compareProps(value, compare, () => {

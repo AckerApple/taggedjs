@@ -1,11 +1,13 @@
 import { renderWithSupport } from './renderWithSupport.function.js';
 export function renderSubjectComponent(subject, reSupport, ownerSupport) {
-    const preClones = ownerSupport.global.clones.map(clone => clone);
-    reSupport = renderWithSupport(reSupport, subject.tagSupport, // existing tag
+    const ownGlobal = ownerSupport.subject.global;
+    const preClones = ownGlobal.clones.map(clone => clone);
+    reSupport = renderWithSupport(reSupport, subject.support, // existing tag
     subject, ownerSupport);
-    if (ownerSupport.global.clones.length > preClones.length) {
-        const myClones = ownerSupport.global.clones.filter(fClone => !preClones.find(clone => clone === fClone));
-        reSupport.global.clones.push(...myClones);
+    const reGlobal = reSupport.subject.global;
+    if (ownGlobal.clones.length > preClones.length) {
+        const myClones = ownGlobal.clones.filter(fClone => !preClones.find(clone => clone === fClone));
+        reGlobal.clones.push(...myClones);
     }
     return reSupport;
 }

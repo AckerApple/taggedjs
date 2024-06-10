@@ -13,7 +13,7 @@ export type TagComponent = ((...args: any[]) => Tag) & {
 };
 export declare const tags: TagWrapper<any>[];
 export type TagWrapper<T> = ((...props: T[]) => TemplaterResult) & {
-    original: (...args: any[]) => any;
+    original: ((...args: any[]) => any);
     compareTo: string;
     isTag: boolean;
     oneRender?: true;

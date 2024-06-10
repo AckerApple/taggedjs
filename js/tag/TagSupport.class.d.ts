@@ -37,6 +37,7 @@ export declare class BaseTagSupport {
     updateConfig(strings: string[], values: any[]): void;
     updateValues(values: any[]): Context;
     destroy(options?: DestroyOptions): Promise<number>;
+    childDestroy(options?: DestroyOptions): Promise<number>;
     destroyClones({ stagger }?: DestroyOptions): {
         promise: Promise<(void | undefined)[]>;
         stagger: number;

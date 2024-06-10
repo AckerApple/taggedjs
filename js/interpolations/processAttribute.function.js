@@ -22,7 +22,7 @@ child, scope, ownerSupport, howToSet) {
             processNameOnlyAttr(value, lastValue, child, ownerSupport, howToSet);
             lastValue = value;
         });
-        ownerSupport.global.subscriptions.push(sub); // this is where unsubscribe is picked up
+        ownerSupport.subject.global.subscriptions.push(sub); // this is where unsubscribe is picked up
         child.removeAttribute(attrName);
         return;
     }
@@ -94,7 +94,7 @@ function processNameValueAttr(attrName, result, child, ownerSupport, howToSet) {
         // 🗞️ Subscribe. Above callback called immediately since its a ValueSubject()
         const sub = result.subscribe(callback);
         // Record subscription for later unsubscribe when element destroyed
-        ownerSupport.global.subscriptions.push(sub);
+        ownerSupport.subject.global.subscriptions.push(sub);
         return;
     }
     howToSet(child, attrName, result);

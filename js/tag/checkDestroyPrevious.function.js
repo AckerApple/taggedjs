@@ -1,7 +1,6 @@
 import { isStaticTag } from '../isInstance.js';
 import { isLikeTags } from './isLikeTags.function.js';
 import { destroyTagMemory } from './destroyTag.function.js';
-import { insertAfter } from '../insertAfter.function.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 export function checkDestroyPrevious(subject, // existing.value is the old value
 newValue, insertBefore, valueType) {
@@ -18,25 +17,22 @@ newValue, insertBefore, valueType) {
         if (newValue instanceof Function && lastValue instanceof Function) {
             return false;
         }
-        destroySimpleValue(insertBefore, displaySubject);
+        destroySimpleValue(displaySubject);
         return 'changed-simple-value';
     }
     const arraySubject = subject;
     const wasArray = arraySubject.lastArray;
     // no longer an array
     if (wasArray && valueType !== ValueTypes.tagArray) {
-        const placeholderElm = arraySubject.placeholder;
         delete arraySubject.lastArray;
-        delete arraySubject.placeholder;
-        insertAfter(insertBefore, placeholderElm);
-        for (let index = wasArray.length - 1; index >= 0; --index) {
-            const { tagSupport } = wasArray[index];
-            destroyArrayTag(tagSupport, { added: 0, removed: 0 });
+        for (let index = wasArray.array.length - 1; index >= 0; --index) {
+            const { support } = wasArray.array[index];
+            destroyArrayTag(support, { added: 0, removed: 0 });
         }
         return 'array';
     }
     const tagSubject = subject;
-    const lastSupport = tagSubject.tagSupport;
+    const lastSupport = tagSubject.support;
     // no longer tag or component?
     if (lastSupport) {
         const isValueTag = isStaticTag(newValue);
@@ -46,9 +42,7 @@ newValue, insertBefore, valueType) {
             // its a different tag now
             if (!isLikeTags(newTag, lastSupport)) {
                 // put template back down
-                restoreTagMarker(lastSupport);
                 destroyTagMemory(lastSupport);
-                // delete lastSupport.global.deleted // ???
                 return 2;
             }
             return false;
@@ -59,8 +53,6 @@ newValue, insertBefore, valueType) {
         if (newValue && newValue.oneRender) {
             return false;
         }
-        // put template back down
-        restoreTagMarker(lastSupport);
         // destroy old component, value is not a component
         destroyTagMemory(lastSupport);
         // delete lastSupport.global.deleted // ???
@@ -71,31 +63,12 @@ newValue, insertBefore, valueType) {
 export function isSimpleType(value) {
     return ['string', 'number', 'boolean'].includes(value);
 }
-export function destroyArrayTag(tagSupport, counts) {
-    tagSupport.destroy({
+export function destroyArrayTag(support, counts) {
+    support.destroy({
         stagger: counts.removed++,
     });
-    const insertBefore = tagSupport.global.insertBefore;
-    const parentNode = insertBefore.parentNode;
-    parentNode.removeChild(insertBefore);
 }
-function destroySimpleValue(insertBefore, // always a template tag
-subject) {
-    const clone = subject.clone;
-    const parent = clone.parentNode;
-    // 1 put the template back down
-    parent.insertBefore(insertBefore, clone);
-    parent.removeChild(clone);
-    delete subject.clone;
+function destroySimpleValue(subject) {
     delete subject.lastValue;
-}
-export function restoreTagMarker(lastSupport) {
-    const insertBefore = lastSupport.global.insertBefore;
-    const global = lastSupport.global;
-    const placeholderElm = global.placeholder;
-    if (placeholderElm) {
-        insertAfter(insertBefore, placeholderElm);
-        delete global.placeholder;
-    }
 }
 //# sourceMappingURL=checkDestroyPrevious.function.js.map

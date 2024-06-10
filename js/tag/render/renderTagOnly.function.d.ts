@@ -1,3 +1,3 @@
-import { BaseTagSupport, TagSupport } from '../TagSupport.class.js';
+import { BaseSupport, Support } from '../Support.class.js';
 import { TagSubject } from '../../subject.types.js';
-export declare function renderTagOnly(newTagSupport: TagSupport | BaseTagSupport, prevSupport: TagSupport | BaseTagSupport | undefined, subject: TagSubject, ownerSupport?: TagSupport | BaseTagSupport): TagSupport;
+export declare function renderTagOnly(newSupport: Support | BaseSupport, prevSupport: Support | BaseSupport | undefined, subject: TagSubject, ownerSupport?: Support | BaseSupport): Support;

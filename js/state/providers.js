@@ -18,18 +18,18 @@ export const providers = {
             const oldStateCount = stateConfig.array.length;
             // Providers with provider requirements just need to use providers.create() and providers.inject()
             const instance = 'prototype' in constructMethod ? new constructMethod() : constructMethod();
-            const tagSupport = stateConfig.tagSupport;
+            const support = stateConfig.support;
             const stateDiff = stateConfig.array.length - oldStateCount;
             const provider = {
                 constructMethod,
                 instance,
                 clone: deepClone(instance),
                 stateDiff,
-                owner: tagSupport,
+                owner: support,
                 children: [],
             };
             stateDiffMemory.provider = provider;
-            tagSupport.global.providers.push(provider);
+            support.subject.global.providers.push(provider);
             stateDiffMemory.stateDiff = stateDiff;
             return instance;
         });
@@ -50,13 +50,13 @@ export const providers = {
             const memory = setUse.memory;
             const cm = constructor;
             const compareTo = cm.compareTo = cm.compareTo || constructor.toString();
-            const tagSupport = memory.stateConfig.tagSupport;
+            const support = memory.stateConfig.support;
             const providers = [];
             let owner = {
-                ownerTagSupport: tagSupport.ownerTagSupport
+                ownerSupport: support.ownerSupport
             };
-            while (owner.ownerTagSupport) {
-                const ownerProviders = owner.ownerTagSupport.global.providers;
+            while (owner.ownerSupport) {
+                const ownerProviders = owner.ownerSupport.subject.global.providers;
                 const provider = ownerProviders.find(provider => {
                     providers.push(provider);
                     const constructorMatch = provider.constructMethod.compareTo === compareTo;
@@ -66,12 +66,12 @@ export const providers = {
                 });
                 if (provider) {
                     provider.clone = deepClone(provider.instance); // keep a copy of the latest before any change occur
-                    const tagSupport = memory.stateConfig.tagSupport;
-                    tagSupport.global.providers.push(provider);
-                    provider.children.push(tagSupport);
+                    const support = memory.stateConfig.support;
+                    support.subject.global.providers.push(provider);
+                    provider.children.push(support);
                     return provider.instance;
                 }
-                owner = owner.ownerTagSupport; // cause reloop checking next parent
+                owner = owner.ownerSupport; // cause reloop checking next parent
             }
             const msg = `Could not inject provider: ${constructor.name} ${constructor}`;
             console.warn(`${msg}. Available providers`, providers);

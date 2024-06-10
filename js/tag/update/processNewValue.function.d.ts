@@ -1,3 +1,4 @@
-import { TagSupport } from '../TagSupport.class.js';
+import { ValueSubject } from '../../subject/ValueSubject.js';
+import { Support } from '../Support.class.js';
 import { InterpolateSubject, TemplateValue } from './processFirstSubject.utils.js';
-export declare function processNewValue(value: TemplateValue, ownerSupport: TagSupport): InterpolateSubject;
+export declare function processNewValue(value: TemplateValue | ValueSubject<any>, ownerSupport: Support): InterpolateSubject;

@@ -6,6 +6,7 @@ export var ValueTypes;
     ValueTypes["tagComponent"] = "tag-component";
     ValueTypes["tagArray"] = "tag-array";
     ValueTypes["subject"] = "subject";
+    ValueTypes["tagJsSubject"] = "tagJsSubject";
     ValueTypes["date"] = "date";
     ValueTypes["string"] = "string";
     ValueTypes["boolean"] = "boolean";

@@ -1,5 +1,5 @@
 import { Context, Tag } from './Tag.class.js';
-import { BaseTagSupport, TagSupport } from './TagSupport.class.js';
+import { BaseSupport, Support } from './Support.class.js';
 import { Props } from '../Props.js';
 import { TagChildren, TagWrapper } from './tag.utils.js';
 import { Provider } from '../state/providers.js';
@@ -13,13 +13,13 @@ import { Subject } from '../subject/index.js';
 export type OriginalFunction = (() => Tag) & {
     compareTo: string;
 };
-export type Wrapper = ((tagSupport: BaseTagSupport | TagSupport, subject: TagSubject) => TagSupport) & {
+export type Wrapper = ((support: BaseSupport | Support, subject: TagSubject) => Support) & {
     parentWrap: TagWrapper<any>;
 };
 export type TagGlobal = {
     destroy$: Subject<any>;
-    oldest: BaseTagSupport | TagSupport;
-    newest?: BaseTagSupport | TagSupport;
+    oldest: BaseSupport | Support;
+    newest?: BaseSupport | Support;
     context: Context;
     providers: Provider[];
     /** Indicator of re-rending. Saves from double rending something already rendered */
@@ -32,9 +32,10 @@ export type TagGlobal = {
     destroyCallback?: OnDestroyCallback;
     init?: OnInitCallback;
     locked?: true;
-    blocked: (BaseTagSupport | TagSupport)[];
-    childTags: TagSupport[];
+    blocked: (BaseSupport | Support)[];
+    childTags: Support[];
     clones: (Element | Text | ChildNode)[];
+    callbackMaker?: true;
 };
 export declare class TemplaterResult {
     props: Props;

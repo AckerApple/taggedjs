@@ -1,18 +1,14 @@
-import { InsertBefore } from './interpolations/InsertBefore.type.js';
-import { BaseTagSupport, TagSupport } from './tag/TagSupport.class.js';
+import { BaseSupport, Support } from './tag/Support.class.js';
 import { TemplaterResult } from './tag/TemplaterResult.class.js';
-import { Template } from './interpolations/interpolateTemplate.js';
 import { Subject } from './subject/Subject.class.js';
-import { ValueSubject } from './subject/ValueSubject.js';
+import { TagJsSubject } from './tag/update/TagJsSubject.class.js';
 export type WasTagSubject = Subject<TemplaterResult> & {
-    tagSupport?: BaseTagSupport | TagSupport;
+    support?: BaseSupport | Support;
 };
-export type TagSubject = ValueSubject<TemplaterResult> & {
-    tagSupport: TagSupport;
+export type TagSubject = TagJsSubject<Support> & {
+    support: Support;
 };
 export type RegularValue = string | number | boolean;
-export type DisplaySubject = Subject<RegularValue> & {
+export type DisplaySubject = TagJsSubject<RegularValue> & Subject<RegularValue> & {
     lastValue?: RegularValue;
-    clone?: Element | Text | Template;
-    insertBefore: InsertBefore;
 };

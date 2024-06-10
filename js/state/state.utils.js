@@ -4,18 +4,18 @@ setUse.memory.stateConfig = {
     array: [], // state memory on the first render
     // rearray: [] as State,
 };
-const beforeRender = (tagSupport) => initState(tagSupport);
+const beforeRender = (support) => initState(support);
 setUse({
     beforeRender,
     beforeRedraw: beforeRender,
-    afterRender: (tagSupport) => {
-        const memory = tagSupport.memory;
+    afterRender: (support) => {
+        const state = support.state;
         const config = setUse.memory.stateConfig;
         const rearray = config.rearray;
         if (rearray.length) {
             if (rearray.length !== config.array.length) {
                 const message = `States lengths have changed ${rearray.length} !== ${config.array.length}. State tracking requires the same amount of function calls every render. Typically this errors is thrown when a state like function call occurs only for certain conditions or when a function is intended to be wrapped with a tag() call`;
-                const wrapper = tagSupport.templater?.wrapper;
+                const wrapper = support.templater?.wrapper;
                 const details = {
                     oldStates: config.array,
                     newStates: config.rearray,
@@ -27,10 +27,9 @@ setUse({
             }
         }
         delete config.rearray; // clean up any previous runs
-        delete config.tagSupport;
-        memory.state.length = 0;
-        memory.state.push(...config.array);
-        const state = memory.state;
+        delete config.support;
+        state.length = 0;
+        state.push(...config.array);
         for (let index = state.length - 1; index >= 0; --index) {
             const item = state[index];
             item.lastValue = getStateValue(item); // set last values
@@ -56,9 +55,8 @@ export function getStateValue(state) {
 }
 export class StateEchoBack {
 }
-function initState(tagSupport) {
-    const memory = tagSupport.memory;
-    const state = memory.state;
+function initState(support) {
+    const state = support.state;
     const config = setUse.memory.stateConfig;
     config.rearray = [];
     const stateLength = state?.length;
@@ -68,7 +66,7 @@ function initState(tagSupport) {
         }
         config.rearray.push(...state);
     }
-    config.tagSupport = tagSupport;
+    config.support = support;
 }
 export function getCallbackValue(callback) {
     const oldState = callback(StateEchoBack); // get value and set to undefined

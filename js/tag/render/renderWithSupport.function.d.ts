@@ -1,5 +1,5 @@
-import { BaseTagSupport, TagSupport } from '../TagSupport.class.js';
+import { BaseSupport, Support } from '../Support.class.js';
 import { TagSubject } from '../../subject.types.js';
-export declare function renderWithSupport(newTagSupport: TagSupport | BaseTagSupport, lastSupport: TagSupport | BaseTagSupport | undefined, // previous
+export declare function renderWithSupport(newSupport: Support | BaseSupport, lastSupport: Support | BaseSupport | undefined, // previous
 subject: TagSubject, // events & memory
-ownerSupport?: TagSupport): TagSupport;
+ownerSupport?: Support): Support;

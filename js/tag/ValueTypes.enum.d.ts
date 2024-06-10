@@ -5,6 +5,7 @@ export declare enum ValueTypes {
     tagComponent = "tag-component",
     tagArray = "tag-array",
     subject = "subject",
+    tagJsSubject = "tagJsSubject",
     date = "date",
     string = "string",
     boolean = "boolean",

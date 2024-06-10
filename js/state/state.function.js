@@ -25,12 +25,12 @@ export function state(defaultValue) {
     // the state is actually intended to be a function
     if (initValue instanceof Function) {
         const oldState = config.array;
-        const tagSupport = config.tagSupport;
+        const support = config.support;
         const original = initValue;
         initValue = ((...args) => {
-            const global = tagSupport.global;
+            const global = support.subject.global;
             const newest = global.newest;
-            const newState = newest.memory.state;
+            const newState = newest.state;
             syncStates(newState, oldState);
             const result = original(...args);
             syncStates(oldState, newState);

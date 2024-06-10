@@ -1,6 +1,6 @@
-import { TagSupport } from './TagSupport.class.js';
+import { Support } from './Support.class.js';
 export type DestroyOptions = {
     stagger: number;
     byParent?: boolean;
 };
-export declare function getChildTagsToDestroy(childTags: TagSupport[], allTags?: TagSupport[]): TagSupport[];
+export declare function getChildTagsToDestroy(childTags: Support[], allTags?: Support[]): Support[];

@@ -1,16 +1,16 @@
-import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js';
+import { BaseSupport, Support } from '../tag/Support.class.js';
 import { Config } from './state.utils.js';
 interface TagUse {
-    beforeRender: (tagSupport: BaseTagSupport | TagSupport, ownerTag?: TagSupport | BaseTagSupport) => void;
-    beforeRedraw: (tagSupport: BaseTagSupport | TagSupport, tag: TagSupport | BaseTagSupport) => void;
-    afterRender: (tagSupport: BaseTagSupport | TagSupport, ownerTagSupport?: TagSupport | BaseTagSupport) => void;
-    beforeDestroy: (tagSupport: BaseTagSupport | TagSupport, tag: TagSupport | BaseTagSupport) => void;
+    beforeRender: (support: BaseSupport | Support, ownerTag?: Support | BaseSupport) => void;
+    beforeRedraw: (support: BaseSupport | Support, tag: Support | BaseSupport) => void;
+    afterRender: (support: BaseSupport | Support, ownerSupport?: Support | BaseSupport) => void;
+    beforeDestroy: (support: BaseSupport | Support, tag: Support | BaseSupport) => void;
 }
 export type UseOptions = {
-    beforeRender?: (tagSupport: TagSupport | BaseTagSupport, ownerTag?: TagSupport | BaseTagSupport) => void;
-    beforeRedraw?: (tagSupport: BaseTagSupport | TagSupport, tag: TagSupport | BaseTagSupport) => void;
-    afterRender?: (tagSupport: BaseTagSupport | TagSupport, ownerTagSupport?: TagSupport | BaseTagSupport) => void;
-    beforeDestroy?: (tagSupport: BaseTagSupport | TagSupport, tag: TagSupport | BaseTagSupport) => void;
+    beforeRender?: (support: Support | BaseSupport, ownerTag?: Support | BaseSupport) => void;
+    beforeRedraw?: (support: BaseSupport | Support, tag: Support | BaseSupport) => void;
+    afterRender?: (support: BaseSupport | Support, ownerSupport?: Support | BaseSupport) => void;
+    beforeDestroy?: (support: BaseSupport | Support, tag: Support | BaseSupport) => void;
 };
 export declare function setUse(use: UseOptions): void;
 export declare namespace setUse {
@@ -19,6 +19,6 @@ export declare namespace setUse {
 }
 type UseMemory = (Record<string, any> & {
     stateConfig: Config;
-    currentSupport: TagSupport;
+    currentSupport: Support;
 });
 export {};

@@ -161,12 +161,10 @@ export class BaseTagSupport {
     }
     destroy(options = {
         stagger: 0,
-        byParent: false, // Only destroy clones of direct children
     }) {
-        const firstDestroy = !options.byParent;
         const global = this.global;
         const childTags = options.byParent ? [] : getChildTagsToDestroy(this.global.childTags);
-        if (firstDestroy && isTagComponent(this.templater)) {
+        if (isTagComponent(this.templater)) {
             global.destroy$.next();
             runBeforeDestroy(this, this);
         }
@@ -180,32 +178,32 @@ export class BaseTagSupport {
             if (isTagComponent(child.templater)) {
                 runBeforeDestroy(child, child);
             }
+            child.destroySubscriptions();
         }
         let mainPromise;
         // FIRST DOM Manipulation to cause painting cycle
         checkRestoreTagMarker(this, options);
-        if (firstDestroy) {
-            const { stagger, promise } = this.destroyClones(options);
-            options.stagger = stagger;
-            if (promise) {
-                mainPromise = promise;
-            }
+        const { stagger, promise } = this.destroyClones(options);
+        options.stagger = stagger;
+        if (promise) {
+            mainPromise = promise;
         }
-        else {
-            this.destroyClones();
-        }
-        // data reset
         resetTagSupport(this);
         if (mainPromise) {
-            mainPromise = mainPromise.then(async () => {
-                const promises = childTags.map(kid => kid.destroy({ stagger: 0, byParent: true }));
+            return mainPromise.then(async () => {
+                const promises = childTags.map(kid => kid.childDestroy());
                 return Promise.all(promises);
-            });
+            }).then(() => options.stagger);
         }
-        else {
-            mainPromise = Promise.all(childTags.map(kid => kid.destroy({ stagger: 0, byParent: true })));
-        }
-        return mainPromise.then(() => options.stagger);
+        return Promise.all(childTags.map(kid => kid.childDestroy())).then(() => options.stagger);
+    }
+    childDestroy(options = {
+        stagger: 0,
+    }) {
+        // const global = this.global
+        this.destroyClones();
+        resetTagSupport(this);
+        return Promise.resolve(options.stagger);
     }
     destroyClones({ stagger } = {
         stagger: 0,
@@ -290,9 +288,7 @@ export function checkRestoreTagMarker(support, options) {
     if (insertBefore.nodeName === 'TEMPLATE') {
         const placeholder = global.placeholder;
         if (placeholder && !('arrayValue' in support.memory)) {
-            if (!options.byParent) {
-                restoreTagMarker(support);
-            }
+            restoreTagMarker(support);
         }
     }
 }
