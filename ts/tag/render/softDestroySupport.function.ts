@@ -19,7 +19,10 @@ export function softDestroySupport(
     subGlobal.deleted = true
   })
 
+  lastSupport.smartRemoveKids()
+  lastSupport.subject.global.clones.length = 0 // tag maybe used for something else
+  lastSupport.subject.global.childTags.length = 0 // tag maybe used for something else
+  
   resetSupport(lastSupport)
-  lastSupport.destroyClones()
   childTags.forEach(child => softDestroySupport(child, {byParent: true, stagger: 0}))
 }

@@ -96,6 +96,7 @@ export function processFirstSubjectValue(
     value as RegularValue,
     subject as DisplaySubject,
     subject.global.placeholder || insertBefore,
+    ownerSupport,
     // fragment,
   )
 }

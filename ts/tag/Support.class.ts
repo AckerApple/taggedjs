@@ -158,38 +158,12 @@ export class BaseSupport {
     const strings = this.strings || thisTag.strings
     const values = this.values || thisTag.values
 
-    strings.forEach((_string, index) => {
-      const hasValue = values.length > index
-      if(!hasValue) {
-        return
-      }
-
-      const variableName = variablePrefix + index
-      const value = values[index]
-
-      // is something already there?
-      const exists = variableName in context
-
-      if(exists) {
-        if(this.subject.global.deleted) {
-          const valueSupport = (value && value.support) as Support
-          if(valueSupport) {
-            valueSupport.destroy()
-            return context // item was deleted, no need to emit
-          }
-        }
-
-        return updateContextItem(context, variableName, value)
-      }
-
-      // 🆕 First time values below
-      context[variableName] = processNewValue(
-        value,
-        this as any as Support,
-      ) as TagJsSubject<any>
-
-      // context[variableName].global.insertBefore = this.subject.global.placeholder || this.subject.global.insertBefore
-    })
+    strings.forEach((_string, index) => updateContext(
+      values,
+      index,
+      context,
+      this,
+    ))
 
     return context
   }
@@ -237,32 +211,71 @@ export class BaseSupport {
       }
 
       child.destroySubscriptions()
-      resetSupport(this)
+      // resetSupport(this)
     }
 
     resetSupport(this)
 
-    let mainPromise: Promise<number | (number | void | undefined)[]> | undefined    
-    const {stagger, promise} = this.destroyClones(options)
+    // let mainPromise: Promise<number | (number | void | undefined)[]> | undefined    
+
+    // first paint
+    const {stagger, promises} = this.smartRemoveKids(options)
     options.stagger = stagger
     
-    if(promise) {
-      mainPromise = promise
+    if(promises.length) {
+      return Promise.all(promises).then(() => options.stagger)
     }
-
-    if(mainPromise) {
-      return mainPromise.then(async () => {
-        const promises = childTags.map(kid => kid.destroyClones())
-        return Promise.all(promises)
-      }).then(() => options.stagger)
-    }
-
-    childTags.forEach(kid => kid.destroyClones())
     return options.stagger
   }
 
+  smartRemoveKids(
+    options: DestroyOptions = {
+      stagger: 0,
+    }
+  ) {
+    const startStagger = options.stagger
+    const promises: Promise<any>[] = []
+    const myClones = this.subject.global.clones
+    this.subject.global.childTags.forEach(childTag => {
+      const clones = childTag.subject.global.clones
+      let cloneOne = clones[0]
+      
+      if(cloneOne === undefined) {
+        const {stagger, promises: newPromises} = childTag.smartRemoveKids(options)
+        options.stagger = options.stagger + stagger
+        promises.push(...newPromises)
+        return
+      }
+
+      let count = 0
+      // let deleted = false
+      while(cloneOne.parentNode && count < 5) {
+        if(myClones.includes(cloneOne)) {
+          return // no need to delete, they live within me
+        }
+
+        cloneOne = cloneOne.parentNode as Element
+        ++count
+      }
+      
+      // recurse
+      const {stagger, promises: newPromises} = childTag.smartRemoveKids(options)
+      options.stagger = options.stagger + stagger
+      promises.push(...newPromises)
+    })
+    
+    const promise = this.destroyClones({stagger: startStagger}).promise
+    this.subject.global.clones.length = 0
+    this.subject.global.childTags.length = 0
+    if(promise) {
+      promises.unshift(promise)
+    }
+    
+    return {promises, stagger: options.stagger}
+  }
+
   destroyClones(
-    {stagger}: DestroyOptions = {
+    options: DestroyOptions = {
       stagger: 0,
     }
   ) {
@@ -270,16 +283,14 @@ export class BaseSupport {
 
     // check subjects that may have clones attached to them
     const promises = oldClones.map(
-      clone => this.checkCloneRemoval(clone, stagger)
+      clone => this.checkCloneRemoval(clone, options.stagger)
     ).filter(x => x) // only return promises
 
-    this.subject.global.clones.length = 0 // tag maybe used for something else
-
     if(promises.length) {
-      return {promise: Promise.all(promises), stagger}
+      return {promise: Promise.all(promises), stagger:options.stagger}
     }
 
-    return {stagger}
+    return {stagger: options.stagger}
   }
 
   /** Reviews elements for the presences of ondestroy */
@@ -307,6 +318,15 @@ export class BaseSupport {
     const parentNode = clone.parentNode as ParentNode
     if(parentNode) {
       parentNode.removeChild(clone)
+    }
+
+    const ownerSupport = (this as any as Support).ownerSupport as Support
+    if(ownerSupport) {
+      const clones = ownerSupport.subject.global.clones
+      const index = clones.indexOf(clone)
+      if(index >= 0) {
+        clones.splice(index, 1)
+      }
     }
 
     return promise
@@ -347,11 +367,46 @@ export class Support extends BaseSupport {
 
 export function resetSupport(support: BaseSupport | Support) {
   const global = support.subject.global
-  // delete global.placeholder
   global.context = {}
   delete (global as any).oldest // may not be needed
   delete global.newest
-  support.subject.global.childTags.length = 0
   const subject = support.subject
   delete (subject as any).support
+}
+
+
+function updateContext(
+  values: unknown[],
+  index: number,
+  context: Context,
+  support: BaseSupport | Support
+) {
+  const hasValue = values.length > index
+  if(!hasValue) {
+    return
+  }
+
+  const variableName = variablePrefix + index
+  const value = values[index] as any
+
+  // is something already there?
+  const exists = variableName in context
+
+  if(exists) {
+    if(support.subject.global.deleted) {
+      const valueSupport = (value && value.support) as Support
+      if(valueSupport) {
+        valueSupport.destroy()
+        return context // item was deleted, no need to emit
+      }
+    }
+
+    return updateContextItem(context, variableName, value)
+  }
+
+  // 🆕 First time values below
+  context[variableName] = processNewValue(
+    value,
+    support as Support,
+  ) as TagJsSubject<any>
 }
