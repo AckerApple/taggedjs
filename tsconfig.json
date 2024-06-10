@@ -12,8 +12,6 @@
     // "target": "es2020",
     // "target": "ES5",
     "module": "esnext",
-    "declaration": true,
-    "sourceMap": true,
     "removeComments": false,
     "strict": true,
     "lib": [
@@ -26,7 +24,6 @@
     "moduleResolution": "Bundler",
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
 

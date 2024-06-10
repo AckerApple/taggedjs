@@ -18,7 +18,7 @@ export function focus(
 export function click(
   q: string
 ) {
-  return query(q).forEach(elm => (elm as HTMLElement).click())
+  return [...query(q)].map(elm => (elm as HTMLElement).click())
 }
 
 export function clickOne(

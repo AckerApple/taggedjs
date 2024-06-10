@@ -1,4 +1,4 @@
-import { BaseTagSupport, RouteProps, RouteQuery, RouteTag, Subject, Tag, TagSubject, TagSupport, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToTagSupport, renderTagOnly } from 'taggedjs'
+import { BaseSupport, RouteProps, RouteQuery, RouteTag, Subject, Tag, TagSubject, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -44,7 +44,7 @@ function templaterToSupport(
   templater.children = templater.children || new ValueSubject([])
   templater.props = templater.props || []
 
-  const support = new BaseTagSupport(templater, subject) as any as TagSupport
+  const support = new BaseSupport(templater, subject) as any as Support
 
   readySupport(support, subject)
 
@@ -52,11 +52,11 @@ function templaterToSupport(
 }
 
 function readySupport(
-  support: TagSupport,
+  support: Support,
   subject: TagSubject,
 ) {
-  subject.tagSupport = support
-  support.global.oldest = support
+  subject.support = support
+  support.subject.global.oldest = support
 
   renderTagOnly(support, support, subject)
   support.update()
@@ -66,10 +66,9 @@ function readySupport(
 
 function templaterToHtml(
   templater: TemplaterResult,
-  ownerTagSupport?: TagSupport,
 ) {
   const support = templaterToSupport(templater)
-  const context = support.global.context
+  const context = support.subject.global.context
   const template = support.getTemplate()
   const strings = new Array(...template.strings) // clone
   const values = Object.values(context)
@@ -80,7 +79,6 @@ function templaterToHtml(
       strings,
       values.length - 1 - index,
       support,
-      //ownerTagSupport,
       subject as TagSubject
     )
   })
@@ -91,8 +89,7 @@ function processValue(
   value: any,
   strings: string[],
   index: number,
-  support: TagSupport,
-  // ownerTagSupport?: TagSupport,
+  support: Support,
   subject?: TagSubject,
 ) {
 
@@ -100,7 +97,7 @@ function processValue(
 
   switch (valueType) {
     case ValueTypes.tagComponent:
-      const tagString = templaterToHtml(value as TemplaterResult, support)
+      const tagString = templaterToHtml(value as TemplaterResult)
       strings.splice(index+1, 0, tagString)
       break
 
@@ -128,15 +125,15 @@ function processValue(
         break // its not a function we should be messing with
       }
 
-      const tagSupport = oneRenderToTagSupport(
+      const tSupport = oneRenderToSupport(
         value as any,
         subject as TagSubject,
         support, // ownerTagSupport as TagSupport,
       )
 
-      readySupport(tagSupport, subject as TagSubject)
+      readySupport(tSupport, subject as TagSubject)
 
-      const fnString = templaterToHtml(tagSupport.templater, tagSupport)
+      const fnString = templaterToHtml(tSupport.templater)
       strings.splice(index+1, 0, fnString)
       
       break

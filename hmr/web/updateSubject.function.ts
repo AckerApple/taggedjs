@@ -9,9 +9,9 @@
  */
 
 import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function.js"
-import { InsertBefore, TagSubject, TagSupport, TaggedFunction, Wrapper } from "taggedjs"
+import { InsertBefore, TagSubject, Support, TaggedFunction, Wrapper } from "taggedjs"
 
-/** @typedef {{renderTagOnly: renderTagOnly, renderTagSupport: renderTagSupport, renderWithSupport: renderWithSupport}} HmrImport */
+/** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 
 /**
  * Used to switch out the wrappers of a subject and then render
@@ -26,11 +26,11 @@ export async function updateSubject(
   oldTag: TaggedFunction<any>,
   hmr: any
 ) {
-  /** @type {TagSupport} */
-  const contextSupport = contextSubject.tagSupport
+  /** @type {Support} */
+  const contextSupport = contextSubject.support
   
-  const oldest = contextSupport.global.oldest as TagSupport
-  const newest = contextSupport.global.newest as TagSupport
+  const oldest = contextSupport.subject.global.oldest as Support
+  const newest = contextSupport.subject.global.newest as Support
 
   const toString = newTag.original.toString()
   // contextSupport.templater.wrapper.original.compareTo = toString
@@ -49,23 +49,23 @@ export async function updateSubject(
   const oldWrapper = oldest.templater.wrapper as Wrapper
   oldWrapper.parentWrap.original = newTag.original
 
-  const prevConstructors = newest.global.providers.map(provider => provider.constructMethod)
+  const prevConstructors = newest.subject.global.providers.map(provider => provider.constructMethod)
 
-  /** @type {TagSupport} */
-  const reSupport: TagSupport = hmr.renderTagOnly(
+  /** @type {Support} */
+  const reSupport: Support = hmr.renderTagOnly(
     newest,
     newest,
     newest.subject,
-    newest.ownerTagSupport,
+    newest.ownerSupport,
   )
 
-  const appSupport = oldest.getAppTagSupport()
-  const providers = reSupport.global.providers
-  const owner = oldest.ownerTagSupport.global.oldest as TagSupport
+  const appSupport = oldest.getAppSupport()
+  const providers = reSupport.subject.global.providers
+  const owner = oldest.ownerSupport.subject.global.oldest as Support
   // connect child to owner
-  reSupport.ownerTagSupport = owner
+  reSupport.ownerSupport = owner
   // connect owner to child
-  owner.global.childTags.push(reSupport)  
+  owner.subject.global.childTags.push(reSupport)  
 
   providers.forEach((provider, index) => {
     prevConstructors[index].compareTo = provider.constructMethod.compareTo
@@ -75,17 +75,14 @@ export async function updateSubject(
 
   await oldest.destroy()
 
-  delete oldest.global.deleted
-  delete (reSupport.global as any).oldest // TODO this maybe redundant of oldest.destroy()
-  delete reSupport.global.newest
+  delete oldest.subject.global.deleted
+  delete (reSupport.subject.global as any).oldest // TODO this maybe redundant of oldest.destroy()
+  delete reSupport.subject.global.newest
 
-  const insertBefore = oldest.global.insertBefore as InsertBefore
-  reSupport.buildBeforeElement(insertBefore, {
-    // forceElement: false,
-    counts: {added:0, removed: 0},
-  })
+  const insertBefore = oldest.subject.global.insertBefore as InsertBefore
+  reSupport.buildBeforeElement(undefined, {counts: {added:0, removed: 0}})
 
-  reSupport.global.newest = reSupport
-  reSupport.global.oldest = reSupport
-  contextSubject.tagSupport = reSupport
+  reSupport.subject.global.newest = reSupport
+  reSupport.subject.global.oldest = reSupport
+  contextSubject.support = reSupport
 }

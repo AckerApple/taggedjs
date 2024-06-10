@@ -4,6 +4,8 @@ import { ViewTypes } from "./isolatedApp"
 export async function runTests(
   views: ViewTypes[]
 ) {
+  await import('./start.test')
+
   if(views.includes(ViewTypes.Content)) {
     await import('./content.test')
   }
@@ -51,6 +53,8 @@ export async function runTests(
   if(views.includes(ViewTypes.Todo)) {
     await import('./todos.test')
   }
+
+  await import('./last.test')
 
   try {
     const start = Date.now() //performance.now()

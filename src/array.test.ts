@@ -39,7 +39,8 @@ describe('array testing', () => {
 
     expect(elmCount('#player-remove-promise-btn-0')).toBe(1)
 
-    await (byId('player-remove-promise-btn-0') as any).onclick()
+    const result = await (byId('player-remove-promise-btn-0') as any).onclick()
+    expect(result).toBe('promise-no-data-ever')
     await delay(1000) // animation
 
     expect(elmCount('#player-remove-promise-btn-0')).toBe(0)

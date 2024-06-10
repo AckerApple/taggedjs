@@ -8,7 +8,7 @@
  * @typedef {import("taggedjs").renderTagSupport} renderTagSupport
  */
 import { TagSubject, TaggedFunction } from "taggedjs";
-/** @typedef {{renderTagOnly: renderTagOnly, renderTagSupport: renderTagSupport, renderWithSupport: renderWithSupport}} HmrImport */
+/** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 /**
  * Used to switch out the wrappers of a subject and then render
  * @param {*} contextSubject

@@ -1,13 +1,13 @@
 /** client code */
 
 // 🟠 Warning: avoid direct imports due to bundle workflow (old bundle and new bundle do not mix well)
-// const { renderWithSupport, renderTagSupport } = require("taggedjs");
+// const { renderWithSupport, renderSupport } = require("taggedjs");
 
-import { TemplaterResult, TagSubject, Tag, TagSupport, TaggedFunction, ValueTypes, Wrapper, variablePrefix } from "taggedjs"
+import { TemplaterResult, TagSubject, Tag, Support, TaggedFunction, ValueTypes, Wrapper, variablePrefix } from "taggedjs"
 import { updateSubject } from "./updateSubject.function"
 
-/** @type {TagSupport | undefined} */
-let lastApp: TagSupport
+/** @type {Support | undefined} */
+let lastApp: Support
 
 reconnect()
 
@@ -16,13 +16,13 @@ reconnect()
  * @typedef {import("taggedjs").TagComponent} TagComponent
  * @typedef {import("taggedjs").TagWrapper} TagWrapper
  * @typedef {import("taggedjs").Tag} Tag
- * @typedef {import("taggedjs").TagSupport} TagSupport
+ * @typedef {import("taggedjs").Support} Support
  * @typedef {import("taggedjs").tagElement} tagElement
  * @typedef {import("taggedjs").renderWithSupport} renderWithSupport
- * @typedef {import("taggedjs").renderTagSupport} renderTagSupport
+ * @typedef {import("taggedjs").renderSupport} renderSupport
  */
 
-/** @typedef {{renderTagOnly: renderTagOnly, renderTagSupport: renderTagSupport, renderWithSupport: renderWithSupport}} HmrImport */
+/** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 
 function reconnect() {
   const socket = new WebSocket('ws://localhost:3000');
@@ -208,7 +208,7 @@ async function updateByElement(
       if(isAppChanged) {
         const lastWrapper = lastApp.templater.wrapper as Wrapper
         lastWrapper.parentWrap.original = newTag.original
-        lastApp.ownerTagSupport = {clones:[], childTags:[]} as any as TagSupport
+        lastApp.ownerSupport = {clones:[], childTags:[]} as any as Support
         // lastApp.rebuild().then(x => lastApp = x)
         lastTags = newTags
         throw new Error('app changed, need code for that')
@@ -238,18 +238,18 @@ async function updateByElement(
 
 /**
  * 
- * @param {TagSupport} ownerTagSupport 
+ * @param {Support} ownerSupport 
  * @param {{oldTag: TagComponent, newTag: TagComponent}} param1 
  * @param {HmrImport} hmr 
  * @returns {Promise<number>}
  */
 async function replaceTemplater(
-  ownerTagSupport: TagSupport,
+  ownerSupport: Support,
   {oldTag, newTag}: {oldTag: any, newTag: any},
   hmr: any
 ) {
   let  count = 0
-  const tag = ownerTagSupport.templater.tag as Tag
+  const tag = ownerSupport.templater.tag as Tag
   const promises = tag.values.map(async (value, index) => {
     const isTemplater = value.jsTagType = ValueTypes.templater
     if(!value || !isTemplater) {
@@ -261,7 +261,7 @@ async function replaceTemplater(
 
     // Check to rebuild a component within an app
     if(isWrapping) {
-      const global = ownerTagSupport.global
+      const global = ownerSupport.subject.global
       const context = global.context
       const contextSubject = context[ variablePrefix + index ]
       
@@ -277,7 +277,7 @@ async function replaceTemplater(
   
   await Promise.all(promises)
 
-  const subPromises = ownerTagSupport.global.childTags.map(async child => {
+  const subPromises = ownerSupport.subject.global.childTags.map(async child => {
     count = count + await replaceTemplater(
       child, {oldTag, newTag},
       hmr
@@ -303,7 +303,7 @@ function rebuildApps() {
         const result = tagElement(newApp[tagName as string], element, {test:1})
         
         lastTags = result.tags
-        lastApp = result.tagSupport
+        lastApp = result.support
   
         return result
       })
@@ -313,12 +313,12 @@ function rebuildApps() {
 
 /**
  * 
- * @param {TagSupport} lastApp 
+ * @param {Support} lastApp 
  * @param {any} oldTag 
  * @returns {boolean}
  */
 function hasAppRelatedTo(
-  lastApp: TagSupport,
+  lastApp: Support,
   oldTag: any,
 ) {
   const oldTemplater = lastApp.templater

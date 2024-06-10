@@ -31,11 +31,11 @@ const insideMultiRender = tag(() => (
 ) => {
   ++renderCount
   return html`
-  <span>👍👍 sub counter-subject-display:<span id="👍👍-counter-subject-display">${counter$}</span></span>
+  <span>👍🔨 sub counter-subject-display:<span id="👍🔨-counter-subject-display">${counter$}</span></span>
   <br />
-  <span>👍👍 sub counter<span id="👍👍-counter-display">${counter}</span></span>
+  <span>👍🔨 sub counter<span id="👍🔨-counter-display">${counter}</span></span>
   <br />
-  <button type="button" id="👍👍-counter-button"
+  <button type="button" id="👍🔨-counter-button"
     onclick=${() => {
       counter$.next(++counter)
     }}

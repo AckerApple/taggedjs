@@ -1,5 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "outDir": "./assets/js",
-  "include": ["./src/."]
+  "include": ["./src/."],
+  "compilerOptions": {
+    "declaration": true,
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+  }
 }

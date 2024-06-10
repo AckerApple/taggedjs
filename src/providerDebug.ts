@@ -107,8 +107,54 @@ export const providerDebugBase = tag((_x = 'providerDebugBase') => {
     ${renderCountDiv({renderCount, name:'providerDebugBase'})}
 
     ${dialog(providerClass)}
+
+    TODOTODOTODOTODO
+    ${/*tagSwitchingWithProvider()*/false}
   `
 })
+
+const tagSwitchingWithProvider = tag(() => (
+  upperProvider = providers.inject( upperTagDebugProvider )
+) => html`
+  <div>
+    <button id="increase-provider-switch-🌹-0-button" onclick=${() => ++upperProvider.test}
+    >🌹 increase switch.provider.test ${upperProvider.test}</button>
+    <span>
+      🌹<span id="increase-provider-switch-🌹-0-display">${upperProvider.test}</span>
+    </span>
+  </div>
+  <hr />
+  <div>statue:${upperProvider.test % 2 == 0 ? 'off' : 'on'}</div>
+  ${tagSwitchingProChild1()}
+  <hr />
+  ${upperProvider.test % 2 == 0 ? null : tagSwitchingProChild2()}
+`)
+
+const tagSwitchingProChild1 = tag(() => (
+  upperProvider = providers.inject( upperTagDebugProvider ),
+) => upperProvider.test % 2 == 0 ? null : html`
+  <div>
+    <button id="increase-provider-switch-🌹-1-button" onclick=${() => ++upperProvider.test}
+    >🌹 increase switch.provider.test ${upperProvider.test}</button>
+    <span>
+      🌹<span id="increase-provider-switch-🌹-1-display">${upperProvider.test}</span>
+    </span>
+  </div>
+`)
+
+const tagSwitchingProChild2 = tag(() => (
+  upperProvider = providers.inject( upperTagDebugProvider )
+) => html`
+  <div>
+    <button id="increase-provider-switch-🌹-2-button" onclick=${() => ++upperProvider.test}
+    >🌹 increase switch.provider.test ${upperProvider.test}</button>
+    <span>
+      🌹<span id="increase-provider-switch-🌹-2-display">${upperProvider.test}</span>
+    </span>
+  </div>
+`)
+
+
 
 const dialog = tag((providerClass: TagDebugProvider) => html`
   <dialog id="provider_debug_dialog" style="padding:0"

@@ -1,4 +1,4 @@
-import { byId, click, html, htmlById } from "./elmSelectors"
+import { byId, click, html, htmlById, query } from "./elmSelectors"
 import { describe, expect, it } from "./expect"
 import { expectHTML, expectMatchedHtml, testCounterElements, testDuelCounterElements } from "./expect.html"
 
@@ -22,7 +22,8 @@ describe('props', () => {
     expectMatchedHtml('#propsDebug-🥩-0-display', '#propsDebug-🥩-2-display')
     const propCounter = Number(html('#propsDebug-🥩-0-display'))
     
-    click('#propsDebug-🥩-2-button')
+    const result = (query('#propsDebug-🥩-2-button')[0] as any).onclick()
+    expect(result).toBe('no-data-ever')
 
     // outer should not have changed
     expect(html('#propsDebug-🥩-0-display')).toBe( propCounter.toString() )
