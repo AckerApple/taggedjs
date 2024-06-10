@@ -1,4 +1,4 @@
-import { Tag } from './Tag.class.js'
+import { Tag, TagTemplate } from './Tag.class.js'
 import { TemplaterResult } from './TemplaterResult.class.js'
 import { ValueSubject } from '../subject/ValueSubject.js'
 import { setUse } from '../state/index.js'
@@ -17,7 +17,7 @@ export const tags: TagWrapper<any>[] = []
 export type TagWrapper<T> = ((
   ...props: T[]
 ) => TemplaterResult) & {
-  original: (...args: any[]) => any
+  original: ((...args: any[]) => any)
   compareTo: string
   isTag: boolean
   oneRender?: true

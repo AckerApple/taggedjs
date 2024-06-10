@@ -9,8 +9,8 @@ export function processRegularValue(
   subject: DisplaySubject, // could be tag via subject.tag
   insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
 ) {
-  subject.insertBefore = insertBefore
-  const before = subject.clone || insertBefore // Either the template is on the doc OR its the first element we last put on doc
+  subject.global.insertBefore = insertBefore
+  const before = subject.global.placeholder || insertBefore // Either the template is on the doc OR its the first element we last put on doc
 
   // matches but also was defined at some point
   if(subject.lastValue === value && 'lastValue' in subject) {
@@ -21,7 +21,7 @@ export function processRegularValue(
   const castedValue = castTextValue(value)
   
   // replace existing string?
-  const oldClone = subject.clone
+  const oldClone = subject.global.placeholder
   if(oldClone) {
     oldClone.textContent = castedValue
     return
@@ -33,7 +33,7 @@ export function processRegularValue(
     before, // this will be removed
   )
 
-  subject.clone = clone // remember single element put down, for future updates
+  subject.global.placeholder = clone // remember single element put down, for future updates
 }
 
 export function processFirstRegularValue(
@@ -50,5 +50,5 @@ export function processFirstRegularValue(
     insertBefore, // this will be removed
   )
 
-  subject.clone = clone // remember single element put down, for future updates 
+  subject.global.placeholder = clone // remember single element put down, for future updates 
 }

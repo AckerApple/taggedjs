@@ -1,5 +1,5 @@
 import { StateMismatchError } from '../errors.js'
-import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js'
+import { BaseSupport, Support } from '../tag/Support.class.js'
 import { Wrapper } from '../tag/TemplaterResult.class.js'
 import { setUse } from'./setUse.function.js'
 
@@ -14,7 +14,7 @@ export type StateConfigItem<T> = {
 }
 
 export type Config = {
-  tagSupport?: BaseTagSupport | TagSupport
+  support?: BaseSupport | Support
   array: State // state memory on the first render
   rearray?: State // state memory to be used before the next render
 }
@@ -28,22 +28,22 @@ setUse.memory.stateConfig = {
 
 export type GetSet<T> = (y: T) => [T, T]
 
-const beforeRender = (tagSupport: TagSupport | BaseTagSupport) => initState(tagSupport)
+const beforeRender = (support: Support | BaseSupport) => initState(support)
 
 setUse({
   beforeRender,
   beforeRedraw: beforeRender,
   afterRender: (
-    tagSupport: TagSupport | BaseTagSupport,
+    support: Support | BaseSupport,
   ) => {
-    const memory = tagSupport.memory
+    const state = support.state
     const config: Config = setUse.memory.stateConfig
     const rearray = config.rearray as unknown as State[]
     
     if(rearray.length) {
       if(rearray.length !== config.array.length) {
         const message = `States lengths have changed ${rearray.length} !== ${config.array.length}. State tracking requires the same amount of function calls every render. Typically this errors is thrown when a state like function call occurs only for certain conditions or when a function is intended to be wrapped with a tag() call`
-        const wrapper = tagSupport.templater?.wrapper as Wrapper
+        const wrapper = support.templater?.wrapper as Wrapper
         const details = {
           oldStates: config.array,
           newStates: config.rearray,
@@ -56,11 +56,10 @@ setUse({
     }
     
     delete config.rearray // clean up any previous runs
-    delete config.tagSupport
+    delete config.support
 
-    memory.state.length = 0
-    memory.state.push(...config.array)
-    const state = memory.state
+    state.length = 0
+    state.push(...config.array)
     for (let index = state.length - 1; index >= 0; --index) {
       const item = state[index]
       item.lastValue = getStateValue(item) // set last values
@@ -98,10 +97,9 @@ export function getStateValue<T>(
 export class StateEchoBack {}
 
 function initState(
-  tagSupport: TagSupport | BaseTagSupport
+  support: Support | BaseSupport
 ) {
-  const memory = tagSupport.memory
-  const state = memory.state as State
+  const state = support.state as State
   const config: Config = setUse.memory.stateConfig
 
   config.rearray = []
@@ -113,7 +111,7 @@ function initState(
     config.rearray.push( ...state )
   }
 
-  config.tagSupport = tagSupport
+  config.support = support
 }
 
 export function getCallbackValue<T>(

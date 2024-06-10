@@ -1,7 +1,7 @@
 import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
 import { Tag } from '../Tag.class.js'
 import { TagSubject } from '../../subject.types.js'
-import { TagSupport } from '../TagSupport.class.js'
+import { Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { ValueSubject } from '../../subject/index.js'
 import { Props } from '../../Props.js'
@@ -9,27 +9,29 @@ import { Props } from '../../Props.js'
 /** When first time render, adds to owner childTags */
 export function processTag(
   templater: TemplaterResult,
-  insertBefore: InsertBefore,
-  ownerSupport: TagSupport, // owner
+  ownerSupport: Support, // owner
   subject: TagSubject, // could be tag via result.tag
-): TagSupport {
-  let tagSupport = subject.tagSupport as any as TagSupport
+  fragment?: DocumentFragment,
+): Support {
+  let support = subject.support as any as Support
   
   // first time seeing this tag?
-  if(!tagSupport) {
-    tagSupport = newTagSupportByTemplater(templater, ownerSupport, subject)
+  if(!support) {
+    support = newSupportByTemplater(templater, ownerSupport, subject)
   }
-  
-  subject.tagSupport = tagSupport
-  tagSupport.ownerTagSupport = ownerSupport
-  // ++tagSupport.global.renderCount
-  tagSupport.buildBeforeElement(
-    insertBefore, {
-      counts: {added:0, removed:0},
-    }
-  )
 
-  return tagSupport
+  subject.support = support
+  support.ownerSupport = ownerSupport
+  const newFragment = support.buildBeforeElement(undefined, {counts: {added:0, removed:0}})
+  if(fragment) {
+    fragment.appendChild(newFragment)
+  } else {
+    const placeholder = subject.global.placeholder as Text
+    const parentNode = placeholder.parentNode as ParentNode
+    parentNode.insertBefore(newFragment, placeholder)
+  }
+
+  return support
 }
 
 export function tagFakeTemplater(
@@ -59,33 +61,33 @@ export function getFakeTemplater() {
   return fake
 }
 
-/** Create TagSupport for a tag component */
-export function newTagSupportByTemplater(
+/** Create Support for a tag component */
+export function newSupportByTemplater(
   templater: TemplaterResult,
-  ownerSupport: TagSupport,
+  ownerSupport: Support,
   subject: TagSubject,
 ) {
-  const tagSupport = new TagSupport(
+  const support = new Support(
     templater,
     ownerSupport,
     subject,
   )
 
-  setupNewSupport(tagSupport, ownerSupport, subject)
-  ownerSupport.global.childTags.push(tagSupport)
+  setupNewSupport(support, ownerSupport, subject)
+  ownerSupport.subject.global.childTags.push(support)
 
-  return tagSupport
+  return support
 }
 
 export function setupNewSupport(
-  tagSupport: TagSupport,
-  ownerSupport: TagSupport,
+  support: Support,
+  ownerSupport: Support,
   subject: TagSubject,
 ) {
-  tagSupport.global.oldest = tagSupport
-  tagSupport.global.newest = tagSupport
+  support.subject = subject
+  subject.global.oldest = support
+  subject.global.newest = support
 
   // asking me to render will cause my parent to render
-  tagSupport.ownerTagSupport = ownerSupport
-  subject.tagSupport = tagSupport
+  support.ownerSupport = ownerSupport
 }

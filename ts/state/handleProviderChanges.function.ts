@@ -1,48 +1,51 @@
 import { deepClone } from '../deepFunctions.js'
 import { Provider } from './providers.js'
-import { renderTagSupport } from'../tag/render/renderTagSupport.function.js'
-import { TagSupport } from '../tag/TagSupport.class.js'
+import { renderSupport } from'../tag/render/renderSupport.function.js'
+import { Support } from '../tag/Support.class.js'
 
 export function handleProviderChanges(
-  appSupport: TagSupport,
+  appSupport: Support,
   provider: Provider,
 ) {
+  let hadChanged = false
   const tagsWithProvider = getTagsWithProvider(appSupport, provider)
   for (let index = tagsWithProvider.length - 1; index >= 0; --index) {
-    const {tagSupport, renderCount, provider} = tagsWithProvider[index]
-    if(tagSupport.global.deleted) {
+    const {support, renderCount, provider} = tagsWithProvider[index]
+    if(support.subject.global.deleted) {
       continue // i was deleted after another tag processed
     }
 
-    const notRendered = renderCount === tagSupport.global.renderCount
+    const notRendered = renderCount === support.subject.global.renderCount
     if(notRendered) {
+      hadChanged = true
       provider.clone = deepClone(provider.instance)
-      renderTagSupport(
-        tagSupport.global.newest as TagSupport, // tagSupport, // tagSupport.global.newest as TagSupport,
+      renderSupport(
+        support.subject.global.newest as Support, // support, // support.subject.global.newest as Support,
         false,
       )
       continue
     }
   }
+  return hadChanged
 }
 
 /** Updates and returns memory of tag providers */
 function getTagsWithProvider(
-  tagSupport: TagSupport,
+  support: Support,
   provider: Provider,
   memory: TagWithProvider[] = []
 ) {
   memory.push({
-    tagSupport,
-    renderCount: tagSupport.global.renderCount,
+    support,
+    renderCount: support.subject.global.renderCount,
     provider,
   })
 
   const childTags = provider.children
   for (let index = childTags.length - 1; index >= 0; --index) {
     memory.push({
-      tagSupport: childTags[index],
-      renderCount: childTags[index].global.renderCount,
+      support: childTags[index],
+      renderCount: childTags[index].subject.global.renderCount,
       provider,
     })
   }
@@ -51,7 +54,7 @@ function getTagsWithProvider(
 }
 
 type TagWithProvider = {
-  tagSupport: TagSupport
+  support: Support
   renderCount: number
   provider: Provider,
 }

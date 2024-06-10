@@ -1,3 +1,9 @@
+tests
+
+- Test a tag that sometimes returns null and has providers
+  - looking to ensure as tag changes the providers are moved
+  - test going back to null and back and that no elements find themselves back on page
+
 ### TODO NOW: Before Mega-aide
 - Remove the destroy call that gets added on tagElement
   - its used for HMR

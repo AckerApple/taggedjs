@@ -1,28 +1,25 @@
-import { BaseTagSupport, TagSupport, checkRestoreTagMarker, resetTagSupport } from '../TagSupport.class.js'
+import { BaseSupport, Support, resetSupport } from '../Support.class.js'
 import { DestroyOptions, getChildTagsToDestroy } from '../destroy.support.js'
 
 /** used when a tag swaps content returned */
 export function softDestroySupport(
-  lastSupport: BaseTagSupport | TagSupport,
+  lastSupport: BaseSupport | Support,
   options: DestroyOptions = {byParent: false, stagger: 0},
 ) {
-  lastSupport.global.deleted = true
-  lastSupport.global.context = {}
-  const childTags = getChildTagsToDestroy(lastSupport.global.childTags)
+  const global = lastSupport.subject.global
+  global.deleted = true
+  global.context = {}
+  const childTags = getChildTagsToDestroy(global.childTags)
 
   lastSupport.destroySubscriptions()
 
   childTags.forEach(child => {
-    const subGlobal = child.global
+    const subGlobal = child.subject.global
     delete subGlobal.newest
     subGlobal.deleted = true
   })
 
-  checkRestoreTagMarker(lastSupport, options)
-
-  resetTagSupport(lastSupport)
-
+  resetSupport(lastSupport)
   lastSupport.destroyClones()
-
   childTags.forEach(child => softDestroySupport(child, {byParent: true, stagger: 0}))
 }

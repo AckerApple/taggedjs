@@ -1,12 +1,14 @@
-import { BaseTagSupport, TagSupport } from './TagSupport.class.js'
+import { BaseSupport, Support } from './Support.class.js'
 import { runAfterRender, runBeforeRender } from'./tagRunner.js'
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { TagComponent, TagMaker} from './tag.utils.js'
 import { ValueSubject } from'../subject/ValueSubject.js'
 import { TagSubject } from '../subject.types.js'
+import { TagJsSubject } from './update/TagJsSubject.class.js'
+import { setTagPlaceholder } from './setTagPlaceholder.function.js'
 
 const appElements: {
-  tagSupport: TagSupport
+  support: Support
   element: Element
 }[] = []
 
@@ -22,12 +24,12 @@ export function tagElement(
   element: HTMLElement | Element,
   props?: unknown,
 ): {
-  tagSupport: TagSupport
+  support: Support
   tags: TagComponent[]
 } {
   const appElmIndex = appElements.findIndex(appElm => appElm.element === element)
   if(appElmIndex >= 0) {
-    appElements[appElmIndex].tagSupport.destroy()
+    appElements[appElmIndex].support.destroy()
     appElements.splice(appElmIndex, 1)
     // an element already had an app on it
     console.warn('Found and destroyed app element already rendered to element', {element})
@@ -36,70 +38,71 @@ export function tagElement(
   // Create the app which returns [props, runOneTimeFunction]
   const wrapper = app(props) as unknown as TemplaterResult
 
-  // have a function setup and call the tagWrapper with (props, {update, async, on})
-  const tagSupport = runWrapper(wrapper)
+
+  // const fragment = document.createDocumentFragment()
+  const template = document.createElement('template')
+  const placeholder = document.createTextNode('')
+  const support = runWrapper(wrapper, template, placeholder)
+  const global = support.subject.global
   
-  tagSupport.appElement = element
-  tagSupport.isApp = true
-  tagSupport.global.isApp = true
+  support.appElement = element
+  support.isApp = true
+  global.isApp = true
     
-  const templateElm = document.createElement('template')
-  templateElm.setAttribute('id', 'app-tag-' + appElements.length)
-  templateElm.setAttribute('app-tag-detail', appElements.length.toString())
-  
-  const fragment = document.createDocumentFragment()
-  fragment.appendChild(templateElm)
 
   // enables hmr destroy so it can control entire app
-  ;(element as any).destroy = async () => {
-    await tagSupport.destroy()
-    const insertBefore = tagSupport.global.insertBefore as Element
-    const parentNode = insertBefore.parentNode as ParentNode
-    parentNode.removeChild(insertBefore)
+  ;(element as any).destroy = () => {
+    support.destroy() // never return anything here
   }
   
-  tagSupport.buildBeforeElement(templateElm)
+  global.insertBefore = placeholder // template
+  ;(global as any).placeholder = placeholder
+  const newFragment = support.buildBeforeElement(undefined)
 
-  tagSupport.global.oldest = tagSupport
-  tagSupport.global.newest = tagSupport
+  support.subject.global.oldest = support
+  support.subject.global.newest = support
 
   ;(element as any).setUse = (app as any).original.setUse
-
-  appElements.push({element, tagSupport})
-  element.appendChild(fragment)
+  appElements.push({element, support})
+  element.appendChild(newFragment)
 
   return {
-    tagSupport,
+    support,
     tags: (app as any).original.tags,
   }
 }
 
 export function runWrapper(
   templater: TemplaterResult,
+  insertBefore: Element,
+  placeholder: Text,
 ) {
-  let newSupport = {} as BaseTagSupport
+  let newSupport = {} as BaseSupport
 
   // TODO: A fake subject may become a problem
-  const subject = new ValueSubject(newSupport as any as TemplaterResult) as TagSubject
+  const subject = new TagJsSubject(newSupport) as any as TagSubject
     
-  newSupport = new BaseTagSupport(
+  newSupport = new BaseSupport(
     templater,
     subject,
   )
 
+  subject.global.insertBefore = insertBefore
+  subject.global.placeholder = placeholder
+  subject.global.oldest = subject.global.oldest || newSupport
   subject.next( templater )
-  subject.tagSupport = newSupport as TagSupport
+  subject.support = newSupport as Support
   
-  runBeforeRender(newSupport, undefined as unknown as TagSupport)
+  runBeforeRender(newSupport, undefined as unknown as Support)
 
   // Call the apps function for our tag templater
   const wrapper = templater.wrapper as Wrapper
-  const tagSupport = wrapper(
+  const support = wrapper(
     newSupport,
     subject,
   )
 
-  runAfterRender(newSupport, tagSupport)
+  runAfterRender(newSupport, support)
 
-  return tagSupport
+  return support
 }

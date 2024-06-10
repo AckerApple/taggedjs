@@ -1,5 +1,5 @@
 import { Context, Tag } from './Tag.class.js'
-import { BaseTagSupport, TagSupport } from './TagSupport.class.js'
+import { BaseSupport, Support } from './Support.class.js'
 import { Props } from '../Props.js'
 import { TagChildren, TagWrapper } from './tag.utils.js'
 import { Provider } from '../state/providers.js'
@@ -15,16 +15,16 @@ import { kidsToTagArraySubject } from './kidsToTagArraySubject.function.js'
 export type OriginalFunction = (() => Tag) & {compareTo: string}
 
 export type Wrapper = ((
-  tagSupport: BaseTagSupport | TagSupport,
+  support: BaseSupport | Support,
   subject: TagSubject,
-) => TagSupport) & {
+) => Support) & {
   parentWrap: TagWrapper<any>
 }
 
 export type TagGlobal = {
   destroy$: Subject<any>
-  oldest: BaseTagSupport | TagSupport
-  newest?: BaseTagSupport | TagSupport
+  oldest: BaseSupport | Support
+  newest?: BaseSupport | Support
   context: Context // populated after reading interpolated.values array converted to an object {variable0, variable:1}
   providers: Provider[]
   /** Indicator of re-rending. Saves from double rending something already rendered */
@@ -43,10 +43,11 @@ export type TagGlobal = {
   init?: OnInitCallback // what to run when init complete, used for onInit
   
   locked?: true
-  blocked: (BaseTagSupport | TagSupport)[], // renders that did not occur because an event was processing
+  blocked: (BaseSupport | Support)[], // renders that did not occur because an event was processing
   
-  childTags: TagSupport[], // tags on me
+  childTags: Support[], // tags on me
   clones: (Element | Text | ChildNode)[],
+  callbackMaker?: true
 }
 
 export class TemplaterResult {

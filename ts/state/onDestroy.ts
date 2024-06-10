@@ -1,4 +1,4 @@
-import { TagSupport } from "../tag/TagSupport.class.js"
+import { Support } from "../tag/Support.class.js"
 import { getSupportInCycle } from "../tag/getSupportInCycle.function.js"
 import { state } from "./state.function.js"
 
@@ -8,7 +8,7 @@ export function onDestroy(
   callback: OnDestroyCallback
 ) {
   state(() => {
-    const tagSupport = getSupportInCycle() as TagSupport
-    tagSupport?.global.destroy$.toCallback(callback)
+    const support = getSupportInCycle() as Support
+    support?.subject.global.destroy$.toCallback(callback)
   })
 }

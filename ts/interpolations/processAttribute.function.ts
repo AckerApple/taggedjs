@@ -3,7 +3,7 @@ import { isSubjectInstance } from '../isInstance.js'
 import { Context } from '../tag/Tag.class.js'
 import { HowToSet } from './interpolateAttributes.js'
 import { bindSubjectCallback } from './bindSubjectCallback.function.js'
-import { TagSupport } from '../tag/TagSupport.class.js'
+import { Support } from '../tag/Support.class.js'
 
 const startRegX = /^\s*{__tagvar/
 const endRegX = /}\s*$/
@@ -16,7 +16,7 @@ export function processAttribute(
   value: string | null, // current attribute value by using .getAttribute
   child: Element,
   scope: Context,
-  ownerSupport: TagSupport,
+  ownerSupport: Support,
   howToSet: HowToSet,
 ) {
   if ( isTagVar(value) ) {  
@@ -50,7 +50,7 @@ export function processAttribute(
 
       lastValue = value
     })
-    ownerSupport.global.subscriptions.push(sub) // this is where unsubscribe is picked up
+    ownerSupport.subject.global.subscriptions.push(sub) // this is where unsubscribe is picked up
     child.removeAttribute(attrName)
 
     return
@@ -68,7 +68,7 @@ function processScopedNameValueAttr(
   value: string, // {__tagVarN}
   child: Element,
   scope: Context,
-  ownerSupport: TagSupport,
+  ownerSupport: Support,
   howToSet: HowToSet
 ) {
   // get the code inside the brackets like "variable0" or "{variable0}"
@@ -93,7 +93,7 @@ function processNameOnlyAttr(
   attrValue: string | Record<string, any>,
   lastValue: string | Record<string, any> | undefined,
   child: Element,
-  ownerSupport: TagSupport,
+  ownerSupport: Support,
   howToSet: HowToSet,
 ) {
   if(lastValue && lastValue != attrValue) {
@@ -139,7 +139,7 @@ function processNameValueAttr(
   attrName: string,
   result: any,
   child: Element,
-  ownerSupport: TagSupport,
+  ownerSupport: Support,
   howToSet: HowToSet
 ) {
   const isSpecial = isSpecialAttr(attrName)
@@ -191,7 +191,7 @@ function processNameValueAttr(
     const sub = result.subscribe(callback as any)
     
     // Record subscription for later unsubscribe when element destroyed
-    ownerSupport.global.subscriptions.push(sub)
+    ownerSupport.subject.global.subscriptions.push(sub)
 
     return
   }
@@ -256,7 +256,7 @@ function isSpecialAttr(
 }
 
 function callbackFun(
-  ownerSupport: TagSupport,
+  ownerSupport: Support,
   newAttrValue: any,
   child: Element,
   attrName: string,

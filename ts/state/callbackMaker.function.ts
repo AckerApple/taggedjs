@@ -1,4 +1,4 @@
-import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js'
+import { BaseSupport, Support } from '../tag/Support.class.js'
 import { setUse } from './setUse.function.js'
 import { State } from './state.utils.js'
 import { SyncCallbackError } from '../errors.js'
@@ -20,10 +20,10 @@ export const callbackMaker = () => innerCallback
 const originalGetter = innerCallback // callbackMaker
 
 setUse({
-  beforeRender: tagSupport => initMemory(tagSupport),
-  beforeRedraw: tagSupport => initMemory(tagSupport),
-  afterRender: tagSupport => {
-    ;(tagSupport.global as any).callbackMaker = true
+  beforeRender: support => initMemory(support),
+  beforeRedraw: support => initMemory(support),
+  afterRender: support => {
+    support.subject.global.callbackMaker = true
     innerCallback = originalGetter // prevent crossing callbacks with another tag
   },
 })
@@ -32,19 +32,19 @@ setUse({
 export function callback<A,B,C,D,E,F, T>(
   callback: Callback<A, B, C, D, E, F, T>
 ): () => T {
-  const tagSupport = getSupportInCycle()
+  const support = getSupportInCycle()
 
-  if(!tagSupport) {
+  if(!support) {
     const error = new SyncCallbackError('callback() was called outside of synchronous rendering. Use `callback = callbackMaker()` to create a callback that could be called out of sync with rendering')
     throw error
   }
 
   const oldState = setUse.memory.stateConfig.array
   const trigger = (...args: any[]) => {
-    const callbackMaker = (tagSupport.global as any).callbackMaker
+    const callbackMaker = support.subject.global.callbackMaker
     
     if(callbackMaker) {
-      return callbackStateUpdate(tagSupport, callback, oldState, ...args)
+      return callbackStateUpdate(support, callback, oldState, ...args)
     }
 
     return (callback as any)(...args)
@@ -53,16 +53,16 @@ export function callback<A,B,C,D,E,F, T>(
   return trigger
 }
 
-function initMemory (tagSupport: TagSupport | BaseTagSupport) {
+function initMemory (support: Support | BaseSupport) {
   const oldState: State = setUse.memory.stateConfig.array
   innerCallback = (
     callback: Callback<any, any, any, any, any, any, any>
   ) => {    
     const trigger = (...args: any[]) => {
-      const callbackMaker = (tagSupport.global as any).callbackMaker
+      const callbackMaker = support.subject.global.callbackMaker
       
       if(callbackMaker) {
-        return callbackStateUpdate(tagSupport, callback, oldState, ...args)
+        return callbackStateUpdate(support, callback, oldState, ...args)
       }
 
       return (callback as any)(...args)

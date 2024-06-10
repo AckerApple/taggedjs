@@ -1,24 +1,24 @@
 import { TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
 import { TagSubject } from '../../subject.types.js'
-import { newTagSupportByTemplater } from './processTag.function.js'
-import { TagSupport } from '../TagSupport.class.js'
+import { newSupportByTemplater } from './processTag.function.js'
+import { Support } from '../Support.class.js'
 import { Tag } from '../Tag.class.js'
 
-export function oneRenderToTagSupport(
+export function oneRenderToSupport(
   wrapper: Wrapper,
   subject: TagSubject,
-  ownerSupport: TagSupport, // owner
+  ownerSupport: Support, // owner
 ) {
   const templater = new TemplaterResult([])
   templater.tagJsType = 'oneRender'
-  const tagSupport = newTagSupportByTemplater(
+  const support = newSupportByTemplater(
     templater, ownerSupport, subject
   )
 
   let tag: Tag
   const wrap = () => {
     templater.tag = tag || ((wrapper as any)())
-    return tagSupport
+    return support
   }
 
   templater.wrapper = wrap as any
@@ -26,5 +26,5 @@ export function oneRenderToTagSupport(
   wrap.oneRender = true
   ;(wrap.parentWrap as any).original = wrapper
 
-  return tagSupport
+  return support
 }

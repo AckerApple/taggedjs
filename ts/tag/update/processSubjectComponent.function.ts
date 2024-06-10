@@ -3,18 +3,20 @@ import { setUse } from'../../state/index.js'
 import { Counts } from'../../interpolations/interpolateTemplate.js'
 import { processTagResult } from'./processTagResult.function.js'
 import { TagSubject } from '../../subject.types.js'
-import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
+import { BaseSupport, Support } from '../Support.class.js'
 import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
 import { renderSubjectComponent } from'../render/renderSubjectComponent.function.js'
+import { setupNewSupport } from './processTag.function.js'
 
 /** create new support, connects globals to old support if one, and  */
 export function processSubjectComponent(
   templater: TemplaterResult,
   subject: TagSubject,
   insertBefore: InsertBefore,
-  ownerSupport: TagSupport,
+  ownerSupport: Support,
   options: {counts: Counts},
-): BaseTagSupport | TagSupport {
+  fragment ?: DocumentFragment,
+): BaseSupport | Support {
   // Check if function component is wrapped in a tag() call
   // TODO: This below check not needed in production mode
   if(templater.tagged !== true) {
@@ -31,23 +33,24 @@ export function processSubjectComponent(
     throw error
   }
 
-  const tagSupport = new TagSupport(
+  const support = new Support(
     templater,
     ownerSupport,
     subject,
   )
-
-  let reSupport = subject.tagSupport
-
-  const global = tagSupport.global = reSupport?.global || tagSupport.global
+  
+  let reSupport = subject.support
+  setupNewSupport(support, ownerSupport, subject)
+  const global = support.subject.global = reSupport?.subject.global || support.subject.global
+  global.oldest = support
   global.insertBefore = insertBefore
   
   const isRender = !reSupport
   if(isRender) {    
-    const support = reSupport || tagSupport
+    const mySupport = reSupport || support
     reSupport = renderSubjectComponent(
       subject,
-      support,
+      mySupport,
       ownerSupport,
     )
   }
@@ -55,12 +58,12 @@ export function processSubjectComponent(
   const newSupport = processTagResult(
     reSupport,
     subject, // The element set here will be removed from document. Also result.tag will be added in here
-    insertBefore, // <template end interpolate /> (will be removed)
     options,
+    fragment,
   )
 
-  // subject.tagSupport = newSupport
-  ownerSupport.global.childTags.push(newSupport as TagSupport)
+  // subject.support = newSupport
+  ownerSupport.subject.global.childTags.push(newSupport as Support)
 
   return reSupport
 }

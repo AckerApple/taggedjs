@@ -7,6 +7,7 @@ export enum ValueTypes {
   
   tagArray = 'tag-array',
   subject = 'subject',
+  tagJsSubject = 'tagJsSubject',
   
   date = 'date',
   string = 'string',

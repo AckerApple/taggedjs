@@ -1,5 +1,5 @@
 import { Subject, ValueSubject } from'../subject/index.js'
-import { TagSupport } from '../tag/TagSupport.class.js'
+import { Support } from '../tag/Support.class.js'
 import { getSupportInCycle } from'../tag/getSupportInCycle.function.js'
 import { setUse } from'./setUse.function.js'
 import { state } from'./state.function.js'
@@ -117,7 +117,7 @@ const setupWatch = <T, R>(
   }
 
   const allExact = currentValues.every((item, index) =>
-    item === (previousValues as any[])[index]
+    item === previousValues[index]
   )
   if(allExact) {
     return previous.pastResult
@@ -151,7 +151,7 @@ function defineOnMethod<R>(
   Object.defineProperty(attachTo, 'asSubject', {
     get() {
       const oldWatch = getWatch()
-      const firstSupport = state(() => (getSupportInCycle() as TagSupport))
+      const firstSupport = state(() => (getSupportInCycle() as Support))
       const subject = state(() => new ValueSubject<any>(undefined))
       
       const method = <T>(
@@ -161,14 +161,14 @@ function defineOnMethod<R>(
         setupWatch(
           currentValues,
           (currentValues, previousValues) => {
-            const nowTagSupport = getSupportInCycle()
+            const nowSupport = getSupportInCycle()
             const setTo = callback(currentValues, previousValues)
 
-            if(nowTagSupport !== firstSupport) {
+            if(nowSupport !== firstSupport) {
               const newestState = setUse.memory.stateConfig.array
               syncStates(
                 newestState,
-                firstSupport.memory.state,
+                firstSupport.state,
               )
             }
 

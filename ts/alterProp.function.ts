@@ -1,7 +1,7 @@
-import { BaseTagSupport, TagSupport } from './tag/TagSupport.class.js'
+import { BaseSupport, Support } from './tag/Support.class.js'
 import { deepClone, deepEqual } from './deepFunctions.js'
 import { isStaticTag } from './isInstance.js'
-import { renderTagSupport } from './tag/render/renderTagSupport.function.js'
+import { renderSupport } from './tag/render/renderSupport.function.js'
 import { State, setUse } from './state/index.js'
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { syncStates } from './state/syncStates.function.js'
@@ -9,23 +9,23 @@ import { Props } from './Props.js'
 
 export function castProps(
   props: Props,
-  newTagSupport: BaseTagSupport | TagSupport,
+  newSupport: BaseSupport | Support,
   stateArray: State,
 ) {
   return props.map(prop => alterProp(
     prop,
-    (newTagSupport as TagSupport).ownerTagSupport,
+    (newSupport as Support).ownerSupport,
     stateArray,
-    newTagSupport,
+    newSupport,
   ))
 }
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProp(
   prop: unknown,
-  ownerSupport: BaseTagSupport | TagSupport,
+  ownerSupport: BaseSupport | Support,
   stateArray: State,
-  newTagSupport: BaseTagSupport | TagSupport,
+  newSupport: BaseSupport | Support,
 ) {
   if(isStaticTag(prop) || !prop) {
     return prop
@@ -35,20 +35,20 @@ export function alterProp(
     return prop // no one above me
   }
 
-  return checkProp(prop, ownerSupport, stateArray, newTagSupport)
+  return checkProp(prop, ownerSupport, stateArray, newSupport)
 }
 
 export function checkProp(
   value: any,
-  ownerSupport: BaseTagSupport | TagSupport,
+  ownerSupport: BaseSupport | Support,
   stateArray: State,
-  newTagSupport: BaseTagSupport | TagSupport,
+  newSupport: BaseSupport | Support,
   index?: string | number,
   newProp?: any,
   seen: any[] = [],
 ) {
   if(value instanceof Function) {
-    return getPropWrap(value, ownerSupport, stateArray, newTagSupport, index, newProp)
+    return getPropWrap(value, ownerSupport, stateArray, newSupport, index, newProp)
   }
 
   if(seen.includes(value)) {
@@ -65,7 +65,7 @@ export function checkProp(
       const subValue = value[index]
   
       value[index] = checkProp(
-        subValue, ownerSupport, stateArray, newTagSupport, index, value, seen
+        subValue, ownerSupport, stateArray, newSupport, index, value, seen
       )
 
       if(subValue instanceof Function) {
@@ -73,7 +73,7 @@ export function checkProp(
           continue
         }
   
-        afterCheckProp(index, subValue, value, newTagSupport)
+        afterCheckProp(index, subValue, value, newSupport)
       }
     }
 
@@ -84,7 +84,7 @@ export function checkProp(
   for(const name in value){
     const subValue = value[name]
     const result = checkProp(
-      subValue, ownerSupport, stateArray, newTagSupport, name, value, seen
+      subValue, ownerSupport, stateArray, newSupport, name, value, seen
     )
     
     const hasSetter = Object.getOwnPropertyDescriptor(value, name)?.set
@@ -98,7 +98,7 @@ export function checkProp(
         continue
       }
   
-      afterCheckProp(name, subValue, value, newTagSupport)
+      afterCheckProp(name, subValue, value, newSupport)
     }
   }
   
@@ -109,21 +109,21 @@ function afterCheckProp(
   index: string | number,
   pastValue: any,
   newProp: any,
-  newTagSupport: BaseTagSupport | TagSupport
+  newSupport: BaseSupport | Support
 ) {
   if(pastValue?.toCall) {
     return // already been done
   }
 
   // restore object to have original function on destroy
-  newTagSupport.global.destroy$.toCallback(() => newProp[index] = pastValue)
+  newSupport.subject.global.destroy$.toCallback(() => newProp[index] = pastValue)
 }
 
 export function getPropWrap(
   value: any,
-  ownerSupport: BaseTagSupport | TagSupport,
+  ownerSupport: BaseSupport | Support,
   stateArray: State,
-  newTagSupport: BaseTagSupport | TagSupport,
+  newSupport: BaseSupport | Support,
   name?: string | number,
   newProp?: any,
 ) {
@@ -137,7 +137,7 @@ export function getPropWrap(
   const wrap = (...args: any[]) => wrap.toCall(...args) // what gets called can switch over parent state changes
   // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
   wrap.toCall = (...args: any[]) => {
-    return callbackPropOwner(wrap.prop, args, ownerSupport, wrap.stateArray)
+    return callbackPropOwner(wrap.prop, args, ownerSupport)
   }
   wrap.original = value
   wrap.prop = value
@@ -153,29 +153,16 @@ export function getPropWrap(
 export function callbackPropOwner(
   toCall: Function,
   callWith: any,
-  ownerSupport: BaseTagSupport | TagSupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
-  oldState: State,
+  ownerSupport: BaseSupport | Support, // <-- WHEN called from alterProp its owner OTHERWISE its previous
 ) {
-  const newest = ownerSupport.global.newest as TagSupport
-  //const newState = newest.memory.state
-  const noCycle = getSupportInCycle() === undefined
-  //const sync = noCycle && oldState.length === newState.length
-  
-  //if(sync) {
-  //  syncStates(newState, oldState)
-  //}
-  
+  const newest = ownerSupport.subject.global.newest as Support
+  const noCycle = getSupportInCycle() === undefined  
   const result = toCall(...callWith)
-
-  // if(sync) {
-  //   syncStates(oldState, newState)
-  // }
-  
   const run = () => {    
     // are we in a rendering cycle? then its being called by alterProps
     if(noCycle === false) {
       // appears a prop function was called sync/immediately so lets see if owner changed state
-      const allMatched = newest.memory.state.every(state => {
+      const allMatched = newest.state.every(state => {
         const lastValue = state.lastValue
         const get = state.get()
         const equal = deepEqual(
@@ -191,7 +178,7 @@ export function callbackPropOwner(
       }
     }
 
-    renderTagSupport(
+    renderSupport(
       newest,
       true,
     )

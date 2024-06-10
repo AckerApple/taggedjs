@@ -1,26 +1,26 @@
-import { buildClones } from '../render.js'
-import { afterElmBuild } from './interpolateTemplate.js'
-import { InsertBefore } from './InsertBefore.type.js'
+import { buildClones } from '../buildClones.function.js'
+import { Template, afterElmBuild } from './interpolateTemplate.js'
 import { Context, ElementBuildOptions } from '../tag/Tag.class.js'
-import { TagSupport } from '../tag/TagSupport.class.js'
+import { Support } from '../tag/Support.class.js'
 
 export function afterInterpolateElement(
   container: DocumentFragment,
-  insertBefore: InsertBefore,
-  tagSupport: TagSupport,
+  template: Template,
+  support: Support,
   context: Context,
   options: ElementBuildOptions,
 ) {
-  const clones = buildClones(container, insertBefore)
+  const clones = buildClones(container, template)
   if(!clones.length) {
     return clones
   }
 
+  const global = support.subject.global
   for (let index = clones.length - 1; index >= 0; --index) {
     const clone = clones[index]
-    afterElmBuild(clone, options, context, tagSupport)
-    tagSupport.global.clones.push( clone )
+    afterElmBuild(clone, options, context, support)
   }
+  global.clones.push( ...clones )
 
   return clones
 }

@@ -1,4 +1,4 @@
-import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
+import { BaseSupport, Support } from '../Support.class.js'
 import { TagSubject } from '../../subject.types.js'
 import { isLikeTags } from'../isLikeTags.function.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
@@ -6,26 +6,26 @@ import { providersChangeCheck } from '../../state/providersChangeCheck.function.
 
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(
-  oldestSupport: TagSupport | BaseTagSupport, // oldest with elements on html
-  newSupport: TagSupport | BaseTagSupport, // new to be rendered
-  ownerSupport: BaseTagSupport | TagSupport, // ownerSupport
+  oldestSupport: Support | BaseSupport, // oldest with elements on html
+  newSupport: Support | BaseSupport, // new to be rendered
+  ownerSupport: BaseSupport | Support, // ownerSupport
   subject: TagSubject,
-): TagSupport {
-  const lastSupport = subject.tagSupport as TagSupport
-  const global = lastSupport.global
+): Support {
+  const lastSupport = subject.support as Support
+  const global = lastSupport.subject.global
   
   // share point between renders
-  newSupport.global = global
+  newSupport.subject.global = global
 
   const preRenderCount = global.renderCount
   providersChangeCheck(oldestSupport)
   
   // When the providers were checked, a render to myself occurred and I do not need to re-render again
-  const prevSupport = global.newest as TagSupport
+  const prevSupport = global.newest as Support
   const justUpdate = preRenderCount !== global.renderCount
 
   if(justUpdate) {
-    oldestSupport.global.oldest.updateBy(prevSupport)
+    oldestSupport.subject.global.oldest.updateBy(prevSupport)
     return prevSupport // already rendered during triggered events
   }
 
@@ -35,13 +35,13 @@ export function renderExistingTag(
     newSupport,
     toRedrawTag,
     subject,
-    ownerSupport as TagSupport,
+    ownerSupport as Support,
   )
 
   const oldest = global.oldest || oldestSupport
 
   if(isLikeTags(prevSupport, reSupport)) {
-    subject.tagSupport = reSupport
+    subject.support = reSupport
     oldest.updateBy(reSupport)
   }
   

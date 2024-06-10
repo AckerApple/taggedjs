@@ -1,10 +1,9 @@
 import { interpolateAttributes } from './interpolateAttributes.js'
 import { interpolateToTemplates } from './interpolations.js'
-import { InterpolatedContentTemplates, interpolateContentTemplates } from './interpolateContentTemplates.js'
+import { interpolateContentTemplates } from './interpolateContentTemplates.js'
 import { Context, TagTemplate, escapeSearch, variablePrefix } from '../tag/Tag.class.js'
-import { Counts, InterpolateComponentResult } from './interpolateTemplate.js'
-import { TagSupport } from '../tag/TagSupport.class.js'
-import { InsertBefore } from './InsertBefore.type.js'
+import { Counts, InterpolateComponentResult, Template } from './interpolateTemplate.js'
+import { Support } from '../tag/Support.class.js'
 
 export type InterpolateOptions = {
   counts: Counts
@@ -12,39 +11,39 @@ export type InterpolateOptions = {
 
 /** Review elements within an element */
 export function interpolateElement(
-  container: DocumentFragment, // element containing innerHTML to review interpolations
+  fragment: DocumentFragment,
+  template: Template, // element containing innerHTML to review interpolations
   context: Context, // variables used to evaluate
   interpolatedTemplates: TagTemplate,
-  ownerSupport: TagSupport,
+  ownerSupport: Support,
   options: InterpolateOptions,
-): InterpolatedContentTemplates {
-  const clones: InsertBefore[] = []
+): InterpolateComponentResult[] {
   const tagComponents: InterpolateComponentResult[] = []
   const result = interpolatedTemplates.interpolation
-  const template = container.children[0] as HTMLTemplateElement
+  // const template = container.children[0] as HTMLTemplateElement
   const children = template.content.children
 
   if(result.keys.length) {
-    const {clones: nextClones, tagComponents: nextTagComponents} = interpolateContentTemplates(
+    const nextTagComponents = interpolateContentTemplates(
       context,
       ownerSupport,
       options,
-      children
+      children,
+      fragment,
     )
-    clones.push( ...nextClones )
-    tagComponents.push( ...nextTagComponents )
+    tagComponents.push(...nextTagComponents)
   }
 
   interpolateAttributes(template, context, ownerSupport)
   processChildrenAttributes(children, context, ownerSupport)
 
-  return {clones, tagComponents}
+  return tagComponents
 }
 
 function processChildrenAttributes(
   children: HTMLCollection,
   context: Context,
-  ownerSupport: TagSupport,
+  ownerSupport: Support,
 ) {
   for (let index=children.length-1; index >= 0; --index) {
     const child = children[index]

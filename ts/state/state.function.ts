@@ -1,4 +1,4 @@
-import { TagSupport } from '../tag/TagSupport.class.js'
+import { Support } from '../tag/Support.class.js'
 import { setUse } from './setUse.function.js'
 import { Config, StateConfig, State, StateConfigItem, getStateValue } from './state.utils.js'
 import { syncStates } from './syncStates.function.js'
@@ -34,13 +34,13 @@ export function state <T>(
   // the state is actually intended to be a function
   if(initValue instanceof Function) {
     const oldState = config.array
-    const tagSupport = config.tagSupport as TagSupport
+    const support = config.support as Support
     const original = initValue
     
     initValue = ((...args: any[]) => {
-      const global = tagSupport.global
-      const newest = global.newest as TagSupport
-      const newState = newest.memory.state
+      const global = support.subject.global
+      const newest = global.newest as Support
+      const newState = newest.state
       
       syncStates(newState, oldState)
 

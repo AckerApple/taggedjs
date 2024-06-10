@@ -1,16 +1,16 @@
-import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js'
+import { BaseSupport, Support } from '../tag/Support.class.js'
 import { State } from './state.utils.js'
-import { renderTagSupport } from '../tag/render/renderTagSupport.function.js'
+import { renderSupport } from '../tag/render/renderSupport.function.js'
 import { syncStates } from './syncStates.function.js'
 import { Callback } from './callbackMaker.function.js'
 
 export default function callbackStateUpdate<T>(
-  tagSupport: TagSupport | BaseTagSupport,
+  support: Support | BaseSupport,
   callback: Callback<any, any,any, any, any, any, T>,
   oldState: State,
   ...args: any[]
 ): T {
-  const state = tagSupport.memory.state  
+  const state = support.state  
 
   // ensure that the oldest has the latest values first
   syncStates(state, oldState)
@@ -20,8 +20,8 @@ export default function callbackStateUpdate<T>(
 
   // send the oldest state changes into the newest
   syncStates(oldState, state)
-  renderTagSupport(
-    tagSupport, // tagSupport.global.newest as TagSupport,
+  renderSupport(
+    support, // support.global.newest as Support,
     false,
   )
 
@@ -30,8 +30,8 @@ export default function callbackStateUpdate<T>(
       // send the oldest state changes into the newest
       syncStates(oldState, state)
 
-      renderTagSupport(
-        tagSupport, // tagSupport.global.newest as TagSupport,
+      renderSupport(
+        support, // support.global.newest as Support,
         false,
       )
     })

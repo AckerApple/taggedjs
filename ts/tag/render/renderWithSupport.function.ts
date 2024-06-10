@@ -1,17 +1,21 @@
-import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
+import { BaseSupport, Support } from '../Support.class.js'
 import { isLikeTags } from'../isLikeTags.function.js'
 import { TagSubject } from '../../subject.types.js'
 import { renderTagOnly } from'./renderTagOnly.function.js'
 import { destroyUnlikeTags } from'./destroyUnlikeTags.function.js'
+import { softDestroySupport } from './softDestroySupport.function.js'
 
 export function renderWithSupport(
-  newTagSupport: TagSupport | BaseTagSupport,
-  lastSupport: TagSupport | BaseTagSupport | undefined, // previous
+  newSupport: Support | BaseSupport,
+  lastSupport: Support | BaseSupport | undefined, // previous
   subject: TagSubject, // events & memory
-  ownerSupport?: TagSupport, // who to report to
-): TagSupport {
+  ownerSupport?: Support, // who to report to
+): Support {
+  const lastTemplater = lastSupport?.templater
+  const lastStrings = lastTemplater?.tag?.strings
+
   const reSupport = renderTagOnly(
-    newTagSupport, lastSupport, subject, ownerSupport,
+    newSupport, lastSupport, subject, ownerSupport,
   )
 
   const isLikeTag = !lastSupport || isLikeTags(lastSupport, reSupport)
@@ -21,11 +25,17 @@ export function renderWithSupport(
       reSupport,
       subject,
     )
-    reSupport.global.oldest = reSupport
+  } else if(lastSupport) {
+    const oldLength = lastStrings?.length
+    const newLength = reSupport.templater.tag?.strings.length
+    if(oldLength !== newLength) {
+      softDestroySupport(lastSupport)
+    }
   }
 
-  const lastOwnerSupport = (lastSupport as TagSupport)?.ownerTagSupport
-  reSupport.ownerTagSupport = (ownerSupport || lastOwnerSupport) as TagSupport
+
+  const lastOwnerSupport = (lastSupport as Support)?.ownerSupport
+  reSupport.ownerSupport = (ownerSupport || lastOwnerSupport) as Support
 
   return reSupport
 }

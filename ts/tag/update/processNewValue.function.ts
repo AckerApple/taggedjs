@@ -2,21 +2,21 @@ import { Tag } from '../Tag.class.js'
 import { DisplaySubject, TagSubject } from '../../subject.types.js'
 import { ValueSubject } from '../../subject/ValueSubject.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
-import { TagSupport } from '../TagSupport.class.js'
+import {  Support } from '../Support.class.js'
 import { InterpolateSubject, TemplateValue } from './processFirstSubject.utils.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { getValueType } from '../getValueType.function.js'
+import { TagJsSubject, getNewGlobal } from './TagJsSubject.class.js'
 
 export function processNewValue(
-  value: TemplateValue,
-  ownerSupport: TagSupport,
+  value: TemplateValue | ValueSubject<any>,
+  ownerSupport: Support,
 ): InterpolateSubject {
   const valueType = getValueType(value)
   
   switch (valueType) {
     case ValueTypes.tagComponent:
-      const tagSubject = new ValueSubject(value) as TagSubject
-      return tagSubject
+      return new TagJsSubject(value) // ownerSupport.global.value
 
     case ValueTypes.templater:
       const templater = value as TemplaterResult
@@ -27,15 +27,16 @@ export function processNewValue(
       return processNewTag(value as Tag, ownerSupport)
 
     case ValueTypes.subject:
-      return value as ValueSubject<any>
+      (value as any).global = getNewGlobal()
+      return value as InterpolateSubject
   }
 
-  return new ValueSubject(value) as unknown as DisplaySubject
+  return new TagJsSubject(value) as unknown as DisplaySubject
 }
 
 function processNewTag(
   value: Tag,
-  ownerSupport: TagSupport
+  ownerSupport: Support
 ) {  
   const tag = value as Tag
   
@@ -46,15 +47,15 @@ function processNewTag(
     tag.templater = templater
   }
 
-  const subject = new ValueSubject(templater) as TagSubject
-
-  subject.tagSupport = new TagSupport(
+  const subject = new TagJsSubject(templater) as any as TagSubject
+  subject.support = new Support(
     templater,
     ownerSupport,
     subject
   )
 
-  ownerSupport.global.childTags.push(subject.tagSupport as TagSupport)
+  subject.global.oldest = subject.support
+  ownerSupport.subject.global.childTags.push(subject.support as Support)
 
   return subject
 }

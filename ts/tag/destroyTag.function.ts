@@ -1,11 +1,11 @@
-import { BaseTagSupport, TagSupport } from './TagSupport.class.js'
+import { BaseSupport, Support } from './Support.class.js'
 
 export function destroyTagMemory(
-  oldTagSupport: TagSupport | BaseTagSupport,
+  oldSupport: Support | BaseSupport,
 ) {
   // must destroy oldest which is tag with elements on stage
-  const oldest = oldTagSupport.global.oldest as TagSupport
+  const oldest = oldSupport.subject.global.oldest as Support
   oldest.destroy()
   
-  oldTagSupport.global.context = {}
+  oldSupport.subject.global.context = {}
 }

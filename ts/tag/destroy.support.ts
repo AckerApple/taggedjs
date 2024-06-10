@@ -1,4 +1,4 @@
-import { TagSupport } from './TagSupport.class.js'
+import { Support } from './Support.class.js'
 
 export type DestroyOptions = {
   stagger: number
@@ -6,15 +6,15 @@ export type DestroyOptions = {
 }
 
 export function getChildTagsToDestroy(
-  childTags: TagSupport[],
-  allTags: TagSupport[] = [],
-): TagSupport[] {
+  childTags: Support[],
+  allTags: Support[] = [],
+): Support[] {
   for (let index = childTags.length - 1; index >= 0; --index) {
     const cTag = childTags[index]
 
     allTags.push(cTag)
     childTags.splice(index, 1)
-    getChildTagsToDestroy(cTag.global.childTags, allTags)
+    getChildTagsToDestroy(cTag.subject.global.childTags, allTags)
   }
 
   return allTags

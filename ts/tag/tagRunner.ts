@@ -1,10 +1,10 @@
-import { BaseTagSupport, TagSupport } from './TagSupport.class.js'
+import { BaseSupport, Support } from './Support.class.js'
 import { setUse } from'../state/index.js'
 import { Subject } from'../subject/index.js'
 import { getSupportInCycle } from'./getSupportInCycle.function.js'
 
 // Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
-setUse.memory.tagClosed$ = new Subject<TagSupport>(undefined, subscription => {
+setUse.memory.tagClosed$ = new Subject<Support>(undefined, subscription => {
   if( !getSupportInCycle() ) {
     subscription.next() // we are not currently processing so process now
   }
@@ -12,63 +12,63 @@ setUse.memory.tagClosed$ = new Subject<TagSupport>(undefined, subscription => {
 
 // Life cycle 1
 export function runBeforeRender(
-  tagSupport: BaseTagSupport | TagSupport,
-  ownerSupport?: TagSupport,
+  support: BaseSupport | Support,
+  ownerSupport?: Support,
 ) {
   const tagUse = setUse.tagUse
   const length = tagUse.length
   for (let index=0; index < length; ++index) {
-    tagUse[index].beforeRender(tagSupport, ownerSupport)
+    tagUse[index].beforeRender(support, ownerSupport)
   }
 }
 
 // Life cycle 2
 export function runAfterRender(
-  tagSupport: BaseTagSupport | TagSupport,
-  ownerTagSupport?: TagSupport | BaseTagSupport,
+  support: BaseSupport | Support,
+  ownerSupport?: Support | BaseSupport,
 ) {
   const tagUse = setUse.tagUse
   const length = tagUse.length
   for (let index=0; index < length; ++index) {
-    tagUse[index].afterRender(tagSupport, ownerTagSupport)
+    tagUse[index].afterRender(support, ownerSupport)
   }
 
-  setUse.memory.tagClosed$.next(ownerTagSupport)
+  setUse.memory.tagClosed$.next(ownerSupport)
 }
 
 // Life cycle 3
 export function runBeforeRedraw(
-  tagSupport: BaseTagSupport | TagSupport,
-  ownerTagSupport: TagSupport | BaseTagSupport,
+  support: BaseSupport | Support,
+  ownerSupport: Support | BaseSupport,
 ) {
   const tagUse = setUse.tagUse
   const length = tagUse.length
   for (let index=0; index < length; ++index) {
-    tagUse[index].beforeRedraw(tagSupport, ownerTagSupport)
+    tagUse[index].beforeRedraw(support, ownerSupport)
   }
 }
 
 // Life cycle 4 - end of life
 export function runBeforeDestroy(
-  tagSupport: TagSupport | BaseTagSupport,
-  ownerTagSupport: TagSupport | BaseTagSupport,
+  support: Support | BaseSupport,
+  ownerSupport: Support | BaseSupport,
 ) {
   const tagUse = setUse.tagUse
   const length = tagUse.length
   for (let index=0; index < length; ++index) {
-    tagUse[index].beforeDestroy(tagSupport as BaseTagSupport, ownerTagSupport as TagSupport)
+    tagUse[index].beforeDestroy(support as BaseSupport, ownerSupport as Support)
   }
 
-  tagSupport.global.deleted = true
-  tagSupport.hasLiveElements = false
+  support.subject.global.deleted = true
+  support.hasLiveElements = false
 
   // remove me from my parents
-  if(ownerTagSupport) {
-    ownerTagSupport.global.childTags = ownerTagSupport.global.childTags.filter(child => child !== tagSupport.global.oldest as unknown as TagSupport)
+  if(ownerSupport) {
+    ownerSupport.subject.global.childTags = ownerSupport.subject.global.childTags.filter(child => child !== support.subject.global.oldest as unknown as Support)
 
-    const global = tagSupport.global
+    const global = support.subject.global
     global.providers.forEach(provider => provider.children.forEach((child, index) => {
-      if(child.global === global) {
+      if(child.subject.global === global) {
         provider.children.splice(index, 1)
       }
     }))

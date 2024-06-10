@@ -1,114 +1,57 @@
 import { Context, ElementBuildOptions, variablePrefix } from '../tag/Tag.class.js'
-import { InterpolateOptions } from './interpolateElement.js'
 import { elementInitCheck } from './elementInitCheck.js'
-import { InsertBefore } from './InsertBefore.type.js'
-import { InterpolateSubject, TemplateValue } from '../tag/update/processFirstSubject.utils.js'
-import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue.function.js'
-import { isTagArray, isTagComponent } from '../isInstance.js'
+import { InterpolateSubject } from '../tag/update/processFirstSubject.utils.js'
 import { scanTextAreaValue } from './scanTextAreaValue.function.js'
-import { updateExistingValue } from '../tag/update/updateExistingValue.function.js'
-import { TagSupport } from '../tag/TagSupport.class.js'
-import { TemplaterResult } from '../tag/TemplaterResult.class.js'
-import { swapInsertBefore } from '../tag/setTagPlaceholder.function.js'
+import { Support } from '../tag/Support.class.js'
+import { subscribeToTemplate } from './subscribeToTemplate.function.js'
 
-export type Template = Element & {clone?: any}
+export type Template = Element & {content: any}
 export type InterpolateComponentResult = {
   subject: InterpolateSubject
   insertBefore: Element | Text | Template
-  ownerSupport: TagSupport
+  ownerSupport: Support
   variableName: string
 }
 
 export function interpolateTemplate(
+  fragment: DocumentFragment,
   insertBefore: Template, // <template end interpolate /> (will be removed)
   context: Context, // variable scope of {`__tagvar${index}`:'x'}
-  ownerSupport: TagSupport, // Tag class
+  ownerSupport: Support, // Tag class
   counts: Counts, // used for animation stagger computing
-): InterpolateComponentResult | undefined {
+): void {
   if ( !insertBefore.hasAttribute('end') ) {
     return // only care about <template end>
   }
 
-  const variableName = insertBefore.getAttribute('id')
-  if(variableName?.substring(0, variablePrefix.length) !== variablePrefix) {
-    return // ignore, not a tagVar
-  }
-
-  const existingSubject = context[variableName]
-  const isDynamic = isTagComponent(existingSubject._value) || isTagArray(existingSubject.value)
-
+  const variableName = insertBefore.getAttribute('id') as string
+  const subject = context[variableName]
+  subject.global.insertBefore = insertBefore
+  
   // process dynamics later
+  /* 
+  ??? newly removed
+  
+  const isDynamic = isTagComponent(subject._value) || isTagArray(subject.value)
   if(isDynamic) {
     return {
       variableName,
       ownerSupport,
-      subject: existingSubject,
+      subject,
       insertBefore
     }
   }
-  
+  */
+
   subscribeToTemplate(
+    fragment,
     insertBefore,
-    existingSubject,
+    subject,
     ownerSupport,
     counts,
   )
 
   return
-}
-
-export function subscribeToTemplate(
-  insertBefore: InsertBefore,
-  subject: InterpolateSubject,
-  ownerSupport: TagSupport,
-  counts: Counts, // used for animation stagger computing
-) {
-  let called = false
-  const onValue = (value: TemplateValue) => {
-    if(called) {
-      updateExistingValue(
-        subject,
-        value,
-        ownerSupport,
-        insertBefore, // needed incase type of value changed and a redraw required
-      )
-      return
-    }
-
-    const templater = value as TemplaterResult
-
-    processFirstSubjectValue(
-      templater,
-      subject,
-      insertBefore,
-      ownerSupport,
-      {
-        counts: {...counts},
-      },
-    )
-
-    called = true
-  }
-
-  let mutatingCallback = onValue
-
-  const callback = (value: TemplateValue) => mutatingCallback(value)
-  const sub = subject.subscribe(callback as any)
-  
-  // on subscribe, the Subject did NOT emit immediately. Lets pull the template off the document
-  if(insertBefore.parentNode) {
-    const clone = subject.clone = swapInsertBefore(insertBefore)
-    mutatingCallback = v => {
-      const parentNode = clone.parentNode as ParentNode
-      parentNode.insertBefore(insertBefore, clone)
-      parentNode.removeChild(clone)
-      delete subject.clone
-      mutatingCallback = onValue // all future calls will just produce value
-      onValue(v) // calls for rending
-    }
-  }
-  
-  ownerSupport.global.subscriptions.push(sub)
 }
 
 export type Counts = {
@@ -121,7 +64,7 @@ export function afterElmBuild(
   elm: Element | ChildNode,
   options: ElementBuildOptions,
   context: Context,
-  ownerSupport: TagSupport,
+  ownerSupport: Support,
 ) {
   if(!(elm as Element).getAttribute) {
     return

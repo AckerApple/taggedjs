@@ -7,7 +7,7 @@ import { Counts } from'../interpolations/interpolateTemplate.js'
 import { destroyTagMemory } from'./destroyTag.function.js'
 import { InsertBefore } from'../interpolations/InsertBefore.type.js'
 import { insertAfter } from'../insertAfter.function.js'
-import { BaseTagSupport, TagSupport } from './TagSupport.class.js'
+import { BaseSupport, Support } from './Support.class.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 
 export function checkDestroyPrevious(
@@ -32,7 +32,7 @@ export function checkDestroyPrevious(
       return false
     }
 
-    destroySimpleValue(insertBefore, displaySubject)
+    destroySimpleValue(displaySubject)
     return 'changed-simple-value'
   }
 
@@ -41,37 +41,30 @@ export function checkDestroyPrevious(
   
   // no longer an array
   if (wasArray && valueType!==ValueTypes.tagArray) {
-    const placeholderElm = arraySubject.placeholder as Text
     delete arraySubject.lastArray
-    delete arraySubject.placeholder
-    insertAfter(insertBefore, placeholderElm)
-
     
-    for (let index = wasArray.length - 1; index >= 0; --index) {
-      const {tagSupport} = wasArray[index]
-      destroyArrayTag(tagSupport, {added:0, removed:0})
+    for (let index = wasArray.array.length - 1; index >= 0; --index) {
+      const {support} = wasArray.array[index]
+      destroyArrayTag(support, {added:0, removed:0})
     }
 
     return 'array'
   }
 
   const tagSubject = subject as TagSubject
-  const lastSupport = tagSubject.tagSupport
+  const lastSupport = tagSubject.support
   
   // no longer tag or component?
   if(lastSupport) {
     const isValueTag = isStaticTag(newValue)
     const isSubjectTag = isStaticTag(subject._value)
+    const newTag = newValue as Support
 
-    const newTag = newValue as TagSupport
     if(isSubjectTag && isValueTag) {
-      
       // its a different tag now
       if(!isLikeTags(newTag, lastSupport)) {
         // put template back down
-        restoreTagMarker(lastSupport)
         destroyTagMemory(lastSupport)
-        // delete lastSupport.global.deleted // ???
         return 2
       }
 
@@ -87,9 +80,6 @@ export function checkDestroyPrevious(
       return false
     }
 
-    // put template back down
-    restoreTagMarker(lastSupport)
-
     // destroy old component, value is not a component
     destroyTagMemory(lastSupport)
     // delete lastSupport.global.deleted // ???
@@ -104,42 +94,18 @@ export function isSimpleType(value: any) {
 }
 
 export function destroyArrayTag(
-  tagSupport: TagSupport,
+  support: Support,
   counts: Counts,
 ) {
-  tagSupport.destroy({
+  support.destroy({
     stagger: counts.removed++,
   })
 
-  const insertBefore = tagSupport.global.insertBefore as Element
-  const parentNode = insertBefore.parentNode as ParentNode
-  parentNode.removeChild(insertBefore)
 }
 
 function destroySimpleValue(
-  insertBefore: InsertBefore, // always a template tag
   subject: DisplaySubject,
 ) {
-  const clone = subject.clone as Element
-  const parent = clone.parentNode as ParentNode
-  
-
-  // 1 put the template back down
-  parent.insertBefore(insertBefore, clone)
-  parent.removeChild(clone)
-  
-  delete subject.clone
   delete subject.lastValue
 }
 
-export function restoreTagMarker(
-  lastSupport: BaseTagSupport | TagSupport,
-) {
-  const insertBefore = lastSupport.global.insertBefore as Element
-  const global = lastSupport.global
-  const placeholderElm = global.placeholder
-  if(placeholderElm) {
-    insertAfter(insertBefore, placeholderElm)
-    delete global.placeholder
-  }
-}

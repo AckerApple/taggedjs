@@ -1,5 +1,5 @@
 import { deepClone } from '../deepFunctions.js'
-import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js'
+import { BaseSupport, Support } from '../tag/Support.class.js'
 import { setUse } from'./setUse.function.js'
 import { state } from'./state.function.js'
 
@@ -8,15 +8,15 @@ export type Provider = {
   instance: any
   clone: any
   stateDiff: number
-  owner: TagSupport // create at
-  children: TagSupport[] // injected into
+  owner: Support // create at
+  children: Support[] // injected into
 }
 
 type ProviderConstructor<T> = (new (...args: any[]) => T) | (() => T)
 
 type ProviderConfig = {
   providers: Provider[]
-  ownerSupport?: TagSupport | BaseTagSupport
+  ownerSupport?: Support | BaseSupport
 }
 
 type functionProvider<T> = () => T
@@ -48,7 +48,7 @@ export const providers = {
       // Providers with provider requirements just need to use providers.create() and providers.inject()
       const instance: T = 'prototype' in constructMethod ? new (constructMethod as classProvider<T>)() : (constructMethod as functionProvider<T>)()
   
-      const tagSupport = stateConfig.tagSupport as TagSupport
+      const support = stateConfig.support as Support
       const stateDiff = stateConfig.array.length - oldStateCount
       
       const provider: Provider = {
@@ -56,12 +56,12 @@ export const providers = {
         instance,
         clone: deepClone(instance),
         stateDiff,
-        owner: tagSupport,
+        owner: support,
         children: [],
       }
 
       stateDiffMemory.provider = provider
-      tagSupport.global.providers.push(provider)
+      support.subject.global.providers.push(provider)
       stateDiffMemory.stateDiff = stateDiff
 
       return instance
@@ -86,15 +86,15 @@ export const providers = {
       const memory = setUse.memory
       const cm = constructor as ConstructMethod<T>
       const compareTo = cm.compareTo = cm.compareTo || constructor.toString()
-      const tagSupport = memory.stateConfig.tagSupport as TagSupport
+      const support = memory.stateConfig.support as Support
       const providers: Provider[] = []
 
       let owner = {
-        ownerTagSupport: tagSupport.ownerTagSupport
-      } as TagSupport
+        ownerSupport: support.ownerSupport
+      } as Support
     
-      while(owner.ownerTagSupport) {
-        const ownerProviders = owner.ownerTagSupport.global.providers
+      while(owner.ownerSupport) {
+        const ownerProviders = owner.ownerSupport.subject.global.providers
   
         const provider = ownerProviders.find(provider => {
           providers.push(provider as Provider)
@@ -107,13 +107,13 @@ export const providers = {
 
         if(provider) {
           provider.clone = deepClone(provider.instance) // keep a copy of the latest before any change occur
-          const tagSupport = memory.stateConfig.tagSupport as TagSupport
-          tagSupport.global.providers.push(provider)
-          provider.children.push(tagSupport)
+          const support = memory.stateConfig.support as Support
+          support.subject.global.providers.push(provider)
+          provider.children.push(support)
           return provider.instance
         }
   
-        owner = owner.ownerTagSupport // cause reloop checking next parent
+        owner = owner.ownerSupport // cause reloop checking next parent
       }
       
       const msg = `Could not inject provider: ${constructor.name} ${constructor}`

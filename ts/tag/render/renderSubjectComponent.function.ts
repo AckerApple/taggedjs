@@ -1,25 +1,27 @@
 import { renderWithSupport } from'./renderWithSupport.function.js'
 import { TagSubject } from '../../subject.types.js'
-import { BaseTagSupport, TagSupport } from '../TagSupport.class.js'
+import { BaseSupport, Support } from '../Support.class.js'
 
 export function renderSubjectComponent(
   subject: TagSubject,
-  reSupport: TagSupport | BaseTagSupport,
-  ownerSupport: TagSupport,
-): TagSupport {
-  const preClones = ownerSupport.global.clones.map(clone => clone)
+  reSupport: Support | BaseSupport,
+  ownerSupport: Support,
+): Support {
+  const ownGlobal = ownerSupport.subject.global
+  const preClones = ownGlobal.clones.map(clone => clone)
   
   reSupport = renderWithSupport(
     reSupport,
-    subject.tagSupport, // existing tag
+    subject.support, // existing tag
     subject,
     ownerSupport,
   )
 
-  if(ownerSupport.global.clones.length > preClones.length) {
-    const myClones = ownerSupport.global.clones.filter(fClone => !preClones.find(clone => clone === fClone))
-    reSupport.global.clones.push(...myClones)
+  const reGlobal = reSupport.subject.global
+  if(ownGlobal.clones.length > preClones.length) {
+    const myClones = ownGlobal.clones.filter(fClone => !preClones.find(clone => clone === fClone))
+    reGlobal.clones.push(...myClones)
   }
 
-  return reSupport as TagSupport
+  return reSupport as Support
 }

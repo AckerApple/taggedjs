@@ -1,29 +1,29 @@
-import { BaseTagSupport, TagSupport } from '../tag/TagSupport.class.js'
+import { BaseSupport, Support } from '../tag/Support.class.js'
 import { Config } from './state.utils.js'
 
 const tagUse: TagUse[] = []
 
 interface TagUse {
   // runs only one time at creation of component html elements
-  beforeRender: (tagSupport: BaseTagSupport | TagSupport, ownerTag?: TagSupport | BaseTagSupport) => void
+  beforeRender: (support: BaseSupport | Support, ownerTag?: Support | BaseSupport) => void
   
   // runs every render
-  beforeRedraw: (tagSupport: BaseTagSupport | TagSupport, tag: TagSupport | BaseTagSupport) => void
+  beforeRedraw: (support: BaseSupport | Support, tag: Support | BaseSupport) => void
   
   // runs every render
-  afterRender: (tagSupport: BaseTagSupport | TagSupport, ownerTagSupport?: TagSupport | BaseTagSupport) => void
+  afterRender: (support: BaseSupport | Support, ownerSupport?: Support | BaseSupport) => void
   
-  beforeDestroy: (tagSupport: BaseTagSupport | TagSupport, tag: TagSupport | BaseTagSupport) => void
+  beforeDestroy: (support: BaseSupport | Support, tag: Support | BaseSupport) => void
 }
 
 export type UseOptions = {
   beforeRender?: (
-    tagSupport: TagSupport | BaseTagSupport,
-    ownerTag?: TagSupport | BaseTagSupport, // not defined on tagElement app
+    support: Support | BaseSupport,
+    ownerTag?: Support | BaseSupport, // not defined on tagElement app
   ) => void
-  beforeRedraw?: (tagSupport: BaseTagSupport | TagSupport, tag: TagSupport | BaseTagSupport) => void
-  afterRender?: (tagSupport: BaseTagSupport | TagSupport, ownerTagSupport?: TagSupport | BaseTagSupport) => void
-  beforeDestroy?: (tagSupport: BaseTagSupport | TagSupport, tag: TagSupport | BaseTagSupport) => void
+  beforeRedraw?: (support: BaseSupport | Support, tag: Support | BaseSupport) => void
+  afterRender?: (support: BaseSupport | Support, ownerSupport?: Support | BaseSupport) => void
+  beforeDestroy?: (support: BaseSupport | Support, tag: Support | BaseSupport) => void
 }
 
 export function setUse(use: UseOptions) {
@@ -43,5 +43,5 @@ setUse.memory = {} as UseMemory
 
 type UseMemory = (Record<string,any> & {
   stateConfig: Config
-  currentSupport: TagSupport // tag being rendered
+  currentSupport: Support // tag being rendered
 })
