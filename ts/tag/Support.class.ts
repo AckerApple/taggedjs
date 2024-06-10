@@ -3,7 +3,7 @@ import { Context, ElementBuildOptions, Tag, TagTemplate, escapeVariable, variabl
 import { deepClone } from '../deepFunctions.js'
 import { isTagComponent } from '../isInstance.js'
 import { State } from '../state/index.js'
-import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
+import { TemplaterResult } from './TemplaterResult.class.js'
 import { TagSubject } from '../subject.types.js'
 import { cloneValueArray } from './cloneValueArray.function.js'
 import { runBeforeDestroy } from './tagRunner.js'
@@ -13,8 +13,10 @@ import { updateContextItem } from './update/updateContextItem.function.js'
 import { processNewValue } from './update/processNewValue.function.js'
 import { interpolateElement, interpolateString } from '../interpolations/interpolateElement.js'
 import { afterInterpolateElement } from '../interpolations/afterInterpolateElement.function.js'
-import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
+// import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
 import { TagJsSubject } from './update/TagJsSubject.class.js'
+// import { interpolateString } from '../interpolations/interpolations.js'
+import { empty } from './ValueTypes.enum.js'
 
 const prefixSearch = new RegExp(variablePrefix, 'g')
 
@@ -128,7 +130,8 @@ export class BaseSupport {
 
     const string = strings.map((string, index) => {
       const safeString = string.replace(prefixSearch, escapeVariable)
-      const endString = safeString + (values.length > index ? `{${variablePrefix}${index}}` : '')
+      //const endString = safeString + (values.length > index ? `{variablePrefix}{index}` : '')
+      const endString = safeString + (values.length > index ? '{' + variablePrefix + index.toString() + '}' : empty)
       // ??? new removed
       //const trimString = endString.replace(/>\s*/g,'>').replace(/\s*</g,'<')
       //return trimString
