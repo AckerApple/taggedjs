@@ -24,7 +24,7 @@ export function processTagResult(
     return processTagResultUpdate(support, subjectTag, prevSupport)
   }
 
-  const newFragment = support.buildBeforeElement(fragment, {counts})
+  const newFragment = support.buildBeforeElement(undefined, {counts})
   //if(fragment) {
   //  fragment.appendChild(newFragment)
   //} else {

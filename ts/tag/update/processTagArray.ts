@@ -212,13 +212,13 @@ function processAddTagArrayItem(
   support.subject.global.placeholder = before // newTempElm
 
   const newFragment = support.buildBeforeElement(undefined, {counts})
-  if(fragment) {
-    fragment.appendChild(newFragment)
-  } else {
+  // if(fragment) {
+  //   fragment.appendChild(newFragment)
+  // } else {
     const placeholder = before // subject.global.placeholder as Text
     const parentNode = placeholder.parentNode as ParentNode
     parentNode.insertBefore(newFragment, placeholder)
-  }
+  // }
 }
 
 /** compare two values. If both values are arrays then the items will be compared */

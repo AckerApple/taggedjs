@@ -23,13 +23,13 @@ export function processTag(
   subject.support = support
   support.ownerSupport = ownerSupport
   const newFragment = support.buildBeforeElement(undefined, {counts: {added:0, removed:0}})
-  if(fragment) {
-    fragment.appendChild(newFragment)
-  } else {
+  // if(fragment) {
+  //   fragment.appendChild(newFragment)
+  // } else {
     const placeholder = subject.global.placeholder as Text
     const parentNode = placeholder.parentNode as ParentNode
     parentNode.insertBefore(newFragment, placeholder)
-  }
+  // }
 
   return support
 }
