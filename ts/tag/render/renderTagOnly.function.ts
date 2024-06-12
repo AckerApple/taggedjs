@@ -18,7 +18,11 @@ export function renderTagOnly(
 
   // NEW TAG CREATED HERE
   const wrapper = templater.wrapper as Wrapper
-  let reSupport = wrapper(newSupport, subject)
+  let reSupport = wrapper(
+    newSupport,
+    subject,
+    prevSupport,
+  )
   /* AFTER */
 
   runAfterRender(newSupport, ownerSupport)

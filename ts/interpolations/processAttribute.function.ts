@@ -35,7 +35,6 @@ export function processAttribute(
   if( isTagVar(attrName) ) {  
     const contextValueSubject = getContextValueByVarString(scope, attrName)
     let lastValue: any;
-
     // the above callback gets called immediately since its a ValueSubject()
     const sub = contextValueSubject.subscribe((value: any) => {
       if(value === lastValue) {

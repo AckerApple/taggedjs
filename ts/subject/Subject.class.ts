@@ -65,9 +65,10 @@ export class Subject<T> implements SubjectLike<T> {
     const value = this._value as any
 
     // Notify all subscribers with the new value
-    const subs = [...this.subscribers] // subs may change as we call callbacks
-    const length = subs.length
-    for (let index=0; index < length; ++index) {
+    // const subs = [...this.subscribers] // subs may change as we call callbacks
+    const subs = this.subscribers // subs may change as we call callbacks
+    // const length = subs.length
+    for (let index=0; index < subs.length; ++index) {
       const sub = subs[index]
       sub.callback(value, sub)
     }
@@ -162,7 +163,7 @@ export class Subject<T> implements SubjectLike<T> {
   pipe(...operations: OperatorFunction<any, any, any>[]): Subject<any> {
     const subject = new Subject(this._value)
     subject.setMethods(operations)
-    subject.subscribeWith = (x) => this.subscribe(x as any)
+    subject.subscribeWith = (x) => this.subscribe(x)
     subject.next = x => this.next(x)
     return subject
   }

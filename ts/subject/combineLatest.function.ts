@@ -34,7 +34,11 @@ export function combineLatest(
     const firstSub = clones.shift() as Subject<any>
     const subscription: Subscription<any> = firstSub.subscribe(x => setValue(x, 0))
     
-    const subscriptions = clones.map((subject, index) => subject.subscribe(x => setValue(x, index + 1)))
+    const subscriptions = clones.map(
+      (subject, index) => {
+        return subject.subscribe(x => setValue(x, index + 1))
+      }
+    )
 
     subscription.subscriptions = subscriptions
 

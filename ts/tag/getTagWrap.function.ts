@@ -1,7 +1,7 @@
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { TagWrapper } from './tag.utils.js'
 import { runTagCallback } from'../interpolations/bindSubjectCallback.function.js'
-import { Support } from './Support.class.js'
+import { BaseSupport, Support } from './Support.class.js'
 import { TagSubject } from '../subject.types.js'
 import { castProps } from'../alterProp.function.js'
 import { setUse } from '../state/setUse.function.js'
@@ -9,6 +9,8 @@ import { Tag } from './Tag.class.js'
 import { State } from '../state/state.utils.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { html } from './html.js'
+import { Props } from '../Props.js'
+import { syncFunctionProps } from './update/updateExistingTagComponent.function.js'
 
 /** creates/returns a function that when called then calls the original component function
  * Gets used as templater.wrapper()
@@ -21,9 +23,17 @@ export function getTagWrap(
 
   // this function gets called by taggedjs
   const wrapper = (
-    lastSupport: Support,
+    newSupport: Support,
     subject: TagSubject,
-  ) => executeWrap(stateArray, templater, result, lastSupport, subject)
+    lastSupport?: Support | BaseSupport | undefined
+  ) => executeWrap(
+    stateArray,
+    templater,
+    result,
+    newSupport,
+    subject,
+    lastSupport,
+  )
 
   return wrapper as Wrapper
 }
@@ -32,10 +42,11 @@ function executeWrap(
   stateArray:  State,
   templater: TemplaterResult,
   result: TagWrapper<any>,
-  lastSupport: Support,
+  newSupport: Support,
   subject: TagSubject,
+  lastSupport?: Support | BaseSupport | undefined,
 ): Support {
-  const global = lastSupport.subject.global
+  const global = newSupport.subject.global
   ++global.renderCount
       
   const childSubject = templater.children
@@ -50,13 +61,28 @@ function executeWrap(
   let props = templater.props
 
   // When defined, this must be an update where my new props have already been made for me
-  const preCastedProps = lastSupport.propsConfig.castProps
-  const castedProps = preCastedProps || castProps(props, lastSupport, stateArray)
-  // const latestCloned = props.map(props => deepClone(props)) // castedProps
+  let preCastedProps: Props | undefined = newSupport.propsConfig.castProps
+
+  const lastCastProps = lastSupport?.propsConfig.castProps
+  if(lastCastProps) {
+    newSupport.propsConfig.castProps = lastCastProps
+    preCastedProps = syncFunctionProps(
+      newSupport,
+      lastSupport as Support,
+      (lastSupport as Support).ownerSupport,
+      props,
+    )
+  }
+
+  const castedProps = preCastedProps || castProps(
+    props,
+    newSupport,
+    stateArray,
+    0,
+  )
 
   // CALL ORIGINAL COMPONENT FUNCTION
   let tag: Tag = originalFunction(...castedProps)
-
   if(tag instanceof Function) {
     tag = tag()
   }
@@ -72,7 +98,7 @@ function executeWrap(
 
   const support = new Support(
     templater,
-    lastSupport.ownerSupport,
+    newSupport.ownerSupport,
     subject,
     castedProps,
     global.renderCount
@@ -81,6 +107,10 @@ function executeWrap(
   support.subject.global = global
   // ??? this should be set by outside?
   global.oldest = global.oldest || support
+  
+  // ??? new
+  // global.newest = support
+
   const nowState = setUse.memory.stateConfig.array
   support.state.push(...nowState)
 

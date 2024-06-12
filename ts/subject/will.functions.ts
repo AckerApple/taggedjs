@@ -45,7 +45,6 @@ export const willSubscribe = <T, H>(
     }) // do nothing on initial return
 
     const result = callback(lastValue) as Subject<H>
-
     const subscription = result.subscribe(x => {
       subscription.unsubscribe()
       utils.next(x)

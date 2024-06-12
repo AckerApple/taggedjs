@@ -11,8 +11,8 @@ export function renderExistingTag(
   ownerSupport: BaseSupport | Support, // ownerSupport
   subject: TagSubject,
 ): Support {
-  const lastSupport = subject.support as Support
-  const global = lastSupport.subject.global
+  const lastSupport = subject.support as Support // todo maybe not needed?
+  const global = subject.global
   
   // share point between renders
   newSupport.subject.global = global

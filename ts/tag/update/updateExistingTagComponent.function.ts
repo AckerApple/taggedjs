@@ -58,9 +58,8 @@ export function updateExistingTagComponent(
 
     // everyhing has matched, no display needs updating.
     if(!hasChanged) {
-      const newProps = templater.props
-
       // update function refs to use latest references
+      const newProps = templater.props
       const castedProps = syncFunctionProps(
         support,
         lastSupport as Support,
@@ -173,18 +172,24 @@ function buildNewTag(
   return newSupport
 }
 
-function syncFunctionProps(
+export function syncFunctionProps(
   newSupport: Support,
   lastSupport: Support,
   ownerSupport: BaseSupport | Support,
   newPropsArray: any[], // templater.props
+  depth = -1
 ): Props {
   const newest = lastSupport.subject.global.newest as Support
 
   if(!newest) {
     const state = ownerSupport.state
     newPropsArray.length = 0
-    const castedProps = castProps(newPropsArray, newSupport, state)
+    const castedProps = castProps(
+      newPropsArray,
+      newSupport,
+      state,
+      depth
+    )
     newPropsArray.push( ...castedProps )
     newSupport.propsConfig.castProps = castedProps
     return newPropsArray
@@ -196,12 +201,14 @@ function syncFunctionProps(
   const priorPropsArray = priorPropConfig.castProps as Props
 
   const newArray = []
-  for (let index = newPropsArray.length - 1; index >= 0; --index) {
+  for (let index = 0; index < newPropsArray.length; ++index) {
     const prop = newPropsArray[index]
     const priorProp = priorPropsArray[index]
 
     const newValue = syncPriorPropFunction(
       priorProp, prop, newSupport, ownerSupport,
+      depth + 1,
+      index,
     )
 
     newArray.push(newValue)
@@ -217,6 +224,8 @@ function syncPriorPropFunction(
   prop: any,
   newSupport: BaseSupport | Support,
   ownerSupport: BaseSupport | Support,
+  depth: number,
+  index: string | number,
   seen: any[] = [],
 ) {
   if(priorProp instanceof Function) {
@@ -225,7 +234,7 @@ function syncPriorPropFunction(
       priorProp.toCall = prop.toCall
       return prop
     }
-    
+
     const ownerGlobal = ownerSupport.subject.global
     const oldOwnerState = (ownerGlobal.newest as Support).state
 
@@ -249,7 +258,10 @@ function syncPriorPropFunction(
     for (let index = prop.length - 1; index >= 0; --index) {
       const x = prop[index]
       prop[index] = syncPriorPropFunction(
-        priorProp[index], x, newSupport, ownerSupport, seen,
+        priorProp[index], x, newSupport, ownerSupport,
+        depth + 1,
+        index,
+        seen,
       )
     }
 
@@ -263,7 +275,13 @@ function syncPriorPropFunction(
   for(const name in prop){
     const subValue = (prop as any)[name]
     const result = syncPriorPropFunction(
-      priorProp[name], subValue, newSupport, ownerSupport, seen,
+      priorProp[name],
+      subValue,
+      newSupport,
+      ownerSupport,
+      depth + 1,
+      name,
+      seen,
     )
     
     const hasSetter = Object.getOwnPropertyDescriptor(prop, name)?.set
@@ -275,7 +293,6 @@ function syncPriorPropFunction(
   }
   
   return prop
-
 }
 
 export function moveProviders(

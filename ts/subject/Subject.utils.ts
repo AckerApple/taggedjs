@@ -61,7 +61,7 @@ export function getSubscription<T>(
   const countSubject = Subject.globalSubCount$ as ValueSubject<number>
   Subject.globalSubCount$.next( countSubject._value + 1 )
 
-  const subscription: Subscription<any> = () => {
+  const subscription: Subscription<any> = function() {
     subscription.unsubscribe()
   }
 
@@ -69,21 +69,8 @@ export function getSubscription<T>(
   subscription.subscriptions = []
 
   // Return a function to unsubscribe from the BehaviorSubject
-  subscription.unsubscribe = () => {
-    removeSubFromArray(subscribers, callback) // each will be called when update comes in
-    // removeSubFromArray(Subject.globalSubs, callback) // 🔬 testing
-    Subject.globalSubCount$.next( countSubject._value - 1 )
-    
-    // any double unsubscribes will be ignored
-    subscription.unsubscribe = () => subscription
-
-    // unsubscribe from any combined subjects
-    const subscriptions = subscription.subscriptions
-    for (let index = subscriptions.length - 1; index >= 0; --index) {
-      subscriptions[index].unsubscribe()
-    }
-    
-    return subscription
+  subscription.unsubscribe = function() {
+    return unsubscribe(subscription, subscribers, callback)
   }
 
   subscription.add = (sub: Subscription<T>) => {
@@ -121,4 +108,27 @@ export function runPipedMethods(
   const pipeUtils = {setHandler, next}
   const methodResponse = firstMethod(value, pipeUtils)
   handler(methodResponse)
+}
+
+function unsubscribe(
+  subscription: Subscription<any>,
+  subscribers: Subscription<any>[],
+  callback: SubjectSubscriber<any>,
+) {
+  removeSubFromArray(subscribers, callback) // each will be called when update comes in
+
+  Subject.globalSubCount$.next(
+    (Subject.globalSubCount$ as ValueSubject<number>)._value - 1
+  )
+  
+  // any double unsubscribes will be ignored
+  subscription.unsubscribe = () => subscription
+
+  // unsubscribe from any combined subjects
+  const subscriptions = subscription.subscriptions
+  for (let index = subscriptions.length - 1; index >= 0; --index) {
+    subscriptions[index].unsubscribe()
+  }
+  
+  return subscription
 }

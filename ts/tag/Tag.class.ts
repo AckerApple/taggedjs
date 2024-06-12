@@ -28,6 +28,7 @@ export interface TagTemplate {
 
 export class Tag {
   tagJsType = ValueTypes.tag
+  children?: {strings: string[] | TemplateStringsArray, values: TagValues}
 
   // present only when an array. Populated by Tag.key()
   memory = {
@@ -47,8 +48,6 @@ export class Tag {
     this.memory.arrayValue = arrayValue
     return this
   }
-
-  children?: {strings: string[] | TemplateStringsArray, values: TagValues}
 
   html(
     strings: string[] | TemplateStringsArray,

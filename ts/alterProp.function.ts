@@ -4,19 +4,21 @@ import { isStaticTag } from './isInstance.js'
 import { renderSupport } from './tag/render/renderSupport.function.js'
 import { State, setUse } from './state/index.js'
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
-import { syncStates } from './state/syncStates.function.js'
 import { Props } from './Props.js'
+import { runBlocked } from './interpolations/bindSubjectCallback.function.js'
 
 export function castProps(
   props: Props,
   newSupport: BaseSupport | Support,
   stateArray: State,
+  depth: number,
 ) {
   return props.map(prop => alterProp(
     prop,
     (newSupport as Support).ownerSupport,
     stateArray,
     newSupport,
+    depth,
   ))
 }
 
@@ -26,6 +28,7 @@ export function alterProp(
   ownerSupport: BaseSupport | Support,
   stateArray: State,
   newSupport: BaseSupport | Support,
+  depth: number,
 ) {
   if(isStaticTag(prop) || !prop) {
     return prop
@@ -35,7 +38,7 @@ export function alterProp(
     return prop // no one above me
   }
 
-  return checkProp(prop, ownerSupport, stateArray, newSupport)
+  return checkProp(prop, ownerSupport, stateArray, newSupport, depth)
 }
 
 export function checkProp(
@@ -43,12 +46,15 @@ export function checkProp(
   ownerSupport: BaseSupport | Support,
   stateArray: State,
   newSupport: BaseSupport | Support,
+  depth: number,
   index?: string | number,
   newProp?: any,
   seen: any[] = [],
 ) {
   if(value instanceof Function) {
-    return getPropWrap(value, ownerSupport, stateArray, newSupport, index, newProp)
+    return getPropWrap(
+      value, ownerSupport, stateArray,
+    )
   }
 
   if(seen.includes(value)) {
@@ -65,15 +71,16 @@ export function checkProp(
       const subValue = value[index]
   
       value[index] = checkProp(
-        subValue, ownerSupport, stateArray, newSupport, index, value, seen
+        subValue, ownerSupport, stateArray, newSupport,
+        depth + 1, index, value, seen
       )
 
       if(subValue instanceof Function) {
         if(subValue.toCall) {
           continue
         }
-  
-        afterCheckProp(index, subValue, value, newSupport)
+
+        afterCheckProp(depth + 1, index, subValue, value, newSupport)
       }
     }
 
@@ -84,7 +91,9 @@ export function checkProp(
   for(const name in value){
     const subValue = value[name]
     const result = checkProp(
-      subValue, ownerSupport, stateArray, newSupport, name, value, seen
+      subValue, ownerSupport, stateArray, newSupport,
+      depth + 1,
+      name, value, seen
     )
     
     const hasSetter = Object.getOwnPropertyDescriptor(value, name)?.set
@@ -98,7 +107,7 @@ export function checkProp(
         continue
       }
   
-      afterCheckProp(name, subValue, value, newSupport)
+      afterCheckProp(depth + 1, name, subValue, value, newSupport)
     }
   }
   
@@ -106,26 +115,30 @@ export function checkProp(
 }
 
 function afterCheckProp(
+  depth: number,
   index: string | number,
-  pastValue: any,
+  originalValue: any,
   newProp: any,
   newSupport: BaseSupport | Support
 ) {
-  if(pastValue?.toCall) {
+  if(originalValue?.toCall) {
+    throw new Error('meg')
     return // already been done
   }
 
   // restore object to have original function on destroy
-  newSupport.subject.global.destroy$.toCallback(() => newProp[index] = pastValue)
+  if(depth > 0) {    
+    const global = newSupport.subject.global
+    newProp[index].subscription = global.destroy$.toCallback(() => {
+      newProp[index] = originalValue
+    })
+  }
 }
 
 export function getPropWrap(
   value: any,
   ownerSupport: BaseSupport | Support,
   stateArray: State,
-  newSupport: BaseSupport | Support,
-  name?: string | number,
-  newProp?: any,
 ) {
   const toCall = value.toCall
 
@@ -155,9 +168,83 @@ export function callbackPropOwner(
   callWith: any,
   ownerSupport: BaseSupport | Support, // <-- WHEN called from alterProp its owner OTHERWISE its previous
 ) {
-  const newest = ownerSupport.subject.global.newest as Support
-  const noCycle = getSupportInCycle() === undefined  
-  const result = toCall(...callWith)
+  const global = ownerSupport.subject.global
+  const newest = global.newest as Support
+  const supportInCycle = getSupportInCycle()
+  const noCycle = supportInCycle === undefined
+
+  if(supportInCycle) {
+    supportInCycle.subject.global.locked = true
+    console.log('supportInCycle.subject.global', {
+      supportInCycle,
+      stateGet: supportInCycle.state[2]?.get(),
+      state: supportInCycle.state[2],
+    })
+  } else {
+    // syncStates(newest.state, global.oldest.state)
+  }
+
+
+  const callbackResult = toCall(...callWith)
+
+  if(supportInCycle) {
+    //return afterTagCallback(supportInCycle as Support,callbackResult)
+
+    const blocked = supportInCycle?.subject.global.blocked 
+    if(supportInCycle && blocked?.length) {
+      setUse.memory.tagClosed$.toCallback(() => {
+        let lastResult: BaseSupport | Support = supportInCycle
+  
+        // throw new Error('cycles ready')
+        // syncStates(supportInCycle.state, (supportInCycle.subject.global.newest as Support).state)
+        delete supportInCycle.subject.global.locked
+        lastResult = runBlocked(
+          supportInCycle,
+          supportInCycle, // lastResult, // supportInCycle
+        ) as Support
+
+        // syncStates((supportInCycle.subject.global.newest as Support).state, supportInCycle.state)
+  
+        console.log('lastResult', lastResult)
+        // delete supportInCycle.subject.global.locked
+        renderSupport(
+          lastResult as Support,
+          false, // renderUp - callback may have changed props so also check to render up
+        )
+
+      })
+      
+      // renderSupport(
+      //   lastResult as Support,
+      //   false, // renderUp - callback may have changed props so also check to render up
+      // )
+
+      // renderSupport(
+      //   lastResult as Support,
+      //   true, // renderUp - callback may have changed props so also check to render up
+      // )
+    
+      // TODO: will need to handle promises
+      return callbackResult
+
+      // Cannot use because we need return value instead of no-data-ever
+      // return checkAfterCallbackPromise(
+      //   callbackResult,
+      //   lastResult,
+      //   lastResult.subject.global
+      // )
+    }
+
+    delete supportInCycle.subject.global.locked
+    //renderSupport(
+    //  newest,
+    //  false,
+    //)
+    //return callbackResult
+  } else {
+    // syncStates(global.oldest.state, newest.state)
+  }
+  
   const run = () => {    
     // are we in a rendering cycle? then its being called by alterProps
     if(noCycle === false) {
@@ -174,7 +261,7 @@ export function callbackPropOwner(
       })
     
       if(allMatched) {
-        return result // owner did not change
+        return callbackResult // owner did not change
       }
     }
 
@@ -183,7 +270,7 @@ export function callbackPropOwner(
       true,
     )
 
-    return result
+    return callbackResult
   }
 
   if(noCycle) {
@@ -192,5 +279,5 @@ export function callbackPropOwner(
   
   setUse.memory.tagClosed$.toCallback(run)
 
-  return result
+  return callbackResult
 }

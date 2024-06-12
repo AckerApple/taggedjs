@@ -24,7 +24,7 @@ export function updateExistingValue(
 ): TagSubject | InterpolateSubject {
   const valueType = getValueType(value)
   
-  checkDestroyPrevious(
+  const destroyCheck = checkDestroyPrevious(
     subject, value, insertBefore, valueType
   )
 
@@ -147,12 +147,6 @@ function handleStillTag(
   if(isTagTemplater(value)) {
     setupNewSupport(valueSupport, ownerSupport, subject)
   }
-
-  /*
-  if(valueSupport.templater.wrapper?.parentWrap.original.toString().includes('🌹-1')) {
-    // console.log('isSameTag', isSameTag)
-  }
-  */
 
   if(isSameTag) {
     lastSupport.updateBy(valueSupport)

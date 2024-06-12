@@ -41,6 +41,9 @@ export function runTagCallback(
   args: any[],
 ) {
   const tag = findTagToCallback(support)
+
+  syncStates((tag.subject.global.newest as Support).state, tag.state)
+  
   const method = value.bind(bindTo)  
   tag.subject.global.locked = useLocks // prevent another render from re-rendering this tag
   const callbackResult = method(...args)
@@ -48,29 +51,20 @@ export function runTagCallback(
  return afterTagCallback(tag, callbackResult)
 }
 
-function afterTagCallback(
+export function afterTagCallback(
   tag: Support,
   callbackResult: any,
 ) {
   delete tag.subject.global.locked
 
   if(tag.subject.global.blocked.length) {    
+    syncStates(tag.state, (tag.subject.global.newest as Support).state)
     let lastResult: BaseSupport | Support | undefined;
-    tag.subject.global.blocked.forEach(blocked => {      
-      const block = blocked as Support
-  
-      lastResult = updateExistingTagComponent(
-        block.ownerSupport,
-        block,
-        block.subject,
-        block.subject.global.insertBefore as any,
-        true, // renderUp
-      )
 
-      tag.subject.global.newest = lastResult
-      tag.subject.global.blocked.splice(0,1)
-    })
-    tag.subject.global.blocked.length = 0
+    lastResult = runBlocked(
+      tag,
+      lastResult as Support,
+    )
 
     // return lastResult
     return checkAfterCallbackPromise(
@@ -113,7 +107,7 @@ function renderCallbackSupport(
   return checkAfterCallbackPromise(callbackResult, last, global)
 }
 
-function checkAfterCallbackPromise(
+export function checkAfterCallbackPromise(
   callbackResult: any,
   last: BaseSupport | Support,
   global: TagGlobal,
@@ -139,4 +133,31 @@ function checkAfterCallbackPromise(
   }
 
   return 'no-data-ever'
+}
+
+export function runBlocked(
+  tag: BaseSupport | Support,
+  lastResult?: BaseSupport | Support
+) {
+  const global = tag.subject.global
+  const blocked = global.blocked
+  while (blocked.length > 0) {
+    const block = blocked[0] as Support
+
+    blocked.splice(0,1)
+    
+    lastResult = updateExistingTagComponent(
+      block.ownerSupport,
+      block,
+      block.subject,
+      block.subject.global.insertBefore as any,
+      true, // renderUp
+    )
+
+    tag.subject.global.newest = lastResult
+    // tag.subject.global.blocked.splice(0,1)
+  }
+  tag.subject.global.blocked.length = 0
+  
+  return lastResult
 }

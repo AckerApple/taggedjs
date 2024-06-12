@@ -16,8 +16,9 @@ import { ValueTypes } from './ValueTypes.enum.js'
 export type OriginalFunction = (() => Tag) & {compareTo: string}
 
 export type Wrapper = ((
-  support: BaseSupport | Support,
+  newSupport: BaseSupport | Support,
   subject: TagSubject,
+  prevSupport?: BaseSupport | Support,
 ) => Support) & {
   parentWrap: TagWrapper<any>
 }
