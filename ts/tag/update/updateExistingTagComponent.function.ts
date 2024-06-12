@@ -230,15 +230,16 @@ function syncPriorPropFunction(
 ) {
   if(priorProp instanceof Function) {
     // the prop i am receiving, is already being monitored/controlled by another parent
-    if(prop.toCall) {
-      priorProp.toCall = prop.toCall
+    if(prop.mem) {
+      priorProp.mem.prop = prop.mem.prop
+      priorProp.mem.stateArray = prop.mem.stateArray
       return prop
     }
 
     const ownerGlobal = ownerSupport.subject.global
     const oldOwnerState = (ownerGlobal.newest as Support).state
 
-    priorProp.prop = prop
+    priorProp.mem.prop = prop
     priorProp.stateArray = oldOwnerState
 
     return priorProp

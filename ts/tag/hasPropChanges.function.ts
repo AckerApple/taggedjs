@@ -12,7 +12,7 @@ export function hasPropChanges(
   props: Props, // natural props
   pastCloneProps: Props, // previously cloned props
   // newTemplater: TemplaterResult,
-): number | false {
+): number | string | false {
   /*
   const isCommonEqual = props === undefined && props === compareToProps
   if(isCommonEqual) {
@@ -53,7 +53,7 @@ export function hasPropChanges(
     })
 
     if(!allFunctionsMatch) {
-      return 6 // a change has been detected by function comparisons
+      return 'functions-changed' // a change has been detected by function comparisons
     }
   }
 

@@ -150,11 +150,14 @@ export function getPropWrap(
   const wrap = (...args: any[]) => wrap.toCall(...args) // what gets called can switch over parent state changes
   // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
   wrap.toCall = (...args: any[]) => {
-    return callbackPropOwner(wrap.prop, args, ownerSupport)
+    return callbackPropOwner(wrap.mem.prop, args, ownerSupport)
   }
   wrap.original = value
-  wrap.prop = value
-  wrap.stateArray = stateArray
+  wrap.mem = {
+    prop: value,
+    // stateArray: stateArray
+  }
+
 
   // copy data properties that maybe on source function
   Object.assign(wrap, value)
@@ -175,21 +178,11 @@ export function callbackPropOwner(
 
   if(supportInCycle) {
     supportInCycle.subject.global.locked = true
-    console.log('supportInCycle.subject.global', {
-      supportInCycle,
-      stateGet: supportInCycle.state[2]?.get(),
-      state: supportInCycle.state[2],
-    })
-  } else {
-    // syncStates(newest.state, global.oldest.state)
   }
-
 
   const callbackResult = toCall(...callWith)
 
   if(supportInCycle) {
-    //return afterTagCallback(supportInCycle as Support,callbackResult)
-
     const blocked = supportInCycle?.subject.global.blocked 
     if(supportInCycle && blocked?.length) {
       setUse.memory.tagClosed$.toCallback(() => {
@@ -205,7 +198,6 @@ export function callbackPropOwner(
 
         // syncStates((supportInCycle.subject.global.newest as Support).state, supportInCycle.state)
   
-        console.log('lastResult', lastResult)
         // delete supportInCycle.subject.global.locked
         renderSupport(
           lastResult as Support,
@@ -213,36 +205,11 @@ export function callbackPropOwner(
         )
 
       })
-      
-      // renderSupport(
-      //   lastResult as Support,
-      //   false, // renderUp - callback may have changed props so also check to render up
-      // )
 
-      // renderSupport(
-      //   lastResult as Support,
-      //   true, // renderUp - callback may have changed props so also check to render up
-      // )
-    
-      // TODO: will need to handle promises
       return callbackResult
-
-      // Cannot use because we need return value instead of no-data-ever
-      // return checkAfterCallbackPromise(
-      //   callbackResult,
-      //   lastResult,
-      //   lastResult.subject.global
-      // )
     }
 
     delete supportInCycle.subject.global.locked
-    //renderSupport(
-    //  newest,
-    //  false,
-    //)
-    //return callbackResult
-  } else {
-    // syncStates(global.oldest.state, newest.state)
   }
   
   const run = () => {    

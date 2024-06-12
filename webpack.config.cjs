@@ -43,8 +43,6 @@ module.exports = {
   },
   plugins: [
       new ResolveTsForJsPlugin(),
-      new CompressionPlugin({
-          algorithm: 'gzip',
-      }),
+      // new CompressionPlugin({algorithm: 'gzip'}),
   ]
 }

@@ -1,6 +1,7 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
 import { setUse } from '../state/setUse.function.js'
+import { State } from '../state/state.utils.js'
 import { syncStates } from '../state/syncStates.function.js'
 import { BaseSupport, Support } from '../tag/Support.class.js'
 import { TagGlobal } from '../tag/TemplaterResult.class.js'
@@ -23,10 +24,11 @@ export function bindSubjectCallback(
     return value
   }
 
-  const state = setUse.memory.stateConfig
+  // const state = setUse.memory.stateConfig.support?.state as State
+  const state = support.state as State
   const subjectFunction = (
-    element: Element, args: any[]
-  ) => runTagCallback(value, support, element, args)
+    element: Element, args: any[],
+  ) => runTagCallback(value, support, element, args, state)
 
   // link back to original. Mostly used for <div oninit ondestroy> animations
   subjectFunction.tagFunction = value
@@ -39,14 +41,19 @@ export function runTagCallback(
   support: Support,
   bindTo: unknown,
   args: any[],
+  state: State
 ) {
   const tag = findTagToCallback(support)
-
-  syncStates((tag.subject.global.newest as Support).state, tag.state)
+  const newState = (tag.subject.global.newest as Support).state
+  if(newState.length === state.length) {
+    syncStates(newState, state)
+    }
+  // syncStates(newState, tag.state)
   
   const method = value.bind(bindTo)  
   tag.subject.global.locked = useLocks // prevent another render from re-rendering this tag
   const callbackResult = method(...args)
+  // syncStates(state, newState)
 
  return afterTagCallback(tag, callbackResult)
 }
@@ -58,7 +65,7 @@ export function afterTagCallback(
   delete tag.subject.global.locked
 
   if(tag.subject.global.blocked.length) {    
-    syncStates(tag.state, (tag.subject.global.newest as Support).state)
+    // syncStates(tag.state, (tag.subject.global.newest as Support).state)
     let lastResult: BaseSupport | Support | undefined;
 
     lastResult = runBlocked(
@@ -78,7 +85,7 @@ export function afterTagCallback(
   return result
 }
 
-function findTagToCallback(
+export function findTagToCallback(
   support: Support,
 ): Support {
   // If we are NOT a component than we need to render my owner instead
@@ -155,7 +162,6 @@ export function runBlocked(
     )
 
     tag.subject.global.newest = lastResult
-    // tag.subject.global.blocked.splice(0,1)
   }
   tag.subject.global.blocked.length = 0
   

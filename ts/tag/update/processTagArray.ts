@@ -10,7 +10,7 @@ import { isTagClass } from '../../isInstance.js'
 import { TagSubject } from '../../subject.types.js'
 import { renderTagOnly } from '../render/renderTagOnly.function.js'
 import { TagJsSubject } from './TagJsSubject.class.js'
-import { textNode } from '../ValueTypes.enum.js'
+import { textNode } from '../textNode.js'
 
 export type LastArrayItem = {
   support: Support

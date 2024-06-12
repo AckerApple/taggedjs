@@ -2,11 +2,9 @@ import { BaseSupport, Support } from './Support.class.js'
 import { runAfterRender, runBeforeRender } from'./tagRunner.js'
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { TagComponent, TagMaker} from './tag.utils.js'
-import { ValueSubject } from'../subject/ValueSubject.js'
 import { TagSubject } from '../subject.types.js'
 import { TagJsSubject } from './update/TagJsSubject.class.js'
-import { setTagPlaceholder } from './setTagPlaceholder.function.js'
-import { textNode } from './ValueTypes.enum.js'
+import { textNode } from './textNode.js'
 
 const appElements: {
   support: Support

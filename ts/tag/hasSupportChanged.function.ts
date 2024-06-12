@@ -6,7 +6,7 @@ export function hasSupportChanged(
   lastSupport: BaseSupport,
   newSupport: BaseSupport,
   newTemplater: TemplaterResult,
-): number | false {
+): number | string | false {
   const latestProps = newTemplater.props // newSupport.propsConfig.latest
   const pastCloneProps = lastSupport.propsConfig.latestCloned
   

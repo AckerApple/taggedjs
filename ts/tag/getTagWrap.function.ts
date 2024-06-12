@@ -1,6 +1,6 @@
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { TagWrapper } from './tag.utils.js'
-import { runTagCallback } from'../interpolations/bindSubjectCallback.function.js'
+import { findTagToCallback, runTagCallback } from'../interpolations/bindSubjectCallback.function.js'
 import { BaseSupport, Support } from './Support.class.js'
 import { TagSubject } from '../subject.types.js'
 import { castProps } from'../alterProp.function.js'
@@ -137,7 +137,8 @@ function executeWrap(
             value, // callback
             support.ownerSupport,
             this, // bindTo
-            args
+            args,
+            support.state, // findTagToCallback(support).state,
           )
         }
         

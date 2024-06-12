@@ -1,6 +1,6 @@
 import { InsertBefore } from'../interpolations/InsertBefore.type.js'
 import { TagGlobal } from './TemplaterResult.class.js'
-import { textNode } from './ValueTypes.enum.js'
+import { textNode } from './textNode.js'
 
 export function setTagPlaceholder(
   global: TagGlobal,

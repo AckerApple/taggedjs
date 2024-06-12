@@ -1,7 +1,5 @@
 export const empty = ''
 
-export const textNode = document.createTextNode(empty)
-
 export enum ValueTypes {
   unknown = 'unknown',
   
