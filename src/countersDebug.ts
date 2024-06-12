@@ -23,7 +23,6 @@ export const counters = tag(({
 
   const pipedSubject0 = state(() => new ValueSubject('222'))
   const pipedSubject1 = Subject.all([pipedSubject0, callbackTestSub]).pipe(callback(x => {
-    console.log('piped 1 saw value', x)
     return counter
   }))
   const pipedSubject2 = subject.all([pipedSubject0, callbackTestSub]).pipe(x => counter)
@@ -35,14 +34,8 @@ export const counters = tag(({
     callbackTestSub.subscribe(
       callbacks(y => {
         counter = y
-        console.log('the sub saw new counter', counter)
       })
     )
-  })
-
-  console.log('latest callbackTestSub counter', {
-    subjectValue: callbackTestSub._value,
-    counter,
   })
 
   // State as a callback only needed so pipedSubject1 has the latest value
