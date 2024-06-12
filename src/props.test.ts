@@ -37,6 +37,7 @@ describe('props', () => {
     
     // test that watch runs onInit
     expect(changed).toBe( (Number(funUpdateValue) + 1).toString() )
+    // expect(changed).toBe( (Number(funUpdateValue) - 4).toString() )
 
     const ownerHTML = byId('propsDebug-🥩-0-display').innerHTML
     const parentHTML = byId('propsDebug-🥩-1-display').innerHTML
@@ -63,6 +64,5 @@ describe('props', () => {
     testCounterElements('#nothing-prop-counter-button', '#nothing-prop-counter-display')
     expectHTML('#sync-prop-number-display', (syncCounter + 2).toString())
     expectMatchedHtml('#sync-prop-counter-display', '#nothing-prop-counter-display')
-    
   })
 })

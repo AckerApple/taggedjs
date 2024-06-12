@@ -22,7 +22,10 @@ export const counters = tag(({
   const callbackTestSub = state(() => new Subject(counter))
 
   const pipedSubject0 = state(() => new ValueSubject('222'))
-  const pipedSubject1 = Subject.all([pipedSubject0, callbackTestSub]).pipe(callback(x => counter))
+  const pipedSubject1 = Subject.all([pipedSubject0, callbackTestSub]).pipe(callback(x => {
+    console.log('piped 1 saw value', x)
+    return counter
+  }))
   const pipedSubject2 = subject.all([pipedSubject0, callbackTestSub]).pipe(x => counter)
 
   onInit(() => {
@@ -30,8 +33,16 @@ export const counters = tag(({
     console.info('countersDebug.ts: 👉 i should only ever run once')
 
     callbackTestSub.subscribe(
-      callbacks(y => counter = y)
+      callbacks(y => {
+        counter = y
+        console.log('the sub saw new counter', counter)
+      })
     )
+  })
+
+  console.log('latest callbackTestSub counter', {
+    subjectValue: callbackTestSub._value,
+    counter,
   })
 
   // State as a callback only needed so pipedSubject1 has the latest value
@@ -52,7 +63,7 @@ export const counters = tag(({
   return html`<!--counters-->
     <div style="display:flex;flex-wrap:wrap;gap:1em">
       ${testBasics && html`
-        <div>👉 Subscriptions:${(Subject as any).globalSubCount$}</div>
+        <div>👉 Subscriptions:<span id="👉-counter-sub-count">${(Subject as any).globalSubCount$}</span></div>
         <button onclick=${() => console.info('subs', (Subject as any).globalSubs)}>log subs</button>
         <div>initCounter:${initCounter}</div>
     
@@ -98,21 +109,18 @@ export const counters = tag(({
             </span>
         </div>
 
-        ${/*
-          <div>
-            <button id="🥦-subject-increase-counter"
-              onclick=${() => callbackTestSub.next(counter + 1)}
-            >subject increase:</button>
-            <span>
-              🥦 <span id="🥦-subject-counter-display">${counter}</span>
-              🥦 <span id="subject-counter-subject-display">${callbackTestSub}</span>
-            </span>
-          </div>
-        */false}
+        <div>
+          <button id="🥦-subject-increase-counter"
+            onclick=${() => callbackTestSub.next(counter + 1)}
+          >subject increase:</button>
+          <span>
+            🥦 <span id="🥦-subject-counter-display">${counter}</span>
+            🥦 <span id="subject-counter-subject-display">${callbackTestSub}</span>
+          </span>
+        </div>
       `}
     </div>
 
-    ${/*
     <fieldset>
       <legend>🪈 pipedSubject 1</legend>
       <div>
@@ -130,7 +138,6 @@ export const counters = tag(({
         </small>
       </div>
     </fieldset>
-    */false}
 
     ${sharedMemory && html`
       <fieldset>

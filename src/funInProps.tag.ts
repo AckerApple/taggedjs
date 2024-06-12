@@ -1,4 +1,4 @@
-import { ElementTargetEvent, InputElementTargetEvent, html, letState, tag } from "taggedjs";
+import { InputElementTargetEvent, html, letState, tag } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
 
 const main = {
@@ -17,10 +17,11 @@ export default tag(() => (
   addArrayItem = (x?: string) => {array = array.map(x => x);array.push(typeof(x) === 'string' ? x : 'push'+array.length)},
   deleteItem = (item: string) => array = array.filter(x => x !== item)
 ) => html`
-  <button id="fun-parent-button" onclick=${myFunction}>++parent</button><span id="fun_in_prop_display">${counter}</span>
+  <button id="fun-parent-button" onclick=${myFunction}>🤰 ++parent</button>
+  <span id="fun_in_prop_display">${counter}</span>
   ${renderCountDiv({renderCount, name:'funInProps_tag_parent'})}
   <div>
-    <strong>main:</strong><span id="main_wrap_state">${(main.function as any).toCall ? 'taggjedjs-wrapped' : 'nowrap'}</span>:${main.count}
+    <strong>🆎 main:</strong><span id="main_wrap_state">${(main.function as any).toCall ? 'taggjedjs-wrapped' : 'nowrap'}</span>:${main.count}
   </div>
   <button id="toggle-fun-in-child" type="button" onclick=${() => showChild = !showChild}>toggle child</button>
   array length: ${array.length}
@@ -52,7 +53,7 @@ const addArrayComponent = tag((
 `)
 
 const funInPropsChild = tag((
-  {addArrayItem, myFunction, deleteItem, child, array}: {
+  arg0: {
     array: unknown[],
     addArrayItem: (x: any) => any,
     myFunction: () => any,
@@ -66,6 +67,7 @@ const funInPropsChild = tag((
   counter = letState(0)(x => [counter, counter = x]),
   renderCount = letState(0)(x => [renderCount, renderCount = x]),
   _ = ++renderCount,
+  {addArrayItem, myFunction, deleteItem, child, array} = arg0,
 ) => html`
   <div>
     <strong>mainFunction:</strong>${(mainProp.function as any).toCall ? 'taggjedjs-wrapped' : 'nowrap'}:
@@ -78,10 +80,10 @@ const funInPropsChild = tag((
     <strong>myFunction:</strong>${(myFunction as any).toCall ? 'taggjedjs-wrapped' : 'nowrap'}
   </div>
 
-  <button id="fun_in_prop1" onclick=${myFunction}>++object argument</button>
-  <button id="fun_in_prop2" onclick=${child.myChildFunction}>++child.myChildFunction</button>
-  <button id="fun_in_prop3" onclick=${myFunction3}>++argument</button>
-  <button onclick=${main.function}>++main</button>
+  <button id="fun_in_prop1" onclick=${myFunction}>🤰 ++object argument</button>
+  <button id="fun_in_prop2" onclick=${child.myChildFunction}>🤰 ++child.myChildFunction</button>
+  <button id="fun_in_prop3" onclick=${myFunction3}>+🤰 +argument</button>
+  <button onclick=${main.function}>🆎 ++main</button>
   <button onclick=${() => ++counter}>++me</button>
   
   <div>

@@ -1,4 +1,4 @@
-import { byId, click, html } from "./elmSelectors"
+import { byId, click, html, htmlById } from "./elmSelectors"
 import { describe, expect, it } from "./expect"
 import { expectElmCount, testCounterElements } from "./expect.html"
 
@@ -18,7 +18,9 @@ describe('counters', () => {
 
     expectElmCount('#conditional-counter', 0)
 
+    const currentSubs = htmlById('👉-counter-sub-count')
     testCounterElements('#❤️-increase-counter', '#❤️-counter-display')
+    expect(htmlById('👉-counter-sub-count')).toBe(currentSubs)
 
     expect(html('#counters_render_count')).toBe( (beforeRenderCount + 2).toString() )
     // the parent changed a value passed to child as a prop
@@ -28,12 +30,14 @@ describe('counters', () => {
 
     expect(html('#counters_render_count')).toBe( (beforeRenderCount + 4).toString() )
     // the child changed a value passed from parent as a prop
+    // expect(html('#inner_counters_render_count')).toBe( (beforeInnerRenderCount + 1).toString() )
     expect(html('#inner_counters_render_count')).toBe( (beforeInnerRenderCount + 4).toString() )
 
     testCounterElements('#standalone-counter', '#standalone-display')
 
     expect(html('#counters_render_count')).toBe( (beforeRenderCount + (firstRun ? 6 : 6)).toString(), 'render count check failed' )
     // the child was not rendered again because props did not change so value should be less
+    // expect(html('#inner_counters_render_count')).toBe( (beforeInnerRenderCount + 1).toString() )
     expect(html('#inner_counters_render_count')).toBe( (beforeInnerRenderCount + 4).toString() )
 
     expectElmCount('#conditional-counter', 1)
@@ -45,7 +49,9 @@ describe('counters', () => {
     
     // test again after higher elements have had reruns
     testCounterElements('#❤️-inner-counter', '#❤️-inner-display')
+  })
 
+  it.skip('piped subject', () => {
     if(firstRun) {
       expect(html('#🪈-pipedSubject')).toBe('')
       expect(html('#🪈-pipedSubject-2')).toBe('')

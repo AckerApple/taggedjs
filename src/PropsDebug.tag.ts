@@ -46,7 +46,10 @@ export const propsDebugMain = tag((_='propsDebugMain') => (
     ${syncPropDebug({
       syncPropNumber,
       propNumberChange: x => syncPropNumber = x,
-      parentTest: x => x
+      parentTest: x => {
+        console.log('echox',x)
+        return x
+      }
     })}
   </fieldset>
 
@@ -77,8 +80,13 @@ const syncPropDebug = tag((
   }
 ) => {
   state('string forced')
+  state(() => {
+    console.log('init setup')
+  })
   let counter = letState(0)(x => [counter, counter = x])
   let renderCount = letState(0)(x => [renderCount, renderCount = x])
+
+  console.log('counter', counter)
 
   ++renderCount
 
@@ -96,7 +104,10 @@ const syncPropDebug = tag((
         counter:<span id="sync-prop-counter-display">${counter}</span>
       </div>
       parentTest<span id="nothing-prop-counter-display">${parentTest(counter)}</span>
-      <button id="nothing-prop-counter-button" onclick=${() => parentTest(++counter)}>++</button>
+      <button id="nothing-prop-counter-button" onclick=${() => {
+        parentTest(++counter)
+        console.log('counter should be', counter)
+      }}>++</button>
     </div>
     ${renderCountDiv({renderCount, name: 'child_sync_props_callback'})}
   `
