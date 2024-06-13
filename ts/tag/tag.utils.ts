@@ -2,6 +2,7 @@ import { Tag, TagTemplate } from './Tag.class.js'
 import { TemplaterResult } from './TemplaterResult.class.js'
 import { ValueSubject } from '../subject/ValueSubject.js'
 import { setUse } from '../state/index.js'
+import { ObjectChildren } from '../interpolations/optimizers/htmlInterpolationToDomMeta.function.js'
 
 export type TagChildren = ValueSubject<Tag[]> & { lastArray?: Tag[] }
 export type TagChildrenInput = Tag[] | Tag | TagChildren
@@ -21,6 +22,7 @@ export type TagWrapper<T> = ((
   compareTo: string
   isTag: boolean
   oneRender?: true
+  domMeta: ObjectChildren
 }
 
 export type TagMaker = ((...args: any[]) => Tag) | ((...args: any[]) => (...args: any[]) => Tag)

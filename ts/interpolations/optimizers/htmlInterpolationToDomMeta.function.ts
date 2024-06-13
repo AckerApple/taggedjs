@@ -45,7 +45,7 @@ type ObjectElement = ObjectNode & {
   children?: ObjectChildren
 }
 
-type ObjectChildren = (ObjectText | ObjectElement)[]
+export type ObjectChildren = (ObjectText | ObjectElement)[]
 
 function parseHTML(html: string) {
   const elements: (ObjectElement | ObjectText)[] = [];
