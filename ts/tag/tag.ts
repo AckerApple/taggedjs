@@ -1,4 +1,6 @@
-import { Tag } from './Tag.class.js'
+// taggedjs-no-compile
+
+import { Dom, Tag } from './Tag.class.js'
 import { setUse } from '../state/index.js'
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { TagComponent, TagWrapper, tags } from './tag.utils.js'
@@ -56,7 +58,7 @@ export function tag<T extends ToTag>(
 }
 
 /** Used to create a tag component that renders once and has no addition rendering cycles */
-tag.oneRender = (...props: any[]): (Tag | StateToTag) => {
+tag.oneRender = (...props: any[]): (Dom | Tag | StateToTag) => {
   throw new Error('Do not call function tag.oneRender but instead set it as: `(props) => tag.oneRender = (state) => html`` `')
 }
 

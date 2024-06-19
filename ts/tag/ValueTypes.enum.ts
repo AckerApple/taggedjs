@@ -3,7 +3,9 @@ export const empty = ''
 export enum ValueTypes {
   unknown = 'unknown',
   
-  tag = 'tag', // this one might be bad
+  tag = 'tag', // html''
+  dom = 'dom', // compiled version of html''
+
   templater = 'templater',
   tagComponent = 'tag-component',
   object = 'object',

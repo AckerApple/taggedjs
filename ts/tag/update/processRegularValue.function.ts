@@ -1,7 +1,7 @@
 import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
 import { DisplaySubject } from '../../subject.types'
 import { castTextValue, updateBeforeTemplate } from'../../updateBeforeTemplate.function.js'
-import { Support } from '../Support.class.js'
+import { AnySupport, Support } from '../Support.class.js'
 
 export type RegularValue = string | number | undefined | boolean
 
@@ -41,7 +41,6 @@ export function processFirstRegularValue(
   value: RegularValue,
   subject: DisplaySubject, // could be tag via subject.tag
   insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
-  ownerSupport: Support,
 ) {
   subject.lastValue = value
   const castedValue = castTextValue(value)

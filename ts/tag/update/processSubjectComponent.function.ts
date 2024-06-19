@@ -13,7 +13,7 @@ export function processSubjectComponent(
   templater: TemplaterResult,
   subject: TagSubject,
   insertBefore: InsertBefore,
-  ownerSupport: Support,
+  ownerSupport: BaseSupport | Support,
   options: {counts: Counts},
   fragment ?: DocumentFragment,
 ): BaseSupport | Support {

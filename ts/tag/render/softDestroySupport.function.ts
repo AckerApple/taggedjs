@@ -8,7 +8,8 @@ export function softDestroySupport(
 ) {
   const global = lastSupport.subject.global
   global.deleted = true
-  global.context = {}
+  // global.context = {}
+  global.context = []
   const childTags = getChildTagsToDestroy(global.childTags)
 
   lastSupport.destroySubscriptions()

@@ -1,40 +1,40 @@
 import { specialAttribute } from './specialAttribute.js'
 import { isSubjectInstance } from '../isInstance.js'
-import { Context } from '../tag/Tag.class.js'
-import { HowToSet } from './interpolateAttributes.js'
+import { Context, variablePrefix } from '../tag/Tag.class.js'
+import { HowToSet, howToSetInputValue } from './interpolateAttributes.js'
 import { bindSubjectCallback } from './bindSubjectCallback.function.js'
-import { Support } from '../tag/Support.class.js'
+import { BaseSupport, Support } from '../tag/Support.class.js'
 import { ValueTypes, empty } from '../tag/ValueTypes.enum.js'
+import { TagJsSubject } from '../tag/update/TagJsSubject.class.js'
 
-const startRegX = /^\s*{__tagvar/
-const endRegX = /}\s*$/
+const INPUT = 'INPUT'
+const valueS = 'value'
 const ondoubleclick = 'ondoubleclick'
-function isTagVar(value: string | null) {
-  return value && value.search(startRegX) >= 0 && value.search(endRegX) >= 0
-}
+export type AttrCombo = [
+  string,
+  (TagJsSubject<any> | string | null)?, // current attribute value by using .getAttribute
+]
 
+/** Sets attribute value, subscribes to value updates  */
 export function processAttribute(
-  attrName: string,
-  value: string | null, // current attribute value by using .getAttribute
-  child: Element,
+  attrs: AttrCombo,
+  element: Element,
   scope: Context,
-  ownerSupport: Support,
-  howToSet: HowToSet,
+  support: BaseSupport | Support,
+  howToSet: HowToSet = howToSetInputValue,
 ) {
-  if ( isTagVar(value) ) {  
-    return processScopedNameValueAttr(
-      attrName,
-      value as string,
-      child,
-      scope,
-      ownerSupport,
-      howToSet,
-    )
+  const attrName = attrs[0]
+  const value = attrs[1]
+  
+  if(element.nodeName === INPUT && attrName === valueS) {
+    howToSet = howToSetInputValue
   }
 
-  if( isTagVar(attrName) ) {  
-    const contextValueSubject = getContextValueByVarString(scope, attrName)
+  const isNameVar = (attrs as any).length === 1 // isTagVar(attrName)
+  if( isNameVar ) {
+    const contextValueSubject = attrName as any as TagJsSubject<any>// getContextValueByVarString(scope, attrName)
     let lastValue: any;
+
     // the above callback gets called immediately since its a ValueSubject()
     const sub = contextValueSubject.subscribe((value: any) => {
       if(value === lastValue) {
@@ -44,59 +44,48 @@ export function processAttribute(
       processNameOnlyAttr(
         value,
         lastValue,
-        child,
-        ownerSupport,
+        element,
+        support,
         howToSet,
       )
 
       lastValue = value
     })
-    ownerSupport.subject.global.subscriptions.push(sub) // this is where unsubscribe is picked up
-    child.removeAttribute(attrName)
+    support.subject.global.subscriptions.push(sub) // this is where unsubscribe is picked up
+    element.removeAttribute(attrName)
 
     return
+  }
+
+  const isSubject = value && isSubjectInstance(value)
+  // const isSubject = isTagVar(value)
+  if ( isSubject ) {
+    return processNameValueAttr(
+      attrName,
+      value as TagJsSubject<any>,
+      element,
+      support,
+      howToSet
+    )
   }
 
   // Non dynamic
   const isSpecial = isSpecialAttr(attrName)
   if (isSpecial) {
-    return specialAttribute(attrName, value, child)
+    return specialAttribute(attrName, value, element)
   }
+
+  howToSet(element, attrName, value as string)
 }
 
-function processScopedNameValueAttr(
-  attrName: string,
-  value: string, // {__tagVarN}
-  child: Element,
-  scope: Context,
-  ownerSupport: Support,
-  howToSet: HowToSet
-) {
-  // get the code inside the brackets like "variable0" or "{variable0}"
-  const result = getContextValueByVarString(scope, value)
-  return processNameValueAttr(
-    attrName,
-    result,
-    child,
-    ownerSupport,
-    howToSet
-  )
-}
-
-function getContextValueByVarString(
-  scope: Context,
-  value: string,
-) {
-  const code = value.replace('{',empty).split(empty).reverse().join(empty).replace('}',empty).split(empty).reverse().join(empty)
-  return scope[code]
-}
 function processNameOnlyAttr(
   attrValue: string | Record<string, any>,
   lastValue: string | Record<string, any> | undefined,
   child: Element,
-  ownerSupport: Support,
+  ownerSupport: BaseSupport | Support,
   howToSet: HowToSet,
 ) {
+  // check to remove previous attribute(s)
   if(lastValue && lastValue != attrValue) {
     if(typeof(lastValue) === ValueTypes.string) {
       child.removeAttribute(lastValue as string)
@@ -107,14 +96,15 @@ function processNameOnlyAttr(
     }
   }
 
+  // regular attributes
   if(typeof(attrValue) === ValueTypes.string) {
     if(!attrValue.length) {
       return
     }
 
     processNameValueAttr(
-      attrValue as string,
-      empty,
+      attrValue as string, // name
+      new TagJsSubject(empty),
       child,
       ownerSupport,
       howToSet,
@@ -123,6 +113,7 @@ function processNameOnlyAttr(
     return
   }
 
+  // process an object of attributes ${{class:'something, checked:true}}
   if(attrValue instanceof Object) {
     for (const name in attrValue) {
       processNameValueAttr(
@@ -136,26 +127,17 @@ function processNameOnlyAttr(
   }
 }
 
+/** Processor for flat attributes and object attributes */
 function processNameValueAttr(
   attrName: string,
-  result: any,
+  result: TagJsSubject<any>,
   child: Element,
-  ownerSupport: Support,
+  support: BaseSupport | Support,
   howToSet: HowToSet
 ) {
-  const isSpecial = isSpecialAttr(attrName)
-
-  if(result instanceof Function) {
-    const action = function(...args: any[]) {
-      const result2 = result(child, args)
-      return result2
-    }
-    
-    ;(child as any)[attrName].action = action
-  }
-
   // Most every variable comes in here since everything is made a ValueSubject
   if(isSubjectInstance(result)) {
+    const isSpecial = isSpecialAttr(attrName)
     child.removeAttribute(attrName)
     let lastValue: any;
 
@@ -163,7 +145,7 @@ function processNameValueAttr(
       // should the function be wrapped so every time its called we re-render?
       if(newAttrValue instanceof Function) {
         return callbackFun(
-          ownerSupport,
+          support,
           newAttrValue,
           child,
           attrName,
@@ -171,6 +153,7 @@ function processNameValueAttr(
           howToSet,
         )
       }
+
 
       // TODO: we maybe able to block higher before instance of check
       if(lastValue === newAttrValue) {
@@ -192,13 +175,14 @@ function processNameValueAttr(
     const sub = result.subscribe(callback as any)
     
     // Record subscription for later unsubscribe when element destroyed
-    ownerSupport.subject.global.subscriptions.push(sub)
+    support.subject.global.subscriptions.push(sub)
 
     return
   }
 
-  howToSet(child, attrName, result)
-  // child.setAttribute(attrName, result.value)
+
+  howToSet(child, attrName, result._value)
+
   return
 }
 
@@ -257,18 +241,18 @@ function isSpecialAttr(
 }
 
 function callbackFun(
-  ownerSupport: Support,
+  support: BaseSupport | Support,
   newAttrValue: any,
   child: Element,
   attrName: string,
   isSpecial: boolean,
   howToSet: HowToSet,
 ) {
-  const wrapper = ownerSupport.templater.wrapper
+  const wrapper = support.templater.wrapper
   const parentWrap = wrapper?.parentWrap
   const oneRender = parentWrap?.oneRender
   if(!oneRender) {
-    newAttrValue = bindSubjectCallback(newAttrValue, ownerSupport)
+    newAttrValue = bindSubjectCallback(newAttrValue, support)
   }
   
   return processAttributeSubjectValue(

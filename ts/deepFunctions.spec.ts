@@ -36,7 +36,7 @@ describe('deepFunctions', () => {
     expect(equal).toBeFalsy()
   })
   
-  it.only('date objects correctly', () => {
+  it('date objects correctly', () => {
     const x =  deepClone({date:new Date(0)})
     const y = {date: new Date(10000)}
     const equal = deepEqual(x, y)  

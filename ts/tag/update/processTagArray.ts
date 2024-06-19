@@ -1,15 +1,18 @@
+// taggedjs-no-compile
+
 import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
-import { Tag, TagTemplate } from '../Tag.class.js'
+import { Dom, Tag, TagTemplate } from '../Tag.class.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { ArrayNoKeyError } from '../../errors.js'
 import { destroyArrayTag } from '../checkDestroyPrevious.function.js'
 import { newSupportByTemplater, setupNewSupport, tagFakeTemplater } from './processTag.function.js'
-import { Support } from '../Support.class.js'
+import { BaseSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { isTagClass } from '../../isInstance.js'
 import { TagSubject } from '../../subject.types.js'
 import { renderTagOnly } from '../render/renderTagOnly.function.js'
 import { TagJsSubject } from './TagJsSubject.class.js'
+import { afterChildrenBuilt } from './processTag.function.js'
 import { textNode } from '../textNode.js'
 
 export type LastArrayItem = {
@@ -20,7 +23,7 @@ export type LastArrayItem = {
 
 type LastArrayMeta = {
   array: LastArrayItem[]
-  lastRun?: TagTemplate
+  lastRuns?: {[index: number]: TagTemplate}
 }
 
 export type TagArraySubject = TagJsSubject<Tag[]> & {
@@ -32,7 +35,7 @@ export function processTagArray(
   subject: TagArraySubject,
   value: (TemplaterResult | Tag)[], // arry of Tag classes
   insertBefore: InsertBefore, // <template end interpolate />
-  ownerSupport: Support,
+  ownerSupport: BaseSupport | Support,
   options: {
     counts: Counts
   },
@@ -64,24 +67,24 @@ export function processTagArray(
       return false
     }
 
-    const subTag = value[index - removed] as Tag | TemplaterResult | undefined
+    const subTag = value[index - removed] as Tag | Dom | TemplaterResult | undefined
     const tagClass = isTagClass(subTag)
 
-    let tag = subTag as Tag
-    let templater = (subTag as Tag).templater
+    let tag = subTag as Tag | Dom
+    let templater = (subTag as Tag | Dom).templater
     let prevArrayValue: unknown
 
     if(tagClass) {
-      prevArrayValue = tag.memory.arrayValue
+      prevArrayValue = tag.arrayValue
     } else {
       templater = subTag as TemplaterResult
-      tag = templater.tag as Tag
+      tag = templater.tag as Tag | Dom
       prevArrayValue = templater.arrayValue
     }
 
     // const tag = subTag?.templater.tag as Tag
-    const lastTag = item.support.templater.tag as Tag
-    const lastArrayValue = lastTag.memory.arrayValue
+    const lastTag = item.support.templater.tag as Tag | Dom
+    const lastArrayValue = lastTag.arrayValue
     const destroyItem = !areLikeValues(prevArrayValue, lastArrayValue)
     
     if(destroyItem) {
@@ -98,20 +101,18 @@ export function processTagArray(
     const item = value[index]
     const previous = lastArray.array[index]
     const previousSupport = previous?.support
-    const subTag = item as Tag | TemplaterResult
+    const subTag = item as Tag | Dom | TemplaterResult
     const tagClass = isTagClass(subTag)
-    const itemSubject = new TagJsSubject(
-      // runtimeInsertBefore,
+    const itemSubject = previousSupport?.subject || new TagJsSubject(
       undefined
     ) as unknown as TagSubject
-    itemSubject.lastRun = lastArray.lastRun
 
-    let templater = (subTag as Tag).templater
+    let templater = (subTag as Tag | Dom).templater
     let support: Support
 
     if(tagClass) {
       if(!templater) {
-        templater = tagFakeTemplater(subTag as Tag)
+        templater = tagFakeTemplater(subTag as Tag | Dom)
       }
       
       support = new Support(
@@ -138,11 +139,11 @@ export function processTagArray(
     }
     
     // check for html``.key()
-    const tag = templater.tag || subTag as Tag
-    const keySet = 'arrayValue' in tag.memory
+    const tag = templater.tag || subTag as Tag | Dom
+    const keySet = 'arrayValue' in tag
     if (!keySet) {
       const details = {
-        template: support.getTemplate().string,
+        // template: support.getTemplate().string,
         array: value,
       }
       const message = 'Use html`...`.key(item) instead of html`...` to template an Array'
@@ -168,7 +169,6 @@ export function processTagArray(
       lastArray.array,
       fragment,
     )
-    lastArray.lastRun = support.subject.lastRun
 
     ownerSupport.subject.global.childTags.push(support)  
   }
@@ -212,13 +212,11 @@ function processAddTagArrayItem(
   support.subject.global.placeholder = before // newTempElm
 
   const newFragment = support.buildBeforeElement(undefined, {counts})
-  // if(fragment) {
-  //   fragment.appendChild(newFragment)
-  // } else {
-    const placeholder = before // subject.global.placeholder as Text
-    const parentNode = placeholder.parentNode as ParentNode
-    parentNode.insertBefore(newFragment, placeholder)
-  // }
+  const children = [...newFragment.children]
+  const placeholder = before // subject.global.placeholder as Text
+  const parentNode = placeholder.parentNode as ParentNode
+  parentNode.insertBefore(newFragment, placeholder)
+  afterChildrenBuilt(children, support.subject, support)
 }
 
 /** compare two values. If both values are arrays then the items will be compared */
@@ -238,7 +236,7 @@ function areLikeValues(valueA: unknown, valueB: unknown): Boolean {
 
 function setupNewTemplater(
   templater: TemplaterResult,
-  ownerSupport: Support,
+  ownerSupport: BaseSupport | Support,
   itemSubject: TagSubject
 ) {
   const support = newSupportByTemplater(templater, ownerSupport, itemSubject)

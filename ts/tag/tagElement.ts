@@ -4,6 +4,7 @@ import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { TagComponent, TagMaker} from './tag.utils.js'
 import { TagSubject } from '../subject.types.js'
 import { TagJsSubject } from './update/TagJsSubject.class.js'
+import { afterChildrenBuilt } from './update/processTag.function.js'
 import { textNode } from './textNode.js'
 
 const appElements: {
@@ -57,13 +58,15 @@ export function tagElement(
   global.insertBefore = placeholder // template
   ;(global as any).placeholder = placeholder
   const newFragment = support.buildBeforeElement(undefined)
-
+  const children = [...newFragment.children]
   support.subject.global.oldest = support
   support.subject.global.newest = support
 
   ;(element as any).setUse = (app as any).original.setUse
   appElements.push({element, support})
   element.appendChild(newFragment)
+
+  afterChildrenBuilt(children, support.subject, support)
 
   return {
     support,

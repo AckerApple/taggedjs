@@ -1,5 +1,6 @@
 tests
 
+- Set max recuse depth of 15
 - Test a tag that sometimes returns null and has providers
   - looking to ensure as tag changes the providers are moved
   - test going back to null and back and that no elements find themselves back on page

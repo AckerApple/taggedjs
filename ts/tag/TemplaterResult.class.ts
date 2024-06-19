@@ -1,4 +1,4 @@
-import { Context, Tag } from './Tag.class.js'
+import { Context, Tag, Dom } from './Tag.class.js'
 import { BaseSupport, Support } from './Support.class.js'
 import { Props } from '../Props.js'
 import { TagChildren, TagWrapper } from './tag.utils.js'
@@ -12,6 +12,7 @@ import { TagValues } from './html.js'
 import { Subject, ValueSubject } from '../subject/index.js'
 import { kidsToTagArraySubject } from './kidsToTagArraySubject.function.js'
 import { ValueTypes } from './ValueTypes.enum.js'
+import { ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 
 export type OriginalFunction = (() => Tag) & {compareTo: string}
 
@@ -48,9 +49,11 @@ export type TagGlobal = {
   blocked: (BaseSupport | Support)[], // renders that did not occur because an event was processing
   
   childTags: Support[], // tags on me
-  clones: (Element | Text | ChildNode)[],
+  clones: Clone[],
   callbackMaker?: true
 }
+
+export type Clone = (Element | Text | ChildNode)
 
 export class TemplaterResult {
   tagJsType = ValueTypes.templater
@@ -59,22 +62,36 @@ export class TemplaterResult {
 
   madeChildIntoSubject?: boolean
   
-  tag?: Tag
-  children: TagChildren = new ValueSubject([] as Tag[])
+  tag?: Tag | Dom
+  children: TagChildren = new ValueSubject<(Tag | Dom)[]>([])
   arrayValue?: unknown // used for tag components used in arrays
 
-  constructor(public props: Props) {}
+  constructor(public props: Props) {
+    (this.html as any).dom = this.dom.bind(this)
+  }
 
   key (arrayValue: unknown) {
     this.arrayValue = arrayValue
     return this
   }
 
+  /** children */
   html(
     strings: string[] | TemplateStringsArray,
     ...values: TagValues
   ) {
     const children = new Tag(strings as string[], values)
+    const childSubject = kidsToTagArraySubject(children, this)
+    this.children = childSubject
+    return this
+  }
+
+  /** children */
+  dom(
+    strings: ObjectChildren,
+    ...values: TagValues
+  ) {
+    const children = new Dom(strings, values)
     const childSubject = kidsToTagArraySubject(children, this)
     this.children = childSubject
     return this

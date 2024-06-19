@@ -1,4 +1,4 @@
-import { BaseSupport, Support } from '../Support.class.js'
+import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { runBeforeRedraw, runBeforeRender } from'../tagRunner.js'
 import { runAfterRender } from'../tagRunner.js'
 import { TagSubject } from '../../subject.types.js'
@@ -46,7 +46,7 @@ function beforeWithRender(
   prevSupport?: Support | BaseSupport,
 ) {
   const lastOwnerSupport = (prevSupport as Support)?.ownerSupport
-  const runtimeOwnerSupport: Support | undefined = lastOwnerSupport || parentSupport
+  const runtimeOwnerSupport: AnySupport | undefined = lastOwnerSupport || parentSupport
 
   if(prevSupport) {
     if(prevSupport !== support) {

@@ -1,11 +1,12 @@
 import { BaseSupport, Support } from './tag/Support.class.js'
 import { deepClone, deepEqual } from './deepFunctions.js'
-import { isStaticTag } from './isInstance.js'
+import { isStaticTag, isSubjectInstance } from './isInstance.js'
 import { renderSupport } from './tag/render/renderSupport.function.js'
 import { State, setUse } from './state/index.js'
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { Props } from './Props.js'
 import { runBlocked } from './interpolations/bindSubjectCallback.function.js'
+import { cloneTagJsValue } from './tag/cloneValueArray.function.js'
 
 export function castProps(
   props: Props,
@@ -49,7 +50,7 @@ export function checkProp(
   depth: number,
   index?: string | number,
   newProp?: any,
-  seen: any[] = [],
+  // seen: any[] = [],
 ) {
   if(value instanceof Function) {
     return getPropWrap(
@@ -57,12 +58,13 @@ export function checkProp(
     )
   }
 
-  if(seen.includes(value)) {
+  // if(seen.includes(value)) {
+  if(depth === 15) {
     return value
   }
-  seen.push(value)
-
-  if(typeof(value)!=='object' || !value) {
+  // seen.push(value)
+  const skip = isSkipPropValue(value)
+  if( skip ) {
     return value // no children to crawl through
   }
 
@@ -72,7 +74,7 @@ export function checkProp(
   
       value[index] = checkProp(
         subValue, ownerSupport, stateArray, newSupport,
-        depth + 1, index, value, seen
+        depth + 1, index, value, // seen
       )
 
       if(subValue instanceof Function) {
@@ -87,20 +89,27 @@ export function checkProp(
     return value
   }
 
-
-  for(const name in value){
+  // for(const name in value){
+  // ??? new we want below
+  const keys = Object.keys(value)
+  for(const name of keys){
     const subValue = value[name]
     const result = checkProp(
       subValue, ownerSupport, stateArray, newSupport,
       depth + 1,
-      name, value, seen
+      name, value, // seen
     )
+
+    if(value[name] === result) {
+      continue // ??? new
+    }
     
-    const hasSetter = Object.getOwnPropertyDescriptor(value, name)?.set
+    const getset = Object.getOwnPropertyDescriptor(value, name)
+    const hasSetter = getset?.get || getset?.set
     if(hasSetter) {
       continue
     }
-    
+
     value[name] = result
     if(result instanceof Function) {
       if(subValue.toCall) {
@@ -193,6 +202,7 @@ export function callbackPropOwner(
         delete supportInCycle.subject.global.locked
         lastResult = runBlocked(
           supportInCycle,
+          supportInCycle.state,
           supportInCycle, // lastResult, // supportInCycle
         ) as Support
 
@@ -220,7 +230,7 @@ export function callbackPropOwner(
         const lastValue = state.lastValue
         const get = state.get()
         const equal = deepEqual(
-          deepClone(lastValue),
+          cloneTagJsValue(lastValue),
           get,
         )
   
@@ -247,4 +257,8 @@ export function callbackPropOwner(
   setUse.memory.tagClosed$.toCallback(run)
 
   return callbackResult
+}
+
+export function isSkipPropValue(value: unknown) {
+  return typeof(value)!=='object' || !value // || isSubjectInstance(value)
 }

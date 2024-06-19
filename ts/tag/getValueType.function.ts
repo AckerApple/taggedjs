@@ -12,28 +12,31 @@ export function getValueType(value: any): ValueTypes {
   if(value instanceof Function) {
     return ValueTypes.function
   }
-  
+
+  if(isSimpleType(type)) {
+    return type as ValueTypes
+  }
+
   if(type === ValueTypes.object) {
     if(value instanceof Date) {
       return ValueTypes.date
     }
-  
-    if(isSimpleType(type)) {
-      return type as ValueTypes
-    }
-
 
     const tagJsType = value.tagJsType
     if(tagJsType) {
+      return tagJsType
+      /*
       const included = [
         ValueTypes.tagComponent,
         ValueTypes.templater,
         ValueTypes.tag,
+        ValueTypes.dom,
       ].includes(tagJsType)
   
       if(included) {
         return tagJsType
       }
+      */
     }
 
     if (isTagArray(value)) {

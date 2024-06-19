@@ -5,14 +5,15 @@ import { processSubjectComponent } from'./processSubjectComponent.function.js'
 import { destroyTagMemory } from'../destroyTag.function.js'
 import { renderSupport } from'../render/renderSupport.function.js'
 import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
-import { castProps } from'../../alterProp.function.js'
+import { castProps, isSkipPropValue } from'../../alterProp.function.js'
 import { isLikeTags } from'../isLikeTags.function.js'
 import { Props } from '../../Props.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
+import { afterChildrenBuilt } from './processTag.function.js'
 import { softDestroySupport } from '../render/softDestroySupport.function.js'
 
 export function updateExistingTagComponent(
-  ownerSupport: Support,
+  ownerSupport: BaseSupport | Support,
   support: Support, // lastest
   subject: TagSubject,
   insertBefore: InsertBefore,
@@ -49,37 +50,36 @@ export function updateExistingTagComponent(
     )
 
     return newSupport
-  } else {
-    const hasChanged = hasSupportChanged(
-      lastSupport as unknown as BaseSupport,
-      support as unknown as BaseSupport,
-      templater
+  }
+
+  const hasChanged = hasSupportChanged(
+    lastSupport as unknown as BaseSupport,
+    support as unknown as BaseSupport,
+    templater
+  )
+
+  // everyhing has matched, no display needs updating.
+  if(!hasChanged) {
+    // update function refs to use latest references
+    const newProps = templater.props
+    const castedProps = syncFunctionProps(
+      support,
+      lastSupport as Support,
+      ownerSupport,
+      newProps,
     )
 
-    // everyhing has matched, no display needs updating.
-    if(!hasChanged) {
-      // update function refs to use latest references
-      const newProps = templater.props
-      const castedProps = syncFunctionProps(
-        support,
-        lastSupport as Support,
-        ownerSupport,
-        newProps,
-      )
+    // When new support actually makes call to real function, use these pre casted props
+    support.propsConfig.castProps = castedProps
+    
+    // update support to think it has different cloned props
+    lastSupport.propsConfig.latestCloned = support.propsConfig.latestCloned
+    lastSupport.propsConfig.lastClonedKidValues = support.propsConfig.lastClonedKidValues
 
-      // When new support actually makes call to real function, use these pre casted props
-      support.propsConfig.castProps = castedProps
-      
-      // update support to think it has different cloned props
-      lastSupport.propsConfig.latestCloned = support.propsConfig.latestCloned
-      lastSupport.propsConfig.lastClonedKidValues = support.propsConfig.lastClonedKidValues
-
-      return lastSupport // its the same tag component
-    }
+    return lastSupport // its the same tag component
   }
 
   const oldest = subject.global.oldest
-
   if(subject.global.locked) {
     subject.global.blocked.push(support)
   
@@ -105,19 +105,6 @@ function afterTagRender(
 ) {
   let lastSupport = subject.support
 
-  // const oldest = newSupport.global.oldest
-  /*
-  const hasOldest = oldest ? true : false
-  if(!hasOldest) {
-    return buildNewTag(
-      newSupport,
-      insertBefore,
-      lastSupport,
-      subject
-    )
-  }
-  */
-
   if(oldest && templater.children._value.length) {
     const oldKidsSub = oldest.templater.children
     oldKidsSub.next(templater.children._value)
@@ -136,11 +123,8 @@ function afterTagRender(
   if(isSameTag && lastSupport) {
     const preGlobal = previous.subject.global
     if(!preGlobal.deleted) {
-      // destroyTagMemory(previous)
       softDestroySupport(previous)
     }
-
-    subject.global.context = {} // do not share previous outputs
   }
 
   return buildNewTag(
@@ -156,16 +140,18 @@ function buildNewTag(
   const fragment = newSupport.buildBeforeElement(undefined, {
     counts: {added: 0, removed: 0},
   })
-  // ??? new
+  
+  // TODO, do we need to clone?
+  const children = [...fragment.children]
+  
   const placeholder = subject.global.placeholder as Text
   const parentNode = placeholder.parentNode as ParentNode
   parentNode.insertBefore(fragment, placeholder)
 
-  subject.global.oldest = newSupport
-  subject.global.newest = newSupport
-  subject.global.oldest = newSupport
-  subject.global.newest = newSupport
+  afterChildrenBuilt(children, subject, newSupport)
   
+  subject.global.oldest = newSupport
+  subject.global.newest = newSupport
   subject.support = newSupport
   newSupport.ownerSupport.subject.global.childTags.push(newSupport)
 
@@ -226,7 +212,7 @@ function syncPriorPropFunction(
   ownerSupport: BaseSupport | Support,
   depth: number,
   index: string | number,
-  seen: any[] = [],
+  // seen: any[] = [],
 ) {
   if(priorProp instanceof Function) {
     // the prop i am receiving, is already being monitored/controlled by another parent
@@ -246,12 +232,13 @@ function syncPriorPropFunction(
   }
 
   // prevent infinite recursion
-  if(seen.includes(prop)) {
+  // if(seen.includes(prop)) {
+  if(depth === 15) {
     return prop
   }
-  seen.push(prop)
+  // seen.push(prop)
 
-  if(typeof(prop)!=='object' || !prop) {
+  if( isSkipPropValue(prop) ) {
     return prop // no children to crawl through
   }
 
@@ -262,7 +249,7 @@ function syncPriorPropFunction(
         priorProp[index], x, newSupport, ownerSupport,
         depth + 1,
         index,
-        seen,
+        // seen,
       )
     }
 
@@ -273,7 +260,9 @@ function syncPriorPropFunction(
     return prop
   }
 
-  for(const name in prop){
+  const keys = Object.keys(prop) 
+  // for(const name in prop){
+  for(const name of keys){
     const subValue = (prop as any)[name]
     const result = syncPriorPropFunction(
       priorProp[name],
@@ -282,8 +271,13 @@ function syncPriorPropFunction(
       ownerSupport,
       depth + 1,
       name,
-      seen,
+      // seen,
     )
+
+    if(prop[name] === result) {
+      continue // ??? new
+    }
+    
     
     const hasSetter = Object.getOwnPropertyDescriptor(prop, name)?.set
     if(hasSetter) {

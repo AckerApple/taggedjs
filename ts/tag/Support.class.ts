@@ -1,23 +1,25 @@
 import { Props } from '../Props.js'
-import { Context, ElementBuildOptions, Tag, TagTemplate, escapeVariable, variablePrefix } from './Tag.class.js'
+import { Context, Tag, Dom } from './Tag.class.js'
+import { ValueTypes } from './ValueTypes.enum.js'
 import { deepClone } from '../deepFunctions.js'
 import { isTagComponent } from '../isInstance.js'
 import { State } from '../state/index.js'
-import { TemplaterResult } from './TemplaterResult.class.js'
+import { Clone, TemplaterResult } from './TemplaterResult.class.js'
 import { TagSubject } from '../subject.types.js'
-import { cloneValueArray } from './cloneValueArray.function.js'
+import { cloneTagJsValue, cloneValueArray } from './cloneValueArray.function.js'
 import { runBeforeDestroy } from './tagRunner.js'
 import { DestroyOptions, getChildTagsToDestroy } from './destroy.support.js'
 import { elementDestroyCheck } from './elementDestroyCheck.function.js'
 import { updateContextItem } from './update/updateContextItem.function.js'
 import { processNewValue } from './update/processNewValue.function.js'
-import { interpolateElement } from '../interpolations/interpolateElement.js'
-import { afterInterpolateElement } from '../interpolations/afterInterpolateElement.function.js'
 import { TagJsSubject } from './update/TagJsSubject.class.js'
-import { empty } from './ValueTypes.enum.js'
-import { interpolateString } from '../interpolations/interpolations.js'
+import { exchangeParsedForValues } from '../interpolations/optimizers/htmlInterpolationToDomMeta.function.js'
+import { attachDomElement } from '../interpolations/optimizers/metaAttachDomElements.function.js'
+import { DomObjectChildren, ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
+import { getDomMeta } from './domMetaCollector.js'
+import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js'
 
-const prefixSearch = new RegExp(variablePrefix, 'g')
+export type AnySupport = BaseSupport | Support
 
 /** used only for apps, otherwise use Support */
 // TODO: We need to split Support and simple tag support apart
@@ -26,7 +28,8 @@ export class BaseSupport {
   appElement?: Element // only seen on this.getAppSupport().appElement
 
   strings?: string[]
-  values?: any[]
+  dom?: ObjectChildren
+  values?: unknown[]
 
   propsConfig: {
     latest: Props // new props NOT cloned props
@@ -52,7 +55,10 @@ export class BaseSupport {
     const children = this.templater.children // children tags passed in as arguments
     const kidValue = children.value
 
-    const latestCloned = props.map(props => deepClone(props))
+    const latestCloned = props.map(props =>
+      cloneTagJsValue(props)
+      // deepClone(props)
+    )
     return this.propsConfig = {
       latest: props,
       latestCloned, // assume its HTML children and then detect
@@ -64,12 +70,42 @@ export class BaseSupport {
     }
   }
 
+  getHtmlDomMeta(
+    fragment: DocumentFragment,
+    options: ElementBuildOptions = {
+      counts: {added:0, removed: 0},
+    }
+  ): DomObjectChildren {
+    const thisTag = this.templater.tag as Tag | Dom
+
+
+    const context = this.update()
+    let orgDomMeta: ObjectChildren | undefined;
+
+    if(thisTag.tagJsType === ValueTypes.dom) {
+      orgDomMeta = (thisTag as Dom).dom
+    } else {
+      orgDomMeta = getDomMeta((thisTag as Tag).strings, thisTag.values)
+    }
+
+    const domMeta = deepClone( orgDomMeta )
+    exchangeParsedForValues(domMeta, context)
+    attachDomElement(
+      domMeta,
+      context,
+      this,
+      fragment,
+      options.counts,
+      fragment as any as Element,
+    )
+    return domMeta as DomObjectChildren
+
+  }
+
   /** Function that kicks off actually putting tags down as HTML elements */
   buildBeforeElement(
     fragment = document.createDocumentFragment(),
-    options: ElementBuildOptions = {
-      counts: {added:0, removed: 0},
-    },
+    options?: ElementBuildOptions,
   ) {
     const subject = this.subject
     const global = this.subject.global
@@ -80,73 +116,30 @@ export class BaseSupport {
     subject.support = this as any as Support
     this.hasLiveElements = true
 
-    const context = this.update()
-    const template = this.getTemplate()
-    
-    const tempDraw = document.createElement('template') // put down a first element we can expect to always be there
-    tempDraw.innerHTML = template.string
+    const htmlDomMeta = this.getHtmlDomMeta(fragment, options)
+    attachClonesToSupport(htmlDomMeta, this.subject.global.clones)
 
-    // Search/replace innerHTML variables but don't interpolate tag components just yet
-    // const tagComponents = 
-    interpolateElement(
-      fragment,
-      tempDraw,
-      context,
-      template,
-      this as any as Support, // ownerSupport,
-      {
-        counts: options.counts
-      },
-    )
-
-    afterInterpolateElement(
-      fragment,
-      tempDraw,
-      this as any as Support, // ownerSupport
-      context,
-      options,
-    )
     return fragment
   }
 
-  getTemplate(): TagTemplate {
-    const thisTag = this.templater.tag as Tag
-    const strings = this.strings || thisTag.strings
-    const values = this.values || thisTag.values
-    const lastRun = this.subject.lastRun
-
-    if(lastRun) {
-      if (lastRun.strings.length === strings.length) {
-        const stringsMatch = lastRun.strings.every((string: string, index: number) =>
-          // string.length === strings[index].length
-          string === strings[index]
-        )
-        if (stringsMatch && lastRun.values.length === values.length) {
-          return lastRun // performance savings using the last time this component was rendered
-        }
-      }
+  updateBy(support: BaseSupport | Support) {  
+    const tempTag = support.templater.tag as Tag | Dom
+    this.updateConfig(tempTag, tempTag.values)
+  }
+  
+  /** triggers values to render */
+  updateConfig(tag: Dom | Tag, values: any[]) {
+    if(tag.tagJsType === ValueTypes.dom) {
+      this.dom = (tag as Dom).dom
+    } else {
+      this.strings = (tag as Tag).strings
     }
-
-    const string = strings.map((string, index) => {
-      const safeString = string.replace(prefixSearch, escapeVariable)
-      const endString = safeString + (values.length > index ? '{' + variablePrefix + index.toString() + '}' : empty)
-      // ??? new removed
-      //const trimString = endString.replace(/>\s*/g,'>').replace(/\s*</g,'<')
-      //return trimString
-      return endString
-    }).join(empty)
-
-    const interpolation = interpolateString(string)
-    const run: TagTemplate = {
-      interpolation,
-      string: interpolation.string,
-      strings,
-      values,
-    }
-
-    this.subject.lastRun = run
-    
-    return run
+    this.updateValues(values)
+  }
+  
+  updateValues(values: any[]) {
+    this.values = values
+    return this.updateContext( this.subject.global.context )
   }
 
   update() {
@@ -154,11 +147,13 @@ export class BaseSupport {
   }
 
   updateContext(context: Context) {
-    const thisTag = this.templater.tag as Tag
-    const strings = this.strings || thisTag.strings
+    const thisTag = this.templater.tag as Tag | Dom
+    // const strings = this.strings || thisTag.strings
     const values = this.values || thisTag.values
 
-    strings.forEach((_string, index) => updateContext(
+    // TODO: loop specific number of times instead of building an array
+    const array = 'x,'.repeat( values.length ).split(',')  // strings
+    array.forEach((_string, index) => updateOneContext(
       values,
       index,
       context,
@@ -168,22 +163,6 @@ export class BaseSupport {
     return context
   }
 
-  updateBy(support: BaseSupport | Support) {  
-    const tempTag = support.templater.tag as Tag
-    this.updateConfig(tempTag.strings, tempTag.values)
-  }
-  
-  updateConfig(strings: string[], values: any[]) {
-    this.strings = strings
-    this.updateValues(values)
-  }
-  
-  updateValues(values: any[]) {
-    this.values = values
-    return this.updateContext( this.subject.global.context )
-  }
-
-  
   destroy(
     options: DestroyOptions = {
       stagger: 0,
@@ -244,7 +223,7 @@ export class BaseSupport {
         const {stagger, promises: newPromises} = childTag.smartRemoveKids(options)
         options.stagger = options.stagger + stagger
         promises.push(...newPromises)
-        return
+        return {promise: Promise.all(promises), stagger:options.stagger}
       }
 
       let count = 0
@@ -346,7 +325,7 @@ export class Support extends BaseSupport {
   
   constructor(
     public templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
-    public ownerSupport: Support,
+    public ownerSupport: BaseSupport | Support,
     public subject: TagSubject,
     castedProps?: Props,
     public version: number = 0
@@ -355,10 +334,9 @@ export class Support extends BaseSupport {
   }
 
   getAppSupport() {
-    let tag: Support = this
-    
+    let tag = this
     while(tag.ownerSupport) {
-      tag = tag.ownerSupport
+      tag = tag.ownerSupport as any
     }
 
     return tag
@@ -367,7 +345,10 @@ export class Support extends BaseSupport {
 
 export function resetSupport(support: BaseSupport | Support) {
   const global = support.subject.global
-  global.context = {}
+  
+  // TODO: We maybe able to replace with: global.context.length = 0
+  global.context = []
+
   delete (global as any).oldest // may not be needed
   delete global.newest
   const subject = support.subject
@@ -375,7 +356,7 @@ export function resetSupport(support: BaseSupport | Support) {
 }
 
 
-function updateContext(
+function updateOneContext(
   values: unknown[],
   index: number,
   context: Context,
@@ -386,11 +367,10 @@ function updateContext(
     return
   }
 
-  const variableName = variablePrefix + index
   const value = values[index] as any
 
   // is something already there?
-  const exists = variableName in context
+  const exists = context.length > index
 
   if(exists) {
     if(support.subject.global.deleted) {
@@ -401,12 +381,30 @@ function updateContext(
       }
     }
 
-    return updateContextItem(context, variableName, value)
+    return updateContextItem(context, index, value)
   }
 
   // 🆕 First time values below
-  context[variableName] = processNewValue(
+  context[index] = processNewValue(
     value,
     support as Support,
   ) as TagJsSubject<any>
+}
+
+function attachClonesToSupport(
+  htmlDomMeta: DomObjectChildren,
+  clones: Clone[],
+) {
+  htmlDomMeta.forEach(meta => {
+    if(meta.domElement) {
+      clones.push(meta.domElement)
+    }
+    
+    clones.push(meta.marker)
+
+    if('children' in meta) {
+      const children = meta.children as DomObjectChildren
+      attachClonesToSupport(children, clones)
+    }
+  })
 }

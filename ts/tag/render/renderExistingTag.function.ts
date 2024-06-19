@@ -23,14 +23,12 @@ export function renderExistingTag(
   // When the providers were checked, a render to myself occurred and I do not need to re-render again
   const prevSupport = global.newest as Support
   const justUpdate = preRenderCount !== global.renderCount
-
   if(justUpdate) {
     oldestSupport.subject.global.oldest.updateBy(prevSupport)
     return prevSupport // already rendered during triggered events
   }
 
   const toRedrawTag = prevSupport || lastSupport || global.oldest
-
   const reSupport = renderWithSupport(
     newSupport,
     toRedrawTag,
@@ -39,11 +37,14 @@ export function renderExistingTag(
   )
 
   const oldest = global.oldest || oldestSupport
-
-  if(isLikeTags(prevSupport, reSupport)) {
+  const isLikeTag = isLikeTags(prevSupport, reSupport)
+  if(isLikeTag) {
     subject.support = reSupport
     oldest.updateBy(reSupport)
   }
+
+  // ??? new - added but then removed
+  // global.newest = reSupport
   
   return reSupport
 }

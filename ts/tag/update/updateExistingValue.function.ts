@@ -1,5 +1,5 @@
 import { DisplaySubject, TagSubject } from '../../subject.types.js'
-import { Support } from '../Support.class.js'
+import { BaseSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { isTagClass, isTagTemplater } from '../../isInstance.js'
 import { InterpolateSubject, TemplateValue } from './processFirstSubject.utils.js'
@@ -11,7 +11,7 @@ import { processSubjectComponent } from './processSubjectComponent.function.js'
 import { isLikeTags } from '../isLikeTags.function.js'
 import { getFakeTemplater, processTag, setupNewSupport } from './processTag.function.js'
 import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
-import { Tag } from '../Tag.class.js'
+import { Tag, Dom } from '../Tag.class.js'
 import { swapInsertBefore } from '../setTagPlaceholder.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { getValueType } from '../getValueType.function.js'
@@ -19,13 +19,13 @@ import { getValueType } from '../getValueType.function.js'
 export function updateExistingValue(
   subject: InterpolateSubject,
   value: TemplateValue,
-  ownerSupport: Support,
+  ownerSupport: BaseSupport | Support,
   insertBefore: InsertBefore,
 ): TagSubject | InterpolateSubject {
   const valueType = getValueType(value)
   
-  const destroyCheck = checkDestroyPrevious(
-    subject, value, insertBefore, valueType
+  checkDestroyPrevious(
+    subject, value, valueType
   )
 
   // handle already seen tag components
@@ -66,7 +66,6 @@ export function updateExistingValue(
           removed: 0,
         }}
       )
-  
       return subject
 
     case ValueTypes.templater:
@@ -78,7 +77,8 @@ export function updateExistingValue(
       return subject
     
     case ValueTypes.tag:
-      const tag = value as Tag
+    case ValueTypes.dom:
+      const tag = value as Tag | Dom
       let templater = tag.templater
   
       if(!templater) {
@@ -120,14 +120,14 @@ export function updateExistingValue(
 function handleStillTag(
   subject: TagSubject,
   value: Tag | TemplateValue,
-  ownerSupport: Support,
+  ownerSupport: BaseSupport | Support,
 ) {
   const lastSupport = subject.support
   let templater = value
   const isClass = isTagClass(value)
 
   if(isClass) {
-    const tag = value as Tag
+    const tag = value as Tag | Dom
     templater = tag.templater
     if(!templater) {
       templater = new TemplaterResult([])
@@ -149,7 +149,9 @@ function handleStillTag(
   }
 
   if(isSameTag) {
-    lastSupport.updateBy(valueSupport)
+    // lastSupport.updateBy(valueSupport)
+    // ??? recently changed from above
+    lastSupport.subject.global.oldest.updateBy(valueSupport)
     return
   }
 
@@ -172,7 +174,7 @@ function prepareUpdateToComponent(
   templater: TemplaterResult,
   subjectTag: TagSubject,
   insertBefore: InsertBefore,
-  ownerSupport: Support,
+  ownerSupport: BaseSupport | Support,
 ): TagSubject {
   // When last value was not a component
   if(!subjectTag.support) {

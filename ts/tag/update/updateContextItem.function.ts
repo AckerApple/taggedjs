@@ -4,12 +4,12 @@ import { Context } from '../Tag.class.js'
 
 export function updateContextItem(
   context: Context,
-  variableName: string,
+  index: number,
   value: TemplateValue
 ) {
-  const subject = context[variableName]
-
-  if(isSubjectInstance(value)) {
+  const subject = context[index]
+  const isSub = isSubjectInstance(value)
+  if(isSub) {
     return // emits on its own
   }
 

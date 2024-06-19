@@ -1,4 +1,4 @@
-import { BaseSupport, Support } from '../Support.class.js'
+import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { deepEqual } from '../../deepFunctions.js'
 import { renderExistingTag } from'./renderExistingTag.function.js'
 import { Props } from '../../Props.js'
@@ -29,7 +29,7 @@ export function renderSupport<T extends Support | BaseSupport>(
   const subject = support.subject
   const oldest = support.subject.global.oldest
   
-  let ownerSupport: undefined | Support
+  let ownerSupport: undefined | AnySupport
   let selfPropChange = false
   const shouldRenderUp = renderUp && support
 

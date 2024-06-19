@@ -1,4 +1,4 @@
-import { BaseSupport, Support } from './Support.class.js'
+import { AnySupport, BaseSupport, Support } from './Support.class.js'
 import { setUse } from'../state/index.js'
 import { Subject } from'../subject/index.js'
 import { getSupportInCycle } from'./getSupportInCycle.function.js'
@@ -12,8 +12,8 @@ setUse.memory.tagClosed$ = new Subject<Support>(undefined, subscription => {
 
 // Life cycle 1
 export function runBeforeRender(
-  support: BaseSupport | Support,
-  ownerSupport?: Support,
+  support: AnySupport,
+  ownerSupport?: AnySupport,
 ) {
   const tagUse = setUse.tagUse
   const length = tagUse.length

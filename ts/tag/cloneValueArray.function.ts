@@ -5,22 +5,25 @@ import { ValueTypes } from './ValueTypes.enum.js'
 import { getValueType } from './getValueType.function.js'
 
 export function cloneValueArray<T>(values: (T | Tag | Tag[])[]): T[] {
-  return values.map((value) => {
-    const tag = value as Tag
+  return values.map(cloneTagJsValue)
+}
 
-    switch( getValueType(value) ) {
-      case ValueTypes.tagComponent:
-        const tagComponent = value as TemplaterResult
-        return deepClone(tagComponent.props)
-      
-      case ValueTypes.tag:
-      case ValueTypes.templater:
-        return cloneValueArray(tag.values)
+export function cloneTagJsValue<T>(value: T | Tag | Tag[]): T {
+  const tag = value as Tag
 
-      case ValueTypes.tagArray:
-        return cloneValueArray(tag as unknown as Tag[])
-    }
+  switch( getValueType(value) ) {
+    case ValueTypes.tagComponent:
+      const tagComponent = value as TemplaterResult
+      return deepClone(tagComponent.props)
+    
+    case ValueTypes.dom:
+    case ValueTypes.tag:
+    case ValueTypes.templater:
+      return cloneValueArray(tag.values) as T
 
-    return deepClone(value)
-  })
+    case ValueTypes.tagArray:
+      return cloneValueArray(tag as unknown as Tag[]) as T
+  }
+
+  return deepClone(value)
 }

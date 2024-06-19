@@ -14,11 +14,6 @@ export type Provider = {
 
 type ProviderConstructor<T> = (new (...args: any[]) => T) | (() => T)
 
-type ProviderConfig = {
-  providers: Provider[]
-  ownerSupport?: Support | BaseSupport
-}
-
 type functionProvider<T> = () => T
 type classProvider<T> = new (...args: any[]) => T
 type Construct<T> = classProvider<T> | functionProvider<T>
@@ -113,7 +108,7 @@ export const providers = {
           return provider.instance
         }
   
-        owner = owner.ownerSupport // cause reloop checking next parent
+        owner = owner.ownerSupport as Support // cause reloop checking next parent
       }
       
       const msg = `Could not inject provider: ${constructor.name} ${constructor}`

@@ -10,6 +10,8 @@ import { renderSupport } from'../tag/render/renderSupport.function.js'
 import { updateExistingTagComponent } from '../tag/update/updateExistingTagComponent.function.js'
 
 const useLocks = true
+const noData = 'no-data-ever'
+const promiseNoData = 'promise-no-data-ever'
 
 export type Callback = (...args: any[]) => any & {
   isChildOverride?: true // if this is set, then a parent tag passed children to a tag/component
@@ -17,7 +19,7 @@ export type Callback = (...args: any[]) => any & {
 
 export function bindSubjectCallback(
   value: Callback,
-  support: Support,
+  support: BaseSupport | Support,
 ) {
   // Is this children? No override needed
   if((value as any).isChildOverride) {
@@ -38,38 +40,50 @@ export function bindSubjectCallback(
 
 export function runTagCallback(
   value: Callback,
-  support: Support,
+  support: BaseSupport | Support,
   bindTo: unknown,
   args: any[],
   state: State
 ) {
   const tag = findTagToCallback(support)
-  const newState = (tag.subject.global.newest as Support).state
+  const global = tag.subject.global
+
+  /*
+  if(global.deleted) {
+    return noData
+  }
+  */
+
+  const newest = global.newest as Support
+  const newState = newest.state
   if(newState.length === state.length) {
     syncStates(newState, state)
-    }
+  }
   // syncStates(newState, tag.state)
   
   const method = value.bind(bindTo)  
   tag.subject.global.locked = useLocks // prevent another render from re-rendering this tag
   const callbackResult = method(...args)
-  // syncStates(state, newState)
 
- return afterTagCallback(tag, callbackResult)
+ return afterTagCallback(tag, callbackResult, state)
 }
 
 export function afterTagCallback(
-  tag: Support,
+  tag: BaseSupport | Support,
   callbackResult: any,
+  state: State,
 ) {
-  delete tag.subject.global.locked
-
-  if(tag.subject.global.blocked.length) {    
-    // syncStates(tag.state, (tag.subject.global.newest as Support).state)
+  const global = tag.subject.global
+  delete global.locked
+  const blocked = global.blocked
+  // // syncStates(state, newState)
+  if(blocked.length) {
+    // syncStates(tag.state, (global.newest as Support).state)
     let lastResult: BaseSupport | Support | undefined;
 
     lastResult = runBlocked(
       tag,
+      state,
       lastResult as Support,
     )
 
@@ -77,20 +91,24 @@ export function afterTagCallback(
     return checkAfterCallbackPromise(
       callbackResult,
       lastResult as Support,
-      (lastResult as Support).subject.global
+      global
     )
   }
 
-  const result = renderCallbackSupport(tag.subject.global.newest as Support, callbackResult, tag.subject.global)
+  const result = renderCallbackSupport(
+    global.newest as Support,
+    callbackResult,
+    global
+  )
   return result
 }
 
 export function findTagToCallback(
-  support: Support,
-): Support {
+  support: BaseSupport | Support,
+): BaseSupport | Support {
   // If we are NOT a component than we need to render my owner instead
   if(support.templater.tagJsType === ValueTypes.templater) {
-    const owner = support.ownerSupport
+    const owner = (support as Support).ownerSupport
     return findTagToCallback(owner)
   }
 
@@ -103,7 +121,7 @@ function renderCallbackSupport(
   global: TagGlobal,
 ) {
   if(global.deleted) {
-    return 'no-data-ever' // || last.global.deleted
+    return noData // || last.global.deleted
   }
 
   renderSupport(
@@ -126,7 +144,7 @@ export function checkAfterCallbackPromise(
       delete last.subject.global.locked
 
       if(global.deleted) {
-        return 'promise-no-data-ever' // tag was deleted during event processing
+        return promiseNoData // tag was deleted during event processing
       }
 
       delete last.subject.global.locked
@@ -135,24 +153,25 @@ export function checkAfterCallbackPromise(
         true,
       )
 
-      return 'promise-no-data-ever'
+      return promiseNoData
     })
   }
 
-  return 'no-data-ever'
+  return noData
 }
 
 export function runBlocked(
   tag: BaseSupport | Support,
-  lastResult?: BaseSupport | Support
+  state: State,
+  lastResult?: BaseSupport | Support,
 ) {
   const global = tag.subject.global
   const blocked = global.blocked
+
   while (blocked.length > 0) {
     const block = blocked[0] as Support
 
     blocked.splice(0,1)
-    
     lastResult = updateExistingTagComponent(
       block.ownerSupport,
       block,
@@ -161,9 +180,26 @@ export function runBlocked(
       true, // renderUp
     )
 
-    tag.subject.global.newest = lastResult
+    global.newest = lastResult
   }
-  tag.subject.global.blocked.length = 0
-  
+  global.blocked.length = 0
+  // global.oldest.updateBy( lastResult as Support )
+
+  /*
+  if(lastResult) {
+    const newState = lastResult.state
+    syncStates(state, newState)
+
+    const newest = renderSupport(
+      lastResult,
+      true,
+    )
+    
+    global.newest = newest
+    global.oldest.updateBy( lastResult as Support )
+    syncStates(newState, state)
+  }
+    */
+
   return lastResult
 }

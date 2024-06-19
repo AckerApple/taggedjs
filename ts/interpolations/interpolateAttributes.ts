@@ -12,35 +12,28 @@ function howToSetAttribute(
   element.setAttribute(name, value)
 }
 
-function howToSetInputValue(
+export function howToSetInputValue(
   element: Element,
   name: string,
   value: string
 ) {
-  (element as any)[name] = value
+  element.setAttribute(name, value)
 }
 
-const INPUT = 'INPUT'
-const valueS = 'value'
-
 export function interpolateAttributes(
-  child: Element,
+  element: Element,
   scope: Context,
   ownerSupport: Support,
 ) {
-  const attrNames = child.getAttributeNames()
+  const attrNames = element.getAttributeNames()
 
   let howToSet = howToSetAttribute
 
   for (let index = 0; index < attrNames.length; ++index) {
     const attrName = attrNames[index]
-    if(child.nodeName === INPUT && attrName === valueS) {
-      howToSet = howToSetInputValue
-    }
-
-    const value = child.getAttribute(attrName)
-    processAttribute(attrName, value, child, scope, ownerSupport, howToSet)
-
-    howToSet = howToSetAttribute // put back
+    const value = element.getAttribute(attrName)
+    processAttribute(
+      [attrName, value], element, scope, ownerSupport, howToSet
+    )
   }
 }

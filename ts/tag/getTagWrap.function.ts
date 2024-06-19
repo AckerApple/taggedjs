@@ -1,6 +1,6 @@
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { TagWrapper } from './tag.utils.js'
-import { findTagToCallback, runTagCallback } from'../interpolations/bindSubjectCallback.function.js'
+import { Callback, findTagToCallback, runTagCallback } from'../interpolations/bindSubjectCallback.function.js'
 import { BaseSupport, Support } from './Support.class.js'
 import { TagSubject } from '../subject.types.js'
 import { castProps } from'../alterProp.function.js'
@@ -87,14 +87,14 @@ function executeWrap(
     tag = tag()
   }
   
-  if(!tag || tag.tagJsType !== ValueTypes.tag) {
+  const unknown = !tag || (tag.tagJsType && ![ValueTypes.tag,ValueTypes.dom].includes(tag.tagJsType))
+  if(unknown) {
     tag = html`${tag}` // component returned a non-component value
-    
   }
 
   tag.templater = templater
   templater.tag = tag
-  tag.memory.arrayValue = templater.arrayValue // tag component could have been used in array.map
+  tag.arrayValue = templater.arrayValue // tag component could have been used in array.map
 
   const support = new Support(
     templater,
@@ -108,7 +108,7 @@ function executeWrap(
   // ??? this should be set by outside?
   global.oldest = global.oldest || support
   
-  // ??? new
+  // ??? new - removed
   // global.newest = support
 
   const nowState = setUse.memory.stateConfig.array
@@ -127,14 +127,14 @@ function executeWrap(
 
         const valuesValue = kid.values[index]
         
-        if(valuesValue.isChildOverride) {
+        if((valuesValue as any).isChildOverride) {
           continue // already overwritten
         }
 
         // all functions need to report to me
         kid.values[index] = function(...args: unknown[]) {
           return runTagCallback(
-            value, // callback
+            value as Callback, // callback
             support.ownerSupport,
             this, // bindTo
             args,
@@ -142,7 +142,7 @@ function executeWrap(
           )
         }
         
-        valuesValue.isChildOverride = true
+        ;(valuesValue as any).isChildOverride = true
       }
     }
   }

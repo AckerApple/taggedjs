@@ -5,7 +5,7 @@ import { BaseSupport, Support } from '../Support.class.js'
 export function renderSubjectComponent(
   subject: TagSubject,
   reSupport: Support | BaseSupport,
-  ownerSupport: Support,
+  ownerSupport: BaseSupport | Support,
 ): Support {
   const ownGlobal = ownerSupport.subject.global
   const preClones = ownGlobal.clones.map(clone => clone)

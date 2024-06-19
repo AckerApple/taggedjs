@@ -1,7 +1,8 @@
-import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
-import { Tag } from '../Tag.class.js'
+import { afterElmBuild } from '../../interpolations/interpolateTemplate.js'
+import { Tag, Dom } from '../Tag.class.js'
+import { TagJsSubject } from './TagJsSubject.class.js'
 import { TagSubject } from '../../subject.types.js'
-import { Support } from '../Support.class.js'
+import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { ValueSubject } from '../../subject/index.js'
 import { Props } from '../../Props.js'
@@ -9,9 +10,8 @@ import { Props } from '../../Props.js'
 /** When first time render, adds to owner childTags */
 export function processTag(
   templater: TemplaterResult,
-  ownerSupport: Support, // owner
+  ownerSupport: AnySupport, // owner
   subject: TagSubject, // could be tag via result.tag
-  fragment?: DocumentFragment,
 ): Support {
   let support = subject.support as any as Support
   
@@ -23,19 +23,18 @@ export function processTag(
   subject.support = support
   support.ownerSupport = ownerSupport
   const newFragment = support.buildBeforeElement(undefined, {counts: {added:0, removed:0}})
-  // if(fragment) {
-  //   fragment.appendChild(newFragment)
-  // } else {
-    const placeholder = subject.global.placeholder as Text
-    const parentNode = placeholder.parentNode as ParentNode
-    parentNode.insertBefore(newFragment, placeholder)
-  // }
+  const children = [...newFragment.children]
+  const placeholder = subject.global.placeholder as Text
+  const parentNode = placeholder.parentNode as ParentNode
+  parentNode.insertBefore(newFragment, placeholder)
+
+  afterChildrenBuilt(children, subject, ownerSupport)
 
   return support
 }
 
 export function tagFakeTemplater(
-  tag: Tag
+  tag: Tag | Dom
 ) {
   const templater = getFakeTemplater()
   templater.tag = tag
@@ -55,6 +54,7 @@ export function getFakeTemplater() {
     tagJsType: 'templater',
     tagged: false,
     html: () => fake,
+    dom: () => fake,
     key: () => fake,
   } as TemplaterResult
 
@@ -64,7 +64,7 @@ export function getFakeTemplater() {
 /** Create Support for a tag component */
 export function newSupportByTemplater(
   templater: TemplaterResult,
-  ownerSupport: Support,
+  ownerSupport: BaseSupport | Support,
   subject: TagSubject,
 ) {
   const support = new Support(
@@ -81,7 +81,7 @@ export function newSupportByTemplater(
 
 export function setupNewSupport(
   support: Support,
-  ownerSupport: Support,
+  ownerSupport: BaseSupport | Support,
   subject: TagSubject,
 ) {
   support.subject = subject
@@ -90,4 +90,17 @@ export function setupNewSupport(
 
   // asking me to render will cause my parent to render
   support.ownerSupport = ownerSupport
+}
+
+export function afterChildrenBuilt(
+  children: Element[],
+  subject: TagJsSubject<any>,
+  ownerSupport: AnySupport,
+) {
+  children.forEach(x => afterElmBuild(
+    x,
+    {counts: {added:0, removed:0}},
+    subject.global.context,
+    ownerSupport,
+  ))
 }

@@ -1,7 +1,5 @@
-import { InsertBefore } from'./interpolations/InsertBefore.type.js'
 import { BaseSupport, Support } from './tag/Support.class.js'
 import { TemplaterResult } from './tag/TemplaterResult.class.js'
-import { Template } from'./interpolations/interpolateTemplate.js'
 import { Subject } from './subject/Subject.class.js'
 import { TagJsSubject } from './tag/update/TagJsSubject.class.js'
 

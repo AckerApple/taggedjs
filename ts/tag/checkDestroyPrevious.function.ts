@@ -5,15 +5,12 @@ import { TagArraySubject } from'./update/processTagArray.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { Counts } from'../interpolations/interpolateTemplate.js'
 import { destroyTagMemory } from'./destroyTag.function.js'
-import { InsertBefore } from'../interpolations/InsertBefore.type.js'
-import { insertAfter } from'../insertAfter.function.js'
-import { BaseSupport, Support } from './Support.class.js'
+import { Support } from './Support.class.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 
 export function checkDestroyPrevious(
   subject: InterpolateSubject, // existing.value is the old value
   newValue: unknown,
-  insertBefore: InsertBefore,
   valueType: ValueTypes,
 ) {
   const displaySubject = subject as DisplaySubject
@@ -59,10 +56,12 @@ export function checkDestroyPrevious(
     const isValueTag = isStaticTag(newValue)
     const isSubjectTag = isStaticTag(subject._value)
     const newTag = newValue as Support
+    
 
     if(isSubjectTag && isValueTag) {
       // its a different tag now
-      if(!isLikeTags(newTag, lastSupport)) {
+      const likeTags = isLikeTags(newTag, lastSupport)
+      if(!likeTags) {
         // put template back down
         destroyTagMemory(lastSupport)
         return 2
@@ -90,7 +89,11 @@ export function checkDestroyPrevious(
 }
 
 export function isSimpleType(value: any) {
-  return ['string','number','boolean'].includes(value)
+  return [
+    ValueTypes.string,
+    ValueTypes.number,
+    ValueTypes.boolean,
+  ].includes(value)
 }
 
 export function destroyArrayTag(

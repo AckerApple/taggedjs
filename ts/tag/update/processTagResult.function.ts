@@ -51,7 +51,9 @@ function processTagResultUpdate(
     return newSupport
   }
 
-  prevSupport.updateBy(support)
+  // ??? - new removed
+  // prevSupport.updateBy(support)
+  subject.global.oldest.updateBy(support)
   subject.support = support
 
   return support

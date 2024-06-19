@@ -5,8 +5,8 @@ import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
 import { DisplaySubject, TagSubject } from '../../subject.types.js'
 import { RegularValue, processFirstRegularValue } from './processRegularValue.function.js'
 import { processTag, tagFakeTemplater } from './processTag.function.js'
-import { Support } from '../Support.class.js'
-import { Tag } from '../Tag.class.js'
+import { AnySupport } from '../Support.class.js'
+import { Tag, Dom } from '../Tag.class.js'
 import { InterpolateSubject, TemplateValue, processOptions } from './processFirstSubject.utils.js'
 import { renderTagOnly } from '../render/renderTagOnly.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
@@ -17,7 +17,7 @@ export function processFirstSubjectValue(
   value: TemplateValue | Tag,
   subject: InterpolateSubject, // could be tag via result.tag
   insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
-  ownerSupport: Support, // owner
+  ownerSupport: AnySupport, // owner
   options: processOptions, // {added:0, removed:0}
   fragment?: DocumentFragment
 ) {
@@ -29,12 +29,13 @@ export function processFirstSubjectValue(
         value as TemplaterResult,
         ownerSupport,
         subject as TagSubject,
-        fragment,
+        // fragment,
       )
       return
 
+    case ValueTypes.dom:
     case ValueTypes.tag:
-      const tag = value as Tag
+      const tag = value as Tag | Dom
       let templater = tag.templater
 
       if(!templater) {
@@ -45,7 +46,7 @@ export function processFirstSubjectValue(
         templater,
         ownerSupport,
         subject as TagSubject,
-        fragment,
+        // fragment,
       )
       return
   
@@ -85,7 +86,7 @@ export function processFirstSubjectValue(
           support.templater,
           ownerSupport,
           subject as TagSubject,
-          fragment,
+          // fragment,
         )
         return
       }
@@ -96,7 +97,5 @@ export function processFirstSubjectValue(
     value as RegularValue,
     subject as DisplaySubject,
     subject.global.placeholder || insertBefore,
-    ownerSupport,
-    // fragment,
   )
 }

@@ -1,60 +1,76 @@
+import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js"
+import { DomObjectElement, ObjectElement, ObjectText } from "./ObjectNode.types.js"
+import { replacePlaceholders } from "./replacePlaceholders.function.js"
+import { restorePlaceholders } from "./restorePlaceholders.function.js"
+
+const fragReplacer = /(^:tagvar\d+:|:tagvar\d+:$)/g
+const safeVar = '__safeTagVar'
+const regexAttr = /([:_a-zA-Z0-9\-\.]+)(?:="([^"]*)"|=(\S+))?/g;
+const regexTagOrg = /<\/?([a-zA-Z0-9\-]+)([^>]*)>/
+
 export function htmlInterpolationToDomMeta(
   strings: string[],
-  values: any[]
+  values: unknown[],
 ) {
   // Sanitize placeholders in the fragments
-  const sanitizedFragments = sanitizePlaceholders(strings);
+  const sanitizedFragments = sanitizePlaceholders(strings)
 
   // Add placeholders to the fragments
-  const fragmentsWithPlaceholders = addPlaceholders(sanitizedFragments, values);
-
+  const fragmentsWithPlaceholders = addPlaceholders(
+    sanitizedFragments, values
+  )
+  
   // Parse the modified fragments
-  const htmlString = fragmentsWithPlaceholders.join('');
-  const parsedElements = parseHTML(htmlString);
+  const htmlString = fragmentsWithPlaceholders.join('')
+  const parsedElements = parseHTML(htmlString)
 
+  return parsedElements
+}
+
+export function exchangeParsedForValues(
+  parsedElements: (ObjectElement | ObjectText)[],
+  values: unknown[],
+) {
   // Replace placeholders with actual dynamic values
-  replacePlaceholders(parsedElements, values);
-
+  replacePlaceholders(parsedElements, values)
+  
   // Restore any sanitized placeholders in text nodes
-  restorePlaceholders(parsedElements);
+  restorePlaceholders(parsedElements)
 
   return parsedElements
 }
 
 function sanitizePlaceholders(fragments: string[]) {
-  return fragments.map(fragment => fragment.replace(/(^__tagVar\d+|__tagVar\d+$)/g, (match, index) => `__safeTagVar${index}`));
+  return fragments.map(fragment =>
+    fragment.replace(fragReplacer,
+    (match, index) => safeVar + index)
+  )
 }
 
-function addPlaceholders(fragments: string[], dynamicValues: any[]) {
-  return fragments.map((fragment, index) => {
-    if (index < dynamicValues.length) {
-      return fragment + '__tagVar' + index;
+function addPlaceholders(
+  strings: string[],
+  values: any[],
+) {
+
+  const results = strings.map((fragment, index) => {
+    if (index < values.length) {
+      return fragment + variablePrefix + index + variableSuffix
     }
     return fragment;
-  });
+  })
+
+  balanceArrayByArrays(results, strings, values)
+
+  return results
 }
 
-type ObjectNode = {
-  nodeName: string
-}
-type ObjectText = ObjectNode & {
-  textContent: string
-}
-type ObjectElement = ObjectNode & {
-  attributes: [string, any][]
-  children?: ObjectChildren
-}
-
-export type ObjectChildren = (ObjectText | ObjectElement)[]
-
-function parseHTML(html: string) {
-  const elements: (ObjectElement | ObjectText)[] = [];
+function parseHTML(html: string): (DomObjectElement | ObjectText)[] {
+  const elements: (DomObjectElement | ObjectText)[] = [];
   const stack: ObjectElement[] = [];
-  let currentElement: ObjectElement | null | undefined = null;
+  let currentElement: ObjectElement | null = null;
   let valueIndex = 0;
   let position = 0;
-  const regexTag = /<\/?([a-zA-Z0-9\-]+)([^>]*)>/g;
-  const regexAttr = /([a-zA-Z0-9\-\.]+)(?:="([^"]*)"|=(\S+))?/g;
+  const regexTag = new RegExp(regexTagOrg, 'g')
 
   while (position < html.length) {
     const tagMatch = regexTag.exec(html);
@@ -68,12 +84,13 @@ function parseHTML(html: string) {
     const isSelfClosing = fullMatch.endsWith('/>');
 
     if (position < tagMatch.index) {
-      const textContent = html.slice(position, tagMatch.index).trim();
-      if (textContent) {
+      const textContent = html.slice(position, tagMatch.index);
+      if (textContent.trim()) {
         const textNode: ObjectText = {
           nodeName: 'text',
-          textContent: textContent
-        };
+          textContent // : textContent.trim() ??? new removed
+        }
+
         if (currentElement) {
           if (!currentElement.children) {
             currentElement.children = [];
@@ -88,7 +105,7 @@ function parseHTML(html: string) {
     position = tagMatch.index + fullMatch.length;
 
     if (isClosingTag) {
-      currentElement = stack.pop();
+      currentElement = stack.pop() || null;
       continue;
     }
 
@@ -102,9 +119,17 @@ function parseHTML(html: string) {
       let [_, attrName, attrValueQuoted, attrValueUnquoted] = attrMatch;
       let attrValue = attrValueQuoted || attrValueUnquoted;
       if (attrValue === undefined) {
-        attrValue = "__tagVar" + valueIndex++;
+        const standAloneVar = attrName.slice(0, variablePrefix.length) === variablePrefix
+
+        if(standAloneVar) {
+          element.attributes.push([attrName]) // the name itself is dynamic
+          continue
+        }
+        
+        attrValue = variablePrefix + (valueIndex++) + variableSuffix
       }
-      element.attributes.push([attrName, attrValue]);
+      
+      element.attributes.push([attrName.toLowerCase(), attrValue])
     }
 
     if (currentElement) {
@@ -113,7 +138,7 @@ function parseHTML(html: string) {
       }
       currentElement.children.push(element);
     } else {
-      elements.push(element);
+      elements.push(element as DomObjectElement);
     }
 
     if (!isSelfClosing) {
@@ -122,102 +147,36 @@ function parseHTML(html: string) {
     }
   }
 
+  if (position < html.length) {
+    const textContent = html.slice(position);
+    if (textContent.trim()) {
+      const textNode: ObjectText = {
+        nodeName: 'text',
+        textContent: textContent.trim()
+      };
+      if (currentElement) {
+        if (!currentElement.children) {
+          currentElement.children = [];
+        }
+        currentElement.children.push(textNode);
+      } else {
+        elements.push(textNode);
+      }
+    }
+  }
+
   return elements;
 }
 
-function replacePlaceholders(
-  elements: (ObjectElement | ObjectText)[],
-  dynamicValues: any[]
+export function balanceArrayByArrays(
+  results: unknown[],
+  strings: string[],
+  values: unknown[],
 ) {
-  function traverseAndReplace(element: ObjectElement | ObjectText) {
-    if ('attributes' in element) {
-      element.attributes = element.attributes.map(([key, value]) => {
-        if (typeof value === 'string' && value.startsWith('__tagVar')) {
-          const index = parseInt(value.replace('__tagVar', ''), 10);
-          if (!isNaN(index) && index < dynamicValues.length) {
-            value = dynamicValues[index];
-          }
-        }
-        return [key, value];
-      });
-    }
-
-    if ('children' in element) {
-      const children = element.children as ObjectChildren
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i];
-        if (child.nodeName === 'text') {
-          let textContent = (child as ObjectText).textContent;
-          const placeholderStartMatch = textContent.match(/^__tagVar(\d+)/);
-          const placeholderEndMatch = textContent.match(/__tagVar(\d+)$/);
-
-          if (placeholderStartMatch) {
-            const index = parseInt(placeholderStartMatch[1], 10);
-            if (!isNaN(index) && index < dynamicValues.length) {
-              children.splice(i, 0, {
-                nodeName: 'text',
-                textContent: dynamicValues[index]
-              });
-              textContent = textContent.replace(`__tagVar${index}`, '');
-              i++;  // Adjust the index to skip the newly inserted element
-            }
-          }
-
-          if (placeholderEndMatch) {
-            const index = parseInt(placeholderEndMatch[1], 10);
-            if (!isNaN(index) && index < dynamicValues.length) {
-              textContent = textContent.replace(`__tagVar${index}`, '');
-              children.splice(i + 1, 0, {
-                nodeName: 'text',
-                textContent: dynamicValues[index]
-              });
-            }
-          }
-
-          ;(child as ObjectText).textContent = textContent;
-        }
-      }
-
-      children.forEach(traverseAndReplace);
-
-      // Remove empty children array
-      if (children.length === 0) {
-        delete element.children;
-      }
-    }
-  }
-
-  elements.forEach(traverseAndReplace);
-}
-
-function restorePlaceholders(elements: ObjectChildren) {
-  elements.forEach(traverseAndRestore);
-}
-
-function traverseAndRestore(element: ObjectElement | ObjectText) {
-  if ('attributes' in element) {
-    element.attributes = element.attributes.map(([key, value]) => {
-      if (typeof value === 'string' && value.startsWith('__safeTagVar')) {
-        const index = parseInt(value.replace('__safeTagVar', ''), 10);
-        value = `__tagVar${index}`;
-      }
-      return [key, value];
-    });
-  }
-
-  if ('children' in element) {
-    const children = element.children as ObjectChildren
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i] as ObjectText
-      if (child.nodeName === 'text') {
-        child.textContent = child.textContent.replace(/__safeTagVar(\d+)/g, (match, index) => `__tagVar${index}`);
-      }
-      traverseAndRestore(child);
-    }
-
-    // Remove empty children array
-    if (children.length === 0) {
-      delete element.children;
+  const diff = values.length - strings.length
+  if(diff > 0) {
+    for (let x = diff; x > 0; --x) {
+      results.push( variablePrefix + (strings.length + x - 1) + variableSuffix )
     }
   }
 }
