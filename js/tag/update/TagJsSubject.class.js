@@ -3,14 +3,13 @@ import { ValueSubject } from '../../subject/ValueSubject.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 export class TagJsSubject extends ValueSubject {
     tagJsType = ValueTypes.tagJsSubject;
-    // travels with all rerenderings
+    // travels with all renderings
     global = getNewGlobal();
-    lastRun;
 }
 export function getNewGlobal() {
     return {
         destroy$: new Subject(),
-        context: {}, // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+        context: [], // populated after reading interpolated.values array converted to an object {variable0, variable:1}
         providers: [],
         /** Indicator of re-rending. Saves from double rending something already rendered */
         renderCount: 0,

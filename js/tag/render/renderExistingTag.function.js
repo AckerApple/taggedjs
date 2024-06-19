@@ -6,8 +6,8 @@ export function renderExistingTag(oldestSupport, // oldest with elements on html
 newSupport, // new to be rendered
 ownerSupport, // ownerSupport
 subject) {
-    const lastSupport = subject.support;
-    const global = lastSupport.subject.global;
+    const lastSupport = subject.support; // todo maybe not needed?
+    const global = subject.global;
     // share point between renders
     newSupport.subject.global = global;
     const preRenderCount = global.renderCount;
@@ -22,10 +22,13 @@ subject) {
     const toRedrawTag = prevSupport || lastSupport || global.oldest;
     const reSupport = renderWithSupport(newSupport, toRedrawTag, subject, ownerSupport);
     const oldest = global.oldest || oldestSupport;
-    if (isLikeTags(prevSupport, reSupport)) {
+    const isLikeTag = isLikeTags(prevSupport, reSupport);
+    if (isLikeTag) {
         subject.support = reSupport;
         oldest.updateBy(reSupport);
     }
+    // ??? new - added but then removed
+    // global.newest = reSupport
     return reSupport;
 }
 //# sourceMappingURL=renderExistingTag.function.js.map

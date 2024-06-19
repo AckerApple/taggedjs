@@ -3,7 +3,7 @@ import { isLikeTags } from './isLikeTags.function.js';
 import { destroyTagMemory } from './destroyTag.function.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 export function checkDestroyPrevious(subject, // existing.value is the old value
-newValue, insertBefore, valueType) {
+newValue, valueType) {
     const displaySubject = subject;
     const hasLastValue = 'lastValue' in displaySubject;
     const lastValue = displaySubject.lastValue; // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
@@ -40,7 +40,8 @@ newValue, insertBefore, valueType) {
         const newTag = newValue;
         if (isSubjectTag && isValueTag) {
             // its a different tag now
-            if (!isLikeTags(newTag, lastSupport)) {
+            const likeTags = isLikeTags(newTag, lastSupport);
+            if (!likeTags) {
                 // put template back down
                 destroyTagMemory(lastSupport);
                 return 2;
@@ -61,7 +62,11 @@ newValue, insertBefore, valueType) {
     return false;
 }
 export function isSimpleType(value) {
-    return ['string', 'number', 'boolean'].includes(value);
+    return [
+        ValueTypes.string,
+        ValueTypes.number,
+        ValueTypes.boolean,
+    ].includes(value);
 }
 export function destroyArrayTag(support, counts) {
     support.destroy({

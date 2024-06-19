@@ -6,7 +6,7 @@ export function renderTagOnly(newSupport, prevSupport, subject, ownerSupport) {
     const templater = newSupport.templater;
     // NEW TAG CREATED HERE
     const wrapper = templater.wrapper;
-    let reSupport = wrapper(newSupport, subject);
+    let reSupport = wrapper(newSupport, subject, prevSupport);
     /* AFTER */
     runAfterRender(newSupport, ownerSupport);
     subject.global.newest = reSupport;

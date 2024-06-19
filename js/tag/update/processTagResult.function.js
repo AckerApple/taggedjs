@@ -9,7 +9,7 @@ export function processTagResult(support, subject, // used for recording past an
     if (prevSupport && justUpdate) {
         return processTagResultUpdate(support, subjectTag, prevSupport);
     }
-    const newFragment = support.buildBeforeElement(fragment, { counts });
+    const newFragment = support.buildBeforeElement(undefined, { counts });
     //if(fragment) {
     //  fragment.appendChild(newFragment)
     //} else {
@@ -28,7 +28,9 @@ prevSupport) {
         subject.support = newSupport;
         return newSupport;
     }
-    prevSupport.updateBy(support);
+    // ??? - new removed
+    // prevSupport.updateBy(support)
+    subject.global.oldest.updateBy(support);
     subject.support = support;
     return support;
 }

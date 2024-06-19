@@ -1,6 +1,7 @@
 import { ValueTypes } from './tag/ValueTypes.enum.js';
 export function isStaticTag(value) {
     return [
+        ValueTypes.dom,
         ValueTypes.tag,
         ValueTypes.templater,
     ].includes(value?.tagJsType);
@@ -13,15 +14,20 @@ export function isTagComponent(value) {
     return value?.tagJsType === ValueTypes.tagComponent;
 }
 export function isTagClass(value) {
-    return value?.tagJsType === ValueTypes.tag;
+    const tagJsType = value?.tagJsType;
+    return tagJsType && [ValueTypes.tag, ValueTypes.dom].includes(tagJsType);
 }
 // isSubjectLike
 export function isSubjectInstance(subject) {
-    return (subject?.isSubject === true || subject?.subscribe) ? true : false; // subject?.isSubject === true || 
+    const isSubject = subject?.isSubject === true;
+    return (isSubject || subject?.subscribe) ? true : false; // subject?.isSubject === true || 
 }
 export function isTagArray(value) {
     return value instanceof Array && value.every(x => [
-        ValueTypes.tag, ValueTypes.templater, ValueTypes.tag, ValueTypes.tagComponent
+        ValueTypes.tag,
+        ValueTypes.templater,
+        ValueTypes.dom,
+        ValueTypes.tagComponent
     ].includes(x?.tagJsType));
 }
 //# sourceMappingURL=isInstance.js.map

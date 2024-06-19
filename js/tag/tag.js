@@ -1,3 +1,4 @@
+// taggedjs-no-compile
 import { setUse } from '../state/index.js';
 import { TemplaterResult } from './TemplaterResult.class.js';
 import { tags } from './tag.utils.js';

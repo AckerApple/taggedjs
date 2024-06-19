@@ -13,6 +13,7 @@ export function processNewValue(value, ownerSupport) {
             const tag = templater.tag;
             return processNewTag(tag, ownerSupport);
         case ValueTypes.tag:
+        case ValueTypes.dom:
             return processNewTag(value, ownerSupport);
         case ValueTypes.subject:
             value.global = getNewGlobal();
@@ -23,6 +24,7 @@ export function processNewValue(value, ownerSupport) {
 function processNewTag(value, ownerSupport) {
     const tag = value;
     let templater = tag.templater;
+    // TODO: Can this ever happen?
     if (!templater) {
         templater = new TemplaterResult([]);
         templater.tag = tag;

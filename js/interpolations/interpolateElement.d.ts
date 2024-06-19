@@ -8,4 +8,3 @@ export type InterpolateOptions = {
 export declare function interpolateElement(fragment: DocumentFragment, template: Template, // element containing innerHTML to review interpolations
 context: Context, // variables used to evaluate
 interpolatedTemplates: TagTemplate, ownerSupport: Support, options: InterpolateOptions): InterpolateComponentResult[];
-export declare function interpolateString(string: string): import("./interpolations.js").InterpolatedTemplates;

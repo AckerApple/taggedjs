@@ -1,3 +1,4 @@
+import { empty } from './tag/ValueTypes.enum.js';
 // Function to update the value of x
 export function updateBeforeTemplate(value, // value should be casted before calling here
 lastFirstChild) {
@@ -12,7 +13,7 @@ lastFirstChild) {
 export function castTextValue(value) {
     // mimic React skipping to display EXCEPT for true does display on page
     if ([undefined, false, null].includes(value)) { // || value === true
-        return '';
+        return empty;
     }
     return value;
 }

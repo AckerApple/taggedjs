@@ -11,8 +11,6 @@ export class Subject {
     subscribers = [];
     subscribeWith;
     _value;
-    // this is overwritten by constructor at runtime. However having it helps editors know of its existence
-    set; // `subject.set = x` equal to `subject.next(x)`
     constructor(value, 
     // private?
     onSubscription) {
@@ -45,12 +43,14 @@ export class Subject {
         this._value = value;
         this.emit();
     }
+    set = this.next;
     emit() {
         const value = this._value;
         // Notify all subscribers with the new value
-        const subs = [...this.subscribers]; // subs may change as we call callbacks
-        const length = subs.length;
-        for (let index = 0; index < length; ++index) {
+        // const subs = [...this.subscribers] // subs may change as we call callbacks
+        const subs = this.subscribers; // subs may change as we call callbacks
+        // const length = subs.length
+        for (let index = 0; index < subs.length; ++index) {
             const sub = subs[index];
             sub.callback(value, sub);
         }
@@ -107,12 +107,6 @@ export function defineValueOn(subject) {
         get() {
             return subject._value;
         }
-    });
-    Object.defineProperty(subject, 'set', {
-        // supports subject.set = x
-        set: (value) => subject.next(value),
-        // supports subject.set(x)
-        get: () => (x) => subject.next(x),
     });
 }
 //# sourceMappingURL=Subject.class.js.map

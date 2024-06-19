@@ -15,12 +15,12 @@ setUse({
         innerCallback = originalGetter; // prevent crossing callbacks with another tag
     },
 });
+const syncError = new SyncCallbackError('callback() was called outside of synchronous rendering. Use `callback = callbackMaker()` to create a callback that could be called out of sync with rendering');
 /** Wrap a function that will be called back. After the wrapper and function are called, a rendering cycle will update display */
 export function callback(callback) {
     const support = getSupportInCycle();
     if (!support) {
-        const error = new SyncCallbackError('callback() was called outside of synchronous rendering. Use `callback = callbackMaker()` to create a callback that could be called out of sync with rendering');
-        throw error;
+        throw syncError;
     }
     const oldState = setUse.memory.stateConfig.array;
     const trigger = (...args) => {

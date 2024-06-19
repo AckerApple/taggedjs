@@ -8,10 +8,10 @@ export declare class Subject<T> implements SubjectLike<T> {
     subscribers: Subscription<T>[];
     subscribeWith?: (x: SubjectSubscriber<T>) => Subscription<T>;
     _value?: T;
-    set: T;
     constructor(value?: T | undefined, onSubscription?: OnSubscription<T> | undefined);
-    subscribe(callback: SubjectSubscriber<T>): Subscription<any> | Subscription<T>;
+    subscribe(callback: SubjectSubscriber<T>): Subscription<T> | Subscription<any>;
     next(value?: any): void;
+    set: (value?: any) => void;
     emit(): void;
     toPromise(): Promise<T>;
     /** like toPromise but faster */

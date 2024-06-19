@@ -1,9 +1,12 @@
 import { Props } from '../Props.js';
-import { Context, ElementBuildOptions, TagTemplate } from './Tag.class.js';
+import { Context, Tag, Dom } from './Tag.class.js';
 import { State } from '../state/index.js';
 import { TemplaterResult } from './TemplaterResult.class.js';
 import { TagSubject } from '../subject.types.js';
 import { DestroyOptions } from './destroy.support.js';
+import { DomObjectChildren, ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
+import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js';
+export type AnySupport = BaseSupport | Support;
 /** used only for apps, otherwise use Support */
 export declare class BaseSupport {
     templater: TemplaterResult;
@@ -11,7 +14,8 @@ export declare class BaseSupport {
     isApp: boolean;
     appElement?: Element;
     strings?: string[];
-    values?: any[];
+    dom?: ObjectChildren;
+    values?: unknown[];
     propsConfig: {
         latest: Props;
         latestCloned: Props;
@@ -25,18 +29,23 @@ export declare class BaseSupport {
         latest: Props;
         latestCloned: any[];
         castProps: Props | undefined;
-        lastClonedKidValues: any[][];
+        lastClonedKidValues: unknown[][];
     };
+    getHtmlDomMeta(fragment: DocumentFragment, options?: ElementBuildOptions): DomObjectChildren;
     /** Function that kicks off actually putting tags down as HTML elements */
     buildBeforeElement(fragment?: DocumentFragment, options?: ElementBuildOptions): DocumentFragment;
-    getTemplate(): TagTemplate;
+    updateBy(support: BaseSupport | Support): void;
+    /** triggers values to render */
+    updateConfig(tag: Dom | Tag, values: any[]): void;
+    updateValues(values: any[]): Context;
     update(): Context;
     updateContext(context: Context): Context;
-    updateBy(support: BaseSupport | Support): void;
-    updateConfig(strings: string[], values: any[]): void;
-    updateValues(values: any[]): Context;
     destroy(options?: DestroyOptions): number | Promise<number>;
-    destroyClones({ stagger }?: DestroyOptions): {
+    smartRemoveKids(options?: DestroyOptions): {
+        promises: Promise<any>[];
+        stagger: number;
+    };
+    destroyClones(options?: DestroyOptions): {
         promise: Promise<(void | undefined)[]>;
         stagger: number;
     } | {
@@ -49,12 +58,12 @@ export declare class BaseSupport {
 }
 export declare class Support extends BaseSupport {
     templater: TemplaterResult;
-    ownerSupport: Support;
+    ownerSupport: BaseSupport | Support;
     subject: TagSubject;
     version: number;
     isApp: boolean;
     constructor(templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
-    ownerSupport: Support, subject: TagSubject, castedProps?: Props, version?: number);
-    getAppSupport(): Support;
+    ownerSupport: BaseSupport | Support, subject: TagSubject, castedProps?: Props, version?: number);
+    getAppSupport(): this;
 }
 export declare function resetSupport(support: BaseSupport | Support): void;

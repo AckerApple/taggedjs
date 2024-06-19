@@ -22,7 +22,9 @@ export function combineLatest(subjects) {
         const clones = [...subjects];
         const firstSub = clones.shift();
         const subscription = firstSub.subscribe(x => setValue(x, 0));
-        const subscriptions = clones.map((subject, index) => subject.subscribe(x => setValue(x, index + 1)));
+        const subscriptions = clones.map((subject, index) => {
+            return subject.subscribe(x => setValue(x, index + 1));
+        });
         subscription.subscriptions = subscriptions;
         return subscription;
     };

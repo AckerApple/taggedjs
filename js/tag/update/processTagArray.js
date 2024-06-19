@@ -1,3 +1,4 @@
+// taggedjs-no-compile
 import { ArrayNoKeyError } from '../../errors.js';
 import { destroyArrayTag } from '../checkDestroyPrevious.function.js';
 import { newSupportByTemplater, setupNewSupport, tagFakeTemplater } from './processTag.function.js';
@@ -5,6 +6,8 @@ import { Support } from '../Support.class.js';
 import { isTagClass } from '../../isInstance.js';
 import { renderTagOnly } from '../render/renderTagOnly.function.js';
 import { TagJsSubject } from './TagJsSubject.class.js';
+import { afterChildrenBuilt } from './processTag.function.js';
+import { textNode } from '../textNode.js';
 export function processTagArray(subject, value, // arry of Tag classes
 insertBefore, // <template end interpolate />
 ownerSupport, options, fragment) {
@@ -31,7 +34,7 @@ ownerSupport, options, fragment) {
         let templater = subTag.templater;
         let prevArrayValue;
         if (tagClass) {
-            prevArrayValue = tag.memory.arrayValue;
+            prevArrayValue = tag.arrayValue;
         }
         else {
             templater = subTag;
@@ -40,7 +43,7 @@ ownerSupport, options, fragment) {
         }
         // const tag = subTag?.templater.tag as Tag
         const lastTag = item.support.templater.tag;
-        const lastArrayValue = lastTag.memory.arrayValue;
+        const lastArrayValue = lastTag.arrayValue;
         const destroyItem = !areLikeValues(prevArrayValue, lastArrayValue);
         if (destroyItem) {
             destroyArrayItem(lastArray.array, index, options);
@@ -56,10 +59,7 @@ ownerSupport, options, fragment) {
         const previousSupport = previous?.support;
         const subTag = item;
         const tagClass = isTagClass(subTag);
-        const itemSubject = new TagJsSubject(
-        // runtimeInsertBefore,
-        undefined);
-        itemSubject.lastRun = lastArray.lastRun;
+        const itemSubject = previousSupport?.subject || new TagJsSubject(undefined);
         let templater = subTag.templater;
         let support;
         if (tagClass) {
@@ -85,10 +85,10 @@ ownerSupport, options, fragment) {
         }
         // check for html``.key()
         const tag = templater.tag || subTag;
-        const keySet = 'arrayValue' in tag.memory;
+        const keySet = 'arrayValue' in tag;
         if (!keySet) {
             const details = {
-                template: support.getTemplate().string,
+                // template: support.getTemplate().string,
                 array: value,
             };
             const message = 'Use html`...`.key(item) instead of html`...` to template an Array';
@@ -105,13 +105,12 @@ ownerSupport, options, fragment) {
             continue;
         }
         processAddTagArrayItem(runtimeInsertBefore, support, index, options, lastArray.array, fragment);
-        lastArray.lastRun = support.subject.lastRun;
         ownerSupport.subject.global.childTags.push(support);
     }
     return clones;
 }
 function setPlaceholderElm(insertBefore, subject) {
-    const placeholder = subject.global.placeholder = document.createTextNode('');
+    const placeholder = subject.global.placeholder = textNode.cloneNode(false);
     const parentNode = insertBefore.parentNode;
     parentNode.insertBefore(placeholder, insertBefore);
     parentNode.removeChild(insertBefore);
@@ -129,14 +128,11 @@ function processAddTagArrayItem(before, support, index, options, lastArray, frag
     // TODO: This might be causing double clones delete issues because all array items share same placeholder
     support.subject.global.placeholder = before; // newTempElm
     const newFragment = support.buildBeforeElement(undefined, { counts });
-    if (fragment) {
-        fragment.appendChild(newFragment);
-    }
-    else {
-        const placeholder = before; // subject.global.placeholder as Text
-        const parentNode = placeholder.parentNode;
-        parentNode.insertBefore(newFragment, placeholder);
-    }
+    const children = [...newFragment.children];
+    const placeholder = before; // subject.global.placeholder as Text
+    const parentNode = placeholder.parentNode;
+    parentNode.insertBefore(newFragment, placeholder);
+    afterChildrenBuilt(children, support.subject, support);
 }
 /** compare two values. If both values are arrays then the items will be compared */
 function areLikeValues(valueA, valueB) {

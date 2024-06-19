@@ -1,4 +1,5 @@
 import { deepEqual } from '../deepFunctions.js';
+import { ValueTypes } from './ValueTypes.enum.js';
 /**
  *
  * @param props
@@ -16,7 +17,7 @@ pastCloneProps) {
     let castedProps = props;
     let castedPastProps = pastCloneProps;
     // check all prop functions match
-    if (typeof (props) === 'object') {
+    if (typeof (props) === ValueTypes.object) {
         if (!pastCloneProps) {
             return 3;
         }
@@ -24,7 +25,7 @@ pastCloneProps) {
         castedPastProps = [...(pastCloneProps || [])];
         const allFunctionsMatch = castedProps.every((value, index) => {
             let compare = castedPastProps[index];
-            if (value && typeof (value) === 'object') {
+            if (value && typeof (value) === ValueTypes.object) {
                 const subCastedProps = { ...value };
                 const subCompareProps = { ...compare || {} };
                 const matched = Object.entries(subCastedProps).every(([key, value]) => compareProps(value, subCompareProps[key], () => {
@@ -39,7 +40,7 @@ pastCloneProps) {
             });
         });
         if (!allFunctionsMatch) {
-            return 6; // a change has been detected by function comparisons
+            return 'functions-changed'; // a change has been detected by function comparisons
         }
     }
     // const isEqual = deepEqual(castedPastProps, castedProps)

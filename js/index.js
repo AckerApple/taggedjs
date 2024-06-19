@@ -6,7 +6,6 @@ export * from './state/index.js';
 export * from './subject/index.js';
 export * from './tag/Support.class.js';
 export * from './interpolations/ElementTargetEvent.interface.js';
-export * from './interpolations/interpolateElement.js';
 export * from './interpolations/InsertBefore.type.js';
 export { tagElement } from './tag/tagElement.js';
 export { Tag, variablePrefix } from './tag/Tag.class.js';

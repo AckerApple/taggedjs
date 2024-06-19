@@ -1,6 +1,8 @@
 import { BaseSupport } from './Support.class.js';
 import { runAfterRender, runBeforeRender } from './tagRunner.js';
 import { TagJsSubject } from './update/TagJsSubject.class.js';
+import { afterChildrenBuilt } from './update/processTag.function.js';
+import { textNode } from './textNode.js';
 const appElements = [];
 /**
  *
@@ -22,7 +24,7 @@ element, props) {
     const wrapper = app(props);
     // const fragment = document.createDocumentFragment()
     const template = document.createElement('template');
-    const placeholder = document.createTextNode('');
+    const placeholder = textNode.cloneNode(false);
     const support = runWrapper(wrapper, template, placeholder);
     const global = support.subject.global;
     support.appElement = element;
@@ -35,11 +37,13 @@ element, props) {
     ;
     global.placeholder = placeholder;
     const newFragment = support.buildBeforeElement(undefined);
+    const children = [...newFragment.children];
     support.subject.global.oldest = support;
     support.subject.global.newest = support;
     element.setUse = app.original.setUse;
     appElements.push({ element, support });
     element.appendChild(newFragment);
+    afterChildrenBuilt(children, support.subject, support);
     return {
         support,
         tags: app.original.tags,

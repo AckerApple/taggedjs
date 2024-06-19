@@ -13,7 +13,7 @@ import { ValueTypes } from '../ValueTypes.enum.js';
 import { getValueType } from '../getValueType.function.js';
 export function updateExistingValue(subject, value, ownerSupport, insertBefore) {
     const valueType = getValueType(value);
-    checkDestroyPrevious(subject, value, insertBefore, valueType);
+    checkDestroyPrevious(subject, value, valueType);
     // handle already seen tag components
     if (valueType === ValueTypes.tagComponent) {
         return prepareUpdateToComponent(value, subject, insertBefore, ownerSupport);
@@ -39,6 +39,7 @@ export function updateExistingValue(subject, value, ownerSupport, insertBefore) 
             processTag(value, ownerSupport, subject);
             return subject;
         case ValueTypes.tag:
+        case ValueTypes.dom:
             const tag = value;
             let templater = tag.templater;
             if (!templater) {
@@ -79,13 +80,10 @@ function handleStillTag(subject, value, ownerSupport) {
     if (isTagTemplater(value)) {
         setupNewSupport(valueSupport, ownerSupport, subject);
     }
-    /*
-    if(valueSupport.templater.wrapper?.parentWrap.original.toString().includes('🌹-1')) {
-      // console.log('isSameTag', isSameTag)
-    }
-    */
     if (isSameTag) {
-        lastSupport.updateBy(valueSupport);
+        // lastSupport.updateBy(valueSupport)
+        // ??? recently changed from above
+        lastSupport.subject.global.oldest.updateBy(valueSupport);
         return;
     }
     if (isSameTag) {

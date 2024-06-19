@@ -1,15 +1,15 @@
-import { escapeVariable, variablePrefix } from './Tag.class.js';
+import { ValueTypes } from './ValueTypes.enum.js';
 import { deepClone } from '../deepFunctions.js';
 import { isTagComponent } from '../isInstance.js';
-import { cloneValueArray } from './cloneValueArray.function.js';
+import { cloneTagJsValue, cloneValueArray } from './cloneValueArray.function.js';
 import { runBeforeDestroy } from './tagRunner.js';
 import { getChildTagsToDestroy } from './destroy.support.js';
 import { elementDestroyCheck } from './elementDestroyCheck.function.js';
 import { updateContextItem } from './update/updateContextItem.function.js';
 import { processNewValue } from './update/processNewValue.function.js';
-import { interpolateElement, interpolateString } from '../interpolations/interpolateElement.js';
-import { afterInterpolateElement } from '../interpolations/afterInterpolateElement.function.js';
-const prefixSearch = new RegExp(variablePrefix, 'g');
+import { exchangeParsedForValues } from '../interpolations/optimizers/htmlInterpolationToDomMeta.function.js';
+import { attachDomElement } from '../interpolations/optimizers/metaAttachDomElements.function.js';
+import { getDomMeta } from './domMetaCollector.js';
 /** used only for apps, otherwise use Support */
 // TODO: We need to split Support and simple tag support apart
 export class BaseSupport {
@@ -18,6 +18,7 @@ export class BaseSupport {
     isApp = true;
     appElement; // only seen on this.getAppSupport().appElement
     strings;
+    dom;
     values;
     propsConfig;
     // stays with current render
@@ -32,7 +33,9 @@ export class BaseSupport {
     clonePropsBy(props, castedProps) {
         const children = this.templater.children; // children tags passed in as arguments
         const kidValue = children.value;
-        const latestCloned = props.map(props => deepClone(props));
+        const latestCloned = props.map(props => cloneTagJsValue(props)
+        // deepClone(props)
+        );
         return this.propsConfig = {
             latest: props,
             latestCloned, // assume its HTML children and then detect
@@ -43,106 +46,64 @@ export class BaseSupport {
             })
         };
     }
-    /** Function that kicks off actually putting tags down as HTML elements */
-    buildBeforeElement(fragment = document.createDocumentFragment(), options = {
+    getHtmlDomMeta(fragment, options = {
         counts: { added: 0, removed: 0 },
     }) {
+        const thisTag = this.templater.tag;
+        const context = this.update();
+        let orgDomMeta;
+        if (thisTag.tagJsType === ValueTypes.dom) {
+            orgDomMeta = thisTag.dom;
+        }
+        else {
+            orgDomMeta = getDomMeta(thisTag.strings, thisTag.values);
+        }
+        const domMeta = deepClone(orgDomMeta);
+        exchangeParsedForValues(domMeta, context);
+        attachDomElement(domMeta, context, this, fragment, options.counts, fragment);
+        return domMeta;
+    }
+    /** Function that kicks off actually putting tags down as HTML elements */
+    buildBeforeElement(fragment = document.createDocumentFragment(), options) {
         const subject = this.subject;
         const global = this.subject.global;
         global.oldest = this;
         global.newest = this;
         subject.support = this;
         this.hasLiveElements = true;
-        const context = this.update();
-        const template = this.getTemplate();
-        const tempDraw = document.createElement('template'); // put down a first element we can expect to always be there
-        tempDraw.innerHTML = template.string;
-        // Search/replace innerHTML variables but don't interpolate tag components just yet
-        // const tagComponents = 
-        interpolateElement(fragment, tempDraw, context, template, this, // ownerSupport,
-        {
-            counts: options.counts
-        });
-        afterInterpolateElement(fragment, tempDraw, this, // ownerSupport
-        context, options);
+        const htmlDomMeta = this.getHtmlDomMeta(fragment, options);
+        attachClonesToSupport(htmlDomMeta, this.subject.global.clones);
         return fragment;
     }
-    getTemplate() {
-        const thisTag = this.templater.tag;
-        const strings = this.strings || thisTag.strings;
-        const values = this.values || thisTag.values;
-        const lastRun = this.subject.lastRun;
-        if (lastRun) {
-            if (lastRun.strings.length === strings.length) {
-                const stringsMatch = lastRun.strings.every((string, index) => 
-                // string.length === strings[index].length
-                string === strings[index]);
-                if (stringsMatch && lastRun.values.length === values.length) {
-                    return lastRun; // performance savings using the last time this component was rendered
-                }
-            }
+    updateBy(support) {
+        const tempTag = support.templater.tag;
+        this.updateConfig(tempTag, tempTag.values);
+    }
+    /** triggers values to render */
+    updateConfig(tag, values) {
+        if (tag.tagJsType === ValueTypes.dom) {
+            this.dom = tag.dom;
         }
-        const string = strings.map((string, index) => {
-            const safeString = string.replace(prefixSearch, escapeVariable);
-            const endString = safeString + (values.length > index ? `{${variablePrefix}${index}}` : '');
-            // ??? new removed
-            //const trimString = endString.replace(/>\s*/g,'>').replace(/\s*</g,'<')
-            //return trimString
-            return endString;
-        }).join('');
-        const interpolation = interpolateString(string);
-        const run = {
-            interpolation,
-            string: interpolation.string,
-            strings,
-            values,
-        };
-        this.subject.lastRun = run;
-        return run;
+        else {
+            this.strings = tag.strings;
+        }
+        this.updateValues(values);
+    }
+    updateValues(values) {
+        this.values = values;
+        return this.updateContext(this.subject.global.context);
     }
     update() {
         return this.updateContext(this.subject.global.context);
     }
     updateContext(context) {
         const thisTag = this.templater.tag;
-        const strings = this.strings || thisTag.strings;
+        // const strings = this.strings || thisTag.strings
         const values = this.values || thisTag.values;
-        strings.forEach((_string, index) => {
-            const hasValue = values.length > index;
-            if (!hasValue) {
-                return;
-            }
-            const variableName = variablePrefix + index;
-            const value = values[index];
-            // is something already there?
-            const exists = variableName in context;
-            if (exists) {
-                if (this.subject.global.deleted) {
-                    const valueSupport = (value && value.support);
-                    if (valueSupport) {
-                        valueSupport.destroy();
-                        return context; // item was deleted, no need to emit
-                    }
-                }
-                return updateContextItem(context, variableName, value);
-            }
-            // 🆕 First time values below
-            context[variableName] = processNewValue(value, this);
-            // context[variableName].global.insertBefore = this.subject.global.placeholder || this.subject.global.insertBefore
-        });
+        // TODO: loop specific number of times instead of building an array
+        const array = 'x,'.repeat(values.length).split(','); // strings
+        array.forEach((_string, index) => updateOneContext(values, index, context, this));
         return context;
-    }
-    updateBy(support) {
-        const tempTag = support.templater.tag;
-        this.updateConfig(tempTag.strings, tempTag.values);
-    }
-    updateConfig(strings, values) {
-        this.strings = strings;
-        this.updateValues(values);
-    }
-    updateValues(values) {
-        this.values = values;
-        return this.updateContext(this.subject.global.context);
     }
     destroy(options = {
         stagger: 0,
@@ -164,35 +125,65 @@ export class BaseSupport {
                 runBeforeDestroy(child, child);
             }
             child.destroySubscriptions();
-            resetSupport(this);
+            // resetSupport(this)
         }
         resetSupport(this);
-        let mainPromise;
-        const { stagger, promise } = this.destroyClones(options);
+        // let mainPromise: Promise<number | (number | void | undefined)[]> | undefined    
+        // first paint
+        const { stagger, promises } = this.smartRemoveKids(options);
         options.stagger = stagger;
-        if (promise) {
-            mainPromise = promise;
+        if (promises.length) {
+            return Promise.all(promises).then(() => options.stagger);
         }
-        if (mainPromise) {
-            return mainPromise.then(async () => {
-                const promises = childTags.map(kid => kid.destroyClones());
-                return Promise.all(promises);
-            }).then(() => options.stagger);
-        }
-        childTags.forEach(kid => kid.destroyClones());
         return options.stagger;
     }
-    destroyClones({ stagger } = {
+    smartRemoveKids(options = {
+        stagger: 0,
+    }) {
+        const startStagger = options.stagger;
+        const promises = [];
+        const myClones = this.subject.global.clones;
+        this.subject.global.childTags.forEach(childTag => {
+            const clones = childTag.subject.global.clones;
+            let cloneOne = clones[0];
+            if (cloneOne === undefined) {
+                const { stagger, promises: newPromises } = childTag.smartRemoveKids(options);
+                options.stagger = options.stagger + stagger;
+                promises.push(...newPromises);
+                return { promise: Promise.all(promises), stagger: options.stagger };
+            }
+            let count = 0;
+            // let deleted = false
+            while (cloneOne.parentNode && count < 5) {
+                if (myClones.includes(cloneOne)) {
+                    return; // no need to delete, they live within me
+                }
+                cloneOne = cloneOne.parentNode;
+                ++count;
+            }
+            // recurse
+            const { stagger, promises: newPromises } = childTag.smartRemoveKids(options);
+            options.stagger = options.stagger + stagger;
+            promises.push(...newPromises);
+        });
+        const promise = this.destroyClones({ stagger: startStagger }).promise;
+        this.subject.global.clones.length = 0;
+        this.subject.global.childTags.length = 0;
+        if (promise) {
+            promises.unshift(promise);
+        }
+        return { promises, stagger: options.stagger };
+    }
+    destroyClones(options = {
         stagger: 0,
     }) {
         const oldClones = this.subject.global.clones; // .toReversed()
         // check subjects that may have clones attached to them
-        const promises = oldClones.map(clone => this.checkCloneRemoval(clone, stagger)).filter(x => x); // only return promises
-        this.subject.global.clones.length = 0; // tag maybe used for something else
+        const promises = oldClones.map(clone => this.checkCloneRemoval(clone, options.stagger)).filter(x => x); // only return promises
         if (promises.length) {
-            return { promise: Promise.all(promises), stagger };
+            return { promise: Promise.all(promises), stagger: options.stagger };
         }
-        return { stagger };
+        return { stagger: options.stagger };
     }
     /** Reviews elements for the presences of ondestroy */
     checkCloneRemoval(clone, stagger) {
@@ -213,6 +204,14 @@ export class BaseSupport {
         const parentNode = clone.parentNode;
         if (parentNode) {
             parentNode.removeChild(clone);
+        }
+        const ownerSupport = this.ownerSupport;
+        if (ownerSupport) {
+            const clones = ownerSupport.subject.global.clones;
+            const index = clones.indexOf(clone);
+            if (index >= 0) {
+                clones.splice(index, 1);
+            }
         }
         return promise;
     }
@@ -248,12 +247,44 @@ export class Support extends BaseSupport {
 }
 export function resetSupport(support) {
     const global = support.subject.global;
-    // delete global.placeholder
-    global.context = {};
+    // TODO: We maybe able to replace with: global.context.length = 0
+    global.context = [];
     delete global.oldest; // may not be needed
     delete global.newest;
-    support.subject.global.childTags.length = 0;
     const subject = support.subject;
     delete subject.support;
+}
+function updateOneContext(values, index, context, support) {
+    const hasValue = values.length > index;
+    if (!hasValue) {
+        return;
+    }
+    const value = values[index];
+    // is something already there?
+    const exists = context.length > index;
+    if (exists) {
+        if (support.subject.global.deleted) {
+            const valueSupport = (value && value.support);
+            if (valueSupport) {
+                valueSupport.destroy();
+                return context; // item was deleted, no need to emit
+            }
+        }
+        return updateContextItem(context, index, value);
+    }
+    // 🆕 First time values below
+    context[index] = processNewValue(value, support);
+}
+function attachClonesToSupport(htmlDomMeta, clones) {
+    htmlDomMeta.forEach(meta => {
+        if (meta.domElement) {
+            clones.push(meta.domElement);
+        }
+        clones.push(meta.marker);
+        if ('children' in meta) {
+            const children = meta.children;
+            attachClonesToSupport(children, clones);
+        }
+    });
 }
 //# sourceMappingURL=Support.class.js.map

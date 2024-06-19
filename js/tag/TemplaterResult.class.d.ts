@@ -1,4 +1,4 @@
-import { Context, Tag } from './Tag.class.js';
+import { Context, Tag, Dom } from './Tag.class.js';
 import { BaseSupport, Support } from './Support.class.js';
 import { Props } from '../Props.js';
 import { TagChildren, TagWrapper } from './tag.utils.js';
@@ -10,10 +10,12 @@ import { Subscription } from '../subject/subject.utils.js';
 import { InsertBefore } from '../interpolations/InsertBefore.type.js';
 import { TagValues } from './html.js';
 import { Subject } from '../subject/index.js';
+import { ValueTypes } from './ValueTypes.enum.js';
+import { ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
 export type OriginalFunction = (() => Tag) & {
     compareTo: string;
 };
-export type Wrapper = ((support: BaseSupport | Support, subject: TagSubject) => Support) & {
+export type Wrapper = ((newSupport: BaseSupport | Support, subject: TagSubject, prevSupport?: BaseSupport | Support) => Support) & {
     parentWrap: TagWrapper<any>;
 };
 export type TagGlobal = {
@@ -34,19 +36,23 @@ export type TagGlobal = {
     locked?: true;
     blocked: (BaseSupport | Support)[];
     childTags: Support[];
-    clones: (Element | Text | ChildNode)[];
+    clones: Clone[];
     callbackMaker?: true;
 };
+export type Clone = (Element | Text | ChildNode);
 export declare class TemplaterResult {
     props: Props;
-    tagJsType: string;
+    tagJsType: ValueTypes;
     tagged: boolean;
     wrapper?: Wrapper;
     madeChildIntoSubject?: boolean;
-    tag?: Tag;
+    tag?: Tag | Dom;
     children: TagChildren;
     arrayValue?: unknown;
     constructor(props: Props);
     key(arrayValue: unknown): this;
+    /** children */
     html(strings: string[] | TemplateStringsArray, ...values: TagValues): this;
+    /** children */
+    dom(strings: ObjectChildren, ...values: TagValues): this;
 }

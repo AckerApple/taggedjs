@@ -9,23 +9,28 @@ export function getValueType(value) {
     if (value instanceof Function) {
         return ValueTypes.function;
     }
-    if (type === 'object') {
+    if (isSimpleType(type)) {
+        return type;
+    }
+    if (type === ValueTypes.object) {
         if (value instanceof Date) {
             return ValueTypes.date;
         }
-        if (isSimpleType(type)) {
-            return type;
-        }
         const tagJsType = value.tagJsType;
         if (tagJsType) {
+            return tagJsType;
+            /*
             const included = [
-                ValueTypes.tagComponent,
-                ValueTypes.templater,
-                ValueTypes.tag,
-            ].includes(tagJsType);
-            if (included) {
-                return tagJsType;
+              ValueTypes.tagComponent,
+              ValueTypes.templater,
+              ValueTypes.tag,
+              ValueTypes.dom,
+            ].includes(tagJsType)
+        
+            if(included) {
+              return tagJsType
             }
+            */
         }
         if (isTagArray(value)) {
             return ValueTypes.tagArray;

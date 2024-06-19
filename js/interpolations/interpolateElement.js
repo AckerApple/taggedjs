@@ -1,7 +1,5 @@
 import { interpolateAttributes } from './interpolateAttributes.js';
-import { interpolateToTemplates } from './interpolations.js';
 import { interpolateContentTemplates } from './interpolateContentTemplates.js';
-import { escapeSearch, variablePrefix } from '../tag/Tag.class.js';
 /** Review elements within an element */
 export function interpolateElement(fragment, template, // element containing innerHTML to review interpolations
 context, // variables used to evaluate
@@ -26,10 +24,5 @@ function processChildrenAttributes(children, context, ownerSupport) {
             processChildrenAttributes(child.children, context, ownerSupport);
         }
     }
-}
-export function interpolateString(string) {
-    const result = interpolateToTemplates(string);
-    result.string = result.string.replace(escapeSearch, variablePrefix);
-    return result;
 }
 //# sourceMappingURL=interpolateElement.js.map

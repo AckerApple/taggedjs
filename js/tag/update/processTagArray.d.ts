@@ -1,7 +1,7 @@
 import { InsertBefore } from '../../interpolations/InsertBefore.type.js';
 import { Tag, TagTemplate } from '../Tag.class.js';
 import { Counts } from '../../interpolations/interpolateTemplate.js';
-import { Support } from '../Support.class.js';
+import { BaseSupport, Support } from '../Support.class.js';
 import { TemplaterResult } from '../TemplaterResult.class.js';
 import { TagJsSubject } from './TagJsSubject.class.js';
 export type LastArrayItem = {
@@ -11,7 +11,9 @@ export type LastArrayItem = {
 };
 type LastArrayMeta = {
     array: LastArrayItem[];
-    lastRun?: TagTemplate;
+    lastRuns?: {
+        [index: number]: TagTemplate;
+    };
 };
 export type TagArraySubject = TagJsSubject<Tag[]> & {
     insertBefore: InsertBefore;
@@ -19,7 +21,7 @@ export type TagArraySubject = TagJsSubject<Tag[]> & {
 };
 export declare function processTagArray(subject: TagArraySubject, value: (TemplaterResult | Tag)[], // arry of Tag classes
 insertBefore: InsertBefore, // <template end interpolate />
-ownerSupport: Support, options: {
+ownerSupport: BaseSupport | Support, options: {
     counts: Counts;
 }, fragment?: DocumentFragment): InsertBefore[];
 export {};

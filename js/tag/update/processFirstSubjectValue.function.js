@@ -14,15 +14,16 @@ fragment) {
     const valueType = getValueType(value);
     switch (valueType) {
         case ValueTypes.templater:
-            processTag(value, ownerSupport, subject, fragment);
+            processTag(value, ownerSupport, subject);
             return;
+        case ValueTypes.dom:
         case ValueTypes.tag:
             const tag = value;
             let templater = tag.templater;
             if (!templater) {
                 templater = tagFakeTemplater(tag);
             }
-            processTag(templater, ownerSupport, subject, fragment);
+            processTag(templater, ownerSupport, subject);
             return;
         case ValueTypes.tagArray:
             return processTagArray(subject, value, insertBefore, ownerSupport, options, fragment);
@@ -34,7 +35,7 @@ fragment) {
             if (v.oneRender) {
                 const support = oneRenderToSupport(v, subject, ownerSupport);
                 renderTagOnly(support, support, subject, ownerSupport);
-                processTag(support.templater, ownerSupport, subject, fragment);
+                processTag(support.templater, ownerSupport, subject);
                 return;
             }
             break;
