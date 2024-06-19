@@ -30,7 +30,7 @@ export const watchTesting = tag(() => (
       return x ? truthSubChangeCount : truthSubChangeCount
     }
   ),
-) => html`
+) => html`<!-- watchTesting.tag.ts -->
   stateNum:<span id="watch-testing-num-display">${stateNum}</span>
   <button id="watch-testing-num-button" type="button"
     onclick=${() => ++stateNum}

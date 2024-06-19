@@ -1,4 +1,4 @@
-import { children, Tag, html, letState, tag } from "taggedjs"
+import { children, BaseTag, html, letState, tag } from "taggedjs"
 import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests.js"
 import { renderCountDiv } from "./renderCount.component.js"
 
@@ -64,11 +64,12 @@ export const childTests = tag((_: string = 'childTests') => (
       onclick=${() => ++counter}
     >🐮 increase childTests outside ${counter} - ${renderCount}</button>
     <span id="childTests-display">${counter}</span>
+
     ${renderCountDiv({renderCount, name:'childTests'})}
   </fieldset>
 `)
 
-function childAsPropTest({child}: {child:Tag}) {
+function childAsPropTest({child}: {child: BaseTag}) {
   return html`
     <fieldset>
       <legend>child as prop</legend>

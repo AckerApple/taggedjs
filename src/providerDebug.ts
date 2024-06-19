@@ -42,7 +42,7 @@ export const providerDebugBase = tag((_x = 'providerDebugBase') => {
 
   ++renderCount
 
-  return html`
+  return html`<!--providerDebug.js-->
     <div>
       <strong>provider.test sugar-daddy-77</strong>:${provider.test}
     </div>

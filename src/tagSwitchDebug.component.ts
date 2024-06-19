@@ -1,4 +1,4 @@
-import { html, tag, letState, InputElementTargetEvent, Tag } from "taggedjs"
+import { html, tag, letState, InputElementTargetEvent, BaseTag } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component.js"
 
 type SelectedTag = null | string | undefined
@@ -19,7 +19,7 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
     }
   }
 
-  let tagOutput: string | Tag = 'select tag below'
+  let tagOutput: string | BaseTag = 'select tag below'
   switch (selectedTag) {
     case null: tagOutput = 'null, select tag below'
       break;
@@ -161,16 +161,17 @@ export const arraySwitching = tag((
       return html`its a null value`
 
     case '':
-      return html`` // tests how .previousSibling works
+      // TODO: ??? should be empty string
+      return html`space` // tests how .previousSibling works
 
     case '1':
-      // return html`${['a'].map(x => html`${tag1({title: `array ${selectedTag} ${x}`})}`.key(x))}`
       return html`${tag1({title: `tag ${selectedTag}`})}`
 
     case '2':
       return html`${['b','c'].map(x => html`${tag2({title: `array ${selectedTag} ${x}`})}`.key(x))}`
 
     case '3':
+      // console.log('allStrings', allStrings, allStrings[16], allStrings[17])
       return html`${['d','e','f'].map(x => html`${tag3({title: `array ${selectedTag} ${x}`})}`.key(x))}`
   }
 

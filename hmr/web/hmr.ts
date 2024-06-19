@@ -3,7 +3,7 @@
 // 🟠 Warning: avoid direct imports due to bundle workflow (old bundle and new bundle do not mix well)
 // const { renderWithSupport, renderSupport } = require("taggedjs");
 
-import { TemplaterResult, TagSubject, Tag, Support, TaggedFunction, ValueTypes, Wrapper, variablePrefix } from "taggedjs"
+import { TemplaterResult, TagSubject, Tag, Support, TaggedFunction, ValueTypes, Wrapper } from "taggedjs"
 import { updateSubject } from "./updateSubject.function"
 
 /** @type {Support | undefined} */
@@ -250,7 +250,7 @@ async function replaceTemplater(
 ) {
   let  count = 0
   const tag = ownerSupport.templater.tag as Tag
-  const promises = tag.values.map(async (value, index) => {
+  const promises = tag.values.map(async (value: any, index) => {
     const isTemplater = value.jsTagType = ValueTypes.templater
     if(!value || !isTemplater) {
       return
@@ -263,7 +263,7 @@ async function replaceTemplater(
     if(isWrapping) {
       const global = ownerSupport.subject.global
       const context = global.context
-      const contextSubject = context[ variablePrefix + index ]
+      const contextSubject = context[ index ]
       
       updateSubject(
         contextSubject as TagSubject, newTag, oldTag, hmr

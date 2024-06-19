@@ -44,7 +44,9 @@ export const counters = tag(({
     pipedSubject0.next('333-' + counter)
   }
 
-  const increasePropCounter = () => ++propCounter
+  const increasePropCounter = () => {
+    ++propCounter
+  }
 
   ++renderCount // for debugging
 
@@ -65,7 +67,10 @@ export const counters = tag(({
             onclick=${() => appCounterSubject.next((appCounterSubject.value || 0) + 1)}
           >🍒 ++app subject</button>
           <span>
-            🍒 <span id="app-counter-subject-display">${appCounterSubject.value}</span>
+            🍒 <span id="app-counters-display">${appCounterSubject.value}</span>
+          </span>
+          <span>
+            🍒 <span id="app-counters-subject-display">${appCounterSubject.value}</span>
           </span>
         </div>
 

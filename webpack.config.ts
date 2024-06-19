@@ -37,6 +37,10 @@ export default {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.(js|ts)$/,  // Adjust the regex to match the files you're interested in
+        use: [path.resolve(__dirname, 'src', 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.js')] // Use the path to your loader
+      },
     ],
   },
   optimization: {

@@ -12,11 +12,14 @@ export const oneRender = () => tag.oneRender = (
   
 
   return html`
+    <div>-start-</div>
     ${x.pipe(x => JSON.stringify(x))}elias
-    <span>👍<span id="👍-counter-display">${counter}</span></span>
-    <button type="button" id="👍-counter-button"
-      onclick=${() => ++counter.value}
-    >++👍</button>
+    <div>
+      <span>👍<span id="👍-counter-display">${counter}</span></span>
+      <button type="button" id="👍-counter-button"
+        onclick=${() => ++counter.value}
+      >++👍</button>
+    </div>
     ${renderCountDiv({renderCount, name:'oneRender_tag_ts'})}
     <hr />
     ${insideMultiRender()}

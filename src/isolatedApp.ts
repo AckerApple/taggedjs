@@ -1,5 +1,5 @@
 import { childTests } from "./childTests"
-import { Subject, callbackMaker, html, onInit, letState, tag, state } from "taggedjs"
+import { Subject, callbackMaker, html, onInit, letState, tag, state, callback } from "taggedjs"
 import { arrayTests } from "./arrayTests"
 import { tagSwitchDebug } from "./tagSwitchDebug.component"
 import { mirroring } from "./mirroring.tag"
@@ -52,6 +52,11 @@ export default tag(() => {
   let testTimeout = letState(null)(x => [testTimeout, testTimeout=x])
   const appCounterSubject = state(() => new Subject(appCounter))
   const callback = callbackMaker()
+  /*
+  const cb = callback((x: number) => {
+    appCounter = x
+  })
+  */
 
   function runTesting(manual = true) {
     const waitFor = 2000
@@ -76,12 +81,14 @@ export default tag(() => {
 
   onInit(() => {
     console.info('1️⃣ app init should only run once')    
-
+    
     appCounterSubject.subscribe(
       callback(x => {
         appCounter = x
       })
     )
+    
+    // appCounterSubject.subscribe(cb)
 
     if(storage.autoTest) {
       runTesting(false)
@@ -114,10 +121,15 @@ export default tag(() => {
 
     <div>
       <button id="app-counter-subject-button"
-        onclick=${() => appCounterSubject.next(appCounter + 1)}
-      >🍒 ++app subject</button>
+        onclick=${() => {
+          appCounterSubject.next(appCounter + 1)
+        }}
+      >🍒 ++app subject</button>  
       <span>
-        🍒 <span id="app-counter-subject-display">${appCounter}</span>
+        🍒 <span id="app-counter-display">${appCounter}</span>
+      </span>
+      <span>
+        🍒 <span id="app-counter-subject-display">${/*appCounterSubject*/'masked'}</span>
       </span>
       auto testing <input type="checkbox" ${storage.autoTest ? 'checked': null} onchange=${toggleAutoTesting} />
       <button type="button" onclick=${() => runTesting(true)}>run tests</button>
@@ -125,6 +137,7 @@ export default tag(() => {
 
     <div>
       <h3>Sections</h3>
+      <!-- checkbox menu -->
       <div style="display:flex;gap:1em;flex-wrap:wrap;margin:1em;">
         ${viewTypes.map(type => html`
           <div>

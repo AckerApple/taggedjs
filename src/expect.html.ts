@@ -104,13 +104,13 @@ function testCounterSelectedElements(
   counterButtons.forEach((increaseCounter, index: number) => {
     const counterDisplay = document.querySelectorAll(counterDisplaySelect)[index] as HTMLElement // counterDisplays[index]
 
-    expect(document.body.contains(counterDisplay)).toBe(true, `The selected element ${counterDisplaySelect} is no longer an element on the document body before clicking ${counterButtonSelect}`)
+    expect(document.body.contains(counterDisplay)).toBe(true, `The selected element ${counterDisplaySelect} is no longer an element on the document body BEFORE clicking ${counterButtonSelect}`)
 
     let counterValue = Number(counterDisplay?.innerText)
     increaseCounter.click()
 
     expect(counterDisplay).toBeDefined()
-    expect(document.body.contains(counterDisplay)).toBe(true, `The selected element ${counterDisplaySelect} is no longer an element on the document body after clicking ${counterButtonSelect}`)
+    expect(document.body.contains(counterDisplay)).toBe(true, `The selected element ${counterDisplaySelect} is no longer an element on the document body AFTER clicking ${counterButtonSelect}`)
 
     let oldCounterValue = counterValue + 1
     counterValue = Number(counterDisplay.innerText)

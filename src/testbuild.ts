@@ -69,8 +69,9 @@ function templaterToHtml(
 ) {
   const support = templaterToSupport(templater)
   const context = support.subject.global.context
-  const template = support.getTemplate()
-  const strings = new Array(...template.strings) // clone
+  const tag = support.templater.tag as Tag
+  const template = (support.strings || tag?.strings) as string[] // support.getTemplate()
+  const strings = new Array(...template) // clone
   const values = Object.values(context)
   
   values.reverse().forEach((subject, index) => {
