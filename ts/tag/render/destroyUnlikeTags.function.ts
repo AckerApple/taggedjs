@@ -1,12 +1,11 @@
-import { BaseSupport, Support } from '../Support.class.js'
+import { AnySupport, Support } from '../Support.class.js'
 import { softDestroySupport } from './softDestroySupport.function.js'
-import { TagSubject, WasTagSubject } from '../../subject.types.js'
+import { TagSubject } from '../../subject.types.js'
 import { moveProviders } from '../update/updateExistingTagComponent.function.js'
-import { TagJsSubject } from '../update/TagJsSubject.class.js'
 
 export function destroyUnlikeTags(
-  lastSupport: Support | BaseSupport, // old
-  reSupport: Support, // new
+  lastSupport: AnySupport, // old
+  reSupport: AnySupport, // new
   subject: TagSubject,
 ) {
   // when a tag is destroyed, disconnect the globals

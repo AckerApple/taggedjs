@@ -8,8 +8,8 @@ export function renderSubjectComponent(
   ownerSupport: BaseSupport | Support,
 ): Support {
   const ownGlobal = ownerSupport.subject.global
-  const preClones = ownGlobal.clones.map(clone => clone)
-  
+  const preClones = ownGlobal.htmlDomMeta.map(clone => clone)
+
   reSupport = renderWithSupport(
     reSupport,
     subject.support, // existing tag
@@ -18,9 +18,9 @@ export function renderSubjectComponent(
   )
 
   const reGlobal = reSupport.subject.global
-  if(ownGlobal.clones.length > preClones.length) {
-    const myClones = ownGlobal.clones.filter(fClone => !preClones.find(clone => clone === fClone))
-    reGlobal.clones.push(...myClones)
+  if(ownGlobal.htmlDomMeta.length > preClones.length) {
+    const myClones = ownGlobal.htmlDomMeta.filter(fClone => !preClones.find(clone => clone === fClone))
+    reGlobal.htmlDomMeta.push(...myClones)
   }
 
   return reSupport as Support

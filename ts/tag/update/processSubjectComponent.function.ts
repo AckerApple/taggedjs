@@ -7,6 +7,7 @@ import { BaseSupport, Support } from '../Support.class.js'
 import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
 import { renderSubjectComponent } from'../render/renderSubjectComponent.function.js'
 import { setupNewSupport } from './processTag.function.js'
+import { ValueTypes } from '../ValueTypes.enum.js'
 
 /** create new support, connects globals to old support if one, and  */
 export function processSubjectComponent(
@@ -15,13 +16,13 @@ export function processSubjectComponent(
   insertBefore: InsertBefore,
   ownerSupport: BaseSupport | Support,
   options: {counts: Counts},
-  fragment ?: DocumentFragment,
 ): BaseSupport | Support {
   // Check if function component is wrapped in a tag() call
   // TODO: This below check not needed in production mode
-  if(templater.tagged !== true) {
-    const wrapper = templater.wrapper as Wrapper
-    const original = wrapper.parentWrap.original
+  const notTag = templater.tagJsType !== ValueTypes.stateRender && templater.tagged !== true
+  if(notTag) {
+    const wrapper = templater.wrapper
+    const original: Function = wrapper?.parentWrap.original || templater as any
     let name: string | undefined = original.name || original.constructor?.name
 
     if(name === 'Function') {
@@ -59,11 +60,9 @@ export function processSubjectComponent(
     reSupport,
     subject, // The element set here will be removed from document. Also result.tag will be added in here
     options,
-    fragment,
   )
 
-  // subject.support = newSupport
-  ownerSupport.subject.global.childTags.push(newSupport as Support)
+  ownerSupport.subject.global.childTags.push(newSupport)
 
   return reSupport
 }

@@ -1,11 +1,10 @@
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { TagWrapper } from './tag.utils.js'
-import { Callback, findTagToCallback, runTagCallback } from'../interpolations/bindSubjectCallback.function.js'
-import { BaseSupport, Support } from './Support.class.js'
+import { AnySupport, BaseSupport, Support } from './Support.class.js'
 import { TagSubject } from '../subject.types.js'
 import { castProps } from'../alterProp.function.js'
 import { setUse } from '../state/setUse.function.js'
-import { Tag } from './Tag.class.js'
+import { StringTag } from './Tag.class.js'
 import { State } from '../state/state.utils.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { html } from './html.js'
@@ -38,51 +37,51 @@ export function getTagWrap(
   return wrapper as Wrapper
 }
 
-function executeWrap(
+export function executeWrap(
   stateArray:  State,
   templater: TemplaterResult,
   result: TagWrapper<any>,
-  newSupport: Support,
+  newSupport: AnySupport,
   subject: TagSubject,
-  lastSupport?: Support | BaseSupport | undefined,
+  lastSupport?: AnySupport | undefined,
 ): Support {
-  const global = newSupport.subject.global
-  ++global.renderCount
-      
-  const childSubject = templater.children
-  const lastArray = global.oldest?.templater.children.lastArray
-  if(lastArray) {
-    childSubject.lastArray = lastArray
-  }
-
-  // result.original
+  const global = subject.global
   const originalFunction = result.original // (innerTagWrap as any).original as unknown as TagComponent
+  let tag: StringTag;
+  let castedProps = []
 
-  let props = templater.props
+  ++global.renderCount
 
-  // When defined, this must be an update where my new props have already been made for me
-  let preCastedProps: Props | undefined = newSupport.propsConfig.castProps
-
-  const lastCastProps = lastSupport?.propsConfig.castProps
-  if(lastCastProps) {
-    newSupport.propsConfig.castProps = lastCastProps
-    preCastedProps = syncFunctionProps(
-      newSupport,
-      lastSupport as Support,
-      (lastSupport as Support).ownerSupport,
+  if(templater.tagJsType === ValueTypes.stateRender) {
+    tag = templater as any as StringTag
+  } else {
+    let props = templater.props
+  
+    // When defined, this must be an update where my new props have already been made for me
+    let preCastedProps: Props | undefined = newSupport.propsConfig.castProps
+  
+    const lastCastProps = lastSupport?.propsConfig.castProps
+    if(lastCastProps) {
+      newSupport.propsConfig.castProps = lastCastProps
+      preCastedProps = syncFunctionProps(
+        newSupport as Support,
+        lastSupport as Support,
+        (lastSupport as Support).ownerSupport,
+        props,
+      )
+    }
+  
+    castedProps = preCastedProps || castProps(
       props,
+      newSupport,
+      stateArray,
+      0,
     )
+    
+    tag = originalFunction(...castedProps)
   }
-
-  const castedProps = preCastedProps || castProps(
-    props,
-    newSupport,
-    stateArray,
-    0,
-  )
 
   // CALL ORIGINAL COMPONENT FUNCTION
-  let tag: Tag = originalFunction(...castedProps)
   if(tag instanceof Function) {
     tag = tag()
   }
@@ -94,11 +93,11 @@ function executeWrap(
 
   tag.templater = templater
   templater.tag = tag
-  tag.arrayValue = templater.arrayValue // tag component could have been used in array.map
+  ;(tag as any).arrayValue = (templater as any).arrayValue // tag component could have been used in array.map
 
   const support = new Support(
     templater,
-    newSupport.ownerSupport,
+    newSupport.ownerSupport as Support,
     subject,
     castedProps,
     global.renderCount
@@ -107,45 +106,9 @@ function executeWrap(
   support.subject.global = global
   // ??? this should be set by outside?
   global.oldest = global.oldest || support
-  
-  // ??? new - removed
-  // global.newest = support
 
   const nowState = setUse.memory.stateConfig.array
   support.state.push(...nowState)
-
-  if( templater.madeChildIntoSubject ) {
-    const value = childSubject.value
-    for (let index = value.length - 1; index >= 0; --index) {
-      const kid = value[index]
-      const values = kid.values
-      for (let index = values.length - 1; index >= 0; --index) {
-        const value = values[index]
-        if(!(value instanceof Function)) {
-          continue
-        }
-
-        const valuesValue = kid.values[index]
-        
-        if((valuesValue as any).isChildOverride) {
-          continue // already overwritten
-        }
-
-        // all functions need to report to me
-        kid.values[index] = function(...args: unknown[]) {
-          return runTagCallback(
-            value as Callback, // callback
-            support.ownerSupport,
-            this, // bindTo
-            args,
-            support.state, // findTagToCallback(support).state,
-          )
-        }
-        
-        ;(valuesValue as any).isChildOverride = true
-      }
-    }
-  }
 
   return support
 }

@@ -7,6 +7,7 @@ import { processAttribute } from "../processAttribute.function.js"
 import { subscribeToTemplate } from "../subscribeToTemplate.function.js"
 import { DomObjectChildren, DomObjectElement, ObjectChildren, ObjectText } from "./ObjectNode.types.js"
 
+// TODO: This could be done within exchangeParsedForValues to reduce loops
 export function attachDomElement(
   nodes: ObjectChildren,
   scope: Context,
@@ -15,14 +16,16 @@ export function attachDomElement(
   counts: Counts, // used for animation stagger computing
   owner: Element
 ): DomObjectChildren {
-  nodes.forEach((node, index) => {
+  for (let index = 0; index < nodes.length; ++index) {
+    const node = nodes[index] as DomObjectElement
     const marker = node.marker = textNode.cloneNode(false) as Text
-    // marker.textContent = `_<${index}>_`
     const subject = node.value as TagJsSubject<any>
 
     if(subject) {
+      // nodes.splice(index, 1) // placeholder will continue its life separated from domMeta
       owner.appendChild( marker )
       subject.global.placeholder = marker
+      delete (node as any).marker
       subscribeToTemplate(
         owner as any,
         marker,
@@ -30,25 +33,21 @@ export function attachDomElement(
         support, // ownerSupport,
         counts,
       )
-      return
+      continue
     }
 
     if (node.nodeName === 'text') {
-      const string = (node as ObjectText).textContent
+      const textNode = (node as any as ObjectText)
+      const string = textNode.textContent
       // parse things like &nbsp;
-      const text = new DOMParser().parseFromString(string, 'text/html')
-      const openingSpace = string.replace(/(^\s+)?.+/g,'$1')
-      const newString = openingSpace + text.documentElement.textContent as string
+      const newString = domParseString(string)
       owner.appendChild( marker )
-      node.domElement = document.createTextNode(newString)
+      textNode.domElement = document.createTextNode(newString)
       owner.appendChild( node.domElement )
-      return
+      continue
     }
   
-    node = node as DomObjectElement
-
     const domElement = node.domElement = document.createElement(node.nodeName)
-    
     owner.appendChild(domElement)
     owner.appendChild(marker)
 
@@ -68,7 +67,17 @@ export function attachDomElement(
         node.children, scope, support, fragment, counts, domElement
       )
     }
-  })
+  }
 
   return nodes as DomObjectChildren
+}
+
+export function domParseString(string: string) {
+  const text = new DOMParser().parseFromString(string, 'text/html')
+  return getLeadingSpaces(string) + text.documentElement.textContent as string
+}
+
+function getLeadingSpaces(str: string) {
+  const match = str.match(/^\s+/);
+  return match ? match[0] : '';
 }

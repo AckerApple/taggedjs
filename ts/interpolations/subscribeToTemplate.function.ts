@@ -2,7 +2,7 @@ import { InsertBefore } from './InsertBefore.type.js'
 import { InterpolateSubject, TemplateValue } from '../tag/update/processFirstSubject.utils.js'
 import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue.function.js'
 import { updateExistingValue } from '../tag/update/updateExistingValue.function.js'
-import { AnySupport, BaseSupport, Support } from '../tag/Support.class.js'
+import { AnySupport } from '../tag/Support.class.js'
 import { TemplaterResult } from '../tag/TemplaterResult.class.js'
 import { Counts } from './interpolateTemplate.js'
 import { swapInsertBefore } from '../tag/setTagPlaceholder.function.js'
@@ -26,6 +26,8 @@ export function subscribeToTemplate(
       return
     }
 
+    called = true
+
     const templater = value as TemplaterResult
     processFirstSubjectValue(
       templater,
@@ -37,8 +39,6 @@ export function subscribeToTemplate(
       },
       syncRun ? fragment : undefined,
     )
-
-    called = true
   }
 
   // TODO: may noy be needed

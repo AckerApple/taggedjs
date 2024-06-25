@@ -1,4 +1,4 @@
-import { BaseSupport, Support } from '../Support.class.js'
+import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { TagSubject } from '../../subject.types.js'
 import { isLikeTags } from'../isLikeTags.function.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
@@ -6,11 +6,11 @@ import { providersChangeCheck } from '../../state/providersChangeCheck.function.
 
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(
-  oldestSupport: Support | BaseSupport, // oldest with elements on html
-  newSupport: Support | BaseSupport, // new to be rendered
+  oldestSupport: AnySupport, // oldest with elements on html
+  newSupport: AnySupport, // new to be rendered
   ownerSupport: BaseSupport | Support, // ownerSupport
   subject: TagSubject,
-): Support {
+): AnySupport {
   const lastSupport = subject.support as Support // todo maybe not needed?
   const global = subject.global
   
@@ -36,15 +36,12 @@ export function renderExistingTag(
     ownerSupport as Support,
   )
 
-  const oldest = global.oldest || oldestSupport
-  const isLikeTag = isLikeTags(prevSupport, reSupport)
+  const isLikeTag = prevSupport && isLikeTags(prevSupport, reSupport)
   if(isLikeTag) {
-    subject.support = reSupport
+    subject.support = reSupport as Support
+    const oldest = global.oldest || oldestSupport
     oldest.updateBy(reSupport)
   }
 
-  // ??? new - added but then removed
-  // global.newest = reSupport
-  
   return reSupport
 }

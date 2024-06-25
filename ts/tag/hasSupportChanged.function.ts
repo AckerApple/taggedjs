@@ -21,22 +21,5 @@ export function hasSupportChanged(
     return propsChanged2
   }
 
-  const kidsChanged = hasKidsChanged(lastSupport, newSupport)
-  // we already know props didn't change and if kids didn't either, than don't render
-  return kidsChanged
-}
-
-export function hasKidsChanged(
-  oldSupport: BaseSupport,
-  newSupport: BaseSupport,
-): number | false {
-  const oldCloneKidValues = oldSupport.propsConfig.lastClonedKidValues
-  const newClonedKidValues = newSupport.propsConfig.lastClonedKidValues
-
-  const everySame = oldCloneKidValues.every((set, index) => {
-    const x = newClonedKidValues[index]
-    return set.every((item, index) => item === x[index])
-  })
-
-  return everySame ? false : 9
+  return false
 }

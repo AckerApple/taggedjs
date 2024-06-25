@@ -10,7 +10,7 @@ const safeReplacer = /__safeTagVar(\d+)/g
 
 function traverseAndRestore(element: ObjectElement | ObjectText) {
   if ('attributes' in element) {
-    element.attributes = element.attributes.map(attr => {
+    element.attributes = element.attributes ? element.attributes.map(attr => {
       if(attr.length === 1) {
         return attr
       }
@@ -21,7 +21,7 @@ function traverseAndRestore(element: ObjectElement | ObjectText) {
         value = variablePrefix + index + variableSuffix
       }
       return [key, value]
-    });
+    }) : []
   }
 
   if ('children' in element) {

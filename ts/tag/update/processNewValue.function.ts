@@ -1,4 +1,4 @@
-import { Tag, Dom } from '../Tag.class.js'
+import { StringTag, DomTag } from '../Tag.class.js'
 import { DisplaySubject, TagSubject } from '../../subject.types.js'
 import { ValueSubject } from '../../subject/ValueSubject.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
@@ -14,17 +14,18 @@ export function processNewValue(
 ): InterpolateSubject {
   const valueType = getValueType(value)
   switch (valueType) {
+    case ValueTypes.stateRender:
     case ValueTypes.tagComponent:
       return new TagJsSubject(value) // ownerSupport.global.value
 
     case ValueTypes.templater:
       const templater = value as TemplaterResult
-      const tag = templater.tag as Tag | Dom
+      const tag = templater.tag as StringTag | DomTag
       return processNewTag(tag, ownerSupport)
     
     case ValueTypes.tag:
     case ValueTypes.dom:
-      return processNewTag(value as Tag | Dom, ownerSupport)
+      return processNewTag(value as StringTag | DomTag, ownerSupport)
 
     case ValueTypes.subject:
       (value as any).global = getNewGlobal()
@@ -35,7 +36,7 @@ export function processNewValue(
 }
 
 function processNewTag(
-  value: Tag | Dom,
+  value: StringTag | DomTag,
   ownerSupport: Support
 ) {  
   const tag = value

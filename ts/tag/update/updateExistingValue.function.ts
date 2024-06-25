@@ -11,10 +11,12 @@ import { processSubjectComponent } from './processSubjectComponent.function.js'
 import { isLikeTags } from '../isLikeTags.function.js'
 import { getFakeTemplater, processTag, setupNewSupport } from './processTag.function.js'
 import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
-import { Tag, Dom } from '../Tag.class.js'
+import { StringTag, DomTag } from '../Tag.class.js'
 import { swapInsertBefore } from '../setTagPlaceholder.function.js'
-import { ValueTypes } from '../ValueTypes.enum.js'
+import { BasicTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { getValueType } from '../getValueType.function.js'
+
+const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender]
 
 export function updateExistingValue(
   subject: InterpolateSubject,
@@ -23,13 +25,14 @@ export function updateExistingValue(
   insertBefore: InsertBefore,
 ): TagSubject | InterpolateSubject {
   const valueType = getValueType(value)
-  
+
   checkDestroyPrevious(
     subject, value, valueType
   )
 
   // handle already seen tag components
-  if(valueType === ValueTypes.tagComponent) {
+  const isStateTag = tagTypes.includes(valueType as ValueType)
+  if(isStateTag) {
     return prepareUpdateToComponent(
       value as TemplaterResult,
       subject as TagSubject,
@@ -41,7 +44,8 @@ export function updateExistingValue(
   // was component but no longer
   const support = (subject as TagSubject).support
   if( support ) {
-    if(valueType === ValueTypes.function) {
+    const oneRender = [BasicTypes.function, ValueTypes.oneRender].includes(valueType)
+    if(oneRender) {
       return subject // its a oneRender tag
     }
 
@@ -58,7 +62,7 @@ export function updateExistingValue(
     case ValueTypes.tagArray:
       processTagArray(
         subject as TagArraySubject,
-        value as (TemplaterResult | Tag)[],
+        value as (TemplaterResult | StringTag)[],
         insertBefore, // oldInsertBefore as InsertBefore,
         ownerSupport,
         {counts: {
@@ -78,7 +82,7 @@ export function updateExistingValue(
     
     case ValueTypes.tag:
     case ValueTypes.dom:
-      const tag = value as Tag | Dom
+      const tag = value as StringTag | DomTag
       let templater = tag.templater
   
       if(!templater) {
@@ -99,7 +103,7 @@ export function updateExistingValue(
       return value as TagSubject
 
     // now its a useless function (we don't automatically call functions)
-    case ValueTypes.function:
+    case BasicTypes.function:
       if(!subject.global.placeholder) {
         subject.global.placeholder = swapInsertBefore(insertBefore)
       }
@@ -119,7 +123,7 @@ export function updateExistingValue(
 
 function handleStillTag(
   subject: TagSubject,
-  value: Tag | TemplateValue,
+  value: StringTag | TemplateValue,
   ownerSupport: BaseSupport | Support,
 ) {
   const lastSupport = subject.support
@@ -127,7 +131,7 @@ function handleStillTag(
   const isClass = isTagClass(value)
 
   if(isClass) {
-    const tag = value as Tag | Dom
+    const tag = value as StringTag | DomTag
     templater = tag.templater
     if(!templater) {
       templater = new TemplaterResult([])
@@ -135,7 +139,7 @@ function handleStillTag(
       tag.templater = templater
     }
   }
-  
+
   const valueSupport = new Support(
     templater as TemplaterResult,
     ownerSupport,
@@ -153,14 +157,6 @@ function handleStillTag(
     // ??? recently changed from above
     lastSupport.subject.global.oldest.updateBy(valueSupport)
     return
-  }
-
-  if(isSameTag) {
-    return processTag(
-      templater as TemplaterResult,
-      ownerSupport,
-      subject,
-    )
   }
 
   return processRegularValue(

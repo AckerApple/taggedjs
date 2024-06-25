@@ -1,11 +1,12 @@
-import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js"
-import { DomObjectElement, ObjectElement, ObjectText } from "./ObjectNode.types.js"
-import { replacePlaceholders } from "./replacePlaceholders.function.js"
-import { restorePlaceholders } from "./restorePlaceholders.function.js"
+/* best */
 
+import { variablePrefix, variableSuffix } from "../../tag/Tag.class.js"
+import { Attribute, DomObjectElement, ObjectElement, ObjectText } from "./ObjectNode.types.js"
+
+const fragFindAny = /(:tagvar\d+:)/
 const fragReplacer = /(^:tagvar\d+:|:tagvar\d+:$)/g
 const safeVar = '__safeTagVar'
-const regexAttr = /([:_a-zA-Z0-9\-\.]+)(?:="([^"]*)"|=(\S+))?/g;
+const regexAttr = /([:_a-zA-Z0-9\-\.]+)\s*(?:=\s*"([^"]*)"|=\s*(\S+))?/g;
 const regexTagOrg = /<\/?([a-zA-Z0-9\-]+)([^>]*)>/
 
 export function htmlInterpolationToDomMeta(
@@ -27,23 +28,11 @@ export function htmlInterpolationToDomMeta(
   return parsedElements
 }
 
-export function exchangeParsedForValues(
-  parsedElements: (ObjectElement | ObjectText)[],
-  values: unknown[],
-) {
-  // Replace placeholders with actual dynamic values
-  replacePlaceholders(parsedElements, values)
-  
-  // Restore any sanitized placeholders in text nodes
-  restorePlaceholders(parsedElements)
-
-  return parsedElements
-}
-
 function sanitizePlaceholders(fragments: string[]) {
   return fragments.map(fragment =>
-    fragment.replace(fragReplacer,
-    (match, index) => safeVar + index)
+    fragment.replace(
+      fragReplacer,
+      (match, index) => safeVar + index)
   )
 }
 
@@ -72,6 +61,8 @@ function parseHTML(html: string): (DomObjectElement | ObjectText)[] {
   let position = 0;
   const regexTag = new RegExp(regexTagOrg, 'g')
 
+  html = preprocessTagsInComments(html)
+
   while (position < html.length) {
     const tagMatch = regexTag.exec(html);
 
@@ -86,19 +77,10 @@ function parseHTML(html: string): (DomObjectElement | ObjectText)[] {
     if (position < tagMatch.index) {
       const textContent = html.slice(position, tagMatch.index);
       if (textContent.trim()) {
-        const textNode: ObjectText = {
-          nodeName: 'text',
-          textContent // : textContent.trim() ??? new removed
-        }
-
-        if (currentElement) {
-          if (!currentElement.children) {
-            currentElement.children = [];
-          }
-          currentElement.children.push(textNode);
-        } else {
-          elements.push(textNode);
-        }
+        const textVarMatches = splitByTagVar(textContent)
+        textVarMatches.forEach(textContent =>
+          pushTextTo(currentElement, elements, textContent)
+        )
       }
     }
 
@@ -109,9 +91,10 @@ function parseHTML(html: string): (DomObjectElement | ObjectText)[] {
       continue;
     }
 
+    const attributes: Attribute[] = []
     const element: ObjectElement = {
       nodeName: tagName,
-      attributes: [] as [string, any][]
+      attributes,
     };
 
     let attrMatch;
@@ -122,14 +105,18 @@ function parseHTML(html: string): (DomObjectElement | ObjectText)[] {
         const standAloneVar = attrName.slice(0, variablePrefix.length) === variablePrefix
 
         if(standAloneVar) {
-          element.attributes.push([attrName]) // the name itself is dynamic
+          attributes.push([attrName]) // the name itself is dynamic
           continue
         }
         
         attrValue = variablePrefix + (valueIndex++) + variableSuffix
       }
       
-      element.attributes.push([attrName.toLowerCase(), attrValue])
+      attributes.push([attrName.toLowerCase(), attrValue])
+    }
+
+    if(!attributes.length) {
+      delete element.attributes
     }
 
     if (currentElement) {
@@ -150,18 +137,10 @@ function parseHTML(html: string): (DomObjectElement | ObjectText)[] {
   if (position < html.length) {
     const textContent = html.slice(position);
     if (textContent.trim()) {
-      const textNode: ObjectText = {
-        nodeName: 'text',
-        textContent: textContent.trim()
-      };
-      if (currentElement) {
-        if (!currentElement.children) {
-          currentElement.children = [];
-        }
-        currentElement.children.push(textNode);
-      } else {
-        elements.push(textNode);
-      }
+      const textVarMatches = splitByTagVar(textContent)
+      textVarMatches.forEach(textContent =>
+        pushTextTo(currentElement, elements, textContent)
+      )
     }
   }
 
@@ -179,4 +158,58 @@ export function balanceArrayByArrays(
       results.push( variablePrefix + (strings.length + x - 1) + variableSuffix )
     }
   }
+}
+
+function splitByTagVar(inputString: string) {
+  // Split the string using the regular expression, keep delimiters in the output
+  const parts = inputString.split(fragFindAny);
+
+  // Filter out any empty strings from the results
+  const filteredParts = parts.filter(part => part !== '');
+
+  return filteredParts;
+}
+
+function pushTo(
+  currentElement: ObjectElement | null,
+  elements: (DomObjectElement | ObjectText)[],
+  textNode: ObjectText
+) {
+  if (currentElement) {
+    if (!currentElement.children) {
+      currentElement.children = []
+    }
+    currentElement.children.push(textNode)
+  } else {
+    elements.push(textNode)
+  }
+}
+
+function pushTextTo(
+  currentElement: ObjectElement | null,
+  elements: (DomObjectElement | ObjectText)[],
+  textContent: string
+) {
+  const textNode: ObjectText = {
+    nodeName: 'text',
+    textContent: postprocessTagsInComments(textContent),
+  }
+
+  pushTo(currentElement, elements, textNode)
+}
+
+function preprocessTagsInComments(html: string) {
+  // Use a regex to find all HTML comments
+  return html.replace(/(<!--[\s\S]*?-->)/g, function(match) {
+      // For each comment found, replace < and > inside it
+      return match.replace(/\[l t\]/g, '[l&nbsp;t]').replace(/\[g t\]/g, '[g&nbsp;t]').replace(/</g, '[l t]').replace(/>/g, '[g t]');
+  });
+}
+
+function postprocessTagsInComments(html: string) {
+  // Use a regex to find all segments that look like processed comments
+  return html.replace(/(\[l t\]!--[\s\S]*?--\[g t\])/g, function(match) {
+      // For each processed comment found, replace *lt* and *gt* back to < and >
+      return match.replace(/\[l t\]/g, '<').replace(/\[g t\]/g, '>').replace(/\[l&nbsp;t\]/g, '[l t]').replace(/\[g&nbsp;t\]/g, '[g t]')
+  });
 }

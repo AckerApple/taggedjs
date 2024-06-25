@@ -48,11 +48,9 @@ export function runTagCallback(
   const tag = findTagToCallback(support)
   const global = tag.subject.global
 
-  /*
   if(global.deleted) {
     return noData
   }
-  */
 
   const newest = global.newest as Support
   const newState = newest.state
@@ -60,10 +58,17 @@ export function runTagCallback(
     syncStates(newState, state)
   }
   // syncStates(newState, tag.state)
-  
+  // const renderCount = global.renderCount
   const method = value.bind(bindTo)  
   tag.subject.global.locked = useLocks // prevent another render from re-rendering this tag
   const callbackResult = method(...args)
+
+  /*
+  if(renderCount !== global.renderCount) {
+    // ??? new - the lock should have been respected
+    // return "no-data-ever"
+  }
+  */
 
  return afterTagCallback(tag, callbackResult, state)
 }
@@ -76,9 +81,7 @@ export function afterTagCallback(
   const global = tag.subject.global
   delete global.locked
   const blocked = global.blocked
-  // // syncStates(state, newState)
   if(blocked.length) {
-    // syncStates(tag.state, (global.newest as Support).state)
     let lastResult: BaseSupport | Support | undefined;
 
     lastResult = runBlocked(
@@ -87,7 +90,6 @@ export function afterTagCallback(
       lastResult as Support,
     )
 
-    // return lastResult
     return checkAfterCallbackPromise(
       callbackResult,
       lastResult as Support,
@@ -177,7 +179,8 @@ export function runBlocked(
       block,
       block.subject,
       block.subject.global.insertBefore as any,
-      true, // renderUp
+      // ??? recently removed
+      // false, // true, // renderUp
     )
 
     global.newest = lastResult

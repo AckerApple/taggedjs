@@ -1,26 +1,25 @@
-import { Context, Tag, Dom } from './Tag.class.js'
+import { Context, StringTag, DomTag } from './Tag.class.js'
 import { BaseSupport, Support } from './Support.class.js'
 import { Props } from '../Props.js'
-import { TagChildren, TagWrapper } from './tag.utils.js'
+import { TagWrapper } from './tag.utils.js'
 import { Provider } from '../state/providers.js'
 import { OnDestroyCallback } from '../state/onDestroy.js'
 import { TagSubject } from '../subject.types.js'
 import { OnInitCallback } from '../state/onInit.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { InsertBefore } from '../interpolations/InsertBefore.type.js'
-import { TagValues } from './html.js'
-import { Subject, ValueSubject } from '../subject/index.js'
-import { kidsToTagArraySubject } from './kidsToTagArraySubject.function.js'
+import { Subject } from '../subject/index.js'
 import { ValueTypes } from './ValueTypes.enum.js'
-import { ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
+import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 
-export type OriginalFunction = (() => Tag) & {compareTo: string}
+export type OriginalFunction = (() => StringTag) & {compareTo: string}
 
 export type Wrapper = ((
   newSupport: BaseSupport | Support,
   subject: TagSubject,
   prevSupport?: BaseSupport | Support,
 ) => Support) & {
+  tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.oneRender | typeof ValueTypes.templater
   parentWrap: TagWrapper<any>
 }
 
@@ -34,11 +33,10 @@ export type TagGlobal = {
   renderCount: number
   deleted?: true
   isApp?: boolean // root element
-  
+
   // ALWAYS template tag
   insertBefore?: InsertBefore // what element put down before
   placeholder?: Text // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
-
 
   subscriptions: Subscription<any>[] // subscriptions created by clones
   
@@ -49,8 +47,10 @@ export type TagGlobal = {
   blocked: (BaseSupport | Support)[], // renders that did not occur because an event was processing
   
   childTags: Support[], // tags on me
-  clones: Clone[],
+  // clones: Clone[],
+  htmlDomMeta: DomObjectChildren
   callbackMaker?: true
+  simpleValueElm?: Clone
 }
 
 export type Clone = (Element | Text | ChildNode)
@@ -59,41 +59,14 @@ export class TemplaterResult {
   tagJsType = ValueTypes.templater
   tagged!: boolean
   wrapper?: Wrapper
-
-  madeChildIntoSubject?: boolean
+  tag?: StringTag | DomTag
   
-  tag?: Tag | Dom
-  children: TagChildren = new ValueSubject<(Tag | Dom)[]>([])
-  arrayValue?: unknown // used for tag components used in arrays
-
-  constructor(public props: Props) {
-    (this.html as any).dom = this.dom.bind(this)
-  }
-
+  constructor(public props: Props) {}
+  
+  // ??? TODO: removed as it create arrayValue = undefined which then make `'arrayValue' in` pass as true
+  // arrayValue?: unknown // used for tag components used in arrays
   key (arrayValue: unknown) {
-    this.arrayValue = arrayValue
-    return this
-  }
-
-  /** children */
-  html(
-    strings: string[] | TemplateStringsArray,
-    ...values: TagValues
-  ) {
-    const children = new Tag(strings as string[], values)
-    const childSubject = kidsToTagArraySubject(children, this)
-    this.children = childSubject
-    return this
-  }
-
-  /** children */
-  dom(
-    strings: ObjectChildren,
-    ...values: TagValues
-  ) {
-    const children = new Dom(strings, values)
-    const childSubject = kidsToTagArraySubject(children, this)
-    this.children = childSubject
+    ;(this as any).arrayValue = arrayValue
     return this
   }
 }

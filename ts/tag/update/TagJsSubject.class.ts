@@ -21,6 +21,6 @@ export function getNewGlobal(): TagGlobal {
     oldest: undefined as any, // TODO: This needs to addressed
     blocked: [], // renders that did not occur because an event was processing
     childTags: [], // tags on me
-    clones: [], // elements on document. Needed at destroy process to know what to destroy
+    htmlDomMeta: [],
   }
 }

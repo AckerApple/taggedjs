@@ -5,7 +5,7 @@ import { renderTagOnly } from'./renderTagOnly.function.js'
 import { destroyUnlikeTags } from'./destroyUnlikeTags.function.js'
 import { softDestroySupport } from './softDestroySupport.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
-import { Dom, Tag } from '../Tag.class.js'
+import { DomTag, StringTag } from '../Tag.class.js'
 import { deepEqual } from '../../deepFunctions.js'
 
 export function renderWithSupport(
@@ -13,7 +13,7 @@ export function renderWithSupport(
   lastSupport: Support | BaseSupport | undefined, // previous
   subject: TagSubject, // events & memory
   ownerSupport?: BaseSupport | Support, // who to report to
-): Support {
+): AnySupport {
   const lastTemplater = lastSupport?.templater
   const lastTag = lastTemplater?.tag
 
@@ -36,7 +36,6 @@ export function renderWithSupport(
     }
   }
 
-
   const lastOwnerSupport = (lastSupport as Support)?.ownerSupport
   reSupport.ownerSupport = (ownerSupport || lastOwnerSupport) as Support
 
@@ -44,31 +43,30 @@ export function renderWithSupport(
 }
 
 function checkTagSoftDestroy(
-  tag: Tag | Dom,
+  tag: StringTag | DomTag,
   lastSupport: AnySupport,
-  lastTag?: Tag | Dom,
+  lastTag?: StringTag | DomTag,
 ) {
   if(tag.tagJsType===ValueTypes.dom) {
-    const lastDom = (lastTag as Dom)?.dom
-    const newDom = (tag as Dom).dom
+    const lastDom = (lastTag as DomTag)?.dom
+    const newDom = (tag as DomTag).dom
     if(!deepEqual(lastDom, newDom)) {
       softDestroySupport(lastSupport)
+      delete lastSupport.subject.global.deleted
     }
     
     return
   }
   
+  // TODO: This is classic runtime code, need to test it
   if(lastTag) {
-    if(lastTag.tagJsType === ValueTypes.dom) {
-      throw new Error('check here')
-    }
-
-    const lastStrings = (lastTag as Tag).strings
+    const lastStrings = (lastTag as StringTag).strings
     if(lastStrings) {
       const oldLength = lastStrings?.length
-      const newLength = (tag as Tag).strings.length
+      const newLength = (tag as StringTag).strings.length
       if(oldLength !== newLength) {
         softDestroySupport(lastSupport)
+        delete lastSupport.subject.global.deleted
       }
     }
   }

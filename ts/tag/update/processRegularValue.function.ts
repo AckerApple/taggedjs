@@ -5,6 +5,7 @@ import { AnySupport, Support } from '../Support.class.js'
 
 export type RegularValue = string | number | undefined | boolean
 
+/** Used during update value process */
 export function processRegularValue(
   value: RegularValue,
   subject: DisplaySubject, // could be tag via subject.tag
@@ -22,7 +23,7 @@ export function processRegularValue(
   const castedValue = castTextValue(value)
   
   // replace existing string?
-  const oldClone = subject.global.placeholder
+  const oldClone = subject.global.simpleValueElm // placeholder
   if(oldClone) {
     oldClone.textContent = castedValue
     return
@@ -34,7 +35,8 @@ export function processRegularValue(
     before, // this will be removed
   )
 
-  subject.global.placeholder = clone // remember single element put down, for future updates
+  subject.global.simpleValueElm = clone
+  // subject.global.placeholder = clone // remember single element put down, for future updates
 }
 
 export function processFirstRegularValue(
@@ -51,5 +53,6 @@ export function processFirstRegularValue(
     insertBefore, // this will be removed
   )
 
-  subject.global.placeholder = clone // remember single element put down, for future updates 
+  subject.global.simpleValueElm = clone
+  // subject.global.placeholder = clone // remember single element put down, for future updates 
 }

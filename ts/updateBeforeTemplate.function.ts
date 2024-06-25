@@ -14,7 +14,7 @@ export function updateBeforeTemplate(
   parent.insertBefore(textNode, lastFirstChild)
 
   /* remove existing nodes */
-  parent.removeChild(lastFirstChild)
+  // parent.removeChild(lastFirstChild)
 
   return textNode
 }

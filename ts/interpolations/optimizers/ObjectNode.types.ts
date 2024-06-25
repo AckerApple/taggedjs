@@ -1,24 +1,33 @@
 type ObjectNode = {
   nodeName: string
-}
-export type ObjectText = ObjectNode & {
-  textContent: string
   value?: unknown
-  domElement?: Text
   marker?: Text
+}
+
+export type ObjectText = ObjectNode & {
+  textContent: string  
+  domElement?: Text
 }
 
 export type Attribute = [string, any?] | [any]
 
 export type ObjectElement = ObjectNode & {
-  attributes: Attribute[]
-  value?: unknown
+  attributes?: Attribute[]
   children?: ObjectChildren
   domElement?: HTMLElement
-  marker?: Text
+}
+
+// A looser typing for compiled code
+export type LikeObjectElement = {
+  nodeName: string
+  textContent?: string
+  attributes?: any[],
+  children?: LikeObjectElement[]
+  domElement?: any
 }
 
 export type ObjectChildren = (ObjectText | ObjectElement)[]
+export type LikeObjectChildren = LikeObjectElement[]
 
 export type DomObjectText = ObjectText & {
   textContent: string
@@ -27,8 +36,9 @@ export type DomObjectText = ObjectText & {
 }
 export type DomObjectElement = ObjectElement & {
   attributes: [string, any][]
-  children?: DomObjectChildren
   domElement: HTMLElement
-  marker: Text
+  
+  children?: DomObjectChildren
+  marker?: Text
 }
 export type DomObjectChildren = (DomObjectText | DomObjectElement)[]

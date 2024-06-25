@@ -1,5 +1,5 @@
 import { ValueSubject } from '../subject/index.js'
-import { Dom, Tag } from './Tag.class.js'
+import { DomTag, StringTag } from './Tag.class.js'
 
 export class RouteQuery {
   get(name: string): string | undefined {
@@ -13,6 +13,9 @@ export type RouteProps = {
   query: RouteQuery
 }
 
-export type ToTag = (...props: any[]) => StateToTag | Tag | Dom | null
-export type StateToTag = () => Tag | Dom | null // Warn: do not data type arguments, let them be inferred
-export type RouteTag = (extraProps?: Record<string, any>) => Tag | Dom
+export type ToTag = ((...props: any[]) => StateToTag | StringTag | DomTag | null) & {
+  arrayValue?: unknown
+}
+
+export type StateToTag = () => StringTag | DomTag | null // Warn: do not data type arguments, let them be inferred
+export type RouteTag = (extraProps?: Record<string, any>) => StringTag | DomTag

@@ -7,7 +7,7 @@ import { TemplaterResult } from './TemplaterResult.class.js'
 import { TagValues } from'./html.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { TagJsSubject } from './update/TagJsSubject.class.js'
-import { ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
+import { LikeObjectChildren, ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 
 
 export const variablePrefix = ':tagvar'
@@ -31,26 +31,26 @@ export interface TagTemplate {
   domMeta?: ObjectChildren
 }
 
-export class BaseTag {
-  tagJsType?: string
-
-  // present only when an array. Populated by Tag.key()
-  arrayValue?: unknown
-
+export class Tag {
+  tagJsType?: typeof ValueTypes.tag | typeof ValueTypes.dom
   templater!: TemplaterResult
 
   constructor(
     public values: unknown[],
   ) {}
 
+
+  // DEPRECATED REMOVE
   /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
+  // present only when an array. Populated by Tag.key()
+  // arrayValue?: unknown
   key(arrayValue: unknown) {
-    this.arrayValue = arrayValue
+    ;(this as any).arrayValue = arrayValue
     return this
   }
 }
 
-export class Tag extends BaseTag {
+export class StringTag extends Tag {
   tagJsType = ValueTypes.tag
   children?: {strings: string[] | TemplateStringsArray, values: TagValues}
 
@@ -70,7 +70,7 @@ export class Tag extends BaseTag {
   }
 }
 
-export class Dom extends BaseTag {
+export class DomTag extends Tag {
   tagJsType = ValueTypes.dom
   children?: {dom: ObjectChildren, values: TagValues}
 
@@ -84,9 +84,10 @@ export class Dom extends BaseTag {
   html = {
     // $this: this,
     dom: (
-      dom: ObjectChildren,
+      // a loose typing for better compatibility with compiled code
+      dom: LikeObjectChildren, // ObjectChildren
       ...values: TagValues    
-    ): Dom => {
+    ): DomTag => {
       this.children = {dom, values}
       return this
     }

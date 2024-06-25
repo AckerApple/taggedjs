@@ -1,40 +1,45 @@
-import { afterElmBuild } from '../../interpolations/interpolateTemplate.js'
-import { Tag, Dom } from '../Tag.class.js'
-import { TagJsSubject } from './TagJsSubject.class.js'
+import { StringTag, DomTag } from '../Tag.class.js'
 import { TagSubject } from '../../subject.types.js'
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { ValueSubject } from '../../subject/index.js'
+import { afterChildrenBuilt } from './afterChildrenBuilt.function.js'
 import { Props } from '../../Props.js'
+import { ValueTypes } from '../ValueTypes.enum.js'
 
-/** When first time render, adds to owner childTags */
+/** When first time render, adds to owner childTags
+ * Used for BOTH inserts & updates
+*/
 export function processTag(
   templater: TemplaterResult,
   ownerSupport: AnySupport, // owner
   subject: TagSubject, // could be tag via result.tag
-): Support {
+): {support: Support, fragment: DocumentFragment} {
   let support = subject.support as any as Support
+  const firstTime = support ? false : true
   
   // first time seeing this tag?
-  if(!support) {
+  if( firstTime ) {
     support = newSupportByTemplater(templater, ownerSupport, subject)
   }
 
   subject.support = support
   support.ownerSupport = ownerSupport
-  const newFragment = support.buildBeforeElement(undefined, {counts: {added:0, removed:0}})
-  const children = [...newFragment.children]
+  const fragment = support.buildBeforeElement(undefined, {counts: {added:0, removed:0}})
+  const children = fragment.children
   const placeholder = subject.global.placeholder as Text
   const parentNode = placeholder.parentNode as ParentNode
-  parentNode.insertBefore(newFragment, placeholder)
+  parentNode.insertBefore(fragment, placeholder)
 
-  afterChildrenBuilt(children, subject, ownerSupport)
+  if( firstTime ) {
+    afterChildrenBuilt(children, subject, ownerSupport)
+  }
 
-  return support
+  return {support, fragment}
 }
 
 export function tagFakeTemplater(
-  tag: Tag | Dom
+  tag: StringTag | DomTag
 ) {
   const templater = getFakeTemplater()
   templater.tag = tag
@@ -45,17 +50,18 @@ export function tagFakeTemplater(
 
 export function getFakeTemplater() {
   const fake = {
-    children: new ValueSubject<Tag[]>([]), // no children
+    children: new ValueSubject<StringTag[]>([]), // no children
     
     // props: {} as Props,
     props: [] as Props,
     
     isTag: true,
-    tagJsType: 'templater',
+    tagJsType: ValueTypes.templater,
     tagged: false,
     html: () => fake,
     dom: () => fake,
     key: () => fake,
+    type: 'fake-templater',
   } as TemplaterResult
 
   return fake
@@ -74,7 +80,6 @@ export function newSupportByTemplater(
   )
 
   setupNewSupport(support, ownerSupport, subject)
-  ownerSupport.subject.global.childTags.push(support)
 
   return support
 }
@@ -90,17 +95,4 @@ export function setupNewSupport(
 
   // asking me to render will cause my parent to render
   support.ownerSupport = ownerSupport
-}
-
-export function afterChildrenBuilt(
-  children: Element[],
-  subject: TagJsSubject<any>,
-  ownerSupport: AnySupport,
-) {
-  children.forEach(x => afterElmBuild(
-    x,
-    {counts: {added:0, removed:0}},
-    subject.global.context,
-    ownerSupport,
-  ))
 }

@@ -7,6 +7,7 @@ import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { Props } from './Props.js'
 import { runBlocked } from './interpolations/bindSubjectCallback.function.js'
 import { cloneTagJsValue } from './tag/cloneValueArray.function.js'
+import { Tag } from './tag/Tag.class.js'
 
 export function castProps(
   props: Props,
@@ -52,6 +53,14 @@ export function checkProp(
   newProp?: any,
   // seen: any[] = [],
 ) {
+  if(!value) {
+    return value
+  }
+
+  if(value.tagJsType) {
+    return value
+  }
+
   if(value instanceof Function) {
     return getPropWrap(
       value, ownerSupport, stateArray,
@@ -89,8 +98,6 @@ export function checkProp(
     return value
   }
 
-  // for(const name in value){
-  // ??? new we want below
   const keys = Object.keys(value)
   for(const name of keys){
     const subValue = value[name]
@@ -101,7 +108,7 @@ export function checkProp(
     )
 
     if(value[name] === result) {
-      continue // ??? new
+      continue
     }
     
     const getset = Object.getOwnPropertyDescriptor(value, name)
@@ -260,5 +267,5 @@ export function callbackPropOwner(
 }
 
 export function isSkipPropValue(value: unknown) {
-  return typeof(value)!=='object' || !value // || isSubjectInstance(value)
+  return typeof(value)!=='object' || !value || (value as Tag).tagJsType // || isSubjectInstance(value)
 }

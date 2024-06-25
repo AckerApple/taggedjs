@@ -11,9 +11,9 @@ export function getChildTagsToDestroy(
 ): Support[] {
   for (let index = childTags.length - 1; index >= 0; --index) {
     const cTag = childTags[index]
-
     allTags.push(cTag)
-    getChildTagsToDestroy(cTag.subject.global.childTags, allTags)
+    const subTags = cTag.subject.global.childTags
+    getChildTagsToDestroy(subTags, allTags)
   }
 
   return allTags

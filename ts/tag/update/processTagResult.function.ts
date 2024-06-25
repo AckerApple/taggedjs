@@ -3,7 +3,9 @@ import { TagArraySubject } from'./processTagArray.js'
 import { TagSubject } from '../../subject.types.js'
 import { BaseSupport, Support } from '../Support.class.js'
 
-/** checks if previous support exists on subject or as a last global support. If first render, calls builder. Otherwise calls support.updateBy() */
+/** checks if previous support exists on subject or as a last global support. If first render, calls builder. Otherwise calls support.updateBy()
+ * Being used for FIRST and UPDATE renders
+*/
 export function processTagResult(
   support: Support,
   subject: TagArraySubject | TagSubject | Function, // used for recording past and current value
@@ -12,7 +14,6 @@ export function processTagResult(
   }: {
     counts: Counts
   },
-  fragment?: DocumentFragment
 ) {
   // *if appears we already have seen
   const subjectTag = subject as TagSubject
@@ -25,13 +26,12 @@ export function processTagResult(
   }
 
   const newFragment = support.buildBeforeElement(undefined, {counts})
-  //if(fragment) {
-  //  fragment.appendChild(newFragment)
-  //} else {
-    const placeholder = (subject as TagSubject).global.placeholder as Text
-    const parentNode = placeholder.parentNode as ParentNode
-    parentNode.insertBefore(newFragment, placeholder)
-  //}
+  const placeholder = subjectTag.global.placeholder as Text
+  const parentNode = placeholder.parentNode as ParentNode
+
+  // TODO: since function used for both new and update, can;t get appendChild performance boost on first
+  // parentNode.appendChild(newFragment)
+  parentNode.insertBefore(newFragment, placeholder)
 
   return support
 }

@@ -3,34 +3,51 @@ import { runBeforeRedraw, runBeforeRender } from'../tagRunner.js'
 import { runAfterRender } from'../tagRunner.js'
 import { TagSubject } from '../../subject.types.js'
 import { Wrapper } from '../TemplaterResult.class.js'
+import { ValueTypes } from '../ValueTypes.enum.js'
+import { executeWrap } from '../getTagWrap.function.js'
+import { setUse } from '../../state/setUse.function.js'
 
 export function renderTagOnly(
-  newSupport: Support | BaseSupport,
-  prevSupport: Support | BaseSupport | undefined,
+  newSupport: AnySupport,
+  prevSupport: AnySupport | undefined,
   subject: TagSubject,
-  ownerSupport?: Support | BaseSupport,
-): Support {
+  ownerSupport?: AnySupport,
+): AnySupport {
   const oldRenderCount = subject.global.renderCount
 
   beforeWithRender(newSupport, ownerSupport, prevSupport)
   
   const templater = newSupport.templater
+  let reSupport: AnySupport
 
   // NEW TAG CREATED HERE
-  const wrapper = templater.wrapper as Wrapper
-  let reSupport = wrapper(
-    newSupport,
-    subject,
-    prevSupport,
-  )
+  if(templater.tagJsType === ValueTypes.stateRender) {
+    const stateArray = setUse.memory.stateConfig.array
+    const result = templater.wrapper || {original: templater} as any
+
+    reSupport = executeWrap(
+      stateArray,
+      templater,
+      result,
+      newSupport,
+      subject,
+      prevSupport,
+    )
+  } else {
+    // functions wrapped in tag()
+    const wrapper = templater.wrapper as Wrapper
+    reSupport = wrapper(
+      newSupport,
+      subject,
+      prevSupport,
+    )
+  }
+
   /* AFTER */
 
   runAfterRender(newSupport, ownerSupport)
     
   subject.global.newest = reSupport
-  if(!prevSupport && ownerSupport) {
-    ownerSupport.subject.global.childTags.push(reSupport)
-  }
 
   // When we rendered, only 1 render should have taken place OTHERWISE rendering caused another render and that is the latest instead
   if(subject.global.renderCount > oldRenderCount + 1) {

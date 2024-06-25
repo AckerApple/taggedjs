@@ -1,4 +1,4 @@
-import { BaseSupport, Support, resetSupport } from '../Support.class.js'
+import { AnySupport, BaseSupport, Support, midDestroyChildTags, resetSupport } from '../Support.class.js'
 import { DestroyOptions, getChildTagsToDestroy } from '../destroy.support.js'
 
 /** used when a tag swaps content returned */
@@ -7,23 +7,28 @@ export function softDestroySupport(
   options: DestroyOptions = {byParent: false, stagger: 0},
 ) {
   const global = lastSupport.subject.global
-  global.deleted = true
-  // global.context = {}
-  global.context = []
   const childTags = getChildTagsToDestroy(global.childTags)
+  childTags.forEach(child => softDestroyOne(child))
+  softDestroyOne(lastSupport)
+}
 
-  lastSupport.destroySubscriptions()
+function softDestroyOne(
+  child: AnySupport
+) {
+  child.destroySubscriptions()
+  const subGlobal = child.subject.global
+  delete subGlobal.newest
+  subGlobal.deleted = true // the children are truly destroyed but the main support will be swapped
 
-  childTags.forEach(child => {
-    const subGlobal = child.subject.global
-    delete subGlobal.newest
-    subGlobal.deleted = true
-  })
-
-  lastSupport.smartRemoveKids()
-  lastSupport.subject.global.clones.length = 0 // tag maybe used for something else
-  lastSupport.subject.global.childTags.length = 0 // tag maybe used for something else
+  const simpleElm = subGlobal.simpleValueElm
+  if(simpleElm) {
+    const parentNode = simpleElm.parentNode as ParentNode
+    parentNode.removeChild(simpleElm)
+    delete subGlobal.simpleValueElm
+  }
   
-  resetSupport(lastSupport)
-  childTags.forEach(child => softDestroySupport(child, {byParent: true, stagger: 0}))
+  child.smartRemoveKids()
+  child.subject.global.htmlDomMeta.length = 0 // tag maybe used for something else
+  child.subject.global.childTags.length = 0 // tag maybe used for something else
+  resetSupport(child, 0)
 }

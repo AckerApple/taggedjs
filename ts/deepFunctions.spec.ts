@@ -29,7 +29,7 @@ describe('deepFunctions', () => {
     const x =  deepClone({date:new Date(0)})
     const y = {date: new Date(10000)}
 
-    x.date = x.date.toString()
+    x.date = x.date.toString() as any as Date
     ;(y as any).date = y.date.toString()
 
     const equal = deepEqual(x, y)

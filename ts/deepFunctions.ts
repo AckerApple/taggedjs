@@ -1,19 +1,20 @@
-import { ValueTypes } from './tag/ValueTypes.enum.js';
+import { BasicTypes, ValueTypes } from './tag/ValueTypes.enum.js';
 
-export function deepClone(
-  obj: any,
-) {
+export function deepClone<T>(
+  obj: T,
+  maxDepth = 15,
+): T {
   // return makeDeepClone(obj, new WeakMap())
-  return makeDeepClone(obj, 0)
+  return makeDeepClone(obj, maxDepth)
 }
 
 function makeDeepClone(
   obj: any,
   // visited: WeakMap<any, any>
-  depth: number
+  maxDepth: number,
 ) {
   // If obj is a primitive type or null, return it directly
-  if (obj === null || typeof obj !== ValueTypes.object) {
+  if (obj === null || typeof obj !== BasicTypes.object) {
     return obj;
   }
 
@@ -23,7 +24,7 @@ function makeDeepClone(
     return visited.get(obj)
   }
   */
- if (depth === 15) {
+ if (maxDepth < 0) {
    return obj
  }
 
@@ -46,13 +47,13 @@ function makeDeepClone(
   if (Array.isArray(obj)) {
     for (let i = 0; i < obj.length; i++) {
       // clone[i] = makeDeepClone(obj[i], visited)
-      clone[i] = makeDeepClone(obj[i], depth + 1)
+      clone[i] = makeDeepClone(obj[i], maxDepth - 1)
     }
   } else {
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
         // clone[key] = makeDeepClone(obj[key], visited)
-        clone[key] = makeDeepClone(obj[key], depth + 1)
+        clone[key] = makeDeepClone(obj[key], maxDepth - 1)
       }
     }
   }
@@ -63,16 +64,17 @@ function makeDeepClone(
 export function deepEqual(
   obj1: any,
   obj2: any,
+  maxDepth = 15,
 ) {
   // return isDeepEqual(obj1, obj2, new WeakMap())
-  return isDeepEqual(obj1, obj2, 0)
+  return isDeepEqual(obj1, obj2, maxDepth)
 }
 
 function isDeepEqual(
   obj1: any,
   obj2: any,
   // visited: WeakMap<any, any>,
-  depth: number
+  maxDepth: number
 ) {
   const directEqual = obj1 === obj2
   if (directEqual || isSameFunctions(obj1,obj2)) {
@@ -81,11 +83,11 @@ function isDeepEqual(
 
   // If obj is already visited, return the cloned reference
   // if (visited.has(obj1)) {
-  if (depth === 15) {
+  if (maxDepth < 0) {
     return true
   }
   
-  if(typeof obj1 === ValueTypes.object && typeof obj2 === ValueTypes.object) {
+  if(typeof obj1 === BasicTypes.object && typeof obj2 === BasicTypes.object) {
     // both are dates and were already determined not the same
     if(obj1 instanceof Date && obj2 instanceof Date) {
       return obj1.getTime() === obj2.getTime()
@@ -97,14 +99,14 @@ function isDeepEqual(
     // Check if obj1 and obj2 are both arrays
     if (Array.isArray(obj1) && Array.isArray(obj2)) {
       // return isArrayDeepEqual(obj1, obj2, visited)
-      return isArrayDeepEqual(obj1, obj2, depth + 1)
+      return isArrayDeepEqual(obj1, obj2, maxDepth - 1)
     } else if (Array.isArray(obj1) || Array.isArray(obj2)) {
       // One is an array, and the other is not
       return false
     }
 
     // return isObjectDeepEqual(obj1, obj2, visited)
-    return isObjectDeepEqual(obj1, obj2, depth + 1)
+    return isObjectDeepEqual(obj1, obj2, maxDepth - 1)
   }
 
   return false
@@ -115,7 +117,7 @@ function isObjectDeepEqual(
   obj1: any,
   obj2: any,
   // visited: WeakMap<any, any>,
-  depth: number,
+  maxDepth: number,
 ) {
   const keys1 = Object.keys(obj1)
   const keys2 = Object.keys(obj2)
@@ -130,7 +132,7 @@ function isObjectDeepEqual(
 
   for (const key of keys1) {
     const keyFound = keys2.includes(key)
-    if (!keyFound || !isDeepEqual(obj1[key], obj2[key], depth + 1)) {
+    if (!keyFound || !isDeepEqual(obj1[key], obj2[key], maxDepth - 1)) {
       return false
     }
   }
@@ -143,7 +145,7 @@ function isArrayDeepEqual(
   obj1: any[],
   obj2: any[],
   // visited: WeakMap<any, any>,
-  depth: number,
+  maxDepth: number,
 ) {
   if (obj1.length !== obj2.length) {
     return false
@@ -151,7 +153,7 @@ function isArrayDeepEqual(
 
   for (let i = 0; i < obj1.length; i++) {
     // if (!isDeepEqual(obj1[i], obj2[i], visited)) {
-    if (!isDeepEqual(obj1[i], obj2[i], depth + 1)) {
+    if (!isDeepEqual(obj1[i], obj2[i], maxDepth - 1)) {
       return false
     }
   }

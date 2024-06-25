@@ -1,12 +1,13 @@
 // taggedjs-no-compile
 
-import { Dom, Tag } from './Tag.class.js'
+import { DomTag, StringTag } from './Tag.class.js'
 import { setUse } from '../state/index.js'
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
-import { TagComponent, TagWrapper, tags } from './tag.utils.js'
+import { Original, TagComponent, TagWrapper, tags } from './tag.utils.js'
 import { getTagWrap } from './getTagWrap.function.js'
 import { RouteProps, RouteTag, StateToTag, ToTag } from './tag.types.js'
 import { ValueTypes } from './ValueTypes.enum.js'
+import { key } from './key.js'
 
 let tagCount = 0
 
@@ -20,7 +21,7 @@ export function tag<T extends ToTag>(
 ): TaggedFunction<T> {
   /** function developer triggers */
   const parentWrap = (function tagWrapper(
-    ...props: (T | Tag | Tag[])[]
+    ...props: (T | StringTag | StringTag[])[]
   ): TemplaterResult {
     const templater: TemplaterResult = new TemplaterResult(props)
     templater.tagJsType = ValueTypes.tagComponent
@@ -46,7 +47,7 @@ export function tag<T extends ToTag>(
 
   const tag = tagComponent as unknown as TagComponent
   parentWrap.isTag = true
-  parentWrap.original = tag
+  parentWrap.original = tag as any as Original
 
   // group tags together and have hmr pickup
   tag.tags = tags
@@ -57,27 +58,50 @@ export function tag<T extends ToTag>(
   return parentWrap as unknown as (T & {original: Function})
 }
 
+type ReturnTag = DomTag | StringTag | StateToTag | null | undefined
+
 /** Used to create a tag component that renders once and has no addition rendering cycles */
-tag.oneRender = (...props: any[]): (Dom | Tag | StateToTag) => {
-  throw new Error('Do not call function tag.oneRender but instead set it as: `(props) => tag.oneRender = (state) => html`` `')
+tag.oneRender = (): ReturnTag => {
+  throw new Error('Do not call tag.oneRender as a function but instead set it as: `(props) => tag.oneRender = () => html`` `')
 }
+
+/** Used to create variable scoping when calling a function that lives within a prop container function */
+tag.state = (): ReturnTag => {
+  throw new Error('Do not call tag.state as a function but instead set it as: `(props) => tag.state = (state) => html`` `')
+}
+
+// TODO???: Is tag.route and tag.app in use?
 
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
  */
 tag.route = (routeProps: RouteProps): StateToTag => {
-  throw new Error('Do not call function tag.route but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
+  throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
 }
+
+tag.key = key
 
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
  */
 tag.app = (routeTag: RouteTag): StateToTag => {
-  throw new Error('Do not call function tag.route but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
+  throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
 }
 
 Object.defineProperty(tag, 'oneRender', {
   set(oneRenderFunction: Function) {
-    (oneRenderFunction as any).oneRender = true
+    (oneRenderFunction as Wrapper).tagJsType = ValueTypes.oneRender
+  },
+})
+
+Object.defineProperty(tag, 'state', {
+  set(renderFunction: Function) {
+    ;(renderFunction as Wrapper).parentWrap = {
+      original: {
+        setUse: setUse,
+        tags,
+      } as any as Original
+    } as TagWrapper<any>
+    ;(renderFunction as Wrapper).tagJsType = ValueTypes.stateRender
   },
 })

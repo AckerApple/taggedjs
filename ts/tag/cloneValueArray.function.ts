@@ -1,20 +1,29 @@
-import { Tag } from './Tag.class.js'
+import { StringTag } from './Tag.class.js'
 import { deepClone } from '../deepFunctions.js'
 import { TemplaterResult } from './TemplaterResult.class.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { getValueType } from './getValueType.function.js'
+import { Props } from '../Props.js'
 
-export function cloneValueArray<T>(values: (T | Tag | Tag[])[]): T[] {
-  return values.map(cloneTagJsValue)
+export function cloneValueArray<T>(
+  values: (T | StringTag | StringTag[])[]
+): T[] {
+  return values.map(cloneTagJsValue as any)
 }
 
-export function cloneTagJsValue<T>(value: T | Tag | Tag[]): T {
-  const tag = value as Tag
+/** clones only what is needed to compare differences later */
+export function cloneTagJsValue<T>(
+  value: T
+): T {
+  const tag = value as StringTag
 
   switch( getValueType(value) ) {
+    case ValueTypes.stateRender:
+      return undefined as any
+      
     case ValueTypes.tagComponent:
       const tagComponent = value as TemplaterResult
-      return deepClone(tagComponent.props)
+      return deepClone(tagComponent.props) as any
     
     case ValueTypes.dom:
     case ValueTypes.tag:
@@ -22,7 +31,7 @@ export function cloneTagJsValue<T>(value: T | Tag | Tag[]): T {
       return cloneValueArray(tag.values) as T
 
     case ValueTypes.tagArray:
-      return cloneValueArray(tag as unknown as Tag[]) as T
+      return cloneValueArray(tag as unknown as StringTag[]) as T
   }
 
   return deepClone(value)

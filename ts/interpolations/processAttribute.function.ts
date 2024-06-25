@@ -4,7 +4,7 @@ import { Context, variablePrefix } from '../tag/Tag.class.js'
 import { HowToSet, howToSetInputValue } from './interpolateAttributes.js'
 import { bindSubjectCallback } from './bindSubjectCallback.function.js'
 import { BaseSupport, Support } from '../tag/Support.class.js'
-import { ValueTypes, empty } from '../tag/ValueTypes.enum.js'
+import { BasicTypes, ValueTypes, empty } from '../tag/ValueTypes.enum.js'
 import { TagJsSubject } from '../tag/update/TagJsSubject.class.js'
 
 const INPUT = 'INPUT'
@@ -87,7 +87,7 @@ function processNameOnlyAttr(
 ) {
   // check to remove previous attribute(s)
   if(lastValue && lastValue != attrValue) {
-    if(typeof(lastValue) === ValueTypes.string) {
+    if(typeof(lastValue) === BasicTypes.string) {
       child.removeAttribute(lastValue as string)
     } else if(lastValue instanceof Object) {
       for (const name in lastValue) {
@@ -97,7 +97,7 @@ function processNameOnlyAttr(
   }
 
   // regular attributes
-  if(typeof(attrValue) === ValueTypes.string) {
+  if(typeof(attrValue) === BasicTypes.string) {
     if(!attrValue.length) {
       return
     }
@@ -204,6 +204,7 @@ function processAttributeSubjectValue(
     // access to original function
     fun.tagFunction = newAttrValue
 
+    // shorthand corrections
     if(attrName === ondoubleclick) {
       attrName = 'ondblclick'
     }
@@ -250,16 +251,19 @@ function callbackFun(
 ) {
   const wrapper = support.templater.wrapper
   const parentWrap = wrapper?.parentWrap
-  const oneRender = parentWrap?.oneRender
+  const tagJsType = wrapper?.tagJsType || parentWrap?.tagJsType
+  const oneRender = tagJsType === ValueTypes.oneRender
+  
   if(!oneRender) {
+    // tag has state and will need all functions wrapped to cause re-renders
     newAttrValue = bindSubjectCallback(newAttrValue, support)
   }
-  
+
   return processAttributeSubjectValue(
     newAttrValue,
     child,
     attrName,
     isSpecial,
     howToSet,
-  )  
+  )
 }

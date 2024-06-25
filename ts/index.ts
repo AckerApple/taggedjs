@@ -9,7 +9,7 @@ export * from './interpolations/ElementTargetEvent.interface.js'
 export * from'./interpolations/InsertBefore.type.js'
 
 export { tagElement } from './tag/tagElement.js'
-export { Tag, variablePrefix } from './tag/Tag.class.js'
+export { Tag, StringTag, DomTag, variablePrefix } from './tag/Tag.class.js'
 export { runBeforeRender } from './tag/tagRunner.js'
 export { renderSupport } from './tag/render/renderSupport.function.js'
 export { renderWithSupport } from './tag/render/renderWithSupport.function.js'
@@ -19,6 +19,7 @@ import { renderTagOnly } from './tag/render/renderTagOnly.function.js'
 import { renderSupport } from './tag/render/renderSupport.function.js'
 import { renderWithSupport } from './tag/render/renderWithSupport.function.js'
 import { tagElement } from './tag/tagElement.js'
+export { key } from './tag/key.js'
 export const hmr = {
   tagElement, renderWithSupport, renderSupport,
   renderTagOnly,

@@ -1,17 +1,19 @@
 import { DisplaySubject, TagSubject } from '../subject.types.js'
-import { isStaticTag } from'../isInstance.js'
+import { isSimpleType, isStaticTag } from'../isInstance.js'
 import { InterpolateSubject } from './update/processFirstSubject.utils.js'
 import { TagArraySubject } from'./update/processTagArray.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { Counts } from'../interpolations/interpolateTemplate.js'
 import { destroyTagMemory } from'./destroyTag.function.js'
 import { Support } from './Support.class.js'
-import { ValueTypes } from './ValueTypes.enum.js'
+import { BasicTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
+
+const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender, ValueTypes.oneRender]
 
 export function checkDestroyPrevious(
   subject: InterpolateSubject, // existing.value is the old value
   newValue: unknown,
-  valueType: ValueTypes,
+  valueType: ValueType | BasicTypes, // new value type
 ) {
   const displaySubject = subject as DisplaySubject
   const hasLastValue = 'lastValue' in displaySubject
@@ -37,7 +39,7 @@ export function checkDestroyPrevious(
   const wasArray = arraySubject.lastArray
   
   // no longer an array
-  if (wasArray && valueType!==ValueTypes.tagArray) {
+  if (wasArray && valueType !== ValueTypes.tagArray) {
     delete arraySubject.lastArray
     
     for (let index = wasArray.array.length - 1; index >= 0; --index) {
@@ -49,66 +51,65 @@ export function checkDestroyPrevious(
   }
 
   const tagSubject = subject as TagSubject
+  const global = subject.global
   const lastSupport = tagSubject.support
   
   // no longer tag or component?
-  if(lastSupport) {
+  if(lastSupport && !global.deleted) {
     const isValueTag = isStaticTag(newValue)
-    const isSubjectTag = isStaticTag(subject._value)
+    // ??? recently changed
+    // const isSubjectTag = isStaticTag(subject._value)
+    const isSubjectTag = isStaticTag(newValue)
     const newTag = newValue as Support
     
-
     if(isSubjectTag && isValueTag) {
       // its a different tag now
       const likeTags = isLikeTags(newTag, lastSupport)
       if(!likeTags) {
-        // put template back down
         destroyTagMemory(lastSupport)
-        return 2
+        delete subject.global.deleted
+        return 'tag-swap'
       }
 
       return false
     }
 
-    if(valueType === ValueTypes.tagComponent) {
+    const isTag = tagTypes.includes(valueType as ValueType)
+    if(isTag) {
       return false // its still a tag component
-    }
-
-
-    if(newValue && (newValue as any).oneRender) {
-      return false
     }
 
     // destroy old component, value is not a component
     destroyTagMemory(lastSupport)
-    // delete lastSupport.global.deleted // ???
+    delete subject.global.deleted // prevent replacing tag from thinking it was deleted
     return 'different-tag'
   }
 
   return false
 }
 
-export function isSimpleType(value: any) {
-  return [
-    ValueTypes.string,
-    ValueTypes.number,
-    ValueTypes.boolean,
-  ].includes(value)
-}
-
 export function destroyArrayTag(
   support: Support,
   counts: Counts,
 ) {
+  const global = support.subject.global
+  const placeholder = global.placeholder as Text
+  const parentNode = placeholder.parentNode as ParentNode
+  parentNode.removeChild(placeholder)
+
+  delete global.placeholder
+
   support.destroy({
     stagger: counts.removed++,
   })
-
 }
 
 function destroySimpleValue(
   subject: DisplaySubject,
 ) {
   delete subject.lastValue
+  const elm = subject.global.simpleValueElm as Element
+  const parentNode = elm.parentNode as ParentNode
+  parentNode.removeChild(elm)
+  delete subject.global.simpleValueElm
 }
-

@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+### v2.6.0 - 7-2024
+- tag().children is now tag(children)
+
 ### v2.5.24 - 6-2024
 - performance
 - Change away from `new Subject().set = x` back to `new Subject().set(x)`

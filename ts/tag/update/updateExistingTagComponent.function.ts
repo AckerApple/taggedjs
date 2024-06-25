@@ -1,6 +1,6 @@
 import { TagSubject } from '../../subject.types.js'
 import { hasSupportChanged } from'../hasSupportChanged.function.js'
-import { BaseSupport, Support } from '../Support.class.js'
+import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { processSubjectComponent } from'./processSubjectComponent.function.js'
 import { destroyTagMemory } from'../destroyTag.function.js'
 import { renderSupport } from'../render/renderSupport.function.js'
@@ -9,15 +9,15 @@ import { castProps, isSkipPropValue } from'../../alterProp.function.js'
 import { isLikeTags } from'../isLikeTags.function.js'
 import { Props } from '../../Props.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
-import { afterChildrenBuilt } from './processTag.function.js'
+import { afterChildrenBuilt } from './afterChildrenBuilt.function.js'
 import { softDestroySupport } from '../render/softDestroySupport.function.js'
+import { ValueTypes } from '../ValueTypes.enum.js'
 
 export function updateExistingTagComponent(
   ownerSupport: BaseSupport | Support,
   support: Support, // lastest
   subject: TagSubject,
   insertBefore: InsertBefore,
-  renderUp = false,
 ): Support | BaseSupport {
   let lastSupport = subject.global.newest as BaseSupport | Support
   
@@ -31,28 +31,23 @@ export function updateExistingTagComponent(
 
     // string compare both functions
     isSameTag = oldFunction === newFunction
+  } else if(support.templater.tagJsType === ValueTypes.stateRender) {
+    // TODO: Performance, we should upgrade string compare to instead check tag creation order identifier(s)
+    isSameTag = isSameStateRenderTag(support, lastSupport)
   }
 
   const templater = support.templater
-
   if(!isSameTag) {
-    const oldestSupport = subject.global.oldest as Support
-    destroyTagMemory(oldestSupport)
-  
-    const newSupport = processSubjectComponent(
-      templater,
-      subject,
+    return swapTags(
       insertBefore,
+      subject,
+      templater,
       ownerSupport,
-      {
-        counts: {added: 0, removed: 0},
-      }
     )
-
-    return newSupport
   }
 
-  const hasChanged = hasSupportChanged(
+
+  const hasChanged = templater.tagJsType === ValueTypes.stateRender || hasSupportChanged(
     lastSupport as unknown as BaseSupport,
     support as unknown as BaseSupport,
     templater
@@ -60,23 +55,12 @@ export function updateExistingTagComponent(
 
   // everyhing has matched, no display needs updating.
   if(!hasChanged) {
-    // update function refs to use latest references
-    const newProps = templater.props
-    const castedProps = syncFunctionProps(
+    return syncSupports(
+      templater,
       support,
-      lastSupport as Support,
+      lastSupport,
       ownerSupport,
-      newProps,
     )
-
-    // When new support actually makes call to real function, use these pre casted props
-    support.propsConfig.castProps = castedProps
-    
-    // update support to think it has different cloned props
-    lastSupport.propsConfig.latestCloned = support.propsConfig.latestCloned
-    lastSupport.propsConfig.lastClonedKidValues = support.propsConfig.lastClonedKidValues
-
-    return lastSupport // its the same tag component
   }
 
   const oldest = subject.global.oldest
@@ -89,33 +73,24 @@ export function updateExistingTagComponent(
   const previous = subject.global.newest as Support
   const newSupport = renderSupport(
     support,
-    renderUp,
+    false,
   )
 
-  return afterTagRender(subject, oldest, templater, previous, newSupport, isSameTag)
+  return afterTagRender(subject, previous, newSupport, isSameTag)
 }
 
 function afterTagRender(
   subject: TagSubject,
-  oldest: BaseSupport | Support,
-  templater: TemplaterResult,
   previous: Support,
   newSupport: Support,
   isSameTag: boolean,
 ) {
   let lastSupport = subject.support
 
-  if(oldest && templater.children._value.length) {
-    const oldKidsSub = oldest.templater.children
-    oldKidsSub.next(templater.children._value)
-  }
-
   // detect if both the function is the same and the return is the same
   const isLikeTag = isSameTag && isLikeTags(previous, newSupport)
   if(isLikeTag) {
-    const oldestTag = subject.global.oldest
     subject.support = newSupport as Support
-    oldestTag.updateBy(newSupport)
     return newSupport
   }
 
@@ -124,6 +99,7 @@ function afterTagRender(
     const preGlobal = previous.subject.global
     if(!preGlobal.deleted) {
       softDestroySupport(previous)
+      delete preGlobal.deleted
     }
   }
 
@@ -141,9 +117,9 @@ function buildNewTag(
     counts: {added: 0, removed: 0},
   })
   
-  // TODO, do we need to clone?
-  const children = [...fragment.children]
-  
+  const children = fragment.children
+
+  // A placeholder was created lets put it down
   const placeholder = subject.global.placeholder as Text
   const parentNode = placeholder.parentNode as ParentNode
   parentNode.insertBefore(fragment, placeholder)
@@ -153,7 +129,6 @@ function buildNewTag(
   subject.global.oldest = newSupport
   subject.global.newest = newSupport
   subject.support = newSupport
-  newSupport.ownerSupport.subject.global.childTags.push(newSupport)
 
   return newSupport
 }
@@ -169,7 +144,7 @@ export function syncFunctionProps(
 
   if(!newest) {
     const state = ownerSupport.state
-    newPropsArray.length = 0
+    // newPropsArray.length = 0
     const castedProps = castProps(
       newPropsArray,
       newSupport,
@@ -292,7 +267,7 @@ function syncPriorPropFunction(
 
 export function moveProviders(
   lastSupport: Support,
-  newSupport: Support,
+  newSupport: AnySupport,
 ) {
   const global = lastSupport.subject.global
   global.providers.forEach(provider => {
@@ -300,9 +275,79 @@ export function moveProviders(
       const wasSameGlobals = global.destroy$ === child.subject.global.destroy$
       if(wasSameGlobals) {
         provider.children.splice(index, 1)
-        provider.children.push(newSupport)
+        provider.children.push(newSupport as Support)
         return
       }
     })
   })
+}
+
+function syncSupports(
+  templater: TemplaterResult,
+  support: Support,
+  lastSupport: AnySupport,
+  ownerSupport: AnySupport
+) {
+  // update function refs to use latest references
+  const newProps = templater.props
+  const castedProps = syncFunctionProps(
+    support,
+    lastSupport as Support,
+    ownerSupport,
+    newProps,
+  )
+
+  // When new support actually makes call to real function, use these pre casted props
+  support.propsConfig.castProps = castedProps
+  
+  // update support to think it has different cloned props
+  lastSupport.propsConfig.latestCloned = support.propsConfig.latestCloned
+
+  return lastSupport // its the same tag component  
+}
+
+function swapTags(
+  insertBefore: InsertBefore,
+  subject: TagSubject,
+  templater: TemplaterResult,
+  ownerSupport: AnySupport
+) {
+  const global = subject.global
+  if(global.deleted) {
+    throw new Error('isSameTag already deleted')
+  }
+
+  const oldestSupport = global.oldest as Support
+  destroyTagMemory(oldestSupport)
+  // ??? - new added
+  delete subject.global.deleted
+
+  const newSupport = processSubjectComponent(
+    templater,
+    subject,
+    insertBefore,
+    ownerSupport,
+    {
+      counts: {added: 0, removed: 0},
+    }
+  )
+
+  return newSupport
+}
+
+function isSameStateRenderTag(
+  newSupport: AnySupport,
+  lastSupport: AnySupport,
+) {
+  return isSameStateFunTag(
+    newSupport.templater,
+    lastSupport.templater,
+  )
+}
+
+export function isSameStateFunTag(
+  newTemplater: TemplaterResult,
+  lastTemplater?: TemplaterResult,
+) {
+  return lastTemplater !== undefined && newTemplater.toString() === lastTemplater.toString()
 }

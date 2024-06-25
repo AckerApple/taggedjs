@@ -11,7 +11,6 @@ export default function callbackStateUpdate<T>(
   ...args: any[]
 ): T {
   const state = support.state  
-
   // ensure that the oldest has the latest values first
   syncStates(state, oldState)
   

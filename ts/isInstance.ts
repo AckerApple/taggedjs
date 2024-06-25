@@ -1,10 +1,18 @@
 import { SubjectLike } from './subject/subject.utils.js'
-import { Dom, Tag } from './tag/Tag.class.js'
+import { DomTag, StringTag } from './tag/Tag.class.js'
 import { TemplaterResult } from './tag/TemplaterResult.class.js'
 import { ValueTypes } from './tag/ValueTypes.enum.js'
 
+export function isSimpleType(value: any) {
+  return [
+    ValueTypes.string,
+    ValueTypes.number,
+    ValueTypes.boolean,
+  ].includes(value)
+}
+
 export function isStaticTag(
-  value?: TemplaterResult | Tag | unknown
+  value?: TemplaterResult | StringTag | unknown
 ) {
   return [
     ValueTypes.dom,
@@ -23,13 +31,14 @@ export function isTagTemplater(
 export function isTagComponent(
   value?: TemplaterResult | unknown
 ) {
-  return (value as TemplaterResult)?.tagJsType === ValueTypes.tagComponent
+  const tagType = (value as TemplaterResult)?.tagJsType
+  return tagType && [ValueTypes.tagComponent, ValueTypes.stateRender].includes(tagType)
 }
 
 export function isTagClass(
-  value?: Tag | Dom | unknown
+  value?: StringTag | DomTag | unknown
 ) {
-  const tagJsType = (value as Tag|Dom)?.tagJsType
+  const tagJsType = (value as StringTag | DomTag)?.tagJsType
   return tagJsType && [ValueTypes.tag, ValueTypes.dom].includes(tagJsType)
 }
 
@@ -42,10 +51,11 @@ export function isSubjectInstance(
 }
 
 export function isTagArray(value: unknown) {
-  return value instanceof Array && value.every(x => [
+  return value instanceof Array/* && value.every(x => [
     ValueTypes.tag,
     ValueTypes.templater,
     ValueTypes.dom,
     ValueTypes.tagComponent
-  ].includes( x?.tagJsType ))
+    ValueTypes.stateRender
+  ].includes( x?.tagJsType ))*/
 }
