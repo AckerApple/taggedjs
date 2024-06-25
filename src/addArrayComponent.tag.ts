@@ -6,7 +6,7 @@ export const addArrayComponent = tag((
 ) => (
   renderCount = letState(0)(x => [renderCount, renderCount=x]),
   _ = ++renderCount,
-  handleKeyDown = (e: InputElementTargetEvent & KeyboardEvent) => {
+  handleKeyUp = (e: InputElementTargetEvent & KeyboardEvent) => {
     if (e.key === "Enter") {
         const value = e.target.value.trim();
         addArrayItem(value)
@@ -14,7 +14,7 @@ export const addArrayComponent = tag((
     }
   },
 ) => html`
-  <input type="text" onkeydown=${handleKeyDown} onchange=${e => {addArrayItem(e.target.value);e.target.value=''}} />
+  <input type="text" onkeyup=${handleKeyUp} onchange=${e => {addArrayItem(e.target.value);e.target.value=''}} />
   <button type="button" onclick=${addArrayItem}>add by outside</button>
   ${renderCountDiv({renderCount, name:'addArrayComponent'})}
 `)

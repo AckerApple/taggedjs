@@ -13,7 +13,7 @@ import { providerDebugBase } from "./providerDebug"
 import { watchTesting } from "./watchTesting.tag"
 import { oneRender } from "./oneRender.tag"
 import funInPropsTag from "./funInProps.tag"
-import {App as todo} from "./todo/app"
+import {App as todo} from "./todo/todos.app"
 import { propsDebugMain } from "./PropsDebug.tag"
 import { arrayTests } from "./arrayTests"
 
@@ -105,7 +105,7 @@ export const App = tag(() => {
 
         <fieldset id="props-debug" style="flex:2 2 20em">
           <legend>Props Debug</legend>
-          ${propsDebugMain(undefined)}
+          ${propsDebugMain()}
         </fieldset>
 
         ${childTests(undefined)}

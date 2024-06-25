@@ -3,11 +3,17 @@ import { ADD_ITEM } from "../constants";
 import { html } from "taggedjs";
 
 export function Header(dispatch: any) {
-    const addItem = (title: string) => dispatch({ type: ADD_ITEM, payload: { title } });
+    const addItem = (title: string) => dispatch({ type: ADD_ITEM, payload: { title } })
     return html`
         <header class="header" data-testid="header">
             <h1>todos</h1>
-            ${Input({onSubmit:addItem, label:"New Todo Input", placeholder:"What needs to be done?"})}
+            ${Input({
+                onSubmit:addItem,
+                label:"New Todo Input",
+                placeholder:"What needs to be done?",
+            })}
+            <button onclick=${() => dispatch({ type: ADD_ITEM, payload: { title: 'New ' + Date.now() } })}
+            >add one</button>
         </header>
     `;
 }

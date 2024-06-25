@@ -1,5 +1,5 @@
 import { childTests } from "./childTests"
-import { Subject, callbackMaker, html, onInit, letState, tag, state, callback } from "taggedjs"
+import { Subject, callbackMaker, html, onInit, letState, tag, state } from "taggedjs"
 import { arrayTests } from "./arrayTests"
 import { tagSwitchDebug } from "./tagSwitchDebug.component"
 import { mirroring } from "./mirroring.tag"
@@ -12,7 +12,7 @@ import { watchTesting } from "./watchTesting.tag"
 import { oneRender } from "./oneRender.tag"
 import { renderCountDiv } from "./renderCount.component"
 import funInPropsTag from "./funInProps.tag"
-import {App as todo} from "./todo/app"
+import {App as todo} from "./todo/todos.app"
 import { runTests } from "./isolatedApp.test"
 
 export enum ViewTypes {
@@ -45,18 +45,14 @@ function saveScopedStorage() {
   localStorage.taggedjs = JSON.stringify(storage)
 }
 
-export default tag(() => {
-  state('isolated app state')
-  let renderCount = letState(0)(x => [renderCount, renderCount = x])
-  let appCounter = letState(0)(x => [appCounter, appCounter=x])
-  let testTimeout = letState(null)(x => [testTimeout, testTimeout=x])
-  const appCounterSubject = state(() => new Subject(appCounter))
-  const callback = callbackMaker()
-  /*
-  const cb = callback((x: number) => {
-    appCounter = x
-  })
-  */
+export default () => tag.state = (
+  _ = state('isolated app state'),
+  renderCount = letState(0)(x => [renderCount, renderCount = x]),
+  appCounter = letState(0)(x => [appCounter, appCounter=x]),
+  testTimeout = letState(null)(x => [testTimeout, testTimeout=x]),
+  appCounterSubject = state(() => new Subject(appCounter)),
+  callback = callbackMaker(),
+) => {
 
   function runTesting(manual = true) {
     const waitFor = 2000
@@ -95,18 +91,34 @@ export default tag(() => {
     }
   })
 
-  function toggleViewType(type: ViewTypes) {
-    if(storage.views.includes(type)) {
-      (storage.views = storage.views.filter(x => x !== type))
-    } else {
-      storage.views.push(type)
+  function activate(
+    type: ViewTypes,
+    checkTesting = true,
+  ) {
+    storage.views.push(type)
       
-      if(storage.autoTest) {
-        runTesting()
-      }  
+    if(checkTesting && storage.autoTest) {
+      runTesting()
+    }
+  }
+
+  function deactivate(
+    type: ViewTypes,
+  ) {
+    (storage.views = storage.views.filter(x => x !== type))      
+  }
+
+  function toggleViewType(
+    type: ViewTypes,
+    checkTesting = true,
+  ) {
+    if(storage.views.includes(type)) {
+      deactivate(type)
+    } else {
+      activate(type, checkTesting)
     }
 
-    saveScopedStorage()    
+    saveScopedStorage()
   }
 
   function toggleAutoTesting() {
@@ -131,7 +143,9 @@ export default tag(() => {
       <span>
         🍒 <span id="app-counter-subject-display">${/*appCounterSubject*/'masked'}</span>
       </span>
-      auto testing <input type="checkbox" ${storage.autoTest ? 'checked': null} onchange=${toggleAutoTesting} />
+      auto testing <input type="checkbox" ${storage.autoTest ? 'checked': null}
+        onchange=${toggleAutoTesting}
+      />
       <button type="button" onclick=${() => runTesting(true)}>run tests</button>
     </div>
 
@@ -149,6 +163,18 @@ export default tag(() => {
             <label for=${'view-type-' + type}>&nbsp;${type}</label>
           </div>
         `.key(type))}
+        <div>
+          <label onclick=${() => viewTypes.forEach(viewType => {
+            activate(viewType, false)
+            saveScopedStorage()
+          })}>&nbsp;all</label>
+        </div>
+        <div>
+          <label onclick=${() => viewTypes.forEach(viewType => {
+            deactivate(viewType)
+            saveScopedStorage()
+          })}>&nbsp;none</label>
+        </div>
       </div>
     </div>
 
@@ -164,7 +190,7 @@ export default tag(() => {
         ${storage.views.includes(ViewTypes.Props) && html`
           <fieldset style="flex:2 2 20em">
             <legend>propsDebugMain</legend>
-            ${propsDebugMain(undefined)}
+            ${propsDebugMain()}
           </fieldset>
         `}
 
@@ -254,4 +280,4 @@ export default tag(() => {
       ${renderCountDiv({renderCount, name:'isolatedApp'})}
     </div>
   `
-})
+}

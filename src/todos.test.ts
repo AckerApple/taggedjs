@@ -8,8 +8,8 @@ describe('todos', () => {
     expect(query('button[data-testid="todo-item-button"]').length).toBe(0)
     
     todoInput.value = 'one'
-    ;(todoInput as any).onkeydown({key:'Enter', target: todoInput})
-    expect(query('button[data-testid="todo-item-button"]').length).toBe(1)
+    ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
+    expect(query('button[data-testid="todo-item-button"]').length).toBe(1, 'expected one new todo')
 
     // delete it
     click('button[data-testid="todo-item-button"]')
@@ -18,7 +18,7 @@ describe('todos', () => {
   
   it('basic', () => {
     todoInput.value = 'one'
-    ;(todoInput as any).onkeydown({key:'Enter', target: todoInput})
+    ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
     // checkbox toggle
     click('input[data-testid="todo-item-toggle"]')
 
@@ -27,16 +27,16 @@ describe('todos', () => {
     expect(query('button[data-testid="todo-item-button"]').length).toBe(0)
 
     todoInput.value = 'one'
-    ;(todoInput as any).onkeydown({key:'Enter', target: todoInput})
+    ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
 
     todoInput.value = 'two'
-    ;(todoInput as any).onkeydown({key:'Enter', target: todoInput})
+    ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
     const todoToggle2 = query('input[data-testid="todo-item-toggle"]')[1] as HTMLInputElement
     todoToggle2.click()
     expect(todoToggle2.checked).toBe(true)
 
     todoInput.value = 'three'
-    ;(todoInput as any).onkeydown({key:'Enter', target: todoInput})
+    ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
     
     expect(query('input[data-testid="todo-item-toggle"]').length).toBe(3)
 
@@ -56,7 +56,7 @@ describe('todos', () => {
   it('editing', () => {
     // create todo
     todoInput.value = 'one'
-    ;(todoInput as any).onkeydown({key:'Enter', target: todoInput})
+    ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
     
     // prepare to make new todo become editable
     let event = new MouseEvent('dblclick', {
@@ -66,14 +66,24 @@ describe('todos', () => {
     });
 
     // Dispatch the event on the specified element
-    query('label[data-testid="todo-item-label"]')[0].dispatchEvent(event);
+    query('label[data-testid="todo-item-label"]')[0].dispatchEvent(event)
+    const parentNode = query('button[data-testid="todo-item-button"]')[0].parentNode as HTMLElement
+    expect(parentNode.style.display).toBe('none', 'expect the delete button hidden')
+    
+    // should have two inputs, the main and the edit
+    expect(query('input[data-testid="text-input"]').length).toBe(2)
+
     focus('input[data-testid="text-input"]')
 
     const editInput = query('input[data-testid="text-input"]')[1] as any
     editInput.value = 'two'
-    editInput.onkeydown({key:'Enter', target: editInput}) // cause save
+    editInput.onkeyup({key:'Enter', target: editInput}) // cause save
 
-    expect(query('input[data-testid="text-input"]').length).toBe(1)
+    // expect one delete button
+    expect(query('button[data-testid="todo-item-button"]').length).toBe(1)
+
+    // main input + array input
+    expect(query('input[data-testid="text-input"]').length).toBe(2)
 
     // delete 0
     clickOne('button[data-testid="todo-item-button"]')

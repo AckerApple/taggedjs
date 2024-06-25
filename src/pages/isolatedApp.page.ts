@@ -70,7 +70,7 @@ export default tag.route = tag(() => () => {
         ${views.includes('props') && html`
           <fieldset style="flex:2 2 20em">
             <legend>propsDebugMain</legend>
-            ${propsDebugMain(undefined)}
+            ${propsDebugMain()}
           </fieldset>
         `}
 

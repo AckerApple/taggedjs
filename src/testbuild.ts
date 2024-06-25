@@ -1,4 +1,4 @@
-import { BaseSupport, RouteProps, RouteQuery, RouteTag, Subject, Tag, TagSubject, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly } from 'taggedjs'
+import { BaseSupport, RouteProps, RouteQuery, RouteTag, Subject, Tag, TagSubject, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -40,10 +40,7 @@ function templaterToSupport(
   templater: TemplaterResult,
 ) {
   const subject = new Subject<any>() as TagSubject
-
-  templater.children = templater.children || new ValueSubject([])
   templater.props = templater.props || []
-
   const support = new BaseSupport(templater, subject) as any as Support
 
   readySupport(support, subject)
@@ -69,7 +66,7 @@ function templaterToHtml(
 ) {
   const support = templaterToSupport(templater)
   const context = support.subject.global.context
-  const tag = support.templater.tag as Tag
+  const tag = support.templater.tag as StringTag // TODO: most likely do not want strings below
   const template = (support.strings || tag?.strings) as string[] // support.getTemplate()
   const strings = new Array(...template) // clone
   const values = Object.values(context)
@@ -104,7 +101,7 @@ function processValue(
 
     case ValueTypes.templater:
     case ValueTypes.tag:
-      const tag = (value as any).tag as Tag
+      const tag = (value as any).tag as StringTag // ??? TODO
       const subStrings = new Array(...tag.strings) // .reverse()
       const string = subStrings.map((x, index) =>
         x + processValue(

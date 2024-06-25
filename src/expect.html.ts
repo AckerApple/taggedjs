@@ -70,7 +70,7 @@ export function testDuelCounterElements(
     let display1Element = query[0] as HTMLElement
     let ip1Check = display1Element.innerText
     const value = (Number(ip0) + increase).toString()
-    expect(ip1Check).toBe(value, () => `Expected second increase provider to be increased to ${ip0} but got ${ip1Check}`)
+    expect(ip1Check).toBe(value, () => `Expected second ${display1} increase provider to be increased to ${ip0} but got ${ip1Check}`)
    
     testCounterSelectedElements(
       buttonQuery as any as HTMLElement[],

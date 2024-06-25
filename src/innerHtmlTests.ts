@@ -1,9 +1,10 @@
-import { html, letState, tag, isSubjectInstance, isTagArray, children } from "taggedjs"
+import { html, letState, tag, isSubjectInstance, isTagArray, Tag } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
 
 export const innerHtmlTest = tag((
   _props: unknown,
   b:number,
+  children: Tag,
 ) => {
   let renderCount = letState(0)(x => [renderCount, renderCount = x])
   let counter = letState(0)(x => [counter, counter = x])
@@ -13,9 +14,9 @@ export const innerHtmlTest = tag((
   return html`<!--innerHtmlTests.js-->
     <fieldset id="innerHtmlTests-1">
       <legend>no props test</legend>
-      <div style="border:2px solid purple;">${children()}</div>
-      <div>isSubjectInstance:${isSubjectInstance(children())}</div>
-      <div>isSubjectTagArray:${isTagArray(children().value)}</div>
+      <div style="border:2px solid purple;">${children}</div>
+      <div>isSubjectInstance:${isSubjectInstance(children)}</div>
+      <div>isSubjectTagArray:${isTagArray(children)}</div>
       <button id="innerHtmlTest-counter-button"
       onclick=${() => ++counter}>increase innerHtmlTest ${counter}</button>
       <span id="innerHtmlTest-counter-display">${counter}</span>
@@ -25,7 +26,7 @@ export const innerHtmlTest = tag((
 })
 
 export const innerHtmlPropsTest = tag((
-  x: number,
+  x: number, children: Tag,
 ) => {
   let renderCount = letState(0)(x => [renderCount, renderCount = x])
   let counter = letState(0)(x => [counter, counter = x])
@@ -35,7 +36,7 @@ export const innerHtmlPropsTest = tag((
   return html`<!--innerHtmlTests.js-->
     <fieldset id="innerHtmlTests-2">
       <legend>innerHTML Props: ${x}</legend>
-      ${children()}
+      ${children}
       <button id="innerHtmlPropsTest-button" onclick=${() => ++counter}
       >increase innerHtmlPropsTest ${counter}</button>
       <span id="innerHtmlPropsTest-display">${counter}</span>

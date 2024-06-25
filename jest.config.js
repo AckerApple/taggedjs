@@ -13,7 +13,7 @@ export default {
     "node",
     "ts"
   ],
-  "rootDir": "./src",
+  "rootDir": ".",
   "testRegex": ".*(\\.spec)\\.ts$",
   "transform": {
     "^.+\\.ts$": "ts-jest"

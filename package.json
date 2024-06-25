@@ -6,6 +6,8 @@
     "start:hmr": "ts-node tagged-hmr.ts --dir \"./src\"",
     "build": "run-s build:bundle build:hmr",
     "build:bundle": "ts-node runBundleScript.ts",
+    "build:js": "rm -rf assets/js && mkdir assets/js && tsc -p tsconfig.build.json",
+    "build:compiler": "rm -rf assets/stringCastHtmlTaggedLoader && tsc -p tsconfig.build.compiler.json",
     "build:hmr": "node hmr/runBundleScript.mjs",
     "build:test": "ts-node src/testbuild.ts -p tsconfig.build.json",
     "test": "jest"

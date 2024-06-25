@@ -1,6 +1,7 @@
 import { fadeInDown, fadeOutUp } from './animations.js'
 import { renderCountDiv } from './renderCount.component.js'
-import {html, state, letState, tag} from 'taggedjs'
+import { arrayScoreData } from './arrayScoreData.tag.js'
+import { html, state, letState, tag } from 'taggedjs'
 
 const frameCount = 4
 type Player = {
@@ -9,9 +10,11 @@ type Player = {
   scores: any[]
 }
 
-export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
-  const players: Player[] = state([])
-  let renderCount: number = letState(0)(x => [renderCount, renderCount = x])
+export const arrayTests = tag(() => (
+  players: Player[] = state([]),
+  renderCount: number = letState(0)(x => [renderCount, renderCount = x]),
+  counter: number = letState(0)(x => [counter, counter = x]),
+) => {/* ArrayTests */
 
   const getNewPlayer = () => ({
     name: 'Person '+players.length,
@@ -24,6 +27,12 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
   ++renderCount
 
   return html`<!--arrayTests.js-->
+    <fieldset style="display:flex;flex-wrap:wrap;gap:1em">
+      <legend>static array test</legend>
+      ${['a','b','c'].map(x => html`<div>html ${counter} content test ${x}</div>`)}
+      <button type="button" onclick=${() => ++counter}>++counter ${counter}</button>
+    </fieldset>
+
     <div style="display:flex;flex-wrap:wrap;gap:1em">
       ${playersDisplay({players, getNewPlayer})}
     </div>
@@ -61,29 +70,6 @@ export const arrayTests = tag(function ArrayTests(){/* ArrayTests */
   `
 })
 
-const scoreData = tag((
-  {score, playerIndex}: {
-    playerIndex: number
-    score:{score: number, frame: number}
-  }
-) => {
-  let renderCount = letState(0)(x => [renderCount, renderCount = x])
-  
-  ++renderCount
-
-  return html`
-    frame:${score.frame}:
-    <button
-      id=${`score-data-${playerIndex}-${score.frame}-inside-button`}
-      onclick=${() => ++score.score}
-    >inner score button ++${score.score}</button>
-    <span id=${`score-data-${playerIndex}-${score.frame}-inside-display`}
-    >${score.score}</span>
-    <button onclick=${() => ++renderCount}>increase renderCount</button>
-    ${renderCountDiv({renderCount, name:'scoreData' + score.frame})}
-  `
-})
-
 const playersDisplay = tag(({
   players, getNewPlayer,
 }: {
@@ -102,22 +88,26 @@ const playersDisplay = tag(({
       </div>
       
       <div style="background-color:purple;padding:.5em">
-        scores:${player.scores.map((score, playerIndex) => html`
-        <div style="border:1px solid white;--animate-duration: .1s;"
-          oninit=${fadeInDown} ondestroy=${fadeOutUp}
-        >
-          <fieldset>
-            <legend>
-              <button id=${`score-data-${playerIndex}-${score.frame}-outside-button`}
-                onclick=${() => ++score.score}
-              >outer score button ++${score.score}</button>
-              <span id=${`score-data-${playerIndex}-${score.frame}-outside-display`}
-              >${score.score}</span>
-            </legend>
-            ${scoreData({score, playerIndex})}
-          </fieldset>
-        </div>
-      `.key(score))}</div>
+        scores:
+        ${player.scores.map((score, playerIndex) => {
+          return html`
+            <div style="border:1px solid white;--animate-duration: .1s;"
+              oninit=${fadeInDown} ondestroy=${fadeOutUp}
+            >
+              <fieldset>
+                <legend>
+                  <button id=${`score-data-${playerIndex}-${score.frame}-outside-button`}
+                    onclick=${() => ++score.score}
+                  >outer score button ++${score.score}</button>
+                  <span id=${`score-data-${playerIndex}-${score.frame}-outside-display`}
+                  >${score.score}</span>
+                </legend>
+                ${arrayScoreData({score, playerIndex})}
+              </fieldset>
+            </div>
+          `.key(score)})
+        }
+      </div>
       
       ${player.edit && html`
         <button onclick=${() => {

@@ -33,13 +33,13 @@ export default {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.(ts|js)x?$/,
         use: 'ts-loader',
         exclude: /node_modules/,
       },
       {
         test: /\.(js|ts)$/,  // Adjust the regex to match the files you're interested in
-        use: [path.resolve(__dirname, 'src', 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.js')] // Use the path to your loader
+        use: [path.resolve(__dirname, 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.ts')] // Use the path to your loader
       },
     ],
   },

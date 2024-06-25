@@ -5,8 +5,8 @@ export function elmCount(selector: string) {
 
 export function query(
   query: string
-) {
-  return document.querySelectorAll(query)
+): HTMLElement[] {
+  return document.querySelectorAll(query) as any as HTMLElement[] // allow .style to just work
 }
 
 export function focus(

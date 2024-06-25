@@ -40,7 +40,7 @@ describe('tagSwitching', () => {
     ;(dropdown as any).onchange({target:dropdown})
 
     expect(elmCount('#tagSwitch-1-hello')).toBe(0,'Expected no hello 1s')
-    expect(elmCount('#tagSwitch-2-hello')).toBe(0)
+    expect(elmCount('#tagSwitch-2-hello')).toBe(0, 'Expected no #tagSwitch-2-hello elements')
     expectElmCount('#tagSwitch-3-hello', 7)
     expect(elmCount('#select-tag-above')).toBe(0)
   })

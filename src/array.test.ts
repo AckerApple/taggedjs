@@ -5,9 +5,12 @@ import { describe, expect, it } from "./expect"
 describe('array testing', () => {
   it('array basics', () => {
     expect(elmCount('#array-test-push-item')).toBe(1)
+    
     const insideCount = elmCount('#score-data-0-1-inside-button')
     expect(insideCount).toBe(0)
     expect(elmCount('#score-data-0-1-outside-button')).toBe(0)
+    
+    // add player 0
     byId('array-test-push-item').click()
     expect(elmCount('#score-data-0-1-inside-button')).toBe(1)
     expect(elmCount('#score-data-0-1-outside-button')).toBe(1)
@@ -20,11 +23,14 @@ describe('array testing', () => {
     const outsideValue = outsideDisplay.innerText
     expect(indexValue).toBe(outsideValue)
 
+    // score for player 0
     insideElm.click()
     expect(insideDisplay.innerText).toBe(outsideDisplay.innerText)
+    expect(insideDisplay).toBe(byId('score-data-0-1-inside-display'), 'test element #score-data-0-1-inside-display was not redrawn')
     expect(indexValue).toBe((Number(insideDisplay.innerText) - 1).toString())
     expect(indexValue).toBe((Number(outsideDisplay.innerText) - 1).toString())
 
+    // score for player 0
     outsideElm.click()
     expect(insideDisplay.innerText).toBe(outsideDisplay.innerText)
     expect(indexValue).toBe((Number(insideDisplay.innerText) - 2).toString())

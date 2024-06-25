@@ -1,53 +1,84 @@
-const classnames = (x: any) => ''
-
-import { Input } from "./input";
-
 import { TOGGLE_ITEM, REMOVE_ITEM, UPDATE_ITEM } from "../constants";
 import { html, letState, state, tag } from "taggedjs";
 
-export const Item = tag((todo, dispatch, index) => {
-    state('item') // helpful when debugging states
-    let isWritable = letState(false)(x => [isWritable, isWritable = x]);
-    let renderCount = letState(0)(x => [renderCount, renderCount = x]);
-    const { title, completed, id } = todo;
-    
-    const toggleItem = () => dispatch({ type: TOGGLE_ITEM, payload: { id } });
-    const removeItem = () => dispatch({ type: REMOVE_ITEM, payload: { id } });
-    const updateItem = (id: string, title: string) => dispatch({ type: UPDATE_ITEM, payload: { id, title } });
+export const Item = (
+  todo: any,
+  dispatch: any,
+) => tag.state = (
+  _ = state('item'), // helpful when debugging states
+  editing = letState(false)(x => [editing, editing = x]),
+  renderCount = letState(0)(x => [renderCount, renderCount = x]),
+) => {
+  const { title, completed, id } = todo
 
-    const handleDoubleClick = () => {
-        isWritable = true
-    };
+  const toggleItem = () => dispatch({ type: TOGGLE_ITEM, payload: { id } })
+  const removeItem = () => dispatch({ type: REMOVE_ITEM, payload: { id } })
+  const updateItem = (id: string, title: string) => dispatch({ type: UPDATE_ITEM, payload: { id, title } })
 
-    const handleBlur = () => isWritable = false;
+  const handleDoubleClick = () => {
+    editing = true
+  }
 
-    const handleUpdate = (title: string) => {
-        if (title.length === 0)
-            removeItem();
-        else
-            updateItem(id, title);
+  const handleBlur = () => editing = false
 
-        isWritable = false
+  const handleUpdate = (title: string) => {
+    if (title.length === 0)
+      removeItem()
+    else
+      updateItem(id, title)
 
-        return '44s'
-    };
+    editing = false
+  }
 
-    ++renderCount
+  ++renderCount
 
-    return html`
-        <li class=${classnames({ completed: todo.completed })} data-testid="todo-item">
-            <div class="view">
-                ${isWritable ?
-                    html`${Input({onSubmit:handleUpdate, label:"Edit Todo Input", defaultValue:title, onBlur:handleBlur})} - ${title}` : html`
-                    completed:${completed}
-                    <input class="toggle" type="checkbox" data-testid="todo-item-toggle" checked=${completed} onChange=${toggleItem} />
-                    <label data-testid="todo-item-label" onDblClick=${handleDoubleClick}>
-                        ${title}
-                    </label>
-                    <button class="destroy" data-testid="todo-item-button" onClick=${removeItem}>delete</button>
-                `}
-            </div>
-            item render count: ${renderCount}
-        </li>
-    `;
-});
+  return html`
+    <li class.completed=${todo.completed}
+      style="border:1px solid orange;"
+    >
+      <div class="view">
+        editing:${editing ? 'true' : 'false'}
+
+        <div style.display=${editing ? 'none' : 'block'}>
+          <input class="toggle" type="checkbox" data-testid="todo-item-toggle" checked=${completed} onChange=${toggleItem} />
+          <label data-testid="todo-item-label" onDoubleClick=${handleDoubleClick}>
+              ${title}
+          </label>
+          <button class="destroy" data-testid="todo-item-button" onClick=${removeItem}>x</button>
+        </div>
+        
+        <div style.display=${editing ? 'block' : 'none'}>
+          <input class="new-todo" id="todo-input" type="text"
+            data-testid="text-input" autofocus
+            value=${title}
+            onblur=${handleBlur}
+            onKeyUp=${e => handleKeyUp(e,handleUpdate)}
+          />
+          <label class="visually-hidden" htmlFor="todo-input">
+            Edit Todo Input
+          </label>
+        </div>
+
+        <button class="destroy" onClick=${() => editing = !editing}
+        >edit</button>
+      </div>
+      item render count: ${renderCount}
+    </li>
+  `
+}
+
+export const hasValidMin = (value: any, min: number) => {
+  return value.length >= min;
+};
+
+export const handleKeyUp = (e: any, onSubmit: (title: string) => any) => {
+  if (e.key === "Enter") {
+      const value = e.target.value.trim();
+
+      if (!hasValidMin(value, 2))
+          return;
+
+      onSubmit(value);
+      e.target.value = "";
+  }
+};

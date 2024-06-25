@@ -10,7 +10,7 @@ export function Input({ onSubmit, placeholder, label, defaultValue, onBlur }: an
             onBlur();
     };
 
-    const handleKeyDown = (e: any) => {
+    const handleKeyChange = (e: any) => {
         if (e.key === "Enter") {
             const value = e.target.value.trim();
 
@@ -24,7 +24,17 @@ export function Input({ onSubmit, placeholder, label, defaultValue, onBlur }: an
 
     return html`
         <div class="input-container">
-            <input class="new-todo" id="todo-input" type="text" data-testid="text-input" placeholder=${placeholder} value=${defaultValue} onblur=${handleBlur} onKeyDown=${handleKeyDown} />
+            <input
+                class       = "new-todo"
+                id          = "todo-input"
+                type        = "text"
+                data-testid = "text-input"
+                placeholder = ${placeholder}
+                value       = ${defaultValue}
+                onblur      = ${handleBlur}
+                onKeyUp     = ${handleKeyChange}
+                style       = "width:100%"
+            />
             <label htmlFor="todo-input" style="visibility:hidden">
                 ${label}
             </label>

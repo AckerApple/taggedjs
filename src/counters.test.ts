@@ -50,7 +50,7 @@ describe('counters', () => {
     // test again after higher elements have had reruns
     testCounterElements('#❤️-inner-counter', '#❤️-inner-display')
   })
-
+/* TODO - bring this back
   it.skip('piped subject', () => {
     if(firstRun) {
       expect(html('#🪈-pipedSubject')).toBe('')
@@ -64,4 +64,5 @@ describe('counters', () => {
     expect(pipedSubDisplay).toBe(subjectCountDisplay, `Expected #🪈-pipedSubject value(${pipedSubDisplay}) to match #🥦-subject-counter-display value(${subjectCountDisplay})`)
     expect(html('#🪈-pipedSubject-2')).toBe(html('#🥦-subject-counter-display') )
   })
+*/
 })
