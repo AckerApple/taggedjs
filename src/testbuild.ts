@@ -1,4 +1,4 @@
-import { BaseSupport, RouteProps, RouteQuery, RouteTag, Subject, Tag, TagSubject, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag } from 'taggedjs'
+import { BaseSupport, RouteProps, RouteQuery, RouteTag, Subject, Tag, TagSubject, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag, BasicTypes } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -117,7 +117,7 @@ function processValue(
       //strings.splice(index+1, 0, tempString)
       break
     
-    case ValueTypes.function:
+    case BasicTypes.function:
       if(!(value as any).oneRender) {
         strings.splice(index + 1, 0, '"' + value.toString() + '"')
         break // its not a function we should be messing with

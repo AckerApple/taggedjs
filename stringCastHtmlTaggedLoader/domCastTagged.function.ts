@@ -15,13 +15,11 @@ export default function domCastTagged(
 
   const finalResults = stringCastHtml(code)
 
-  /*
-  if(filePath.includes('input.ts')) {
+  if(filePath.includes('providerDialog.tag.ts')) {
     console.debug('---------------')
-    console.debug(finalResults)
+    console.debug(JSON.stringify(finalResults, null, 2))
     console.debug('---------------')
   }
-  */
 
 
   // was not intended to be parsed
