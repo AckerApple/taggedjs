@@ -1,9 +1,11 @@
-import { BasicTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
+import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
 import { isSimpleType, isSubjectInstance, isTagArray } from '../isInstance.js'
 
-export function getValueType(value: any): BasicTypes | ValueType {
+export function getValueType(
+  value: any
+): ImmutableTypes | BasicTypes | ValueType {
   if(value === undefined || value === null) {
-    return ValueTypes.undefined
+    return ImmutableTypes.undefined
   }
 
   const tagJsType = value.tagJsType
@@ -12,7 +14,7 @@ export function getValueType(value: any): BasicTypes | ValueType {
   }
 
   if(value instanceof Function) {
-    return ValueTypes.function
+    return BasicTypes.function
   }
 
   const type = typeof(value)
@@ -22,7 +24,7 @@ export function getValueType(value: any): BasicTypes | ValueType {
 
   if(type === BasicTypes.object) {
     if(value instanceof Date) {
-      return ValueTypes.date
+      return BasicTypes.date
     }
 
     if (isTagArray(value)) {
@@ -34,5 +36,5 @@ export function getValueType(value: any): BasicTypes | ValueType {
     }
   }
 
-  return ValueTypes.unknown
+  return BasicTypes.unknown
 }

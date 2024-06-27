@@ -18,7 +18,6 @@ import { DomObjectChildren, ObjectChildren } from '../interpolations/optimizers/
 import { getDomMeta } from './domMetaCollector.js'
 import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js'
 import { exchangeParsedForValues } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
-import { ValueSubject } from '../subject/ValueSubject.js'
 
 export type AnySupport = (BaseSupport & {
   ownerSupport?: AnySupport
@@ -90,6 +89,7 @@ export class BaseSupport {
     let context = global.context
     context = this.update()
     
+    console.log('domMeta, context', {domMeta, context})
     exchangeParsedForValues(domMeta, context)
     attachDomElement(
       domMeta,

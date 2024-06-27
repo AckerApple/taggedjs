@@ -110,7 +110,6 @@ export function runWrapper(
   subject.global.insertBefore = insertBefore
   subject.global.placeholder = placeholder
   subject.global.oldest = subject.global.oldest || newSupport
-  // subject.next( templater )
   subject.support = newSupport as Support
   let nowSupport = newSupport
   

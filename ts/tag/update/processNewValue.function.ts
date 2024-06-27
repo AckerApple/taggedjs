@@ -13,26 +13,33 @@ export function processNewValue(
   ownerSupport: Support,
 ): InterpolateSubject {
   const valueType = getValueType(value)
+
   switch (valueType) {
     case ValueTypes.stateRender:
     case ValueTypes.tagComponent:
-      return new TagJsSubject(value) // ownerSupport.global.value
+      return new TagJsSubject(value, valueType) // ownerSupport.global.value
 
     case ValueTypes.templater:
       const templater = value as TemplaterResult
       const tag = templater.tag as StringTag | DomTag
-      return processNewTag(tag, ownerSupport)
+      const subject = processNewTag(tag, ownerSupport)
+      subject.global.nowValueType = valueType
+      return subject
     
     case ValueTypes.tag:
     case ValueTypes.dom:
-      return processNewTag(value as StringTag | DomTag, ownerSupport)
+      const htmlSubject = processNewTag(value as StringTag | DomTag, ownerSupport)
+      htmlSubject.global.nowValueType = valueType
+      return htmlSubject
 
     case ValueTypes.subject:
-      (value as any).global = getNewGlobal()
+      const newGlobal = getNewGlobal()
+      ;(value as any).global = newGlobal
       return value as InterpolateSubject
   }
 
-  return new TagJsSubject(value) as unknown as DisplaySubject
+  const subject = new TagJsSubject(value, valueType) as unknown as DisplaySubject
+  return subject
 }
 
 function processNewTag(

@@ -6,14 +6,14 @@ import { isLikeTags } from'./isLikeTags.function.js'
 import { Counts } from'../interpolations/interpolateTemplate.js'
 import { destroyTagMemory } from'./destroyTag.function.js'
 import { Support } from './Support.class.js'
-import { BasicTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
+import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
 
 const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender, ValueTypes.oneRender]
 
 export function checkDestroyPrevious(
   subject: InterpolateSubject, // existing.value is the old value
   newValue: unknown,
-  valueType: ValueType | BasicTypes, // new value type
+  valueType: ValueType | BasicTypes | ImmutableTypes, // new value type
 ) {
   const displaySubject = subject as DisplaySubject
   const hasLastValue = 'lastValue' in displaySubject

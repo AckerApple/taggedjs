@@ -22,6 +22,7 @@ export function getDomMeta(
   }
 
   domMeta = htmlInterpolationToDomMeta(strings, values)
+
   const template = {
     interpolation: undefined as any,
     string: undefined as any,

@@ -13,7 +13,7 @@ import { getFakeTemplater, processTag, setupNewSupport } from './processTag.func
 import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
 import { StringTag, DomTag } from '../Tag.class.js'
 import { swapInsertBefore } from '../setTagPlaceholder.function.js'
-import { BasicTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
+import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { getValueType } from '../getValueType.function.js'
 
 const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender]
@@ -24,7 +24,11 @@ export function updateExistingValue(
   ownerSupport: BaseSupport | Support,
   insertBefore: InsertBefore,
 ): TagSubject | InterpolateSubject {
-  const valueType = getValueType(value)
+  let valueType = subject.global.nowValueType as ValueType | BasicTypes | ImmutableTypes
+
+  if(!valueType || valueType === ValueTypes.subject) {
+    valueType = getValueType(value)
+  }
 
   checkDestroyPrevious(
     subject, value, valueType
@@ -44,7 +48,7 @@ export function updateExistingValue(
   // was component but no longer
   const support = (subject as TagSubject).support
   if( support ) {
-    const oneRender = [BasicTypes.function, ValueTypes.oneRender].includes(valueType)
+    const oneRender = [BasicTypes.function, ValueTypes.oneRender].includes(valueType as ValueType | BasicTypes)
     if(oneRender) {
       return subject // its a oneRender tag
     }
@@ -100,6 +104,7 @@ export function updateExistingValue(
       return subject
 
     case ValueTypes.subject:
+      // ;(value as any).global.nowValueType = valueType
       return value as TagSubject
 
     // now its a useless function (we don't automatically call functions)

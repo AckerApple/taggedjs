@@ -9,7 +9,7 @@ import { OnInitCallback } from '../state/onInit.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { InsertBefore } from '../interpolations/InsertBefore.type.js'
 import { Subject } from '../subject/index.js'
-import { ValueTypes } from './ValueTypes.enum.js'
+import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 
 export type OriginalFunction = (() => StringTag) & {compareTo: string}
@@ -24,6 +24,7 @@ export type Wrapper = ((
 }
 
 export type TagGlobal = {
+  nowValueType?: ImmutableTypes | ValueType | BasicTypes
   destroy$: Subject<any>
   oldest: BaseSupport | Support
   newest?: BaseSupport | Support

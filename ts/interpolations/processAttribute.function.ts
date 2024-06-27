@@ -1,10 +1,10 @@
 import { specialAttribute } from './specialAttribute.js'
 import { isSubjectInstance } from '../isInstance.js'
-import { Context, variablePrefix } from '../tag/Tag.class.js'
+import { Context } from '../tag/Tag.class.js'
 import { HowToSet, howToSetInputValue } from './interpolateAttributes.js'
 import { bindSubjectCallback } from './bindSubjectCallback.function.js'
 import { BaseSupport, Support } from '../tag/Support.class.js'
-import { BasicTypes, ValueTypes, empty } from '../tag/ValueTypes.enum.js'
+import { ImmutableTypes, ValueTypes, empty } from '../tag/ValueTypes.enum.js'
 import { TagJsSubject } from '../tag/update/TagJsSubject.class.js'
 
 const INPUT = 'INPUT'
@@ -87,7 +87,7 @@ function processNameOnlyAttr(
 ) {
   // check to remove previous attribute(s)
   if(lastValue && lastValue != attrValue) {
-    if(typeof(lastValue) === BasicTypes.string) {
+    if(typeof(lastValue) === ImmutableTypes.string) {
       child.removeAttribute(lastValue as string)
     } else if(lastValue instanceof Object) {
       for (const name in lastValue) {
@@ -97,7 +97,7 @@ function processNameOnlyAttr(
   }
 
   // regular attributes
-  if(typeof(attrValue) === BasicTypes.string) {
+  if(typeof(attrValue) === ImmutableTypes.string) {
     if(!attrValue.length) {
       return
     }

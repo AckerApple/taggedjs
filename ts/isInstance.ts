@@ -1,13 +1,13 @@
 import { SubjectLike } from './subject/subject.utils.js'
 import { DomTag, StringTag } from './tag/Tag.class.js'
 import { TemplaterResult } from './tag/TemplaterResult.class.js'
-import { ValueTypes } from './tag/ValueTypes.enum.js'
+import { ImmutableTypes, ValueTypes } from './tag/ValueTypes.enum.js'
 
 export function isSimpleType(value: any) {
   return [
-    ValueTypes.string,
-    ValueTypes.number,
-    ValueTypes.boolean,
+    ImmutableTypes.string,
+    ImmutableTypes.number,
+    ImmutableTypes.boolean,
   ].includes(value)
 }
 

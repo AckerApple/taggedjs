@@ -33,7 +33,7 @@ function traverseAndRestore(element: ObjectElement | ObjectText) {
           return
         }
 
-        child.textContent = child.textContent.replace(safeReplacer, (match, index) =>
+        child.textContent = child.textContent.replace(safeReplacer, (_match, index) =>
           variablePrefix + index + variableSuffix
         )
       }

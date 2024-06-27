@@ -9,12 +9,8 @@ import { ValueTypes } from './ValueTypes.enum.js'
 import { TagJsSubject } from './update/TagJsSubject.class.js'
 import { LikeObjectChildren, ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 
-
 export const variablePrefix = ':tagvar'
 export const variableSuffix = ':'
-export const escapeVariable = '--' + variablePrefix + '--'
-
-export const escapeSearch = new RegExp(escapeVariable, 'g')
 
 export type Context = TagJsSubject<any>[]
 

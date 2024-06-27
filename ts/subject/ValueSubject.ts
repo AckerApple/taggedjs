@@ -12,7 +12,7 @@ export class ValueSubject<T> extends Subject<T> {
   constructor(public value: T) {
     super(value)
 
-    defineValueOn(this)
+    defineValueOn(this) // if you extend this AND have a constructor, you must call this in your extension
   }
 
   subscribe(callback: ValueSubjectSubscriber<T>) {

@@ -12,20 +12,20 @@ const regexTagOrg = /<\/?([a-zA-Z0-9\-]+)([^>]*)>/
 export function htmlInterpolationToDomMeta(
   strings: string[],
   values: unknown[],
-) {
+): ParsedHtml {
   // Sanitize placeholders in the fragments
   const sanitizedFragments = sanitizePlaceholders(strings)
 
   // Add placeholders to the fragments
   const fragmentsWithPlaceholders = addPlaceholders(
-    sanitizedFragments, values
+    sanitizedFragments, values,
   )
   
   // Parse the modified fragments
   const htmlString = fragmentsWithPlaceholders.join('')
-  const parsedElements = parseHTML(htmlString)
+  const domMeta = parseHTML(htmlString)
 
-  return parsedElements
+  return domMeta
 }
 
 function sanitizePlaceholders(fragments: string[]) {
@@ -53,7 +53,10 @@ function addPlaceholders(
   return results
 }
 
-function parseHTML(html: string): (DomObjectElement | ObjectText)[] {
+type ParsedHtml = (DomObjectElement | ObjectText)[]
+
+function parseHTML(html: string): ParsedHtml {
+  const valuePositions: string[][] = []
   const elements: (DomObjectElement | ObjectText)[] = [];
   const stack: ObjectElement[] = [];
   let currentElement: ObjectElement | null = null;
@@ -101,10 +104,12 @@ function parseHTML(html: string): (DomObjectElement | ObjectText)[] {
     while ((attrMatch = regexAttr.exec(attrString)) !== null) {
       let [_, attrName, attrValueQuoted, attrValueUnquoted] = attrMatch;
       let attrValue = attrValueQuoted || attrValueUnquoted;
+      
       if (attrValue === undefined) {
         const standAloneVar = attrName.slice(0, variablePrefix.length) === variablePrefix
 
         if(standAloneVar) {
+          valuePositions.push(['attributes', attrName])
           attributes.push([attrName]) // the name itself is dynamic
           continue
         }
@@ -112,7 +117,8 @@ function parseHTML(html: string): (DomObjectElement | ObjectText)[] {
         attrValue = variablePrefix + (valueIndex++) + variableSuffix
       }
       
-      attributes.push([attrName.toLowerCase(), attrValue])
+      const fixedName = attrName.toLowerCase()
+      attributes.push([fixedName, attrValue])
     }
 
     if(!attributes.length) {

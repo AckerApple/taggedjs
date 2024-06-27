@@ -1,19 +1,32 @@
 export const empty = ''
 
-export enum BasicTypes {
-  unknown = 'unknown',
-  object = 'object',
-  date = 'date',
+export enum ImmutableTypes {
   string = 'string',
   number = 'number',
   boolean = 'boolean',
-  function = 'function',
   undefined = 'undefined',
+}
+
+export enum BasicTypes {
+  function = 'function',
+  date = 'date',
+  unknown = 'unknown',
+  object = 'object',
 }
 
 
 export type ValueType = [string]
-type ValueTypeObject = {[name: string]: ValueType}
+type ValueTypeObject = {
+  tag: ValueType
+  dom: ValueType
+  templater: ValueType
+  tagComponent: ValueType
+  tagArray: ValueType
+  subject: ValueType
+  tagJsSubject: ValueType
+  oneRender: ValueType
+  stateRender: ValueType
+}
 
 export const ValueTypes: ValueTypeObject = {  
   tag: ['html'], // html'' aka StringTag | DomTag

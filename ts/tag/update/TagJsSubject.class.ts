@@ -1,13 +1,23 @@
 import { TagGlobal } from '../TemplaterResult.class.js'
 import { BaseSupport, Support } from '../Support.class.js'
-import { Subject } from '../../subject/Subject.class.js'
+import { Subject, defineValueOn } from '../../subject/Subject.class.js'
 import { ValueSubject } from '../../subject/ValueSubject.js'
-import { ValueTypes } from '../ValueTypes.enum.js'
+import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
+import { getValueType } from '../getValueType.function.js'
 
 export class TagJsSubject<T> extends ValueSubject<T> {
   tagJsType = ValueTypes.tagJsSubject
   // travels with all renderings
   global: TagGlobal = getNewGlobal()
+
+  constructor(
+    value: any,
+    valueType?: ValueType | ImmutableTypes | BasicTypes | undefined
+  ) {
+    super(value)
+    this.global.nowValueType = valueType || getValueType(value)
+    defineValueOn(this) // if you extend this AND have a constructor, you must call this in your extension
+  }
 }
 
 export function getNewGlobal(): TagGlobal {

@@ -50,7 +50,7 @@ export function tagFakeTemplater(
 
 export function getFakeTemplater() {
   const fake = {
-    children: new ValueSubject<StringTag[]>([]), // no children
+    // children: new ValueSubject<StringTag[]>([]), // no children
     
     // props: {} as Props,
     props: [] as Props,
