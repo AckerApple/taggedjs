@@ -6,8 +6,11 @@ import { Attribute, DomObjectElement, ObjectElement, ObjectText } from "./Object
 const fragFindAny = /(:tagvar\d+:)/
 const fragReplacer = /(^:tagvar\d+:|:tagvar\d+:$)/g
 const safeVar = '__safeTagVar'
+// name?=value
 const regexAttr = /([:_a-zA-Z0-9\-\.]+)\s*(?:=\s*"([^"]*)"|=\s*(\S+))?/g;
-const regexTagOrg = /<\/?([a-zA-Z0-9\-]+)([^>]*)>/
+// const regexAttr = /([:_a-zA-Z0-9\-.]+)\s*=\s*"([^"]*)"|([:_a-zA-Z0-9\-.]+)\s*=\s*'([^']*)'|([:_a-zA-Z0-9\-.]+)\s*=\s*([^>\s]+)/g;
+// const regexTagOrg = /<\/?([a-zA-Z0-9\-]+)([^>]*)>/
+const regexTagOrg = /<\/?([a-zA-Z0-9\-]+)((?:\s+[a-zA-Z_:][\w:.\-]*(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)+\s*|\s*)\/?>/g;
 
 export function htmlInterpolationToDomMeta(
   strings: string[],
@@ -56,15 +59,15 @@ function addPlaceholders(
 type ParsedHtml = (DomObjectElement | ObjectText)[]
 
 function parseHTML(html: string): ParsedHtml {
-  const valuePositions: string[][] = []
+  const valuePositions: string[][] = [];
   const elements: (DomObjectElement | ObjectText)[] = [];
   const stack: ObjectElement[] = [];
   let currentElement: ObjectElement | null = null;
   let valueIndex = 0;
   let position = 0;
-  const regexTag = new RegExp(regexTagOrg, 'g')
+  const regexTag = new RegExp(regexTagOrg, 'g');
 
-  html = preprocessTagsInComments(html)
+  html = preprocessTagsInComments(html);
 
   while (position < html.length) {
     const tagMatch = regexTag.exec(html);
@@ -80,10 +83,10 @@ function parseHTML(html: string): ParsedHtml {
     if (position < tagMatch.index) {
       const textContent = html.slice(position, tagMatch.index);
       if (textContent.trim()) {
-        const textVarMatches = splitByTagVar(textContent)
+        const textVarMatches = splitByTagVar(textContent);
         textVarMatches.forEach(textContent =>
           pushTextTo(currentElement, elements, textContent)
-        )
+        );
       }
     }
 
@@ -94,7 +97,7 @@ function parseHTML(html: string): ParsedHtml {
       continue;
     }
 
-    const attributes: Attribute[] = []
+    const attributes: Attribute[] = [];
     const element: ObjectElement = {
       nodeName: tagName,
       attributes,
@@ -102,27 +105,31 @@ function parseHTML(html: string): ParsedHtml {
 
     let attrMatch;
     while ((attrMatch = regexAttr.exec(attrString)) !== null) {
-      let [_, attrName, attrValueQuoted, attrValueUnquoted] = attrMatch;
-      let attrValue = attrValueQuoted || attrValueUnquoted;
-      
-      if (attrValue === undefined) {
-        const standAloneVar = attrName.slice(0, variablePrefix.length) === variablePrefix
+      const attrName = attrMatch[1] || attrMatch[3] || attrMatch[5];
+      let attrValue = attrMatch[2] || attrMatch[4] || attrMatch[6];
 
-        if(standAloneVar) {
-          valuePositions.push(['attributes', attrName])
-          attributes.push([attrName]) // the name itself is dynamic
-          continue
-        }
-        
-        attrValue = variablePrefix + (valueIndex++) + variableSuffix
+      if (attrName === undefined) {
+        continue;
       }
-      
-      const fixedName = attrName.toLowerCase()
-      attributes.push([fixedName, attrValue])
+
+      if (attrValue === undefined) {
+        const standAloneVar = attrName.slice(0, variablePrefix.length) === variablePrefix;
+
+        if (standAloneVar) {
+          valuePositions.push(['attributes', attrName]);
+          attributes.push([attrName]); // the name itself is dynamic
+          continue;
+        }
+
+        attrValue = variablePrefix + (valueIndex++) + variableSuffix;
+      }
+
+      const fixedName = attrName.toLowerCase();
+      attributes.push([fixedName, attrValue]);
     }
 
-    if(!attributes.length) {
-      delete element.attributes
+    if (!attributes.length) {
+      delete element.attributes;
     }
 
     if (currentElement) {
@@ -143,10 +150,10 @@ function parseHTML(html: string): ParsedHtml {
   if (position < html.length) {
     const textContent = html.slice(position);
     if (textContent.trim()) {
-      const textVarMatches = splitByTagVar(textContent)
+      const textVarMatches = splitByTagVar(textContent);
       textVarMatches.forEach(textContent =>
         pushTextTo(currentElement, elements, textContent)
-      )
+      );
     }
   }
 

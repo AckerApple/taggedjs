@@ -65,25 +65,17 @@ function examineChild(
       const isArray = array instanceof Array // value instanceof Array
       
       if(isArray) {
+/*
         array.forEach((x: any, index: number) => {
           if(x?.tagJsType === ValueTypes.dom) {
-            // console.log('x.dom', {dom: x.dom, x})
             const domClone = [...x.dom]
-            // const loopTail = [...currentTail, index]
-            const loopTail: (string | number)[] = []
-            const newValuePositions: ValuePos[] = []
-
             // replacePlaceholders(domClone, x.values, newValuePositions, loopTail)
             return domClone
           }
 
           return x
         })
-        /*
-        valuePositions[wIndex] = {
-          pos: [...currentTail, 'value'], value: newValuePositions
-        }
-        */
+*/
       }
 
       const newPos = {pos: [...currentTail, 'value'], value}
@@ -144,7 +136,7 @@ function processAttributes(
     if (typeof value === 'string' && value.startsWith(variablePrefix)) {
       const index = parseInt(value.replace(variablePrefix, ''), 10)
       if (!isNaN(index) && index < values.length) {
-        console.log('key1', {key,index, value, newValue: values[index], valueLength: values.length})
+        // console.log('key1', {key,index, value, newValue: values[index], valueLength: values.length})
         value = values[index]
         valuePositions[index] = {key, value, isAttr: true, pos: [...currentTail, 'attributes', attrIndex, 1]} as any
       }
