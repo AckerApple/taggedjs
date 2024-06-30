@@ -1,6 +1,6 @@
 import * as path from 'path'
 import TerserPlugin from 'terser-webpack-plugin'
-import CompressionPlugin from 'compression-webpack-plugin'
+// import CompressionPlugin from 'compression-webpack-plugin'
 
 import { fileURLToPath } from 'url'
 import ResolveTsForJsPlugin from './ResolveTsForJsPlugin.class.js'
@@ -52,8 +52,10 @@ export default {
   },
   plugins: [
     new ResolveTsForJsPlugin(),
+    /*
     new CompressionPlugin({
         algorithm: 'gzip',
     }),
+    */
   ]
 }
