@@ -16,19 +16,26 @@ export function htmlInterpolationToDomMeta(
   strings: string[],
   values: unknown[],
 ): ParsedHtml {
+  htmlInterpolationToPlaceholders(strings, values)
+  
+  // Parse the modified fragments
+  const htmlString = htmlInterpolationToPlaceholders(strings, values).join('')
+  const domMeta = parseHTML(htmlString)
+
+  return domMeta
+}
+
+export function htmlInterpolationToPlaceholders(
+  strings: string[],
+  values: unknown[]
+) {
   // Sanitize placeholders in the fragments
   const sanitizedFragments = sanitizePlaceholders(strings)
 
   // Add placeholders to the fragments
-  const fragmentsWithPlaceholders = addPlaceholders(
+  return  addPlaceholders(
     sanitizedFragments, values,
   )
-  
-  // Parse the modified fragments
-  const htmlString = fragmentsWithPlaceholders.join('')
-  const domMeta = parseHTML(htmlString)
-
-  return domMeta
 }
 
 function sanitizePlaceholders(fragments: string[]) {
@@ -58,12 +65,12 @@ function addPlaceholders(
 
 type ParsedHtml = (DomObjectElement | ObjectText)[]
 
-function parseHTML(html: string): ParsedHtml {
+export function parseHTML(html: string): ParsedHtml {
   const valuePositions: string[][] = [];
   const elements: (DomObjectElement | ObjectText)[] = [];
   const stack: ObjectElement[] = [];
   let currentElement: ObjectElement | null = null;
-  let valueIndex = 0;
+  let valueIndex = -1;
   let position = 0;
   const regexTag = new RegExp(regexTagOrg, 'g');
 
@@ -84,9 +91,14 @@ function parseHTML(html: string): ParsedHtml {
       const textContent = html.slice(position, tagMatch.index);
       if (textContent.trim()) {
         const textVarMatches = splitByTagVar(textContent);
-        textVarMatches.forEach(textContent =>
+
+        textVarMatches.forEach(textContent => {
+          if(textContent.startsWith(variablePrefix)) {
+            textContent = variablePrefix + (++valueIndex) + variableSuffix
+          }
+
           pushTextTo(currentElement, elements, textContent)
-        );
+        })
       }
     }
 
@@ -106,26 +118,38 @@ function parseHTML(html: string): ParsedHtml {
     let attrMatch;
     while ((attrMatch = regexAttr.exec(attrString)) !== null) {
       const attrName = attrMatch[1] || attrMatch[3] || attrMatch[5];
-      let attrValue = attrMatch[2] || attrMatch[4] || attrMatch[6];
+      const attrChoice = attrMatch[2] || attrMatch[4] || attrMatch[6]
+      let attrValue = attrChoice
 
       if (attrName === undefined) {
         continue;
       }
 
-      if (attrValue === undefined) {
-        const standAloneVar = attrName.slice(0, variablePrefix.length) === variablePrefix;
+      const notEmpty = attrMatch[2] !== ''
+      const noValue = attrValue === undefined && notEmpty
+      const fixedName = attrName.toLowerCase()
 
+      if (noValue) {
+        const standAloneVar = attrName.slice(0, variablePrefix.length) === variablePrefix;
+        
         if (standAloneVar) {
-          valuePositions.push(['attributes', attrName]);
-          attributes.push([attrName]); // the name itself is dynamic
-          continue;
+          const valueName = variablePrefix + (++valueIndex) + variableSuffix
+          valuePositions.push(['attributes', valueName]);
+          attributes.push([valueName]); // the name itself is dynamic
+          continue
+        }
+        
+        const standAloneAttr = attrMatch[0].startsWith(attrName) && attrMatch[0].slice(attrName.length, attrMatch[0].length).search(/\s+$/) >= 0
+        if(standAloneAttr) {
+          attributes.push([fixedName])
+          continue
         }
 
-        attrValue = variablePrefix + (valueIndex++) + variableSuffix;
+        const valueName = variablePrefix + (++valueIndex) + variableSuffix
+        attrValue = valueName
       }
 
-      const fixedName = attrName.toLowerCase();
-      attributes.push([fixedName, attrValue]);
+      attributes.push([fixedName, attrValue])
     }
 
     if (!attributes.length) {
@@ -151,9 +175,12 @@ function parseHTML(html: string): ParsedHtml {
     const textContent = html.slice(position);
     if (textContent.trim()) {
       const textVarMatches = splitByTagVar(textContent);
-      textVarMatches.forEach(textContent =>
-        pushTextTo(currentElement, elements, textContent)
-      );
+      textVarMatches.forEach(textContent => {
+        if(textContent.startsWith(variablePrefix)) {
+          ++valueIndex
+        }
+        return pushTextTo(currentElement, elements, textContent)
+      })
     }
   }
 

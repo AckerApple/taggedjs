@@ -89,8 +89,17 @@ export class BaseSupport {
     let context = global.context
     context = this.update()
     
-    console.log('domMeta, context', {domMeta, context})
-    exchangeParsedForValues(domMeta, context)
+    const wrapper = (this.subject._value as any)?.wrapper
+    const original = wrapper?.parentWrap?.original
+    
+    const { valuePositions } = exchangeParsedForValues(domMeta, context)
+
+    if(original && (original.toString().includes('selectTag-wrap') || original.toString().includes('tagSwitchDebug'))) {
+      console.log('domMeta, context', {
+        domMeta, context, valuePositions,
+      })
+    }
+
     attachDomElement(
       domMeta,
       context,

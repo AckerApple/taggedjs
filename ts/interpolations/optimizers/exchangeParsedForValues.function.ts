@@ -19,12 +19,11 @@ export function exchangeParsedForValues(
   
   // ???new
   replaceHoldersByPosMaps(parsedElements, values, valuePositions)
-  // console.log('valuePositions', {valuePositions, parsedElements})
   
   // Restore any sanitized placeholders in text nodes
   restorePlaceholders(parsedElements)
 
-  return parsedElements
+  return {parsedElements, valuePositions}
 }
 
 function replaceHoldersByPosMaps(
@@ -32,7 +31,9 @@ function replaceHoldersByPosMaps(
   values: unknown[],
   valuePositions: ValuePos[],
 ) {
-  for (let index = valuePositions.length - 1; index >= 0; --index) {
+  const startIndex = valuePositions.length - 1
+
+  for (let index = startIndex; index >= 0; --index) {
     const valuePosMeta = valuePositions[index]
     replaceHolderByPosMap(parsedElements, values, valuePosMeta, index)
   }
@@ -51,14 +52,6 @@ function replaceHolderByPosMap(
   const lastName = posMap[stopAt]
   for (let index=0; index < stopAt; ++index) {
     varPart = varPart[ posMap[index] ]
-  }
-
-  if(varPart[lastName] != values[valueIndex] && typeof(varPart[lastName]) !== 'string') {
-    console.log('varPart here', {
-      varPart, lastName, valueIndex,
-      valuePosition,
-      parsedElements,
-    })
   }
 
   varPart[lastName] = values[valueIndex]

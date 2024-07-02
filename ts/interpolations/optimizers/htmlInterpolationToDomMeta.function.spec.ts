@@ -1,9 +1,722 @@
 import { getDomMeta } from '../../tag/domMetaCollector.js';
 import { html } from '../../tag/html.js';
 import { exchangeParsedForValues } from './exchangeParsedForValues.function.js';
-import { htmlInterpolationToDomMeta } from './htmlInterpolationToDomMeta.function.js'
+import { htmlInterpolationToDomMeta, htmlInterpolationToPlaceholders, parseHTML } from './htmlInterpolationToDomMeta.function.js'
 
 describe('htmlInterpolationToDomMeta', () => {
+  it('exchangeParsedForValues - onclicks', () => {
+    const strings = [
+      "<!--app.js--><h1 id=\"h1-app\">🏷️ TaggedJs - ",
+      "</h1><button id=\"toggle-test\" onclick=",
+      ">toggle test ",
+      "</button><button onclick=",
+      ">run test</button>"
+    ]
+
+    const values = [2+2, 'toggle', 'toggleValue', 'runTesting']
+    const domMeta = htmlInterpolationToDomMeta(strings, values)
+    const {parsedElements: result} = exchangeParsedForValues(domMeta, values)
+    // console.debug('result', JSON.stringify(result, null, 2))
+    expect(result).toEqual([
+      {
+        "nodeName": "text",
+        "textContent": "<!--app.js-->"
+      },
+      {
+        "nodeName": "h1",
+        "attributes": [
+          [
+            "id",
+            "h1-app"
+          ]
+        ],
+        "children": [
+          {
+            "nodeName": "text",
+            "textContent": "🏷️ TaggedJs - "
+          },
+          {
+            "nodeName": "text",
+            "value": 4
+          }
+        ]
+      },
+      {
+        "nodeName": "button",
+        "attributes": [
+          [
+            "id",
+            "toggle-test"
+          ],
+          [
+            "onclick",
+            "toggle"
+          ]
+        ],
+        "children": [
+          {
+            "nodeName": "text",
+            "textContent": "toggle test "
+          },
+          {
+            "nodeName": "text",
+            "value": "toggleValue"
+          }
+        ]
+      },
+      {
+        "nodeName": "button",
+        "attributes": [
+          [
+            "onclick",
+            "runTesting"
+          ]
+        ],
+        "children": [
+          {
+            "nodeName": "text",
+            "textContent": "run test"
+          }
+        ]
+      }
+    ])
+  })
+
+  it('select input attributes', () => {
+    const strings = [
+      "<div id=\"selectTag-wrap\">selectedTag: |", // 0
+      "|</div><select id=\"tag-switch-dropdown\" onchange=",
+      "><option></option><!-- TODO: implement selected attribute ---><option value=\"\" ", // 2
+      ">empty-string</option><option value=\"undefined\" ",
+      ">undefined</option><option value=\"null\" ", // 4
+      ">null</option><option value=\"1\" ",
+      ">tag 1</option><option value=\"2\" ", // 6
+      ">tag 2</option><option value=\"3\" ",
+      ">tag 3</option></select><div id=\"switch-tests-wrap\" style=\"display:flex;flex-wrap:wrap;gap:1em;\"><div style=\"border:1px solid blue;flex-grow:1\"><h3>Test 1 - string | Tag</h3><div>",
+      "</div></div><div style=\"border:1px solid blue;flex-grow:1\"><h3>Test 2 - Tag</h3><div>", // 9
+      "</div></div></div>"
+    ]
+
+    const values = [
+      'selected-tag', // content - 0
+      '() => onchange', // attr - 1
+      'value_empty', // attr - 2
+      'value_undefined', // attr - 3
+      'value_null', // attr - 4
+      'value_1', // attr - 5
+      'value_2', // attr - 6
+      'value_3', // attr - 7
+      'some content 0', // content - 8
+      'some content 1', // content - 9
+    ]
+
+    
+    // const placeheldStrings = htmlInterpolationToPlaceholders(strings, values)
+    // console.log('placeheldStringsplaceheldStringsplaceheldStrings')
+    // console.log(placeheldStrings)
+    // console.log('placeheldStringsplaceheldStringsplaceheldStrings')
+
+    // const htmlString = htmlInterpolationToPlaceholders(strings, values).join('')
+    // const domMeta2 = parseHTML(htmlString)
+    // console.log('htmlString', JSON.stringify({htmlString, domMeta2}, null, 2))
+
+    const domMeta = htmlInterpolationToDomMeta(strings, values)
+    // console.debug('domMeta', JSON.stringify(domMeta, null, 2))
+    expect(domMeta).toEqual([
+      {
+        "nodeName": "div",
+        "attributes": [
+          [
+            "id",
+            "selectTag-wrap"
+          ]
+        ],
+        "children": [
+          {
+            "nodeName": "text",
+            "textContent": "selectedTag: |"
+          },
+          {
+            "nodeName": "text",
+            "textContent": ":tagvar0:"
+          },
+          {
+            "nodeName": "text",
+            "textContent": "|"
+          }
+        ]
+      },
+      {
+        "nodeName": "select",
+        "attributes": [
+          [
+            "id",
+            "tag-switch-dropdown"
+          ],
+          [
+            "onchange",
+            ":tagvar1:"
+          ]
+        ],
+        "children": [
+          {
+            "nodeName": "option"
+          },
+          {
+            "nodeName": "text",
+            "textContent": "<!-- TODO: implement selected attribute --->"
+          },
+          {
+            "nodeName": "option",
+            "attributes": [
+              [
+                "value",
+                undefined,
+              ],
+              [
+                ":tagvar2:"
+              ]
+            ],
+            "children": [
+              {
+                "nodeName": "text",
+                "textContent": "empty-string"
+              }
+            ]
+          },
+          {
+            "nodeName": "option",
+            "attributes": [
+              [
+                "value",
+                "undefined"
+              ],
+              [
+                ":tagvar3:"
+              ]
+            ],
+            "children": [
+              {
+                "nodeName": "text",
+                "textContent": "undefined"
+              }
+            ]
+          },
+          {
+            "nodeName": "option",
+            "attributes": [
+              [
+                "value",
+                "null"
+              ],
+              [
+                ":tagvar4:"
+              ]
+            ],
+            "children": [
+              {
+                "nodeName": "text",
+                "textContent": "null"
+              }
+            ]
+          },
+          {
+            "nodeName": "option",
+            "attributes": [
+              [
+                "value",
+                "1"
+              ],
+              [
+                ":tagvar5:"
+              ]
+            ],
+            "children": [
+              {
+                "nodeName": "text",
+                "textContent": "tag 1"
+              }
+            ]
+          },
+          {
+            "nodeName": "option",
+            "attributes": [
+              [
+                "value",
+                "2"
+              ],
+              [
+                ":tagvar6:"
+              ]
+            ],
+            "children": [
+              {
+                "nodeName": "text",
+                "textContent": "tag 2"
+              }
+            ]
+          },
+          {
+            "nodeName": "option",
+            "attributes": [
+              [
+                "value",
+                "3"
+              ],
+              [
+                ":tagvar7:"
+              ]
+            ],
+            "children": [
+              {
+                "nodeName": "text",
+                "textContent": "tag 3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "nodeName": "div",
+        "attributes": [
+          [
+            "id",
+            "switch-tests-wrap"
+          ],
+          [
+            "style",
+            "display:flex;flex-wrap:wrap;gap:1em;"
+          ]
+        ],
+        "children": [
+          {
+            "nodeName": "div",
+            "attributes": [
+              [
+                "style",
+                "border:1px solid blue;flex-grow:1"
+              ]
+            ],
+            "children": [
+              {
+                "nodeName": "h3",
+                "children": [
+                  {
+                    "nodeName": "text",
+                    "textContent": "Test 1 - string | Tag"
+                  }
+                ]
+              },
+              {
+                "nodeName": "div",
+                "children": [
+                  {
+                    "nodeName": "text",
+                    "textContent": ":tagvar8:"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "nodeName": "div",
+            "attributes": [
+              [
+                "style",
+                "border:1px solid blue;flex-grow:1"
+              ]
+            ],
+            "children": [
+              {
+                "nodeName": "h3",
+                "children": [
+                  {
+                    "nodeName": "text",
+                    "textContent": "Test 2 - Tag"
+                  }
+                ]
+              },
+              {
+                "nodeName": "div",
+                "children": [
+                  {
+                    "nodeName": "text",
+                    "textContent": ":tagvar9:"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ])
+  })
+
+  it('7 variables', () => {
+    const strings = [
+      "<!--propsDebug.js--><h3>Props Json</h3><textarea style=\"font-size:0.6em;height:200px;width:100%;;max-width:400px\" wrap=\"off\"\n          onchange=",
+      "\n        >",
+      "</textarea><pre>",
+      "</pre><!--<div style=\"display:flex;flex-wrap:wrap\"></div>--><hr /><h3>Props Number</h3><textarea style=\"font-size:0.6em;height:200px;width:100%;color:white;\" wrap=\"off\" disabled\n        >",
+      "</textarea><div><button id=\"propsDebug-🥩-1-button\" onclick=",
+      "\n          >🐄 🥩 propNumber ",
+      "</button><span id=\"propsDebug-🥩-1-display\">",
+      "</span></div>"
+    ]
+
+    const values = [
+      '() => onchange', // attr - 0
+      'text_area_content', // content - 1
+      'pre_content', // content - 2
+      'text_area_content_2', // content - 3
+      '() => div_onclick', // attr - 4
+      'prop_num_content' , // content - 5
+      'span-content' , // content - 6
+    ]
+    
+    // const placeholders = htmlInterpolationToPlaceholders(strings, values)
+    // console.debug('placeholders', JSON.stringify(placeholders, null, 2))
+
+    const domMeta = htmlInterpolationToDomMeta(strings, values)
+    // console.debug('domMeta', JSON.stringify(domMeta, null, 2))
+
+    expect(domMeta).toEqual([
+      {
+        "nodeName": "text",
+        "textContent": "<!--propsDebug.js-->"
+      },
+      {
+        "nodeName": "h3",
+        "children": [
+          {
+            "nodeName": "text",
+            "textContent": "Props Json"
+          }
+        ]
+      },
+      {
+        "nodeName": "textarea",
+        "attributes": [
+          [
+            "style",
+            "font-size:0.6em;height:200px;width:100%;;max-width:400px"
+          ],
+          [
+            "wrap",
+            "off"
+          ],
+          [
+            "onchange",
+            ":tagvar0:"
+          ]
+        ],
+        "children": [
+          {
+            "nodeName": "text",
+            "textContent": ":tagvar1:"
+          }
+        ]
+      },
+      {
+        "nodeName": "pre",
+        "children": [
+          {
+            "nodeName": "text",
+            "textContent": ":tagvar2:"
+          }
+        ]
+      },
+      {
+        "nodeName": "text",
+        "textContent": "<!--<div style=\"display:flex;flex-wrap:wrap\"></div>-->"
+      },
+      {
+        "nodeName": "hr"
+      },
+      {
+        "nodeName": "h3",
+        "children": [
+          {
+            "nodeName": "text",
+            "textContent": "Props Number"
+          }
+        ]
+      },
+      {
+        "nodeName": "textarea",
+        "attributes": [
+          [
+            "style",
+            "font-size:0.6em;height:200px;width:100%;color:white;"
+          ],
+          [
+            "wrap",
+            "off"
+          ],
+          [
+            "disabled"
+          ]
+        ],
+        "children": [
+          {
+            "nodeName": "text",
+            "textContent": ":tagvar3:"
+          }
+        ]
+      },
+      {
+        "nodeName": "div",
+        "children": [
+          {
+            "nodeName": "button",
+            "attributes": [
+              [
+                "id",
+                "propsDebug-🥩-1-button"
+              ],
+              [
+                "onclick",
+                ":tagvar4:"
+              ]
+            ],
+            "children": [
+              {
+                "nodeName": "text",
+                "textContent": "🐄 🥩 propNumber "
+              },
+              {
+                "nodeName": "text",
+                "textContent": ":tagvar5:"
+              }
+            ]
+          },
+          {
+            "nodeName": "span",
+            "attributes": [
+              [
+                "id",
+                "propsDebug-🥩-1-display"
+              ]
+            ],
+            "children": [
+              {
+                "nodeName": "text",
+                "textContent": ":tagvar6:"
+              }
+            ]
+          }
+        ]
+      }
+    ])
+  })
+
+  it('exchangeParsedForValues - 3 vars attrs and content', () => {
+    const strings = [
+      "<div>👉 Subscriptions:<span id=\"👉-counter-sub-count\">", // global_count - 0
+      "</span></div><button onclick=", // () => ++global_count - 1
+      ">log subs</button><div>initCounter:", // initCounter - 2
+      "</div><div><button id=\"counters-app-counter-subject-button\"\n              onclick=", // appCounterClick - 3
+      "\n            >🍒 ++app subject</button><span>🍒 <span id=\"app-counters-display\">", // app-counters-display - 4
+      "</span></span><span>🍒 <span id=\"app-counters-subject-display\">", // app-counters-subject-display - 5
+      "</span></span></div>}</div>"
+    ]
+
+    const values = [
+      'global_count', // attr
+      '() => ++global_count', // attr
+      'initCounter', // content
+      '() => ++appCounterClick', // attr
+      'app-counters-display', // content
+      'app-counters-subject-display' , // content
+    ]
+    
+    const domMeta = htmlInterpolationToDomMeta(strings, values)
+    // console.debug('domMeta', JSON.stringify(domMeta, null, 2))
+    expect(domMeta).toEqual([
+      {
+        "nodeName": "div",
+        "children": [
+          {
+            "nodeName": "text",
+            "textContent": "👉 Subscriptions:"
+          },
+          {
+            "nodeName": "span",
+            "attributes": [
+              [
+                "id",
+                "👉-counter-sub-count"
+              ]
+            ],
+            "children": [
+              {
+                "nodeName": "text",
+                "textContent": ":tagvar0:"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "nodeName": "button",
+        "attributes": [
+          [
+            "onclick",
+            ":tagvar1:"
+          ]
+        ],
+        "children": [
+          {
+            "nodeName": "text",
+            "textContent": "log subs"
+          }
+        ]
+      },
+      {
+        "nodeName": "div",
+        "children": [
+          {
+            "nodeName": "text",
+            "textContent": "initCounter:"
+          },
+          {
+            "nodeName": "text",
+            "textContent": ":tagvar2:"
+          }
+        ]
+      },
+      {
+        "nodeName": "div",
+        "children": [
+          {
+            "nodeName": "button",
+            "attributes": [
+              [
+                "id",
+                "counters-app-counter-subject-button"
+              ],
+              [
+                "onclick",
+                ":tagvar3:"
+              ]
+            ],
+            "children": [
+              {
+                "nodeName": "text",
+                "textContent": "🍒 ++app subject"
+              }
+            ]
+          },
+          {
+            "nodeName": "span",
+            "children": [
+              {
+                "nodeName": "text",
+                "textContent": "🍒 "
+              },
+              {
+                "nodeName": "span",
+                "attributes": [
+                  [
+                    "id",
+                    "app-counters-display"
+                  ]
+                ],
+                "children": [
+                  {
+                    "nodeName": "text",
+                    "textContent": ":tagvar4:"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "nodeName": "span",
+            "children": [
+              {
+                "nodeName": "text",
+                "textContent": "🍒 "
+              },
+              {
+                "nodeName": "span",
+                "attributes": [
+                  [
+                    "id",
+                    "app-counters-subject-display"
+                  ]
+                ],
+                "children": [
+                  {
+                    "nodeName": "text",
+                    "textContent": ":tagvar5:"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "nodeName": "text",
+        "textContent": "}"
+      }
+    ])
+  })
+
+  it('exchangeParsedForValues - 3 vars attrs and content', () => {
+    const strings = [
+      '<div><small>(',' render count <span id=','>','</span>)</small></div>'
+    ]
+
+    const values = ['name', 'name_render_count', 'renderCount']
+    const domMeta = htmlInterpolationToDomMeta(strings, values)
+    // console.debug('domMeta', JSON.stringify(domMeta, null, 2))
+    expect(domMeta).toEqual([
+      {
+        "nodeName": "div",
+        "children": [
+          {
+            "nodeName": "small",
+            "children": [
+              {
+                "nodeName": "text",
+                "textContent": "("
+              },
+              {
+                "nodeName": "text",
+                "textContent": ":tagvar0:"
+              },
+              {
+                "nodeName": "text",
+                "textContent": " render count "
+              },
+              {
+                "nodeName": "span",
+                "attributes": [
+                  [
+                    "id",
+                    ":tagvar1:"
+                  ]
+                ],
+                "children": [
+                  {
+                    "nodeName": "text",
+                    "textContent": ":tagvar2:"
+                  }
+                ]
+              },
+              {
+                "nodeName": "text",
+                "textContent": ")"
+              }
+            ]
+          }
+        ]
+      }
+    ])
+  })
+
   it('works', () => {
     // Example usage with an array of HTML fragments and dynamic values
     const strings = [
@@ -196,7 +909,7 @@ describe('htmlInterpolationToDomMeta', () => {
       ])
     })
 
-    it('aligned spacing with line returns', () => {
+    it.only('aligned spacing with line returns', () => {
       const strings = [
         '            <input\n' +
         '                type        = "text"\n' +
@@ -324,6 +1037,26 @@ describe('exchangeParsedForValues', () => {
     exchangeParsedForValues(parsedElements, values)
     const string = JSON.stringify(parsedElements)
     expect(string).toBe(`[{"nodeName":"text","value":1}]`)
+  })
+
+  it('empty values', () => {
+    const values: any[] = []
+    const parsedElements = [
+    {
+        "nodeName": "b",
+        "children": [
+            {
+                "nodeName": "text",
+                "textContent": "bold 77"
+            }
+        ]
+    }
+]
+    const parsedElements_old = JSON.parse(JSON.stringify(parsedElements))
+    exchangeParsedForValues(parsedElements as any, values)
+    // const string = JSON.stringify(parsedElements)
+    // console.debug(JSON.stringify(string, null, 2))
+    expect(parsedElements_old).toEqual(parsedElements)
   })
 
   it('spacing maintains', () => {

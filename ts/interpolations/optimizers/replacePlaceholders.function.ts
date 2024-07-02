@@ -1,6 +1,4 @@
-import { TagSubject } from "../../subject.types.js";
 import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
-import { ValueTypes } from "../../tag/ValueTypes.enum.js";
 import { TagJsSubject } from "../../tag/update/TagJsSubject.class.js";
 import { Attribute, ObjectChildren, ObjectElement, ObjectText } from "./ObjectNode.types.js";
 import { ValuePos } from "./exchangeParsedForValues.function.js";
@@ -79,25 +77,6 @@ function examineChild(
       }
 
       const newPos = {pos: [...currentTail, 'value'], value}
-      if(valuePositions[wIndex] != undefined) {
-        console.log('valuePositions[wIndex]', {
-          wIndex,
-          vLen: valuePositions.length,
-          vPos: valuePositions[wIndex],
-          varContent,
-          secondMatch,
-          values,
-          // match,
-          // child,
-          // children,
-
-          newPos,
-          // equal: valuePositions[wIndex].value === value
-        })
-        // throw new Error('already defined?')
-      }
-
-      // valuePositions.push({pos: [...currentTail, 'value']})
       valuePositions[wIndex] = newPos
       children.splice(index, 1, ...[{
         nodeName: 'text',
@@ -125,7 +104,6 @@ function processAttributes(
     if (key.startsWith(variablePrefix)) {
       const index = parseInt(key.replace(variablePrefix, ''), 10)
       if (!isNaN(index) && index < values.length) {
-        console.log('key0', {key,index, valueLength: values.length})
         const value = values[index]
         valuePositions[index] = {value, isAttr: true, pos: [...currentTail, 'attributes', attrIndex, 0]}
         return [value] // the name is the value
@@ -136,7 +114,6 @@ function processAttributes(
     if (typeof value === 'string' && value.startsWith(variablePrefix)) {
       const index = parseInt(value.replace(variablePrefix, ''), 10)
       if (!isNaN(index) && index < values.length) {
-        // console.log('key1', {key,index, value, newValue: values[index], valueLength: values.length})
         value = values[index]
         valuePositions[index] = {key, value, isAttr: true, pos: [...currentTail, 'attributes', attrIndex, 1]} as any
       }
