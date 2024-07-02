@@ -84,7 +84,7 @@ export const App = tag(() => {
       </span>
     </div>
 
-    ${renderCountDiv({name:'app', renderCount},)}
+    ${renderCountDiv({name:'app', renderCount})}
 
     <div id="tagDebug-fx-wrap">
       <div style="display:flex;flex-wrap:wrap;gap:1em">

@@ -32,7 +32,7 @@ export default function domCastTagged(
   const reconstructed = reconstructCode(
     finalResults as ParsedResults,
     'html.dom',
-  );
+  )
 
 /*
   if(filePath.includes('input.ts')) {

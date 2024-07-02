@@ -4,6 +4,9 @@ import { parseHtmlTemplates, removeInterpolatedValues } from './parseHtmlTemplat
 // import path from 'path'
 import { reconstructCode } from './reconstructCode.function'
 
+// import { exchangeParsedForValues } from 'taggedjs/js/interpolations/optimizers/exchangeParsedForValues.function'
+// import { htmlInterpolationToDomMeta } from 'taggedjs/js/interpolations/optimizers/htmlInterpolationToDomMeta.function'
+
 // not testable - getDomMeta cannot use import?
 // import { reconstructedToOutput } from './reconstructedToOutput.function'
 
@@ -66,6 +69,67 @@ describe('stringCastHtmlTagged.function.spec.ts', () => {
         values: [ 'onclickFun', '3' ]
       }
     ])
+  })
+
+  it.skip('html with hint ---- ????', () => {
+    const htmlString = `
+      html\`
+        <div id="selectTag-wrap">
+          selectedTag: |\${
+            selectedTag === null && 'null' ||
+            selectedTag === undefined && 'undefined' ||
+            selectedTag === '' && 'empty-string' ||
+            selectedTag
+          }|
+        </div>
+        
+        <select id="tag-switch-dropdown" onchange=\${changeSelectedTag}>
+          <option></option>
+          <!-- TODO: implement selected attribute --->
+          <option value="" \${ typeof(selectedTag) === 'string' && !selectedTag.length ? {selected: true} : {} }>empty-string</option>
+          <option value="undefined" \${ selectedTag === undefined ? {selected: true} : {} }>undefined</option>
+          <option value="null" \${ selectedTag === null ? {selected: true} : {} }>null</option>
+          <option value="1" \${ selectedTag === '1' ? {selected: true} : {} }>tag 1</option>
+          <option value="2" \${ selectedTag === '2' ? {selected: true} : {} }>tag 2</option>
+          <option value="3" \${ selectedTag === '3' ? {selected: true} : {} }>tag 3</option>
+        </select>
+
+        <div id="switch-tests-wrap" style="display:flex;flex-wrap:wrap;gap:1em;">
+          <div style="border:1px solid blue;flex-grow:1">
+            <h3>Test 1 - string | Tag</h3>
+            <div>\${tagOutput}</div>
+          </div>
+          
+          <div style="border:1px solid blue;flex-grow:1">
+            <h3>Test 2 - Tag</h3>
+            <div>\${tagOutput2}</div>
+          </div>
+        </div>
+      \`
+    `
+    // const htmlString = 'html`' + innerHtml + '`'
+    const result = stringCastHtml(htmlString)
+
+    const reconstructed = reconstructCode(
+      result as ParsedResults,
+      'html.dom',
+    )
+  
+    // const parsed = parseHtmlTemplates(htmlString);
+    // console.log('parsed', JSON.stringify(parsed, null, 2))
+    // console.log('result', JSON.stringify(result, null, 2))
+    console.log('reconstructed', JSON.stringify(reconstructed.allStrings, null, 2))
+    // exchangeParsedForValues()
+    // htmlInterpolationToDomMeta((reconstructed.allStrings as any).strings, [2+2, 'toggle', 'toggleValue', 'runTesting'])
+    /*
+    expect(parsed).toEqual([
+      {
+        html: '<div ondragstart="const {e,dt,t} = {t:this,e:event,dt:event.dataTransfer};const d=t.drag=t.drag||{x:0,y:0};d.initX=d.x;d.startX=event.clientX-t.offsetLeft;d.startY=event.clientY-t.offsetTop;t.ondragover=e.target.ondragover=(e)=>e.preventDefault();dt.effectAllowed=\'move\';dt.dropEffect=\'move\'" onclick=${onclickFun}>${3}</div>',
+        strings: [ '<div ondragstart="const {e,dt,t} = {t:this,e:event,dt:event.dataTransfer};const d=t.drag=t.drag||{x:0,y:0};d.initX=d.x;d.startX=event.clientX-t.offsetLeft;d.startY=event.clientY-t.offsetTop;t.ondragover=e.target.ondragover=(e)=>e.preventDefault();dt.effectAllowed=\'move\';dt.dropEffect=\'move\'" onclick=', '>', '</div>' ],
+        values: [ 'onclickFun', '3' ]
+      }
+    ])
+    */
   })
 
   it('spacing test', () => {

@@ -63,7 +63,7 @@ export const counters = tag(({
         <div>initCounter:${initCounter}</div>
     
         <div>
-          <button id="app-counter-subject-button"
+          <button id="counters-app-counter-subject-button"
             onclick=${() => appCounterSubject.next((appCounterSubject.value || 0) + 1)}
           >🍒 ++app subject</button>
           <span>
