@@ -2,7 +2,7 @@ import { isSubjectInstance } from '../../isInstance.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { Context } from '../Tag.class.js'
 import { getValueType } from '../getValueType.function.js'
-import { ImmutableTypes, ValueTypes } from '../ValueTypes.enum.js'
+import { ImmutableTypes } from '../ValueTypes.enum.js'
 
 export function updateContextItem(
   context: Context,
@@ -19,7 +19,7 @@ export function updateContextItem(
     return // emits on its own
   }
 
-  if(value === subject._value) {
+  if(value === subject.value) {
     if(Object.values(ImmutableTypes).includes(valueType as ImmutableTypes)) {
       return // its the same exact non-complex value
     }

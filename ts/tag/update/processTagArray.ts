@@ -103,8 +103,7 @@ function reviewArrayItem(
     item,
   ) as unknown as TagSubject
 
-  let templater = (subTag as StringTag | DomTag).templater
-  // let support: Support
+  const templater = (subTag as StringTag | DomTag).templater
 
   // check for html``.key()
   const tag = templater?.tag || subTag as StringTag | DomTag
@@ -274,7 +273,7 @@ function reviewLastArrayItem(
   const subTag = value[index - removed] as StringTag | DomTag | TemplaterResult | undefined
   const tagClass = isTagClass(subTag)
 
-  let tag = subTag as StringTag | DomTag
+  const tag = subTag as StringTag | DomTag
   let templater = tag.templater // || subTag
   let prevArrayValue: unknown
 

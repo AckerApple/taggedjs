@@ -11,15 +11,13 @@ export class Subject<T> implements SubjectLike<T> {
   // private?
   subscribers: Subscription<T>[] = []
   subscribeWith?: (x: SubjectSubscriber<T>) => Subscription<T>
-  public _value?: T
 
   constructor(
     public value?: T,
-    // private?
+    // private? - only used by extending classes
     public onSubscription?: OnSubscription<T>
   ) {
-    this._value = value
-    defineValueOn(this)
+    // defineValueOn(this)
   }
 
   subscribe(callback: SubjectSubscriber<T>) {
@@ -56,20 +54,19 @@ export class Subject<T> implements SubjectLike<T> {
   }
 
   next(value?: any) {
-    this._value = value
+    this.value = value
     this.emit()
   }
   set = this.next
   
   emit() {
-    const value = this._value as any
+    const value = this.value as any
 
     // Notify all subscribers with the new value
     // const subs = [...this.subscribers] // subs may change as we call callbacks
     const subs = this.subscribers // subs may change as we call callbacks
     // const length = subs.length
-    for (let index=0; index < subs.length; ++index) {
-      const sub = subs[index]
+    for (const sub of subs) {
       sub.callback(value, sub)
     }
   }
@@ -161,7 +158,7 @@ export class Subject<T> implements SubjectLike<T> {
     ...operations: OperatorFunction<any, any, any>[]
   ): Subject<unknown>;
   pipe(...operations: OperatorFunction<any, any, any>[]): Subject<any> {
-    const subject = new Subject(this._value)
+    const subject = new Subject(this.value)
     subject.setMethods(operations)
     subject.subscribeWith = (x) => this.subscribe(x)
     subject.next = x => this.next(x)
@@ -194,10 +191,41 @@ export class Subject<T> implements SubjectLike<T> {
     return combineLatest(switched as Subject<any>[]) as any
   }
 
-  static globalSubCount$ = new Subject<number>(0) // for ease of debugging
+  static globalSubCount$ = new Subject<number>(0) // for ease of debugging}
 }
 
-export function defineValueOn(subject: Subject<any>) {
+export class Subjective<T> extends Subject<T> {
+  public _value?: T
+
+  constructor(
+    public value?: T,
+    // private?
+    public onSubscription?: OnSubscription<T>
+  ) {
+    super(value, onSubscription)
+    this._value = value
+    defineValueOn(this)
+  }
+
+  next(value?: any) {
+    this._value = value
+    this.emit()
+  }
+
+  emit() {
+    const value = this._value as any
+
+    // Notify all subscribers with the new value
+    // const subs = [...this.subscribers] // subs may change as we call callbacks
+    const subs = this.subscribers // subs may change as we call callbacks
+    // const length = subs.length
+    for (const sub of subs) {
+      sub.callback(value, sub)
+    }
+  }
+}
+
+export function defineValueOn(subject: Subjective<any>) {
   Object.defineProperty(subject, 'value', {
     // supports subject.value = x
     set(value) {

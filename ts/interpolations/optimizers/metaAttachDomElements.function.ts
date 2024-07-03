@@ -16,13 +16,11 @@ export function attachDomElement(
   counts: Counts, // used for animation stagger computing
   owner: Element
 ): DomObjectChildren {
-  for (let index = 0; index < nodes.length; ++index) {
-    const node = nodes[index] as DomObjectElement
+  for (const node of nodes as  DomObjectElement[]) {
     const marker = node.marker = textNode.cloneNode(false) as Text
     const subject = node.value as TagJsSubject<any>
 
     if(subject) {
-      // nodes.splice(index, 1) // placeholder will continue its life separated from domMeta
       owner.appendChild( marker )
       subject.global.placeholder = marker
       delete (node as any).marker
@@ -56,7 +54,6 @@ export function attachDomElement(
         processAttribute(
           attr,
           domElement,
-          scope,
           support,
         )
       })

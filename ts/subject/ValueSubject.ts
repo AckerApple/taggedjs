@@ -7,11 +7,26 @@ type ValueSubjectSubscriber<T> = (
 ) => unknown
 
 export class ValueSubject<T> extends Subject<T> {
+  constructor(public value: T) {
+    super(value)
+  }
+
+  subscribe(callback: ValueSubjectSubscriber<T>) {
+    const subscription = super.subscribe(callback as SubjectSubscriber<T>)
+    
+    // Call the callback immediately with the current value
+    callback(this.value as T, subscription)
+
+    return subscription
+  }
+}
+
+export class ValueSubjective<T> extends Subject<T> {
   declare public _value: T
 
   constructor(public value: T) {
     super(value)
-
+    this._value = value
     defineValueOn(this) // if you extend this AND have a constructor, you must call this in your extension
   }
 

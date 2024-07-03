@@ -1,6 +1,5 @@
 import { specialAttribute } from './specialAttribute.js'
 import { isSubjectInstance } from '../isInstance.js'
-import { Context } from '../tag/Tag.class.js'
 import { HowToSet, howToSetInputValue } from './interpolateAttributes.js'
 import { bindSubjectCallback } from './bindSubjectCallback.function.js'
 import { BaseSupport, Support } from '../tag/Support.class.js'
@@ -19,7 +18,6 @@ export type AttrCombo = [
 export function processAttribute(
   attrs: AttrCombo,
   element: Element,
-  scope: Context,
   support: BaseSupport | Support,
   howToSet: HowToSet = howToSetInputValue,
 ) {
@@ -181,7 +179,7 @@ function processNameValueAttr(
   }
 
 
-  howToSet(child, attrName, result._value)
+  howToSet(child, attrName, result.value)
 
   return
 }

@@ -2,6 +2,7 @@ import { deepClone } from '../deepFunctions.js'
 import { Provider } from './providers.js'
 import { renderSupport } from'../tag/render/renderSupport.function.js'
 import { Support } from '../tag/Support.class.js'
+import { safeRenderSupport } from '../alterProp.function.js'
 
 export function handleProviderChanges(
   appSupport: Support,
@@ -11,18 +12,24 @@ export function handleProviderChanges(
   const tagsWithProvider = getTagsWithProvider(appSupport, provider)
   for (let index = tagsWithProvider.length - 1; index >= 0; --index) {
     const {support, renderCount, provider} = tagsWithProvider[index]
-    if(support.subject.global.deleted) {
+    const global = support.subject.global
+    if(global.deleted) {
       continue // i was deleted after another tag processed
     }
 
-    const notRendered = renderCount === support.subject.global.renderCount
-    if(notRendered) {
+    const notRendered = renderCount === global.renderCount
+    const locked = global.locked
+    if(notRendered && !locked) {
       hadChanged = true
-      provider.clone = deepClone(provider.instance)
+      const newSupport = global.newest as Support
+      // provider.clone = deepClone(provider.instance)
+      /*
       renderSupport(
-        support.subject.global.newest as Support, // support, // support.subject.global.newest as Support,
+        newSupport,
         false,
       )
+      */
+      safeRenderSupport(newSupport, newSupport.ownerSupport as Support)
       continue
     }
   }

@@ -1,6 +1,6 @@
 import { getDomMeta } from '../../tag/domMetaCollector.js';
 import { html } from '../../tag/html.js';
-import { exchangeParsedForValues } from './exchangeParsedForValues.function.js';
+import { replaceHoldersByPosMaps } from './exchangeParsedForValues.function.js';
 import { htmlInterpolationToDomMeta, htmlInterpolationToPlaceholders, parseHTML } from './htmlInterpolationToDomMeta.function.js'
 
 describe('htmlInterpolationToDomMeta', () => {
@@ -15,9 +15,9 @@ describe('htmlInterpolationToDomMeta', () => {
 
     const values = [2+2, 'toggle', 'toggleValue', 'runTesting']
     const domMeta = htmlInterpolationToDomMeta(strings, values)
-    const {parsedElements: result} = exchangeParsedForValues(domMeta, values)
+    // const {domMeta: result} = replaceHoldersByPosMaps(domMeta, values, [])
     // console.debug('result', JSON.stringify(result, null, 2))
-    expect(result).toEqual([
+    expect(domMeta).toEqual([
       {
         "nodeName": "text",
         "textContent": "<!--app.js-->"
@@ -37,7 +37,7 @@ describe('htmlInterpolationToDomMeta', () => {
           },
           {
             "nodeName": "text",
-            "value": 4
+            "textContent": ":tagvar0:"
           }
         ]
       },
@@ -50,7 +50,7 @@ describe('htmlInterpolationToDomMeta', () => {
           ],
           [
             "onclick",
-            "toggle"
+            ":tagvar1:"
           ]
         ],
         "children": [
@@ -60,7 +60,7 @@ describe('htmlInterpolationToDomMeta', () => {
           },
           {
             "nodeName": "text",
-            "value": "toggleValue"
+            "textContent": ":tagvar2:"
           }
         ]
       },
@@ -69,7 +69,7 @@ describe('htmlInterpolationToDomMeta', () => {
         "attributes": [
           [
             "onclick",
-            "runTesting"
+            ":tagvar3:"
           ]
         ],
         "children": [
@@ -109,16 +109,6 @@ describe('htmlInterpolationToDomMeta', () => {
       'some content 0', // content - 8
       'some content 1', // content - 9
     ]
-
-    
-    // const placeheldStrings = htmlInterpolationToPlaceholders(strings, values)
-    // console.log('placeheldStringsplaceheldStringsplaceheldStrings')
-    // console.log(placeheldStrings)
-    // console.log('placeheldStringsplaceheldStringsplaceheldStrings')
-
-    // const htmlString = htmlInterpolationToPlaceholders(strings, values).join('')
-    // const domMeta2 = parseHTML(htmlString)
-    // console.log('htmlString', JSON.stringify({htmlString, domMeta2}, null, 2))
 
     const domMeta = htmlInterpolationToDomMeta(strings, values)
     // console.debug('domMeta', JSON.stringify(domMeta, null, 2))
@@ -909,7 +899,7 @@ describe('htmlInterpolationToDomMeta', () => {
       ])
     })
 
-    it.only('aligned spacing with line returns', () => {
+    it('aligned spacing with line returns', () => {
       const strings = [
         '            <input\n' +
         '                type        = "text"\n' +
@@ -1032,11 +1022,7 @@ describe('exchangeParsedForValues', () => {
   it('empty strings', () => {
     const values = [1]
     const parsedElements = htmlInterpolationToDomMeta([], values)
-    expect(parsedElements).toEqual([{"nodeName":"text","textContent":":tagvar0:"}])
-    
-    exchangeParsedForValues(parsedElements, values)
-    const string = JSON.stringify(parsedElements)
-    expect(string).toBe(`[{"nodeName":"text","value":1}]`)
+    expect(parsedElements).toEqual([{"nodeName":"text","textContent":":tagvar0:"}])    
   })
 
   it('empty values', () => {
@@ -1053,7 +1039,7 @@ describe('exchangeParsedForValues', () => {
     }
 ]
     const parsedElements_old = JSON.parse(JSON.stringify(parsedElements))
-    exchangeParsedForValues(parsedElements as any, values)
+    replaceHoldersByPosMaps(parsedElements, values, [])
     // const string = JSON.stringify(parsedElements)
     // console.debug(JSON.stringify(string, null, 2))
     expect(parsedElements_old).toEqual(parsedElements)
@@ -1076,11 +1062,11 @@ describe('exchangeParsedForValues', () => {
       nodeName: 'text',
       textContent: ' worlds'
     }])
-    exchangeParsedForValues(parsedElements, values)
+    replaceHoldersByPosMaps(parsedElements, values, [])
     expect(parsedElements).toEqual([
-      { nodeName: 'text', value: 53 },
+      { nodeName: 'text', textContent: ':tagvar0:' },
       { nodeName: 'text', textContent: ' ' },
-      { nodeName: 'text', value: 'hello' },
+      { nodeName: 'text', textContent: ':tagvar1:' },
       { nodeName: 'text', textContent: ' worlds' }
     ])
   })
@@ -1089,7 +1075,7 @@ describe('exchangeParsedForValues', () => {
 describe('getDomMeta', () => {
   it('empty strings', async () => {
     const result = getDomMeta([], [1])
-    expect(result).toEqual([ { nodeName: 'text', textContent: ':tagvar0:' } ])
+    expect(result.domMeta).toEqual([ { nodeName: 'text', value: ':tagvar0:' } ])
   })
 
   it('wild 1', async () => {
@@ -1236,120 +1222,70 @@ describe('getDomMeta', () => {
       return keyResult
     })
     const result = html.dom(allStrings[15], values)
-    exchangeParsedForValues(result.dom, result.values)
-    // console.debug(JSON.stringify(result, null, 2))
-    expect(JSON.parse(JSON.stringify(result))).toEqual({
-      "values": [
-        [
-          {
-            "values": [
-              "tagdvalue"
-            ],
-            "tagJsType": [
-              "dom"
-            ],
-            "dom": [
-              {
-                "nodeName": "text",
-                "textContent": ":tagvar0:"
-              }
-            ],
-            "html": {},
-            "arrayValue": "d"
-          },
-          {
-            "values": [
-              "tagevalue"
-            ],
-            "tagJsType": [
-              "dom"
-            ],
-            "dom": [
-              {
-                "nodeName": "text",
-                "textContent": ":tagvar0:"
-              }
-            ],
-            "html": {},
-            "arrayValue": "e"
-          },
-          {
-            "values": [
-              "tagfvalue"
-            ],
-            "tagJsType": [
-              "dom"
-            ],
-            "dom": [
-              {
-                "nodeName": "text",
-                "textContent": ":tagvar0:"
-              }
-            ],
-            "html": {},
-            "arrayValue": "f"
-          }
-        ]
-      ],
-      "tagJsType": [
-        "dom"
-      ],
-      "dom": [
+    // exchangeParsedForValues(result.dom, result.values)
+    replaceHoldersByPosMaps(result.dom as any, values, [])
+    // console.debug(JSON.stringify(result.dom, null, 2))
+    // console.debug(JSON.stringify(result.values, null, 2))
+    expect(result.dom).toEqual([
+      {
+        "nodeName": "text",
+        "textContent": ":tagvar0:"
+      }
+    ])
+    
+    expect(JSON.parse(JSON.stringify(result.values))).toEqual([
+      [
         {
-          "nodeName": "text",
-          "value": [
+          "values": [
+            "tagdvalue"
+          ],
+          "tagJsType": [
+            "dom"
+          ],
+          "dom": [
             {
-              "values": [
-                "tagdvalue"
-              ],
-              "tagJsType": [
-                "dom"
-              ],
-              "dom": [
-                {
-                  "nodeName": "text",
-                  "textContent": ":tagvar0:"
-                }
-              ],
-              "html": {},
-              "arrayValue": "d"
-            },
-            {
-              "values": [
-                "tagevalue"
-              ],
-              "tagJsType": [
-                "dom"
-              ],
-              "dom": [
-                {
-                  "nodeName": "text",
-                  "textContent": ":tagvar0:"
-                }
-              ],
-              "html": {},
-              "arrayValue": "e"
-            },
-            {
-              "values": [
-                "tagfvalue"
-              ],
-              "tagJsType": [
-                "dom"
-              ],
-              "dom": [
-                {
-                  "nodeName": "text",
-                  "textContent": ":tagvar0:"
-                }
-              ],
-              "html": {},
-              "arrayValue": "f"
+              "nodeName": "text",
+              "textContent": ":tagvar0:"
             }
-          ]
+          ],
+          "html": {},
+          "arrayValue": "d"
+        },
+        {
+          "values": [
+            "tagevalue"
+          ],
+          "tagJsType": [
+            "dom"
+          ],
+          "dom": [
+            {
+              "nodeName": "text",
+              "textContent": ":tagvar0:"
+            }
+          ],
+          "html": {},
+          "arrayValue": "e"
+        },
+        {
+          "values": [
+            "tagfvalue"
+          ],
+          "tagJsType": [
+            "dom"
+          ],
+          "dom": [
+            {
+              "nodeName": "text",
+              "textContent": ":tagvar0:"
+            }
+          ],
+          "html": {},
+          "arrayValue": "f"
         }
-      ],
-      "html": {}
-    })
+      ]
+    ])
+
+    expect(result.tagJsType).toEqual(["dom"])
   })
 })

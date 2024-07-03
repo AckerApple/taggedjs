@@ -6,19 +6,19 @@ export function providersChangeCheck(
   support: Support | BaseSupport
 ) {
   const global = support.subject.global
-  const providersWithChanges = global.providers.filter(provider => !deepEqual(provider.instance, provider.clone))
+  // const providersWithChanges = global.providers.filter(provider => !deepEqual(provider.instance, provider.clone))
+  const providersWithChanges = global.providers // .filter(provider => !deepEqual(provider.instance, provider.clone))
   let hadChanged = false
 
   // reset clones
-  for (let index = providersWithChanges.length - 1; index >= 0; --index) {
-    const provider = providersWithChanges[index]
+  for (const provider of providersWithChanges) {
     const owner = provider.owner
 
     if(handleProviderChanges(owner, provider)) {
       hadChanged = true
     }
 
-    provider.clone = deepClone(provider.instance)
+    // provider.clone = deepClone(provider.instance)
   }
 
   return hadChanged

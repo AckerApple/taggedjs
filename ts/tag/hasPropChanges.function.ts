@@ -32,7 +32,7 @@ export function hasPropChanges(
     castedPastProps = [...(pastCloneProps || [])]
     
     const allFunctionsMatch = castedProps.every((value, index) => {      
-      let compare = castedPastProps[index]
+      const compare = castedPastProps[index]
 
       if(value && typeof(value) === BasicTypes.object) {
         const subCastedProps = {...value}

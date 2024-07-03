@@ -15,11 +15,11 @@ import { ValueTypes } from '../ValueTypes.enum.js'
 
 export function updateExistingTagComponent(
   ownerSupport: BaseSupport | Support,
-  support: Support, // lastest
+  support: AnySupport, // lastest
   subject: TagSubject,
   insertBefore: InsertBefore,
 ): Support | BaseSupport {
-  let lastSupport = subject.global.newest as BaseSupport | Support
+  const lastSupport = subject.global.newest as BaseSupport | Support
   
   const oldWrapper = lastSupport.templater.wrapper
   const newWrapper = support.templater.wrapper
@@ -82,10 +82,10 @@ export function updateExistingTagComponent(
 function afterTagRender(
   subject: TagSubject,
   previous: Support,
-  newSupport: Support,
+  newSupport: AnySupport,
   isSameTag: boolean,
 ) {
-  let lastSupport = subject.support
+  const lastSupport = subject.support
 
   // detect if both the function is the same and the return is the same
   const isLikeTag = isSameTag && isLikeTags(previous, newSupport)
@@ -110,7 +110,7 @@ function afterTagRender(
 }
 
 function buildNewTag(
-  newSupport: Support,
+  newSupport: AnySupport,
   subject: TagSubject,
 ) {
   const fragment = newSupport.buildBeforeElement(undefined, {
@@ -128,13 +128,13 @@ function buildNewTag(
   
   subject.global.oldest = newSupport
   subject.global.newest = newSupport
-  subject.support = newSupport
+  subject.support = newSupport as Support
 
   return newSupport
 }
 
 export function syncFunctionProps(
-  newSupport: Support,
+  newSupport: AnySupport,
   lastSupport: Support,
   ownerSupport: BaseSupport | Support,
   newPropsArray: any[], // templater.props
@@ -284,7 +284,7 @@ export function moveProviders(
 
 function syncSupports(
   templater: TemplaterResult,
-  support: Support,
+  support: AnySupport,
   lastSupport: AnySupport,
   ownerSupport: AnySupport
 ) {

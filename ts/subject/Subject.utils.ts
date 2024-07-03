@@ -59,7 +59,7 @@ export function getSubscription<T>(
   subscribers: Subscription<T>[],
 ) {
   const countSubject = Subject.globalSubCount$ as ValueSubject<number>
-  Subject.globalSubCount$.next( countSubject._value + 1 )
+  Subject.globalSubCount$.next( countSubject.value + 1 )
 
   const subscription: Subscription<any> = function() {
     subscription.unsubscribe()
@@ -117,8 +117,9 @@ function unsubscribe(
 ) {
   removeSubFromArray(subscribers, callback) // each will be called when update comes in
 
+  const valSub = Subject.globalSubCount$ as ValueSubject<number>
   Subject.globalSubCount$.next(
-    (Subject.globalSubCount$ as ValueSubject<number>)._value - 1
+    valSub.value - 1
   )
   
   // any double unsubscribes will be ignored
@@ -126,8 +127,8 @@ function unsubscribe(
 
   // unsubscribe from any combined subjects
   const subscriptions = subscription.subscriptions
-  for (let index = subscriptions.length - 1; index >= 0; --index) {
-    subscriptions[index].unsubscribe()
+  for (const sub of subscriptions) {
+    sub.unsubscribe()
   }
   
   return subscription

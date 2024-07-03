@@ -11,8 +11,6 @@ export function syncStates(
 
     if(callback) {
       callback( fromValue ) // set the value
-    }
-    
-    stateTo[index].lastValue = fromValue // record the value
+    }    
   }
 }

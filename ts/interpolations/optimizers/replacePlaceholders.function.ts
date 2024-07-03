@@ -1,39 +1,44 @@
+import { deepClone } from "../../deepFunctions.js";
 import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
 import { TagJsSubject } from "../../tag/update/TagJsSubject.class.js";
 import { Attribute, ObjectChildren, ObjectElement, ObjectText } from "./ObjectNode.types.js";
-import { ValuePos } from "./exchangeParsedForValues.function.js";
+import { DomMetaMap, ValuePos } from "./exchangeParsedForValues.function.js";
 
 const placeholderRegex = new RegExp(variablePrefix + '(\\d+)' + variableSuffix, 'g');
 
 export function replacePlaceholders(
-  elements: (ObjectElement | ObjectText)[],
-  values: unknown[],
+  dom: (ObjectElement | ObjectText)[],
+  valueCount: number,
   valuePositions: ValuePos[] = [],
   currentTail: (string | number)[] = [],
-) {
+): DomMetaMap {
+  // const elements = deepClone( dom )
+  const elements = dom
+
   for (let i = 0; i < elements.length; i++) {
     const loopTail: (string | number)[] = [...currentTail, i]
 
     const element = elements[i]
     if ('attributes' in element) {
       const attrs = element.attributes as Attribute[]
-      element.attributes = processAttributes(attrs, values, loopTail, valuePositions)
+      element.attributes = processAttributes(attrs, valueCount, loopTail, valuePositions)
     }
 
     if ('children' in element) {
       const children = element.children as ObjectChildren
       const innerLoopTail: (string | number)[] = [...loopTail, 'children']
-      replacePlaceholders(children, values, valuePositions, innerLoopTail)
-      element.children = children
+      element.children = replacePlaceholders(children, valueCount, valuePositions, innerLoopTail).domMeta
     }
 
-    i = examineChild(element, values, elements, i, loopTail, valuePositions)
+    i = examineChild(element, valueCount, elements, i, loopTail, valuePositions)
   }
+
+  return {domMeta: elements, pos: valuePositions}
 }
 
 function examineChild(
   child: ObjectElement | ObjectText,
-  values: any[],
+  valueCount: number,
   children: (ObjectElement | ObjectText)[],
   index: number,
   currentTail: (string | number)[] = [],
@@ -54,33 +59,15 @@ function examineChild(
   while ((match = placeholderRegex.exec(textContent)) !== null) {
     const secondMatch = match[1]
     const wIndex = parseInt(secondMatch, 10);
-    const examine = !isNaN(wIndex) && wIndex < values.length
+    const examine = !isNaN(wIndex) && wIndex < valueCount
     if (examine) {
       const varContent = variablePrefix + wIndex + variableSuffix
       const after = textContent.slice(match.index + varContent.length)
-      let value = values[wIndex] as TagJsSubject<any>
-      const array = value._value
-      const isArray = array instanceof Array // value instanceof Array
-      
-      if(isArray) {
-/*
-        array.forEach((x: any, index: number) => {
-          if(x?.tagJsType === ValueTypes.dom) {
-            const domClone = [...x.dom]
-            // replacePlaceholders(domClone, x.values, newValuePositions, loopTail)
-            return domClone
-          }
-
-          return x
-        })
-*/
-      }
-
-      const newPos = {pos: [...currentTail, 'value'], value}
+      const newPos = {pos: [...currentTail, 'value']}
       valuePositions[wIndex] = newPos
+
       children.splice(index, 1, ...[{
         nodeName: 'text',
-        value,
         // value: varContent,
       }])
       
@@ -96,26 +83,23 @@ function examineChild(
 
 function processAttributes(
   attributes: Attribute[],
-  values: unknown[],
+  valueCount: number,
   currentTail: (string | number)[] = [],
   valuePositions: ValuePos[]
 ): Attribute[] {
   return attributes.map(([key, value], attrIndex) => {
     if (key.startsWith(variablePrefix)) {
       const index = parseInt(key.replace(variablePrefix, ''), 10)
-      if (!isNaN(index) && index < values.length) {
-        const value = values[index]
-        valuePositions[index] = {value, isAttr: true, pos: [...currentTail, 'attributes', attrIndex, 0]}
-        return [value] // the name is the value
-        // return [key]
+      if (!isNaN(index) && index < valueCount) {
+        valuePositions[index] = {isAttr: true, pos: [...currentTail, 'attributes', attrIndex, 0]}
+        return [key]
       }
     }
 
     if (typeof value === 'string' && value.startsWith(variablePrefix)) {
       const index = parseInt(value.replace(variablePrefix, ''), 10)
-      if (!isNaN(index) && index < values.length) {
-        value = values[index]
-        valuePositions[index] = {key, value, isAttr: true, pos: [...currentTail, 'attributes', attrIndex, 1]} as any
+      if (!isNaN(index) && index < valueCount) {
+        valuePositions[index] = {isAttr: true, pos: [...currentTail, 'attributes', attrIndex, 1]} as any
       }
     }
 

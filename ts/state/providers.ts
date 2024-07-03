@@ -6,7 +6,7 @@ import { state } from'./state.function.js'
 export type Provider = {
   constructMethod: any
   instance: any
-  clone: any
+  // clone: any
   stateDiff: number
   owner: Support // create at
   children: Support[] // injected into
@@ -49,7 +49,7 @@ export const providers = {
       const provider: Provider = {
         constructMethod,
         instance,
-        clone: deepClone(instance),
+        // clone: deepClone(instance),
         stateDiff,
         owner: support,
         children: [],
@@ -101,7 +101,7 @@ export const providers = {
         })
 
         if(provider) {
-          provider.clone = deepClone(provider.instance) // keep a copy of the latest before any change occur
+          // provider.clone = deepClone(provider.instance) // keep a copy of the latest before any change occur
           const support = memory.stateConfig.support as Support
           support.subject.global.providers.push(provider)
           provider.children.push(support)

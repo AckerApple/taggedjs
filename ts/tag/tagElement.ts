@@ -97,12 +97,10 @@ export function runWrapper(
   insertBefore: Element,
   placeholder: Text,
 ) {
-  let newSupport = {} as BaseSupport
-
   // TODO: A fake subject may become a problem
   const subject = new TagJsSubject(templater) as any as TagSubject
     
-  newSupport = new BaseSupport(
+  const newSupport = new BaseSupport(
     templater,
     subject,
   )
@@ -111,18 +109,14 @@ export function runWrapper(
   subject.global.placeholder = placeholder
   subject.global.oldest = subject.global.oldest || newSupport
   subject.support = newSupport as Support
-  let nowSupport = newSupport
   
   runBeforeRender(newSupport, undefined as unknown as Support)
 
   if(templater.tagJsType === ValueTypes.stateRender) {
-    // nowSupport = newSupport
-    // ;(templater as any as TemplaterResult).tag = (templater as any)() as (StringTag | DomTag)
-
     const stateArray = setUse.memory.stateConfig.array
     const result = templater.wrapper || {original: templater} as any
 
-    nowSupport = executeWrap(
+    const nowSupport = executeWrap(
       stateArray,
       templater,
       result,
@@ -131,15 +125,17 @@ export function runWrapper(
       newSupport,
     )
 
-  } else {
-    // Call the apps function for our tag templater
-    const wrapper = templater.wrapper as Wrapper
-    nowSupport = wrapper(
-      newSupport,
-      subject,
-    )
-  }
+    runAfterRender(newSupport, nowSupport)
 
+    return nowSupport
+  }
+  
+  // Call the apps function for our tag templater
+  const wrapper = templater.wrapper as Wrapper
+  const nowSupport = wrapper(
+    newSupport,
+    subject,
+  )
 
   runAfterRender(newSupport, nowSupport)
 

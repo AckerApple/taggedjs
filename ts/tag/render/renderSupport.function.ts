@@ -3,6 +3,11 @@ import { deepEqual } from '../../deepFunctions.js'
 import { renderExistingTag } from'./renderExistingTag.function.js'
 import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
+import { TemplaterResult } from '../TemplaterResult.class.js'
+
+export function isInlineHtml(templater: TemplaterResult) {
+  return !templater.wrapper && templater.tagJsType !== ValueTypes.stateRender
+}
 
 /** Main function used by all other callers to render/update display of a tag component */
 export function renderSupport<T extends AnySupport>(
@@ -11,26 +16,23 @@ export function renderSupport<T extends AnySupport>(
 ): T {
   const global = support.subject.global
   const templater = support.templater
-  const isInlineHtml = !templater.wrapper && templater.tagJsType !== ValueTypes.stateRender
+  const inlineHtml = isInlineHtml(templater)
   const ownerSupport = (support as Support).ownerSupport
 
   // is it just a vanilla tag, not component?
-  if( isInlineHtml ) {// || isTagTemplater(templater) 
-    if(ownerSupport.subject.global.deleted) {
-      return support
-    }
-
-    ++global.renderCount
-    return renderSupport(ownerSupport.subject.global.newest as Support, true) as T
+  if( inlineHtml ) {// || isTagTemplater(templater) 
+    return renderInlineHtml(ownerSupport, support) as T
   }
 
-  if(support.subject.global.locked) {
-    support.subject.global.blocked.push(support)
+  if(global.locked) {
+    global.blocked.push(support)
     return support
   }
 
+  global.locked = true
+
   const subject = support.subject
-  const oldest = support.subject.global.oldest
+  const oldest = global.oldest
   
   let selfPropChange = false
   const shouldRenderUp = renderUp && support
@@ -44,7 +46,6 @@ export function renderSupport<T extends AnySupport>(
   // ??? newly moved above renderExistingTag
   // render up first and that will cause me to re-render
   if(ownerSupport && selfPropChange) {
-    global.locked = true
     // const myRenderCount = global.renderCount
     const myOwnerSupport = ownerSupport.subject.global.newest as Support
     renderSupport(
@@ -54,11 +55,10 @@ export function renderSupport<T extends AnySupport>(
 
     if(global.blocked.length) {
       support = global.blocked.pop() as T
-      delete global.locked
       global.blocked.length = 0
     }
   }
-
+  
   const tag = renderExistingTag(
     oldest,
     support,
@@ -66,5 +66,19 @@ export function renderSupport<T extends AnySupport>(
     subject,
   )
   
+  delete global.locked
+
   return tag as T
+}
+
+export function renderInlineHtml(
+  ownerSupport: AnySupport,
+  support: AnySupport,
+) {
+  if(ownerSupport.subject.global.deleted) {
+    return support
+  }
+
+  ++support.subject.global.renderCount
+  return renderSupport(ownerSupport.subject.global.newest as Support, true)
 }

@@ -12,7 +12,6 @@ const badLetState = 'letState function incorrectly used. Second item in array is
 export type StateConfigItem<T> = {
   get: () => T // TODO: only a convenience, not needed, remove
   callback?: StateConfig<T>
-  lastValue?: T
   defaultValue?: T
   watch?: T // when this value changes, the state becomes this value
 }
@@ -64,11 +63,6 @@ setUse({
 
     state.length = 0
     state.push(...config.array)
-    for (let index = state.length - 1; index >= 0; --index) {
-      const item = state[index]
-      item.lastValue = getStateValue(item) // set last values
-    }
-
     config.array = []
   }
 })
@@ -106,8 +100,8 @@ function initState(
   config.rearray = []
   const stateLength = state?.length
   if(stateLength) {
-    for (let index=0; index < stateLength; ++index) {
-      getStateValue(state[index])
+    for (const item of state) {
+      getStateValue(item)
     }
     config.rearray.push( ...state )
   }

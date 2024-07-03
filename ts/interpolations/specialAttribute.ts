@@ -17,12 +17,12 @@ export function specialAttribute(
   if(names[0] === classS) {
     names.shift()
     if(value) {
-      for (let index=0; index < names.length; ++index) {
-        element.classList.add(names[index])
+      for (const name of names) {
+        element.classList.add(name)
       }
     } else {
-      for (let index=0; index < names.length; ++index) {
-        element.classList.remove(names[index])
+      for (const name of names) {
+        element.classList.remove(name)
       }
     }
   }

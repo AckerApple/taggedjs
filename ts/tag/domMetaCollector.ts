@@ -3,6 +3,10 @@ import { htmlInterpolationToDomMeta } from '../interpolations/optimizers/htmlInt
 import { getStringsId } from './getStringsId.function.js'
 import { isLastRunMatched } from './isLastRunMatched.function.js'
 import { ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
+import { DomMetaMap, ValuePos } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
+import { replacePlaceholders } from '../interpolations/optimizers/replacePlaceholders.function.js'
+import { deepClone } from '../deepFunctions.js'
+import { restorePlaceholders } from '../interpolations/optimizers/restorePlaceholders.function.js'
 
 const lastRuns: {[index: number]: TagTemplate} = {}
 
@@ -10,18 +14,21 @@ const lastRuns: {[index: number]: TagTemplate} = {}
 export function getDomMeta(
   strings: string[],
   values: unknown[],
-) {
+): DomMetaMap {
   const stringId = getStringsId(strings, values)
   const lastRun = lastRuns[stringId]
   const matches = lastRun && isLastRunMatched(strings, values, lastRun)
-  let domMeta: ObjectChildren
   
   if(matches) {
-    domMeta = lastRun.domMeta as ObjectChildren
-    return domMeta
+    const domMetaMap: DomMetaMap = lastRun.domMetaMap as DomMetaMap
+    return domMetaMap
   }
 
-  domMeta = htmlInterpolationToDomMeta(strings, values)
+  const domMeta = htmlInterpolationToDomMeta(strings, values)
+  const map = replacePlaceholders(domMeta, values.length)
+
+  // Restore any sanitized placeholders in text nodes
+  restorePlaceholders(map.domMeta)
 
   const template = {
     interpolation: undefined as any,
@@ -29,10 +36,10 @@ export function getDomMeta(
     strings,
     values,
   
-    domMeta,
+    domMetaMap: map
   }
 
   lastRuns[stringId] = template
 
-  return domMeta
+  return map
 }

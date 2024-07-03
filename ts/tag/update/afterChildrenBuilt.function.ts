@@ -9,8 +9,7 @@ export function afterChildrenBuilt(
   subject: TagJsSubject<any>,
   ownerSupport: AnySupport,
 ) {
-  for (let index=0; index < children.length; ++index) {
-    const child = children[index]
+  for (const child of children) {
     afterElmBuild(
       child,
       {counts: {added:0, removed:0}},
@@ -31,8 +30,7 @@ function afterElmBuild(
     return
   }
 
-  let diff = options.counts.added
-  diff = elementInitCheck(elm, options.counts) - diff
+  elementInitCheck(elm, options.counts)
 
   const hasFocusFun = (elm as any).focus
   if (hasFocusFun) {
@@ -47,8 +45,7 @@ function afterElmBuild(
 
   const children = (elm as Element).children as HTMLCollection
   if (children) {
-    for (let index = children.length - 1; index >= 0; --index) {
-      const child = children[index]
+    for (const child of children) {
       const subOptions = {
         ...options,
         counts: options.counts,

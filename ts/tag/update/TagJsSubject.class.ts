@@ -16,7 +16,7 @@ export class TagJsSubject<T> extends ValueSubject<T> {
   ) {
     super(value)
     this.global.nowValueType = valueType || getValueType(value)
-    defineValueOn(this) // if you extend this AND have a constructor, you must call this in your extension
+    // defineValueOn(this) // if you extend this AND have a constructor, you must call this in your extension
   }
 }
 

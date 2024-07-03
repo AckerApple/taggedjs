@@ -9,8 +9,7 @@ export function getChildTagsToDestroy(
   childTags: Support[],
   allTags: Support[] = [],
 ): Support[] {
-  for (let index = childTags.length - 1; index >= 0; --index) {
-    const cTag = childTags[index]
+  for (const cTag of childTags) {
     allTags.push(cTag)
     const subTags = cTag.subject.global.childTags
     getChildTagsToDestroy(subTags, allTags)

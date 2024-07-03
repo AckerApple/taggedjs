@@ -1,3 +1,4 @@
+import { deepClone } from '../deepFunctions.js'
 import { InputElementTargetEvent } from '../interpolations/ElementTargetEvent.interface.js'
 import { LikeObjectChildren, ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { RegularValue } from '../subject.types.js'
@@ -16,5 +17,5 @@ html.dom = function(
   dom: LikeObjectChildren,
   ...values: TagValues
 ) {
-  return new DomTag(dom as ObjectChildren, values)
+  return new DomTag(dom, values)
 }

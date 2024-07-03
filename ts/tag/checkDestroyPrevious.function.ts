@@ -42,8 +42,7 @@ export function checkDestroyPrevious(
   if (wasArray && valueType !== ValueTypes.tagArray) {
     delete arraySubject.lastArray
     
-    for (let index = wasArray.array.length - 1; index >= 0; --index) {
-      const {support} = wasArray.array[index]
+    for (const {support} of wasArray.array) {
       destroyArrayTag(support, {added:0, removed:0})
     }
 

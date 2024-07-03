@@ -1,13 +1,14 @@
-import { BaseSupport, Support } from './tag/Support.class.js'
-import { deepClone, deepEqual } from './deepFunctions.js'
-import { isStaticTag, isSubjectInstance } from './isInstance.js'
-import { renderSupport } from './tag/render/renderSupport.function.js'
+import { AnySupport, BaseSupport, Support } from './tag/Support.class.js'
+import { deepEqual } from './deepFunctions.js'
+import { isStaticTag } from './isInstance.js'
+import { isInlineHtml, renderInlineHtml, renderSupport } from './tag/render/renderSupport.function.js'
 import { State, setUse } from './state/index.js'
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { Props } from './Props.js'
 import { runBlocked } from './interpolations/bindSubjectCallback.function.js'
 import { cloneTagJsValue } from './tag/cloneValueArray.function.js'
 import { Tag } from './tag/Tag.class.js'
+import { renderExistingTag } from './tag/render/renderExistingTag.function.js'
 
 export function castProps(
   props: Props,
@@ -201,26 +202,14 @@ export function callbackPropOwner(
   if(supportInCycle) {
     const blocked = supportInCycle?.subject.global.blocked 
     if(supportInCycle && blocked?.length) {
-      setUse.memory.tagClosed$.toCallback(() => {
-        let lastResult: BaseSupport | Support = supportInCycle
-  
-        // throw new Error('cycles ready')
-        // syncStates(supportInCycle.state, (supportInCycle.subject.global.newest as Support).state)
+      setUse.memory.tagClosed$.toCallback(() => {  
         delete supportInCycle.subject.global.locked
-        lastResult = runBlocked(
-          supportInCycle,
-          supportInCycle.state,
-          supportInCycle, // lastResult, // supportInCycle
-        ) as Support
+        const lastResult = runBlocked(supportInCycle) as Support
 
-        // syncStates((supportInCycle.subject.global.newest as Support).state, supportInCycle.state)
-  
-        // delete supportInCycle.subject.global.locked
         renderSupport(
-          lastResult as Support,
+          lastResult,
           false, // renderUp - callback may have changed props so also check to render up
         )
-
       })
 
       return callbackResult
@@ -232,27 +221,14 @@ export function callbackPropOwner(
   const run = () => {    
     // are we in a rendering cycle? then its being called by alterProps
     if(noCycle === false) {
-      // appears a prop function was called sync/immediately so lets see if owner changed state
-      const allMatched = newest.state.every(state => {
-        const lastValue = state.lastValue
-        const get = state.get()
-        const equal = deepEqual(
-          cloneTagJsValue(lastValue),
-          get,
-        )
-  
-        return equal
-      })
+      const allMatched = newest.subject.global.locked === true
     
       if(allMatched) {
         return callbackResult // owner did not change
       }
     }
 
-    renderSupport(
-      newest,
-      true,
-    )
+    safeRenderSupport(newest, ownerSupport)
 
     return callbackResult
   }
@@ -268,4 +244,24 @@ export function callbackPropOwner(
 
 export function isSkipPropValue(value: unknown) {
   return typeof(value)!=='object' || !value || (value as Tag).tagJsType // || isSubjectInstance(value)
+}
+
+export function safeRenderSupport(
+  newest: AnySupport,
+  ownerSupport: AnySupport,
+) {
+  if(isInlineHtml(newest.templater)) {
+    return renderInlineHtml(ownerSupport, newest)
+  }
+
+  newest.subject.global.locked = true
+
+  renderExistingTag(
+    newest.subject.global.oldest,
+    newest,
+    ownerSupport as Support, // useSupport,
+    newest.subject,
+  )
+
+  delete newest.subject.global.locked
 }

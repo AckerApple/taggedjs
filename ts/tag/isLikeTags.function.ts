@@ -55,7 +55,9 @@ function isLikeDomTags(
   const dom1 = tag1.dom
 
   if(dom0 !== dom1) {
-    const equal = deepEqual(tag0.dom, tag1.dom)
+    const domMeta0 = tag0.dom.domMeta
+    const domMeta1 = tag1.dom.domMeta
+    const equal = deepEqual(domMeta0, domMeta1)
     if(!equal) {
       return false
     }

@@ -1,7 +1,5 @@
-import { Support } from '../tag/Support.class.js'
 import { setUse } from './setUse.function.js'
 import { Config, StateConfig, State, StateConfigItem, getStateValue } from './state.utils.js'
-import { syncStates } from './syncStates.function.js'
 
 /** Used for variables that need to remain the same variable during render passes */
 export function state <T>(
@@ -18,7 +16,7 @@ export function state <T>(
     const push: StateConfigItem<T> = {
       get: () => getStateValue(push) as T,
       callback: getSetMethod,
-      lastValue: oldValue,
+      // lastValue: oldValue,
       defaultValue: restate.defaultValue,
     }
 
@@ -33,21 +31,10 @@ export function state <T>(
 
   // the state is actually intended to be a function
   if(initValue instanceof Function) {
-    const oldState = config.array
-    const support = config.support as Support
     const original = initValue
     
     initValue = ((...args: any[]) => {
-      const global = support.subject.global
-      const newest = global.newest as Support
-      const newState = newest.state
-      
-      syncStates(newState, oldState)
-
       const result = original(...args)
-      
-      syncStates(oldState, newState)
-      
       return result
     }) as any
 
@@ -58,7 +45,7 @@ export function state <T>(
   const push: StateConfigItem<T> = {
     get: () => getStateValue(push) as T,
     callback: getSetMethod,
-    lastValue: initValue,
+    // lastValue: initValue,
     defaultValue: initValue,
   }
   config.array.push(push)

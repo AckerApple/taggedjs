@@ -8,6 +8,7 @@ import { TagValues } from'./html.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { TagJsSubject } from './update/TagJsSubject.class.js'
 import { LikeObjectChildren, ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
+import { DomMetaMap, ValuePos } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
 
 export const variablePrefix = ':tagvar'
 export const variableSuffix = ':'
@@ -24,7 +25,10 @@ export interface TagTemplate {
   string: string,
   strings: string[]
   values: unknown[]
-  domMeta?: ObjectChildren
+  
+  domMetaMap?: DomMetaMap
+  // domMeta?: ObjectChildren
+  // pos?: ValuePos[]
 }
 
 export class Tag {
@@ -68,10 +72,11 @@ export class StringTag extends Tag {
 
 export class DomTag extends Tag {
   tagJsType = ValueTypes.dom
-  children?: {dom: ObjectChildren, values: TagValues}
+  children?: {dom: LikeObjectChildren, values: TagValues}
 
   constructor(
-    public dom: ObjectChildren,
+    // public dom: ObjectChildren,
+    public dom: LikeObjectChildren,
     public values: unknown[],
   ) {
     super(values)
@@ -84,7 +89,7 @@ export class DomTag extends Tag {
       dom: LikeObjectChildren, // ObjectChildren
       ...values: TagValues    
     ): DomTag => {
-      this.children = {dom, values}
+      this.children = {dom: dom, values}
       return this
     }
   }

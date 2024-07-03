@@ -24,11 +24,9 @@ export function updateExistingValue(
   ownerSupport: BaseSupport | Support,
   insertBefore: InsertBefore,
 ): TagSubject | InterpolateSubject {
-  let valueType = subject.global.nowValueType as ValueType | BasicTypes | ImmutableTypes
-
-  if(!valueType || valueType === ValueTypes.subject) {
-    valueType = getValueType(value)
-  }
+  const nowValueType = subject.global.nowValueType as ValueType | BasicTypes | ImmutableTypes
+  const fetchType = !nowValueType || nowValueType === ValueTypes.subject
+  const valueType = fetchType ? getValueType(value) : nowValueType
 
   checkDestroyPrevious(
     subject, value, valueType

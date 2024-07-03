@@ -55,7 +55,7 @@ export function executeWrap(
   if(templater.tagJsType === ValueTypes.stateRender) {
     tag = templater as any as StringTag
   } else {
-    let props = templater.props
+    const props = templater.props
   
     // When defined, this must be an update where my new props have already been made for me
     let preCastedProps: Props | undefined = newSupport.propsConfig.castProps

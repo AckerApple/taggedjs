@@ -1,3 +1,5 @@
+import { ValuePos } from "./exchangeParsedForValues.function"
+
 type ObjectNode = {
   nodeName: string
   value?: unknown
@@ -21,13 +23,17 @@ export type ObjectElement = ObjectNode & {
 export type LikeObjectElement = {
   nodeName: string
   textContent?: string
+  value?: any
   attributes?: any[],
   children?: LikeObjectElement[]
   domElement?: any
 }
 
 export type ObjectChildren = (ObjectText | ObjectElement)[]
-export type LikeObjectChildren = LikeObjectElement[]
+export type LikeObjectChildren = {
+  pos: ValuePos[]
+  domMeta: LikeObjectElement[]
+}
 
 export type DomObjectText = ObjectText & {
   textContent: string

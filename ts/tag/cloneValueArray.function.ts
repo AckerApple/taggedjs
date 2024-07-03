@@ -3,7 +3,6 @@ import { deepClone } from '../deepFunctions.js'
 import { TemplaterResult } from './TemplaterResult.class.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { getValueType } from './getValueType.function.js'
-import { Props } from '../Props.js'
 
 export function cloneValueArray<T>(
   values: (T | StringTag | StringTag[])[]

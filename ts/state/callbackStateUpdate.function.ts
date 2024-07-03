@@ -12,13 +12,15 @@ export default function callbackStateUpdate<T>(
 ): T {
   const state = support.state  
   // ensure that the oldest has the latest values first
-  syncStates(state, oldState)
+  // ??? new removed
+  // syncStates(state, oldState)
   
   // run the callback
   const maybePromise = callback(...args as [any,any,any,any,any,any])
 
   // send the oldest state changes into the newest
-  syncStates(oldState, state)
+  // ??? new removed
+  // syncStates(oldState, state)
   renderSupport(
     support, // support.global.newest as Support,
     false,
@@ -27,7 +29,8 @@ export default function callbackStateUpdate<T>(
   if(maybePromise instanceof Promise) {
     maybePromise.finally(() => {
       // send the oldest state changes into the newest
-      syncStates(oldState, state)
+      // ??? new removed
+      // syncStates(oldState, state)
 
       renderSupport(
         support, // support.global.newest as Support,

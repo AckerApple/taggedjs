@@ -14,10 +14,11 @@ import { updateContextItem } from './update/updateContextItem.function.js'
 import { processNewValue } from './update/processNewValue.function.js'
 import { TagJsSubject } from './update/TagJsSubject.class.js'
 import { attachDomElement } from '../interpolations/optimizers/metaAttachDomElements.function.js'
-import { DomObjectChildren, ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
+import { DomObjectChildren, LikeObjectChildren, ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { getDomMeta } from './domMetaCollector.js'
 import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js'
-import { exchangeParsedForValues } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
+import { DomMetaMap, ValuePos, replaceHoldersByPosMaps } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
+import { replacePlaceholders } from '../interpolations/optimizers/replacePlaceholders.function.js'
 
 export type AnySupport = (BaseSupport & {
   ownerSupport?: AnySupport
@@ -30,7 +31,7 @@ export class BaseSupport {
   appElement?: Element // only seen on this.getAppSupport().appElement
 
   strings?: string[]
-  dom?: ObjectChildren
+  dom?: LikeObjectChildren // ??? is this in use?
   values?: unknown[]
 
   propsConfig: {
@@ -68,7 +69,6 @@ export class BaseSupport {
 
     const latestCloned = props.map(props =>
       cloneTagJsValue(props)
-      // deepClone(props)
     )
     return this.propsConfig = {
       latest: props,
@@ -83,48 +83,34 @@ export class BaseSupport {
       counts: {added:0, removed: 0},
     }
   ): DomObjectChildren {
-    const domMeta = this.loadDomMeta()
+    const context = this.update()
 
-    const global = this.subject.global
-    let context = global.context
-    context = this.update()
-    
-    const wrapper = (this.subject._value as any)?.wrapper
-    const original = wrapper?.parentWrap?.original
-    
-    const { valuePositions } = exchangeParsedForValues(domMeta, context)
-
-    if(original && (original.toString().includes('selectTag-wrap') || original.toString().includes('tagSwitchDebug'))) {
-      console.log('domMeta, context', {
-        domMeta, context, valuePositions,
-      })
-    }
+    const domMeta = this.loadDomMeta()  
+    replaceHoldersByPosMaps(domMeta.domMeta, context, domMeta.pos)
 
     attachDomElement(
-      domMeta,
+      domMeta.domMeta,
       context,
       this,
       fragment,
       options.counts,
       fragment as any as Element,
     )
-    return domMeta as DomObjectChildren
-
+    
+    return domMeta.domMeta as DomObjectChildren
   }
 
-  loadDomMeta() {
+  loadDomMeta(): DomMetaMap {
     const templater = this.templater
     const thisTag = (templater.tag as StringTag | DomTag) // || templater
-    let orgDomMeta: ObjectChildren | undefined;
 
     if(thisTag.tagJsType === ValueTypes.dom) {
-      orgDomMeta = (thisTag as DomTag).dom
-    } else {
-      orgDomMeta = getDomMeta((thisTag as StringTag).strings, thisTag.values)
+      const domMeta: DomMetaMap = (thisTag as DomTag).dom as DomMetaMap
+      // return deepClone(domMeta)
+      return {domMeta: deepClone(domMeta.domMeta), pos: domMeta.pos}
     }
 
-    const domMeta = deepClone( orgDomMeta )
-    return domMeta
+    return getDomMeta((thisTag as StringTag).strings, thisTag.values)
   }
 
   /** Function that kicks off actually putting tags down as HTML elements */
@@ -273,7 +259,7 @@ export class BaseSupport {
 
       const clones = global.htmlDomMeta
 
-      let cloneOne = clones[0]
+      const cloneOne = clones[0]
       if(cloneOne === undefined) {
         const {stagger, promises: newPromises} = oldest.smartRemoveKids(options)
         options.stagger = options.stagger + stagger
@@ -359,8 +345,8 @@ export class BaseSupport {
 
   destroySubscriptions() {
     const subs = this.subject.global.subscriptions
-    for (let index = subs.length - 1; index >= 0; --index) {
-      subs[index].unsubscribe()
+    for (const sub of subs) {
+      sub.unsubscribe()
     }
     subs.length = 0
   }
@@ -439,8 +425,7 @@ export function midDestroyChildTags(
   childTags: Support[]
 ) {
     // signify immediately child has been deleted (looked for during event processing)
-    for (let index = childTags.length - 1; index >= 0; --index) {
-      const child = childTags[index]
+    for (const child of childTags) {
       const subGlobal = child.subject.global
       delete subGlobal.newest
       subGlobal.deleted = true
