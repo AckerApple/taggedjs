@@ -18,7 +18,13 @@ export function focus(
 export function click(
   q: string
 ) {
-  return [...query(q)].map(elm => (elm as HTMLElement).click())
+  const items = [...query(q)]
+  return new Promise<void>(res => {
+    requestAnimationFrame(() => {
+      items.map(elm => (elm as HTMLElement).click())
+      res()
+    })
+  })
 }
 
 export function clickOne(
@@ -26,7 +32,12 @@ export function clickOne(
   index = 0,
 ) {
   const element = query(q)[index] as HTMLElement
-  return element.click()
+  return new Promise<void>(res => {
+    requestAnimationFrame(() => {
+      element.click()
+      res()
+    })
+  })
 }
 
 export function html(

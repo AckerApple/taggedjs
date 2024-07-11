@@ -107,6 +107,7 @@ function testCounterSelectedElements(
     expect(document.body.contains(counterDisplay)).toBe(true, `The selected element ${counterDisplaySelect} is no longer an element on the document body BEFORE clicking ${counterButtonSelect}`)
 
     let counterValue = Number(counterDisplay?.innerText)
+    expect(typeof increaseCounter.click).toBe('function')
     increaseCounter.click()
 
     expect(counterDisplay).toBeDefined()

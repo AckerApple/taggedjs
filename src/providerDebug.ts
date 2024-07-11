@@ -20,6 +20,7 @@ export function tagDebugProvider() {
 }
 
 export function upperTagDebugProvider() {
+  state('ensure states in providers are stable')
   return {
     name: 'upperTagDebugProvider',
     test: 0
@@ -113,7 +114,7 @@ export const providerDebugBase = tag((_x = 'providerDebugBase') => {
     ${/*tagSwitchingWithProvider()*/false}
   `
 })
-
+/*
 const tagSwitchingWithProvider = tag(() => (
   upperProvider = providers.inject( upperTagDebugProvider )
 ) => html`
@@ -130,7 +131,7 @@ const tagSwitchingWithProvider = tag(() => (
   <hr />
   ${upperProvider.test % 2 == 0 ? null : tagSwitchingProChild2()}
 `)
-
+*/
 const tagSwitchingProChild1 = tag(() => (
   upperProvider = providers.inject( upperTagDebugProvider ),
 ) => upperProvider.test % 2 == 0 ? null : html`

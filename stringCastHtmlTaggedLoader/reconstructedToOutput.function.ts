@@ -10,13 +10,14 @@ export function reconstructedToOutput(
 ) {  
   const allDom = reconstructed.allStrings.map((data) => {
     const {strings, valueCount} = data
-    let values: any[] = []
+    const values: any[] = []
     
     if(valueCount) {
-      values = ','.repeat(valueCount - 1).split(',')
+      values.push(...','.repeat(valueCount - 1).split(','))
     }
     
-    return getDomMeta(strings, values)
+    const map = getDomMeta(strings, values)
+    return map
   })
 
   return domMetaArrayToOutput(reconstructed, allDom, filePath)

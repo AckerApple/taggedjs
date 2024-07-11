@@ -1,4 +1,4 @@
-import { stringCastHtmlTagged } from "./stringCastHtmlTagged.function"
+import { stringCastHtmlTagged } from "./stringCastHtmlTagged.function.js"
 
 export default function stringCastHtmlTaggedLoader(this: any, source: string) {
     const resourcePath = this.resourcePath;  

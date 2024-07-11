@@ -102,6 +102,6 @@ export const watchTesting = tag(() => (
 
     <button id="🦷-truthChange-button" type="button"
       onclick=${() => truthChange = !truthChange}
-    >toggle to ${truthChange ? 'true' : 'false'}</button>
+    >🦷 toggle to ${truthChange ? 'true' : 'false'}</button>
   </fieldset>`
 )

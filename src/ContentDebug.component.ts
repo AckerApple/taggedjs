@@ -1,5 +1,5 @@
 import { html, tag, letState, ValueSubject, state, combineLatest, willPromise } from "taggedjs"
-import { ObjectChildren } from "taggedjs/js/interpolations/optimizers/ObjectNode.types"
+import { LikeObjectChildren } from "taggedjs/js/interpolations/optimizers/exchangeParsedForValues.function"
 
 export const contentDebug = tag(() => {
   const vs0 = state(() => new ValueSubject(0))
@@ -9,15 +9,20 @@ export const contentDebug = tag(() => {
 
   ++renderCount
 
-  const dom: ObjectChildren = [{nodeName: 'b', children:[{
-    nodeName: 'text',
-    textContent: 'big',
-  }]}]
+  const dom: LikeObjectChildren = () => [{
+    nodeName: 'b', children:[{
+      nodeName: 'text',
+      textContent: 'big',
+    }]
+  }]
 
   let orangeToggle = letState(true)(x => [orangeToggle, orangeToggle = x])
 
+  const injectionTest = '<script>alert("i should never run")</script>'
+
   return html`<!-- content-debug-testing -->
-    <div style="display:flex;flex-wrap:wrap">
+    <div style="display:flex;flex-wrap:wrap;gap:1em;">
+      <div id="injection-test">injection test ${injectionTest}</div>
       <div id="hello-big-dom-world">hello ${html.dom(dom)} world</div>
       <div id="hello-big-string-world">hello ${html`<b>big</b>`} world</div>
       
@@ -74,7 +79,7 @@ export const contentDebug = tag(() => {
         </div>
       </fieldset>
       <div style="flex-grow:1">
-        should be a safe string no html "&lt;div&gt;hello&lt;/div&gt;" here => "${'<div>hello</div>'}"
+        should be a safe string no html <span id="content-dom-parse-0-0">"&lt;div&gt;hello&lt;/div&gt;"</span> here => <span id="content-dom-parse-0-1">"${'<div>hello</div>'}"</span>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:1em">
         <fieldset style="flex-grow:1">

@@ -141,7 +141,7 @@ export default () => tag.state = (
         🍒 <span id="app-counter-display">${appCounter}</span>
       </span>
       <span>
-        🍒 <span id="app-counter-subject-display">${/*appCounterSubject*/'masked'}</span>
+        🍒&lt;<span id="app-counter-subject-display">${appCounterSubject}</span>&gt;
       </span>
       auto testing <input type="checkbox" ${storage.autoTest ? 'checked': null}
         onchange=${toggleAutoTesting}

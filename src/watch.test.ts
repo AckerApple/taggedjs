@@ -7,7 +7,7 @@ describe('⌚️ watch tests', () => {
   // tests can be run multiple times. Only the first time will this expect below work
   const firstRun = slowCount === '0'
 
-  it('basic', () => {
+  it('basic', async () => {
     const startCount = Number(htmlById('watch-testing-num-display'))
 
     expectMatchedHtml('#watch-testing-num-display', '#🍄-slowChangeCount')
@@ -25,7 +25,7 @@ describe('⌚️ watch tests', () => {
       expect(html('#🦷-watchTruthAsSub')).toBe( html('#🦷-truthSubChangeCount') )
     }
 
-    click('#watch-testing-num-button')
+    await click('#watch-testing-num-button')
     
     expectMatchedHtml('#watch-testing-num-display', '#🍄-slowChangeCount')
     expectMatchedHtml('#🍄-watchPropNumSlow', '#🍄-slowChangeCount')
@@ -35,7 +35,7 @@ describe('⌚️ watch tests', () => {
     
     const truthStartCount = Number(html('#🦷-truthChangeCount'))
 
-    click('#🦷-truthChange-button')
+    await click('#🦷-truthChange-button')
 
     let newCount = (truthStartCount + 1).toString()
     // its been changed to "true", that causes a change watch count increase
@@ -43,7 +43,7 @@ describe('⌚️ watch tests', () => {
     expect(html('#🦷-watchTruth')).toBe( newCount )
     expect(html('#🦷-truthChangeCount')).toBe( newCount )
 
-    click('#🦷-truthChange-button')
+    await click('#🦷-truthChange-button')
 
     newCount = (truthStartCount + 1).toString()
     // its been changed to back to "false", that does NOT cause a change watch count increase
@@ -51,7 +51,7 @@ describe('⌚️ watch tests', () => {
     expect(html('#🦷-watchTruth')).toBe(newCount)
     expect(html('#🦷-truthChangeCount')).toBe( newCount )
 
-    click('#🦷-truthChange-button')
+    await click('#🦷-truthChange-button')
 
     // its been changed to "true", that causes a change watch count increase
     newCount = (truthStartCount + 2).toString()

@@ -6,6 +6,7 @@ describe('content', () => {
   it('basic', () => {
     expectMatchedHtml('#content-subject-pipe-display0', '#content-subject-pipe-display1')
     expectMatchedHtml('#content-combineLatest-pipe-display0', '#content-combineLatest-pipe-display1')
+    expect(html('#content-dom-parse-0-0')).toBe(html('#content-dom-parse-0-1'))
   })
 
   it('html', () => {
@@ -18,13 +19,13 @@ describe('content', () => {
     expect(html('#hello-spacing-dom-world')).toBe('54 hello worlds')
   })
 
-  it('style.', () => {
+  it('style.', async () => {
     expect(query('#style-simple-border-orange')[0].style.border).toBe('3px solid orange')
     expect(query('#style-var-border-orange')[0].style.border).toBe('3px solid orange')
     expect(query('#style-toggle-border-orange')[0].style.border).toBe('3px solid orange')
-    click('#toggle-border-orange')
+    await click('#toggle-border-orange')
     expect(query('#style-toggle-border-orange')[0].style.border).toBe('3px solid green')
-    click('#toggle-border-orange')
+    await click('#toggle-border-orange')
     expect(query('#style-toggle-border-orange')[0].style.border).toBe('3px solid orange')
   })
 })

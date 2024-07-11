@@ -10,7 +10,7 @@ export const mouseOverTag = tag(({
 }) => {
   let mouseOverEditShow = letState(false)(x => [mouseOverEditShow, mouseOverEditShow = x])
   let edit = letState(false)(x => [edit, edit = x])
-  return html`
+  return html`<!-- mouseOverTag -->
     <div style="background-color:purple;padding:.2em;flex:1"
       onmouseover=${() => mouseOverEditShow = true}
       onmouseout=${() => mouseOverEditShow = false}

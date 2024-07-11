@@ -4,7 +4,7 @@ import { describe, expect, it } from "./expect"
 describe('todos', () => {
   const todoInput = byId('todo-input') as HTMLInputElement
 
-  it('add one remove one', () => {
+  it('add one remove one', async () => {
     expect(query('button[data-testid="todo-item-button"]').length).toBe(0)
     
     todoInput.value = 'one'
@@ -12,18 +12,20 @@ describe('todos', () => {
     expect(query('button[data-testid="todo-item-button"]').length).toBe(1, 'expected one new todo')
 
     // delete it
-    click('button[data-testid="todo-item-button"]')
+    await click('button[data-testid="todo-item-button"]')
     expect(query('button[data-testid="todo-item-button"]').length).toBe(0)
   })  
   
-  it('basic', () => {
+  it('basic', async () => {
     todoInput.value = 'one'
     ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
+    
     // checkbox toggle
     click('input[data-testid="todo-item-toggle"]')
 
     // delete it
-    click('button[data-testid="todo-item-button"]')
+    await click('button[data-testid="todo-item-button"]')
+
     expect(query('button[data-testid="todo-item-button"]').length).toBe(0)
 
     todoInput.value = 'one'
@@ -32,7 +34,7 @@ describe('todos', () => {
     todoInput.value = 'two'
     ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
     const todoToggle2 = query('input[data-testid="todo-item-toggle"]')[1] as HTMLInputElement
-    todoToggle2.click()
+    await todoToggle2.click()
     expect(todoToggle2.checked).toBe(true)
 
     todoInput.value = 'three'
@@ -41,19 +43,19 @@ describe('todos', () => {
     expect(query('input[data-testid="todo-item-toggle"]').length).toBe(3)
 
     // delete 0
-    clickOne('button[data-testid="todo-item-button"]')
+    await clickOne('button[data-testid="todo-item-button"]')
     expect(query('input[data-testid="todo-item-toggle"]').length).toBe(2)
 
     // delete 0
-    clickOne('button[data-testid="todo-item-button"]')
+    await clickOne('button[data-testid="todo-item-button"]')
     expect(query('input[data-testid="todo-item-toggle"]').length).toBe(1)
 
     // delete 0
-    clickOne('button[data-testid="todo-item-button"]')
+    await clickOne('button[data-testid="todo-item-button"]')
     expect(query('input[data-testid="todo-item-toggle"]').length).toBe(0)
   })
 
-  it('editing', () => {
+  it('editing', async () => {
     // create todo
     todoInput.value = 'one'
     ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
@@ -86,7 +88,7 @@ describe('todos', () => {
     expect(query('input[data-testid="text-input"]').length).toBe(2)
 
     // delete 0
-    clickOne('button[data-testid="todo-item-button"]')
+    await clickOne('button[data-testid="todo-item-button"]')
     expect(query('label[data-testid="todo-item-label"]').length).toBe(0)
   })
 })

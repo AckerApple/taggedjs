@@ -1,4 +1,4 @@
-import { BaseSupport, RouteProps, RouteQuery, RouteTag, Subject, Tag, TagSubject, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag, BasicTypes } from 'taggedjs'
+import { BaseSupport, RouteProps, RouteQuery, RouteTag, Subject, Tag, TagSubject, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag, BasicTypes, ContextItem, getNewGlobal } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -39,7 +39,9 @@ console.debug(`💾 wrote ${fileSavePath}`)
 function templaterToSupport(
   templater: TemplaterResult,
 ) {
-  const subject = new Subject<any>() as TagSubject
+  const subject: ContextItem = {
+    value: templater, tagJsType: getValueType(templater), global: getNewGlobal()
+  }
   templater.props = templater.props || []
   const support = new BaseSupport(templater, subject) as any as Support
 
@@ -50,13 +52,13 @@ function templaterToSupport(
 
 function readySupport(
   support: Support,
-  subject: TagSubject,
+  subject: ContextItem,
 ) {
   subject.support = support
   support.subject.global.oldest = support
 
-  renderTagOnly(support, support, subject)
-  support.update()
+  renderTagOnly(support, support, subject as TagSubject)
+  support.buildContext()
   
   return support
 }
@@ -103,15 +105,16 @@ function processValue(
     case ValueTypes.tag:
       const tag = (value as any).tag as StringTag // ??? TODO
       const subStrings = new Array(...tag.strings) // .reverse()
-      const string = subStrings.map((x, index) =>
+      const string = subStrings.map((x, index) => {
+        const value = tag.values[index]
         x + processValue(
-          tag.values[index],
+          value,
           [],
           tag.strings.length - 1 -index,
           support,
-          new Subject<any>(tag.values[index]) as TagSubject
+          {value, tagJsType: getValueType(value), global: getNewGlobal()} as TagSubject
         )
-      ).join('')
+      }).join('')
       strings.splice(index+1, 0, string)
       //const tempString = templaterToHtml(value as TemplaterResult)
       //strings.splice(index+1, 0, tempString)

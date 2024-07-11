@@ -74,12 +74,25 @@ export const counters = tag(({
           </span>
         </div>
 
+        <input id="set-main-counter-input" placeholder="input counter value"
+          onkeyup=${e => (counter = Number(e.target.value) || 0)}
+        />
+
         <div>
-          <button id="standalone-counter"
-            onclick=${increaseCounter}
-          >stand alone counters:${counter}</button>
+          <button id="❤️-increase-counter"
+            onclick=${increasePropCounter}
+          >❤️ propCounter:${propCounter}</button>
           <span>
-            🥦 <span id="standalone-display">${counter}</span>
+            ❤️ <span id="❤️-counter-display">${propCounter}</span>
+            </span>
+        </div>
+
+        <div>
+          <button id="🥦-standalone-counter"
+            onclick=${increaseCounter}
+          >🥦 stand alone counters</button>
+          <span>
+            🥦 <span id="🥦-standalone-display">${counter}</span>
           </span>
         </div>
     
@@ -94,26 +107,12 @@ export const counters = tag(({
           </div>
         `}
 
-        <input id="set-main-counter-input"
-          onkeyup=${e => (counter = Number(e.target.value) || 0)}
-        />
-
-        <div>
-          <button id="❤️-increase-counter"
-            onclick=${increasePropCounter}
-          >❤️ propCounter:${propCounter}</button>
-          <span>
-            ❤️ <span id="❤️-counter-display">${propCounter}</span>
-            </span>
-        </div>
-
         <div>
           <button id="🥦-subject-increase-counter"
             onclick=${() => callbackTestSub.next(counter + 1)}
-          >subject increase:</button>
+          >++subject&lt;&gt;</button>
           <span>
-            🥦 <span id="🥦-subject-counter-display">${counter}</span>
-            🥦 <span id="subject-counter-subject-display">${callbackTestSub}</span>
+            🥦&lt;<span id="subject-counter-subject-display">${callbackTestSub}</span>&gt;
           </span>
         </div>
       `}

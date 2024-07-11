@@ -1,7 +1,7 @@
 // taggedjs-no-compile
 
-import { parseHtmlTemplates } from "./parseHtmlTemplates.function"
-import { reconstructCode } from "./reconstructCode.function"
+import { parseHtmlTemplates } from "./parseHtmlTemplates.function.js"
+import { reconstructCode } from "./reconstructCode.function.js"
 
 
 export type ParsedResult = { html: string, values?: unknown[], strings?: string[] }

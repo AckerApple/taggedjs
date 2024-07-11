@@ -33,7 +33,7 @@ describe('counters', () => {
     // expect(html('#inner_counters_render_count')).toBe( (beforeInnerRenderCount + 1).toString() )
     expect(html('#inner_counters_render_count')).toBe( (beforeInnerRenderCount + 4).toString() )
 
-    testCounterElements('#standalone-counter', '#standalone-display')
+    testCounterElements('#🥦-standalone-counter', '#🥦-standalone-display')
 
     expect(html('#counters_render_count')).toBe( (beforeRenderCount + (firstRun ? 6 : 6)).toString(), 'render count check failed' )
     // the child was not rendered again because props did not change so value should be less
@@ -60,9 +60,9 @@ describe('counters', () => {
     click('#🥦-subject-increase-counter')
 
     const pipedSubDisplay = html('#🪈-pipedSubject')
-    const subjectCountDisplay = html('#🥦-subject-counter-display')
-    expect(pipedSubDisplay).toBe(subjectCountDisplay, `Expected #🪈-pipedSubject value(${pipedSubDisplay}) to match #🥦-subject-counter-display value(${subjectCountDisplay})`)
-    expect(html('#🪈-pipedSubject-2')).toBe(html('#🥦-subject-counter-display') )
+    const subjectCountDisplay = html('#🥦-standalone-display')
+    expect(pipedSubDisplay).toBe(subjectCountDisplay, `Expected #🪈-pipedSubject value(${pipedSubDisplay}) to match #🥦-standalone-display value(${subjectCountDisplay})`)
+    expect(html('#🪈-pipedSubject-2')).toBe(html('#🥦-standalone-display') )
   })
 */
 })
