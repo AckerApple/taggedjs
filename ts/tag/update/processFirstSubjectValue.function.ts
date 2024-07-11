@@ -1,29 +1,36 @@
-import { processSubjectComponent } from './processSubjectComponent.function.js'
 import { TagArraySubject, processTagArray } from './processTagArray.js'
 import { TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
 import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
 import { DisplaySubject, TagSubject } from '../../subject.types.js'
-import { RegularValue, processFirstRegularValue } from './processRegularValue.function.js'
+import { RegularValue } from './processRegularValue.function.js'
 import { processTag, tagFakeTemplater } from './processTag.function.js'
 import { AnySupport } from '../Support.class.js'
-import { StringTag, DomTag } from '../Tag.class.js'
-import { InterpolateSubject, TemplateValue, processOptions } from './processFirstSubject.utils.js'
+import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
+import { TemplateValue, processOptions } from './processFirstSubject.utils.js'
 import { renderTagOnly } from '../render/renderTagOnly.function.js'
 import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js'
 import { oneRenderToSupport } from './oneRenderToSupport.function.js'
 import { getValueType } from '../getValueType.function.js'
+import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function.js'
+import { processFirstSubjectComponent } from './processFirstSubjectComponent.function.js'
 
 export function processFirstSubjectValue(
   value: TemplateValue | StringTag,
-  subject: InterpolateSubject, // could be tag via result.tag
-  insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
+  subject: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owning support
   options: processOptions, // {added:0, removed:0}
-  fragment?: DocumentFragment
-): {support?: AnySupport, fragment?: DocumentFragment} {
+  fragment?: DocumentFragment | Element
+): {
+  support?: AnySupport
+  fragment?: DocumentFragment | Element
+} {
   const valueType = getValueType(value)
-  
+
   switch (valueType) {
+    case ValueTypes.subject: {
+      return {fragment}// its managed on its own
+    }
+    
     case ValueTypes.templater:
       return processTag(
         value as TemplaterResult,
@@ -50,7 +57,6 @@ export function processFirstSubjectValue(
       const result = processTagArray(
         subject as TagArraySubject,
         value as (StringTag | TemplaterResult)[],
-        insertBefore,
         ownerSupport,
         options,
         fragment,
@@ -59,10 +65,9 @@ export function processFirstSubjectValue(
     
     case ValueTypes.stateRender:
     case ValueTypes.tagComponent:
-      const processResult = processSubjectComponent(
+      const processResult = processFirstSubjectComponent(
         value as TemplaterResult,
         subject as TagSubject,
-        insertBefore,
         ownerSupport,
         options,
       )
@@ -89,11 +94,28 @@ export function processFirstSubjectValue(
       break
   }
 
-  const result = processFirstRegularValue(
+  processFirstRegularValue(
     value as RegularValue,
     subject as DisplaySubject,
-    subject.global.placeholder || insertBefore,
+    subject.global.placeholder as InsertBefore, // || insertBefore,
   )
 
   return {fragment}
+}
+
+function processFirstRegularValue(
+  value: RegularValue,
+  subject: DisplaySubject, // could be tag via subject.tag
+  insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
+) {
+  subject.lastValue = value
+  const castedValue = castTextValue(value)
+
+  // Processing of regular values
+  const clone = updateBeforeTemplate(
+    castedValue,
+    insertBefore, // this will be removed
+  )
+
+  subject.global.simpleValueElm = clone
 }

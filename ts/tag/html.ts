@@ -1,6 +1,5 @@
-import { deepClone } from '../deepFunctions.js'
-import { InputElementTargetEvent } from '../interpolations/ElementTargetEvent.interface.js'
-import { LikeObjectChildren, ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
+import { InputElementTargetEvent } from '../interpolations/attributes/ElementTargetEvent.interface.js'
+import { LikeObjectChildren } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
 import { RegularValue } from '../subject.types.js'
 import { StringTag, DomTag } from './Tag.class.js'
 

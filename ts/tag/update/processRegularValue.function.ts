@@ -1,7 +1,7 @@
 import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
 import { DisplaySubject } from '../../subject.types'
 import { castTextValue, updateBeforeTemplate } from'../../updateBeforeTemplate.function.js'
-import { AnySupport, Support } from '../Support.class.js'
+import { paintContent } from '../paint.function.js'
 
 export type RegularValue = string | number | undefined | boolean
 
@@ -9,13 +9,12 @@ export type RegularValue = string | number | undefined | boolean
 export function processRegularValue(
   value: RegularValue,
   subject: DisplaySubject, // could be tag via subject.tag
-  insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
 ) {
-  subject.global.insertBefore = insertBefore
-  const before = subject.global.placeholder || insertBefore // Either the template is on the doc OR its the first element we last put on doc
+  const before = subject.global.placeholder as InsertBefore // || insertBefore // Either the template is on the doc OR its the first element we last put on doc
 
   // matches but also was defined at some point
-  if(subject.lastValue === value && 'lastValue' in subject) {
+  const skip = subject.lastValue === value && 'lastValue' in subject
+  if(skip) {
     return // no need to update display, its the same
   }
 
@@ -25,7 +24,10 @@ export function processRegularValue(
   // replace existing string?
   const oldClone = subject.global.simpleValueElm // placeholder
   if(oldClone) {
-    oldClone.textContent = castedValue
+    // oldClone.textContent = castedValue
+    paintContent.push(() => {
+      oldClone.textContent = castedValue
+    })
     return
   }
   
@@ -36,23 +38,4 @@ export function processRegularValue(
   )
 
   subject.global.simpleValueElm = clone
-  // subject.global.placeholder = clone // remember single element put down, for future updates
-}
-
-export function processFirstRegularValue(
-  value: RegularValue,
-  subject: DisplaySubject, // could be tag via subject.tag
-  insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
-) {
-  subject.lastValue = value
-  const castedValue = castTextValue(value)
-
-  // Processing of regular values
-  const clone = updateBeforeTemplate(
-    castedValue,
-    insertBefore, // this will be removed
-  )
-
-  subject.global.simpleValueElm = clone
-  // subject.global.placeholder = clone // remember single element put down, for future updates 
 }

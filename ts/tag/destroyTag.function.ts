@@ -3,7 +3,9 @@ import { BaseSupport, Support } from './Support.class.js'
 export function destroyTagMemory(
   oldSupport: Support | BaseSupport,
 ) {
-  const global = oldSupport.subject.global
+  const subject = oldSupport.subject
+  const global = subject.global
   const oldest = global.oldest as Support
+  delete subject.support
   oldest.destroy()
 }

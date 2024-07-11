@@ -91,11 +91,11 @@ const setupWatch = <T, R>(
   callback: WatchCallback<T>,
   {
     init,
-    before = () => true,
+    before,
     final = defaultFinally,  
   }: WatchSetup<R> = {}
 ): T => {
-  let previous = state({
+  const previous = state({
     pastResult: undefined as T,
     values: undefined as unknown as any[],
   })
@@ -104,7 +104,7 @@ const setupWatch = <T, R>(
 
   // First time running watch?
   if(previousValues === undefined) {
-    if(!before(currentValues)) {
+    if(before && !before(currentValues)) {
       previous.values = currentValues
       return previous.pastResult // do not continue
     }
@@ -123,7 +123,7 @@ const setupWatch = <T, R>(
     return previous.pastResult
   }
 
-  if(!before(currentValues)) {
+  if(before && !before(currentValues)) {
     previous.values = currentValues
     return previous.pastResult // do not continue
   }

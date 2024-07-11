@@ -1,10 +1,8 @@
 import { TagSubject } from '../../subject.types.js'
 import { hasSupportChanged } from'../hasSupportChanged.function.js'
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
-import { processSubjectComponent } from'./processSubjectComponent.function.js'
 import { destroyTagMemory } from'../destroyTag.function.js'
 import { renderSupport } from'../render/renderSupport.function.js'
-import { InsertBefore } from'../../interpolations/InsertBefore.type.js'
 import { castProps, isSkipPropValue } from'../../alterProp.function.js'
 import { isLikeTags } from'../isLikeTags.function.js'
 import { Props } from '../../Props.js'
@@ -12,12 +10,15 @@ import { TemplaterResult } from '../TemplaterResult.class.js'
 import { afterChildrenBuilt } from './afterChildrenBuilt.function.js'
 import { softDestroySupport } from '../render/softDestroySupport.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
+import { DomObjectChildren } from '../../interpolations/optimizers/ObjectNode.types.js'
+import { ContextItem } from '../Tag.class.js'
+import { processFirstSubjectComponent } from './processFirstSubjectComponent.function.js'
+import { paintContent } from '../paint.function.js'
 
 export function updateExistingTagComponent(
   ownerSupport: BaseSupport | Support,
   support: AnySupport, // lastest
   subject: TagSubject,
-  insertBefore: InsertBefore,
 ): Support | BaseSupport {
   const lastSupport = subject.global.newest as BaseSupport | Support
   
@@ -32,20 +33,17 @@ export function updateExistingTagComponent(
     // string compare both functions
     isSameTag = oldFunction === newFunction
   } else if(support.templater.tagJsType === ValueTypes.stateRender) {
-    // TODO: Performance, we should upgrade string compare to instead check tag creation order identifier(s)
-    isSameTag = isSameStateRenderTag(support, lastSupport)
+    isSameTag = lastSupport.dom === support.dom
   }
 
   const templater = support.templater
   if(!isSameTag) {
     return swapTags(
-      insertBefore,
       subject,
       templater,
       ownerSupport,
     )
   }
-
 
   const hasChanged = templater.tagJsType === ValueTypes.stateRender || hasSupportChanged(
     lastSupport as unknown as BaseSupport,
@@ -63,7 +61,6 @@ export function updateExistingTagComponent(
     )
   }
 
-  const oldest = subject.global.oldest
   if(subject.global.locked) {
     subject.global.blocked.push(support)
   
@@ -85,8 +82,6 @@ function afterTagRender(
   newSupport: AnySupport,
   isSameTag: boolean,
 ) {
-  const lastSupport = subject.support
-
   // detect if both the function is the same and the return is the same
   const isLikeTag = isSameTag && isLikeTags(previous, newSupport)
   if(isLikeTag) {
@@ -95,6 +90,8 @@ function afterTagRender(
   }
 
   // Although function looked the same it returned a different html result
+  /*
+  // const lastSupport = subject.support
   if(isSameTag && lastSupport) {
     const preGlobal = previous.subject.global
     if(!preGlobal.deleted) {
@@ -102,6 +99,7 @@ function afterTagRender(
       delete preGlobal.deleted
     }
   }
+  */
 
   return buildNewTag(
     newSupport,
@@ -117,15 +115,18 @@ function buildNewTag(
     counts: {added: 0, removed: 0},
   })
   
-  const children = fragment.children
+  paintContent.push(() => {
+    // const placeholder = subject.global.placeholder as Text
+    // const parentNode = placeholder.parentNode as ParentNode
+    // parentNode.insertBefore(fragment, placeholder)
 
-  // A placeholder was created lets put it down
-  const placeholder = subject.global.placeholder as Text
-  const parentNode = placeholder.parentNode as ParentNode
-  parentNode.insertBefore(fragment, placeholder)
+    afterChildrenBuilt(
+      subject.global.htmlDomMeta as DomObjectChildren,
+      subject,
+      newSupport
+    )
+  })
 
-  afterChildrenBuilt(children, subject, newSupport)
-  
   subject.global.oldest = newSupport
   subject.global.newest = newSupport
   subject.support = newSupport as Support
@@ -143,12 +144,10 @@ export function syncFunctionProps(
   const newest = lastSupport.subject.global.newest as Support
 
   if(!newest) {
-    const state = ownerSupport.state
     // newPropsArray.length = 0
     const castedProps = castProps(
       newPropsArray,
       newSupport,
-      state,
       depth
     )
     newPropsArray.push( ...castedProps )
@@ -160,7 +159,6 @@ export function syncFunctionProps(
 
   const priorPropConfig = lastSupport.propsConfig
   const priorPropsArray = priorPropConfig.castProps as Props
-
   const newArray = []
   for (let index = 0; index < newPropsArray.length; ++index) {
     const prop = newPropsArray[index]
@@ -198,10 +196,13 @@ function syncPriorPropFunction(
     }
 
     const ownerGlobal = ownerSupport.subject.global
-    const oldOwnerState = (ownerGlobal.newest as Support).state
+    const newest = ownerGlobal.newest as Support
+    const oldOwnerState = newest.state
 
-    priorProp.mem.prop = prop
-    priorProp.stateArray = oldOwnerState
+    priorProp.mem = {
+      prop,
+      stateArray: oldOwnerState,
+    }
 
     return priorProp
   }
@@ -307,25 +308,19 @@ function syncSupports(
 }
 
 function swapTags(
-  insertBefore: InsertBefore,
-  subject: TagSubject,
+  subject: ContextItem,
   templater: TemplaterResult,
   ownerSupport: AnySupport
 ) {
   const global = subject.global
-  if(global.deleted) {
-    throw new Error('isSameTag already deleted')
-  }
-
   const oldestSupport = global.oldest as Support
   destroyTagMemory(oldestSupport)
   // ??? - new added
   delete subject.global.deleted
 
-  const newSupport = processSubjectComponent(
+  const newSupport = processFirstSubjectComponent(
     templater,
     subject,
-    insertBefore,
     ownerSupport,
     {
       counts: {added: 0, removed: 0},
@@ -333,21 +328,4 @@ function swapTags(
   )
 
   return newSupport
-}
-
-function isSameStateRenderTag(
-  newSupport: AnySupport,
-  lastSupport: AnySupport,
-) {
-  return isSameStateFunTag(
-    newSupport.templater,
-    lastSupport.templater,
-  )
-}
-
-export function isSameStateFunTag(
-  newTemplater: TemplaterResult,
-  lastTemplater?: TemplaterResult,
-) {
-  return lastTemplater !== undefined && newTemplater.toString() === lastTemplater.toString()
 }

@@ -1,13 +1,14 @@
 import { Counts } from'../../interpolations/interpolateTemplate.js'
 import { TagArraySubject } from'./processTagArray.js'
 import { TagSubject } from '../../subject.types.js'
-import { BaseSupport, Support } from '../Support.class.js'
+import { AnySupport, BaseSupport, Support } from '../Support.class.js'
+import { paintAppends } from '../paint.function.js'
 
 /** checks if previous support exists on subject or as a last global support. If first render, calls builder. Otherwise calls support.updateBy()
  * Being used for FIRST and UPDATE renders
 */
 export function processTagResult(
-  support: Support,
+  support: AnySupport,
   subject: TagArraySubject | TagSubject | Function, // used for recording past and current value
   {
     counts,
@@ -25,20 +26,27 @@ export function processTagResult(
     return processTagResultUpdate(support, subjectTag, prevSupport)
   }
 
+  return processFirstTagResult(support, counts, subjectTag)
+}
+
+export function processFirstTagResult(
+  support: AnySupport,
+  counts: Counts,
+  subjectTag: TagSubject,
+) {
   const newFragment = support.buildBeforeElement(undefined, {counts})
   const placeholder = subjectTag.global.placeholder as Text
-  const parentNode = placeholder.parentNode as ParentNode
 
-  // TODO: since function used for both new and update, can;t get appendChild performance boost on first
-  // parentNode.appendChild(newFragment)
-  parentNode.insertBefore(newFragment, placeholder)
+  paintAppends.push(() => {  
+    const parentNode = placeholder.parentNode as ParentNode
+    parentNode.insertBefore(newFragment, placeholder)
+  })
 
   return support
 }
 
-
 function processTagResultUpdate(
-  support: Support,
+  support: AnySupport,
   subject: TagSubject | ((x: BaseSupport | Support) => Support), // used for recording past and current value
   prevSupport: BaseSupport | Support,
 ) {
@@ -54,7 +62,7 @@ function processTagResultUpdate(
   // ??? - new removed
   // prevSupport.updateBy(support)
   subject.global.oldest.updateBy(support)
-  subject.support = support
+  subject.support = support as Support
 
   return support
 }

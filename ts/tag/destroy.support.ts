@@ -1,3 +1,4 @@
+import { Subscription } from '../subject/subject.utils.js'
 import { Support } from './Support.class.js'
 
 export type DestroyOptions = {
@@ -8,12 +9,18 @@ export type DestroyOptions = {
 export function getChildTagsToDestroy(
   childTags: Support[],
   allTags: Support[] = [],
-): Support[] {
+  subs: Subscription<any>[] = []
+): {tags:Support[], subs: Subscription<any>[]} {
   for (const cTag of childTags) {
     allTags.push(cTag)
+    const iSubs = cTag.subject.global.subscriptions
+    subs.push(...iSubs)
+    iSubs.length = 0
     const subTags = cTag.subject.global.childTags
-    getChildTagsToDestroy(subTags, allTags)
+    getChildTagsToDestroy(subTags, allTags, subs)
   }
 
-  return allTags
+  childTags.length = 0
+
+  return {tags:allTags, subs}
 }

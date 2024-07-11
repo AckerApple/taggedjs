@@ -4,6 +4,7 @@ import { renderExistingTag } from'./renderExistingTag.function.js'
 import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
+import { runBlocked } from '../../interpolations/attributes/bindSubjectCallback.function.js'
 
 export function isInlineHtml(templater: TemplaterResult) {
   return !templater.wrapper && templater.tagJsType !== ValueTypes.stateRender
@@ -34,7 +35,7 @@ export function renderSupport<T extends AnySupport>(
   const subject = support.subject
   const oldest = global.oldest
   
-  let selfPropChange = false
+  let selfPropChange = false // have my props changed?
   const shouldRenderUp = renderUp && support
 
   if(shouldRenderUp && ownerSupport) {
@@ -46,19 +47,24 @@ export function renderSupport<T extends AnySupport>(
   // ??? newly moved above renderExistingTag
   // render up first and that will cause me to re-render
   if(ownerSupport && selfPropChange) {
-    // const myRenderCount = global.renderCount
-    const myOwnerSupport = ownerSupport.subject.global.newest as Support
+    const ownerGlobal = ownerSupport.subject.global
+    const myOwnerSupport = ownerGlobal.newest as Support
     renderSupport(
       myOwnerSupport,
       true,
     )
 
-    if(global.blocked.length) {
-      support = global.blocked.pop() as T
-      global.blocked.length = 0
+    if(global.deleted) {
+      return support // exit because got deleted by parent
     }
+    // return support // exit because got deleted by parent
   }
-  
+
+  if(global.blocked.length) {
+    support = global.blocked.pop() as T
+    global.blocked.length = 0
+  }
+
   const tag = renderExistingTag(
     oldest,
     support,
@@ -79,6 +85,6 @@ export function renderInlineHtml(
     return support
   }
 
-  ++support.subject.global.renderCount
+  // ++support.subject.global.renderCount
   return renderSupport(ownerSupport.subject.global.newest as Support, true)
 }

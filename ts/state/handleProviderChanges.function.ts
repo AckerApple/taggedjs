@@ -1,38 +1,39 @@
-import { deepClone } from '../deepFunctions.js'
 import { Provider } from './providers.js'
-import { renderSupport } from'../tag/render/renderSupport.function.js'
-import { Support } from '../tag/Support.class.js'
+import { AnySupport, Support } from '../tag/Support.class.js'
 import { safeRenderSupport } from '../alterProp.function.js'
 
 export function handleProviderChanges(
   appSupport: Support,
   provider: Provider,
+  skip: AnySupport,
 ) {
   let hadChanged = false
   const tagsWithProvider = getTagsWithProvider(appSupport, provider)
   for (let index = tagsWithProvider.length - 1; index >= 0; --index) {
     const {support, renderCount, provider} = tagsWithProvider[index]
     const global = support.subject.global
+
+    if(skip.subject.global === global) {
+      continue
+    }
+
     if(global.deleted) {
       continue // i was deleted after another tag processed
     }
 
     const notRendered = renderCount === global.renderCount
     const locked = global.locked
-    if(notRendered && !locked) {
+    const render = notRendered && !locked
+    
+    if(render) {
       hadChanged = true
       const newSupport = global.newest as Support
       // provider.clone = deepClone(provider.instance)
-      /*
-      renderSupport(
-        newSupport,
-        false,
-      )
-      */
       safeRenderSupport(newSupport, newSupport.ownerSupport as Support)
       continue
     }
   }
+  
   return hadChanged
 }
 
@@ -41,7 +42,7 @@ function getTagsWithProvider(
   support: Support,
   provider: Provider,
   memory: TagWithProvider[] = []
-) {
+): TagWithProvider[] {
   memory.push({
     support,
     renderCount: support.subject.global.renderCount,
@@ -50,9 +51,10 @@ function getTagsWithProvider(
 
   const childTags = provider.children
   for (let index = childTags.length - 1; index >= 0; --index) {
+    const child = childTags[index]
     memory.push({
-      support: childTags[index],
-      renderCount: childTags[index].subject.global.renderCount,
+      support: child,
+      renderCount: child.subject.global.renderCount,
       provider,
     })
   }

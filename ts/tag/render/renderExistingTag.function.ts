@@ -1,19 +1,20 @@
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
-import { TagSubject } from '../../subject.types.js'
-import { isLikeTags } from'../isLikeTags.function.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
 import { providersChangeCheck } from '../../state/providersChangeCheck.function.js'
+import { ContextItem } from '../Tag.class.js'
+import { TagSubject } from '../../subject.types.js'
+import { processTag } from '../update/processTag.function.js'
 
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(
   oldestSupport: AnySupport, // oldest with elements on html
   newSupport: AnySupport, // new to be rendered
   ownerSupport: BaseSupport | Support, // ownerSupport
-  subject: TagSubject,
+  subject: ContextItem,
 ): AnySupport {
   const lastSupport = subject.support as Support // todo maybe not needed?
   const global = subject.global
-  
+
   // share point between renders
   newSupport.subject.global = global
 
@@ -29,19 +30,26 @@ export function renderExistingTag(
   }
 
   const toRedrawTag = prevSupport || lastSupport || global.oldest
-  const reSupport = renderWithSupport(
+  const {support, wasLikeTags} = renderWithSupport(
     newSupport,
     toRedrawTag,
-    subject,
+    subject as TagSubject,
     ownerSupport as Support,
   )
 
-  const isLikeTag = prevSupport && isLikeTags(prevSupport, reSupport)
-  if(isLikeTag) {
-    subject.support = reSupport as Support
+  const updateAfterRender = prevSupport && wasLikeTags
+  if(updateAfterRender) {
+    subject.support = support as Support
     const oldest = global.oldest || oldestSupport
-    oldest.updateBy(reSupport)
+    oldest.updateBy(support)
+    return support
   }
 
-  return reSupport
+  processTag(
+    support.templater,
+    ownerSupport,
+    subject as TagSubject,
+  )
+
+  return support
 }

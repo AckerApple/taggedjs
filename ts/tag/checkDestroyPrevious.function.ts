@@ -1,17 +1,19 @@
 import { DisplaySubject, TagSubject } from '../subject.types.js'
 import { isSimpleType, isStaticTag } from'../isInstance.js'
 import { InterpolateSubject } from './update/processFirstSubject.utils.js'
-import { TagArraySubject } from'./update/processTagArray.js'
+import { destroyArrayItem, TagArraySubject } from'./update/processTagArray.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { Counts } from'../interpolations/interpolateTemplate.js'
 import { destroyTagMemory } from'./destroyTag.function.js'
 import { Support } from './Support.class.js'
 import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
+import { paintAppends } from './paint.function.js'
+import { ContextItem } from './Tag.class.js'
 
 const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender, ValueTypes.oneRender]
 
 export function checkDestroyPrevious(
-  subject: InterpolateSubject, // existing.value is the old value
+  subject: ContextItem, // existing.value is the old value
   newValue: unknown,
   valueType: ValueType | BasicTypes | ImmutableTypes, // new value type
 ) {
@@ -32,6 +34,7 @@ export function checkDestroyPrevious(
     }
 
     destroySimpleValue(displaySubject)
+    subject.global.renderCount = 0
     return 'changed-simple-value'
   }
 
@@ -41,11 +44,13 @@ export function checkDestroyPrevious(
   // no longer an array
   if (wasArray && valueType !== ValueTypes.tagArray) {
     delete arraySubject.lastArray
-    
-    for (const {support} of wasArray.array) {
-      destroyArrayTag(support, {added:0, removed:0})
+    const counts = {added:0, removed:0}
+    for (let index=0; index < wasArray.array.length; ++index) {
+      const {support} = wasArray.array[index]
+      destroyArrayItem(wasArray.array, index, {counts})
+      // destroyArrayTag(support, )
     }
-
+    subject.global.renderCount = 0
     return 'array'
   }
 
@@ -67,6 +72,7 @@ export function checkDestroyPrevious(
       if(!likeTags) {
         destroyTagMemory(lastSupport)
         delete subject.global.deleted
+        subject.global.renderCount = 0
         return 'tag-swap'
       }
 
@@ -80,6 +86,7 @@ export function checkDestroyPrevious(
 
     // destroy old component, value is not a component
     destroyTagMemory(lastSupport)
+    subject.global.renderCount = 0
     delete subject.global.deleted // prevent replacing tag from thinking it was deleted
     return 'different-tag'
   }
@@ -87,28 +94,14 @@ export function checkDestroyPrevious(
   return false
 }
 
-export function destroyArrayTag(
-  support: Support,
-  counts: Counts,
-) {
-  const global = support.subject.global
-  const placeholder = global.placeholder as Text
-  const parentNode = placeholder.parentNode as ParentNode
-  parentNode.removeChild(placeholder)
-
-  delete global.placeholder
-
-  support.destroy({
-    stagger: counts.removed++,
-  })
-}
-
 function destroySimpleValue(
   subject: DisplaySubject,
 ) {
   delete subject.lastValue
   const elm = subject.global.simpleValueElm as Element
-  const parentNode = elm.parentNode as ParentNode
-  parentNode.removeChild(elm)
+  paintAppends.push(() => {
+    const parentNode = elm.parentNode as ParentNode
+    parentNode.removeChild(elm)
+  })
   delete subject.global.simpleValueElm
 }

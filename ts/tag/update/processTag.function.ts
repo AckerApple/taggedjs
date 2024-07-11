@@ -1,14 +1,15 @@
-import { StringTag, DomTag } from '../Tag.class.js'
+import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
 import { TagSubject } from '../../subject.types.js'
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
-import { ValueSubject } from '../../subject/index.js'
 import { afterChildrenBuilt } from './afterChildrenBuilt.function.js'
 import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
+import { DomObjectChildren } from '../../interpolations/optimizers/ObjectNode.types.js'
+import { paintAppends } from '../paint.function.js'
 
 /** When first time render, adds to owner childTags
- * Used for BOTH inserts & updates
+ * Used for BOTH inserts & updates to values that were something else
 */
 export function processTag(
   templater: TemplaterResult,
@@ -16,7 +17,8 @@ export function processTag(
   subject: TagSubject, // could be tag via result.tag
 ): {support: Support, fragment: DocumentFragment} {
   let support = subject.support as any as Support
-  const firstTime = support ? false : true
+
+  const firstTime = !support || subject.global.renderCount === 0
   
   // first time seeing this tag?
   if( firstTime ) {
@@ -26,14 +28,18 @@ export function processTag(
   subject.support = support
   support.ownerSupport = ownerSupport
   const fragment = support.buildBeforeElement(undefined, {counts: {added:0, removed:0}})
-  const children = fragment.children
   const placeholder = subject.global.placeholder as Text
-  const parentNode = placeholder.parentNode as ParentNode
-  parentNode.insertBefore(fragment, placeholder)
-
-  if( firstTime ) {
-    afterChildrenBuilt(children, subject, ownerSupport)
+  
+  if(subject.global.deleted) {
+    throw new Error('working with something deleted')
   }
+  paintAppends.push(() => {
+    const parentNode = placeholder.parentNode as ParentNode
+    parentNode.insertBefore(fragment, placeholder)
+    
+    afterChildrenBuilt(subject.global.htmlDomMeta as DomObjectChildren, subject, ownerSupport)
+  })
+
 
   return {support, fragment}
 }
@@ -87,9 +93,10 @@ export function newSupportByTemplater(
 export function setupNewSupport(
   support: Support,
   ownerSupport: BaseSupport | Support,
-  subject: TagSubject,
+  subject: ContextItem,
 ) {
   support.subject = subject
+  subject.support = support
   subject.global.oldest = support
   subject.global.newest = support
 

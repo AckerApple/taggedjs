@@ -1,5 +1,5 @@
-import { deepClone } from '../deepFunctions.js'
-import { BaseSupport, Support } from '../tag/Support.class.js'
+import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
+import { Support } from '../tag/Support.class.js'
 import { setUse } from'./setUse.function.js'
 import { state } from'./state.function.js'
 
@@ -29,7 +29,8 @@ export const providers = {
 
     // mimic how many states were called the first time
     if(stateDiffMemory.stateDiff) {
-      for(let x = stateDiffMemory.stateDiff; x > 0; --x){
+      let x = stateDiffMemory.stateDiff
+      while(x--){
         state(undefined)
       }
       const result = state(undefined) as T
@@ -63,7 +64,6 @@ export const providers = {
     })
 
     const cm = constructMethod as ConstructMethod<T>
-    // const compareTo = cm.compareTo = cm.compareTo || cm.toString()
     const compareTo = cm.compareTo = cm.toString()
     stateDiffMemory.provider.constructMethod.compareTo = compareTo
 
@@ -81,7 +81,7 @@ export const providers = {
       const memory = setUse.memory
       const cm = constructor as ConstructMethod<T>
       const compareTo = cm.compareTo = cm.compareTo || constructor.toString()
-      const support = memory.stateConfig.support as Support
+      const support =  getSupportInCycle() as Support // memory.stateConfig.support as Support
       const providers: Provider[] = []
 
       let owner = {
@@ -102,7 +102,7 @@ export const providers = {
 
         if(provider) {
           // provider.clone = deepClone(provider.instance) // keep a copy of the latest before any change occur
-          const support = memory.stateConfig.support as Support
+          // const support = memory.stateConfig.support as Support
           support.subject.global.providers.push(provider)
           provider.children.push(support)
           return provider.instance

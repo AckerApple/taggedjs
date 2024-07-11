@@ -1,50 +1,61 @@
-import { StringTag, DomTag } from '../Tag.class.js'
-import { DisplaySubject, TagSubject } from '../../subject.types.js'
+import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
 import { ValueSubject } from '../../subject/ValueSubject.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
-import { Support } from '../Support.class.js'
-import { InterpolateSubject, TemplateValue } from './processFirstSubject.utils.js'
+import { AnySupport, Support } from '../Support.class.js'
+import { TemplateValue } from './processFirstSubject.utils.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { getValueType } from '../getValueType.function.js'
-import { TagJsSubject, getNewGlobal } from './TagJsSubject.class.js'
 
 export function processNewValue(
   value: TemplateValue | ValueSubject<any>,
-  ownerSupport: Support,
-): InterpolateSubject {
+  ownerSupport: AnySupport,
+  contextItem: ContextItem,
+): ContextItem {
   const valueType = getValueType(value)
+
+  if(contextItem.global.isAttr) {
+    contextItem.support = ownerSupport
+    contextItem.global.lastValue = value
+    contextItem.value = value
+    return contextItem
+  }
 
   switch (valueType) {
     case ValueTypes.stateRender:
     case ValueTypes.tagComponent:
-      return new TagJsSubject(value, valueType) // ownerSupport.global.value
+      contextItem.tagJsType = ValueTypes.tagJsSubject
+      break
 
     case ValueTypes.templater:
       const templater = value as TemplaterResult
       const tag = templater.tag as StringTag | DomTag
-      const subject = processNewTag(tag, ownerSupport)
-      subject.global.nowValueType = valueType
-      return subject
+      processNewTag(tag, ownerSupport, contextItem)
+      break
     
     case ValueTypes.tag:
     case ValueTypes.dom:
-      const htmlSubject = processNewTag(value as StringTag | DomTag, ownerSupport)
-      htmlSubject.global.nowValueType = valueType
-      return htmlSubject
+      processNewTag(value as StringTag | DomTag, ownerSupport, contextItem)
+      break
 
+    // its already a subject
     case ValueTypes.subject:
-      const newGlobal = getNewGlobal()
-      ;(value as any).global = newGlobal
-      return value as InterpolateSubject
+      contextItem.tagJsType = ValueTypes.subject
+      break
   }
 
-  const subject = new TagJsSubject(value, valueType) as unknown as DisplaySubject
-  return subject
+  // after processing
+  contextItem.value = value
+  contextItem.tagJsType = valueType
+  contextItem.global.lastValue = value
+  contextItem.global.nowValueType = valueType
+
+  return contextItem
 }
 
 function processNewTag(
   value: StringTag | DomTag,
-  ownerSupport: Support
+  ownerSupport: AnySupport,
+  contextItem: ContextItem,
 ) {  
   const tag = value
   
@@ -56,15 +67,17 @@ function processNewTag(
     tag.templater = templater
   }
 
-  const subject = new TagJsSubject(templater) as any as TagSubject
-  subject.support = new Support(
+  contextItem.value = templater,
+  contextItem.tagJsType = getValueType(templater)
+
+  contextItem.support = new Support(
     templater,
     ownerSupport,
-    subject
+    contextItem
   )
 
-  subject.global.oldest = subject.support
-  ownerSupport.subject.global.childTags.push(subject.support as Support)
+  contextItem.global.oldest = contextItem.support
+  ownerSupport.subject.global.childTags.push(contextItem.support as Support)
 
-  return subject
+  return contextItem
 }

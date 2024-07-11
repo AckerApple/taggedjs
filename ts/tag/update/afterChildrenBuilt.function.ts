@@ -1,57 +1,46 @@
-import { Context } from '../Tag.class.js'
-import { elementInitCheck } from '../../interpolations/elementInitCheck.js'
-import { ElementBuildOptions } from '../../interpolations/interpolateTemplate.js'
+import { elementInitCheck } from '../../interpolations/attributes/elementInitCheck.js'
+import { DomObjectChildren, DomObjectElement } from '../../interpolations/optimizers/ObjectNode.types.js'
 import { AnySupport } from '../Support.class.js'
-import { TagJsSubject } from './TagJsSubject.class.js'
-
-export function afterChildrenBuilt(
-  children: HTMLCollection, // Element[],
-  subject: TagJsSubject<any>,
-  ownerSupport: AnySupport,
-) {
-  for (const child of children) {
-    afterElmBuild(
-      child,
-      {counts: {added:0, removed:0}},
-      subject.global.context,
-      ownerSupport,
-    )
-  }
-}
+import { ContextItem } from '../Tag.class.js'
 
 /** This is the function that enhances elements such as [class.something] and [style.color] OR it fixes elements that alter innerHTML */
-function afterElmBuild(
-  elm: Element | ChildNode,
-  options: ElementBuildOptions,
-  context: Context,
+export function afterChildrenBuilt(
+  children: DomObjectChildren, // HTMLCollection // Element[],
+  subject: ContextItem,
   ownerSupport: AnySupport,
 ) {
-  if (!(elm as Element).getAttribute) {
-    return
-  }
+  const kids = children
+  const len = kids.length
+  let index = 0
+  while (index < len) {
+    const elm = kids[index] as DomObjectElement
 
-  elementInitCheck(elm, options.counts)
-
-  const hasFocusFun = (elm as any).focus
-  if (hasFocusFun) {
-    if ((elm as any).hasAttribute('autofocus')) {
-      (elm as any).focus()
+    const isElm = elm.nodeName !== 'text' // (elm as Element).getAttribute
+    if (!isElm) {
+      return
     }
 
-    if ((elm as any).hasAttribute('autoselect')) {
-      (elm as any).select()
-    }
-  }
-
-  const children = (elm as Element).children as HTMLCollection
-  if (children) {
-    for (const child of children) {
-      const subOptions = {
-        ...options,
-        counts: options.counts,
+    const domElm = elm.domElement
+  
+    // ??? todo this might be way animations out of sync
+    elementInitCheck(domElm, {added:0, removed:0})
+  
+    const hasFocusAbility = (domElm as any).focus
+    if (hasFocusAbility) {
+      if ((domElm as any).hasAttribute('autofocus')) {
+        (domElm as any).focus()
       }
-
-      afterElmBuild(child, subOptions, context, ownerSupport)
+  
+      if ((domElm as any).hasAttribute('autoselect')) {
+        (domElm as any).select()
+      }
     }
+  
+    const children = elm.children
+    if(children) {
+      afterChildrenBuilt(children, subject, ownerSupport)
+    }
+
+    ++index
   }
 }

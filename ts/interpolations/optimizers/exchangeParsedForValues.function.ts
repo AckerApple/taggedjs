@@ -1,40 +1,38 @@
+import { ParsedHtml } from "./htmlInterpolationToDomMeta.function.js"
 import { ObjectElement, ObjectText } from "./ObjectNode.types.js"
 
-export type ValuePos = {
-  pos: (string | number)[]
-  // isAttr?: true
-  isAttr?: boolean
+export type ValuePos = (elements:any) => ([any, string | number] | any[])
+export type ObjectChildren = (ObjectText | ObjectElement)[]
+
+// used for runtime processing
+export type DomMetaMap = () => ParsedHtml
+// used for imports with no typing
+export type LikeObjectChildren = () => LikeObjectElement[]
+
+// A looser typing for compiled code
+type LikeObjectElement = {
+  nodeName: string
+  textContent?: string
+  value?: any
+  attributes?: any[],
+  children?: LikeObjectElement[]
+  domElement?: any
 }
 
-export type DomMetaMap = {
-  domMeta: (ObjectElement | ObjectText)[],
-  pos: ValuePos[]
-}
 
+// TODO: remove
 export function replaceHoldersByPosMaps(
-  parsedElements: (ObjectElement | ObjectText)[],
-  values: unknown[],
+  parsedElements: ParsedHtml[],
   valuePositions: ValuePos[],
 ) {
-  Object.values(valuePositions).forEach((valuePosMeta, index) =>
-    replaceHolderByPosMap(parsedElements, values, valuePosMeta, index)
+  return Object.values(valuePositions).map((valuePosMeta, index) =>
+    replaceHolderByPosMap(parsedElements, valuePosMeta)
   )
 }
 
 function replaceHolderByPosMap(
-  parsedElements: (ObjectElement | ObjectText)[],
-  values: unknown[],
+  parsedElements: ParsedHtml[],
   valuePosition: ValuePos,
-  valueIndex: number,
 ) {
-  const posMap = [...valuePosition.pos]
-  const lastName = posMap.pop()
-  const varPart: any = posMap.reduce((
-    all: any,
-    name: string | number,
-  ) => {
-    return all[ name as any ]
-  }, parsedElements)
-
-  varPart[lastName as any] = values[valueIndex]
+  return valuePosition(parsedElements)
 }

@@ -3,6 +3,7 @@
 import { variablePrefix, variableSuffix } from "../../tag/Tag.class.js"
 import { Attribute, DomObjectElement, ObjectElement, ObjectText } from "./ObjectNode.types.js"
 
+const ondoubleclick = 'ondoubleclick'
 const fragFindAny = /(:tagvar\d+:)/
 const fragReplacer = /(^:tagvar\d+:|:tagvar\d+:$)/g
 const safeVar = '__safeTagVar'
@@ -63,11 +64,13 @@ function addPlaceholders(
   return results
 }
 
-type ParsedHtml = (DomObjectElement | ObjectText)[]
+export type OneUnparsedHtml = ObjectElement | ObjectText
+export type UnparsedHtml = OneUnparsedHtml[]
+export type ParsedHtml = (DomObjectElement | ObjectText)[]
 
 export function parseHTML(html: string): ParsedHtml {
   const valuePositions: string[][] = [];
-  const elements: (DomObjectElement | ObjectText)[] = [];
+  const elements: ParsedHtml = [];
   const stack: ObjectElement[] = [];
   let currentElement: ObjectElement | null = null;
   let valueIndex = -1;
@@ -127,7 +130,8 @@ export function parseHTML(html: string): ParsedHtml {
 
       const notEmpty = attrMatch[2] !== ''
       const noValue = attrValue === undefined && notEmpty
-      const fixedName = attrName.toLowerCase()
+      const lowerName = attrName.toLowerCase()
+      const fixedName = lowerName.length === ondoubleclick.length && lowerName === ondoubleclick ? 'ondblclick' : lowerName
 
       if (noValue) {
         const standAloneVar = attrName.slice(0, variablePrefix.length) === variablePrefix;
@@ -147,6 +151,10 @@ export function parseHTML(html: string): ParsedHtml {
 
         const valueName = variablePrefix + (++valueIndex) + variableSuffix
         attrValue = valueName
+      }
+
+      if(!notEmpty) {
+        attrValue = attrMatch[2]
       }
 
       attributes.push([fixedName, attrValue])
@@ -212,7 +220,7 @@ function splitByTagVar(inputString: string) {
 
 function pushTo(
   currentElement: ObjectElement | null,
-  elements: (DomObjectElement | ObjectText)[],
+  elements: ParsedHtml,
   textNode: ObjectText
 ) {
   if (currentElement) {
@@ -227,7 +235,7 @@ function pushTo(
 
 function pushTextTo(
   currentElement: ObjectElement | null,
-  elements: (DomObjectElement | ObjectText)[],
+  elements: ParsedHtml,
   textContent: string
 ) {
   const textNode: ObjectText = {

@@ -1,5 +1,7 @@
 import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
-import { ObjectChildren, ObjectElement, ObjectText } from "./ObjectNode.types.js";
+import { ObjectChildren } from "./exchangeParsedForValues.function.js";
+import { OneUnparsedHtml } from "./htmlInterpolationToDomMeta.function.js";
+import { ObjectText } from "./ObjectNode.types.js";
 export const safeVar = '__safeTagVar'
 
 export function restorePlaceholders(elements: ObjectChildren) {
@@ -8,7 +10,7 @@ export function restorePlaceholders(elements: ObjectChildren) {
 
 const safeReplacer = /__safeTagVar(\d+)/g
 
-function traverseAndRestore(element: ObjectElement | ObjectText) {
+function traverseAndRestore(element: OneUnparsedHtml) {
   if ('attributes' in element) {
     element.attributes = element.attributes ? element.attributes.map(attr => {
       if(attr.length === 1) {

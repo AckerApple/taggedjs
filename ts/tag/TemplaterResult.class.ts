@@ -1,22 +1,22 @@
-import { Context, StringTag, DomTag } from './Tag.class.js'
+import { Context, StringTag, DomTag, ContextItem } from './Tag.class.js'
 import { BaseSupport, Support } from './Support.class.js'
 import { Props } from '../Props.js'
 import { TagWrapper } from './tag.utils.js'
 import { Provider } from '../state/providers.js'
 import { OnDestroyCallback } from '../state/onDestroy.js'
-import { TagSubject } from '../subject.types.js'
 import { OnInitCallback } from '../state/onInit.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { InsertBefore } from '../interpolations/InsertBefore.type.js'
 import { Subject } from '../subject/index.js'
 import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
+import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 
 export type OriginalFunction = (() => StringTag) & {compareTo: string}
 
 export type Wrapper = ((
   newSupport: BaseSupport | Support,
-  subject: TagSubject,
+  subject: ContextItem,
   prevSupport?: BaseSupport | Support,
 ) => Support) & {
   tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.oneRender | typeof ValueTypes.templater
@@ -24,7 +24,16 @@ export type Wrapper = ((
 }
 
 export type TagGlobal = {
+  isAttr: boolean
+  element?: Element
+  howToSet?: HowToSet
+  isNameOnly?: boolean
+  attrName?: string
+  isSpecial?: boolean
+
   nowValueType?: ImmutableTypes | ValueType | BasicTypes
+  lastValue?: any
+  
   destroy$: Subject<any>
   oldest: BaseSupport | Support
   newest?: BaseSupport | Support
@@ -49,7 +58,7 @@ export type TagGlobal = {
   
   childTags: Support[], // tags on me
   // clones: Clone[],
-  htmlDomMeta: DomObjectChildren
+  htmlDomMeta?: DomObjectChildren
   callbackMaker?: true
   simpleValueElm?: Clone
 }

@@ -31,11 +31,9 @@ setUse.memory.stateConfig = {
 
 export type GetSet<T> = (y: T) => [T, T]
 
-const beforeRender = (support: Support | BaseSupport) => initState(support)
-
 setUse({
-  beforeRender,
-  beforeRedraw: beforeRender,
+  beforeRender: (support: Support | BaseSupport) => initState(support),
+  beforeRedraw: (support: Support | BaseSupport) => reState(support),
   afterRender: (
     support: Support | BaseSupport,
   ) => {
@@ -72,17 +70,18 @@ export function getStateValue<T>(
 ) {
   const callback = state.callback
   
+  // state()
   if(!callback) {
     return state.defaultValue
   }
 
+  // letState()
   const [value,checkValue] = getCallbackValue(callback)
 
+  // TODO: not needed in production
   if(checkValue !== StateEchoBack) {
-    const message = badLetState + (callback ? callback.toString() : JSON.stringify(state)) +'\n'
-    
+    const message = badLetState + (callback ? callback.toString() : JSON.stringify(state)) +'\n'    
     console.error(message, {state, callback, value, checkValue})
-    
     throw new Error(message)
   }
 
@@ -94,26 +93,32 @@ export class StateEchoBack {}
 function initState(
   support: Support | BaseSupport
 ) {
+  const config: Config = setUse.memory.stateConfig
+  config.rearray = []
+  config.support = support
+}
+
+function reState(
+  support: Support | BaseSupport
+) {
   const state = support.state as State
   const config: Config = setUse.memory.stateConfig
 
   config.rearray = []
-  const stateLength = state?.length
-  if(stateLength) {
-    for (const item of state) {
-      getStateValue(item)
-    }
-    config.rearray.push( ...state )
+  for (const item of state) {
+    getStateValue(item)
   }
-
+  config.rearray.push( ...state )
   config.support = support
 }
 
+// sends a fake value and then sets back to received value
 export function getCallbackValue<T>(
   callback: StateConfig<T>
 ): [T, T] {
   const oldState = callback(StateEchoBack as any) // get value and set to undefined
   const [value] = oldState
+  
   const [checkValue] = callback( value ) // set back to original value
   return [value, checkValue]
 }

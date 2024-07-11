@@ -1,37 +1,35 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
-import { State } from '../state/state.utils.js'
-import { BaseSupport, Support } from '../tag/Support.class.js'
-import { TagGlobal } from '../tag/TemplaterResult.class.js'
-import { ValueTypes } from '../tag/ValueTypes.enum.js'
-import { renderSupport } from'../tag/render/renderSupport.function.js'
-import { updateExistingTagComponent } from '../tag/update/updateExistingTagComponent.function.js'
+import { State } from '../../state/state.utils.js'
+import { syncStates } from '../../state/syncStates.function.js'
+import { TagSubject } from '../../subject.types.js'
+import { AnySupport, BaseSupport, Support } from '../../tag/Support.class.js'
+import { TagGlobal } from '../../tag/TemplaterResult.class.js'
+import { ValueTypes } from '../../tag/ValueTypes.enum.js'
+import { renderSupport } from'../../tag/render/renderSupport.function.js'
+import { updateExistingTagComponent } from '../../tag/update/updateExistingTagComponent.function.js'
 
-const useLocks = true
 const noData = 'no-data-ever'
 const promiseNoData = 'promise-no-data-ever'
 
-export type Callback = (...args: any[]) => any & {
-  isChildOverride?: true // if this is set, then a parent tag passed children to a tag/component
-}
+export type Callback = (...args: any[]) => any
 
 export function bindSubjectCallback(
   value: Callback,
-  support: BaseSupport | Support,
+  support: AnySupport,
 ) {
-  // Is this children? No override needed
-  if((value as any).isChildOverride) {
-    return value
-  }
-
-  // const state = setUse.memory.stateConfig.support?.state as State
-  const state = support.state as State
+  const state = support.state
   const subjectFunction = (
     element: Element, args: any[],
-  ) => runTagCallback(value, support, element, args, state)
+  ) => {
+    return runTagCallback(
+      subjectFunction.tagFunction, subjectFunction.support, element, args, state
+    )
+  }
 
   // link back to original. Mostly used for <div oninit ondestroy> animations
   subjectFunction.tagFunction = value
+  subjectFunction.support = support
 
   return subjectFunction
 }
@@ -41,17 +39,27 @@ export function runTagCallback(
   support: BaseSupport | Support,
   bindTo: unknown,
   args: any[],
-  state: State
+  state: State,
 ) {
   const tag = findTagToCallback(support)
   const global = tag.subject.global
-
+  
+  // ??? TODO: this may not be needed (its covered below)
   if(global.deleted) {
     return noData
   }
 
+  // ??? not sure if needed
+  /*
+  const newest = global.newest as Support
+  const newState = newest.state
+  if(newState.length === state.length) {
+    syncStates(newState, state)
+  }
+  */
+
   const method = value.bind(bindTo)  
-  tag.subject.global.locked = useLocks // prevent another render from re-rendering this tag
+  tag.subject.global.locked = true // prevent another render from re-rendering this tag
   const callbackResult = method(...args)
 
  return afterTagCallback(tag, callbackResult)
@@ -62,7 +70,13 @@ export function afterTagCallback(
   callbackResult: any,
 ) {
   const global = tag.subject.global
+  /*
+  if (global.deleted) {
+    return noData;
+  }
+  */
   delete global.locked
+  
   const blocked = global.blocked
   if(blocked.length) {
     const lastResult = runBlocked(tag)
@@ -118,7 +132,7 @@ export function checkAfterCallbackPromise(
   global: TagGlobal,
 ) {
   if(callbackResult instanceof Promise) {
-    last.subject.global.locked = useLocks
+    last.subject.global.locked = true
 
     return callbackResult.then(() => {
       delete last.subject.global.locked
@@ -153,8 +167,7 @@ export function runBlocked(
     const lastResult = updateExistingTagComponent(
       block.ownerSupport,
       block,
-      block.subject,
-      block.subject.global.insertBefore as any,
+      block.subject as TagSubject,
     )
 
     global.newest = lastResult

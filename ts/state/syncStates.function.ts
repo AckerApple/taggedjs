@@ -1,4 +1,4 @@
-import { State } from './state.utils'
+import { State, StateConfigItem } from './state.utils'
 
 export function syncStates(
   stateFrom: State,
@@ -7,10 +7,18 @@ export function syncStates(
   for (let index = stateFrom.length - 1; index >= 0; --index) {
     const state = stateFrom[index]
     const fromValue = state.get()
-    const callback = stateTo[index].callback
+    const s = stateTo[index]
+    setState(s, fromValue)
+  }
+}
 
-    if(callback) {
-      callback( fromValue ) // set the value
-    }    
+function setState(
+  s: StateConfigItem<any>,
+  fromValue: any,
+) {
+  const callback = s.callback
+
+  if(callback) {
+    callback( fromValue ) // set the value
   }
 }

@@ -1,5 +1,6 @@
 import { Config, GetSet, StateConfig, State, StateConfigItem, getStateValue } from './state.utils.js'
 import { setUse } from './setUse.function.js'
+import { Support } from '../tag/Support.class.js'
 
 /** Used for variables that need to remain the same variable during render passes. If defaultValue is a function it is called only once, its return value is first state, and let value can changed */
 export function letState <T>(
@@ -7,17 +8,13 @@ export function letState <T>(
 ): ((getSet: GetSet<T>) => T) {
   const config: Config = setUse.memory.stateConfig
   const rearray = config.rearray as State
-  const restate = rearray[config.array.length]
   
-  if(restate) {
+  if(rearray.length) {
+    const restate = rearray[config.array.length]
     let oldValue = getStateValue(restate) as T
 
-    const getSetMethod: StateConfig<T> = ((x: T) => [oldValue, oldValue = x])
-    
     const push: StateConfigItem<T> = {
       get: () => getStateValue(push) as T,
-      callback: getSetMethod,
-      // lastValue: oldValue,
       defaultValue: restate.defaultValue,
     }
 
@@ -27,14 +24,9 @@ export function letState <T>(
   }
 
   // State first time run
-  const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue
-  let initValue = defaultFn()
-
-  const getSetMethod: StateConfig<T> = ((x: T) => [initValue, initValue = x])
+  const initValue = defaultValue instanceof Function ? defaultValue() : defaultValue
   const push: StateConfigItem<T> = {
     get: () => getStateValue(push) as T,
-    callback: getSetMethod,
-    // lastValue: initValue,
     defaultValue: initValue,
   }
   config.array.push(push)
@@ -46,10 +38,8 @@ function makeStateResult<T>(
   initValue: T,
   push: StateConfigItem<T>,
 ) {
-  // return initValue
-  const result =  (y: any) => {
-    push.callback = y || (x => [initValue, initValue = x])
-
+  const result = (y: any) => {
+    push.callback = y // || (x => [initValue, initValue = x])
     return initValue
   }
 

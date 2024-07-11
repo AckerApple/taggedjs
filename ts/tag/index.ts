@@ -1,3 +1,4 @@
+export { getNewGlobal } from './update/getNewGlobal.function.js'
 export * from './tag.types.js'
 export { getDomMeta } from './domMetaCollector.js'
 export * from './tag.js'
@@ -9,4 +10,3 @@ export * from './render/renderTagOnly.function.js'
 export * from './update/oneRenderToSupport.function.js'
 export * from './getValueType.function.js'
 export * from './TemplaterResult.class.js'
-

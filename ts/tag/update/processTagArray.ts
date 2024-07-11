@@ -1,20 +1,21 @@
 // taggedjs-no-compile
 
 import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
-import { DomTag, StringTag, TagTemplate } from '../Tag.class.js'
+import { ContextItem, DomTag, StringTag, TagTemplate } from '../Tag.class.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { ArrayNoKeyError } from '../../errors.js'
-import { destroyArrayTag } from '../checkDestroyPrevious.function.js'
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { isTagClass } from '../../isInstance.js'
-import { TagSubject } from '../../subject.types.js'
-import { TagJsSubject } from './TagJsSubject.class.js'
 import { textNode } from '../textNode.js'
 import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { afterChildrenBuilt } from './afterChildrenBuilt.function.js'
+import { DomObjectChildren } from '../../interpolations/optimizers/ObjectNode.types.js'
+import { paintAppends } from '../paint.function.js'
+import { getNewGlobal } from './getNewGlobal.function.js'
+import { processNewValue } from './processNewValue.function.js'
 
 export type LastArrayItem = {
   support: Support
@@ -27,7 +28,7 @@ type LastArrayMeta = {
   lastRuns?: {[index: number]: TagTemplate}
 }
 
-export type TagArraySubject = TagJsSubject<StringTag[]> & {
+export type TagArraySubject = ContextItem & {
   insertBefore: InsertBefore // template tag
   lastArray?: LastArrayMeta // previous array that may have been processed
 }
@@ -35,20 +36,20 @@ export type TagArraySubject = TagJsSubject<StringTag[]> & {
 export function processTagArray(
   subject: TagArraySubject,
   value: (TemplaterResult | StringTag)[], // arry of Tag classes
-  insertBefore: InsertBefore, // <template end interpolate />
+  // insertBefore: InsertBefore, // <template end interpolate />
   ownerSupport: BaseSupport | Support,
   options: {
     counts: Counts
   },
-  fragment?: DocumentFragment,
+  fragment?: DocumentFragment | Element,
 // ): DomObjectChildren {
-): DocumentFragment | undefined {
+): DocumentFragment | Element | undefined {
   const global = subject.global
   ++global.renderCount
   
   const existed = subject.lastArray ? true : false
   const lastArray = subject.lastArray = subject.lastArray || {array: []}
-  let lastFragment: DocumentFragment | undefined
+  let lastFragment: DocumentFragment | Element | undefined
   const runtimeInsertBefore = global.placeholder
 
   let removed = 0
@@ -91,17 +92,18 @@ function reviewArrayItem(
   options: {
     counts: Counts
   },
-  fragment?: DocumentFragment,
+  fragment?: DocumentFragment | Element,
 ) {
   const item = value[index]
   const previous = lastArray.array[index]
   const previousSupport = previous?.support
   const subTag = item as StringTag | DomTag | TemplaterResult
   // const tagClass = isTagClass(subTag)
-  const itemSubject = previousSupport?.subject || new TagJsSubject(
-    // undefined
-    item,
-  ) as unknown as TagSubject
+  const itemSubject: ContextItem = previousSupport?.subject || {
+    tagJsType: item,
+    value: value,
+    global: getNewGlobal(),
+  }
 
   const templater = (subTag as StringTag | DomTag).templater
 
@@ -125,9 +127,6 @@ function reviewArrayItem(
       itemSubject,
       item as TemplateValue,
       ownerSupport, // prevSupport,
-      // ??? recently switched
-      // prevGlobal.insertBefore as InsertBefore,
-      runtimeInsertBefore as InsertBefore,
     )
 
     return
@@ -152,7 +151,7 @@ function reviewArrayItem(
 }
 
 function setPlaceholderElm(
-  subject: TagSubject, // || TagArraySubject,
+  subject: ContextItem,
 ) {
   const elm = textNode.cloneNode(false) as Text
   return subject.global.placeholder = elm
@@ -161,62 +160,49 @@ function setPlaceholderElm(
 function processAddTagArrayItem(
   item: unknown,
   before: Text,
-  itemSubject: TagSubject,
+  itemSubject: ContextItem,
   index: number,
   ownerSupport: AnySupport,
   options: {
     counts: Counts
   },
   lastArray: LastArrayItem[],
-  fragment?: DocumentFragment,
-): {newFragment?: DocumentFragment, newSupport?: AnySupport} {
+  fragment?: DocumentFragment | Element,
+): {
+  newFragment?: DocumentFragment | Element
+  newSupport?: AnySupport
+} {
   options.counts.added = options.counts.added + 1 // index
-  // options.counts.removed
-  
-  const insertBefore = document.createTextNode('')
   const subPlaceholder = setPlaceholderElm( itemSubject )
-  const parentNode = before.parentNode as ParentNode
 
-  if(fragment) {
-    fragment.insertBefore(insertBefore, before)
-    fragment.insertBefore(subPlaceholder, before)
-  } else {
-    parentNode.insertBefore(insertBefore, before)
+  paintAppends.push(() => {
+    const parentNode = before.parentNode as ParentNode
     parentNode.insertBefore(subPlaceholder, before)
-  }
+  })
+
+  processNewValue(item as TemplateValue, ownerSupport, itemSubject)
 
   const { fragment: newFragment, support } = processFirstSubjectValue(
     item as TemplateValue,
     itemSubject,
-    insertBefore, // subPlaceholder,
     ownerSupport, // support,
     options,
   )
 
-  const children = itemSubject.global.htmlDomMeta
+  const children = itemSubject.global.htmlDomMeta as DomObjectChildren
   
   if(newFragment) {
-    if(fragment) {
-      fragment.insertBefore(newFragment, subPlaceholder)
-    } else {
+    paintAppends.push(() => {
+      const parentNode = before.parentNode as ParentNode
       parentNode.insertBefore(newFragment, subPlaceholder)
-    }
-  }
-  
-  children.forEach(child => {
-    const element = child.domElement
-
-    if (element && child.nodeName !== 'text') {
-      afterChildrenBuilt([element] as any, itemSubject, support as Support)
-    }
-  })
-
-  const lastValue = {
-    support: support as Support, index
+      afterChildrenBuilt(children, itemSubject, support as Support)
+    })
   }
   
   // Added to previous array
-  lastArray.push(lastValue)
+  lastArray.push({
+    support: support as Support, index
+  })
 
   return {newFragment, newSupport: support}
 }
@@ -236,7 +222,7 @@ function areLikeValues(valueA: unknown, valueB: unknown): Boolean {
   return false
 }
 
-function destroyArrayItem(
+export function destroyArrayItem(
   lastArray: LastArrayItem[],
   index: number,
   options: {
@@ -248,6 +234,23 @@ function destroyArrayItem(
   destroyArrayTag(support, options.counts)
   last.deleted = true
   ++options.counts.removed
+}
+
+/** Destroys one item in an array of items */
+function destroyArrayTag(
+  support: Support,
+  counts: Counts,
+) {
+  const global = support.subject.global
+  const placeholder = global.placeholder as Text
+  const parentNode = placeholder.parentNode as ParentNode
+  parentNode.removeChild(placeholder)
+
+  delete global.placeholder
+
+  support.destroy({
+    stagger: counts.removed++,
+  })
 }
 
 function reviewLastArrayItem(

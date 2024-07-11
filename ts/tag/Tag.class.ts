@@ -3,20 +3,24 @@
 import { State } from'../state/index.js'
 import { InterpolatedTemplates } from '../interpolations/interpolations.js'
 
-import { TemplaterResult } from './TemplaterResult.class.js'
+import { TagGlobal, TemplaterResult } from './TemplaterResult.class.js'
 import { TagValues } from'./html.js'
 import { ValueTypes } from './ValueTypes.enum.js'
-import { TagJsSubject } from './update/TagJsSubject.class.js'
-import { LikeObjectChildren, ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
-import { DomMetaMap, ValuePos } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
+import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
+import { AnySupport } from './Support.class.js'
 
 export const variablePrefix = ':tagvar'
 export const variableSuffix = ':'
 
-export type Context = TagJsSubject<any>[]
+// export type Context = TagJsSubject<any>[]
+export type ContextItem = {
+  global: TagGlobal
+  value: any, tagJsType: any
+  support?: AnySupport
+}
+export type Context = ContextItem[]
 
 export type TagMemory = {
-  // context: Context
   state: State
 }
 
@@ -24,11 +28,8 @@ export interface TagTemplate {
   interpolation: InterpolatedTemplates,
   string: string,
   strings: string[]
-  values: unknown[]
-  
+  values: unknown[]  
   domMetaMap?: DomMetaMap
-  // domMeta?: ObjectChildren
-  // pos?: ValuePos[]
 }
 
 export class Tag {

@@ -1,18 +1,16 @@
-import { deepClone } from "../../deepFunctions.js";
 import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
-import { TagJsSubject } from "../../tag/update/TagJsSubject.class.js";
-import { Attribute, ObjectChildren, ObjectElement, ObjectText } from "./ObjectNode.types.js";
-import { DomMetaMap, ValuePos } from "./exchangeParsedForValues.function.js";
+import { Attribute, ObjectText } from "./ObjectNode.types.js";
+import { DomMetaMap, ObjectChildren, ValuePos } from "./exchangeParsedForValues.function.js";
+import { OneUnparsedHtml, ParsedHtml, UnparsedHtml } from "./htmlInterpolationToDomMeta.function.js";
 
 const placeholderRegex = new RegExp(variablePrefix + '(\\d+)' + variableSuffix, 'g');
 
 export function replacePlaceholders(
-  dom: (ObjectElement | ObjectText)[],
+  dom: UnparsedHtml,
   valueCount: number,
   valuePositions: ValuePos[] = [],
   currentTail: (string | number)[] = [],
-): DomMetaMap {
-  // const elements = deepClone( dom )
+): ParsedHtml {
   const elements = dom
 
   for (let i = 0; i < elements.length; i++) {
@@ -21,28 +19,26 @@ export function replacePlaceholders(
     const element = elements[i]
     if ('attributes' in element) {
       const attrs = element.attributes as Attribute[]
-      element.attributes = processAttributes(attrs, valueCount, loopTail, valuePositions)
+      element.attributes = processAttributes(attrs, valueCount)
     }
 
     if ('children' in element) {
       const children = element.children as ObjectChildren
       const innerLoopTail: (string | number)[] = [...loopTail, 'children']
-      element.children = replacePlaceholders(children, valueCount, valuePositions, innerLoopTail).domMeta
+      element.children = replacePlaceholders(children, valueCount, valuePositions, innerLoopTail)
     }
 
-    i = examineChild(element, valueCount, elements, i, loopTail, valuePositions)
+    i = examineChild(element, valueCount, elements, i)
   }
 
-  return {domMeta: elements, pos: valuePositions}
+  return elements as ParsedHtml
 }
 
 function examineChild(
-  child: ObjectElement | ObjectText,
+  child: OneUnparsedHtml,
   valueCount: number,
-  children: (ObjectElement | ObjectText)[],
+  children: UnparsedHtml,
   index: number,
-  currentTail: (string | number)[] = [],
-  valuePositions: ValuePos[],
 ): number {
   if (child.nodeName !== 'text') {
     return index;
@@ -63,12 +59,10 @@ function examineChild(
     if (examine) {
       const varContent = variablePrefix + wIndex + variableSuffix
       const after = textContent.slice(match.index + varContent.length)
-      const newPos = {pos: [...currentTail, 'value']}
-      valuePositions[wIndex] = newPos
 
       children.splice(index, 1, ...[{
         nodeName: 'text',
-        // value: varContent,
+        value: wIndex
       }])
       
       textContent = after;
@@ -84,22 +78,19 @@ function examineChild(
 function processAttributes(
   attributes: Attribute[],
   valueCount: number,
-  currentTail: (string | number)[] = [],
-  valuePositions: ValuePos[]
 ): Attribute[] {
-  return attributes.map(([key, value], attrIndex) => {
+  return attributes.map(([key, value]) => {
     if (key.startsWith(variablePrefix)) {
       const index = parseInt(key.replace(variablePrefix, ''), 10)
       if (!isNaN(index) && index < valueCount) {
-        valuePositions[index] = {isAttr: true, pos: [...currentTail, 'attributes', attrIndex, 0]}
-        return [key]
+        return [{tagJsVar: index}]
       }
     }
 
     if (typeof value === 'string' && value.startsWith(variablePrefix)) {
       const index = parseInt(value.replace(variablePrefix, ''), 10)
       if (!isNaN(index) && index < valueCount) {
-        valuePositions[index] = {isAttr: true, pos: [...currentTail, 'attributes', attrIndex, 1]} as any
+        return [key, {tagJsVar: index}]
       }
     }
 

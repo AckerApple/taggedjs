@@ -5,46 +5,56 @@ import { updateExistingValue } from '../tag/update/updateExistingValue.function.
 import { AnySupport } from '../tag/Support.class.js'
 import { TemplaterResult } from '../tag/TemplaterResult.class.js'
 import { Counts } from './interpolateTemplate.js'
-import { swapInsertBefore } from '../tag/setTagPlaceholder.function.js'
+import { paint } from '../tag/paint.function.js'
+import { setUse } from '../state/setUse.function.js'
+import { ContextItem } from '../tag/Tag.class.js'
 
-export function subscribeToTemplate(
-  fragment: DocumentFragment,
-  insertBefore: InsertBefore,
-  subject: InterpolateSubject,
-  support: AnySupport,
-  counts: Counts, // used for animation stagger computing
-) {
-  let called = false
-  const onValue = (value: TemplateValue) => {
-    if(called) {
-      updateExistingValue(
-        subject,
-        value,
-        support,
-        insertBefore, // needed incase type of value changed and a redraw required
-      )
-      return
-    }
+export type SubToTemplateOptions = {
+  fragment: DocumentFragment | Element
+  insertBefore: InsertBefore
+  subject: InterpolateSubject
+  support: AnySupport
+  counts: Counts // used for animation stagger computing
+  contextItem: ContextItem
+}
 
-    called = true
-
+export function subscribeToTemplate({
+  fragment,
+  subject,
+  support,
+  counts,
+  contextItem,
+}: SubToTemplateOptions) {
+  let onValue = function onSubValue(value: TemplateValue) {
     const templater = value as TemplaterResult
     processFirstSubjectValue(
       templater,
-      subject,
-      insertBefore,
+      contextItem,
       support,
       {
         counts: {...counts},
       },
       syncRun ? fragment : undefined,
     )
-  }
 
-  // TODO: may noy be needed
-  // leave no template tag
-  if(!subject.global.placeholder) {
-    subject.global.placeholder = swapInsertBefore(insertBefore)
+    if(!syncRun && !setUse.memory.stateConfig.support) {
+      paint()
+    }
+
+    // from now on just run update
+    onValue = (value: TemplateValue) => {
+      updateExistingValue(
+        contextItem,
+        value,
+        support,
+      )
+
+      if(!setUse.memory.stateConfig.support) {
+        paint()
+      }
+
+      return
+    }
   }
   
   const callback = (value: TemplateValue) => onValue(value)

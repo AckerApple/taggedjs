@@ -4,7 +4,7 @@ import { AnySupport, BaseSupport, Support } from './Support.class.js'
 import { TagSubject } from '../subject.types.js'
 import { castProps } from'../alterProp.function.js'
 import { setUse } from '../state/setUse.function.js'
-import { StringTag } from './Tag.class.js'
+import { ContextItem, StringTag } from './Tag.class.js'
 import { State } from '../state/state.utils.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { html } from './html.js'
@@ -42,42 +42,22 @@ export function executeWrap(
   templater: TemplaterResult,
   result: TagWrapper<any>,
   newSupport: AnySupport,
-  subject: TagSubject,
+  subject: ContextItem,
   lastSupport?: AnySupport | undefined,
 ): Support {
   const global = subject.global
   const originalFunction = result.original // (innerTagWrap as any).original as unknown as TagComponent
+  const stateless = templater.tagJsType === ValueTypes.stateRender
+  const castedProps = stateless ? [] : getCastedProps(
+    templater,
+    newSupport,
+    lastSupport,
+  )
+
   let tag: StringTag;
-  let castedProps = []
-
-  ++global.renderCount
-
-  if(templater.tagJsType === ValueTypes.stateRender) {
+  if(stateless) {
     tag = templater as any as StringTag
   } else {
-    const props = templater.props
-  
-    // When defined, this must be an update where my new props have already been made for me
-    let preCastedProps: Props | undefined = newSupport.propsConfig.castProps
-  
-    const lastCastProps = lastSupport?.propsConfig.castProps
-    if(lastCastProps) {
-      newSupport.propsConfig.castProps = lastCastProps
-      preCastedProps = syncFunctionProps(
-        newSupport as Support,
-        lastSupport as Support,
-        (lastSupport as Support).ownerSupport,
-        props,
-      )
-    }
-  
-    castedProps = preCastedProps || castProps(
-      props,
-      newSupport,
-      stateArray,
-      0,
-    )
-    
     tag = originalFunction(...castedProps)
   }
 
@@ -111,4 +91,34 @@ export function executeWrap(
   support.state.push(...nowState)
 
   return support
+}
+
+export function getCastedProps(
+  templater: TemplaterResult,
+  newSupport: AnySupport,
+  lastSupport?: AnySupport,
+) {
+  const props = templater.props
+  
+  // When defined, this must be an update where my new props have already been made for me
+  let preCastedProps: Props | undefined = newSupport.propsConfig.castProps
+
+  const lastCastProps = lastSupport?.propsConfig.castProps
+  if(lastCastProps) {
+    newSupport.propsConfig.castProps = lastCastProps
+    preCastedProps = syncFunctionProps(
+      newSupport as Support,
+      lastSupport as Support,
+      (lastSupport as Support).ownerSupport,
+      props,
+    )
+  }
+
+  const castedProps = preCastedProps || castProps(
+    props,
+    newSupport,
+    0,
+  )
+
+  return castedProps
 }

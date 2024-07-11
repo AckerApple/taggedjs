@@ -1,54 +1,81 @@
+import { isSubjectInstance } from "../../isInstance.js"
+import { paintAppends } from "../../tag/paint.function.js"
 import { BaseSupport, Support } from "../../tag/Support.class.js"
-import { Context } from "../../tag/Tag.class.js"
-import { textNode } from "../../tag/textNode.js"
-import { TagJsSubject } from "../../tag/update/TagJsSubject.class.js"
+import { Context, ContextItem } from "../../tag/Tag.class.js"
+import { InterpolateSubject } from "../../tag/update/processFirstSubject.utils.js"
+import { empty } from "../../tag/ValueTypes.enum.js"
 import { Counts } from "../interpolateTemplate.js"
-import { processAttribute } from "../processAttribute.function.js"
-import { subscribeToTemplate } from "../subscribeToTemplate.function.js"
-import { DomObjectChildren, DomObjectElement, ObjectChildren, ObjectText } from "./ObjectNode.types.js"
+import { processAttribute } from "../attributes/processAttribute.function.js"
+import { SubToTemplateOptions } from "../subscribeToTemplate.function.js"
+import { DomObjectElement, ObjectText } from "./ObjectNode.types.js"
+import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
+import { ObjectChildren } from "./exchangeParsedForValues.function.js"
 
-// TODO: This could be done within exchangeParsedForValues to reduce loops
+// ??? TODO: This could be done within exchangeParsedForValues to reduce loops
 export function attachDomElement(
   nodes: ObjectChildren,
   scope: Context,
   support: BaseSupport | Support,
-  fragment: DocumentFragment,
   counts: Counts, // used for animation stagger computing
-  owner: Element
-): DomObjectChildren {
-  for (const node of nodes as  DomObjectElement[]) {
-    const marker = node.marker = textNode.cloneNode(false) as Text
-    const subject = node.value as TagJsSubject<any>
+  owner: Element,
+  subs: SubToTemplateOptions[] = [],
+) {
+  const x = document.createElement('div')
 
-    if(subject) {
-      owner.appendChild( marker )
+  for (const node of nodes as  DomObjectElement[]) {
+    const value = node.value as ContextItem
+    const isNum = !isNaN(value as unknown as number)
+
+    if(isNum) {
+      const marker = node.marker = node.marker || document.createTextNode(empty) // textNode.cloneNode(false) as Text
+      paintAppends.push(() => owner.appendChild(marker))
+      const subject = scope[ value as unknown as number ]
       subject.global.placeholder = marker
-      delete (node as any).marker
-      subscribeToTemplate(
-        owner as any,
-        marker,
+      // delete (node as any).marker // delete so that the marker is not destroyed with tag
+
+      const subVal = subject.value
+      if(isSubjectInstance(subVal)) {
+        subs.push({
+          fragment: owner,
+          insertBefore: marker,
+          subject: subVal as InterpolateSubject,
+          support, // ownerSupport,
+          counts,
+          contextItem: subject,
+        })
+        continue
+      }
+
+      processFirstSubjectValue(
+        subject.value,
         subject,
-        support, // ownerSupport,
-        counts,
+        support,
+        {
+          counts: {...counts},
+        },
+        owner,
       )
+  
       continue
     }
 
     if (node.nodeName === 'text') {
       const textNode = (node as any as ObjectText)
       const string = textNode.textContent
-      // parse things like &nbsp;
-      const newString = domParseString(string)
-      owner.appendChild( marker )
-      textNode.domElement = document.createTextNode(newString)
-      owner.appendChild( node.domElement )
+      // PARSE things like &nbsp; and <!-- -->
+      // const newString = string // domParseString(string)
+      x.innerHTML = string
+      const domElement = textNode.domElement = document.createTextNode(x.innerText)
+      paintAppends.push(() => {
+        // owner.appendChild(marker)
+        owner.appendChild(domElement)
+      })
       continue
     }
   
     const domElement = node.domElement = document.createElement(node.nodeName)
-    owner.appendChild(domElement)
-    owner.appendChild(marker)
 
+    // attributes that may effect style, come first
     if (node.attributes) {
       node.attributes.forEach(attr => {
         processAttribute(
@@ -59,17 +86,28 @@ export function attachDomElement(
       })
     }
 
+    paintAppends.push(() => {
+      owner.appendChild(domElement)
+      // owner.appendChild(marker)
+    })
+
     if (node.children) {
       attachDomElement(
-        node.children, scope, support, fragment, counts, domElement
+        node.children,
+        scope,
+        support,
+        counts,
+        domElement,
+        subs,
       )
     }
   }
 
-  return nodes as DomObjectChildren
+  return {subs}
 }
 
-export function domParseString(string: string) {
+// parse things like &nbsp; and <!-- -->
+function domParseString(string: string) {
   const text = new DOMParser().parseFromString(string, 'text/html')
   return getLeadingSpaces(string) + text.documentElement.textContent as string
 }

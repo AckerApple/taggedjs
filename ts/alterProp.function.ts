@@ -1,25 +1,21 @@
 import { AnySupport, BaseSupport, Support } from './tag/Support.class.js'
-import { deepEqual } from './deepFunctions.js'
 import { isStaticTag } from './isInstance.js'
 import { isInlineHtml, renderInlineHtml, renderSupport } from './tag/render/renderSupport.function.js'
-import { State, setUse } from './state/index.js'
+import { setUse } from './state/index.js'
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { Props } from './Props.js'
-import { runBlocked } from './interpolations/bindSubjectCallback.function.js'
-import { cloneTagJsValue } from './tag/cloneValueArray.function.js'
+import { runBlocked } from './interpolations/attributes/bindSubjectCallback.function.js'
 import { Tag } from './tag/Tag.class.js'
 import { renderExistingTag } from './tag/render/renderExistingTag.function.js'
 
 export function castProps(
   props: Props,
   newSupport: BaseSupport | Support,
-  stateArray: State,
   depth: number,
 ) {
   return props.map(prop => alterProp(
     prop,
     (newSupport as Support).ownerSupport,
-    stateArray,
     newSupport,
     depth,
   ))
@@ -29,7 +25,6 @@ export function castProps(
 export function alterProp(
   prop: unknown,
   ownerSupport: BaseSupport | Support,
-  stateArray: State,
   newSupport: BaseSupport | Support,
   depth: number,
 ) {
@@ -41,18 +36,14 @@ export function alterProp(
     return prop // no one above me
   }
 
-  return checkProp(prop, ownerSupport, stateArray, newSupport, depth)
+  return checkProp(prop, ownerSupport, newSupport, depth)
 }
 
 export function checkProp(
   value: any,
   ownerSupport: BaseSupport | Support,
-  stateArray: State,
   newSupport: BaseSupport | Support,
   depth: number,
-  index?: string | number,
-  newProp?: any,
-  // seen: any[] = [],
 ) {
   if(!value) {
     return value
@@ -63,9 +54,7 @@ export function checkProp(
   }
 
   if(value instanceof Function) {
-    return getPropWrap(
-      value, ownerSupport, stateArray,
-    )
+    return getPropWrap(value, ownerSupport)
   }
 
   // if(seen.includes(value)) {
@@ -83,8 +72,7 @@ export function checkProp(
       const subValue = value[index]
   
       value[index] = checkProp(
-        subValue, ownerSupport, stateArray, newSupport,
-        depth + 1, index, value, // seen
+        subValue, ownerSupport, newSupport, depth + 1,
       )
 
       if(subValue instanceof Function) {
@@ -103,9 +91,7 @@ export function checkProp(
   for(const name of keys){
     const subValue = value[name]
     const result = checkProp(
-      subValue, ownerSupport, stateArray, newSupport,
-      depth + 1,
-      name, value, // seen
+      subValue, ownerSupport, newSupport, depth + 1,
     )
 
     if(value[name] === result) {
@@ -138,11 +124,6 @@ function afterCheckProp(
   newProp: any,
   newSupport: BaseSupport | Support
 ) {
-  if(originalValue?.toCall) {
-    throw new Error('meg')
-    return // already been done
-  }
-
   // restore object to have original function on destroy
   if(depth > 0) {    
     const global = newSupport.subject.global
@@ -155,7 +136,6 @@ function afterCheckProp(
 export function getPropWrap(
   value: any,
   ownerSupport: BaseSupport | Support,
-  stateArray: State,
 ) {
   const toCall = value.toCall
 
@@ -174,7 +154,6 @@ export function getPropWrap(
     prop: value,
     // stateArray: stateArray
   }
-
 
   // copy data properties that maybe on source function
   Object.assign(wrap, value)
@@ -218,16 +197,23 @@ export function callbackPropOwner(
     delete supportInCycle.subject.global.locked
   }
   
-  const run = () => {    
+  const run = () => {
+    const global = newest.subject.global
+
     // are we in a rendering cycle? then its being called by alterProps
     if(noCycle === false) {
-      const allMatched = newest.subject.global.locked === true
+      const allMatched = global.locked === true
     
       if(allMatched) {
         return callbackResult // owner did not change
       }
     }
 
+    const oldest = global.oldest
+    if(oldest === newest && global.renderCount === 0) {
+      return // prop was called immediately
+    }
+  
     safeRenderSupport(newest, ownerSupport)
 
     return callbackResult
@@ -254,10 +240,11 @@ export function safeRenderSupport(
     return renderInlineHtml(ownerSupport, newest)
   }
 
+  const oldest = newest.subject.global.oldest  
   newest.subject.global.locked = true
 
   renderExistingTag(
-    newest.subject.global.oldest,
+    oldest,
     newest,
     ownerSupport as Support, // useSupport,
     newest.subject,

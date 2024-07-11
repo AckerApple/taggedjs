@@ -64,8 +64,6 @@ export function runBeforeDestroy(
 
   // remove me from my parents
   if(ownerSupport) {
-    ownerSupport.subject.global.childTags = ownerSupport.subject.global.childTags.filter(child => child !== support.subject.global.oldest as unknown as Support)
-
     const global = support.subject.global
     global.providers.forEach(provider => provider.children.forEach((child, index) => {
       if(child.subject.global === global) {

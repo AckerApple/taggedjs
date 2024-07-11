@@ -8,12 +8,13 @@ import { ValueTypes } from '../ValueTypes.enum.js'
 import { DomTag, StringTag } from '../Tag.class.js'
 import { deepEqual } from '../../deepFunctions.js'
 
+/** TODO: This seems to support both new and updates and should be separated? */
 export function renderWithSupport(
   newSupport: Support | BaseSupport,
   lastSupport: Support | BaseSupport | undefined, // previous
   subject: TagSubject, // events & memory
   ownerSupport?: BaseSupport | Support, // who to report to
-): AnySupport {
+): {support: AnySupport, wasLikeTags: boolean} {
   const lastTemplater = lastSupport?.templater
   const lastTag = lastTemplater?.tag
 
@@ -29,9 +30,9 @@ export function renderWithSupport(
       subject,
     )
   } else if(lastSupport) {
-    const tag = reSupport.templater.tag
-
-    if(tag) {
+    // const tag = reSupport.templater.tag
+    const tag = lastSupport.templater.tag
+    if(tag && subject.global.renderCount > 1) {
       checkTagSoftDestroy(tag, lastSupport, lastTag)
     }
   }
@@ -39,7 +40,7 @@ export function renderWithSupport(
   const lastOwnerSupport = (lastSupport as Support)?.ownerSupport
   reSupport.ownerSupport = (ownerSupport || lastOwnerSupport) as Support
 
-  return reSupport
+  return {support: reSupport, wasLikeTags: isLikeTag}
 }
 
 function checkTagSoftDestroy(

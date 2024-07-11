@@ -1,17 +1,16 @@
 import { BaseSupport, Support } from './tag/Support.class.js'
-import { TemplaterResult } from './tag/TemplaterResult.class.js'
 import { Subject } from './subject/Subject.class.js'
-import { TagJsSubject } from './tag/update/TagJsSubject.class.js'
+import { ContextItem } from './tag/Tag.class.js'
 
-export type WasTagSubject = Subject<TemplaterResult> & {
+export type WasTagSubject = ContextItem & {
   support?: BaseSupport | Support
 }
 
-export type TagSubject = TagJsSubject<Support> & {
+export type TagSubject = ContextItem & {
   support: Support
 }
 
 export type RegularValue = string | number | boolean
-export type DisplaySubject = TagJsSubject<RegularValue> & Subject<RegularValue> & {
+export type DisplaySubject = ContextItem & Subject<RegularValue> & {
   lastValue?: RegularValue
 }
