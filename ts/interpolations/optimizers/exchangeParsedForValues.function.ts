@@ -5,9 +5,9 @@ export type ValuePos = (elements:any) => ([any, string | number] | any[])
 export type ObjectChildren = (ObjectText | ObjectElement)[]
 
 // used for runtime processing
-export type DomMetaMap = () => ParsedHtml
+export type DomMetaMap = ParsedHtml
 // used for imports with no typing
-export type LikeObjectChildren = () => LikeObjectElement[]
+export type LikeObjectChildren = LikeObjectElement[]
 
 // A looser typing for compiled code
 type LikeObjectElement = {

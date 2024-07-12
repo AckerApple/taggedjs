@@ -49,6 +49,8 @@ In many cases, since TaggedJs is natively compatible with browser vanilla Javasc
   - ```return html`<div>${component()}</div>` ```
 - The boolean `true` will render to screen
 - An attribute dynamic value of `undefined` will cause `element.removeAttribute(name)` to occur
+- attributes autofocus and autoselect
+- attributes oninit and ondestroy
 - Render template syntax is `${}` instead of `{}`
   - `<div onclick={handler}></div>`
   - `<div onclick=${handler}></div>`

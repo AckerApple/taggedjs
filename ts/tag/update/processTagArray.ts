@@ -41,8 +41,6 @@ export function processTagArray(
   options: {
     counts: Counts
   },
-  fragment?: DocumentFragment | Element,
-// ): DomObjectChildren {
 ): DocumentFragment | Element | undefined {
   const global = subject.global
   ++global.renderCount
@@ -75,11 +73,10 @@ export function processTagArray(
       existed,
       runtimeInsertBefore,
       options,
-      fragment,
     )
   }
 
-  return lastFragment || fragment
+  return lastFragment
 }
 
 function reviewArrayItem(
@@ -92,7 +89,6 @@ function reviewArrayItem(
   options: {
     counts: Counts
   },
-  fragment?: DocumentFragment | Element,
 ) {
   const item = value[index]
   const previous = lastArray.array[index]
@@ -140,7 +136,6 @@ function reviewArrayItem(
     ownerSupport,
     options,
     lastArray.array,
-    fragment,
   )
 
   if(newSupport) {
@@ -167,7 +162,6 @@ function processAddTagArrayItem(
     counts: Counts
   },
   lastArray: LastArrayItem[],
-  fragment?: DocumentFragment | Element,
 ): {
   newFragment?: DocumentFragment | Element
   newSupport?: AnySupport
@@ -182,29 +176,19 @@ function processAddTagArrayItem(
 
   processNewValue(item as TemplateValue, ownerSupport, itemSubject)
 
-  const { fragment: newFragment, support } = processFirstSubjectValue(
+  const { support } = processFirstSubjectValue(
     item as TemplateValue,
     itemSubject,
     ownerSupport, // support,
     options,
   )
 
-  const children = itemSubject.global.htmlDomMeta as DomObjectChildren
-  
-  if(newFragment) {
-    paintAppends.push(() => {
-      const parentNode = before.parentNode as ParentNode
-      parentNode.insertBefore(newFragment, subPlaceholder)
-      afterChildrenBuilt(children, itemSubject, support as Support)
-    })
-  }
-  
   // Added to previous array
   lastArray.push({
     support: support as Support, index
   })
 
-  return {newFragment, newSupport: support}
+  return {newSupport: support}
 }
 
 /** compare two values. If both values are arrays then the items will be compared */
@@ -242,9 +226,9 @@ function destroyArrayTag(
   counts: Counts,
 ) {
   const global = support.subject.global
-  const placeholder = global.placeholder as Text
-  const parentNode = placeholder.parentNode as ParentNode
-  parentNode.removeChild(placeholder)
+  const ph = global.placeholder as Text
+  const parentNode = ph.parentNode as ParentNode
+  parentNode.removeChild(ph)
 
   delete global.placeholder
 

@@ -68,7 +68,6 @@ export function processAttribute(
     )  
   }
 
-
   return processNameValueAttribute(
     attrName as string,
     value,
@@ -84,7 +83,6 @@ function processNameOnlyAttr(
   element: Element,
   howToSet: HowToSet,
 ) {
-  
   contextValue.global.element = element
   contextValue.global.howToSet = howToSet
   contextValue.global.isNameOnly = true
@@ -93,18 +91,14 @@ function processNameOnlyAttr(
   const contextValueSubject = contextValue.value
   if(isSubjectInstance(contextValueSubject)) {
     const sub = contextValueSubject.subscribe((value: any) => {
-      processNameOnlyEmit(value, support, contextValue, element, howToSet)
-  
-      if(!contextValueSubject.global.madeByTagJs) {
-        paint()
-      }
+      processNameOnlyEmit(value, support, contextValue, element, howToSet)  
+      paint()
     })
     support.subject.global.subscriptions.push(sub) // this is where unsubscribe is picked up
     return
   }
 
   processNameOnlyEmit(contextValue.value, support, contextValue, element, howToSet)
-  return
 }
 
 export function processNameOnlyEmit(
@@ -114,7 +108,8 @@ export function processNameOnlyEmit(
   element: Element,
   howToSet: HowToSet,
 ) {
-  if(value === support.subject.global.lastValue) {
+  const global = subject.global
+  if(value === global.lastValue) {
     return // value did not change
   }
 
@@ -125,8 +120,6 @@ export function processNameOnlyEmit(
     support,
     howToSet,
   )
-
-  subject.global.lastValue = value
 }
 
 function processNameOnlyAttrValue(
@@ -285,8 +278,6 @@ export function processAttributeSubjectValue(
   if(subject.global.lastValue === newAttrValue) {
     return subject.global.lastValue
   }
-
-  subject.global.lastValue = newAttrValue
   
   if (isSpecial) {
     specialAttribute(attrName, newAttrValue, element)
@@ -380,7 +371,6 @@ export function processTagCallbackFun(
 ) {
   const prevFun = subject.global.lastValue
   if(prevFun && prevFun.tagFunction && prevFun.support) {
-    newAttrValue = prevFun
     prevFun.tagFunction = newAttrValue
     prevFun.support = support
     return prevFun
@@ -388,6 +378,7 @@ export function processTagCallbackFun(
 
   // tag has state and will need all functions wrapped to cause re-renders
   newAttrValue = bindSubjectCallback(newAttrValue, support)
+  subject.global.lastValue = newAttrValue
 
   return processAttributeFunction(element, newAttrValue, support, attrName)
 }

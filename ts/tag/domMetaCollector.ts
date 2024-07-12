@@ -18,8 +18,7 @@ export function getDomMeta(
   const matches = lastRun && isLastRunMatched(strings, values, lastRun)
   
   if(matches) {
-    const domMetaMap: DomMetaMap = lastRun.domMetaMap as DomMetaMap
-    return domMetaMap()
+    return lastRun.domMetaMap as DomMetaMap
   }
 
   const domMeta = htmlInterpolationToDomMeta(strings, values)
@@ -34,7 +33,7 @@ export function getDomMeta(
     strings,
     values,
   
-    domMetaMap: () => map,
+    domMetaMap: map,
   }
 
   lastRuns[stringId] = template

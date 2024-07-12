@@ -7,11 +7,12 @@ import { afterChildrenBuilt } from './update/afterChildrenBuilt.function.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { executeWrap } from './getTagWrap.function.js'
 import { setUse } from '../state/setUse.function.js'
-import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
+import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { paint, painting } from './paint.function.js'
 import { ContextItem } from './Tag.class.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { getValueType } from './getValueType.function.js'
+import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
 
 const appElements: {
   support: BaseSupport // Support
@@ -61,12 +62,11 @@ export function tagElement(
     support.destroy() // never return anything here
   }
   
-  global.insertBefore = placeholder // template
-  global.placeholder = placeholder
   let tags: any[] = []
 
   ++painting.locks
-  const newFragment = support.buildBeforeElement(undefined)
+
+  const result = support.buildBeforeElement()
   --painting.locks
 
   requestAnimationFrame(() => {
@@ -88,7 +88,11 @@ export function tagElement(
     ;(element as any).setUse = setUse
     appElements.push({element, support})
 
+    const newFragment = document.createDocumentFragment()
     newFragment.appendChild(placeholder)
+    putDomDown(result.dom, newFragment)
+    result.subs.forEach(sub => subscribeToTemplate(sub))
+
     paint()
     element.appendChild(newFragment)
     
@@ -110,10 +114,11 @@ export function runWrapper(
   // insertBefore: Element,
   placeholder: Text,
 ) {
-  // TODO: A fake subject may become a problem
+  const global = getNewGlobal()
+
   const subject: ContextItem = {
     value: templater,
-    global: getNewGlobal(),
+    global,
     tagJsType: getValueType(templater),
   }
     
@@ -123,8 +128,9 @@ export function runWrapper(
   )
 
   // subject.global.insertBefore = insertBefore
-  subject.global.placeholder = placeholder
-  subject.global.oldest = subject.global.oldest || newSupport
+  global.placeholder = placeholder
+  global.insertBefore = placeholder // template
+  global.oldest = subject.global.oldest || newSupport
   subject.support = newSupport as Support
   
   runBeforeRender(newSupport, undefined as unknown as Support)
@@ -157,4 +163,23 @@ export function runWrapper(
   runAfterRender(newSupport, nowSupport)
 
   return nowSupport
+}
+
+function putDomDown(
+  dom: DomObjectChildren,
+  newFragment: DocumentFragment,
+) {
+  dom.forEach(domItem => putOneDomDown(domItem, newFragment))
+}
+
+function putOneDomDown(
+  dom: DomObjectText | DomObjectElement,
+  newFragment: DocumentFragment,
+) {
+  if(dom.domElement) {
+    newFragment.appendChild(dom.domElement)
+  }
+  if(dom.marker) {
+    newFragment.appendChild(dom.marker)
+  }
 }

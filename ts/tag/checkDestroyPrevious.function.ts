@@ -61,8 +61,6 @@ export function checkDestroyPrevious(
   // no longer tag or component?
   if(lastSupport && !global.deleted) {
     const isValueTag = isStaticTag(newValue)
-    // ??? recently changed
-    // const isSubjectTag = isStaticTag(subject._value)
     const isSubjectTag = isStaticTag(newValue)
     const newTag = newValue as Support
     

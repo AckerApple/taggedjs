@@ -11,6 +11,7 @@ export function paint() {
     return
   }
 
+  ++painting.locks
   while(paintContent.length) {
     (paintContent.shift() as any)()
   }
@@ -18,4 +19,5 @@ export function paint() {
   while(paintAppends.length) {
     (paintAppends.shift() as any)()
   }
+  --painting.locks
 }

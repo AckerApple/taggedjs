@@ -9,8 +9,7 @@ export function updateBeforeTemplate(
   lastFirstChild: InsertBefore,
 ) {
   const textNode = document.createTextNode(value) // never innerHTML
-  
-  // Insert the new value (never use innerHTML here)
+
   paintAppends.push(() => {
     const parent = lastFirstChild.parentNode as ParentNode
     parent.insertBefore(textNode, lastFirstChild)

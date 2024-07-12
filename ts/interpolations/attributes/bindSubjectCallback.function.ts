@@ -23,7 +23,11 @@ export function bindSubjectCallback(
     element: Element, args: any[],
   ) => {
     return runTagCallback(
-      subjectFunction.tagFunction, subjectFunction.support, element, args, state
+      subjectFunction.tagFunction,
+      subjectFunction.support,
+      element,
+      args,
+      state,
     )
   }
 

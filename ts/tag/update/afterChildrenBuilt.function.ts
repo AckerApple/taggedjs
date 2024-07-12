@@ -13,30 +13,34 @@ export function afterChildrenBuilt(
   const len = kids.length
   let index = 0
   while (index < len) {
-    const elm = kids[index] as DomObjectElement
+    const elmMeta = kids[index] as DomObjectElement
+    const attributes = elmMeta.attributes
 
-    const isElm = elm.nodeName !== 'text' // (elm as Element).getAttribute
-    if (!isElm) {
-      return
+    if(!attributes) {
+      ++index
+      continue
     }
 
-    const domElm = elm.domElement
-  
-    // ??? todo this might be way animations out of sync
-    elementInitCheck(domElm, {added:0, removed:0})
-  
-    const hasFocusAbility = (domElm as any).focus
-    if (hasFocusAbility) {
-      if ((domElm as any).hasAttribute('autofocus')) {
-        (domElm as any).focus()
+    const domElm = elmMeta.domElement    
+    elmMeta.attributes.forEach(attribute => {      
+      const name = attribute[0]
+      
+      switch (name) {
+        case 'oninit':
+          elementInitCheck(domElm, {added:0, removed:0})
+          break;
+
+        case 'autofocus':
+          (domElm as any).focus()
+          break;
+
+        case 'autoselect':
+          (domElm as any).select()
+          break;
       }
+    })
   
-      if ((domElm as any).hasAttribute('autoselect')) {
-        (domElm as any).select()
-      }
-    }
-  
-    const children = elm.children
+    const children = elmMeta.children
     if(children) {
       afterChildrenBuilt(children, subject, ownerSupport)
     }

@@ -13,7 +13,7 @@ export function processNameValueAttribute(
   support: AnySupport,
 ) {
   const global = value?.global as TagGlobal
-
+  
   if(global) {
     const contextItem = value as ContextItem
     const isFun = contextItem.value instanceof Function

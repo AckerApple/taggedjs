@@ -44,11 +44,11 @@ export function renderSupport<T extends AnySupport>(
     selfPropChange = !deepEqual(nowProps, latestProps)
   }
 
-  // ??? newly moved above renderExistingTag
-  // render up first and that will cause me to re-render
+  // render owner up first and that will cause me to re-render
   if(ownerSupport && selfPropChange) {
     const ownerGlobal = ownerSupport.subject.global
     const myOwnerSupport = ownerGlobal.newest as Support
+    
     renderSupport(
       myOwnerSupport,
       true,
@@ -85,6 +85,5 @@ export function renderInlineHtml(
     return support
   }
 
-  // ++support.subject.global.renderCount
   return renderSupport(ownerSupport.subject.global.newest as Support, true)
 }

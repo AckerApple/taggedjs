@@ -10,7 +10,6 @@ import { setUse } from '../state/setUse.function.js'
 import { ContextItem } from '../tag/Tag.class.js'
 
 export type SubToTemplateOptions = {
-  fragment: DocumentFragment | Element
   insertBefore: InsertBefore
   subject: InterpolateSubject
   support: AnySupport
@@ -19,7 +18,6 @@ export type SubToTemplateOptions = {
 }
 
 export function subscribeToTemplate({
-  fragment,
   subject,
   support,
   counts,
@@ -34,7 +32,6 @@ export function subscribeToTemplate({
       {
         counts: {...counts},
       },
-      syncRun ? fragment : undefined,
     )
 
     if(!syncRun && !setUse.memory.stateConfig.support) {

@@ -6,7 +6,8 @@ import { afterChildrenBuilt } from './afterChildrenBuilt.function.js'
 import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { DomObjectChildren } from '../../interpolations/optimizers/ObjectNode.types.js'
-import { paintAppends } from '../paint.function.js'
+import { paintAppends, painting } from '../paint.function.js'
+import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
 
 /** When first time render, adds to owner childTags
  * Used for BOTH inserts & updates to values that were something else
@@ -15,7 +16,7 @@ export function processTag(
   templater: TemplaterResult,
   ownerSupport: AnySupport, // owner
   subject: TagSubject, // could be tag via result.tag
-): {support: Support, fragment: DocumentFragment} {
+): {support: Support} {
   let support = subject.support as any as Support
 
   const firstTime = !support || subject.global.renderCount === 0
@@ -27,21 +28,31 @@ export function processTag(
 
   subject.support = support
   support.ownerSupport = ownerSupport
-  const fragment = support.buildBeforeElement(undefined, {counts: {added:0, removed:0}})
-  const placeholder = subject.global.placeholder as Text
+  const appendIndex = paintAppends.length
+  const result = support.buildBeforeElement({counts: {added:0, removed:0}})
+  const ph = subject.global.placeholder as Text
   
   if(subject.global.deleted) {
     throw new Error('working with something deleted')
   }
-  paintAppends.push(() => {
-    const parentNode = placeholder.parentNode as ParentNode
-    parentNode.insertBefore(fragment, placeholder)
+  paintAppends.splice(appendIndex, 0, () => {
+    const parentNode = ph.parentNode as ParentNode
     
+    result.dom.forEach(dom => {
+      if(dom.marker) {
+        parentNode.insertBefore(dom.marker, ph)
+      }
+      if(dom.domElement) {
+        parentNode.insertBefore(dom.domElement, ph)
+      }
+    })
+
+    result.subs.forEach(sub => subscribeToTemplate(sub))
+
     afterChildrenBuilt(subject.global.htmlDomMeta as DomObjectChildren, subject, ownerSupport)
   })
 
-
-  return {support, fragment}
+  return {support}
 }
 
 export function tagFakeTemplater(

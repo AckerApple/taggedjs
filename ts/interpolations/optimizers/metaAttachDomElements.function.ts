@@ -7,7 +7,7 @@ import { empty } from "../../tag/ValueTypes.enum.js"
 import { Counts } from "../interpolateTemplate.js"
 import { processAttribute } from "../attributes/processAttribute.function.js"
 import { SubToTemplateOptions } from "../subscribeToTemplate.function.js"
-import { DomObjectElement, ObjectText } from "./ObjectNode.types.js"
+import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode.types.js"
 import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
 import { ObjectChildren } from "./exchangeParsedForValues.function.js"
 
@@ -17,18 +17,27 @@ export function attachDomElement(
   scope: Context,
   support: BaseSupport | Support,
   counts: Counts, // used for animation stagger computing
-  owner: Element,
+  owner?: Element,
   subs: SubToTemplateOptions[] = [],
-) {
+): {
+  subs:SubToTemplateOptions[],
+  dom: DomObjectChildren
+} {
   const x = document.createElement('div')
+  const dom: DomObjectChildren = []
 
   for (const node of nodes as  DomObjectElement[]) {
+    const newNode = {} as DomObjectElement // DomObjectText
+    dom.push(newNode)
+
     const value = node.value as ContextItem
     const isNum = !isNaN(value as unknown as number)
 
     if(isNum) {
-      const marker = node.marker = node.marker || document.createTextNode(empty) // textNode.cloneNode(false) as Text
-      paintAppends.push(() => owner.appendChild(marker))
+      const marker = newNode.marker = node.marker || document.createTextNode(empty) // textNode.cloneNode(false) as Text
+      if(owner) {
+        paintAppends.push(() => owner.appendChild(marker))
+      }
       const subject = scope[ value as unknown as number ]
       subject.global.placeholder = marker
       // delete (node as any).marker // delete so that the marker is not destroyed with tag
@@ -36,7 +45,7 @@ export function attachDomElement(
       const subVal = subject.value
       if(isSubjectInstance(subVal)) {
         subs.push({
-          fragment: owner,
+          // fragment: owner,
           insertBefore: marker,
           subject: subVal as InterpolateSubject,
           support, // ownerSupport,
@@ -53,57 +62,62 @@ export function attachDomElement(
         {
           counts: {...counts},
         },
-        owner,
       )
   
       continue
     }
 
     if (node.nodeName === 'text') {
-      const textNode = (node as any as ObjectText)
-      const string = textNode.textContent
+      const textNode = (newNode as any as DomObjectText)
+      const string = textNode.textContent = (node as any as DomObjectText).textContent
+
       // PARSE things like &nbsp; and <!-- -->
       // const newString = string // domParseString(string)
       x.innerHTML = string
+      
       const domElement = textNode.domElement = document.createTextNode(x.innerText)
-      paintAppends.push(() => {
-        // owner.appendChild(marker)
-        owner.appendChild(domElement)
-      })
+      if(owner) {
+        paintAppends.push(() => {
+          // owner.appendChild(marker)
+          owner.appendChild(domElement)
+        })
+      }
       continue
     }
   
-    const domElement = node.domElement = document.createElement(node.nodeName)
+    const domElement = newNode.domElement = document.createElement(node.nodeName)
 
     // attributes that may effect style, come first
     if (node.attributes) {
-      node.attributes.forEach(attr => {
+      node.attributes.map(attr =>
         processAttribute(
           attr,
           domElement,
           support,
         )
+      )
+    }
+
+    if(owner) {
+      paintAppends.push(() => {
+        owner.appendChild(domElement)
+        // owner.appendChild(marker)
       })
     }
 
-    paintAppends.push(() => {
-      owner.appendChild(domElement)
-      // owner.appendChild(marker)
-    })
-
     if (node.children) {
-      attachDomElement(
+      newNode.children = attachDomElement(
         node.children,
         scope,
         support,
         counts,
         domElement,
         subs,
-      )
+      ).dom
     }
   }
 
-  return {subs}
+  return {subs, dom}
 }
 
 // parse things like &nbsp; and <!-- -->

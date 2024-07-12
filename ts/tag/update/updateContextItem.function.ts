@@ -1,21 +1,19 @@
 import { isSubjectInstance } from '../../isInstance.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
-import { Context } from '../Tag.class.js'
+import { ContextItem } from '../Tag.class.js'
 import { getValueType } from '../getValueType.function.js'
 import { ImmutableTypes } from '../ValueTypes.enum.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
 import { AnySupport } from '../Support.class.js'
 
 export function updateContextItem(
-  context: Context,
-  index: number,
+  subject: ContextItem,
   value: TemplateValue,
   support: AnySupport,
   isUpdate: boolean,
 ) {
   const valueType = getValueType(value)
 
-  const subject = context[index]
   subject.global.nowValueType = valueType
   
   const isSub = isSubjectInstance(value)

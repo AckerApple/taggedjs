@@ -13,7 +13,8 @@ import { ValueTypes } from '../ValueTypes.enum.js'
 import { DomObjectChildren } from '../../interpolations/optimizers/ObjectNode.types.js'
 import { ContextItem } from '../Tag.class.js'
 import { processFirstSubjectComponent } from './processFirstSubjectComponent.function.js'
-import { paintContent } from '../paint.function.js'
+import { paintContent, painting } from '../paint.function.js'
+import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
 
 export function updateExistingTagComponent(
   ownerSupport: BaseSupport | Support,
@@ -72,8 +73,9 @@ export function updateExistingTagComponent(
     support,
     false,
   )
-
   return afterTagRender(subject, previous, newSupport, isSameTag)
+
+  return support
 }
 
 function afterTagRender(
@@ -88,48 +90,6 @@ function afterTagRender(
     subject.support = newSupport as Support
     return newSupport
   }
-
-  // Although function looked the same it returned a different html result
-  /*
-  // const lastSupport = subject.support
-  if(isSameTag && lastSupport) {
-    const preGlobal = previous.subject.global
-    if(!preGlobal.deleted) {
-      softDestroySupport(previous)
-      delete preGlobal.deleted
-    }
-  }
-  */
-
-  return buildNewTag(
-    newSupport,
-    subject,
-  )
-}
-
-function buildNewTag(
-  newSupport: AnySupport,
-  subject: TagSubject,
-) {
-  const fragment = newSupport.buildBeforeElement(undefined, {
-    counts: {added: 0, removed: 0},
-  })
-  
-  paintContent.push(() => {
-    // const placeholder = subject.global.placeholder as Text
-    // const parentNode = placeholder.parentNode as ParentNode
-    // parentNode.insertBefore(fragment, placeholder)
-
-    afterChildrenBuilt(
-      subject.global.htmlDomMeta as DomObjectChildren,
-      subject,
-      newSupport
-    )
-  })
-
-  subject.global.oldest = newSupport
-  subject.global.newest = newSupport
-  subject.support = newSupport as Support
 
   return newSupport
 }
@@ -237,7 +197,6 @@ function syncPriorPropFunction(
   }
 
   const keys = Object.keys(prop) 
-  // for(const name in prop){
   for(const name of keys){
     const subValue = (prop as any)[name]
     const result = syncPriorPropFunction(
@@ -251,7 +210,7 @@ function syncPriorPropFunction(
     )
 
     if(prop[name] === result) {
-      continue // ??? new
+      continue
     }
     
     
@@ -271,16 +230,22 @@ export function moveProviders(
   newSupport: AnySupport,
 ) {
   const global = lastSupport.subject.global
-  global.providers.forEach(provider => {
-    provider.children.forEach((child, index) => {
+  let pIndex = -1
+  const pLen = global.providers.length - 1
+  while (pIndex++ < pLen) {
+    const provider = global.providers[pIndex]
+    let index = -1
+    const pcLen = provider.children.length - 1
+    while ( index++ < pcLen) {
+      const child = provider.children[index]
       const wasSameGlobals = global.destroy$ === child.subject.global.destroy$
       if(wasSameGlobals) {
         provider.children.splice(index, 1)
         provider.children.push(newSupport as Support)
         return
       }
-    })
-  })
+    }
+  }
 }
 
 function syncSupports(
@@ -315,7 +280,6 @@ function swapTags(
   const global = subject.global
   const oldestSupport = global.oldest as Support
   destroyTagMemory(oldestSupport)
-  // ??? - new added
   delete subject.global.deleted
 
   const newSupport = processFirstSubjectComponent(

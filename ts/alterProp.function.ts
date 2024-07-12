@@ -184,7 +184,7 @@ export function callbackPropOwner(
       setUse.memory.tagClosed$.toCallback(() => {  
         delete supportInCycle.subject.global.locked
         const lastResult = runBlocked(supportInCycle) as Support
-
+      
         renderSupport(
           lastResult,
           false, // renderUp - callback may have changed props so also check to render up

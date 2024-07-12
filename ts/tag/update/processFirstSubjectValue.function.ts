@@ -19,16 +19,14 @@ export function processFirstSubjectValue(
   subject: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owning support
   options: processOptions, // {added:0, removed:0}
-  fragment?: DocumentFragment | Element
 ): {
   support?: AnySupport
-  fragment?: DocumentFragment | Element
 } {
   const valueType = getValueType(value)
 
   switch (valueType) {
     case ValueTypes.subject: {
-      return {fragment}// its managed on its own
+      return {}// its managed on its own
     }
     
     case ValueTypes.templater:
@@ -54,14 +52,13 @@ export function processFirstSubjectValue(
       )
   
     case ValueTypes.tagArray:
-      const result = processTagArray(
+      processTagArray(
         subject as TagArraySubject,
         value as (StringTag | TemplaterResult)[],
         ownerSupport,
         options,
-        fragment,
       )
-      return {fragment: result}
+      return {}
     
     case ValueTypes.stateRender:
     case ValueTypes.tagComponent:
@@ -71,7 +68,7 @@ export function processFirstSubjectValue(
         ownerSupport,
         options,
       )
-      return {support: processResult, fragment}
+      return {support: processResult}
     
     case BasicTypes.function:
     case ValueTypes.oneRender:
@@ -100,7 +97,7 @@ export function processFirstSubjectValue(
     subject.global.placeholder as InsertBefore, // || insertBefore,
   )
 
-  return {fragment}
+  return {}
 }
 
 function processFirstRegularValue(
@@ -110,8 +107,6 @@ function processFirstRegularValue(
 ) {
   subject.lastValue = value
   const castedValue = castTextValue(value)
-
-  // Processing of regular values
   const clone = updateBeforeTemplate(
     castedValue,
     insertBefore, // this will be removed

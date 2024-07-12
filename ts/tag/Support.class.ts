@@ -1,7 +1,6 @@
 import { Props } from '../Props.js'
 import { Context, StringTag, DomTag, ContextItem } from './Tag.class.js'
 import { empty, ValueTypes } from './ValueTypes.enum.js'
-import { deepClone } from '../deepFunctions.js'
 import { isTagComponent } from '../isInstance.js'
 import { State } from '../state/index.js'
 import { TemplaterResult } from './TemplaterResult.class.js'
@@ -16,13 +15,14 @@ import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types
 import { getDomMeta } from './domMetaCollector.js'
 import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js'
 import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
-import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { paint, paintAppends, painting } from './paint.function.js'
 import { getValueType } from './getValueType.function.js'
 import { processAttributeEmit, processNameOnlyEmit } from '../interpolations/attributes/processAttribute.function.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 import { ParsedHtml } from '../interpolations/optimizers/htmlInterpolationToDomMeta.function.js'
+
+let testCount = 0
 
 export type AnySupport = (BaseSupport & {
   ownerSupport?: AnySupport
@@ -79,28 +79,25 @@ export class BaseSupport {
   }
 
   getHtmlDomMeta(
-    fragment: DocumentFragment,
+    // fragment: DocumentFragment,
     options: ElementBuildOptions = {
       counts: {added:0, removed: 0},
     }
-  ): DomObjectChildren {
+  ) {
     const domMeta = this.loadDomMeta()
     const context = this.buildContext()
     
-    const {subs} = attachDomElement(
+    const result = attachDomElement(
       domMeta,
       context,
       this,
       options.counts,
-      fragment as any as Element,
+      // fragment as any as Element,
     )
 
-    processContext(this, context, fragment)
-
-    // append all at once
-    subs.forEach(sub => subscribeToTemplate(sub))
+    processContext(this, context)
         
-    return domMeta as DomObjectChildren
+    return result
   }
 
   loadDomMeta(): ParsedHtml {
@@ -108,17 +105,15 @@ export class BaseSupport {
     const thisTag = (templater.tag as StringTag | DomTag) // || templater
 
     if(thisTag.tagJsType === ValueTypes.dom) {
-      const domMeta: DomMetaMap = (thisTag as DomTag).dom as DomMetaMap
-      return domMeta()
+      return (thisTag as DomTag).dom as DomMetaMap
     }
 
-    const domMeta = getDomMeta((thisTag as StringTag).strings, thisTag.values)
-    return domMeta
+    return getDomMeta((thisTag as StringTag).strings, thisTag.values)
   }
 
   /** Function that kicks off actually putting tags down as HTML elements */
   buildBeforeElement(
-    fragment = document.createDocumentFragment(),
+    // fragment = document.createDocumentFragment(),
     options?: ElementBuildOptions,
   ) {
     const subject = this.subject
@@ -131,18 +126,20 @@ export class BaseSupport {
     this.hasLiveElements = true
 
     ++painting.locks
-    global.htmlDomMeta = this.getHtmlDomMeta(fragment, options)
+    const result = this.getHtmlDomMeta(options)
+    global.htmlDomMeta = result.dom
     --painting.locks
 
-    return fragment
+    // return fragment
+    return result
   }
 
   updateBy(support: BaseSupport | Support) {
+    const locked = this.subject.global.locked
     const context = this.subject.global.context
     const tempTag = support.templater.tag as StringTag | DomTag
     ++painting.locks
     this.updateConfig(tempTag, tempTag.values)
-
     processContextUpdate(this, context)
     --painting.locks
     paint()
@@ -395,7 +392,6 @@ function processOneContext(
   context: Context,
   support: BaseSupport | Support,
   isUpdate: boolean,
-  fragment?: DocumentFragment,
 ) {
   const value = values[index] as any
 
@@ -441,7 +437,7 @@ function processOneContext(
       }
     }
 
-    updateContextItem(context, index, value, support, isUpdate)
+    updateContextItem(contextItem, value, support, isUpdate)
   }
 }
 
@@ -495,19 +491,16 @@ function buildContext(
   const value = values[index] as any
 
   // 🆕 First time values below
-  const contextItem = context[index] = {
+  context[index] = {
     value,
     global: getNewGlobal(),
     tagJsType: getValueType(value),
   }
-
-  contextItem.global.lastValue = value
 }
 
 function processContext(
   support: AnySupport,
   context: Context,
-  fragment?: DocumentFragment,
 ) {
   const thisTag = support.templater.tag as StringTag | DomTag
   const values = support.values || thisTag.values
@@ -524,7 +517,6 @@ function processContext(
       context,
       support,
       false,
-      fragment,
     )
 
     contextItem.value = value
@@ -542,7 +534,6 @@ function processContext(
 function processContextUpdate(
   support: AnySupport,
   context: Context,
-  fragment?: DocumentFragment,
 ) {
   const thisTag = support.templater.tag as StringTag | DomTag
   const values = support.values || thisTag.values
@@ -559,7 +550,6 @@ function processContextUpdate(
       context,
       support,
       true,
-      fragment,
     )
 
     contextItem.value = value

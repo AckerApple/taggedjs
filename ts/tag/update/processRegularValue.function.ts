@@ -24,7 +24,6 @@ export function processRegularValue(
   // replace existing string?
   const oldClone = subject.global.simpleValueElm // placeholder
   if(oldClone) {
-    // oldClone.textContent = castedValue
     paintContent.push(() => {
       oldClone.textContent = castedValue
     })
@@ -32,10 +31,8 @@ export function processRegularValue(
   }
   
   // Processing of regular values
-  const clone = updateBeforeTemplate(
+  subject.global.simpleValueElm = updateBeforeTemplate(
     castedValue,
     before, // this will be removed
   )
-
-  subject.global.simpleValueElm = clone
 }
