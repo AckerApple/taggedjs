@@ -5,7 +5,7 @@ import { updateExistingValue } from '../tag/update/updateExistingValue.function.
 import { AnySupport } from '../tag/Support.class.js'
 import { TemplaterResult } from '../tag/TemplaterResult.class.js'
 import { Counts } from './interpolateTemplate.js'
-import { paint } from '../tag/paint.function.js'
+import { paint, painting } from '../tag/paint.function.js'
 import { setUse } from '../state/setUse.function.js'
 import { ContextItem } from '../tag/Tag.class.js'
 

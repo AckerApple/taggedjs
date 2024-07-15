@@ -6,8 +6,11 @@ import { TagSubject } from '../../subject.types.js'
 import { AnySupport, BaseSupport, Support } from '../../tag/Support.class.js'
 import { TagGlobal } from '../../tag/TemplaterResult.class.js'
 import { ValueTypes } from '../../tag/ValueTypes.enum.js'
-import { renderSupport } from'../../tag/render/renderSupport.function.js'
+import { paint, painting } from '../../tag/paint.function.js'
+import { checkRenderUp, renderSupport } from'../../tag/render/renderSupport.function.js'
 import { updateExistingTagComponent } from '../../tag/update/updateExistingTagComponent.function.js'
+import { getUpTags } from './getUpTags.function.js'
+import { renderTagUpdateArray } from './renderTagArray.function.js'
 
 const noData = 'no-data-ever'
 const promiseNoData = 'promise-no-data-ever'
@@ -24,7 +27,7 @@ export function bindSubjectCallback(
   ) => {
     return runTagCallback(
       subjectFunction.tagFunction,
-      subjectFunction.support,
+      subjectFunction.support.subject.global.newest as Support, // subjectFunction.support
       element,
       args,
       state,
@@ -45,13 +48,10 @@ export function runTagCallback(
   args: any[],
   state: State,
 ) {
-  const tag = findTagToCallback(support)
+  // ??? todo: restore this?
+  // const tag = support.templater.tag?.ownerSupport || support
+  const tag = support
   const global = tag.subject.global
-  
-  // ??? TODO: this may not be needed (its covered below)
-  if(global.deleted) {
-    return noData
-  }
 
   // ??? not sure if needed
   /*
@@ -63,10 +63,14 @@ export function runTagCallback(
   */
 
   const method = value.bind(bindTo)  
-  tag.subject.global.locked = true // prevent another render from re-rendering this tag
+  global.locked = true // prevent another render from re-rendering this tag
   const callbackResult = method(...args)
-
- return afterTagCallback(tag, callbackResult)
+  /*
+  if(newState.length === state.length) {
+    syncStates(state, newState)
+  }
+  */
+  return afterTagCallback(tag, callbackResult)
 }
 
 export function afterTagCallback(
@@ -101,31 +105,25 @@ export function afterTagCallback(
   return result
 }
 
-export function findTagToCallback(
-  support: BaseSupport | Support,
-): BaseSupport | Support {
-  // If we are NOT a component than we need to render my owner instead
-  if(support.templater.tagJsType === ValueTypes.templater) {
-    const owner = (support as Support).ownerSupport
-    return findTagToCallback(owner)
-  }
-
-  return support
-}
-
 function renderCallbackSupport(
   last: Support,
   callbackResult: any,
   global: TagGlobal,
 ) {
+  /*
   if(global.deleted) {
     return noData // || last.global.deleted
   }
+  */
+  const tagsToUpdate = getUpTags(last)
+  renderTagUpdateArray(tagsToUpdate)
 
+  /*
   renderSupport(
-    last as Support,
+    last,
     true, // renderUp - callback may have changed props so also check to render up
   )
+  */
 
   return checkAfterCallbackPromise(callbackResult, last, global)
 }
@@ -139,17 +137,22 @@ export function checkAfterCallbackPromise(
     last.subject.global.locked = true
 
     return callbackResult.then(() => {
-      delete last.subject.global.locked
+      // delete last.subject.global.locked
 
       if(global.deleted) {
         return promiseNoData // tag was deleted during event processing
       }
 
       delete last.subject.global.locked
+      const tagsToUpdate = getUpTags(last)
+      renderTagUpdateArray(tagsToUpdate)
+    
+      /*
       renderSupport(
         global.newest as Support,
         true,
       )
+      */
 
       return promiseNoData
     })
@@ -174,7 +177,7 @@ export function runBlocked(
       block.subject as TagSubject,
     )
 
-    global.newest = lastResult
+    global.newest = lastResult.support
   }
 
   return global.newest

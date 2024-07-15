@@ -10,6 +10,7 @@ import { ValueTypes } from './ValueTypes.enum.js'
 import { html } from './html.js'
 import { Props } from '../Props.js'
 import { syncFunctionProps } from './update/updateExistingTagComponent.function.js'
+import { syncStates } from '../state/syncStates.function.js'
 
 /** creates/returns a function that when called then calls the original component function
  * Gets used as templater.wrapper()
@@ -18,7 +19,6 @@ export function getTagWrap(
   templater: TemplaterResult,
   result: TagWrapper<any>
 ): Wrapper {
-  const stateArray = setUse.memory.stateConfig.array
 
   // this function gets called by taggedjs
   const wrapper = (
@@ -26,7 +26,6 @@ export function getTagWrap(
     subject: TagSubject,
     lastSupport?: Support | BaseSupport | undefined
   ) => executeWrap(
-    stateArray,
     templater,
     result,
     newSupport,
@@ -38,7 +37,6 @@ export function getTagWrap(
 }
 
 export function executeWrap(
-  stateArray:  State,
   templater: TemplaterResult,
   result: TagWrapper<any>,
   newSupport: AnySupport,

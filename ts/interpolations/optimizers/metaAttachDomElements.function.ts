@@ -36,7 +36,11 @@ export function attachDomElement(
     if(isNum) {
       const marker = newNode.marker = node.marker || document.createTextNode(empty) // textNode.cloneNode(false) as Text
       if(owner) {
-        paintAppends.push(() => owner.appendChild(marker))
+        paintAppends.push({
+          relative: owner,
+          element: marker,
+          isAppend: true,
+        })
       }
       const subject = scope[ value as unknown as number ]
       subject.global.placeholder = marker
@@ -77,9 +81,10 @@ export function attachDomElement(
       
       const domElement = textNode.domElement = document.createTextNode(x.innerText)
       if(owner) {
-        paintAppends.push(() => {
-          // owner.appendChild(marker)
-          owner.appendChild(domElement)
+        paintAppends.push({
+          isAppend: true,
+          element: domElement,
+          relative: owner,
         })
       }
       continue
@@ -99,9 +104,10 @@ export function attachDomElement(
     }
 
     if(owner) {
-      paintAppends.push(() => {
-        owner.appendChild(domElement)
-        // owner.appendChild(marker)
+      paintAppends.push({
+        element: domElement,
+        relative: owner,
+        isAppend: true,
       })
     }
 

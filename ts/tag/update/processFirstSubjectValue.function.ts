@@ -80,7 +80,12 @@ export function processFirstSubjectValue(
           ownerSupport,
         )
         
-        renderTagOnly(support, support, subject as TagSubject, ownerSupport)
+        renderTagOnly(
+          support,
+          undefined, // support,
+          subject as TagSubject,
+          ownerSupport,
+        )
         
         return processTag(
           support.templater,

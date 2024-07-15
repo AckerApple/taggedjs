@@ -20,7 +20,7 @@ export function updateExistingValue(
   subject: ContextItem, // InterpolateSubject,
   value: TemplateValue,
   ownerSupport: BaseSupport | Support,
-): ContextItem {
+): {subject: ContextItem, rendered: boolean} {
   const nowValueType = subject.global.nowValueType as ValueType | BasicTypes | ImmutableTypes
   const fetchType = !nowValueType || nowValueType === ValueTypes.subject
   const valueType = fetchType ? getValueType(value) : nowValueType
@@ -36,7 +36,7 @@ export function updateExistingValue(
       value as TemplaterResult,
       subject as TagSubject,
       ownerSupport,
-    ) as TagSubject
+    )
   }
   
   // was component but no longer
@@ -44,7 +44,7 @@ export function updateExistingValue(
   if( support ) {
     const oneRender = [BasicTypes.function, ValueTypes.oneRender].includes(valueType as ValueType | BasicTypes)
     if(oneRender) {
-      return subject // its a oneRender tag
+      return {subject, rendered: false} // its a oneRender tag
     }
 
     handleStillTag(
@@ -53,7 +53,7 @@ export function updateExistingValue(
       ownerSupport
     )
 
-    return subject as TagSubject
+    return {subject, rendered: true}
   }
 
   switch (valueType) {
@@ -67,7 +67,7 @@ export function updateExistingValue(
           removed: 0,
         }}
       )
-      return subject
+      return {subject, rendered: true}
 
     case ValueTypes.templater:
       processTag(
@@ -75,7 +75,7 @@ export function updateExistingValue(
         ownerSupport,
         subject as TagSubject,
       )
-      return subject
+      return {subject, rendered: true}
     
     case ValueTypes.tag:
     case ValueTypes.dom:
@@ -94,16 +94,16 @@ export function updateExistingValue(
         subject as TagSubject,
       )
 
-      return subject
+      return {subject, rendered: true}
 
     // TODO: This don't look right?
     case ValueTypes.subject:
       subject.value = value
-      return subject
+      return {subject, rendered: false}
 
     // now its a useless function (we don't automatically call functions)
     case BasicTypes.function:
-      return subject
+      return {subject, rendered: false}
   }
 
   // This will cause all other values to render
@@ -112,7 +112,7 @@ export function updateExistingValue(
     subject as DisplaySubject,
   )
 
-  return subject
+  return {subject, rendered: true}
 }
 
 function handleStillTag(
@@ -161,11 +161,11 @@ function prepareUpdateToComponent(
   templater: TemplaterResult,
   subjectTag: TagSubject,
   ownerSupport: BaseSupport | Support,
-): TagSubject {
+): {subject: TagSubject, rendered: boolean} {
   // When last value was not a component
   if(!subjectTag.support) {
     processFirstSubjectComponent(templater, subjectTag, ownerSupport, {counts:{added:0, removed:0}})
-   return subjectTag
+   return {subject: subjectTag, rendered: true}
   }
   
   const support = new Support(
@@ -183,11 +183,9 @@ function prepareUpdateToComponent(
   subjectTag.global = subjectSup.subject.global
   subjectTag.support = support
 
-  updateExistingTagComponent(
+  return updateExistingTagComponent(
     ownerSupport,
     support, // latest value
     subjectTag,
   )
-
-  return subjectTag
 }

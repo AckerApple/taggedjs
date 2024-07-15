@@ -1,14 +1,34 @@
 import { Provider } from './providers.js'
 import { AnySupport, Support } from '../tag/Support.class.js'
-import { safeRenderSupport } from '../alterProp.function.js'
+import { safeRenderSupport, safeRenderSupportTwo } from '../alterProp.function.js'
+import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArray.function.js'
 
 export function handleProviderChanges(
   appSupport: Support,
   provider: Provider,
   skip: AnySupport,
-) {
+): TagWithProvider[] {
   let hadChanged = false
   const tagsWithProvider = getTagsWithProvider(appSupport, provider)
+
+  return tagsWithProvider
+
+  /*
+  console.log('tagsWithProvider', tagsWithProvider.length, {
+    locked: tagsWithProvider.filter(x => x.support.subject.global.locked),
+    deleted: tagsWithProvider.filter(x => x.support.subject.global.deleted),
+  })
+*/
+  /*
+  const unlocked = tagsWithProvider.filter(x => x.provider.locked === undefined)
+  const supports = unlocked.map(x => {
+    x.provider.locked = true
+    return x.support
+  })
+  */
+
+  // renderTagUpdateArray(supports, false)
+
   for (let index = tagsWithProvider.length - 1; index >= 0; --index) {
     const {support, renderCount, provider} = tagsWithProvider[index]
     const global = support.subject.global
@@ -29,12 +49,14 @@ export function handleProviderChanges(
       hadChanged = true
       const newSupport = global.newest as Support
       // provider.clone = deepClone(provider.instance)
-      safeRenderSupport(newSupport, newSupport.ownerSupport as Support)
+      safeRenderSupportTwo(newSupport, newSupport.ownerSupport as Support)
       continue
     }
   }
-  
-  return hadChanged
+
+  //unlocked.forEach(unlocked => delete unlocked.provider.locked)
+
+  //return hadChanged
 }
 
 /** Updates and returns memory of tag providers */

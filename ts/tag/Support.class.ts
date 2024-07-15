@@ -16,7 +16,7 @@ import { getDomMeta } from './domMetaCollector.js'
 import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js'
 import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
 import { Subscription } from '../subject/subject.utils.js'
-import { paint, paintAppends, painting } from './paint.function.js'
+import { paint, paintContent, painting } from './paint.function.js'
 import { getValueType } from './getValueType.function.js'
 import { processAttributeEmit, processNameOnlyEmit } from '../interpolations/attributes/processAttribute.function.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
@@ -31,7 +31,6 @@ export type AnySupport = (BaseSupport & {
 /** used only for apps, otherwise use Support */
 // TODO: We need to split Support and simple tag support apart
 export class BaseSupport {
-  isApp = true
   appElement?: Element // only seen on this.getAppSupport().appElement
 
   strings?: string[]
@@ -135,7 +134,6 @@ export class BaseSupport {
   }
 
   updateBy(support: BaseSupport | Support) {
-    const locked = this.subject.global.locked
     const context = this.subject.global.context
     const tempTag = support.templater.tag as StringTag | DomTag
     ++painting.locks
@@ -186,10 +184,11 @@ export class BaseSupport {
     if(!options.byParent) {
       const ownerSupport = (this as unknown as Support).ownerSupport
       if(ownerSupport) {
-        ownerSupport.subject.global.childTags = ownerSupport.subject.global.childTags.filter(child => child.subject.global !== this.subject.global)
+        ownerSupport.subject.global.childTags = ownerSupport.subject.global.childTags.filter(
+          child => child.subject.global !== this.subject.global
+        )
       }
     }
-
 
     if(isTagComponent(this.templater)) {
       global.destroy$.next()
@@ -235,24 +234,12 @@ export class BaseSupport {
       const elm = global.simpleValueElm
       if(elm) {
         delete global.simpleValueElm
-        paintAppends.push(() => {
+        paintContent.push(() => {
           const parentNode = elm.parentNode as ParentNode
           parentNode.removeChild(elm)
-          // parentNode.removeChild(global.placeholder as Text)
         })
         return
       }
-
-      /*
-      const placeholder = global.placeholder
-      if(placeholder) {
-        const parentNode = placeholder.parentNode
-        if(parentNode) {
-          parentNode.removeChild(placeholder)
-        }
-        delete global.placeholder
-      }
-      */
 
       const oldest = global.oldest
       if(oldest) {
@@ -302,7 +289,7 @@ export class BaseSupport {
     const promises = oldClones.map(clone => {
       const marker = clone.marker
       if(marker) {
-        paintAppends.push(() => {
+        paintContent.push(() => {
           const parentNode = marker.parentNode as ParentNode
           parentNode.removeChild(marker)
         })
@@ -340,7 +327,7 @@ export class BaseSupport {
       }
     }
 
-    paintAppends.push(() => {
+    paintContent.push(() => {
       const parentNode = clone.parentNode as ParentNode
       parentNode.removeChild(clone)
     })
@@ -351,9 +338,7 @@ export class BaseSupport {
   }
 }
 
-export class Support extends BaseSupport {
-  isApp = false
-  
+export class Support extends BaseSupport {  
   constructor(
     public templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
     public ownerSupport: AnySupport,
@@ -386,13 +371,14 @@ export function resetSupport(
   delete (subject as any).support
 }
 
+/** returns boolean of did render */
 function processOneContext(
   values: unknown[],
   index: number,
   context: Context,
   support: BaseSupport | Support,
   isUpdate: boolean,
-) {
+): boolean {
   const value = values[index] as any
 
   // is something already there?
@@ -411,7 +397,7 @@ function processOneContext(
         global.howToSet as HowToSet,
       )
 
-      return
+      return false
     }
 
     const element = contextItem.global.element as Element
@@ -425,7 +411,7 @@ function processOneContext(
       contextItem.global.howToSet as HowToSet,
     )
 
-    return
+    return false
   }
 
   if(renderCount > 0) {
@@ -433,12 +419,15 @@ function processOneContext(
       const valueSupport = (value && value.support) as Support
       if(valueSupport) {
         valueSupport.destroy()
-        return context // item was deleted, no need to emit
+        context // item was deleted, no need to emit
+        return false
       }
     }
-
-    updateContextItem(contextItem, value, support, isUpdate)
+    
+    return updateContextItem(contextItem, value, support, isUpdate)
   }
+
+  return false
 }
 
 export function midDestroyChildTags(
@@ -544,7 +533,7 @@ function processContextUpdate(
     const contextItem = context[index]
     const value = values[index] as any
 
-    processOneContext(
+    const rendered = processOneContext(
       values,
       index,
       context,
@@ -554,7 +543,7 @@ function processContextUpdate(
 
     contextItem.value = value
     contextItem.global.lastValue = value
-    if(!contextItem.global.locked) {
+    if(rendered && !contextItem.global.locked) {
       ++contextItem.global.renderCount
     }
 

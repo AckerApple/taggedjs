@@ -36,7 +36,7 @@ export function processFirstSubjectComponent(
   
   const {support} = renderWithSupport(
     newSupport,
-    subject.support, // existing tag
+    subject.global.newest, // subject.support, // existing tag
     subject as TagSubject,
     ownerSupport,
   )

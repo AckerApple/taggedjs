@@ -7,20 +7,15 @@ import { castProps, isSkipPropValue } from'../../alterProp.function.js'
 import { isLikeTags } from'../isLikeTags.function.js'
 import { Props } from '../../Props.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
-import { afterChildrenBuilt } from './afterChildrenBuilt.function.js'
-import { softDestroySupport } from '../render/softDestroySupport.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
-import { DomObjectChildren } from '../../interpolations/optimizers/ObjectNode.types.js'
 import { ContextItem } from '../Tag.class.js'
 import { processFirstSubjectComponent } from './processFirstSubjectComponent.function.js'
-import { paintContent, painting } from '../paint.function.js'
-import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
 
 export function updateExistingTagComponent(
   ownerSupport: BaseSupport | Support,
   support: AnySupport, // lastest
   subject: TagSubject,
-): Support | BaseSupport {
+): {subject: TagSubject, support: Support | BaseSupport, rendered: boolean} {
   const lastSupport = subject.global.newest as BaseSupport | Support
   
   const oldWrapper = lastSupport.templater.wrapper
@@ -39,11 +34,13 @@ export function updateExistingTagComponent(
 
   const templater = support.templater
   if(!isSameTag) {
-    return swapTags(
+    const newSupport = swapTags(
       subject,
       templater,
       ownerSupport,
     )
+
+    return {subject, support: newSupport, rendered: true}
   }
 
   const hasChanged = templater.tagJsType === ValueTypes.stateRender || hasSupportChanged(
@@ -52,20 +49,23 @@ export function updateExistingTagComponent(
     templater
   )
 
+
   // everyhing has matched, no display needs updating.
   if(!hasChanged) {
-    return syncSupports(
+    syncSupports(
       templater,
       support,
       lastSupport,
       ownerSupport,
     )
+
+    return {subject, rendered: false, support: lastSupport}
   }
 
   if(subject.global.locked) {
     subject.global.blocked.push(support)
   
-    return support
+    return {subject, support, rendered: false}
   }
 
   const previous = subject.global.newest as Support
@@ -73,9 +73,9 @@ export function updateExistingTagComponent(
     support,
     false,
   )
-  return afterTagRender(subject, previous, newSupport, isSameTag)
 
-  return support
+  return {subject, support: afterTagRender(subject, previous, newSupport, isSameTag), rendered: true}
+  //return support
 }
 
 function afterTagRender(
@@ -248,10 +248,10 @@ export function moveProviders(
   }
 }
 
-function syncSupports(
+function syncSupports<T extends AnySupport>(
   templater: TemplaterResult,
   support: AnySupport,
-  lastSupport: AnySupport,
+  lastSupport: T,
   ownerSupport: AnySupport
 ) {
   // update function refs to use latest references

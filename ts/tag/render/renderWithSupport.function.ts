@@ -18,9 +18,16 @@ export function renderWithSupport(
   const lastTemplater = lastSupport?.templater
   const lastTag = lastTemplater?.tag
 
+  // subject.global.locked = true
+
   const reSupport = renderTagOnly(
-    newSupport, lastSupport, subject, ownerSupport,
+    newSupport,
+    lastSupport,
+    subject,
+    ownerSupport,
   )
+
+  // delete subject.global.locked
 
   const isLikeTag = !lastSupport || isLikeTags(lastSupport, reSupport)
   if(!isLikeTag) {

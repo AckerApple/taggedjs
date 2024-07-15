@@ -4,40 +4,42 @@ import { ContextItem } from '../Tag.class.js'
 import { getValueType } from '../getValueType.function.js'
 import { ImmutableTypes } from '../ValueTypes.enum.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
-import { AnySupport } from '../Support.class.js'
+import { AnySupport, Support } from '../Support.class.js'
+import { TemplaterResult } from '../TemplaterResult.class.js'
 
+/** return boolean indicated if render took place */
 export function updateContextItem(
   subject: ContextItem,
   value: TemplateValue,
   support: AnySupport,
   isUpdate: boolean,
-) {
+): boolean {
   const valueType = getValueType(value)
 
   subject.global.nowValueType = valueType
   
   const isSub = isSubjectInstance(value)
   if(isSub) {
-    return // emits on its own
+    return false // emits on its own
   }
 
   if(value === subject.value) {
     if(Object.values(ImmutableTypes).includes(valueType as ImmutableTypes)) {
-      return // its the same exact non-complex value
+      return false // its the same exact non-complex value
     }
   }
 
   // listeners will evaluate updated values to possibly update display(s)
   if(isUpdate) {
-    updateExistingValue(
+    return updateExistingValue(
       subject,
       value,
       support,
-    )
-    return
+    ).rendered
   }
   
   // after rocessing update
   subject.value = value
   subject.global.lastValue = value
+  return false
 }

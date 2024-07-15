@@ -28,29 +28,40 @@ export function processTag(
 
   subject.support = support
   support.ownerSupport = ownerSupport
-  const appendIndex = paintAppends.length
+  let appendIndex = paintAppends.length
   const result = support.buildBeforeElement({counts: {added:0, removed:0}})
   const ph = subject.global.placeholder as Text
   
   if(subject.global.deleted) {
     throw new Error('working with something deleted')
   }
-  paintAppends.splice(appendIndex, 0, () => {
-    const parentNode = ph.parentNode as ParentNode
-    
-    result.dom.forEach(dom => {
-      if(dom.marker) {
-        parentNode.insertBefore(dom.marker, ph)
-      }
-      if(dom.domElement) {
-        parentNode.insertBefore(dom.domElement, ph)
-      }
-    })
 
-    result.subs.forEach(sub => subscribeToTemplate(sub))
+  result.dom.forEach(dom => {
+    if(dom.marker) {
+      paintAppends.splice(appendIndex++, 0, {
+        element: dom.marker,
+        relative: ph,
+      })
+    }
 
-    afterChildrenBuilt(subject.global.htmlDomMeta as DomObjectChildren, subject, ownerSupport)
+    if(dom.domElement) {
+      paintAppends.splice(appendIndex++, 0, {
+        element: dom.domElement,
+        relative: ph,
+      })
+    }
   })
+
+  let index = -1
+  const length = result.subs.length - 1
+  //++painting.locks
+  while(index++ < length) {
+    const sub = result.subs[index]
+    subscribeToTemplate(sub)
+  }
+  //--painting.locks
+
+  afterChildrenBuilt(subject.global.htmlDomMeta as DomObjectChildren, subject, ownerSupport)
 
   return {support}
 }

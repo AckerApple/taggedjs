@@ -1,7 +1,7 @@
 const path = require('path');
 const out = path.resolve(__dirname, 'dist');
 const TerserPlugin = require('terser-webpack-plugin')
-const CompressionPlugin = require('compression-webpack-plugin');
+// const CompressionPlugin = require('compression-webpack-plugin');
 const { ResolveTsForJsPlugin } = require('./ResolveTsForJsPlugin.class.cjs');
 console.debug(`🖊️ Writing bundle to ${out}`)
 

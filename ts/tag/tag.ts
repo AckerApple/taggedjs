@@ -61,12 +61,12 @@ export function tag<T extends ToTag>(
 type ReturnTag = DomTag | StringTag | StateToTag | null | undefined
 
 /** Used to create a tag component that renders once and has no addition rendering cycles */
-tag.oneRender = (): ReturnTag => {
+tag.oneRender = function(): ReturnTag {
   throw new Error('Do not call tag.oneRender as a function but instead set it as: `(props) => tag.oneRender = () => html`` `')
 }
 
 /** Used to create variable scoping when calling a function that lives within a prop container function */
-tag.state = (): ReturnTag => {
+tag.state = function(): ReturnTag {
   throw new Error('Do not call tag.state as a function but instead set it as: `(props) => tag.state = (state) => html`` `')
 }
 
@@ -75,7 +75,7 @@ tag.state = (): ReturnTag => {
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
  */
-tag.route = (routeProps: RouteProps): StateToTag => {
+tag.route = function(routeProps: RouteProps): StateToTag {
   throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
 }
 
@@ -84,7 +84,7 @@ tag.key = key
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
  */
-tag.app = (routeTag: RouteTag): StateToTag => {
+tag.app = function(routeTag: RouteTag): StateToTag {
   throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
 }
 

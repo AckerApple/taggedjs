@@ -10,6 +10,8 @@ export type Provider = {
   stateDiff: number
   owner: Support // create at
   children: Support[] // injected into
+
+  // locked?: true
 }
 
 type ProviderConstructor<T> = (new (...args: any[]) => T) | (() => T)
@@ -78,7 +80,7 @@ export const providers = {
   inject: <T>(constructor: ProviderConstructor<T>): T => {
     // find once, return same every time after
     return state(() => {
-      const memory = setUse.memory
+      // const memory = setUse.memory
       const cm = constructor as ConstructMethod<T>
       const compareTo = cm.compareTo = cm.compareTo || constructor.toString()
       const support =  getSupportInCycle() as Support // memory.stateConfig.support as Support

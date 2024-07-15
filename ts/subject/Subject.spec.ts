@@ -247,8 +247,8 @@ describe('Subject', () => {
       subject1.value = 1
       subject2.value = 2
   
-      expect(subject1._value).toBe(1)
-      expect(subject2._value).toBe(2)
+      expect(subject1.value).toBe(1)
+      expect(subject2.value).toBe(2)
 
       expect(y[0]).toBe(1)
       expect(y[1]).toBe(2)
@@ -296,8 +296,8 @@ describe('Subject', () => {
       subject1.next(1)
       subject2.next(2)
 
-      expect(subject1._value).toBe(1)
-      expect(subject2._value).toBe(2)
+      expect(subject1.value).toBe(1)
+      expect(subject2.value).toBe(2)
 
       expect(subject1.value).toBe(1)
       expect(subject2.value).toBe(2)
@@ -329,8 +329,8 @@ describe('Subject', () => {
       subject1.value = 1
       subject2.value = 2
 
-      expect(subject1._value).toBe(1)
-      expect(subject2._value).toBe(2)
+      expect(subject1.value).toBe(1)
+      expect(subject2.value).toBe(2)
   
       expect(y).toBe(33)
       expect(z).toBe(1)

@@ -7,7 +7,7 @@ import { Counts } from'../interpolations/interpolateTemplate.js'
 import { destroyTagMemory } from'./destroyTag.function.js'
 import { Support } from './Support.class.js'
 import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
-import { paintAppends } from './paint.function.js'
+import { paintAppends, paintContent } from './paint.function.js'
 import { ContextItem } from './Tag.class.js'
 
 const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender, ValueTypes.oneRender]
@@ -97,7 +97,7 @@ function destroySimpleValue(
 ) {
   delete subject.lastValue
   const elm = subject.global.simpleValueElm as Element
-  paintAppends.push(() => {
+  paintContent.push(() => {
     const parentNode = elm.parentNode as ParentNode
     parentNode.removeChild(elm)
   })

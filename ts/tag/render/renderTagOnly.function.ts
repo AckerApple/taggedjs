@@ -6,6 +6,7 @@ import { Wrapper } from '../TemplaterResult.class.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { executeWrap } from '../getTagWrap.function.js'
 import { setUse } from '../../state/setUse.function.js'
+import { syncStates } from '../../state/syncStates.function.js'
 
 export function renderTagOnly(
   newSupport: AnySupport,
@@ -15,7 +16,11 @@ export function renderTagOnly(
 ): AnySupport {
   const oldRenderCount = subject.global.renderCount
 
-  beforeWithRender(newSupport, ownerSupport, prevSupport)
+  beforeWithRender(
+    newSupport,
+    ownerSupport,
+    prevSupport,
+  )
   
   const templater = newSupport.templater
   let reSupport: AnySupport
@@ -26,7 +31,6 @@ export function renderTagOnly(
     const result = templater.wrapper || {original: templater} as any
 
     reSupport = executeWrap(
-      stateArray,
       templater,
       result,
       newSupport,
@@ -66,6 +70,7 @@ function beforeWithRender(
   const runtimeOwnerSupport: AnySupport | undefined = lastOwnerSupport || parentSupport
 
   if(prevSupport) {
+    // ??? new removed
     if(prevSupport !== support) {
       const lastState = prevSupport.state
       support.subject.global = prevSupport.subject.global

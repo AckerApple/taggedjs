@@ -8,6 +8,7 @@ import { TagValues } from'./html.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
 import { AnySupport } from './Support.class.js'
+import { getSupportInCycle } from './getSupportInCycle.function.js'
 
 export const variablePrefix = ':tagvar'
 export const variableSuffix = ':'
@@ -35,10 +36,13 @@ export interface TagTemplate {
 export class Tag {
   tagJsType?: typeof ValueTypes.tag | typeof ValueTypes.dom
   templater!: TemplaterResult
+  ownerSupport?: AnySupport
 
   constructor(
     public values: unknown[],
-  ) {}
+  ) {
+    this.ownerSupport = getSupportInCycle()
+  }
 
 
   // DEPRECATED REMOVE

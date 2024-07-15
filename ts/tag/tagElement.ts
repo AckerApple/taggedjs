@@ -54,11 +54,10 @@ export function tagElement(
   const global = subject.global
   
   support.appElement = element
-  support.isApp = true
   global.isApp = true
   
   // enables hmr destroy so it can control entire app
-  ;(element as any).destroy = () => {
+  ;(element as any).destroy = function() {
     support.destroy() // never return anything here
   }
   
@@ -67,7 +66,6 @@ export function tagElement(
   ++painting.locks
 
   const result = support.buildBeforeElement()
-  --painting.locks
 
   requestAnimationFrame(() => {
     subject.global.oldest = support
@@ -92,6 +90,7 @@ export function tagElement(
     newFragment.appendChild(placeholder)
     putDomDown(result.dom, newFragment)
     result.subs.forEach(sub => subscribeToTemplate(sub))
+    --painting.locks
 
     paint()
     element.appendChild(newFragment)
@@ -140,7 +139,6 @@ export function runWrapper(
     const result = templater.wrapper || {original: templater} as any
 
     const nowSupport = executeWrap(
-      stateArray,
       templater,
       result,
       newSupport,

@@ -169,9 +169,9 @@ function processAddTagArrayItem(
   options.counts.added = options.counts.added + 1 // index
   const subPlaceholder = setPlaceholderElm( itemSubject )
 
-  paintAppends.push(() => {
-    const parentNode = before.parentNode as ParentNode
-    parentNode.insertBefore(subPlaceholder, before)
+  paintAppends.push({
+    element: subPlaceholder,
+    relative: before,
   })
 
   processNewValue(item as TemplateValue, ownerSupport, itemSubject)
