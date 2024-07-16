@@ -24,10 +24,6 @@ export function renderExistingTag(
   // When the providers were checked, a render to myself occurred and I do not need to re-render again
   const justUpdate = preRenderCount !== global.renderCount
 
-  if(newSupport.templater.wrapper?.parentWrap.original.toString().includes('providerDebug.js@child')) {
-    console.log('justUpdate?', {justUpdate, preRenderCount, renderCount: global.renderCount})
-  }
-
   if(justUpdate) {
     oldestSupport.subject.global.oldest.updateBy(prevSupport)
     return prevSupport // already rendered during triggered events

@@ -3,8 +3,6 @@ import { BaseSupport, Support } from './Support.class.js'
 import { TemplaterResult } from './TemplaterResult.class.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 
-let counter = 0
-
 export function isLikeTags(
   support0: BaseSupport | Support | StringTag, // new
   support1: Support | BaseSupport, // previous
@@ -29,12 +27,6 @@ export function isLikeTags(
     support1
   )
   
-  if(counter === 200) {
-    throw new Error('too many')
-  }
-
-  ++counter
-
   return like
 }
 

@@ -14,12 +14,6 @@ export function handleProviderChanges(
   return tagsWithProvider
 
   /*
-  console.log('tagsWithProvider', tagsWithProvider.length, {
-    locked: tagsWithProvider.filter(x => x.support.subject.global.locked),
-    deleted: tagsWithProvider.filter(x => x.support.subject.global.deleted),
-  })
-*/
-  /*
   const unlocked = tagsWithProvider.filter(x => x.provider.locked === undefined)
   const supports = unlocked.map(x => {
     x.provider.locked = true

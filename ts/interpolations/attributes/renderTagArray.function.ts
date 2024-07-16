@@ -25,7 +25,6 @@ export function renderTagUpdateArray(
     }
     
     const newest = support.subject.global.newest as Support
-
     renderSupport(
       newest,
       false, // renderUp - callback may have changed props so also check to render up

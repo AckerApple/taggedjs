@@ -87,7 +87,7 @@ export function renderInlineHtml(
   const newest = ownerSupport.subject.global.newest || ownerSupport
   const result = renderSupport(
     newest as Support,
-    true,
+    true, // false, // true,
   )
 
   return result

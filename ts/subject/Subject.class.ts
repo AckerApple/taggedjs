@@ -57,7 +57,7 @@ export class Subject<T> implements SubjectLike<T> {
     this.value = value
     this.emit()
   }
-  set = this.next
+  set = this.next.bind(this)
   
   emit() {
     const value = this.value as any
