@@ -2,8 +2,9 @@ import { watch, letState, html, tag, letProp, state } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component.js"
 import statePropDebugTag from "./statePropDebug.tag.js"
 
-export const propsDebugMain = tag(() => (
-  _ = state('propsDebugMain'),
+export const propsDebugMain = tag((
+  _ = 'propsDebugMain',
+) => (
   syncPropNumber = letState(0)(x => [syncPropNumber, syncPropNumber = x]),
   propNumber = letState(0)(x => [propNumber, propNumber = x]),
   renderCount = letState(0)(x => [renderCount, renderCount = x]),
@@ -49,9 +50,7 @@ export const propsDebugMain = tag(() => (
     ${syncPropDebug({
       syncPropNumber,
       propNumberChange: x => syncPropNumber = x,
-      parentTest: x => {
-        return x
-      }
+      parentTest: x => x, // causes no change, however the tag did ++counter to itself which should render
     })}
   </fieldset>
 
@@ -98,7 +97,7 @@ const syncPropDebug = tag((
     propNumberChange(syncPropNumber = syncPropNumber + 1)
   }
   
-  return html`<!--syncPropDebug-->
+  return html`<!--syncPropDebug html-->
     <div>
       🥡 child syncPropNumber:<span id="sync-prop-child-display">${syncPropNumber}</span>
       <button id="sync-prop-child-button"

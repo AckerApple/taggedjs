@@ -9,7 +9,7 @@ export const contentDebug = tag(() => {
 
   ++renderCount
 
-  const dom: LikeObjectChildren = () => [{
+  const dom: LikeObjectChildren = [{
     nodeName: 'b', children:[{
       nodeName: 'text',
       textContent: 'big',

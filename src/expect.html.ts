@@ -64,7 +64,7 @@ export function testDuelCounterElements(
   )
   
   let increase = 2
-  sets.forEach(([button1, display1]) => {    
+  sets.forEach(([button1, display1], index) => {    
     query = expectElmCount(display1, 1)
     buttonQuery = expectElmCount(button1, 1)
     let display1Element = query[0] as HTMLElement
@@ -78,6 +78,7 @@ export function testDuelCounterElements(
       {elementCountExpected: 1},
       button0,
       display0,
+      index + 2,
     )
   
     display1Element = query[0] as HTMLElement
@@ -97,6 +98,7 @@ function testCounterSelectedElements(
   },
   counterButtonSelect: string,
   counterDisplaySelect: string,
+  testQuantifier: number = 0
 ) {
   expect(counterButtons.length).toBe(elementCountExpected, () => `Expected ${counterButtonSelect} to be ${elementCountExpected} elements but is instead ${counterButtons.length}`)
   expect(counterDisplays.length).toBe(elementCountExpected, ()=> `Expected ${counterDisplaySelect} to be ${elementCountExpected} elements but is instead ${counterDisplays.length}`)
@@ -113,15 +115,15 @@ function testCounterSelectedElements(
     expect(counterDisplay).toBeDefined()
     expect(document.body.contains(counterDisplay)).toBe(true, `The selected element ${counterDisplaySelect} is no longer an element on the document body AFTER clicking ${counterButtonSelect}`)
 
-    let oldCounterValue = counterValue + 1
+    let newCounterValue = counterValue + 1
     counterValue = Number(counterDisplay.innerText)
     expect(document.body.contains(counterDisplay)).toBe(true)
-    expect(oldCounterValue).toBe(counterValue, () => `Counter test 1 of 2 expected ${counterDisplaySelect} to be value ${oldCounterValue} but it is ${counterValue}`)
+    expect(newCounterValue).toBe(counterValue, () => `After click ${counterButtonSelect}, counter test ${testQuantifier + 1} of ${testQuantifier + 2} expected ${counterDisplaySelect} to be value ${newCounterValue} but it is ${counterValue}`)
     increaseCounter.click()
 
     counterValue = Number(counterDisplay?.innerText)
-    ++oldCounterValue
-    expect(oldCounterValue).toBe(counterValue, () => `Counter test 2 of 2 expected ${counterDisplaySelect} to increase value to ${oldCounterValue} but it is ${counterValue}`)
+    ++newCounterValue
+    expect(newCounterValue).toBe(counterValue, () => `Counter test ${testQuantifier + 2} of ${testQuantifier + 2} expected ${counterDisplaySelect} to increase value to ${newCounterValue} but it is ${counterValue}`)
   })
 
 }

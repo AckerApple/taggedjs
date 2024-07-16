@@ -26,7 +26,7 @@ describe('todos', () => {
     // delete it
     await click('button[data-testid="todo-item-button"]')
 
-    expect(query('button[data-testid="todo-item-button"]').length).toBe(0)
+    expect(query('button[data-testid="todo-item-button"]').length).toBe(0, 'expected todo 0 deleted')
 
     todoInput.value = 'one'
     ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})

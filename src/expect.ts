@@ -137,7 +137,7 @@ export function expect(expected: unknown) {
       }
 
       const message = customMessage || `Expected ${typeof(expected)} ${JSON.stringify(expected)} to be ${typeof(received)} ${JSON.stringify(received)}`
-      console.error(message, {received, expected})
+      console.error(message, {toBe: received, expected})
       throw new Error(message as string)
     },
     toBeGreaterThan: (amount: number, customMessage?: string) => {

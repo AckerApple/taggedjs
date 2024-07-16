@@ -83,7 +83,7 @@ export const providerDebugBase = tag((_x = 'providerDebugBase') => {
 
       <div>
         <button id="increase-prop-🐷-0-button" onclick=${() => ++propCounter}
-        >🐷 increase propCounter ${propCounter}</button>
+        >🐷 ++propCounter in parent ${propCounter}</button>
         <span>
           🐷 <span id="increase-prop-🐷-0-display">${propCounter}</span>
         </span>
@@ -96,7 +96,7 @@ export const providerDebugBase = tag((_x = 'providerDebugBase') => {
     <hr />
 
     <div style="display:flex;flex-wrap:wrap;gap:1em">
-      ${providerDebug({
+      ${providerChildDebug({
         propCounter,
         propCounterChange: x => {
           propCounter = x
@@ -132,6 +132,7 @@ const tagSwitchingWithProvider = tag(() => (
   ${upperProvider.test % 2 == 0 ? null : tagSwitchingProChild2()}
 `)
 */
+/*
 const tagSwitchingProChild1 = tag(() => (
   upperProvider = providers.inject( upperTagDebugProvider ),
 ) => upperProvider.test % 2 == 0 ? null : html`
@@ -154,14 +155,17 @@ const tagSwitchingProChild2 = tag(() => (
       🌹<span id="increase-provider-switch-🌹-2-display">${upperProvider.test}</span>
     </span>
   </div>
-`)
+`)*/
 
-const providerDebug = tag(({
+/* child of main provider testing */
+const providerChildDebug = tag(({
   propCounter,
   propCounterChange,
+  _ = 'providerDebug.js@child',
 }: {
   propCounter: number,
-  propCounterChange: (x: number) => unknown
+  propCounterChange: (x: number) => unknown,
+  _?: string
 }) => {
   const funcProvider = providers.inject(ProviderFunc) // test that an arrow function can be a provider
   const provider = providers.inject( tagDebugProvider )
@@ -187,7 +191,7 @@ const providerDebug = tag(({
 
   ++renderCount
 
-  return html`<!--providerDebug.js-->
+  return html`<!--providerDebug.js@child-->
     <div>
       <button id="increase-provider-🍌-1-button" onclick=${() => ++provider.test}
       >🍌 increase provider.test ${provider.test}</button>
@@ -231,7 +235,7 @@ const providerDebug = tag(({
 
     <div>
       <button id="increase-prop-🐷-1-button" onclick=${() => propCounterChange(++propCounter)}
-      >🐷 increase propCounter ${propCounter}</button>
+      >🐷 ++propCounter in child ${propCounter}</button>
       <span>
         🐷 <span id="increase-prop-🐷-1-display">${propCounter}</span>
       </span>

@@ -151,7 +151,8 @@ export const tag3 = tag(({title}: {title: string}) => {
 })
 
 export const arraySwitching = tag((
-  {selectedTag}: {selectedTag: SelectedTag}
+  {selectedTag}: {selectedTag: SelectedTag},
+  _ = 'arraySwitching'
 ) => {
   switch (selectedTag) {
     case undefined:

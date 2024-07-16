@@ -4,6 +4,7 @@ import { testCounterElements, testDuelCounterElements } from "./expect.html"
 it('child tests', () => {
   testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display')
   testCounterElements('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display')
+  
   testDuelCounterElements(
     ['#childTests-button', '#childTests-display'],
     ['#child-as-prop-test-button', '#child-as-prop-test-display'],

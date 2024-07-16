@@ -49,7 +49,8 @@ export const todoReducer = (state: any[], action: any) => {
         case UPDATE_ITEM:
             return state.map((todo) => (todo.id === action.payload.id ? { ...todo, title: action.payload.title } : todo))
         case REMOVE_ITEM:
-            return state.filter((todo) => todo.id !== action.payload.id)
+            const newState = state.filter((todo) => todo.id !== action.payload.id)
+            return newState
         case TOGGLE_ITEM:
             return state.map((todo) => (todo.id === action.payload.id ? { ...todo, completed: !todo.completed } : todo))
         case REMOVE_ALL_ITEMS:

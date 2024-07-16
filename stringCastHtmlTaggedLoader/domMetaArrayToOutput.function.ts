@@ -16,19 +16,8 @@ export function domMetaArrayToOutput(
   return output;
 }
 
-function customStringify(obj: ParsedHtml[]) {
-  // const seen = new WeakSet();
-/*
-  function replacer(key: any, value: any) {
-      if (typeof value === 'function') {
-          return '__isFunction**' + value.toString() + '**isFunction__'
-      }
-      return value;
-  }
-  const jsonString = JSON.stringify(obj, replacer, 0);
-  */
- 
-  const funStrings = obj.map(o => '() => ' + JSON.stringify(o))
+function customStringify(obj: ParsedHtml[]) { 
+  const funStrings = obj.map(o => JSON.stringify(o))
   const jsonString = '[' + funStrings.join(',') + ']'
 
   return jsonString.replace(/"__isFunction\*\*(.*?)\*\*isFunction__"/g, (match, p1) => {
