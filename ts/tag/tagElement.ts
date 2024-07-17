@@ -65,7 +65,7 @@ export function tagElement(
 
   ++painting.locks
 
-  const result = support.buildBeforeElement()
+  const result = support.buildBeforeElement(element)
 
   requestAnimationFrame(() => {
     subject.global.oldest = support
@@ -89,7 +89,9 @@ export function tagElement(
     const newFragment = document.createDocumentFragment()
     newFragment.appendChild(placeholder)
     putDomDown(result.dom, newFragment)
-    result.subs.forEach(sub => subscribeToTemplate(sub))
+    result.subs.forEach(sub =>
+      subscribeToTemplate(sub)
+    )
     --painting.locks
 
     paint()

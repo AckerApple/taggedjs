@@ -39,7 +39,6 @@ export function attachDomElement(
         paintAppends.push({
           relative: owner,
           element: marker,
-          isAppend: true,
         })
       }
       const subject = scope[ value as unknown as number ]
@@ -51,6 +50,8 @@ export function attachDomElement(
         subs.push({
           // fragment: owner,
           insertBefore: marker,
+          appendTo: owner,
+          
           subject: subVal as InterpolateSubject,
           support, // ownerSupport,
           counts,
@@ -66,6 +67,8 @@ export function attachDomElement(
         {
           counts: {...counts},
         },
+        marker,
+        owner as Element,
       )
   
       continue
@@ -82,7 +85,6 @@ export function attachDomElement(
       const domElement = textNode.domElement = document.createTextNode(x.innerText)
       if(owner) {
         paintAppends.push({
-          isAppend: true,
           element: domElement,
           relative: owner,
         })
@@ -107,7 +109,6 @@ export function attachDomElement(
       paintAppends.push({
         element: domElement,
         relative: owner,
-        isAppend: true,
       })
     }
 

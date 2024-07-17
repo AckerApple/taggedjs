@@ -39,7 +39,7 @@ export function isTagClass(
   value?: StringTag | DomTag | unknown
 ) {
   const tagJsType = (value as StringTag | DomTag)?.tagJsType
-  return tagJsType && [ValueTypes.tag, ValueTypes.dom].includes(tagJsType)
+  return tagJsType && [ValueTypes.tag].includes(tagJsType)
 }
 
 // isSubjectLike

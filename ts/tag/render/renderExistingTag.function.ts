@@ -17,18 +17,6 @@ export function renderExistingTag(
   const global = subject.global
   const prevSupport = global.newest as Support
 
-  /*
-  const preRenderCount = global.renderCount
-  providersChangeCheck(oldestSupport)
-  
-  // When the providers were checked, a render to myself occurred and I do not need to re-render again
-  const justUpdate = preRenderCount !== global.renderCount
-
-  if(justUpdate) {
-    oldestSupport.subject.global.oldest.updateBy(prevSupport)
-    return prevSupport // already rendered during triggered events
-  }
-  */
   return renderExistingReadyTag(
     lastSupport,
     oldestSupport,

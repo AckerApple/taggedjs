@@ -1,6 +1,6 @@
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { TagWrapper } from './tag.utils.js'
-import { AnySupport, BaseSupport, Support } from './Support.class.js'
+import { AnySupport, BaseSupport, PropsConfig, Support } from './Support.class.js'
 import { TagSubject } from '../subject.types.js'
 import { castProps } from'../alterProp.function.js'
 import { setUse } from '../state/setUse.function.js'
@@ -97,15 +97,16 @@ export function getCastedProps(
   lastSupport?: AnySupport,
 ) {
   const props = templater.props
-  
+  const propsConfig = newSupport.propsConfig as PropsConfig
   // When defined, this must be an update where my new props have already been made for me
-  let preCastedProps: Props | undefined = newSupport.propsConfig.castProps
+  let preCastedProps: Props | undefined = propsConfig.castProps
 
-  const lastCastProps = lastSupport?.propsConfig.castProps
+  const lastPropsConfig = lastSupport?.propsConfig
+  const lastCastProps = lastPropsConfig?.castProps
   if(lastCastProps) {
-    newSupport.propsConfig.castProps = lastCastProps
+    propsConfig.castProps = lastCastProps
     preCastedProps = syncFunctionProps(
-      newSupport as Support,
+      newSupport,
       lastSupport as Support,
       (lastSupport as Support).ownerSupport,
       props,

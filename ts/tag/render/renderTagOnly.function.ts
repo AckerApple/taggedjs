@@ -6,7 +6,6 @@ import { Wrapper } from '../TemplaterResult.class.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { executeWrap } from '../getTagWrap.function.js'
 import { setUse } from '../../state/setUse.function.js'
-import { syncStates } from '../../state/syncStates.function.js'
 
 export function renderTagOnly(
   newSupport: AnySupport,

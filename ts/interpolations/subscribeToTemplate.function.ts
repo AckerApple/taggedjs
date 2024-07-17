@@ -8,6 +8,7 @@ import { Counts } from './interpolateTemplate.js'
 import { paint, painting } from '../tag/paint.function.js'
 import { setUse } from '../state/setUse.function.js'
 import { ContextItem } from '../tag/Tag.class.js'
+import { getValueType } from '../tag/getValueType.function.js'
 
 export type SubToTemplateOptions = {
   insertBefore: InsertBefore
@@ -15,6 +16,8 @@ export type SubToTemplateOptions = {
   support: AnySupport
   counts: Counts // used for animation stagger computing
   contextItem: ContextItem
+  
+  appendTo?: Element
 }
 
 export function subscribeToTemplate({
@@ -22,9 +25,11 @@ export function subscribeToTemplate({
   support,
   counts,
   contextItem,
+  appendTo,
 }: SubToTemplateOptions) {
   let onValue = function onSubValue(value: TemplateValue) {
     const templater = value as TemplaterResult
+    const placeholder = subject.global?.placeholder as Text
     processFirstSubjectValue(
       templater,
       contextItem,
@@ -32,6 +37,8 @@ export function subscribeToTemplate({
       {
         counts: {...counts},
       },
+      placeholder,
+      syncRun ? appendTo : undefined,
     )
 
     if(!syncRun && !setUse.memory.stateConfig.support) {
@@ -40,6 +47,8 @@ export function subscribeToTemplate({
 
     // from now on just run update
     onValue = (value: TemplateValue) => {
+      contextItem.global.nowValueType = getValueType(value)
+
       updateExistingValue(
         contextItem,
         value,

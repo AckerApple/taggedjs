@@ -1,13 +1,9 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
 import { State } from '../../state/state.utils.js'
-import { syncStates } from '../../state/syncStates.function.js'
 import { TagSubject } from '../../subject.types.js'
 import { AnySupport, BaseSupport, Support } from '../../tag/Support.class.js'
 import { TagGlobal } from '../../tag/TemplaterResult.class.js'
-import { ValueTypes } from '../../tag/ValueTypes.enum.js'
-import { paint, painting } from '../../tag/paint.function.js'
-import { checkRenderUp, renderSupport } from'../../tag/render/renderSupport.function.js'
 import { updateExistingTagComponent } from '../../tag/update/updateExistingTagComponent.function.js'
 import { getUpTags } from './getUpTags.function.js'
 import { renderTagUpdateArray } from './renderTagArray.function.js'
@@ -78,11 +74,6 @@ export function afterTagCallback(
   callbackResult: any,
 ) {
   const global = tag.subject.global
-  /*
-  if (global.deleted) {
-    return noData;
-  }
-  */
   delete global.locked
   
   const blocked = global.blocked
@@ -110,20 +101,8 @@ function renderCallbackSupport(
   callbackResult: any,
   global: TagGlobal,
 ) {
-  /*
-  if(global.deleted) {
-    return noData // || last.global.deleted
-  }
-  */
   const tagsToUpdate = getUpTags(last)
   renderTagUpdateArray(tagsToUpdate)
-
-  /*
-  renderSupport(
-    last,
-    true, // renderUp - callback may have changed props so also check to render up
-  )
-  */
 
   return checkAfterCallbackPromise(callbackResult, last, global)
 }
@@ -137,8 +116,6 @@ export function checkAfterCallbackPromise(
     last.subject.global.locked = true
 
     return callbackResult.then(() => {
-      // delete last.subject.global.locked
-
       if(global.deleted) {
         return promiseNoData // tag was deleted during event processing
       }
@@ -146,13 +123,6 @@ export function checkAfterCallbackPromise(
       delete last.subject.global.locked
       const tagsToUpdate = getUpTags(last)
       renderTagUpdateArray(tagsToUpdate)
-    
-      /*
-      renderSupport(
-        global.newest as Support,
-        true,
-      )
-      */
 
       return promiseNoData
     })

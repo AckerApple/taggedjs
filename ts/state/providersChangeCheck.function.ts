@@ -11,7 +11,7 @@ export function providersChangeCheck(
   // reset clones
   for (const provider of providersWithChanges) {
     const owner = provider.owner
-    const hasChange = handleProviderChanges(owner, provider, support)
+    const hasChange = handleProviderChanges(owner, provider)
     prosWithChanges.push(...hasChange.map(x => x.support))    
   }
 

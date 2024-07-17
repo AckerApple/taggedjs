@@ -4,9 +4,8 @@ import { isInlineHtml, renderInlineHtml, renderSupport } from './tag/render/rend
 import { setUse } from './state/index.js'
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { Props } from './Props.js'
-import { runBlocked } from './interpolations/attributes/bindSubjectCallback.function.js'
 import { Tag } from './tag/Tag.class.js'
-import { renderExistingReadyTag, renderExistingTag } from './tag/render/renderExistingTag.function.js'
+import { renderExistingTag } from './tag/render/renderExistingTag.function.js'
 
 export function castProps(
   props: Props,
@@ -171,36 +170,8 @@ export function callbackPropOwner(
   const newest = global.newest as Support
   const supportInCycle = getSupportInCycle()
   const noCycle = supportInCycle === undefined
-  
-  /*
-  if(supportInCycle) {
-    supportInCycle.subject.global.locked = true
-  }
-  */
-
   const callbackResult = toCall(...callWith)
 
-  /*
-  if(supportInCycle) {
-    const blocked = supportInCycle?.subject.global.blocked 
-    if(supportInCycle && blocked?.length) {
-      setUse.memory.tagClosed$.toCallback(() => {  
-        delete supportInCycle.subject.global.locked
-        const lastResult = runBlocked(supportInCycle) as Support
-      
-        renderSupport(
-          lastResult,
-          false, // renderUp - callback may have changed props so also check to render up
-        )
-      })
-
-      return callbackResult
-    }
-    
-    delete supportInCycle.subject.global.locked
-  }
-  */
-  
   const run = () => {
     const global = newest.subject.global
 
@@ -253,17 +224,6 @@ export function safeRenderSupport(
   newest.subject.global.locked = true
   const oldest = newest.subject.global.oldest  
 
-  /*
-  renderExistingReadyTag(
-    newest.subject.support as Support,
-    oldest,
-    newest,
-    ownerSupport,
-    newest.subject,
-    newest.subject.global.newest,
-  )
-  */
-
   renderExistingTag(
     oldest,
     newest,
@@ -272,28 +232,5 @@ export function safeRenderSupport(
   )
 
   // ??? new removed
-  delete newest.subject.global.locked
-}
-
-export function safeRenderSupportTwo(
-  newest: AnySupport,
-  ownerSupport: AnySupport,
-) {
-  if(isInlineHtml(newest.templater)) {
-    const result = renderInlineHtml(ownerSupport, newest)
-    delete newest.subject.global.locked
-    return result
-  }
-  
-  newest.subject.global.locked = true
-  const oldest = newest.subject.global.oldest  
-
-  renderExistingTag(
-    oldest,
-    newest,
-    ownerSupport as Support, // useSupport,
-    newest.subject,
-  )
-
   delete newest.subject.global.locked
 }

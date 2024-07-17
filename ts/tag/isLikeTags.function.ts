@@ -11,7 +11,11 @@ export function isLikeTags(
   const templater1 = support1.templater as TemplaterResult
 
   const tag0 = templater0?.tag || (support0 as StringTag | DomTag)
-  const tag1 = templater1.tag as StringTag | DomTag
+  const tag1 = templater1.tag as StringTag | DomTag // || (support1 as any)
+
+  if(templater0?.tagJsType === ValueTypes.stateRender) {
+    return (templater0 as any).dom === (templater1 as any).dom
+  }
 
   if(tag0.tagJsType === ValueTypes.dom) {
     return isLikeDomTags(
@@ -30,6 +34,7 @@ export function isLikeTags(
   return like
 }
 
+// used when compiler was used
 export function isLikeDomTags(
   tag0: DomTag,
   tag1: DomTag,
@@ -39,6 +44,7 @@ export function isLikeDomTags(
   return domMeta0 === domMeta1
 }
 
+// used for no compiling
 function isLikeStringTags(
   tag0: StringTag,
   tag1: StringTag,
@@ -46,7 +52,7 @@ function isLikeStringTags(
   support1: Support | BaseSupport, // previous
 ) {
   const strings0 = tag0.strings
-  const strings1 = tag1.strings || support1.strings
+  const strings1 = tag1.strings
   if(strings0.length !== strings1.length) {
     return false
   }

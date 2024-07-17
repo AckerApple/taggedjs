@@ -1,5 +1,5 @@
 import { Props } from '../Props.js'
-import { Context, StringTag, DomTag, ContextItem } from './Tag.class.js'
+import { Context, StringTag, DomTag, ContextItem, Tag } from './Tag.class.js'
 import { empty, ValueTypes } from './ValueTypes.enum.js'
 import { isTagComponent } from '../isInstance.js'
 import { State } from '../state/index.js'
@@ -22,26 +22,24 @@ import { processAttributeEmit, processNameOnlyEmit } from '../interpolations/att
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 import { ParsedHtml } from '../interpolations/optimizers/htmlInterpolationToDomMeta.function.js'
 
-let testCount = 0
-
 export type AnySupport = (BaseSupport & {
   ownerSupport?: AnySupport
 }) | Support
+
+export type PropsConfig = {
+  latest: Props // new props NOT cloned props
+  latestCloned: Props
+  castProps?: Props // props that had functions wrapped
+}
 
 /** used only for apps, otherwise use Support */
 // TODO: We need to split Support and simple tag support apart
 export class BaseSupport {
   appElement?: Element // only seen on this.getAppSupport().appElement
 
-  strings?: string[]
-  dom?: LikeObjectChildren // ??? is this in use?
   values?: unknown[]
 
-  propsConfig: {
-    latest: Props // new props NOT cloned props
-    latestCloned: Props
-    castProps?: Props // props that had functions wrapped
-  }
+  propsConfig?: PropsConfig
 
   // stays with current render
   state: State = []
@@ -53,6 +51,11 @@ export class BaseSupport {
     castedProps?: Props
   ) {
     const props = templater.props  // natural props
+
+    if(!props) {
+      return
+    }
+
     this.propsConfig = this.clonePropsBy(props, castedProps)
   }
 
@@ -78,20 +81,19 @@ export class BaseSupport {
   }
 
   getHtmlDomMeta(
-    // fragment: DocumentFragment,
     options: ElementBuildOptions = {
       counts: {added:0, removed: 0},
-    }
+    },
+    appendTo?: Element,
   ) {
     const domMeta = this.loadDomMeta()
     const context = this.buildContext()
-    
     const result = attachDomElement(
       domMeta,
       context,
       this,
       options.counts,
-      // fragment as any as Element,
+      appendTo,
     )
 
     processContext(this, context)
@@ -112,7 +114,7 @@ export class BaseSupport {
 
   /** Function that kicks off actually putting tags down as HTML elements */
   buildBeforeElement(
-    // fragment = document.createDocumentFragment(),
+    element?: Element,
     options?: ElementBuildOptions,
   ) {
     const subject = this.subject
@@ -125,7 +127,7 @@ export class BaseSupport {
     this.hasLiveElements = true
 
     ++painting.locks
-    const result = this.getHtmlDomMeta(options)
+    const result = this.getHtmlDomMeta(options, element)
     global.htmlDomMeta = result.dom
     --painting.locks
 
@@ -135,24 +137,17 @@ export class BaseSupport {
 
   updateBy(support: BaseSupport | Support) {
     const context = this.subject.global.context
-    const tempTag = support.templater.tag as StringTag | DomTag
+    const tempTag = (support.templater.tag || support.templater) as DomTag | StringTag
     ++painting.locks
-    this.updateConfig(tempTag, tempTag.values)
+    
+    const values = (support.templater as any as Tag).values || tempTag.values
+
+    this.values = values
     processContextUpdate(this, context)
     --painting.locks
     paint()
   }
   
-  /** triggers values to render */
-  updateConfig(tag: DomTag | StringTag, values: any[]) {
-    if(tag.tagJsType === ValueTypes.dom) {
-      this.dom = (tag as DomTag).dom
-    } else {
-      this.strings = (tag as StringTag).strings
-    }
-    this.values = values
-  }
-
   buildContext() {
     const context = this.subject.global.context
     const thisTag = this.templater.tag as StringTag | DomTag
@@ -376,7 +371,7 @@ function processOneContext(
   values: unknown[],
   index: number,
   context: Context,
-  support: BaseSupport | Support,
+  ownerSupport: BaseSupport | Support,
   isUpdate: boolean,
 ): boolean {
   const value = values[index] as any
@@ -387,11 +382,11 @@ function processOneContext(
   const renderCount = contextItem.global.renderCount
 
   if(global.isAttr) {
-    contextItem.support = support
+    contextItem.support = ownerSupport
     if(global.isNameOnly) {
       processNameOnlyEmit(
         value,
-        support,
+        ownerSupport,
         contextItem,
         global.element as Element,
         global.howToSet as HowToSet,
@@ -407,7 +402,7 @@ function processOneContext(
       contextItem.global.attrName as string,
       contextItem,
       element,
-      support,
+      ownerSupport,
       contextItem.global.howToSet as HowToSet,
     )
 
@@ -424,7 +419,7 @@ function processOneContext(
       }
     }
     
-    return updateContextItem(contextItem, value, support, isUpdate)
+    return updateContextItem(contextItem, value, ownerSupport)
   }
 
   return false

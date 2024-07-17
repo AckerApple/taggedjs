@@ -14,21 +14,16 @@ export function renderTagUpdateArray(
     const global = support.subject.global
     const newCount = global.renderCount
 
-    // ??? not sure if used
     if(renderCount !== newCount) {
       return // already rendered
     }
 
-    // ??? not sure if used
     if(global.deleted) {
       return // deleted
     }
-    
+
     const newest = support.subject.global.newest as Support
-    renderSupport(
-      newest,
-      false, // renderUp - callback may have changed props so also check to render up
-    )  
+    renderSupport(newest)  
   })
 
   --painting.locks

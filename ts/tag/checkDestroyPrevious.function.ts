@@ -1,13 +1,11 @@
 import { DisplaySubject, TagSubject } from '../subject.types.js'
 import { isSimpleType, isStaticTag } from'../isInstance.js'
-import { InterpolateSubject } from './update/processFirstSubject.utils.js'
 import { destroyArrayItem, TagArraySubject } from'./update/processTagArray.js'
 import { isLikeTags } from'./isLikeTags.function.js'
-import { Counts } from'../interpolations/interpolateTemplate.js'
 import { destroyTagMemory } from'./destroyTag.function.js'
 import { Support } from './Support.class.js'
 import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
-import { paintAppends, paintContent } from './paint.function.js'
+import { paintContent } from './paint.function.js'
 import { ContextItem } from './Tag.class.js'
 
 const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender, ValueTypes.oneRender]
@@ -21,17 +19,19 @@ export function checkDestroyPrevious(
   const hasLastValue = 'lastValue' in displaySubject
   const lastValue = displaySubject.lastValue // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
 
-  // was simple value but now something bigger
-  if(hasLastValue && lastValue !== newValue) {
+  // was simple value but now some different type
+  if(hasLastValue) {
     // below is faster than using getValueType
-    const newType = typeof(newValue)
-    if( isSimpleType(newType) && typeof(lastValue) === newType ) {
-      return false
+    if( isSimpleType(valueType) && typeof(lastValue) === valueType ) {
+      return false // no need to destroy, just update display
     }
 
+    /*
+    // ??? recently removed
     if(newValue instanceof Function && (lastValue as any) instanceof Function) {
       return false
     }
+    */
 
     destroySimpleValue(displaySubject)
     subject.global.renderCount = 0
@@ -46,9 +46,7 @@ export function checkDestroyPrevious(
     delete arraySubject.lastArray
     const counts = {added:0, removed:0}
     for (let index=0; index < wasArray.array.length; ++index) {
-      const {support} = wasArray.array[index]
       destroyArrayItem(wasArray.array, index, {counts})
-      // destroyArrayTag(support, )
     }
     subject.global.renderCount = 0
     return 'array'

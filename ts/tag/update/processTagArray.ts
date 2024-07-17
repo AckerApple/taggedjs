@@ -13,7 +13,7 @@ import { updateExistingValue } from './updateExistingValue.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { afterChildrenBuilt } from './afterChildrenBuilt.function.js'
 import { DomObjectChildren } from '../../interpolations/optimizers/ObjectNode.types.js'
-import { paintAppends } from '../paint.function.js'
+import { paintAppends, paintInsertBefores } from '../paint.function.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { processNewValue } from './processNewValue.function.js'
 
@@ -41,6 +41,7 @@ export function processTagArray(
   options: {
     counts: Counts
   },
+  appendTo?: Element,
 ): DocumentFragment | Element | undefined {
   const global = subject.global
   ++global.renderCount
@@ -73,6 +74,7 @@ export function processTagArray(
       existed,
       runtimeInsertBefore,
       options,
+      existed ? undefined : appendTo,
     )
   }
 
@@ -85,10 +87,11 @@ function reviewArrayItem(
   lastArray: LastArrayMeta,
   ownerSupport: AnySupport,
   existed: boolean,
-  runtimeInsertBefore: Text | undefined,
+  runtimeInsertBefore: Text | undefined, // used during updates
   options: {
     counts: Counts
   },
+  appendTo?: Element, // used during initial rendering of entire array
 ) {
   const item = value[index]
   const previous = lastArray.array[index]
@@ -136,6 +139,7 @@ function reviewArrayItem(
     ownerSupport,
     options,
     lastArray.array,
+    appendTo,
   )
 
   if(newSupport) {
@@ -154,7 +158,7 @@ function setPlaceholderElm(
 
 function processAddTagArrayItem(
   item: unknown,
-  before: Text,
+  before: Text, // used during updates
   itemSubject: ContextItem,
   index: number,
   ownerSupport: AnySupport,
@@ -162,6 +166,7 @@ function processAddTagArrayItem(
     counts: Counts
   },
   lastArray: LastArrayItem[],
+  appendTo?: Element, // used during initial entire array rendering
 ): {
   newFragment?: DocumentFragment | Element
   newSupport?: AnySupport
@@ -169,19 +174,43 @@ function processAddTagArrayItem(
   options.counts.added = options.counts.added + 1 // index
   const subPlaceholder = setPlaceholderElm( itemSubject )
 
-  paintAppends.push({
-    element: subPlaceholder,
-    relative: before,
-  })
+  if( appendTo ) {
+    paintAppends.push({
+      element: subPlaceholder,
+      relative: appendTo,
+    })
+  } else {
+    paintInsertBefores.push({
+      element: subPlaceholder,
+      relative: before,
+    })
+  }
 
   processNewValue(item as TemplateValue, ownerSupport, itemSubject)
+  let support: Support
 
-  const { support } = processFirstSubjectValue(
-    item as TemplateValue,
-    itemSubject,
-    ownerSupport, // support,
-    options,
-  )
+  if(appendTo) {
+    const result = processFirstSubjectValue(
+      item as TemplateValue,
+      itemSubject,
+      ownerSupport, // support,
+      options,
+      before,
+      appendTo,
+    )
+    support = result.support as Support
+  } else {
+    const result = processFirstSubjectValue(
+      item as TemplateValue,
+      itemSubject,
+      ownerSupport, // support,
+      options,
+      before,
+      appendTo,
+    )
+    
+    support = result.support as Support
+  }
 
   // Added to previous array
   lastArray.push({

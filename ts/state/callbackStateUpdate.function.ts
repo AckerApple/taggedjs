@@ -22,10 +22,7 @@ export default function callbackStateUpdate<T>(
   // ??? new removed
   syncStates(oldState, state)
 
-  renderSupport(
-    support, // support.global.newest as Support,
-    false,
-  )
+  renderSupport(support)
 
   if(maybePromise instanceof Promise) {
     maybePromise.finally(() => {
@@ -33,10 +30,7 @@ export default function callbackStateUpdate<T>(
       // ??? new removed
       syncStates(oldState, state)
 
-      renderSupport(
-        support, // support.global.newest as Support,
-        false,
-      )
+      renderSupport(support)
     })
   }
 

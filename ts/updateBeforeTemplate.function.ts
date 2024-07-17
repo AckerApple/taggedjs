@@ -1,6 +1,6 @@
 import { InsertBefore } from'./interpolations/InsertBefore.type.js'
 import { NoDisplayValue } from'./interpolations/attributes/processAttribute.function.js'
-import { paintAppends } from './tag/paint.function.js'
+import { paintInsertBefores } from './tag/paint.function.js'
 import { empty } from './tag/ValueTypes.enum.js'
 
 // Function to update the value of x
@@ -10,7 +10,7 @@ export function updateBeforeTemplate(
 ) {
   const textNode = document.createTextNode(value) // never innerHTML
 
-  paintAppends.push({
+  paintInsertBefores.push({
     element: textNode,
     relative: lastFirstChild as Element,
   })

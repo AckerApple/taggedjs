@@ -6,11 +6,12 @@ import { afterChildrenBuilt } from './afterChildrenBuilt.function.js'
 import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { DomObjectChildren } from '../../interpolations/optimizers/ObjectNode.types.js'
-import { paintAppends, painting } from '../paint.function.js'
+import { paintAppends, paintInsertBefores } from '../paint.function.js'
 import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
 
 /** When first time render, adds to owner childTags
  * Used for BOTH inserts & updates to values that were something else
+ * Intended use only for updates
 */
 export function processTag(
   templater: TemplaterResult,
@@ -21,31 +22,27 @@ export function processTag(
 
   const firstTime = !support || subject.global.renderCount === 0
   
-  // first time seeing this tag?
+  // tag replacement?
   if( firstTime ) {
     support = newSupportByTemplater(templater, ownerSupport, subject)
   }
 
   subject.support = support
   support.ownerSupport = ownerSupport
-  let appendIndex = paintAppends.length
-  const result = support.buildBeforeElement({counts: {added:0, removed:0}})
+  let appendIndex = paintInsertBefores.length
+  const result = support.buildBeforeElement(undefined, {counts: {added:0, removed:0}})
   const ph = subject.global.placeholder as Text
-  
-  if(subject.global.deleted) {
-    throw new Error('working with something deleted')
-  }
 
   result.dom.forEach(dom => {
     if(dom.marker) {
-      paintAppends.splice(appendIndex++, 0, {
+      paintInsertBefores.splice(appendIndex++, 0, {
         element: dom.marker,
         relative: ph,
       })
     }
 
     if(dom.domElement) {
-      paintAppends.splice(appendIndex++, 0, {
+      paintInsertBefores.splice(appendIndex++, 0, {
         element: dom.domElement,
         relative: ph,
       })
@@ -124,4 +121,46 @@ export function setupNewSupport(
 
   // asking me to render will cause my parent to render
   support.ownerSupport = ownerSupport
+}
+
+export function processNewTag(
+  templater: TemplaterResult,
+  ownerSupport: AnySupport, // owner
+  subject: TagSubject, // could be tag via result.tag
+  appendTo: Element,
+): {support: Support} {
+  const support = newSupportByTemplater(templater, ownerSupport, subject)
+
+  subject.support = support
+  support.ownerSupport = ownerSupport
+  const result = support.buildBeforeElement(appendTo, {counts: {added:0, removed:0}})
+
+  result.dom.forEach(dom => {
+    if(dom.marker) {
+      paintAppends.push({
+        element: dom.marker,
+        relative: appendTo, // ph.parentNode as Element,
+      })
+    }
+
+    if(dom.domElement) {
+      paintAppends.push({
+        element: dom.domElement,
+        relative: appendTo, // ph.parentNode as Element,
+      })
+    }
+  })
+
+  let index = -1
+  const length = result.subs.length - 1
+  //++painting.locks
+  while(index++ < length) {
+    const sub = result.subs[index]
+    subscribeToTemplate(sub)
+  }
+  //--painting.locks
+
+  afterChildrenBuilt(subject.global.htmlDomMeta as DomObjectChildren, subject, ownerSupport)
+
+  return {support}
 }

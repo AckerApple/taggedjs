@@ -2,18 +2,44 @@ import { isSubjectInstance } from '../../isInstance.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { ContextItem } from '../Tag.class.js'
 import { getValueType } from '../getValueType.function.js'
-import { ImmutableTypes } from '../ValueTypes.enum.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
-import { AnySupport, Support } from '../Support.class.js'
-import { TemplaterResult } from '../TemplaterResult.class.js'
+import { AnySupport } from '../Support.class.js'
 
 /** return boolean indicated if render took place */
 export function updateContextItem(
   subject: ContextItem,
   value: TemplateValue,
-  support: AnySupport,
-  isUpdate: boolean,
+  ownerSupport: AnySupport,
 ): boolean {
+  if(value === subject.value) {
+    return false
+    /*
+    if(Object.values(ImmutableTypes).includes(valueType as ImmutableTypes)) {
+      return false // its the same exact non-complex value
+    }
+
+    if(value instanceof Date) {
+      return false
+    }
+
+    if(value instanceof Array) {
+      processTagArray(
+        subject as TagArraySubject,
+        value as (TemplaterResult | StringTag)[],
+        ownerSupport,
+        {counts: {
+          added: 0,
+          removed: 0,
+        }}
+      )
+      return false // true
+    }
+
+    // console.log('xxxxx', value, subject.value)
+    return false
+    */
+  }
+
   const valueType = getValueType(value)
 
   subject.global.nowValueType = valueType
@@ -23,23 +49,10 @@ export function updateContextItem(
     return false // emits on its own
   }
 
-  if(value === subject.value) {
-    if(Object.values(ImmutableTypes).includes(valueType as ImmutableTypes)) {
-      return false // its the same exact non-complex value
-    }
-  }
-
   // listeners will evaluate updated values to possibly update display(s)
-  if(isUpdate) {
-    return updateExistingValue(
-      subject,
-      value,
-      support,
-    ).rendered
-  }
-  
-  // after rocessing update
-  subject.value = value
-  subject.global.lastValue = value
-  return false
+  return updateExistingValue(
+    subject,
+    value,
+    ownerSupport,
+  ).rendered
 }

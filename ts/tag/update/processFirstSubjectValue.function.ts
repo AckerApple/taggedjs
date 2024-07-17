@@ -3,7 +3,7 @@ import { TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
 import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
 import { DisplaySubject, TagSubject } from '../../subject.types.js'
 import { RegularValue } from './processRegularValue.function.js'
-import { processTag, tagFakeTemplater } from './processTag.function.js'
+import { processNewTag, processTag, tagFakeTemplater } from './processTag.function.js'
 import { AnySupport } from '../Support.class.js'
 import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
 import { TemplateValue, processOptions } from './processFirstSubject.utils.js'
@@ -12,13 +12,15 @@ import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js'
 import { oneRenderToSupport } from './oneRenderToSupport.function.js'
 import { getValueType } from '../getValueType.function.js'
 import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function.js'
-import { processFirstSubjectComponent } from './processFirstSubjectComponent.function.js'
+import { processFirstSubjectComponent, processReplacementComponent } from './processFirstSubjectComponent.function.js'
 
 export function processFirstSubjectValue(
   value: TemplateValue | StringTag,
   subject: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owning support
   options: processOptions, // {added:0, removed:0}
+  insertBefore: Text,
+  appendTo?: Element,
 ): {
   support?: AnySupport
 } {
@@ -30,10 +32,11 @@ export function processFirstSubjectValue(
     }
     
     case ValueTypes.templater:
-      return processTag(
+      return processNewTag(
         value as TemplaterResult,
         ownerSupport,
         subject as TagSubject,
+        appendTo as Element,
       )
 
     case ValueTypes.dom:
@@ -45,11 +48,20 @@ export function processFirstSubjectValue(
         templater = tagFakeTemplater(tag)
       }
 
+      if(appendTo) {
+        return processNewTag(
+          templater,
+          ownerSupport,
+          subject as TagSubject,
+          appendTo as Element,
+        )
+      }
+
       return processTag(
         templater,
         ownerSupport,
         subject as TagSubject,
-      )
+      )      
   
     case ValueTypes.tagArray:
       processTagArray(
@@ -57,19 +69,31 @@ export function processFirstSubjectValue(
         value as (StringTag | TemplaterResult)[],
         ownerSupport,
         options,
+        appendTo,
       )
       return {}
     
     case ValueTypes.stateRender:
     case ValueTypes.tagComponent:
-      const processResult = processFirstSubjectComponent(
+      if(appendTo) {
+        const processResult = processFirstSubjectComponent(
+          value as TemplaterResult,
+          subject as TagSubject,
+          ownerSupport,
+          options,
+          appendTo as Element,
+        )
+        return {support: processResult}
+      }
+
+      const processResult = processReplacementComponent(
         value as TemplaterResult,
         subject as TagSubject,
         ownerSupport,
         options,
       )
       return {support: processResult}
-    
+      
     case BasicTypes.function:
     case ValueTypes.oneRender:
       const v = value as Wrapper
@@ -87,10 +111,11 @@ export function processFirstSubjectValue(
           ownerSupport,
         )
         
-        return processTag(
+        return processNewTag(
           support.templater,
           ownerSupport,
           subject as TagSubject,
+          appendTo as Element,
         )
       }
       break

@@ -1,6 +1,6 @@
 import { TagSubject } from '../../subject.types.js'
 import { hasSupportChanged } from'../hasSupportChanged.function.js'
-import { AnySupport, BaseSupport, Support } from '../Support.class.js'
+import { AnySupport, BaseSupport, PropsConfig, Support } from '../Support.class.js'
 import { destroyTagMemory } from'../destroyTag.function.js'
 import { renderSupport } from'../render/renderSupport.function.js'
 import { castProps, isSkipPropValue } from'../../alterProp.function.js'
@@ -9,7 +9,7 @@ import { Props } from '../../Props.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { ContextItem } from '../Tag.class.js'
-import { processFirstSubjectComponent } from './processFirstSubjectComponent.function.js'
+import { processFirstSubjectComponent, processReplacementComponent } from './processFirstSubjectComponent.function.js'
 
 export function updateExistingTagComponent(
   ownerSupport: BaseSupport | Support,
@@ -21,6 +21,7 @@ export function updateExistingTagComponent(
   const oldWrapper = lastSupport.templater.wrapper
   const newWrapper = support.templater.wrapper
   let isSameTag = false
+  const skipComparing = [ValueTypes.stateRender, ValueTypes.oneRender].includes(support.templater.tagJsType)
 
   if(oldWrapper && newWrapper) {
     const oldFunction = oldWrapper.parentWrap.original
@@ -28,8 +29,8 @@ export function updateExistingTagComponent(
 
     // string compare both functions
     isSameTag = oldFunction === newFunction
-  } else if(support.templater.tagJsType === ValueTypes.stateRender) {
-    isSameTag = lastSupport.dom === support.dom
+  } else if(skipComparing) {
+    isSameTag = support.templater.tagJsType === ValueTypes.oneRender || isLikeTags(lastSupport,support)
   }
 
   const templater = support.templater
@@ -43,9 +44,8 @@ export function updateExistingTagComponent(
     return {subject, support: newSupport, rendered: true}
   }
 
-  const hasChanged = templater.tagJsType === ValueTypes.stateRender || hasSupportChanged(
+  const hasChanged = skipComparing || hasSupportChanged(
     lastSupport as unknown as BaseSupport,
-    support as unknown as BaseSupport,
     templater
   )
 
@@ -69,10 +69,7 @@ export function updateExistingTagComponent(
   }
 
   const previous = subject.global.newest as Support
-  const newSupport = renderSupport(
-    support,
-    false,
-  )
+  const newSupport = renderSupport(support)
 
   return {subject, support: afterTagRender(subject, previous, newSupport, isSameTag), rendered: true}
   //return support
@@ -111,13 +108,14 @@ export function syncFunctionProps(
       depth
     )
     newPropsArray.push( ...castedProps )
-    newSupport.propsConfig.castProps = castedProps
+    const propsConfig = newSupport.propsConfig as PropsConfig
+    propsConfig.castProps = castedProps
     return newPropsArray
   }
 
   lastSupport = newest || lastSupport as Support
 
-  const priorPropConfig = lastSupport.propsConfig
+  const priorPropConfig = lastSupport.propsConfig as PropsConfig
   const priorPropsArray = priorPropConfig.castProps as Props
   const newArray = []
   for (let index = 0; index < newPropsArray.length; ++index) {
@@ -133,7 +131,8 @@ export function syncFunctionProps(
     newArray.push(newValue)
   }
 
-  newSupport.propsConfig.castProps = newArray
+  const newPropsConfig = newSupport.propsConfig as PropsConfig
+  newPropsConfig.castProps = newArray
 
   return newArray
 }
@@ -263,11 +262,14 @@ function syncSupports<T extends AnySupport>(
     newProps,
   )
 
+  const propsConfig = support.propsConfig as PropsConfig
+
   // When new support actually makes call to real function, use these pre casted props
-  support.propsConfig.castProps = castedProps
+  propsConfig.castProps = castedProps
   
+  const lastPropsConfig = lastSupport.propsConfig as PropsConfig
   // update support to think it has different cloned props
-  lastSupport.propsConfig.latestCloned = support.propsConfig.latestCloned
+  lastPropsConfig.latestCloned = propsConfig.latestCloned
 
   return lastSupport // its the same tag component  
 }
@@ -282,13 +284,13 @@ function swapTags(
   destroyTagMemory(oldestSupport)
   delete subject.global.deleted
 
-  const newSupport = processFirstSubjectComponent(
+  const newSupport = processReplacementComponent(
     templater,
     subject,
     ownerSupport,
     {
       counts: {added: 0, removed: 0},
-    }
+    },
   )
 
   return newSupport

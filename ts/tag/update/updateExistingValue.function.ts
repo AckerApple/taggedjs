@@ -1,18 +1,16 @@
 import { DisplaySubject, TagSubject } from '../../subject.types.js'
 import { BaseSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
-import { isTagClass, isTagTemplater } from '../../isInstance.js'
+import { isTagTemplater } from '../../isInstance.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { TagArraySubject, processTagArray } from './processTagArray.js'
 import { updateExistingTagComponent } from './updateExistingTagComponent.function.js'
-import { RegularValue, processRegularValue } from './processRegularValue.function.js'
+import { processNewRegularValue, processUpdateRegularValue, RegularValue } from './processRegularValue.function.js'
 import { checkDestroyPrevious } from '../checkDestroyPrevious.function.js'
-import { isLikeTags } from '../isLikeTags.function.js'
 import { getFakeTemplater, processTag, setupNewSupport } from './processTag.function.js'
-import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
+import { StringTag, DomTag, ContextItem, Tag } from '../Tag.class.js'
 import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
-import { getValueType } from '../getValueType.function.js'
-import { processFirstSubjectComponent } from './processFirstSubjectComponent.function.js'
+import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
 
 const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender]
 
@@ -21,11 +19,13 @@ export function updateExistingValue(
   value: TemplateValue,
   ownerSupport: BaseSupport | Support,
 ): {subject: ContextItem, rendered: boolean} {
-  const nowValueType = subject.global.nowValueType as ValueType | BasicTypes | ImmutableTypes
-  const fetchType = !nowValueType || nowValueType === ValueTypes.subject
-  const valueType = fetchType ? getValueType(value) : nowValueType
+  const valueType = subject.global.nowValueType as ValueType | BasicTypes | ImmutableTypes
 
-  checkDestroyPrevious(
+  if(!valueType) {
+    throw new Error('bad')
+  }
+
+  const wasDestroyed = checkDestroyPrevious(
     subject, value, valueType
   )
 
@@ -96,21 +96,23 @@ export function updateExistingValue(
 
       return {subject, rendered: true}
 
-    // TODO: This don't look right?
-    case ValueTypes.subject:
-      subject.value = value
-      return {subject, rendered: false}
-
-    // now its a useless function (we don't automatically call functions)
     case BasicTypes.function:
+      subject.value = value
       return {subject, rendered: false}
   }
 
   // This will cause all other values to render
-  processRegularValue(
-    value as RegularValue,
-    subject as DisplaySubject,
-  )
+  if(wasDestroyed) {
+    processNewRegularValue(
+      value as RegularValue,
+      subject as DisplaySubject,
+    )
+  } else {
+    processUpdateRegularValue(
+      value as RegularValue,
+      subject as DisplaySubject,
+    )
+  }
 
   return {subject, rendered: true}
 }
@@ -121,40 +123,20 @@ function handleStillTag(
   ownerSupport: BaseSupport | Support,
 ) {
   const lastSupport = subject.support
-  let templater = value
-  const isClass = isTagClass(value)
-
-  if(isClass) {
-    const tag = value as StringTag | DomTag
-    templater = tag.templater
-    if(!templater) {
-      templater = new TemplaterResult([])
-      templater.tag = tag
-      tag.templater = templater
-    }
-  }
+  // StringTag || OtherTag
+  const templater = (value as Tag).templater || value
 
   const valueSupport = new Support(
     templater as TemplaterResult,
     ownerSupport,
     subject,
   )
-  
-  const isSameTag = value && isLikeTags(lastSupport, valueSupport)
 
   if(isTagTemplater(value)) {
     setupNewSupport(valueSupport, ownerSupport, subject)
   }
 
-  if(isSameTag) {
-    lastSupport.subject.global.oldest.updateBy(valueSupport)
-    return
-  }
-
-  return processRegularValue(
-    value as RegularValue,
-    subject as unknown as DisplaySubject,
-  )
+  lastSupport.subject.global.oldest.updateBy(valueSupport)
 }
 
 function prepareUpdateToComponent(
@@ -164,7 +146,13 @@ function prepareUpdateToComponent(
 ): {subject: TagSubject, rendered: boolean} {
   // When last value was not a component
   if(!subjectTag.support) {
-    processFirstSubjectComponent(templater, subjectTag, ownerSupport, {counts:{added:0, removed:0}})
+    processReplacementComponent(
+      templater,
+      subjectTag,
+      ownerSupport,
+      {counts:{added:0, removed:0}},
+      // subjectTag.global.placeholder?.parentNode as Element,
+    )
    return {subject: subjectTag, rendered: true}
   }
   
