@@ -3,7 +3,7 @@
 // 🟠 Warning: avoid direct imports due to bundle workflow (old bundle and new bundle do not mix well)
 // const { renderWithSupport, renderSupport } = require("taggedjs");
 
-import { TemplaterResult, TagSubject, Tag, Support, TaggedFunction, ValueTypes, Wrapper } from "taggedjs"
+import { TemplaterResult, Tag, Support, TaggedFunction, ValueTypes, Wrapper } from "taggedjs"
 import { updateSubject } from "./updateSubject.function"
 
 /** @type {Support | undefined} */
@@ -266,7 +266,7 @@ async function replaceTemplater(
       const contextSubject = context[ index ]
       
       updateSubject(
-        contextSubject as TagSubject, newTag, oldTag, hmr
+        contextSubject, newTag, oldTag, hmr
       )
       
       ++count

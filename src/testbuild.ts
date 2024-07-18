@@ -1,4 +1,4 @@
-import { BaseSupport, RouteProps, RouteQuery, RouteTag, Subject, Tag, TagSubject, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag, BasicTypes, ContextItem, getNewGlobal } from 'taggedjs'
+import { BaseSupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag, BasicTypes, ContextItem, getNewGlobal } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -40,7 +40,9 @@ function templaterToSupport(
   templater: TemplaterResult,
 ) {
   const subject: ContextItem = {
-    value: templater, tagJsType: getValueType(templater), global: getNewGlobal()
+    value: templater,
+    // tagJsType: getValueType(templater),
+    global: getNewGlobal()
   }
   templater.props = templater.props || []
   const support = new BaseSupport(templater, subject) as any as Support
@@ -54,10 +56,11 @@ function readySupport(
   support: Support,
   subject: ContextItem,
 ) {
-  subject.support = support
-  support.subject.global.oldest = support
+  const global = subject.global
+  global.newest = support
+  global.oldest = support
 
-  renderTagOnly(support, support, subject as TagSubject)
+  renderTagOnly(support, support, subject)
   support.buildContext()
   
   return support
@@ -79,7 +82,7 @@ function templaterToHtml(
       strings,
       values.length - 1 - index,
       support,
-      subject as TagSubject
+      subject,
     )
   })
   return strings.join('')
@@ -90,7 +93,7 @@ function processValue(
   strings: string[],
   index: number,
   support: Support,
-  subject?: TagSubject,
+  subject?: ContextItem,
 ) {
 
   const valueType = getValueType(value)
@@ -112,7 +115,11 @@ function processValue(
           [],
           tag.strings.length - 1 -index,
           support,
-          {value, tagJsType: getValueType(value), global: getNewGlobal()} as TagSubject
+          {
+            value,
+            // tagJsType: getValueType(value),
+            global: getNewGlobal()
+          }
         )
       }).join('')
       strings.splice(index+1, 0, string)
@@ -128,11 +135,11 @@ function processValue(
 
       const tSupport = oneRenderToSupport(
         value as any,
-        subject as TagSubject,
+        subject as ContextItem,
         support, // ownerTagSupport as TagSupport,
       )
 
-      readySupport(tSupport, subject as TagSubject)
+      readySupport(tSupport, subject as ContextItem)
 
       const fnString = templaterToHtml(tSupport.templater)
       strings.splice(index+1, 0, fnString)

@@ -9,7 +9,7 @@
  */
 
 import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function.js"
-import { InsertBefore, TagSubject, Support, TaggedFunction, Wrapper } from "taggedjs"
+import { ContextItem, InsertBefore, Support, TaggedFunction, Wrapper } from "taggedjs"
 
 /** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 
@@ -21,16 +21,16 @@ import { InsertBefore, TagSubject, Support, TaggedFunction, Wrapper } from "tagg
  * @param {HmrImport} hmr 
  */
 export async function updateSubject(
-  contextSubject: TagSubject,
+  contextSubject: ContextItem,
   newTag: TaggedFunction<any>,
   oldTag: TaggedFunction<any>,
   hmr: any
 ) {
   /** @type {Support} */
-  const contextSupport = contextSubject.support
+  const global = contextSubject.global
   
-  const oldest = contextSupport.subject.global.oldest as Support
-  const newest = contextSupport.subject.global.newest as Support
+  const oldest = global.oldest as Support
+  const newest = global.newest as Support
 
   const toString = newTag.original.toString()
   // contextSupport.templater.wrapper.original.compareTo = toString
@@ -40,7 +40,7 @@ export async function updateSubject(
   
   // everytime an old owner tag redraws, it will use the new function
   oldTag.original = newTag.original
-  const contextWrapper = contextSupport.templater.wrapper as Wrapper
+  const contextWrapper = newest.templater.wrapper as Wrapper
   contextWrapper.parentWrap.original = newTag.original
   
   const newWrapper = newest.templater.wrapper as Wrapper
@@ -84,5 +84,5 @@ export async function updateSubject(
 
   reSupport.subject.global.newest = reSupport
   reSupport.subject.global.oldest = reSupport
-  contextSubject.support = reSupport
+  // contextSubject.support = reSupport
 }
