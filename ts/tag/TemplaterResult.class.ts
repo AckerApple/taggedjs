@@ -12,7 +12,7 @@ import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './ValueTypes.
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 
-export type OriginalFunction = (() => StringTag) & {compareTo: string}
+export type OriginalFunction = (() => StringTag)
 
 export type Wrapper = ((
   newSupport: BaseSupport | Support,
@@ -48,7 +48,7 @@ export type TagGlobal = {
   insertBefore?: InsertBefore // what element put down before
   placeholder?: Text // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
 
-  subscriptions: Subscription<any>[] // subscriptions created by clones
+  subscriptions?: Subscription<any>[] // subscriptions created by clones
   
   destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
   init?: OnInitCallback // what to run when init complete, used for onInit
@@ -70,11 +70,10 @@ export type Clone = (Element | Text | ChildNode)
 
 export class TemplaterResult {
   tagJsType = ValueTypes.templater
-  tagged!: boolean
   wrapper?: Wrapper
   tag?: StringTag | DomTag
   
-  constructor(public props: Props) {}
+  constructor(public props?: Props) {}
   
   // ??? TODO: removed as it create arrayValue = undefined which then make `'arrayValue' in` pass as true
   // arrayValue?: unknown // used for tag components used in arrays

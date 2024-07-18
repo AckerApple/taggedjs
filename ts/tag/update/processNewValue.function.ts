@@ -6,24 +6,19 @@ import { TemplateValue } from './processFirstSubject.utils.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { getValueType } from '../getValueType.function.js'
 
-export function processNewValue(
+export function processNewArrayValue(
   value: TemplateValue | ValueSubject<any>,
   ownerSupport: AnySupport,
   contextItem: ContextItem,
 ): ContextItem {
   const valueType = getValueType(value)
-
-  if(contextItem.global.isAttr) {
-    contextItem.support = ownerSupport
-    contextItem.value = value
-    return contextItem
-  }
+  contextItem.global.nowValueType = valueType
 
   switch (valueType) {
     case ValueTypes.stateRender:
     case ValueTypes.tagComponent:
-      contextItem.tagJsType = ValueTypes.tagJsSubject
-      break
+    case ValueTypes.subject:
+        break
 
     case ValueTypes.templater:
       const templater = value as TemplaterResult
@@ -35,18 +30,11 @@ export function processNewValue(
     case ValueTypes.dom:
       processNewTag(value as StringTag | DomTag, ownerSupport, contextItem)
       break
-
-    // its already a subject
-    case ValueTypes.subject:
-      contextItem.tagJsType = ValueTypes.subject
-      break
   }
 
   // after processing
   contextItem.value = value
-  contextItem.tagJsType = valueType
   contextItem.global.lastValue = value
-  contextItem.global.nowValueType = valueType
 
   return contextItem
 }
@@ -59,6 +47,7 @@ function processNewTag(
   const tag = value
   
   let templater = tag.templater
+
   // TODO: Can this ever happen?
   if(!templater) {
     templater = new TemplaterResult([])
@@ -66,18 +55,18 @@ function processNewTag(
     tag.templater = templater
   }
 
-  contextItem.value = templater,
-  contextItem.tagJsType = getValueType(templater)
+  contextItem.value = templater
 
-  contextItem.support = new Support(
+  const global = contextItem.global
+  const newest = global.newest = new Support(
     templater,
     ownerSupport,
     ownerSupport.appSupport,
     contextItem
   )
 
-  contextItem.global.oldest = contextItem.support
-  ownerSupport.subject.global.childTags.push(contextItem.support as Support)
+  global.oldest = newest
+  ownerSupport.subject.global.childTags.push(newest)
 
   return contextItem
 }

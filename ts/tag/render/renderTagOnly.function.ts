@@ -1,16 +1,16 @@
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { runBeforeRedraw, runBeforeRender } from'../tagRunner.js'
 import { runAfterRender } from'../tagRunner.js'
-import { TagSubject } from '../../subject.types.js'
 import { Wrapper } from '../TemplaterResult.class.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { executeWrap } from '../getTagWrap.function.js'
 import { setUse } from '../../state/setUse.function.js'
+import { ContextItem } from '../Tag.class.js'
 
 export function renderTagOnly(
   newSupport: AnySupport,
   prevSupport: AnySupport | undefined,
-  subject: TagSubject,
+  subject: ContextItem,
   ownerSupport?: AnySupport,
 ): AnySupport {
   const oldRenderCount = subject.global.renderCount

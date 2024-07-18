@@ -34,10 +34,7 @@ export function subscribeToTemplate({
       templater,
       contextItem,
       support,
-      {
-        counts: {...counts},
-      },
-      placeholder,
+      {...counts},
       syncRun ? appendTo : undefined,
     )
 
@@ -77,5 +74,7 @@ export function subscribeToTemplate({
   const sub = subject.subscribe(callback as any)
   syncRun = false
   
-  support.subject.global.subscriptions.push(sub)
+  const global = support.subject.global
+  const subs = global.subscriptions = global.subscriptions || []
+  subs.push(sub)
 }

@@ -151,7 +151,6 @@ export function getPropWrap(
   wrap.original = value
   wrap.mem = {
     prop: value,
-    // stateArray: stateArray
   }
 
   // copy data properties that maybe on source function

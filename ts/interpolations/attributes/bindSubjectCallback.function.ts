@@ -1,7 +1,5 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
-import { State } from '../../state/state.utils.js'
-import { TagSubject } from '../../subject.types.js'
 import { AnySupport, BaseSupport, Support } from '../../tag/Support.class.js'
 import { TagGlobal } from '../../tag/TemplaterResult.class.js'
 import { updateExistingTagComponent } from '../../tag/update/updateExistingTagComponent.function.js'
@@ -134,7 +132,7 @@ export function runBlocked(
     const lastResult = updateExistingTagComponent(
       block.ownerSupport,
       block,
-      block.subject as TagSubject,
+      block.subject,
     )
 
     global.newest = lastResult.support

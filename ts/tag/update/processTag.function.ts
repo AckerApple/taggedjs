@@ -1,10 +1,8 @@
 import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
-import { TagSubject } from '../../subject.types.js'
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
-import { DomObjectChildren } from '../../interpolations/optimizers/ObjectNode.types.js'
 import { paintAppends, paintInsertBefores } from '../paint.function.js'
 import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
 
@@ -13,22 +11,14 @@ import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.fu
  * Intended use only for updates
 */
 export function processTag(
-  templater: TemplaterResult,
   ownerSupport: AnySupport, // owner
-  subject: TagSubject, // could be tag via result.tag
-): {support: Support} {
-  let support = subject.support as any as Support
-
-  const firstTime = !support || subject.global.renderCount === 0
-  
-  // tag replacement?
-  if( firstTime ) {
-    support = newSupportByTemplater(templater, ownerSupport, subject)
-  }
-
-  subject.support = support
+  subject: ContextItem, // could be tag via result.tag
+): Support {
+  const support = subject.global.newest as Support
   support.ownerSupport = ownerSupport
+  
   let appendIndex = paintInsertBefores.length
+
   const result = support.buildBeforeElement(undefined, {counts: {added:0, removed:0}})
   const ph = subject.global.placeholder as Text
 
@@ -50,13 +40,12 @@ export function processTag(
 
   let index = -1
   const length = result.subs.length - 1
-  //++painting.locks
   while(index++ < length) {
     const sub = result.subs[index]
     subscribeToTemplate(sub)
   }
 
-  return {support}
+  return support
 }
 
 export function tagFakeTemplater(
@@ -71,18 +60,10 @@ export function tagFakeTemplater(
 
 export function getFakeTemplater() {
   const fake = {
-    // children: new ValueSubject<StringTag[]>([]), // no children
-    
-    // props: {} as Props,
-    props: [] as Props,
-    
-    isTag: true,
     tagJsType: ValueTypes.templater,
-    tagged: false,
     html: () => fake,
     dom: () => fake,
     key: () => fake,
-    type: 'fake-templater',
   } as TemplaterResult
 
   return fake
@@ -92,7 +73,7 @@ export function getFakeTemplater() {
 export function newSupportByTemplater(
   templater: TemplaterResult,
   ownerSupport: BaseSupport | Support,
-  subject: TagSubject,
+  subject: ContextItem,
 ) {
   const support = new Support(
     templater,
@@ -112,7 +93,6 @@ export function setupNewSupport(
   subject: ContextItem,
 ) {
   support.subject = subject
-  // subject.support = support
   subject.global.oldest = support
   subject.global.newest = support
 
@@ -123,12 +103,11 @@ export function setupNewSupport(
 export function processNewTag(
   templater: TemplaterResult,
   ownerSupport: AnySupport, // owner
-  subject: TagSubject, // could be tag via result.tag
+  subject: ContextItem, // could be tag via result.tag
   appendTo: Element,
-): {support: Support} {
+): Support {
   const support = newSupportByTemplater(templater, ownerSupport, subject)
 
-  subject.support = support
   support.ownerSupport = ownerSupport
   const result = support.buildBeforeElement(appendTo, {counts: {added:0, removed:0}})
 
@@ -156,5 +135,5 @@ export function processNewTag(
     subscribeToTemplate(sub)
   }
 
-  return {support}
+  return support
 }

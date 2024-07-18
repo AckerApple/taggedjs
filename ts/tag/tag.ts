@@ -36,17 +36,15 @@ export function tag<T extends ToTag>(
       innerTagWrap.parentWrap = parentWrap
     }
     
-    templater.tagged = true
     templater.wrapper = innerTagWrap as Wrapper
 
     return templater
   }) as TagWrapper<T>// we override the function provided and pretend original is what's returned
   
   ;(parentWrap as any).original = tagComponent
-  parentWrap.compareTo = (tagComponent as any).toString()
+  // parentWrap.compareTo = (tagComponent as any).toString()
 
   const tag = tagComponent as unknown as TagComponent
-  parentWrap.isTag = true
   parentWrap.original = tag as any as Original
 
   // group tags together and have hmr pickup

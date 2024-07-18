@@ -1,24 +1,21 @@
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { isLikeTags } from'../isLikeTags.function.js'
-import { TagSubject } from '../../subject.types.js'
 import { renderTagOnly } from'./renderTagOnly.function.js'
 import { destroyUnlikeTags } from'./destroyUnlikeTags.function.js'
 import { softDestroySupport } from './softDestroySupport.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
-import { DomTag, StringTag } from '../Tag.class.js'
+import { ContextItem, DomTag, StringTag } from '../Tag.class.js'
 import { deepEqual } from '../../deepFunctions.js'
 
 /** TODO: This seems to support both new and updates and should be separated? */
 export function renderWithSupport(
   newSupport: Support | BaseSupport,
   lastSupport: Support | BaseSupport | undefined, // previous
-  subject: TagSubject, // events & memory
+  subject: ContextItem, // events & memory
   ownerSupport?: BaseSupport | Support, // who to report to
 ): {support: AnySupport, wasLikeTags: boolean} {
   const lastTemplater = lastSupport?.templater
   const lastTag = lastTemplater?.tag
-
-  // subject.global.locked = true
 
   const reSupport = renderTagOnly(
     newSupport,
@@ -26,8 +23,6 @@ export function renderWithSupport(
     subject,
     ownerSupport,
   )
-
-  // delete subject.global.locked
 
   const isLikeTag = !lastSupport || isLikeTags(lastSupport, reSupport)
   if(!isLikeTag) {
@@ -58,7 +53,7 @@ function checkTagSoftDestroy(
   if(tag.tagJsType===ValueTypes.dom) {
     const lastDom = (lastTag as DomTag)?.dom
     const newDom = (tag as DomTag).dom
-    if(!deepEqual(lastDom, newDom)) {
+    if(lastDom !== newDom) {
       softDestroySupport(lastSupport)
       delete lastSupport.subject.global.deleted
     }

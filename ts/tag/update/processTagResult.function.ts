@@ -1,13 +1,13 @@
 import { Counts } from'../../interpolations/interpolateTemplate.js'
-import { TagSubject } from '../../subject.types.js'
-import { AnySupport, BaseSupport, Support } from '../Support.class.js'
+import { AnySupport } from '../Support.class.js'
 import { paintAppends, paintInsertBefores } from '../paint.function.js'
 import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
+import { ContextItem } from '../Tag.class.js'
 
 export function processReplaceTagResult(
   support: AnySupport,
   counts: Counts,
-  subjectTag: TagSubject,
+  subjectTag: ContextItem,
 ) {
   let insertIndex = paintInsertBefores.length
 
@@ -47,7 +47,7 @@ export function processReplaceTagResult(
 export function processFirstTagResult(
   support: AnySupport,
   counts: Counts,
-  subjectTag: TagSubject,
+  subjectTag: ContextItem,
   appendTo: Element,
 ) {
   let appendIndex = paintAppends.length

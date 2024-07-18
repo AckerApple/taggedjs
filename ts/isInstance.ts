@@ -27,7 +27,6 @@ export function isTagTemplater(
   return (value as TemplaterResult)?.tagJsType === ValueTypes.templater
 }
 
-// TODO: whats the difference between isTagClass and isTagComponent
 export function isTagComponent(
   value?: TemplaterResult | unknown
 ) {
@@ -35,17 +34,11 @@ export function isTagComponent(
   return tagType && [ValueTypes.tagComponent, ValueTypes.stateRender].includes(tagType)
 }
 
-export function isTagClass(
-  value?: StringTag | DomTag | unknown
-) {
-  const tagJsType = (value as StringTag | DomTag)?.tagJsType
-  return tagJsType && [ValueTypes.tag].includes(tagJsType)
-}
-
 // isSubjectLike
 export function isSubjectInstance(
   subject?: SubjectLike<any> | any
 ): Boolean {
-  const isSubject = subject?.isSubject === true
-  return (isSubject || subject?.subscribe) ? true : false // subject?.isSubject === true || 
+  // const isSubject = subject?.isSubject === true
+  // return (isSubject || subject?.subscribe) ? true : false // subject?.isSubject === true || 
+  return subject?.subscribe ? true : false // subject?.isSubject === true || 
 }

@@ -66,10 +66,7 @@ export function attachDomElement(
         subject.value,
         subject,
         support,
-        {
-          counts: {...counts},
-        },
-        marker,
+        {...counts},
         owner as Element,
       )
   
@@ -81,10 +78,12 @@ export function attachDomElement(
       const string = textNode.tc = (node as any as DomObjectText).tc
 
       // PARSE things like &nbsp; and <!-- -->
-      // const newString = string // domParseString(string)
-      x.innerHTML = string
+      const newString = domParseString(string)
+      const domElement = textNode.domElement = document.createTextNode(newString)
       
-      const domElement = textNode.domElement = document.createTextNode(x.innerText)
+      // x.innerHTML = string
+      // const domElement = textNode.domElement = document.createTextNode(x.innerText)
+      
       if(owner) {
         paintAppends.push({
           element: domElement,
@@ -132,10 +131,17 @@ export function attachDomElement(
 // parse things like &nbsp; and <!-- -->
 function domParseString(string: string) {
   const text = new DOMParser().parseFromString(string, 'text/html')
-  return getLeadingSpaces(string) + text.documentElement.textContent as string
+  return getStartingSpaces(string) + text.documentElement.textContent as string
 }
 
-function getLeadingSpaces(str: string) {
-  const match = str.match(/^\s+/);
-  return match ? match[0] : '';
+function getStartingSpaces(str: string) {
+  let spaces = '';
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] === ' ') {
+      spaces += ' ';
+    } else {
+      break;
+    }
+  }
+  return spaces;
 }

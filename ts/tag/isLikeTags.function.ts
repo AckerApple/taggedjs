@@ -65,8 +65,8 @@ function isLikeStringTags(
     return false
   }
 
-  const values0 = support0.values || tag0.values
-  const values1 = support1.values || tag1.values
+  const values0 = (support0.templater as any).values || tag0.values
+  const values1 = (support1.templater as any).values || tag1.values
   return isLikeValueSets(values0, values1)
 
 }
@@ -90,7 +90,7 @@ export function isLikeValueSets(values0:any[], values1:any[]) {
       return false
     }
 
-    return true // deepEqual(value, compareTo)
+    return true
   })
 
   if(allVarsMatch) {

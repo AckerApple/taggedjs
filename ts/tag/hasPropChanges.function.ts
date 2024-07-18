@@ -13,12 +13,6 @@ export function hasPropChanges(
   pastCloneProps: Props, // previously cloned props
   // newTemplater: TemplaterResult,
 ): number | string | false {
-  /*
-  const isCommonEqual = props === undefined && props === compareToProps
-  if(isCommonEqual) {
-    return false
-  }
-  */
   let castedProps: Props = props
   let castedPastProps: Props = pastCloneProps
 
@@ -68,7 +62,6 @@ function compareProps(
   compare: unknown,
   onDelete: () => any,
 ) {
-
   if(!(value instanceof Function)) {
     return deepEqual(value, compare) ? 4 : false
   }

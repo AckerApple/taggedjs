@@ -9,6 +9,6 @@ export function onDestroy(
 ) {
   state(() => {
     const support = getSupportInCycle() as Support
-    support?.subject.global.destroy$.toCallback(callback)
+    support.subject.global.destroy$.toCallback(callback)
   })
 }

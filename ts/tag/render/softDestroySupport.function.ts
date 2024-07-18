@@ -10,9 +10,12 @@ export function softDestroySupport(
   tags.forEach(child => softDestroyOne(child))
   softDestroyOne(lastSupport)
   const mySubs = lastSupport.subject.global.subscriptions
-  subs.push(...mySubs)
-  mySubs.length = 0
-  destroySubs(subs)
+  
+  if(mySubs) {
+    subs.push(...mySubs)
+    mySubs.length = 0
+    destroySubs(subs)
+  }
 }
 
 function softDestroyOne(

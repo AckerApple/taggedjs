@@ -1,16 +1,13 @@
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { TagWrapper } from './tag.utils.js'
 import { AnySupport, BaseSupport, PropsConfig, Support } from './Support.class.js'
-import { TagSubject } from '../subject.types.js'
 import { castProps } from'../alterProp.function.js'
 import { setUse } from '../state/setUse.function.js'
 import { ContextItem, StringTag } from './Tag.class.js'
-import { State } from '../state/state.utils.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { html } from './html.js'
 import { Props } from '../Props.js'
 import { syncFunctionProps } from './update/updateExistingTagComponent.function.js'
-import { syncStates } from '../state/syncStates.function.js'
 
 /** creates/returns a function that when called then calls the original component function
  * Gets used as templater.wrapper()
@@ -23,7 +20,7 @@ export function getTagWrap(
   // this function gets called by taggedjs
   const wrapper = (
     newSupport: Support,
-    subject: TagSubject,
+    subject: ContextItem,
     lastSupport?: Support | BaseSupport | undefined
   ) => executeWrap(
     templater,
@@ -98,7 +95,7 @@ export function getCastedProps(
   newSupport: AnySupport,
   lastSupport?: AnySupport,
 ) {
-  const props = templater.props
+  const props = templater.props as Props
   const propsConfig = newSupport.propsConfig as PropsConfig
   // When defined, this must be an update where my new props have already been made for me
   let preCastedProps: Props | undefined = propsConfig.castProps

@@ -38,14 +38,10 @@ export type PropsConfig = {
 export class BaseSupport {
   appElement?: Element // only seen on this.getAppSupport().appElement
   appSupport: BaseSupport = this
-
-  values?: unknown[]
-
   propsConfig?: PropsConfig
 
   // stays with current render
   state: State = []
-  hasLiveElements = false
 
   constructor(
     public templater: TemplaterResult,
@@ -166,14 +162,10 @@ export class BaseSupport {
     element?: Element,
     options?: ElementBuildOptions,
   ) {
-    const subject = this.subject
     const global = this.subject.global
 
     global.oldest = this as any as Support
     global.newest = this as any as Support
-
-    subject.support = this as any as Support
-    this.hasLiveElements = true
 
     ++painting.locks
     const result = this.getHtmlDomMeta(options, element)
@@ -187,20 +179,21 @@ export class BaseSupport {
   updateBy(support: BaseSupport | Support) {
     const context = this.subject.global.context
     const tempTag = (support.templater.tag || support.templater) as DomTag | StringTag
-    ++painting.locks
-    
     const values = (support.templater as any as Tag).values || tempTag.values
-
-    this.values = values
+    const tag = this.templater.tag as any
+    tag.values = values
+    
+    ++painting.locks    
     processUpdateContext(this, context)
     --painting.locks
+
     paint()
   }
   
   buildContext() {
     const context = this.subject.global.context
     const thisTag = this.templater.tag as StringTag | DomTag
-    const values = this.values || thisTag.values
+    const values = thisTag.values // this.values || thisTag.values
 
     let index = 0
     const len = values.length
@@ -240,10 +233,19 @@ export class BaseSupport {
     }
 
     const mySubs = this.subject.global.subscriptions
-    subs.push(...mySubs)
-    mySubs.length = 0
+    if(mySubs) {
+      subs.push(...mySubs)
+    }
     destroySubs(subs)
-    midDestroyChildTags(tags)
+
+    // signify immediately child has been deleted (looked for during event processing)
+    let index = tags.length
+    while (index--) {
+      const child = tags[index]
+      if(isTagComponent(child.templater)) {
+        runBeforeDestroy(child, child)
+      }
+    }
     
     resetSupport(
       this,
@@ -273,22 +275,14 @@ export class BaseSupport {
         
     thisGlobal.context.forEach(subject => {
       const global = subject.global
-
-      // regular values, no placeholders
-      const elm = global.simpleValueElm
-      if(elm) {
-        delete global.simpleValueElm
-        paintRemoves.push(elm)
-        return
-      }
-
       const oldest = global.oldest
+      
       if(oldest) {
         const clones = global.htmlDomMeta as DomObjectChildren
         const cloneOne = clones[0]  
         
+        // check and see if child content lives within content of mine
         let count = 0
-        // TODO: ??? maybe not needed?
         if(cloneOne) {
           let domOne = cloneOne.domElement
           while(domOne && domOne.parentNode && count < 5) {
@@ -300,11 +294,19 @@ export class BaseSupport {
             ++count
           }
         }
-        
+
         // recurse
         const {stagger, promises: newPromises} = oldest.smartRemoveKids(options)
         options.stagger = options.stagger + stagger
         promises.push(...newPromises)
+      }
+
+      // regular values, no placeholders
+      const elm = global.simpleValueElm
+      if(elm) {
+        delete global.simpleValueElm
+        paintRemoves.push(elm)
+        return
       }
     })
     
@@ -352,7 +354,6 @@ export class BaseSupport {
     clone: Element | Text | ChildNode,
     stagger: number,
   ) {
-    
     const customElm = clone as any
     if( customElm.ondestroy ) {
       const promise = elementDestroyCheck(customElm, stagger)
@@ -366,10 +367,6 @@ export class BaseSupport {
     }
 
     paintRemoves.push(clone)
-  }
-
-  destroySubscriptions() {
-    destroySubs(this.subject.global.subscriptions)
   }
 }
 
@@ -402,9 +399,7 @@ export function resetSupport(
   const subject = support.subject
   const global = subject.global  
   global.context.length = newContextLength
-  delete (global as any).oldest // may not be needed
   delete global.newest
-  delete (subject as any).support
 }
 
 /** returns boolean of did render */
@@ -421,7 +416,7 @@ function processOneContext(
   const global = context[index].global
 
   if(global.isAttr) {
-    contextItem.support = ownerSupport
+    global.newest = ownerSupport
     if(global.isNameOnly) {
       processNameOnlyAttrValue(
         value,
@@ -473,8 +468,10 @@ export function processUpdateOneContext(
     return false
   }
 
+  global.nowValueType = valueType
+
   if(global.isAttr) {
-    contextItem.support = ownerSupport
+    contextItem.global.newest = ownerSupport
     if(global.isNameOnly) {
       processNameOnlyAttrValue(
         value,
@@ -517,37 +514,14 @@ export function processUpdateOneContext(
   return updateContextItem(contextItem, value, ownerSupport, valueType)
 }
 
-export function midDestroyChildTags(
-  childTags: Support[]
+export function destroySubs(
+  subs: Subscription<any>[],
+  // mySubs: Subscription<any>[],
 ) {
-    // signify immediately child has been deleted (looked for during event processing)
-    let index = childTags.length
-    while (index--) {
-      const child = childTags[index]
-      const subGlobal = child.subject.global
-      delete subGlobal.newest
-      subGlobal.deleted = true
-
-      if(isTagComponent(child.templater)) {
-        runBeforeDestroy(child, child)
-      }
-
-      checkDestroySimpleValueTag(child)
-    }
-}
-
-function checkDestroySimpleValueTag(
-  child: AnySupport
-) {
-  const subGlobal = child.subject.global
-  const simpleElm = subGlobal.simpleValueElm
-  if(simpleElm) {
-    paintRemoves.push(simpleElm)
-    delete subGlobal.simpleValueElm
+  if(!subs.length) {
+    return
   }
-}
 
-export function destroySubs(subs: Subscription<any>[]) {
   const cloneSubs = [...subs]
   subs.length = 0
 
@@ -569,7 +543,6 @@ function buildContext(
   context[index] = {
     value,
     global: getNewGlobal(),
-    tagJsType: getValueType(value),
   }
 }
 
@@ -578,7 +551,7 @@ function processContext(
   context: Context,
 ) {
   const thisTag = support.templater.tag as StringTag | DomTag
-  const values = support.values || thisTag.values
+  const values = thisTag.values
 
   let index = 0
   const len = values.length
@@ -610,7 +583,7 @@ function processUpdateContext(
   context: Context,
 ) {
   const thisTag = support.templater.tag as StringTag | DomTag
-  const values = support.values || thisTag.values
+  const values = thisTag.values
 
   let index = 0
   const len = values.length

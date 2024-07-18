@@ -13,9 +13,13 @@ export function getChildTagsToDestroy(
 ): {tags:Support[], subs: Subscription<any>[]} {
   for (const cTag of childTags) {
     allTags.push(cTag)
+    
     const iSubs = cTag.subject.global.subscriptions
-    subs.push(...iSubs)
-    iSubs.length = 0
+    if(iSubs) {
+      subs.push(...iSubs)
+      iSubs.length = 0
+    }
+
     const subTags = cTag.subject.global.childTags
     getChildTagsToDestroy(subTags, allTags, subs)
   }

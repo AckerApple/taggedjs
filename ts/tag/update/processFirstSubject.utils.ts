@@ -6,10 +6,6 @@ import { Callback } from '../../interpolations/attributes/bindSubjectCallback.fu
 import {  StringTag } from '../Tag.class.js'
 import { Subject } from '../../subject/index.js'
 
-export type processOptions = {
-  counts: Counts // used to count stagger
-}
-
 export type InterpolateSubject = (ValueSubject<any>  | ValueSubject<Callback>) & {
   global: TagGlobal
 }

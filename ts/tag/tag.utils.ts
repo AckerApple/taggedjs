@@ -22,8 +22,7 @@ export type TagWrapper<T> = ((
   ...props: T[]
 ) => TemplaterResult) & {
   original: Original
-  compareTo: string
-  isTag: boolean
+  // compareTo: string
   tagJsType?: typeof ValueTypes.oneRender | typeof ValueTypes.stateRender
   lastRuns?: {[index: number]: TagTemplate}
 }

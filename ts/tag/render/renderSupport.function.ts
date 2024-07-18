@@ -4,7 +4,6 @@ import { renderExistingTag } from'./renderExistingTag.function.js'
 import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
-import { paint, painting } from '../paint.function.js'
 
 export function isInlineHtml(templater: TemplaterResult) {
   return !templater.wrapper && templater.tagJsType !== ValueTypes.stateRender
@@ -20,7 +19,7 @@ export function renderSupport<T extends AnySupport>(
   const ownerSupport = (support as Support).ownerSupport
 
   // is it just a vanilla tag, not component?
-  if( inlineHtml ) {// || isTagTemplater(templater) 
+  if( inlineHtml ) {
     return renderInlineHtml(ownerSupport, support) as T
   }
 

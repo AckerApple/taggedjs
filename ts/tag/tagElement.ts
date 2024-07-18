@@ -5,12 +5,10 @@ import { Original, TagComponent, TagMaker} from './tag.utils.js'
 import { textNode } from './textNode.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { executeWrap } from './getTagWrap.function.js'
-import { setUse } from '../state/setUse.function.js'
 import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { paint, painting } from './paint.function.js'
 import { ContextItem } from './Tag.class.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
-import { getValueType } from './getValueType.function.js'
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
 
 const appElements: {
@@ -112,7 +110,6 @@ export function runWrapper(
   const subject: ContextItem = {
     value: templater,
     global,
-    tagJsType: getValueType(templater),
   }
     
   const newSupport = new BaseSupport(
@@ -131,7 +128,6 @@ export function runWrapper(
   runBeforeRender(newSupport, undefined as unknown as Support)
 
   if(templater.tagJsType === ValueTypes.stateRender) {
-    const stateArray = setUse.memory.stateConfig.array
     const result = templater.wrapper || {original: templater} as any
 
     const nowSupport = executeWrap(

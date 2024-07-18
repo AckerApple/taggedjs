@@ -1,4 +1,3 @@
-import { TagSubject } from '../../subject.types.js'
 import { BaseSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { isTagTemplater } from '../../isInstance.js'
@@ -7,7 +6,7 @@ import { TagArraySubject, processTagArray } from './processTagArray.js'
 import { updateExistingTagComponent } from './updateExistingTagComponent.function.js'
 import { processNewRegularValue, processUpdateRegularValue, RegularValue } from './processRegularValue.function.js'
 import { checkDestroyPrevious } from '../checkDestroyPrevious.function.js'
-import { getFakeTemplater, processTag, setupNewSupport } from './processTag.function.js'
+import { getFakeTemplater, newSupportByTemplater, processTag, setupNewSupport } from './processTag.function.js'
 import { StringTag, DomTag, ContextItem, Tag } from '../Tag.class.js'
 import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
@@ -29,13 +28,13 @@ export function updateExistingValue(
   if(isStateTag) {
     return prepareUpdateToComponent(
       value as TemplaterResult,
-      subject as TagSubject,
+      subject as ContextItem,
       ownerSupport,
     )
   }
   
   // was component but no longer
-  const support = (subject as TagSubject).support
+  const support = subject.global.newest
   if( support ) {
     const oneRender = [BasicTypes.function, ValueTypes.oneRender].includes(valueType as ValueType | BasicTypes)
     if(oneRender) {
@@ -43,7 +42,7 @@ export function updateExistingValue(
     }
 
     handleStillTag(
-      subject as TagSubject,
+      subject as ContextItem,
       value as TemplaterResult,
       ownerSupport
     )
@@ -57,18 +56,14 @@ export function updateExistingValue(
         subject as TagArraySubject,
         value as (TemplaterResult | StringTag)[],
         ownerSupport,
-        {counts: {
-          added: 0,
-          removed: 0,
-        }}
+        {added: 0, removed: 0}
       )
       return {subject, rendered: true}
 
     case ValueTypes.templater:
       processTag(
-        value as TemplaterResult,
         ownerSupport,
-        subject as TagSubject,
+        subject as ContextItem,
       )
       return {subject, rendered: true}
     
@@ -82,11 +77,12 @@ export function updateExistingValue(
         tag.templater = templater
         templater.tag = tag
       }
+
+      subject.global.newest = newSupportByTemplater(templater, ownerSupport, subject)
   
       processTag(
-        templater,
         ownerSupport,
-        subject as TagSubject,
+        subject,
       )
 
       return {subject, rendered: true}
@@ -113,12 +109,11 @@ export function updateExistingValue(
 }
 
 function handleStillTag(
-  subject: TagSubject,
+  subject: ContextItem,
   value: StringTag | TemplateValue,
   ownerSupport: BaseSupport | Support,
 ) {
-  const lastSupport = subject.support
-  // StringTag || OtherTag
+  const lastSupport = subject.global.newest as Support
   const templater = (value as Tag).templater || value
 
   const valueSupport = new Support(
@@ -137,40 +132,30 @@ function handleStillTag(
 
 function prepareUpdateToComponent(
   templater: TemplaterResult,
-  subjectTag: TagSubject,
+  contextItem: ContextItem,
   ownerSupport: BaseSupport | Support,
-): {subject: TagSubject, rendered: boolean} {
+): {subject: ContextItem, rendered: boolean} {
   // When last value was not a component
-  if(!subjectTag.support) {
+  if(!contextItem.global.newest) {
     processReplacementComponent(
       templater,
-      subjectTag,
+      contextItem,
       ownerSupport,
-      {counts:{added:0, removed:0}},
-      // subjectTag.global.placeholder?.parentNode as Element,
+      {added:0, removed:0},
     )
-   return {subject: subjectTag, rendered: true}
+   return {subject: contextItem, rendered: true}
   }
   
   const support = new Support(
     templater,
     ownerSupport,
     ownerSupport.appSupport,
-    subjectTag,
+    contextItem,
   )
-
-  const subjectSup = subjectTag.support
-  const prevSupport = subjectSup.subject.global.newest as Support
-  const newestState = prevSupport.state
-  support.state.length = 0
-  support.state.push(...newestState)
-
-  subjectTag.global = subjectSup.subject.global
-  subjectTag.support = support
 
   return updateExistingTagComponent(
     ownerSupport,
     support, // latest value
-    subjectTag,
+    contextItem,
   )
 }

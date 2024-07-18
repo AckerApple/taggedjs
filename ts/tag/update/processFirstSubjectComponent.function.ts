@@ -1,7 +1,6 @@
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { Counts } from'../../interpolations/interpolateTemplate.js'
 import { processFirstTagResult, processReplaceTagResult } from'./processTagResult.function.js'
-import { TagSubject } from '../../subject.types.js'
 import { BaseSupport, PropsConfig, Support } from '../Support.class.js'
 import { setupNewSupport } from './processTag.function.js'
 import { renderWithSupport } from '../render/renderWithSupport.function.js'
@@ -14,7 +13,7 @@ export function processReplacementComponent(
   templater: TemplaterResult,
   subject: ContextItem,
   ownerSupport: BaseSupport | Support,
-  options: {counts: Counts},
+  counts: Counts,
 ): BaseSupport | Support {
   // TODO: This below check not needed in production mode
   validateTemplater(templater)
@@ -40,15 +39,15 @@ export function processReplacementComponent(
   
   const {support} = renderWithSupport(
     newSupport,
-    subject.global.newest, // subject.support, // existing tag
-    subject as TagSubject,
+    subject.global.newest, // existing tag
+    subject as ContextItem,
     ownerSupport,
   )
 
   processReplaceTagResult(
     support,
-    options.counts,
-    subject as TagSubject, // The element set here will be removed from document. Also result.tag will be added in here
+    counts,
+    subject as ContextItem, // The element set here will be removed from document. Also result.tag will be added in here
   )
 
   ownerSupport.subject.global.childTags.push(newSupport as Support)
@@ -60,7 +59,7 @@ export function processFirstSubjectComponent(
   templater: TemplaterResult,
   subject: ContextItem,
   ownerSupport: BaseSupport | Support,
-  options: {counts: Counts},
+  counts: Counts,
   appendTo: Element,
 ): BaseSupport | Support {
   // TODO: This below check not needed in production mode
@@ -87,15 +86,15 @@ export function processFirstSubjectComponent(
   
   const {support} = renderWithSupport(
     newSupport,
-    subject.global.newest, // subject.support, // existing tag
-    subject as TagSubject,
+    subject.global.newest, // existing tag
+    subject as ContextItem,
     ownerSupport,
   )
 
   processFirstTagResult(
     support,
-    options.counts,
-    subject as TagSubject, // The element set here will be removed from document. Also result.tag will be added in here
+    counts,
+    subject as ContextItem, // The element set here will be removed from document. Also result.tag will be added in here
     appendTo,
   )
 

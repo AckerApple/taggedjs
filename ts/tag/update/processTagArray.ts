@@ -6,14 +6,13 @@ import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { ArrayNoKeyError } from '../../errors.js'
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
-import { isTagClass } from '../../isInstance.js'
 import { textNode } from '../textNode.js'
 import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { paintAppends, paintInsertBefores, paintRemoves } from '../paint.function.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
-import { processNewValue } from './processNewValue.function.js'
+import { processNewArrayValue } from './processNewValue.function.js'
 
 export type LastArrayItem = {
   support: Support
@@ -34,19 +33,15 @@ export type TagArraySubject = ContextItem & {
 export function processTagArray(
   subject: TagArraySubject,
   value: (TemplaterResult | StringTag)[], // arry of Tag classes
-  // insertBefore: InsertBefore, // <template end interpolate />
   ownerSupport: BaseSupport | Support,
-  options: {
-    counts: Counts
-  },
+  counts: Counts,
   appendTo?: Element,
-): DocumentFragment | Element | undefined {
+) {
   const global = subject.global
   ++global.renderCount
   
   const existed = subject.lastArray ? true : false
   const lastArray = subject.lastArray = subject.lastArray || {array: []}
-  let lastFragment: DocumentFragment | Element | undefined
   const runtimeInsertBefore = global.placeholder
 
   let removed = 0
@@ -56,7 +51,7 @@ export function processTagArray(
     index: number,
   ) => {
     const {newRemoved, same} = reviewLastArrayItem(
-      item, value, index, lastArray, removed, options
+      item, value, index, lastArray, removed, counts
     )
     removed = removed + newRemoved
     return same
@@ -64,19 +59,17 @@ export function processTagArray(
 
   const length = value.length
   for (let index=0; index < length; ++index) {
-    lastFragment = reviewArrayItem(
+    reviewArrayItem(
       value,
       index,
       lastArray,
       ownerSupport,
       existed,
       runtimeInsertBefore,
-      options,
+      counts,
       existed ? undefined : appendTo,
     )
   }
-
-  return lastFragment
 }
 
 function reviewArrayItem(
@@ -86,19 +79,16 @@ function reviewArrayItem(
   ownerSupport: AnySupport,
   existed: boolean,
   runtimeInsertBefore: Text | undefined, // used during updates
-  options: {
-    counts: Counts
-  },
+  counts: Counts,
   appendTo?: Element, // used during initial rendering of entire array
 ) {
   const item = value[index]
   const previous = lastArray.array[index]
   const previousSupport = previous?.support
   const subTag = item as StringTag | DomTag | TemplaterResult
-  // const tagClass = isTagClass(subTag)
   const itemSubject: ContextItem = previousSupport?.subject || {
-    tagJsType: item,
-    value: value,
+    // tagJsType: item,
+    value,
     global: getNewGlobal(),
   }
 
@@ -109,7 +99,6 @@ function reviewArrayItem(
   const keySet = 'arrayValue' in tag
   if (existed && lastArray.array.length != value.length && !keySet) {
     const details = {
-      // template: support.getTemplate().string,
       array: value,
     }
     const message = 'Found Tag in array without key value, during array update. Be sure to use "html`...`.key(unique)" OR import TaggedJs "key" "key(unique).html = CustomTag(props)"'
@@ -123,19 +112,19 @@ function reviewArrayItem(
     updateExistingValue(
       itemSubject,
       item as TemplateValue,
-      ownerSupport, // prevSupport,
+      ownerSupport,
     )
 
     return
   }
 
-  const {newFragment, newSupport} = processAddTagArrayItem(
+  const newSupport = processAddTagArrayItem(
     item,
     runtimeInsertBefore as any, // thisInsert as any,
     itemSubject,
     index,
     ownerSupport,
-    options,
+    counts,
     lastArray.array,
     appendTo,
   )
@@ -144,7 +133,7 @@ function reviewArrayItem(
     ownerSupport.subject.global.childTags.push(newSupport as Support)
   }
   
-  return newFragment
+  return
 }
 
 function setPlaceholderElm(
@@ -160,16 +149,11 @@ function processAddTagArrayItem(
   itemSubject: ContextItem,
   index: number,
   ownerSupport: AnySupport,
-  options: {
-    counts: Counts
-  },
+  counts: Counts,
   lastArray: LastArrayItem[],
   appendTo?: Element, // used during initial entire array rendering
-): {
-  newFragment?: DocumentFragment | Element
-  newSupport?: AnySupport
-} {
-  options.counts.added = options.counts.added + 1 // index
+): AnySupport {
+  counts.added = counts.added + 1 // index
   const subPlaceholder = setPlaceholderElm( itemSubject )
 
   if( appendTo ) {
@@ -184,38 +168,22 @@ function processAddTagArrayItem(
     })
   }
 
-  processNewValue(item as TemplateValue, ownerSupport, itemSubject)
-  let support: Support
+  processNewArrayValue(item as TemplateValue, ownerSupport, itemSubject)
 
-  if(appendTo) {
-    const result = processFirstSubjectValue(
-      item as TemplateValue,
-      itemSubject,
-      ownerSupport, // support,
-      options,
-      before,
-      appendTo,
-    )
-    support = result.support as Support
-  } else {
-    const result = processFirstSubjectValue(
-      item as TemplateValue,
-      itemSubject,
-      ownerSupport, // support,
-      options,
-      before,
-      appendTo,
-    )
-    
-    support = result.support as Support
-  }
-
+  const support = processFirstSubjectValue(
+    item as TemplateValue,
+    itemSubject,
+    ownerSupport, // support,
+    counts,
+    appendTo,
+  ) as Support
+  
   // Added to previous array
   lastArray.push({
-    support: support as Support, index
+    support, index
   })
 
-  return {newSupport: support}
+  return support
 }
 
 /** compare two values. If both values are arrays then the items will be compared */
@@ -236,15 +204,13 @@ function areLikeValues(valueA: unknown, valueB: unknown): Boolean {
 export function destroyArrayItem(
   lastArray: LastArrayItem[],
   index: number,
-  options: {
-    counts: Counts
-  }
+  counts: Counts,
 ) {
   const last = lastArray[index]
   const support = last.support
-  destroyArrayTag(support, options.counts)
+  destroyArrayTag(support, counts)
   last.deleted = true
-  ++options.counts.removed
+  ++counts.removed
 }
 
 /** Destroys one item in an array of items */
@@ -252,10 +218,12 @@ function destroyArrayTag(
   support: Support,
   counts: Counts,
 ) {
-  const global = support.subject.global
-  const ph = global.placeholder as Text
-  delete global.placeholder
-  paintRemoves.push(ph)
+  setTimeout(() => {
+    const global = support.subject.global
+    const ph = global.placeholder as Text
+    delete global.placeholder
+    paintRemoves.push(ph)
+  }, 0)
 
   support.destroy({
     stagger: counts.removed++,
@@ -268,43 +236,35 @@ function reviewLastArrayItem(
   index: number,
   lastArray: LastArrayMeta,
   removed: number,
-  options: {
-    counts: Counts
-  },
+  counts: Counts,
 ) {
-  const newLength = value.length-1
+  const newLength = value.length - 1
   const at = index - removed
   const lessLength = at < 0 || newLength < at
 
   if(lessLength) {
-    destroyArrayItem(lastArray.array, index, options)
+    destroyArrayItem(lastArray.array, index, counts)
     ++removed
     return {same: false, newRemoved: removed}
   }
 
   const subTag = value[index - removed] as StringTag | DomTag | TemplaterResult | undefined
-  const tagClass = isTagClass(subTag)
 
   const tag = subTag as StringTag | DomTag
   let templater = tag.templater // || subTag
   let prevArrayValue: unknown
 
-  if(tagClass) {
-    prevArrayValue = (tag as any).arrayValue
-  } else {
-    templater = subTag as TemplaterResult
-    // tag = templater.tag as StringTag | DomTag
-    prevArrayValue = (templater as any).arrayValue
-  }
+  templater = subTag as TemplaterResult
+  // tag = templater.tag as StringTag | DomTag
+  prevArrayValue = (templater as any).arrayValue
 
   // const tag = subTag?.templater.tag as Tag
   const lateTemp = item.support.templater
   const lastTag = lateTemp?.tag || lateTemp
   const lastArrayValue = (lastTag as any).arrayValue
   const destroyItem = !areLikeValues(prevArrayValue, lastArrayValue)
-  
   if(destroyItem) {
-    destroyArrayItem(lastArray.array, index, options)
+    destroyArrayItem(lastArray.array, index, counts)
     ++removed
     return {same:false, newRemoved: removed}
   }

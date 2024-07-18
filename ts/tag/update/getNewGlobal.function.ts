@@ -15,6 +15,5 @@ export function getNewGlobal(): TagGlobal {
     
     blocked: [], // renders that did not occur because an event was processing
     childTags: [], // tags on me
-    // htmlDomMeta: [],
   }
 }

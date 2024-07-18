@@ -19,8 +19,7 @@ export type EventMem = {elm: Element, callback:EventCallback}
 // export type Context = TagJsSubject<any>[]
 export type ContextItem = {
   global: TagGlobal
-  value: any, tagJsType: any
-  support?: AnySupport
+  value: any,
 }
 export type Context = ContextItem[]
 
@@ -47,11 +46,6 @@ export class Tag {
     this.ownerSupport = getSupportInCycle()
   }
 
-
-  // DEPRECATED REMOVE
-  /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
-  // present only when an array. Populated by Tag.key()
-  // arrayValue?: unknown
   key(arrayValue: unknown) {
     ;(this as any).arrayValue = arrayValue
     return this
@@ -71,7 +65,7 @@ export class StringTag extends Tag {
 
   html(
     strings: string[] | TemplateStringsArray,
-    ...values: TagValues
+    values: TagValues,
   ) {
     this.children = {strings, values}
     return this
@@ -83,7 +77,6 @@ export class DomTag extends Tag {
   children?: {dom: LikeObjectChildren, values: TagValues}
 
   constructor(
-    // public dom: ObjectChildren,
     public dom: LikeObjectChildren,
     public values: unknown[],
   ) {
@@ -91,11 +84,9 @@ export class DomTag extends Tag {
   }
 
   html = {
-    // $this: this,
     dom: (
-      // a loose typing for better compatibility with compiled code
       dom: LikeObjectChildren, // ObjectChildren
-      ...values: TagValues    
+      values: TagValues,
     ): DomTag => {
       this.children = {dom: dom, values}
       return this

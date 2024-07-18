@@ -1,4 +1,3 @@
-import { TagSubject } from '../subject.types.js'
 import { isSimpleType, isStaticTag } from'../isInstance.js'
 import { destroyArrayItem, TagArraySubject } from'./update/processTagArray.js'
 import { isLikeTags } from'./isLikeTags.function.js'
@@ -46,15 +45,14 @@ export function checkDestroyPrevious(
     delete arraySubject.lastArray
     const counts = {added:0, removed:0}
     for (let index=0; index < wasArray.array.length; ++index) {
-      destroyArrayItem(wasArray.array, index, {counts})
+      destroyArrayItem(wasArray.array, index, counts)
     }
     subject.global.renderCount = 0
     return 'array'
   }
 
-  const tagSubject = subject as TagSubject
   const global = subject.global
-  const lastSupport = tagSubject.support
+  const lastSupport = global.newest
   
   // no longer tag or component?
   if(lastSupport && !global.deleted) {

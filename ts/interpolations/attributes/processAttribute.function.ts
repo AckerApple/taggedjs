@@ -34,8 +34,7 @@ export function processAttribute(
   const attrName = attrs.name // attrs[0]
   const value = attrs.value // attrs[1]
   const nameVar = getTagJsVar(attrName)
-  // const isNameVar = (attrs as any).length === 1 || nameVar >= 0 // isTagVar(attrName)
-  const isNameVar = nameVar >= 0 // isTagVar(attrName)
+  const isNameVar = nameVar >= 0
 
   if( isNameVar ) {
     const contextItem = support.subject.global.context[ nameVar ]
@@ -113,7 +112,9 @@ function processNameOnlyAttr(
       )  
       paint()
     })
-    support.subject.global.subscriptions.push(sub) // this is where unsubscribe is picked up
+    const global = support.subject.global
+    const subs = global.subscriptions = global.subscriptions || []
+    subs.push(sub) // this is where unsubscribe is picked up
     return
   }
 
@@ -216,7 +217,9 @@ function processNameValueAttributeAttrSubject(
     const sub = contextValueSubject.subscribe(callback as any)
     
     // Record subscription for later unsubscribe when element destroyed
-    result.global.subscriptions.push(sub)
+    const global = result.global
+    const subs = global.subscriptions = global.subscriptions || []
+    subs.push(sub)
   }
 
   processAttributeEmit(

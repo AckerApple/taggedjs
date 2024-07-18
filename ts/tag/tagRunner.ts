@@ -53,14 +53,7 @@ export function runBeforeDestroy(
   support: Support | BaseSupport,
   ownerSupport: Support | BaseSupport,
 ) {
-  const tagUse = setUse.tagUse
-  const length = tagUse.length
-  for (let index=0; index < length; ++index) {
-    tagUse[index].beforeDestroy(support as BaseSupport, ownerSupport as Support)
-  }
-
-  support.subject.global.deleted = true
-  support.hasLiveElements = false
+  runBeforeChildDestroy(support, ownerSupport)
 
   // remove me from my parents
   if(ownerSupport) {
@@ -71,4 +64,19 @@ export function runBeforeDestroy(
       }
     }))
   }
+}
+
+// Life cycle 5 - end of life for child
+export function runBeforeChildDestroy(
+  support: Support | BaseSupport,
+  ownerSupport: Support | BaseSupport,
+) {
+  support.subject.global.deleted = true
+
+  const tagUse = setUse.tagUse
+  const length = tagUse.length
+  for (let index=0; index < length; ++index) {
+    tagUse[index].beforeDestroy(support as BaseSupport, ownerSupport as Support)
+  }
+
 }

@@ -1,10 +1,7 @@
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
-import { providersChangeCheck } from '../../state/providersChangeCheck.function.js'
 import { ContextItem } from '../Tag.class.js'
-import { TagSubject } from '../../subject.types.js'
 import { processTag } from '../update/processTag.function.js'
-import { painting } from '../paint.function.js'
 
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(
@@ -13,8 +10,8 @@ export function renderExistingTag(
   ownerSupport: BaseSupport | Support, // ownerSupport
   subject: ContextItem,
 ): AnySupport {
-  const lastSupport = subject.support as Support // todo maybe not needed?
   const global = subject.global
+  const lastSupport = global.newest as Support // todo maybe not needed?
   const prevSupport = global.newest as Support
 
   return renderExistingReadyTag(
@@ -26,7 +23,6 @@ export function renderExistingTag(
     prevSupport,
   )
 }
-
 
 export function renderExistingReadyTag(
   lastSupport: AnySupport,
@@ -43,22 +39,20 @@ export function renderExistingReadyTag(
   const {support, wasLikeTags} = renderWithSupport(
     newSupport,
     toRedrawTag,
-    subject as TagSubject,
+    subject,
     ownerSupport as Support,
   )
   
   const updateAfterRender = prevSupport && wasLikeTags
   if(updateAfterRender) {
-    subject.support = support as Support
     const oldest = global.oldest || oldestSupport
     oldest.updateBy(support)
     return support
   }
 
   processTag(
-    support.templater,
     ownerSupport,
-    subject as TagSubject,
+    subject,
   )
 
   return support
