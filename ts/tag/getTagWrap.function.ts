@@ -73,9 +73,11 @@ export function executeWrap(
   templater.tag = tag
   ;(tag as any).arrayValue = (templater as any).arrayValue // tag component could have been used in array.map
 
+  const ownerSupport = newSupport.ownerSupport as Support
   const support = new Support(
     templater,
-    newSupport.ownerSupport as Support,
+    ownerSupport,
+    newSupport.appSupport, // ownerSupport.appSupport as Support,
     subject,
     castedProps,
     global.renderCount

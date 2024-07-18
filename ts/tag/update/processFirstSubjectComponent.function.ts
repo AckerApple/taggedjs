@@ -22,6 +22,7 @@ export function processReplacementComponent(
   const newSupport = new Support(
     templater,
     ownerSupport,
+    ownerSupport.appSupport,
     subject,
   )
 
@@ -68,6 +69,7 @@ export function processFirstSubjectComponent(
   const newSupport = new Support(
     templater,
     ownerSupport,
+    ownerSupport.appSupport,
     subject,
   )
   

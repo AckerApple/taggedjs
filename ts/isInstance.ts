@@ -49,13 +49,3 @@ export function isSubjectInstance(
   const isSubject = subject?.isSubject === true
   return (isSubject || subject?.subscribe) ? true : false // subject?.isSubject === true || 
 }
-
-export function isTagArray(value: unknown) {
-  return value instanceof Array/* && value.every(x => [
-    ValueTypes.tag,
-    ValueTypes.templater,
-    ValueTypes.dom,
-    ValueTypes.tagComponent
-    ValueTypes.stateRender
-  ].includes( x?.tagJsType ))*/
-}

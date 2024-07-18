@@ -17,16 +17,22 @@ export function bindSubjectCallback(
   value: Callback,
   support: AnySupport,
 ) {
-  const state = support.state
+  // const state = support.state
   const subjectFunction = (
     element: Element, args: any[],
   ) => {
+    const global = subjectFunction.support.subject.global
+    const newest = global.newest as Support // || subjectFunction.support
+
+    if(!global.newest) {
+      return // most likely deleted
+    }
+
     return runTagCallback(
       subjectFunction.tagFunction,
-      subjectFunction.support.subject.global.newest as Support, // subjectFunction.support
+      newest,
       element,
       args,
-      state,
     )
   }
 
@@ -42,30 +48,14 @@ export function runTagCallback(
   support: BaseSupport | Support,
   bindTo: unknown,
   args: any[],
-  state: State,
 ) {
-  // ??? todo: restore this?
-  // const tag = support.templater.tag?.ownerSupport || support
   const tag = support
   const global = tag.subject.global
-
-  // ??? not sure if needed
-  /*
-  const newest = global.newest as Support
-  const newState = newest.state
-  if(newState.length === state.length) {
-    syncStates(newState, state)
-  }
-  */
 
   const method = value.bind(bindTo)  
   global.locked = true // prevent another render from re-rendering this tag
   const callbackResult = method(...args)
-  /*
-  if(newState.length === state.length) {
-    syncStates(state, newState)
-  }
-  */
+
   return afterTagCallback(tag, callbackResult)
 }
 

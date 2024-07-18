@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "alwaysStrict": true,
     "target": "ESNext",
     "module": "ESNext",
     "rootDir": "./ts/.",

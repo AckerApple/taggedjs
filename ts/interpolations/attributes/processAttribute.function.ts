@@ -1,3 +1,5 @@
+// taggedjs-no-compile
+
 import { specialAttribute } from './specialAttribute.js'
 import { isSubjectInstance } from '../../isInstance.js'
 import { HowToSet, howToSetInputValue } from './howToSetInputValue.function.js'
@@ -9,11 +11,18 @@ import { ContextItem } from '../../tag/Tag.class.js'
 import { processNameValueAttribute } from './processNameValueAttribute.function.js'
 
 type TagVarIdNum = {tagJsVar: number}
-
+/*
 export type AttrCombo = [
   string | TagVarIdNum,
   (string | null | TagVarIdNum)?, // current attribute value by using .getAttribute
 ]
+*/
+
+export type AttrCombo = {
+  name: string | TagVarIdNum
+  value?: string | null | TagVarIdNum
+  isSpecial?: boolean
+}
 
 /** Sets attribute value, subscribes to value updates  */
 export function processAttribute(
@@ -22,8 +31,8 @@ export function processAttribute(
   support: AnySupport,
   howToSet: HowToSet = howToSetInputValue,
 ) {
-  const attrName = attrs[0]
-  const value = attrs[1]
+  const attrName = attrs.name // attrs[0]
+  const value = attrs.value // attrs[1]
   const nameVar = getTagJsVar(attrName)
   // const isNameVar = (attrs as any).length === 1 || nameVar >= 0 // isTagVar(attrName)
   const isNameVar = nameVar >= 0 // isTagVar(attrName)
@@ -40,6 +49,7 @@ export function processAttribute(
     )
   }
 
+  const isSpecial = attrs.isSpecial || false
   const valueVar = getTagJsVar(value)
   if(valueVar >= 0) {
     const contextItem = support.subject.global.context[ valueVar ]
@@ -54,7 +64,8 @@ export function processAttribute(
         contextItem,
         element,
         support,
-        howToSet
+        howToSet,
+        isSpecial,
       )
     }
 
@@ -65,6 +76,7 @@ export function processAttribute(
       element,
       howToSet,
       support,
+      isSpecial,
     )  
   }
 
@@ -74,6 +86,7 @@ export function processAttribute(
     element,
     howToSet,
     support,
+    isSpecial,
   )
 }
 
@@ -91,38 +104,29 @@ function processNameOnlyAttr(
   const contextValueSubject = contextValue.value
   if(isSubjectInstance(contextValueSubject)) {
     const sub = contextValueSubject.subscribe((value: any) => {
-      processNameOnlyEmit(value, support, contextValue, element, howToSet)  
+      processNameOnlyAttrValue(
+        value,
+        contextValue.global.lastValue,
+        element,
+        support,
+        howToSet,
+      )  
       paint()
     })
     support.subject.global.subscriptions.push(sub) // this is where unsubscribe is picked up
     return
   }
 
-  processNameOnlyEmit(contextValue.value, support, contextValue, element, howToSet)
-}
-
-export function processNameOnlyEmit(
-  value: any,
-  support: AnySupport,
-  subject: ContextItem,
-  element: Element,
-  howToSet: HowToSet,
-) {
-  const global = subject.global
-  if(value === global.lastValue) {
-    return // value did not change
-  }
-
   processNameOnlyAttrValue(
-    value,
-    subject.global.lastValue,
+    contextValue.value,
+    contextValue.global.lastValue,
     element,
     support,
     howToSet,
   )
 }
 
-function processNameOnlyAttrValue(
+export function processNameOnlyAttrValue(
   attrValue: string | boolean | Record<string, any>,
   lastValue: string | Record<string, any> | undefined,
   element: Element,
@@ -155,18 +159,6 @@ function processNameOnlyAttrValue(
     }
   }
 
-  // process an object of attributes ${{class:'something, checked:true}}
-  if(attrValue instanceof Object) {
-    for (const name in attrValue) {
-      processAttribute(
-        [name, attrValue[name]],
-        element,
-        ownerSupport,
-        howToSet
-      )
-    }
-  }
-
   // regular attributes
   if(typeof(attrValue) === ImmutableTypes.string) {
     if(!(attrValue as string).length) {
@@ -174,6 +166,20 @@ function processNameOnlyAttrValue(
     }
 
     howToSet(element, attrValue as string, empty)
+    return
+  }
+
+  // process an object of attributes ${{class:'something, checked:true}}
+  if(attrValue instanceof Object) {
+    for (const name in attrValue) {
+      const value = attrValue[name]
+      processAttribute(
+        {name, value, isSpecial: isSpecialAttr(name)},
+        element,
+        ownerSupport,
+        howToSet
+      )
+    }
     return
   }
 }
@@ -184,9 +190,10 @@ function processNameValueAttributeAttrSubject(
   result: ContextItem,
   element: Element,
   support: AnySupport,
-  howToSet: HowToSet
+  howToSet: HowToSet,
+  isSpecial: boolean,
 ) {
-  const isSpecial = isSpecialAttr(attrName)
+  // const isSpecial = isSpecialAttr(attrName)
   if(isSpecial) {
     paintContent.push(() => element.removeAttribute(attrName))
   }
@@ -254,7 +261,6 @@ export function processAttributeEmit(
     isSpecial,
     howToSet,
     support,
-    subject,
   )
 }
 
@@ -268,15 +274,9 @@ export function processAttributeSubjectValue(
   isSpecial: boolean,
   howToSet: HowToSet,
   support: AnySupport,
-  subject: ContextItem,
 ) {
   if(newAttrValue instanceof Function) {
     return processAttributeFunction(element, newAttrValue, support, attrName)
-  }
-
-  // its already the same value
-  if(subject.global.lastValue === newAttrValue) {
-    return subject.global.lastValue
   }
   
   if (isSpecial) {
@@ -308,23 +308,33 @@ function processAttributeFunction(
   fun.tagFunction = newAttrValue
   fun.support = support
 
-  return applyFunToElm(attrName, element, fun)
+  return applyFunToElm(attrName, element, support, fun)
 }
 
 export function applyFunToElm(
   attrName: string,
   element: Element,
+  support: AnySupport,
   fun: (...args: unknown[]) => unknown,
 ) {
-  (element as any)[attrName] = fun
+  // support.appSupport.addEventListener(attrName, element, fun)
+  ;(element as any)[attrName] = fun
   return attrName
 }
 
 /** Looking for (class | style) followed by a period */
 export function isSpecialAttr(
-  attrName: string | String
+  attrName: string
 ) {
-  return attrName.search(/^(class|style)(\.)/) >= 0
+  if(isSpecialAction(attrName)) {
+    return true
+  }
+
+  return attrName.startsWith('class.') || attrName.startsWith('style.')
+}
+
+export function isSpecialAction(attrName: string) {
+  return ['autoselect', 'autofocus', 'oninit'].includes(attrName)
 }
 
 function callbackFun(
@@ -358,7 +368,6 @@ function callbackFun(
     isSpecial,
     howToSet,
     support,
-    subject
   )
 }
 
@@ -378,7 +387,7 @@ export function processTagCallbackFun(
 
   // tag has state and will need all functions wrapped to cause re-renders
   newAttrValue = bindSubjectCallback(newAttrValue, support)
-  subject.global.lastValue = newAttrValue
+  // subject.global.lastValue = newAttrValue
 
   return processAttributeFunction(element, newAttrValue, support, attrName)
 }

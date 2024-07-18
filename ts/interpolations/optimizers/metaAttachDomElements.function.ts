@@ -1,3 +1,5 @@
+// taggedjs-no-compile
+
 import { isSubjectInstance } from "../../isInstance.js"
 import { paintAppends } from "../../tag/paint.function.js"
 import { BaseSupport, Support } from "../../tag/Support.class.js"
@@ -30,7 +32,7 @@ export function attachDomElement(
     const newNode = {} as DomObjectElement // DomObjectText
     dom.push(newNode)
 
-    const value = node.value as ContextItem
+    const value = node.v as ContextItem
     const isNum = !isNaN(value as unknown as number)
 
     if(isNum) {
@@ -74,9 +76,9 @@ export function attachDomElement(
       continue
     }
 
-    if (node.nodeName === 'text') {
+    if (node.nn === 'text') {
       const textNode = (newNode as any as DomObjectText)
-      const string = textNode.textContent = (node as any as DomObjectText).textContent
+      const string = textNode.tc = (node as any as DomObjectText).tc
 
       // PARSE things like &nbsp; and <!-- -->
       // const newString = string // domParseString(string)
@@ -92,13 +94,13 @@ export function attachDomElement(
       continue
     }
   
-    const domElement = newNode.domElement = document.createElement(node.nodeName)
+    const domElement = newNode.domElement = document.createElement(node.nn)
 
     // attributes that may effect style, come first
-    if (node.attributes) {
-      node.attributes.map(attr =>
+    if (node.at) {
+      node.at.map(attr =>
         processAttribute(
-          attr,
+          {name: attr[0], value: attr[1], isSpecial: attr[2]},
           domElement,
           support,
         )
@@ -112,9 +114,9 @@ export function attachDomElement(
       })
     }
 
-    if (node.children) {
-      newNode.children = attachDomElement(
-        node.children,
+    if (node.ch) {
+      newNode.ch = attachDomElement(
+        node.ch,
         scope,
         support,
         counts,

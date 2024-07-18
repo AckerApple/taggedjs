@@ -1,4 +1,4 @@
-import { Context, StringTag, DomTag, ContextItem } from './Tag.class.js'
+import { Context, StringTag, DomTag, ContextItem, EventMem } from './Tag.class.js'
 import { BaseSupport, Support } from './Support.class.js'
 import { Props } from '../Props.js'
 import { TagWrapper } from './tag.utils.js'
@@ -61,6 +61,9 @@ export type TagGlobal = {
   htmlDomMeta?: DomObjectChildren
   callbackMaker?: true
   simpleValueElm?: Clone
+
+  // only appears on app
+  events?: {[name: string]: EventMem[]}
 }
 
 export type Clone = (Element | Text | ChildNode)

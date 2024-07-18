@@ -1,9 +1,11 @@
 import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
-import { isSimpleType, isSubjectInstance, isTagArray } from '../isInstance.js'
+import { isSimpleType, isSubjectInstance } from '../isInstance.js'
+
+export type TypedValue = ImmutableTypes | BasicTypes | ValueType
 
 export function getValueType(
   value: any
-): ImmutableTypes | BasicTypes | ValueType {
+): TypedValue {
   if(value === undefined || value === null) {
     return ImmutableTypes.undefined
   }
@@ -27,7 +29,7 @@ export function getValueType(
       return BasicTypes.date
     }
 
-    if (isTagArray(value)) {
+    if (value instanceof Array) {
       return ValueTypes.tagArray
     }
   

@@ -2,7 +2,6 @@ import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
 import { TagSubject } from '../../subject.types.js'
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
-import { afterChildrenBuilt } from './afterChildrenBuilt.function.js'
 import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { DomObjectChildren } from '../../interpolations/optimizers/ObjectNode.types.js'
@@ -56,9 +55,6 @@ export function processTag(
     const sub = result.subs[index]
     subscribeToTemplate(sub)
   }
-  //--painting.locks
-
-  afterChildrenBuilt(subject.global.htmlDomMeta as DomObjectChildren, subject, ownerSupport)
 
   return {support}
 }
@@ -101,6 +97,7 @@ export function newSupportByTemplater(
   const support = new Support(
     templater,
     ownerSupport,
+    ownerSupport.appSupport,
     subject,
   )
 
@@ -158,9 +155,6 @@ export function processNewTag(
     const sub = result.subs[index]
     subscribeToTemplate(sub)
   }
-  //--painting.locks
-
-  afterChildrenBuilt(subject.global.htmlDomMeta as DomObjectChildren, subject, ownerSupport)
 
   return {support}
 }

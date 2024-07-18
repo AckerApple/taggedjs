@@ -1,4 +1,6 @@
-import { paintContent } from "../../tag/paint.function.js"
+import { paintAfters, paintContent } from "../../tag/paint.function.js"
+import { elementInitCheck } from "./elementInitCheck.js";
+import { isSpecialAction } from "./processAttribute.function.js";
 
 const style = 'style'
 const classS = 'class'
@@ -8,6 +10,22 @@ export function specialAttribute(
   value: any,
   element: Element,
 ) {
+  if(isSpecialAction(name)) {
+    switch (name) {
+      case 'oninit':
+        paintAfters.push(() => elementInitCheck(element, {added:0, removed:0}))
+        break;
+
+      case 'autofocus':
+        paintAfters.push(() => (element as any).focus())
+        break;
+
+      case 'autoselect':
+        paintAfters.push(() => (element as any).select())
+        break;
+    }
+  }
+
   const names = name.split('.')
   const firstName = names[0]
 

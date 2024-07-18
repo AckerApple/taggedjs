@@ -11,31 +11,31 @@ export function restorePlaceholders(elements: ObjectChildren) {
 const safeReplacer = /__safeTagVar(\d+)/g
 
 function traverseAndRestore(element: OneUnparsedHtml) {
-  if ('attributes' in element) {
-    element.attributes = element.attributes ? element.attributes.map(attr => {
+  if ('at' in element) {
+    element.at = element.at ? element.at.map(attr => {
       if(attr.length === 1) {
         return attr
       }
       
-      let [key, value] = attr
+      const [, value] = attr
       if (typeof value === 'string' && value.startsWith(safeVar)) {
         const index = parseInt(value.replace(safeVar, ''), 10)
-        value = variablePrefix + index + variableSuffix
+        attr[1] = variablePrefix + index + variableSuffix
       }
-      return [key, value]
+      return attr
     }) : []
   }
 
-  if ('children' in element) {
-    const children = element.children as ObjectChildren
+  if ('ch' in element) {
+    const children = element.ch as ObjectChildren
     for (let i = 0; i < children.length; i++) {
       const child = children[i] as ObjectText
-      if (child.nodeName === 'text') {
-        if(typeof child.textContent !== 'string') {
+      if (child.nn === 'text') {
+        if(typeof child.tc !== 'string') {
           return
         }
 
-        child.textContent = child.textContent.replace(safeReplacer, (_match, index) =>
+        child.tc = child.tc.replace(safeReplacer, (_match, index) =>
           variablePrefix + index + variableSuffix
         )
       }
@@ -44,7 +44,7 @@ function traverseAndRestore(element: OneUnparsedHtml) {
 
     // Remove empty children array
     if (children.length === 0) {
-      delete element.children
+      delete element.ch
     }
   }
 }

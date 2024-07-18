@@ -1,3 +1,5 @@
+// taggedjs-no-compile
+
 import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
 import { Attribute, ObjectText } from "./ObjectNode.types.js";
 import { DomMetaMap, ObjectChildren, ValuePos } from "./exchangeParsedForValues.function.js";
@@ -17,15 +19,15 @@ export function replacePlaceholders(
     const loopTail: (string | number)[] = [...currentTail, i]
 
     const element = elements[i]
-    if ('attributes' in element) {
-      const attrs = element.attributes as Attribute[]
-      element.attributes = processAttributes(attrs, valueCount)
+    if ('at' in element) {
+      const attrs = element.at as Attribute[]
+      element.at = processAttributes(attrs, valueCount)
     }
 
-    if ('children' in element) {
-      const children = element.children as ObjectChildren
-      const innerLoopTail: (string | number)[] = [...loopTail, 'children']
-      element.children = replacePlaceholders(children, valueCount, valuePositions, innerLoopTail)
+    if ('ch' in element) {
+      const children = element.ch as ObjectChildren
+      const innerLoopTail: (string | number)[] = [...loopTail, 'ch']
+      element.ch = replacePlaceholders(children, valueCount, valuePositions, innerLoopTail)
     }
 
     i = examineChild(element, valueCount, elements, i)
@@ -40,12 +42,12 @@ function examineChild(
   children: UnparsedHtml,
   index: number,
 ): number {
-  if (child.nodeName !== 'text') {
+  if (child.nn !== 'text') {
     return index;
   }
 
   const textChild = child as ObjectText;
-  let textContent = textChild.textContent;
+  let textContent = textChild.tc;
 
   if (typeof textContent !== 'string') {
     return index;
@@ -61,8 +63,8 @@ function examineChild(
       const after = textContent.slice(match.index + varContent.length)
 
       children.splice(index, 1, ...[{
-        nodeName: 'text',
-        value: wIndex
+        nn: 'text',
+        v: wIndex
       }])
       
       textContent = after;
@@ -70,7 +72,7 @@ function examineChild(
     }
   }
 
-  textChild.textContent = textContent;
+  textChild.tc = textContent;
 
   return index
 }
@@ -79,7 +81,9 @@ function processAttributes(
   attributes: Attribute[],
   valueCount: number,
 ): Attribute[] {
-  return attributes.map(([key, value]) => {
+  return attributes.map(attrSet => {
+    const [key, value, isSpecial] = attrSet
+
     if (key.startsWith(variablePrefix)) {
       const index = parseInt(key.replace(variablePrefix, ''), 10)
       if (!isNaN(index) && index < valueCount) {
@@ -90,10 +94,10 @@ function processAttributes(
     if (typeof value === 'string' && value.startsWith(variablePrefix)) {
       const index = parseInt(value.replace(variablePrefix, ''), 10)
       if (!isNaN(index) && index < valueCount) {
-        return [key, {tagJsVar: index}]
+        return [key, {tagJsVar: index}, isSpecial]
       }
     }
 
-    return [key, value]
+    return attrSet
   })
 }

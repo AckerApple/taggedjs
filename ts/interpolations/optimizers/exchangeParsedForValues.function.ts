@@ -11,11 +11,12 @@ export type LikeObjectChildren = LikeObjectElement[]
 
 // A looser typing for compiled code
 type LikeObjectElement = {
-  nodeName: string
-  textContent?: string
-  value?: any
-  attributes?: any[],
-  children?: LikeObjectElement[]
+  nn: string // nodeName
+  tc?: string // textContent
+  v?: any // value
+  at?: any[], // attributes
+  ch?: LikeObjectElement[] // children
+  
   domElement?: any
 }
 

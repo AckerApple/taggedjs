@@ -1,7 +1,7 @@
 import { TagArraySubject, processTagArray } from './processTagArray.js'
 import { TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
 import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
-import { DisplaySubject, TagSubject } from '../../subject.types.js'
+import { TagSubject } from '../../subject.types.js'
 import { RegularValue } from './processRegularValue.function.js'
 import { processNewTag, processTag, tagFakeTemplater } from './processTag.function.js'
 import { AnySupport } from '../Support.class.js'
@@ -123,7 +123,7 @@ export function processFirstSubjectValue(
 
   processFirstRegularValue(
     value as RegularValue,
-    subject as DisplaySubject,
+    subject,
     subject.global.placeholder as InsertBefore, // || insertBefore,
   )
 
@@ -132,10 +132,10 @@ export function processFirstSubjectValue(
 
 function processFirstRegularValue(
   value: RegularValue,
-  subject: DisplaySubject, // could be tag via subject.tag
+  subject: ContextItem, // could be tag via subject.tag
   insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
 ) {
-  subject.lastValue = value
+  // subject.global.lastValue = value
   const castedValue = castTextValue(value)
   const clone = updateBeforeTemplate(
     castedValue,

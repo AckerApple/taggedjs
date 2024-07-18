@@ -3,7 +3,6 @@ import { runAfterRender, runBeforeRender } from'./tagRunner.js'
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { Original, TagComponent, TagMaker} from './tag.utils.js'
 import { textNode } from './textNode.js'
-import { afterChildrenBuilt } from './update/afterChildrenBuilt.function.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { executeWrap } from './getTagWrap.function.js'
 import { setUse } from '../state/setUse.function.js'
@@ -49,11 +48,10 @@ export function tagElement(
   // const template = document.createElement('template')
 
   const placeholder = textNode.cloneNode(false) as Text
-  const support = runWrapper(wrapper, placeholder)
+  const support = runWrapper(wrapper, placeholder, element)
   const subject = support.subject
   const global = subject.global
   
-  support.appElement = element
   global.isApp = true
   
   // enables hmr destroy so it can control entire app
@@ -96,12 +94,6 @@ export function tagElement(
 
     paint()
     element.appendChild(newFragment)
-    
-    afterChildrenBuilt(
-      subject.global.htmlDomMeta as DomObjectChildren,
-      subject,
-      support
-    )
   })
 
   return {
@@ -112,8 +104,8 @@ export function tagElement(
 
 export function runWrapper(
   templater: TemplaterResult,
-  // insertBefore: Element,
   placeholder: Text,
+  appElement: Element,
 ) {
   const global = getNewGlobal()
 
@@ -127,6 +119,8 @@ export function runWrapper(
     templater,
     subject,
   )
+
+  newSupport.appElement = appElement
 
   // subject.global.insertBefore = insertBefore
   global.placeholder = placeholder

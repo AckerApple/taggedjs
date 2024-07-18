@@ -1,3 +1,5 @@
+// taggedjs-no-compile
+
 import { TagTemplate } from './Tag.class.js'
 import { htmlInterpolationToDomMeta, ParsedHtml } from '../interpolations/optimizers/htmlInterpolationToDomMeta.function.js'
 import { getStringsId } from './getStringsId.function.js'
@@ -23,10 +25,10 @@ export function getDomMeta(
 
   const domMeta = htmlInterpolationToDomMeta(strings, values)
   const map = replacePlaceholders(domMeta, values.length)
-
+  
   // Restore any sanitized placeholders in text nodes
   restorePlaceholders(map)
-
+  
   const template: TagTemplate = {
     interpolation: undefined as any,
     string: undefined as any,

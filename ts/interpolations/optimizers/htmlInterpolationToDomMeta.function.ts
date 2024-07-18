@@ -1,16 +1,12 @@
-/* best */
-
 import { variablePrefix, variableSuffix } from "../../tag/Tag.class.js"
+import { isSpecialAttr } from "../attributes/processAttribute.function.js"
 import { Attribute, DomObjectElement, ObjectElement, ObjectText } from "./ObjectNode.types.js"
 
 const ondoubleclick = 'ondoubleclick'
 const fragFindAny = /(:tagvar\d+:)/
 const fragReplacer = /(^:tagvar\d+:|:tagvar\d+:$)/g
 const safeVar = '__safeTagVar'
-// name?=value
 const regexAttr = /([:_a-zA-Z0-9\-\.]+)\s*(?:=\s*"([^"]*)"|=\s*(\S+))?/g;
-// const regexAttr = /([:_a-zA-Z0-9\-.]+)\s*=\s*"([^"]*)"|([:_a-zA-Z0-9\-.]+)\s*=\s*'([^']*)'|([:_a-zA-Z0-9\-.]+)\s*=\s*([^>\s]+)/g;
-// const regexTagOrg = /<\/?([a-zA-Z0-9\-]+)([^>]*)>/
 const regexTagOrg = /<\/?([a-zA-Z0-9\-]+)((?:\s+[a-zA-Z_:][\w:.\-]*(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)+\s*|\s*)\/?>/g;
 
 export function htmlInterpolationToDomMeta(
@@ -113,10 +109,6 @@ export function parseHTML(html: string): ParsedHtml {
     }
 
     const attributes: Attribute[] = [];
-    const element: ObjectElement = {
-      nodeName: tagName,
-      attributes,
-    };
 
     let attrMatch;
     while ((attrMatch = regexAttr.exec(attrString)) !== null) {
@@ -135,15 +127,16 @@ export function parseHTML(html: string): ParsedHtml {
 
       if (noValue) {
         const standAloneVar = attrName.slice(0, variablePrefix.length) === variablePrefix;
-        
+  
         if (standAloneVar) {
           const valueName = variablePrefix + (++valueIndex) + variableSuffix
-          valuePositions.push(['attributes', valueName]);
+          valuePositions.push(['at', valueName]);
           attributes.push([valueName]); // the name itself is dynamic
           continue
         }
         
-        const standAloneAttr = attrMatch[0].startsWith(attrName) && attrMatch[0].slice(attrName.length, attrMatch[0].length).search(/\s+$/) >= 0
+        const startMatched = attrMatch[0].startsWith(attrName)
+        const standAloneAttr = startMatched && attrMatch[0].slice(attrName.length, attrMatch[0].length).search(/\s+$/) >= 0
         if(standAloneAttr) {
           attributes.push([fixedName])
           continue
@@ -157,18 +150,29 @@ export function parseHTML(html: string): ParsedHtml {
         attrValue = attrMatch[2]
       }
 
-      attributes.push([fixedName, attrValue])
+      const attrSet: Attribute = [fixedName, attrValue]
+
+      const isSpecial = isSpecialAttr(fixedName)
+      if(isSpecial) {
+        attrSet.push(true)
+      }
+
+      attributes.push(attrSet)
     }
 
-    if (!attributes.length) {
-      delete element.attributes;
+    const element: ObjectElement = {
+      nn: tagName, // nodeName
+    };
+
+    if (attributes.length) {
+      element.at = attributes;
     }
 
     if (currentElement) {
-      if (!currentElement.children) {
-        currentElement.children = [];
+      if (!currentElement.ch) {
+        currentElement.ch = [];
       }
-      currentElement.children.push(element);
+      currentElement.ch.push(element);
     } else {
       elements.push(element as DomObjectElement);
     }
@@ -224,10 +228,10 @@ function pushTo(
   textNode: ObjectText
 ) {
   if (currentElement) {
-    if (!currentElement.children) {
-      currentElement.children = []
+    if (!currentElement.ch) {
+      currentElement.ch = []
     }
-    currentElement.children.push(textNode)
+    currentElement.ch.push(textNode)
   } else {
     elements.push(textNode)
   }
@@ -239,8 +243,8 @@ function pushTextTo(
   textContent: string
 ) {
   const textNode: ObjectText = {
-    nodeName: 'text',
-    textContent: postprocessTagsInComments(textContent),
+    nn: 'text', // nodeName
+    tc: postprocessTagsInComments(textContent), // textContent
   }
 
   pushTo(currentElement, elements, textNode)

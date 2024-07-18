@@ -1,9 +1,10 @@
 const path = require('path');
-const out = path.resolve(__dirname, 'dist');
-const TerserPlugin = require('terser-webpack-plugin')
-// const CompressionPlugin = require('compression-webpack-plugin');
+const webpack = require('webpack');
+const TerserPlugin = require('terser-webpack-plugin');
 const { ResolveTsForJsPlugin } = require('./ResolveTsForJsPlugin.class.cjs');
-console.debug(`🖊️ Writing bundle to ${out}`)
+
+const out = path.resolve(__dirname, 'dist');
+console.debug(`🖊️ Writing bundle to ${out}`);
 
 module.exports = {
   mode: 'production', // development
@@ -21,9 +22,6 @@ module.exports = {
   target: 'node',
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
-    alias: {
-      // taggedjs: path.resolve(__dirname, '../main/ts'),
-    }
   },
   module: {
     rules: [
@@ -35,14 +33,18 @@ module.exports = {
     ],
   },
   optimization: {
-      minimize: true,
-      minimizer: [new TerserPlugin()],
-      splitChunks: {
-          chunks: 'all',
-      },
+    minimize: true,
+    minimizer: [new TerserPlugin()],
+    splitChunks: {
+      chunks: 'all',
+    },
   },
   plugins: [
-      new ResolveTsForJsPlugin(),
-      // new CompressionPlugin({algorithm: 'gzip'}),
-  ]
-}
+    new ResolveTsForJsPlugin(),
+    new webpack.BannerPlugin({
+      banner: '"use strict";',
+      raw: true,
+    }),
+    // new CompressionPlugin({algorithm: 'gzip'}),
+  ],
+};

@@ -11,9 +11,7 @@ import { textNode } from '../textNode.js'
 import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
-import { afterChildrenBuilt } from './afterChildrenBuilt.function.js'
-import { DomObjectChildren } from '../../interpolations/optimizers/ObjectNode.types.js'
-import { paintAppends, paintInsertBefores } from '../paint.function.js'
+import { paintAppends, paintInsertBefores, paintRemoves } from '../paint.function.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { processNewValue } from './processNewValue.function.js'
 
@@ -256,10 +254,8 @@ function destroyArrayTag(
 ) {
   const global = support.subject.global
   const ph = global.placeholder as Text
-  const parentNode = ph.parentNode as ParentNode
-  parentNode.removeChild(ph)
-
   delete global.placeholder
+  paintRemoves.push(ph)
 
   support.destroy({
     stagger: counts.removed++,

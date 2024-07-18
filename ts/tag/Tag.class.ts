@@ -13,6 +13,9 @@ import { getSupportInCycle } from './getSupportInCycle.function.js'
 export const variablePrefix = ':tagvar'
 export const variableSuffix = ':'
 
+export type EventCallback = (event: Event) => any
+export type EventMem = {elm: Element, callback:EventCallback}
+
 // export type Context = TagJsSubject<any>[]
 export type ContextItem = {
   global: TagGlobal

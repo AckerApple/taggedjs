@@ -5,7 +5,7 @@ import { updateExistingValue } from '../tag/update/updateExistingValue.function.
 import { AnySupport } from '../tag/Support.class.js'
 import { TemplaterResult } from '../tag/TemplaterResult.class.js'
 import { Counts } from './interpolateTemplate.js'
-import { paint, painting } from '../tag/paint.function.js'
+import { paint } from '../tag/paint.function.js'
 import { setUse } from '../state/setUse.function.js'
 import { ContextItem } from '../tag/Tag.class.js'
 import { getValueType } from '../tag/getValueType.function.js'
@@ -41,19 +41,28 @@ export function subscribeToTemplate({
       syncRun ? appendTo : undefined,
     )
 
+    contextItem.global.lastValue = value
+
     if(!syncRun && !setUse.memory.stateConfig.support) {
       paint()
     }
 
     // from now on just run update
     onValue = (value: TemplateValue) => {
-      contextItem.global.nowValueType = getValueType(value)
+      if(value === contextItem.value) {
+        return false // same value emitted
+      }
+
+      const valueType = getValueType(value)
+      contextItem.global.nowValueType = valueType
 
       updateExistingValue(
         contextItem,
         value,
         support,
       )
+      
+      contextItem.global.lastValue = value
 
       if(!setUse.memory.stateConfig.support) {
         paint()

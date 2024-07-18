@@ -1,4 +1,4 @@
-import { DisplaySubject, TagSubject } from '../../subject.types.js'
+import { TagSubject } from '../../subject.types.js'
 import { BaseSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { isTagTemplater } from '../../isInstance.js'
@@ -20,11 +20,6 @@ export function updateExistingValue(
   ownerSupport: BaseSupport | Support,
 ): {subject: ContextItem, rendered: boolean} {
   const valueType = subject.global.nowValueType as ValueType | BasicTypes | ImmutableTypes
-
-  if(!valueType) {
-    throw new Error('bad')
-  }
-
   const wasDestroyed = checkDestroyPrevious(
     subject, value, valueType
   )
@@ -105,12 +100,12 @@ export function updateExistingValue(
   if(wasDestroyed) {
     processNewRegularValue(
       value as RegularValue,
-      subject as DisplaySubject,
+      subject,
     )
   } else {
     processUpdateRegularValue(
       value as RegularValue,
-      subject as DisplaySubject,
+      subject,
     )
   }
 
@@ -129,6 +124,7 @@ function handleStillTag(
   const valueSupport = new Support(
     templater as TemplaterResult,
     ownerSupport,
+    ownerSupport.appSupport,
     subject,
   )
 
@@ -159,6 +155,7 @@ function prepareUpdateToComponent(
   const support = new Support(
     templater,
     ownerSupport,
+    ownerSupport.appSupport,
     subjectTag,
   )
 

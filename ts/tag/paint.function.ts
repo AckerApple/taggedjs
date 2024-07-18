@@ -1,22 +1,29 @@
-export const paintContent: (() => any)[] = []
 type PaintAppend = {
   element: Text | Element
   relative: Text | Element
 }
 
+export const paintRemoves: (Element | Text | ChildNode)[] = []
+export const paintContent: (() => any)[] = []
 export const paintAppends: PaintAppend[] = []
 export const paintInsertBefores: PaintAppend[] = []
+export const paintAfters: (() => any)[] = []
 
 export const painting = {
-  paintContent,
-  paintAppends,
-  paintInsertBefores,
   locks: 0
 }
 
 export function paint() {
   if(painting.locks > 0) {
     return
+  }
+
+  let d = -1
+  const removeLength = paintRemoves.length - 1
+  while(d++ < removeLength) {
+    const toRemove = paintRemoves[d]
+    const parentNode = toRemove.parentNode as ParentNode
+    parentNode.removeChild(toRemove as Element)
   }
 
   let x = -1
@@ -40,7 +47,16 @@ export function paint() {
     parentNode.insertBefore(now.element, now.relative)
   }
 
+
+  let a = -1
+  const paintAftersLength = paintAfters.length - 1
+  while(a++ < paintAftersLength) {
+    paintAfters[a]()
+  }
+
   paintContent.length = 0
   paintAppends.length = 0
   paintInsertBefores.length = 0
+  paintRemoves.length = 0
+  paintAfters.length = 0
 }

@@ -1,35 +1,44 @@
 import { ObjectChildren, ValuePos } from "./exchangeParsedForValues.function"
 
 type ObjectNode = {
-  nodeName: string
-  value?: unknown
+  nn: string // nodeName
+  v?: unknown // value
   marker?: Text
 }
 
 export type ObjectText = ObjectNode & {
-  textContent: string  
+  tc: string // textContent
   domElement?: Text
 }
 
-export type Attribute = [string, any?] | [any]
+export type Attribute = [
+  string, // name
+  any?, // value
+  boolean? // isSpecial
+] | [any]
 
 export type ObjectElement = ObjectNode & {
-  attributes?: Attribute[]
-  children?: ObjectChildren
+  at?: Attribute[] // attributes
+  ch?: ObjectChildren // children
+  
   domElement?: HTMLElement
 }
 
 
 export type DomObjectText = ObjectText & {
-  textContent: string
+  tc: string // textContent
   domElement: Text
   marker: Text
 }
 export type DomObjectElement = ObjectElement & {
-  attributes: [string, any][]
+  at: [
+    string, // name
+    any, // value
+    boolean, // isSpecial
+  ][] // attributes
   domElement: HTMLElement
   
-  children?: DomObjectChildren
+  ch?: DomObjectChildren // children
   marker?: Text
 }
 export type DomObjectChildren = (DomObjectText | DomObjectElement)[]

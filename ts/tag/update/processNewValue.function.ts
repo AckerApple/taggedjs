@@ -15,7 +15,6 @@ export function processNewValue(
 
   if(contextItem.global.isAttr) {
     contextItem.support = ownerSupport
-    // contextItem.global.lastValue = value
     contextItem.value = value
     return contextItem
   }
@@ -73,6 +72,7 @@ function processNewTag(
   contextItem.support = new Support(
     templater,
     ownerSupport,
+    ownerSupport.appSupport,
     contextItem
   )
 

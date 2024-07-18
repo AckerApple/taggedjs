@@ -1,11 +1,11 @@
-import { DisplaySubject, TagSubject } from '../subject.types.js'
+import { TagSubject } from '../subject.types.js'
 import { isSimpleType, isStaticTag } from'../isInstance.js'
 import { destroyArrayItem, TagArraySubject } from'./update/processTagArray.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { destroyTagMemory } from'./destroyTag.function.js'
 import { Support } from './Support.class.js'
 import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
-import { paintContent } from './paint.function.js'
+import { paintRemoves } from './paint.function.js'
 import { ContextItem } from './Tag.class.js'
 
 const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender, ValueTypes.oneRender]
@@ -15,12 +15,12 @@ export function checkDestroyPrevious(
   newValue: unknown,
   valueType: ValueType | BasicTypes | ImmutableTypes, // new value type
 ) {
-  const displaySubject = subject as DisplaySubject
-  const hasLastValue = 'lastValue' in displaySubject
-  const lastValue = displaySubject.lastValue // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
+  // const hasLastValue = 'lastValue' in subject.global
 
   // was simple value but now some different type
-  if(hasLastValue) {
+  if(subject.global.simpleValueElm) {
+    const lastValue = subject.global.lastValue // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
+
     // below is faster than using getValueType
     if( isSimpleType(valueType) && typeof(lastValue) === valueType ) {
       return false // no need to destroy, just update display
@@ -33,7 +33,7 @@ export function checkDestroyPrevious(
     }
     */
 
-    destroySimpleValue(displaySubject)
+    destroySimpleValue(subject)
     subject.global.renderCount = 0
     return 'changed-simple-value'
   }
@@ -91,13 +91,10 @@ export function checkDestroyPrevious(
 }
 
 function destroySimpleValue(
-  subject: DisplaySubject,
+  subject: ContextItem,
 ) {
-  delete subject.lastValue
+  delete subject.global.lastValue
   const elm = subject.global.simpleValueElm as Element
-  paintContent.push(() => {
-    const parentNode = elm.parentNode as ParentNode
-    parentNode.removeChild(elm)
-  })
+  paintRemoves.push(elm)
   delete subject.global.simpleValueElm
 }
