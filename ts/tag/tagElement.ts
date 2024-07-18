@@ -65,33 +65,33 @@ export function tagElement(
 
   const result = support.buildBeforeElement(element)
 
+  subject.global.oldest = support
+  subject.global.newest = support
+  
+  let setUse = (wrapper as any).setUse
+  
+  if(wrapper.tagJsType !== ValueTypes.stateRender) {
+    const wrap = app as any as Wrapper
+    const parentWrap = wrap.parentWrap
+    const original = (wrap as any).original || parentWrap.original as Original
+    
+    setUse = original.setUse
+    tags.length = 0
+    tags.push(...(app as any).original.tags)
+  }
+
+  ;(element as any).setUse = setUse
+  appElements.push({element, support})
+
+  const newFragment = document.createDocumentFragment()
+  newFragment.appendChild(placeholder)
+  putDomDown(result.dom, newFragment)
+  result.subs.forEach(sub =>
+    subscribeToTemplate(sub)
+  )
+  --painting.locks
+
   requestAnimationFrame(() => {
-    subject.global.oldest = support
-    subject.global.newest = support
-    
-    let setUse = (wrapper as any).setUse
-    
-    if(wrapper.tagJsType !== ValueTypes.stateRender) {
-      const wrap = app as any as Wrapper
-      const parentWrap = wrap.parentWrap
-      const original = (wrap as any).original || parentWrap.original as Original
-      
-      setUse = original.setUse
-      tags.length = 0
-      tags.push(...(app as any).original.tags)
-    }
-
-    ;(element as any).setUse = setUse
-    appElements.push({element, support})
-
-    const newFragment = document.createDocumentFragment()
-    newFragment.appendChild(placeholder)
-    putDomDown(result.dom, newFragment)
-    result.subs.forEach(sub =>
-      subscribeToTemplate(sub)
-    )
-    --painting.locks
-
     paint()
     element.appendChild(newFragment)
   })
@@ -125,8 +125,8 @@ export function runWrapper(
   // subject.global.insertBefore = insertBefore
   global.placeholder = placeholder
   global.insertBefore = placeholder // template
-  global.oldest = subject.global.oldest || newSupport
-  subject.support = newSupport as Support
+  global.oldest = global.oldest || newSupport
+  global.newest = newSupport as Support
   
   runBeforeRender(newSupport, undefined as unknown as Support)
 

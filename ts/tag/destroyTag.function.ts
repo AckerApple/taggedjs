@@ -6,6 +6,5 @@ export function destroyTagMemory(
   const subject = oldSupport.subject
   const global = subject.global
   const oldest = global.oldest as Support
-  delete subject.support
   oldest.destroy()
 }

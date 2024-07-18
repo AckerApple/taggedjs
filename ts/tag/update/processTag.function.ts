@@ -112,7 +112,7 @@ export function setupNewSupport(
   subject: ContextItem,
 ) {
   support.subject = subject
-  subject.support = support
+  // subject.support = support
   subject.global.oldest = support
   subject.global.newest = support
 
