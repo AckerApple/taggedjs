@@ -1,3 +1,5 @@
+// taggedjs-no-compile
+
 import { click, html, query } from "./elmSelectors"
 import { expect, describe, it } from "./expect"
 import { expectMatchedHtml } from "./expect.html"

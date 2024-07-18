@@ -80,7 +80,7 @@ export async function updateSubject(
   delete reSupport.subject.global.newest
 
   const insertBefore = oldest.subject.global.insertBefore as InsertBefore
-  reSupport.buildBeforeElement({counts: {added:0, removed: 0}})
+  reSupport.buildBeforeElement(undefined, {counts: {added:0, removed: 0}})
 
   reSupport.subject.global.newest = reSupport
   reSupport.subject.global.oldest = reSupport

@@ -39,6 +39,6 @@ input {
   font-size: .9em;
 }
 
-a, button {
+label, a, button {
   cursor: pointer;
 }

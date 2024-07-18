@@ -69,7 +69,7 @@ function templaterToHtml(
   const support = templaterToSupport(templater)
   const context = support.subject.global.context
   const tag = support.templater.tag as StringTag // TODO: most likely do not want strings below
-  const template = (support.strings || tag?.strings) as string[] // support.getTemplate()
+  const template = tag.strings // support.getTemplate()
   const strings = new Array(...template) // clone
   const values = Object.values(context)
   

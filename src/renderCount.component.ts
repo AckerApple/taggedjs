@@ -1,6 +1,6 @@
-import { tag, html } from "taggedjs"
+import { html } from "taggedjs"
 
-export const renderCountDiv = tag((
+export const renderCountDiv = (
   {renderCount, name}: {
     renderCount: number
     name: string
@@ -9,4 +9,4 @@ export const renderCountDiv = tag((
   <div>
     <small>(${name} render count <span id=${name+'_render_count'}>${renderCount}</span>)</small>
   </div>
-`)
+`

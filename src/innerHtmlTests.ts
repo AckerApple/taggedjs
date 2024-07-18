@@ -1,4 +1,4 @@
-import { html, letState, tag, isSubjectInstance, isTagArray, Tag } from "taggedjs"
+import { html, letState, tag, isSubjectInstance, Tag } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
 
 export const innerHtmlTest = tag((
@@ -16,7 +16,7 @@ export const innerHtmlTest = tag((
       <legend>no props test</legend>
       <div style="border:2px solid purple;">${children}</div>
       <div>isSubjectInstance:${isSubjectInstance(children)}</div>
-      <div>isSubjectTagArray:${isTagArray(children)}</div>
+      <div>isSubjectTagArray:${children instanceof Array}</div>
       <button id="innerHtmlTest-counter-button"
       onclick=${() => ++counter}>increase innerHtmlTest ${counter}</button>
       <span id="innerHtmlTest-counter-display">${counter}</span>

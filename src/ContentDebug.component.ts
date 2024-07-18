@@ -10,9 +10,9 @@ export const contentDebug = tag(() => {
   ++renderCount
 
   const dom: LikeObjectChildren = [{
-    nodeName: 'b', children:[{
-      nodeName: 'text',
-      textContent: 'big',
+    nn: 'b', ch:[{
+      nn: 'text',
+      tc: 'big',
     }]
   }]
 
@@ -29,8 +29,12 @@ export const contentDebug = tag(() => {
       <div id="style-simple-border-orange" style.border="3px solid orange">simple orange border</div>
       <div id="style-var-border-orange" style.border=${"3px solid orange"}>var orange border</div>
       <div>
-        <div id="style-toggle-border-orange" style.border=${ orangeToggle ? "3px solid orange" : "3px solid green"}>toggle orange border</div>
-        <button id="toggle-border-orange" onclick=${() => orangeToggle = !orangeToggle}>orange toggle ${orangeToggle}</button>
+        <div id="style-toggle-border-orange"
+          style.border=${ orangeToggle ? "3px solid orange" : "3px solid green"}
+        >toggle orange border</div>
+        <button id="toggle-border-orange"
+          onclick=${() => orangeToggle = !orangeToggle}
+        >orange toggle ${orangeToggle}</button>
       </div>
       <div id="hello-spacing-dom-world">${54} ${'hello'} worlds</div>
     </div>
