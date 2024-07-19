@@ -1,4 +1,4 @@
-import { BaseSupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag, BasicTypes, ContextItem, getNewGlobal } from 'taggedjs'
+import { BaseSupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag, BasicTypes, ContextItem, getNewGlobal, buildSupportContext } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -61,7 +61,7 @@ function readySupport(
   global.oldest = support
 
   renderTagOnly(support, support, subject)
-  support.buildContext()
+  buildSupportContext(support)
   
   return support
 }
