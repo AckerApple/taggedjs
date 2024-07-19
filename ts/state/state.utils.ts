@@ -37,7 +37,6 @@ setUse({
   afterRender: (
     support: Support | BaseSupport,
   ) => {
-    const state = support.state
     const config: Config = setUse.memory.stateConfig
     const rearray = config.rearray as unknown as State[]
     
@@ -59,8 +58,8 @@ setUse({
     delete config.rearray // clean up any previous runs
     delete config.support
 
-    state.length = 0
-    state.push(...config.array)
+    support.state = []
+    support.state.push(...config.array)
     config.array = []
   }
 })

@@ -34,7 +34,7 @@ export function renderSupport<T extends AnySupport>(
   const oldest = global.oldest
   if(global.blocked.length) {
     support = global.blocked.pop() as T
-    global.blocked.length = 0
+    global.blocked = []
   }
 
   delete global.locked

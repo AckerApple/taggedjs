@@ -73,8 +73,7 @@ function beforeWithRender(
     if(prevSupport !== support) {
       const lastState = prevSupport.state
       support.subject.global = prevSupport.subject.global
-      support.state.length = 0
-      support.state.push(...lastState)
+      support.state = lastState
     }
 
     return runBeforeRedraw(support, prevSupport)

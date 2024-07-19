@@ -3,11 +3,11 @@ type PaintAppend = {
   relative: Text | Element
 }
 
-export const paintRemoves: (Element | Text | ChildNode)[] = []
-export const paintContent: (() => any)[] = []
-export const paintAppends: PaintAppend[] = []
-export const paintInsertBefores: PaintAppend[] = []
-export const paintAfters: (() => any)[] = []
+export let paintRemoves: (Element | Text | ChildNode)[] = []
+export let paintContent: (() => any)[] = []
+export let paintAppends: PaintAppend[] = []
+export let paintInsertBefores: PaintAppend[] = []
+export let paintAfters: (() => any)[] = []
 
 export const painting = {
   locks: 0
@@ -54,9 +54,9 @@ export function paint() {
     paintAfters[a]()
   }
 
-  paintContent.length = 0
-  paintAppends.length = 0
-  paintInsertBefores.length = 0
-  paintRemoves.length = 0
-  paintAfters.length = 0
+  paintContent = []
+  paintAppends = []
+  paintInsertBefores = []
+  paintRemoves = []
+  paintAfters = []
 }

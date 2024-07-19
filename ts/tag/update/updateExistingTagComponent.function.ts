@@ -81,7 +81,6 @@ export function syncFunctionProps(
   const newest = lastSupport.subject.global.newest as Support
 
   if(!newest) {
-    // newPropsArray.length = 0
     const castedProps = castProps(
       newPropsArray,
       newSupport,

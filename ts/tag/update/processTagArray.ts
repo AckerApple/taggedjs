@@ -139,7 +139,8 @@ function reviewArrayItem(
 function setPlaceholderElm(
   subject: ContextItem,
 ) {
-  const elm = textNode.cloneNode(false) as Text
+  // const elm = textNode.cloneNode(false) as Text
+  const elm = document.createTextNode('')
   return subject.global.placeholder = elm
 }
 
@@ -218,12 +219,12 @@ function destroyArrayTag(
   support: Support,
   counts: Counts,
 ) {
-  setTimeout(() => {
+  Promise.resolve().then(() => {
     const global = support.subject.global
     const ph = global.placeholder as Text
     delete global.placeholder
     paintRemoves.push(ph)
-  }, 0)
+  })
 
   support.destroy({
     stagger: counts.removed++,

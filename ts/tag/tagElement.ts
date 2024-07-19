@@ -41,11 +41,7 @@ export function tagElement(
 
   // Create the app which returns [props, runOneTimeFunction]
   const wrapper = app(props) as unknown as TemplaterResult
-
-  // TODO: maybe remove below?
-  // const template = document.createElement('template')
-
-  const placeholder = textNode.cloneNode(false) as Text
+  const placeholder = document.createTextNode('')
   const support = runWrapper(wrapper, placeholder, element)
   const subject = support.subject
   const global = subject.global
@@ -74,7 +70,7 @@ export function tagElement(
     const original = (wrap as any).original || parentWrap.original as Original
     
     setUse = original.setUse
-    tags.length = 0
+    tags = []
     tags.push(...(app as any).original.tags)
   }
 

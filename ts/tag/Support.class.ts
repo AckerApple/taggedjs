@@ -253,9 +253,9 @@ export class BaseSupport {
     )
 
     // first paint
-    const {stagger, promises} = this.smartRemoveKids(options)
-    options.stagger = stagger
-    global.context.length = 0
+    const promises: Promise<any>[] = []
+    options.stagger = this.smartRemoveKids(promises, options)
+    global.context = []
     
     if(promises.length) {
       return Promise.all(promises).then(() => options.stagger)
@@ -264,12 +264,12 @@ export class BaseSupport {
   }
 
   smartRemoveKids(
+    promises: Promise<any>[],
     options: DestroyOptions = {
       stagger: 0,
-    }
+    },
   ) {
     const startStagger = options.stagger
-    const promises: Promise<any>[] = []
     const thisGlobal = this.subject.global
     const htmlDomMeta = thisGlobal.htmlDomMeta as DomObjectChildren
         
@@ -296,9 +296,7 @@ export class BaseSupport {
         }
 
         // recurse
-        const {stagger, promises: newPromises} = oldest.smartRemoveKids(options)
-        options.stagger = options.stagger + stagger
-        promises.push(...newPromises)
+        options.stagger = options.stagger + oldest.smartRemoveKids(promises, options)
       }
 
       // regular values, no placeholders
@@ -310,26 +308,23 @@ export class BaseSupport {
       }
     })
     
-    const promise = this.destroyClones(htmlDomMeta, {stagger: startStagger}).promise
+    this.destroyClones(htmlDomMeta, {stagger: startStagger}, promises)
     
-    htmlDomMeta.length = 0 // clear array    
-    thisGlobal.childTags.length = 0
+    thisGlobal.htmlDomMeta = []
+    thisGlobal.childTags = []
     
-    if(promise) {
-      promises.unshift(promise)
-    }
-    
-    return {promises, stagger: options.stagger}
+    return options.stagger
   }
 
   destroyClones(
     oldClones: DomObjectChildren,
     options: DestroyOptions = {
       stagger: 0,
-    }
+    },
+    promises: Promise<any>[]
   ) {
     // check subjects that may have clones attached to them
-    const promises = oldClones.map(clone => {
+    const newPromises = oldClones.map(clone => {
       const marker = clone.marker
       if(marker) {
         paintRemoves.push(marker)
@@ -342,11 +337,12 @@ export class BaseSupport {
       return this.checkCloneRemoval(clone.domElement, options.stagger)
     }).filter(x => x) // only return promises
 
-    if(promises.length) {
-      return {promise: Promise.all(promises), stagger:options.stagger}
+    if(newPromises.length) {
+      promises.push(Promise.all(newPromises))
+      return options.stagger
     }
 
-    return {stagger: options.stagger}
+    return options.stagger
   }
 
   /** Reviews elements for the presences of ondestroy */
@@ -522,14 +518,11 @@ export function destroySubs(
     return
   }
 
-  const cloneSubs = [...subs]
-  subs.length = 0
-
-  setTimeout(() => {
-    for (const sub of cloneSubs) {
+  Promise.resolve().then(() => {
+    for (const sub of subs) {
       sub.unsubscribe()
     }
-  },0)
+  })
 }
 
 function buildContext(

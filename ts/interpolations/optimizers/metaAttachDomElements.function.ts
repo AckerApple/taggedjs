@@ -36,7 +36,7 @@ export function attachDomElement(
     const isNum = !isNaN(value as unknown as number)
 
     if(isNum) {
-      const marker = newNode.marker = node.marker || document.createTextNode(empty) // textNode.cloneNode(false) as Text
+      const marker = newNode.marker = node.marker || document.createTextNode(empty)
       if(owner) {
         paintAppends.push({
           relative: owner,
@@ -76,13 +76,9 @@ export function attachDomElement(
     if (node.nn === 'text') {
       const textNode = (newNode as any as DomObjectText)
       const string = textNode.tc = (node as any as DomObjectText).tc
-
-      // PARSE things like &nbsp; and <!-- -->
-      const newString = domParseString(string)
-      const domElement = textNode.domElement = document.createTextNode(newString)
       
-      // x.innerHTML = string
-      // const domElement = textNode.domElement = document.createTextNode(x.innerText)
+      x.innerHTML = string
+      const domElement = textNode.domElement = document.createTextNode(x.innerText)
       
       if(owner) {
         paintAppends.push({
@@ -126,22 +122,4 @@ export function attachDomElement(
   }
 
   return {subs, dom}
-}
-
-// parse things like &nbsp; and <!-- -->
-function domParseString(string: string) {
-  const text = new DOMParser().parseFromString(string, 'text/html')
-  return getStartingSpaces(string) + text.documentElement.textContent as string
-}
-
-function getStartingSpaces(str: string) {
-  let spaces = '';
-  for (let i = 0; i < str.length; i++) {
-    if (str[i] === ' ') {
-      spaces += ' ';
-    } else {
-      break;
-    }
-  }
-  return spaces;
 }
