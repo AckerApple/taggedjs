@@ -1,4 +1,4 @@
-import { TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
+import { getTemplaterResult, TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
 import { newSupportByTemplater } from './processTag.function.js'
 import { AnySupport } from '../Support.class.js'
 import { ContextItem, StringTag } from '../Tag.class.js'
@@ -10,7 +10,7 @@ export function oneRenderToSupport(
   subject: ContextItem,
   ownerSupport: AnySupport, // owner
 ) {
-  const templater = new TemplaterResult([])
+  const templater = getTemplaterResult([])
   templater.tagJsType = wrapper.tagJsType as typeof ValueTypes.templater
   const support = newSupportByTemplater(
     templater, ownerSupport, subject

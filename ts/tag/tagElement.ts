@@ -1,4 +1,4 @@
-import { BaseSupport, Support } from './Support.class.js'
+import { BaseSupport, getBaseSupport, Support } from './Support.class.js'
 import { runAfterRender, runBeforeRender } from'./tagRunner.js'
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { Original, TagComponent, TagMaker} from './tag.utils.js'
@@ -10,6 +10,8 @@ import { paint, painting } from './paint.function.js'
 import { ContextItem } from './Tag.class.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
+import { buildBeforeElement } from './buildBeforeElement.function.js'
+import { destroySupport } from './destroySupport.function.js'
 
 const appElements: {
   support: BaseSupport // Support
@@ -33,7 +35,7 @@ export function tagElement(
 } {
   const appElmIndex = appElements.findIndex(appElm => appElm.element === element)
   if(appElmIndex >= 0) {
-    appElements[appElmIndex].support.destroy()
+    destroySupport(appElements[appElmIndex].support)
     appElements.splice(appElmIndex, 1)
     // an element already had an app on it
     console.warn('Found and destroyed app element already rendered to element', {element})
@@ -50,14 +52,14 @@ export function tagElement(
   
   // enables hmr destroy so it can control entire app
   ;(element as any).destroy = function() {
-    support.destroy() // never return anything here
+    destroySupport(support) // never return anything here
   }
   
   let tags: any[] = []
 
   ++painting.locks
 
-  const result = support.buildBeforeElement(element)
+  const result = buildBeforeElement(support, element)
 
   subject.global.oldest = support
   subject.global.newest = support
@@ -107,7 +109,7 @@ export function runWrapper(
     global,
   }
     
-  const newSupport = new BaseSupport(
+  const newSupport = getBaseSupport(
     templater,
     subject,
   )

@@ -1,6 +1,6 @@
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { TagWrapper } from './tag.utils.js'
-import { AnySupport, BaseSupport, PropsConfig, Support } from './Support.class.js'
+import { AnySupport, BaseSupport, getSupport, PropsConfig, Support } from './Support.class.js'
 import { castProps } from'../alterProp.function.js'
 import { setUse } from '../state/setUse.function.js'
 import { ContextItem, StringTag } from './Tag.class.js'
@@ -71,13 +71,12 @@ export function executeWrap(
   ;(tag as any).arrayValue = (templater as any).arrayValue // tag component could have been used in array.map
 
   const ownerSupport = newSupport.ownerSupport as Support
-  const support = new Support(
+  const support = getSupport(
     templater,
     ownerSupport,
     newSupport.appSupport, // ownerSupport.appSupport as Support,
     subject,
     castedProps,
-    global.renderCount
   )
 
   support.subject.global = global

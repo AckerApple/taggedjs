@@ -3,6 +3,7 @@ import { AnySupport } from '../Support.class.js'
 import { paintAppends, paintInsertBefores } from '../paint.function.js'
 import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
 import { ContextItem } from '../Tag.class.js'
+import { buildBeforeElement } from '../buildBeforeElement.function.js'
 
 export function processReplaceTagResult(
   support: AnySupport,
@@ -11,7 +12,7 @@ export function processReplaceTagResult(
 ) {
   let insertIndex = paintInsertBefores.length
 
-  const result = support.buildBeforeElement(undefined, {counts})
+  const result = buildBeforeElement(support, undefined, {counts})
   const global = subjectTag.global
   const ph = global.placeholder as Text
 
@@ -52,7 +53,7 @@ export function processFirstTagResult(
 ) {
   let appendIndex = paintAppends.length
 
-  const result = support.buildBeforeElement(appendTo, {counts})
+  const result = buildBeforeElement(support, appendTo, {counts})
   const global = subjectTag.global
   const ph = global.placeholder as Text
 

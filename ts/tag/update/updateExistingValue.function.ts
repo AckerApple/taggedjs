@@ -1,4 +1,4 @@
-import { BaseSupport, Support } from '../Support.class.js'
+import { BaseSupport, getSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { isTagTemplater } from '../../isInstance.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
@@ -10,6 +10,7 @@ import { getFakeTemplater, newSupportByTemplater, processTag, setupNewSupport } 
 import { StringTag, DomTag, ContextItem, Tag } from '../Tag.class.js'
 import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
+import { updateSupportBy } from '../updateSupportBy.function.js'
 
 const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender]
 
@@ -116,7 +117,7 @@ function handleStillTag(
   const lastSupport = subject.global.newest as Support
   const templater = (value as Tag).templater || value
 
-  const valueSupport = new Support(
+  const valueSupport = getSupport(
     templater as TemplaterResult,
     ownerSupport,
     ownerSupport.appSupport,
@@ -127,7 +128,7 @@ function handleStillTag(
     setupNewSupport(valueSupport, ownerSupport, subject)
   }
 
-  lastSupport.subject.global.oldest.updateBy(valueSupport)
+  updateSupportBy(lastSupport.subject.global.oldest, valueSupport)
 }
 
 function prepareUpdateToComponent(
@@ -146,7 +147,7 @@ function prepareUpdateToComponent(
    return {subject: contextItem, rendered: true}
   }
   
-  const support = new Support(
+  const support = getSupport(
     templater,
     ownerSupport,
     ownerSupport.appSupport,

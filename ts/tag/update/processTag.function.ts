@@ -1,10 +1,10 @@
 import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
-import { AnySupport, BaseSupport, Support } from '../Support.class.js'
+import { AnySupport, BaseSupport, getSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
-import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { paintAppends, paintInsertBefores } from '../paint.function.js'
 import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
+import { buildBeforeElement } from '../buildBeforeElement.function.js'
 
 /** When first time render, adds to owner childTags
  * Used for BOTH inserts & updates to values that were something else
@@ -19,7 +19,7 @@ export function processTag(
   
   let appendIndex = paintInsertBefores.length
 
-  const result = support.buildBeforeElement(undefined, {counts: {added:0, removed:0}})
+  const result = buildBeforeElement(support, undefined, {counts: {added:0, removed:0}})
   const ph = subject.global.placeholder as Text
 
   result.dom.forEach(dom => {
@@ -61,9 +61,6 @@ export function tagFakeTemplater(
 export function getFakeTemplater() {
   const fake = {
     tagJsType: ValueTypes.templater,
-    html: () => fake,
-    dom: () => fake,
-    key: () => fake,
   } as TemplaterResult
 
   return fake
@@ -75,7 +72,7 @@ export function newSupportByTemplater(
   ownerSupport: BaseSupport | Support,
   subject: ContextItem,
 ) {
-  const support = new Support(
+  const support = getSupport(
     templater,
     ownerSupport,
     ownerSupport.appSupport,
@@ -109,7 +106,7 @@ export function processNewTag(
   const support = newSupportByTemplater(templater, ownerSupport, subject)
 
   support.ownerSupport = ownerSupport
-  const result = support.buildBeforeElement(appendTo, {counts: {added:0, removed:0}})
+  const result = buildBeforeElement(support, appendTo, {counts: {added:0, removed:0}})
 
   result.dom.forEach(dom => {
     if(dom.marker) {

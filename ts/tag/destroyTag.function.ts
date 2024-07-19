@@ -1,3 +1,4 @@
+import { destroySupport } from './destroySupport.function.js'
 import { BaseSupport, Support } from './Support.class.js'
 
 export function destroyTagMemory(
@@ -6,5 +7,5 @@ export function destroyTagMemory(
   const subject = oldSupport.subject
   const global = subject.global
   const oldest = global.oldest as Support
-  oldest.destroy()
+  destroySupport(oldest)
 }

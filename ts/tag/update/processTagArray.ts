@@ -13,6 +13,7 @@ import { TemplateValue } from './processFirstSubject.utils.js'
 import { paintAppends, paintInsertBefores, paintRemoves } from '../paint.function.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { processNewArrayValue } from './processNewValue.function.js'
+import { destroySupport } from '../destroySupport.function.js'
 
 export type LastArrayItem = {
   support: Support
@@ -64,7 +65,6 @@ export function processTagArray(
       index,
       lastArray,
       ownerSupport,
-      existed,
       runtimeInsertBefore,
       counts,
       existed ? undefined : appendTo,
@@ -77,7 +77,6 @@ function reviewArrayItem(
   index: number,
   lastArray: LastArrayMeta,
   ownerSupport: AnySupport,
-  existed: boolean,
   runtimeInsertBefore: Text | undefined, // used during updates
   counts: Counts,
   appendTo?: Element, // used during initial rendering of entire array
@@ -85,26 +84,9 @@ function reviewArrayItem(
   const item = value[index]
   const previous = lastArray.array[index]
   const previousSupport = previous?.support
-  const subTag = item as StringTag | DomTag | TemplaterResult
   const itemSubject: ContextItem = previousSupport?.subject || {
-    // tagJsType: item,
     value,
     global: getNewGlobal(),
-  }
-
-  const templater = (subTag as StringTag | DomTag).templater
-
-  // check for html``.key()
-  const tag = templater?.tag || subTag as StringTag | DomTag
-  const keySet = 'arrayValue' in tag
-  if (existed && lastArray.array.length != value.length && !keySet) {
-    const details = {
-      array: value,
-    }
-    const message = 'Found Tag in array without key value, during array update. Be sure to use "html`...`.key(unique)" OR import TaggedJs "key" "key(unique).html = CustomTag(props)"'
-    console.error(message, details)
-    const err = new ArrayNoKeyError(message, details)
-    throw err
   }
 
   const couldBeSame = lastArray.array.length > index
@@ -187,21 +169,6 @@ function processAddTagArrayItem(
   return support
 }
 
-/** compare two values. If both values are arrays then the items will be compared */
-function areLikeValues(valueA: unknown, valueB: unknown): Boolean {
-  if(valueA === valueB) {
-    return true
-  }
-
-  const bothArrays = valueA instanceof Array && valueB instanceof Array
-  const matchLengths = bothArrays && valueA.length == valueB.length
-  if(matchLengths) {
-    return valueA.every((item, index) => item === valueB[index])
-  }
-
-  return false
-}
-
 export function destroyArrayItem(
   lastArray: LastArrayItem[],
   index: number,
@@ -219,20 +186,20 @@ function destroyArrayTag(
   support: Support,
   counts: Counts,
 ) {
-  Promise.resolve().then(() => {
+  setTimeout(function () {
     const global = support.subject.global
     const ph = global.placeholder as Text
     delete global.placeholder
     paintRemoves.push(ph)
-  })
+  }, 0)
 
-  support.destroy({
+  destroySupport(support, {
     stagger: counts.removed++,
   })
 }
 
 function reviewLastArrayItem(
-  item: any,
+  subTag: any,
   value: any[],
   index: number,
   lastArray: LastArrayMeta,
@@ -249,21 +216,28 @@ function reviewLastArrayItem(
     return {same: false, newRemoved: removed}
   }
 
-  const subTag = value[index - removed] as StringTag | DomTag | TemplaterResult | undefined
+  const templater = subTag.support.templater as TemplaterResult
+  const nowValue = templater.tag?.arrayValue // (templater as any).arrayValue
+  const lastTemp = lastArray.array[index].support.templater
+  const tag = lastTemp.tag as any
+  const lastArrayValue = tag.arrayValue
 
-  const tag = subTag as StringTag | DomTag
-  let templater = tag.templater // || subTag
-  let prevArrayValue: unknown
+  // check for html``.key()
+  const keySet = 'arrayValue' in tag
+  if (!keySet) {
+    const details = {
+      array: value.map(item => item.values || item),
+      vdom: (tag as any)?.support.templater.tag.dom,
+      tag,
+      lastArray: lastArray.array[index]
+    }
+    const message = 'Found Tag in array without key value, during array update. Be sure to use "html`...`.key(unique)" OR import TaggedJs "key" "key(unique).html = CustomTag(props)"'
+    console.error(message, details)
+    const err = new ArrayNoKeyError(message, details)
+    throw err
+  }
 
-  templater = subTag as TemplaterResult
-  // tag = templater.tag as StringTag | DomTag
-  prevArrayValue = (templater as any).arrayValue
-
-  // const tag = subTag?.templater.tag as Tag
-  const lateTemp = item.support.templater
-  const lastTag = lateTemp?.tag || lateTemp
-  const lastArrayValue = (lastTag as any).arrayValue
-  const destroyItem = !areLikeValues(prevArrayValue, lastArrayValue)
+  const destroyItem = nowValue !== lastArrayValue
   if(destroyItem) {
     destroyArrayItem(lastArray.array, index, counts)
     ++removed

@@ -5,7 +5,7 @@ import { InterpolatedTemplates } from '../interpolations/interpolations.js'
 
 import { TagGlobal, TemplaterResult } from './TemplaterResult.class.js'
 import { TagValues } from'./html.js'
-import { ValueTypes } from './ValueTypes.enum.js'
+import { ValueType, ValueTypes } from './ValueTypes.enum.js'
 import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
 import { AnySupport } from './Support.class.js'
 import { getSupportInCycle } from './getSupportInCycle.function.js'
@@ -35,61 +35,96 @@ export interface TagTemplate {
   domMetaMap?: DomMetaMap
 }
 
-export class Tag {
+export type Tag = {
+  values: unknown[]
   tagJsType?: typeof ValueTypes.tag | typeof ValueTypes.dom
-  templater!: TemplaterResult
+  templater?: TemplaterResult
   ownerSupport?: AnySupport
 
-  constructor(
-    public values: unknown[],
-  ) {
-    this.ownerSupport = getSupportInCycle()
-  }
-
-  key(arrayValue: unknown) {
-    ;(this as any).arrayValue = arrayValue
-    return this
-  }
+  arrayValue?: any
 }
 
-export class StringTag extends Tag {
-  tagJsType = ValueTypes.tag
-  children?: {strings: string[] | TemplateStringsArray, values: TagValues}
-
-  constructor(
-    public strings: string[],
-    public values: unknown[],
-  ) {
-    super(values)
+export type StringTag = Tag & {
+  children?: {
+    strings: string[] | TemplateStringsArray
+    values: TagValues
   }
+  strings: string[],
+  values: unknown[],
 
-  html(
+  key: (arrayValue: unknown) => StringTag
+
+  html: (
     strings: string[] | TemplateStringsArray,
     values: TagValues,
-  ) {
-    this.children = {strings, values}
-    return this
-  }
+  ) => StringTag
 }
 
-export class DomTag extends Tag {
-  tagJsType = ValueTypes.dom
-  children?: {dom: LikeObjectChildren, values: TagValues}
-
-  constructor(
-    public dom: LikeObjectChildren,
-    public values: unknown[],
-  ) {
-    super(values)
+export function getStringTag(
+  strings: string[],
+  values: unknown[],
+): StringTag {
+  const tag: StringTag = {
+    values,
+    ownerSupport: getSupportInCycle(),
+    
+    tagJsType: ValueTypes.tag,
+    strings: strings,
+    key(arrayValue: unknown) {
+      tag.arrayValue = arrayValue
+      return tag
+    },  
+    html: (
+      strings: string[] | TemplateStringsArray,
+      values: TagValues,
+    ) => {
+      tag.children = {strings, values}
+      return tag
+    }
   }
 
-  html = {
+  return tag
+}
+
+export type DomTag = Tag & {
+  children?: {
+    dom: LikeObjectChildren
+    values: TagValues
+  }
+  dom: LikeObjectChildren
+  values: unknown[]
+  key: (arrayValue: unknown) => DomTag
+
+  html: {
     dom: (
       dom: LikeObjectChildren, // ObjectChildren
       values: TagValues,
-    ): DomTag => {
-      this.children = {dom: dom, values}
-      return this
+    ) => DomTag
+  }
+}
+
+export function getDomTag(
+  dom: LikeObjectChildren,
+  values: unknown[],
+): DomTag {
+  const tag: DomTag = {
+    values,
+    ownerSupport: getSupportInCycle(),
+    dom,
+    tagJsType: ValueTypes.dom,
+    key: (arrayValue: unknown) => {
+      tag.arrayValue = arrayValue
+      return tag
+    },
+    html: {
+      dom: (
+        dom: LikeObjectChildren, // ObjectChildren
+        values: TagValues,
+      ): DomTag => {
+        tag.children = {dom: dom, values}
+        return tag
+      }
     }
   }
+  return tag
 }

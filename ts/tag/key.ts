@@ -1,7 +1,7 @@
 import { ToTag } from "./tag.types"
 
-/** Used to give unique value to an array of tag content */
-export function key(arrayValue: unknown) {
+/** Used to give unique value to an array of tag content. Should not be an object */
+export function key(arrayValue: string | number | null) {
   return {
     /*
     get tag() {

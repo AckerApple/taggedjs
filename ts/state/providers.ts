@@ -59,7 +59,9 @@ export const providers = {
       }
 
       stateDiffMemory.provider = provider
-      support.subject.global.providers.push(provider)
+      const global = support.subject.global
+      const providers = global.providers = global.providers || []
+      providers.push(provider)
       stateDiffMemory.stateDiff = stateDiff
 
       return instance
@@ -93,6 +95,8 @@ export const providers = {
       while(owner.ownerSupport) {
         const ownerProviders = owner.ownerSupport.subject.global.providers
   
+        if(!ownerProviders) continue
+
         const provider = ownerProviders.find(provider => {
           providers.push(provider as Provider)
           const constructorMatch = provider.constructMethod.compareTo === compareTo
@@ -103,9 +107,9 @@ export const providers = {
         })
 
         if(provider) {
-          // provider.clone = deepClone(provider.instance) // keep a copy of the latest before any change occur
-          // const support = memory.stateConfig.support as Support
-          support.subject.global.providers.push(provider)
+          const global = support.subject.global
+          const providers = global.providers = global.providers || []
+          providers.push(provider)
           provider.children.push(support)
           return provider.instance
         }

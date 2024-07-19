@@ -5,11 +5,16 @@ export function providersChangeCheck(
   support: AnySupport
 ): AnySupport[] {
   const global = support.subject.global
-  const providersWithChanges = global.providers // .filter(provider => !deepEqual(provider.instance, provider.clone))
+  const providers = global.providers // .filter(provider => !deepEqual(provider.instance, provider.clone))
+
+  if(!providers) {
+    return []
+  }
+
   const prosWithChanges = []
 
   // reset clones
-  for (const provider of providersWithChanges) {
+  for (const provider of providers) {
     const owner = provider.owner
     const hasChange = handleProviderChanges(owner, provider)
     prosWithChanges.push(...hasChange.map(x => x.support))    

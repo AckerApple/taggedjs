@@ -2,6 +2,7 @@ import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
 import { ContextItem } from '../Tag.class.js'
 import { processTag } from '../update/processTag.function.js'
+import { updateSupportBy } from '../updateSupportBy.function.js'
 
 /** Returns true when rendering owner is not needed. Returns false when rendering owner should occur */
 export function renderExistingTag(
@@ -46,7 +47,7 @@ export function renderExistingReadyTag(
   const updateAfterRender = prevSupport && wasLikeTags
   if(updateAfterRender) {
     const oldest = global.oldest || oldestSupport
-    oldest.updateBy(support)
+    updateSupportBy(oldest, support)
     return support
   }
 

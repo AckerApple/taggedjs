@@ -2,7 +2,7 @@
 
 import { DomTag, StringTag } from './Tag.class.js'
 import { setUse } from '../state/index.js'
-import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
+import { getTemplaterResult, TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { Original, TagComponent, TagWrapper, tags } from './tag.utils.js'
 import { getTagWrap } from './getTagWrap.function.js'
 import { RouteProps, RouteTag, StateToTag, ToTag } from './tag.types.js'
@@ -23,7 +23,7 @@ export function tag<T extends ToTag>(
   const parentWrap = (function tagWrapper(
     ...props: (T | StringTag | StringTag[])[]
   ): TemplaterResult {
-    const templater: TemplaterResult = new TemplaterResult(props)
+    const templater: TemplaterResult = getTemplaterResult(props)
     templater.tagJsType = ValueTypes.tagComponent
     
     // attach memory back to original function that contains developer display logic

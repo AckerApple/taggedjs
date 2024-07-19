@@ -58,11 +58,14 @@ export function runBeforeDestroy(
   // remove me from my parents
   if(ownerSupport) {
     const global = support.subject.global
-    global.providers.forEach(provider => provider.children.forEach((child, index) => {
-      if(child.subject.global === global) {
-        provider.children.splice(index, 1)
-      }
-    }))
+    const providers = global.providers
+    if(providers) {
+      providers.forEach(provider => provider.children.forEach((child, index) => {
+        if(child.subject.global === global) {
+          provider.children.splice(index, 1)
+        }
+      }))
+    }
   }
 }
 

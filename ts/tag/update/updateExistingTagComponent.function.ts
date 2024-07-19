@@ -209,9 +209,11 @@ export function moveProviders(
 ) {
   const global = lastSupport.subject.global
   let pIndex = -1
-  const pLen = global.providers.length - 1
+  const providers = global.providers = global.providers || []
+
+  const pLen = providers.length - 1
   while (pIndex++ < pLen) {
-    const provider = global.providers[pIndex]
+    const provider = providers[pIndex]
     let index = -1
     const pcLen = provider.children.length - 1
     while ( index++ < pcLen) {

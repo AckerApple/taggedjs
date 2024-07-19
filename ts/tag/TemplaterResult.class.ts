@@ -24,7 +24,7 @@ export type Wrapper = ((
 }
 
 export type TagGlobal = {
-  isAttr: boolean
+  isAttr?: true
   element?: Element
   howToSet?: HowToSet
   isNameOnly?: boolean
@@ -38,7 +38,8 @@ export type TagGlobal = {
   oldest: BaseSupport | Support
   newest?: BaseSupport | Support
   context: Context // populated after reading interpolated.values array converted to an object {variable0, variable:1}
-  providers: Provider[]
+  providers?: Provider[]
+  
   /** Indicator of re-rending. Saves from double rending something already rendered */
   renderCount: number
   deleted?: true
@@ -68,17 +69,24 @@ export type TagGlobal = {
 
 export type Clone = (Element | Text | ChildNode)
 
-export class TemplaterResult {
-  tagJsType = ValueTypes.templater
+export type TemplaterResult = {
+  tagJsType: ValueType
   wrapper?: Wrapper
   tag?: StringTag | DomTag
-  
-  constructor(public props?: Props) {}
-  
-  // ??? TODO: removed as it create arrayValue = undefined which then make `'arrayValue' in` pass as true
-  // arrayValue?: unknown // used for tag components used in arrays
-  key (arrayValue: unknown) {
-    ;(this as any).arrayValue = arrayValue
-    return this
+  props?: Props
+
+  arrayValue?: unknown
+  key: (arrayValue: unknown) => TemplaterResult
+}
+export function getTemplaterResult(props?: Props) {
+  const templater: TemplaterResult = {
+    props,
+    tagJsType: ValueTypes.templater,
+    key: (arrayValue: unknown) => {
+      templater.arrayValue = arrayValue
+      return templater
+    }
   }
+  
+  return templater
 }

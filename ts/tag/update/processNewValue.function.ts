@@ -1,7 +1,7 @@
 import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
 import { ValueSubject } from '../../subject/ValueSubject.js'
-import { TemplaterResult } from '../TemplaterResult.class.js'
-import { AnySupport, Support } from '../Support.class.js'
+import { getTemplaterResult, TemplaterResult } from '../TemplaterResult.class.js'
+import { AnySupport, getSupport, Support } from '../Support.class.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { getValueType } from '../getValueType.function.js'
@@ -50,7 +50,7 @@ function processNewTag(
 
   // TODO: Can this ever happen?
   if(!templater) {
-    templater = new TemplaterResult([])
+    templater = getTemplaterResult([])
     templater.tag = tag
     tag.templater = templater
   }
@@ -58,7 +58,7 @@ function processNewTag(
   contextItem.value = templater
 
   const global = contextItem.global
-  const newest = global.newest = new Support(
+  const newest = global.newest = getSupport(
     templater,
     ownerSupport,
     ownerSupport.appSupport,
