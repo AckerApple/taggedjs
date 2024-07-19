@@ -1,4 +1,4 @@
-import { BaseSupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag, BasicTypes, ContextItem, getNewGlobal, buildSupportContext } from 'taggedjs'
+import { BaseSupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag, BasicTypes, ContextItem, getNewGlobal, buildSupportContext, getBaseSupport } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -45,7 +45,7 @@ function templaterToSupport(
     global: getNewGlobal()
   }
   templater.props = templater.props || []
-  const support = new BaseSupport(templater, subject) as any as Support
+  const support = getBaseSupport(templater, subject) as any as Support
 
   readySupport(support, subject)
 

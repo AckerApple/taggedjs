@@ -29,7 +29,7 @@ export const arrayTests = tag(() => (
   return html`<!--arrayTests.js-->
     <fieldset style="display:flex;flex-wrap:wrap;gap:1em">
       <legend>static array test</legend>
-      ${['a','b','c'].map(x => html`<div>html ${counter} content test ${x}</div>`)}
+      ${['a','b','c'].map(x => html`<div>html ${counter} content test ${x}</div>`.key(x))}
       <button type="button" onclick=${() => ++counter}>++counter ${counter}</button>
     </fieldset>
 

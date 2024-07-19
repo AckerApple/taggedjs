@@ -9,7 +9,7 @@
  */
 
 import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function.js"
-import { ContextItem, InsertBefore, Support, TaggedFunction, Wrapper } from "taggedjs"
+import { buildBeforeElement, ContextItem, destroySupport, InsertBefore, Support, TaggedFunction, Wrapper } from "taggedjs"
 
 /** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 
@@ -49,7 +49,8 @@ export async function updateSubject(
   const oldWrapper = oldest.templater.wrapper as Wrapper
   oldWrapper.parentWrap.original = newTag.original
 
-  const prevConstructors = newest.subject.global.providers.map(provider => provider.constructMethod)
+  const pros = global.providers
+  const prevConstructors = pros ? pros.map(provider => provider.constructMethod) : []
 
   /** @type {Support} */
   const reSupport: Support = hmr.renderTagOnly(
@@ -59,7 +60,7 @@ export async function updateSubject(
     newest.ownerSupport,
   )
 
-  const appSupport = oldest.getAppSupport()
+  const appSupport = oldest.appSupport
   const providers = reSupport.subject.global.providers
   const owner = oldest.ownerSupport.subject.global.oldest as Support
   // connect child to owner
@@ -67,20 +68,22 @@ export async function updateSubject(
   // connect owner to child
   owner.subject.global.childTags.push(reSupport)  
 
-  providers.forEach((provider, index) => {
-    prevConstructors[index].compareTo = provider.constructMethod.compareTo
-    provider.constructMethod.compareTo = provider.constructMethod.toString()
-    switchAllProviderConstructors(appSupport, provider)
-  })
+  if(providers) {
+    providers.forEach((provider, index) => {
+      prevConstructors[index].compareTo = provider.constructMethod.compareTo
+      provider.constructMethod.compareTo = provider.constructMethod.toString()
+      switchAllProviderConstructors(appSupport, provider)
+    })
+  }
 
-  await oldest.destroy()
+  await destroySupport(oldest)
 
   delete oldest.subject.global.deleted
   delete (reSupport.subject.global as any).oldest // TODO this maybe redundant of oldest.destroy()
   delete reSupport.subject.global.newest
 
   const insertBefore = oldest.subject.global.insertBefore as InsertBefore
-  reSupport.buildBeforeElement(undefined, {counts: {added:0, removed: 0}})
+  buildBeforeElement(reSupport, undefined, {counts: {added:0, removed: 0}})
 
   reSupport.subject.global.newest = reSupport
   reSupport.subject.global.oldest = reSupport
