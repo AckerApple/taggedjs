@@ -70,8 +70,7 @@ export function tagElement(
     const original = (wrap as any).original || parentWrap.original as Original
     
     setUse = original.setUse
-    tags = []
-    tags.push(...(app as any).original.tags)
+    tags = (app as any).original.tags
   }
 
   ;(element as any).setUse = setUse

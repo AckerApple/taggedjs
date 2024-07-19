@@ -30,10 +30,8 @@ export function getUpTags(
       getUpTags(ownerSupport, supports)
     }
 
-    const proSupports = providersChangeCheck(newSupport)
-  
-    supports.push(...proSupports)
-    supports.push(newSupport)
+    const proSupports = providersChangeCheck(newSupport)  
+    supports.push(...proSupports, newSupport)
   
     return supports
   

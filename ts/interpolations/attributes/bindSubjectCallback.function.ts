@@ -15,11 +15,10 @@ export function bindSubjectCallback(
   value: Callback,
   support: AnySupport,
 ) {
-  // const state = support.state
+  const global = support.subject.global
   const subjectFunction = (
     element: Element, args: any[],
   ) => {
-    const global = subjectFunction.support.subject.global
     const newest = global.newest as Support // || subjectFunction.support
 
     if(!global.newest) {
@@ -49,10 +48,8 @@ export function runTagCallback(
 ) {
   const tag = support
   const global = tag.subject.global
-
-  const method = value.bind(bindTo)  
   global.locked = true // prevent another render from re-rendering this tag
-  const callbackResult = method(...args)
+  const callbackResult = value.apply(bindTo, args)
 
   return afterTagCallback(tag, callbackResult)
 }
@@ -75,13 +72,11 @@ export function afterTagCallback(
     )
   }
 
-  const result = renderCallbackSupport(
+  return renderCallbackSupport(
     global.newest as Support,
     callbackResult,
     global
   )
-
-  return result
 }
 
 function renderCallbackSupport(
@@ -125,10 +120,11 @@ export function runBlocked(
   const global = tag.subject.global
   const blocked = global.blocked
 
-  while (blocked.length > 0) {
-    const block = blocked[0] as Support
-
-    blocked.splice(0,1)
+  let index = -1
+  const length = blocked.length - 1
+  while(index++ < length) {
+    const block = blocked[index] as Support
+    
     const lastResult = updateExistingTagComponent(
       block.ownerSupport,
       block,
@@ -137,6 +133,8 @@ export function runBlocked(
 
     global.newest = lastResult.support
   }
-
+  
+  global.blocked = []
+  
   return global.newest
 }

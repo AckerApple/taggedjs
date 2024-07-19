@@ -132,7 +132,7 @@ export class BaseSupport {
     appendTo?: Element,
   ) {
     const domMeta = this.loadDomMeta()
-    const context = this.buildContext()
+    const context = buildSupportContext(this)
     const result = attachDomElement(
       domMeta,
       context,
@@ -188,26 +188,6 @@ export class BaseSupport {
     --painting.locks
 
     paint()
-  }
-  
-  buildContext() {
-    const context = this.subject.global.context
-    const thisTag = this.templater.tag as StringTag | DomTag
-    const values = thisTag.values // this.values || thisTag.values
-
-    let index = 0
-    const len = values.length
-    while (index < len) {
-      buildContext(
-        values,
-        index,
-        context,
-      )
-
-      ++index
-    }
-
-    return context
   }
 
   destroy(
@@ -308,63 +288,44 @@ export class BaseSupport {
       }
     })
     
-    this.destroyClones(htmlDomMeta, {stagger: startStagger}, promises)
+    destroyClones(htmlDomMeta, {stagger: startStagger}, promises)
     
     thisGlobal.htmlDomMeta = []
     thisGlobal.childTags = []
     
     return options.stagger
   }
+}
 
-  destroyClones(
-    oldClones: DomObjectChildren,
-    options: DestroyOptions = {
-      stagger: 0,
-    },
-    promises: Promise<any>[]
-  ) {
-    // check subjects that may have clones attached to them
-    const newPromises = oldClones.map(clone => {
-      const marker = clone.marker
-      if(marker) {
-        paintRemoves.push(marker)
-      }
-
-      if(!clone.domElement) {
-        return
-      }
-
-      return this.checkCloneRemoval(clone.domElement, options.stagger)
-    }).filter(x => x) // only return promises
-
-    if(newPromises.length) {
-      promises.push(Promise.all(newPromises))
-      return options.stagger
+function destroyClones(
+  oldClones: DomObjectChildren,
+  options: DestroyOptions = {
+    stagger: 0,
+  },
+  promises: Promise<any>[]
+) {
+  // check subjects that may have clones attached to them
+  const newPromises = oldClones.map(clone => {
+    const marker = clone.marker
+    if(marker) {
+      paintRemoves.push(marker)
     }
 
+    if(!clone.domElement) {
+      return
+    }
+
+    return checkCloneRemoval(clone.domElement, options.stagger)
+  }).filter(x => x) // only return promises
+
+  if(newPromises.length) {
+    promises.push(Promise.all(newPromises))
     return options.stagger
   }
 
-  /** Reviews elements for the presences of ondestroy */
-  checkCloneRemoval(
-    clone: Element | Text | ChildNode,
-    stagger: number,
-  ) {
-    const customElm = clone as any
-    if( customElm.ondestroy ) {
-      const promise = elementDestroyCheck(customElm, stagger)
-
-      if(promise instanceof Promise) {
-        return promise.then(() => {
-          paintRemoves.push(clone)
-          paint()
-        })
-      }
-    }
-
-    paintRemoves.push(clone)
-  }
+  return options.stagger
 }
+
 
 export class Support extends BaseSupport {
   constructor(
@@ -592,4 +553,45 @@ function processUpdateContext(
   }
 
   return context
+}
+
+  
+export function buildSupportContext(support: AnySupport) {
+  const context = support.subject.global.context
+  const thisTag = support.templater.tag as StringTag | DomTag
+  const values = thisTag.values // this.values || thisTag.values
+
+  let index = 0
+  const len = values.length
+  while (index < len) {
+    buildContext(
+      values,
+      index,
+      context,
+    )
+
+    ++index
+  }
+
+  return context
+}
+
+/** Reviews elements for the presences of ondestroy */
+function checkCloneRemoval(
+  clone: Element | Text | ChildNode,
+  stagger: number,
+) {
+  const customElm = clone as any
+  if( customElm.ondestroy ) {
+    const promise = elementDestroyCheck(customElm, stagger)
+
+    if(promise instanceof Promise) {
+      return promise.then(() => {
+        paintRemoves.push(clone)
+        paint()
+      })
+    }
+  }
+
+  paintRemoves.push(clone)
 }
