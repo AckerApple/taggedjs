@@ -15,23 +15,27 @@ export function state <T>(
   }
 
   // State first time run
-  const defaultFn = defaultValue instanceof Function ? defaultValue : () => defaultValue
+  const defaultFn = defaultValue instanceof Function ? defaultValue : function() {
+    return defaultValue
+  }
   let initValue = defaultFn()
 
   // the state is actually intended to be a function
   if(initValue instanceof Function) {
     const original = initValue
     
-    initValue = ((...args: any[]) => {
+    initValue = function initValueFun(...args: any[]) {
       const result = original(...args)
       return result
-    }) as any
+    } as any
 
     ;(initValue as any).original = original
   }
 
   const push: StateConfigItem<T> = {
-    get: () => getStateValue(push) as T,
+    get: function pushState() {
+      return getStateValue(push) as T
+    },
     defaultValue: initValue,
   }
   config.array.push(push)

@@ -32,10 +32,6 @@ export function processNewArrayValue(
       break
   }
 
-  // after processing
-  contextItem.value = value
-  contextItem.global.lastValue = value
-
   return contextItem
 }
 
@@ -55,8 +51,6 @@ function processNewTag(
     tag.templater = templater
   }
 
-  contextItem.value = templater
-
   const global = contextItem.global
   const newest = global.newest = getSupport(
     templater,
@@ -66,7 +60,7 @@ function processNewTag(
   )
 
   global.oldest = newest
-  ownerSupport.subject.global.childTags.push(newest)
+  // ownerSupport.subject.global.childTags.push(newest)
 
   return contextItem
 }

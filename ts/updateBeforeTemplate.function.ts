@@ -1,4 +1,3 @@
-import { InsertBefore } from'./interpolations/InsertBefore.type.js'
 import { NoDisplayValue } from'./interpolations/attributes/processAttribute.function.js'
 import { paintInsertBefores } from './tag/paint.function.js'
 import { empty } from './tag/ValueTypes.enum.js'
@@ -6,13 +5,13 @@ import { empty } from './tag/ValueTypes.enum.js'
 // Function to update the value of x
 export function updateBeforeTemplate(
   value: string, // value should be casted before calling here
-  lastFirstChild: InsertBefore,
+  lastFirstChild: Text,
 ) {
   const textNode = document.createTextNode(value) // never innerHTML
 
   paintInsertBefores.push({
     element: textNode,
-    relative: lastFirstChild as Element,
+    relative: lastFirstChild,
   })
 
   return textNode

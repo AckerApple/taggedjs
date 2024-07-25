@@ -3,7 +3,7 @@ type PaintAppend = {
   relative: Text | Element
 }
 
-export let paintRemoves: (Element | Text | ChildNode)[] = []
+export let paintRemoves = [] as (Element | Text | ChildNode)[]
 export let paintContent: (() => any)[] = []
 export let paintAppends: PaintAppend[] = []
 export let paintInsertBefores: PaintAppend[] = []
@@ -18,45 +18,34 @@ export function paint() {
     return
   }
 
-  let d = -1
-  const removeLength = paintRemoves.length - 1
-  while(d++ < removeLength) {
-    const toRemove = paintRemoves[d]
+  ++painting.locks
+
+  for(const toRemove of paintRemoves) {
     const parentNode = toRemove.parentNode as ParentNode
     parentNode.removeChild(toRemove as Element)
   }
 
-  let x = -1
-  const contentLength = paintContent.length - 1
-  while(x++ < contentLength) {
-    paintContent[x]()
+  for(const content of paintContent) {
+    content()
   }
 
-  let y = -1
-  const appendLength = paintAppends.length - 1
-  while(y++ < appendLength) {
-    const now = paintAppends[y]
+  for(const now of paintAppends) {
     now.relative.appendChild(now.element)
   }
 
-  let z = -1
-  const insertBeforeLength = paintInsertBefores.length - 1
-  while(z++ < insertBeforeLength) {
-    const now = paintInsertBefores[z]
+  for(const now of paintInsertBefores) {
     const parentNode = now.relative.parentNode as ParentNode
     parentNode.insertBefore(now.element, now.relative)
   }
 
-
-  let a = -1
-  const paintAftersLength = paintAfters.length - 1
-  while(a++ < paintAftersLength) {
-    paintAfters[a]()
+  for(const now of paintAfters) {
+    now()
   }
 
+  paintRemoves = []
   paintContent = []
   paintAppends = []
   paintInsertBefores = []
-  paintRemoves = []
   paintAfters = []
+  --painting.locks
 }

@@ -1,6 +1,5 @@
-import { TagArraySubject, processTagArray } from './processTagArray.js'
+import { processTagArray } from './processTagArray.js'
 import { TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
-import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
 import { RegularValue } from './processRegularValue.function.js'
 import { newSupportByTemplater, processNewTag, processTag, tagFakeTemplater } from './processTag.function.js'
 import { AnySupport } from '../Support.class.js'
@@ -29,11 +28,18 @@ export function processFirstSubjectValue(
     }
     
     case ValueTypes.templater:
-      return processNewTag(
-        value as TemplaterResult,
+      if(appendTo) {
+        return processNewTag(
+          value as TemplaterResult,
+          ownerSupport,
+          subject,
+          appendTo,
+        )
+      }
+      
+      return processTag(
         ownerSupport,
-        subject as ContextItem,
-        appendTo as Element,
+        subject,
       )
 
     case ValueTypes.dom:
@@ -50,7 +56,7 @@ export function processFirstSubjectValue(
           templater,
           ownerSupport,
           subject as ContextItem,
-          appendTo as Element,
+          appendTo,
         )
       }
 
@@ -59,11 +65,11 @@ export function processFirstSubjectValue(
       return processTag(
         ownerSupport,
         subject,
-      )      
+      )
   
     case ValueTypes.tagArray:
       processTagArray(
-        subject as TagArraySubject,
+        subject,
         value as (StringTag | TemplaterResult)[],
         ownerSupport,
         counts,
@@ -122,21 +128,20 @@ export function processFirstSubjectValue(
   processFirstRegularValue(
     value as RegularValue,
     subject,
-    subject.global.placeholder as InsertBefore, // || insertBefore,
+    subject.global.placeholder as Text,
   )
 }
 
 function processFirstRegularValue(
   value: RegularValue,
   subject: ContextItem, // could be tag via subject.tag
-  insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
+  insertBefore: Text, // <template end interpolate /> (will be removed)
 ) {
-  // subject.global.lastValue = value
   const castedValue = castTextValue(value)
   const clone = updateBeforeTemplate(
     castedValue,
     insertBefore, // this will be removed
   )
 
-  subject.global.simpleValueElm = clone
+  subject.global.simpleValueElm = clone  
 }

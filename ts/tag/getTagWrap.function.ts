@@ -2,12 +2,10 @@ import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { TagWrapper } from './tag.utils.js'
 import { AnySupport, BaseSupport, getSupport, PropsConfig, Support } from './Support.class.js'
 import { castProps } from'../alterProp.function.js'
-import { setUse } from '../state/setUse.function.js'
-import { ContextItem, StringTag } from './Tag.class.js'
-import { ValueTypes } from './ValueTypes.enum.js'
-import { html } from './html.js'
+import { ContextItem } from './Tag.class.js'
 import { Props } from '../Props.js'
 import { syncFunctionProps } from './update/updateExistingTagComponent.function.js'
+import { executeWrap } from './executeWrap.function.js'
 
 /** creates/returns a function that when called then calls the original component function
  * Gets used as templater.wrapper()
@@ -22,71 +20,33 @@ export function getTagWrap(
     newSupport: Support,
     subject: ContextItem,
     lastSupport?: Support | BaseSupport | undefined
-  ) => executeWrap(
-    templater,
-    result,
-    newSupport,
-    subject,
-    lastSupport,
-  )
+  ) => {
+    const castedProps = getCastedProps(
+      templater,
+      newSupport,
+      lastSupport,
+    )
+  
+    const ownerSupport = newSupport.ownerSupport as Support
+    const useSupport = getSupport(
+      templater,
+      ownerSupport,
+      newSupport.appSupport, // ownerSupport.appSupport as Support,
+      subject,
+      castedProps,
+    )
+  
+    return executeWrap(
+      templater,
+      result,
+      newSupport,
+      subject,
+      useSupport,
+      lastSupport,
+    )
+  }
 
   return wrapper as Wrapper
-}
-
-export function executeWrap(
-  templater: TemplaterResult,
-  result: TagWrapper<any>,
-  newSupport: AnySupport,
-  subject: ContextItem,
-  lastSupport?: AnySupport | undefined,
-): Support {
-  const global = subject.global
-  const originalFunction = result.original // (innerTagWrap as any).original as unknown as TagComponent
-  const stateless = templater.tagJsType === ValueTypes.stateRender
-  const castedProps = stateless ? [] : getCastedProps(
-    templater,
-    newSupport,
-    lastSupport,
-  )
-
-  let tag: StringTag;
-  if(stateless) {
-    tag = templater as any as StringTag
-  } else {
-    tag = originalFunction(...castedProps)
-  }
-
-  // CALL ORIGINAL COMPONENT FUNCTION
-  if(tag instanceof Function) {
-    tag = tag()
-  }
-  
-  const unknown = !tag || (tag.tagJsType && ![ValueTypes.tag,ValueTypes.dom].includes(tag.tagJsType))
-  if(unknown) {
-    tag = html`${tag}` // component returned a non-component value
-  }
-
-  tag.templater = templater
-  templater.tag = tag
-  ;(tag as any).arrayValue = (templater as any).arrayValue // tag component could have been used in array.map
-
-  const ownerSupport = newSupport.ownerSupport as Support
-  const support = getSupport(
-    templater,
-    ownerSupport,
-    newSupport.appSupport, // ownerSupport.appSupport as Support,
-    subject,
-    castedProps,
-  )
-
-  support.subject.global = global
-  // ??? this should be set by outside?
-  global.oldest = global.oldest || support
-
-  const nowState = setUse.memory.stateConfig.array
-  support.state.push(...nowState)
-
-  return support
 }
 
 export function getCastedProps(

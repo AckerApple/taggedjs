@@ -1,11 +1,11 @@
-import { AnySupport, BaseSupport, Support } from '../Support.class.js'
+import { AnySupport, BaseSupport, getSupport, Support } from '../Support.class.js'
 import { runBeforeRedraw, runBeforeRender } from'../tagRunner.js'
 import { runAfterRender } from'../tagRunner.js'
 import { Wrapper } from '../TemplaterResult.class.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
-import { executeWrap } from '../getTagWrap.function.js'
-import { setUse } from '../../state/setUse.function.js'
 import { ContextItem } from '../Tag.class.js'
+import { TagWrapper } from '../tag.utils.js'
+import { executeWrap } from '../executeWrap.function.js'
 
 export function renderTagOnly(
   newSupport: AnySupport,
@@ -26,14 +26,21 @@ export function renderTagOnly(
 
   // NEW TAG CREATED HERE
   if(templater.tagJsType === ValueTypes.stateRender) {
-    const stateArray = setUse.memory.stateConfig.array
-    const result = templater.wrapper || {original: templater} as any
+    const result = templater as any as TagWrapper<any> // .wrapper as any// || {original: templater} as any
+
+    const useSupport = getSupport(
+      templater,
+      ownerSupport as AnySupport,
+      newSupport.appSupport, // ownerSupport.appSupport as Support,
+      subject,
+    )
 
     reSupport = executeWrap(
       templater,
       result,
       newSupport,
       subject,
+      useSupport,
       prevSupport,
     )
   } else {
@@ -69,10 +76,10 @@ function beforeWithRender(
   const runtimeOwnerSupport: AnySupport | undefined = lastOwnerSupport || parentSupport
 
   if(prevSupport) {
-    // ??? new removed
     if(prevSupport !== support) {
       const lastState = prevSupport.state
-      support.subject.global = prevSupport.subject.global
+      // ??? new removed
+      // support.subject.global = prevSupport.subject.global
       support.state = lastState
     }
 

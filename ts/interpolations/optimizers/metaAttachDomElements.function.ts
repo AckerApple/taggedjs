@@ -1,7 +1,7 @@
 // taggedjs-no-compile
 
 import { isSubjectInstance } from "../../isInstance.js"
-import { paintAppends } from "../../tag/paint.function.js"
+import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
 import { BaseSupport, Support } from "../../tag/Support.class.js"
 import { Context, ContextItem } from "../../tag/Tag.class.js"
 import { InterpolateSubject } from "../../tag/update/processFirstSubject.utils.js"
@@ -12,6 +12,7 @@ import { SubToTemplateOptions } from "../subscribeToTemplate.function.js"
 import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode.types.js"
 import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
 import { ObjectChildren } from "./exchangeParsedForValues.function.js"
+import { howToSetInputValue } from "../attributes/howToSetInputValue.function.js"
 
 // ??? TODO: This could be done within exchangeParsedForValues to reduce loops
 export function attachDomElement(
@@ -36,16 +37,23 @@ export function attachDomElement(
     const isNum = !isNaN(value as unknown as number)
 
     if(isNum) {
-      const marker = newNode.marker = node.marker || document.createTextNode(empty)
+      const marker = document.createTextNode(empty)
+      const subject = scope[ value as unknown as number ]
+      subject.global.placeholder = marker
+
       if(owner) {
         paintAppends.push({
           relative: owner,
           element: marker,
         })
+      } else {
+        paintInsertBefores.push({
+          element: marker,
+          relative: support.subject.global.placeholder as Text,
+        })
       }
-      const subject = scope[ value as unknown as number ]
-      subject.global.placeholder = marker
-      // delete (node as any).marker // delete so that the marker is not destroyed with tag
+      // newNode.marker = marker
+      // delete newNode.marker // delete so that the marker is not destroyed with tag
 
       const subVal = subject.value
       if(isSubjectInstance(subVal)) {
@@ -66,8 +74,8 @@ export function attachDomElement(
         subject.value,
         subject,
         support,
-        {...counts},
-        owner as Element,
+        counts,
+        owner,
       )
   
       continue
@@ -95,9 +103,12 @@ export function attachDomElement(
     if (node.at) {
       node.at.map(attr =>
         processAttribute(
-          {name: attr[0], value: attr[1], isSpecial: attr[2]},
+          attr[0], // name
           domElement,
           support,
+          howToSetInputValue,
+          attr[1], // value
+          attr[2] as boolean | undefined, // isSpecial
         )
       )
     }

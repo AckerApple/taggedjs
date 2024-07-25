@@ -16,10 +16,7 @@ export function processReplaceTagResult(
   const global = subjectTag.global
   const ph = global.placeholder as Text
 
-  let domIndex = -1
-  const domLen = result.dom.length - 1
-  while(domIndex++ < domLen) {
-    const dom = result.dom[domIndex]
+  for(const dom of result.dom) {
     if(dom.domElement) {
       paintInsertBefores.splice(insertIndex++, 0, {
         element: dom.domElement,
@@ -34,13 +31,10 @@ export function processReplaceTagResult(
     }
   }
 
-  let index = -1
-  const len = result.subs.length - 1
-  // ++painting.locks
-  while(index++ < len) {
-    subscribeToTemplate(result.subs[index])
+  const subs = result.subs
+  for(const sub of subs) {
+    subscribeToTemplate(sub)
   }
-  // --painting.locks
 
   return support
 }
@@ -48,19 +42,12 @@ export function processReplaceTagResult(
 export function processFirstTagResult(
   support: AnySupport,
   counts: Counts,
-  subjectTag: ContextItem,
   appendTo: Element,
 ) {
   let appendIndex = paintAppends.length
 
   const result = buildBeforeElement(support, appendTo, {counts})
-  const global = subjectTag.global
-  const ph = global.placeholder as Text
-
-  let domIndex = -1
-  const domLen = result.dom.length - 1
-  while(domIndex++ < domLen) {
-    const dom = result.dom[domIndex]
+  for(const dom of result.dom) {
     if(dom.domElement) {
       paintAppends.splice(appendIndex++, 0, {
         element: dom.domElement,
@@ -75,13 +62,10 @@ export function processFirstTagResult(
     }
   }
 
-  let index = -1
-  const len = result.subs.length - 1
-  // ++painting.locks
-  while(index++ < len) {
-    subscribeToTemplate(result.subs[index])
+  const subs = result.subs
+  for(const sub of subs) {
+    subscribeToTemplate(sub)
   }
-  // --painting.locks
 
   return support
 }

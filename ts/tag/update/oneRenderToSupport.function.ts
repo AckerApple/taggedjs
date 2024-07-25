@@ -17,7 +17,7 @@ export function oneRenderToSupport(
   )
 
   let tag: StringTag
-  const wrap = () => {
+  function wrap() {
     templater.tag = tag || ((wrapper as any)())
     return support
   }

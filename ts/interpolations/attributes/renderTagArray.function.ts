@@ -8,18 +8,11 @@ export function renderTagUpdateArray(
 ) {
   ++painting.locks
 
-  supports.map(support => {
-    return {support, renderCount: support.subject.global.renderCount}
-  }).forEach(({support, renderCount}) => {
+  supports.forEach(function mapTagUpdate(support) {
     const global = support.subject.global
-    const newCount = global.renderCount
-
-    if(renderCount !== newCount) {
-      return // already rendered
-    }
 
     if(global.deleted) {
-      return // deleted
+      return
     }
 
     const newest = support.subject.global.newest as Support
@@ -27,5 +20,6 @@ export function renderTagUpdateArray(
   })
 
   --painting.locks
+
   paint()
 }

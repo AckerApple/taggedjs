@@ -7,7 +7,7 @@ import { bindSubjectCallback } from './bindSubjectCallback.function.js'
 import { AnySupport } from '../../tag/Support.class.js'
 import { ImmutableTypes, ValueTypes, empty } from '../../tag/ValueTypes.enum.js'
 import { paint, paintContent } from '../../tag/paint.function.js'
-import { ContextItem } from '../../tag/Tag.class.js'
+import { Context, ContextItem } from '../../tag/Tag.class.js'
 import { processNameValueAttribute } from './processNameValueAttribute.function.js'
 
 type TagVarIdNum = {tagJsVar: number}
@@ -19,25 +19,24 @@ export type AttrCombo = [
 */
 
 export type AttrCombo = {
-  name: string | TagVarIdNum
-  value?: string | null | TagVarIdNum
-  isSpecial?: boolean
 }
 
 /** Sets attribute value, subscribes to value updates  */
 export function processAttribute(
-  attrs: AttrCombo,
+  attrName: string | TagVarIdNum,
   element: Element,
   support: AnySupport,
-  howToSet: HowToSet = howToSetInputValue,
+  howToSet: HowToSet, //  = howToSetInputValue
+  value?: string | null | TagVarIdNum,
+  isSpecial?: boolean,
 ) {
-  const attrName = attrs.name // attrs[0]
-  const value = attrs.value // attrs[1]
   const nameVar = getTagJsVar(attrName)
   const isNameVar = nameVar >= 0
 
   if( isNameVar ) {
-    const contextItem = support.subject.global.context[ nameVar ]
+    const global = support.subject.global
+    const context = global.context as Context
+    const contextItem = context[ nameVar ]
     contextItem.global.isAttr = true
     contextItem.global.element = element
     return processNameOnlyAttr(
@@ -48,10 +47,11 @@ export function processAttribute(
     )
   }
 
-  const isSpecial = attrs.isSpecial || false
   const valueVar = getTagJsVar(value)
   if(valueVar >= 0) {
-    const contextItem = support.subject.global.context[ valueVar ]
+    const global = support.subject.global
+    const context = global.context as Context
+    const contextItem = context[ valueVar ]
     contextItem.global.isAttr = true
     contextItem.global.element = element
     contextItem.global.attrName = attrName as string
@@ -102,10 +102,10 @@ function processNameOnlyAttr(
   // the above callback gets called immediately since its a ValueSubject()
   const contextValueSubject = contextValue.value
   if(isSubjectInstance(contextValueSubject)) {
-    const sub = contextValueSubject.subscribe((value: any) => {
+    const sub = contextValueSubject.subscribe(function contextValueCallback(value: any) {
       processNameOnlyAttrValue(
         value,
-        contextValue.global.lastValue,
+        contextValue.value,
         element,
         support,
         howToSet,
@@ -143,12 +143,16 @@ export function processNameOnlyAttrValue(
           if(name in attrValue) {
             continue
           }
-          paintContent.push(() => element.removeAttribute(name))
+          paintContent.push(function paintContent() {
+            element.removeAttribute(name)
+          })
           // delete element[name]
         }
       } else {
         for (const name in lastValue) {
-          paintContent.push(() => element.removeAttribute(name))
+          paintContent.push(function paintContent() {
+            element.removeAttribute(name)
+          })
           // delete element[name]
         }
       }
@@ -175,10 +179,12 @@ export function processNameOnlyAttrValue(
     for (const name in attrValue) {
       const value = attrValue[name]
       processAttribute(
-        {name, value, isSpecial: isSpecialAttr(name)},
+        name,
         element,
         ownerSupport,
-        howToSet
+        howToSet,
+        value,
+        isSpecialAttr(name),
       )
     }
     return
@@ -192,24 +198,26 @@ function processNameValueAttributeAttrSubject(
   element: Element,
   support: AnySupport,
   howToSet: HowToSet,
-  isSpecial: boolean,
+  isSpecial?: boolean,
 ) {
   // const isSpecial = isSpecialAttr(attrName)
   if(isSpecial) {
-    paintContent.push(() => element.removeAttribute(attrName))
+    paintContent.push(function paintContent() {
+      element.removeAttribute(attrName)
+    })
   }
 
   const contextValueSubject = result.value
   if(isSubjectInstance(contextValueSubject)) {
-    const callback = (newAttrValue: any) => {
+    const callback = function processAttrCallback(newAttrValue: any) {
       processAttributeEmit(
-        isSpecial,
         newAttrValue,
         attrName,
         result,
         element,
         support,
         howToSet,
+        isSpecial,
       )
     }
   
@@ -223,26 +231,26 @@ function processNameValueAttributeAttrSubject(
   }
 
   processAttributeEmit(
-    isSpecial,
     result.value,
     attrName,
     result,
     element,
     support,
     howToSet,
+    isSpecial,
   )
 
   return
 }
 
 export function processAttributeEmit(
-  isSpecial: boolean,
   newAttrValue: any,
   attrName: string,
   subject: ContextItem,
   element: Element,
   support: AnySupport,
-  howToSet: HowToSet
+  howToSet: HowToSet,
+  isSpecial?: boolean,
 ) {
   // should the function be wrapped so every time its called we re-render?
   if(newAttrValue instanceof Function) {
@@ -274,7 +282,7 @@ export function processAttributeSubjectValue(
   newAttrValue: DisplayValue | NoDisplayValue,
   element: Element,
   attrName: string,
-  isSpecial: boolean,
+  isSpecial: boolean | undefined,
   howToSet: HowToSet,
   support: AnySupport,
 ) {
@@ -289,7 +297,9 @@ export function processAttributeSubjectValue(
 
   const isDeadValue = [undefined, false, null].includes(newAttrValue as NoDisplayValue)
   if(isDeadValue) {
-    paintContent.push(() => element.removeAttribute(attrName))
+    paintContent.push(function paintContentPush() {
+      element.removeAttribute(attrName)
+    })
     return
   }
 
@@ -311,16 +321,14 @@ function processAttributeFunction(
   fun.tagFunction = newAttrValue
   fun.support = support
 
-  return applyFunToElm(attrName, element, support, fun)
+  return applyFunToElm(attrName, element, fun)
 }
 
 export function applyFunToElm(
   attrName: string,
   element: Element,
-  support: AnySupport,
   fun: (...args: unknown[]) => unknown,
 ) {
-  // support.appSupport.addEventListener(attrName, element, fun)
   ;(element as any)[attrName] = fun
   return attrName
 }
@@ -345,7 +353,7 @@ function callbackFun(
   newAttrValue: any,
   element: Element,
   attrName: string,
-  isSpecial: boolean,
+  isSpecial: boolean | undefined,
   howToSet: HowToSet,
   subject: ContextItem,
 ) {
@@ -389,8 +397,7 @@ export function processTagCallbackFun(
   }
 
   // tag has state and will need all functions wrapped to cause re-renders
-  newAttrValue = bindSubjectCallback(newAttrValue, support)
-  // subject.global.lastValue = newAttrValue
+  newAttrValue = bindSubjectCallback(newAttrValue, support, attrName)
 
   return processAttributeFunction(element, newAttrValue, support, attrName)
 }

@@ -1,11 +1,10 @@
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { isLikeTags } from'../isLikeTags.function.js'
 import { renderTagOnly } from'./renderTagOnly.function.js'
-import { destroyUnlikeTags } from'./destroyUnlikeTags.function.js'
 import { softDestroySupport } from './softDestroySupport.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { ContextItem, DomTag, StringTag } from '../Tag.class.js'
-import { deepEqual } from '../../deepFunctions.js'
+import { moveProviders } from '../update/updateExistingTagComponent.function.js'
 
 /** TODO: This seems to support both new and updates and should be separated? */
 export function renderWithSupport(
@@ -26,13 +25,11 @@ export function renderWithSupport(
 
   const isLikeTag = !lastSupport || isLikeTags(lastSupport, reSupport)
   if(!isLikeTag) {
-    destroyUnlikeTags(
-      lastSupport,
-      reSupport,
-      subject,
-    )
+    moveProviders(lastSupport as Support, reSupport)
+    softDestroySupport(lastSupport)
+    reSupport.subject.global.oldest = reSupport
+    reSupport.subject.global.newest = reSupport
   } else if(lastSupport) {
-    // const tag = reSupport.templater.tag
     const tag = lastSupport.templater.tag
     if(tag && subject.global.renderCount > 1) {
       checkTagSoftDestroy(tag, lastSupport, lastTag)
@@ -55,7 +52,6 @@ function checkTagSoftDestroy(
     const newDom = (tag as DomTag).dom
     if(lastDom !== newDom) {
       softDestroySupport(lastSupport)
-      delete lastSupport.subject.global.deleted
     }
     
     return
@@ -69,7 +65,6 @@ function checkTagSoftDestroy(
       const newLength = (tag as StringTag).strings.length
       if(oldLength !== newLength) {
         softDestroySupport(lastSupport)
-        delete lastSupport.subject.global.deleted
       }
     }
   }

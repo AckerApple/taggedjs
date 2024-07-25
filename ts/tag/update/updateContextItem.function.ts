@@ -20,19 +20,15 @@ export function updateContextItem(
     ownerSupport,
   ).rendered
   
-  updateOneContextValue(result, value, contextItem)
+  updateOneContextValue(value, contextItem)
 
   return result
 }
 
 export function updateOneContextValue(
-  wasUpdated: boolean,
   value: TemplateValue,
   contextItem: ContextItem,
 ) {
   contextItem.value = value
   contextItem.global.lastValue = value
-  if(wasUpdated && !contextItem.global.locked) {
-    ++contextItem.global.renderCount
-  }
 }

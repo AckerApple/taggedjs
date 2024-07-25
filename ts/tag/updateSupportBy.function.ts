@@ -12,7 +12,8 @@ export function updateSupportBy(
   fromSupport: AnySupport,
   toSupport: AnySupport,
 ) {
-  const context = fromSupport.subject.global.context
+  const global = fromSupport.subject.global
+  const context = global.context as Context
   const tempTag = (toSupport.templater.tag || toSupport.templater) as DomTag | StringTag
   const values = (toSupport.templater as any as Tag).values || tempTag.values
   const tag = fromSupport.templater.tag as any
@@ -73,33 +74,33 @@ export function processUpdateOneContext(
   global.nowValueType = valueType
 
   if(global.isAttr) {
-    contextItem.global.newest = ownerSupport
+    // contextItem.global.newest = ownerSupport
     if(global.isNameOnly) {
       processNameOnlyAttrValue(
         value,
-        contextItem.global.lastValue,
+        contextItem.value,
         global.element as Element,
         ownerSupport,
         global.howToSet as HowToSet,
       )
 
-      updateOneContextValue(false, value, contextItem)
+      updateOneContextValue(value, contextItem)
 
       return false
     }
 
     const element = contextItem.global.element as Element
     processAttributeEmit(
-      contextItem.global.isSpecial as boolean,
       value,
       contextItem.global.attrName as string,
       contextItem,
       element,
       ownerSupport,
       contextItem.global.howToSet as HowToSet,
+      contextItem.global.isSpecial as boolean,
     )
 
-    updateOneContextValue(false, value, contextItem)
+    updateOneContextValue(value, contextItem)
 
     return false
   }
@@ -107,7 +108,7 @@ export function processUpdateOneContext(
   if(global.deleted) {
     const valueSupport = (value && value.support) as Support
     if(valueSupport) {
-      destroySupport(valueSupport)
+      destroySupport(valueSupport, 0)
       context // item was deleted, no need to emit
       return false
     }

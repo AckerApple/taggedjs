@@ -1,10 +1,9 @@
 import { Props } from '../Props.js'
 import { ContextItem } from './Tag.class.js'
-import { empty, ValueTypes } from './ValueTypes.enum.js'
 import { State } from '../state/index.js'
 import { TemplaterResult } from './TemplaterResult.class.js'
-import { cloneTagJsValue } from './cloneValueArray.function.js'
 import { Subscription } from '../subject/subject.utils.js'
+import { clonePropsBy } from './clonePropsBy.function.js'
 
 export type AnySupport = (BaseSupport & {
 })
@@ -120,39 +119,6 @@ export function getSupport(
   support.ownerSupport = ownerSupport
   support.appSupport = appSupport
   return support as Support
-}
-
-function clonePropsBy(
-  support: AnySupport,
-  props: Props,
-  castedProps?: Props,
-) {
-  if(support.templater.tagJsType === ValueTypes.stateRender) {
-    return support.propsConfig = {
-      latest: [],
-      latestCloned: [],
-    }
-  }
-
-  const latestCloned = props.map(props =>
-    cloneTagJsValue(props)
-  )
-  return support.propsConfig = {
-    latest: props,
-    latestCloned, // assume its HTML children and then detect
-    castProps: castedProps,
-  }
-}
-
-
-export function resetSupport(
-  support: Support,
-  newContextLength: number // 0
-) {
-  const subject = support.subject
-  const global = subject.global  
-  global.context.length = newContextLength
-  delete global.newest
 }
 
 export function destroySubs(

@@ -6,7 +6,6 @@ import { Provider } from '../state/providers.js'
 import { OnDestroyCallback } from '../state/onDestroy.js'
 import { OnInitCallback } from '../state/onInit.js'
 import { Subscription } from '../subject/subject.utils.js'
-import { InsertBefore } from '../interpolations/InsertBefore.type.js'
 import { Subject } from '../subject/index.js'
 import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
@@ -35,10 +34,16 @@ export type TagGlobal = {
   lastValue?: any
   
   destroy$: Subject<any>
+
+  // SUPPORTS
   oldest: BaseSupport | Support
   newest?: BaseSupport | Support
-  context: Context // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+  context?: Context // populated after reading interpolated.values array converted to an object {variable0, variable:1}
   providers?: Provider[]
+  destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
+  init?: OnInitCallback // what to run when init complete, used for onInit
+  // childTags: Support[], // tags on me
+  htmlDomMeta?: DomObjectChildren
   
   /** Indicator of re-rending. Saves from double rending something already rendered */
   renderCount: number
@@ -46,20 +51,15 @@ export type TagGlobal = {
   isApp?: boolean // root element
 
   // ALWAYS template tag
-  insertBefore?: InsertBefore // what element put down before
+  // insertBefore?: InsertBefore // what element put down before
   placeholder?: Text // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
 
   subscriptions?: Subscription<any>[] // subscriptions created by clones
   
-  destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
-  init?: OnInitCallback // what to run when init complete, used for onInit
   
   locked?: true
   blocked: (BaseSupport | Support)[], // renders that did not occur because an event was processing
   
-  childTags: Support[], // tags on me
-  // clones: Clone[],
-  htmlDomMeta?: DomObjectChildren
   callbackMaker?: true
   simpleValueElm?: Clone
 
@@ -82,7 +82,7 @@ export function getTemplaterResult(props?: Props) {
   const templater: TemplaterResult = {
     props,
     tagJsType: ValueTypes.templater,
-    key: (arrayValue: unknown) => {
+    key: function keyTemplate(arrayValue: unknown) {
       templater.arrayValue = arrayValue
       return templater
     }

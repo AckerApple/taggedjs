@@ -13,7 +13,7 @@ export function processNameValueAttribute(
   element: Element,
   howToSet: HowToSet,
   support: AnySupport,
-  isSpecial: boolean
+  isSpecial?: boolean
 ) {
   const global = value?.global as TagGlobal
   
@@ -53,7 +53,7 @@ function processNonDynamicAttr(
   value: string,
   element: Element,
   howToSet: HowToSet,
-  isSpecial: boolean,
+  isSpecial?: boolean,
 ) {
   // const isSpecial = isSpecialAttr(attrName)
   if (isSpecial) {

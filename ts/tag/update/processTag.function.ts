@@ -22,26 +22,23 @@ export function processTag(
   const result = buildBeforeElement(support, undefined, {counts: {added:0, removed:0}})
   const ph = subject.global.placeholder as Text
 
-  result.dom.forEach(dom => {
+  for(const dom of result.dom) {
     if(dom.marker) {
-      paintInsertBefores.splice(appendIndex++, 0, {
+      paintInsertBefores.push({
         element: dom.marker,
         relative: ph,
       })
     }
 
     if(dom.domElement) {
-      paintInsertBefores.splice(appendIndex++, 0, {
+      paintInsertBefores.push({
         element: dom.domElement,
         relative: ph,
       })
     }
-  })
+  }
 
-  let index = -1
-  const length = result.subs.length - 1
-  while(index++ < length) {
-    const sub = result.subs[index]
+  for(const sub of result.subs) {
     subscribeToTemplate(sub)
   }
 
@@ -108,7 +105,7 @@ export function processNewTag(
   support.ownerSupport = ownerSupport
   const result = buildBeforeElement(support, appendTo, {counts: {added:0, removed:0}})
 
-  result.dom.forEach(dom => {
+  for(const dom of result.dom) {
     if(dom.marker) {
       paintAppends.push({
         element: dom.marker,
@@ -122,7 +119,7 @@ export function processNewTag(
         relative: appendTo, // ph.parentNode as Element,
       })
     }
-  })
+  }
 
   let index = -1
   const length = result.subs.length - 1

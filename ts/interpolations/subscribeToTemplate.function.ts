@@ -1,4 +1,3 @@
-import { InsertBefore } from './InsertBefore.type.js'
 import { InterpolateSubject, TemplateValue } from '../tag/update/processFirstSubject.utils.js'
 import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue.function.js'
 import { updateExistingValue } from '../tag/update/updateExistingValue.function.js'
@@ -11,7 +10,7 @@ import { ContextItem } from '../tag/Tag.class.js'
 import { getValueType } from '../tag/getValueType.function.js'
 
 export type SubToTemplateOptions = {
-  insertBefore: InsertBefore
+  insertBefore: Text
   subject: InterpolateSubject
   support: AnySupport
   counts: Counts // used for animation stagger computing
@@ -29,7 +28,7 @@ export function subscribeToTemplate({
 }: SubToTemplateOptions) {
   let onValue = function onSubValue(value: TemplateValue) {
     const templater = value as TemplaterResult
-    const placeholder = subject.global?.placeholder as Text
+
     processFirstSubjectValue(
       templater,
       contextItem,

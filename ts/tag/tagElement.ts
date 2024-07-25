@@ -2,9 +2,7 @@ import { BaseSupport, getBaseSupport, Support } from './Support.class.js'
 import { runAfterRender, runBeforeRender } from'./tagRunner.js'
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { Original, TagComponent, TagMaker} from './tag.utils.js'
-import { textNode } from './textNode.js'
 import { ValueTypes } from './ValueTypes.enum.js'
-import { executeWrap } from './getTagWrap.function.js'
 import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { paint, painting } from './paint.function.js'
 import { ContextItem } from './Tag.class.js'
@@ -12,6 +10,7 @@ import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
 import { buildBeforeElement } from './buildBeforeElement.function.js'
 import { destroySupport } from './destroySupport.function.js'
+import { executeWrap } from './executeWrap.function.js'
 
 const appElements: {
   support: BaseSupport // Support
@@ -35,7 +34,7 @@ export function tagElement(
 } {
   const appElmIndex = appElements.findIndex(appElm => appElm.element === element)
   if(appElmIndex >= 0) {
-    destroySupport(appElements[appElmIndex].support)
+    destroySupport(appElements[appElmIndex].support, 0)
     appElements.splice(appElmIndex, 1)
     // an element already had an app on it
     console.warn('Found and destroyed app element already rendered to element', {element})
@@ -52,7 +51,7 @@ export function tagElement(
   
   // enables hmr destroy so it can control entire app
   ;(element as any).destroy = function() {
-    destroySupport(support) // never return anything here
+    destroySupport(support, 0) // never return anything here
   }
   
   let tags: any[] = []
@@ -80,13 +79,17 @@ export function tagElement(
 
   const newFragment = document.createDocumentFragment()
   newFragment.appendChild(placeholder)
-  putDomDown(result.dom, newFragment)
-  result.subs.forEach(sub =>
+
+  for(const domItem of result.dom) {
+    putOneDomDown(domItem, newFragment)
+  }
+
+  for(const sub of result.subs) {
     subscribeToTemplate(sub)
-  )
+  }
   --painting.locks
 
-  requestAnimationFrame(() => {
+  requestAnimationFrame(function() {
     paint()
     element.appendChild(newFragment)
   })
@@ -116,9 +119,7 @@ export function runWrapper(
 
   newSupport.appElement = appElement
 
-  // subject.global.insertBefore = insertBefore
   global.placeholder = placeholder
-  global.insertBefore = placeholder // template
   global.oldest = global.oldest || newSupport
   global.newest = newSupport as Support
   
@@ -156,7 +157,6 @@ function putDomDown(
   dom: DomObjectChildren,
   newFragment: DocumentFragment,
 ) {
-  dom.forEach(domItem => putOneDomDown(domItem, newFragment))
 }
 
 function putOneDomDown(

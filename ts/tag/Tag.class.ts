@@ -74,10 +74,10 @@ export function getStringTag(
       tag.arrayValue = arrayValue
       return tag
     },  
-    html: (
+    html: function html(
       strings: string[] | TemplateStringsArray,
       values: TagValues,
-    ) => {
+    ) {
       tag.children = {strings, values}
       return tag
     }
@@ -112,15 +112,15 @@ export function getDomTag(
     ownerSupport: getSupportInCycle(),
     dom,
     tagJsType: ValueTypes.dom,
-    key: (arrayValue: unknown) => {
+    key: function keyFun(arrayValue: unknown) {
       tag.arrayValue = arrayValue
       return tag
     },
     html: {
-      dom: (
+      dom: function dom(
         dom: LikeObjectChildren, // ObjectChildren
         values: TagValues,
-      ): DomTag => {
+      ): DomTag {
         tag.children = {dom: dom, values}
         return tag
       }

@@ -60,11 +60,13 @@ export function runBeforeDestroy(
     const global = support.subject.global
     const providers = global.providers
     if(providers) {
-      providers.forEach(provider => provider.children.forEach((child, index) => {
-        if(child.subject.global === global) {
-          provider.children.splice(index, 1)
-        }
-      }))
+      for(const provider of providers ) {
+        provider.children.forEach((child, index) => {
+          if(child.subject.global === global) {
+            provider.children.splice(index, 1)
+          }
+        })
+      }
     }
   }
 }
@@ -74,12 +76,9 @@ export function runBeforeChildDestroy(
   support: Support | BaseSupport,
   ownerSupport: Support | BaseSupport,
 ) {
-  support.subject.global.deleted = true
-
   const tagUse = setUse.tagUse
   const length = tagUse.length
   for (let index=0; index < length; ++index) {
     tagUse[index].beforeDestroy(support as BaseSupport, ownerSupport as Support)
   }
-
 }

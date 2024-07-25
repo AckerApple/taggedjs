@@ -110,7 +110,7 @@ function processOneContext(
   const global = context[index].global
 
   if(global.isAttr) {
-    global.newest = ownerSupport
+    // global.newest = ownerSupport
     if(global.isNameOnly) {
       processNameOnlyAttrValue(
         value,
@@ -125,13 +125,13 @@ function processOneContext(
 
     const element = contextItem.global.element as Element
     processAttributeEmit(
-      contextItem.global.isSpecial as boolean,
       value,
       contextItem.global.attrName as string,
       contextItem,
       element,
       ownerSupport,
       contextItem.global.howToSet as HowToSet,
+      contextItem.global.isSpecial as boolean,
     )
 
     return false

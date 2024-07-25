@@ -14,7 +14,9 @@ export function letState <T>(
     let oldValue = getStateValue(restate) as T
 
     const push: StateConfigItem<T> = {
-      get: () => getStateValue(push) as T,
+      get: function getLetState(){
+        return getStateValue(push) as T
+      },
       defaultValue: restate.defaultValue,
     }
 
@@ -26,7 +28,9 @@ export function letState <T>(
   // State first time run
   const initValue = defaultValue instanceof Function ? defaultValue() : defaultValue
   const push: StateConfigItem<T> = {
-    get: () => getStateValue(push) as T,
+    get: function getPushState() {
+      return getStateValue(push) as T
+    },
     defaultValue: initValue,
   }
   config.array.push(push)
@@ -38,10 +42,8 @@ function makeStateResult<T>(
   initValue: T,
   push: StateConfigItem<T>,
 ) {
-  const result = (y: any) => {
-    push.callback = y // || (x => [initValue, initValue = x])
+  return function msr(y: any) {
+    push.callback = y
     return initValue
   }
-
-  return result
 }

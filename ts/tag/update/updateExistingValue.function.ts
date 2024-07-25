@@ -2,7 +2,7 @@ import { BaseSupport, getSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { isTagTemplater } from '../../isInstance.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
-import { TagArraySubject, processTagArray } from './processTagArray.js'
+import { processTagArray } from './processTagArray.js'
 import { updateExistingTagComponent } from './updateExistingTagComponent.function.js'
 import { processNewRegularValue, processUpdateRegularValue, RegularValue } from './processRegularValue.function.js'
 import { checkDestroyPrevious } from '../checkDestroyPrevious.function.js'
@@ -20,6 +20,7 @@ export function updateExistingValue(
   ownerSupport: BaseSupport | Support,
 ): {subject: ContextItem, rendered: boolean} {
   const valueType = subject.global.nowValueType as ValueType | BasicTypes | ImmutableTypes
+
   const wasDestroyed = checkDestroyPrevious(
     subject, value, valueType
   )
@@ -48,17 +49,26 @@ export function updateExistingValue(
       ownerSupport
     )
 
+    if(!subject.global.locked) {
+      ++subject.global.renderCount
+    }
+  
     return {subject, rendered: true}
   }
 
   switch (valueType) {
     case ValueTypes.tagArray:
       processTagArray(
-        subject as TagArraySubject,
+        subject,
         value as (TemplaterResult | StringTag)[],
         ownerSupport,
         {added: 0, removed: 0}
       )
+
+      if(!subject.global.locked) {
+        ++subject.global.renderCount
+      }
+    
       return {subject, rendered: true}
 
     case ValueTypes.templater:
@@ -66,6 +76,11 @@ export function updateExistingValue(
         ownerSupport,
         subject as ContextItem,
       )
+
+      if(!subject.global.locked) {
+        ++subject.global.renderCount
+      }
+    
       return {subject, rendered: true}
     
     case ValueTypes.tag:
@@ -86,6 +101,10 @@ export function updateExistingValue(
         subject,
       )
 
+      if(!subject.global.locked) {
+        ++subject.global.renderCount
+      }
+    
       return {subject, rendered: true}
 
     case BasicTypes.function:
@@ -104,6 +123,10 @@ export function updateExistingValue(
       value as RegularValue,
       subject,
     )
+  }
+
+  if(subject.global.locked) {
+    ++subject.global.renderCount
   }
 
   return {subject, rendered: true}

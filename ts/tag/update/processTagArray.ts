@@ -1,12 +1,9 @@
 // taggedjs-no-compile
 
-import { InsertBefore } from '../../interpolations/InsertBefore.type.js'
-import { ContextItem, DomTag, StringTag, TagTemplate } from '../Tag.class.js'
+import { Context, ContextItem, StringTag, TagTemplate } from '../Tag.class.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { ArrayNoKeyError } from '../../errors.js'
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
-import { textNode } from '../textNode.js'
 import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
@@ -15,107 +12,111 @@ import { getNewGlobal } from './getNewGlobal.function.js'
 import { processNewArrayValue } from './processNewValue.function.js'
 import { destroySupport } from '../destroySupport.function.js'
 
-export type LastArrayItem = {
-  support: Support
-  index: number
-  deleted?: boolean
-}
-
-type LastArrayMeta = {
-  array: LastArrayItem[]
-  lastRuns?: {[index: number]: TagTemplate}
-}
-
-export type TagArraySubject = ContextItem & {
-  insertBefore: InsertBefore // template tag
-  lastArray?: LastArrayMeta // previous array that may have been processed
-}
-
 export function processTagArray(
-  subject: TagArraySubject,
+  subject: ContextItem,
   value: (TemplaterResult | StringTag)[], // arry of Tag classes
   ownerSupport: BaseSupport | Support,
   counts: Counts,
   appendTo?: Element,
 ) {
   const global = subject.global
-  ++global.renderCount
+  const existed = global.context ? true : false
+  if(!existed){
+    global.context = [] as Context
+  }
+
   
-  const existed = subject.lastArray ? true : false
-  const lastArray = subject.lastArray = subject.lastArray || {array: []}
-  const runtimeInsertBefore = global.placeholder
+  let runtimeInsertBefore = global.placeholder
+  const lastArray = global.context as Context
 
   let removed = 0
   /** 🗑️ remove previous items first */
-  lastArray.array = lastArray.array.filter((
-    item: LastArrayItem,
+  const filteredLast = global.context = lastArray.filter(function lastArrayFilter(
+    item: ContextItem,
     index: number,
-  ) => {
-    const {newRemoved, same} = reviewLastArrayItem(
-      item, value, index, lastArray, removed, counts
+  ) {
+    const newRemoved = reviewLastArrayItem(
+      item, value, index, lastArray, removed, counts,
     )
     removed = removed + newRemoved
-    return same
+    return newRemoved === 0
   })
+
+  // const eAppendTo = existed ? undefined : appendTo
+  const eAppendTo = appendTo // existed ? undefined : appendTo
 
   const length = value.length
   for (let index=0; index < length; ++index) {
-    reviewArrayItem(
+    const newSubject = reviewArrayItem(
       value,
       index,
-      lastArray,
+      filteredLast,
       ownerSupport,
       runtimeInsertBefore,
       counts,
-      existed ? undefined : appendTo,
+      eAppendTo,
     )
+
+    runtimeInsertBefore = newSubject.global.placeholder
   }
 }
 
 function reviewArrayItem(
   value: unknown[],
   index: number,
-  lastArray: LastArrayMeta,
+  lastArray: Context,
   ownerSupport: AnySupport,
   runtimeInsertBefore: Text | undefined, // used during updates
   counts: Counts,
   appendTo?: Element, // used during initial rendering of entire array
 ) {
   const item = value[index]
-  const previous = lastArray.array[index]
-  const previousSupport = previous?.support
-  const itemSubject: ContextItem = previousSupport?.subject || {
-    value,
-    global: getNewGlobal(),
-  }
-
-  const couldBeSame = lastArray.array.length > index
-  if (couldBeSame) {
-    updateExistingValue(
-      itemSubject,
-      item as TemplateValue,
-      ownerSupport,
+  const previous = lastArray[index]
+  if(previous) {
+    return reviewPreviousArrayItem(
+      item, previous, lastArray, ownerSupport, index,
+      runtimeInsertBefore, counts, appendTo,
     )
-
-    return
   }
 
-  const newSupport = processAddTagArrayItem(
+  return processAddTagArrayItem(
     item,
     runtimeInsertBefore as any, // thisInsert as any,
-    itemSubject,
     index,
     ownerSupport,
     counts,
-    lastArray.array,
+    lastArray,
     appendTo,
   )
+}
 
-  if(newSupport) {
-    ownerSupport.subject.global.childTags.push(newSupport as Support)
+function reviewPreviousArrayItem(
+  item: unknown,
+  previous: ContextItem,
+  lastArray: Context,
+  ownerSupport: AnySupport,
+  index: number,
+  runtimeInsertBefore: Text | undefined, // used during updates
+  counts: Counts,
+  appendTo?: Element, // used during initial rendering of entire array
+) {
+  const itemSubject: ContextItem = previous
+
+  const couldBeSame = lastArray.length > index
+  if (couldBeSame) {
+    updateExistingValue(itemSubject, item as any, ownerSupport)
+    return itemSubject
   }
-  
-  return
+
+  return processAddTagArrayItem(
+    item,
+    runtimeInsertBefore as any, // thisInsert as any,
+    index,
+    ownerSupport,
+    counts,
+    lastArray,
+    appendTo,
+  )
 }
 
 function setPlaceholderElm(
@@ -129,22 +130,22 @@ function setPlaceholderElm(
 function processAddTagArrayItem(
   item: unknown,
   before: Text, // used during updates
-  itemSubject: ContextItem,
+  // itemSubject: ContextItem,
   index: number,
   ownerSupport: AnySupport,
   counts: Counts,
-  lastArray: LastArrayItem[],
+  lastArray: ContextItem[],
   appendTo?: Element, // used during initial entire array rendering
-): AnySupport {
+): ContextItem {
+  const itemSubject: ContextItem = {
+    value: item,
+    global: getNewGlobal(),
+  }
+
   counts.added = counts.added + 1 // index
   const subPlaceholder = setPlaceholderElm( itemSubject )
 
-  if( appendTo ) {
-    paintAppends.push({
-      element: subPlaceholder,
-      relative: appendTo,
-    })
-  } else {
+  if( !appendTo ) {
     paintInsertBefores.push({
       element: subPlaceholder,
       relative: before,
@@ -153,56 +154,62 @@ function processAddTagArrayItem(
 
   processNewArrayValue(item as TemplateValue, ownerSupport, itemSubject)
 
-  const support = processFirstSubjectValue(
+  processFirstSubjectValue(
     item as TemplateValue,
     itemSubject,
     ownerSupport, // support,
     counts,
     appendTo,
-  ) as Support
+  )
   
-  // Added to previous array
-  lastArray.push({
-    support, index
-  })
+  // after processing
+  itemSubject.value = item
+  itemSubject.global.lastValue = item  
 
-  return support
+  // Added to previous array
+  lastArray.push(itemSubject)
+
+  if( appendTo ) {
+    paintAppends.push({
+      element: subPlaceholder,
+      relative: appendTo,
+    })
+  }
+
+  /*
+  const newSupport = itemSubject.global.newest
+  if(newSupport) {
+    ownerSupport.subject.global.childTags.push(newSupport as Support)
+  }
+  */
+
+  return itemSubject
 }
 
 export function destroyArrayItem(
-  lastArray: LastArrayItem[],
-  index: number,
+  item: ContextItem,
   counts: Counts,
 ) {
-  const last = lastArray[index]
-  const support = last.support
-  destroyArrayTag(support, counts)
-  last.deleted = true
+  const global = item.global
+  const support = global.newest as Support
+
+  if(support) {
+    destroySupport(support, counts.removed++)
+  } else {
+    const element = global.simpleValueElm as Element
+    paintRemoves.push(element)
+  }
+
+  // last.deleted = true
+  global.deleted = true
   ++counts.removed
-}
-
-/** Destroys one item in an array of items */
-function destroyArrayTag(
-  support: Support,
-  counts: Counts,
-) {
-  setTimeout(function () {
-    const global = support.subject.global
-    const ph = global.placeholder as Text
-    delete global.placeholder
-    paintRemoves.push(ph)
-  }, 0)
-
-  destroySupport(support, {
-    stagger: counts.removed++,
-  })
 }
 
 function reviewLastArrayItem(
   subTag: any,
   value: any[],
   index: number,
-  lastArray: LastArrayMeta,
+  lastArray: Context,
   removed: number,
   counts: Counts,
 ) {
@@ -211,18 +218,18 @@ function reviewLastArrayItem(
   const lessLength = at < 0 || newLength < at
 
   if(lessLength) {
-    destroyArrayItem(lastArray.array, index, counts)
+    destroyArrayItem(lastArray[index], counts)
     ++removed
-    return {same: false, newRemoved: removed}
+    return 1
   }
 
-  const templater = subTag.support.templater as TemplaterResult
-  const nowValue = templater.tag?.arrayValue // (templater as any).arrayValue
-  const lastTemp = lastArray.array[index].support.templater
-  const tag = lastTemp.tag as any
-  const lastArrayValue = tag.arrayValue
+  /*
+  const nowValue = getArrayValueByItem(subTag)
+  const lastArrayValue = lastArray.array[index].arrayValue
+  */
 
   // check for html``.key()
+  /*
   const keySet = 'arrayValue' in tag
   if (!keySet) {
     const details = {
@@ -236,13 +243,20 @@ function reviewLastArrayItem(
     const err = new ArrayNoKeyError(message, details)
     throw err
   }
+  */
 
+  /*
   const destroyItem = nowValue !== lastArrayValue
   if(destroyItem) {
     destroyArrayItem(lastArray.array, index, counts)
     ++removed
-    return {same:false, newRemoved: removed}
+    return 1
   }
+  */
 
-  return {same:true, newRemoved: removed}
+  return 0
+}
+
+function getArrayValueByItem(item: any) {
+  return item?.arrayValue || item
 }

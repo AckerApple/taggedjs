@@ -32,11 +32,11 @@ setUse.memory.stateConfig = {
 export type GetSet<T> = (y: T) => [T, T]
 
 setUse({
-  beforeRender: (support: Support | BaseSupport) => initState(support),
-  beforeRedraw: (support: Support | BaseSupport) => reState(support),
-  afterRender: (
+  beforeRender: initState,
+  beforeRedraw: reState,
+  afterRender: function afterRender(
     support: Support | BaseSupport,
-  ) => {
+  ) {
     const config: Config = setUse.memory.stateConfig
     const rearray = config.rearray as unknown as State[]
     

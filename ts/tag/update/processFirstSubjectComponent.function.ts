@@ -16,7 +16,7 @@ export function processReplacementComponent(
   counts: Counts,
 ): BaseSupport | Support {
   // TODO: This below check not needed in production mode
-  validateTemplater(templater)
+  // validateTemplater(templater)
 
   const newSupport = getSupport(
     templater,
@@ -50,7 +50,7 @@ export function processReplacementComponent(
     subject as ContextItem, // The element set here will be removed from document. Also result.tag will be added in here
   )
 
-  ownerSupport.subject.global.childTags.push(newSupport as Support)
+  // ownerSupport.subject.global.childTags.push(newSupport as Support)
 
   return support
 }
@@ -63,7 +63,7 @@ export function processFirstSubjectComponent(
   appendTo: Element,
 ): BaseSupport | Support {
   // TODO: This below check not needed in production mode
-  validateTemplater(templater)
+  // validateTemplater(templater)
 
   const newSupport = getSupport(
     templater,
@@ -94,11 +94,10 @@ export function processFirstSubjectComponent(
   processFirstTagResult(
     support,
     counts,
-    subject as ContextItem, // The element set here will be removed from document. Also result.tag will be added in here
     appendTo,
   )
 
-  ownerSupport.subject.global.childTags.push(newSupport as Support)
+  // ownerSupport.subject.global.childTags.push(newSupport as Support)
 
   return support
 }

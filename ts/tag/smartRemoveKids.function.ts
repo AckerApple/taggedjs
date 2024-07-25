@@ -1,24 +1,27 @@
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
-import { DestroyOptions } from './destroy.support.js'
 import { elementDestroyCheck } from './elementDestroyCheck.function.js'
 import { paint, paintRemoves } from './paint.function.js'
 import { AnySupport } from './Support.class.js'
+import { ContextItem } from './Tag.class.js'
 
+/** sets global.deleted on support and all children */
 export function smartRemoveKids(
   support: AnySupport,
   promises: Promise<any>[],
-  options: DestroyOptions = {
-    stagger: 0,
-  },
+  stagger: number,
 ) {
-  const startStagger = options.stagger
+  const startStagger = stagger
   const thisGlobal = support.subject.global
   const htmlDomMeta = thisGlobal.htmlDomMeta as DomObjectChildren
-      
-  thisGlobal.context.forEach(subject => {
+  const context = thisGlobal.context as ContextItem[]
+
+  for (const subject of context) {
     const global = subject.global
+    if(global.deleted) {
+      continue
+    }
+
     const oldest = global.oldest
-    
     if(oldest) {
       const clones = global.htmlDomMeta as DomObjectChildren
       const cloneOne = clones[0]  
@@ -27,42 +30,48 @@ export function smartRemoveKids(
       let count = 0
       if(cloneOne) {
         let domOne = cloneOne.domElement
+        let doContinue = false
         while(domOne && domOne.parentNode && count < 5) {
           if(htmlDomMeta.find(x => x.domElement === domOne.parentNode)) {
-            return // no need to delete, they live within me
+            doContinue = true
+            break // no need to delete, they live within me
           }
   
           domOne = domOne.parentNode as HTMLElement | Text
           ++count
         }
+
+        if(doContinue) {
+          continue
+        }
       }
 
       // recurse
-      options.stagger = options.stagger + smartRemoveKids(oldest, promises, options)
+      stagger = stagger + smartRemoveKids(oldest, promises, stagger)
     }
 
     // regular values, no placeholders
     const elm = global.simpleValueElm
     if(elm) {
-      delete global.simpleValueElm
+      delete global.simpleValueElm    
       paintRemoves.push(elm)
-      return
     }
-  })
+
+    global.deleted = true
+  }
   
-  destroyClones(htmlDomMeta, {stagger: startStagger}, promises)
+  destroyClones(htmlDomMeta, startStagger, promises)
   
-  thisGlobal.htmlDomMeta = []
-  thisGlobal.childTags = []
+  thisGlobal.deleted = true
+  // thisGlobal.htmlDomMeta = []
+  // thisGlobal.childTags = []
   
-  return options.stagger
+  return stagger
 }
 
 function destroyClones(
   oldClones: DomObjectChildren,
-  options: DestroyOptions = {
-    stagger: 0,
-  },
+  stagger: number,
   promises: Promise<any>[]
 ) {
   // check subjects that may have clones attached to them
@@ -72,19 +81,20 @@ function destroyClones(
       paintRemoves.push(marker)
     }
 
-    if(!clone.domElement) {
+    const dom = clone.domElement
+    if(!dom) {
       return
     }
-
-    return checkCloneRemoval(clone.domElement, options.stagger)
+  
+    return checkCloneRemoval(dom, stagger)
   }).filter(x => x) // only return promises
 
   if(newPromises.length) {
     promises.push(Promise.all(newPromises))
-    return options.stagger
+    return stagger
   }
 
-  return options.stagger
+  return stagger
 }
 
 /** Reviews elements for the presences of ondestroy */

@@ -1,6 +1,5 @@
 import { hasSupportChanged } from'../hasSupportChanged.function.js'
 import { AnySupport, BaseSupport, PropsConfig, Support } from '../Support.class.js'
-import { destroyTagMemory } from'../destroyTag.function.js'
 import { renderSupport } from'../render/renderSupport.function.js'
 import { castProps, isSkipPropValue } from'../../alterProp.function.js'
 import { isLikeTags } from'../isLikeTags.function.js'
@@ -9,6 +8,8 @@ import { TemplaterResult } from '../TemplaterResult.class.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { ContextItem } from '../Tag.class.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
+import { getNewGlobal } from './getNewGlobal.function.js'
+import { destroySupport } from '../destroySupport.function.js'
 
 export function updateExistingTagComponent(
   ownerSupport: BaseSupport | Support,
@@ -262,8 +263,10 @@ function swapTags(
 ) {
   const global = subject.global
   const oldestSupport = global.oldest as Support
-  destroyTagMemory(oldestSupport)
-  delete subject.global.deleted
+  destroySupport(oldestSupport, 0)
+  
+  subject.global = getNewGlobal()
+  subject.global.placeholder = global.placeholder
 
   const newSupport = processReplacementComponent(
     templater,

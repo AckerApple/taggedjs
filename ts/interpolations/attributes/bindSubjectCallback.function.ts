@@ -14,17 +14,17 @@ export type Callback = (...args: any[]) => any
 export function bindSubjectCallback(
   value: Callback,
   support: AnySupport,
+  attrName: string,
 ) {
   const global = support.subject.global
-  const subjectFunction = (
+  const subjectFunction = function (
     element: Element, args: any[],
-  ) => {
-    const newest = global.newest as Support // || subjectFunction.support
-
-    if(!global.newest) {
-      return // most likely deleted
+  ) {
+    if(global.deleted) {
+      return
     }
-
+    
+    const newest = global.newest as Support // || subjectFunction.support
     return runTagCallback(
       subjectFunction.tagFunction,
       newest,
@@ -120,13 +120,9 @@ export function runBlocked(
   const global = tag.subject.global
   const blocked = global.blocked
 
-  let index = -1
-  const length = blocked.length - 1
-  while(index++ < length) {
-    const block = blocked[index] as Support
-    
+  for(const block of blocked) {    
     const lastResult = updateExistingTagComponent(
-      block.ownerSupport,
+      block.ownerSupport as Support,
       block,
       block.subject,
     )

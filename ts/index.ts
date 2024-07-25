@@ -7,7 +7,6 @@ export * from './subject/index.js'
 export * from './tag/Support.class.js'
 export * from './interpolations/attributes/howToSetInputValue.function.js'
 export * from './interpolations/attributes/ElementTargetEvent.interface.js'
-export * from'./interpolations/InsertBefore.type.js'
 
 export { tagElement } from './tag/tagElement.js'
 export { Tag, StringTag, DomTag, variablePrefix } from './tag/Tag.class.js'
