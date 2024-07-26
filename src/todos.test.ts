@@ -1,64 +1,67 @@
-import { byId, click, clickOne, focus, query } from "./elmSelectors"
+import { click, clickOne, focus, keydownOn, query } from "./elmSelectors"
 import { describe, expect, it } from "./expect"
 
-describe('todos', () => {
-  const todoInput = byId('todo-input') as HTMLInputElement
+describe('todos', function todos() {
+  const todoInput = query('.new-todo')[0] as HTMLInputElement
 
-  it('add one remove one', async () => {
-    expect(query('button[data-testid="todo-item-button"]').length).toBe(0)
+  it('add one remove one', function addOneRemoveOne() {
+    expect(query('button.destroy').length).toBe(0)
+    expect(todoInput).toBeDefined()
     
     todoInput.value = 'one'
-    ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
-    expect(query('button[data-testid="todo-item-button"]').length).toBe(1, 'expected one new todo')
+    keydownOn(todoInput, 'Enter')
+    expect(query('button.destroy').length).toBe(1, 'expected one new todo')
 
     // delete it
-    await click('button[data-testid="todo-item-button"]')
-    expect(query('button[data-testid="todo-item-button"]').length).toBe(0)
+    click('button.destroy')
+    expect(query('button.destroy').length).toBe(0)
   })  
   
-  it('basic', async () => {
+  it('basic', function basic() {
     todoInput.value = 'one'
-    ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
+    keydownOn(todoInput, 'Enter')
     
     // checkbox toggle
-    click('input[data-testid="todo-item-toggle"]')
+    click('input.toggle')
 
     // delete it
-    await click('button[data-testid="todo-item-button"]')
+    click('button.destroy')
 
-    expect(query('button[data-testid="todo-item-button"]').length).toBe(0, 'expected todo 0 deleted')
+    expect(query('button.destroy').length).toBe(0, 'expected todo 0 deleted')
 
     todoInput.value = 'one'
-    ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
+    keydownOn(todoInput, 'Enter')
 
     todoInput.value = 'two'
-    ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
-    const todoToggle2 = query('input[data-testid="todo-item-toggle"]')[1] as HTMLInputElement
-    await todoToggle2.click()
+    keydownOn(todoInput, 'Enter')
+
+    const todoToggle2 = query('input.toggle')[1] as HTMLInputElement
+    todoToggle2.click()
     expect(todoToggle2.checked).toBe(true)
 
     todoInput.value = 'three'
-    ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
+    keydownOn(todoInput, 'Enter')
     
-    expect(query('input[data-testid="todo-item-toggle"]').length).toBe(3)
+    expect(query('input.toggle').length).toBe(3)
 
     // delete 0
-    await clickOne('button[data-testid="todo-item-button"]')
-    expect(query('input[data-testid="todo-item-toggle"]').length).toBe(2)
+    clickOne('button.destroy')
+    expect(query('input.toggle').length).toBe(2)
 
     // delete 0
-    await clickOne('button[data-testid="todo-item-button"]')
-    expect(query('input[data-testid="todo-item-toggle"]').length).toBe(1)
+    clickOne('button.destroy')
+    expect(query('input.toggle').length).toBe(1)
 
     // delete 0
-    await clickOne('button[data-testid="todo-item-button"]')
-    expect(query('input[data-testid="todo-item-toggle"]').length).toBe(0)
+    clickOne('button.destroy')
+    expect(query('input.toggle').length).toBe(0)
   })
 
-  it('editing', async () => {
+  it('editing', function editing() {
     // create todo
     todoInput.value = 'one'
-    ;(todoInput as any).onkeyup({key:'Enter', target: todoInput})
+    keydownOn(todoInput, 'Enter')
+    expect(query('input#edit-todo-input').length).toBe(0)
     
     // prepare to make new todo become editable
     let event = new MouseEvent('dblclick', {
@@ -69,26 +72,65 @@ describe('todos', () => {
 
     // Dispatch the event on the specified element
     query('label[data-testid="todo-item-label"]')[0].dispatchEvent(event)
-    const parentNode = query('button[data-testid="todo-item-button"]')[0].parentNode as HTMLElement
-    expect(parentNode.style.display).toBe('none', 'expect the delete button hidden')
     
     // should have two inputs, the main and the edit
-    expect(query('input[data-testid="text-input"]').length).toBe(2)
+    expect(query('input.new-todo').length).toBe(1)
+    expect(query('input#edit-todo-input').length).toBe(1)
 
-    focus('input[data-testid="text-input"]')
+    focus('input#edit-todo-input')
 
-    const editInput = query('input[data-testid="text-input"]')[1] as any
+    const editInput = query('input#edit-todo-input')[0] as any
     editInput.value = 'two'
-    editInput.onkeyup({key:'Enter', target: editInput}) // cause save
+    keydownOn(editInput, 'Enter')
 
     // expect one delete button
-    expect(query('button[data-testid="todo-item-button"]').length).toBe(1)
+    expect(query('button.destroy').length).toBe(1)
 
     // main input + array input
-    expect(query('input[data-testid="text-input"]').length).toBe(2)
+    expect(query('input.new-todo').length).toBe(1)
+    expect(query('input#edit-todo-input').length).toBe(1)
+    // editInput.onblur({editInput}) // cause close input
+    editInput.dispatchEvent(blurEvent)
+    expect(query('input#edit-todo-input').length).toBe(0)
 
     // delete 0
-    await clickOne('button[data-testid="todo-item-button"]')
-    expect(query('label[data-testid="todo-item-label"]').length).toBe(0)
+    clickOne('button.destroy')
+    expect(query('input#edit-todo-input').length).toBe(0)
   })
+
+  it('⌚️ speedometer', runTodoSpeedometer)
 })
+
+const blurEvent = new Event('blur', {
+  bubbles: true, // Blur events typically do not bubble, but this can be set to true if needed
+  cancelable: false // Blur events are not cancelable
+})
+
+function runTodoSpeedometer() {
+  const numberOfItemsToAdd = 500
+  console.time('☀️-speedometer-all')
+
+  console.time('🆕 speedometer-adding')
+  const newTodo = document.querySelector(".new-todo") as any
+  for (let i = 0; i < numberOfItemsToAdd; i++) {
+      newTodo.value = 'aaa - ' + i;
+      
+      // Dispatch the event on the child element
+      keydownOn(newTodo, 'Enter')
+  }
+  console.timeEnd('🆕 speedometer-adding')
+
+  console.time('✏️ speedometer-editing')
+  const checkboxes = document.querySelectorAll(".toggle") as any
+  for (let i = 0; i < numberOfItemsToAdd; i++)
+      checkboxes[i].click();
+  console.timeEnd('✏️ speedometer-editing')
+
+  console.time('🗑️ speedometer-deleting')
+  const deleteButtons = document.querySelectorAll(".destroy") as any
+  for (let i = numberOfItemsToAdd - 1; i >= 0; i--)
+      deleteButtons[i].click();
+  console.timeEnd('🗑️ speedometer-deleting')
+
+  console.timeEnd('☀️-speedometer-all')
+}

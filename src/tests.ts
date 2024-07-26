@@ -1,4 +1,4 @@
-import { execute, expect, it } from "./expect"
+import { execute } from "./expect"
 
 export async function runTests() {
   await import('./start.test')

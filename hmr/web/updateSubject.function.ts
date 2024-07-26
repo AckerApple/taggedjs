@@ -9,7 +9,7 @@
  */
 
 import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function.js"
-import { buildBeforeElement, ContextItem, destroySupport, InsertBefore, Support, TaggedFunction, Wrapper } from "taggedjs"
+import { buildBeforeElement, ContextItem, destroySupport, Support, SupportTagGlobal, TaggedFunction, Wrapper } from "taggedjs"
 
 /** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 
@@ -26,8 +26,7 @@ export async function updateSubject(
   oldTag: TaggedFunction<any>,
   hmr: any
 ) {
-  /** @type {Support} */
-  const global = contextSubject.global
+  const global = contextSubject.global as SupportTagGlobal
   
   const oldest = global.oldest as Support
   const newest = global.newest as Support
@@ -61,12 +60,13 @@ export async function updateSubject(
   )
 
   const appSupport = oldest.appSupport
-  const providers = reSupport.subject.global.providers
-  const owner = oldest.ownerSupport.subject.global.oldest as Support
+  const ownGlobal = oldest.ownerSupport.subject.global as SupportTagGlobal
+  const providers = global.providers
+  const owner = ownGlobal.oldest as Support
   // connect child to owner
   reSupport.ownerSupport = owner
   // connect owner to child
-  owner.subject.global.childTags.push(reSupport)  
+  // owner.subject.global.childTags.push(reSupport)  
 
   if(providers) {
     providers.forEach((provider, index) => {
@@ -76,16 +76,16 @@ export async function updateSubject(
     })
   }
 
-  await destroySupport(oldest)
+  await destroySupport(oldest, 0)
 
+  const reGlobal = reSupport.subject.global as SupportTagGlobal
   delete oldest.subject.global.deleted
-  delete (reSupport.subject.global as any).oldest // TODO this maybe redundant of oldest.destroy()
-  delete reSupport.subject.global.newest
+  // delete (reSupport.subject.global as any).oldest // TODO this maybe redundant of oldest.destroy()
+  // delete reGlobal.newest
 
-  const insertBefore = oldest.subject.global.insertBefore as InsertBefore
+  // const insertBefore = oldest.subject.global.insertBefore as InsertBefore
   buildBeforeElement(reSupport, undefined, {counts: {added:0, removed: 0}})
 
-  reSupport.subject.global.newest = reSupport
-  reSupport.subject.global.oldest = reSupport
-  // contextSubject.support = reSupport
+  reGlobal.newest = reSupport
+  reGlobal.oldest = reSupport
 }

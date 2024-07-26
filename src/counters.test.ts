@@ -1,4 +1,4 @@
-import { byId, click, html, htmlById } from "./elmSelectors"
+import { byId, click, html, htmlById, keyupOn } from "./elmSelectors"
 import { describe, expect, it } from "./expect"
 import { expectElmCount, testCounterElements } from "./expect.html"
 
@@ -11,7 +11,7 @@ describe('counters', () => {
     const counterInput = byId('set-main-counter-input') as HTMLInputElement
     expect(counterInput).toBeDefined()
     counterInput.value = '0'
-    ;(counterInput as any).onkeyup({target: counterInput})
+    keyupOn(counterInput)
 
     const beforeRenderCount = Number(html('#counters_render_count'))
     const beforeInnerRenderCount = Number(html('#inner_counters_render_count'))

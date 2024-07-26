@@ -4,7 +4,7 @@ let tests: Test[] = []
 let tab = 0
 
 export function describe(label: string, run: () => any) {
-  tests.push(async () => {
+  tests.push(async function itTest() {
     const oldTests = tests
     tests = []
     
@@ -26,11 +26,11 @@ export function describe(label: string, run: () => any) {
   })
 }
 
-describe.skip = (label: string, run: () => any) => {
+describe.skip = function skip(label: string, run: () => any) {
   console.debug('⏭️ Skipped ' + label)
 }
 
-describe.only = (label: string, run: () => any) => {
+describe.only = function only(label: string, run: () => any) {
   onlyTests.push(async () => {
     const oldTests = tests
     tests = []
@@ -55,7 +55,7 @@ describe.only = (label: string, run: () => any) => {
 }
 
 export function it(label: string, run: () => any) {
-  tests.push(async () => {
+  tests.push(async function pushIt() {
     try {
       const start = Date.now()
       await run()
@@ -69,7 +69,7 @@ export function it(label: string, run: () => any) {
 }
 
 it.only = (label: string, run: () => any) => {
-  onlyTests.push(async () => {
+  onlyTests.push(async function pushOnlyTest() {
     try {
       const start = Date.now()
       await run()
@@ -82,7 +82,7 @@ it.only = (label: string, run: () => any) => {
   })
 }
 
-it.skip = (label: string, run: () => any) => {
+it.skip = function skip(label: string, run: () => any) {
   console.debug('⏭️ Skipped ' + label)
 }
 
@@ -114,7 +114,7 @@ async function runTests(tests: Test[]) {
 
 export function expect(expected: unknown) {
   return {
-    toBeDefined: (customMessage?: string | Function) => {
+    toBeDefined: function toBeDefined(customMessage?: string | Function) {
       if(expected !== undefined && expected !== null) {
         return
       }
@@ -127,7 +127,7 @@ export function expect(expected: unknown) {
       console.error(message, {expected})
       throw new Error(message as string)
     },
-    toBe: (received: unknown, customMessage?: string | Function) => {
+    toBe: function toBe(received: unknown, customMessage?: string | Function) {
       if(expected === received) {
         return
       }
@@ -140,7 +140,7 @@ export function expect(expected: unknown) {
       console.error(message, {toBe: received, expected})
       throw new Error(message as string)
     },
-    toBeGreaterThan: (amount: number, customMessage?: string) => {
+    toBeGreaterThan: function toBeGreaterThan(amount: number, customMessage?: string) {
       const expectNum = expected as number
       if(!isNaN(expectNum) && expectNum > amount) {
         return
@@ -150,7 +150,7 @@ export function expect(expected: unknown) {
       console.error(message, {amount, expected})
       throw new Error(message)
     },
-    toBeLessThan: (amount: number, customMessage?: string) => {
+    toBeLessThan: function toBeLessThan(amount: number, customMessage?: string) {
       const expectNum = expected as number
       if(!isNaN(expectNum) && expectNum < amount) {
         return

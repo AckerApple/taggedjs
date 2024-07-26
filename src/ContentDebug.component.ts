@@ -17,6 +17,7 @@ export const contentDebug = tag(() => {
   }]
 
   let orangeToggle = letState(true)(x => [orangeToggle, orangeToggle = x])
+  let boldToggle = letState(false)(x => [boldToggle, boldToggle = x])
 
   const injectionTest = '<script>alert("i should never run")</script>'
 
@@ -28,6 +29,7 @@ export const contentDebug = tag(() => {
       
       <div id="style-simple-border-orange" style.border="3px solid orange">simple orange border</div>
       <div id="style-var-border-orange" style.border=${"3px solid orange"}>var orange border</div>
+      
       <div>
         <div id="style-toggle-border-orange"
           style.border=${ orangeToggle ? "3px solid orange" : "3px solid green"}
@@ -36,6 +38,16 @@ export const contentDebug = tag(() => {
           onclick=${() => orangeToggle = !orangeToggle}
         >orange toggle ${orangeToggle}</button>
       </div>
+
+      <div>
+        <div id="style-toggle-bold"
+          ${ boldToggle ? {style:'font-weight:bold;'} : {}}
+        >toggle orange border</div>
+        <button id="toggle-bold"
+          onclick=${() => boldToggle = !boldToggle}
+        >bold toggle ${boldToggle}</button>
+      </div>
+      
       <div id="hello-spacing-dom-world">${54} ${'hello'} worlds</div>
     </div>
 

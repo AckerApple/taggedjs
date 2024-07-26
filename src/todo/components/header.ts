@@ -1,19 +1,17 @@
-import { Input } from "./input";
-import { ADD_ITEM } from "../constants";
 import { html } from "taggedjs";
+import { handleKey } from "./item.js";
 
-export function Header(dispatch: any) {
-    const addItem = (title: string) => dispatch({ type: ADD_ITEM, payload: { title } })
-    return html`
-        <header class="header" data-testid="header">
-            <h1>todos</h1>
-            ${Input({
-                onSubmit:addItem,
-                label:"New Todo Input",
-                placeholder:"What needs to be done?",
-            })}
-            <button onclick=${() => dispatch({ type: ADD_ITEM, payload: { title: 'New ' + Date.now() } })}
-            >add one</button>
-        </header>
-    `;
-}
+export const Header = (dispatch: any) => html`
+    <header class="header" data-testid="header">
+        <h1>todos</h1>
+        <input autoFocus class="new-todo"
+            placeholder="What needs to be done?"
+            onKeyDown=${e => {
+                const enter = handleKey(e, title => dispatch.addItem(title))
+                if(enter) {
+                    e.target.value = ""
+                }
+            }}
+        />
+    </header>
+`;

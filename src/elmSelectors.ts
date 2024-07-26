@@ -19,12 +19,26 @@ export function click(
   q: string
 ) {
   const items = [...query(q)]
-  return new Promise<void>(res => {
-    requestAnimationFrame(() => {
-      items.map(elm => (elm as HTMLElement).click())
-      res()
-    })
+  items.map(elm => (elm as HTMLElement).click())
+}
+
+export function keydownOn(input: Element, key: string) {
+  const keyEvent = new KeyboardEvent('keydown', {
+    key,
+    bubbles: true, // Ensure the event bubbles
   })
+
+  input.dispatchEvent(keyEvent)
+}
+
+
+export function keyupOn(input: Element, key?: string) {
+  const keyEvent = new KeyboardEvent('keyup', {
+    key,
+    bubbles: true, // Ensure the event bubbles
+  })
+  
+  input.dispatchEvent(keyEvent)
 }
 
 export function clickOne(
@@ -32,12 +46,7 @@ export function clickOne(
   index = 0,
 ) {
   const element = query(q)[index] as HTMLElement
-  return new Promise<void>(res => {
-    requestAnimationFrame(() => {
-      element.click()
-      res()
-    })
-  })
+  element.click()
 }
 
 export function html(

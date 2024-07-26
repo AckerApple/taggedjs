@@ -3,7 +3,7 @@
 // 🟠 Warning: avoid direct imports due to bundle workflow (old bundle and new bundle do not mix well)
 // const { renderWithSupport, renderSupport } = require("taggedjs");
 
-import { TemplaterResult, Tag, Support, TaggedFunction, ValueTypes, Wrapper } from "taggedjs"
+import { TemplaterResult, Tag, Support, TaggedFunction, ValueTypes, Wrapper, Context, SupportTagGlobal } from "taggedjs"
 import { updateSubject } from "./updateSubject.function"
 
 /** @type {Support | undefined} */
@@ -261,8 +261,8 @@ async function replaceTemplater(
 
     // Check to rebuild a component within an app
     if(isWrapping) {
-      const global = ownerSupport.subject.global
-      const context = global.context
+      const global = ownerSupport.subject.global as SupportTagGlobal
+      const context = global.context as Context
       const contextSubject = context[ index ]
       
       updateSubject(
@@ -277,11 +277,18 @@ async function replaceTemplater(
   
   await Promise.all(promises)
 
-  const subPromises = ownerSupport.subject.global.childTags.map(async child => {
-    count = count + await replaceTemplater(
-      child, {oldTag, newTag},
-      hmr
-    )
+  const global = ownerSupport.subject.global as SupportTagGlobal
+  const context = global.context
+  const subPromises = context.map(async child => {
+    const childGlobal = child.global as SupportTagGlobal
+    const support = childGlobal.newest as Support
+
+    if(support) {
+      count = count + await replaceTemplater(
+        support, {oldTag, newTag},
+        hmr
+      )
+    }
   })
 
   await Promise.all(subPromises)

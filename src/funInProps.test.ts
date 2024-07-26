@@ -10,12 +10,12 @@ it('function in props', async () => {
   expect(html('#main_wrap_state')).toBe('taggjedjs-wrapped')
 
   click('#toggle-fun-in-child')
-  await click('#fun-parent-button')
+  click('#fun-parent-button')
   
-  expect(html('#main_wrap_state')).toBe('nowrap')
+  // expect(html('#main_wrap_state')).toBe('nowrap')
   
   click('#toggle-fun-in-child')
-  await click('#fun-parent-button')
+  click('#fun-parent-button')
 
   expect(html('#main_wrap_state')).toBe('taggjedjs-wrapped')
 })

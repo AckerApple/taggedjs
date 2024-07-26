@@ -1,65 +1,70 @@
-import { ADD_ITEM, UPDATE_ITEM, REMOVE_ITEM, TOGGLE_ITEM, REMOVE_ALL_ITEMS, TOGGLE_ALL, REMOVE_COMPLETED_ITEMS } from "./constants"
-
-/* Borrowed from https://github.com/ai/nanoid/blob/3.0.2/non-secure/index.js
-
-The MIT License (MIT)
-
-Copyright 2017 Andrey Sitnik <andrey@sitnik.ru>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
-
-// This alphabet uses `A-Za-z0-9_-` symbols.
-// The order of characters is optimized for better gzip and brotli compression.
-// References to the same file (works both for gzip and brotli):
-// `'use`, `andom`, and `rict'`
-// References to the brotli default dictionary:
-// `-26T`, `1983`, `40px`, `75px`, `bush`, `jack`, `mind`, `very`, and `wolf`
-let urlAlphabet = "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict"
-
-function nanoid(size = 21) {
-    let id = ""
-    // A compact alternative for `for (var i = 0; i < step; i++)`.
-    let i = size
-    while (i--) {
-        // `| 0` is more compact and faster than `Math.floor()`.
-        id += urlAlphabet[(Math.random() * 64) | 0]
-    }
-    return id
+function uuid() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+        var r = (Math.random() * 16) | 0,
+            v = c === "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
 }
 
-export const todoReducer = (state: any[], action: any) => {
-    switch (action.type) {
-        case ADD_ITEM:
-            return state.concat({ id: nanoid(), title: action.payload.title, completed: false })
-        case UPDATE_ITEM:
-            return state.map((todo) => (todo.id === action.payload.id ? { ...todo, title: action.payload.title } : todo))
-        case REMOVE_ITEM:
-            const newState = state.filter((todo) => todo.id !== action.payload.id)
-            return newState
-        case TOGGLE_ITEM:
-            return state.map((todo) => (todo.id === action.payload.id ? { ...todo, completed: !todo.completed } : todo))
-        case REMOVE_ALL_ITEMS:
-            return []
-        case TOGGLE_ALL:
-            return state.map((todo) => (todo.completed !== action.payload.completed ? { ...todo, completed: action.payload.completed } : todo))
-        case REMOVE_COMPLETED_ITEMS:
-            return state.filter((todo) => !todo.completed)
+
+export function todoReducer(todos: any) {
+    function addItem(title: string) {
+        todos.push({ id: uuid()/*nanoid()*/, title, completed: false });
+        return todos;
     }
 
-    throw Error(`Unknown action: ${action.type}`)
+    function removeItem(id: string) {
+        return todos.filter((t: any) => t.id !== id);
+    }
+
+    function removeItemByIndex(index: number) {
+        todos.splice(index, 1);
+        return todos
+    }
+
+    function toggleItem(id: string) {
+        const toggleIndex = todosIndexById(todos, id)
+        if(toggleIndex >= -1) {
+            todos[toggleIndex].completed = !todos[toggleIndex].completed
+        }
+        return todos;
+    }
+
+    function removeAll() {
+        todos = []
+        return todos;
+    }
+
+    function toggleAll(completed: boolean) {
+        for (let index = todos.length - 1; index >= 0; --index) {
+            todos[index].completed = completed // !todos[index].completed
+        }
+        // update()
+        return todos;
+    }
+
+    function removeCompleted() {
+        for (let index = todos.length - 1; index >= 0; --index) {
+            if(todos[index].completed) {
+                todos.splice(index,1)
+            }
+        }
+        // update()
+        return todos;
+    }
+
+    return {
+        addItem,
+        removeItem,
+        toggleItem,
+        removeAll,
+        toggleAll,
+        removeCompleted,
+        removeItemByIndex,
+    }
 };
+
+
+function todosIndexById(todos: any[], id: string) {
+    return todos.findIndex((todo: any) => todo.id === id);
+}

@@ -1,4 +1,4 @@
-import { BaseSupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag, BasicTypes, ContextItem, getNewGlobal, buildSupportContext, getBaseSupport } from 'taggedjs'
+import { BaseSupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag, BasicTypes, ContextItem, getNewGlobal, getBaseSupport, Context, SupportTagGlobal } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -56,12 +56,12 @@ function readySupport(
   support: Support,
   subject: ContextItem,
 ) {
-  const global = subject.global
+  const global = subject.global as SupportTagGlobal
   global.newest = support
   global.oldest = support
 
   renderTagOnly(support, support, subject)
-  buildSupportContext(support)
+  // buildSupportContext(support)
   
   return support
 }
@@ -70,7 +70,8 @@ function templaterToHtml(
   templater: TemplaterResult,
 ) {
   const support = templaterToSupport(templater)
-  const context = support.subject.global.context
+  const global = support.subject.global as SupportTagGlobal
+  const context = global.context as Context
   const tag = support.templater.tag as StringTag // TODO: most likely do not want strings below
   const template = tag.strings // support.getTemplate()
   const strings = new Array(...template) // clone

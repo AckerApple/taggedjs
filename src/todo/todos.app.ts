@@ -1,35 +1,37 @@
-import { Header } from "./components/header"
-import { Main } from "./components/main"
-import { Footer } from "./components/footer"
-import { todoReducer } from "./reducer"
-import { letState, html, tag, state } from "taggedjs"
+import { Header } from "./components/header.js";
+import { Footer } from "./components/footer.js";
+import { todoReducer } from "./reducer.js";
+import { html, tag, key } from "taggedjs";
+import { useHashRouter } from "./HashRouter.function.js";
+import { Item } from "./components/item.js";
 
-let renderCount = 0
+const todos: {id:string, title:string, completed: boolean}[] = []
+const dispatch = todoReducer(todos)
+
 export const App = () => tag.state = (
-  _ = state('todos.app.ts'),
-  // myCount = renderCount,
-  todos = letState([] as any[])(x => {
-    // console.log('get in', myCount)
-    return [todos, todos = x]
-  }),
-  dispatch = (payload: string) => {
-    // const wasLen = todos.length
-    todos = todoReducer(todos, payload)
-    /*
-    if(todos.length === 0 && wasLen) {
-      console.log(' ------ cleared -----', myCount)
-    }
-    */
-    return todos
-  },
-  // __ = console.log('todos', {len:todos.length, renderCount}),
-) => html`<!-- TODO APP -->
-  todo app
-  ${Header(dispatch)}
-  ${todos.length > 0 && html`
-    ${Main({todos, dispatch})}
-    ${Footer(todos, dispatch)}
-  `}
-
-  app renderCount: ${++renderCount}
-`
+    route = useHashRouter().route,
+    toggleAll = (e: any) => dispatch.toggleAll(e.target.checked),
+    visibleTodos = todos.filter((todo) => {
+        if (route === "/active") return !todo.completed;
+        if (route === "/completed") return todo.completed;
+        return todo;
+    }),
+) => html`
+    ${Header(dispatch)}
+    start***
+    ${todos.length > 0 && html`
+        <main class="main">
+            <div class="toggle-all-container">
+                <input class="toggle-all" type="checkbox" checked=${visibleTodos.every((todo) => todo.completed)} onChange=${toggleAll} />
+                <label class="toggle-all-label" htmlFor="toggle-all">
+                    Toggle All Input
+                </label>
+            </div>
+            <ul class="todo-list show-priority">
+                ${visibleTodos.map((todo, index) => key(todo.id).html = Item(todo, dispatch, index))}
+            </ul>
+        </main>
+        ${Footer(todos, dispatch, route)}
+    `}
+    ***end
+`;

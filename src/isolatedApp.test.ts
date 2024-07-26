@@ -1,5 +1,5 @@
 import { execute } from "./expect"
-import { ViewTypes } from "./isolatedApp"
+import { ViewTypes } from "./sections.tag"
 
 export async function runTests(
   views: ViewTypes[]

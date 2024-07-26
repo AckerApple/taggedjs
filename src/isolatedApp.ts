@@ -14,67 +14,15 @@ import { renderCountDiv } from "./renderCount.component"
 import funInPropsTag from "./funInProps.tag"
 import {App as todo} from "./todo/todos.app"
 import { runTests } from "./isolatedApp.test"
-
-export enum ViewTypes {
-  Todo = 'todo',
-  FunInPropsTag = 'funInPropsTag',
-  OneRender = 'oneRender',
-  WatchTesting = 'watchTesting',
-  Mirroring = 'mirroring',
-  Content = 'content',
-  Arrays = 'arrays',
-  Counters = 'counters',
-  TableDebug = 'tableDebug',
-  Props = 'props',
-  Child = 'child',
-  TagSwitchDebug = 'tagSwitchDebug',
-  ProviderDebug = 'providerDebug'
-}
-const viewTypes = Object.values(ViewTypes)
-
-const storage = getScopedStorage()
-
-function getScopedStorage(): {
-  autoTest: boolean, views: ViewTypes[]
-} {
-  const string = localStorage.taggedjs || JSON.stringify({autoTest: true, views: []})
-  return JSON.parse(string)
-}
-
-function saveScopedStorage() {
-  localStorage.taggedjs = JSON.stringify(storage)
-}
+import { saveScopedStorage, sections, storage, viewChanged, ViewTypes } from "./sections.tag"
 
 export default () => tag.state = (
   _ = state('isolated app state'),
   renderCount = letState(0)(x => [renderCount, renderCount = x]),
   appCounter = letState(0)(x => [appCounter, appCounter=x]),
-  testTimeout = letState(null)(x => [testTimeout, testTimeout=x]),
   appCounterSubject = state(() => new Subject(appCounter)),
   callback = callbackMaker(),
 ) => {
-
-  function runTesting(manual = true) {
-    const waitFor = 2000
-
-    testTimeout = setTimeout(async () => {
-      console.debug('🏃 Running tests...')
-      const result = await runTests(storage.views)
-
-      if(!manual) {
-        return
-      }
-
-      if(result) {
-        alert('✅ all app tests passed')
-        return
-      }
-
-      alert('❌ tests failed. See console for more details')
-
-    }, waitFor) as any // cause delay to be separate from renders
-  }
-
   onInit(() => {
     console.info('1️⃣ app init should only run once')    
     
@@ -91,42 +39,18 @@ export default () => tag.state = (
     }
   })
 
-  function activate(
-    type: ViewTypes,
-    checkTesting = true,
-  ) {
-    storage.views.push(type)
-      
-    if(checkTesting && storage.autoTest) {
-      runTesting()
-    }
-  }
-
-  function deactivate(
-    type: ViewTypes,
-  ) {
-    (storage.views = storage.views.filter(x => x !== type))      
-  }
-
-  function toggleViewType(
-    type: ViewTypes,
-    checkTesting = true,
-  ) {
-    if(storage.views.includes(type)) {
-      deactivate(type)
-    } else {
-      activate(type, checkTesting)
-    }
-
-    saveScopedStorage()
-  }
-
   function toggleAutoTesting() {
     storage.autoTest = storage.autoTest = !storage.autoTest
     saveScopedStorage()
   }
 
   ++renderCount
+
+  const outputSections = [{
+    title: 'oneRender',
+    output: oneRender(),
+    view: ViewTypes.OneRender,
+  }]
 
   return html`<!--isolatedApp.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
@@ -149,43 +73,16 @@ export default () => tag.state = (
       <button type="button" onclick=${() => runTesting(true)}>run tests</button>
     </div>
 
-    <div>
-      <h3>Sections</h3>
-      <!-- checkbox menu -->
-      <div style="display:flex;gap:1em;flex-wrap:wrap;margin:1em;">
-        ${viewTypes.map(type => html`
-          <div>
-            <input type="checkbox"
-              id=${'view-type-' + type} name=${'view-type-' + type}
-              ${storage.views.includes(type) && 'checked'}
-              onclick=${() => toggleViewType(type)}
-            />
-            <label for=${'view-type-' + type}>&nbsp;${type}</label>
-          </div>
-        `.key(type))}
-        <div>
-          <label onclick=${() => viewTypes.forEach(viewType => {
-            activate(viewType, false)
-            saveScopedStorage()
-          })}>&nbsp;all</label>
-        </div>
-        <div>
-          <label onclick=${() => viewTypes.forEach(viewType => {
-            deactivate(viewType)
-            saveScopedStorage()
-          })}>&nbsp;none</label>
-        </div>
-      </div>
-    </div>
+    ${sections()}
 
     <div id="tagDebug-fx-wrap">
       <div style="display:flex;flex-wrap:wrap;gap:1em">
-        ${storage.views.includes(ViewTypes.OneRender) && html`
+        ${outputSections.map(({view, title, output}) => storage.views.includes(view) && html`
           <fieldset style="flex:2 2 20em">
-            <legend>oneRender</legend>
-            ${oneRender()}
+            <legend>${title}</legend>
+            ${output}
           </fieldset>
-        `}
+        `)}
 
         ${storage.views.includes(ViewTypes.Props) && html`
           <fieldset style="flex:2 2 20em">
@@ -281,3 +178,40 @@ export default () => tag.state = (
     </div>
   `
 }
+
+let testTimeout = null
+function runTesting(manual = true) {
+  const waitFor = 2000
+
+  testTimeout = setTimeout(async () => {
+    console.debug('🏃 Running tests...')
+    const result = await runTests(storage.views)
+
+    if(!manual) {
+      return
+    }
+
+    if(result) {
+      alert('✅ all app tests passed')
+      return
+    }
+
+    alert('❌ tests failed. See console for more details')
+
+  }, waitFor) as any // cause delay to be separate from renders
+}
+
+function activate(
+  type: ViewTypes,
+  checkTesting = true,
+) {
+  storage.views.push(type)
+    
+  if(checkTesting && storage.autoTest) {
+    runTesting()
+  }
+}
+
+viewChanged.subscribe(({type, checkTesting}) => {
+  activate(type, checkTesting)
+})

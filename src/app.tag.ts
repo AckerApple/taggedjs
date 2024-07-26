@@ -16,6 +16,7 @@ import funInPropsTag from "./funInProps.tag"
 import {App as todo} from "./todo/todos.app"
 import { propsDebugMain } from "./PropsDebug.tag"
 import { arrayTests } from "./arrayTests"
+import { sections } from "./sections.tag"
 
 export const App = tag(() => {
   let _firstState = letState('app first state')(x => [_firstState, _firstState=x])
@@ -85,6 +86,10 @@ export const App = tag(() => {
     </div>
 
     ${renderCountDiv({name:'app', renderCount})}
+
+    ----
+    ${sections()}
+    ----
 
     <div id="tagDebug-fx-wrap">
       <div style="display:flex;flex-wrap:wrap;gap:1em">

@@ -22,7 +22,7 @@ describe('props', () => {
     expectMatchedHtml('#propsDebug-🥩-0-display', '#propsDebug-🥩-2-display')
     const propCounter = Number(html('#propsDebug-🥩-0-display'))
     
-    const result = (query('#propsDebug-🥩-2-button')[0] as any).onclick()
+    const result = (query('#propsDebug-🥩-2-button')[0] as any)._click()
     expect(result).toBe('no-data-ever')
 
     // outer should not have changed
