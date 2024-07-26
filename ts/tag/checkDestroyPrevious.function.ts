@@ -7,6 +7,7 @@ import { paintRemoves } from './paint.function.js'
 import { ContextItem } from './Tag.class.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { destroySupport } from './destroySupport.function.js'
+import { SupportTagGlobal } from './TemplaterResult.class.js'
 
 const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender, ValueTypes.oneRender]
 
@@ -15,15 +16,11 @@ export function checkDestroyPrevious(
   newValue: unknown,
   valueType: ValueType | BasicTypes | ImmutableTypes, // new value type
 ) {
-  const global = subject.global
+  const global = subject.global as SupportTagGlobal
 
   // was simple value but now some different type
   if(global.simpleValueElm) {
-    const lastValue = global.lastValue // TODO: we maybe able to use displaySubject.value and remove concept of lastValue
-    // const lastValue = subject.value
-
-    // below is faster than using getValueType
-    if( isSimpleType(valueType) && typeof(lastValue) === valueType ) {
+    if( isSimpleType(valueType) && global.lastValueType === valueType ) {
       return false // no need to destroy, just update display
     }
 
@@ -32,6 +29,7 @@ export function checkDestroyPrevious(
     paintRemoves.push(elm)
     subject.global = getNewGlobal()
     subject.global.placeholder = global.placeholder
+    subject.global.lastValueType = global.nowValueType
     return 'changed-simple-value'
   }
 
@@ -49,6 +47,7 @@ export function checkDestroyPrevious(
         destroySupport(lastSupport, 0)
         subject.global = getNewGlobal()
         subject.global.placeholder = oldGlobal.placeholder
+        subject.global.lastValueType = oldGlobal.nowValueType
         return 'tag-swap'
       }
 
@@ -64,6 +63,7 @@ export function checkDestroyPrevious(
     destroySupport(lastSupport, 0)
     subject.global = getNewGlobal()
     subject.global.placeholder = oldGlobal.placeholder
+    subject.global.lastValueType = oldGlobal.nowValueType
     return 'different-tag'
   }
 

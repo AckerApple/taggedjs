@@ -19,7 +19,7 @@ export type EventMem = {elm: Element, callback:EventCallback}
 // export type Context = TagJsSubject<any>[]
 export type ContextItem = {
   global: TagGlobal
-  value: any,
+  value?: any,
 }
 export type Context = ContextItem[]
 

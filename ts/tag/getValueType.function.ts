@@ -19,20 +19,20 @@ export function getValueType(
     return BasicTypes.function
   }
 
+  if(value instanceof Date) {
+    return BasicTypes.date
+  }
+
+  if (value instanceof Array) {
+    return ValueTypes.tagArray
+  }
+
   const type = typeof(value)
   if(isSimpleType(type)) {
     return type as BasicTypes
   }
 
-  if(type === BasicTypes.object) {
-    if(value instanceof Date) {
-      return BasicTypes.date
-    }
-
-    if (value instanceof Array) {
-      return ValueTypes.tagArray
-    }
-  
+  if(type === BasicTypes.object) {  
     if(isSubjectInstance(value)) {
       return ValueTypes.subject
     }

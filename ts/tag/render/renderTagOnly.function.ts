@@ -1,7 +1,7 @@
 import { AnySupport, BaseSupport, getSupport, Support } from '../Support.class.js'
 import { runBeforeRedraw, runBeforeRender } from'../tagRunner.js'
 import { runAfterRender } from'../tagRunner.js'
-import { Wrapper } from '../TemplaterResult.class.js'
+import { SupportTagGlobal, Wrapper } from '../TemplaterResult.class.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { ContextItem } from '../Tag.class.js'
 import { TagWrapper } from '../tag.utils.js'
@@ -56,12 +56,13 @@ export function renderTagOnly(
   /* AFTER */
 
   runAfterRender(newSupport, ownerSupport)
-    
-  subject.global.newest = reSupport
+  
+  const global = subject.global as SupportTagGlobal
+  global.newest = reSupport
 
   // When we rendered, only 1 render should have taken place OTHERWISE rendering caused another render and that is the latest instead
   if(subject.global.renderCount > oldRenderCount + 1) {
-    return subject.global.newest as Support
+    return global.newest as Support
   }
 
   return reSupport

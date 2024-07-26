@@ -3,6 +3,7 @@ import { elementDestroyCheck } from './elementDestroyCheck.function.js'
 import { paint, paintRemoves } from './paint.function.js'
 import { AnySupport } from './Support.class.js'
 import { ContextItem } from './Tag.class.js'
+import { SupportTagGlobal } from './TemplaterResult.class.js'
 
 /** sets global.deleted on support and all children */
 export function smartRemoveKids(
@@ -11,12 +12,12 @@ export function smartRemoveKids(
   stagger: number,
 ) {
   const startStagger = stagger
-  const thisGlobal = support.subject.global
+  const thisGlobal = support.subject.global as SupportTagGlobal
   const htmlDomMeta = thisGlobal.htmlDomMeta as DomObjectChildren
   const context = thisGlobal.context as ContextItem[]
 
   for (const subject of context) {
-    const global = subject.global
+    const global = subject.global as SupportTagGlobal
     if(global.deleted) {
       continue
     }
@@ -63,8 +64,6 @@ export function smartRemoveKids(
   destroyClones(htmlDomMeta, startStagger, promises)
   
   thisGlobal.deleted = true
-  // thisGlobal.htmlDomMeta = []
-  // thisGlobal.childTags = []
   
   return stagger
 }

@@ -123,7 +123,9 @@ export function parseHTML(html: string): ParsedHtml {
       const notEmpty = attrMatch[2] !== ''
       const noValue = attrValue === undefined && notEmpty
       const lowerName = attrName.toLowerCase()
-      const fixedName = lowerName.length === ondoubleclick.length && lowerName === ondoubleclick ? 'ondblclick' : lowerName
+      
+
+      const fixedName = lowerName.startsWith('on') ? cleanEventName(lowerName) : lowerName
 
       if (noValue) {
         const standAloneVar = attrName.slice(0, variablePrefix.length) === variablePrefix;
@@ -264,4 +266,17 @@ function postprocessTagsInComments(html: string) {
       // For each processed comment found, replace *lt* and *gt* back to < and >
       return match.replace(/\[l t\]/g, '<').replace(/\[g t\]/g, '>').replace(/\[l&nbsp;t\]/g, '[l t]').replace(/\[g&nbsp;t\]/g, '[g t]')
   });
+}
+
+function cleanEventName(eventName: string) {
+  if(eventName.startsWith('on')) {
+    const couldByDblClick = eventName.length === ondoubleclick.length && eventName === ondoubleclick
+    if(couldByDblClick) {
+      return 'dblclick'
+    }
+
+    return eventName.slice(2, eventName.length)
+  }
+
+  return eventName
 }

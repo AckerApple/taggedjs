@@ -1,5 +1,5 @@
 import { processTagArray } from './processTagArray.js'
-import { TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
+import { SupportTagGlobal, TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
 import { RegularValue } from './processRegularValue.function.js'
 import { newSupportByTemplater, processNewTag, processTag, tagFakeTemplater } from './processTag.function.js'
 import { AnySupport } from '../Support.class.js'
@@ -8,7 +8,6 @@ import { TemplateValue } from './processFirstSubject.utils.js'
 import { renderTagOnly } from '../render/renderTagOnly.function.js'
 import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js'
 import { oneRenderToSupport } from './oneRenderToSupport.function.js'
-import { getValueType } from '../getValueType.function.js'
 import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function.js'
 import { processFirstSubjectComponent, processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
@@ -20,7 +19,7 @@ export function processFirstSubjectValue(
   counts: Counts, // {added:0, removed:0}
   appendTo?: Element,
 ): AnySupport | undefined {
-  const valueType = subject.global.nowValueType = getValueType(value)
+  const valueType = subject.global.nowValueType
 
   switch (valueType) {
     case ValueTypes.subject: {
@@ -60,7 +59,8 @@ export function processFirstSubjectValue(
         )
       }
 
-      subject.global.newest = newSupportByTemplater(templater, ownerSupport, subject)
+      const global = subject.global as SupportTagGlobal
+      global.newest = newSupportByTemplater(templater, ownerSupport, subject)
 
       return processTag(
         ownerSupport,

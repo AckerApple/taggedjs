@@ -1,5 +1,6 @@
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
 import { Support } from '../tag/Support.class.js'
+import { SupportTagGlobal } from '../tag/TemplaterResult.class.js'
 import { setUse } from'./setUse.function.js'
 import { state } from'./state.function.js'
 
@@ -59,7 +60,7 @@ export const providers = {
       }
 
       stateDiffMemory.provider = provider
-      const global = support.subject.global
+      const global = support.subject.global as SupportTagGlobal
       const providers = global.providers = global.providers || []
       providers.push(provider)
       stateDiffMemory.stateDiff = stateDiff
@@ -93,7 +94,8 @@ export const providers = {
       } as Support
     
       while(owner.ownerSupport) {
-        const ownerProviders = owner.ownerSupport.subject.global.providers
+        const ownGlobal = owner.ownerSupport.subject.global as SupportTagGlobal
+        const ownerProviders = ownGlobal.providers
   
         if(!ownerProviders) continue
 
@@ -107,7 +109,7 @@ export const providers = {
         })
 
         if(provider) {
-          const global = support.subject.global
+          const global = support.subject.global as SupportTagGlobal
           const providers = global.providers = global.providers || []
           providers.push(provider)
           provider.children.push(support)

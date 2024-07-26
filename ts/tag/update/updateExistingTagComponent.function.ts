@@ -4,7 +4,7 @@ import { renderSupport } from'../render/renderSupport.function.js'
 import { castProps, isSkipPropValue } from'../../alterProp.function.js'
 import { isLikeTags } from'../isLikeTags.function.js'
 import { Props } from '../../Props.js'
-import { TemplaterResult } from '../TemplaterResult.class.js'
+import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { ContextItem } from '../Tag.class.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
@@ -16,7 +16,8 @@ export function updateExistingTagComponent(
   support: AnySupport, // lastest
   subject: ContextItem,
 ): {subject: ContextItem, support: Support | BaseSupport, rendered: boolean} {
-  const lastSupport = subject.global.newest as BaseSupport | Support
+  const global = subject.global as SupportTagGlobal
+  const lastSupport = global.newest
   
   const oldWrapper = lastSupport.templater.wrapper
   const newWrapper = support.templater.wrapper
@@ -62,8 +63,8 @@ export function updateExistingTagComponent(
     return {subject, rendered: false, support: lastSupport}
   }
 
-  if(subject.global.locked) {
-    subject.global.blocked.push(support)
+  if(global.locked) {
+    global.blocked.push(support)
     return {subject, support, rendered: false}
   }
 
@@ -74,12 +75,13 @@ export function updateExistingTagComponent(
 
 export function syncFunctionProps(
   newSupport: AnySupport,
-  lastSupport: Support,
+  lastSupport: AnySupport,
   ownerSupport: BaseSupport | Support,
   newPropsArray: any[], // templater.props
   depth = -1
 ): Props {
-  const newest = lastSupport.subject.global.newest as Support
+  const global = lastSupport.subject.global as SupportTagGlobal
+  const newest = global.newest
 
   if(!newest) {
     const castedProps = castProps(
@@ -134,7 +136,7 @@ function syncPriorPropFunction(
       return prop
     }
 
-    const ownerGlobal = ownerSupport.subject.global
+    const ownerGlobal = ownerSupport.subject.global as SupportTagGlobal
     const newest = ownerGlobal.newest as Support
     const oldOwnerState = newest.state
 
@@ -208,7 +210,7 @@ export function moveProviders(
   lastSupport: Support,
   newSupport: AnySupport,
 ) {
-  const global = lastSupport.subject.global
+  const global = lastSupport.subject.global as SupportTagGlobal
   let pIndex = -1
   const providers = global.providers = global.providers || []
 
@@ -261,12 +263,13 @@ function swapTags(
   templater: TemplaterResult,
   ownerSupport: AnySupport
 ) {
-  const global = subject.global
+  const global = subject.global as SupportTagGlobal
   const oldestSupport = global.oldest as Support
   destroySupport(oldestSupport, 0)
   
   subject.global = getNewGlobal()
   subject.global.placeholder = global.placeholder
+  subject.global.lastValueType = global.nowValueType
 
   const newSupport = processReplacementComponent(
     templater,

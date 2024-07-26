@@ -1,18 +1,17 @@
 import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
 import { ValueSubject } from '../../subject/ValueSubject.js'
-import { getTemplaterResult, TemplaterResult } from '../TemplaterResult.class.js'
+import { getTemplaterResult, SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { AnySupport, getSupport, Support } from '../Support.class.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
-import { getValueType } from '../getValueType.function.js'
 
 export function processNewArrayValue(
   value: TemplateValue | ValueSubject<any>,
   ownerSupport: AnySupport,
   contextItem: ContextItem,
 ): ContextItem {
-  const valueType = getValueType(value)
-  contextItem.global.nowValueType = valueType
+  // const valueType = getValueType(value)
+  const valueType = contextItem.global.nowValueType
 
   switch (valueType) {
     case ValueTypes.stateRender:
@@ -51,7 +50,7 @@ function processNewTag(
     tag.templater = templater
   }
 
-  const global = contextItem.global
+  const global = contextItem.global as SupportTagGlobal
   const newest = global.newest = getSupport(
     templater,
     ownerSupport,
@@ -60,7 +59,6 @@ function processNewTag(
   )
 
   global.oldest = newest
-  // ownerSupport.subject.global.childTags.push(newest)
 
   return contextItem
 }

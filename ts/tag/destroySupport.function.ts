@@ -3,24 +3,14 @@ import { getChildTagsToDestroy } from './destroy.support.js'
 import { AnySupport, destroySubs, Support } from './Support.class.js'
 import { smartRemoveKids } from './smartRemoveKids.function.js'
 import { Context } from './Tag.class.js'
+import { SupportTagGlobal } from './TemplaterResult.class.js'
 
 export function destroySupport(
   support: AnySupport,
   stagger: number,
 ): number | Promise<number> {
-  const global = support.subject.global
+  const global = support.subject.global as SupportTagGlobal
   const subs = getChildTagsToDestroy(global.context as Context)
-
-  /*
-  const ownerSupport = (support as unknown as Support).ownerSupport
-  if(ownerSupport) {
-    const ownGlobal = ownerSupport.subject.global
-    // remove myself from parent
-    ownGlobal.childTags = ownGlobal.childTags.filter(
-      child => child.subject.global !== support.subject.global
-    )
-  }
-  */
 
   global.destroy$.next()
   runBeforeDestroy(support, support)

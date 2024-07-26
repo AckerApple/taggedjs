@@ -2,6 +2,7 @@ import { AnySupport, BaseSupport, Support } from './Support.class.js'
 import { setUse } from'../state/index.js'
 import { Subject } from'../subject/index.js'
 import { getSupportInCycle } from'./getSupportInCycle.function.js'
+import { SupportTagGlobal } from './TemplaterResult.class.js'
 
 // Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
 setUse.memory.tagClosed$ = new Subject<Support>(undefined, subscription => {
@@ -57,7 +58,7 @@ export function runBeforeDestroy(
 
   // remove me from my parents
   if(ownerSupport) {
-    const global = support.subject.global
+    const global = support.subject.global as SupportTagGlobal
     const providers = global.providers
     if(providers) {
       for(const provider of providers ) {

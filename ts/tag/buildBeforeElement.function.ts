@@ -1,15 +1,17 @@
 import { ParsedHtml } from '../interpolations/optimizers/htmlInterpolationToDomMeta.function.js'
-import { attachDomElement } from '../interpolations/optimizers/metaAttachDomElements.function.js'
+import { attachDomElements } from '../interpolations/optimizers/attachDomElements.function.js'
 import { getDomMeta } from './domMetaCollector.js'
 import { DomMetaMap } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
 import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js'
 import { painting } from './paint.function.js'
 import { AnySupport } from './Support.class.js'
-import { buildSupportContext } from './buildSupportContext.function.js'
 import { processAttributeEmit, processNameOnlyAttrValue } from '../interpolations/attributes/processAttribute.function.js'
-import { Context, DomTag, StringTag } from './Tag.class.js'
+import { Context, ContextItem, DomTag, StringTag } from './Tag.class.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 import { ValueTypes } from './ValueTypes.enum.js'
+import { SupportTagGlobal } from './TemplaterResult.class.js'
+import { getValueType } from './getValueType.function.js'
+import { getNewGlobal } from './update/getNewGlobal.function.js'
 
 /** Function that kicks off actually putting tags down as HTML elements */
 export function buildBeforeElement(
@@ -17,7 +19,7 @@ export function buildBeforeElement(
   element?: Element,
   options?: ElementBuildOptions,
 ) {
-  const global = support.subject.global
+  const global = support.subject.global as SupportTagGlobal
 
   global.oldest = support
   global.newest = support
@@ -39,16 +41,24 @@ function getHtmlDomMeta(
   appendTo?: Element,
 ) {
   const domMeta = loadDomMeta(support)
-  const context = buildSupportContext(support)
-  const result = attachDomElement(
+  const thisTag = support.templater.tag as StringTag | DomTag
+  const values = thisTag.values
+  const context: Context = []
+
+  const global = support.subject.global as SupportTagGlobal
+  global.context = context
+
+  const result = attachDomElements(
     domMeta,
-    context,
+    values,
     support,
     options.counts,
+    context,
     appendTo,
   )
 
-  processContext(support, context)
+  // const context = global.context = result.context
+  // processContext(support, context)
       
   return result
 }
@@ -76,19 +86,16 @@ function processContext(
   while (index < len) {
     const contextItem = context[index]
     const value = values[index] as any
+    const global = contextItem.global
+    const nowValueType = global.nowValueType // = getValueType(value)
 
-    processOneContext(
+    runOneContext(
+      value,
       values,
       index,
       context,
       support,
     )
-
-    contextItem.value = value
-    contextItem.global.lastValue = value
-    if(!contextItem.global.locked) {
-      ++contextItem.global.renderCount
-    }
     
     ++index
   }
@@ -96,28 +103,61 @@ function processContext(
   return context
 }
 
-/** returns boolean of did render */
-function processOneContext(
+export function runOneContext(
+  value: unknown,
   values: unknown[],
   index: number,
   context: Context,
   ownerSupport: AnySupport,
-): boolean {
-  const value = values[index] as any
+): ContextItem {
+  const global = getNewGlobal()
+  const contextItem: ContextItem = {
+    global
+  }
 
-  // is something already there?
-  const contextItem = context[index]
-  const global = context[index].global
+  context.push(contextItem)
+  const nowValueType = global.nowValueType = getValueType(value)
+
+  processOneContext(
+    values,
+    values[index],
+    contextItem,
+    context,
+    ownerSupport,
+  )
+
+  contextItem.value = value
+  global.lastValueType = nowValueType
+
+
+  if(!contextItem.global.locked) {
+    ++contextItem.global.renderCount
+  }
+
+  return contextItem
+}
+
+/** returns boolean of did render */
+function processOneContext(
+  values: unknown[],
+  value: unknown,
+  contextItem: ContextItem,
+  context: Context,
+  ownerSupport: AnySupport,
+): boolean {
+  const global = contextItem.global
 
   if(global.isAttr) {
     // global.newest = ownerSupport
     if(global.isNameOnly) {
       processNameOnlyAttrValue(
-        value,
-        contextItem.global.lastValue,
+        values,
+        value as any,
+        contextItem.value,
         global.element as Element,
         ownerSupport,
         global.howToSet as HowToSet,
+        context,
       )
 
       return false

@@ -18,7 +18,7 @@ export function updateBeforeTemplate(
 }
 
 type TextableValue = string | boolean | number | NoDisplayValue
-const negatives = [undefined,false,null]
+export const negatives = [undefined,false,null]
 export function castTextValue(
   value: TextableValue
 ) {

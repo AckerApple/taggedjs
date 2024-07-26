@@ -1,9 +1,10 @@
 import { Props } from '../Props.js'
-import { ContextItem } from './Tag.class.js'
+import { ContextItem, EventCallback, EventMem } from './Tag.class.js'
 import { State } from '../state/index.js'
-import { TemplaterResult } from './TemplaterResult.class.js'
+import { Events, SupportTagGlobal, TemplaterResult } from './TemplaterResult.class.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { clonePropsBy } from './clonePropsBy.function.js'
+import { Subject } from '../subject/Subject.class.js'
 
 export type AnySupport = (BaseSupport & {
 })
@@ -42,66 +43,20 @@ export function getBaseSupport(
 
     appSupport: undefined as any as BaseSupport,
   } as BaseSupport
+  
+  baseSupport.appSupport = baseSupport
 
-  ;(baseSupport as any).appSupport = baseSupport
+  const global = subject.global as SupportTagGlobal
+  global.blocked = []
+  global.destroy$ = new Subject<void>()
 
   const props = templater.props  // natural props
-
-  if(!props) {
-    return baseSupport
+  if(props) {
+    baseSupport.propsConfig = clonePropsBy(baseSupport, props, castedProps)
   }
 
-  baseSupport.propsConfig = clonePropsBy(baseSupport, props, castedProps)
   return baseSupport
 }
-/*
-  addEventListener(
-    eventName: string,
-    element: Element,
-    callback: EventCallback,
-) {
-    const elm = this.appElement as Element
-    const newEventName = eventName.slice(2, eventName.length)
-
-    const global = this.subject.global
-    const events = global.events = global.events || {}
-    
-    if(!events[newEventName]) {
-      const eventArray = events[newEventName] = [] as EventMem[]
-      elm.addEventListener(newEventName, event => this.findListenerFor(event, eventArray, element, elm))
-    }
-
-    const eventArray = events[newEventName]
-
-    const found = eventArray.find(x => x.elm === element)
-
-    if(found) {
-      found.callback = callback
-      return
-    }
-
-    eventArray.push({elm: element, callback})
-  }
-
-  findListenerFor(
-    event: Event,
-    eventArray: EventMem[],
-    element: Element,
-    appElm: Element,
-  ) {
-    eventArray.find(x => {
-      if(x.elm === event.target) {
-        x.callback(event)
-        return true
-      }
-    })
-
-    const parentNode = element.parentNode
-    if(parentNode && parentNode !== appElm) {
-      this.findListenerFor(event, eventArray, parentNode as Element, appElm)
-    }
-  }
-*/
 
 export type Support = BaseSupport & {
   ownerSupport: AnySupport
@@ -133,4 +88,37 @@ export function destroySubs(
       sub.unsubscribe()
     }
   }, 0)
+}
+
+
+export function addSupportEventListener(
+  support: AnySupport,
+  eventName: string,
+  element: Element,
+  callback: EventCallback,
+) {
+  const elm = support.appElement as Element
+  // const newEventName = eventName.slice(2, eventName.length)
+  const replaceEventName = '_' + eventName
+
+  const global = support.subject.global
+  const eventReg = global.events as Events
+  
+  if(!eventReg[eventName]) {
+    const listener = function eventCallback(event: Event) {
+      const target = event.target
+      const callback = (target as any)[replaceEventName]
+
+      if(!callback) {
+        return
+      }
+
+      callback(event)
+    }
+    eventReg[eventName] = listener
+    elm.addEventListener(eventName, listener)
+  }
+
+  // attach to element but not as "onclick" instead as "_onclick"
+  ;(element as any)[replaceEventName] = callback
 }

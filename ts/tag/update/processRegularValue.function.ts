@@ -1,5 +1,5 @@
 import { castTextValue, updateBeforeTemplate } from'../../updateBeforeTemplate.function.js'
-import { paintContent } from '../paint.function.js'
+import { setContent } from '../paint.function.js'
 import { ContextItem } from '../Tag.class.js'
 
 export type RegularValue = string | number | undefined | boolean
@@ -12,9 +12,7 @@ export function processUpdateRegularValue(
   
   // replace existing string?
   const oldClone = subject.global.simpleValueElm as Text // placeholder
-  paintContent.push(function paintContentPush() {
-    oldClone.textContent = castedValue
-  })
+  setContent.push([castedValue, oldClone])
 }
 
 export function processNewRegularValue(

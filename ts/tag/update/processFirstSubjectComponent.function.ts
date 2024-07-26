@@ -1,4 +1,4 @@
-import { TemplaterResult } from '../TemplaterResult.class.js'
+import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { Counts } from'../../interpolations/interpolateTemplate.js'
 import { processFirstTagResult, processReplaceTagResult } from'./processTagResult.function.js'
 import { BaseSupport, getSupport, PropsConfig, Support } from '../Support.class.js'
@@ -37,9 +37,10 @@ export function processReplacementComponent(
   
   setupNewSupport(newSupport, ownerSupport, subject)
   
+  const global = subject.global as SupportTagGlobal
   const {support} = renderWithSupport(
     newSupport,
-    subject.global.newest, // existing tag
+    global.newest, // existing tag
     subject as ContextItem,
     ownerSupport,
   )
@@ -84,9 +85,11 @@ export function processFirstSubjectComponent(
   
   setupNewSupport(newSupport, ownerSupport, subject)
   
+  const global = subject.global as SupportTagGlobal
+
   const {support} = renderWithSupport(
     newSupport,
-    subject.global.newest, // existing tag
+    global.newest, // existing tag   
     subject as ContextItem,
     ownerSupport,
   )
@@ -96,8 +99,6 @@ export function processFirstSubjectComponent(
     counts,
     appendTo,
   )
-
-  // ownerSupport.subject.global.childTags.push(newSupport as Support)
 
   return support
 }

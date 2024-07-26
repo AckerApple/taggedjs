@@ -5,7 +5,8 @@ import { setUse } from './state/index.js'
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { Props } from './Props.js'
 import { Tag } from './tag/Tag.class.js'
-import { renderExistingTag } from './tag/render/renderExistingTag.function.js'
+import { renderExistingReadyTag } from './tag/render/renderExistingTag.function.js'
+import { SupportTagGlobal } from './tag/TemplaterResult.class.js'
 
 export function castProps(
   props: Props,
@@ -125,7 +126,7 @@ function afterCheckProp(
 ) {
   // restore object to have original function on destroy
   if(depth > 0) {    
-    const global = newSupport.subject.global
+    const global = newSupport.subject.global as SupportTagGlobal
     newProp[index].subscription = global.destroy$.toCallback(() => {
       newProp[index] = originalValue
     })
@@ -165,14 +166,14 @@ export function callbackPropOwner(
   callWith: any,
   ownerSupport: BaseSupport | Support, // <-- WHEN called from alterProp its owner OTHERWISE its previous
 ) {
-  const global = ownerSupport.subject.global
+  const global = ownerSupport.subject.global as SupportTagGlobal
   const newest = global.newest as Support
   const supportInCycle = getSupportInCycle()
   const noCycle = supportInCycle === undefined
   const callbackResult = toCall(...callWith)
 
   const run = () => {
-    const global = newest.subject.global
+    const global = newest.subject.global as SupportTagGlobal
 
     // are we in a rendering cycle? then its being called by alterProps
     if(noCycle === false) {
@@ -205,31 +206,32 @@ export function callbackPropOwner(
 }
 
 export function isSkipPropValue(value: unknown) {
-  return typeof(value)!=='object' || !value || (value as Tag).tagJsType // || isSubjectInstance(value)
+  return typeof(value)!=='object' || !value || (value as Tag).tagJsType
 }
 
 export function safeRenderSupport(
   newest: AnySupport,
   ownerSupport: AnySupport,
 ) {
+  const subject = newest.subject
   const isInline = isInlineHtml(newest.templater)
   if( isInline ) {
     const result = renderInlineHtml(ownerSupport, newest)
-    delete newest.subject.global.locked
+    delete subject.global.locked
     return result
   }
   
+  const global = newest.subject.global as SupportTagGlobal
   // ??? new removed
-  newest.subject.global.locked = true
-  const oldest = newest.subject.global.oldest  
+  global.locked = true
 
-  renderExistingTag(
-    oldest,
+  renderExistingReadyTag(
+    global.newest as Support,
     newest,
-    ownerSupport as Support, // useSupport,
-    newest.subject,
+    ownerSupport,
+    subject,
   )
 
   // ??? new removed
-  delete newest.subject.global.locked
+  delete global.locked
 }

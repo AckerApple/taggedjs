@@ -1,7 +1,7 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
 import { AnySupport, BaseSupport, Support } from '../../tag/Support.class.js'
-import { TagGlobal } from '../../tag/TemplaterResult.class.js'
+import { SupportTagGlobal, TagGlobal } from '../../tag/TemplaterResult.class.js'
 import { updateExistingTagComponent } from '../../tag/update/updateExistingTagComponent.function.js'
 import { getUpTags } from './getUpTags.function.js'
 import { renderTagUpdateArray } from './renderTagArray.function.js'
@@ -14,9 +14,8 @@ export type Callback = (...args: any[]) => any
 export function bindSubjectCallback(
   value: Callback,
   support: AnySupport,
-  attrName: string,
 ) {
-  const global = support.subject.global
+  const global = support.subject.global as SupportTagGlobal
   const subjectFunction = function (
     element: Element, args: any[],
   ) {
@@ -50,7 +49,6 @@ export function runTagCallback(
   const global = tag.subject.global
   global.locked = true // prevent another render from re-rendering this tag
   const callbackResult = value.apply(bindTo, args)
-
   return afterTagCallback(tag, callbackResult)
 }
 
@@ -58,7 +56,7 @@ export function afterTagCallback(
   tag: BaseSupport | Support,
   callbackResult: any,
 ) {
-  const global = tag.subject.global
+  const global = tag.subject.global as SupportTagGlobal
   delete global.locked
   
   const blocked = global.blocked
@@ -117,7 +115,7 @@ export function checkAfterCallbackPromise(
 export function runBlocked(
   tag: BaseSupport | Support,
 ) {
-  const global = tag.subject.global
+  const global = tag.subject.global as SupportTagGlobal
   const blocked = global.blocked
 
   for(const block of blocked) {    

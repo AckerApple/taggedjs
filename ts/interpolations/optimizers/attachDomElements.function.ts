@@ -1,7 +1,7 @@
 // taggedjs-no-compile
 
 import { isSubjectInstance } from "../../isInstance.js"
-import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
+import { paint, paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
 import { BaseSupport, Support } from "../../tag/Support.class.js"
 import { Context, ContextItem } from "../../tag/Tag.class.js"
 import { InterpolateSubject } from "../../tag/update/processFirstSubject.utils.js"
@@ -13,17 +13,20 @@ import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode
 import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
 import { ObjectChildren } from "./exchangeParsedForValues.function.js"
 import { howToSetInputValue } from "../attributes/howToSetInputValue.function.js"
+import { getNewGlobal, runOneContext, SupportTagGlobal } from "../../tag/index.js"
 
 // ??? TODO: This could be done within exchangeParsedForValues to reduce loops
-export function attachDomElement(
+export function attachDomElements(
   nodes: ObjectChildren,
-  scope: Context,
+  values: any[],
   support: BaseSupport | Support,
   counts: Counts, // used for animation stagger computing
+  context: Context,
   owner?: Element,
   subs: SubToTemplateOptions[] = [],
 ): {
-  subs:SubToTemplateOptions[],
+  context: Context
+  subs:SubToTemplateOptions[]
   dom: DomObjectChildren
 } {
   const x = document.createElement('div')
@@ -35,11 +38,13 @@ export function attachDomElement(
 
     const value = node.v as ContextItem
     const isNum = !isNaN(value as unknown as number)
-
+    
     if(isNum) {
+      const subVal = values[ context.length ]
       const marker = document.createTextNode(empty)
-      const subject = scope[ value as unknown as number ]
-      subject.global.placeholder = marker
+      const contextItem = runOneContext(subVal, values, context.length, context, support)
+      const global = contextItem.global as SupportTagGlobal
+      global.placeholder = marker
 
       if(owner) {
         paintAppends.push({
@@ -52,10 +57,7 @@ export function attachDomElement(
           relative: support.subject.global.placeholder as Text,
         })
       }
-      // newNode.marker = marker
-      // delete newNode.marker // delete so that the marker is not destroyed with tag
 
-      const subVal = subject.value
       if(isSubjectInstance(subVal)) {
         subs.push({
           // fragment: owner,
@@ -65,18 +67,23 @@ export function attachDomElement(
           subject: subVal as InterpolateSubject,
           support, // ownerSupport,
           counts,
-          contextItem: subject,
+          contextItem,
         })
         continue
       }
 
+      support.subject.global.locked = true
+      
       processFirstSubjectValue(
-        subject.value,
-        subject,
+        subVal,
+        contextItem,
         support,
         counts,
         owner,
       )
+      paint()
+      delete support.subject.global.locked
+      contextItem.value = subVal
   
       continue
     }
@@ -103,10 +110,12 @@ export function attachDomElement(
     if (node.at) {
       node.at.map(attr =>
         processAttribute(
+          values,
           attr[0], // name
           domElement,
           support,
           howToSetInputValue,
+          context,
           attr[1], // value
           attr[2] as boolean | undefined, // isSpecial
         )
@@ -121,16 +130,17 @@ export function attachDomElement(
     }
 
     if (node.ch) {
-      newNode.ch = attachDomElement(
+      newNode.ch = attachDomElements(
         node.ch,
-        scope,
+        values,
         support,
         counts,
+        context,
         domElement,
         subs,
       ).dom
     }
   }
 
-  return {subs, dom}
+  return {subs, dom, context}
 }

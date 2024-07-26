@@ -1,19 +1,22 @@
 import { AnySupport, PropsConfig, Support } from '../Support.class.js'
 import { deepEqual } from '../../deepFunctions.js'
-import { renderExistingTag } from'./renderExistingTag.function.js'
+import { renderExistingReadyTag } from'./renderExistingTag.function.js'
 import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
-import { TemplaterResult } from '../TemplaterResult.class.js'
+import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 
 export function isInlineHtml(templater: TemplaterResult) {
+  /*
   return !templater.wrapper && templater.tagJsType !== ValueTypes.stateRender
+  */
+  return ValueTypes.templater === templater.tagJsType
 }
 
 /** Main function used by all other callers to render/update display of a tag component */
 export function renderSupport<T extends AnySupport>(
   support: T, // must be latest/newest state render
 ): T {
-  const global = support.subject.global
+  const global = support.subject.global as SupportTagGlobal
   const templater = support.templater
   const inlineHtml = isInlineHtml(templater)
   const ownerSupport = (support as Support).ownerSupport
@@ -31,7 +34,6 @@ export function renderSupport<T extends AnySupport>(
   global.locked = true
 
   const subject = support.subject
-  const oldest = global.oldest
   if(global.blocked.length) {
     support = global.blocked.pop() as T
     global.blocked = []
@@ -39,10 +41,10 @@ export function renderSupport<T extends AnySupport>(
 
   delete global.locked
 
-  const tag = renderExistingTag(
-    oldest,
+  const tag = renderExistingReadyTag(
+    global.newest as Support,
     support,
-    ownerSupport as Support, // useSupport,
+    ownerSupport,
     subject,
   )
 
@@ -53,12 +55,14 @@ export function renderInlineHtml(
   ownerSupport: AnySupport,
   support: AnySupport,
 ) {
-  if(ownerSupport.subject.global.deleted) {
+  const ownGlobal = ownerSupport.subject.global as SupportTagGlobal
+  
+  if(ownGlobal.deleted) {
     return support
   }
 
   // ??? new change
-  const newest = ownerSupport.subject.global.newest || ownerSupport
+  const newest = ownGlobal.newest || ownerSupport
   const result = renderSupport(newest as Support)
 
   return result

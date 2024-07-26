@@ -1,6 +1,6 @@
 import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
 import { AnySupport, BaseSupport, getSupport, Support } from '../Support.class.js'
-import { TemplaterResult } from '../TemplaterResult.class.js'
+import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { paintAppends, paintInsertBefores } from '../paint.function.js'
 import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
@@ -14,11 +14,10 @@ export function processTag(
   ownerSupport: AnySupport, // owner
   subject: ContextItem, // could be tag via result.tag
 ): Support {
-  const support = subject.global.newest as Support
+  const global = subject.global as SupportTagGlobal
+  const support = global.newest as Support
   support.ownerSupport = ownerSupport
   
-  let appendIndex = paintInsertBefores.length
-
   const result = buildBeforeElement(support, undefined, {counts: {added:0, removed:0}})
   const ph = subject.global.placeholder as Text
 
@@ -76,6 +75,9 @@ export function newSupportByTemplater(
     subject,
   )
 
+  const global = subject.global as SupportTagGlobal
+  global.context = []
+
   setupNewSupport(support, ownerSupport, subject)
 
   return support
@@ -87,8 +89,9 @@ export function setupNewSupport(
   subject: ContextItem,
 ) {
   support.subject = subject
-  subject.global.oldest = support
-  subject.global.newest = support
+  const global = subject.global as SupportTagGlobal
+  global.oldest = support
+  global.newest = support
 
   // asking me to render will cause my parent to render
   support.ownerSupport = ownerSupport

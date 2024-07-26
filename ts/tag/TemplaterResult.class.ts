@@ -1,4 +1,4 @@
-import { Context, StringTag, DomTag, ContextItem, EventMem } from './Tag.class.js'
+import { Context, StringTag, DomTag, ContextItem, EventCallback } from './Tag.class.js'
 import { BaseSupport, Support } from './Support.class.js'
 import { Props } from '../Props.js'
 import { TagWrapper } from './tag.utils.js'
@@ -31,18 +31,11 @@ export type TagGlobal = {
   isSpecial?: boolean
 
   nowValueType?: ImmutableTypes | ValueType | BasicTypes
+  lastValueType?: ImmutableTypes | ValueType | BasicTypes
+  // TODO: I think we should remove this
   lastValue?: any
-  
-  destroy$: Subject<any>
 
   // SUPPORTS
-  oldest: BaseSupport | Support
-  newest?: BaseSupport | Support
-  context?: Context // populated after reading interpolated.values array converted to an object {variable0, variable:1}
-  providers?: Provider[]
-  destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
-  init?: OnInitCallback // what to run when init complete, used for onInit
-  // childTags: Support[], // tags on me
   htmlDomMeta?: DomObjectChildren
   
   /** Indicator of re-rending. Saves from double rending something already rendered */
@@ -55,16 +48,31 @@ export type TagGlobal = {
   placeholder?: Text // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
 
   subscriptions?: Subscription<any>[] // subscriptions created by clones
-  
+
+  destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
   
   locked?: true
-  blocked: (BaseSupport | Support)[], // renders that did not occur because an event was processing
   
   callbackMaker?: true
   simpleValueElm?: Clone
-
+  
   // only appears on app
-  events?: {[name: string]: EventMem[]}
+  events?: Events
+}
+
+export type SupportTagGlobal = TagGlobal & {
+  destroy$: Subject<any>
+  blocked: (BaseSupport | Support)[], // renders that did not occur because an event was processing
+  oldest: BaseSupport | Support
+  newest: BaseSupport | Support
+  context: Context // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+  
+  init?: OnInitCallback // what to run when init complete, used for onInit
+  providers?: Provider[]
+}
+
+export type Events = {
+  [name: string]: EventCallback
 }
 
 export type Clone = (Element | Text | ChildNode)

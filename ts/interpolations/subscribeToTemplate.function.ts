@@ -29,6 +29,8 @@ export function subscribeToTemplate({
   let onValue = function onSubValue(value: TemplateValue) {
     const templater = value as TemplaterResult
 
+    const nowValueType = contextItem.global.nowValueType = getValueType(value)
+
     processFirstSubjectValue(
       templater,
       contextItem,
@@ -37,14 +39,14 @@ export function subscribeToTemplate({
       syncRun ? appendTo : undefined,
     )
 
-    contextItem.global.lastValue = value
+    contextItem.global.lastValueType = nowValueType
 
     if(!syncRun && !setUse.memory.stateConfig.support) {
       paint()
     }
 
     // from now on just run update
-    onValue = (value: TemplateValue) => {
+    onValue = function subscriptionUpdate(value: TemplateValue) {
       if(value === contextItem.value) {
         return false // same value emitted
       }
@@ -58,7 +60,7 @@ export function subscribeToTemplate({
         support,
       )
       
-      contextItem.global.lastValue = value
+      contextItem.global.lastValueType = valueType
 
       if(!setUse.memory.stateConfig.support) {
         paint()

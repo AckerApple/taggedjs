@@ -7,48 +7,43 @@ import { processTagCallbackFun } from './processAttribute.function.js'
 import { ContextItem } from '../../tag/Tag.class.js'
 import { AnySupport } from '../../tag/Support.class.js'
 
-export function processNameValueAttribute(
+export function processDynamicNameValueAttribute(
   attrName: string,
-  value: any,
+  value: any | TagGlobal,
+  contextItem: ContextItem,
   element: Element,
   howToSet: HowToSet,
   support: AnySupport,
   isSpecial?: boolean
 ) {
-  const global = value?.global as TagGlobal
-  
+  const global = contextItem.global
+  const isFun = value instanceof Function
+  global.attrName = attrName
+  global.element = element
+  global.howToSet = howToSet
+
+  if(isFun) {
+    return processTagCallbackFun(
+      contextItem,
+      value,
+      support,
+      attrName,
+      element,
+    )
+  }
+
+  // TODO: enhance this condition
   if(global) {
-    const contextItem = value as ContextItem
-    const isFun = contextItem.value instanceof Function
     global.attrName = attrName
     global.element = element
     global.howToSet = howToSet
-  
-    if(isFun) {
-      return processTagCallbackFun(
-        contextItem,
-        contextItem.value,
-        support,
-        attrName,
-        element,
-      )
-    }
-
-    value = value.value
-
-    // TODO: enhance this condition
-    if(global) {
-      global.attrName = attrName
-      global.element = element
-      global.howToSet = howToSet
-      global.isSpecial = isSpecial // isSpecialAttr(attrName)
-    }
+    global.isSpecial = isSpecial // isSpecialAttr(attrName)
   }
 
   return processNonDynamicAttr(attrName, value, element, howToSet, isSpecial)
 }
 
-function processNonDynamicAttr(
+export function processNonDynamicAttr(
   attrName: string,
   value: string,
   element: Element,

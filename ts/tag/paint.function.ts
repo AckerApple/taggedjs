@@ -5,6 +5,7 @@ type PaintAppend = {
 
 export let paintRemoves = [] as (Element | Text | ChildNode)[]
 export let paintContent: (() => any)[] = []
+export let setContent: [string, Text][] = []
 export let paintAppends: PaintAppend[] = []
 export let paintInsertBefores: PaintAppend[] = []
 export let paintAfters: (() => any)[] = []
@@ -29,13 +30,16 @@ export function paint() {
     content()
   }
 
+  for(const [text, textNode] of setContent) {
+    textNode.textContent = text
+  }
+
   for(const now of paintAppends) {
     now.relative.appendChild(now.element)
   }
 
-  for(const now of paintInsertBefores) {
-    const parentNode = now.relative.parentNode as ParentNode
-    parentNode.insertBefore(now.element, now.relative)
+  for(const { element, relative } of paintInsertBefores) {
+    (relative.parentNode as ParentNode).insertBefore(element, relative)
   }
 
   for(const now of paintAfters) {
@@ -47,5 +51,6 @@ export function paint() {
   paintAppends = []
   paintInsertBefores = []
   paintAfters = []
+  setContent = []
   --painting.locks
 }

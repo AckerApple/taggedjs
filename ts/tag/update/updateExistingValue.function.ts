@@ -1,5 +1,5 @@
 import { BaseSupport, getSupport, Support } from '../Support.class.js'
-import { TemplaterResult } from '../TemplaterResult.class.js'
+import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { isTagTemplater } from '../../isInstance.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { processTagArray } from './processTagArray.js'
@@ -36,7 +36,8 @@ export function updateExistingValue(
   }
   
   // was component but no longer
-  const support = subject.global.newest
+  const global = subject.global as SupportTagGlobal
+  const support = global.newest
   if( support ) {
     const oneRender = [BasicTypes.function, ValueTypes.oneRender].includes(valueType as ValueType | BasicTypes)
     if(oneRender) {
@@ -94,15 +95,15 @@ export function updateExistingValue(
         templater.tag = tag
       }
 
-      subject.global.newest = newSupportByTemplater(templater, ownerSupport, subject)
+      global.newest = newSupportByTemplater(templater, ownerSupport, subject)
   
       processTag(
         ownerSupport,
         subject,
       )
 
-      if(!subject.global.locked) {
-        ++subject.global.renderCount
+      if(!global.locked) {
+        ++global.renderCount
       }
     
       return {subject, rendered: true}
@@ -137,7 +138,8 @@ function handleStillTag(
   value: StringTag | TemplateValue,
   ownerSupport: BaseSupport | Support,
 ) {
-  const lastSupport = subject.global.newest as Support
+  const global = subject.global as SupportTagGlobal
+  const lastSupport = global.newest
   const templater = (value as Tag).templater || value
 
   const valueSupport = getSupport(
@@ -151,7 +153,8 @@ function handleStillTag(
     setupNewSupport(valueSupport, ownerSupport, subject)
   }
 
-  updateSupportBy(lastSupport.subject.global.oldest, valueSupport)
+  const newGlobal = lastSupport.subject.global as SupportTagGlobal
+  updateSupportBy(newGlobal.oldest, valueSupport)
 }
 
 function prepareUpdateToComponent(
@@ -159,8 +162,9 @@ function prepareUpdateToComponent(
   contextItem: ContextItem,
   ownerSupport: BaseSupport | Support,
 ): {subject: ContextItem, rendered: boolean} {
+  const global = contextItem.global as SupportTagGlobal
   // When last value was not a component
-  if(!contextItem.global.newest) {
+  if(!global.newest) {
     processReplacementComponent(
       templater,
       contextItem,

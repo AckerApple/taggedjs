@@ -1,9 +1,9 @@
 import { BaseSupport, getBaseSupport, Support } from './Support.class.js'
 import { runAfterRender, runBeforeRender } from'./tagRunner.js'
-import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
+import { Events, SupportTagGlobal, TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { Original, TagComponent, TagMaker} from './tag.utils.js'
 import { ValueTypes } from './ValueTypes.enum.js'
-import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
+import { DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { paint, painting } from './paint.function.js'
 import { ContextItem } from './Tag.class.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
@@ -45,12 +45,19 @@ export function tagElement(
   const placeholder = document.createTextNode('')
   const support = runWrapper(wrapper, placeholder, element)
   const subject = support.subject
-  const global = subject.global
+  const global = subject.global as SupportTagGlobal
   
   global.isApp = true
   
   // enables hmr destroy so it can control entire app
   ;(element as any).destroy = function() {
+    const events = global.events as Events
+    for (const eventName in events) {
+      const callback = events[eventName]
+      element.removeEventListener(eventName, callback)
+    }
+    global.events = {}
+
     destroySupport(support, 0) // never return anything here
   }
   
@@ -60,8 +67,8 @@ export function tagElement(
 
   const result = buildBeforeElement(support, element)
 
-  subject.global.oldest = support
-  subject.global.newest = support
+  global.oldest = support
+  global.newest = support
   
   let setUse = (wrapper as any).setUse
   
@@ -105,7 +112,8 @@ export function runWrapper(
   placeholder: Text,
   appElement: Element,
 ) {
-  const global = getNewGlobal()
+  const global = getNewGlobal() as SupportTagGlobal
+  global.events = {}
 
   const subject: ContextItem = {
     value: templater,
@@ -151,12 +159,6 @@ export function runWrapper(
   runAfterRender(newSupport, nowSupport)
 
   return nowSupport
-}
-
-function putDomDown(
-  dom: DomObjectChildren,
-  newFragment: DocumentFragment,
-) {
 }
 
 function putOneDomDown(
