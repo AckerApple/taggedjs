@@ -46,7 +46,7 @@ export function processAttribute(
       support
     )
     
-    const global = contextItem.global as TagGlobal
+    const global = contextItem.global as any
     global.isAttr = true
     global.element = element
 
@@ -67,7 +67,7 @@ export function processAttribute(
   const valueVar = getTagJsVar(value)
   if(valueVar >= 0) {
     const value = values[valueVar]
-    const global = getNewGlobal()
+    const global = getNewGlobal() as any
     global.isAttr = true
     global.element = element
     global.attrName = attrName as string
@@ -119,7 +119,7 @@ function processNameOnlyAttr(
   howToSet: HowToSet,
   context: Context,
 ) {
-  const global = contextValue.global as TagGlobal
+  const global = contextValue.global as any
   global.element = element
   global.howToSet = howToSet
   global.isNameOnly = true

@@ -49,7 +49,7 @@ export function processUpdateOneContext(
     return false // emits on its own
   }
 
-  const global = contextItem.global as TagGlobal
+  const global = contextItem.global as any
   if(global.isAttr) {
     return processUpdateAttrContext(
       values, value, contextItem, ownerSupport
@@ -74,7 +74,7 @@ function processUpdateAttrContext(
   contextItem: ContextItem,
   ownerSupport: AnySupport,
 ) {
-  const global = contextItem.global as TagGlobal
+  const global = contextItem.global as any
   if(global.isNameOnly) {
     processNameOnlyAttrValue(
       values,

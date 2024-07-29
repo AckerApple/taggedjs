@@ -23,13 +23,6 @@ export type Wrapper = ((
 }
 
 export type TagGlobal = {
-  isAttr?: true
-  element?: Element
-  howToSet?: HowToSet
-  isNameOnly?: boolean
-  attrName?: string
-  isSpecial?: boolean
-
   // SUPPORTS
   htmlDomMeta?: DomObjectChildren
   

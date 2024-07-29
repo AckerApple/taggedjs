@@ -16,7 +16,7 @@ export function processDynamicNameValueAttribute(
   support: AnySupport,
   isSpecial?: boolean
 ) {
-  const global = contextItem.global as TagGlobal
+  const global = contextItem.global as any
   const isFun = value instanceof Function
   global.attrName = attrName
   global.element = element

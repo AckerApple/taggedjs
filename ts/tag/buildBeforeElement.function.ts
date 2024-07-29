@@ -109,7 +109,7 @@ function processOneContext(
   context: Context,
   ownerSupport: AnySupport,
 ): boolean {
-  const global = contextItem.global as TagGlobal
+  const global = contextItem.global as any
 
   if(global.isAttr) {
     // global.newest = ownerSupport
