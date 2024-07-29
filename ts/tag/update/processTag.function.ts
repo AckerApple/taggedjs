@@ -19,7 +19,7 @@ export function processTag(
   support.ownerSupport = ownerSupport
   
   const result = buildBeforeElement(support, undefined, {counts: {added:0, removed:0}})
-  const ph = subject.global.placeholder as Text
+  const ph = subject.placeholder as Text
 
   for(const dom of result.dom) {
     if(dom.marker) {

@@ -12,7 +12,8 @@ export function smartRemoveKids(
   stagger: number,
 ) {
   const startStagger = stagger
-  const thisGlobal = support.subject.global as SupportTagGlobal
+  const subject = support.subject
+  const thisGlobal = subject.global as SupportTagGlobal
   const htmlDomMeta = thisGlobal.htmlDomMeta as DomObjectChildren
   const context = thisGlobal.context as ContextItem[]
 
@@ -52,9 +53,9 @@ export function smartRemoveKids(
     }
 
     // regular values, no placeholders
-    const elm = global.simpleValueElm
+    const elm = subject.simpleValueElm
     if(elm) {
-      delete global.simpleValueElm    
+      delete subject.simpleValueElm    
       paintRemoves.push(elm)
     }
 

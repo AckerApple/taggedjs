@@ -1,5 +1,5 @@
-import { BaseSupport, getSupport, Support } from '../Support.class.js'
-import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import { AnySupport, BaseSupport, getSupport, Support } from '../Support.class.js'
+import { SupportTagGlobal, TagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { isTagTemplater } from '../../isInstance.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { processTagArray } from './processTagArray.js'
@@ -19,98 +19,109 @@ export function updateExistingValue(
   value: TemplateValue,
   ownerSupport: BaseSupport | Support,
 ): {subject: ContextItem, rendered: boolean} {
-  const valueType = subject.global.nowValueType as ValueType | BasicTypes | ImmutableTypes
-
-  const wasDestroyed = checkDestroyPrevious(
-    subject, value, valueType
-  )
+  const global = subject.global as SupportTagGlobal
+  const wasDestroyed = checkDestroyPrevious(subject, value)
 
   // handle already seen tag components
-  const isStateTag = tagTypes.includes(valueType as ValueType)
-  if(isStateTag) {
-    return prepareUpdateToComponent(
-      value as TemplaterResult,
-      subject as ContextItem,
-      ownerSupport,
-    )
+  const tagJsType = value && (value as any).tagJsType as ValueType
+  if(tagJsType) {
+    const isStateTag = tagTypes.includes(tagJsType)
+    if(isStateTag) {
+      return prepareUpdateToComponent(
+        value as TemplaterResult,
+        subject as ContextItem,
+        ownerSupport,
+      )
+    }
+
+    if(tagJsType === ValueTypes.oneRender) {
+      return {subject, rendered: false} // its a oneRender tag
+    }
   }
   
   // was component but no longer
-  const global = subject.global as SupportTagGlobal
-  const support = global.newest
+  const global2 = subject.global as SupportTagGlobal
+  const support = global2.newest
   if( support ) {
-    const oneRender = [BasicTypes.function, ValueTypes.oneRender].includes(valueType as ValueType | BasicTypes)
-    if(oneRender) {
+    if(value instanceof Function) {
       return {subject, rendered: false} // its a oneRender tag
     }
 
     handleStillTag(
+      support,
       subject as ContextItem,
       value as TemplaterResult,
       ownerSupport
     )
 
-    if(!subject.global.locked) {
-      ++subject.global.renderCount
+    const global0 = subject.global as TagGlobal
+    if(!global0.locked) {
+      ++global0.renderCount
     }
   
     return {subject, rendered: true}
   }
 
-  switch (valueType) {
-    case ValueTypes.tagArray:
-      processTagArray(
-        subject,
-        value as (TemplaterResult | StringTag)[],
-        ownerSupport,
-        {added: 0, removed: 0}
-      )
-
-      if(!subject.global.locked) {
-        ++subject.global.renderCount
-      }
-    
-      return {subject, rendered: true}
-
-    case ValueTypes.templater:
-      processTag(
-        ownerSupport,
-        subject as ContextItem,
-      )
-
-      if(!subject.global.locked) {
-        ++subject.global.renderCount
-      }
-    
-      return {subject, rendered: true}
-    
-    case ValueTypes.tag:
-    case ValueTypes.dom:
-      const tag = value as StringTag | DomTag
-      let templater = tag.templater
+  if(tagJsType) {
+    switch (tagJsType) {
+      case ValueTypes.templater:
+        processTag(
+          ownerSupport,
+          subject as ContextItem,
+        )
   
-      if(!templater) {
-        templater = getFakeTemplater()
-        tag.templater = templater
-        templater.tag = tag
-      }
-
-      global.newest = newSupportByTemplater(templater, ownerSupport, subject)
-  
-      processTag(
-        ownerSupport,
-        subject,
-      )
-
-      if(!global.locked) {
-        ++global.renderCount
-      }
+        const global2 = subject.global as TagGlobal
+        if(!global2.locked) {
+          ++global2.renderCount
+        }
+      
+        return {subject, rendered: true}
+      
+      case ValueTypes.tag:
+      case ValueTypes.dom:
+        const tag = value as StringTag | DomTag
+        let templater = tag.templater
     
-      return {subject, rendered: true}
+        if(!templater) {
+          templater = getFakeTemplater()
+          tag.templater = templater
+          templater.tag = tag
+        }
+  
+        global.newest = newSupportByTemplater(templater, ownerSupport, subject)
+    
+        processTag(
+          ownerSupport,
+          subject,
+        )
+  
+        if(!global.locked) {
+          ++global.renderCount
+        }
+      
+        return {subject, rendered: true}  
+    }
+  }
 
-    case BasicTypes.function:
-      subject.value = value
-      return {subject, rendered: false}
+  if(value instanceof Array) {
+    processTagArray(
+      subject,
+      value as (TemplaterResult | StringTag)[],
+      ownerSupport,
+      {added: 0, removed: 0}
+    )
+
+    const global1 = subject.global as TagGlobal
+    if(!global1.locked) {
+      ++global1.renderCount
+    }
+  
+    return {subject, rendered: true}
+  }
+
+  if(value instanceof Function) {
+    subject.value = value
+    return {subject, rendered: false}
   }
 
   // This will cause all other values to render
@@ -126,20 +137,22 @@ export function updateExistingValue(
     )
   }
 
-  if(subject.global.locked) {
-    ++subject.global.renderCount
+  const global3 = subject.global as TagGlobal
+  if(global3.locked) {
+    ++global3.renderCount
   }
 
   return {subject, rendered: true}
 }
 
 function handleStillTag(
+  lastSupport: AnySupport,
   subject: ContextItem,
   value: StringTag | TemplateValue,
   ownerSupport: BaseSupport | Support,
 ) {
   const global = subject.global as SupportTagGlobal
-  const lastSupport = global.newest
+  // const lastSupport = global.newest
   const templater = (value as Tag).templater || value
 
   const valueSupport = getSupport(
@@ -153,8 +166,21 @@ function handleStillTag(
     setupNewSupport(valueSupport, ownerSupport, subject)
   }
 
-  const newGlobal = lastSupport.subject.global as SupportTagGlobal
-  updateSupportBy(newGlobal.oldest, valueSupport)
+  /*
+  if(!lastSupport) {
+    console.log('lastSupport.subject', {lastSupport, global, value, support})
+    throw new Error('something here')
+  }
+  */
+  const lastSubject = lastSupport.subject as ContextItem
+  const newGlobal = lastSubject.global as SupportTagGlobal
+  const oldest = newGlobal.oldest
+  if(!oldest) {
+    console.log('noooooo oldest', {newGlobal, lastSubject, lastSupport})
+  }
+  if(oldest) {
+    updateSupportBy(oldest, valueSupport)
+  }
 }
 
 function prepareUpdateToComponent(

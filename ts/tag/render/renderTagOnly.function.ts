@@ -13,7 +13,8 @@ export function renderTagOnly(
   subject: ContextItem,
   ownerSupport?: AnySupport,
 ): AnySupport {
-  const oldRenderCount = subject.global.renderCount
+  const global = subject.global as SupportTagGlobal
+  const oldRenderCount = global.renderCount
 
   beforeWithRender(
     newSupport,
@@ -57,11 +58,10 @@ export function renderTagOnly(
 
   runAfterRender(newSupport, ownerSupport)
   
-  const global = subject.global as SupportTagGlobal
   global.newest = reSupport
 
   // When we rendered, only 1 render should have taken place OTHERWISE rendering caused another render and that is the latest instead
-  if(subject.global.renderCount > oldRenderCount + 1) {
+  if(global.renderCount > oldRenderCount + 1) {
     return global.newest as Support
   }
 

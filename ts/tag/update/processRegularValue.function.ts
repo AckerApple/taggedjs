@@ -9,9 +9,7 @@ export function processUpdateRegularValue(
   subject: ContextItem, // could be tag via subject.tag
 ) {
   const castedValue = castTextValue(value)
-  
-  // replace existing string?
-  const oldClone = subject.global.simpleValueElm as Text // placeholder
+  const oldClone = subject.simpleValueElm as Text // placeholder
   setContent.push([castedValue, oldClone])
 }
 
@@ -19,11 +17,11 @@ export function processNewRegularValue(
   value: RegularValue,
   subject: ContextItem, // could be tag via subject.tag
 ) {
-  const before = subject.global.placeholder as Text
+  const before = subject.placeholder as Text
   const castedValue = castTextValue(value)
 
   // Processing of regular values
-  subject.global.simpleValueElm = updateBeforeTemplate(
+  subject.simpleValueElm = updateBeforeTemplate(
     castedValue,
     before,
   )

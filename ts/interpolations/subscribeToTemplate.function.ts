@@ -2,12 +2,11 @@ import { InterpolateSubject, TemplateValue } from '../tag/update/processFirstSub
 import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue.function.js'
 import { updateExistingValue } from '../tag/update/updateExistingValue.function.js'
 import { AnySupport } from '../tag/Support.class.js'
-import { TemplaterResult } from '../tag/TemplaterResult.class.js'
+import { TagGlobal, TemplaterResult } from '../tag/TemplaterResult.class.js'
 import { Counts } from './interpolateTemplate.js'
 import { paint } from '../tag/paint.function.js'
 import { setUse } from '../state/setUse.function.js'
 import { ContextItem } from '../tag/Tag.class.js'
-import { getValueType } from '../tag/getValueType.function.js'
 
 export type SubToTemplateOptions = {
   insertBefore: Text
@@ -29,8 +28,6 @@ export function subscribeToTemplate({
   let onValue = function onSubValue(value: TemplateValue) {
     const templater = value as TemplaterResult
 
-    const nowValueType = contextItem.global.nowValueType = getValueType(value)
-
     processFirstSubjectValue(
       templater,
       contextItem,
@@ -39,7 +36,7 @@ export function subscribeToTemplate({
       syncRun ? appendTo : undefined,
     )
 
-    contextItem.global.lastValueType = nowValueType
+    const global2 = contextItem.global as TagGlobal
 
     if(!syncRun && !setUse.memory.stateConfig.support) {
       paint()
@@ -51,16 +48,11 @@ export function subscribeToTemplate({
         return false // same value emitted
       }
 
-      const valueType = getValueType(value)
-      contextItem.global.nowValueType = valueType
-
       updateExistingValue(
         contextItem,
         value,
         support,
       )
-      
-      contextItem.global.lastValueType = valueType
 
       if(!setUse.memory.stateConfig.support) {
         paint()
@@ -75,7 +67,7 @@ export function subscribeToTemplate({
   const sub = subject.subscribe(callback as any)
   syncRun = false
   
-  const global = support.subject.global
+  const global = support.subject.global as TagGlobal
   const subs = global.subscriptions = global.subscriptions || []
   subs.push(sub)
 }

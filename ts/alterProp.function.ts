@@ -6,7 +6,7 @@ import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { Props } from './Props.js'
 import { Tag } from './tag/Tag.class.js'
 import { renderExistingReadyTag } from './tag/render/renderExistingTag.function.js'
-import { SupportTagGlobal } from './tag/TemplaterResult.class.js'
+import { SupportTagGlobal, TagGlobal } from './tag/TemplaterResult.class.js'
 
 export function castProps(
   props: Props,
@@ -217,7 +217,8 @@ export function safeRenderSupport(
   const isInline = isInlineHtml(newest.templater)
   if( isInline ) {
     const result = renderInlineHtml(ownerSupport, newest)
-    delete subject.global.locked
+    const global = subject.global as TagGlobal
+    delete global.locked
     return result
   }
   

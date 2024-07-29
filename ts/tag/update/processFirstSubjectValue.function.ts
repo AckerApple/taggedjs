@@ -1,12 +1,12 @@
 import { processTagArray } from './processTagArray.js'
-import { SupportTagGlobal, TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
+import { SupportTagGlobal, TagGlobal, TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
 import { RegularValue } from './processRegularValue.function.js'
 import { newSupportByTemplater, processNewTag, processTag, tagFakeTemplater } from './processTag.function.js'
 import { AnySupport } from '../Support.class.js'
 import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { renderTagOnly } from '../render/renderTagOnly.function.js'
-import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js'
+import { BasicTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { oneRenderToSupport } from './oneRenderToSupport.function.js'
 import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function.js'
 import { processFirstSubjectComponent, processReplacementComponent } from './processFirstSubjectComponent.function.js'
@@ -19,91 +19,74 @@ export function processFirstSubjectValue(
   counts: Counts, // {added:0, removed:0}
   appendTo?: Element,
 ): AnySupport | undefined {
-  const valueType = subject.global.nowValueType
-
-  switch (valueType) {
-    case ValueTypes.subject: {
-      return
-    }
-    
-    case ValueTypes.templater:
-      if(appendTo) {
-        return processNewTag(
-          value as TemplaterResult,
+  const tagJsType = (value as any)?.tagJsType as ValueType
+  if(tagJsType) {
+    switch (tagJsType) {
+      case ValueTypes.templater:
+        if(appendTo) {
+          return processNewTag(
+            value as TemplaterResult,
+            ownerSupport,
+            subject,
+            appendTo,
+          )
+        }
+        
+        return processTag(
           ownerSupport,
           subject,
-          appendTo,
         )
-      }
-      
-      return processTag(
-        ownerSupport,
-        subject,
-      )
 
-    case ValueTypes.dom:
-    case ValueTypes.tag:
-      const tag = value as StringTag | DomTag
-      let templater = tag.templater
-
-      if(!templater) {
-        templater = tagFakeTemplater(tag)
-      }
-
-      if(appendTo) {
-        return processNewTag(
-          templater,
-          ownerSupport,
-          subject as ContextItem,
-          appendTo,
-        )
-      }
-
-      const global = subject.global as SupportTagGlobal
-      global.newest = newSupportByTemplater(templater, ownerSupport, subject)
-
-      return processTag(
-        ownerSupport,
-        subject,
-      )
+      case ValueTypes.dom:
+      case ValueTypes.tag:
+        const tag = value as StringTag | DomTag
+        let templater = tag.templater
   
-    case ValueTypes.tagArray:
-      processTagArray(
-        subject,
-        value as (StringTag | TemplaterResult)[],
-        ownerSupport,
-        counts,
-        appendTo,
-      )
-      return
-    
-    case ValueTypes.stateRender:
-    case ValueTypes.tagComponent:
-      if(appendTo) {
-        const processResult = processFirstSubjectComponent(
+        if(!templater) {
+          templater = tagFakeTemplater(tag)
+        }
+  
+        if(appendTo) {
+          return processNewTag(
+            templater,
+            ownerSupport,
+            subject as ContextItem,
+            appendTo,
+          )
+        }
+  
+        const global = subject.global as SupportTagGlobal
+        global.newest = newSupportByTemplater(templater, ownerSupport, subject)
+  
+        return processTag(
+          ownerSupport,
+          subject,
+        )
+
+      case ValueTypes.stateRender:
+      case ValueTypes.tagComponent:
+        if(appendTo) {
+          const processResult = processFirstSubjectComponent(
+            value as TemplaterResult,
+            subject as ContextItem,
+            ownerSupport,
+            counts,
+            appendTo as Element,
+          )
+          return processResult
+        }
+  
+        const processResult = processReplacementComponent(
           value as TemplaterResult,
           subject as ContextItem,
           ownerSupport,
           counts,
-          appendTo as Element,
         )
         return processResult
-      }
 
-      const processResult = processReplacementComponent(
-        value as TemplaterResult,
-        subject as ContextItem,
-        ownerSupport,
-        counts,
-      )
-      return processResult
-      
-    case BasicTypes.function:
-    case ValueTypes.oneRender:
-      const v = value as Wrapper
-      if(valueType === ValueTypes.oneRender) {
+      case ValueTypes.oneRender:
         const support = oneRenderToSupport(
-          v,
+          value as Wrapper,
           subject as ContextItem,
           ownerSupport,
         )
@@ -120,15 +103,29 @@ export function processFirstSubjectValue(
           ownerSupport,
           subject as ContextItem,
           appendTo as Element,
-        )
-      }
-      break
+        )    
+    }
+  }
+
+  if(value instanceof Array) {
+    processTagArray(
+      subject,
+      value as (StringTag | TemplaterResult)[],
+      ownerSupport,
+      counts,
+      appendTo,
+    )
+    return
+  }
+
+  if(value instanceof Object && 'subscribe' in (value as any)) {
+    return // will be subscribed to for value
   }
 
   processFirstRegularValue(
     value as RegularValue,
     subject,
-    subject.global.placeholder as Text,
+    subject.placeholder as Text,
   )
 }
 
@@ -143,5 +140,5 @@ function processFirstRegularValue(
     insertBefore, // this will be removed
   )
 
-  subject.global.simpleValueElm = clone  
+  subject.simpleValueElm = clone  
 }

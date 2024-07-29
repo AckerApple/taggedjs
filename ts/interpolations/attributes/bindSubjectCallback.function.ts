@@ -46,7 +46,7 @@ export function runTagCallback(
   args: any[],
 ) {
   const tag = support
-  const global = tag.subject.global
+  const global = tag.subject.global as TagGlobal
   global.locked = true // prevent another render from re-rendering this tag
   const callbackResult = value.apply(bindTo, args)
   return afterTagCallback(tag, callbackResult)
@@ -94,14 +94,16 @@ export function checkAfterCallbackPromise(
   global: TagGlobal,
 ) {
   if(callbackResult instanceof Promise) {
-    last.subject.global.locked = true
+    const global0 = last.subject.global as TagGlobal
+    global0.locked = true
 
     return callbackResult.then(() => {
       if(global.deleted) {
         return promiseNoData // tag was deleted during event processing
       }
 
-      delete last.subject.global.locked
+      const global1 = last.subject.global as TagGlobal
+      delete global1.locked
       const tagsToUpdate = getUpTags(last)
       renderTagUpdateArray(tagsToUpdate)
 

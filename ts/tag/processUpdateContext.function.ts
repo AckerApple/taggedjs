@@ -1,13 +1,9 @@
 import { AnySupport } from './Support.class.js'
-import { Context, ContextItem, DomTag, StringTag, Tag } from './Tag.class.js'
-import { SupportTagGlobal, TagGlobal } from './TemplaterResult.class.js'
-import { ValueTypes } from './ValueTypes.enum.js'
+import { Context, ContextItem, DomTag, StringTag } from './Tag.class.js'
 import { updateExistingValue } from './update/updateExistingValue.function.js'
-import { TemplateValue } from './update/processFirstSubject.utils.js'
-import { getValueType } from './getValueType.function.js'
 import { processAttributeEmit, processNameOnlyAttrValue } from '../interpolations/attributes/processAttribute.function.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
-import { processFirstSubjectValue } from './update/processFirstSubjectValue.function.js'
+import { TagGlobal } from './index.js'
 
 export function processUpdateContext(
   support: AnySupport,
@@ -43,23 +39,20 @@ export function processUpdateOneContext(
 
   // is something already there?
   const contextItem = context[index]
-  const global = context[index].global as SupportTagGlobal
 
   // Do not continue if the value is just the same
   if(value === contextItem.value) {
     return false
   }
 
-  const valueType = getValueType(value)
-  if(valueType === ValueTypes.subject) {
+  if(value instanceof Object && 'subscribe' in value) {
     return false // emits on its own
   }
 
-  global.nowValueType = valueType
-
+  const global = contextItem.global as TagGlobal
   if(global.isAttr) {
     return processUpdateAttrContext(
-      values, value, contextItem, global, ownerSupport
+      values, value, contextItem, ownerSupport
     )
   }
 
@@ -71,7 +64,6 @@ export function processUpdateOneContext(
   ).rendered
   
   contextItem.value = value
-  global.lastValueType = valueType
 
   return result
 }
@@ -80,9 +72,9 @@ function processUpdateAttrContext(
   values: unknown[],
   value: unknown,
   contextItem: ContextItem,
-  global: TagGlobal,
   ownerSupport: AnySupport,
 ) {
+  const global = contextItem.global as TagGlobal
   if(global.isNameOnly) {
     processNameOnlyAttrValue(
       values,
@@ -99,19 +91,18 @@ function processUpdateAttrContext(
     return false
   }
 
-  const element = contextItem.global.element as Element
+  const element = global.element as Element
   processAttributeEmit(
     value,
-    contextItem.global.attrName as string,
+    global.attrName as string,
     contextItem,
     element,
     ownerSupport,
-    contextItem.global.howToSet as HowToSet,
-    contextItem.global.isSpecial as boolean,
+    global.howToSet as HowToSet,
+    global.isSpecial as boolean,
   )
 
   contextItem.value = value
 
   return false
 }
-

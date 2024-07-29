@@ -1,34 +1,29 @@
 import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
 import { ValueSubject } from '../../subject/ValueSubject.js'
-import { getTemplaterResult, SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import { getTemplaterResult, SupportTagGlobal, TagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { AnySupport, getSupport, Support } from '../Support.class.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
-import { ValueTypes } from '../ValueTypes.enum.js'
+import { ValueTypes, ValueType } from '../ValueTypes.enum.js'
 
 export function processNewArrayValue(
   value: TemplateValue | ValueSubject<any>,
   ownerSupport: AnySupport,
   contextItem: ContextItem,
 ): ContextItem {
-  // const valueType = getValueType(value)
-  const valueType = contextItem.global.nowValueType
-
-  switch (valueType) {
-    case ValueTypes.stateRender:
-    case ValueTypes.tagComponent:
-    case ValueTypes.subject:
+  const tagJsType = (value as any).tagJsType as ValueType
+  if(tagJsType) {
+    switch (tagJsType) {
+      case ValueTypes.templater:
+        const templater = value as TemplaterResult
+        const tag = templater.tag as StringTag | DomTag
+        processNewTag(tag, ownerSupport, contextItem)
         break
-
-    case ValueTypes.templater:
-      const templater = value as TemplaterResult
-      const tag = templater.tag as StringTag | DomTag
-      processNewTag(tag, ownerSupport, contextItem)
-      break
-    
-    case ValueTypes.tag:
-    case ValueTypes.dom:
-      processNewTag(value as StringTag | DomTag, ownerSupport, contextItem)
-      break
+      
+      case ValueTypes.tag:
+      case ValueTypes.dom:
+        processNewTag(value as StringTag | DomTag, ownerSupport, contextItem)
+        break
+    }
   }
 
   return contextItem

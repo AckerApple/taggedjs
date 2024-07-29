@@ -4,6 +4,7 @@ import { State } from './state.utils.js'
 import { SyncCallbackError } from '../errors.js'
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
 import callbackStateUpdate from './callbackStateUpdate.function.js'
+import { TagGlobal } from '../tag/index.js'
 
 export type Callback<A,B,C,D,E,F, T> = (
   a: A, b: B, c: C, d: D, e: E, f: F,
@@ -23,7 +24,8 @@ setUse({
   beforeRender: support => initMemory(support),
   beforeRedraw: support => initMemory(support),
   afterRender: support => {
-    support.subject.global.callbackMaker = true
+    const global = support.subject.global as TagGlobal
+    global.callbackMaker = true
     innerCallback = originalGetter // prevent crossing callbacks with another tag
   },
 })
@@ -42,7 +44,8 @@ export function callback<A,B,C,D,E,F, T>(
 
   const oldState = setUse.memory.stateConfig.array
   const trigger = (...args: any[]) => {
-    const callbackMaker = support.subject.global.callbackMaker
+    const global = support.subject.global as TagGlobal
+    const callbackMaker = global.callbackMaker
     
     if(callbackMaker) {
       return callbackStateUpdate(support, callback, oldState, ...args)
@@ -60,7 +63,8 @@ function initMemory (support: Support | BaseSupport) {
     callback: Callback<any, any, any, any, any, any, any>
   ) => {    
     const trigger = (...args: any[]) => {
-      const callbackMaker = support.subject.global.callbackMaker
+      const global = support.subject.global as TagGlobal
+      const callbackMaker = global.callbackMaker
       
       if(callbackMaker) {
         return callbackStateUpdate(support, callback, oldState, ...args)

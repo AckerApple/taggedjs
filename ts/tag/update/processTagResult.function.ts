@@ -13,8 +13,7 @@ export function processReplaceTagResult(
   let insertIndex = paintInsertBefores.length
 
   const result = buildBeforeElement(support, undefined, {counts})
-  const global = subjectTag.global
-  const ph = global.placeholder as Text
+  const ph = subjectTag.placeholder as Text
 
   for(const dom of result.dom) {
     if(dom.domElement) {

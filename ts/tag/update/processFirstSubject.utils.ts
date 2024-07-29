@@ -1,5 +1,4 @@
 import { TagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
-import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { ValueSubject } from '../../subject/ValueSubject.js'
 import { RegularValue } from './processRegularValue.function.js'
 import { Callback } from '../../interpolations/attributes/bindSubjectCallback.function.js'

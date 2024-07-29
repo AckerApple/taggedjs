@@ -13,7 +13,7 @@ import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode
 import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
 import { ObjectChildren } from "./exchangeParsedForValues.function.js"
 import { howToSetInputValue } from "../attributes/howToSetInputValue.function.js"
-import { getNewGlobal, runOneContext, SupportTagGlobal } from "../../tag/index.js"
+import { getNewGlobal, runOneContext, SupportTagGlobal, TagGlobal } from "../../tag/index.js"
 
 // ??? TODO: This could be done within exchangeParsedForValues to reduce loops
 export function attachDomElements(
@@ -43,8 +43,7 @@ export function attachDomElements(
       const subVal = values[ context.length ]
       const marker = document.createTextNode(empty)
       const contextItem = runOneContext(subVal, values, context.length, context, support)
-      const global = contextItem.global as SupportTagGlobal
-      global.placeholder = marker
+      contextItem.placeholder = marker
 
       if(owner) {
         paintAppends.push({
@@ -54,7 +53,7 @@ export function attachDomElements(
       } else {
         paintInsertBefores.push({
           element: marker,
-          relative: support.subject.global.placeholder as Text,
+          relative: support.subject.placeholder as Text,
         })
       }
 
@@ -72,7 +71,8 @@ export function attachDomElements(
         continue
       }
 
-      support.subject.global.locked = true
+      const global = support.subject.global as TagGlobal
+      global.locked = true
       
       processFirstSubjectValue(
         subVal,
@@ -82,7 +82,8 @@ export function attachDomElements(
         owner,
       )
       paint()
-      delete support.subject.global.locked
+      const global2 = support.subject.global as TagGlobal
+      delete global2.locked
       contextItem.value = subVal
   
       continue

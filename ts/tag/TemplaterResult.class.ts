@@ -30,11 +30,6 @@ export type TagGlobal = {
   attrName?: string
   isSpecial?: boolean
 
-  nowValueType?: ImmutableTypes | ValueType | BasicTypes
-  lastValueType?: ImmutableTypes | ValueType | BasicTypes
-  // TODO: I think we should remove this
-  lastValue?: any
-
   // SUPPORTS
   htmlDomMeta?: DomObjectChildren
   
@@ -43,10 +38,6 @@ export type TagGlobal = {
   deleted?: true
   isApp?: boolean // root element
 
-  // ALWAYS template tag
-  // insertBefore?: InsertBefore // what element put down before
-  placeholder?: Text // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
-
   subscriptions?: Subscription<any>[] // subscriptions created by clones
 
   destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
@@ -54,7 +45,6 @@ export type TagGlobal = {
   locked?: true
   
   callbackMaker?: true
-  simpleValueElm?: Clone
   
   // only appears on app
   events?: Events

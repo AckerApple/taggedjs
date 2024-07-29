@@ -15,7 +15,7 @@ export function destroySupport(
   global.destroy$.next()
   runBeforeDestroy(support, support)
 
-  const mySubs = support.subject.global.subscriptions
+  const mySubs = global.subscriptions
   if(mySubs) {
     subs.push(...mySubs)
   }

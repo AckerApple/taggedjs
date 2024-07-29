@@ -3,7 +3,7 @@
 import { Context, ContextItem, StringTag, TagTemplate } from '../Tag.class.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
-import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import { SupportTagGlobal, TagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
@@ -11,7 +11,6 @@ import { paintAppends, paintInsertBefores, paintRemoves } from '../paint.functio
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { processNewArrayValue } from './processNewValue.function.js'
 import { destroySupport } from '../destroySupport.function.js'
-import { getValueType } from '../getValueType.function.js'
 
 export function processTagArray(
   subject: ContextItem,
@@ -27,7 +26,7 @@ export function processTagArray(
   }
 
   
-  let runtimeInsertBefore = global.placeholder
+  let runtimeInsertBefore = subject.placeholder
   const lastArray = global.context as Context
 
   let removed = 0
@@ -58,7 +57,7 @@ export function processTagArray(
       eAppendTo,
     )
 
-    runtimeInsertBefore = newSubject.global.placeholder
+    runtimeInsertBefore = newSubject.placeholder
   }
 }
 
@@ -100,13 +99,9 @@ function reviewPreviousArrayItem(
   counts: Counts,
   appendTo?: Element, // used during initial rendering of entire array
 ) {
-  const global = itemSubject.global
-  const nowValueType = global.nowValueType
-
   const couldBeSame = lastArray.length > index
   if (couldBeSame) {
     updateExistingValue(itemSubject, item as any, ownerSupport)
-    global.lastValueType = nowValueType
     return itemSubject
   }
 
@@ -118,8 +113,6 @@ function reviewPreviousArrayItem(
     lastArray,
     appendTo,
   )
-
-  global.lastValueType = nowValueType
 
   return result
 }
@@ -133,7 +126,6 @@ function processAddTagArrayItem(
   appendTo?: Element, // used during initial entire array rendering
 ): ContextItem {
   const global = getNewGlobal()
-  const valueType = global.nowValueType = getValueType(value)
   const itemSubject: ContextItem = {
     value,
     global,
@@ -141,7 +133,7 @@ function processAddTagArrayItem(
 
   counts.added = counts.added + 1 // index
   const subPlaceholder = document.createTextNode('')
-  itemSubject.global.placeholder = subPlaceholder
+  itemSubject.placeholder = subPlaceholder
 
   if( !appendTo ) {
     paintInsertBefores.push({
@@ -162,7 +154,6 @@ function processAddTagArrayItem(
   
   // after processing
   itemSubject.value = value
-  global.lastValueType = valueType
 
   // Added to previous array
   lastArray.push(itemSubject)
@@ -187,7 +178,8 @@ export function destroyArrayItem(
   if(support) {
     destroySupport(support, counts.removed)
   } else {
-    const element = global.simpleValueElm as Element
+    const element = item.simpleValueElm as Element
+    delete item.simpleValueElm
     paintRemoves.push(element)
   }
 

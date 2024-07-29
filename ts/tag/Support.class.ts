@@ -1,7 +1,7 @@
 import { Props } from '../Props.js'
 import { ContextItem, EventCallback, EventMem } from './Tag.class.js'
 import { State } from '../state/index.js'
-import { Events, SupportTagGlobal, TemplaterResult } from './TemplaterResult.class.js'
+import { Events, SupportTagGlobal, TagGlobal, TemplaterResult } from './TemplaterResult.class.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { clonePropsBy } from './clonePropsBy.function.js'
 import { Subject } from '../subject/Subject.class.js'
@@ -101,7 +101,7 @@ export function addSupportEventListener(
   // const newEventName = eventName.slice(2, eventName.length)
   const replaceEventName = '_' + eventName
 
-  const global = support.subject.global
+  const global = support.subject.global as TagGlobal
   const eventReg = global.events as Events
   
   if(!eventReg[eventName]) {

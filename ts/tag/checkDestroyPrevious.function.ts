@@ -7,30 +7,27 @@ import { paintRemoves } from './paint.function.js'
 import { ContextItem } from './Tag.class.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { destroySupport } from './destroySupport.function.js'
-import { SupportTagGlobal } from './TemplaterResult.class.js'
-
-const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender, ValueTypes.oneRender]
+import { SupportTagGlobal, TagGlobal } from './TemplaterResult.class.js'
 
 export function checkDestroyPrevious(
   subject: ContextItem, // existing.value is the old value
   newValue: unknown,
-  valueType: ValueType | BasicTypes | ImmutableTypes, // new value type
 ) {
   const global = subject.global as SupportTagGlobal
+  const isArray = newValue instanceof Array
 
   // was simple value but now some different type
-  if(global.simpleValueElm) {
-    if( isSimpleType(valueType) && global.lastValueType === valueType ) {
-      return false // no need to destroy, just update display
-    }
+  if(subject.simpleValueElm) {
+   if([null,undefined].includes(newValue as any) || !(isArray || newValue instanceof Object)) {
+     return false  // no need to destroy, just update display
+   }
 
     global.deleted = true
-    const elm = subject.global.simpleValueElm as Element
+    const elm = subject.simpleValueElm as Element
+    delete subject.simpleValueElm
     paintRemoves.push(elm)
     subject.global = getNewGlobal()
-    subject.global.placeholder = global.placeholder
-    subject.global.lastValueType = global.nowValueType
-    return 'changed-simple-value'
+    return 6 // 'changed-simple-value'
   }
 
   const lastSupport = global.newest  
@@ -38,7 +35,7 @@ export function checkDestroyPrevious(
   if(lastSupport && !global.deleted) {
     const isValueTag = isStaticTag(newValue)
     const newTag = newValue as Support
-    const oldGlobal = subject.global
+    const oldGlobal = subject.global as TagGlobal
     
     if(isValueTag) {
       // its a different tag now
@@ -46,15 +43,13 @@ export function checkDestroyPrevious(
       if(!likeTags) {
         destroySupport(lastSupport, 0)
         subject.global = getNewGlobal()
-        subject.global.placeholder = oldGlobal.placeholder
-        subject.global.lastValueType = oldGlobal.nowValueType
-        return 'tag-swap'
+        return 7 // 'tag-swap'
       }
 
       return false
     }
 
-    const isTag = tagTypes.includes(valueType as ValueType)
+    const isTag = newValue && 'tagJsType' in (newValue as any)
     if(isTag) {
       return false // its still a tag component
     }
@@ -62,15 +57,12 @@ export function checkDestroyPrevious(
     // destroy old component, value is not a component
     destroySupport(lastSupport, 0)
     subject.global = getNewGlobal()
-    subject.global.placeholder = oldGlobal.placeholder
-    subject.global.lastValueType = oldGlobal.nowValueType
-    return 'different-tag'
+    return 8 // 'different-tag'
   }
-
 
   const wasArray = global.context
   // no longer an array
-  if (wasArray && valueType !== ValueTypes.tagArray) {
+  if (wasArray && !isArray) {
     const counts = {added:0, removed:0}
     for (let index=0; index < wasArray.length; ++index) {
       destroyArrayItem(wasArray[index], counts)
@@ -78,7 +70,6 @@ export function checkDestroyPrevious(
     
     global.deleted = true
     subject.global = getNewGlobal()
-    subject.global.placeholder = global.placeholder
 
     return 'array'
   }

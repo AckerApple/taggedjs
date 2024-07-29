@@ -1,6 +1,6 @@
 import { AnySupport, BaseSupport, Support, destroySubs } from '../Support.class.js'
 import { Context } from '../Tag.class.js'
-import { SupportTagGlobal } from '../TemplaterResult.class.js'
+import { SupportTagGlobal, TagGlobal } from '../TemplaterResult.class.js'
 import { getChildTagsToSoftDestroy } from '../destroy.support.js'
 import { smartRemoveKids } from '../smartRemoveKids.function.js'
 import { getNewGlobal } from '../update/getNewGlobal.function.js'
@@ -24,14 +24,13 @@ export function softDestroySupport(
   }
 
   lastSupport.subject.global = getNewGlobal()
-  lastSupport.subject.global.placeholder = global.placeholder
-  lastSupport.subject.global.lastValueType = global.nowValueType
 }
 
 function softDestroyOne(
   child: AnySupport
 ) {
-  const global = child.subject.global
+  const global = child.subject.global as TagGlobal
+
   if(global.deleted) {
     return
   }

@@ -5,7 +5,7 @@ import { softDestroySupport } from './softDestroySupport.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { ContextItem, DomTag, StringTag } from '../Tag.class.js'
 import { moveProviders } from '../update/updateExistingTagComponent.function.js'
-import { SupportTagGlobal } from '../TemplaterResult.class.js'
+import { SupportTagGlobal, TagGlobal } from '../TemplaterResult.class.js'
 
 /** TODO: This seems to support both new and updates and should be separated? */
 export function renderWithSupport(
@@ -33,7 +33,8 @@ export function renderWithSupport(
     global.newest = reSupport
   } else if(lastSupport) {
     const tag = lastSupport.templater.tag
-    if(tag && subject.global.renderCount > 1) {
+    const global = subject.global as TagGlobal
+    if(tag && global.renderCount > 1) {
       checkTagSoftDestroy(tag, lastSupport, lastTag)
     }
   }

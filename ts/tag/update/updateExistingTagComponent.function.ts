@@ -268,8 +268,6 @@ function swapTags(
   destroySupport(oldestSupport, 0)
   
   subject.global = getNewGlobal()
-  subject.global.placeholder = global.placeholder
-  subject.global.lastValueType = global.nowValueType
 
   const newSupport = processReplacementComponent(
     templater,

@@ -10,7 +10,7 @@ import { paint, paintContent } from '../../tag/paint.function.js'
 import { Context, ContextItem } from '../../tag/Tag.class.js'
 import { processDynamicNameValueAttribute, processNonDynamicAttr } from './processNameValueAttribute.function.js'
 import { negatives } from '../../updateBeforeTemplate.function.js'
-import { getNewGlobal, runOneContext } from '../../tag/index.js'
+import { getNewGlobal, runOneContext, TagGlobal } from '../../tag/index.js'
 
 type TagVarIdNum = {tagJsVar: number}
 /*
@@ -38,9 +38,6 @@ export function processAttribute(
   const isNameVar = nameVar >= 0
 
   if( isNameVar ) {
-    // const global = support.subject.global as SupportTagGlobal
-    // const context = global.context
-    // const contextItem = context[ nameVar ]
     const contextItem = runOneContext(
       attrName,
       values,
@@ -49,7 +46,7 @@ export function processAttribute(
       support
     )
     
-    const global = contextItem.global
+    const global = contextItem.global as TagGlobal
     global.isAttr = true
     global.element = element
 
@@ -122,9 +119,10 @@ function processNameOnlyAttr(
   howToSet: HowToSet,
   context: Context,
 ) {
-  contextValue.global.element = element
-  contextValue.global.howToSet = howToSet
-  contextValue.global.isNameOnly = true
+  const global = contextValue.global as TagGlobal
+  global.element = element
+  global.howToSet = howToSet
+  global.isNameOnly = true
 
   // the above callback gets called immediately since its a ValueSubject()
   const contextValueSubject = contextValue.value
@@ -141,7 +139,7 @@ function processNameOnlyAttr(
       )  
       paint()
     })
-    const global = support.subject.global
+    const global = support.subject.global as TagGlobal
     const subs = global.subscriptions = global.subscriptions || []
     subs.push(sub) // this is where unsubscribe is picked up
     return
@@ -260,7 +258,7 @@ function processNameValueAttributeAttrSubject(
     const sub = contextValueSubject.subscribe(callback as any)
     
     // Record subscription for later unsubscribe when element destroyed
-    const global = result.global
+    const global = result.global as TagGlobal
     const subs = global.subscriptions = global.subscriptions || []
     subs.push(sub)
   }

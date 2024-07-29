@@ -9,7 +9,7 @@ import { processAttributeEmit, processNameOnlyAttrValue } from '../interpolation
 import { Context, ContextItem, DomTag, StringTag } from './Tag.class.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 import { ValueTypes } from './ValueTypes.enum.js'
-import { SupportTagGlobal } from './TemplaterResult.class.js'
+import { SupportTagGlobal, TagGlobal } from './TemplaterResult.class.js'
 import { getValueType } from './getValueType.function.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 
@@ -74,35 +74,6 @@ function loadDomMeta(support: AnySupport): ParsedHtml {
   return getDomMeta((thisTag as StringTag).strings, thisTag.values)
 }
 
-function processContext(
-  support: AnySupport,
-  context: Context,
-) {
-  const thisTag = support.templater.tag as StringTag | DomTag
-  const values = thisTag.values
-
-  let index = 0
-  const len = values.length
-  while (index < len) {
-    const contextItem = context[index]
-    const value = values[index] as any
-    const global = contextItem.global
-    const nowValueType = global.nowValueType // = getValueType(value)
-
-    runOneContext(
-      value,
-      values,
-      index,
-      context,
-      support,
-    )
-    
-    ++index
-  }
-
-  return context
-}
-
 export function runOneContext(
   value: unknown,
   values: unknown[],
@@ -116,7 +87,6 @@ export function runOneContext(
   }
 
   context.push(contextItem)
-  const nowValueType = global.nowValueType = getValueType(value)
 
   processOneContext(
     values,
@@ -127,11 +97,10 @@ export function runOneContext(
   )
 
   contextItem.value = value
-  global.lastValueType = nowValueType
 
 
-  if(!contextItem.global.locked) {
-    ++contextItem.global.renderCount
+  if(!global.locked) {
+    ++global.renderCount
   }
 
   return contextItem
@@ -145,7 +114,7 @@ function processOneContext(
   context: Context,
   ownerSupport: AnySupport,
 ): boolean {
-  const global = contextItem.global
+  const global = contextItem.global as TagGlobal
 
   if(global.isAttr) {
     // global.newest = ownerSupport
@@ -163,15 +132,15 @@ function processOneContext(
       return false
     }
 
-    const element = contextItem.global.element as Element
+    const element = global.element as Element
     processAttributeEmit(
       value,
-      contextItem.global.attrName as string,
+      global.attrName as string,
       contextItem,
       element,
       ownerSupport,
-      contextItem.global.howToSet as HowToSet,
-      contextItem.global.isSpecial as boolean,
+      global.howToSet as HowToSet,
+      global.isSpecial as boolean,
     )
 
     return false

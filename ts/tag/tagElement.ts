@@ -127,7 +127,7 @@ export function runWrapper(
 
   newSupport.appElement = appElement
 
-  global.placeholder = placeholder
+  subject.placeholder = placeholder
   global.oldest = global.oldest || newSupport
   global.newest = newSupport as Support
   
