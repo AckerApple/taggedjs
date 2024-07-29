@@ -10,7 +10,6 @@ import { Context, ContextItem, DomTag, StringTag } from './Tag.class.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { SupportTagGlobal, TagGlobal } from './TemplaterResult.class.js'
-import { getValueType } from './getValueType.function.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 
 /** Function that kicks off actually putting tags down as HTML elements */
@@ -56,9 +55,6 @@ function getHtmlDomMeta(
     context,
     appendTo,
   )
-
-  // const context = global.context = result.context
-  // processContext(support, context)
       
   return result
 }
@@ -97,7 +93,6 @@ export function runOneContext(
   )
 
   contextItem.value = value
-
 
   if(!global.locked) {
     ++global.renderCount
