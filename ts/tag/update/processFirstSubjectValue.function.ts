@@ -6,11 +6,12 @@ import { AnySupport } from '../Support.class.js'
 import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { renderTagOnly } from '../render/renderTagOnly.function.js'
-import { BasicTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
+import { ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { oneRenderToSupport } from './oneRenderToSupport.function.js'
 import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function.js'
 import { processFirstSubjectComponent, processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
+import { getNewGlobal } from './getNewGlobal.function.js'
 
 export function processFirstSubjectValue(
   value: TemplateValue | StringTag,
@@ -43,8 +44,10 @@ export function processFirstSubjectValue(
         let templater = tag.templater
   
         if(!templater) {
-          templater = tagFakeTemplater(tag)
+          templater = tagFakeTemplater(tag) // TODO: most likely a not needed performance hit
         }
+
+        const global = subject.global = getNewGlobal() as SupportTagGlobal
   
         if(appendTo) {
           return processNewTag(
@@ -55,7 +58,6 @@ export function processFirstSubjectValue(
           )
         }
   
-        const global = subject.global as SupportTagGlobal
         global.newest = newSupportByTemplater(templater, ownerSupport, subject)
   
         return processTag(
@@ -65,6 +67,8 @@ export function processFirstSubjectValue(
 
       case ValueTypes.stateRender:
       case ValueTypes.tagComponent:
+        subject.global = getNewGlobal() as SupportTagGlobal
+
         if(appendTo) {
           const processResult = processFirstSubjectComponent(
             value as TemplaterResult,
@@ -73,6 +77,9 @@ export function processFirstSubjectValue(
             counts,
             appendTo as Element,
           )
+          
+          ++subject.global.renderCount
+
           return processResult
         }
   
@@ -82,9 +89,14 @@ export function processFirstSubjectValue(
           ownerSupport,
           counts,
         )
+        
+        ++subject.global.renderCount
+        
         return processResult
 
       case ValueTypes.oneRender:
+        subject.global = getNewGlobal() as SupportTagGlobal
+
         const support = oneRenderToSupport(
           value as Wrapper,
           subject as ContextItem,
@@ -98,16 +110,22 @@ export function processFirstSubjectValue(
           ownerSupport,
         )
         
-        return processNewTag(
+        const result = processNewTag(
           support.templater,
           ownerSupport,
           subject as ContextItem,
           appendTo as Element,
-        )    
+        )
+
+        ++subject.global.renderCount
+
+        return result
     }
   }
 
   if(value instanceof Array) {
+    subject.global = getNewGlobal() as SupportTagGlobal
+
     processTagArray(
       subject,
       value as (StringTag | TemplaterResult)[],

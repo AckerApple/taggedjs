@@ -77,9 +77,7 @@ export function runOneContext(
   context: Context,
   ownerSupport: AnySupport,
 ): ContextItem {
-  const global = getNewGlobal()
   const contextItem: ContextItem = {
-    global
   }
 
   context.push(contextItem)
@@ -94,10 +92,6 @@ export function runOneContext(
 
   contextItem.value = value
 
-  if(!global.locked) {
-    ++global.renderCount
-  }
-
   return contextItem
 }
 
@@ -109,33 +103,30 @@ function processOneContext(
   context: Context,
   ownerSupport: AnySupport,
 ): boolean {
-  const global = contextItem.global as any
-
-  if(global.isAttr) {
-    // global.newest = ownerSupport
-    if(global.isNameOnly) {
+  if(contextItem.isAttr) {
+    if(contextItem.isNameOnly) {
       processNameOnlyAttrValue(
         values,
         value as any,
         contextItem.value,
-        global.element as Element,
+        contextItem.element as Element,
         ownerSupport,
-        global.howToSet as HowToSet,
+        contextItem.howToSet as HowToSet,
         context,
       )
 
       return false
     }
 
-    const element = global.element as Element
+    const element = contextItem.element as Element
     processAttributeEmit(
       value,
-      global.attrName as string,
+      contextItem.attrName as string,
       contextItem,
       element,
       ownerSupport,
-      global.howToSet as HowToSet,
-      global.isSpecial as boolean,
+      contextItem.howToSet as HowToSet,
+      contextItem.isSpecial as boolean,
     )
 
     return false

@@ -19,21 +19,3 @@ type LikeObjectElement = {
   
   domElement?: any
 }
-
-
-// TODO: remove
-export function replaceHoldersByPosMaps(
-  parsedElements: ParsedHtml[],
-  valuePositions: ValuePos[],
-) {
-  return Object.values(valuePositions).map((valuePosMeta, index) =>
-    replaceHolderByPosMap(parsedElements, valuePosMeta)
-  )
-}
-
-function replaceHolderByPosMap(
-  parsedElements: ParsedHtml[],
-  valuePosition: ValuePos,
-) {
-  return valuePosition(parsedElements)
-}

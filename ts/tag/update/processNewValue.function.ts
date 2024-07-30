@@ -4,6 +4,7 @@ import { getTemplaterResult, SupportTagGlobal, TagGlobal, TemplaterResult } from
 import { AnySupport, getSupport, Support } from '../Support.class.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { ValueTypes, ValueType } from '../ValueTypes.enum.js'
+import { getNewGlobal } from './getNewGlobal.function.js'
 
 export function processNewArrayValue(
   value: TemplateValue | ValueSubject<any>,
@@ -45,7 +46,7 @@ function processNewTag(
     tag.templater = templater
   }
 
-  const global = contextItem.global as SupportTagGlobal
+  const global = contextItem.global = getNewGlobal() as SupportTagGlobal // contextItem.global as SupportTagGlobal
   const newest = global.newest = getSupport(
     templater,
     ownerSupport,

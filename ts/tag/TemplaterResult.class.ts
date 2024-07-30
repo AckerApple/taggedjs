@@ -7,9 +7,8 @@ import { OnDestroyCallback } from '../state/onDestroy.js'
 import { OnInitCallback } from '../state/onInit.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { Subject } from '../subject/index.js'
-import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
+import { ValueType, ValueTypes } from './ValueTypes.enum.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
-import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 
 export type OriginalFunction = (() => StringTag)
 

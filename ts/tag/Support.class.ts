@@ -29,7 +29,6 @@ export type BaseSupport = {
 }
 
 /** used only for apps, otherwise use Support */
-// TODO: We need to split Support and simple tag support apart
 export function getBaseSupport(
   templater: TemplaterResult,
   subject: ContextItem,

@@ -8,9 +8,10 @@ import { processNewRegularValue, processUpdateRegularValue, RegularValue } from 
 import { checkDestroyPrevious } from '../checkDestroyPrevious.function.js'
 import { getFakeTemplater, newSupportByTemplater, processTag, setupNewSupport } from './processTag.function.js'
 import { StringTag, DomTag, ContextItem, Tag } from '../Tag.class.js'
-import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
+import { ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { updateSupportBy } from '../updateSupportBy.function.js'
+import { getNewGlobal } from './getNewGlobal.function.js'
 
 const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender]
 
@@ -18,8 +19,7 @@ export function updateExistingValue(
   subject: ContextItem, // InterpolateSubject,
   value: TemplateValue,
   ownerSupport: BaseSupport | Support,
-): {subject: ContextItem, rendered: boolean} {
-  const global = subject.global as SupportTagGlobal
+) {
   const wasDestroyed = checkDestroyPrevious(subject, value)
 
   // handle already seen tag components
@@ -27,6 +27,8 @@ export function updateExistingValue(
   if(tagJsType) {
     const isStateTag = tagTypes.includes(tagJsType)
     if(isStateTag) {
+      subject.global = subject.global || getNewGlobal()
+
       return prepareUpdateToComponent(
         value as TemplaterResult,
         subject as ContextItem,
@@ -35,31 +37,33 @@ export function updateExistingValue(
     }
 
     if(tagJsType === ValueTypes.oneRender) {
-      return {subject, rendered: false} // its a oneRender tag
+      return
     }
   }
   
-  // was component but no longer
   const global2 = subject.global as SupportTagGlobal
-  const support = global2.newest
-  if( support ) {
-    if(value instanceof Function) {
-      return {subject, rendered: false} // its a oneRender tag
-    }
-
-    handleStillTag(
-      support,
-      subject as ContextItem,
-      value as TemplaterResult,
-      ownerSupport
-    )
-
-    const global0 = subject.global as TagGlobal
-    if(!global0.locked) {
-      ++global0.renderCount
-    }
+  if(global2) {
+    // was component but no longer
+    const support = global2.newest
+    if( support ) {
+      if(value instanceof Function) {
+        return
+      }
   
-    return {subject, rendered: true}
+      handleStillTag(
+        support,
+        subject as ContextItem,
+        value as TemplaterResult,
+        ownerSupport
+      )
+  
+      const global0 = subject.global as TagGlobal
+      if(!global0.locked) {
+        ++global0.renderCount
+      }
+    
+      return
+    }
   }
 
   if(tagJsType) {
@@ -69,13 +73,14 @@ export function updateExistingValue(
           ownerSupport,
           subject as ContextItem,
         )
-  
+
+/*
         const global2 = subject.global as TagGlobal
         if(!global2.locked) {
           ++global2.renderCount
         }
-      
-        return {subject, rendered: true}
+*/
+        return
       
       case ValueTypes.tag:
       case ValueTypes.dom:
@@ -88,18 +93,19 @@ export function updateExistingValue(
           templater.tag = tag
         }
   
-        global.newest = newSupportByTemplater(templater, ownerSupport, subject)
+        const nowGlobal = subject.global = (subject.global || getNewGlobal()) as SupportTagGlobal
+        nowGlobal.newest = newSupportByTemplater(templater, ownerSupport, subject)
     
         processTag(
           ownerSupport,
           subject,
         )
   
-        if(!global.locked) {
-          ++global.renderCount
+        if(!nowGlobal.locked) {
+          ++nowGlobal.renderCount
         }
       
-        return {subject, rendered: true}  
+        return
     }
   }
 
@@ -116,12 +122,12 @@ export function updateExistingValue(
       ++global1.renderCount
     }
   
-    return {subject, rendered: true}
+    return
   }
 
   if(value instanceof Function) {
     subject.value = value
-    return {subject, rendered: false}
+    return
   }
 
   // This will cause all other values to render
@@ -136,13 +142,13 @@ export function updateExistingValue(
       subject,
     )
   }
-
+/*
   const global3 = subject.global as TagGlobal
-  if(global3.locked) {
+  if(global3 && global3.locked) {
     ++global3.renderCount
   }
-
-  return {subject, rendered: true}
+*/
+  return
 }
 
 function handleStillTag(
@@ -151,8 +157,6 @@ function handleStillTag(
   value: StringTag | TemplateValue,
   ownerSupport: BaseSupport | Support,
 ) {
-  const global = subject.global as SupportTagGlobal
-  // const lastSupport = global.newest
   const templater = (value as Tag).templater || value
 
   const valueSupport = getSupport(
@@ -166,21 +170,10 @@ function handleStillTag(
     setupNewSupport(valueSupport, ownerSupport, subject)
   }
 
-  /*
-  if(!lastSupport) {
-    console.log('lastSupport.subject', {lastSupport, global, value, support})
-    throw new Error('something here')
-  }
-  */
   const lastSubject = lastSupport.subject as ContextItem
   const newGlobal = lastSubject.global as SupportTagGlobal
   const oldest = newGlobal.oldest
-  if(!oldest) {
-    console.log('noooooo oldest', {newGlobal, lastSubject, lastSupport})
-  }
-  if(oldest) {
-    updateSupportBy(oldest, valueSupport)
-  }
+  updateSupportBy(oldest, valueSupport)
 }
 
 function prepareUpdateToComponent(

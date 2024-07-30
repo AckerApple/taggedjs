@@ -15,14 +15,12 @@ export function processDynamicNameValueAttribute(
   howToSet: HowToSet,
   support: AnySupport,
   isSpecial?: boolean
-) {
-  const global = contextItem.global as any
-  const isFun = value instanceof Function
-  global.attrName = attrName
-  global.element = element
-  global.howToSet = howToSet
+) {  
+  contextItem.attrName = attrName
+  contextItem.element = element
+  contextItem.howToSet = howToSet
 
-  if(isFun) {
+  if( value instanceof Function ) {
     return processTagCallbackFun(
       contextItem,
       value,
@@ -32,13 +30,10 @@ export function processDynamicNameValueAttribute(
     )
   }
 
-  // TODO: enhance this condition
-  if(global) {
-    global.attrName = attrName
-    global.element = element
-    global.howToSet = howToSet
-    global.isSpecial = isSpecial // isSpecialAttr(attrName)
-  }
+  contextItem.attrName = attrName
+  contextItem.element = element
+  contextItem.howToSet = howToSet
+  contextItem.isSpecial = isSpecial
 
   return processNonDynamicAttr(attrName, value, element, howToSet, isSpecial)
 }
@@ -50,7 +45,6 @@ export function processNonDynamicAttr(
   howToSet: HowToSet,
   isSpecial?: boolean,
 ) {
-  // const isSpecial = isSpecialAttr(attrName)
   if (isSpecial) {
     return specialAttribute(attrName, value, element)
   }

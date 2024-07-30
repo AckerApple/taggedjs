@@ -5,7 +5,7 @@ import { InterpolatedTemplates } from '../interpolations/interpolations.js'
 
 import { Clone, TagGlobal, TemplaterResult } from './TemplaterResult.class.js'
 import { TagValues } from'./html.js'
-import { ValueType, ValueTypes } from './ValueTypes.enum.js'
+import { ValueTypes } from './ValueTypes.enum.js'
 import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
 import { AnySupport } from './Support.class.js'
 import { getSupportInCycle } from './getSupportInCycle.function.js'
@@ -19,14 +19,13 @@ export type EventMem = {elm: Element, callback:EventCallback}
 
 // export type Context = TagJsSubject<any>[]
 export type ContextItem = {
-  /*
   isAttr?: true
   element?: Element
   howToSet?: HowToSet
   isNameOnly?: boolean
   attrName?: string
   isSpecial?: boolean
-  */
+  
   simpleValueElm?: Clone
   placeholder?: Text // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
 

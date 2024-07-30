@@ -1,6 +1,6 @@
 import { isTagComponent } from '../isInstance.js'
 import { Subscription } from '../subject/subject.utils.js'
-import { AnySupport, Support } from './Support.class.js'
+import { AnySupport } from './Support.class.js'
 import { Context } from './Tag.class.js'
 import { runBeforeDestroy } from './tagRunner.js'
 import { SupportTagGlobal } from './TemplaterResult.class.js'
@@ -11,6 +11,11 @@ export function getChildTagsToDestroy(
 ): Subscription<any>[] {
   for (const child of childTags) {    
     const global = child.global as SupportTagGlobal
+    
+    if(!global) {
+      continue // not a support contextItem
+    }
+
     const support = global.newest
     if(!support) {
       continue // not a support contextItem
@@ -38,8 +43,12 @@ export function getChildTagsToSoftDestroy(
   subs: Subscription<any>[] = []
 ): {subs: Subscription<any>[], tags: AnySupport[]} {
   for (const child of childTags) {
-
     const global = child.global as SupportTagGlobal
+
+    if(!global) {
+      continue
+    }
+
     const support = global.newest
     if(support) {
       tags.push(support)

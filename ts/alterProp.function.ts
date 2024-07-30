@@ -184,12 +184,13 @@ export function callbackPropOwner(
       }
     }
 
+    /*
     const oldest = global.oldest
     const wasInstant = oldest === newest && global.renderCount === 0
-
     if(wasInstant) {
       return // prop was called immediately
     }
+    */
   
     safeRenderSupport(newest, ownerSupport)
 

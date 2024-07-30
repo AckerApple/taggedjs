@@ -1,7 +1,7 @@
 import { AnySupport } from './Support.class.js'
 import { Context, ContextItem, DomTag, StringTag } from './Tag.class.js'
 import { updateExistingValue } from './update/updateExistingValue.function.js'
-import { processAttributeEmit, processNameOnlyAttrValue } from '../interpolations/attributes/processAttribute.function.js'
+import { processAttributeEmit, processNameOnlyAttrValue, updateNameOnlyAttrValue } from '../interpolations/attributes/processAttribute.function.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 import { TagGlobal } from './index.js'
 
@@ -34,7 +34,7 @@ export function processUpdateOneContext(
   index: number,
   context: Context,
   ownerSupport: AnySupport,
-): boolean {
+) {
   const value = values[index] as any
 
   // is something already there?
@@ -42,30 +42,27 @@ export function processUpdateOneContext(
 
   // Do not continue if the value is just the same
   if(value === contextItem.value) {
-    return false
+    return
   }
 
   if(value instanceof Object && 'subscribe' in value) {
-    return false // emits on its own
+    return // emits on its own
   }
 
-  const global = contextItem.global as any
-  if(global.isAttr) {
+  if(contextItem.isAttr) {
     return processUpdateAttrContext(
       values, value, contextItem, ownerSupport
     )
   }
 
   // listeners will evaluate updated values to possibly update display(s)
-  const result = updateExistingValue(
+  updateExistingValue(
     contextItem,
     value,
     ownerSupport,
-  ).rendered
+  )
   
   contextItem.value = value
-
-  return result
 }
 
 function processUpdateAttrContext(
@@ -74,15 +71,14 @@ function processUpdateAttrContext(
   contextItem: ContextItem,
   ownerSupport: AnySupport,
 ) {
-  const global = contextItem.global as any
-  if(global.isNameOnly) {
-    processNameOnlyAttrValue(
+  if(contextItem.isNameOnly) {
+    updateNameOnlyAttrValue(
       values,
       value as string,
       contextItem.value,
-      global.element as Element,
+      contextItem.element as Element,// global.element as Element,
       ownerSupport,
-      global.howToSet as HowToSet,
+      contextItem.howToSet as HowToSet,
       [], // Context, but we dont want to alter current
     )
 
@@ -91,15 +87,15 @@ function processUpdateAttrContext(
     return false
   }
 
-  const element = global.element as Element
+  const element = contextItem.element as Element
   processAttributeEmit(
     value,
-    global.attrName as string,
+    contextItem.attrName as string,
     contextItem,
     element,
     ownerSupport,
-    global.howToSet as HowToSet,
-    global.isSpecial as boolean,
+    contextItem.howToSet as HowToSet,
+    contextItem.isSpecial as boolean,
   )
 
   contextItem.value = value

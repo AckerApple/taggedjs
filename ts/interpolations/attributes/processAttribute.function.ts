@@ -45,10 +45,9 @@ export function processAttribute(
       context,
       support
     )
-    
-    const global = contextItem.global as any
-    global.isAttr = true
-    global.element = element
+
+    contextItem.isAttr = true
+    contextItem.element = element
 
     processNameOnlyAttr(
       values,
@@ -67,12 +66,13 @@ export function processAttribute(
   const valueVar = getTagJsVar(value)
   if(valueVar >= 0) {
     const value = values[valueVar]
-    const global = getNewGlobal() as any
-    global.isAttr = true
-    global.element = element
-    global.attrName = attrName as string
 
-    const contextItem: ContextItem = {global}
+    const contextItem: ContextItem = {
+      isAttr: true,
+      element,
+      attrName: attrName as string,
+    }
+
     context.push(contextItem)
 
     const isSubject = isSubjectInstance(contextItem.value)
@@ -119,10 +119,9 @@ function processNameOnlyAttr(
   howToSet: HowToSet,
   context: Context,
 ) {
-  const global = contextValue.global as any
-  global.element = element
-  global.howToSet = howToSet
-  global.isNameOnly = true
+  contextValue.element = element
+  contextValue.howToSet = howToSet
+  contextValue.isNameOnly = true
 
   // the above callback gets called immediately since its a ValueSubject()
   const contextValueSubject = contextValue.value
@@ -156,7 +155,7 @@ function processNameOnlyAttr(
   )
 }
 
-export function processNameOnlyAttrValue(
+export function updateNameOnlyAttrValue(
   values: unknown[],
   attrValue: string | boolean | Record<string, any>,
   lastValue: string | Record<string, any> | undefined,
@@ -195,16 +194,18 @@ export function processNameOnlyAttrValue(
     }
   }
 
-  // regular attributes
-  if(typeof(attrValue) === ImmutableTypes.string) {
-    if(!(attrValue as string).length) {
-      return // ignore, do not set at this time
-    }
+  processNameOnlyAttrValue(values, attrValue, lastValue, element, ownerSupport, howToSet, context)
+}
 
-    howToSet(element, attrValue as string, empty)
-    return
-  }
-
+export function processNameOnlyAttrValue(
+  values: unknown[],
+  attrValue: string | boolean | Record<string, any>,
+  lastValue: string | Record<string, any> | undefined,
+  element: Element,
+  ownerSupport: AnySupport,
+  howToSet: HowToSet,
+  context: Context,
+) {
   // process an object of attributes ${{class:'something, checked:true}}
   if(attrValue instanceof Object) {
     for (const name in attrValue) {
@@ -217,11 +218,18 @@ export function processNameOnlyAttrValue(
         howToSet,
         context,
         value,
-        isSpecialAttr(name),
+        isSpecialAttr(name), // only object variables are evaluated for is special attr
       )
     }
     return
   }
+
+  // regular attributes
+  if((attrValue as string).length === 0) {
+    return // ignore, do not set at this time
+  }
+
+  howToSet(element, attrValue as string, empty)  
 }
 
 /** Processor for flat attributes and object attributes */
@@ -233,7 +241,6 @@ function processNameValueAttributeAttrSubject(
   howToSet: HowToSet,
   isSpecial?: boolean,
 ) {
-  // const isSpecial = isSpecialAttr(attrName)
   if(isSpecial) {
     paintContent.push(function paintContent() {
       element.removeAttribute(attrName)

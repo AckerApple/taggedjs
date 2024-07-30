@@ -60,7 +60,6 @@ function checkTagSoftDestroy(
     return
   }
   
-  // TODO: This is classic runtime code, need to test it
   if(lastTag) {
     const lastStrings = (lastTag as StringTag).strings
     if(lastStrings) {

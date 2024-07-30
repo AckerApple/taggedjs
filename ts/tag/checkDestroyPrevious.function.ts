@@ -1,8 +1,7 @@
-import { isSimpleType, isStaticTag } from'../isInstance.js'
+import { isStaticTag } from'../isInstance.js'
 import { destroyArrayItem } from'./update/processTagArray.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { Support } from './Support.class.js'
-import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './ValueTypes.enum.js'
 import { paintRemoves } from './paint.function.js'
 import { ContextItem } from './Tag.class.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
@@ -22,11 +21,11 @@ export function checkDestroyPrevious(
      return false  // no need to destroy, just update display
    }
 
-    global.deleted = true
+    // global.deleted = true
     const elm = subject.simpleValueElm as Element
     delete subject.simpleValueElm
     paintRemoves.push(elm)
-    subject.global = getNewGlobal()
+
     return 6 // 'changed-simple-value'
   }
 
@@ -35,7 +34,6 @@ export function checkDestroyPrevious(
   if(lastSupport && !global.deleted) {
     const isValueTag = isStaticTag(newValue)
     const newTag = newValue as Support
-    const oldGlobal = subject.global as TagGlobal
     
     if(isValueTag) {
       // its a different tag now
@@ -56,7 +54,7 @@ export function checkDestroyPrevious(
 
     // destroy old component, value is not a component
     destroySupport(lastSupport, 0)
-    subject.global = getNewGlobal()
+    delete subject.global
     return 8 // 'different-tag'
   }
 
@@ -69,7 +67,6 @@ export function checkDestroyPrevious(
     }
     
     global.deleted = true
-    subject.global = getNewGlobal()
 
     return 'array'
   }

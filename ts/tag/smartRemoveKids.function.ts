@@ -19,7 +19,8 @@ export function smartRemoveKids(
 
   for (const subject of context) {
     const global = subject.global as SupportTagGlobal
-    if(global.deleted) {
+    
+    if(!global || global.deleted) {
       continue
     }
 

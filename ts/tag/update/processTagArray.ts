@@ -125,10 +125,8 @@ function processAddTagArrayItem(
   lastArray: ContextItem[],
   appendTo?: Element, // used during initial entire array rendering
 ): ContextItem {
-  const global = getNewGlobal()
   const itemSubject: ContextItem = {
     value,
-    global,
   }
 
   counts.added = counts.added + 1 // index
