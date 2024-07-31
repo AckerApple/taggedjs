@@ -3,12 +3,11 @@
 import { Context, ContextItem, StringTag, TagTemplate } from '../Tag.class.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
-import { SupportTagGlobal, TagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { paintAppends, paintInsertBefores, paintRemoves } from '../paint.function.js'
-import { getNewGlobal } from './getNewGlobal.function.js'
 import { processNewArrayValue } from './processNewValue.function.js'
 import { destroySupport } from '../destroySupport.function.js'
 
@@ -19,19 +18,18 @@ export function processTagArray(
   counts: Counts,
   appendTo?: Element,
 ) {
-  const global = subject.global as SupportTagGlobal
-  const existed = global.context ? true : false
-  if(!existed){
-    global.context = [] as Context
+  
+  if(!subject.lastArray){
+    subject.lastArray = [] as Context
   }
-
+  
+  let lastArray = subject.lastArray
   
   let runtimeInsertBefore = subject.placeholder
-  const lastArray = global.context as Context
 
   let removed = 0
   /** 🗑️ remove previous items first */
-  const filteredLast = global.context = lastArray.filter(function lastArrayFilter(
+  const filteredLast = subject.lastArray = lastArray.filter(function lastArrayFilter(
     item: ContextItem,
     index: number,
   ) {
@@ -172,6 +170,7 @@ export function destroyArrayItem(
 ) {
   const global = item.global as SupportTagGlobal
   const support = global.newest
+  global.deleted = true
 
   if(support) {
     destroySupport(support, counts.removed)
@@ -181,7 +180,6 @@ export function destroyArrayItem(
     paintRemoves.push(element)
   }
 
-  global.deleted = true
   ++counts.removed
 }
 

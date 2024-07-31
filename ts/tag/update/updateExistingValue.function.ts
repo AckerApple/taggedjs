@@ -1,12 +1,11 @@
 import { AnySupport, BaseSupport, getSupport, Support } from '../Support.class.js'
 import { SupportTagGlobal, TagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
-import { isTagTemplater } from '../../isInstance.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { processTagArray } from './processTagArray.js'
 import { updateExistingTagComponent } from './updateExistingTagComponent.function.js'
 import { processNewRegularValue, processUpdateRegularValue, RegularValue } from './processRegularValue.function.js'
 import { checkDestroyPrevious } from '../checkDestroyPrevious.function.js'
-import { getFakeTemplater, newSupportByTemplater, processTag, setupNewSupport } from './processTag.function.js'
+import { getFakeTemplater, newSupportByTemplater, processTag } from './processTag.function.js'
 import { StringTag, DomTag, ContextItem, Tag } from '../Tag.class.js'
 import { ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
@@ -86,7 +85,7 @@ export function updateExistingValue(
       case ValueTypes.dom:
         const tag = value as StringTag | DomTag
         let templater = tag.templater
-    
+
         if(!templater) {
           templater = getFakeTemplater()
           tag.templater = templater
@@ -117,10 +116,12 @@ export function updateExistingValue(
       {added: 0, removed: 0}
     )
 
+    /*
     const global1 = subject.global as TagGlobal
     if(!global1.locked) {
       ++global1.renderCount
     }
+    */
   
     return
   }
@@ -165,10 +166,6 @@ function handleStillTag(
     ownerSupport.appSupport,
     subject,
   )
-
-  if(isTagTemplater(value)) {
-    setupNewSupport(valueSupport, ownerSupport, subject)
-  }
 
   const lastSubject = lastSupport.subject as ContextItem
   const newGlobal = lastSubject.global as SupportTagGlobal

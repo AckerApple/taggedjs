@@ -1,7 +1,7 @@
 import { DomTag, StringTag, TagTemplate } from './Tag.class.js'
 import { TemplaterResult } from './TemplaterResult.class.js'
 import { ValueSubject } from '../subject/ValueSubject.js'
-import { setUse } from '../state/index.js'
+import { setUseMemory } from '../state/index.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 
 
@@ -10,7 +10,7 @@ export type TagChildrenInput = (StringTag | DomTag)[] | DomTag | StringTag | Tag
 
 export type TagComponent = ((...args:  any[]) => (StringTag | DomTag)) & {
   tags?: TagWrapper<any>[]
-  setUse?: typeof setUse
+  setUse?: typeof setUseMemory
   tagIndex?: number
 }
 

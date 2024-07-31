@@ -9,7 +9,6 @@ export * from './interpolations/attributes/ElementTargetEvent.interface.js'
 
 export { tagElement } from './tag/tagElement.js'
 export { Tag, StringTag, DomTag, variablePrefix } from './tag/Tag.class.js'
-export { runBeforeRender } from './tag/tagRunner.js'
 export { renderSupport } from './tag/render/renderSupport.function.js'
 export { renderWithSupport } from './tag/render/renderWithSupport.function.js'
 

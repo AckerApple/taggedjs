@@ -13,10 +13,10 @@ export function softDestroySupport(
   const mySubs = global.subscriptions
   const {subs, tags} = getChildTagsToSoftDestroy(global.context as Context)
 
+  softDestroyOne(lastSupport)
   for (const child of tags) {
     softDestroyOne(child)
   }
-  softDestroyOne(lastSupport)
   
   if(mySubs) {
     subs.push(...mySubs)
@@ -35,6 +35,6 @@ function softDestroyOne(
     return
   }
 
-  smartRemoveKids(child, [], 0)
   global.deleted = true // the children are truly destroyed but the main support will be swapped
+  smartRemoveKids(child, [], 0)
 }

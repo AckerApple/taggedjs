@@ -1,7 +1,7 @@
 import { Subject, ValueSubject } from'../subject/index.js'
 import { Support } from '../tag/Support.class.js'
 import { getSupportInCycle } from'../tag/getSupportInCycle.function.js'
-import { setUse } from'./setUse.function.js'
+import { setUseMemory } from'./setUse.function.js'
 import { state } from'./state.function.js'
 import { syncStates } from'./syncStates.function.js'
 
@@ -165,7 +165,7 @@ function defineOnMethod<R>(
             const setTo = callback(currentValues, previousValues)
 
             if(nowSupport !== firstSupport) {
-              const newestState = setUse.memory.stateConfig.array
+              const newestState = setUseMemory.stateConfig.array
               syncStates(
                 newestState,
                 firstSupport.state,

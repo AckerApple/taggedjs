@@ -40,7 +40,6 @@ export function getTagWrap(
       templater,
       result,
       newSupport,
-      subject,
       useSupport,
       lastSupport,
     )

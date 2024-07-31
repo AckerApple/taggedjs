@@ -6,13 +6,12 @@ import { paintRemoves } from './paint.function.js'
 import { ContextItem } from './Tag.class.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { destroySupport } from './destroySupport.function.js'
-import { SupportTagGlobal, TagGlobal } from './TemplaterResult.class.js'
+import { SupportTagGlobal } from './TemplaterResult.class.js'
 
 export function checkDestroyPrevious(
   subject: ContextItem, // existing.value is the old value
   newValue: unknown,
 ) {
-  const global = subject.global as SupportTagGlobal
   const isArray = newValue instanceof Array
 
   // was simple value but now some different type
@@ -21,7 +20,6 @@ export function checkDestroyPrevious(
      return false  // no need to destroy, just update display
    }
 
-    // global.deleted = true
     const elm = subject.simpleValueElm as Element
     delete subject.simpleValueElm
     paintRemoves.push(elm)
@@ -29,7 +27,8 @@ export function checkDestroyPrevious(
     return 6 // 'changed-simple-value'
   }
 
-  const lastSupport = global.newest  
+  const global = subject.global as SupportTagGlobal
+  const lastSupport = global?.newest  
   // no longer tag or component?
   if(lastSupport && !global.deleted) {
     const isValueTag = isStaticTag(newValue)
@@ -58,18 +57,26 @@ export function checkDestroyPrevious(
     return 8 // 'different-tag'
   }
 
-  const wasArray = global.context
+  const lastArray = subject.lastArray
   // no longer an array
-  if (wasArray && !isArray) {
-    const counts = {added:0, removed:0}
-    for (let index=0; index < wasArray.length; ++index) {
-      destroyArrayItem(wasArray[index], counts)
-    }
-    
-    global.deleted = true
+  if (lastArray && !isArray) {
+    destroyArray(subject, lastArray)
 
-    return 'array'
+    return 9 // 'array'
   }
 
   return false
+}
+
+export function destroyArray(
+  subject: ContextItem,
+  lastArray: any[]
+) {
+  const counts = {added:0, removed:0}
+  // global.deleted = true
+  delete subject.lastArray
+  
+  for (let index=0; index < lastArray.length; ++index) {
+    destroyArrayItem(lastArray[index], counts)
+  }
 }

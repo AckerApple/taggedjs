@@ -10,8 +10,6 @@ import { Subject } from '../subject/index.js'
 import { ValueType, ValueTypes } from './ValueTypes.enum.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 
-export type OriginalFunction = (() => StringTag)
-
 export type Wrapper = ((
   newSupport: BaseSupport | Support,
   subject: ContextItem,
@@ -68,6 +66,7 @@ export type TemplaterResult = {
   arrayValue?: unknown
   key: (arrayValue: unknown) => TemplaterResult
 }
+
 export function getTemplaterResult(props?: Props) {
   const templater: TemplaterResult = {
     props,

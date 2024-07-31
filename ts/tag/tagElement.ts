@@ -1,5 +1,5 @@
 import { BaseSupport, getBaseSupport, Support } from './Support.class.js'
-import { runAfterRender, runBeforeRender } from'./tagRunner.js'
+import { runAfterRender } from'./tagRunner.js'
 import { Events, SupportTagGlobal, TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { Original, TagComponent, TagMaker} from './tag.utils.js'
 import { ValueTypes } from './ValueTypes.enum.js'
@@ -11,6 +11,7 @@ import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.funct
 import { buildBeforeElement } from './buildBeforeElement.function.js'
 import { destroySupport } from './destroySupport.function.js'
 import { executeWrap } from './executeWrap.function.js'
+import { initState } from '../state/state.utils.js'
 
 const appElements: {
   support: BaseSupport // Support
@@ -25,7 +26,7 @@ const appElements: {
  * @returns 
  */
 export function tagElement(
-  app: TagMaker, // (...args: unknown[]) => TemplaterResult,
+  app: TagMaker,
   element: HTMLElement | Element,
   props?: unknown,
 ): {
@@ -131,7 +132,7 @@ export function runWrapper(
   global.oldest = global.oldest || newSupport
   global.newest = newSupport as Support
   
-  runBeforeRender(newSupport, undefined as unknown as Support)
+  initState(newSupport)
 
   if(templater.tagJsType === ValueTypes.stateRender) {
     const result = templater.wrapper || {original: templater} as any
@@ -140,7 +141,6 @@ export function runWrapper(
       templater,
       result,
       newSupport,
-      subject,
       newSupport,
     )
 

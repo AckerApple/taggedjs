@@ -1,7 +1,7 @@
 // taggedjs-no-compile
 
 import { DomTag, StringTag } from './Tag.class.js'
-import { setUse } from '../state/index.js'
+import { setUseMemory } from '../state/index.js'
 import { getTemplaterResult, TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { Original, TagComponent, TagWrapper, tags } from './tag.utils.js'
 import { getTagWrap } from './getTagWrap.function.js'
@@ -49,7 +49,7 @@ export function tag<T extends ToTag>(
 
   // group tags together and have hmr pickup
   tag.tags = tags
-  tag.setUse = setUse
+  tag.setUse = setUseMemory
   tag.tagIndex = tagCount++ // needed for things like HMR
   tags.push(parentWrap)
 
@@ -96,7 +96,7 @@ Object.defineProperty(tag, 'state', {
   set(renderFunction: Function) {
     ;(renderFunction as Wrapper).parentWrap = {
       original: {
-        setUse: setUse,
+        setUse: setUseMemory,
         tags,
       } as any as Original
     } as TagWrapper<any>

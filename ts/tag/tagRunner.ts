@@ -1,85 +1,42 @@
-import { AnySupport, BaseSupport, Support } from './Support.class.js'
-import { setUse } from'../state/index.js'
+import { BaseSupport, Support } from './Support.class.js'
+import { setUseMemory } from'../state/index.js'
 import { Subject } from'../subject/index.js'
 import { getSupportInCycle } from'./getSupportInCycle.function.js'
 import { SupportTagGlobal } from './TemplaterResult.class.js'
+import { afterRender } from '../state/state.utils.js'
 
 // Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
-setUse.memory.tagClosed$ = new Subject<Support>(undefined, subscription => {
+setUseMemory.tagClosed$ = new Subject<Support>(undefined, function tagCloser(subscription) {
   if( !getSupportInCycle() ) {
     subscription.next() // we are not currently processing so process now
   }
 })
-
-// Life cycle 1
-export function runBeforeRender(
-  support: AnySupport,
-  ownerSupport?: AnySupport,
-) {
-  const tagUse = setUse.tagUse
-  const length = tagUse.length
-  for (let index=0; index < length; ++index) {
-    tagUse[index].beforeRender(support, ownerSupport)
-  }
-}
 
 // Life cycle 2
 export function runAfterRender(
   support: BaseSupport | Support,
   ownerSupport?: Support | BaseSupport,
 ) {
-  const tagUse = setUse.tagUse
-  const length = tagUse.length
-  for (let index=0; index < length; ++index) {
-    tagUse[index].afterRender(support, ownerSupport)
-  }
-
-  setUse.memory.tagClosed$.next(ownerSupport)
-}
-
-// Life cycle 3
-export function runBeforeRedraw(
-  support: BaseSupport | Support,
-  ownerSupport: Support | BaseSupport,
-) {
-  const tagUse = setUse.tagUse
-  const length = tagUse.length
-  for (let index=0; index < length; ++index) {
-    tagUse[index].beforeRedraw(support, ownerSupport)
-  }
+  afterRender(support)
+  setUseMemory.tagClosed$.next(ownerSupport)
 }
 
 // Life cycle 4 - end of life
 export function runBeforeDestroy(
   support: Support | BaseSupport,
-  ownerSupport: Support | BaseSupport,
 ) {
-  runBeforeChildDestroy(support, ownerSupport)
-
+  // TODO: We don't need to remove from parents if parent is being destroyed
   // remove me from my parents
-  if(ownerSupport) {
-    const global = support.subject.global as SupportTagGlobal
-    const providers = global.providers
-    if(providers) {
-      for(const provider of providers ) {
-        provider.children.forEach((child, index) => {
-          if(child.subject.global === global) {
-            provider.children.splice(index, 1)
-          }
-        })
+  const global = support.subject.global as SupportTagGlobal
+  const providers = global.providers
+  if(providers) {
+    for(const provider of providers) {
+      for (let index = provider.children.length - 1; index >= 0; --index) {
+        const child = provider.children[index]
+        if(child.subject.global === global) {
+          provider.children.splice(index, 1)
+        }
       }
     }
-  }
-}
-
-// Life cycle 5 - end of life for child
-export function runBeforeChildDestroy(
-  support: Support | BaseSupport,
-  ownerSupport: Support | BaseSupport,
-) {
-  const tagUse = setUse.tagUse
-  const length = tagUse.length
-  for (let index=0; index < length; ++index) {
-    tagUse[index].beforeDestroy(support as BaseSupport, ownerSupport as Support)
   }
 }

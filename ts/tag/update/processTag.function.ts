@@ -78,23 +78,7 @@ export function newSupportByTemplater(
   const global = subject.global as SupportTagGlobal
   global.context = []
 
-  setupNewSupport(support, ownerSupport, subject)
-
   return support
-}
-
-export function setupNewSupport(
-  support: Support,
-  ownerSupport: BaseSupport | Support,
-  subject: ContextItem,
-) {
-  support.subject = subject
-  const global = subject.global as SupportTagGlobal
-  global.oldest = support
-  global.newest = support
-
-  // asking me to render will cause my parent to render
-  support.ownerSupport = ownerSupport
 }
 
 export function processNewTag(

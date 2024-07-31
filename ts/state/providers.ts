@@ -1,7 +1,7 @@
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
 import { Support } from '../tag/Support.class.js'
 import { SupportTagGlobal } from '../tag/TemplaterResult.class.js'
-import { setUse } from'./setUse.function.js'
+import { setUseMemory } from'./setUse.function.js'
 import { state } from'./state.function.js'
 
 export type Provider = {
@@ -41,8 +41,7 @@ export const providers = {
     }
 
     const result = state(() => {
-      const memory = setUse.memory
-      const stateConfig = memory.stateConfig
+      const stateConfig = setUseMemory.stateConfig
       const oldStateCount = stateConfig.array.length
       // Providers with provider requirements just need to use providers.create() and providers.inject()
       const instance: T = 'prototype' in constructMethod ? new (constructMethod as classProvider<T>)() : (constructMethod as functionProvider<T>)()

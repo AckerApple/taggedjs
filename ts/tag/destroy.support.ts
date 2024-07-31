@@ -7,27 +7,28 @@ import { SupportTagGlobal } from './TemplaterResult.class.js'
 
 export function getChildTagsToDestroy(
   childTags: Context,
-  subs: Subscription<any>[] = [],
+  subs: Subscription<any>[],
 ): Subscription<any>[] {
-  for (const child of childTags) {    
+  for (const child of childTags) {
+    const lastArray = child.lastArray
+    if(lastArray) {
+      getChildTagsToDestroy(lastArray, subs)
+      continue
+    }
+
     const global = child.global as SupportTagGlobal
-    
     if(!global) {
       continue // not a support contextItem
     }
 
     const support = global.newest
-    if(!support) {
-      continue // not a support contextItem
-    }
-
     const iSubs = global.subscriptions
     if(iSubs) {
       subs.push(...iSubs)
     }
 
     if(isTagComponent(support.templater)) {
-      runBeforeDestroy(support, support)
+      runBeforeDestroy(support)
     }
 
     const subTags = global.context as Context

@@ -131,19 +131,11 @@ function syncPriorPropFunction(
   if(priorProp instanceof Function) {
     // the prop i am receiving, is already being monitored/controlled by another parent
     if(prop.mem) {
-      priorProp.mem.prop = prop.mem.prop
-      priorProp.mem.stateArray = prop.mem.stateArray
+      priorProp.mem = prop.mem
       return prop
     }
 
-    const ownerGlobal = ownerSupport.subject.global as SupportTagGlobal
-    const newest = ownerGlobal.newest as Support
-    const oldOwnerState = newest.state
-
-    priorProp.mem = {
-      prop,
-      stateArray: oldOwnerState,
-    }
+    priorProp.mem = prop
 
     return priorProp
   }
@@ -166,7 +158,6 @@ function syncPriorPropFunction(
         priorProp[index], x, newSupport, ownerSupport,
         depth + 1,
         index,
-        // seen,
       )
     }
 
@@ -187,7 +178,6 @@ function syncPriorPropFunction(
       ownerSupport,
       depth + 1,
       name,
-      // seen,
     )
 
     if(prop[name] === result) {

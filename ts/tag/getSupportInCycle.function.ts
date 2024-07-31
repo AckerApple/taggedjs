@@ -1,5 +1,5 @@
-import { setUse } from'../state/index.js'
+import { setUseMemory } from'../state/index.js'
 
 export function getSupportInCycle() {
-  return setUse.memory.stateConfig.support
+  return setUseMemory.stateConfig.support
 }

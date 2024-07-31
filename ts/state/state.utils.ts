@@ -1,13 +1,10 @@
-import { StateMismatchError } from '../errors.js'
 import { BaseSupport, Support } from '../tag/Support.class.js'
-import { Wrapper } from '../tag/TemplaterResult.class.js'
-import { setUse } from'./setUse.function.js'
+import { firstLetState, reLetState } from './letState.function.js'
+import { setUseMemory } from'./setUse.function.js'
+// import { runFirstState } from './state.function.js'
+import { stateHandlers } from './stateHandlers.js'
 
 export type StateConfig<T> = (x: T) => [T, T]
-const badLetState = 'letState function incorrectly used. Second item in array is not setting expected value.\n\n' +
-'For "let" state use `let name = state(default)(x => [name, name = x])`\n\n' +
-'For "const" state use `const name = state(default)()`\n\n' +
-'Problem state:\n'
 
 export type StateConfigItem<T> = {
   get: () => T // TODO: only a convenience, not needed, remove
@@ -24,92 +21,72 @@ export type Config = {
 
 export type State = StateConfigItem<any>[]
 
-setUse.memory.stateConfig = {
+setUseMemory.stateConfig = {
   array: [] as State, // state memory on the first render
   // rearray: [] as State,
 } as Config
 
 export type GetSet<T> = (y: T) => [T, T]
 
-setUse({
-  beforeRender: initState,
-  beforeRedraw: reState,
-  afterRender: function afterRender(
-    support: Support | BaseSupport,
-  ) {
-    const config: Config = setUse.memory.stateConfig
-    const rearray = config.rearray as unknown as State[]
-    
-    if(rearray.length) {
-      if(rearray.length !== config.array.length) {
-        const message = `States lengths have changed ${rearray.length} !== ${config.array.length}. State tracking requires the same amount of function calls every render. Typically this errors is thrown when a state like function call occurs only for certain conditions or when a function is intended to be wrapped with a tag() call`
-        const wrapper = support.templater?.wrapper as Wrapper
-        const details = {
-          oldStates: config.array,
-          newStates: config.rearray,
-          tagFunction: wrapper.parentWrap.original,
-        }
-        const error = new StateMismatchError(message,details)
-        console.warn(message,details)
-        throw error
-      }
-    }
-    
-    delete config.rearray // clean up any previous runs
-    delete config.support
-
-    support.state = []
-    support.state.push(...config.array)
-    config.array = []
-  }
-})
-
-export function getStateValue<T>(
-  state: StateConfigItem<T>,
+export function afterRender(
+  support: Support | BaseSupport,
 ) {
-  const callback = state.callback
+  const config: Config = setUseMemory.stateConfig
   
-  // state()
-  if(!callback) {
-    return state.defaultValue
+  // TODO: only needed in development
+  /*
+  const rearray = config.rearray as unknown as State[]
+  if(rearray.length && rearray.length !== config.array.length) {
+    const message = `States lengths have changed ${rearray.length} !== ${config.array.length}. State tracking requires the same amount of function calls every render. Typically this errors is thrown when a state like function call occurs only for certain conditions or when a function is intended to be wrapped with a tag() call`
+    const wrapper = support.templater?.wrapper as Wrapper
+    const details = {
+      oldStates: config.array,
+      newStates: config.rearray,
+      tagFunction: wrapper.parentWrap.original,
+    }
+    const error = new StateMismatchError(message,details)
+    console.warn(message,details)
+    throw error
+  }
+  */
+  
+  delete config.support
+
+  support.state = config.array
+  config.array = []
+}
+
+export function initState(
+  support: Support | BaseSupport
+) {
+  // stateHandlers.handler = runFirstState
+  stateHandlers.letHandler = firstLetState as any
+
+  const config: Config = setUseMemory.stateConfig
+  config.rearray = []
+  config.support = support
+}
+
+export function reState(
+  support: Support | BaseSupport
+) {
+  const state = support.state
+  const config: Config = setUseMemory.stateConfig
+  config.rearray = state
+  const rearray = config.rearray as State
+  
+  if(rearray && rearray.length) {
+    // stateHandlers.handler = reState as any
+    stateHandlers.letHandler = reLetState as any
+  } else {
+    // stateHandlers.handler = runFirstState
+    stateHandlers.letHandler = firstLetState
   }
 
-  // letState()
-  const [value,checkValue] = getCallbackValue(callback)
-
-  // TODO: not needed in production
-  if(checkValue !== StateEchoBack) {
-    const message = badLetState + (callback ? callback.toString() : JSON.stringify(state)) +'\n'    
-    console.error(message, {state, callback, value, checkValue})
-    throw new Error(message)
-  }
-
-  return value
+  config.support = support
 }
 
 export class StateEchoBack {}
-
-function initState(
-  support: Support | BaseSupport
-) {
-  const config: Config = setUse.memory.stateConfig
-  config.rearray = []
-  config.support = support
-}
-
-function reState(
-  support: Support | BaseSupport
-) {
-  const state = support.state as State
-  const config: Config = setUse.memory.stateConfig
-
-  config.rearray = []
-  for (const item of state) {
-    getStateValue(item)
-  }
-  config.rearray.push( ...state )
-  config.support = support
-}
 
 // sends a fake value and then sets back to received value
 export function getCallbackValue<T>(

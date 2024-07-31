@@ -10,15 +10,14 @@ export function destroySupport(
   stagger: number,
 ): number | Promise<number> {
   const global = support.subject.global as SupportTagGlobal
-  const subs = getChildTagsToDestroy(global.context as Context)
+  global.deleted = true
+
+  const context = global.context as Context
+
+  const subs = getChildTagsToDestroy(context, global.subscriptions || [])
 
   global.destroy$.next()
-  runBeforeDestroy(support, support)
-
-  const mySubs = global.subscriptions
-  if(mySubs) {
-    subs.push(...mySubs)
-  }
+  runBeforeDestroy(support)
   
   // destroy all child and possibly my own subscriptions
   destroySubs(subs)

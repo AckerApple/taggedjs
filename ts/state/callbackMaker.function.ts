@@ -1,6 +1,4 @@
-import { BaseSupport, Support } from '../tag/Support.class.js'
-import { setUse } from './setUse.function.js'
-import { State } from './state.utils.js'
+import { setUseMemory } from './setUse.function.js'
 import { SyncCallbackError } from '../errors.js'
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
 import callbackStateUpdate from './callbackStateUpdate.function.js'
@@ -16,19 +14,7 @@ let innerCallback = <A,B,C,D,E,F, T>(
 ) => (a?:A, b?:B, c?:C, d?:D, e?:E, f?:F): T => {
   throw new SyncCallbackError('Callback function was called immediately in sync and must instead be call async')
 }
-export const callbackMaker = () => innerCallback
-
-const originalGetter = innerCallback // callbackMaker
-
-setUse({
-  beforeRender: support => initMemory(support),
-  beforeRedraw: support => initMemory(support),
-  afterRender: support => {
-    const global = support.subject.global as TagGlobal
-    global.callbackMaker = true
-    innerCallback = originalGetter // prevent crossing callbacks with another tag
-  },
-})
+export const callbackMaker = () => callback as typeof innerCallback
 
 const syncError = new SyncCallbackError('callback() was called outside of synchronous rendering. Use `callback = callbackMaker()` to create a callback that could be called out of sync with rendering')
 
@@ -42,7 +28,7 @@ export function callback<A,B,C,D,E,F, T>(
     throw syncError
   }
 
-  const oldState = setUse.memory.stateConfig.array
+  const oldState = setUseMemory.stateConfig.array
   const trigger = (...args: any[]) => {
     const global = support.subject.global as TagGlobal
     const callbackMaker = global.callbackMaker
@@ -55,24 +41,4 @@ export function callback<A,B,C,D,E,F, T>(
   }
 
   return trigger
-}
-
-function initMemory (support: Support | BaseSupport) {
-  const oldState: State = setUse.memory.stateConfig.array
-  innerCallback = (
-    callback: Callback<any, any, any, any, any, any, any>
-  ) => {    
-    const trigger = (...args: any[]) => {
-      const global = support.subject.global as TagGlobal
-      const callbackMaker = global.callbackMaker
-      
-      if(callbackMaker) {
-        return callbackStateUpdate(support, callback, oldState, ...args)
-      }
-
-      return (callback as any)(...args)
-    }
-
-    return trigger
-  }
 }

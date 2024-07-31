@@ -124,7 +124,7 @@ export function processFirstSubjectValue(
   }
 
   if(value instanceof Array) {
-    subject.global = getNewGlobal() as SupportTagGlobal
+    // subject.global = getNewGlobal() as SupportTagGlobal
 
     processTagArray(
       subject,

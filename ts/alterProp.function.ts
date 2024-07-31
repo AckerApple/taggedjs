@@ -1,7 +1,7 @@
 import { AnySupport, BaseSupport, Support } from './tag/Support.class.js'
 import { isStaticTag } from './isInstance.js'
 import { isInlineHtml, renderInlineHtml, renderSupport } from './tag/render/renderSupport.function.js'
-import { setUse } from './state/index.js'
+import { setUseMemory } from './state/index.js'
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { Props } from './Props.js'
 import { Tag } from './tag/Tag.class.js'
@@ -76,7 +76,7 @@ export function checkProp(
       )
 
       if(subValue instanceof Function) {
-        if(subValue.toCall) {
+        if(subValue.mem) {
           continue
         }
 
@@ -106,7 +106,7 @@ export function checkProp(
 
     value[name] = result
     if(result instanceof Function) {
-      if(subValue.toCall) {
+      if(subValue.mem) {
         continue
       }
   
@@ -127,7 +127,7 @@ function afterCheckProp(
   // restore object to have original function on destroy
   if(depth > 0) {    
     const global = newSupport.subject.global as SupportTagGlobal
-    newProp[index].subscription = global.destroy$.toCallback(() => {
+    newProp[index].subscription = global.destroy$.toCallback(function alterCheckProcessor() {
       newProp[index] = originalValue
     })
   }
@@ -137,22 +137,25 @@ export function getPropWrap(
   value: any,
   ownerSupport: BaseSupport | Support,
 ) {
-  const toCall = value.toCall
+  const already = value.mem
 
   // already previously converted by a parent?
-  if(toCall) {
+  if(already) {
     return value
   }
 
-  const wrap = (...args: any[]) => wrap.toCall(...args) // what gets called can switch over parent state changes
+  const wrap = function wrapRunner(...args: any[]) {
+    return wrap.toCall(...args)
+  } // what gets called can switch over parent state changes
+  
   // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
-  wrap.toCall = (...args: any[]) => {
-    return callbackPropOwner(wrap.mem.prop, args, ownerSupport)
+  wrap.toCall = function toCallRunner(...args: any[]) {
+    // return callbackPropOwner(wrap.mem, args, ownerSupport)
+    return callbackPropOwner(wrap.mem, args, ownerSupport)
   }
+  
   wrap.original = value
-  wrap.mem = {
-    prop: value,
-  }
+  wrap.mem = value
 
   // copy data properties that maybe on source function
   Object.assign(wrap, value)
@@ -172,7 +175,7 @@ export function callbackPropOwner(
   const noCycle = supportInCycle === undefined
   const callbackResult = toCall(...callWith)
 
-  const run = () => {
+  const run = function propCallbackProcessor() {
     const global = newest.subject.global as SupportTagGlobal
 
     // are we in a rendering cycle? then its being called by alterProps
@@ -201,7 +204,7 @@ export function callbackPropOwner(
     return run()
   }
   
-  setUse.memory.tagClosed$.toCallback(run)
+  setUseMemory.tagClosed$.toCallback(run)
 
   return callbackResult
 }

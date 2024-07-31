@@ -29,6 +29,7 @@ export type ContextItem = {
   simpleValueElm?: Clone
   placeholder?: Text // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
 
+  lastArray?: Context
   global?: TagGlobal
   value?: any,
 }

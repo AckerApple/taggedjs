@@ -1,4 +1,5 @@
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
+import { destroyArray } from './checkDestroyPrevious.function.js'
 import { elementDestroyCheck } from './elementDestroyCheck.function.js'
 import { paint, paintRemoves } from './paint.function.js'
 import { AnySupport } from './Support.class.js'
@@ -12,17 +13,25 @@ export function smartRemoveKids(
   stagger: number,
 ) {
   const startStagger = stagger
-  const subject = support.subject
-  const thisGlobal = subject.global as SupportTagGlobal
+  const ownerSubject = support.subject
+  const thisGlobal = ownerSubject.global as SupportTagGlobal
   const htmlDomMeta = thisGlobal.htmlDomMeta as DomObjectChildren
   const context = thisGlobal.context as ContextItem[]
+  thisGlobal.deleted = true
 
   for (const subject of context) {
+    const lastArray = subject.lastArray
+    if(lastArray) {
+      destroyArray(subject, lastArray)
+      continue
+    }
+
     const global = subject.global as SupportTagGlobal
-    
     if(!global || global.deleted) {
       continue
     }
+    
+    global.deleted = true
 
     const oldest = global.oldest
     if(oldest) {
@@ -59,14 +68,10 @@ export function smartRemoveKids(
       delete subject.simpleValueElm    
       paintRemoves.push(elm)
     }
-
-    global.deleted = true
   }
   
   destroyClones(htmlDomMeta, startStagger, promises)
-  
-  thisGlobal.deleted = true
-  
+    
   return stagger
 }
 

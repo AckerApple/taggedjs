@@ -21,12 +21,6 @@ export function isStaticTag(
   ].includes( (value as any)?.tagJsType )
 }
 
-export function isTagTemplater(
-  value?: TemplaterResult | unknown
-) {
-  return (value as TemplaterResult)?.tagJsType === ValueTypes.templater
-}
-
 export function isTagComponent(
   value?: TemplaterResult | unknown
 ) {

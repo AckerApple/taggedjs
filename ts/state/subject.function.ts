@@ -1,7 +1,7 @@
 import { Support } from '../tag/Support.class.js'
 import { OnSubscription, Subject, ValueSubject } from '../subject/index.js'
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
-import { setUse } from './setUse.function.js'
+import { setUseMemory } from './setUse.function.js'
 import { state } from './state.function.js'
 import { syncStates } from './syncStates.function.js'
 
@@ -10,9 +10,12 @@ export function subject<T>(
   value?: T,
   onSubscription?: OnSubscription<T>
 ) {
-  const oldestState = state(() => setUse.memory.stateConfig.array)
+  const oldestState = state(function subjectState() {
+    return setUseMemory.stateConfig.array
+  })
+  
   const nowSupport = getSupportInCycle() as Support
-  return state(() => {
+  return state(function subjectState() {
     const subject = new Subject(value, onSubscription).pipe(x => {
       syncStates(nowSupport.state, oldestState)
       return x
@@ -22,9 +25,12 @@ export function subject<T>(
 }
 
 subject._value = <T>(value: T) => {
-  const oldestState = state(() => setUse.memory.stateConfig.array)
+  const oldestState = state(function subjectValue() {
+    return setUseMemory.stateConfig.array
+  })
+
   const nowSupport = getSupportInCycle() as Support
-  return state(() => {
+  return state(function subjectValue() {
     const subject = new ValueSubject(value).pipe(x => {
       syncStates(nowSupport.state, oldestState)
       return x
@@ -40,7 +46,7 @@ function all<A, B, C>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C]): S
 function all<A, B>(args: [Subject<A> | A, Subject<B> | B]): Subject<[A,B]>
 function all<A>(args: [Subject<A> | A]): Subject<[A]>
 function all(args: any[]): Subject<any> {
-  const oldestState = state(() => setUse.memory.stateConfig.array)
+  const oldestState = state(() => setUseMemory.stateConfig.array)
   const nowSupport = getSupportInCycle() as Support
   return Subject.all(args as any).pipe(x => {
     syncStates(nowSupport.state, oldestState)

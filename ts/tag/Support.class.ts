@@ -82,7 +82,7 @@ export function destroySubs(
     return
   }
 
-  setTimeout(function () {
+  setTimeout(function destroySubsTimeout() {
     for (const sub of subs) {
       sub.unsubscribe()
     }

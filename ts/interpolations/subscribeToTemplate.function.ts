@@ -5,7 +5,7 @@ import { AnySupport } from '../tag/Support.class.js'
 import { TagGlobal, TemplaterResult } from '../tag/TemplaterResult.class.js'
 import { Counts } from './interpolateTemplate.js'
 import { paint } from '../tag/paint.function.js'
-import { setUse } from '../state/setUse.function.js'
+import { setUseMemory } from '../state/setUse.function.js'
 import { ContextItem } from '../tag/Tag.class.js'
 
 export type SubToTemplateOptions = {
@@ -36,9 +36,7 @@ export function subscribeToTemplate({
       syncRun ? appendTo : undefined,
     )
 
-    const global2 = contextItem.global as TagGlobal
-
-    if(!syncRun && !setUse.memory.stateConfig.support) {
+    if(!syncRun && !setUseMemory.stateConfig.support) {
       paint()
     }
 
@@ -54,7 +52,7 @@ export function subscribeToTemplate({
         support,
       )
 
-      if(!setUse.memory.stateConfig.support) {
+      if(!setUseMemory.stateConfig.support) {
         paint()
       }
 
@@ -62,7 +60,10 @@ export function subscribeToTemplate({
     }
   }
   
-  const callback = (value: TemplateValue) => onValue(value)
+  const callback = function subValueProcessor(value: TemplateValue) {
+    onValue(value)
+  }
+  
   let syncRun = true
   const sub = subject.subscribe(callback as any)
   syncRun = false
