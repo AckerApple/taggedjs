@@ -9,7 +9,7 @@
  */
 
 import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function.js"
-import { buildBeforeElement, ContextItem, destroySupport, Support, SupportTagGlobal, TaggedFunction, Wrapper } from "taggedjs"
+import { buildBeforeElement, ContextItem, destroySupport, Support, SupportTagGlobal, TaggedFunction, TagGlobal, Wrapper } from "taggedjs"
 
 /** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 
@@ -63,10 +63,9 @@ export async function updateSubject(
   const ownGlobal = oldest.ownerSupport.subject.global as SupportTagGlobal
   const providers = global.providers
   const owner = ownGlobal.oldest as Support
+
   // connect child to owner
   reSupport.ownerSupport = owner
-  // connect owner to child
-  // owner.subject.global.childTags.push(reSupport)  
 
   if(providers) {
     providers.forEach((provider, index) => {
@@ -79,11 +78,9 @@ export async function updateSubject(
   await destroySupport(oldest, 0)
 
   const reGlobal = reSupport.subject.global as SupportTagGlobal
-  delete oldest.subject.global.deleted
-  // delete (reSupport.subject.global as any).oldest // TODO this maybe redundant of oldest.destroy()
-  // delete reGlobal.newest
+  const oldGlobal = oldest.subject.global as TagGlobal
+  delete oldGlobal.deleted
 
-  // const insertBefore = oldest.subject.global.insertBefore as InsertBefore
   buildBeforeElement(reSupport, undefined, {counts: {added:0, removed: 0}})
 
   reGlobal.newest = reSupport

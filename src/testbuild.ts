@@ -1,4 +1,4 @@
-import { BaseSupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, getValueType, oneRenderToSupport, renderTagOnly, StringTag, BasicTypes, ContextItem, getNewGlobal, getBaseSupport, Context, SupportTagGlobal } from 'taggedjs'
+import { RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, StringTag, ContextItem, getNewGlobal, getBaseSupport, Context, SupportTagGlobal } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -97,63 +97,57 @@ function processValue(
   subject?: ContextItem,
 ) {
 
-  const valueType = getValueType(value)
-
-  switch (valueType) {
-    case ValueTypes.tagComponent:
-      const tagString = templaterToHtml(value as TemplaterResult)
-      strings.splice(index+1, 0, tagString)
-      break
-
-    case ValueTypes.templater:
-    case ValueTypes.tag:
-      const tag = (value as any).tag as StringTag // ??? TODO
-      const subStrings = new Array(...tag.strings) // .reverse()
-      const string = subStrings.map((x, index) => {
-        const value = tag.values[index]
-        x + processValue(
-          value,
-          [],
-          tag.strings.length - 1 -index,
-          support,
-          {
-            value,
-            // tagJsType: getValueType(value),
-            global: getNewGlobal()
-          }
+  if(value instanceof Object && value.tagJsType) {
+    switch (value.tagJsType) {
+      case ValueTypes.tagComponent:
+        const tagString = templaterToHtml(value as TemplaterResult)
+        strings.splice(index+1, 0, tagString)
+        break
+  
+      case ValueTypes.oneRender: 
+        const tSupport = oneRenderToSupport(
+          value as any,
+          subject as ContextItem,
+          support, // ownerTagSupport as TagSupport,
         )
-      }).join('')
-      strings.splice(index+1, 0, string)
-      //const tempString = templaterToHtml(value as TemplaterResult)
-      //strings.splice(index+1, 0, tempString)
-      break
-    
-    case BasicTypes.function:
-      if(!(value as any).oneRender) {
-        strings.splice(index + 1, 0, '"' + value.toString() + '"')
-        break // its not a function we should be messing with
-      }
+  
+        readySupport(tSupport, subject as ContextItem)
+  
+        const fnString = templaterToHtml(tSupport.templater)
+        strings.splice(index+1, 0, fnString)
+        break
+   
 
-      const tSupport = oneRenderToSupport(
-        value as any,
-        subject as ContextItem,
-        support, // ownerTagSupport as TagSupport,
-      )
-
-      readySupport(tSupport, subject as ContextItem)
-
-      const fnString = templaterToHtml(tSupport.templater)
-      strings.splice(index+1, 0, fnString)
-      
-      break
-    
-    default:
+      case ValueTypes.templater:
+      case ValueTypes.tag:
+        const tag = (value as any).tag as StringTag // ??? TODO
+        const subStrings = new Array(...tag.strings) // .reverse()
+        const string = subStrings.map((x, index) => {
+          const value = tag.values[index]
+          x + processValue(
+            value,
+            [],
+            tag.strings.length - 1 -index,
+            support,
+            {
+              value,
+              global: getNewGlobal()
+            }
+          )
+        }).join('')
+        strings.splice(index+1, 0, string)
+        break  
+    }
+  } else {
+    if(value instanceof Function) {
+      strings.splice(index + 1, 0, '"' + value.toString() + '"')
+    } else {
       if([undefined, null].includes(value)) {
         value = ''
       }
-
+    
       strings.splice(index+1, 0, value.toString())
-      break
+    }
   }
 
   return strings
