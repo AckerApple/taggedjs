@@ -1,5 +1,5 @@
 import { InputElementTargetEvent } from '../interpolations/attributes/ElementTargetEvent.interface.js'
-import { LikeObjectChildren } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
+import { LikeObjectChildren } from '../interpolations/optimizers/LikeObjectElement.type.js'
 import { getStringTag, getDomTag } from './Tag.class.js'
 import { getTemplaterResult } from './TemplaterResult.class.js'
 import { RegularValue } from './update/processRegularValue.function.js'

@@ -2,7 +2,7 @@
 
 import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
 import { Attribute, ObjectText } from "./ObjectNode.types.js";
-import { DomMetaMap, ObjectChildren, ValuePos } from "./exchangeParsedForValues.function.js";
+import { DomMetaMap, ObjectChildren, ValuePos } from "./LikeObjectElement.type.js";
 import { OneUnparsedHtml, ParsedHtml, UnparsedHtml } from "./htmlInterpolationToDomMeta.function.js";
 
 const placeholderRegex = new RegExp(variablePrefix + '(\\d+)' + variableSuffix, 'g');

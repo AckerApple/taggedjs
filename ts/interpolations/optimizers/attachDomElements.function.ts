@@ -11,9 +11,9 @@ import { processAttribute } from "../attributes/processAttribute.function.js"
 import { SubToTemplateOptions } from "../subscribeToTemplate.function.js"
 import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode.types.js"
 import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
-import { ObjectChildren } from "./exchangeParsedForValues.function.js"
+import { ObjectChildren } from "./LikeObjectElement.type.js"
 import { howToSetInputValue } from "../attributes/howToSetInputValue.function.js"
-import { getNewGlobal, runOneContext, SupportTagGlobal, TagGlobal } from "../../tag/index.js"
+import { runOneContext, TagGlobal } from "../../tag/index.js"
 
 // ??? TODO: This could be done within exchangeParsedForValues to reduce loops
 export function attachDomElements(
@@ -42,7 +42,10 @@ export function attachDomElements(
     if(isNum) {
       const subVal = values[ context.length ]
       const marker = document.createTextNode(empty)
-      const contextItem = runOneContext(subVal, values, context.length, context, support)
+      const contextItem = runOneContext(
+        subVal,
+        context,
+      )
       contextItem.placeholder = marker
 
       if(owner) {

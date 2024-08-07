@@ -3,6 +3,7 @@ import { State } from './state.utils.js'
 import { renderSupport } from '../tag/render/renderSupport.function.js'
 import { syncStates } from './syncStates.function.js'
 import { Callback } from './callbackMaker.function.js'
+import { SupportTagGlobal } from '../tag/index.js'
 
 export default function callbackStateUpdate<T>(
   support: Support | BaseSupport,
@@ -10,24 +11,22 @@ export default function callbackStateUpdate<T>(
   oldState: State,
   ...args: any[]
 ): T {
-  const state = support.state  
+  const global = support.subject.global as SupportTagGlobal
+  support = global.newest // || support
+  const state = support.state
   // ensure that the oldest has the latest values first
-  // ??? new removed
   syncStates(state, oldState)
   
   // run the callback
   const maybePromise = callback(...args as [any,any,any,any,any,any])
 
   // send the oldest state changes into the newest
-  // ??? new removed
   syncStates(oldState, state)
-
   renderSupport(support)
 
   if(maybePromise instanceof Promise) {
     maybePromise.finally(() => {
       // send the oldest state changes into the newest
-      // ??? new removed
       syncStates(oldState, state)
 
       renderSupport(support)

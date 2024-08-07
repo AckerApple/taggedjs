@@ -4,7 +4,7 @@ import { TagTemplate } from './Tag.class.js'
 import { htmlInterpolationToDomMeta, ParsedHtml } from '../interpolations/optimizers/htmlInterpolationToDomMeta.function.js'
 import { getStringsId } from './getStringsId.function.js'
 import { isLastRunMatched } from './isLastRunMatched.function.js'
-import { DomMetaMap, ValuePos } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
+import { DomMetaMap, ValuePos } from '../interpolations/optimizers/LikeObjectElement.type.js'
 import { replacePlaceholders } from '../interpolations/optimizers/replacePlaceholders.function.js'
 import { restorePlaceholders } from '../interpolations/optimizers/restorePlaceholders.function.js'
 

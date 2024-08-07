@@ -60,6 +60,8 @@ export function tagElement(
     global.events = {}
 
     destroySupport(support, 0) // never return anything here
+
+    paint()
   }
   
   let tags: any[] = []
@@ -97,10 +99,10 @@ export function tagElement(
   }
   --painting.locks
 
-  requestAnimationFrame(function() {
-    paint()
-    element.appendChild(newFragment)
-  })
+  paint()
+  element.appendChild(newFragment)
+
+  ++global.renderCount
 
   return {
     support,

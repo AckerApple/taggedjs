@@ -7,6 +7,7 @@ import { ContextItem } from './Tag.class.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { destroySupport } from './destroySupport.function.js'
 import { SupportTagGlobal } from './TemplaterResult.class.js'
+import { processNewRegularValue, processUpdateRegularValue, RegularValue } from './update/processRegularValue.function.js'
 
 export function checkDestroyPrevious(
   subject: ContextItem, // existing.value is the old value
@@ -17,13 +18,24 @@ export function checkDestroyPrevious(
   // was simple value but now some different type
   if(subject.simpleValueElm) {
    if([null,undefined].includes(newValue as any) || !(isArray || newValue instanceof Object)) {
-     return false  // no need to destroy, just update display
+     // This will cause all other values to render
+     processUpdateRegularValue(
+       newValue as RegularValue,
+       subject,
+     )
+
+     return -1  // no need to destroy, just update display
    }
 
     const elm = subject.simpleValueElm as Element
     delete subject.simpleValueElm
     paintRemoves.push(elm)
-
+/*
+    processNewRegularValue(
+      newValue as RegularValue,
+      subject,
+    )
+*/
     return 6 // 'changed-simple-value'
   }
 

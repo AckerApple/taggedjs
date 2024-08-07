@@ -10,6 +10,9 @@ export function processUpdateRegularValue(
 ) {
   const castedValue = castTextValue(value)
   const oldClone = subject.simpleValueElm as Text // placeholder
+  if(!oldClone) {
+    throw new Error('issue here')
+  }
   setContent.push([castedValue, oldClone])
 }
 

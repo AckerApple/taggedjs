@@ -82,13 +82,10 @@ export function destroySubs(
     return
   }
 
-  setTimeout(function destroySubsTimeout() {
-    for (const sub of subs) {
-      sub.unsubscribe()
-    }
-  }, 0)
+  for (const sub of subs) {
+    sub.unsubscribe()
+  }
 }
-
 
 export function addSupportEventListener(
   support: AnySupport,

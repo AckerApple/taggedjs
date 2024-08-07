@@ -1,5 +1,5 @@
 import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
-import { ObjectChildren } from "./exchangeParsedForValues.function.js";
+import { ObjectChildren } from "./LikeObjectElement.type.js";
 import { OneUnparsedHtml } from "./htmlInterpolationToDomMeta.function.js";
 import { ObjectText } from "./ObjectNode.types.js";
 export const safeVar = '__safeTagVar'

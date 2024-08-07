@@ -15,7 +15,7 @@ export function updateExistingTagComponent(
   ownerSupport: BaseSupport | Support,
   support: AnySupport, // lastest
   subject: ContextItem,
-): {subject: ContextItem, support: Support | BaseSupport, rendered: boolean} {
+): void {
   const global = subject.global as SupportTagGlobal
   const lastSupport = global.newest
   
@@ -36,20 +36,19 @@ export function updateExistingTagComponent(
 
   const templater = support.templater
   if(!isSameTag) {
-    const newSupport = swapTags(
+    swapTags(
       subject,
       templater,
       ownerSupport,
     )
 
-    return {subject, support: newSupport, rendered: true}
+    return
   }
 
   const hasChanged = skipComparing || hasSupportChanged(
     lastSupport as unknown as BaseSupport,
     templater
   )
-
 
   // everyhing has matched, no display needs updating.
   if(!hasChanged) {
@@ -60,17 +59,17 @@ export function updateExistingTagComponent(
       ownerSupport,
     )
 
-    return {subject, rendered: false, support: lastSupport}
+    return
   }
 
   if(global.locked) {
     global.blocked.push(support)
-    return {subject, support, rendered: false}
+    return
   }
 
   const newSupport = renderSupport(support)
 
-  return {subject, support: newSupport, rendered: true}
+  return
 }
 
 export function syncFunctionProps(

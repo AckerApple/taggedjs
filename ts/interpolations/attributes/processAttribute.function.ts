@@ -38,28 +38,26 @@ export function processAttribute(
   const isNameVar = nameVar >= 0
 
   if( isNameVar ) {
+    const value = values[nameVar]
     const contextItem = runOneContext(
-      attrName,
-      values,
-      context.length,
+      value,
       context,
-      support
     )
 
     contextItem.isAttr = true
     contextItem.element = element
+    contextItem.howToSet = howToSet
+    contextItem.isNameOnly = true
 
-    processNameOnlyAttr(
+    processNameOnlyAttrValue(
       values,
+      value as any,
+      element as Element,
       support,
-      contextItem,
-      element,
-      howToSet,
+      howToSet as HowToSet,
       context,
     )
-
-    contextItem.value = attrName
-
+  
     return
   }
 
@@ -130,7 +128,6 @@ function processNameOnlyAttr(
       processNameOnlyAttrValue(
         values,
         value,
-        contextValue.value,
         element,
         support,
         howToSet,
@@ -146,7 +143,6 @@ function processNameOnlyAttr(
 
   processNameOnlyAttrValue(
     values,
-    contextValue.value,
     contextValue.value,
     element,
     support,
@@ -194,18 +190,21 @@ export function updateNameOnlyAttrValue(
     }
   }
 
-  processNameOnlyAttrValue(values, attrValue, lastValue, element, ownerSupport, howToSet, context)
+  processNameOnlyAttrValue(values, attrValue, element, ownerSupport, howToSet, context)
 }
 
 export function processNameOnlyAttrValue(
   values: unknown[],
   attrValue: string | boolean | Record<string, any>,
-  lastValue: string | Record<string, any> | undefined,
   element: Element,
   ownerSupport: AnySupport,
   howToSet: HowToSet,
   context: Context,
 ) {
+  if([undefined, null, false].includes(attrValue as any)) {
+    return
+  }
+
   // process an object of attributes ${{class:'something, checked:true}}
   if(attrValue instanceof Object) {
     for (const name in attrValue) {
@@ -229,7 +228,7 @@ export function processNameOnlyAttrValue(
     return // ignore, do not set at this time
   }
 
-  howToSet(element, attrValue as string, empty)  
+  howToSet(element, attrValue as string, empty)
 }
 
 /** Processor for flat attributes and object attributes */

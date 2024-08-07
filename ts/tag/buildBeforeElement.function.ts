@@ -1,7 +1,7 @@
 import { ParsedHtml } from '../interpolations/optimizers/htmlInterpolationToDomMeta.function.js'
 import { attachDomElements } from '../interpolations/optimizers/attachDomElements.function.js'
 import { getDomMeta } from './domMetaCollector.js'
-import { DomMetaMap } from '../interpolations/optimizers/exchangeParsedForValues.function.js'
+import { DomMetaMap } from '../interpolations/optimizers/LikeObjectElement.type.js'
 import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js'
 import { painting } from './paint.function.js'
 import { AnySupport } from './Support.class.js'
@@ -72,65 +72,14 @@ function loadDomMeta(support: AnySupport): ParsedHtml {
 
 export function runOneContext(
   value: unknown,
-  values: unknown[],
-  index: number,
   context: Context,
-  ownerSupport: AnySupport,
 ): ContextItem {
   const contextItem: ContextItem = {
+    value
   }
 
   context.push(contextItem)
 
-  processOneContext(
-    values,
-    values[index],
-    contextItem,
-    context,
-    ownerSupport,
-  )
-
-  contextItem.value = value
 
   return contextItem
-}
-
-/** returns boolean of did render */
-function processOneContext(
-  values: unknown[],
-  value: unknown,
-  contextItem: ContextItem,
-  context: Context,
-  ownerSupport: AnySupport,
-): boolean {
-  if(contextItem.isAttr) {
-    if(contextItem.isNameOnly) {
-      processNameOnlyAttrValue(
-        values,
-        value as any,
-        contextItem.value,
-        contextItem.element as Element,
-        ownerSupport,
-        contextItem.howToSet as HowToSet,
-        context,
-      )
-
-      return false
-    }
-
-    const element = contextItem.element as Element
-    processAttributeEmit(
-      value,
-      contextItem.attrName as string,
-      contextItem,
-      element,
-      ownerSupport,
-      contextItem.howToSet as HowToSet,
-      contextItem.isSpecial as boolean,
-    )
-
-    return false
-  }
-
-  return false
 }

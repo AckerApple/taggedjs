@@ -21,6 +21,10 @@ export function updateExistingValue(
 ) {
   const wasDestroyed = checkDestroyPrevious(subject, value)
 
+  if(wasDestroyed === -1) {
+    return // do nothing
+  }
+
   // handle already seen tag components
   const tagJsType = value && (value as any).tagJsType as ValueType
   if(tagJsType) {
@@ -28,11 +32,13 @@ export function updateExistingValue(
     if(isStateTag) {
       subject.global = subject.global || getNewGlobal()
 
-      return prepareUpdateToComponent(
+      prepareUpdateToComponent(
         value as TemplaterResult,
         subject as ContextItem,
         ownerSupport,
       )
+
+      return
     }
 
     if(tagJsType === ValueTypes.oneRender) {
@@ -130,7 +136,6 @@ export function updateExistingValue(
     subject.value = value
     return
   }
-
   // This will cause all other values to render
   if(wasDestroyed) {
     processNewRegularValue(
@@ -143,13 +148,6 @@ export function updateExistingValue(
       subject,
     )
   }
-/*
-  const global3 = subject.global as TagGlobal
-  if(global3 && global3.locked) {
-    ++global3.renderCount
-  }
-*/
-  return
 }
 
 function handleStillTag(
@@ -177,7 +175,7 @@ function prepareUpdateToComponent(
   templater: TemplaterResult,
   contextItem: ContextItem,
   ownerSupport: BaseSupport | Support,
-): {subject: ContextItem, rendered: boolean} {
+): void {
   const global = contextItem.global as SupportTagGlobal
   // When last value was not a component
   if(!global.newest) {
@@ -187,7 +185,7 @@ function prepareUpdateToComponent(
       ownerSupport,
       {added:0, removed:0},
     )
-   return {subject: contextItem, rendered: true}
+   return
   }
   
   const support = getSupport(
@@ -197,7 +195,7 @@ function prepareUpdateToComponent(
     contextItem,
   )
 
-  return updateExistingTagComponent(
+  updateExistingTagComponent(
     ownerSupport,
     support, // latest value
     contextItem,

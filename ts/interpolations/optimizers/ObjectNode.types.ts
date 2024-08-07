@@ -1,4 +1,4 @@
-import { ObjectChildren, ValuePos } from "./exchangeParsedForValues.function"
+import { ObjectChildren, ValuePos } from "./LikeObjectElement.type"
 
 type ObjectNode = {
   nn: string // nodeName

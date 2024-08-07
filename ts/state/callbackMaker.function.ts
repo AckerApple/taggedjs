@@ -21,7 +21,7 @@ const syncError = new SyncCallbackError('callback() was called outside of synchr
 /** Wrap a function that will be called back. After the wrapper and function are called, a rendering cycle will update display */
 export function callback<A,B,C,D,E,F, T>(
   callback: Callback<A, B, C, D, E, F, T>
-): () => T {
+): (A?: A, B?: B, C?: C, D?: D, E?: E, F?: F) => T {
   const support = getSupportInCycle()
 
   if(!support) {
@@ -31,12 +31,13 @@ export function callback<A,B,C,D,E,F, T>(
   const oldState = setUseMemory.stateConfig.array
   const trigger = (...args: any[]) => {
     const global = support.subject.global as TagGlobal
-    const callbackMaker = global.callbackMaker
-    
+    const callbackMaker = global.renderCount > 0
+
     if(callbackMaker) {
       return callbackStateUpdate(support, callback, oldState, ...args)
     }
 
+    // we are in sync with rendering, just run callback naturally
     return (callback as any)(...args)
   }
 

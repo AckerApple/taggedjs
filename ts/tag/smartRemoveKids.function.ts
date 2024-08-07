@@ -13,8 +13,8 @@ export function smartRemoveKids(
   stagger: number,
 ) {
   const startStagger = stagger
-  const ownerSubject = support.subject
-  const thisGlobal = ownerSubject.global as SupportTagGlobal
+  const subject = support.subject
+  const thisGlobal = subject.global as SupportTagGlobal
   const htmlDomMeta = thisGlobal.htmlDomMeta as DomObjectChildren
   const context = thisGlobal.context as ContextItem[]
   thisGlobal.deleted = true

@@ -1,5 +1,6 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
+import { renderSupport } from '../../tag/render/renderSupport.function.js'
 import { AnySupport, BaseSupport, Support } from '../../tag/Support.class.js'
 import { SupportTagGlobal, TagGlobal } from '../../tag/TemplaterResult.class.js'
 import { updateExistingTagComponent } from '../../tag/update/updateExistingTagComponent.function.js'
@@ -16,6 +17,8 @@ export function bindSubjectCallback(
   support: AnySupport,
 ) {
   const global = support.subject.global as SupportTagGlobal
+
+  // MAIN EVENT EVENT CALLBACK PROCESSOR
   const subjectFunction = function (
     element: Element, args: any[],
   ) {
@@ -120,14 +123,18 @@ export function runBlocked(
   const global = tag.subject.global as SupportTagGlobal
   const blocked = global.blocked
 
-  for(const block of blocked) {    
+  for(const block of blocked) {
+    /* ??? - recently removed
     const lastResult = updateExistingTagComponent(
       block.ownerSupport as Support,
       block,
       block.subject,
     )
-
     global.newest = lastResult.support
+    */
+    
+    const lastResult = renderSupport(block)
+    global.newest = lastResult
   }
   
   global.blocked = []
