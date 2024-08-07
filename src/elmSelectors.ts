@@ -57,6 +57,14 @@ export function html(
   return html
 }
 
+export function textContent(
+  q: string
+) {
+  let html = ''
+  query(q).forEach(elm => html = html + elm.textContent)
+  return html
+}
+
 export function byId(id: string): HTMLElement {
   return document.getElementById(id) as HTMLElement
 }

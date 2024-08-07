@@ -8,7 +8,7 @@
  * @typedef {import("taggedjs").renderTagSupport} renderTagSupport
  */
 
-import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function.js"
+import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function"
 import { buildBeforeElement, ContextItem, destroySupport, Support, SupportTagGlobal, TaggedFunction, TagGlobal, Wrapper } from "taggedjs"
 
 /** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */

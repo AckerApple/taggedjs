@@ -1,5 +1,5 @@
 import { childTests } from "./childTests"
-import { Subject, callbackMaker, html, onInit, letState, tag, state } from "taggedjs"
+import { Subject, callbackMaker, html, onInit, letState, tag, state, ValueSubject } from "taggedjs"
 import { arrayTests } from "./arrayTests"
 import { tagSwitchDebug } from "./tagSwitchDebug.component"
 import { mirroring } from "./mirroring.tag"
@@ -13,27 +13,25 @@ import { oneRender } from "./oneRender.tag"
 import { renderCountDiv } from "./renderCount.component"
 import funInPropsTag from "./funInProps.tag"
 import {App as todo} from "./todo/todos.app"
-import { runTests } from "./isolatedApp.test"
-import { saveScopedStorage, sections, storage, viewChanged, ViewTypes } from "./sections.tag"
+import { activate, saveScopedStorage, sections, storage, viewChanged, ViewTypes } from "./sections.tag"
+import { runTesting } from "./runTesting.function"
 
 export default () => tag.state = (
   _ = state('isolated app state'),
   renderCount = letState(0)(x => [renderCount, renderCount = x]),
   appCounter = letState(0)(x => [appCounter, appCounter=x]),
   appCounterSubject = state(() => new Subject(appCounter)),
+  toggleValue = letState(false)(x => [toggleValue, toggleValue=x]),
+  toggle = () => toggleValue = !toggleValue,
   callback = callbackMaker(),
 ) => {
   onInit(() => {
     console.info('1️⃣ app init should only run once')    
     
     appCounterSubject.subscribe(
-      callback(x => {
-        appCounter = x
-      })
+      callback(x => appCounter = x) // a let variable is expected to maintain new value over render cycles forward
     )
     
-    // appCounterSubject.subscribe(cb)
-
     if(storage.autoTest) {
       runTesting(false)
     }
@@ -56,22 +54,34 @@ export default () => tag.state = (
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
 
     <div>
-      <button id="app-counter-subject-button"
-        onclick=${() => {
-          appCounterSubject.next(appCounter + 1)
-        }}
-      >🍒 ++app subject</button>  
-      <span>
-        🍒 <span id="app-counter-display">${appCounter}</span>
-      </span>
-      <span>
-        🍒&lt;<span id="app-counter-subject-display">${appCounterSubject}</span>&gt;
-      </span>
+      <fieldset>
+        <legend>direct app tests</legend>        
+        <button id="app-counter-subject-button"
+          onclick=${() => {
+            appCounterSubject.next(appCounter + 1)
+            console.log('appCounterSubject', appCounterSubject.value)
+          }}
+        >🍒 ++app subject</button>
+        <button id="app-counter-button" onclick=${() => ++appCounter}>🍒 ++app</button>
+        <span>
+          🍒 <span id="app-counter-display">${appCounter}</span>
+        </span>
+        <span>
+          🍒$&lt;<span id="app-counter-subject-display">${appCounterSubject}</span>&gt;
+        </span>
+        <span>
+          🍒$.value&lt;<span id="app-counter-subject-value-display">${appCounterSubject.value}</span>&gt;
+        </span>
+        <button id="toggle-test" onclick=${toggle}>toggle test ${toggleValue}</button>
+      </fieldset>  
+
       auto testing <input type="checkbox" ${storage.autoTest ? 'checked': null}
         onchange=${toggleAutoTesting}
       />
       <button type="button" onclick=${() => runTesting(true)}>run tests</button>
     </div>
+
+    ${renderCountDiv({name:'app', renderCount})}
 
     ${sections()}
 
@@ -177,39 +187,6 @@ export default () => tag.state = (
       ${renderCountDiv({renderCount, name:'isolatedApp'})}
     </div>
   `
-}
-
-let testTimeout = null
-function runTesting(manual = true) {
-  const waitFor = 2000
-
-  testTimeout = setTimeout(async () => {
-    console.debug('🏃 Running tests...')
-    const result = await runTests(storage.views)
-
-    if(!manual) {
-      return
-    }
-
-    if(result) {
-      alert('✅ all app tests passed')
-      return
-    }
-
-    alert('❌ tests failed. See console for more details')
-
-  }, waitFor) as any // cause delay to be separate from renders
-}
-
-function activate(
-  type: ViewTypes,
-  checkTesting = true,
-) {
-  storage.views.push(type)
-    
-  if(checkTesting && storage.autoTest) {
-    runTesting()
-  }
 }
 
 viewChanged.subscribe(({type, checkTesting}) => {

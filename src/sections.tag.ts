@@ -1,4 +1,5 @@
 import { html, Subject } from "taggedjs"
+import { runTesting } from "./runTesting.function"
 
 export const storage = getScopedStorage()
 
@@ -47,7 +48,8 @@ export const sections = () => html`
       `.key(type))}
       <div>
         <label onclick=${() => viewTypes.forEach(viewType => {
-          viewChanged.next({viewType, checkTesting: false})
+          // viewChanged.next({viewType, checkTesting: false})
+          activate(viewType, false)
           saveScopedStorage()
         })}>&nbsp;all</label>
       </div>
@@ -80,4 +82,15 @@ function deactivate(
   type: ViewTypes,
 ) {
   (storage.views = storage.views.filter(x => x !== type))      
+}
+
+export function activate(
+  type: ViewTypes,
+  checkTesting = true,
+) {
+  storage.views.push(type)
+    
+  if(checkTesting && storage.autoTest) {
+    runTesting()
+  }
 }

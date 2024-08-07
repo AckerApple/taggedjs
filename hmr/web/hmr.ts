@@ -302,11 +302,10 @@ function rebuildApps() {
       apps.forEach(({newApp, tagName}) => {
         /** @type {{tagElement: tagElement}} */
         const { tagElement } = newApp.hmr
-        
         if((element as any).destroy) {
           (element as any).destroy()
         }
-
+        
         const result = tagElement(newApp[tagName as string], element, {test:1})
         
         lastTags = result.tags

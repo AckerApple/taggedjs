@@ -18,17 +18,15 @@ import { propsDebugMain } from "./PropsDebug.tag"
 import { arrayTests } from "./arrayTests"
 import { sections } from "./sections.tag"
 
-export const App = tag(() => {
-  let _firstState = letState('app first state')(x => [_firstState, _firstState=x])
-  let toggleValue = letState(false)(x => [toggleValue, toggleValue=x])
-  let appCounter = letState(0)(x => [appCounter, appCounter=x])
-  let renderCount = letState(0)(x => [renderCount, renderCount=x])
-  let testTimeout = letState(null)(x => [testTimeout, testTimeout=x])
-
-  const toggle = () => {
-    toggleValue = !toggleValue
-  }
-
+export const App = tag(() => (
+  _firstState = letState('app first state')(x => [_firstState, _firstState=x]),
+  appCounter = letState(0)(x => [appCounter, appCounter=x]),
+  toggleValue = letState(false)(x => [toggleValue, toggleValue=x]),
+  toggle = () => toggleValue = !toggleValue,
+  appCounterSubject = state(() => new Subject<number>(appCounter)),
+  renderCount = letState(0)(x => [renderCount, renderCount=x]),
+  testTimeout = letState(null)(x => [testTimeout, testTimeout=x]),
+) => {
   // if I am destroyed before my test runs, prevent test from running
   onDestroy(() => {
     clearTimeout(testTimeout as any)
@@ -58,7 +56,6 @@ export const App = tag(() => {
   ++renderCount
 
   const callbacks = callbackMaker()
-  const appCounterSubject = state(() => new Subject<number>(appCounter))
 
   onInit(() => {
     console.info('1️⃣ app init should only run once')
@@ -66,24 +63,38 @@ export const App = tag(() => {
     runTesting(false)
 
     appCounterSubject.subscribe(
-      callbacks(y => appCounter = y)
+      callbacks(y => {
+        appCounter = y
+        console.log('appCounter', {appCounter, subValue: appCounterSubject.value})
+      })
     )
   })
 
   const content = html`<!--app.js-->
     <h1 id="h1-app">🏷️ TaggedJs - ${2+2}</h1>
 
-    <button id="toggle-test" onclick=${toggle}>toggle test ${toggleValue}</button>
     <button onclick=${runTesting}>run test</button>
 
-    <div>
-      <button id="app-counter-subject-button"
-        onclick=${() => appCounterSubject.next(appCounter + 1)}
-      >🍒 ++app subject</button>
-      <span>
-        🍒 <span id="app-counter-subject-display">${appCounter}</span>
-      </span>
-    </div>
+    <fieldset>
+        <legend>direct app tests</legend>        
+        <button id="app-counter-subject-button"
+          onclick=${() => {
+            appCounterSubject.next(appCounter + 1)
+            console.log('appCounterSubject', appCounterSubject.value)
+          }}
+        >🍒 ++app subject</button>
+        <button id="app-counter-button" onclick=${() => ++appCounter}>🍒 ++app</button>
+        <span>
+          🍒 <span id="app-counter-display">${appCounter}</span>
+        </span>
+        <span>
+          🍒$&lt;<span id="app-counter-subject-display">${appCounterSubject}</span>&gt;
+        </span>
+        <span>
+          🍒$.value&lt;<span id="app-counter-subject-value-display">${appCounterSubject.value}</span>&gt;
+        </span>
+        <button id="toggle-test" onclick=${toggle}>toggle test ${toggleValue}</button>
+      </fieldset>  
 
     ${renderCountDiv({name:'app', renderCount})}
 

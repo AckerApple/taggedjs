@@ -1,8 +1,9 @@
 import { execute } from "./expect"
 
 export async function runTests() {
+  await import('./basic.test') // not in gh-pages
   await import('./start.test')
-  await import('./basic.test')
+  
   await import('./content.test')
   await import('./counters.test')
   await import('./props.test')
