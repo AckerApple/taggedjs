@@ -1,8 +1,8 @@
 import { runBeforeDestroy } from './tagRunner.js'
 import { getChildTagsToDestroy } from './destroy.support.js'
-import { AnySupport, destroySubs, Support } from './Support.class.js'
+import { AnySupport } from './Support.class.js'
 import { smartRemoveKids } from './smartRemoveKids.function.js'
-import { Context } from './Tag.class.js'
+import { Context } from './Context.types.js'
 import { SupportTagGlobal } from './TemplaterResult.class.js'
 
 export function destroySupport(
@@ -13,14 +13,12 @@ export function destroySupport(
   global.deleted = true
 
   const context = global.context as Context
+  getChildTagsToDestroy(context)
 
-  const subs = getChildTagsToDestroy(context, global.subscriptions || [])
-
-  global.destroy$.next()
-  runBeforeDestroy(support)
-  
-  // destroy all child and possibly my own subscriptions
-  destroySubs(subs)
+  if(global.destroy$) {
+    global.destroy$.next()
+    runBeforeDestroy(support)
+  }
 
   // first paint
   const promises: Promise<any>[] = []

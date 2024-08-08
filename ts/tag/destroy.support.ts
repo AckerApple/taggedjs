@@ -1,18 +1,17 @@
 import { isTagComponent } from '../isInstance.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { AnySupport } from './Support.class.js'
-import { Context } from './Tag.class.js'
+import { Context } from './Context.types.js'
 import { runBeforeDestroy } from './tagRunner.js'
 import { SupportTagGlobal } from './TemplaterResult.class.js'
 
 export function getChildTagsToDestroy(
   childTags: Context,
-  subs: Subscription<any>[],
-): Subscription<any>[] {
+) {
   for (const child of childTags) {
     const lastArray = child.lastArray
     if(lastArray) {
-      getChildTagsToDestroy(lastArray, subs)
+      getChildTagsToDestroy(lastArray)
       continue
     }
 
@@ -24,7 +23,7 @@ export function getChildTagsToDestroy(
     const support = global.newest
     const iSubs = global.subscriptions
     if(iSubs) {
-      subs.push(...iSubs)
+      iSubs.forEach(iSub => iSub.unsubscribe())
     }
 
     if(isTagComponent(support.templater)) {
@@ -32,10 +31,8 @@ export function getChildTagsToDestroy(
     }
 
     const subTags = global.context as Context
-    getChildTagsToDestroy(subTags, subs)
+    getChildTagsToDestroy(subTags)
   }
-
-  return subs
 }
 
 export function getChildTagsToSoftDestroy(

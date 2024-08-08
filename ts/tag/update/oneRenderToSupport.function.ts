@@ -1,7 +1,8 @@
-import { getTemplaterResult, TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
+import { getTemplaterResult, Wrapper } from '../TemplaterResult.class.js'
 import { newSupportByTemplater } from './processTag.function.js'
 import { AnySupport } from '../Support.class.js'
-import { ContextItem, StringTag } from '../Tag.class.js'
+import { StringTag } from '../Tag.class.js'
+import { ContextItem } from '../Context.types.js'
 import { Original, TagWrapper } from '../tag.utils.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 

@@ -2,15 +2,15 @@
 
 import { specialAttribute } from './specialAttribute.js'
 import { isSubjectInstance } from '../../isInstance.js'
-import { HowToSet, howToSetInputValue } from './howToSetInputValue.function.js'
+import { HowToSet } from './howToSetInputValue.function.js'
 import { bindSubjectCallback } from './bindSubjectCallback.function.js'
 import { addSupportEventListener, AnySupport } from '../../tag/Support.class.js'
-import { ImmutableTypes, ValueTypes, empty } from '../../tag/ValueTypes.enum.js'
+import { ValueTypes, empty } from '../../tag/ValueTypes.enum.js'
 import { paint, paintContent } from '../../tag/paint.function.js'
-import { Context, ContextItem } from '../../tag/Tag.class.js'
+import { Context, ContextItem } from '../../tag/Context.types.js'
 import { processDynamicNameValueAttribute, processNonDynamicAttr } from './processNameValueAttribute.function.js'
 import { negatives } from '../../updateBeforeTemplate.function.js'
-import { getNewGlobal, runOneContext, TagGlobal } from '../../tag/index.js'
+import { checkSimpleValueChange, runOneContext, TagGlobal } from '../../tag/index.js'
 
 type TagVarIdNum = {tagJsVar: number}
 /*
@@ -69,6 +69,7 @@ export function processAttribute(
       isAttr: true,
       element,
       attrName: attrName as string,
+      checkValueChange: checkSimpleValueChange,
     }
 
     context.push(contextItem)
@@ -106,48 +107,6 @@ export function processAttribute(
     element,
     howToSet,
     isSpecial,
-  )
-}
-
-function processNameOnlyAttr(
-  values: unknown[],
-  support: AnySupport,
-  contextValue: ContextItem,
-  element: Element,
-  howToSet: HowToSet,
-  context: Context,
-) {
-  contextValue.element = element
-  contextValue.howToSet = howToSet
-  contextValue.isNameOnly = true
-
-  // the above callback gets called immediately since its a ValueSubject()
-  const contextValueSubject = contextValue.value
-  if(isSubjectInstance(contextValueSubject)) {
-    const sub = contextValueSubject.subscribe(function contextValueCallback(value: any) {
-      processNameOnlyAttrValue(
-        values,
-        value,
-        element,
-        support,
-        howToSet,
-        context,
-      )  
-      paint()
-    })
-    const global = support.subject.global as TagGlobal
-    const subs = global.subscriptions = global.subscriptions || []
-    subs.push(sub) // this is where unsubscribe is picked up
-    return
-  }
-
-  processNameOnlyAttrValue(
-    values,
-    contextValue.value,
-    element,
-    support,
-    howToSet,
-    context,
   )
 }
 

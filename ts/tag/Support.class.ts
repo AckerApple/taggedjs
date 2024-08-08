@@ -1,8 +1,8 @@
 import { Props } from '../Props.js'
-import { ContextItem, EventCallback, EventMem } from './Tag.class.js'
+import { EventCallback } from './Tag.class.js'
+import { ContextItem } from './Context.types.js'
 import { State } from '../state/index.js'
 import { Events, SupportTagGlobal, TagGlobal, TemplaterResult } from './TemplaterResult.class.js'
-import { Subscription } from '../subject/subject.utils.js'
 import { clonePropsBy } from './clonePropsBy.function.js'
 import { Subject } from '../subject/Subject.class.js'
 
@@ -15,17 +15,20 @@ export type PropsConfig = {
   castProps?: Props // props that had functions wrapped
 }
 
-export type BaseSupport = {
+export type HtmlSupport = {
   appSupport: BaseSupport
   ownerSupport?: AnySupport
   appElement?: Element // only seen on this.getAppSupport().appElement
   propsConfig?: PropsConfig
   
-  state: State, // TODO: this is not needed for every type of  tag
   templater: TemplaterResult,
 
   // only on support
   subject: ContextItem
+}
+
+export type BaseSupport = HtmlSupport & {
+  state: State, // TODO: this is not needed for every type of  tag
 }
 
 /** used only for apps, otherwise use Support */
@@ -75,16 +78,24 @@ export function getSupport(
   return support as Support
 }
 
-export function destroySubs(
-  subs: Subscription<any>[],
-) {
-  if(!subs.length) {
-    return
-  }
+export function getHtmlSupport(
+  templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
+  ownerSupport: AnySupport,
+  appSupport: BaseSupport,
+  subject: ContextItem,
+  castedProps?: Props,
+): Support {
+  const support = {
+    templater,
+    subject,
+    castedProps,
 
-  for (const sub of subs) {
-    sub.unsubscribe()
-  }
+    appSupport: undefined as any as BaseSupport,
+  } as HtmlSupport
+  
+  support.ownerSupport = ownerSupport
+  support.appSupport = appSupport
+  return support as Support
 }
 
 export function addSupportEventListener(

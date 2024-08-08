@@ -22,7 +22,7 @@ export function bindSubjectCallback(
   const subjectFunction = function (
     element: Element, args: any[],
   ) {
-    if(global.deleted) {
+    if(global.deleted === true) {
       return
     }
     
@@ -63,7 +63,7 @@ export function afterTagCallback(
   delete global.locked
   
   const blocked = global.blocked
-  if(blocked.length) {
+  if(blocked && blocked.length) {
     const lastResult = runBlocked(tag)
 
     return checkAfterCallbackPromise(
@@ -101,7 +101,7 @@ export function checkAfterCallbackPromise(
     global0.locked = true
 
     return callbackResult.then(() => {
-      if(global.deleted) {
+      if(global.deleted === true) {
         return promiseNoData // tag was deleted during event processing
       }
 
@@ -124,15 +124,6 @@ export function runBlocked(
   const blocked = global.blocked
 
   for(const block of blocked) {
-    /* ??? - recently removed
-    const lastResult = updateExistingTagComponent(
-      block.ownerSupport as Support,
-      block,
-      block.subject,
-    )
-    global.newest = lastResult.support
-    */
-    
     const lastResult = renderSupport(block)
     global.newest = lastResult
   }

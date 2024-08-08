@@ -3,7 +3,7 @@ import { destroyArray } from './checkDestroyPrevious.function.js'
 import { elementDestroyCheck } from './elementDestroyCheck.function.js'
 import { paint, paintRemoves } from './paint.function.js'
 import { AnySupport } from './Support.class.js'
-import { ContextItem } from './Tag.class.js'
+import { ContextItem } from './Context.types.js'
 import { SupportTagGlobal } from './TemplaterResult.class.js'
 
 /** sets global.deleted on support and all children */
@@ -20,46 +20,14 @@ export function smartRemoveKids(
   thisGlobal.deleted = true
 
   for (const subject of context) {
+    if(subject.isAttr) {
+      continue
+    }
+
     const lastArray = subject.lastArray
     if(lastArray) {
       destroyArray(subject, lastArray)
       continue
-    }
-
-    const global = subject.global as SupportTagGlobal
-    if(!global || global.deleted) {
-      continue
-    }
-    
-    global.deleted = true
-
-    const oldest = global.oldest
-    if(oldest) {
-      const clones = global.htmlDomMeta as DomObjectChildren
-      const cloneOne = clones[0]  
-      
-      // check and see if child content lives within content of mine
-      let count = 0
-      if(cloneOne) {
-        let domOne = cloneOne.domElement
-        let doContinue = false
-        while(domOne && domOne.parentNode && count < 5) {
-          if(htmlDomMeta.find(x => x.domElement === domOne.parentNode)) {
-            doContinue = true
-            break // no need to delete, they live within me
-          }
-  
-          domOne = domOne.parentNode as HTMLElement | Text
-          ++count
-        }
-
-        if(doContinue) {
-          continue
-        }
-      }
-
-      // recurse
-      stagger = stagger + smartRemoveKids(oldest, promises, stagger)
     }
 
     // regular values, no placeholders
@@ -67,6 +35,25 @@ export function smartRemoveKids(
     if(elm) {
       delete subject.simpleValueElm    
       paintRemoves.push(elm)
+      continue
+    }
+
+
+    const global = subject.global as SupportTagGlobal
+    if(global === undefined) {
+      continue // subject
+    }
+
+    if(global.deleted === true) {
+      continue
+    }
+
+    global.deleted = true
+    const oldest = global.oldest
+    if(oldest) {
+      // recurse
+      stagger = stagger + smartRemoveKids(oldest, promises, stagger)
+      continue
     }
   }
   

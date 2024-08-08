@@ -2,7 +2,7 @@ import { AnySupport, BaseSupport, getSupport, Support } from '../Support.class.j
 import { runAfterRender } from'../tagRunner.js'
 import { SupportTagGlobal, Wrapper } from '../TemplaterResult.class.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
-import { ContextItem } from '../Tag.class.js'
+import { ContextItem } from '../Context.types.js'
 import { TagWrapper } from '../tag.utils.js'
 import { executeWrap } from '../executeWrap.function.js'
 import { initState, reState } from '../../state/state.utils.js'

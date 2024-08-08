@@ -1,9 +1,9 @@
 import { AnySupport } from './Support.class.js'
-import { Context, ContextItem, DomTag, StringTag } from './Tag.class.js'
+import { DomTag, StringTag } from './Tag.class.js'
 import { updateExistingValue } from './update/updateExistingValue.function.js'
-import { processAttributeEmit, processNameOnlyAttrValue, updateNameOnlyAttrValue } from '../interpolations/attributes/processAttribute.function.js'
+import { processAttributeEmit, updateNameOnlyAttrValue } from '../interpolations/attributes/processAttribute.function.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
-import { TagGlobal } from './index.js'
+import { Context, ContextItem } from './Context.types.js'
 
 export function processUpdateContext(
   support: AnySupport,

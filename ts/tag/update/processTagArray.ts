@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 
-import { Context, ContextItem, StringTag, TagTemplate } from '../Tag.class.js'
+import { StringTag } from '../Tag.class.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { AnySupport, BaseSupport, Support } from '../Support.class.js'
 import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
@@ -10,6 +10,8 @@ import { TemplateValue } from './processFirstSubject.utils.js'
 import { paintAppends, paintInsertBefores, paintRemoves } from '../paint.function.js'
 import { processNewArrayValue } from './processNewValue.function.js'
 import { destroySupport } from '../destroySupport.function.js'
+import { checkSimpleValueChange } from '../checkDestroyPrevious.function.js'
+import { Context, ContextItem } from '../Context.types.js'
 
 export function processTagArray(
   subject: ContextItem,
@@ -125,6 +127,7 @@ function processAddTagArrayItem(
 ): ContextItem {
   const itemSubject: ContextItem = {
     value,
+    checkValueChange: checkSimpleValueChange,
   }
 
   counts.added = counts.added + 1 // index

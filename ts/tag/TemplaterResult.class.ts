@@ -1,4 +1,5 @@
-import { Context, StringTag, DomTag, ContextItem, EventCallback } from './Tag.class.js'
+import { StringTag, DomTag, EventCallback } from './Tag.class.js'
+import { ContextItem, Context } from './Context.types.js'
 import { BaseSupport, Support } from './Support.class.js'
 import { Props } from '../Props.js'
 import { TagWrapper } from './tag.utils.js'

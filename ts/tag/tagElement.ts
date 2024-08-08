@@ -5,13 +5,14 @@ import { Original, TagComponent, TagMaker} from './tag.utils.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { paint, painting } from './paint.function.js'
-import { ContextItem } from './Tag.class.js'
+import { ContextItem } from './Context.types.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
 import { buildBeforeElement } from './buildBeforeElement.function.js'
 import { destroySupport } from './destroySupport.function.js'
 import { executeWrap } from './executeWrap.function.js'
 import { initState } from '../state/state.utils.js'
+import { checkTagValueChange } from './index.js'
 
 const appElements: {
   support: BaseSupport // Support
@@ -121,6 +122,7 @@ export function runWrapper(
   const subject: ContextItem = {
     value: templater,
     global,
+    checkValueChange: checkTagValueChange,
   }
     
   const newSupport = getBaseSupport(

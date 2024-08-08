@@ -1,5 +1,5 @@
-import { AnySupport, BaseSupport, Support, destroySubs } from '../Support.class.js'
-import { Context } from '../Tag.class.js'
+import { AnySupport, BaseSupport, Support } from '../Support.class.js'
+import { Context } from '../Context.types.js'
 import { SupportTagGlobal, TagGlobal } from '../TemplaterResult.class.js'
 import { getChildTagsToSoftDestroy } from '../destroy.support.js'
 import { smartRemoveKids } from '../smartRemoveKids.function.js'
@@ -10,7 +10,6 @@ export function softDestroySupport(
   lastSupport: BaseSupport | Support,
 ) {
   const global = lastSupport.subject.global as SupportTagGlobal
-  const mySubs = global.subscriptions
   const {subs, tags} = getChildTagsToSoftDestroy(global.context as Context)
 
   softDestroyOne(lastSupport)
@@ -18,9 +17,9 @@ export function softDestroySupport(
     softDestroyOne(child)
   }
   
+  const mySubs = global.subscriptions
   if(mySubs) {
-    subs.push(...mySubs)
-    destroySubs(subs)
+    subs.forEach(sub => sub.unsubscribe())
   }
 
   lastSupport.subject.global = getNewGlobal()
@@ -31,7 +30,7 @@ function softDestroyOne(
 ) {
   const global = child.subject.global as TagGlobal
 
-  if(global.deleted) {
+  if(global.deleted === true) {
     return
   }
 

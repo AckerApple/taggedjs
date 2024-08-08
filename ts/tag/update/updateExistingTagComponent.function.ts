@@ -6,7 +6,7 @@ import { isLikeTags } from'../isLikeTags.function.js'
 import { Props } from '../../Props.js'
 import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
-import { ContextItem } from '../Tag.class.js'
+import { ContextItem } from '../Context.types.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { destroySupport } from '../destroySupport.function.js'
@@ -67,7 +67,7 @@ export function updateExistingTagComponent(
     return
   }
 
-  const newSupport = renderSupport(support)
+  renderSupport(support)
 
   return
 }

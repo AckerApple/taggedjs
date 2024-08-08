@@ -6,7 +6,7 @@ import { TagGlobal, TemplaterResult } from '../tag/TemplaterResult.class.js'
 import { Counts } from './interpolateTemplate.js'
 import { paint } from '../tag/paint.function.js'
 import { setUseMemory } from '../state/setUse.function.js'
-import { ContextItem } from '../tag/Tag.class.js'
+import { ContextItem } from '../tag/Context.types.js'
 
 export type SubToTemplateOptions = {
   insertBefore: Text

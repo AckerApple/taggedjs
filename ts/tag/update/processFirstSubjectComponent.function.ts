@@ -3,7 +3,7 @@ import { Counts } from'../../interpolations/interpolateTemplate.js'
 import { processFirstTagResult, processReplaceTagResult } from'./processTagResult.function.js'
 import { BaseSupport, getSupport, PropsConfig, Support } from '../Support.class.js'
 import { renderWithSupport } from '../render/renderWithSupport.function.js'
-import { ContextItem } from '../Tag.class.js'
+import { ContextItem } from '../Context.types.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { getCastedProps } from '../getTagWrap.function.js'
 

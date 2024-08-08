@@ -3,37 +3,18 @@
 import { State } from'../state/index.js'
 import { InterpolatedTemplates } from '../interpolations/interpolations.js'
 
-import { Clone, TagGlobal, TemplaterResult } from './TemplaterResult.class.js'
+import { TemplaterResult } from './TemplaterResult.class.js'
 import { TagValues } from'./html.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/LikeObjectElement.type.js'
 import { AnySupport } from './Support.class.js'
 import { getSupportInCycle } from './getSupportInCycle.function.js'
-import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 
 export const variablePrefix = ':tagvar'
 export const variableSuffix = ':'
 
 export type EventCallback = (event: Event) => any
 export type EventMem = {elm: Element, callback:EventCallback}
-
-// export type Context = TagJsSubject<any>[]
-export type ContextItem = {
-  isAttr?: true
-  element?: Element
-  howToSet?: HowToSet
-  isNameOnly?: boolean
-  attrName?: string
-  isSpecial?: boolean
-  
-  simpleValueElm?: Clone
-  placeholder?: Text // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
-
-  lastArray?: Context
-  global?: TagGlobal
-  value?: any,
-}
-export type Context = ContextItem[]
 
 export type TagMemory = {
   state: State

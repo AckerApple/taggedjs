@@ -1,9 +1,9 @@
 import { processTagArray } from './processTagArray.js'
-import { SupportTagGlobal, TagGlobal, TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
+import { SupportTagGlobal, TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
 import { RegularValue } from './processRegularValue.function.js'
 import { newSupportByTemplater, processNewTag, processTag, tagFakeTemplater } from './processTag.function.js'
 import { AnySupport } from '../Support.class.js'
-import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
+import { StringTag, DomTag } from '../Tag.class.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { renderTagOnly } from '../render/renderTagOnly.function.js'
 import { ValueType, ValueTypes } from '../ValueTypes.enum.js'
@@ -12,6 +12,8 @@ import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.
 import { processFirstSubjectComponent, processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
+import { ContextItem } from '../Context.types.js'
+import { checkArrayValueChange, checkSimpleValueChange, checkTagValueChange } from '../checkDestroyPrevious.function.js'
 
 export function processFirstSubjectValue(
   value: TemplateValue | StringTag,
@@ -24,6 +26,8 @@ export function processFirstSubjectValue(
   if(tagJsType) {
     switch (tagJsType) {
       case ValueTypes.templater:
+        subject.checkValueChange = checkTagValueChange
+
         if(appendTo) {
           return processNewTag(
             value as TemplaterResult,
@@ -40,6 +44,7 @@ export function processFirstSubjectValue(
 
       case ValueTypes.dom:
       case ValueTypes.tag:
+        subject.checkValueChange = checkTagValueChange
         const tag = value as StringTag | DomTag
         let templater = tag.templater
   
@@ -59,6 +64,7 @@ export function processFirstSubjectValue(
         }
   
         global.newest = newSupportByTemplater(templater, ownerSupport, subject)
+        subject.checkValueChange = checkTagValueChange
   
         return processTag(
           ownerSupport,
@@ -68,6 +74,7 @@ export function processFirstSubjectValue(
       case ValueTypes.stateRender:
       case ValueTypes.tagComponent:
         subject.global = getNewGlobal() as SupportTagGlobal
+        subject.checkValueChange = checkTagValueChange
 
         if(appendTo) {
           const processResult = processFirstSubjectComponent(
@@ -118,14 +125,13 @@ export function processFirstSubjectValue(
         )
 
         ++subject.global.renderCount
+        subject.checkValueChange = checkTagValueChange
 
         return result
     }
   }
 
   if(value instanceof Array) {
-    // subject.global = getNewGlobal() as SupportTagGlobal
-
     processTagArray(
       subject,
       value as (StringTag | TemplaterResult)[],
@@ -133,6 +139,9 @@ export function processFirstSubjectValue(
       counts,
       appendTo,
     )
+
+    subject.checkValueChange = checkArrayValueChange
+
     return
   }
 
@@ -159,4 +168,5 @@ function processFirstRegularValue(
   )
 
   subject.simpleValueElm = clone  
+  subject.checkValueChange = checkSimpleValueChange
 }

@@ -4,13 +4,13 @@ import { TemplateValue } from './processFirstSubject.utils.js'
 import { processTagArray } from './processTagArray.js'
 import { updateExistingTagComponent } from './updateExistingTagComponent.function.js'
 import { processNewRegularValue, processUpdateRegularValue, RegularValue } from './processRegularValue.function.js'
-import { checkDestroyPrevious } from '../checkDestroyPrevious.function.js'
 import { getFakeTemplater, newSupportByTemplater, processTag } from './processTag.function.js'
-import { StringTag, DomTag, ContextItem, Tag } from '../Tag.class.js'
+import { StringTag, DomTag, Tag } from '../Tag.class.js'
 import { ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { updateSupportBy } from '../updateSupportBy.function.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
+import { ContextItem } from '../Context.types.js'
 
 const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender]
 
@@ -19,7 +19,7 @@ export function updateExistingValue(
   value: TemplateValue,
   ownerSupport: BaseSupport | Support,
 ) {
-  const wasDestroyed = checkDestroyPrevious(subject, value)
+  const wasDestroyed = subject.checkValueChange(value, subject)
 
   if(wasDestroyed === -1) {
     return // do nothing
@@ -78,13 +78,6 @@ export function updateExistingValue(
           ownerSupport,
           subject as ContextItem,
         )
-
-/*
-        const global2 = subject.global as TagGlobal
-        if(!global2.locked) {
-          ++global2.renderCount
-        }
-*/
         return
       
       case ValueTypes.tag:
@@ -105,10 +98,6 @@ export function updateExistingValue(
           ownerSupport,
           subject,
         )
-  
-        if(!nowGlobal.locked) {
-          ++nowGlobal.renderCount
-        }
       
         return
     }
@@ -121,13 +110,6 @@ export function updateExistingValue(
       ownerSupport,
       {added: 0, removed: 0}
     )
-
-    /*
-    const global1 = subject.global as TagGlobal
-    if(!global1.locked) {
-      ++global1.renderCount
-    }
-    */
   
     return
   }

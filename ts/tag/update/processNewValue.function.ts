@@ -1,10 +1,12 @@
-import { StringTag, DomTag, ContextItem } from '../Tag.class.js'
+import { StringTag, DomTag } from '../Tag.class.js'
+import { ContextItem } from '../Context.types.js'
 import { ValueSubject } from '../../subject/ValueSubject.js'
-import { getTemplaterResult, SupportTagGlobal, TagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
-import { AnySupport, getSupport, Support } from '../Support.class.js'
+import { getTemplaterResult, SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import { AnySupport, getSupport } from '../Support.class.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { ValueTypes, ValueType } from '../ValueTypes.enum.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
+import { checkTagValueChange } from '../checkDestroyPrevious.function.js'
 
 export function processNewArrayValue(
   value: TemplateValue | ValueSubject<any>,
@@ -34,7 +36,8 @@ function processNewTag(
   value: StringTag | DomTag,
   ownerSupport: AnySupport,
   contextItem: ContextItem,
-) {  
+) {
+  contextItem.checkValueChange = checkTagValueChange
   const tag = value
   
   let templater = tag.templater

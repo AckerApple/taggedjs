@@ -5,12 +5,11 @@ import { DomMetaMap } from '../interpolations/optimizers/LikeObjectElement.type.
 import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js'
 import { painting } from './paint.function.js'
 import { AnySupport } from './Support.class.js'
-import { processAttributeEmit, processNameOnlyAttrValue } from '../interpolations/attributes/processAttribute.function.js'
-import { Context, ContextItem, DomTag, StringTag } from './Tag.class.js'
-import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
+import { DomTag, StringTag } from './Tag.class.js'
+import { ContextItem, Context } from './Context.types.js'
 import { ValueTypes } from './ValueTypes.enum.js'
-import { SupportTagGlobal, TagGlobal } from './TemplaterResult.class.js'
-import { getNewGlobal } from './update/getNewGlobal.function.js'
+import { SupportTagGlobal } from './TemplaterResult.class.js'
+import { checkSimpleValueChange } from './index.js'
 
 /** Function that kicks off actually putting tags down as HTML elements */
 export function buildBeforeElement(
@@ -75,7 +74,8 @@ export function runOneContext(
   context: Context,
 ): ContextItem {
   const contextItem: ContextItem = {
-    value
+    value,
+    checkValueChange: checkSimpleValueChange,
   }
 
   context.push(contextItem)

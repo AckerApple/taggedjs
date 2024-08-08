@@ -3,7 +3,7 @@
 import { isSubjectInstance } from "../../isInstance.js"
 import { paint, paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
 import { BaseSupport, Support } from "../../tag/Support.class.js"
-import { Context, ContextItem } from "../../tag/Tag.class.js"
+import { Context, ContextItem } from "../../tag/Context.types.js"
 import { InterpolateSubject } from "../../tag/update/processFirstSubject.utils.js"
 import { empty } from "../../tag/ValueTypes.enum.js"
 import { Counts } from "../interpolateTemplate.js"

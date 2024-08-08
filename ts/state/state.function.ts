@@ -97,7 +97,6 @@ export function runFirstState <T>(
   }
   config.array.push(push)
   
-  console.log('initValue', {initValue, defaultValue})
   return initValue as T
 }
 */
