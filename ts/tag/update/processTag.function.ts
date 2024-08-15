@@ -21,24 +21,8 @@ export function processTag(
   support.ownerSupport = ownerSupport
   subject.checkValueChange = checkTagValueChange
   
-  const result = buildBeforeElement(support, undefined, {counts: {added:0, removed:0}})
   const ph = subject.placeholder as Text
-
-  for(const dom of result.dom) {
-    if(dom.marker) {
-      paintInsertBefores.push({
-        element: dom.marker,
-        relative: ph,
-      })
-    }
-
-    if(dom.domElement) {
-      paintInsertBefores.push({
-        element: dom.domElement,
-        relative: ph,
-      })
-    }
-  }
+  const result = buildBeforeElement(support, undefined, ph, {counts: {added:0, removed:0}})
 
   for(const sub of result.subs) {
     subscribeToTemplate(sub)
@@ -94,7 +78,7 @@ export function processNewTag(
   const support = newSupportByTemplater(templater, ownerSupport, subject)
 
   support.ownerSupport = ownerSupport
-  const result = buildBeforeElement(support, appendTo, {counts: {added:0, removed:0}})
+  const result = buildBeforeElement(support, appendTo, undefined, {counts: {added:0, removed:0}})
 
   for(const dom of result.dom) {
     if(dom.marker) {

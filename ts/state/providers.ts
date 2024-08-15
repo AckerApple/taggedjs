@@ -52,7 +52,6 @@ export const providers = {
       const provider: Provider = {
         constructMethod,
         instance,
-        // clone: deepClone(instance),
         stateDiff,
         owner: support,
         children: [],

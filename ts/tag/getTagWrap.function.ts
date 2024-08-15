@@ -21,6 +21,7 @@ export function getTagWrap(
     subject: ContextItem,
     lastSupport?: Support | BaseSupport | undefined
   ) => {
+    // wrap any prop functions that are passed in
     const castedProps = getCastedProps(
       templater,
       newSupport,
@@ -53,6 +54,7 @@ export function getCastedProps(
   newSupport: AnySupport,
   lastSupport?: AnySupport,
 ) {
+  const maxDepth = templater.deepPropWatch ? 15 : 2
   const props = templater.props as Props
   const propsConfig = newSupport.propsConfig as PropsConfig
   // When defined, this must be an update where my new props have already been made for me
@@ -67,6 +69,7 @@ export function getCastedProps(
       lastSupport as Support,
       (lastSupport as Support).ownerSupport,
       props,
+      maxDepth,
     )
   }
 

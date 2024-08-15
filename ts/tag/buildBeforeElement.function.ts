@@ -15,6 +15,7 @@ import { checkSimpleValueChange } from './index.js'
 export function buildBeforeElement(
   support: AnySupport,
   element?: Element,
+  insertBefore?: Text,
   options?: ElementBuildOptions,
 ) {
   const global = support.subject.global as SupportTagGlobal
@@ -23,7 +24,7 @@ export function buildBeforeElement(
   global.newest = support
 
   ++painting.locks
-  const result = getHtmlDomMeta(support, options, element)
+  const result = getHtmlDomMeta(support, options, element, insertBefore)
   global.htmlDomMeta = result.dom
   --painting.locks
 
@@ -37,6 +38,7 @@ function getHtmlDomMeta(
     counts: {added:0, removed: 0},
   },
   appendTo?: Element,
+  insertBefore?: Text,
 ) {
   const domMeta = loadDomMeta(support)
   const thisTag = support.templater.tag as StringTag | DomTag
@@ -53,6 +55,7 @@ function getHtmlDomMeta(
     options.counts,
     context,
     appendTo,
+    insertBefore,
   )
       
   return result

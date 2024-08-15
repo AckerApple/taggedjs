@@ -150,7 +150,6 @@ export function getPropWrap(
   
   // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
   wrap.toCall = function toCallRunner(...args: any[]) {
-    // return callbackPropOwner(wrap.mem, args, ownerSupport)
     return callbackPropOwner(wrap.mem, args, ownerSupport)
   }
   
@@ -170,7 +169,7 @@ export function callbackPropOwner(
   ownerSupport: BaseSupport | Support, // <-- WHEN called from alterProp its owner OTHERWISE its previous
 ) {
   const global = ownerSupport.subject.global as SupportTagGlobal
-  const newest = global.newest as Support
+  const newest = global?.newest || ownerSupport as Support
   const supportInCycle = getSupportInCycle()
   const noCycle = supportInCycle === undefined
   const callbackResult = toCall(...callWith)
@@ -194,7 +193,7 @@ export function callbackPropOwner(
       return // prop was called immediately
     }
     */
-  
+
     safeRenderSupport(newest, ownerSupport)
 
     return callbackResult
@@ -221,13 +220,18 @@ export function safeRenderSupport(
   const isInline = isInlineHtml(newest.templater)
   if( isInline ) {
     const result = renderInlineHtml(ownerSupport, newest)
+    // TODO: below maybe never true
+    /*
     const global = subject.global as TagGlobal
-    delete global.locked
+    if(global) {
+      delete global.locked
+    }
+    */
     return result
   }
   
-  const global = newest.subject.global as SupportTagGlobal
-  // ??? new removed
+  const global = subject.global as SupportTagGlobal
+
   global.locked = true
 
   renderExistingReadyTag(
@@ -237,6 +241,5 @@ export function safeRenderSupport(
     subject,
   )
 
-  // ??? new removed
   delete global.locked
 }

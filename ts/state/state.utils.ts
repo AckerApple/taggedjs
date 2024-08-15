@@ -2,7 +2,7 @@ import { BaseSupport, Support } from '../tag/Support.class.js'
 import { firstLetState, reLetState } from './letState.function.js'
 import { setUseMemory } from'./setUse.function.js'
 // import { runFirstState } from './state.function.js'
-import { stateHandlers } from './stateHandlers.js'
+import { runFirstState, runRestate, stateHandlers } from './stateHandlers.js'
 
 export type StateConfig<T> = (x: T) => [T, T]
 
@@ -59,7 +59,7 @@ export function afterRender(
 export function initState(
   support: Support | BaseSupport
 ) {
-  // stateHandlers.handler = runFirstState
+  stateHandlers.handler = runFirstState
   stateHandlers.letHandler = firstLetState as any
 
   const config: Config = setUseMemory.stateConfig
@@ -74,14 +74,9 @@ export function reState(
   const config: Config = setUseMemory.stateConfig
   config.rearray = state
   const rearray = config.rearray as State
-  
-  if(rearray && rearray.length) {
-    // stateHandlers.handler = reState as any
+
+    stateHandlers.handler = runRestate as any
     stateHandlers.letHandler = reLetState as any
-  } else {
-    // stateHandlers.handler = runFirstState
-    stateHandlers.letHandler = firstLetState
-  }
 
   config.support = support
 }

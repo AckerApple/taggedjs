@@ -12,25 +12,14 @@ export function processReplaceTagResult(
   contextItem: ContextItem,
 ) {
   contextItem.checkValueChange = checkTagValueChange
-  let insertIndex = paintInsertBefores.length
-
-  const result = buildBeforeElement(support, undefined, {counts})
   const ph = contextItem.placeholder as Text
 
-  for(const dom of result.dom) {
-    if(dom.domElement) {
-      paintInsertBefores.splice(insertIndex++, 0, {
-        element: dom.domElement,
-        relative: ph      
-      })
-    }
-    if(dom.marker) {
-      paintInsertBefores.splice(insertIndex++, 0, {
-        element: dom.marker,
-        relative: ph,
-      })
-    }
-  }
+  const result = buildBeforeElement(
+    support,
+    undefined,
+    ph,
+    {counts},
+  )
 
   const subs = result.subs
   for(const sub of subs) {
@@ -47,7 +36,7 @@ export function processFirstTagResult(
 ) {
   let appendIndex = paintAppends.length
 
-  const result = buildBeforeElement(support, appendTo, {counts})
+  const result = buildBeforeElement(support, appendTo, undefined, {counts})
   for(const dom of result.dom) {
     if(dom.domElement) {
       paintAppends.splice(appendIndex++, 0, {

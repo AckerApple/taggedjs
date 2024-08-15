@@ -252,9 +252,10 @@ function pushTextTo(
   pushTo(currentElement, elements, textNode)
 }
 
+const removeCommentRegX = new RegExp('(<!--[\\s\\S]*?-->)', 'g')
 function preprocessTagsInComments(html: string) {
   // Use a regex to find all HTML comments
-  return html.replace(/(<!--[\s\S]*?-->)/g, function(match) {
+  return html.replace(removeCommentRegX, function(match) {
       // For each comment found, replace < and > inside it
       return match.replace(/\[l t\]/g, '[l&nbsp;t]').replace(/\[g t\]/g, '[g&nbsp;t]').replace(/</g, '[l t]').replace(/>/g, '[g t]');
   });

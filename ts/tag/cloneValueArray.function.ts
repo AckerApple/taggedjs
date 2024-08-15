@@ -21,9 +21,8 @@ export function cloneTagJsValue<T>(
       case ValueTypes.stateRender:
         return undefined as any
 
-      case ValueTypes.tagComponent:
-        const tagComponent = value as any as TemplaterResult
-        return deepClone(tagComponent.props) as any
+      // case ValueTypes.tagComponent:
+      //   return cloneTagComponent(value as any as TemplaterResult)
       
       case ValueTypes.dom:
       case ValueTypes.tag:
@@ -38,3 +37,11 @@ export function cloneTagJsValue<T>(
 
   return deepClone(value)
 }
+
+/*
+function cloneTagComponent(
+  tagComponent: TemplaterResult
+) {
+  return deepClone(tagComponent.props) as any
+}
+*/

@@ -105,7 +105,12 @@ export function addSupportEventListener(
   callback: EventCallback,
 ) {
   const elm = support.appElement as Element
-  // const newEventName = eventName.slice(2, eventName.length)
+
+  // cast events that do not bubble up into ones that do
+  if(eventName === 'blur') {
+    eventName = 'focusout'
+  }
+
   const replaceEventName = '_' + eventName
 
   const global = support.subject.global as TagGlobal

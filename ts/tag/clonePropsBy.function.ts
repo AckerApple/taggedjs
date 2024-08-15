@@ -8,11 +8,21 @@ export function clonePropsBy(
   props: Props,
   castedProps?: Props,
 ) {
-  if(support.templater.tagJsType === ValueTypes.stateRender) {
+  const templater = support.templater
+
+  if(templater.tagJsType === ValueTypes.stateRender) {
     return support.propsConfig = {
       latest: [],
       latestCloned: [],
     }
+  }
+
+  if(templater.deepPropWatch === false) {
+    return support.propsConfig = {
+      latest: props,
+      latestCloned: props, // assume its HTML children and then detect
+      castProps: castedProps,
+    }  
   }
 
   const latestCloned = props.map(props =>

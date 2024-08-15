@@ -17,13 +17,14 @@ export type TaggedFunction<T> = T & {original: Function}
  * For single rendering, no event cycles, use: tag.renderOnce = (props) => html``
  */
 export function tag<T extends ToTag>(
-  tagComponent: T
+  tagComponent: T,
+  deepPropWatch?: boolean,
 ): TaggedFunction<T> {
   /** function developer triggers */
   const parentWrap = (function tagWrapper(
     ...props: (T | StringTag | StringTag[])[]
   ): TemplaterResult {
-    const templater: TemplaterResult = getTemplaterResult(props)
+    const templater: TemplaterResult = getTemplaterResult(props, deepPropWatch)
     templater.tagJsType = ValueTypes.tagComponent
     
     // attach memory back to original function that contains developer display logic
@@ -85,6 +86,8 @@ tag.key = key
 tag.app = function(routeTag: RouteTag): StateToTag {
   throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
 }
+
+tag.deepPropWatch = tag
 
 Object.defineProperty(tag, 'oneRender', {
   set(oneRenderFunction: Function) {

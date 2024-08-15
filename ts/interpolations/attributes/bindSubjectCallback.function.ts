@@ -18,7 +18,7 @@ export function bindSubjectCallback(
 ) {
   const global = support.subject.global as SupportTagGlobal
 
-  // MAIN EVENT EVENT CALLBACK PROCESSOR
+  // MAIN EVENT CALLBACK PROCESSOR
   const subjectFunction = function (
     element: Element, args: any[],
   ) {

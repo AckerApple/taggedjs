@@ -57,7 +57,7 @@ export function renderInlineHtml(
 ) {
   const ownGlobal = ownerSupport.subject.global as SupportTagGlobal
   
-  if(ownGlobal.deleted === true) {
+  if(!ownGlobal || ownGlobal.deleted === true) {
     return support
   }
 

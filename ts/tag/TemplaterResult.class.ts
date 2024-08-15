@@ -59,6 +59,7 @@ export type Events = {
 export type Clone = (Element | Text | ChildNode)
 
 export type TemplaterResult = {
+  deepPropWatch: boolean
   tagJsType: ValueType
   wrapper?: Wrapper
   tag?: StringTag | DomTag
@@ -68,8 +69,12 @@ export type TemplaterResult = {
   key: (arrayValue: unknown) => TemplaterResult
 }
 
-export function getTemplaterResult(props?: Props) {
+export function getTemplaterResult(
+  props?: Props,
+  deepPropWatch = true,
+) {
   const templater: TemplaterResult = {
+    deepPropWatch,
     props,
     tagJsType: ValueTypes.templater,
     key: function keyTemplate(arrayValue: unknown) {

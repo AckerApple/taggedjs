@@ -52,11 +52,13 @@ export function updateExistingTagComponent(
 
   // everyhing has matched, no display needs updating.
   if(!hasChanged) {
+    const maxDepth = templater.deepPropWatch ? 15 : 2
     syncSupports(
       templater,
       support,
       lastSupport,
       ownerSupport,
+      maxDepth,
     )
 
     return
@@ -77,7 +79,8 @@ export function syncFunctionProps(
   lastSupport: AnySupport,
   ownerSupport: BaseSupport | Support,
   newPropsArray: any[], // templater.props
-  depth = -1
+  maxDepth: number,
+  depth = -1,
 ): Props {
   const global = lastSupport.subject.global as SupportTagGlobal
   const newest = global.newest
@@ -106,7 +109,7 @@ export function syncFunctionProps(
     const newValue = syncPriorPropFunction(
       priorProp, prop, newSupport, ownerSupport,
       depth + 1,
-      index,
+      maxDepth,
     )
 
     newArray.push(newValue)
@@ -123,9 +126,8 @@ function syncPriorPropFunction(
   prop: any,
   newSupport: BaseSupport | Support,
   ownerSupport: BaseSupport | Support,
+  maxDepth: number,
   depth: number,
-  index: string | number,
-  // seen: any[] = [],
 ) {
   if(priorProp instanceof Function) {
     // the prop i am receiving, is already being monitored/controlled by another parent
@@ -141,7 +143,7 @@ function syncPriorPropFunction(
 
   // prevent infinite recursion
   // if(seen.includes(prop)) {
-  if(depth === 15) {
+  if(depth === maxDepth) {
     return prop
   }
   // seen.push(prop)
@@ -175,8 +177,8 @@ function syncPriorPropFunction(
       subValue,
       newSupport,
       ownerSupport,
+      maxDepth,
       depth + 1,
-      name,
     )
 
     if(prop[name] === result) {
@@ -224,7 +226,8 @@ function syncSupports<T extends AnySupport>(
   templater: TemplaterResult,
   support: AnySupport,
   lastSupport: T,
-  ownerSupport: AnySupport
+  ownerSupport: AnySupport,
+  maxDepth: number,
 ) {
   // update function refs to use latest references
   const newProps = templater.props as Props
@@ -233,6 +236,7 @@ function syncSupports<T extends AnySupport>(
     lastSupport as Support,
     ownerSupport,
     newProps,
+    maxDepth,
   )
 
   const propsConfig = support.propsConfig as PropsConfig

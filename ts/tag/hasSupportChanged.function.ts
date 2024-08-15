@@ -10,8 +10,14 @@ export function hasSupportChanged(
 ): number | string | false {
   const latestProps = newTemplater.props as Props
   const propsConfig = lastSupport.propsConfig as PropsConfig
-  const pastCloneProps = propsConfig.latestCloned  
-  const propsChanged = hasPropChanges(latestProps, pastCloneProps)
+  const pastCloneProps = propsConfig.latestCloned
+  
+  const propsChanged = hasPropChanges(
+    latestProps,
+    pastCloneProps,
+    lastSupport.templater.deepPropWatch,
+  )
+  
   return propsChanged
 }
 
@@ -24,49 +30,84 @@ export function hasSupportChanged(
 function hasPropChanges(
   props: Props, // natural props
   pastCloneProps: Props, // previously cloned props
-  // newTemplater: TemplaterResult,
-): number | string | false {
+  deepPropWatch: boolean,
+): number | false {
+  if(deepPropWatch === false) {
+    return shallowPropMatch(props, pastCloneProps)
+  }
+
   let castedProps: Props = props
   let castedPastProps: Props = pastCloneProps
 
-  // check all prop functions match
-  if(typeof(props) === BasicTypes.object) {
-    if(!pastCloneProps) {
-      return 3
-    }
+  castedProps = [...props]
+  castedPastProps = [...(pastCloneProps || [])]
 
-    castedProps = [...props]
-    castedPastProps = [...(pastCloneProps || [])]
+  const allFunctionsMatch = castedProps.every((value, index) =>
+    onePropCompare(value, index, castedProps, castedPastProps)
+  )
 
-    const allFunctionsMatch = castedProps.every((value, index) => {
-      const compare = castedPastProps[index]
+  if(!allFunctionsMatch) {
+    return 6 // a change has been detected by function comparisons
+  }
+  
+  return false
+}
 
-      if(value && typeof(value) === BasicTypes.object) {
-        const subCastedProps = {...value}
-        const subCompareProps = {...compare || {}} as any
-        const matched = Object.entries(subCastedProps).every(([key, value]) =>
-          compareProps(value, subCompareProps[key], () => {
-            delete subCastedProps[key] // its a function and not needed to be compared
-            delete subCompareProps[key] // its a function and not needed to be compared
-          })
-        )
-        return matched
-      }
-
-      return compareProps(value, compare, () => {
-        castedProps.splice(index, 1)
-        castedPastProps.splice(index, 1)
-      })
-    })
-
-    if(!allFunctionsMatch) {
-      return 'functions-changed' // a change has been detected by function comparisons
-    }
+function shallowPropMatch(
+  props: Props,
+  pastCloneProps: Props,
+) {
+  if(props.length !== pastCloneProps.length) {
+    return 1 // amount of args has changed
   }
 
-  // const isEqual = deepEqual(castedPastProps, castedProps)
-  // return isEqual ? false : 7 // if equal then no changes
-  return false
+  // if every prop the same, then no changes
+  const everyMatched = props.every((prop, index) => {
+    const pastProp = pastCloneProps[index]
+    
+    if(prop instanceof Array && pastProp instanceof Array) {
+      return prop === pastProp
+    }
+
+    if(prop instanceof Object) {
+      if(pastCloneProps instanceof Object) {
+        const result = Object.entries(prop).every(([name, value]) => pastProp[name] === value)
+        return result
+      }
+
+      return false
+    }
+
+    return prop === pastProp
+  })
+
+  return everyMatched ? false : 2
+}
+
+function onePropCompare(
+  value: any,
+  index: number,
+  castedProps: Props,
+  castedPastProps: Props,
+) {
+  const compare = castedPastProps[index]
+
+  if(value && typeof(value) === BasicTypes.object) {
+    const subCastedProps = {...value}
+    const subCompareProps = {...compare || {}} as any
+    const matched = Object.entries(subCastedProps).every(([key, value]) =>
+      compareProps(value, subCompareProps[key], () => {
+        delete subCastedProps[key] // its a function and not needed to be compared
+        delete subCompareProps[key] // its a function and not needed to be compared
+      })
+    )
+    return matched
+  }
+
+  return compareProps(value, compare, () => {
+    castedProps.splice(index, 1)
+    castedPastProps.splice(index, 1)
+  })
 }
 
 /** returning a number means true good comparison */

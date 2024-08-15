@@ -2,7 +2,7 @@
 
 import { isSubjectInstance } from "../../isInstance.js"
 import { paint, paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
-import { BaseSupport, Support } from "../../tag/Support.class.js"
+import { AnySupport, BaseSupport, Support } from "../../tag/Support.class.js"
 import { Context, ContextItem } from "../../tag/Context.types.js"
 import { InterpolateSubject } from "../../tag/update/processFirstSubject.utils.js"
 import { empty } from "../../tag/ValueTypes.enum.js"
@@ -23,6 +23,7 @@ export function attachDomElements(
   counts: Counts, // used for animation stagger computing
   context: Context,
   owner?: Element,
+  insertBefore?: Text,
   subs: SubToTemplateOptions[] = [],
 ): {
   context: Context
@@ -40,55 +41,14 @@ export function attachDomElements(
     const isNum = !isNaN(value as unknown as number)
     
     if(isNum) {
-      const subVal = values[ context.length ]
-      const marker = document.createTextNode(empty)
-      const contextItem = runOneContext(
-        subVal,
+      attachDynamicDom(
+        values,
         context,
-      )
-      contextItem.placeholder = marker
-
-      if(owner) {
-        paintAppends.push({
-          relative: owner,
-          element: marker,
-        })
-      } else {
-        paintInsertBefores.push({
-          element: marker,
-          relative: support.subject.placeholder as Text,
-        })
-      }
-
-      if(isSubjectInstance(subVal)) {
-        subs.push({
-          // fragment: owner,
-          insertBefore: marker,
-          appendTo: owner,
-          
-          subject: subVal as InterpolateSubject,
-          support, // ownerSupport,
-          counts,
-          contextItem,
-        })
-        continue
-      }
-
-      const global = support.subject.global as TagGlobal
-      global.locked = true
-      
-      processFirstSubjectValue(
-        subVal,
-        contextItem,
-        support,
-        counts,
         owner,
+        support,
+        subs,
+        counts,
       )
-      paint()
-      const global2 = support.subject.global as TagGlobal
-      delete global2.locked
-      contextItem.value = subVal
-  
       continue
     }
 
@@ -103,6 +63,11 @@ export function attachDomElements(
         paintAppends.push({
           element: domElement,
           relative: owner,
+        })
+      } else {
+        paintInsertBefores.push({
+          element: domElement,
+          relative: insertBefore as Text,
         })
       }
       continue
@@ -131,6 +96,11 @@ export function attachDomElements(
         element: domElement,
         relative: owner,
       })
+    } else {
+      paintInsertBefores.push({
+        element: domElement,
+        relative: insertBefore as Text,
+      })
     }
 
     if (node.ch) {
@@ -141,10 +111,70 @@ export function attachDomElements(
         counts,
         context,
         domElement,
+        insertBefore,
         subs,
       ).dom
     }
   }
 
   return {subs, dom, context}
+}
+
+function attachDynamicDom(
+  values: any[],
+  context: Context,
+  owner: Element | undefined,
+  support: AnySupport,
+  subs:SubToTemplateOptions[],
+  counts: Counts, // used for animation stagger computing
+) {
+  const subVal = values[ context.length ]
+  const marker = document.createTextNode(empty)
+  const contextItem = runOneContext(
+    subVal,
+    context,
+  )
+  contextItem.placeholder = marker
+
+  if(owner) {
+    paintAppends.push({
+      relative: owner,
+      element: marker,
+    })
+  } else {
+    paintInsertBefores.push({
+      element: marker,
+      relative: support.subject.placeholder as Text,
+    })
+  }
+
+  if(isSubjectInstance(subVal)) {
+    subs.push({
+      insertBefore: marker,
+      appendTo: owner,
+      
+      subject: subVal as InterpolateSubject,
+      support, // ownerSupport,
+      counts,
+      contextItem,
+    })
+    return
+  }
+
+  const global = support.subject.global as TagGlobal
+  global.locked = true
+  
+  processFirstSubjectValue(
+    subVal,
+    contextItem,
+    support,
+    counts,
+    owner,
+  )
+
+  const global2 = support.subject.global as TagGlobal
+  delete global2.locked
+  contextItem.value = subVal
+
+  return
 }
