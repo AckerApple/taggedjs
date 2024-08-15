@@ -77,3 +77,20 @@ export function lastById(id: string): Element {
   const elms = document.querySelectorAll('#' + id)
   return elms[elms.length - 1]
 }
+
+
+export function blur(
+  q: string
+) {
+  return query(q).forEach(elm => blurElm((elm as HTMLElement)))
+}
+
+const blurEvent = new Event('focusout', {
+  bubbles: true, // Blur events typically do not bubble, but this can be set to true if needed
+  cancelable: false // Blur events are not cancelable
+})
+
+
+function blurElm(elm: Element) {
+  elm.dispatchEvent(blurEvent)
+}

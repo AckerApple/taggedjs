@@ -81,7 +81,7 @@ export async function updateSubject(
   const oldGlobal = oldest.subject.global as TagGlobal
   delete oldGlobal.deleted
 
-  buildBeforeElement(reSupport, undefined, {counts: {added:0, removed: 0}})
+  buildBeforeElement(reSupport, undefined, oldest.subject.placeholder, {counts: {added:0, removed: 0}})
 
   reGlobal.newest = reSupport
   reGlobal.oldest = reSupport

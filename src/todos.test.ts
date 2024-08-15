@@ -1,4 +1,4 @@
-import { click, clickOne, focus, keydownOn, query } from "./elmSelectors"
+import { blur, click, clickOne, focus, keydownOn, query } from "./elmSelectors"
 import { describe, expect, it } from "./expect"
 
 describe('todos', function todos() {
@@ -89,8 +89,7 @@ describe('todos', function todos() {
     // main input + array input
     expect(query('input.new-todo').length).toBe(1)
     expect(query('input#edit-todo-input').length).toBe(1)
-    // editInput.onblur({editInput}) // cause close input
-    editInput.dispatchEvent(blurEvent)
+    blur('input#edit-todo-input')
     expect(query('input#edit-todo-input').length).toBe(0)
 
     // delete 0
@@ -99,11 +98,6 @@ describe('todos', function todos() {
   })
 
   it('⌚️ speedometer', runTodoSpeedometer)
-})
-
-const blurEvent = new Event('blur', {
-  bubbles: true, // Blur events typically do not bubble, but this can be set to true if needed
-  cancelable: false // Blur events are not cancelable
 })
 
 function runTodoSpeedometer() {

@@ -1,6 +1,6 @@
 import { watch, letState, html, tag } from "taggedjs"
 
-export const watchTesting = tag(() => (
+export const watchTesting = tag.deepPropWatch(() => (
   stateNum = letState(0)(x => [stateNum, stateNum=x]),
   stateNumChangeCount = letState(0)(x => [stateNumChangeCount, stateNumChangeCount=x]),
   _ = watch([stateNum], () => ++stateNumChangeCount),

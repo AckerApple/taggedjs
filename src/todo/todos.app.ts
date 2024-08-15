@@ -31,7 +31,9 @@ export const App = () => tag.state = (
                 ${visibleTodos.map((todo, index) => key(todo.id).html = Item(todo, dispatch, index))}
             </ul>
         </main>
+        -- before footer --
         ${Footer(todos, dispatch, route)}
+        -- after footer --
     `}
     ***end
 `;

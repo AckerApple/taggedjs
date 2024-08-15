@@ -39,7 +39,7 @@ function reconnect() {
 
   // Listen for messages from the server
   socket.addEventListener('message', async (event) => {
-    console.info('Message from server:', event.data, event.data);
+    console.info('💬 from server:', event.data, event.data);
 
     if(event.data==='Connected to the WebSocket endpoint') {
       // immediately overwrite existing running app

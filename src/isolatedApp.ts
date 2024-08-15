@@ -57,10 +57,7 @@ export default () => tag.state = (
       <fieldset>
         <legend>direct app tests</legend>        
         <button id="app-counter-subject-button"
-          onclick=${() => {
-            appCounterSubject.next(appCounter + 1)
-            console.log('appCounterSubject', appCounterSubject.value)
-          }}
+          onclick=${() => appCounterSubject.next(appCounter + 1)}
         >🍒 ++app subject</button>
         <button id="app-counter-button" onclick=${() => ++appCounter}>🍒 ++app</button>
         <span>

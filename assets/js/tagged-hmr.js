@@ -112,8 +112,13 @@ function sendFile(filePath, res) {
                 return res.status(500).send('Internal Server Error');
             }
         }
+        const at = data.indexOf('</body>')
+        
         // Inject your custom script into the HTML
-        const modifiedHtml = data.replace('</body>', `${customScript}</body>`);
+        // const modifiedHtml = data.replace('</body>', `${customScript}</body>`);
+        
+        const modifiedHtml = data.slice(0, at) + '</body>' + customScript + data.slice(at + 7, data.length)
+        
         // Send the modified HTML
         res.send(modifiedHtml);
     });

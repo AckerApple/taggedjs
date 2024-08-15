@@ -65,7 +65,6 @@ export const App = tag(() => (
     appCounterSubject.subscribe(
       callbacks(y => {
         appCounter = y
-        console.log('appCounter', {appCounter, subValue: appCounterSubject.value})
       })
     )
   })
@@ -78,10 +77,7 @@ export const App = tag(() => (
     <fieldset>
         <legend>direct app tests</legend>        
         <button id="app-counter-subject-button"
-          onclick=${() => {
-            appCounterSubject.next(appCounter + 1)
-            console.log('appCounterSubject', appCounterSubject.value)
-          }}
+          onclick=${() => appCounterSubject.next(appCounter + 1)}
         >🍒 ++app subject</button>
         <button id="app-counter-button" onclick=${() => ++appCounter}>🍒 ++app</button>
         <span>

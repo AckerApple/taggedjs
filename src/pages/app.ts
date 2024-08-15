@@ -1,6 +1,6 @@
 import { html, tag } from "taggedjs"
 
-export default tag.app = tag(routeTag => () => html`
+export default tag.app = tag(routeTag => (_ = console.log('app tag route?')) => html`
   <!DOCTYPE html>
   <html lang="en">
     <head>
@@ -26,7 +26,7 @@ export default tag.app = tag(routeTag => () => html`
           </td>
         </tr>
       </table>
-    </body>
+    <!-- app tag body before end ---></body><!-- app tag body after end --->
   </html>
 `)
 
