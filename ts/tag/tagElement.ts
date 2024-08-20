@@ -123,6 +123,7 @@ export function runWrapper(
     value: templater,
     global,
     checkValueChange: checkTagValueChange,
+    withinOwnerElement: false, // i am the highest owner
   }
     
   const newSupport = getBaseSupport(

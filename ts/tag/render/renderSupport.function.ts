@@ -6,9 +6,6 @@ import { ValueTypes } from '../ValueTypes.enum.js'
 import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 
 export function isInlineHtml(templater: TemplaterResult) {
-  /*
-  return !templater.wrapper && templater.tagJsType !== ValueTypes.stateRender
-  */
   return ValueTypes.templater === templater.tagJsType
 }
 

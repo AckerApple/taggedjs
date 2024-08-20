@@ -7,12 +7,9 @@ import { state } from'./state.function.js'
 export type Provider = {
   constructMethod: any
   instance: any
-  // clone: any
   stateDiff: number
   owner: Support // create at
   children: Support[] // injected into
-
-  // locked?: true
 }
 
 type ProviderConstructor<T> = (new (...args: any[]) => T) | (() => T)
@@ -95,7 +92,10 @@ export const providers = {
         const ownGlobal = owner.ownerSupport.subject.global as SupportTagGlobal
         const ownerProviders = ownGlobal.providers
   
-        if(!ownerProviders) continue
+        if(!ownerProviders) {
+          owner = owner.ownerSupport as Support // cause reloop checking next parent
+          continue
+        }
 
         const provider = ownerProviders.find(provider => {
           providers.push(provider as Provider)

@@ -22,6 +22,7 @@ export function attachDomElements(
   support: BaseSupport | Support,
   counts: Counts, // used for animation stagger computing
   context: Context,
+  depth: number, // used to know if dynamic variables live within parent owner tag/support
   owner?: Element,
   insertBefore?: Text,
   subs: SubToTemplateOptions[] = [],
@@ -48,6 +49,7 @@ export function attachDomElements(
         support,
         subs,
         counts,
+        depth,
       )
       continue
     }
@@ -110,6 +112,7 @@ export function attachDomElements(
         support,
         counts,
         context,
+        depth + 1,
         domElement,
         insertBefore,
         subs,
@@ -127,12 +130,14 @@ function attachDynamicDom(
   support: AnySupport,
   subs:SubToTemplateOptions[],
   counts: Counts, // used for animation stagger computing
+  depth: number, // used to indicate if variable lives within an owner's element
 ) {
   const subVal = values[ context.length ]
   const marker = document.createTextNode(empty)
   const contextItem = runOneContext(
     subVal,
     context,
+    depth > 0,
   )
   contextItem.placeholder = marker
 

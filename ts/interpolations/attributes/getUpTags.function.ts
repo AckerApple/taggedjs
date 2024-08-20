@@ -43,5 +43,4 @@ export function getUpTags(
     supports.push(newSupport)
   
     return supports
-  
 }

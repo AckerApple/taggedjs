@@ -167,7 +167,7 @@ function prepareUpdateToComponent(
       ownerSupport,
       {added:0, removed:0},
     )
-   return
+    return
   }
   
   const support = getSupport(

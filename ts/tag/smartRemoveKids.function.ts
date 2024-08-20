@@ -20,8 +20,8 @@ export function smartRemoveKids(
   thisGlobal.deleted = true
 
   for (const subject of context) {
-    if(subject.isAttr) {
-      continue
+    if(subject.withinOwnerElement) {
+      continue // i live within my owner variable. I will be deleted with owner
     }
 
     const lastArray = subject.lastArray

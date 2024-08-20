@@ -14,13 +14,12 @@ export function getTagWrap(
   templater: TemplaterResult,
   result: TagWrapper<any>
 ): Wrapper {
-
   // this function gets called by taggedjs
-  const wrapper = (
+  const wrapper = function tagFunWrap(
     newSupport: Support,
     subject: ContextItem,
     lastSupport?: Support | BaseSupport | undefined
-  ) => {
+  ) {
     // wrap any prop functions that are passed in
     const castedProps = getCastedProps(
       templater,
@@ -36,7 +35,7 @@ export function getTagWrap(
       subject,
       castedProps,
     )
-  
+
     return executeWrap(
       templater,
       result,

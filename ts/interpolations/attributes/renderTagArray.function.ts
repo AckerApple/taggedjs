@@ -9,13 +9,19 @@ export function renderTagUpdateArray(
 ) {
   ++painting.locks
 
-  supports.forEach(function mapTagUpdate(support, index) {
-    const global = support.subject.global as SupportTagGlobal
-    const newest = global.newest as Support
-    renderSupport(newest)  
-  })
+  supports.forEach(mapTagUpdate)
 
   --painting.locks
 
   paint()
+}
+
+function mapTagUpdate(support: AnySupport) {
+  const global = support.subject.global as SupportTagGlobal
+  if(!global) {
+    return // while rendering a parent, a child may have been deleted (pinbowl)
+  }
+
+  const newest = global.newest // || support
+  renderSupport(newest)  
 }

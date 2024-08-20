@@ -35,14 +35,6 @@ export function executeWrap(
     }
   }
 
-  
-  /* ??? - newly removed. Intended to convert tag component returns into always tags
-  const unknown = !tag || !tag.tagJsType // (tag.tagJsType && ![ValueTypes.tag,ValueTypes.dom].includes(tag.tagJsType))
-  if(unknown) {
-    tag = html`${tag}` // component returned a non-component value
-  }
-  */
-
   tag.templater = templater
   templater.tag = tag
 

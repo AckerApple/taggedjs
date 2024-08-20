@@ -54,6 +54,7 @@ function getHtmlDomMeta(
     support,
     options.counts,
     context,
+    0,
     appendTo,
     insertBefore,
   )
@@ -75,10 +76,12 @@ function loadDomMeta(support: AnySupport): ParsedHtml {
 export function runOneContext(
   value: unknown,
   context: Context,
+  withinOwnerElement: boolean
 ): ContextItem {
   const contextItem: ContextItem = {
     value,
     checkValueChange: checkSimpleValueChange,
+    withinOwnerElement,
   }
 
   context.push(contextItem)

@@ -16,6 +16,7 @@ export type ContextItem = {
   global?: TagGlobal
   value?: any,
 
+  withinOwnerElement: boolean
   checkValueChange: (value:unknown, subject: ContextItem) => number | boolean
 }
 export type Context = ContextItem[]

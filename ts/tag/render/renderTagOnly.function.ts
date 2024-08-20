@@ -71,8 +71,6 @@ function beforeWithRender(
   if(prevSupport) {
     if(prevSupport !== support) {
       const lastState = prevSupport.state
-      // ??? new removed
-      // support.subject.global = prevSupport.subject.global
       support.state = lastState
     }
 

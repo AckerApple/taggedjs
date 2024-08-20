@@ -128,6 +128,7 @@ function processAddTagArrayItem(
   const itemSubject: ContextItem = {
     value,
     checkValueChange: checkSimpleValueChange,
+    withinOwnerElement: false, // TODO: we need to pass down depth so we can answer this truthfully
   }
 
   counts.added = counts.added + 1 // index

@@ -4,24 +4,16 @@ import { specialAttribute } from './specialAttribute.js'
 import { isSubjectInstance } from '../../isInstance.js'
 import { HowToSet } from './howToSetInputValue.function.js'
 import { bindSubjectCallback } from './bindSubjectCallback.function.js'
-import { addSupportEventListener, AnySupport } from '../../tag/Support.class.js'
 import { ValueTypes, empty } from '../../tag/ValueTypes.enum.js'
-import { paint, paintContent } from '../../tag/paint.function.js'
+import { AnySupport } from '../../tag/Support.class.js'
+import { paintContent } from '../../tag/paint.function.js'
 import { Context, ContextItem } from '../../tag/Context.types.js'
 import { processDynamicNameValueAttribute, processNonDynamicAttr } from './processNameValueAttribute.function.js'
 import { negatives } from '../../updateBeforeTemplate.function.js'
 import { checkSimpleValueChange, runOneContext, TagGlobal } from '../../tag/index.js'
+import { processAttributeFunction } from './processAttributeCallback.function.js'
 
 type TagVarIdNum = {tagJsVar: number}
-/*
-export type AttrCombo = [
-  string | TagVarIdNum,
-  (string | null | TagVarIdNum)?, // current attribute value by using .getAttribute
-]
-*/
-
-export type AttrCombo = {
-}
 
 /** Sets attribute value, subscribes to value updates  */
 export function processAttribute(
@@ -42,6 +34,7 @@ export function processAttribute(
     const contextItem = runOneContext(
       value,
       context,
+      true,
     )
 
     contextItem.isAttr = true
@@ -70,6 +63,7 @@ export function processAttribute(
       element,
       attrName: attrName as string,
       checkValueChange: checkSimpleValueChange,
+      withinOwnerElement: true,
     }
 
     context.push(contextItem)
@@ -305,38 +299,6 @@ export function processAttributeSubjectValue(
   howToSet(element, attrName, newAttrValue as string)
 }
 
-function processAttributeFunction(
-  element: Element,
-  newAttrValue: (...args: unknown[]) => unknown,
-  support: AnySupport,
-  attrName: string
-) {
-  const fun = function (...args: any[]) {
-    return fun.tagFunction(element, args)
-  }
-
-  // access to original function
-  fun.tagFunction = newAttrValue
-  fun.support = support
-
-  return applyFunToElm(attrName, element, fun, support)
-}
-
-export function applyFunToElm(
-  attrName: string,
-  element: Element,
-  callback: (...args: unknown[]) => unknown,
-  support: AnySupport,
-) {
-  // ;(element as any)[attrName] = callback
-  addSupportEventListener(
-    support.appSupport,
-    attrName,
-    element, // support.appSupport.appElement as Element,
-    callback,
-  )
-  return attrName
-}
 
 /** Looking for (class | style) followed by a period */
 export function isSpecialAttr(
