@@ -44,6 +44,7 @@ function templaterToSupport(
     // tagJsType: getValueType(templater),
     global: getNewGlobal(),
     checkValueChange: checkSimpleValueChange,
+    withinOwnerElement: false,
   }
   templater.props = templater.props || []
   const support = getBaseSupport(templater, subject) as any as Support
@@ -118,7 +119,6 @@ function processValue(
         strings.splice(index+1, 0, fnString)
         break
    
-
       case ValueTypes.templater:
       case ValueTypes.tag:
         const tag = (value as any).tag as StringTag // ??? TODO
@@ -134,6 +134,7 @@ function processValue(
               value,
               global: getNewGlobal(),
               checkValueChange: checkSimpleValueChange,
+              withinOwnerElement: subject?.withinOwnerElement || false,
             }
           )
         }).join('')

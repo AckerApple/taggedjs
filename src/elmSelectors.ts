@@ -20,6 +20,7 @@ export function click(
 ) {
   const items = [...query(q)]
   items.map(elm => (elm as HTMLElement).click())
+  // items.map(elm => elm.dispatchEvent(new MouseEvent('click')))
 }
 
 export function keydownOn(input: Element, key: string) {
