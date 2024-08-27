@@ -7,6 +7,7 @@ import { TemplateValue } from './processFirstSubject.utils.js'
 import { ValueTypes, ValueType } from '../ValueTypes.enum.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { checkTagValueChange } from '../checkDestroyPrevious.function.js'
+import { PropWatches } from '../tag.js'
 
 export function processNewArrayValue(
   value: TemplateValue | ValueSubject<any>,
@@ -44,7 +45,7 @@ function processNewTag(
 
   // TODO: Can this ever happen?
   if(!templater) {
-    templater = getTemplaterResult([])
+    templater = getTemplaterResult(PropWatches.DEEP)
     templater.tag = tag
     tag.templater = templater
   }

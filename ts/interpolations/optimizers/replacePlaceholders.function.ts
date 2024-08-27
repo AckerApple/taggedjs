@@ -2,10 +2,14 @@
 
 import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
 import { Attribute, ObjectText } from "./ObjectNode.types.js";
-import { DomMetaMap, ObjectChildren, ValuePos } from "./LikeObjectElement.type.js";
+import { ObjectChildren, ValuePos } from "./LikeObjectElement.type.js";
 import { OneUnparsedHtml, ParsedHtml, UnparsedHtml } from "./htmlInterpolationToDomMeta.function.js";
+import { ImmutableTypes } from "../../tag/ValueTypes.enum.js";
 
 const placeholderRegex = new RegExp(variablePrefix + '(\\d+)' + variableSuffix, 'g');
+
+const at = 'at' // short for attribute
+const ch = 'ch' // short for children
 
 export function replacePlaceholders(
   dom: UnparsedHtml,
@@ -19,14 +23,14 @@ export function replacePlaceholders(
     const loopTail: (string | number)[] = [...currentTail, i]
 
     const element = elements[i]
-    if ('at' in element) {
+    if (at in element) {
       const attrs = element.at as Attribute[]
       element.at = processAttributes(attrs, valueCount)
     }
 
-    if ('ch' in element) {
+    if (ch in element) {
       const children = element.ch as ObjectChildren
-      const innerLoopTail: (string | number)[] = [...loopTail, 'ch']
+      const innerLoopTail: (string | number)[] = [...loopTail, ch]
       element.ch = replacePlaceholders(children, valueCount, valuePositions, innerLoopTail)
     }
 
@@ -49,7 +53,7 @@ function examineChild(
   const textChild = child as ObjectText;
   let textContent = textChild.tc;
 
-  if (typeof textContent !== 'string') {
+  if (typeof textContent !== ImmutableTypes.string) {
     return index;
   }
 
@@ -91,7 +95,7 @@ function processAttributes(
       }
     }
 
-    if (typeof value === 'string' && value.startsWith(variablePrefix)) {
+    if (typeof value === ImmutableTypes.string && value.startsWith(variablePrefix)) {
       const index = parseInt(value.replace(variablePrefix, ''), 10)
       if (!isNaN(index) && index < valueCount) {
         return [key, {tagJsVar: index}, isSpecial]

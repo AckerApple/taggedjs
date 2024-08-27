@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### v2.7.0 - 7-2024
+- oneRender is now renderOnce
+- added tag() === tag.shallowPropWatch
+- added tag.deepPropWatch()
+- added tag.immutablePropWatch()
+
 ### v2.6.0 - 7-2024
 - tag().children is now tag(children)
 

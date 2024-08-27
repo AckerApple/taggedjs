@@ -24,7 +24,7 @@ type ValueTypeObject = {
   tagArray: ValueType
   subject: ValueType
   tagJsSubject: ValueType
-  oneRender: ValueType
+  renderOnce: ValueType
   stateRender: ValueType
 }
 
@@ -38,6 +38,6 @@ export const ValueTypes: ValueTypeObject = {
   subject: ['subject'],
   tagJsSubject: ['tagJsSubject'],
   
-  oneRender: ['oneRender'],
+  renderOnce: ['renderOnce'],
   stateRender: ['stateRender'],
 }

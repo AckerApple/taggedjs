@@ -146,7 +146,6 @@ export function runWrapper(
       templater,
       result,
       newSupport,
-      newSupport,
     )
 
     runAfterRender(newSupport, nowSupport)

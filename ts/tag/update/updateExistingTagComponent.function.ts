@@ -1,4 +1,4 @@
-import { hasSupportChanged } from'../hasSupportChanged.function.js'
+import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from'../hasSupportChanged.function.js'
 import { AnySupport, BaseSupport, PropsConfig, Support } from '../Support.class.js'
 import { renderSupport } from'../render/renderSupport.function.js'
 import { castProps, isSkipPropValue } from'../../alterProp.function.js'
@@ -10,6 +10,7 @@ import { ContextItem } from '../Context.types.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { destroySupport } from '../destroySupport.function.js'
+import { PropWatches } from '../tag.js'
 
 export function updateExistingTagComponent(
   ownerSupport: BaseSupport | Support,
@@ -22,10 +23,10 @@ export function updateExistingTagComponent(
   const oldWrapper = lastSupport.templater.wrapper
   const newWrapper = support.templater.wrapper
   let isSameTag = false
-  const skipComparing = [ValueTypes.stateRender, ValueTypes.oneRender].includes(support.templater.tagJsType)
+  const skipComparing = [ValueTypes.stateRender, ValueTypes.renderOnce].includes(support.templater.tagJsType)
 
   if(skipComparing) {
-    isSameTag = support.templater.tagJsType === ValueTypes.oneRender || isLikeTags(lastSupport,support)
+    isSameTag = support.templater.tagJsType === ValueTypes.renderOnce || isLikeTags(lastSupport,support)
   } else if(oldWrapper && newWrapper) {
     const oldFunction = oldWrapper.parentWrap.original
     const newFunction = newWrapper.parentWrap.original
@@ -52,7 +53,7 @@ export function updateExistingTagComponent(
 
   // everyhing has matched, no display needs updating.
   if(!hasChanged) {
-    const maxDepth = templater.deepPropWatch ? 15 : 2
+    const maxDepth = templater.propWatch === PropWatches.DEEP ? deepCompareDepth : shallowCompareDepth
     syncSupports(
       templater,
       support,
@@ -246,7 +247,7 @@ function syncSupports<T extends AnySupport>(
   
   const lastPropsConfig = lastSupport.propsConfig as PropsConfig
   // update support to think it has different cloned props
-  lastPropsConfig.latestCloned = propsConfig.latestCloned
+  lastPropsConfig.latest = propsConfig.latest
 
   return lastSupport // its the same tag component  
 }

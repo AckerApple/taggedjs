@@ -35,9 +35,7 @@ export function renderTagOnly(
     reSupport = executeWrap(
       templater,
       result,
-      newSupport,
       useSupport,
-      prevSupport,
     )
   } else {
     // functions wrapped in tag()

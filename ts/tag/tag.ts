@@ -13,18 +13,25 @@ let tagCount = 0
 
 export type TaggedFunction<T> = T & {original: Function}
 
+export enum PropWatches {
+  DEEP = 'deep',
+  SHALLOW = 'shallow',
+  NONE = 'none',
+  IMMUTABLE = 'immutable'
+}
+
 /** Wraps a function tag in a state manager and calls wrapped function on event cycles
  * For single rendering, no event cycles, use: tag.renderOnce = (props) => html``
  */
 export function tag<T extends ToTag>(
   tagComponent: T,
-  deepPropWatch?: boolean,
+  propWatch: PropWatches = PropWatches.SHALLOW, // PropWatches.DEEP,
 ): TaggedFunction<T> {
   /** function developer triggers */
   const parentWrap = (function tagWrapper(
     ...props: (T | StringTag | StringTag[])[]
   ): TemplaterResult {
-    const templater: TemplaterResult = getTemplaterResult(props, deepPropWatch)
+    const templater: TemplaterResult = getTemplaterResult(propWatch, props)
     templater.tagJsType = ValueTypes.tagComponent
     
     // attach memory back to original function that contains developer display logic
@@ -60,8 +67,8 @@ export function tag<T extends ToTag>(
 type ReturnTag = DomTag | StringTag | StateToTag | null | undefined
 
 /** Used to create a tag component that renders once and has no addition rendering cycles */
-tag.oneRender = function(): ReturnTag {
-  throw new Error('Do not call tag.oneRender as a function but instead set it as: `(props) => tag.oneRender = () => html`` `')
+tag.renderOnce = function(): ReturnTag {
+  throw new Error('Do not call tag.renderOnce as a function but instead set it as: `(props) => tag.renderOnce = () => html`` `')
 }
 
 /** Used to create variable scoping when calling a function that lives within a prop container function */
@@ -89,9 +96,21 @@ tag.app = function(routeTag: RouteTag): StateToTag {
 
 tag.deepPropWatch = tag
 
-Object.defineProperty(tag, 'oneRender', {
+tag.immutableProps = function immutableProps<T extends ToTag>(
+  tagComponent: T,
+): TaggedFunction<T> {
+  return tag(tagComponent, PropWatches.IMMUTABLE)
+}
+
+tag.watchProps = function watchProps<T extends ToTag>(
+  tagComponent: T,
+): TaggedFunction<T> {
+  return tag(tagComponent, PropWatches.SHALLOW)
+}
+
+Object.defineProperty(tag, 'renderOnce', {
   set(oneRenderFunction: Function) {
-    (oneRenderFunction as Wrapper).tagJsType = ValueTypes.oneRender
+    (oneRenderFunction as Wrapper).tagJsType = ValueTypes.renderOnce
   },
 })
 

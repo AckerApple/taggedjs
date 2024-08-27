@@ -6,7 +6,7 @@ export function providersChangeCheck(
   support: AnySupport
 ): AnySupport[] {
   const global = support.subject.global as SupportTagGlobal
-  const providers = global.providers // .filter(provider => !deepEqual(provider.instance, provider.clone))
+  const providers = global.providers
 
   if(!providers) {
     return []

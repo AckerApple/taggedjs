@@ -327,7 +327,7 @@ function callbackFun(
   const wrapper = support.templater.wrapper
   const parentWrap = wrapper?.parentWrap
   const tagJsType = wrapper?.tagJsType || parentWrap?.tagJsType
-  const oneRender = tagJsType === ValueTypes.oneRender
+  const oneRender = tagJsType === ValueTypes.renderOnce
   
   if(!oneRender) {
     return processTagCallbackFun(

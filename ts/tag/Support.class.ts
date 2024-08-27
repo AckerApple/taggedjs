@@ -10,7 +10,6 @@ export type AnySupport = (BaseSupport & {
 
 export type PropsConfig = {
   latest: Props // new props NOT cloned props
-  latestCloned: Props
   castProps?: Props // props that had functions wrapped
 }
 

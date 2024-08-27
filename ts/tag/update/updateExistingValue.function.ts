@@ -41,7 +41,7 @@ export function updateExistingValue(
       return
     }
 
-    if(tagJsType === ValueTypes.oneRender) {
+    if(tagJsType === ValueTypes.renderOnce) {
       return
     }
   }

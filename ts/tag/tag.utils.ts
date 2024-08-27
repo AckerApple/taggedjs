@@ -23,7 +23,7 @@ export type TagWrapper<T> = ((
 ) => TemplaterResult) & {
   original: Original
   // compareTo: string
-  tagJsType?: typeof ValueTypes.oneRender | typeof ValueTypes.stateRender
+  tagJsType?: typeof ValueTypes.renderOnce | typeof ValueTypes.stateRender
   lastRuns?: {[index: number]: TagTemplate}
 }
 

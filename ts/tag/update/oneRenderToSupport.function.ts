@@ -5,13 +5,14 @@ import { StringTag } from '../Tag.class.js'
 import { ContextItem } from '../Context.types.js'
 import { Original, TagWrapper } from '../tag.utils.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
+import { PropWatches } from '../tag.js'
 
 export function oneRenderToSupport(
   wrapper: Wrapper,
   subject: ContextItem,
   ownerSupport: AnySupport, // owner
 ) {
-  const templater = getTemplaterResult([])
+  const templater = getTemplaterResult(PropWatches.DEEP)
   templater.tagJsType = wrapper.tagJsType as typeof ValueTypes.templater
   const support = newSupportByTemplater(
     templater, ownerSupport, subject

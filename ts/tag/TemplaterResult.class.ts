@@ -10,13 +10,14 @@ import { Subscription } from '../subject/subject.utils.js'
 import { Subject } from '../subject/index.js'
 import { ValueType, ValueTypes } from './ValueTypes.enum.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
+import { PropWatches } from './tag.js'
 
 export type Wrapper = ((
   newSupport: BaseSupport | Support,
   subject: ContextItem,
   prevSupport?: BaseSupport | Support,
 ) => Support) & {
-  tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.oneRender | typeof ValueTypes.templater
+  tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater
   parentWrap: TagWrapper<any>
 }
 
@@ -59,7 +60,7 @@ export type Events = {
 export type Clone = (Element | Text | ChildNode)
 
 export type TemplaterResult = {
-  deepPropWatch: boolean
+  propWatch: PropWatches
   tagJsType: ValueType
   wrapper?: Wrapper
   tag?: StringTag | DomTag
@@ -70,11 +71,11 @@ export type TemplaterResult = {
 }
 
 export function getTemplaterResult(
+  propWatch: PropWatches,
   props?: Props,
-  deepPropWatch = true,
 ) {
   const templater: TemplaterResult = {
-    deepPropWatch,
+    propWatch,
     props,
     tagJsType: ValueTypes.templater,
     key: function keyTemplate(arrayValue: unknown) {

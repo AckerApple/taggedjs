@@ -7,6 +7,8 @@ import { Props } from './Props.js'
 import { Tag } from './tag/Tag.class.js'
 import { renderExistingReadyTag } from './tag/render/renderExistingTag.function.js'
 import { SupportTagGlobal, TagGlobal } from './tag/TemplaterResult.class.js'
+import { BasicTypes } from './tag/ValueTypes.enum.js'
+import { deepCompareDepth } from './tag/hasSupportChanged.function.js'
 
 export function castProps(
   props: Props,
@@ -58,7 +60,7 @@ export function checkProp(
   }
 
   // if(seen.includes(value)) {
-  if(depth === 15) {
+  if(depth === deepCompareDepth) {
     return value
   }
   // seen.push(value)
@@ -209,7 +211,7 @@ export function callbackPropOwner(
 }
 
 export function isSkipPropValue(value: unknown) {
-  return typeof(value)!=='object' || !value || (value as Tag).tagJsType
+  return typeof(value)!== BasicTypes.object || !value || (value as Tag).tagJsType
 }
 
 export function safeRenderSupport(

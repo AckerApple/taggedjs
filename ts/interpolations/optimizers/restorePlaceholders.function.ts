@@ -2,6 +2,7 @@ import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
 import { ObjectChildren } from "./LikeObjectElement.type.js";
 import { OneUnparsedHtml } from "./htmlInterpolationToDomMeta.function.js";
 import { ObjectText } from "./ObjectNode.types.js";
+import { ImmutableTypes } from "../../tag/ValueTypes.enum.js";
 export const safeVar = '__safeTagVar'
 
 export function restorePlaceholders(elements: ObjectChildren) {
@@ -18,7 +19,7 @@ function traverseAndRestore(element: OneUnparsedHtml) {
       }
       
       const [, value] = attr
-      if (typeof value === 'string' && value.startsWith(safeVar)) {
+      if (typeof value === ImmutableTypes.string && value.startsWith(safeVar)) {
         const index = parseInt(value.replace(safeVar, ''), 10)
         attr[1] = variablePrefix + index + variableSuffix
       }
@@ -31,7 +32,7 @@ function traverseAndRestore(element: OneUnparsedHtml) {
     for (let i = 0; i < children.length; i++) {
       const child = children[i] as ObjectText
       if (child.nn === 'text') {
-        if(typeof child.tc !== 'string') {
+        if(typeof child.tc !== ImmutableTypes.string) {
           return
         }
 

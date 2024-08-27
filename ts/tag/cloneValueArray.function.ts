@@ -1,6 +1,5 @@
 import { StringTag } from './Tag.class.js'
 import { deepClone } from '../deepFunctions.js'
-import { TemplaterResult } from './TemplaterResult.class.js'
 import { ValueType, ValueTypes } from './ValueTypes.enum.js'
 
 export function cloneValueArray<T>(
@@ -11,7 +10,8 @@ export function cloneValueArray<T>(
 
 /** clones only what is needed to compare differences later */
 export function cloneTagJsValue<T>(
-  value: T
+  value: T,
+  maxDepth: number,
 ): T {
   const tag = value as StringTag
 
@@ -35,13 +35,5 @@ export function cloneTagJsValue<T>(
     return cloneValueArray(tag as unknown as StringTag[]) as T
   }
 
-  return deepClone(value)
+  return deepClone(value, maxDepth)
 }
-
-/*
-function cloneTagComponent(
-  tagComponent: TemplaterResult
-) {
-  return deepClone(tagComponent.props) as any
-}
-*/

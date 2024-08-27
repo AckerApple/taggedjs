@@ -6,6 +6,8 @@ import { ContextItem } from './Context.types.js'
 import { Props } from '../Props.js'
 import { syncFunctionProps } from './update/updateExistingTagComponent.function.js'
 import { executeWrap } from './executeWrap.function.js'
+import { PropWatches } from './tag.js'
+import { deepCompareDepth, shallowCompareDepth } from './hasSupportChanged.function.js'
 
 /** creates/returns a function that when called then calls the original component function
  * Gets used as templater.wrapper()
@@ -39,9 +41,8 @@ export function getTagWrap(
     return executeWrap(
       templater,
       result,
-      newSupport,
       useSupport,
-      lastSupport,
+      castedProps,
     )
   }
 
@@ -53,7 +54,7 @@ export function getCastedProps(
   newSupport: AnySupport,
   lastSupport?: AnySupport,
 ) {
-  const maxDepth = templater.deepPropWatch ? 15 : 2
+  const maxDepth = templater.propWatch === PropWatches.DEEP ? deepCompareDepth : shallowCompareDepth
   const props = templater.props as Props
   const propsConfig = newSupport.propsConfig as PropsConfig
   // When defined, this must be an update where my new props have already been made for me

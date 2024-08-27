@@ -2,7 +2,7 @@ import { BasicTypes, ValueTypes } from './tag/ValueTypes.enum.js';
 
 export function deepClone<T>(
   obj: T,
-  maxDepth = 15,
+  maxDepth: number,
 ): T {
   // return makeDeepClone(obj, new WeakMap())
   return makeDeepClone(obj, maxDepth)
@@ -40,19 +40,14 @@ function makeDeepClone(
   // Create an empty object or array with the same prototype
   const clone = Array.isArray(obj) ? [] : Object.create(Object.getPrototypeOf(obj));
 
-  // Register the cloned object to avoid cyclic references
-  // visited.set(obj, clone)
-
   // Clone each property or element of the object or array
   if (Array.isArray(obj)) {
     for (let i = 0; i < obj.length; i++) {
-      // clone[i] = makeDeepClone(obj[i], visited)
       clone[i] = makeDeepClone(obj[i], maxDepth - 1)
     }
   } else {
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
-        // clone[key] = makeDeepClone(obj[key], visited)
         clone[key] = makeDeepClone(obj[key], maxDepth - 1)
       }
     }
@@ -64,9 +59,8 @@ function makeDeepClone(
 export function deepEqual(
   obj1: any,
   obj2: any,
-  maxDepth = 15,
+  maxDepth: number,
 ) {
-  // return isDeepEqual(obj1, obj2, new WeakMap())
   return isDeepEqual(obj1, obj2, maxDepth)
 }
 
@@ -144,7 +138,6 @@ function isObjectDeepEqual(
 function isArrayDeepEqual(
   obj1: any[],
   obj2: any[],
-  // visited: WeakMap<any, any>,
   maxDepth: number,
 ) {
   if (obj1.length !== obj2.length) {
@@ -152,7 +145,6 @@ function isArrayDeepEqual(
   }
 
   for (let i = 0; i < obj1.length; i++) {
-    // if (!isDeepEqual(obj1[i], obj2[i], visited)) {
     if (!isDeepEqual(obj1[i], obj2[i], maxDepth - 1)) {
       return false
     }

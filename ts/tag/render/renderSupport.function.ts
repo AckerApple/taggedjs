@@ -4,6 +4,8 @@ import { renderExistingReadyTag } from'./renderExistingTag.function.js'
 import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import { PropWatches } from '../index.js'
+import { deepCompareDepth, immutablePropMatch, shallowCompareDepth } from '../hasSupportChanged.function.js'
 
 export function isInlineHtml(templater: TemplaterResult) {
   return ValueTypes.templater === templater.tagJsType
@@ -97,7 +99,16 @@ function hasPropsToOwnerChanged(
 
   const nowProps = templater.props as Props
   const propsConfig = support.propsConfig as PropsConfig
-  const latestProps = propsConfig.latestCloned
+  const latestProps = propsConfig.latest
   const noLength = nowProps && nowProps.length === 0 && latestProps.length === 0
-  return !(noLength || deepEqual(nowProps, latestProps))
+
+  if(noLength) {
+    return false
+  }
+  
+  if([PropWatches.IMMUTABLE, PropWatches.SHALLOW].includes(templater.propWatch)) {
+    return immutablePropMatch(nowProps, latestProps)
+  }
+
+  return !(deepEqual(nowProps, latestProps, deepCompareDepth))
 }
