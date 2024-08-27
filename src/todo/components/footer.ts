@@ -1,8 +1,9 @@
 import { html, tag } from "taggedjs";
+import { Dispatch } from "../reducer";
 
 export const Footer = (
   todos: any,
-  dispatch: any,
+  dispatch: Dispatch,
   route: any,
 ) => tag.state = (
     activeTodoCount = todos.filter((todo: any) => !todo.completed).length,

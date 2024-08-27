@@ -1,24 +1,30 @@
-import { html, letState, tag } from "taggedjs";
+import { Dispatch, Todo } from "../reducer.js";
+import { html, tag } from "taggedjs";
 
-export const Item = tag((
-    todo: any,
-    dispatch: any,
+export const Item = tag.immutableProps((
+    todo: Todo,
+    dispatch: Dispatch,
     index: number,
-) => tag.state = (
-    editing = letState(false)(x => [editing, editing = x]),
 ) => html`
     <li class.completed=${todo.completed} class.editing=${todo.editing}>
-        <div class="view">
-            <input class="toggle" type="checkbox" checked=${todo.completed} onchange=${e => todo.completed = e.target.checked} />
-            <label data-testid="todo-item-label" ondoubleclick=${() => editing = !editing}>${todo.title}</label>
-            <button class="destroy" onclick=${() => dispatch.removeItemByIndex(index)}>destroy</button>
-        </div>
-        ${editing && html`            
+        ${!todo.editing ? html`
+            <div class="view">
+                <input type="button" onclick=${e => dispatch.toggleItem(todo, index)} value="toggle" />
+                
+                <input class="toggle" type="checkbox" ${todo.completed && 'checked'} onchange=${e => dispatch.completeItem(todo, index)} />
+                
+                <label data-testid="todo-item-label" ondoubleclick=${() => dispatch.toggleEditItem(todo, index)}
+                >${todo.title}</label>
+                
+                <button class="destroy" onclick=${() => dispatch.removeItemByIndex(index)}
+                >destroy</button>
+            </div>
+        ` : html`
             <div class="input-container">
-                <input id="edit-todo-input" type="text" autofocus
+                <input id="edit-todo-input" type="text" autofocus class="edit"
                     value=${todo.title}
-                    onblur=${() => editing = false}
-                    onKeyDown=${e => handleKey(e, title => handleUpdate(title, todo, dispatch))}
+                    onblur=${() => dispatch.stopEditItem(todo, index)}
+                    onKeyDown=${e => handleKey(e, title => handleUpdate(title, todo, index, dispatch))}
                 />
                 <label class="visually-hidden" htmlFor="todo-input">
                     Edit Todo Input
@@ -26,18 +32,23 @@ export const Item = tag((
             </div>
         `}
     </li>
-`, false);
+`)
 
 function handleUpdate(
   title: string,
-  todo: any,
-  dispatch: any
+  todo: Todo,
+  index: number,
+  dispatch: Dispatch
 ) {
     if (title.length === 0) {
         dispatch.removeItem(todo.id)
         return
     }
-    todo.title = title;
+
+    dispatch.updateToByIndex(todo, {
+        title,
+        editing: false,
+    }, index)
 }
 
 export function handleKey(

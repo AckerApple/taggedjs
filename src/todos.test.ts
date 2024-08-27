@@ -83,14 +83,13 @@ describe('todos', function todos() {
     editInput.value = 'two'
     keydownOn(editInput, 'Enter')
 
-    // expect one delete button
-    expect(query('button.destroy').length).toBe(1)
+    expect(query('button.destroy').length).toBe(1, 'expected only one delete button')
 
     // main input + array input
     expect(query('input.new-todo').length).toBe(1)
-    expect(query('input#edit-todo-input').length).toBe(1)
-    blur('input#edit-todo-input')
-    expect(query('input#edit-todo-input').length).toBe(0)
+    expect(query('input#edit-todo-input').length).toBe(0) // enter key already hid it
+    // blur('input#edit-todo-input')
+    // expect(query('input#edit-todo-input').length).toBe(0)
 
     // delete 0
     clickOne('button.destroy')

@@ -2,7 +2,7 @@ import { html, letState, Subject, subject, tag, ValueSubject, ValueSubjective } 
 import { renderCountDiv } from "./renderCount.component.js"
 
 /** this tag renders only once */
-export const oneRender = () => tag.oneRender = (
+export const oneRender = () => tag.renderOnce = (
   counter = new ValueSubjective(0),
   renderCount = letState(0)(x => [renderCount, renderCount = x]), // state can be used but it never updates
 ) => {

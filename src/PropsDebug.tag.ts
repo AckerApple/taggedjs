@@ -191,7 +191,7 @@ const propsDebug = tag((
   })}    
 `)
 
-const propFnUpdateTest = tag(({
+const propFnUpdateTest = tag.immutableProps(({
   propNumber, callback,
 }: {
   propNumber: number, callback: Function
@@ -209,7 +209,7 @@ const propFnUpdateTest = tag(({
     ${renderCountDiv({renderCount, name: 'propFnUpdateTest'})}
     <small style="opacity:.5">the count here and within parent increases but not in parent parent</small>
   `
-}, false)
+})
 
 function timestampToValues(
   timestamp: number | Date | string

@@ -106,7 +106,7 @@ function processValue(
         strings.splice(index+1, 0, tagString)
         break
   
-      case ValueTypes.oneRender: 
+      case ValueTypes.renderOnce: 
         const tSupport = oneRenderToSupport(
           value as any,
           subject as ContextItem,
