@@ -6,6 +6,7 @@ import { TagGlobal } from '../../tag/TemplaterResult.class.js'
 import { processTagCallbackFun } from './processAttribute.function.js'
 import { ContextItem } from '../../tag/Context.types.js'
 import { AnySupport } from '../../tag/Support.class.js'
+import { BasicTypes } from '../../tag/ValueTypes.enum.js'
 
 export function processDynamicNameValueAttribute(
   attrName: string,
@@ -20,7 +21,7 @@ export function processDynamicNameValueAttribute(
   contextItem.element = element
   contextItem.howToSet = howToSet
 
-  if( value instanceof Function ) {
+  if(typeof(value) === BasicTypes.function ) {
     return processTagCallbackFun(
       contextItem,
       value,

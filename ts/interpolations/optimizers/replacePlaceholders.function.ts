@@ -23,13 +23,13 @@ export function replacePlaceholders(
     const loopTail: (string | number)[] = [...currentTail, i]
 
     const element = elements[i]
-    if (at in element) {
+    if (element.at) {
       const attrs = element.at as Attribute[]
       element.at = processAttributes(attrs, valueCount)
     }
 
-    if (ch in element) {
-      const children = element.ch as ObjectChildren
+    if (element.ch) {
+      const children = element.ch as UnparsedHtml
       const innerLoopTail: (string | number)[] = [...loopTail, ch]
       element.ch = replacePlaceholders(children, valueCount, valuePositions, innerLoopTail)
     }

@@ -5,6 +5,7 @@ import { paint, paintRemoves } from './paint.function.js'
 import { AnySupport } from './Support.class.js'
 import { ContextItem } from './Context.types.js'
 import { SupportTagGlobal } from './TemplaterResult.class.js'
+import { isPromise } from '../isInstance.js'
 
 /** sets global.deleted on support and all children */
 export function smartRemoveKids(
@@ -99,8 +100,8 @@ function checkCloneRemoval(
   if( customElm.ondestroy ) {
     const promise = elementDestroyCheck(customElm, stagger)
 
-    if(promise instanceof Promise) {
-      return promise.then(() => {
+    if(isPromise(promise)) {
+      return (promise as Promise<any>).then(() => {
         paintRemoves.push(clone)
         paint()
       })

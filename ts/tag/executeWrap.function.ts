@@ -2,7 +2,7 @@ import { TemplaterResult } from './TemplaterResult.class.js'
 import { TagWrapper } from './tag.utils.js'
 import { AnySupport } from './Support.class.js'
 import { StringTag } from './Tag.class.js'
-import { ValueTypes } from './ValueTypes.enum.js'
+import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 import { setUseMemory } from '../state/setUse.function.js'
 import { Props } from '../Props.js'
 
@@ -24,8 +24,8 @@ export function executeWrap(
     tag = originalFunction(...castedProps as unknown[])
 
     // CALL ORIGINAL COMPONENT FUNCTION
-    if(tag instanceof Function) {
-      tag = tag()
+    if(typeof(tag) === BasicTypes.function) {
+      tag = (tag as any)()
     }
   }
 

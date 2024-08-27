@@ -1,5 +1,6 @@
 import { variablePrefix, variableSuffix } from "../../tag/Tag.class.js"
 import { isSpecialAttr } from "../attributes/processAttribute.function.js"
+import { ObjectChildren } from "./LikeObjectElement.type.js"
 import { Attribute, DomObjectElement, ObjectElement, ObjectText } from "./ObjectNode.types.js"
 
 const ondoubleclick = 'ondoubleclick'
@@ -60,7 +61,7 @@ function addPlaceholders(
   return results
 }
 
-export type OneUnparsedHtml = ObjectElement | ObjectText
+export type OneUnparsedHtml = (ObjectElement | ObjectText) & {ch?: ObjectChildren, at?: any[]}
 export type UnparsedHtml = OneUnparsedHtml[]
 export type ParsedHtml = (DomObjectElement | ObjectText)[]
 

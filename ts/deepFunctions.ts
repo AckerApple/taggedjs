@@ -1,3 +1,4 @@
+import { isArray, isFunction } from './isInstance.js';
 import { BasicTypes, ValueTypes } from './tag/ValueTypes.enum.js';
 
 export function deepClone<T>(
@@ -38,10 +39,10 @@ function makeDeepClone(
   }
 
   // Create an empty object or array with the same prototype
-  const clone = Array.isArray(obj) ? [] : Object.create(Object.getPrototypeOf(obj));
+  const clone = isArray(obj) ? [] : Object.create(Object.getPrototypeOf(obj));
 
   // Clone each property or element of the object or array
-  if (Array.isArray(obj)) {
+  if (isArray(obj)) {
     for (let i = 0; i < obj.length; i++) {
       clone[i] = makeDeepClone(obj[i], maxDepth - 1)
     }
@@ -91,10 +92,9 @@ function isDeepEqual(
     // visited.set(obj1, 0)
 
     // Check if obj1 and obj2 are both arrays
-    if (Array.isArray(obj1) && Array.isArray(obj2)) {
-      // return isArrayDeepEqual(obj1, obj2, visited)
+    if (isArray(obj1) && isArray(obj2)) {
       return isArrayDeepEqual(obj1, obj2, maxDepth - 1)
-    } else if (Array.isArray(obj1) || Array.isArray(obj2)) {
+    } else if (isArray(obj1) || isArray(obj2)) {
       // One is an array, and the other is not
       return false
     }
@@ -157,6 +157,6 @@ function isSameFunctions(
   fn0: Function,
   fn1: Function
 ): Boolean {
-  const bothFunction = fn0 instanceof Function && fn1 instanceof Function
+  const bothFunction = isFunction(fn0) && isFunction(fn1)
   return bothFunction && fn0.toString() === fn1.toString()
 }

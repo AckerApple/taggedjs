@@ -1,6 +1,7 @@
 import { StringTag } from './Tag.class.js'
 import { deepClone } from '../deepFunctions.js'
 import { ValueType, ValueTypes } from './ValueTypes.enum.js'
+import { isArray } from '../isInstance.js'
 
 export function cloneValueArray<T>(
   values: (T | StringTag | StringTag[])[]
@@ -15,15 +16,12 @@ export function cloneTagJsValue<T>(
 ): T {
   const tag = value as StringTag
 
-  const tagJsType = value instanceof Object && (value as any).tagJsType as ValueType
+  const tagJsType = (value as any)?.tagJsType as ValueType
   if(tagJsType) {
     switch( tagJsType ) {
       case ValueTypes.stateRender:
         return undefined as any
 
-      // case ValueTypes.tagComponent:
-      //   return cloneTagComponent(value as any as TemplaterResult)
-      
       case ValueTypes.dom:
       case ValueTypes.tag:
       case ValueTypes.templater:
@@ -31,7 +29,7 @@ export function cloneTagJsValue<T>(
     }
   }
 
-  if(value instanceof Array) {
+  if(isArray(value)) {
     return cloneValueArray(tag as unknown as StringTag[]) as T
   }
 

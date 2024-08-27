@@ -4,6 +4,7 @@ import { updateExistingValue } from './update/updateExistingValue.function.js'
 import { processAttributeEmit, updateNameOnlyAttrValue } from '../interpolations/attributes/processAttribute.function.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 import { Context, ContextItem } from './Context.types.js'
+import { isSubjectInstance } from '../isInstance.js'
 
 export function processUpdateContext(
   support: AnySupport,
@@ -45,7 +46,7 @@ export function processUpdateOneContext(
     return
   }
 
-  if(value instanceof Object && 'subscribe' in value) {
+  if(isSubjectInstance(value)) {
     return // emits on its own
   }
 

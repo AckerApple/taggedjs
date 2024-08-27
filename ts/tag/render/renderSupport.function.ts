@@ -72,10 +72,6 @@ export function checkRenderUp(
   templater: TemplaterResult,
   support: AnySupport,
 ) {
-  if(!ownerSupport) {
-    return false
-  }
-
   const selfPropChange = hasPropsToOwnerChanged(
     templater,
     support,
@@ -93,22 +89,14 @@ function hasPropsToOwnerChanged(
   templater: TemplaterResult,
   support: AnySupport,
 ) {
-  if(support.templater.tagJsType === ValueTypes.stateRender) {
-    return true
-  }
-
   const nowProps = templater.props as Props
   const propsConfig = support.propsConfig as PropsConfig
   const latestProps = propsConfig.latest
-  const noLength = nowProps && nowProps.length === 0 && latestProps.length === 0
 
-  if(noLength) {
-    return false
-  }
-  
   if([PropWatches.IMMUTABLE, PropWatches.SHALLOW].includes(templater.propWatch)) {
     return immutablePropMatch(nowProps, latestProps)
   }
 
-  return !(deepEqual(nowProps, latestProps, deepCompareDepth))
+  const noLength = nowProps && nowProps.length === 0 && latestProps.length === 0
+  return !(noLength || deepEqual(nowProps, latestProps, deepCompareDepth))
 }

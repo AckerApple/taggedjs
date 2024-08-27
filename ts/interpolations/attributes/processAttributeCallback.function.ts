@@ -1,9 +1,10 @@
 import { AnySupport } from '../../tag/Support.class.js'
 import { addSupportEventListener } from './addSupportEventListener.function.js'
+import { Callback } from './bindSubjectCallback.function.js'
 
 export function processAttributeFunction(
   element: Element,
-  newAttrValue: (...args: unknown[]) => unknown,
+  newAttrValue: Callback,
   support: AnySupport,
   attrName: string
 ) {

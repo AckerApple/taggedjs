@@ -12,7 +12,7 @@ export function restorePlaceholders(elements: ObjectChildren) {
 const safeReplacer = /__safeTagVar(\d+)/g
 
 function traverseAndRestore(element: OneUnparsedHtml) {
-  if ('at' in element) {
+  if (element.at) {
     element.at = element.at ? element.at.map(attr => {
       if(attr.length === 1) {
         return attr
@@ -27,8 +27,8 @@ function traverseAndRestore(element: OneUnparsedHtml) {
     }) : []
   }
 
-  if ('ch' in element) {
-    const children = element.ch as ObjectChildren
+  if ((element as any).ch) {
+    const children = (element as any).ch as ObjectChildren
     for (let i = 0; i < children.length; i++) {
       const child = children[i] as ObjectText
       if (child.nn === 'text') {
@@ -40,7 +40,7 @@ function traverseAndRestore(element: OneUnparsedHtml) {
           variablePrefix + index + variableSuffix
         )
       }
-      traverseAndRestore(child)
+      traverseAndRestore(child as OneUnparsedHtml)
     }
 
     // Remove empty children array

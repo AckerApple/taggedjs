@@ -6,7 +6,7 @@ import { AnySupport } from '../Support.class.js'
 import { StringTag, DomTag } from '../Tag.class.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { renderTagOnly } from '../render/renderTagOnly.function.js'
-import { ValueType, ValueTypes } from '../ValueTypes.enum.js'
+import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { oneRenderToSupport } from './oneRenderToSupport.function.js'
 import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function.js'
 import { processFirstSubjectComponent, processReplacementComponent } from './processFirstSubjectComponent.function.js'
@@ -14,6 +14,7 @@ import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { ContextItem } from '../Context.types.js'
 import { checkArrayValueChange, checkSimpleValueChange, checkTagValueChange } from '../checkDestroyPrevious.function.js'
+import { isArray, isSubjectInstance } from '../../isInstance.js'
 
 export function processFirstSubjectValue(
   value: TemplateValue | StringTag,
@@ -131,7 +132,7 @@ export function processFirstSubjectValue(
     }
   }
 
-  if(value instanceof Array) {
+  if(isArray(value)) {
     processTagArray(
       subject,
       value as (StringTag | TemplaterResult)[],
@@ -145,7 +146,7 @@ export function processFirstSubjectValue(
     return
   }
 
-  if(value instanceof Object && 'subscribe' in (value as any)) {
+  if(isSubjectInstance(value)) {
     return // will be subscribed to for value
   }
 

@@ -6,11 +6,12 @@ import { updateExistingTagComponent } from './updateExistingTagComponent.functio
 import { processNewRegularValue, processUpdateRegularValue, RegularValue } from './processRegularValue.function.js'
 import { getFakeTemplater, newSupportByTemplater, processTag } from './processTag.function.js'
 import { StringTag, DomTag, Tag } from '../Tag.class.js'
-import { ValueType, ValueTypes } from '../ValueTypes.enum.js'
+import { BasicTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { updateSupportBy } from '../updateSupportBy.function.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { ContextItem } from '../Context.types.js'
+import { isArray } from '../../isInstance.js'
 
 const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender]
 
@@ -51,7 +52,7 @@ export function updateExistingValue(
     // was component but no longer
     const support = global2.newest
     if( support ) {
-      if(value instanceof Function) {
+      if(typeof(value) === BasicTypes.function) {
         return
       }
   
@@ -103,7 +104,7 @@ export function updateExistingValue(
     }
   }
 
-  if(value instanceof Array) {
+  if(isArray(value)) {
     processTagArray(
       subject,
       value as (TemplaterResult | StringTag)[],
@@ -114,7 +115,7 @@ export function updateExistingValue(
     return
   }
 
-  if(value instanceof Function) {
+  if(typeof(value) === BasicTypes.function) {
     subject.value = value
     return
   }

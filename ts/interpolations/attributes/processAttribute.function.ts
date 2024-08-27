@@ -1,10 +1,10 @@
 // taggedjs-no-compile
 
 import { specialAttribute } from './specialAttribute.js'
-import { isSubjectInstance } from '../../isInstance.js'
+import { isFunction, isObject, isSubjectInstance } from '../../isInstance.js'
 import { HowToSet } from './howToSetInputValue.function.js'
-import { bindSubjectCallback } from './bindSubjectCallback.function.js'
-import { ValueTypes, empty } from '../../tag/ValueTypes.enum.js'
+import { bindSubjectCallback, Callback } from './bindSubjectCallback.function.js'
+import { BasicTypes, ValueTypes, empty } from '../../tag/ValueTypes.enum.js'
 import { AnySupport } from '../../tag/Support.class.js'
 import { paintContent } from '../../tag/paint.function.js'
 import { Context, ContextItem } from '../../tag/Context.types.js'
@@ -115,11 +115,12 @@ export function updateNameOnlyAttrValue(
 ) {
   // check to remove previous attribute(s)
   if(lastValue) {
-    if(lastValue instanceof Object) {
-      const isObStill = attrValue instanceof Object
+    if(typeof(lastValue) === BasicTypes.object) {
+      const isObStill = typeof(attrValue) === BasicTypes.object
       if(isObStill) {
-        for (const name in lastValue) {
-          if(name in attrValue) {
+        for (const name in (lastValue as object)) {
+          // if((attrValue as any)[name]) {
+            if(name in (attrValue as any)) {
             continue
           }
           paintContent.push(function paintContent() {
@@ -128,7 +129,7 @@ export function updateNameOnlyAttrValue(
           // delete element[name]
         }
       } else {
-        for (const name in lastValue) {
+        for (const name in (lastValue as object)) {
           paintContent.push(function paintContent() {
             element.removeAttribute(name)
           })
@@ -159,9 +160,9 @@ export function processNameOnlyAttrValue(
   }
 
   // process an object of attributes ${{class:'something, checked:true}}
-  if(attrValue instanceof Object) {
-    for (const name in attrValue) {
-      const value = attrValue[name]
+  if(typeof attrValue === BasicTypes.object) {
+    for (const name in (attrValue as any)) {
+      const value = (attrValue as any)[name]
       processAttribute(
         values,
         name,
@@ -245,7 +246,7 @@ export function processAttributeEmit(
   isSpecial?: boolean,
 ) {
   // should the function be wrapped so every time its called we re-render?
-  if(newAttrValue instanceof Function) {
+  if(isFunction(newAttrValue)) {
     return callbackFun(
       support,
       newAttrValue,
@@ -278,8 +279,8 @@ export function processAttributeSubjectValue(
   howToSet: HowToSet,
   support: AnySupport,
 ) {
-  if(newAttrValue instanceof Function) {
-    return processAttributeFunction(element, newAttrValue, support, attrName)
+  if(isFunction(newAttrValue)) {
+    return processAttributeFunction(element, newAttrValue as Callback, support, attrName)
   }
   
   if (isSpecial) {
@@ -372,8 +373,9 @@ export function processTagCallbackFun(
 function getTagJsVar(
   attrPart: string | TagVarIdNum | null | undefined
 ) {
-  if(attrPart && attrPart instanceof Object && 'tagJsVar' in (attrPart as TagVarIdNum))
+  if(isObject(attrPart) && 'tagJsVar' in (attrPart as TagVarIdNum))
     return (attrPart as TagVarIdNum).tagJsVar
   
   return -1
+  // return (attrPart as TagVarIdNum)?.tagJsVar || -1
 }

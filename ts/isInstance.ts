@@ -1,7 +1,7 @@
 import { SubjectLike } from './subject/subject.utils.js'
 import { DomTag, StringTag } from './tag/Tag.class.js'
 import { TemplaterResult } from './tag/TemplaterResult.class.js'
-import { ImmutableTypes, ValueTypes } from './tag/ValueTypes.enum.js'
+import { BasicTypes, ImmutableTypes, ValueTypes } from './tag/ValueTypes.enum.js'
 
 export function isSimpleType(value: any) {
   return [
@@ -32,7 +32,21 @@ export function isTagComponent(
 export function isSubjectInstance(
   subject?: SubjectLike<any> | any
 ): Boolean {
-  // const isSubject = subject?.isSubject === true
-  // return (isSubject || subject?.subscribe) ? true : false // subject?.isSubject === true || 
-  return subject?.subscribe ? true : false // subject?.isSubject === true || 
+  return isObject(subject) && typeof subject.subscribe === BasicTypes.function
+}
+
+export function isPromise(value: any) {
+  return !!value && isFunction(value.then)
+}
+
+export function isFunction(value: any) {
+  return typeof value === BasicTypes.function
+}
+
+export function isObject(value: any) {
+  return typeof(value) === BasicTypes.object && value !== null
+}
+
+export function isArray(value: any) {
+  return Array.isArray(value)
 }

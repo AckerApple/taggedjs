@@ -2,6 +2,7 @@ import { firstLetState } from './letState.function.js'
 import { setUseMemory } from './setUse.function.js'
 import { Config, State, StateConfigItem } from './state.utils.js'
 import { getStateValue } from './getStateValue.function.js'
+import { BasicTypes } from '../tag/ValueTypes.enum.js'
 
 export const stateHandlers = {
   handler: runFirstState,
@@ -26,12 +27,12 @@ export function runFirstState <T>(
   // State first time run
   let initValue = defaultValue
   
-  if(defaultValue instanceof Function) {
-    initValue = defaultValue()
+  if(typeof(defaultValue) === BasicTypes.function) {
+    initValue = (defaultValue as Function)()
   }
 
   // the state is actually intended to be a function
-  if(initValue instanceof Function) {
+  if(typeof(initValue) === BasicTypes.function) {
     const original = initValue as Function
     
     initValue = function initValueFun(...args: any[]) {

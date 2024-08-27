@@ -1,5 +1,5 @@
 import { AnySupport, BaseSupport, Support } from './tag/Support.class.js'
-import { isStaticTag } from './isInstance.js'
+import { isArray, isStaticTag } from './isInstance.js'
 import { isInlineHtml, renderInlineHtml, renderSupport } from './tag/render/renderSupport.function.js'
 import { setUseMemory } from './state/index.js'
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
@@ -55,7 +55,7 @@ export function checkProp(
     return value
   }
 
-  if(value instanceof Function) {
+  if(typeof(value) === BasicTypes.function) {
     return getPropWrap(value, ownerSupport)
   }
 
@@ -69,7 +69,7 @@ export function checkProp(
     return value // no children to crawl through
   }
 
-  if(value instanceof Array) {
+  if(isArray(value)) {
     for (let index = value.length - 1; index >= 0; --index) {
       const subValue = value[index]
   
@@ -77,7 +77,7 @@ export function checkProp(
         subValue, ownerSupport, newSupport, depth + 1,
       )
 
-      if(subValue instanceof Function) {
+      if(typeof(subValue) === BasicTypes.function) {
         if(subValue.mem) {
           continue
         }
@@ -107,7 +107,7 @@ export function checkProp(
     }
 
     value[name] = result
-    if(result instanceof Function) {
+    if(typeof(result) === BasicTypes.function) {
       if(subValue.mem) {
         continue
       }

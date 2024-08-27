@@ -1,7 +1,7 @@
 import { StringTag, DomTag, Tag } from './Tag.class.js'
 import { BaseSupport, Support } from './Support.class.js'
 import { TemplaterResult } from './TemplaterResult.class.js'
-import { ValueTypes } from './ValueTypes.enum.js'
+import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 
 export function isLikeTags(
   support0: BaseSupport | Support | StringTag, // new
@@ -79,7 +79,7 @@ export function isLikeValueSets(values0:any[], values1:any[]) {
 
   const allVarsMatch = values1.every((value, index)=> {
     const compareTo = values0[index]
-    const isFunctions = value instanceof Function && compareTo instanceof Function
+    const isFunctions = typeof(value) === BasicTypes.function && typeof(compareTo) === BasicTypes.function
     
     if(isFunctions) {
       const stringMatch = value.toString() === compareTo.toString()

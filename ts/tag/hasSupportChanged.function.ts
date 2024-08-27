@@ -1,4 +1,5 @@
 import { deepEqual } from '../deepFunctions.js'
+import { isArray } from '../isInstance.js'
 import { Props } from '../Props.js'
 import { BaseSupport, PropsConfig } from './Support.class.js'
 import { PropWatches } from './tag.js'
@@ -37,10 +38,7 @@ function hasPropChanges(
     case PropWatches.NONE:
       return 1 // always render
 
-    case PropWatches.SHALLOW:
-      // determining equal is same as immutable, its the previous cloning step thats different
-      return immutablePropMatch(props, pastCloneProps)
-
+    case PropWatches.SHALLOW: // determining equal is same as immutable, its the previous cloning step thats different
     case PropWatches.IMMUTABLE:
       return immutablePropMatch(props, pastCloneProps)
   }
@@ -83,24 +81,24 @@ export function immutablePropMatch(
   const everyMatched = props.every((prop, index) => {
     const pastProp = pastCloneProps[index]
 
+    if(isArray(prop) && isArray(pastProp)) {
+      return prop === pastProp
+    }
+
+    if(typeof(prop) === BasicTypes.function && typeof(pastProp) === BasicTypes.function) {
+      return true // prop.toString() === pastProp.toString()
+    }
+
     if(prop === pastProp) {
       return true
     }
 
-    if(prop instanceof Array && pastProp instanceof Array) {
-      return prop === pastProp
-    }
-
-    if(prop instanceof Object) {
-      if(pastCloneProps instanceof Object) {
+    if(typeof(prop) === BasicTypes.object) {
+      if(typeof(pastCloneProps) === BasicTypes.object) {
         return Object.entries(prop).every(x => objectItemMatches(x, pastProp))
       }
 
       return false
-    }
-
-    if(prop instanceof Function && pastProp instanceof Function) {
-      return true // prop.toString() === pastProp.toString()
     }
 
     return false
@@ -118,7 +116,7 @@ function onePropCompare(
 ) {
   const compare = castedPastProps[index]
 
-  if(value instanceof Object) {
+  if(typeof(value) === BasicTypes.object) {
     const subCastedProps = {...value}
     const subCompareProps = {...compare || {}} as any
     const matched = Object.entries(subCastedProps).every(([key, value]) =>
@@ -145,12 +143,12 @@ function compareProps(
   compare: unknown,
   onDelete: () => any,
 ) {
-  if(!(value instanceof Function)) {
+  if(!(typeof(value) === BasicTypes.function)) {
     return deepEqual(value, compare, deepCompareDepth) ? 4 : false
   }
 
   const compareFn = compare as Function
-  if(!(compareFn instanceof Function)) {
+  if(!(typeof(compareFn) === BasicTypes.function)) {
     return false // its a function now but was not before
   }
 
@@ -183,7 +181,7 @@ function objectItemMatches(
 ) {
   const pastValue = pastProp[name]
   
-  if(value instanceof Function && pastValue instanceof Function) {
+  if(typeof(value) === BasicTypes.function && typeof(pastValue) === BasicTypes.function) {
     return true
   }
   

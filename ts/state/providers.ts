@@ -41,7 +41,7 @@ export const providers = {
       const stateConfig = setUseMemory.stateConfig
       const oldStateCount = stateConfig.array.length
       // Providers with provider requirements just need to use providers.create() and providers.inject()
-      const instance: T = 'prototype' in constructMethod ? new (constructMethod as classProvider<T>)() : (constructMethod as functionProvider<T>)()
+      const instance: T = constructMethod.prototype ? new (constructMethod as classProvider<T>)() : (constructMethod as functionProvider<T>)()
   
       const support = stateConfig.support as Support
       const stateDiff = stateConfig.array.length - oldStateCount

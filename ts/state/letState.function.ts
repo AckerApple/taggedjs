@@ -2,6 +2,7 @@ import { Config, GetSet, State, StateConfigItem } from './state.utils.js'
 import { setUseMemory } from './setUse.function.js'
 import { getStateValue } from './getStateValue.function.js'
 import { stateHandlers } from './stateHandlers.js'
+import { BasicTypes } from '../tag/ValueTypes.enum.js'
 
 /** Used for variables that need to remain the same variable during render passes. If defaultValue is a function it is called only once, its return value is first state, and let value can changed */
 export function letState <T>(
@@ -15,7 +16,7 @@ export function firstLetState <T>(
 ) {
   const config: Config = setUseMemory.stateConfig
   // State first time run
-  const initValue = defaultValue instanceof Function ? defaultValue() : defaultValue
+  const initValue = typeof(defaultValue) === BasicTypes.function ? (defaultValue as Function)() : defaultValue
   const push: StateConfigItem<T> = {
     get: function getPushState() {
       return getStateValue(push) as T

@@ -5,12 +5,13 @@ import { castProps, isSkipPropValue } from'../../alterProp.function.js'
 import { isLikeTags } from'../isLikeTags.function.js'
 import { Props } from '../../Props.js'
 import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
-import { ValueTypes } from '../ValueTypes.enum.js'
+import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js'
 import { ContextItem } from '../Context.types.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { destroySupport } from '../destroySupport.function.js'
 import { PropWatches } from '../tag.js'
+import { isArray } from '../../isInstance.js'
 
 export function updateExistingTagComponent(
   ownerSupport: BaseSupport | Support,
@@ -130,7 +131,7 @@ function syncPriorPropFunction(
   maxDepth: number,
   depth: number,
 ) {
-  if(priorProp instanceof Function) {
+  if(typeof(priorProp) === BasicTypes.function) {
     // the prop i am receiving, is already being monitored/controlled by another parent
     if(prop.mem) {
       priorProp.mem = prop.mem
@@ -153,7 +154,7 @@ function syncPriorPropFunction(
     return prop // no children to crawl through
   }
 
-  if(prop instanceof Array) {
+  if(isArray(prop)) {
     for (let index = prop.length - 1; index >= 0; --index) {
       const x = prop[index]
       prop[index] = syncPriorPropFunction(

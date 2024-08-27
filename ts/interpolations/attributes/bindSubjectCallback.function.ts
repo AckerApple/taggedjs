@@ -1,5 +1,6 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
+import { isPromise } from '../../isInstance.js'
 import { renderSupport } from '../../tag/render/renderSupport.function.js'
 import { AnySupport, BaseSupport, Support } from '../../tag/Support.class.js'
 import { SupportTagGlobal, TagGlobal } from '../../tag/TemplaterResult.class.js'
@@ -95,7 +96,7 @@ export function checkAfterCallbackPromise(
   last: BaseSupport | Support,
   global: TagGlobal,
 ) {
-  if(callbackResult instanceof Promise) {
+  if(isPromise(callbackResult)) {
     const global0 = last.subject.global as TagGlobal
     global0.locked = true
 

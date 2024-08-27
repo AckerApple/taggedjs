@@ -4,6 +4,7 @@ import { renderSupport } from '../tag/render/renderSupport.function.js'
 import { syncStates } from './syncStates.function.js'
 import { Callback } from './callbackMaker.function.js'
 import { SupportTagGlobal } from '../tag/index.js'
+import { isPromise } from '../isInstance.js'
 
 export default function callbackStateUpdate<T>(
   support: Support | BaseSupport,
@@ -24,8 +25,8 @@ export default function callbackStateUpdate<T>(
   syncStates(oldState, state)
   renderSupport(support)
 
-  if(maybePromise instanceof Promise) {
-    maybePromise.finally(() => {
+  if(isPromise(maybePromise)) {
+    (maybePromise as Promise<any>).finally(() => {
       // send the oldest state changes into the newest
       syncStates(oldState, state)
 

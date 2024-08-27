@@ -1,4 +1,4 @@
-import { isStaticTag } from'../isInstance.js'
+import { isArray, isStaticTag } from'../isInstance.js'
 import { destroyArrayItem } from'./update/processTagArray.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { Support } from './Support.class.js'
@@ -8,15 +8,14 @@ import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { destroySupport } from './destroySupport.function.js'
 import { SupportTagGlobal } from './TemplaterResult.class.js'
 import { processUpdateRegularValue, RegularValue } from './update/processRegularValue.function.js'
+import { BasicTypes } from './ValueTypes.enum.js'
 
 export function checkArrayValueChange(
   newValue: unknown,
   subject: ContextItem,
-) {
-  const isArray = newValue instanceof Array
-  
+) {  
   // no longer an array?
-  if (!isArray) {
+  if (!isArray(newValue)) {
     const lastArray = subject.lastArray as unknown[]
     destroyArray(subject, lastArray)
 
@@ -42,8 +41,7 @@ export function checkSimpleValueChange(
   newValue: unknown,
   subject: ContextItem,
 ) {
-  const isArray = newValue instanceof Array
-  if([null,undefined].includes(newValue as any) || !(isArray || newValue instanceof Object)) {
+  if([null,undefined].includes(newValue as any) || !(isArray(newValue) || typeof(newValue) === BasicTypes.object)) {
     // This will cause all other values to render
     processUpdateRegularValue(
       newValue as RegularValue,
@@ -81,7 +79,7 @@ export function checkTagValueChange(
     return false
   }
 
-  const isTag = newValue && 'tagJsType' in (newValue as any)
+  const isTag = (newValue as any)?.tagJsType
   if(isTag) {
     return false // its still a tag component
   }
