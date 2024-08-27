@@ -144,7 +144,7 @@ ___ = letProp(propNumber)(x => [propNumber, propNumber = x])) => html `<!--props
     callback: () => ++myPropNumber
 })}    
 `);
-const propFnUpdateTest = tag(({ propNumber, callback, }) => (_ = state('propFnUpdateTest'), // something to see in console
+const propFnUpdateTest = tag.immutableProps(({ propNumber, callback, }) => (_ = state('propFnUpdateTest'), // something to see in console
 renderCount = letState(0)(x => [renderCount, renderCount = x])) => {
     ++renderCount;
     return html `

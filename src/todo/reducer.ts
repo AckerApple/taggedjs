@@ -17,7 +17,7 @@ export type Todo = {
 
 export function todoReducer(todos: any) {
     function addItem(title: string) {
-        todos.push({ id: uuid()/*nanoid()*/, title, completed: false });
+        todos.push({ id: uuid(), title, completed: false });
         return todos;
     }
 
@@ -59,7 +59,6 @@ export function todoReducer(todos: any) {
                 todos.splice(index,1)
             }
         }
-        // update()
         return todos;
     }
     
@@ -95,7 +94,3 @@ export function todoReducer(todos: any) {
         updateToByIndex,
     }
 };
-
-function todosIndexById(todos: any[], id: string) {
-    return todos.findIndex((todo: any) => todo.id === id);
-}

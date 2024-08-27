@@ -6,7 +6,7 @@ function uuid() {
 }
 export function todoReducer(todos) {
     function addItem(title) {
-        todos.push({ id: uuid() /*nanoid()*/, title, completed: false });
+        todos.push({ id: uuid(), title, completed: false });
         return todos;
     }
     function removeItem(id) {
@@ -16,11 +16,11 @@ export function todoReducer(todos) {
         todos.splice(index, 1);
         return todos;
     }
-    function toggleItem(id) {
-        const toggleIndex = todosIndexById(todos, id);
-        if (toggleIndex >= -1) {
-            todos[toggleIndex].completed = !todos[toggleIndex].completed;
-        }
+    function toggleItem(todo, index) {
+        todos[index] = {
+            ...todos[index],
+            completed: !todo.completed,
+        };
         return todos;
     }
     function removeAll() {
@@ -29,9 +29,11 @@ export function todoReducer(todos) {
     }
     function toggleAll(completed) {
         for (let index = todos.length - 1; index >= 0; --index) {
-            todos[index].completed = completed; // !todos[index].completed
+            todos[index] = {
+                ...todos[index],
+                completed,
+            };
         }
-        // update()
         return todos;
     }
     function removeCompleted() {
@@ -40,7 +42,10 @@ export function todoReducer(todos) {
                 todos.splice(index, 1);
             }
         }
-        // update()
+        return todos;
+    }
+    function updateToByIndex(todo, partial, index) {
+        todos[index] = { ...todo, ...partial };
         return todos;
     }
     return {
@@ -51,10 +56,22 @@ export function todoReducer(todos) {
         toggleAll,
         removeCompleted,
         removeItemByIndex,
+        stopEditItem: function completeItem(todo, index) {
+            return updateToByIndex(todo, { editing: false }, index);
+        },
+        toggleEditItem: function completeItem(todo, index) {
+            return updateToByIndex(todo, { editing: !todo.editing }, index);
+        },
+        completeItem: function completeItem(todo, index) {
+            return updateToByIndex(todo, { completed: true }, index);
+        },
+        updateItemByIndex: function updateItemByIndex(todo, index) {
+            todos[index] = { ...todo };
+            console.log('xxx', todos[index]);
+            return todos;
+        },
+        updateToByIndex,
     };
 }
 ;
-function todosIndexById(todos, id) {
-    return todos.findIndex((todo) => todo.id === id);
-}
 //# sourceMappingURL=reducer.js.map

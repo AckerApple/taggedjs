@@ -18,25 +18,43 @@ describe('counters', () => {
         expect(htmlById('👉-counter-sub-count')).toBe(currentSubs);
         expect(html('#counters_render_count')).toBe((beforeRenderCount + 2).toString());
         // the parent changed a value passed to child as a prop
-        expect(html('#inner_counters_render_count')).toBe((beforeInnerRenderCount + 2).toString());
+        let toBe = (beforeInnerRenderCount + 2).toString();
+        let renderCount = html('#inner_counters_render_count');
+        expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`);
         testCounterElements('#❤️-inner-counter', '#❤️-inner-display');
-        expect(html('#counters_render_count')).toBe((beforeRenderCount + 4).toString());
+        toBe = (beforeRenderCount + 4).toString();
+        renderCount = html('#counters_render_count');
+        expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`);
         // the child changed a value passed from parent as a prop
-        // expect(html('#inner_counters_render_count')).toBe( (beforeInnerRenderCount + 1).toString() )
-        expect(html('#inner_counters_render_count')).toBe((beforeInnerRenderCount + 4).toString());
+        renderCount = html('#inner_counters_render_count');
+        toBe = (beforeInnerRenderCount + 4).toString();
+        expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`);
         testCounterElements('#🥦-standalone-counter', '#🥦-standalone-display');
-        expect(html('#counters_render_count')).toBe((beforeRenderCount + (firstRun ? 6 : 6)).toString(), 'render count check failed');
+        toBe = (beforeRenderCount + (firstRun ? 6 : 6)).toString();
+        renderCount = html('#counters_render_count');
+        expect(renderCount).toBe(toBe, 'render count check failed');
         // the child was not rendered again because props did not change so value should be less
-        // expect(html('#inner_counters_render_count')).toBe( (beforeInnerRenderCount + 1).toString() )
-        expect(html('#inner_counters_render_count')).toBe((beforeInnerRenderCount + 4).toString());
+        renderCount = html('#inner_counters_render_count');
+        toBe = (beforeInnerRenderCount + 4).toString();
+        expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`);
         expectElmCount('#conditional-counter', 1);
         expectElmCount('#conditional-display', 1);
         if (firstRun) {
             expect(html('#conditional-display')).toBe('2');
         }
+        renderCount = htmlById('❤️💧-shallow-display');
         testCounterElements('#conditional-counter', '#conditional-display');
+        expect(renderCount).toBe(htmlById('❤️💧-shallow-display'), 'expect shallow render not to have changed');
         // test again after higher elements have had reruns
         testCounterElements('#❤️-inner-counter', '#❤️-inner-display');
+        testCounterElements('#❤️💧-shallow-counter', '#❤️💧-shallow-display');
+        speedClickCountTest('🤿-deep-counter', '🤿-deep-display', '❤️-inner-counter');
+        speedClickCountTest('💧-shallow-counter', '💧-shallow-display', '❤️💧-shallow-display');
+        speedClickCountTest('🪨-immutable-counter', '🪨-immutable-display', '❤️🪨-immutable-counter');
+        speedClickCountTest('🚫-nowatch-counter', '🚫-nowatch-display', '❤️🚫-nowatch-counter');
+        // renderCount = html('#shallow_counters_render_count')
+        // toBe = (beforeInnerRenderCount + 4).toString()
+        // expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`)
     });
     /* TODO - bring this back
       it.skip('piped subject', () => {
@@ -54,4 +72,21 @@ describe('counters', () => {
       })
     */
 });
+export const clickSpeedAmount = 600;
+function speedClickCountTest(counterQuery, displayQuery, increaseOuterCounterQuery) {
+    const clickCount = htmlById(displayQuery);
+    const elm = byId(counterQuery);
+    const propCounterBtnElm = byId(increaseOuterCounterQuery);
+    console.time(`⌚️ ${counterQuery}`);
+    for (let index = 0; index < 600; index++) {
+        elm.click();
+    }
+    console.timeEnd(`⌚️ ${counterQuery}`);
+    console.time(`⌚️ outer ${counterQuery}`);
+    for (let index = 0; index < 600; index++) {
+        propCounterBtnElm.click();
+    }
+    console.timeEnd(`⌚️ outer ${counterQuery}`);
+    expect(htmlById(displayQuery)).toBe((Number(clickCount) + clickSpeedAmount).toString());
+}
 //# sourceMappingURL=counters.test.js.map

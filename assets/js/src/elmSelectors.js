@@ -10,6 +10,7 @@ export function focus(q) {
 export function click(q) {
     const items = [...query(q)];
     items.map(elm => elm.click());
+    // items.map(elm => elm.dispatchEvent(new MouseEvent('click')))
 }
 export function keydownOn(input, key) {
     const keyEvent = new KeyboardEvent('keydown', {
@@ -34,6 +35,11 @@ export function html(q) {
     query(q).forEach(elm => html = html + elm.innerHTML);
     return html;
 }
+export function textContent(q) {
+    let html = '';
+    query(q).forEach(elm => html = html + elm.textContent);
+    return html;
+}
 export function byId(id) {
     return document.getElementById(id);
 }
@@ -43,5 +49,15 @@ export function htmlById(id) {
 export function lastById(id) {
     const elms = document.querySelectorAll('#' + id);
     return elms[elms.length - 1];
+}
+export function blur(q) {
+    return query(q).forEach(elm => blurElm(elm));
+}
+const blurEvent = new Event('focusout', {
+    bubbles: true, // Blur events typically do not bubble, but this can be set to true if needed
+    cancelable: false // Blur events are not cancelable
+});
+function blurElm(elm) {
+    elm.dispatchEvent(blurEvent);
 }
 //# sourceMappingURL=elmSelectors.js.map

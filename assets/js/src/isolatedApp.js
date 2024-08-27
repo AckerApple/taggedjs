@@ -18,12 +18,8 @@ import { runTesting } from "./runTesting.function";
 export default () => tag.state = (_ = state('isolated app state'), renderCount = letState(0)(x => [renderCount, renderCount = x]), appCounter = letState(0)(x => [appCounter, appCounter = x]), appCounterSubject = state(() => new Subject(appCounter)), toggleValue = letState(false)(x => [toggleValue, toggleValue = x]), toggle = () => toggleValue = !toggleValue, callback = callbackMaker()) => {
     onInit(() => {
         console.info('1️⃣ app init should only run once');
-        appCounterSubject.subscribe(callback(x => {
-            console.log('appCounterSubject called', x);
-            appCounter = x;
-            // return 'goose' + x
-        }));
-        // appCounterSubject.subscribe(cb)
+        appCounterSubject.subscribe(callback(x => appCounter = x) // a let variable is expected to maintain new value over render cycles forward
+        );
         if (storage.autoTest) {
             runTesting(false);
         }
@@ -42,23 +38,23 @@ export default () => tag.state = (_ = state('isolated app state'), renderCount =
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
 
     <div>
-      <button id="app-counter-subject-button"
-        onclick=${() => {
-        appCounterSubject.next(appCounter + 1);
-        console.log('appCounterSubject', appCounterSubject.value);
-    }}
-      >🍒 ++app subject</button>
-      <span>
-        🍒 <span id="app-counter-display">${appCounter}</span>
-      </span>
-      <span>
-        🍒$&lt;<span id="app-counter-subject-display">${appCounterSubject}</span>&gt;
-      </span>
-      <span>
-        🍒$.value&lt;<span id="app-counter-subject-display">${appCounterSubject.value}</span>&gt;
-      </span>
-
-      <button id="toggle-test" onclick=${toggle}>toggle test ${toggleValue}</button>
+      <fieldset>
+        <legend>direct app tests</legend>        
+        <button id="app-counter-subject-button"
+          onclick=${() => appCounterSubject.next(appCounter + 1)}
+        >🍒 ++app subject</button>
+        <button id="app-counter-button" onclick=${() => ++appCounter}>🍒 ++app</button>
+        <span>
+          🍒 <span id="app-counter-display">${appCounter}</span>
+        </span>
+        <span>
+          🍒$&lt;<span id="app-counter-subject-display">${appCounterSubject}</span>&gt;
+        </span>
+        <span>
+          🍒$.value&lt;<span id="app-counter-subject-value-display">${appCounterSubject.value}</span>&gt;
+        </span>
+        <button id="toggle-test" onclick=${toggle}>toggle test ${toggleValue}</button>
+      </fieldset>  
 
       auto testing <input type="checkbox" ${storage.autoTest ? 'checked' : null}
         onchange=${toggleAutoTesting}

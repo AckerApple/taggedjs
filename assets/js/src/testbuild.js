@@ -1,4 +1,4 @@
-import { RouteQuery, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, getNewGlobal, getBaseSupport } from 'taggedjs';
+import { RouteQuery, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, getNewGlobal, getBaseSupport, checkSimpleValueChange } from 'taggedjs';
 import App from './pages/app.js';
 import isolatedApp from './pages/isolatedApp.page.js';
 import * as fs from 'fs';
@@ -30,7 +30,9 @@ function templaterToSupport(templater) {
     const subject = {
         value: templater,
         // tagJsType: getValueType(templater),
-        global: getNewGlobal()
+        global: getNewGlobal(),
+        checkValueChange: checkSimpleValueChange,
+        withinOwnerElement: false,
     };
     templater.props = templater.props || [];
     const support = getBaseSupport(templater, subject);
@@ -65,7 +67,7 @@ function processValue(value, strings, index, support, subject) {
                 const tagString = templaterToHtml(value);
                 strings.splice(index + 1, 0, tagString);
                 break;
-            case ValueTypes.oneRender:
+            case ValueTypes.renderOnce:
                 const tSupport = oneRenderToSupport(value, subject, support);
                 readySupport(tSupport, subject);
                 const fnString = templaterToHtml(tSupport.templater);
@@ -79,7 +81,9 @@ function processValue(value, strings, index, support, subject) {
                     const value = tag.values[index];
                     x + processValue(value, [], tag.strings.length - 1 - index, support, {
                         value,
-                        global: getNewGlobal()
+                        global: getNewGlobal(),
+                        checkValueChange: checkSimpleValueChange,
+                        withinOwnerElement: subject?.withinOwnerElement || false,
                     });
                 }).join('');
                 strings.splice(index + 1, 0, string);

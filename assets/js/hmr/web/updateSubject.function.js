@@ -7,7 +7,7 @@
  * @typedef {import("taggedjs").renderWithSupport} renderWithSupport
  * @typedef {import("taggedjs").renderTagSupport} renderTagSupport
  */
-import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function.js";
+import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function";
 import { buildBeforeElement, destroySupport } from "taggedjs";
 /** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 /**
@@ -55,7 +55,7 @@ export async function updateSubject(contextSubject, newTag, oldTag, hmr) {
     const reGlobal = reSupport.subject.global;
     const oldGlobal = oldest.subject.global;
     delete oldGlobal.deleted;
-    buildBeforeElement(reSupport, undefined, { counts: { added: 0, removed: 0 } });
+    buildBeforeElement(reSupport, undefined, oldest.subject.placeholder, { counts: { added: 0, removed: 0 } });
     reGlobal.newest = reSupport;
     reGlobal.oldest = reSupport;
 }

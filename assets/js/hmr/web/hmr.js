@@ -29,7 +29,7 @@ function reconnect() {
     });
     // Listen for messages from the server
     socket.addEventListener('message', async (event) => {
-        console.info('Message from server:', event.data, event.data);
+        console.info('💬 from server:', event.data, event.data);
         if (event.data === 'Connected to the WebSocket endpoint') {
             // immediately overwrite existing running app
             rebuildApps();
@@ -230,10 +230,6 @@ function rebuildApps() {
                 if (element.destroy) {
                     element.destroy();
                 }
-
-                console.log('ejected');
-                return;
-
                 const result = tagElement(newApp[tagName], element, { test: 1 });
                 lastTags = result.tags;
                 lastApp = result.support;

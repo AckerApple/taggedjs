@@ -38,7 +38,7 @@ function handleUpdate(
   title: string,
   todo: Todo,
   index: number,
-  dispatch: Dispatch
+  dispatch: Dispatch,
 ) {
     if (title.length === 0) {
         dispatch.removeItem(todo.id)

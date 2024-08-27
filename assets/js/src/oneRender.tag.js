@@ -1,7 +1,7 @@
 import { html, letState, Subject, subject, tag, ValueSubjective } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component.js";
 /** this tag renders only once */
-export const oneRender = () => tag.oneRender = (counter = new ValueSubjective(0), renderCount = letState(0)(x => [renderCount, renderCount = x])) => {
+export const oneRender = () => tag.renderOnce = (counter = new ValueSubjective(0), renderCount = letState(0)(x => [renderCount, renderCount = x])) => {
     ++renderCount;
     const x = Subject.all([0, 'all', 4]);
     return html `

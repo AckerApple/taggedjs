@@ -1,9 +1,6 @@
 export function domMetaArrayToOutput(reconstructed, allDom, filePath) {
-    // const outputVarString = JSON.stringify(allDom)
     const outputVarString = customStringify(allDom);
     const allStrings = `\n// @ts-ignore\nconst allStrings = ${outputVarString}`;
-    // console.log('\n\n', allStrings, '\n\n')
-    // const allStrings = `\nconst allStrings: {pos: any[], domMeta: any[], org:any[]}[] = ${JSON.stringify(allDom)}`
     const output = reconstructed.code + allStrings;
     return output;
 }

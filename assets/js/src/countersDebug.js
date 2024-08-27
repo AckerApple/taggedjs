@@ -2,13 +2,21 @@ import { mouseOverTag } from "./mouseover.tag.js";
 import { renderCountDiv } from "./renderCount.component.js";
 import { html, tag, Subject, onInit, letState, callbackMaker, state, ValueSubject, callback, subject } from "taggedjs";
 const loadStartTime = Date.now();
-export const counters = tag(({ appCounterSubject }) => (readStartTime = state(() => Date.now())) => {
+export const counters = tag.immutableProps(({ appCounterSubject }) => (readStartTime = state(() => Date.now())) => {
     state('countersDebug state');
     let counter = letState(0)(x => [counter, counter = x]);
     let propCounter = letState(0)(x => [propCounter, propCounter = x]);
     let renderCount = letState(0)(x => [renderCount, renderCount = x]);
     let initCounter = letState(0)(x => [initCounter, initCounter = x]);
     let memory = state(() => ({ counter: 0 }));
+    const increasePropCounter = () => {
+        ++propCounter;
+    };
+    // create an object that remains the same
+    let immutableProps = letState(() => ({ propCounter, increasePropCounter }))(x => [immutableProps, immutableProps]);
+    if (immutableProps.propCounter !== propCounter) {
+        immutableProps = { propCounter, increasePropCounter };
+    }
     const callbacks = callbackMaker();
     const callbackTestSub = state(() => new Subject(counter));
     const pipedSubject0 = state(() => new ValueSubject('222'));
@@ -27,9 +35,6 @@ export const counters = tag(({ appCounterSubject }) => (readStartTime = state(()
     const increaseCounter = () => {
         ++counter;
         pipedSubject0.next('333-' + counter);
-    };
-    const increasePropCounter = () => {
-        ++propCounter;
     };
     ++renderCount; // for debugging
     const sharedMemory = true;
@@ -135,6 +140,22 @@ export const counters = tag(({ appCounterSubject }) => (readStartTime = state(()
         ${innerCounters({ propCounter, increasePropCounter })}
       </fieldset>
     `}
+
+    <fieldset>
+      <legend>shallow props</legend>
+      ${shallowPropCounters({ propCounter, increasePropCounter })}
+    </fieldset>
+
+    <fieldset>
+      <legend>immutable props</legend>
+      ${immutablePropCounters(immutableProps)}
+    </fieldset>
+
+    <fieldset>
+      <legend>nowatch props</legend>
+      ${noWatchPropCounters({ propCounter, increasePropCounter })}
+    </fieldset>
+
     ${displayRenderCounters && renderCountDiv({ renderCount, name: 'counters' })}
     <div style="font-size:0.8em;opacity:0.8">
       ⌚️ page load to display in&nbsp;<span oninit=${event => event.target.innerText = (Date.now() - loadStartTime).toString()}>-</span>ms
@@ -144,17 +165,112 @@ export const counters = tag(({ appCounterSubject }) => (readStartTime = state(()
     </div>
   `;
 });
-const innerCounters = tag(({ propCounter, increasePropCounter, }) => {
+const innerCounters = tag.deepPropWatch(({ propCounter, increasePropCounter, }) => {
     let renderCount = letState(0)(x => [renderCount, renderCount = x]);
+    let otherCounter = letState(0)(x => [otherCounter, otherCounter = x]);
     ++renderCount; // for debugging
     return html `
-    <button id="❤️-inner-counter" onclick=${increasePropCounter}
-    >❤️ propCounter:${propCounter}</button>
-    <span>
-      ❤️ <span id="❤️-inner-display">${propCounter}</span>
-    </span>
+    <div style="display:flex;flex-wrap:wrap;gap:1em;">
+      <div style="border:1px dashed black;padding:1em;">
+        <button id="❤️-inner-counter" onclick=${increasePropCounter}
+        >❤️ propCounter:${propCounter}</button>
+        <span>
+          ❤️ <span id="❤️-inner-display">${propCounter}</span>
+        </span>
+      </div>
+
+      <div style="border:1px dashed black;padding:1em;">
+        <button id="🤿-deep-counter" onclick=${() => ++otherCounter}
+        >🤿 otherCounter:${otherCounter}</button>
+        <span>
+        🤿 <span id="🤿-deep-display">${otherCounter}</span>
+        </span>
+      </div>
+    </div>
+
     <div>renderCount:${renderCount}</div>
     ${renderCountDiv({ renderCount, name: 'inner_counters' })}
   `;
 });
+const shallowPropCounters = tag.watchProps(({ propCounter, increasePropCounter, }) => {
+    let renderCount = letState(0)(x => [renderCount, renderCount = x]);
+    let otherCounter = letState(0)(x => [otherCounter, otherCounter = x]);
+    ++renderCount; // for debugging
+    return html `
+    <div style="display:flex;flex-wrap:wrap;gap:1em;">
+      <div style="border:1px dashed black;padding:1em;">
+        <button id="❤️💧-shallow-counter" onclick=${increasePropCounter}
+        >❤️💧 propCounter:${propCounter}</button>
+        <span>
+          ❤️💧 <span id="❤️💧-shallow-display">${propCounter}</span>
+        </span>
+      </div>
+
+      <div style="border:1px dashed black;padding:1em;">
+        <button id="💧-shallow-counter" onclick=${() => ++otherCounter}
+        >💧 otherCounter:${otherCounter}</button>
+        <span>
+          💧 <span id="💧-shallow-display">${otherCounter}</span>
+        </span>
+      </div>
+    </div>
+    
+    <div>renderCount:${renderCount}</div>
+    ${renderCountDiv({ renderCount, name: 'shallow_counters' })}
+  `;
+});
+const immutablePropCounters = tag.immutableProps(({ propCounter, increasePropCounter, }) => {
+    let renderCount = letState(0)(x => [renderCount, renderCount = x]);
+    let otherCounter = letState(0)(x => [otherCounter, otherCounter = x]);
+    ++renderCount; // for debugging
+    return html `
+    <div style="display:flex;flex-wrap:wrap;gap:1em;">
+      <div style="border:1px dashed black;padding:1em;">
+        <button id="❤️🪨-immutable-counter" onclick=${increasePropCounter}
+        >❤️🪨 propCounter:${propCounter}</button>
+        <span>
+          ❤️🪨 <span id="❤️🪨-immutable-display">${propCounter}</span>
+        </span>
+      </div>
+
+      <div style="border:1px dashed black;padding:1em;">
+        <button id="🪨-immutable-counter" onclick=${() => ++otherCounter}
+        >🪨 otherCounter:${otherCounter}</button>
+        <span>
+        🪨 <span id="🪨-immutable-display">${otherCounter}</span>
+        </span>
+      </div>
+    </div>
+    
+    <div>renderCount:${renderCount}</div>
+    ${renderCountDiv({ renderCount, name: 'immutable_counters' })}
+  `;
+});
+const noWatchPropCounters = ({ propCounter, increasePropCounter, }) => {
+    let renderCount = letState(0)(x => [renderCount, renderCount = x]);
+    let otherCounter = letState(0)(x => [otherCounter, otherCounter = x]);
+    ++renderCount; // for debugging
+    return html `
+    <div style="display:flex;flex-wrap:wrap;gap:1em;">
+      <div style="border:1px dashed black;padding:1em;">
+        <button id="❤️🚫-nowatch-counter" onclick=${increasePropCounter}
+        >❤️🚫 propCounter:${propCounter}</button>
+        <span>
+          ❤️🚫 <span id="❤️🚫-nowatch-display">${propCounter}</span>
+        </span>
+      </div>
+
+      <div style="border:1px dashed black;padding:1em;">
+        <button id="🚫-nowatch-counter" onclick=${() => ++otherCounter}
+        >🚫 otherCounter:${otherCounter}</button>
+        <span>
+        🚫 <span id="🚫-nowatch-display">${otherCounter}</span>
+        </span>
+      </div>
+    </div>
+    
+    <div>renderCount:${renderCount}</div>
+    ${renderCountDiv({ renderCount, name: 'nowatch_counters' })}
+  `;
+};
 //# sourceMappingURL=countersDebug.js.map
