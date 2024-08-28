@@ -1,6 +1,7 @@
 import { deepEqual } from '../deepFunctions.js'
 import { isArray } from '../isInstance.js'
 import { Props } from '../Props.js'
+import { hasPropLengthsChanged } from './render/renderSupport.function.js'
 import { BaseSupport, PropsConfig } from './Support.class.js'
 import { PropWatches } from './tag.js'
 import { TemplaterResult } from './TemplaterResult.class.js'
@@ -34,11 +35,19 @@ function hasPropChanges(
   pastCloneProps: Props, // previously cloned props
   propWatch: PropWatches,
 ): number | false {
+  const hasLenChanged = hasPropLengthsChanged(props, pastCloneProps)
+
+  if(hasLenChanged) {
+    return 11
+  }
+
   switch (propWatch) {
     case PropWatches.NONE:
       return 1 // always render
 
     case PropWatches.SHALLOW: // determining equal is same as immutable, its the previous cloning step thats different
+      return shallowPropMatch(props, pastCloneProps)
+
     case PropWatches.IMMUTABLE:
       return immutablePropMatch(props, pastCloneProps)
   }
@@ -73,39 +82,66 @@ export function immutablePropMatch(
   props: Props,
   pastCloneProps: Props,
 ) {
-  if(props.length !== pastCloneProps.length) {
-    return 1 // amount of args has changed
-  }
-
   // if every prop the same, then no changes
-  const everyMatched = props.every((prop, index) => {
+  const len = props.length
+  for (let index = 0; index < len; ++index) {
+    const prop = props[index]
     const pastProp = pastCloneProps[index]
 
-    if(isArray(prop) && isArray(pastProp)) {
-      return prop === pastProp
+    if(prop !== pastProp) {
+      return 2
     }
+  }
 
+  return false // false means has not changed
+}
+
+
+export function shallowPropMatch(
+  props: Props,
+  pastCloneProps: Props,
+) {
+  // if every prop the same, then no changes
+  const len = props.length
+  for (let index = 0; index < len; ++index) {
+    const prop = props[index]
+    const pastProp = pastCloneProps[index]
+  
+    if(isArray(prop) && isArray(pastProp)) {
+      if(prop === pastProp) {
+        continue
+      }
+
+      return 3.0 // not equal array
+    }
+  
     if(typeof(prop) === BasicTypes.function && typeof(pastProp) === BasicTypes.function) {
-      return true // prop.toString() === pastProp.toString()
+      continue // considered good
+    }
+  
+    if(typeof(prop) === BasicTypes.object) {
+      if(typeof(pastCloneProps) === BasicTypes.object) {
+        const obEntries = Object.entries(prop)
+        for (const subItem of obEntries) {
+          const result = objectItemMatches(subItem, pastProp)
+          if(!result) {
+            return 3.1
+          }
+        }
+
+      }
+      
+      continue // all sub objects matched
     }
 
     if(prop === pastProp) {
-      return true
+      continue // matched good
     }
+  
+    return 3.3 // not equal
+  }
 
-    if(typeof(prop) === BasicTypes.object) {
-      if(typeof(pastCloneProps) === BasicTypes.object) {
-        return Object.entries(prop).every(x => objectItemMatches(x, pastProp))
-      }
-
-      return false
-    }
-
-    return false
-  })
-
-  // false means has not changed
-  return everyMatched ? false : 3
+  return false // false means has not changed
 }
 
 function onePropCompare(
@@ -180,7 +216,7 @@ function objectItemMatches(
   pastProp: any,
 ) {
   const pastValue = pastProp[name]
-  
+
   if(typeof(value) === BasicTypes.function && typeof(pastValue) === BasicTypes.function) {
     return true
   }

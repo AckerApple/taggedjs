@@ -5,7 +5,7 @@ import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { PropWatches } from '../index.js'
-import { deepCompareDepth, immutablePropMatch, shallowCompareDepth } from '../hasSupportChanged.function.js'
+import { deepCompareDepth, immutablePropMatch, shallowCompareDepth, shallowPropMatch } from '../hasSupportChanged.function.js'
 
 export function isInlineHtml(templater: TemplaterResult) {
   return ValueTypes.templater === templater.tagJsType
@@ -92,11 +92,35 @@ function hasPropsToOwnerChanged(
   const nowProps = templater.props as Props
   const propsConfig = support.propsConfig as PropsConfig
   const latestProps = propsConfig.latest
+  const compareLen = hasPropLengthsChanged(nowProps, latestProps)
 
-  if([PropWatches.IMMUTABLE, PropWatches.SHALLOW].includes(templater.propWatch)) {
-    return immutablePropMatch(nowProps, latestProps)
+  if(compareLen) {
+    return true
   }
 
-  const noLength = nowProps && nowProps.length === 0 && latestProps.length === 0
-  return !(noLength || deepEqual(nowProps, latestProps, deepCompareDepth))
+  switch (templater.propWatch) {
+    case PropWatches.IMMUTABLE:
+      return immutablePropMatch(nowProps, latestProps)  
+    
+    case PropWatches.SHALLOW:
+      return shallowPropMatch(nowProps, latestProps)
+  }
+
+  return !deepEqual(nowProps, latestProps, deepCompareDepth)
+}
+
+export function hasPropLengthsChanged(
+  nowProps: Props,
+  latestProps: Props,
+) {
+  const nowLen = nowProps.length
+  const latestLen = latestProps.length
+  /*
+  const noLength = nowProps && nowLen === 0 && latestLen === 0
+
+  if(noLength) {
+    return false
+  }
+  */
+  return nowLen !== latestLen
 }
