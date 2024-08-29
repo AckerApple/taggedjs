@@ -12,7 +12,6 @@ export type Todo = {
     id: string
     title: string
     completed: boolean
-    editing?: boolean
 }
 
 export function todoReducer(todos: any) {
@@ -31,11 +30,7 @@ export function todoReducer(todos: any) {
     }
 
     function toggleItem(todo: Todo, index: number) {
-        todos[index] = {
-            ...todos[index],
-            completed: !todo.completed,
-        }
-        return todos;
+        return updateToByIndex(todo, {completed: !todo.completed}, index)
     }
 
     function removeAll() {
@@ -77,12 +72,6 @@ export function todoReducer(todos: any) {
         toggleAll,
         removeCompleted,
         removeItemByIndex,
-        stopEditItem: function completeItem(todo: Todo, index: number) {
-            return updateToByIndex(todo, {editing: false}, index)
-        },
-        toggleEditItem: function completeItem(todo: Todo, index: number) {
-            return updateToByIndex(todo, {editing: !todo.editing}, index)
-        },
         completeItem: function completeItem(todo: Todo, index: number) {
             return updateToByIndex(todo, {completed: true}, index)
         },

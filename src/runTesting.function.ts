@@ -1,13 +1,18 @@
-import { storage } from "./sections.tag"
-import { runTests } from "./isolatedApp.test"
+import { storage, ViewTypes } from "./sections.tag"
+import { runIsolatedTests } from "./isolatedApp.test"
 
 let testTimeout = null
-export function runTesting(manual = true) {
+export function runTesting(
+  manual = true,
+  tests?: ViewTypes[],
+  runStartEndTests?: boolean
+) {
   const waitFor = 2000
 
   testTimeout = setTimeout(async () => {
-    console.debug('🏃 Running tests...')
-    const result = await runTests(storage.views)
+    tests = tests || storage.views
+    console.debug(`🏃 Running ${tests.length} test suites...`)
+    const result = await runIsolatedTests(tests, runStartEndTests)
 
     if(!manual) {
       return

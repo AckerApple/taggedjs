@@ -1,7 +1,8 @@
-import { html } from "taggedjs";
+import { html, tag } from "taggedjs";
 import { handleKey } from "./item.js";
+import { Dispatch } from "../reducer.js";
 
-export const Header = (dispatch: any) => html`
+export const Header = (dispatch: Dispatch) => tag.renderOnce = () => html`
     <header class="header" data-testid="header">
         <h1>todos</h1>
         <input autoFocus class="new-todo"

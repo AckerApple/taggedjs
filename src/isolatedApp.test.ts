@@ -1,10 +1,13 @@
 import { execute } from "./expect"
 import { ViewTypes } from "./sections.tag"
 
-export async function runTests(
-  views: ViewTypes[]
+export async function runIsolatedTests(
+  views: ViewTypes[],
+  runStartEndTests = true,
 ) {
-  await import('./start.test')
+  if(runStartEndTests) {
+    await import('./start.test')
+  }
 
   if(views.includes(ViewTypes.Content)) {
     await import('./content.test')
@@ -54,16 +57,18 @@ export async function runTests(
     await import('./todos.test')
   }
 
-  await import('./last.test')
+  if(runStartEndTests) {
+    await import('./last.test')
+  }
 
   try {
     const start = Date.now() //performance.now()
     await execute()
     const time = Date.now() - start // performance.now() - start
-    console.info(`✅ isolated tests passed in ${time}ms`)
+    console.info(`✅ tests passed in ${time}ms`)
     return true
   } catch (error: unknown) {
-    console.error('❌ isolated tests failed: ' + (error as Error).message, error)
+    console.error('❌ tests failed: ' + (error as Error).message, error)
     return false
   }
 }

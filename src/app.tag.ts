@@ -13,7 +13,7 @@ import { providerDebugBase } from "./providerDebug"
 import { watchTesting } from "./watchTesting.tag"
 import { oneRender } from "./oneRender.tag"
 import funInPropsTag from "./funInProps.tag"
-import {App as todo} from "./todo/todos.app"
+import { todoApp } from "./todo/todos.app"
 import { propsDebugMain } from "./PropsDebug.tag"
 import { arrayTests } from "./arrayTests"
 import { sections } from "./sections.tag"
@@ -164,7 +164,7 @@ export const App = tag(() => (
 
         <fieldset style="flex:2 2 20em">
           <legend>todo</legend>
-          ${todo()}
+          ${todoApp()}
         </fieldset>
       </div>
 

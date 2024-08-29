@@ -12,9 +12,10 @@ import { watchTesting } from "./watchTesting.tag"
 import { oneRender } from "./oneRender.tag"
 import { renderCountDiv } from "./renderCount.component"
 import funInPropsTag from "./funInProps.tag"
-import {App as todo} from "./todo/todos.app"
-import { activate, saveScopedStorage, sections, storage, viewChanged, ViewTypes } from "./sections.tag"
+import { todoApp } from "./todo/todos.app"
+import { activate, sections, storage, viewChanged, ViewTypes } from "./sections.tag"
 import { runTesting } from "./runTesting.function"
+import { autoTestingControls } from "./autoTestingControls.tag"
 
 export default () => tag.state = (
   _ = state('isolated app state'),
@@ -31,16 +32,7 @@ export default () => tag.state = (
     appCounterSubject.subscribe(
       callback(x => appCounter = x) // a let variable is expected to maintain new value over render cycles forward
     )
-    
-    if(storage.autoTest) {
-      runTesting(false)
-    }
   })
-
-  function toggleAutoTesting() {
-    storage.autoTest = storage.autoTest = !storage.autoTest
-    saveScopedStorage()
-  }
 
   ++renderCount
 
@@ -72,10 +64,7 @@ export default () => tag.state = (
         <button id="toggle-test" onclick=${toggle}>toggle test ${toggleValue}</button>
       </fieldset>  
 
-      auto testing <input type="checkbox" ${storage.autoTest ? 'checked': null}
-        onchange=${toggleAutoTesting}
-      />
-      <button type="button" onclick=${() => runTesting(true)}>run tests</button>
+      ${autoTestingControls()}
     </div>
 
     ${renderCountDiv({name:'app', renderCount})}
@@ -171,7 +160,7 @@ export default () => tag.state = (
         ${storage.views.includes(ViewTypes.Todo) && html`
           <fieldset style="flex:2 2 20em">
             <legend>todo</legend>
-            ${todo()}
+            ${todoApp()}
           </fieldset>
         `}
 
