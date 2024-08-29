@@ -1,3 +1,4 @@
+import { isTagComponent } from '../../isInstance.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 
@@ -5,7 +6,7 @@ export function validateTemplater(
   templater: TemplaterResult
 ) {
   // Check if function component is wrapped in a tag() call
-  if([ValueTypes.stateRender, ValueTypes.tagComponent].includes(templater.tagJsType)) {
+  if(isTagComponent(templater)) {
     return
   }
 

@@ -1,60 +1,64 @@
 import { paintAfters, paintContent } from "../../tag/paint.function.js"
 import { elementInitCheck } from "./elementInitCheck.js";
-import { isSpecialAction } from "./processAttribute.function.js";
+import { SpecialDefinition } from "./processAttribute.function.js";
 
 const style = 'style'
 const classS = 'class'
+
+// const styleStart = style + '.'
+// const classStart = classS + '.'
 
 export function specialAttribute(
   name: string,
   value: any,
   element: Element,
+  specialName: SpecialDefinition
 ) {
-  if(isSpecialAction(name)) {
-    switch (name) {
-      case 'oninit':
-        paintAfters.push(() => elementInitCheck(element, {added:0, removed:0}))
-        break;
+  switch (specialName) {
+    case 'oninit':
+      paintAfters.push(() => elementInitCheck(element, {added:0, removed:0}))
+      return
 
-      case 'autofocus':
-        paintAfters.push(() => (element as any).focus())
-        break;
+    case 'autofocus':
+      paintAfters.push(() => (element as any).focus())
+      return
 
-      case 'autoselect':
-        paintAfters.push(() => (element as any).select())
-        break;
-    }
+    case 'autoselect':
+      paintAfters.push(() => (element as any).select())
+      return
+
+    case 'style':
+      const names = name.split('.')
+      // names.shift() // remove 'style'
+      paintContent.push(() => (element as any).style[names[1]] = value) // attribute changes should come first
+      return
+
+    case 'class':
+      processSpecialClass(name, value, element)
+      return
   }
 
-  const names = name.split('.')
-  const firstName = names[0]
+  throw new Error(`Invalid special attribute of ${specialName}. ${name}`)
+}
 
-  // style.position = "absolute"
-  if(firstName === style) {
-    paintContent.push(() => (element as any).style[names[1]] = value) // attribute changes should come first
+function processSpecialClass(
+  name: string,
+  value: any,
+  element: Element,
+) {
+  const names = name.split('.')
+  names.shift() // remove class
+  
+  // truthy
+  if(value) {
+    for (const name of names) {
+      paintContent.push(() => element.classList.add(name))
+    }
     return
   }
 
-  // Example: class.width-full = "true"
-  if(firstName === classS) {
-    names.shift()
-    
-    // truthy
-    if(value) {
-      for (const name of names) {
-        /*
-        if(element.classList.contains(name)) {
-          continue
-        }
-        */
-        paintContent.push(() => element.classList.add(name))
-      }
-      return
-    }
-
-    // falsy
-    for (const name of names) {
-      paintContent.push(() => element.classList.remove(name))
-    }
+  // falsy
+  for (const name of names) {
+    paintContent.push(() => element.classList.remove(name))
   }
 }

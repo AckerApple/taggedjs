@@ -11,7 +11,7 @@ import { key } from './key.js'
 
 let tagCount = 0
 
-export type TaggedFunction<T> = T & {original: Function}
+export type TaggedFunction<T> = T & { original: Function }
 
 export enum PropWatches {
   DEEP = 'deep',
@@ -61,7 +61,7 @@ export function tag<T extends ToTag>(
   tag.tagIndex = tagCount++ // needed for things like HMR
   tags.push(parentWrap)
 
-  return parentWrap as unknown as (T & {original: Function})
+  return parentWrap as TaggedFunction<any>
 }
 
 type ReturnTag = DomTag | StringTag | StateToTag | null | undefined

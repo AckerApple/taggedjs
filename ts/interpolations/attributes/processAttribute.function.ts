@@ -9,11 +9,12 @@ import { AnySupport } from '../../tag/Support.class.js'
 import { paintContent } from '../../tag/paint.function.js'
 import { Context, ContextItem } from '../../tag/Context.types.js'
 import { processDynamicNameValueAttribute, processNonDynamicAttr } from './processNameValueAttribute.function.js'
-import { negatives } from '../../updateBeforeTemplate.function.js'
 import { checkSimpleValueChange, runOneContext, TagGlobal } from '../../tag/index.js'
 import { processAttributeFunction } from './processAttributeCallback.function.js'
+import { isSpecialAttr } from './isSpecialAttribute.function.js'
 
 type TagVarIdNum = {tagJsVar: number}
+export type SpecialDefinition = boolean | 'class' | 'style' | 'oninit' | 'autofocus' | 'autoselect'
 
 /** Sets attribute value, subscribes to value updates  */
 export function processAttribute(
@@ -24,7 +25,7 @@ export function processAttribute(
   howToSet: HowToSet, //  = howToSetInputValue
   context: Context,
   value?: string | null | TagVarIdNum,
-  isSpecial?: boolean,
+  isSpecial?: SpecialDefinition,
 ) {
   const nameVar = getTagJsVar(attrName)
   const isNameVar = nameVar >= 0
@@ -115,6 +116,11 @@ export function updateNameOnlyAttrValue(
 ) {
   // check to remove previous attribute(s)
   if(lastValue) {
+    if(isNoDisplayValue(attrValue)) {
+      element.removeAttribute(lastValue as string)
+      return
+    }
+
     if(typeof(lastValue) === BasicTypes.object) {
       const isObStill = typeof(attrValue) === BasicTypes.object
       if(isObStill) {
@@ -126,21 +132,14 @@ export function updateNameOnlyAttrValue(
           paintContent.push(function paintContent() {
             element.removeAttribute(name)
           })
-          // delete element[name]
         }
       } else {
         for (const name in (lastValue as object)) {
           paintContent.push(function paintContent() {
             element.removeAttribute(name)
           })
-          // delete element[name]
         }
       }
-    }
-
-    if([undefined, null, false].includes(attrValue as any)) {
-      element.removeAttribute(lastValue as string)
-      return
     }
   }
 
@@ -155,7 +154,7 @@ export function processNameOnlyAttrValue(
   howToSet: HowToSet,
   context: Context,
 ) {
-  if([undefined, null, false].includes(attrValue as any)) {
+  if(isNoDisplayValue(attrValue)) {
     return
   }
 
@@ -192,7 +191,7 @@ function processNameValueAttributeAttrSubject(
   element: Element,
   support: AnySupport,
   howToSet: HowToSet,
-  isSpecial?: boolean,
+  isSpecial?: SpecialDefinition,
 ) {
   if(isSpecial) {
     paintContent.push(function paintContent() {
@@ -243,7 +242,7 @@ export function processAttributeEmit(
   element: Element,
   support: AnySupport,
   howToSet: HowToSet,
-  isSpecial?: boolean,
+  isSpecial?: SpecialDefinition,
 ) {
   // should the function be wrapped so every time its called we re-render?
   if(isFunction(newAttrValue)) {
@@ -275,7 +274,7 @@ export function processAttributeSubjectValue(
   newAttrValue: DisplayValue | NoDisplayValue,
   element: Element,
   attrName: string,
-  isSpecial: boolean | undefined,
+  isSpecial: SpecialDefinition | undefined,
   howToSet: HowToSet,
   support: AnySupport,
 ) {
@@ -284,36 +283,22 @@ export function processAttributeSubjectValue(
   }
   
   if (isSpecial) {
-    specialAttribute(attrName, newAttrValue, element)
+    specialAttribute(attrName, newAttrValue, element, isSpecial)
     return
   }
 
-  const isDeadValue = negatives.includes(newAttrValue as NoDisplayValue)
-  if(isDeadValue) {
-    paintContent.push(function paintContentPush() {
-      element.removeAttribute(attrName)
-    })
-    return
+  switch (newAttrValue) {
+    case undefined:
+    case false:
+    case null:
+      paintContent.push(function paintContentPush() {
+        element.removeAttribute(attrName)
+      })
+      return
   }
 
   // value is 0
   howToSet(element, attrName, newAttrValue as string)
-}
-
-
-/** Looking for (class | style) followed by a period */
-export function isSpecialAttr(
-  attrName: string
-) {
-  if(isSpecialAction(attrName)) {
-    return true
-  }
-
-  return attrName.startsWith('class.') || attrName.startsWith('style.')
-}
-
-export function isSpecialAction(attrName: string) {
-  return ['autoselect', 'autofocus', 'oninit'].includes(attrName)
 }
 
 function callbackFun(
@@ -321,7 +306,7 @@ function callbackFun(
   newAttrValue: any,
   element: Element,
   attrName: string,
-  isSpecial: boolean | undefined,
+  isSpecial: SpecialDefinition | undefined,
   howToSet: HowToSet,
   subject: ContextItem,
 ) {
@@ -378,4 +363,8 @@ function getTagJsVar(
   
   return -1
   // return (attrPart as TagVarIdNum)?.tagJsVar || -1
+}
+
+export function isNoDisplayValue(attrValue: any) {
+  return undefined === attrValue || null === attrValue || false === attrValue
 }

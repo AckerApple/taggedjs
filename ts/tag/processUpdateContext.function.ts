@@ -1,10 +1,9 @@
 import { AnySupport } from './Support.class.js'
 import { DomTag, StringTag } from './Tag.class.js'
 import { updateExistingValue } from './update/updateExistingValue.function.js'
-import { processAttributeEmit, updateNameOnlyAttrValue } from '../interpolations/attributes/processAttribute.function.js'
-import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
-import { Context, ContextItem } from './Context.types.js'
+import { Context } from './Context.types.js'
 import { isSubjectInstance } from '../isInstance.js'
+import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
 
 export function processUpdateContext(
   support: AnySupport,
@@ -41,19 +40,21 @@ export function processUpdateOneContext(
   // is something already there?
   const contextItem = context[index]
 
-  // Do not continue if the value is just the same
-  if(value === contextItem.value) {
-    return
-  }
-
   if(isSubjectInstance(value)) {
     return // emits on its own
   }
 
   if(contextItem.isAttr) {
-    return processUpdateAttrContext(
+    // Do not continue if the value is just the same
+    if(value === contextItem.value) {
+      return
+    }
+
+    processUpdateAttrContext(
       values, value, contextItem, ownerSupport
     )
+
+    contextItem.value = value
   }
 
   // listeners will evaluate updated values to possibly update display(s)
@@ -64,42 +65,4 @@ export function processUpdateOneContext(
   )
   
   contextItem.value = value
-}
-
-function processUpdateAttrContext(
-  values: unknown[],
-  value: unknown,
-  contextItem: ContextItem,
-  ownerSupport: AnySupport,
-) {
-  if(contextItem.isNameOnly) {
-    updateNameOnlyAttrValue(
-      values,
-      value as string,
-      contextItem.value,
-      contextItem.element as Element,// global.element as Element,
-      ownerSupport,
-      contextItem.howToSet as HowToSet,
-      [], // Context, but we dont want to alter current
-    )
-
-    contextItem.value = value
-
-    return false
-  }
-
-  const element = contextItem.element as Element
-  processAttributeEmit(
-    value,
-    contextItem.attrName as string,
-    contextItem,
-    element,
-    ownerSupport,
-    contextItem.howToSet as HowToSet,
-    contextItem.isSpecial as boolean,
-  )
-
-  contextItem.value = value
-
-  return false
 }

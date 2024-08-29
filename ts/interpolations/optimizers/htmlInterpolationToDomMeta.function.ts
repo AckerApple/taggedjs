@@ -1,5 +1,5 @@
 import { variablePrefix, variableSuffix } from "../../tag/Tag.class.js"
-import { isSpecialAttr } from "../attributes/processAttribute.function.js"
+import { isSpecialAttr } from "../attributes/isSpecialAttribute.function.js"
 import { ObjectChildren } from "./LikeObjectElement.type.js"
 import { Attribute, DomObjectElement, ObjectElement, ObjectText } from "./ObjectNode.types.js"
 
@@ -157,7 +157,7 @@ export function parseHTML(html: string): ParsedHtml {
 
       const isSpecial = isSpecialAttr(fixedName)
       if(isSpecial) {
-        attrSet.push(true)
+        attrSet.push(isSpecial)
       }
 
       attributes.push(attrSet)

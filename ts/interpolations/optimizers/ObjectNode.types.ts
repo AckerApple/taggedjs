@@ -1,3 +1,4 @@
+import { SpecialDefinition } from "../attributes/processAttribute.function"
 import { ObjectChildren, ValuePos } from "./LikeObjectElement.type"
 
 type ObjectNode = {
@@ -14,7 +15,7 @@ export type ObjectText = ObjectNode & {
 export type Attribute = [
   string, // name
   any?, // value
-  boolean? // isSpecial
+  SpecialDefinition? // isSpecial
 ] | [any]
 
 export type ObjectElement = ObjectNode & {

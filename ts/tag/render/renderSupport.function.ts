@@ -20,14 +20,14 @@ export function renderSupport<T extends AnySupport>(
   const inlineHtml = isInlineHtml(templater)
   const ownerSupport = (support as Support).ownerSupport
 
-  // is it just a vanilla tag, not component?
-  if( inlineHtml ) {
-    return renderInlineHtml(ownerSupport, support) as T
-  }
-
   if(global.locked) {
     global.blocked.push(support)
     return support
+  }
+
+  // is it just a vanilla tag, not component?
+  if( inlineHtml ) {
+    return renderInlineHtml(ownerSupport, support) as T
   }
 
   global.locked = true

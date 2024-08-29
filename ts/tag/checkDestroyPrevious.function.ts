@@ -41,7 +41,8 @@ export function checkSimpleValueChange(
   newValue: unknown,
   subject: ContextItem,
 ) {
-  if([null,undefined].includes(newValue as any) || !(isArray(newValue) || typeof(newValue) === BasicTypes.object)) {
+  const isBadValue = newValue === null || newValue === undefined
+  if(isBadValue || !(typeof(newValue) === BasicTypes.object)) {
     // This will cause all other values to render
     processUpdateRegularValue(
       newValue as RegularValue,

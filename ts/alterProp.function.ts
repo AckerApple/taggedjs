@@ -59,11 +59,10 @@ export function checkProp(
     return getPropWrap(value, ownerSupport)
   }
 
-  // if(seen.includes(value)) {
   if(depth === deepCompareDepth) {
     return value
   }
-  // seen.push(value)
+
   const skip = isSkipPropValue(value)
   if( skip ) {
     return value // no children to crawl through

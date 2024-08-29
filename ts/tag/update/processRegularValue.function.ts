@@ -7,10 +7,10 @@ export type RegularValue = string | number | undefined | boolean
 
 export function processUpdateRegularValue(
   value: RegularValue,
-  subject: ContextItem, // could be tag via subject.tag
+  contextItem: ContextItem, // could be tag via contextItem.tag
 ) {
   const castedValue = castTextValue(value)
-  const oldClone = subject.simpleValueElm as Text // placeholder
+  const oldClone = contextItem.simpleValueElm as Text // placeholder
   setContent.push([castedValue, oldClone])
 }
 

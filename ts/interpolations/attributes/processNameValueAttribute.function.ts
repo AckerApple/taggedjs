@@ -3,7 +3,7 @@
 import { specialAttribute } from './specialAttribute.js'
 import { HowToSet } from './howToSetInputValue.function.js'
 import { TagGlobal } from '../../tag/TemplaterResult.class.js'
-import { processTagCallbackFun } from './processAttribute.function.js'
+import { processTagCallbackFun, SpecialDefinition } from './processAttribute.function.js'
 import { ContextItem } from '../../tag/Context.types.js'
 import { AnySupport } from '../../tag/Support.class.js'
 import { BasicTypes } from '../../tag/ValueTypes.enum.js'
@@ -15,7 +15,7 @@ export function processDynamicNameValueAttribute(
   element: Element,
   howToSet: HowToSet,
   support: AnySupport,
-  isSpecial?: boolean
+  isSpecial?: SpecialDefinition,
 ) {  
   contextItem.attrName = attrName
   contextItem.element = element
@@ -44,10 +44,10 @@ export function processNonDynamicAttr(
   value: string,
   element: Element,
   howToSet: HowToSet,
-  isSpecial?: boolean,
+  isSpecial?: SpecialDefinition,
 ) {
   if (isSpecial) {
-    return specialAttribute(attrName, value, element)
+    return specialAttribute(attrName, value, element, isSpecial)
   }
 
   howToSet(element, attrName, value as string)  

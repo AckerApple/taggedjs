@@ -17,8 +17,6 @@ export function executeWrap(
 
   let tag: StringTag;
   if(stateless) {
-    tag = templater as any as StringTag
-
     tag = (templater as any)()
   } else {
     tag = originalFunction(...castedProps as unknown[])

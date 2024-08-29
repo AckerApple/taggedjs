@@ -18,14 +18,13 @@ export function updateBeforeTemplate(
 }
 
 type TextableValue = string | boolean | number | NoDisplayValue
-export const negatives = [undefined,false,null]
-export function castTextValue(
-  value: TextableValue
-) {
-  // mimic React skipping to display EXCEPT for true does display on page
-  if(negatives.includes(value as NoDisplayValue)) { // || value === true
-    return empty
+export function castTextValue(value: TextableValue) {
+  switch (value) {
+    case undefined:
+    case false:
+    case null:
+      return empty
   }
 
-  return value as string
+  return value as string;
 }

@@ -22,6 +22,6 @@ function mapTagUpdate(support: AnySupport) {
     return // while rendering a parent, a child may have been deleted (pinbowl)
   }
 
-  const newest = global.newest // || support
-  renderSupport(newest)  
+  // renderSupport(support)
+  renderSupport(global.newest)
 }

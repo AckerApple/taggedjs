@@ -1,3 +1,4 @@
+import { isTagComponent } from "../../isInstance.js"
 import { providersChangeCheck } from "../../state/providersChangeCheck.function.js"
 import { checkRenderUp, isInlineHtml } from "../../tag/render/renderSupport.function.js"
 import { AnySupport, Support } from "../../tag/Support.class.js"
@@ -12,20 +13,21 @@ export function getUpTags(
     const templater = support.templater
     const inlineHtml = isInlineHtml(templater)
     const ownerSupport = (support as Support).ownerSupport
-  
-    // is it just a vanilla tag, not component?
-    if( inlineHtml ) {
-      return getUpTags(ownerSupport, supports)
-    }
-  
+
     if(global.locked) {
       supports.push(support)
       return supports
     }
 
-    const newSupport = global.newest as Support
-    const isComponent = newSupport.templater.tagJsType === ValueTypes.tagComponent
-    const canContinueUp = ownerSupport && support.templater.tagJsType !== ValueTypes.stateRender
+    // is it just a vanilla tag, not component?
+    if( inlineHtml ) {
+      return getUpTags(ownerSupport, supports)
+    }
+
+    const newSupport = support // global.newest as Support
+    const isComponent = isTagComponent(newSupport.templater)
+    const tagJsType = support.templater.tagJsType
+    const canContinueUp = ownerSupport && tagJsType !== ValueTypes.stateRender
     const continueUp = canContinueUp && (!isComponent || checkRenderUp(ownerSupport, newSupport.templater, newSupport))
     
     const proSupports = providersChangeCheck(newSupport)

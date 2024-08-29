@@ -11,16 +11,19 @@ import { processReplacementComponent } from './processFirstSubjectComponent.func
 import { updateSupportBy } from '../updateSupportBy.function.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { ContextItem } from '../Context.types.js'
-import { isArray } from '../../isInstance.js'
-
-const tagTypes = [ValueTypes.tagComponent, ValueTypes.stateRender]
+import { isArray, isTagComponent } from '../../isInstance.js'
 
 export function updateExistingValue(
-  subject: ContextItem, // InterpolateSubject,
+  contextItem: ContextItem, // InterpolateSubject,
   value: TemplateValue,
   ownerSupport: BaseSupport | Support,
 ) {
-  const wasDestroyed = subject.checkValueChange(value, subject)
+  // Do not continue if the value is just the same
+  if(value === contextItem.value) {
+    return
+  }
+
+  const wasDestroyed = contextItem.checkValueChange(value, contextItem)
 
   if(wasDestroyed === -1) {
     return // do nothing
@@ -29,28 +32,28 @@ export function updateExistingValue(
   // handle already seen tag components
   const tagJsType = value && (value as any).tagJsType as ValueType
   if(tagJsType) {
-    const isStateTag = tagTypes.includes(tagJsType)
-    if(isStateTag) {
-      subject.global = subject.global || getNewGlobal()
+    if(tagJsType === ValueTypes.renderOnce) {
+      return
+    }
+
+    const isComp = isTagComponent(value)
+    if(isComp) {
+      contextItem.global = contextItem.global || getNewGlobal()
 
       prepareUpdateToComponent(
         value as TemplaterResult,
-        subject as ContextItem,
+        contextItem as ContextItem,
         ownerSupport,
       )
 
       return
     }
-
-    if(tagJsType === ValueTypes.renderOnce) {
-      return
-    }
   }
   
-  const global2 = subject.global as SupportTagGlobal
-  if(global2) {
+  const global = contextItem.global as SupportTagGlobal
+  if(global) {
     // was component but no longer
-    const support = global2.newest
+    const support = global.newest
     if( support ) {
       if(typeof(value) === BasicTypes.function) {
         return
@@ -58,14 +61,13 @@ export function updateExistingValue(
   
       handleStillTag(
         support,
-        subject as ContextItem,
+        contextItem as ContextItem,
         value as TemplaterResult,
         ownerSupport
       )
   
-      const global0 = subject.global as TagGlobal
-      if(!global0.locked) {
-        ++global0.renderCount
+      if(!global.locked) {
+        ++global.renderCount
       }
     
       return
@@ -77,7 +79,7 @@ export function updateExistingValue(
       case ValueTypes.templater:
         processTag(
           ownerSupport,
-          subject as ContextItem,
+          contextItem,
         )
         return
       
@@ -92,12 +94,12 @@ export function updateExistingValue(
           templater.tag = tag
         }
   
-        const nowGlobal = subject.global = (subject.global || getNewGlobal()) as SupportTagGlobal
-        nowGlobal.newest = newSupportByTemplater(templater, ownerSupport, subject)
+        const nowGlobal = contextItem.global = (contextItem.global || getNewGlobal()) as SupportTagGlobal
+        nowGlobal.newest = newSupportByTemplater(templater, ownerSupport, contextItem)
     
         processTag(
           ownerSupport,
-          subject,
+          contextItem,
         )
       
         return
@@ -106,7 +108,7 @@ export function updateExistingValue(
 
   if(isArray(value)) {
     processTagArray(
-      subject,
+      contextItem,
       value as (TemplaterResult | StringTag)[],
       ownerSupport,
       {added: 0, removed: 0}
@@ -116,19 +118,14 @@ export function updateExistingValue(
   }
 
   if(typeof(value) === BasicTypes.function) {
-    subject.value = value
+    contextItem.value = value // do not render functions that are not explicity defined as tag html processing
     return
   }
-  // This will cause all other values to render
+  
   if(wasDestroyed) {
     processNewRegularValue(
       value as RegularValue,
-      subject,
-    )
-  } else {
-    processUpdateRegularValue(
-      value as RegularValue,
-      subject,
+      contextItem,
     )
   }
 }

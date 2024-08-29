@@ -24,7 +24,8 @@ export function updateExistingTagComponent(
   const oldWrapper = lastSupport.templater.wrapper
   const newWrapper = support.templater.wrapper
   let isSameTag = false
-  const skipComparing = [ValueTypes.stateRender, ValueTypes.renderOnce].includes(support.templater.tagJsType)
+  const tagJsType = support.templater.tagJsType
+  const skipComparing = ValueTypes.stateRender === tagJsType || ValueTypes.renderOnce === tagJsType
 
   if(skipComparing) {
     isSameTag = support.templater.tagJsType === ValueTypes.renderOnce || isLikeTags(lastSupport,support)
@@ -144,11 +145,9 @@ function syncPriorPropFunction(
   }
 
   // prevent infinite recursion
-  // if(seen.includes(prop)) {
   if(depth === maxDepth) {
     return prop
   }
-  // seen.push(prop)
 
   if( isSkipPropValue(prop) ) {
     return prop // no children to crawl through

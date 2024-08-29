@@ -1,6 +1,7 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
-import { isPromise } from '../../isInstance.js'
+import { isPromise, isTagComponent } from '../../isInstance.js'
+import { syncStates } from '../../state/syncStates.function.js'
 import { renderSupport } from '../../tag/render/renderSupport.function.js'
 import { AnySupport, BaseSupport, Support } from '../../tag/Support.class.js'
 import { SupportTagGlobal, TagGlobal } from '../../tag/TemplaterResult.class.js'
@@ -26,10 +27,10 @@ export function bindSubjectCallback(
       return
     }
     
-    const newest = global.newest as Support // || subjectFunction.support
+    // const newest = global.newest as Support // || subjectFunction.support
     return runTagCallback(
       subjectFunction.tagFunction,
-      newest,
+      subjectFunction.support, // newest
       element,
       args,
     )
@@ -48,46 +49,45 @@ export function runTagCallback(
   bindTo: unknown,
   args: any[],
 ) {
-  const tag = support
-  const global = tag.subject.global as TagGlobal
+  // get actual component owner not just the html`` support
+  let component = support as Support
+  while(component.ownerSupport && !isTagComponent(component.templater)) {
+    component = component.ownerSupport as Support
+  }
+
+  const global = component.subject.global as SupportTagGlobal // tag.subject.global as TagGlobal
   global.locked = true // prevent another render from re-rendering this tag
+
+  // ACTUAL CALLBACK TO ORIGINAL FUNCTION
   const callbackResult = value.apply(bindTo, args)
-  return afterTagCallback(tag, callbackResult)
+  
+  return afterTagCallback(
+    callbackResult,
+    component,
+  )
 }
 
 export function afterTagCallback(
-  tag: BaseSupport | Support,
   callbackResult: any,
+  eventHandlerSupport: AnySupport,
 ) {
-  const global = tag.subject.global as SupportTagGlobal
+  const global = eventHandlerSupport.subject.global as SupportTagGlobal // tag.subject.global as SupportTagGlobal
   delete global.locked
-  
-  const blocked = global.blocked
-  if(blocked && blocked.length) {
-    const lastResult = runBlocked(tag)
-
-    return checkAfterCallbackPromise(
-      callbackResult,
-      lastResult as Support,
-      global
-    )
-  }
 
   return renderCallbackSupport(
-    global.newest as Support,
+    eventHandlerSupport as Support,
     callbackResult,
-    global
+    global, // eventHandlerSupport.subject.global as TagGlobal,
   )
 }
 
 function renderCallbackSupport(
-  last: Support,
+  last: AnySupport,
   callbackResult: any,
-  global: TagGlobal,
+  global: SupportTagGlobal, // TagGlobal,
 ) {
   const tagsToUpdate = getUpTags(last)
   renderTagUpdateArray(tagsToUpdate)
-
   return checkAfterCallbackPromise(callbackResult, last, global)
 }
 
