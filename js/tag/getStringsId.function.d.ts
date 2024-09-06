@@ -1,1 +1,1 @@
-export declare function getStringsId(strings: string[], values: any[]): number;
+export declare function getStringsId(strings: string[]): number;

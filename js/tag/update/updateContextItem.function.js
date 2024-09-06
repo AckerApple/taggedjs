@@ -1,12 +1,14 @@
-import { isSubjectInstance } from '../../isInstance.js';
-export function updateContextItem(context, index, value) {
-    const subject = context[index];
-    const isSub = isSubjectInstance(value);
-    if (isSub) {
-        return; // emits on its own
-    }
+import { updateExistingValue } from './updateExistingValue.function.js';
+/** return boolean indicated if render took place */
+export function updateContextItem(contextItem, value, ownerSupport, valueType) {
+    contextItem.global.nowValueType = valueType;
     // listeners will evaluate updated values to possibly update display(s)
-    subject.next(value);
-    return;
+    const result = updateExistingValue(contextItem, value, ownerSupport).rendered;
+    updateOneContextValue(value, contextItem);
+    return result;
+}
+export function updateOneContextValue(value, contextItem) {
+    contextItem.value = value;
+    contextItem.global.lastValue = value;
 }
 //# sourceMappingURL=updateContextItem.function.js.map

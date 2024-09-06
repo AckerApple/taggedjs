@@ -1,22 +1,26 @@
-import { resetSupport } from '../Support.class.js';
-import { getChildTagsToDestroy } from '../destroy.support.js';
+import { getChildTagsToSoftDestroy } from '../getChildTagsToDestroy.function.js';
+import { smartRemoveKids } from '../smartRemoveKids.function.js';
+import { getNewGlobal } from '../update/getNewGlobal.function.js';
 /** used when a tag swaps content returned */
-export function softDestroySupport(lastSupport, options = { byParent: false, stagger: 0 }) {
+export function softDestroySupport(lastSupport) {
     const global = lastSupport.subject.global;
-    global.deleted = true;
-    // global.context = {}
-    global.context = [];
-    const childTags = getChildTagsToDestroy(global.childTags);
-    lastSupport.destroySubscriptions();
-    childTags.forEach(child => {
-        const subGlobal = child.subject.global;
-        delete subGlobal.newest;
-        subGlobal.deleted = true;
-    });
-    lastSupport.smartRemoveKids();
-    lastSupport.subject.global.clones.length = 0; // tag maybe used for something else
-    lastSupport.subject.global.childTags.length = 0; // tag maybe used for something else
-    resetSupport(lastSupport);
-    childTags.forEach(child => softDestroySupport(child, { byParent: true, stagger: 0 }));
+    const { subs, tags } = getChildTagsToSoftDestroy(global.context);
+    softDestroyOne(lastSupport);
+    for (const child of tags) {
+        softDestroyOne(child);
+    }
+    const mySubs = global.subscriptions;
+    if (mySubs) {
+        subs.forEach(sub => sub.unsubscribe());
+    }
+    lastSupport.subject.global = getNewGlobal();
+}
+function softDestroyOne(child) {
+    const global = child.subject.global;
+    if (global.deleted === true) {
+        return;
+    }
+    global.deleted = true; // the children are truly destroyed but the main support will be swapped
+    smartRemoveKids(child, [], 0);
 }
 //# sourceMappingURL=softDestroySupport.function.js.map

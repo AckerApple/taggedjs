@@ -1,14 +1,17 @@
-import { Tag, Dom } from '../Tag.class.js';
-import { TagJsSubject } from './TagJsSubject.class.js';
-import { TagSubject } from '../../subject.types.js';
+import { StringTag, DomTag } from '../Tag.class.js';
+import { ContextItem } from '../Context.types.js';
 import { AnySupport, BaseSupport, Support } from '../Support.class.js';
 import { TemplaterResult } from '../TemplaterResult.class.js';
-/** When first time render, adds to owner childTags */
-export declare function processTag(templater: TemplaterResult, ownerSupport: AnySupport, // owner
-subject: TagSubject): Support;
-export declare function tagFakeTemplater(tag: Tag | Dom): TemplaterResult;
+/** When first time render, adds to owner childTags
+ * Used for BOTH inserts & updates to values that were something else
+ * Intended use only for updates
+*/
+export declare function processTag(ownerSupport: AnySupport, // owner
+subject: ContextItem): Support;
+export declare function tagFakeTemplater(tag: StringTag | DomTag): TemplaterResult;
 export declare function getFakeTemplater(): TemplaterResult;
 /** Create Support for a tag component */
-export declare function newSupportByTemplater(templater: TemplaterResult, ownerSupport: BaseSupport | Support, subject: TagSubject): Support;
-export declare function setupNewSupport(support: Support, ownerSupport: BaseSupport | Support, subject: TagSubject): void;
-export declare function afterChildrenBuilt(children: Element[], subject: TagJsSubject<any>, ownerSupport: AnySupport): void;
+export declare function newSupportByTemplater(templater: TemplaterResult, ownerSupport: BaseSupport | Support, subject: ContextItem): Support;
+export declare function processNewTag(templater: TemplaterResult, ownerSupport: AnySupport, // owner
+subject: ContextItem, // could be tag via result.tag
+appendTo: Element): Support;

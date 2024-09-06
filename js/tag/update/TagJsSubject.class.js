@@ -1,11 +1,4 @@
 import { Subject } from '../../subject/Subject.class.js';
-import { ValueSubject } from '../../subject/ValueSubject.js';
-import { ValueTypes } from '../ValueTypes.enum.js';
-export class TagJsSubject extends ValueSubject {
-    tagJsType = ValueTypes.tagJsSubject;
-    // travels with all renderings
-    global = getNewGlobal();
-}
 export function getNewGlobal() {
     return {
         destroy$: new Subject(),
@@ -17,7 +10,7 @@ export function getNewGlobal() {
         oldest: undefined, // TODO: This needs to addressed
         blocked: [], // renders that did not occur because an event was processing
         childTags: [], // tags on me
-        clones: [], // elements on document. Needed at destroy process to know what to destroy
+        // htmlDomMeta: [],
     };
 }
 //# sourceMappingURL=TagJsSubject.class.js.map

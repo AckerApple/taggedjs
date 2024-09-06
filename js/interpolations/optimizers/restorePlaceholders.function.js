@@ -1,38 +1,39 @@
 import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
+import { ImmutableTypes } from "../../tag/ValueTypes.enum.js";
 export const safeVar = '__safeTagVar';
 export function restorePlaceholders(elements) {
     elements.forEach(traverseAndRestore);
 }
 const safeReplacer = /__safeTagVar(\d+)/g;
 function traverseAndRestore(element) {
-    if ('attributes' in element) {
-        element.attributes = element.attributes.map(attr => {
+    if (element.at) {
+        element.at = element.at ? element.at.map(attr => {
             if (attr.length === 1) {
                 return attr;
             }
-            let [key, value] = attr;
-            if (typeof value === 'string' && value.startsWith(safeVar)) {
+            const [, value] = attr;
+            if (typeof value === ImmutableTypes.string && value.startsWith(safeVar)) {
                 const index = parseInt(value.replace(safeVar, ''), 10);
-                value = variablePrefix + index + variableSuffix;
+                attr[1] = variablePrefix + index + variableSuffix;
             }
-            return [key, value];
-        });
+            return attr;
+        }) : [];
     }
-    if ('children' in element) {
-        const children = element.children;
+    if (element.ch) {
+        const children = element.ch;
         for (let i = 0; i < children.length; i++) {
             const child = children[i];
-            if (child.nodeName === 'text') {
-                if (typeof child.textContent !== 'string') {
+            if (child.nn === 'text') {
+                if (typeof child.tc !== ImmutableTypes.string) {
                     return;
                 }
-                child.textContent = child.textContent.replace(safeReplacer, (match, index) => variablePrefix + index + variableSuffix);
+                child.tc = child.tc.replace(safeReplacer, (_match, index) => variablePrefix + index + variableSuffix);
             }
             traverseAndRestore(child);
         }
         // Remove empty children array
         if (children.length === 0) {
-            delete element.children;
+            delete element.ch;
         }
     }
 }

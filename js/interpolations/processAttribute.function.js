@@ -2,143 +2,187 @@ import { specialAttribute } from './specialAttribute.js';
 import { isSubjectInstance } from '../isInstance.js';
 import { howToSetInputValue } from './interpolateAttributes.js';
 import { bindSubjectCallback } from './bindSubjectCallback.function.js';
-import { ValueTypes, empty } from '../tag/ValueTypes.enum.js';
-import { TagJsSubject } from '../tag/update/TagJsSubject.class.js';
+import { ImmutableTypes, ValueTypes, empty } from '../tag/ValueTypes.enum.js';
+import { paint, paintAwaits } from '../tag/paint.function.js';
 const INPUT = 'INPUT';
 const valueS = 'value';
 const ondoubleclick = 'ondoubleclick';
 /** Sets attribute value, subscribes to value updates  */
-export function processAttribute(attrs, element, scope, support, howToSet = howToSetInputValue) {
+export function processAttribute(attrs, element, support, howToSet = howToSetInputValue) {
     const attrName = attrs[0];
     const value = attrs[1];
-    if (element.nodeName === INPUT && attrName === valueS) {
-        howToSet = howToSetInputValue;
-    }
     const isNameVar = attrs.length === 1; // isTagVar(attrName)
     if (isNameVar) {
-        const contextValueSubject = attrName; // getContextValueByVarString(scope, attrName)
-        let lastValue;
-        // the above callback gets called immediately since its a ValueSubject()
-        const sub = contextValueSubject.subscribe((value) => {
-            if (value === lastValue) {
-                return; // value did not change
-            }
-            processNameOnlyAttr(value, lastValue, element, support, howToSet);
-            lastValue = value;
-        });
-        support.subject.global.subscriptions.push(sub); // this is where unsubscribe is picked up
-        element.removeAttribute(attrName);
-        return;
+        return processNameOnlyAttr(support, attrName, element, howToSet);
     }
     const isSubject = value && isSubjectInstance(value);
     // const isSubject = isTagVar(value)
     if (isSubject) {
-        return processNameValueAttr(attrName, value, element, support, howToSet);
+        return processNameValueAttrSubject(attrName, value, element, support, howToSet);
     }
+    processNameValue(attrName, value, element, howToSet);
+}
+export function processNameValue(attrName, value, element, howToSet) {
     // Non dynamic
     const isSpecial = isSpecialAttr(attrName);
+    // TODO: enhance this condition
+    const global = value?.global;
+    if (global) {
+        global.attrName = attrName;
+        global.element = element;
+        global.howToSet = howToSet;
+        global.isSpecial = isSpecial;
+    }
     if (isSpecial) {
         return specialAttribute(attrName, value, element);
     }
     howToSet(element, attrName, value);
 }
-function processNameOnlyAttr(attrValue, lastValue, child, ownerSupport, howToSet) {
+function processNameOnlyAttr(support, attrName, element, howToSet) {
+    const contextValue = attrName;
+    contextValue.global.element = element;
+    contextValue.global.howToSet = howToSet;
+    contextValue.global.isNameOnly = true;
+    paintAwaits.push(() => element.removeAttribute(attrName));
+    // the above callback gets called immediately since its a ValueSubject()
+    const contextValueSubject = contextValue.value;
+    if (isSubjectInstance(contextValueSubject)) {
+        const sub = contextValueSubject.subscribe((value) => {
+            processNameOnlyEmit(value, support, contextValue, element, howToSet);
+            if (!contextValueSubject.global.madeByTagJs) {
+                paint();
+            }
+        });
+        support.subject.global.subscriptions.push(sub); // this is where unsubscribe is picked up
+        return;
+    }
+    processNameOnlyEmit(contextValue.value, support, contextValue, element, howToSet);
+    return;
+}
+export function processNameOnlyEmit(value, support, subject, element, howToSet) {
+    if (value === support.subject.global.lastValue) {
+        return; // value did not change
+    }
+    processNameOnlyAttrValue(value, subject.global.lastValue, element, support, howToSet);
+    subject.global.lastValue = value;
+}
+function processNameOnlyAttrValue(attrValue, lastValue, element, ownerSupport, howToSet) {
     // check to remove previous attribute(s)
-    if (lastValue && lastValue != attrValue) {
-        if (typeof (lastValue) === ValueTypes.string) {
-            child.removeAttribute(lastValue);
-        }
-        else if (lastValue instanceof Object) {
-            for (const name in lastValue) {
-                child.removeAttribute(name);
+    if (lastValue) {
+        if (lastValue instanceof Object) {
+            const isObStill = attrValue instanceof Object;
+            if (isObStill) {
+                for (const name in lastValue) {
+                    if (name in attrValue) {
+                        continue;
+                    }
+                    paintAwaits.push(() => element.removeAttribute(name));
+                    // delete element[name]
+                }
+            }
+            else {
+                for (const name in lastValue) {
+                    paintAwaits.push(() => element.removeAttribute(name));
+                    // delete element[name]
+                }
             }
         }
     }
     // regular attributes
-    if (typeof (attrValue) === ValueTypes.string) {
+    if (typeof (attrValue) === ImmutableTypes.string) {
         if (!attrValue.length) {
-            return;
+            return; // ignore, do not set at this time
         }
-        processNameValueAttr(attrValue, // name
-        new TagJsSubject(empty), child, ownerSupport, howToSet);
+        howToSet(element, attrValue, empty);
         return;
     }
     // process an object of attributes ${{class:'something, checked:true}}
     if (attrValue instanceof Object) {
         for (const name in attrValue) {
-            processNameValueAttr(name, attrValue[name], child, ownerSupport, howToSet);
+            processAttribute([name, attrValue[name]], element, ownerSupport, howToSet);
         }
     }
 }
 /** Processor for flat attributes and object attributes */
-function processNameValueAttr(attrName, result, child, support, howToSet) {
-    // Most every variable comes in here since everything is made a ValueSubject
-    if (isSubjectInstance(result)) {
-        const isSpecial = isSpecialAttr(attrName);
-        child.removeAttribute(attrName);
-        let lastValue;
+function processNameValueAttrSubject(attrName, result, element, support, howToSet) {
+    const isSpecial = isSpecialAttr(attrName);
+    if (isSpecial) {
+        paintAwaits.push(() => element.removeAttribute(attrName));
+    }
+    const contextValueSubject = result.value;
+    if (isSubjectInstance(contextValueSubject)) {
         const callback = (newAttrValue) => {
-            // should the function be wrapped so every time its called we re-render?
-            if (newAttrValue instanceof Function) {
-                return callbackFun(support, newAttrValue, child, attrName, isSpecial, howToSet);
-            }
-            // TODO: we maybe able to block higher before instance of check
-            if (lastValue === newAttrValue) {
-                return lastValue;
-            }
-            lastValue = newAttrValue;
-            return processAttributeSubjectValue(newAttrValue, child, attrName, isSpecial, howToSet);
+            processAttributeEmit(isSpecial, newAttrValue, attrName, result, element, support, howToSet);
         };
         // 🗞️ Subscribe. Above callback called immediately since its a ValueSubject()
-        const sub = result.subscribe(callback);
+        const sub = contextValueSubject.subscribe(callback);
         // Record subscription for later unsubscribe when element destroyed
-        support.subject.global.subscriptions.push(sub);
-        return;
+        result.global.subscriptions.push(sub);
     }
-    howToSet(child, attrName, result._value);
+    processAttributeEmit(isSpecial, result.value, attrName, result, element, support, howToSet);
     return;
 }
-function processAttributeSubjectValue(newAttrValue, child, attrName, isSpecial, howToSet) {
+export function processAttributeEmit(isSpecial, newAttrValue, attrName, result, element, support, howToSet) {
+    // should the function be wrapped so every time its called we re-render?
+    if (newAttrValue instanceof Function) {
+        return callbackFun(support, newAttrValue, element, attrName, isSpecial, howToSet, result);
+    }
+    return processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support, result);
+}
+export function processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support, subject) {
     if (newAttrValue instanceof Function) {
         const fun = function (...args) {
-            return newAttrValue(child, args);
+            return fun.tagFunction(element, args);
         };
         // access to original function
         fun.tagFunction = newAttrValue;
+        fun.support = support;
+        // shorthand corrections
         if (attrName === ondoubleclick) {
             attrName = 'ondblclick';
         }
-        ;
-        child[attrName] = fun;
+        console.log('funfunfun', attrName, fun);
+        element[attrName] = fun;
         return;
     }
+    // its already the same value
+    if (subject.global.lastValue === newAttrValue) {
+        return subject.global.lastValue;
+    }
+    subject.global.lastValue = newAttrValue;
     if (isSpecial) {
-        specialAttribute(attrName, newAttrValue, child);
-        return;
-    }
-    if (newAttrValue) {
-        howToSet(child, attrName, newAttrValue);
+        specialAttribute(attrName, newAttrValue, element);
         return;
     }
     const isDeadValue = [undefined, false, null].includes(newAttrValue);
     if (isDeadValue) {
-        child.removeAttribute(attrName);
+        paintAwaits.push(() => element.removeAttribute(attrName));
         return;
     }
     // value is 0
-    howToSet(child, attrName, newAttrValue);
+    howToSet(element, attrName, newAttrValue);
 }
 /** Looking for (class | style) followed by a period */
 function isSpecialAttr(attrName) {
     return attrName.search(/^(class|style)(\.)/) >= 0;
 }
-function callbackFun(support, newAttrValue, child, attrName, isSpecial, howToSet) {
+function callbackFun(support, newAttrValue, element, attrName, isSpecial, howToSet, subject) {
     const wrapper = support.templater.wrapper;
     const parentWrap = wrapper?.parentWrap;
-    const oneRender = parentWrap?.oneRender;
+    const tagJsType = wrapper?.tagJsType || parentWrap?.tagJsType;
+    const oneRender = tagJsType === ValueTypes.oneRender;
     if (!oneRender) {
+        const prevFun = subject.global.lastValue;
+        if (prevFun && prevFun.tagFunction && prevFun.support) {
+            newAttrValue = prevFun;
+            prevFun.tagFunction = newAttrValue;
+            prevFun.support = support;
+            return prevFun;
+        }
+        // tag has state and will need all functions wrapped to cause re-renders
         newAttrValue = bindSubjectCallback(newAttrValue, support);
+        console.log('bind', attrName, { newAttrValue });
     }
-    return processAttributeSubjectValue(newAttrValue, child, attrName, isSpecial, howToSet);
+    return processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support, subject);
 }
 //# sourceMappingURL=processAttribute.function.js.map

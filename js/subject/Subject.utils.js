@@ -7,7 +7,7 @@ function removeSubFromArray(subscribers, callback) {
 }
 export function getSubscription(subject, callback, subscribers) {
     const countSubject = Subject.globalSubCount$;
-    Subject.globalSubCount$.next(countSubject._value + 1);
+    Subject.globalSubCount$.next(countSubject.value + 1);
     const subscription = function () {
         subscription.unsubscribe();
     };
@@ -43,13 +43,14 @@ export function runPipedMethods(value, methods, onComplete) {
 }
 function unsubscribe(subscription, subscribers, callback) {
     removeSubFromArray(subscribers, callback); // each will be called when update comes in
-    Subject.globalSubCount$.next(Subject.globalSubCount$._value - 1);
+    const valSub = Subject.globalSubCount$;
+    Subject.globalSubCount$.next(valSub.value - 1);
     // any double unsubscribes will be ignored
     subscription.unsubscribe = () => subscription;
     // unsubscribe from any combined subjects
     const subscriptions = subscription.subscriptions;
-    for (let index = subscriptions.length - 1; index >= 0; --index) {
-        subscriptions[index].unsubscribe();
+    for (const sub of subscriptions) {
+        sub.unsubscribe();
     }
     return subscription;
 }

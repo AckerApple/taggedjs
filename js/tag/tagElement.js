@@ -1,8 +1,16 @@
-import { BaseSupport } from './Support.class.js';
-import { runAfterRender, runBeforeRender } from './tagRunner.js';
-import { TagJsSubject } from './update/TagJsSubject.class.js';
-import { afterChildrenBuilt } from './update/processTag.function.js';
-import { textNode } from './textNode.js';
+import { getBaseSupport } from './Support.class.js';
+import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js';
+import { buildBeforeElement } from './buildBeforeElement.function.js';
+import { getNewGlobal } from './update/getNewGlobal.function.js';
+import { BasicTypes, ValueTypes } from './ValueTypes.enum.js';
+import { destroySupport } from './destroySupport.function.js';
+import { checkTagValueChange, PropWatches } from './index.js';
+import { setUseMemory } from '../state/setUse.function.js';
+import { executeWrap } from './executeWrap.function.js';
+import { paint, painting } from './paint.function.js';
+import { initState } from '../state/state.utils.js';
+import { isTagComponent } from '../isInstance.js';
+import { runAfterRender } from './tagRunner.js';
 const appElements = [];
 /**
  *
@@ -11,59 +19,124 @@ const appElements = [];
  * @param props object
  * @returns
  */
-export function tagElement(app, // (...args: unknown[]) => TemplaterResult,
-element, props) {
+export function tagElement(app, element, props) {
     const appElmIndex = appElements.findIndex(appElm => appElm.element === element);
     if (appElmIndex >= 0) {
-        appElements[appElmIndex].support.destroy();
+        destroySupport(appElements[appElmIndex].support, 0);
         appElements.splice(appElmIndex, 1);
         // an element already had an app on it
         console.warn('Found and destroyed app element already rendered to element', { element });
     }
     // Create the app which returns [props, runOneTimeFunction]
-    const wrapper = app(props);
-    // const fragment = document.createDocumentFragment()
-    const template = document.createElement('template');
-    const placeholder = textNode.cloneNode(false);
-    const support = runWrapper(wrapper, template, placeholder);
-    const global = support.subject.global;
-    support.appElement = element;
-    support.isApp = true;
+    let templater = (() => templater2(props));
+    templater.propWatch = PropWatches.NONE;
+    templater.tagJsType = ValueTypes.stateRender;
+    // todo: props should be an array
+    templater.props = [props];
+    const subject = getNewSubject(templater, element);
+    const global = subject.global;
+    initState(global.newest, setUseMemory.stateConfig);
+    let templater2 = app(props);
+    if (typeof templater2 !== BasicTypes.function) {
+        if (!isTagComponent(templater2)) {
+            templater2 = app;
+        }
+        else {
+            global.newest.propsConfig = {
+                latest: [props],
+                castProps: [props],
+            };
+            templater.propWatch = templater2.propWatch;
+            templater.tagJsType = templater2.tagJsType;
+            templater.wrapper = templater2.wrapper;
+            templater = templater2;
+        }
+    }
+    const placeholder = document.createTextNode('');
+    const support = runWrapper(templater, placeholder, element, subject);
     global.isApp = true;
-    element.destroy = () => {
-        support.destroy(); // never return anything here
+    element.destroy = function () {
+        const events = global.events;
+        for (const eventName in events) {
+            const callback = events[eventName];
+            element.removeEventListener(eventName, callback);
+        }
+        global.events = {};
+        destroySupport(support, 0); // never return anything here
+        paint();
     };
-    global.insertBefore = placeholder // template
+    let tags = [];
+    ++painting.locks;
+    const result = buildBeforeElement(support, element);
+    global.oldest = support;
+    global.newest = support;
+    let setUse = templater.setUse;
+    if (templater.tagJsType !== ValueTypes.stateRender) {
+        const wrap = app;
+        const parentWrap = wrap.parentWrap;
+        const original = wrap.original || parentWrap.original;
+        setUse = original.setUse;
+        tags = app.original.tags;
+    }
     ;
-    global.placeholder = placeholder;
-    const newFragment = support.buildBeforeElement(undefined);
-    const children = [...newFragment.children];
-    support.subject.global.oldest = support;
-    support.subject.global.newest = support;
-    element.setUse = app.original.setUse;
+    element.setUse = setUse;
+    element.ValueTypes = ValueTypes;
     appElements.push({ element, support });
+    const newFragment = document.createDocumentFragment();
+    newFragment.appendChild(placeholder);
+    for (const domItem of result.dom) {
+        putOneDomDown(domItem, newFragment);
+    }
+    for (const sub of result.subs) {
+        subscribeToTemplate(sub);
+    }
+    --painting.locks;
+    paint();
     element.appendChild(newFragment);
-    afterChildrenBuilt(children, support.subject, support);
+    ++global.renderCount;
     return {
         support,
-        tags: app.original.tags,
+        tags,
+        ValueTypes,
     };
 }
-export function runWrapper(templater, insertBefore, placeholder) {
-    let newSupport = {};
-    // TODO: A fake subject may become a problem
-    const subject = new TagJsSubject(newSupport);
-    newSupport = new BaseSupport(templater, subject);
-    subject.global.insertBefore = insertBefore;
-    subject.global.placeholder = placeholder;
-    subject.global.oldest = subject.global.oldest || newSupport;
-    subject.next(templater);
-    subject.support = newSupport;
-    runBeforeRender(newSupport, undefined);
+function getNewSubject(templater, appElement) {
+    const global = getNewGlobal();
+    global.events = {};
+    const subject = {
+        value: templater,
+        global,
+        checkValueChange: checkTagValueChange,
+        withinOwnerElement: false, // i am the highest owner
+    };
+    const newSupport = getBaseSupport(templater, subject);
+    newSupport.appElement = appElement;
+    global.oldest = global.oldest || newSupport;
+    global.newest = newSupport;
+    return subject;
+}
+export function runWrapper(templater, placeholder, appElement, subject) {
+    subject.placeholder = placeholder;
+    const global = subject.global;
+    const newSupport = global.newest;
+    if (templater.tagJsType === ValueTypes.stateRender) {
+        const result = templater.wrapper || { original: templater };
+        const nowSupport = executeWrap(templater, result, newSupport);
+        runAfterRender(newSupport, nowSupport);
+        return nowSupport;
+    }
     // Call the apps function for our tag templater
     const wrapper = templater.wrapper;
-    const support = wrapper(newSupport, subject);
-    runAfterRender(newSupport, support);
-    return support;
+    const nowSupport = wrapper(newSupport, subject);
+    runAfterRender(newSupport, nowSupport);
+    return nowSupport;
+}
+function putOneDomDown(dom, newFragment) {
+    if (dom.domElement) {
+        newFragment.appendChild(dom.domElement);
+    }
+    if (dom.marker) {
+        newFragment.appendChild(dom.marker);
+    }
 }
 //# sourceMappingURL=tagElement.js.map

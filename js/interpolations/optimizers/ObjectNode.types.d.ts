@@ -1,31 +1,38 @@
+import { SpecialDefinition } from "../attributes/processAttribute.function";
+import { ObjectChildren } from "./LikeObjectElement.type";
 type ObjectNode = {
-    nodeName: string;
+    nn: string;
+    v?: unknown;
+    marker?: Text;
 };
 export type ObjectText = ObjectNode & {
-    textContent: string;
-    value?: unknown;
+    tc: string;
     domElement?: Text;
-    marker?: Text;
 };
-export type Attribute = [string, any?] | [any];
+export type Attribute = [
+    string,
+    any?,
+    SpecialDefinition?
+] | [any];
 export type ObjectElement = ObjectNode & {
-    attributes: Attribute[];
-    value?: unknown;
-    children?: ObjectChildren;
+    at?: Attribute[];
+    ch?: ObjectChildren;
     domElement?: HTMLElement;
-    marker?: Text;
 };
-export type ObjectChildren = (ObjectText | ObjectElement)[];
 export type DomObjectText = ObjectText & {
-    textContent: string;
+    tc: string;
     domElement: Text;
     marker: Text;
 };
 export type DomObjectElement = ObjectElement & {
-    attributes: [string, any][];
-    children?: DomObjectChildren;
+    at: [
+        string,
+        any,
+        boolean
+    ][];
     domElement: HTMLElement;
-    marker: Text;
+    ch?: DomObjectChildren;
+    marker?: Text;
 };
 export type DomObjectChildren = (DomObjectText | DomObjectElement)[];
 export {};

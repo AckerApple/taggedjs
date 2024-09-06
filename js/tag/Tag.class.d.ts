@@ -3,13 +3,15 @@ import { InterpolatedTemplates } from '../interpolations/interpolations.js';
 import { TemplaterResult } from './TemplaterResult.class.js';
 import { TagValues } from './html.js';
 import { ValueTypes } from './ValueTypes.enum.js';
-import { TagJsSubject } from './update/TagJsSubject.class.js';
-import { ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
+import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/LikeObjectElement.type.js';
+import { AnySupport } from './Support.class.js';
 export declare const variablePrefix = ":tagvar";
 export declare const variableSuffix = ":";
-export declare const escapeVariable: string;
-export declare const escapeSearch: RegExp;
-export type Context = TagJsSubject<any>[];
+export type EventCallback = (event: Event) => any;
+export type EventMem = {
+    elm: Element;
+    callback: EventCallback;
+};
 export type TagMemory = {
     state: State;
 };
@@ -18,38 +20,37 @@ export interface TagTemplate {
     string: string;
     strings: string[];
     values: unknown[];
-    domMeta?: ObjectChildren;
+    domMetaMap?: DomMetaMap;
 }
-export declare class BaseTag {
+export type Tag = {
     values: unknown[];
-    tagJsType?: string;
-    arrayValue?: unknown;
-    templater: TemplaterResult;
-    constructor(values: unknown[]);
-    /** Used for array, such as array.map(), calls aka array.map(x => html``.key(x)) */
-    key(arrayValue: unknown): this;
-}
-export declare class Tag extends BaseTag {
-    strings: string[];
-    values: unknown[];
-    tagJsType: ValueTypes;
+    tagJsType?: typeof ValueTypes.tag | typeof ValueTypes.dom;
+    templater?: TemplaterResult;
+    ownerSupport?: AnySupport;
+    arrayValue?: any;
+};
+export type StringTag = Tag & {
     children?: {
         strings: string[] | TemplateStringsArray;
         values: TagValues;
     };
-    constructor(strings: string[], values: unknown[]);
-    html(strings: string[] | TemplateStringsArray, ...values: TagValues): this;
-}
-export declare class Dom extends BaseTag {
-    dom: ObjectChildren;
+    strings: string[];
     values: unknown[];
-    tagJsType: ValueTypes;
+    key: (arrayValue: unknown) => StringTag;
+    html: (strings: string[] | TemplateStringsArray, values: TagValues) => StringTag;
+};
+export declare function getStringTag(strings: string[], values: unknown[]): StringTag;
+export type DomTag = Tag & {
     children?: {
-        dom: ObjectChildren;
+        dom: LikeObjectChildren;
         values: TagValues;
     };
-    constructor(dom: ObjectChildren, values: unknown[]);
+    dom: LikeObjectChildren;
+    values: unknown[];
+    key: (arrayValue: unknown) => DomTag;
     html: {
-        dom: (dom: ObjectChildren, ...values: TagValues) => Dom;
+        dom: (dom: LikeObjectChildren, // ObjectChildren
+        values: TagValues) => DomTag;
     };
-}
+};
+export declare function getDomTag(dom: LikeObjectChildren, values: unknown[]): DomTag;

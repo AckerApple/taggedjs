@@ -1,82 +1,38 @@
-import { runTagCallback } from '../interpolations/bindSubjectCallback.function.js';
-import { Support } from './Support.class.js';
+import { getSupport } from './Support.class.js';
 import { castProps } from '../alterProp.function.js';
-import { setUse } from '../state/setUse.function.js';
-import { ValueTypes } from './ValueTypes.enum.js';
-import { html } from './html.js';
 import { syncFunctionProps } from './update/updateExistingTagComponent.function.js';
+import { executeWrap } from './executeWrap.function.js';
+import { PropWatches } from './tag.js';
+import { deepCompareDepth, shallowCompareDepth } from './hasSupportChanged.function.js';
 /** creates/returns a function that when called then calls the original component function
  * Gets used as templater.wrapper()
  */
 export function getTagWrap(templater, result) {
-    const stateArray = setUse.memory.stateConfig.array;
     // this function gets called by taggedjs
-    const wrapper = (newSupport, subject, lastSupport) => executeWrap(stateArray, templater, result, newSupport, subject, lastSupport);
+    const wrapper = function tagFunWrap(newSupport, subject, lastSupport // subject.global.newest
+    ) {
+        // wrap any prop functions that are passed in
+        const castedProps = getCastedProps(templater, newSupport, lastSupport);
+        const ownerSupport = newSupport.ownerSupport;
+        const useSupport = getSupport(templater, ownerSupport, newSupport.appSupport, // ownerSupport.appSupport as Support,
+        subject, castedProps);
+        return executeWrap(templater, result, useSupport, castedProps);
+    };
     return wrapper;
 }
-function executeWrap(stateArray, templater, result, newSupport, subject, lastSupport) {
-    const global = newSupport.subject.global;
-    ++global.renderCount;
-    const childSubject = templater.children;
-    const lastArray = global.oldest?.templater.children.lastArray;
-    if (lastArray) {
-        childSubject.lastArray = lastArray;
-    }
-    // result.original
-    const originalFunction = result.original; // (innerTagWrap as any).original as unknown as TagComponent
-    let props = templater.props;
+export function getCastedProps(templater, newSupport, lastSupport) {
+    const maxDepth = templater.propWatch === PropWatches.DEEP ? deepCompareDepth : shallowCompareDepth;
+    const props = templater.props;
+    const propsConfig = newSupport.propsConfig;
     // When defined, this must be an update where my new props have already been made for me
-    let preCastedProps = newSupport.propsConfig.castProps;
-    const lastCastProps = lastSupport?.propsConfig.castProps;
+    let preCastedProps = propsConfig.castProps;
+    const lastPropsConfig = lastSupport?.propsConfig;
+    const lastCastProps = lastPropsConfig?.castProps;
     if (lastCastProps) {
-        newSupport.propsConfig.castProps = lastCastProps;
-        preCastedProps = syncFunctionProps(newSupport, lastSupport, lastSupport.ownerSupport, props);
+        propsConfig.castProps = lastCastProps;
+        preCastedProps = syncFunctionProps(newSupport, lastSupport, lastSupport.ownerSupport, props, maxDepth);
     }
-    const castedProps = preCastedProps || castProps(props, newSupport, stateArray, 0);
-    // CALL ORIGINAL COMPONENT FUNCTION
-    let tag = originalFunction(...castedProps);
-    if (tag instanceof Function) {
-        tag = tag();
-    }
-    const unknown = !tag || (tag.tagJsType && ![ValueTypes.tag, ValueTypes.dom].includes(tag.tagJsType));
-    if (unknown) {
-        tag = html `${tag}`; // component returned a non-component value
-    }
-    tag.templater = templater;
-    templater.tag = tag;
-    tag.arrayValue = templater.arrayValue; // tag component could have been used in array.map
-    const support = new Support(templater, newSupport.ownerSupport, subject, castedProps, global.renderCount);
-    support.subject.global = global;
-    // ??? this should be set by outside?
-    global.oldest = global.oldest || support;
-    // ??? new - removed
-    // global.newest = support
-    const nowState = setUse.memory.stateConfig.array;
-    support.state.push(...nowState);
-    if (templater.madeChildIntoSubject) {
-        const value = childSubject.value;
-        for (let index = value.length - 1; index >= 0; --index) {
-            const kid = value[index];
-            const values = kid.values;
-            for (let index = values.length - 1; index >= 0; --index) {
-                const value = values[index];
-                if (!(value instanceof Function)) {
-                    continue;
-                }
-                const valuesValue = kid.values[index];
-                if (valuesValue.isChildOverride) {
-                    continue; // already overwritten
-                }
-                // all functions need to report to me
-                kid.values[index] = function (...args) {
-                    return runTagCallback(value, // callback
-                    support.ownerSupport, this, // bindTo
-                    args, support.state);
-                };
-                valuesValue.isChildOverride = true;
-            }
-        }
-    }
-    return support;
+    const castedProps = preCastedProps || castProps(props, newSupport, 0);
+    return castedProps;
 }
 //# sourceMappingURL=getTagWrap.function.js.map

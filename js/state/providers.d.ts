@@ -2,7 +2,6 @@ import { Support } from '../tag/Support.class.js';
 export type Provider = {
     constructMethod: any;
     instance: any;
-    clone: any;
     stateDiff: number;
     owner: Support;
     children: Support[];

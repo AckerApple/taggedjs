@@ -1,28 +1,27 @@
 import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue.function.js';
-import { updateExistingValue } from '../tag/update/updateExistingValue.function.js';
-import { swapInsertBefore } from '../tag/setTagPlaceholder.function.js';
-export function subscribeToTemplate(fragment, insertBefore, subject, support, counts) {
-    let called = false;
-    const onValue = (value) => {
-        if (called) {
-            updateExistingValue(subject, value, support, insertBefore);
-            return;
+import { setUseMemory } from '../state/setUse.function.js';
+import { paint } from '../tag/paint.function.js';
+import { processSubUpdate } from './processSubscriptionUpdate.function.js';
+export function subscribeToTemplate({ subject, support, counts, contextItem, appendTo, }) {
+    let onValue = function onSubValue(value) {
+        processFirstSubjectValue(value, contextItem, support, { ...counts }, `rvp_-1_${support.templater.tag?.values.length}`, syncRun ? appendTo : undefined);
+        if (!syncRun && !setUseMemory.stateConfig.support) {
+            paint();
         }
-        const templater = value;
-        processFirstSubjectValue(templater, subject, insertBefore, support, {
-            counts: { ...counts },
-        }, syncRun ? fragment : undefined);
-        called = true;
+        // from now on just run update
+        onValue = function subscriptionUpdate(value) {
+            processSubUpdate(value, contextItem, support);
+        };
     };
-    // TODO: may noy be needed
-    // leave no template tag
-    if (!subject.global.placeholder) {
-        subject.global.placeholder = swapInsertBefore(insertBefore);
-    }
-    const callback = (value) => onValue(value);
+    const callback = function subValueProcessor(value) {
+        onValue(value);
+    };
     let syncRun = true;
     const sub = subject.subscribe(callback);
+    contextItem.subject = subject;
     syncRun = false;
-    support.subject.global.subscriptions.push(sub);
+    const global = support.subject.global;
+    const subs = global.subscriptions = global.subscriptions || [];
+    subs.push(sub);
 }
 //# sourceMappingURL=subscribeToTemplate.function.js.map

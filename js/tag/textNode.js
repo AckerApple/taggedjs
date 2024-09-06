@@ -1,5 +1,5 @@
 import { empty } from "./ValueTypes.enum.js";
-export const textNode = typeof document === 'undefined' ? getTestTextNode() : document.createTextNode(empty);
+export const textNode = document === undefined ? getTestTextNode() : document.createTextNode(empty);
 function getTestTextNode() {
     return {
         textContent: empty,

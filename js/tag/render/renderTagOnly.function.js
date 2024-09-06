@@ -1,38 +1,47 @@
-import { runBeforeRedraw, runBeforeRender } from '../tagRunner.js';
+import { getSupport } from '../Support.class.js';
 import { runAfterRender } from '../tagRunner.js';
-export function renderTagOnly(newSupport, prevSupport, subject, ownerSupport) {
-    const oldRenderCount = subject.global.renderCount;
-    beforeWithRender(newSupport, ownerSupport, prevSupport);
+import { ValueTypes } from '../ValueTypes.enum.js';
+import { executeWrap } from '../executeWrap.function.js';
+import { initState, reState } from '../../state/state.utils.js';
+import { setUseMemory } from '../../state/setUse.function.js';
+export function renderTagOnly(newSupport, prevSupport, // causes restate
+subject, ownerSupport) {
+    const global = subject.global;
+    const oldRenderCount = global.renderCount;
+    beforeWithRender(newSupport, prevSupport?.state);
     const templater = newSupport.templater;
+    let reSupport;
     // NEW TAG CREATED HERE
-    const wrapper = templater.wrapper;
-    let reSupport = wrapper(newSupport, subject, prevSupport);
+    if (templater.tagJsType === ValueTypes.stateRender) {
+        const result = templater; // .wrapper as any// || {original: templater} as any
+        const useSupport = getSupport(templater, ownerSupport, newSupport.appSupport, // ownerSupport.appSupport as Support,
+        subject);
+        reSupport = executeWrap(templater, result, useSupport);
+    }
+    else {
+        // functions wrapped in tag()
+        const wrapper = templater.wrapper;
+        // calls the function returned from getTagWrap()
+        reSupport = wrapper(newSupport, subject, prevSupport);
+    }
     /* AFTER */
     runAfterRender(newSupport, ownerSupport);
-    subject.global.newest = reSupport;
-    if (!prevSupport && ownerSupport) {
-        ownerSupport.subject.global.childTags.push(reSupport);
-    }
+    global.newest = reSupport;
     // When we rendered, only 1 render should have taken place OTHERWISE rendering caused another render and that is the latest instead
-    if (subject.global.renderCount > oldRenderCount + 1) {
-        return subject.global.newest;
+    if (global.renderCount > oldRenderCount + 1) {
+        return global.newest;
     }
     return reSupport;
 }
 function beforeWithRender(support, // new
-parentSupport, prevSupport) {
-    const lastOwnerSupport = prevSupport?.ownerSupport;
-    const runtimeOwnerSupport = lastOwnerSupport || parentSupport;
-    if (prevSupport) {
-        if (prevSupport !== support) {
-            const lastState = prevSupport.state;
-            support.subject.global = prevSupport.subject.global;
-            support.state.length = 0;
-            support.state.push(...lastState);
-        }
-        return runBeforeRedraw(support, prevSupport);
+prevState) {
+    if (prevState) {
+        const lastState = prevState;
+        support.state = lastState;
+        reState(support, setUseMemory.stateConfig);
+        return;
     }
     // first time render
-    return runBeforeRender(support, runtimeOwnerSupport);
+    initState(support, setUseMemory.stateConfig);
 }
 //# sourceMappingURL=renderTagOnly.function.js.map

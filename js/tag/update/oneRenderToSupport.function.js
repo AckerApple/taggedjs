@@ -1,18 +1,18 @@
-import { TemplaterResult } from '../TemplaterResult.class.js';
+import { getTemplaterResult } from '../TemplaterResult.class.js';
 import { newSupportByTemplater } from './processTag.function.js';
-import { ValueTypes } from '../ValueTypes.enum.js';
+import { PropWatches } from '../tag.js';
 export function oneRenderToSupport(wrapper, subject, ownerSupport) {
-    const templater = new TemplaterResult([]);
-    templater.tagJsType = ValueTypes.oneRender;
+    const templater = getTemplaterResult(PropWatches.DEEP);
+    templater.tagJsType = wrapper.tagJsType;
     const support = newSupportByTemplater(templater, ownerSupport, subject);
     let tag;
-    const wrap = () => {
+    function wrap() {
         templater.tag = tag || (wrapper());
         return support;
-    };
+    }
     templater.wrapper = wrap;
     wrap.parentWrap = wrap;
-    wrap.oneRender = true;
+    wrap.tagJsType = wrapper.tagJsType;
     wrap.parentWrap.original = wrapper;
     return support;
 }

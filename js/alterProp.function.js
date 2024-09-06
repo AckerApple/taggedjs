@@ -1,42 +1,46 @@
-import { deepEqual } from './deepFunctions.js';
-import { isStaticTag } from './isInstance.js';
-import { renderSupport } from './tag/render/renderSupport.function.js';
-import { setUse } from './state/index.js';
+import { isInlineHtml, renderInlineHtml } from './tag/render/renderSupport.function.js';
+import { renderExistingReadyTag } from './tag/render/renderExistingTag.function.js';
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js';
-import { runBlocked } from './interpolations/bindSubjectCallback.function.js';
-import { cloneTagJsValue } from './tag/cloneValueArray.function.js';
-export function castProps(props, newSupport, stateArray, depth) {
-    return props.map(prop => alterProp(prop, newSupport.ownerSupport, stateArray, newSupport, depth));
+import { deepCompareDepth } from './tag/hasSupportChanged.function.js';
+import { isArray, isStaticTag } from './isInstance.js';
+import { BasicTypes } from './tag/ValueTypes.enum.js';
+import { setUseMemory } from './state/index.js';
+export function castProps(props, newSupport, depth) {
+    return props.map(prop => alterProp(prop, newSupport.ownerSupport, newSupport, depth));
 }
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
-export function alterProp(prop, ownerSupport, stateArray, newSupport, depth) {
+export function alterProp(prop, ownerSupport, newSupport, depth) {
     if (isStaticTag(prop) || !prop) {
         return prop;
     }
     if (!ownerSupport) {
         return prop; // no one above me
     }
-    return checkProp(prop, ownerSupport, stateArray, newSupport, depth);
+    return checkProp(prop, ownerSupport, newSupport, depth);
 }
-export function checkProp(value, ownerSupport, stateArray, newSupport, depth, index, newProp) {
-    if (value instanceof Function) {
-        return getPropWrap(value, ownerSupport, stateArray);
-    }
-    // if(seen.includes(value)) {
-    if (depth === 15) {
+export function checkProp(value, ownerSupport, newSupport, depth) {
+    if (!value) {
         return value;
     }
-    // seen.push(value)
+    if (value.tagJsType) {
+        return value;
+    }
+    if (typeof (value) === BasicTypes.function) {
+        return getPropWrap(value, ownerSupport);
+    }
+    if (depth === deepCompareDepth) {
+        return value;
+    }
     const skip = isSkipPropValue(value);
     if (skip) {
         return value; // no children to crawl through
     }
-    if (value instanceof Array) {
+    if (isArray(value)) {
         for (let index = value.length - 1; index >= 0; --index) {
             const subValue = value[index];
-            value[index] = checkProp(subValue, ownerSupport, stateArray, newSupport, depth + 1, index, value);
-            if (subValue instanceof Function) {
-                if (subValue.toCall) {
+            value[index] = checkProp(subValue, ownerSupport, newSupport, depth + 1);
+            if (typeof (subValue) === BasicTypes.function) {
+                if (subValue.mem) {
                     continue;
                 }
                 afterCheckProp(depth + 1, index, subValue, value, newSupport);
@@ -44,14 +48,12 @@ export function checkProp(value, ownerSupport, stateArray, newSupport, depth, in
         }
         return value;
     }
-    // for(const name in value){
-    // ??? new we want below
     const keys = Object.keys(value);
     for (const name of keys) {
         const subValue = value[name];
-        const result = checkProp(subValue, ownerSupport, stateArray, newSupport, depth + 1, name, value);
+        const result = checkProp(subValue, ownerSupport, newSupport, depth + 1);
         if (value[name] === result) {
-            continue; // ??? new
+            continue;
         }
         const getset = Object.getOwnPropertyDescriptor(value, name);
         const hasSetter = getset?.get || getset?.set;
@@ -59,8 +61,8 @@ export function checkProp(value, ownerSupport, stateArray, newSupport, depth, in
             continue;
         }
         value[name] = result;
-        if (result instanceof Function) {
-            if (subValue.toCall) {
+        if (typeof (result) === BasicTypes.function) {
+            if (subValue.mem) {
                 continue;
             }
             afterCheckProp(depth + 1, name, subValue, value, newSupport);
@@ -69,34 +71,29 @@ export function checkProp(value, ownerSupport, stateArray, newSupport, depth, in
     return value;
 }
 function afterCheckProp(depth, index, originalValue, newProp, newSupport) {
-    if (originalValue?.toCall) {
-        throw new Error('meg');
-        return; // already been done
-    }
     // restore object to have original function on destroy
     if (depth > 0) {
         const global = newSupport.subject.global;
-        newProp[index].subscription = global.destroy$.toCallback(() => {
+        newProp[index].subscription = global.destroy$.toCallback(function alterCheckProcessor() {
             newProp[index] = originalValue;
         });
     }
 }
-export function getPropWrap(value, ownerSupport, stateArray) {
-    const toCall = value.toCall;
+export function getPropWrap(value, ownerSupport) {
+    const already = value.mem;
     // already previously converted by a parent?
-    if (toCall) {
+    if (already) {
         return value;
     }
-    const wrap = (...args) => wrap.toCall(...args); // what gets called can switch over parent state changes
+    const wrap = function wrapRunner(...args) {
+        return wrap.toCall(...args);
+    }; // what gets called can switch over parent state changes
     // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
-    wrap.toCall = (...args) => {
-        return callbackPropOwner(wrap.mem.prop, args, ownerSupport);
+    wrap.toCall = function toCallRunner(...args) {
+        return callbackPropOwner(wrap.mem, args, ownerSupport);
     };
     wrap.original = value;
-    wrap.mem = {
-        prop: value,
-        // stateArray: stateArray
-    };
+    wrap.mem = value;
     // copy data properties that maybe on source function
     Object.assign(wrap, value);
     return wrap;
@@ -104,54 +101,55 @@ export function getPropWrap(value, ownerSupport, stateArray) {
 /** Function shared by alterProps() and updateExistingTagComponent... TODO: May want to have to functions to reduce cycle checking?  */
 export function callbackPropOwner(toCall, callWith, ownerSupport) {
     const global = ownerSupport.subject.global;
-    const newest = global.newest;
+    const newest = global?.newest || ownerSupport;
     const supportInCycle = getSupportInCycle();
     const noCycle = supportInCycle === undefined;
-    if (supportInCycle) {
-        supportInCycle.subject.global.locked = true;
-    }
     const callbackResult = toCall(...callWith);
-    if (supportInCycle) {
-        const blocked = supportInCycle?.subject.global.blocked;
-        if (supportInCycle && blocked?.length) {
-            setUse.memory.tagClosed$.toCallback(() => {
-                let lastResult = supportInCycle;
-                // throw new Error('cycles ready')
-                // syncStates(supportInCycle.state, (supportInCycle.subject.global.newest as Support).state)
-                delete supportInCycle.subject.global.locked;
-                lastResult = runBlocked(supportInCycle, supportInCycle.state, supportInCycle);
-                // syncStates((supportInCycle.subject.global.newest as Support).state, supportInCycle.state)
-                // delete supportInCycle.subject.global.locked
-                renderSupport(lastResult, false);
-            });
-            return callbackResult;
-        }
-        delete supportInCycle.subject.global.locked;
-    }
-    const run = () => {
+    const run = function propCallbackProcessor() {
+        const global = newest.subject.global;
         // are we in a rendering cycle? then its being called by alterProps
         if (noCycle === false) {
-            // appears a prop function was called sync/immediately so lets see if owner changed state
-            const allMatched = newest.state.every(state => {
-                const lastValue = state.lastValue;
-                const get = state.get();
-                const equal = deepEqual(cloneTagJsValue(lastValue), get);
-                return equal;
-            });
+            const allMatched = global.locked === true;
             if (allMatched) {
                 return callbackResult; // owner did not change
             }
         }
-        renderSupport(newest, true);
+        /*
+        const oldest = global.oldest
+        const wasInstant = oldest === newest && global.renderCount === 0
+        if(wasInstant) {
+          return // prop was called immediately
+        }
+        */
+        safeRenderSupport(newest, ownerSupport);
         return callbackResult;
     };
     if (noCycle) {
         return run();
     }
-    setUse.memory.tagClosed$.toCallback(run);
+    setUseMemory.tagClosed$.toCallback(run);
     return callbackResult;
 }
 export function isSkipPropValue(value) {
-    return typeof (value) !== 'object' || !value; // || isSubjectInstance(value)
+    return typeof (value) !== BasicTypes.object || !value || value.tagJsType;
+}
+export function safeRenderSupport(newest, ownerSupport) {
+    const subject = newest.subject;
+    const isInline = isInlineHtml(newest.templater);
+    if (isInline) {
+        const result = renderInlineHtml(ownerSupport, newest);
+        // TODO: below maybe never true
+        /*
+        const global = subject.global as TagGlobal
+        if(global) {
+          delete global.locked
+        }
+        */
+        return result;
+    }
+    const global = subject.global;
+    global.locked = true;
+    renderExistingReadyTag(global.newest, newest, ownerSupport, subject);
+    delete global.locked;
 }
 //# sourceMappingURL=alterProp.function.js.map

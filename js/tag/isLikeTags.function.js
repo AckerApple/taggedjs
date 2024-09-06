@@ -1,43 +1,30 @@
-import { ValueTypes } from './ValueTypes.enum.js';
-import { deepEqual } from '../deepFunctions.js';
+import { BasicTypes, ValueTypes } from './ValueTypes.enum.js';
 export function isLikeTags(support0, // new
 support1) {
     const templater0 = support0.templater;
     const templater1 = support1.templater;
-    // TODO: turn this on
-    /*
-    if(templater0 === templater1) {
-      return true
-    }
-    */
     const tag0 = templater0?.tag || support0;
-    const tag1 = templater1.tag;
-    if (tag0.tagJsType !== tag1.tagJsType) {
-        return false;
+    const tag1 = templater1.tag; // || (support1 as any)
+    if (templater0?.tagJsType === ValueTypes.stateRender) {
+        return templater0.dom === templater1.dom;
     }
     if (tag0.tagJsType === ValueTypes.dom) {
-        return isLikeDomTags(tag0, tag1, support0, support1);
+        return isLikeDomTags(tag0, tag1);
     }
-    return isLikeStringTags(tag0, tag1, support0, support1);
+    const like = isLikeStringTags(tag0, tag1, support0, support1);
+    return like;
 }
-function isLikeDomTags(tag0, tag1, support0, // new
-support1) {
-    const dom0 = tag0.dom;
-    const dom1 = tag1.dom;
-    if (dom0 !== dom1) {
-        const equal = deepEqual(tag0.dom, tag1.dom);
-        if (!equal) {
-            return false;
-        }
-    }
-    const values0 = support0.values || tag0.values;
-    const values1 = support1.values || tag1.values;
-    return isLikeValueSets(values0, values1);
+// used when compiler was used
+export function isLikeDomTags(tag0, tag1) {
+    const domMeta0 = tag0.dom;
+    const domMeta1 = tag1.dom;
+    return domMeta0 === domMeta1;
 }
+// used for no compiling
 function isLikeStringTags(tag0, tag1, support0, // new
 support1) {
     const strings0 = tag0.strings;
-    const strings1 = tag1.strings || support1.strings;
+    const strings1 = tag1.strings;
     if (strings0.length !== strings1.length) {
         return false;
     }
@@ -47,8 +34,8 @@ support1) {
     if (!everyStringMatched) {
         return false;
     }
-    const values0 = support0.values || tag0.values;
-    const values1 = support1.values || tag1.values;
+    const values0 = support0.templater.values || tag0.values;
+    const values1 = support1.templater.values || tag1.values;
     return isLikeValueSets(values0, values1);
 }
 export function isLikeValueSets(values0, values1) {
@@ -58,7 +45,7 @@ export function isLikeValueSets(values0, values1) {
     }
     const allVarsMatch = values1.every((value, index) => {
         const compareTo = values0[index];
-        const isFunctions = value instanceof Function && compareTo instanceof Function;
+        const isFunctions = typeof (value) === BasicTypes.function && typeof (compareTo) === BasicTypes.function;
         if (isFunctions) {
             const stringMatch = value.toString() === compareTo.toString();
             if (stringMatch) {
@@ -66,7 +53,7 @@ export function isLikeValueSets(values0, values1) {
             }
             return false;
         }
-        return true; // deepEqual(value, compareTo)
+        return true;
     });
     if (allVarsMatch) {
         return true;

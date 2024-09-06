@@ -1,19 +1,29 @@
 export declare const empty = "";
-export declare enum ValueTypes {
-    unknown = "unknown",
-    tag = "tag",// html''
-    dom = "dom",// compiled version of html''
-    templater = "templater",
-    tagComponent = "tag-component",
-    object = "object",
-    tagArray = "tag-array",
-    subject = "subject",
-    tagJsSubject = "tagJsSubject",
-    oneRender = "oneRender",
-    date = "date",
+export declare enum ImmutableTypes {
     string = "string",
     number = "number",
     boolean = "boolean",
-    function = "function",
     undefined = "undefined"
 }
+export declare enum BasicTypes {
+    function = "function",
+    date = "date",
+    unknown = "unknown",
+    object = "object"
+}
+export type ValueType = [string];
+type ValueTypeObject = {
+    tag: ValueType;
+    dom: ValueType;
+    templater: ValueType;
+    tagComponent: ValueType;
+    tagArray: ValueType;
+    subject: ValueType;
+    tagJsSubject: ValueType;
+    renderOnce: ValueType;
+    stateRender: ValueType;
+    version: number;
+};
+/** Used as direct memory comparisons, the strings are never compared, just the array */
+export declare const ValueTypes: ValueTypeObject;
+export {};

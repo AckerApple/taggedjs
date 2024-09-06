@@ -1,2 +1,3 @@
-import { ObjectElement, ObjectText } from "./ObjectNode.types.js";
-export declare function replacePlaceholders(elements: (ObjectElement | ObjectText)[], values: unknown[]): void;
+import { ValuePos } from "./LikeObjectElement.type.js";
+import { ParsedHtml, UnparsedHtml } from "./htmlInterpolationToDomMeta.function.js";
+export declare function replacePlaceholders(dom: UnparsedHtml, valueCount: number, valuePositions?: ValuePos[], currentTail?: (string | number)[]): ParsedHtml;

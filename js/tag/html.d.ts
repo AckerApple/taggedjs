@@ -1,9 +1,8 @@
-import { InputElementTargetEvent } from '../interpolations/ElementTargetEvent.interface.js';
-import { ObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
-import { RegularValue } from '../subject.types.js';
-import { Tag, Dom } from './Tag.class.js';
+import { InputElementTargetEvent } from '../interpolations/attributes/ElementTargetEvent.interface.js';
+import { LikeObjectChildren } from '../interpolations/optimizers/LikeObjectElement.type.js';
+import { RegularValue } from './update/processRegularValue.function.js';
 export type TagValues = (((e: InputElementTargetEvent) => any) | RegularValue | null | undefined | Object)[];
-export declare function html(strings: string[] | TemplateStringsArray, ...values: TagValues): Tag;
+export declare function html(strings: string[] | TemplateStringsArray, ...values: TagValues): import("./Tag.class.js").StringTag;
 export declare namespace html {
-    var dom: (dom: ObjectChildren, ...values: TagValues) => Dom;
+    var dom: (dom: LikeObjectChildren, ...values: TagValues) => import("./Tag.class.js").DomTag;
 }

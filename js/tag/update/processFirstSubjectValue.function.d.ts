@@ -1,9 +1,9 @@
-import { InsertBefore } from '../../interpolations/InsertBefore.type.js';
+import { Counts } from '../../interpolations/interpolateTemplate.js';
+import { TemplateValue } from './processFirstSubject.utils.js';
+import { StringTag } from '../Tag.class.js';
+import { ContextItem } from '../Context.types.js';
 import { AnySupport } from '../Support.class.js';
-import { Tag } from '../Tag.class.js';
-import { InterpolateSubject, TemplateValue, processOptions } from './processFirstSubject.utils.js';
-export declare function processFirstSubjectValue(value: TemplateValue | Tag, subject: InterpolateSubject, // could be tag via result.tag
-insertBefore: InsertBefore, // <template end interpolate /> (will be removed)
-ownerSupport: AnySupport, // owner
-options: processOptions, // {added:0, removed:0}
-fragment?: DocumentFragment): import("../Support.class.js").BaseSupport | InsertBefore[] | undefined;
+export declare function processFirstSubjectValue(value: TemplateValue | StringTag, subject: ContextItem, // could be tag via result.tag
+ownerSupport: AnySupport, // owning support
+counts: Counts, // {added:0, removed:0}
+valueId: string, appendTo?: Element): AnySupport | undefined;

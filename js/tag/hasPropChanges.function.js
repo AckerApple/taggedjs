@@ -1,5 +1,5 @@
 import { deepEqual } from '../deepFunctions.js';
-import { ValueTypes } from './ValueTypes.enum.js';
+import { BasicTypes } from './ValueTypes.enum.js';
 /**
  *
  * @param props
@@ -8,24 +8,18 @@ import { ValueTypes } from './ValueTypes.enum.js';
  */
 export function hasPropChanges(props, // natural props
 pastCloneProps) {
-    /*
-    const isCommonEqual = props === undefined && props === compareToProps
-    if(isCommonEqual) {
-      return false
-    }
-    */
     let castedProps = props;
     let castedPastProps = pastCloneProps;
     // check all prop functions match
-    if (typeof (props) === ValueTypes.object) {
+    if (typeof (props) === BasicTypes.object) {
         if (!pastCloneProps) {
             return 3;
         }
         castedProps = [...props];
         castedPastProps = [...(pastCloneProps || [])];
         const allFunctionsMatch = castedProps.every((value, index) => {
-            let compare = castedPastProps[index];
-            if (value && typeof (value) === ValueTypes.object) {
+            const compare = castedPastProps[index];
+            if (value && typeof (value) === BasicTypes.object) {
                 const subCastedProps = { ...value };
                 const subCompareProps = { ...compare || {} };
                 const matched = Object.entries(subCastedProps).every(([key, value]) => compareProps(value, subCompareProps[key], () => {

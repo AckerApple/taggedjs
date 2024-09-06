@@ -1,8 +1,7 @@
 import { softDestroySupport } from './softDestroySupport.function.js';
 import { moveProviders } from '../update/updateExistingTagComponent.function.js';
 export function destroyUnlikeTags(lastSupport, // old
-reSupport, // new
-subject) {
+reSupport) {
     // when a tag is destroyed, disconnect the globals
     const global = reSupport.subject.global; // = {...oldGlobal} // break memory references
     moveProviders(lastSupport, reSupport);
@@ -10,6 +9,5 @@ subject) {
     delete global.deleted;
     global.oldest = reSupport;
     global.newest = reSupport;
-    subject.support = reSupport;
 }
 //# sourceMappingURL=destroyUnlikeTags.function.js.map

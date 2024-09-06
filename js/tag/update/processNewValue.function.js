@@ -1,39 +1,39 @@
-import { TemplaterResult } from '../TemplaterResult.class.js';
-import { Support } from '../Support.class.js';
+import { getTemplaterResult } from '../TemplaterResult.class.js';
+import { getSupport } from '../Support.class.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
-import { getValueType } from '../getValueType.function.js';
-import { TagJsSubject, getNewGlobal } from './TagJsSubject.class.js';
-export function processNewValue(value, ownerSupport) {
-    const valueType = getValueType(value);
-    switch (valueType) {
-        case ValueTypes.tagComponent:
-            return new TagJsSubject(value); // ownerSupport.global.value
-        case ValueTypes.templater:
-            const templater = value;
-            const tag = templater.tag;
-            return processNewTag(tag, ownerSupport);
-        case ValueTypes.tag:
-        case ValueTypes.dom:
-            return processNewTag(value, ownerSupport);
-        case ValueTypes.subject:
-            value.global = getNewGlobal();
-            return value;
+import { getNewGlobal } from './getNewGlobal.function.js';
+import { checkTagValueChange } from '../checkDestroyPrevious.function.js';
+import { PropWatches } from '../tag.js';
+export function processNewArrayValue(value, ownerSupport, contextItem) {
+    const tagJsType = value.tagJsType;
+    if (tagJsType) {
+        switch (tagJsType) {
+            case ValueTypes.templater:
+                const templater = value;
+                const tag = templater.tag;
+                processNewTag(tag, ownerSupport, contextItem);
+                break;
+            case ValueTypes.tag:
+            case ValueTypes.dom:
+                processNewTag(value, ownerSupport, contextItem);
+                break;
+        }
     }
-    return new TagJsSubject(value);
+    return contextItem;
 }
-function processNewTag(value, ownerSupport) {
+function processNewTag(value, ownerSupport, contextItem) {
+    contextItem.checkValueChange = checkTagValueChange;
     const tag = value;
     let templater = tag.templater;
     // TODO: Can this ever happen?
     if (!templater) {
-        templater = new TemplaterResult([]);
+        templater = getTemplaterResult(PropWatches.DEEP);
         templater.tag = tag;
         tag.templater = templater;
     }
-    const subject = new TagJsSubject(templater);
-    subject.support = new Support(templater, ownerSupport, subject);
-    subject.global.oldest = subject.support;
-    ownerSupport.subject.global.childTags.push(subject.support);
-    return subject;
+    const global = contextItem.global = getNewGlobal(); // contextItem.global as SupportTagGlobal
+    const newest = global.newest = getSupport(templater, ownerSupport, ownerSupport.appSupport, contextItem);
+    global.oldest = newest;
+    return contextItem;
 }
 //# sourceMappingURL=processNewValue.function.js.map

@@ -11,8 +11,8 @@ export function combineLatest(subjects) {
             if (!countMatched) {
                 return;
             }
-            for (let index = valuesSeen.length - 1; index >= 0; --index) {
-                if (!valuesSeen[index]) {
+            for (const item of valuesSeen) {
+                if (!item) {
                     return;
                 }
             }
