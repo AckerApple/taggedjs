@@ -1,5 +1,5 @@
-import { SpecialDefinition } from "../attributes/processAttribute.function"
-import { ObjectChildren, ValuePos } from "./LikeObjectElement.type"
+import { SpecialDefinition } from "../attributes/processAttribute.function.js"
+import { ObjectChildren } from "./LikeObjectElement.type.js"
 
 type ObjectNode = {
   nn: string // nodeName
