@@ -1,8 +1,8 @@
 import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
 import { ObjectChildren } from "./LikeObjectElement.type.js";
-import { OneUnparsedHtml } from "./htmlInterpolationToDomMeta.function.js";
 import { ObjectText } from "./ObjectNode.types.js";
 import { ImmutableTypes } from "../../tag/ValueTypes.enum.js";
+import { OneUnparsedHtml } from "./types.js";
 export const safeVar = '__safeTagVar'
 
 export function restorePlaceholders(elements: ObjectChildren) {

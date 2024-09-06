@@ -1,7 +1,7 @@
 import { variablePrefix, variableSuffix } from "../../tag/Tag.class.js"
 import { isSpecialAttr } from "../attributes/isSpecialAttribute.function.js"
-import { ObjectChildren } from "./LikeObjectElement.type.js"
 import { Attribute, DomObjectElement, ObjectElement, ObjectText } from "./ObjectNode.types.js"
+import { ParsedHtml } from "./types.js"
 
 const ondoubleclick = 'ondoubleclick'
 const fragFindAny = /(:tagvar\d+:)/
@@ -60,10 +60,6 @@ function addPlaceholders(
 
   return results
 }
-
-export type OneUnparsedHtml = (ObjectElement | ObjectText) & {ch?: ObjectChildren, at?: any[]}
-export type UnparsedHtml = OneUnparsedHtml[]
-export type ParsedHtml = (DomObjectElement | ObjectText)[]
 
 export function parseHTML(html: string): ParsedHtml {
   const valuePositions: string[][] = [];

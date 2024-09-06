@@ -2,8 +2,8 @@
 
 import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
 import { Attribute, ObjectText } from "./ObjectNode.types.js";
-import { ObjectChildren, ValuePos } from "./LikeObjectElement.type.js";
-import { OneUnparsedHtml, ParsedHtml, UnparsedHtml } from "./htmlInterpolationToDomMeta.function.js";
+import { ValuePos } from "./LikeObjectElement.type.js";
+import { OneUnparsedHtml, ParsedHtml, UnparsedHtml } from "./types.js";
 import { ImmutableTypes } from "../../tag/ValueTypes.enum.js";
 
 const placeholderRegex = new RegExp(variablePrefix + '(\\d+)' + variableSuffix, 'g');

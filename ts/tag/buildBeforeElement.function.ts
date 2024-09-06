@@ -1,14 +1,14 @@
-import { ParsedHtml } from '../interpolations/optimizers/htmlInterpolationToDomMeta.function.js'
 import { attachDomElements } from '../interpolations/optimizers/attachDomElements.function.js'
 import { DomMetaMap } from '../interpolations/optimizers/LikeObjectElement.type.js'
 import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js'
+import { AnySupport, SupportContextItem } from './Support.class.js'
 import { SupportTagGlobal } from './TemplaterResult.class.js'
 import { ContextItem, Context } from './Context.types.js'
+import { ParsedHtml } from '../interpolations/index.js'
 import { checkSimpleValueChange } from './index.js'
 import { getDomMeta } from './domMetaCollector.js'
 import { DomTag, StringTag } from './Tag.class.js'
 import { ValueTypes } from './ValueTypes.enum.js'
-import { AnySupport, SupportContextItem } from './Support.class.js'
 import { painting } from './paint.function.js'
 
 /** Function that kicks off actually putting tags down as HTML elements */
