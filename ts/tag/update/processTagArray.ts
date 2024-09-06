@@ -1,17 +1,17 @@
 // taggedjs-no-compile
 
-import { StringTag } from '../Tag.class.js'
-import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { AnySupport, BaseSupport, Support } from '../Support.class.js'
-import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
-import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
-import { updateExistingValue } from './updateExistingValue.function.js'
-import { TemplateValue } from './processFirstSubject.utils.js'
 import { paintAppends, paintInsertBefores, paintRemoves } from '../paint.function.js'
-import { processNewArrayValue } from './processNewValue.function.js'
-import { destroySupport } from '../destroySupport.function.js'
+import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
+import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { checkSimpleValueChange } from '../checkDestroyPrevious.function.js'
+import { updateExistingValue } from './updateExistingValue.function.js'
+import { AnySupport, BaseSupport, Support } from '../Support.class.js'
+import { Counts } from '../../interpolations/interpolateTemplate.js'
+import { processNewArrayValue } from './processNewValue.function.js'
+import { TemplateValue } from './processFirstSubject.utils.js'
+import { destroySupport } from '../destroySupport.function.js'
 import { Context, ContextItem } from '../Context.types.js'
+import { StringTag } from '../Tag.class.js'
 
 export function processTagArray(
   subject: ContextItem,
@@ -149,6 +149,7 @@ function processAddTagArrayItem(
     itemSubject,
     ownerSupport, // support,
     counts,
+    `rvp_${lastArray.length}_array`,
     appendTo,
   )
   

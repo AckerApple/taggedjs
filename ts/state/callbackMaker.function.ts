@@ -4,7 +4,7 @@ import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
 import callbackStateUpdate from './callbackStateUpdate.function.js'
 import { TagGlobal } from '../tag/index.js'
 import { AnySupport } from '../tag/Support.class.js'
-import { State } from './state.utils.js'
+import { State } from './state.types.js'
 
 export type Callback<A,B,C,D,E,F, T> = (
   a: A, b: B, c: C, d: D, e: E, f: F,

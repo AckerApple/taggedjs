@@ -26,18 +26,25 @@ type ValueTypeObject = {
   tagJsSubject: ValueType
   renderOnce: ValueType
   stateRender: ValueType
+
+  version: number
 }
 
+const version = Date.now()
+
+/** Used as direct memory comparisons, the strings are never compared, just the array */
 export const ValueTypes: ValueTypeObject = {  
   tag: ['html'], // html'' aka StringTag | DomTag
   dom: ['dom'], // compiled version of html''
 
   templater: ['templater'],
-  tagComponent: ['tag-component'],  
-  tagArray: ['tag-array'],
+  tagComponent: ['tagComponent'],  
+  tagArray: ['tagArray'],
   subject: ['subject'],
   tagJsSubject: ['tagJsSubject'],
   
   renderOnce: ['renderOnce'],
   stateRender: ['stateRender'],
+
+  version,
 }

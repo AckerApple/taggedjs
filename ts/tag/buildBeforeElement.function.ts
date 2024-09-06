@@ -1,15 +1,15 @@
 import { ParsedHtml } from '../interpolations/optimizers/htmlInterpolationToDomMeta.function.js'
 import { attachDomElements } from '../interpolations/optimizers/attachDomElements.function.js'
-import { getDomMeta } from './domMetaCollector.js'
 import { DomMetaMap } from '../interpolations/optimizers/LikeObjectElement.type.js'
 import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js'
-import { painting } from './paint.function.js'
-import { AnySupport } from './Support.class.js'
-import { DomTag, StringTag } from './Tag.class.js'
-import { ContextItem, Context } from './Context.types.js'
-import { ValueTypes } from './ValueTypes.enum.js'
 import { SupportTagGlobal } from './TemplaterResult.class.js'
+import { ContextItem, Context } from './Context.types.js'
 import { checkSimpleValueChange } from './index.js'
+import { getDomMeta } from './domMetaCollector.js'
+import { DomTag, StringTag } from './Tag.class.js'
+import { ValueTypes } from './ValueTypes.enum.js'
+import { AnySupport, SupportContextItem } from './Support.class.js'
+import { painting } from './paint.function.js'
 
 /** Function that kicks off actually putting tags down as HTML elements */
 export function buildBeforeElement(
@@ -43,7 +43,7 @@ function getHtmlDomMeta(
   const domMeta = loadDomMeta(support)
   const thisTag = support.templater.tag as StringTag | DomTag
   const values = thisTag.values
-  const context: Context = []
+  const context: SupportContextItem[] = []
 
   const global = support.subject.global as SupportTagGlobal
   global.context = context
@@ -73,7 +73,7 @@ function loadDomMeta(support: AnySupport): ParsedHtml {
   return getDomMeta((thisTag as StringTag).strings, thisTag.values)
 }
 
-export function runOneContext(
+export function addOneContext(
   value: unknown,
   context: Context,
   withinOwnerElement: boolean

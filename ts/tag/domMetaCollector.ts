@@ -15,7 +15,7 @@ export function getDomMeta(
   strings: string[],
   values: unknown[],
 ): ParsedHtml {
-  const stringId = getStringsId(strings, values)
+  const stringId = getStringsId(strings)
   const lastRun = lastRuns[stringId]
   const matches = lastRun && isLastRunMatched(strings, values, lastRun)
   

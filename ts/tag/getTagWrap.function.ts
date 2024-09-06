@@ -20,7 +20,7 @@ export function getTagWrap(
   const wrapper = function tagFunWrap(
     newSupport: Support,
     subject: ContextItem,
-    lastSupport?: Support | BaseSupport | undefined
+    lastSupport?: Support | BaseSupport | undefined // subject.global.newest
   ) {
     // wrap any prop functions that are passed in
     const castedProps = getCastedProps(

@@ -1,6 +1,6 @@
 import { StringTag, DomTag, EventCallback } from './Tag.class.js'
 import { ContextItem, Context } from './Context.types.js'
-import { BaseSupport, Support } from './Support.class.js'
+import { BaseSupport, Support, SupportContextItem } from './Support.class.js'
 import { Props } from '../Props.js'
 import { TagWrapper } from './tag.utils.js'
 import { Provider } from '../state/providers.js'
@@ -47,7 +47,7 @@ export type SupportTagGlobal = TagGlobal & {
   blocked: (BaseSupport | Support)[], // renders that did not occur because an event was processing
   oldest: BaseSupport | Support
   newest: BaseSupport | Support
-  context: Context // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+  context: SupportContextItem[] // populated after reading interpolated.values array converted to an object {variable0, variable:1}
   
   init?: OnInitCallback // what to run when init complete, used for onInit
   providers?: Provider[]

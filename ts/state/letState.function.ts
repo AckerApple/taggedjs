@@ -1,14 +1,15 @@
-import { Config, GetSet, State, StateConfigItem } from './state.utils.js'
-import { setUseMemory } from './setUse.function.js'
 import { getStateValue } from './getStateValue.function.js'
-import { stateHandlers } from './stateHandlers.js'
+import { State, StateConfigItem } from './state.types.js'
 import { BasicTypes } from '../tag/ValueTypes.enum.js'
+import { setUseMemory } from './setUse.function.js'
+import { Config, GetSet } from './state.utils.js'
 
 /** Used for variables that need to remain the same variable during render passes. If defaultValue is a function it is called only once, its return value is first state, and let value can changed */
 export function letState <T>(
   defaultValue: T | (() => T),
 ): ((getSet: GetSet<T>) => T) {
-  return stateHandlers.letHandler(defaultValue)
+  const config: Config = setUseMemory.stateConfig
+  return config.handlers.letHandler(defaultValue)
 }
 
 export function firstLetState <T>(
@@ -31,8 +32,9 @@ export function firstLetState <T>(
 export function reLetState <T>() {
   const config: Config = setUseMemory.stateConfig
   const rearray = config.rearray as State
-
   const restate = rearray[config.array.length]
+
+
   let oldValue = getStateValue(restate) as T
 
   const push: StateConfigItem<T> = {

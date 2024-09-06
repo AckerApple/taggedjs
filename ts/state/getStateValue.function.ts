@@ -1,4 +1,5 @@
-import { getCallbackValue, StateConfig, StateConfigItem } from './state.utils.js'
+import { getCallbackValue } from './state.utils.js'
+import { StateConfigItem } from './state.types.js'
 
 const badLetState = 'letState function incorrectly used. Second item in array is not setting expected value.\n\n' +
 'For "let" state use `let name = state(default)(x => [name, name = x])`\n\n' +

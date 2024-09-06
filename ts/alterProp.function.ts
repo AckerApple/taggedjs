@@ -1,14 +1,14 @@
-import { AnySupport, BaseSupport, Support } from './tag/Support.class.js'
-import { isArray, isStaticTag } from './isInstance.js'
 import { isInlineHtml, renderInlineHtml, renderSupport } from './tag/render/renderSupport.function.js'
-import { setUseMemory } from './state/index.js'
-import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
-import { Props } from './Props.js'
-import { Tag } from './tag/Tag.class.js'
 import { renderExistingReadyTag } from './tag/render/renderExistingTag.function.js'
-import { SupportTagGlobal, TagGlobal } from './tag/TemplaterResult.class.js'
-import { BasicTypes } from './tag/ValueTypes.enum.js'
+import { AnySupport, BaseSupport, Support } from './tag/Support.class.js'
+import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { deepCompareDepth } from './tag/hasSupportChanged.function.js'
+import { SupportTagGlobal } from './tag/TemplaterResult.class.js'
+import { isArray, isStaticTag } from './isInstance.js'
+import { BasicTypes } from './tag/ValueTypes.enum.js'
+import { setUseMemory } from './state/index.js'
+import { Tag } from './tag/Tag.class.js'
+import { Props } from './Props.js'
 
 export function castProps(
   props: Props,

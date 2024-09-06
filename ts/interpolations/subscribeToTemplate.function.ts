@@ -1,12 +1,12 @@
 import { InterpolateSubject, TemplateValue } from '../tag/update/processFirstSubject.utils.js'
 import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue.function.js'
-import { updateExistingValue } from '../tag/update/updateExistingValue.function.js'
-import { AnySupport } from '../tag/Support.class.js'
-import { TagGlobal, TemplaterResult } from '../tag/TemplaterResult.class.js'
-import { Counts } from './interpolateTemplate.js'
-import { paint } from '../tag/paint.function.js'
+import { TagGlobal } from '../tag/TemplaterResult.class.js'
 import { setUseMemory } from '../state/setUse.function.js'
 import { ContextItem } from '../tag/Context.types.js'
+import { AnySupport } from '../tag/Support.class.js'
+import { Counts } from './interpolateTemplate.js'
+import { paint } from '../tag/paint.function.js'
+import { processSubUpdate } from './processSubscriptionUpdate.function.js'
 
 export type SubToTemplateOptions = {
   insertBefore: Text
@@ -26,13 +26,12 @@ export function subscribeToTemplate({
   appendTo,
 }: SubToTemplateOptions) {
   let onValue = function onSubValue(value: TemplateValue) {
-    const templater = value as TemplaterResult
-
     processFirstSubjectValue(
-      templater,
+      value,
       contextItem,
       support,
       {...counts},
+      `rvp_-1_${support.templater.tag?.values.length}`,
       syncRun ? appendTo : undefined,
     )
 
@@ -42,21 +41,7 @@ export function subscribeToTemplate({
 
     // from now on just run update
     onValue = function subscriptionUpdate(value: TemplateValue) {
-      if(value === contextItem.value) {
-        return false // same value emitted
-      }
-
-      updateExistingValue(
-        contextItem,
-        value,
-        support,
-      )
-
-      if(!setUseMemory.stateConfig.support) {
-        paint()
-      }
-
-      return
+      processSubUpdate(value, contextItem, support)
     }
   }
   
@@ -66,6 +51,7 @@ export function subscribeToTemplate({
   
   let syncRun = true
   const sub = subject.subscribe(callback as any)
+  contextItem.subject = subject
   syncRun = false
   
   const global = support.subject.global as TagGlobal

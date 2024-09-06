@@ -1,19 +1,19 @@
 // taggedjs-no-compile
 
-import { isSubjectInstance } from "../../isInstance.js"
-import { paint, paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
-import { AnySupport, BaseSupport, Support } from "../../tag/Support.class.js"
-import { Context, ContextItem } from "../../tag/Context.types.js"
+import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
+import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode.types.js"
 import { InterpolateSubject } from "../../tag/update/processFirstSubject.utils.js"
-import { empty } from "../../tag/ValueTypes.enum.js"
-import { Counts } from "../interpolateTemplate.js"
+import { howToSetInputValue } from "../attributes/howToSetInputValue.function.js"
+import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
+import { AnySupport, BaseSupport, Support } from "../../tag/Support.class.js"
 import { processAttribute } from "../attributes/processAttribute.function.js"
 import { SubToTemplateOptions } from "../subscribeToTemplate.function.js"
-import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode.types.js"
-import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
+import { Context, ContextItem } from "../../tag/Context.types.js"
+import { addOneContext, TagGlobal } from "../../tag/index.js"
 import { ObjectChildren } from "./LikeObjectElement.type.js"
-import { howToSetInputValue } from "../attributes/howToSetInputValue.function.js"
-import { runOneContext, TagGlobal } from "../../tag/index.js"
+import { isSubjectInstance } from "../../isInstance.js"
+import { empty } from "../../tag/ValueTypes.enum.js"
+import { Counts } from "../interpolateTemplate.js"
 
 // ??? TODO: This could be done within exchangeParsedForValues to reduce loops
 export function attachDomElements(
@@ -60,6 +60,9 @@ export function attachDomElements(
       
       x.innerHTML = string
       const domElement = textNode.domElement = document.createTextNode(x.innerText)
+
+      // TODO: for debugging only
+      ;(domElement as any).id = `tp_${context.length}_${values.length}`
       
       if(owner) {
         paintAppends.push({
@@ -134,7 +137,11 @@ function attachDynamicDom(
 ) {
   const subVal = values[ context.length ]
   const marker = document.createTextNode(empty)
-  const contextItem = runOneContext(
+
+  // attach an identifier that can be read in dom reader
+  ;(marker as any).id = `dvp_${context.length}_${values.length}`
+  
+  const contextItem = addOneContext(
     subVal,
     context,
     depth > 0,
@@ -174,6 +181,7 @@ function attachDynamicDom(
     contextItem,
     support,
     counts,
+    `rvp_${context.length}_${values.length}`,
     owner,
   )
 

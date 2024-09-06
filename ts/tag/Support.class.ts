@@ -1,9 +1,9 @@
-import { Props } from '../Props.js'
-import { ContextItem } from './Context.types.js'
-import { State } from '../state/index.js'
 import { SupportTagGlobal, TemplaterResult } from './TemplaterResult.class.js'
 import { clonePropsBy } from './clonePropsBy.function.js'
 import { Subject } from '../subject/Subject.class.js'
+import { ContextItem } from './Context.types.js'
+import { State } from '../state/index.js'
+import { Props } from '../Props.js'
 
 export type AnySupport = (BaseSupport & {
 })
@@ -27,12 +27,17 @@ export type HtmlSupport = {
 
 export type BaseSupport = HtmlSupport & {
   state: State, // TODO: this is not needed for every type of  tag
+  subject: SupportContextItem,
+}
+
+export type SupportContextItem = ContextItem & {
+  global: SupportTagGlobal
 }
 
 /** used only for apps, otherwise use Support */
 export function getBaseSupport(
   templater: TemplaterResult,
-  subject: ContextItem,
+  subject: SupportContextItem,
   castedProps?: Props,
 ): BaseSupport {
   const baseSupport = {
@@ -46,7 +51,7 @@ export function getBaseSupport(
   
   baseSupport.appSupport = baseSupport
 
-  const global = subject.global as SupportTagGlobal
+  const global = subject.global
   global.blocked = []
   global.destroy$ = new Subject<void>()
 
@@ -70,9 +75,15 @@ export function getSupport(
   subject: ContextItem,
   castedProps?: Props,
 ): Support {
-  const support = getBaseSupport(templater, subject, castedProps)
+  const support = getBaseSupport(
+    templater,
+    subject as SupportContextItem,
+    castedProps
+  )
+
   support.ownerSupport = ownerSupport
   support.appSupport = appSupport
+  
   return support as Support
 }
 

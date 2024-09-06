@@ -1,30 +1,19 @@
-import { BaseSupport, Support } from '../tag/Support.class.js'
 import { firstLetState, reLetState } from './letState.function.js'
+import { BaseSupport, Support } from '../tag/Support.class.js'
+import { runFirstState, runRestate } from './stateHandlers.js'
+import { State, StateConfig } from './state.types.js'
 import { setUseMemory } from'./setUse.function.js'
-// import { runFirstState } from './state.function.js'
-import { runFirstState, runRestate, stateHandlers } from './stateHandlers.js'
-
-export type StateConfig<T> = (x: T) => [T, T]
-
-export type StateConfigItem<T> = {
-  get: () => T // TODO: only a convenience, not needed, remove
-  callback?: StateConfig<T>
-  defaultValue?: T
-  watch?: T // when this value changes, the state becomes this value
-}
 
 export type Config = {
+  version: number
   support?: BaseSupport | Support
   array: State // state memory on the first render
   rearray?: State // state memory to be used before the next render
+  handlers: {
+    handler: typeof runFirstState,
+    letHandler: typeof firstLetState,
+  }
 }
-
-export type State = StateConfigItem<any>[]
-
-setUseMemory.stateConfig = {
-  array: [] as State, // state memory on the first render
-  // rearray: [] as State,
-} as Config
 
 export type GetSet<T> = (y: T) => [T, T]
 
@@ -57,27 +46,25 @@ export function afterRender(
 }
 
 export function initState(
-  support: Support | BaseSupport
+  support: Support | BaseSupport,
+  config: Config,
 ) {
-  stateHandlers.handler = runFirstState
-  stateHandlers.letHandler = firstLetState as any
-
-  const config: Config = setUseMemory.stateConfig
+  config.handlers.handler = runFirstState
+  config.handlers.letHandler = firstLetState as any
+  
   config.rearray = []
   config.support = support
 }
 
 export function reState(
-  support: Support | BaseSupport
+  support: Support | BaseSupport,
+  config: Config,
 ) {
   const state = support.state
-  const config: Config = setUseMemory.stateConfig
   config.rearray = state
-  const rearray = config.rearray as State
 
-    stateHandlers.handler = runRestate as any
-    stateHandlers.letHandler = reLetState as any
-
+  config.handlers.handler = runRestate as any
+  config.handlers.letHandler = reLetState as any
   config.support = support
 }
 

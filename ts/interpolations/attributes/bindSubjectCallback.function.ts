@@ -1,3 +1,4 @@
+// taggedjs-no-compile
 /** File largely responsible for reacting to element events, such as onclick */
 
 import { isPromise, isTagComponent } from '../../isInstance.js'

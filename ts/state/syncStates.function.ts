@@ -1,4 +1,4 @@
-import { State, StateConfigItem } from './state.utils'
+import { State, StateConfigItem } from './state.types.js'
 
 export function syncStates(
   stateFrom: State,

@@ -58,6 +58,7 @@ export function tag<T extends ToTag>(
   // group tags together and have hmr pickup
   tag.tags = tags
   tag.setUse = setUseMemory
+  tag.ValueTypes = ValueTypes
   tag.tagIndex = tagCount++ // needed for things like HMR
   tags.push(parentWrap)
 

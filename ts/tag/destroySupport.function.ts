@@ -1,5 +1,5 @@
 import { runBeforeDestroy } from './tagRunner.js'
-import { getChildTagsToDestroy } from './destroy.support.js'
+import { getChildTagsToDestroy } from './getChildTagsToDestroy.function.js'
 import { AnySupport } from './Support.class.js'
 import { smartRemoveKids } from './smartRemoveKids.function.js'
 import { Context } from './Context.types.js'

@@ -10,8 +10,11 @@ export type TagChildrenInput = (StringTag | DomTag)[] | DomTag | StringTag | Tag
 
 export type TagComponent = ((...args:  any[]) => (StringTag | DomTag)) & {
   tags?: TagWrapper<any>[]
-  setUse?: typeof setUseMemory
   tagIndex?: number
+  
+  // HMR shares
+  setUse?: typeof setUseMemory
+  ValueTypes: typeof ValueTypes
 }
 
 export const tags: TagWrapper<any>[] = []

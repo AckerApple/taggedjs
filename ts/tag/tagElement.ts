@@ -1,20 +1,23 @@
-import { BaseSupport, getBaseSupport, Support } from './Support.class.js'
-import { runAfterRender } from'./tagRunner.js'
-import { Events, SupportTagGlobal, TemplaterResult, Wrapper } from './TemplaterResult.class.js'
-import { Original, TagComponent, TagMaker} from './tag.utils.js'
-import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 import { DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
-import { paint, painting } from './paint.function.js'
-import { ContextItem } from './Context.types.js'
-import { getNewGlobal } from './update/getNewGlobal.function.js'
+import { Events, SupportTagGlobal, TemplaterResult, Wrapper } from './TemplaterResult.class.js'
+import { BaseSupport, getBaseSupport, Support, SupportContextItem } from './Support.class.js'
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
 import { buildBeforeElement } from './buildBeforeElement.function.js'
+import { Original, TagComponent, TagMaker} from './tag.utils.js'
+import { getNewGlobal } from './update/getNewGlobal.function.js'
+import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 import { destroySupport } from './destroySupport.function.js'
-import { executeWrap } from './executeWrap.function.js'
-import { initState } from '../state/state.utils.js'
 import { checkTagValueChange, PropWatches } from './index.js'
+import { setUseMemory } from '../state/setUse.function.js'
+import { executeWrap } from './executeWrap.function.js'
+import { paint, painting } from './paint.function.js'
+import { initState } from '../state/state.utils.js'
 import { isTagComponent } from '../isInstance.js'
+import { ContextItem } from './Context.types.js'
+import { runAfterRender } from'./tagRunner.js'
 import { Props } from '../Props.js'
+
+export type TagAppElement = Element & { ValueTypes: typeof ValueTypes, setUse: any }
 
 const appElements: {
   support: BaseSupport // Support
@@ -35,6 +38,7 @@ export function tagElement(
 ): {
   support: BaseSupport
   tags: TagComponent[]
+  ValueTypes: typeof ValueTypes
 } {
   const appElmIndex = appElements.findIndex(appElm => appElm.element === element)
   if(appElmIndex >= 0) {
@@ -54,7 +58,7 @@ export function tagElement(
 
   const subject = getNewSubject(templater, element)
   const global = subject.global as SupportTagGlobal
-  initState(global.newest)
+  initState(global.newest, setUseMemory.stateConfig)
 
   let templater2 = app(props) as unknown as TemplaterResult
   
@@ -112,7 +116,8 @@ export function tagElement(
     tags = (app as any).original.tags
   }
 
-  ;(element as any).setUse = setUse
+  ;(element as TagAppElement).setUse = setUse
+  ;(element as TagAppElement).ValueTypes = ValueTypes
   appElements.push({element, support})
 
   const newFragment = document.createDocumentFragment()
@@ -135,6 +140,7 @@ export function tagElement(
   return {
     support,
     tags,
+    ValueTypes,
   }
 }
 
@@ -154,7 +160,7 @@ function getNewSubject(
   
   const newSupport = getBaseSupport(
     templater,
-    subject,
+    subject as SupportContextItem,
   )
 
   newSupport.appElement = appElement

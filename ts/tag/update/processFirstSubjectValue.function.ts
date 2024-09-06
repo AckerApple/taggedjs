@@ -1,26 +1,27 @@
-import { processTagArray } from './processTagArray.js'
-import { SupportTagGlobal, TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
-import { RegularValue } from './processRegularValue.function.js'
-import { newSupportByTemplater, processNewTag, processTag, tagFakeTemplater } from './processTag.function.js'
-import { AnySupport } from '../Support.class.js'
-import { StringTag, DomTag } from '../Tag.class.js'
-import { TemplateValue } from './processFirstSubject.utils.js'
-import { renderTagOnly } from '../render/renderTagOnly.function.js'
-import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
-import { oneRenderToSupport } from './oneRenderToSupport.function.js'
-import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function.js'
-import { processFirstSubjectComponent, processReplacementComponent } from './processFirstSubjectComponent.function.js'
-import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { getNewGlobal } from './getNewGlobal.function.js'
-import { ContextItem } from '../Context.types.js'
 import { checkArrayValueChange, checkSimpleValueChange, checkTagValueChange } from '../checkDestroyPrevious.function.js'
+import { processFirstSubjectComponent, processReplacementComponent } from './processFirstSubjectComponent.function.js'
+import { newSupportByTemplater, processNewTag, processTag, tagFakeTemplater } from './processTag.function.js'
+import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function.js'
+import { SupportTagGlobal, TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
+import { oneRenderToSupport } from './oneRenderToSupport.function.js'
+import { Counts } from '../../interpolations/interpolateTemplate.js'
+import { renderTagOnly } from '../render/renderTagOnly.function.js'
+import { RegularValue } from './processRegularValue.function.js'
 import { isArray, isSubjectInstance } from '../../isInstance.js'
+import { TemplateValue } from './processFirstSubject.utils.js'
+import { ValueType, ValueTypes } from '../ValueTypes.enum.js'
+import { getNewGlobal } from './getNewGlobal.function.js'
+import { processTagArray } from './processTagArray.js'
+import { StringTag, DomTag } from '../Tag.class.js'
+import { ContextItem } from '../Context.types.js'
+import { AnySupport } from '../Support.class.js'
 
 export function processFirstSubjectValue(
   value: TemplateValue | StringTag,
   subject: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owning support
   counts: Counts, // {added:0, removed:0}
+  valueId: string,
   appendTo?: Element,
 ): AnySupport | undefined {
   const tagJsType = (value as any)?.tagJsType as ValueType
@@ -154,6 +155,7 @@ export function processFirstSubjectValue(
     value as RegularValue,
     subject,
     subject.placeholder as Text,
+    valueId,
   )
 }
 
@@ -161,12 +163,16 @@ function processFirstRegularValue(
   value: RegularValue,
   subject: ContextItem, // could be tag via subject.tag
   insertBefore: Text, // <template end interpolate /> (will be removed)
+  valueId: string,
 ) {
   const castedValue = castTextValue(value)
   const clone = updateBeforeTemplate(
     castedValue,
     insertBefore, // this will be removed
   )
+
+  // TODO: for debugging purposes only
+  ;(clone as any).id = valueId
 
   subject.simpleValueElm = clone  
   subject.checkValueChange = checkSimpleValueChange

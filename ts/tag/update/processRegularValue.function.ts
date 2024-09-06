@@ -14,7 +14,8 @@ export function processUpdateRegularValue(
   setContent.push([castedValue, oldClone])
 }
 
-export function processNewRegularValue(
+/** Used during updates that were another value/tag first but now simple string */
+export function processNowRegularValue(
   value: RegularValue,
   subject: ContextItem, // could be tag via subject.tag
 ) {

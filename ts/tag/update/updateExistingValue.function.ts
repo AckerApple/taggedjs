@@ -1,17 +1,17 @@
-import { AnySupport, BaseSupport, getSupport, Support } from '../Support.class.js'
-import { SupportTagGlobal, TagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
-import { TemplateValue } from './processFirstSubject.utils.js'
-import { processTagArray } from './processTagArray.js'
-import { updateExistingTagComponent } from './updateExistingTagComponent.function.js'
-import { processNewRegularValue, processUpdateRegularValue, RegularValue } from './processRegularValue.function.js'
 import { getFakeTemplater, newSupportByTemplater, processTag } from './processTag.function.js'
-import { StringTag, DomTag, Tag } from '../Tag.class.js'
-import { BasicTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
+import { processNowRegularValue, RegularValue } from './processRegularValue.function.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
+import { updateExistingTagComponent } from './updateExistingTagComponent.function.js'
+import { AnySupport, BaseSupport, getSupport, Support } from '../Support.class.js'
+import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import { BasicTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { updateSupportBy } from '../updateSupportBy.function.js'
-import { getNewGlobal } from './getNewGlobal.function.js'
-import { ContextItem } from '../Context.types.js'
+import { TemplateValue } from './processFirstSubject.utils.js'
 import { isArray, isTagComponent } from '../../isInstance.js'
+import { getNewGlobal } from './getNewGlobal.function.js'
+import { StringTag, DomTag, Tag } from '../Tag.class.js'
+import { processTagArray } from './processTagArray.js'
+import { ContextItem } from '../Context.types.js'
 
 export function updateExistingValue(
   contextItem: ContextItem, // InterpolateSubject,
@@ -123,7 +123,7 @@ export function updateExistingValue(
   }
   
   if(wasDestroyed) {
-    processNewRegularValue(
+    processNowRegularValue(
       value as RegularValue,
       contextItem,
     )

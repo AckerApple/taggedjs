@@ -6,17 +6,19 @@ import { ContextItem } from '../Context.types.js'
 import { TagWrapper } from '../tag.utils.js'
 import { executeWrap } from '../executeWrap.function.js'
 import { initState, reState } from '../../state/state.utils.js'
+import { setUseMemory } from '../../state/setUse.function.js'
+import { State } from '../../state/state.types.js'
 
 export function renderTagOnly(
   newSupport: AnySupport,
-  prevSupport: AnySupport | undefined,
+  prevSupport: AnySupport | undefined, // causes restate
   subject: ContextItem,
   ownerSupport?: AnySupport,
 ): AnySupport {
   const global = subject.global as SupportTagGlobal
   const oldRenderCount = global.renderCount
 
-  beforeWithRender(newSupport, prevSupport)
+  beforeWithRender(newSupport, prevSupport?.state)
   
   const templater = newSupport.templater
   let reSupport: AnySupport
@@ -40,6 +42,8 @@ export function renderTagOnly(
   } else {
     // functions wrapped in tag()
     const wrapper = templater.wrapper as Wrapper
+
+    // calls the function returned from getTagWrap()
     reSupport = wrapper(
       newSupport,
       subject,
@@ -63,19 +67,17 @@ export function renderTagOnly(
 
 function beforeWithRender(
   support: BaseSupport | Support, // new
-  prevSupport?: Support | BaseSupport,
+  prevState?: State,
 ) {
 
-  if(prevSupport) {
-    if(prevSupport !== support) {
-      const lastState = prevSupport.state
-      support.state = lastState
-    }
+  if(prevState) {
+    const lastState = prevState
+    support.state = lastState
 
-    reState(support)
+    reState(support, setUseMemory.stateConfig)
     return
   }
 
   // first time render
-  initState(support)
+  initState(support, setUseMemory.stateConfig)
 }

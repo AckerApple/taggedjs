@@ -1,6 +1,5 @@
 import { isTagComponent } from '../../isInstance.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
-import { ValueTypes } from '../ValueTypes.enum.js'
 
 export function validateTemplater(
   templater: TemplaterResult
