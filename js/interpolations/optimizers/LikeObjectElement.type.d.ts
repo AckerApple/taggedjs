@@ -1,4 +1,4 @@
-import { ParsedHtml } from "./htmlInterpolationToDomMeta.function.js";
+import { ParsedHtml } from "./types.js";
 import { ObjectElement, ObjectText } from "./ObjectNode.types.js";
 export type ValuePos = (elements: any) => ([any, string | number] | any[]);
 export type ObjectChildren = (ObjectText | ObjectElement)[];

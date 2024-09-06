@@ -1,9 +1,9 @@
 // taggedjs-no-compile
 import { htmlInterpolationToDomMeta } from '../interpolations/optimizers/htmlInterpolationToDomMeta.function.js';
-import { getStringsId } from './getStringsId.function.js';
-import { isLastRunMatched } from './isLastRunMatched.function.js';
 import { replacePlaceholders } from '../interpolations/optimizers/replacePlaceholders.function.js';
 import { restorePlaceholders } from '../interpolations/optimizers/restorePlaceholders.function.js';
+import { isLastRunMatched } from './isLastRunMatched.function.js';
+import { getStringsId } from './getStringsId.function.js';
 const lastRuns = {};
 /** Converts strings & values into dom meta */
 export function getDomMeta(strings, values) {

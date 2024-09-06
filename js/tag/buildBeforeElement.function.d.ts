@@ -1,6 +1,6 @@
 import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js';
-import { ContextItem, Context } from './Context.types.js';
 import { AnySupport } from './Support.class.js';
+import { ContextItem, Context } from './Context.types.js';
 /** Function that kicks off actually putting tags down as HTML elements */
 export declare function buildBeforeElement(support: AnySupport, element?: Element, insertBefore?: Text, options?: ElementBuildOptions): {
     context: Context;
