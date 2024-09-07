@@ -14,7 +14,7 @@ export type Todo = {
     completed: boolean
 }
 
-export function todoReducer(todos: any) {
+export function todoReducer(todos: Todo[]) {
     function addItem(title: string) {
         todos.push({ id: uuid(), title, completed: false });
         return todos;

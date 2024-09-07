@@ -30,7 +30,9 @@ export const app = () => {
             </label>
           </div>
           <ul class="todo-list show-priority">
-          ${visibleTodos.map((todo, index) => Item(todo, dispatch, index).key(todo.id))}
+            ${visibleTodos.map((todo, index) =>
+              Item(todo, dispatch, index).key(todo.id)
+            )}
           </ul>
         </main>
         ${Footer(todoCount, dispatch.removeCompleted, route, activeTodoCount)}

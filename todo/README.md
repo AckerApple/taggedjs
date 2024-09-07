@@ -1,3 +1,5 @@
+[live demo on github](https://ackerapple.github.io/taggedjs/todo/www/)
+
 ### Clone this project and develop
 
 - This will checkout more code then you need, you will only be interested in the 📂 "todo" folder
