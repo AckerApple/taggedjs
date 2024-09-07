@@ -29,6 +29,7 @@ export type Tag = {
     ownerSupport?: AnySupport;
     arrayValue?: any;
 };
+export type KeyFunction = (arrayValue: unknown) => StringTag;
 export type StringTag = Tag & {
     children?: {
         strings: string[] | TemplateStringsArray;
@@ -36,7 +37,7 @@ export type StringTag = Tag & {
     };
     strings: string[];
     values: unknown[];
-    key: (arrayValue: unknown) => StringTag;
+    key: KeyFunction;
     html: (strings: string[] | TemplateStringsArray, values: TagValues) => StringTag;
 };
 export declare function getStringTag(strings: string[], values: unknown[]): StringTag;
