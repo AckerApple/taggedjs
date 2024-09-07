@@ -8,8 +8,9 @@
  * @typedef {import("taggedjs").renderTagSupport} renderTagSupport
  */
 
+import { HmrImport } from "./hmr"
 import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function"
-import { buildBeforeElement, ContextItem, destroySupport, Support, SupportTagGlobal, TaggedFunction, TagGlobal, Wrapper } from "taggedjs"
+import { processSubUpdate, processFirstSubjectValue, buildBeforeElement, ContextItem, destroySupport, paint, Support, SupportTagGlobal, TaggedFunction, isSubjectInstance, Wrapper, Context, AnySupport, SupportContextItem, ValueTypes, Original } from "taggedjs"
 
 /** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 
@@ -24,7 +25,7 @@ export async function updateSubject(
   contextSubject: ContextItem,
   newTag: TaggedFunction<any>,
   oldTag: TaggedFunction<any>,
-  hmr: any
+  hmr: HmrImport,
 ) {
   const global = contextSubject.global as SupportTagGlobal
   
@@ -34,31 +35,46 @@ export async function updateSubject(
   const toString = newTag.original.toString()
   // contextSupport.templater.wrapper.original.compareTo = toString
   if(oldTag.original) {
-    oldTag.compareTo = toString
+    (oldTag as any).compareTo = toString
   }
   
   // everytime an old owner tag redraws, it will use the new function
   oldTag.original = newTag.original
   const contextWrapper = newest.templater.wrapper as Wrapper
-  contextWrapper.parentWrap.original = newTag.original
+  contextWrapper.parentWrap.original = newTag.original as Original
   
   const newWrapper = newest.templater.wrapper as Wrapper
-  newWrapper.parentWrap.original = newTag.original
+  newWrapper.parentWrap.original = newTag.original as Original
   
   const oldWrapper = oldest.templater.wrapper as Wrapper
-  oldWrapper.parentWrap.original = newTag.original
+  oldWrapper.parentWrap.original = newTag.original as Original
 
   const pros = global.providers
   const prevConstructors = pros ? pros.map(provider => provider.constructMethod) : []
 
-  /** @type {Support} */
-  const reSupport: Support = hmr.renderTagOnly(
+  const placeholder = contextSubject.placeholder
+  console.log('before destroy', {placeholder, parent: placeholder?.parentNode, onDoc: document.contains(placeholder as Node)})
+
+  await destroySupport(oldest, 0)
+  const reGlobal = contextSubject.global as SupportTagGlobal
+  delete reGlobal.deleted
+
+// console.log('before render', {reGlobal, placeholder, parent: placeholder?.parentNode, onDoc: document.contains(placeholder as Node)})
+  
+  const reSupport = hmr.renderTagOnly(
     newest,
     newest,
-    newest.subject,
+    contextSubject,
     newest.ownerSupport,
   )
-
+/*
+  console.log('after render', {
+    reSupport,
+    placeholder: reSupport.subject.placeholder,
+    parent: reSupport.subject.placeholder?.parentNode,
+    onDoc: document.contains(placeholder as Node)
+  })
+*/
   const appSupport = oldest.appSupport
   const ownGlobal = oldest.ownerSupport.subject.global as SupportTagGlobal
   const providers = global.providers
@@ -75,14 +91,71 @@ export async function updateSubject(
     })
   }
 
-  await destroySupport(oldest, 0)
+  buildBeforeElement(reSupport, undefined, placeholder, {counts: {added:0, removed: 0}})
 
-  const reGlobal = reSupport.subject.global as SupportTagGlobal
-  const oldGlobal = oldest.subject.global as TagGlobal
-  delete oldGlobal.deleted
+  recurseContext(global.context, reSupport)
 
-  buildBeforeElement(reSupport, undefined, oldest.subject.placeholder, {counts: {added:0, removed: 0}})
+  paint()
 
   reGlobal.newest = reSupport
   reGlobal.oldest = reSupport
+}
+
+function recurseContext(
+  context: SupportContextItem[],
+  reSupport: AnySupport,
+) {
+  switch (reSupport.templater.tagJsType[0]) {
+    case ValueTypes.dom[0]:
+      reSupport.templater.tagJsType = ValueTypes.dom
+      break
+
+      case ValueTypes.templater[0]:
+      reSupport.templater.tagJsType = ValueTypes.templater
+      break
+
+      case ValueTypes.tagComponent[0]:
+      reSupport.templater.tagJsType = ValueTypes.tagComponent
+      break
+  }
+
+  context.forEach(contextItem => {
+    if(isSubjectInstance(contextItem.value)) {
+      console.log('found right here ---2----', contextItem.value, contextItem)
+      processSubUpdate(contextItem.value, contextItem, reSupport)
+      /*
+      processFirstSubjectValue(
+        contextItem.value,
+        contextItem,
+        reSupport,
+        {added:0, removed:0},
+        `rvp_-1_${reSupport.templater.tag?.values.length}`,
+        undefined // syncRun ? appendTo : undefined,
+      )
+      */
+    }
+    /*
+    if(contextItem.subject) {
+      processFirstSubjectValue(
+        contextItem.value,
+        contextItem,
+        reSupport,
+        {added:0, removed:0},
+        `rvp_-1_${reSupport.templater.tag?.values.length}`,
+        undefined // syncRun ? appendTo : undefined,
+      )  
+    }
+    */
+
+    const nextGlobal = contextItem.global
+
+    if(contextItem.global) {
+      const nextContext = nextGlobal?.context
+      if(nextContext) {
+        const nextSupport = nextGlobal.newest as AnySupport
+        recurseContext(nextContext, nextSupport)
+      }
+    }
+
+  })
 }

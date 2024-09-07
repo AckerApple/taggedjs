@@ -1,4 +1,4 @@
-import { RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, StringTag, ContextItem, getNewGlobal, getBaseSupport, Context, SupportTagGlobal, checkSimpleValueChange } from 'taggedjs'
+import { RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, StringTag, ContextItem, getNewGlobal, getBaseSupport, Context, SupportTagGlobal, checkSimpleValueChange, SupportContextItem } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -39,10 +39,9 @@ console.debug(`💾 wrote ${fileSavePath}`)
 function templaterToSupport(
   templater: TemplaterResult,
 ) {
-  const subject: ContextItem = {
+  const subject: SupportContextItem = {
     value: templater,
-    // tagJsType: getValueType(templater),
-    global: getNewGlobal(),
+    global: getNewGlobal() as SupportTagGlobal,
     checkValueChange: checkSimpleValueChange,
     withinOwnerElement: false,
   }

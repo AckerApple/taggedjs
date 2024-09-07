@@ -7,4 +7,5 @@ export { IsolatedApp }
 import { todoApp } from "./todo/todos.app"
 export { todoApp }
 
-export { app } from './app.function'
+import { run } from './run.function'
+export { run }

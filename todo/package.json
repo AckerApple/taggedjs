@@ -1,0 +1,21 @@
+{
+  "type": "module",
+  "name": "todo",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "ts-node scripts/runBundle.script.ts",
+    "start": "npm run watch & live-server ./www",
+    "watch": "chokidar 'src/**/*' -c 'npm run build'"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "chokidar-cli": "^3.0.0",
+    "live-server": "^1.2.2",
+    "taggedjs": "^2.6.5",
+    "taggedjs-cli": "^0.0.21",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4",
+    "webpack": "^5.94.0"
+  }
+}

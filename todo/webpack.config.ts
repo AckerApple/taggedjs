@@ -3,12 +3,12 @@ import TerserPlugin from 'terser-webpack-plugin'
 // import CompressionPlugin from 'compression-webpack-plugin'
 
 import { fileURLToPath } from 'url'
-import ResolveTsForJsPlugin from './ResolveTsForJsPlugin.class.js'
+// import ResolveTsForJsPlugin from './ResolveTsForJsPlugin.class.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const out = path.resolve(__dirname, 'assets', 'dist')
+const out = path.resolve(__dirname, 'www', 'assets')
 
 export default {
   mode: 'production', // development
@@ -39,7 +39,6 @@ export default {
       },
       {
         test: /\.(js|ts)$/,  // Adjust the regex to match the files you're interested in
-        // use: [path.resolve(__dirname, 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.ts')] // Use the path to your loader
         use: [path.resolve(__dirname, 'node_modules', 'taggedjs-cli', 'bin', 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.js')] // Use the path to your loader
       },
     ],
@@ -52,7 +51,7 @@ export default {
     },*/
   },
   plugins: [
-    new ResolveTsForJsPlugin(),
+    // new ResolveTsForJsPlugin(),
     /*
     new CompressionPlugin({
         algorithm: 'gzip',

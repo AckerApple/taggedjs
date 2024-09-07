@@ -1,22 +1,9 @@
-import { attributeDebug } from "./attributeDebug.component"
-import { contentDebug } from "./ContentDebug.component"
-import { tableDebug } from "./tableDebug.component"
 import { html, tag, letState, onInit, state, Subject, callbackMaker, onDestroy } from "taggedjs"
-import { tagDebug } from "./tagJsDebug"
-import { tagSwitchDebug } from "./tagSwitchDebug.component"
-import { mirroring } from "./mirroring.tag"
-import { childTests } from "./childTests"
-import { runTests } from "./tests"
+import { renderedSections } from "./renderedSections.tag"
 import { renderCountDiv } from "./renderCount.component"
-import { counters } from "./countersDebug"
-import { providerDebugBase } from "./providerDebug"
-import { watchTesting } from "./watchTesting.tag"
-import { oneRender } from "./oneRender.tag"
-import funInPropsTag from "./funInProps.tag"
-import { todoApp } from "./todo/todos.app"
-import { propsDebugMain } from "./PropsDebug.tag"
-import { arrayTests } from "./arrayTests"
 import { sections } from "./sections.tag"
+import { tagDebug } from "./tagJsDebug"
+import { runTests } from "./tests"
 
 export const App = tag(() => (
   _firstState = letState('app first state')(x => [_firstState, _firstState=x]),
@@ -33,11 +20,17 @@ export const App = tag(() => (
     testTimeout = null
   })
 
-  function runTesting(manual = true) {
+  function runTesting(
+    manual = true,
+    onComplete: (success: boolean) => any = () => undefined,
+  ) {
+    testEmoji = '🟦'
     const waitFor = 2000
     testTimeout = setTimeout(async () => {
       console.debug('🏃 Running tests...')
       const result = await runTests()
+
+      onComplete(result)
 
       if(!manual) {
         return
@@ -49,7 +42,6 @@ export const App = tag(() => (
       }
 
       alert('❌ tests failed. See console for more details')
-
     }, waitFor) as any // cause delay to be separate from renders
   }
 
@@ -57,10 +49,13 @@ export const App = tag(() => (
 
   const callbacks = callbackMaker()
 
+  let testEmoji = letState('🟦')(x => [testEmoji, testEmoji = x])
+  const onTestComplete = callbacks(success => testEmoji = success ? '✅' : '❌')
+
   onInit(() => {
     console.info('1️⃣ app init should only run once')
     
-    runTesting(false)
+    runTesting(false, onTestComplete)
 
     appCounterSubject.subscribe(
       callbacks(y => {
@@ -72,7 +67,7 @@ export const App = tag(() => (
   const content = html`<!--app.js-->
     <h1 id="h1-app">🏷️ TaggedJs - ${2+2}</h1>
 
-    <button onclick=${runTesting}>run test</button>
+    <button onclick=${() => runTesting(true, onTestComplete)}>run tests ${testEmoji}</button>
 
     <fieldset>
         <legend>direct app tests</legend>        
@@ -94,78 +89,11 @@ export const App = tag(() => (
 
     ${renderCountDiv({name:'app', renderCount})}
 
-    ----
     ${sections()}
-    ----
 
     <div id="tagDebug-fx-wrap">
       <div style="display:flex;flex-wrap:wrap;gap:1em">
-        <fieldset id="counters" style="flex:2 2 20em">
-          <legend>counters</legend>
-          ${counters({appCounterSubject})}
-        </fieldset>
-
-        <fieldset id="counters" style="flex:2 2 20em">
-          <legend>⌚️ watch testing</legend>
-          ${watchTesting()}
-        </fieldset>
-
-        <fieldset id="provider-debug" style="flex:2 2 20em">
-          <legend>Provider Debug</legend>
-          ${providerDebugBase(undefined)}
-        </fieldset>
-
-        <fieldset id="props-debug" style="flex:2 2 20em">
-          <legend>Props Debug</legend>
-          ${propsDebugMain()}
-        </fieldset>
-
-        ${childTests(undefined)}
-
-        <fieldset style="flex:2 2 20em">
-          <legend>Attribute Tests</legend>
-          ${attributeDebug()}
-        </fieldset>
-
-        <fieldset id="content-debug" style="flex:2 2 20em">
-          <legend>Content Debug</legend>
-          ${contentDebug()}
-        </fieldset>
-
-        <fieldset style="flex:2 2 20em">
-          <legend>Tag Switching</legend>
-          ${tagSwitchDebug(undefined)}
-        </fieldset>
-
-        <fieldset style="flex:2 2 20em">
-          <legend>arrays</legend>
-          ${arrayTests()}
-        </fieldset>
-
-        <fieldset style="flex:2 2 20em">
-          <legend>Tag Mirroring</legend>
-          ${mirroring()}
-        </fieldset>
-
-        <fieldset style="flex:2 2 20em">
-          <legend>Table Tests</legend>
-          ${tableDebug()}
-        </fieldset>
-
-        <fieldset style="flex:2 2 20em">
-          <legend>oneRender</legend>
-          ${oneRender()}
-        </fieldset>
-
-        <fieldset style="flex:2 2 20em">
-          <legend>functions in props</legend>
-          ${funInPropsTag()}
-        </fieldset>
-
-        <fieldset style="flex:2 2 20em">
-          <legend>todo</legend>
-          ${todoApp()}
-        </fieldset>
+        ${renderedSections(appCounterSubject)}
       </div>
 
       ${tagDebug()}

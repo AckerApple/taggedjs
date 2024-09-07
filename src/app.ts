@@ -1,4 +1,4 @@
-import { app } from "./app.function.js"
+import { run as app } from "./run.function.js"
 
 app()
 

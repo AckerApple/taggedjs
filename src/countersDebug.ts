@@ -6,9 +6,9 @@ const loadStartTime = Date.now()
 
 export const counters = tag.immutableProps(({
   appCounterSubject
-}: {
-  appCounterSubject: Subject<number>
-}) => (
+}: { appCounterSubject: Subject<number> },
+_ = 'countersDebug'
+) => (
   readStartTime = state(() => Date.now()),
 ) => {
   state('countersDebug state')
@@ -65,7 +65,7 @@ export const counters = tag.immutableProps(({
   return html`<!--counters-->
     <div style="display:flex;flex-wrap:wrap;gap:1em">
       ${testBasics && html`
-        <div>👉 Subscriptions:<span id="👉-counter-sub-count">${(Subject as any).globalSubCount$}</span></div>
+        <div>👉 Subscriptionszzzzp:<span id="👉-counter-sub-count">${(Subject as any).globalSubCount$}</span></div>
         <button onclick=${() => console.info('subs', (Subject as any).globalSubs)}>log subs</button>
         <div>initCounter:${initCounter}</div>
     
