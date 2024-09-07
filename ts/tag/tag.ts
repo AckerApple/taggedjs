@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 
-import { DomTag, StringTag } from './Tag.class.js'
+import { DomTag, KeyFunction, StringTag } from './Tag.class.js'
 import { setUseMemory } from '../state/index.js'
 import { getTemplaterResult, TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { Original, TagComponent, TagWrapper, tags } from './tag.utils.js'
@@ -11,7 +11,11 @@ import { key } from './key.js'
 
 let tagCount = 0
 
-export type TaggedFunction<T> = T & { original: Function }
+export type TaggedFunction<T extends ToTag> = ((...x:Parameters<T>) => ReturnType<T> & {
+  key: KeyFunction
+  original?: Original
+  compareTo?: string
+}) & { original: Function }
 
 export enum PropWatches {
   DEEP = 'deep',

@@ -8,9 +8,9 @@
   "scripts": {
     "build:js": "rm -rf js && mkdir js && tsc -p tsconfig.build.json",
     "build": "npm-run-all --sequential build:js build:webpack build:dist:only && echo \"✅ Build completed\"",
-    "build:others": "npm-run-all --sequentialbuild:gh-pages build:pinbowl",
+    "build:others": "npm-run-all --sequential build:gh-pages build:pinbowl",
     "build:webpack": "npx webpack",
-    "build:gh-pages": "npm run build:copy:gh-pages && cd ../gh-pages && npm run build && npm run build:other && echo \"🔬 Built gh-pages\"",
+    "build:gh-pages": "npm run build:copy:gh-pages && cd ../gh-pages && npm run build && echo \"🔬 Built gh-pages\"",
     "build:copy:gh-pages": "cp -R dist/. ../gh-pages/node_modules/taggedjs",
     "build:watch:gh-pages": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:dist:only && npm run build:gh-pages'",
     "build:dist": "run-s build:js build:webpack build:dist:only",
@@ -23,9 +23,9 @@
     "patch:version": "npm --no-git-tag-version version patch",
     "publish": "npm run build:dist && npm run save:dist && npm run save && cd ../dist && npm publish",
     "build:watch": "chokidar 'ts/**/*' -c 'npm run build'",
-    "build:pinbowl": "cp -R dist/. ../../../services/pinbowl/src/taggedjs && cd ../../../services/pinbowl/ && npm run build && npm run build:others && echo \"🎳 Built pinbowl\"",
+    "build:pinbowl": "cp -R dist/. ../../../services/pinbowl/src/taggedjs && cd ../../../services/pinbowl/ && npm run build && echo \"🎳 Built pinbowl\"",
     "build:watch:pinbowl": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:webpack && npm run build:dist:only && npm run build:pinbowl'",
-    "build:dump:gh-pages": "cp -R js/. ../../taggedjs-dump/gh-pages/node_modules/taggedjs/js && cd ../../taggedjs-dump/gh-pages/ && npm run build && npm run build:others && echo \"🔭 Built dump#gh-pages\"",
+    "build:dump:gh-pages": "cp -R js/. ../../taggedjs-dump/gh-pages/node_modules/taggedjs/js && cd ../../taggedjs-dump/gh-pages/ && npm run build && echo \"🔭 Built dump#gh-pages\"",
     "build:watch:dump:gh-pages": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:dist:only && npm run build:dump:gh-pages'"
   },
   "keywords": [
