@@ -1,15 +1,14 @@
+import { getSupport } from '../Support.class.js';
 import { getFakeTemplater, newSupportByTemplater, processTag } from './processTag.function.js';
 import { processNowRegularValue } from './processRegularValue.function.js';
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js';
 import { updateExistingTagComponent } from './updateExistingTagComponent.function.js';
-import { getSupport } from '../Support.class.js';
 import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js';
 import { updateSupportBy } from '../updateSupportBy.function.js';
 import { isArray, isTagComponent } from '../../isInstance.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { processTagArray } from './processTagArray.js';
-export function updateExistingValue(contextItem, // InterpolateSubject,
-value, ownerSupport) {
+export function updateExistingValue(contextItem, value, ownerSupport) {
     // Do not continue if the value is just the same
     if (value === contextItem.value) {
         return;
@@ -26,23 +25,19 @@ value, ownerSupport) {
         }
         const isComp = isTagComponent(value);
         if (isComp) {
-            contextItem.global = contextItem.global || getNewGlobal();
+            if (!contextItem.global) {
+                getNewGlobal(contextItem);
+            }
             prepareUpdateToComponent(value, contextItem, ownerSupport);
             return;
         }
     }
     const global = contextItem.global;
     if (global) {
-        // was component but no longer
+        // its html/dom based tag
         const support = global.newest;
         if (support) {
-            if (typeof (value) === BasicTypes.function) {
-                return;
-            }
-            handleStillTag(support, contextItem, value, ownerSupport);
-            if (!global.locked) {
-                ++global.renderCount;
-            }
+            updateContextItemBySupport(support, contextItem, value, ownerSupport);
             return;
         }
     }
@@ -52,7 +47,7 @@ value, ownerSupport) {
                 processTag(ownerSupport, contextItem);
                 return;
             case ValueTypes.tag:
-            case ValueTypes.dom:
+            case ValueTypes.dom: {
                 const tag = value;
                 let templater = tag.templater;
                 if (!templater) {
@@ -60,10 +55,11 @@ value, ownerSupport) {
                     tag.templater = templater;
                     templater.tag = tag;
                 }
-                const nowGlobal = contextItem.global = (contextItem.global || getNewGlobal());
+                const nowGlobal = (contextItem.global ? contextItem.global : getNewGlobal(contextItem));
                 nowGlobal.newest = newSupportByTemplater(templater, ownerSupport, contextItem);
                 processTag(ownerSupport, contextItem);
                 return;
+            }
         }
     }
     if (isArray(value)) {
@@ -96,5 +92,13 @@ function prepareUpdateToComponent(templater, contextItem, ownerSupport) {
     const support = getSupport(templater, ownerSupport, ownerSupport.appSupport, contextItem);
     updateExistingTagComponent(ownerSupport, support, // latest value
     contextItem);
+}
+/** Used to destro */
+function updateContextItemBySupport(support, contextItem, value, ownerSupport) {
+    if (typeof (value) === BasicTypes.function) {
+        return;
+    }
+    handleStillTag(support, contextItem, value, ownerSupport);
+    return;
 }
 //# sourceMappingURL=updateExistingValue.function.js.map

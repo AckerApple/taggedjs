@@ -6,11 +6,11 @@ import { BasicTypes, ValueTypes } from './ValueTypes.enum.js';
 import { destroySupport } from './destroySupport.function.js';
 import { checkTagValueChange, PropWatches } from './index.js';
 import { setUseMemory } from '../state/setUse.function.js';
+import { runAfterRender } from './afterRender.function.js';
 import { executeWrap } from './executeWrap.function.js';
 import { paint, painting } from './paint.function.js';
 import { initState } from '../state/state.utils.js';
 import { isTagComponent } from '../isInstance.js';
-import { runAfterRender } from './tagRunner.js';
 const appElements = [];
 /**
  *
@@ -33,6 +33,7 @@ export function tagElement(app, element, props) {
     templater.tagJsType = ValueTypes.stateRender;
     // todo: props should be an array
     templater.props = [props];
+    // create observable the app lives on
     const subject = getNewSubject(templater, element);
     const global = subject.global;
     initState(global.newest, setUseMemory.stateConfig);
@@ -65,7 +66,7 @@ export function tagElement(app, element, props) {
         destroySupport(support, 0); // never return anything here
         paint();
     };
-    let tags = [];
+    let tags = []; // TagWrapper<unknown>[]
     ++painting.locks;
     const result = buildBeforeElement(support, element);
     global.oldest = support;
@@ -73,10 +74,12 @@ export function tagElement(app, element, props) {
     let setUse = templater.setUse;
     if (templater.tagJsType !== ValueTypes.stateRender) {
         const wrap = app;
-        const parentWrap = wrap.parentWrap;
-        const original = wrap.original || parentWrap.original;
+        const original = wrap.original;
+        // const parentWrap = wrap.parentWrap
+        // const original = (wrap as unknown).original || parentWrap.original as Original
+        //  const original = parentWrap.original as Original
         setUse = original.setUse;
-        tags = app.original.tags;
+        tags = original.tags;
     }
     ;
     element.setUse = setUse;
@@ -93,7 +96,7 @@ export function tagElement(app, element, props) {
     --painting.locks;
     paint();
     element.appendChild(newFragment);
-    ++global.renderCount;
+    // ++subject.renderCount
     return {
         support,
         tags,
@@ -101,14 +104,15 @@ export function tagElement(app, element, props) {
     };
 }
 function getNewSubject(templater, appElement) {
-    const global = getNewGlobal();
-    global.events = {};
     const subject = {
         value: templater,
-        global,
         checkValueChange: checkTagValueChange,
         withinOwnerElement: false, // i am the highest owner
+        renderCount: 0,
+        global: undefined, // gets set below in getNewGlobal()
     };
+    const global = getNewGlobal(subject);
+    global.events = {};
     const newSupport = getBaseSupport(templater, subject);
     newSupport.appElement = appElement;
     global.oldest = global.oldest || newSupport;
@@ -120,7 +124,7 @@ export function runWrapper(templater, placeholder, appElement, subject) {
     const global = subject.global;
     const newSupport = global.newest;
     if (templater.tagJsType === ValueTypes.stateRender) {
-        const result = templater.wrapper || { original: templater };
+        const result = (templater.wrapper || { original: templater });
         const nowSupport = executeWrap(templater, result, newSupport);
         runAfterRender(newSupport, nowSupport);
         return nowSupport;

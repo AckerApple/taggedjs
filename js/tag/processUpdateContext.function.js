@@ -1,6 +1,6 @@
+import { processUpdateAttrContext } from './processUpdateAttrContext.function.js';
 import { updateExistingValue } from './update/updateExistingValue.function.js';
 import { isSubjectInstance } from '../isInstance.js';
-import { processUpdateAttrContext } from './processUpdateAttrContext.function.js';
 export function processUpdateContext(support, context) {
     const thisTag = support.templater.tag;
     const values = thisTag.values;

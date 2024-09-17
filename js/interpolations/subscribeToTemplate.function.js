@@ -1,7 +1,7 @@
 import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue.function.js';
+import { processSubUpdate } from './processSubscriptionUpdate.function.js';
 import { setUseMemory } from '../state/setUse.function.js';
 import { paint } from '../tag/paint.function.js';
-import { processSubUpdate } from './processSubscriptionUpdate.function.js';
 export function subscribeToTemplate({ subject, support, counts, contextItem, appendTo, }) {
     let onValue = function onSubValue(value) {
         processFirstSubjectValue(value, contextItem, support, { ...counts }, `rvp_-1_${support.templater.tag?.values.length}`, syncRun ? appendTo : undefined);

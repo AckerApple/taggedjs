@@ -54,14 +54,14 @@ tag.state = function () {
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
  */
-tag.route = function (routeProps) {
+tag.route = function (_routeProps) {
     throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `');
 };
 tag.key = key;
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
  */
-tag.app = function (routeTag) {
+tag.app = function (_routeTag) {
     throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `');
 };
 tag.deepPropWatch = tag;

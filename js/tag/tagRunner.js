@@ -1,18 +1,12 @@
+import { getSupportInCycle } from './getSupportInCycle.function.js';
 import { setUseMemory } from '../state/index.js';
 import { Subject } from '../subject/index.js';
-import { getSupportInCycle } from './getSupportInCycle.function.js';
-import { afterRender } from '../state/state.utils.js';
 // Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
 setUseMemory.tagClosed$ = new Subject(undefined, function tagCloser(subscription) {
     if (!getSupportInCycle()) {
         subscription.next(); // we are not currently processing so process now
     }
 });
-// Life cycle 2
-export function runAfterRender(support, ownerSupport) {
-    afterRender(support);
-    setUseMemory.tagClosed$.next(ownerSupport);
-}
 // Life cycle 4 - end of life
 export function runBeforeDestroy(support) {
     // TODO: We don't need to remove from parents if parent is being destroyed
@@ -29,5 +23,6 @@ export function runBeforeDestroy(support) {
             }
         }
     }
+    support.subject.renderCount = 0; // if it comes back, wont be considered an update
 }
 //# sourceMappingURL=tagRunner.js.map

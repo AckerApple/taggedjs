@@ -1,13 +1,13 @@
 import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from '../hasSupportChanged.function.js';
-import { renderSupport } from '../render/renderSupport.function.js';
-import { castProps, isSkipPropValue } from '../../alterProp.function.js';
-import { isLikeTags } from '../isLikeTags.function.js';
-import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js';
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js';
-import { getNewGlobal } from './getNewGlobal.function.js';
+import { castProps, isSkipPropValue } from '../../alterProp.function.js';
+import { renderSupport } from '../render/renderSupport.function.js';
+import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js';
 import { destroySupport } from '../destroySupport.function.js';
-import { PropWatches } from '../tag.js';
+import { getNewGlobal } from './getNewGlobal.function.js';
+import { isLikeTags } from '../isLikeTags.function.js';
 import { isArray } from '../../isInstance.js';
+import { PropWatches } from '../tag.js';
 export function updateExistingTagComponent(ownerSupport, support, // lastest
 subject) {
     const global = subject.global;
@@ -88,15 +88,14 @@ function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, maxDep
         return prop; // no children to crawl through
     }
     if (isArray(prop)) {
-        for (let index = prop.length - 1; index >= 0; --index) {
-            const x = prop[index];
-            prop[index] = syncPriorPropFunction(priorProp[index], x, newSupport, ownerSupport, depth + 1, index);
-        }
-        return prop;
+        return updateExistingArray(prop, priorProp, newSupport, ownerSupport, depth);
     }
     if (priorProp === undefined) {
         return prop;
     }
+    return updateExistingObject(prop, priorProp, newSupport, ownerSupport, depth, maxDepth);
+}
+function updateExistingObject(prop, priorProp, newSupport, ownerSupport, depth, maxDepth) {
     const keys = Object.keys(prop);
     for (const name of keys) {
         const subValue = prop[name];
@@ -108,7 +107,15 @@ function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, maxDep
         if (hasSetter) {
             continue;
         }
+        ;
         prop[name] = result;
+    }
+    return prop;
+}
+function updateExistingArray(prop, priorProp, newSupport, ownerSupport, depth) {
+    for (let index = prop.length - 1; index >= 0; --index) {
+        const x = prop[index];
+        prop[index] = syncPriorPropFunction(priorProp[index], x, newSupport, ownerSupport, depth + 1, index);
     }
     return prop;
 }
@@ -144,11 +151,13 @@ function syncSupports(templater, support, lastSupport, ownerSupport, maxDepth) {
     lastPropsConfig.latest = propsConfig.latest;
     return lastSupport; // its the same tag component  
 }
-function swapTags(subject, templater, ownerSupport) {
+/** Was tag, will be tag */
+function swapTags(subject, templater, // new tag
+ownerSupport) {
     const global = subject.global;
     const oldestSupport = global.oldest;
     destroySupport(oldestSupport, 0);
-    subject.global = getNewGlobal();
+    getNewGlobal(subject);
     const newSupport = processReplacementComponent(templater, subject, ownerSupport, { added: 0, removed: 0 });
     return newSupport;
 }

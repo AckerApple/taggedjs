@@ -6,7 +6,7 @@ export declare function isSimpleType(value: any): boolean;
 export declare function isStaticTag(value?: TemplaterResult | StringTag | unknown): boolean;
 /** passed in is expected to be a TemplaterResult */
 export declare function isTagComponent(value?: TemplaterResult | Exclude<unknown, Support>): boolean;
-export declare function isSubjectInstance(subject?: SubjectLike<any> | any): Boolean;
+export declare function isSubjectInstance(subject?: SubjectLike<any> | any): boolean;
 export declare function isPromise(value: any): any;
 export declare function isFunction(value: any): boolean;
 export declare function isObject(value: any): boolean;

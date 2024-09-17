@@ -13,28 +13,28 @@ import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types
 import { PropWatches } from './tag.js';
 export type Wrapper = ((newSupport: BaseSupport | Support, subject: ContextItem, prevSupport?: BaseSupport | Support) => Support) & {
     tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater;
-    parentWrap: TagWrapper<any>;
+    parentWrap: TagWrapper<unknown>;
 };
 export type TagGlobal = {
     htmlDomMeta?: DomObjectChildren;
-    /** Indicator of re-rending. Saves from double rending something already rendered */
-    renderCount: number;
     deleted?: true;
     isApp?: boolean;
-    subscriptions?: Subscription<any>[];
+    subscriptions?: Subscription<unknown>[];
     destroyCallback?: OnDestroyCallback;
     locked?: true;
     callbackMaker?: true;
-    events?: Events;
 };
 export type SupportTagGlobal = TagGlobal & {
-    destroy$: Subject<any>;
+    destroy$: Subject<void>;
     blocked: (BaseSupport | Support)[];
     oldest: BaseSupport | Support;
     newest: BaseSupport | Support;
     context: SupportContextItem[];
     init?: OnInitCallback;
     providers?: Provider[];
+};
+export type BaseTagGlobal = SupportTagGlobal & {
+    events?: Events;
 };
 export type Events = {
     [name: string]: EventCallback;

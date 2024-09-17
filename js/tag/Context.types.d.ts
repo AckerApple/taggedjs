@@ -1,7 +1,8 @@
-import { Clone, TagGlobal } from './TemplaterResult.class.js';
-import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js';
 import { SpecialDefinition } from '../interpolations/attributes/processAttribute.function.js';
+import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js';
 import { InterpolateSubject } from './update/processFirstSubject.utils.js';
+import { Clone, TagGlobal } from './TemplaterResult.class.js';
+import { SupportContextItem } from './Support.class.js';
 export type ContextItem = {
     isAttr?: true;
     element?: Element;
@@ -16,6 +17,8 @@ export type ContextItem = {
     global?: TagGlobal;
     value?: any;
     withinOwnerElement: boolean;
-    checkValueChange: (value: unknown, subject: ContextItem) => number | boolean;
+    checkValueChange: CheckValueChange | CheckSupportValueChange;
 };
 export type Context = ContextItem[];
+export type CheckValueChange = (value: unknown, subject: ContextItem) => number | boolean;
+export type CheckSupportValueChange = (value: unknown, subject: SupportContextItem) => number | boolean;

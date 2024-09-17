@@ -13,7 +13,6 @@ export type Config = {
     };
 };
 export type GetSet<T> = (y: T) => [T, T];
-export declare function afterRender(support: Support | BaseSupport): void;
 export declare function initState(support: Support | BaseSupport, config: Config): void;
 export declare function reState(support: Support | BaseSupport, config: Config): void;
 export declare class StateEchoBack {

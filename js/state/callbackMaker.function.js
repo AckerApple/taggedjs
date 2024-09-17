@@ -1,10 +1,7 @@
-import { setUseMemory } from './setUse.function.js';
-import { SyncCallbackError } from '../errors.js';
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
 import callbackStateUpdate from './callbackStateUpdate.function.js';
-let innerCallback = (callback) => (a, b, c, d, e, f) => {
-    throw new SyncCallbackError('Callback function was called immediately in sync and must instead be call async');
-};
+import { setUseMemory } from './setUse.function.js';
+import { SyncCallbackError } from '../errors.js';
 export const callbackMaker = () => {
     const support = getSupportInCycle();
     // callback as typeof innerCallback
@@ -27,8 +24,7 @@ export function callback(callback) {
 }
 function createTrigger(support, oldState, toCallback) {
     return function trigger(...args) {
-        const global = support.subject.global;
-        const callbackMaker = global.renderCount > 0;
+        const callbackMaker = support.subject.renderCount > 0;
         if (callbackMaker) {
             return callbackStateUpdate(support, toCallback, oldState, ...args);
         }

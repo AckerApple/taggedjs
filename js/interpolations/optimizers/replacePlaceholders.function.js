@@ -2,7 +2,6 @@
 import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
 import { ImmutableTypes } from "../../tag/ValueTypes.enum.js";
 const placeholderRegex = new RegExp(variablePrefix + '(\\d+)' + variableSuffix, 'g');
-const at = 'at'; // short for attribute
 const ch = 'ch'; // short for children
 export function replacePlaceholders(dom, valueCount, valuePositions = [], currentTail = []) {
     const elements = dom;

@@ -1,9 +1,5 @@
 import { paintAfters, paintContent } from "../../tag/paint.function.js";
 import { elementInitCheck } from "./elementInitCheck.js";
-const style = 'style';
-const classS = 'class';
-// const styleStart = style + '.'
-// const classStart = classS + '.'
 export function specialAttribute(name, value, element, specialName) {
     switch (specialName) {
         case 'oninit':
@@ -15,11 +11,12 @@ export function specialAttribute(name, value, element, specialName) {
         case 'autoselect':
             paintAfters.push(() => element.select());
             return;
-        case 'style':
+        case 'style': {
             const names = name.split('.');
             // names.shift() // remove 'style'
             paintContent.push(() => element.style[names[1]] = value); // attribute changes should come first
             return;
+        }
         case 'class':
             processSpecialClass(name, value, element);
             return;

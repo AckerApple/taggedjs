@@ -10,7 +10,7 @@ ownerSupport, counts, appendTo) {
     if (!subject.lastArray) {
         subject.lastArray = [];
     }
-    let lastArray = subject.lastArray;
+    const lastArray = subject.lastArray;
     let runtimeInsertBefore = subject.placeholder;
     let removed = 0;
     /** 🗑️ remove previous items first */
@@ -93,7 +93,8 @@ export function destroyArrayItem(item, counts) {
     }
     ++counts.removed;
 }
-function reviewLastArrayItem(subTag, value, index, lastArray, removed, counts) {
+function reviewLastArrayItem(_subTag, // used to compare arrays
+value, index, lastArray, removed, counts) {
     const newLength = value.length - 1;
     const at = index - removed;
     const lessLength = at < 0 || newLength < at;
@@ -132,7 +133,9 @@ function reviewLastArrayItem(subTag, value, index, lastArray, removed, counts) {
     */
     return 0;
 }
-function getArrayValueByItem(item) {
-    return item?.arrayValue || item;
+/*
+function getArrayValueByItem(item: any) {
+  return item?.arrayValue || item
 }
+*/
 //# sourceMappingURL=processTagArray.js.map

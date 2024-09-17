@@ -36,23 +36,30 @@ export function checkProp(value, ownerSupport, newSupport, depth) {
         return value; // no children to crawl through
     }
     if (isArray(value)) {
-        for (let index = value.length - 1; index >= 0; --index) {
-            const subValue = value[index];
-            value[index] = checkProp(subValue, ownerSupport, newSupport, depth + 1);
-            if (typeof (subValue) === BasicTypes.function) {
-                if (subValue.mem) {
-                    continue;
-                }
-                afterCheckProp(depth + 1, index, subValue, value, newSupport);
-            }
-        }
-        return value;
+        return checkArrayProp(value, newSupport, ownerSupport, depth);
     }
+    return checkObjectProp(value, newSupport, ownerSupport, depth);
+}
+function checkArrayProp(value, newSupport, ownerSupport, depth) {
+    for (let index = value.length - 1; index >= 0; --index) {
+        const subValue = value[index];
+        value[index] = checkProp(subValue, ownerSupport, newSupport, depth + 1);
+        if (typeof (subValue) === BasicTypes.function) {
+            if (subValue.mem) {
+                continue;
+            }
+            afterCheckProp(depth + 1, index, subValue, value, newSupport);
+        }
+    }
+    return value;
+}
+function checkObjectProp(value, newSupport, ownerSupport, depth) {
     const keys = Object.keys(value);
     for (const name of keys) {
         const subValue = value[name];
         const result = checkProp(subValue, ownerSupport, newSupport, depth + 1);
-        if (value[name] === result) {
+        const newSubValue = value[name];
+        if (newSubValue === result) {
             continue;
         }
         const getset = Object.getOwnPropertyDescriptor(value, name);
@@ -88,12 +95,12 @@ export function getPropWrap(value, ownerSupport) {
     const wrap = function wrapRunner(...args) {
         return wrap.toCall(...args);
     }; // what gets called can switch over parent state changes
+    wrap.original = value;
+    wrap.mem = value;
     // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
     wrap.toCall = function toCallRunner(...args) {
         return callbackPropOwner(wrap.mem, args, ownerSupport);
     };
-    wrap.original = value;
-    wrap.mem = value;
     // copy data properties that maybe on source function
     Object.assign(wrap, value);
     return wrap;
@@ -114,13 +121,6 @@ export function callbackPropOwner(toCall, callWith, ownerSupport) {
                 return callbackResult; // owner did not change
             }
         }
-        /*
-        const oldest = global.oldest
-        const wasInstant = oldest === newest && global.renderCount === 0
-        if(wasInstant) {
-          return // prop was called immediately
-        }
-        */
         safeRenderSupport(newest, ownerSupport);
         return callbackResult;
     };

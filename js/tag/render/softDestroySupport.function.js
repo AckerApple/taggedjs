@@ -1,6 +1,6 @@
 import { getChildTagsToSoftDestroy } from '../getChildTagsToDestroy.function.js';
-import { smartRemoveKids } from '../smartRemoveKids.function.js';
 import { getNewGlobal } from '../update/getNewGlobal.function.js';
+import { smartRemoveKids } from '../smartRemoveKids.function.js';
 /** used when a tag swaps content returned */
 export function softDestroySupport(lastSupport) {
     const global = lastSupport.subject.global;
@@ -13,14 +13,16 @@ export function softDestroySupport(lastSupport) {
     if (mySubs) {
         subs.forEach(sub => sub.unsubscribe());
     }
-    lastSupport.subject.global = getNewGlobal();
+    getNewGlobal(lastSupport.subject);
 }
 function softDestroyOne(child) {
-    const global = child.subject.global;
+    const subject = child.subject;
+    const global = subject.global;
     if (global.deleted === true) {
         return;
     }
     global.deleted = true; // the children are truly destroyed but the main support will be swapped
+    subject.renderCount = 0;
     smartRemoveKids(child, [], 0);
 }
 //# sourceMappingURL=softDestroySupport.function.js.map

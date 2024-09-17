@@ -1,7 +1,7 @@
 import { ValueSubject } from '../subject/index.js';
 import { DomTag, StringTag } from './Tag.class.js';
 export declare class RouteQuery {
-    get(name: string): string | undefined;
+    get(_name: string): string | undefined;
 }
 export type RouteProps = {
     param: string;

@@ -1,8 +1,8 @@
-import { isLikeTags } from '../isLikeTags.function.js';
-import { renderTagOnly } from './renderTagOnly.function.js';
-import { softDestroySupport } from './softDestroySupport.function.js';
-import { ValueTypes } from '../ValueTypes.enum.js';
 import { moveProviders } from '../update/updateExistingTagComponent.function.js';
+import { softDestroySupport } from './softDestroySupport.function.js';
+import { renderTagOnly } from './renderTagOnly.function.js';
+import { isLikeTags } from '../isLikeTags.function.js';
+import { ValueTypes } from '../ValueTypes.enum.js';
 /** TODO: This seems to support both new and updates and should be separated? */
 export function renderWithSupport(newSupport, lastSupport, // previous
 subject, // events & memory
@@ -20,8 +20,7 @@ ownerSupport) {
     }
     else if (lastSupport) {
         const tag = lastSupport.templater.tag;
-        const global = subject.global;
-        if (tag && global.renderCount > 1) {
+        if (tag && subject.renderCount > 0) {
             checkTagSoftDestroy(tag, lastSupport, lastTag);
         }
     }

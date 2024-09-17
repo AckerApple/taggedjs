@@ -7,15 +7,16 @@ export type TagChildren = ValueSubject<(StringTag | DomTag)[]> & {
     lastArray?: (StringTag | DomTag)[];
 };
 export type TagChildrenInput = (StringTag | DomTag)[] | DomTag | StringTag | TagChildren;
-export type TagComponent = ((...args: any[]) => (StringTag | DomTag)) & {
-    tags?: TagWrapper<any>[];
+export type TagComponent = ((...args: unknown[]) => (StringTag | DomTag)) & {
+    tags?: TagWrapper<unknown>[];
     tagIndex?: number;
     setUse?: typeof setUseMemory;
     ValueTypes: typeof ValueTypes;
 };
-export declare const tags: TagWrapper<any>[];
-export type Original = ((...args: any[]) => any) & {
-    setUse: any[];
+export declare const tags: TagWrapper<unknown>[];
+export type Original = ((...args: unknown[]) => unknown) & {
+    setUse: unknown[];
+    tags?: TagWrapper<unknown>[];
 };
 export type TagWrapper<T> = ((...props: T[]) => TemplaterResult) & {
     original: Original;
@@ -24,4 +25,3 @@ export type TagWrapper<T> = ((...props: T[]) => TemplaterResult) & {
         [index: number]: TagTemplate;
     };
 };
-export type TagMaker = ((...args: any[]) => (StringTag | DomTag)) | ((...args: any[]) => (...args: any[]) => (StringTag | DomTag));

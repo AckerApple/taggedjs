@@ -23,7 +23,7 @@ export function reLetState() {
     const config = setUseMemory.stateConfig;
     const rearray = config.rearray;
     const restate = rearray[config.array.length];
-    let oldValue = getStateValue(restate);
+    const oldValue = getStateValue(restate);
     const push = {
         get: function getLetState() {
             return getStateValue(push);

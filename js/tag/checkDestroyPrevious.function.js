@@ -1,10 +1,11 @@
-import { isArray, isStaticTag } from '../isInstance.js';
+// Functions in here are attached as ContextItem.checkValueChange
+import { processUpdateRegularValue } from './update/processRegularValue.function.js';
+import { getNewGlobal } from './update/getNewGlobal.function.js';
 import { destroyArrayItem } from './update/processTagArray.js';
+import { destroySupport } from './destroySupport.function.js';
+import { isArray, isStaticTag } from '../isInstance.js';
 import { isLikeTags } from './isLikeTags.function.js';
 import { paintRemoves } from './paint.function.js';
-import { getNewGlobal } from './update/getNewGlobal.function.js';
-import { destroySupport } from './destroySupport.function.js';
-import { processUpdateRegularValue } from './update/processRegularValue.function.js';
 import { BasicTypes } from './ValueTypes.enum.js';
 export function checkArrayValueChange(newValue, subject) {
     // no longer an array?
@@ -44,7 +45,7 @@ export function checkTagValueChange(newValue, subject) {
         const likeTags = isLikeTags(newTag, lastSupport);
         if (!likeTags) {
             destroySupport(lastSupport, 0);
-            subject.global = getNewGlobal();
+            getNewGlobal(subject);
             return 7; // 'tag-swap'
         }
         return false;
@@ -56,6 +57,7 @@ export function checkTagValueChange(newValue, subject) {
     // destroy old component, value is not a component
     destroySupport(lastSupport, 0);
     delete subject.global;
+    subject.renderCount = 0;
     return 8; // 'no-longer-tag'
 }
 //# sourceMappingURL=checkDestroyPrevious.function.js.map

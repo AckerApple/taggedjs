@@ -21,6 +21,8 @@ export type BaseSupport = HtmlSupport & {
 };
 export type SupportContextItem = ContextItem & {
     global: SupportTagGlobal;
+    /** Indicator of re-rending. Saves from double rending something already rendered */
+    renderCount: number;
 };
 /** used only for apps, otherwise use Support */
 export declare function getBaseSupport(templater: TemplaterResult, subject: SupportContextItem, castedProps?: Props): BaseSupport;

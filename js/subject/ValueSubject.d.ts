@@ -1,6 +1,6 @@
 import { Subject } from './Subject.class.js';
 import { Subscription } from './subject.utils.js';
-type ValueSubjectSubscriber<T> = (value: T, subscription: Subscription<T>) => unknown;
+export type ValueSubjectSubscriber<T> = (value: T, subscription: Subscription<T>) => unknown;
 export declare class ValueSubject<T> extends Subject<T> {
     value: T;
     constructor(value: T);
@@ -12,4 +12,3 @@ export declare class ValueSubjective<T> extends Subject<T> {
     constructor(value: T);
     subscribe(callback: ValueSubjectSubscriber<T>): Subscription<any> | Subscription<T>;
 }
-export {};

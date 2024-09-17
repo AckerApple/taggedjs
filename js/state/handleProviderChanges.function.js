@@ -4,19 +4,19 @@ export function handleProviderChanges(appSupport, provider) {
 }
 /** Updates and returns memory of tag providers */
 function getTagsWithProvider(support, provider, memory = []) {
-    const global = support.subject.global;
+    const subject = support.subject;
     memory.push({
         support,
-        renderCount: global.renderCount,
+        renderCount: subject.renderCount,
         provider,
     });
     const childTags = provider.children;
     for (let index = childTags.length - 1; index >= 0; --index) {
         const child = childTags[index];
-        const cGlobal = child.subject.global;
+        const cSubject = child.subject;
         memory.push({
             support: child,
-            renderCount: cGlobal.renderCount,
+            renderCount: cSubject.renderCount,
             provider,
         });
     }

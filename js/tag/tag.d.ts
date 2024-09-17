@@ -1,12 +1,13 @@
 import { DomTag, KeyFunction, StringTag } from './Tag.class.js';
 import { Original } from './tag.utils.js';
 import { RouteProps, RouteTag, StateToTag, ToTag } from './tag.types.js';
+import { UnknownFunction } from './update/oneRenderToSupport.function.js';
 export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnType<T> & {
     key: KeyFunction;
     original?: Original;
     compareTo?: string;
 }) & {
-    original: Function;
+    original: UnknownFunction;
 };
 export declare enum PropWatches {
     DEEP = "deep",
@@ -21,9 +22,9 @@ export declare function tag<T extends ToTag>(tagComponent: T, propWatch?: PropWa
 export declare namespace tag {
     var renderOnce: () => ReturnTag;
     var state: () => ReturnTag;
-    var route: (routeProps: RouteProps) => StateToTag;
+    var route: (_routeProps: RouteProps) => StateToTag;
     var key: typeof import("./key.js").key;
-    var app: (routeTag: RouteTag) => StateToTag;
+    var app: (_routeTag: RouteTag) => StateToTag;
     var deepPropWatch: typeof tag;
     var immutableProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
     var watchProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;

@@ -1,3 +1,4 @@
+import { Subject } from '../subject/Subject.class.js';
 import { BaseSupport, Support } from '../tag/Support.class.js';
 import { Config } from './state.utils.js';
 export type UseOptions = {
@@ -7,8 +8,8 @@ export type UseOptions = {
     beforeDestroy?: (support: BaseSupport | Support, tag: Support | BaseSupport) => void;
 };
 export declare const setUseMemory: UseMemory;
-type UseMemory = (Record<string, any> & {
+export type UseMemory = (Record<string, unknown> & {
     stateConfig: Config;
     currentSupport: Support;
+    tagClosed$: Subject<Support>;
 });
-export {};

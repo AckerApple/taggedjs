@@ -1,5 +1,4 @@
-import { AnySupport, BaseSupport, Support } from '../Support.class.js';
-import { ContextItem } from '../Context.types.js';
+import { AnySupport, BaseSupport, Support, SupportContextItem } from '../Support.class.js';
 export declare function renderExistingReadyTag(lastSupport: AnySupport, newSupport: AnySupport, // new to be rendered
 ownerSupport: BaseSupport | Support, // ownerSupport
-subject: ContextItem): AnySupport;
+subject: SupportContextItem): AnySupport;
