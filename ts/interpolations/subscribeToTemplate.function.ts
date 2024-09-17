@@ -1,12 +1,15 @@
 import { InterpolateSubject, TemplateValue } from '../tag/update/processFirstSubject.utils.js'
 import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue.function.js'
+import { processSubUpdate } from './processSubscriptionUpdate.function.js'
+import { Callback } from './attributes/bindSubjectCallback.function.js'
+import { ValueSubjectSubscriber } from '../subject/ValueSubject.js'
 import { TagGlobal } from '../tag/TemplaterResult.class.js'
 import { setUseMemory } from '../state/setUse.function.js'
+import { Subscription } from '../subject/subject.utils.js'
 import { ContextItem } from '../tag/Context.types.js'
 import { AnySupport } from '../tag/Support.class.js'
 import { Counts } from './interpolateTemplate.js'
 import { paint } from '../tag/paint.function.js'
-import { processSubUpdate } from './processSubscriptionUpdate.function.js'
 
 export type SubToTemplateOptions = {
   insertBefore: Text
@@ -47,14 +50,14 @@ export function subscribeToTemplate({
   
   const callback = function subValueProcessor(value: TemplateValue) {
     onValue(value)
-  }
+  } as unknown as (ValueSubjectSubscriber<Callback> & ValueSubjectSubscriber<unknown>)
   
   let syncRun = true
-  const sub = subject.subscribe(callback as any)
+  const sub = subject.subscribe(callback)
   contextItem.subject = subject
   syncRun = false
   
   const global = support.subject.global as TagGlobal
   const subs = global.subscriptions = global.subscriptions || []
-  subs.push(sub)
+  subs.push(sub as unknown as Subscription<unknown>)
 }

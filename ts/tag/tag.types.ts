@@ -2,7 +2,7 @@ import { ValueSubject } from '../subject/index.js'
 import { DomTag, StringTag } from './Tag.class.js'
 
 export class RouteQuery {
-  get(name: string): string | undefined {
+  get(_name: string): string | undefined {
     return 'todo'
   }
 }

@@ -1,18 +1,17 @@
-import { AnySupport, BaseSupport, Support } from '../Support.class.js'
-import { isLikeTags } from'../isLikeTags.function.js'
-import { renderTagOnly } from'./renderTagOnly.function.js'
-import { softDestroySupport } from './softDestroySupport.function.js'
-import { ValueTypes } from '../ValueTypes.enum.js'
-import { DomTag, StringTag } from '../Tag.class.js'
-import { ContextItem } from '../Context.types.js'
+import { AnySupport, BaseSupport, Support, SupportContextItem } from '../Support.class.js'
 import { moveProviders } from '../update/updateExistingTagComponent.function.js'
-import { SupportTagGlobal, TagGlobal } from '../TemplaterResult.class.js'
+import { softDestroySupport } from './softDestroySupport.function.js'
+import { SupportTagGlobal } from '../TemplaterResult.class.js'
+import { renderTagOnly } from'./renderTagOnly.function.js'
+import { isLikeTags } from'../isLikeTags.function.js'
+import { DomTag, StringTag } from '../Tag.class.js'
+import { ValueTypes } from '../ValueTypes.enum.js'
 
 /** TODO: This seems to support both new and updates and should be separated? */
 export function renderWithSupport(
   newSupport: Support | BaseSupport,
   lastSupport: Support | BaseSupport | undefined, // previous
-  subject: ContextItem, // events & memory
+  subject: SupportContextItem, // events & memory
   ownerSupport?: BaseSupport | Support, // who to report to
 ): {support: AnySupport, wasLikeTags: boolean} {
   const lastTemplater = lastSupport?.templater
@@ -34,8 +33,7 @@ export function renderWithSupport(
     global.newest = reSupport
   } else if(lastSupport) {
     const tag = lastSupport.templater.tag
-    const global = subject.global as TagGlobal
-    if(tag && global.renderCount > 1) {
+    if(tag && subject.renderCount > 0) {
       checkTagSoftDestroy(tag, lastSupport, lastTag)
     }
   }

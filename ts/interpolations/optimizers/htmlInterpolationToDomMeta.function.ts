@@ -7,8 +7,8 @@ const ondoubleclick = 'ondoubleclick'
 const fragFindAny = /(:tagvar\d+:)/
 const fragReplacer = /(^:tagvar\d+:|:tagvar\d+:$)/g
 const safeVar = '__safeTagVar'
-const regexAttr = /([:_a-zA-Z0-9\-\.]+)\s*(?:=\s*"([^"]*)"|=\s*(\S+))?/g;
-const regexTagOrg = /<\/?([a-zA-Z0-9\-]+)((?:\s+[a-zA-Z_:][\w:.\-]*(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)+\s*|\s*)\/?>/g;
+const regexAttr = /([:_a-zA-Z0-9\-.]+)\s*(?:=\s*"([^"]*)"|=\s*(\S+))?/g;
+const regexTagOrg = /<\/?([a-zA-Z0-9-]+)((?:\s+[a-zA-Z_:][\w:.-]*(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)+\s*|\s*)\/?>/g;
 
 export function htmlInterpolationToDomMeta(
   strings: string[],

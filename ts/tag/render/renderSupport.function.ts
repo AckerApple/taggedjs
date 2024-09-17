@@ -5,7 +5,7 @@ import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { PropWatches } from '../index.js'
-import { deepCompareDepth, immutablePropMatch, shallowCompareDepth, shallowPropMatch } from '../hasSupportChanged.function.js'
+import { deepCompareDepth, immutablePropMatch, shallowPropMatch } from '../hasSupportChanged.function.js'
 
 export function isInlineHtml(templater: TemplaterResult) {
   return ValueTypes.templater === templater.tagJsType

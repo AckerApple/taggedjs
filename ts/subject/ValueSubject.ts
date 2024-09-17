@@ -1,7 +1,7 @@
 import { Subject, defineValueOn } from './Subject.class.js'
 import { SubjectSubscriber, Subscription } from './subject.utils.js'
 
-type ValueSubjectSubscriber<T> = (
+export type ValueSubjectSubscriber<T> = (
   value: T,
   subscription: Subscription<T>,
 ) => unknown

@@ -1,9 +1,9 @@
+import { AnySupport, BaseSupport, getSupport, Support, SupportContextItem } from '../Support.class.js'
 import { getFakeTemplater, newSupportByTemplater, processTag } from './processTag.function.js'
+import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { processNowRegularValue, RegularValue } from './processRegularValue.function.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { updateExistingTagComponent } from './updateExistingTagComponent.function.js'
-import { AnySupport, BaseSupport, getSupport, Support } from '../Support.class.js'
-import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { BasicTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { updateSupportBy } from '../updateSupportBy.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
@@ -14,7 +14,7 @@ import { processTagArray } from './processTagArray.js'
 import { ContextItem } from '../Context.types.js'
 
 export function updateExistingValue(
-  contextItem: ContextItem, // InterpolateSubject,
+  contextItem: ContextItem | SupportContextItem,
   value: TemplateValue,
   ownerSupport: BaseSupport | Support,
 ) {
@@ -23,14 +23,16 @@ export function updateExistingValue(
     return
   }
 
-  const wasDestroyed = contextItem.checkValueChange(value, contextItem)
+  const wasDestroyed = contextItem.checkValueChange(
+    value, contextItem as SupportContextItem
+  )
 
   if(wasDestroyed === -1) {
     return // do nothing
   }
 
   // handle already seen tag components
-  const tagJsType = value && (value as any).tagJsType as ValueType
+  const tagJsType = value && (value as TemplaterResult).tagJsType as ValueType
   if(tagJsType) {
     if(tagJsType === ValueTypes.renderOnce) {
       return
@@ -38,11 +40,13 @@ export function updateExistingValue(
 
     const isComp = isTagComponent(value)
     if(isComp) {
-      contextItem.global = contextItem.global || getNewGlobal()
+      if(!contextItem.global) {
+        getNewGlobal(contextItem)
+      }
 
       prepareUpdateToComponent(
         value as TemplaterResult,
-        contextItem as ContextItem,
+        contextItem as SupportContextItem,
         ownerSupport,
       )
 
@@ -52,24 +56,16 @@ export function updateExistingValue(
   
   const global = contextItem.global as SupportTagGlobal
   if(global) {
-    // was component but no longer
+    // its html/dom based tag
     const support = global.newest
     if( support ) {
-      if(typeof(value) === BasicTypes.function) {
-        return
-      }
-  
-      handleStillTag(
+      updateContextItemBySupport(
         support,
-        contextItem as ContextItem,
+        contextItem as SupportContextItem,
         value as TemplaterResult,
-        ownerSupport
+        ownerSupport,
       )
-  
-      if(!global.locked) {
-        ++global.renderCount
-      }
-    
+
       return
     }
   }
@@ -84,7 +80,7 @@ export function updateExistingValue(
         return
       
       case ValueTypes.tag:
-      case ValueTypes.dom:
+      case ValueTypes.dom: {
         const tag = value as StringTag | DomTag
         let templater = tag.templater
 
@@ -94,7 +90,7 @@ export function updateExistingValue(
           templater.tag = tag
         }
   
-        const nowGlobal = contextItem.global = (contextItem.global || getNewGlobal()) as SupportTagGlobal
+        const nowGlobal = (contextItem.global ? contextItem.global : getNewGlobal(contextItem)) as SupportTagGlobal
         nowGlobal.newest = newSupportByTemplater(templater, ownerSupport, contextItem)
     
         processTag(
@@ -103,6 +99,7 @@ export function updateExistingValue(
         )
       
         return
+      }
     }
   }
 
@@ -153,7 +150,7 @@ function handleStillTag(
 
 function prepareUpdateToComponent(
   templater: TemplaterResult,
-  contextItem: ContextItem,
+  contextItem: SupportContextItem,
   ownerSupport: BaseSupport | Support,
 ): void {
   const global = contextItem.global as SupportTagGlobal
@@ -180,4 +177,26 @@ function prepareUpdateToComponent(
     support, // latest value
     contextItem,
   )
+}
+
+/** Used to destro */
+function updateContextItemBySupport(
+  support: AnySupport,
+  contextItem: SupportContextItem,
+  value: TemplaterResult,
+  ownerSupport: AnySupport,
+) {
+  if(typeof(value) === BasicTypes.function) {
+    return
+  }
+
+  handleStillTag(
+    support,
+    contextItem as ContextItem,
+    value,
+    ownerSupport,
+  )
+
+  return
+
 }

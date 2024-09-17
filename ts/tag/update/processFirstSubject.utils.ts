@@ -5,9 +5,9 @@ import { Callback } from '../../interpolations/attributes/bindSubjectCallback.fu
 import {  StringTag } from '../Tag.class.js'
 import { Subject } from '../../subject/index.js'
 
-export type InterpolateSubject = (ValueSubject<any>  | ValueSubject<Callback>) & {
+export type InterpolateSubject = (ValueSubject<unknown>  | ValueSubject<Callback>) & {
   global: TagGlobal
 }
 
 // what can be put down with ${}
-export type TemplateValue = StringTag | TemplaterResult | (StringTag | TemplaterResult)[] | RegularValue | Subject<any> | Callback
+export type TemplateValue = StringTag | TemplaterResult | (StringTag | TemplaterResult)[] | RegularValue | Subject<unknown> | Callback

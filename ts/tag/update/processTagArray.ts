@@ -25,7 +25,7 @@ export function processTagArray(
     subject.lastArray = [] as Context
   }
   
-  let lastArray = subject.lastArray
+  const lastArray = subject.lastArray
   
   let runtimeInsertBefore = subject.placeholder
 
@@ -81,7 +81,7 @@ function reviewArrayItem(
 
   return processAddTagArrayItem(
     item,
-    runtimeInsertBefore as any, // thisInsert as any,
+    runtimeInsertBefore as Text, // thisInsert as any,
     ownerSupport,
     counts,
     lastArray,
@@ -101,13 +101,13 @@ function reviewPreviousArrayItem(
 ) {
   const couldBeSame = lastArray.length > index
   if (couldBeSame) {
-    updateExistingValue(itemSubject, item as any, ownerSupport)
+    updateExistingValue(itemSubject, item as TemplateValue, ownerSupport)
     return itemSubject
   }
 
   const result = processAddTagArrayItem(
     item,
-    runtimeInsertBefore as any, // thisInsert as any,
+    runtimeInsertBefore as Text, // thisInsert as any,
     ownerSupport,
     counts,
     lastArray,
@@ -189,8 +189,8 @@ export function destroyArrayItem(
 }
 
 function reviewLastArrayItem(
-  subTag: any,
-  value: any[],
+  _subTag: unknown, // used to compare arrays
+  value: unknown[],
   index: number,
   lastArray: Context,
   removed: number,
@@ -240,6 +240,8 @@ function reviewLastArrayItem(
   return 0
 }
 
+/*
 function getArrayValueByItem(item: any) {
   return item?.arrayValue || item
 }
+*/

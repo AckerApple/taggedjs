@@ -1,29 +1,25 @@
-import { AnySupport, BaseSupport, Support } from '../Support.class.js'
+import { AnySupport, BaseSupport, Support, SupportContextItem } from '../Support.class.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
-import { ContextItem } from '../Context.types.js'
 import { processTag } from '../update/processTag.function.js'
 import { updateSupportBy } from '../updateSupportBy.function.js'
-import { SupportTagGlobal } from '../TemplaterResult.class.js'
 
+// TODO: This function is being called for 1st time renders WHEN renderCount === 1
 export function renderExistingReadyTag(
   lastSupport: AnySupport,
   newSupport: AnySupport, // new to be rendered
   ownerSupport: BaseSupport | Support, // ownerSupport
-  subject: ContextItem, 
+  subject: SupportContextItem,
 ) {
-  const global = subject.global as SupportTagGlobal
-
+  const global = subject.global
   const {support, wasLikeTags} = renderWithSupport(
     newSupport,
-    lastSupport,
+    lastSupport, // renderCount <= 0 ? undefined : lastSupport
     subject,
     ownerSupport as Support,
   )
-  
+
   if( wasLikeTags ) {
     updateSupportBy(global.oldest, support)
-    // updateSupportValuesBy(oldest, support)
-    // paint()
     return support
   }
 
@@ -33,5 +29,4 @@ export function renderExistingReadyTag(
   )
 
   return support
-  
 }

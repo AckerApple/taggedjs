@@ -1,3 +1,4 @@
+import { Subject } from '../subject/Subject.class.js'
 import { BaseSupport, Support } from '../tag/Support.class.js'
 import { firstLetState } from './letState.function.js'
 import { State } from './state.types.js'
@@ -25,7 +26,8 @@ export const setUseMemory = {
   },
 } as UseMemory
 
-type UseMemory = (Record<string,any> & {
+export type UseMemory = (Record<string, unknown> & {
   stateConfig: Config
   currentSupport: Support // tag being rendered
+  tagClosed$: Subject<Support>
 })

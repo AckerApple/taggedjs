@@ -1,24 +1,21 @@
-import { AnySupport, BaseSupport, getSupport, Support } from '../Support.class.js'
-import { runAfterRender } from'../tagRunner.js'
 import { SupportTagGlobal, Wrapper } from '../TemplaterResult.class.js'
-import { ValueTypes } from '../ValueTypes.enum.js'
-import { ContextItem } from '../Context.types.js'
-import { TagWrapper } from '../tag.utils.js'
+import { AnySupport, getSupport, Support, SupportContextItem } from '../Support.class.js'
+import { beforeRender } from './beforeRender.function.js'
 import { executeWrap } from '../executeWrap.function.js'
-import { initState, reState } from '../../state/state.utils.js'
-import { setUseMemory } from '../../state/setUse.function.js'
-import { State } from '../../state/state.types.js'
+import { ValueTypes } from '../ValueTypes.enum.js'
+import { TagWrapper } from '../tag.utils.js'
+import { runAfterRender } from '../afterRender.function.js'
 
 export function renderTagOnly(
   newSupport: AnySupport,
   prevSupport: AnySupport | undefined, // causes restate
-  subject: ContextItem,
+  subject: SupportContextItem,
   ownerSupport?: AnySupport,
 ): AnySupport {
   const global = subject.global as SupportTagGlobal
-  const oldRenderCount = global.renderCount
+  const oldRenderCount = subject.renderCount
 
-  beforeWithRender(newSupport, prevSupport?.state)
+  beforeRender(newSupport, prevSupport?.state)
   
   const templater = newSupport.templater
   let reSupport: AnySupport
@@ -51,33 +48,15 @@ export function renderTagOnly(
     )
   }
 
-  /* AFTER */
-
-  runAfterRender(newSupport, ownerSupport)
+  runAfterRender(reSupport, ownerSupport)
   
   global.newest = reSupport
 
   // When we rendered, only 1 render should have taken place OTHERWISE rendering caused another render and that is the latest instead
-  if(global.renderCount > oldRenderCount + 1) {
+  // TODO: below most likely not needed
+  if(subject.renderCount > oldRenderCount + 1) {
     return global.newest as Support
   }
 
   return reSupport
-}
-
-function beforeWithRender(
-  support: BaseSupport | Support, // new
-  prevState?: State,
-) {
-
-  if(prevState) {
-    const lastState = prevState
-    support.state = lastState
-
-    reState(support, setUseMemory.stateConfig)
-    return
-  }
-
-  // first time render
-  initState(support, setUseMemory.stateConfig)
 }

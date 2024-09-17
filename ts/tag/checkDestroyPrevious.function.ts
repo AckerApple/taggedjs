@@ -1,14 +1,16 @@
-import { isArray, isStaticTag } from'../isInstance.js'
-import { destroyArrayItem } from'./update/processTagArray.js'
-import { isLikeTags } from'./isLikeTags.function.js'
-import { Support } from './Support.class.js'
-import { paintRemoves } from './paint.function.js'
-import { ContextItem } from './Context.types.js'
+// Functions in here are attached as ContextItem.checkValueChange
+
+import { processUpdateRegularValue, RegularValue } from './update/processRegularValue.function.js'
+import { Support, SupportContextItem } from './Support.class.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
+import { destroyArrayItem } from'./update/processTagArray.js'
 import { destroySupport } from './destroySupport.function.js'
 import { SupportTagGlobal } from './TemplaterResult.class.js'
-import { processUpdateRegularValue, RegularValue } from './update/processRegularValue.function.js'
+import { isArray, isStaticTag } from'../isInstance.js'
+import { isLikeTags } from'./isLikeTags.function.js'
+import { paintRemoves } from './paint.function.js'
 import { BasicTypes } from './ValueTypes.enum.js'
+import { ContextItem } from './Context.types.js'
 
 export function checkArrayValueChange(
   newValue: unknown,
@@ -61,7 +63,7 @@ export function checkSimpleValueChange(
 
 export function checkTagValueChange(
   newValue: unknown,
-  subject: ContextItem,
+  subject: SupportContextItem,
 ) {
   const global = subject.global as SupportTagGlobal
   const lastSupport = global?.newest
@@ -73,7 +75,7 @@ export function checkTagValueChange(
     const likeTags = isLikeTags(newTag, lastSupport)
     if(!likeTags) {
       destroySupport(lastSupport, 0)
-      subject.global = getNewGlobal()
+      getNewGlobal(subject) as SupportTagGlobal
       return 7 // 'tag-swap'
     }
 
@@ -87,7 +89,8 @@ export function checkTagValueChange(
 
   // destroy old component, value is not a component
   destroySupport(lastSupport, 0)
-  delete subject.global
-  
+  delete (subject as ContextItem).global
+  subject.renderCount = 0
+   
   return 8 // 'no-longer-tag'
 }

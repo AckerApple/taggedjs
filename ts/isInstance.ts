@@ -39,7 +39,7 @@ export function isTagComponent(
 // isSubjectLike
 export function isSubjectInstance(
   subject?: SubjectLike<any> | any
-): Boolean {
+): boolean {
   return isObject(subject) && typeof subject.subscribe === BasicTypes.function
 }
 

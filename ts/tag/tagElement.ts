@@ -3,21 +3,25 @@ import { Events, SupportTagGlobal, TemplaterResult, Wrapper } from './TemplaterR
 import { BaseSupport, getBaseSupport, Support, SupportContextItem } from './Support.class.js'
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
 import { buildBeforeElement } from './buildBeforeElement.function.js'
-import { Original, TagComponent, TagMaker} from './tag.utils.js'
+import { TagComponent, TagWrapper } from './tag.utils.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 import { destroySupport } from './destroySupport.function.js'
-import { checkTagValueChange, PropWatches } from './index.js'
-import { setUseMemory } from '../state/setUse.function.js'
+import { BaseTagGlobal, checkTagValueChange, PropWatches } from './index.js'
+import { setUseMemory, UseMemory } from '../state/setUse.function.js'
+import { runAfterRender } from './afterRender.function.js'
 import { executeWrap } from './executeWrap.function.js'
 import { paint, painting } from './paint.function.js'
 import { initState } from '../state/state.utils.js'
 import { isTagComponent } from '../isInstance.js'
 import { ContextItem } from './Context.types.js'
-import { runAfterRender } from'./tagRunner.js'
 import { Props } from '../Props.js'
+import { TagMaker } from './TagMaker.type.js'
 
-export type TagAppElement = Element & { ValueTypes: typeof ValueTypes, setUse: any }
+export type TagAppElement = Element & {
+  ValueTypes: typeof ValueTypes
+  setUse: typeof setUseMemory
+}
 
 const appElements: {
   support: BaseSupport // Support
@@ -50,21 +54,22 @@ export function tagElement(
 
   // Create the app which returns [props, runOneTimeFunction]
   
-  let templater = (() => (templater2 as any)(props)) as unknown as TemplaterResult
+  let templater = (() => (templater2 as unknown as (...n:unknown[]) => unknown)(props)) as unknown as TemplaterResult
   templater.propWatch = PropWatches.NONE
   templater.tagJsType = ValueTypes.stateRender
   // todo: props should be an array
   templater.props = [props]
 
+  // create observable the app lives on
   const subject = getNewSubject(templater, element)
-  const global = subject.global as SupportTagGlobal
+  const global = subject.global as BaseTagGlobal
   initState(global.newest, setUseMemory.stateConfig)
 
   let templater2 = app(props) as unknown as TemplaterResult
   
   if(typeof templater2 !== BasicTypes.function) {
     if(!isTagComponent(templater2)) {
-      templater2 = app as any
+      templater2 = app as unknown as TemplaterResult
     } else {
       global.newest.propsConfig = {
         latest: [props] as Props,
@@ -83,7 +88,7 @@ export function tagElement(
   global.isApp = true
   
   // enables hmr destroy so it can control entire app
-  ;(element as any).destroy = function() {
+  ;(element as TagJsElement).destroy = function() {
     const events = global.events as Events
     for (const eventName in events) {
       const callback = events[eventName]
@@ -96,7 +101,7 @@ export function tagElement(
     paint()
   }
   
-  let tags: any[] = []
+  let tags = [] as TagComponent[] // TagWrapper<unknown>[]
 
   ++painting.locks
 
@@ -105,15 +110,17 @@ export function tagElement(
   global.oldest = support
   global.newest = support
   
-  let setUse = (templater as any).setUse
+  let setUse = (templater as unknown as TagAppElement).setUse
   
   if(templater.tagJsType !== ValueTypes.stateRender) {
-    const wrap = app as any as Wrapper
-    const parentWrap = wrap.parentWrap
-    const original = (wrap as any).original || parentWrap.original as Original
+    const wrap = app as unknown as Wrapper
+    const original = (wrap as unknown as TagWrapper<unknown>).original
+    // const parentWrap = wrap.parentWrap
+    // const original = (wrap as unknown).original || parentWrap.original as Original
+    //  const original = parentWrap.original as Original
     
-    setUse = original.setUse
-    tags = (app as any).original.tags
+    setUse = original.setUse as unknown as UseMemory
+    tags = original.tags as unknown as TagComponent[]
   }
 
   ;(element as TagAppElement).setUse = setUse
@@ -135,7 +142,7 @@ export function tagElement(
   paint()
   element.appendChild(newFragment)
 
-  ++global.renderCount
+  // ++subject.renderCount
 
   return {
     support,
@@ -148,16 +155,19 @@ function getNewSubject(
   templater: TemplaterResult,
   appElement: Element,
 ) {
-  const global = getNewGlobal() as SupportTagGlobal
-  global.events = {}
 
-  const subject: ContextItem = {
+  const subject: SupportContextItem = {
     value: templater,
-    global,
     checkValueChange: checkTagValueChange,
     withinOwnerElement: false, // i am the highest owner
+    renderCount: 0,
+
+    global: undefined as unknown as SupportTagGlobal, // gets set below in getNewGlobal()
   }
-  
+
+  const global = getNewGlobal(subject) as BaseTagGlobal
+  global.events = {}
+
   const newSupport = getBaseSupport(
     templater,
     subject as SupportContextItem,
@@ -182,7 +192,7 @@ export function runWrapper(
   const newSupport = global.newest
 
   if(templater.tagJsType === ValueTypes.stateRender) {
-    const result = templater.wrapper || {original: templater} as any
+    const result = (templater.wrapper || {original: templater}) as unknown as TagWrapper<unknown>
 
     const nowSupport = executeWrap(
       templater,
@@ -217,4 +227,8 @@ function putOneDomDown(
   if(dom.marker) {
     newFragment.appendChild(dom.marker)
   }
+}
+
+type TagJsElement = Element & {
+  destroy?: (...n: unknown[]) => unknown
 }

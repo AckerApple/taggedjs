@@ -2,7 +2,6 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
 import { isPromise, isTagComponent } from '../../isInstance.js'
-import { syncStates } from '../../state/syncStates.function.js'
 import { renderSupport } from '../../tag/render/renderSupport.function.js'
 import { AnySupport, BaseSupport, Support } from '../../tag/Support.class.js'
 import { SupportTagGlobal, TagGlobal } from '../../tag/TemplaterResult.class.js'

@@ -2,12 +2,6 @@ import { paintAfters, paintContent } from "../../tag/paint.function.js"
 import { elementInitCheck } from "./elementInitCheck.js";
 import { SpecialDefinition } from "./processAttribute.function.js";
 
-const style = 'style'
-const classS = 'class'
-
-// const styleStart = style + '.'
-// const classStart = classS + '.'
-
 export function specialAttribute(
   name: string,
   value: any,
@@ -27,11 +21,12 @@ export function specialAttribute(
       paintAfters.push(() => (element as any).select())
       return
 
-    case 'style':
+    case 'style': {
       const names = name.split('.')
       // names.shift() // remove 'style'
       paintContent.push(() => (element as any).style[names[1]] = value) // attribute changes should come first
       return
+    }
 
     case 'class':
       processSpecialClass(name, value, element)

@@ -8,8 +8,8 @@ import { ValueTypes } from './ValueTypes.enum.js'
 export type TagChildren = ValueSubject<(StringTag | DomTag)[]> & { lastArray?: (StringTag | DomTag)[] }
 export type TagChildrenInput = (StringTag | DomTag)[] | DomTag | StringTag | TagChildren
 
-export type TagComponent = ((...args:  any[]) => (StringTag | DomTag)) & {
-  tags?: TagWrapper<any>[]
+export type TagComponent = ((...args:  unknown[]) => (StringTag | DomTag)) & {
+  tags?: TagWrapper<unknown>[]
   tagIndex?: number
   
   // HMR shares
@@ -17,9 +17,12 @@ export type TagComponent = ((...args:  any[]) => (StringTag | DomTag)) & {
   ValueTypes: typeof ValueTypes
 }
 
-export const tags: TagWrapper<any>[] = []
+export const tags: TagWrapper<unknown>[] = []
 
-export type Original = ((...args: any[]) => any) & {setUse: any[]}
+export type Original = ((...args: unknown[]) => unknown) & {
+  setUse: unknown[]
+  tags?: TagWrapper<unknown>[]
+}
 
 export type TagWrapper<T> = ((
   ...props: T[]
@@ -28,5 +31,3 @@ export type TagWrapper<T> = ((
   tagJsType?: typeof ValueTypes.renderOnce | typeof ValueTypes.stateRender
   lastRuns?: {[index: number]: TagTemplate}
 }
-
-export type TagMaker = ((...args: any[]) => (StringTag | DomTag)) | ((...args: any[]) => (...args: any[]) => (StringTag | DomTag))

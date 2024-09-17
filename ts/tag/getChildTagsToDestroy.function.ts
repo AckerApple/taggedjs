@@ -1,9 +1,9 @@
-import { isTagComponent } from '../isInstance.js'
+import { SupportTagGlobal } from './TemplaterResult.class.js'
 import { Subscription } from '../subject/subject.utils.js'
+import { isTagComponent } from '../isInstance.js'
+import { runBeforeDestroy } from './tagRunner.js'
 import { AnySupport } from './Support.class.js'
 import { Context } from './Context.types.js'
-import { runBeforeDestroy } from './tagRunner.js'
-import { SupportTagGlobal } from './TemplaterResult.class.js'
 
 export function getChildTagsToDestroy(
   childTags: Context,

@@ -1,5 +1,5 @@
 import { StringTag, DomTag, EventCallback } from './Tag.class.js'
-import { ContextItem, Context } from './Context.types.js'
+import { ContextItem } from './Context.types.js'
 import { BaseSupport, Support, SupportContextItem } from './Support.class.js'
 import { Props } from '../Props.js'
 import { TagWrapper } from './tag.utils.js'
@@ -18,32 +18,27 @@ export type Wrapper = ((
   prevSupport?: BaseSupport | Support,
 ) => Support) & {
   tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater
-  parentWrap: TagWrapper<any>
+  parentWrap: TagWrapper<unknown>
 }
 
 export type TagGlobal = {
   // SUPPORTS
   htmlDomMeta?: DomObjectChildren
-  
-  /** Indicator of re-rending. Saves from double rending something already rendered */
-  renderCount: number
+
   deleted?: true
   isApp?: boolean // root element
 
-  subscriptions?: Subscription<any>[] // subscriptions created by clones
+  subscriptions?: Subscription<unknown>[] // subscriptions created by clones
 
   destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
   
   locked?: true
   
   callbackMaker?: true
-  
-  // only appears on app
-  events?: Events
 }
 
 export type SupportTagGlobal = TagGlobal & {
-  destroy$: Subject<any>
+  destroy$: Subject<void>
   blocked: (BaseSupport | Support)[], // renders that did not occur because an event was processing
   oldest: BaseSupport | Support
   newest: BaseSupport | Support
@@ -51,6 +46,11 @@ export type SupportTagGlobal = TagGlobal & {
   
   init?: OnInitCallback // what to run when init complete, used for onInit
   providers?: Provider[]
+}
+
+export type BaseTagGlobal = SupportTagGlobal & {
+  // only appears on app
+  events?: Events
 }
 
 export type Events = {

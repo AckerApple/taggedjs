@@ -1,9 +1,8 @@
-import { setUseMemory } from './setUse.function.js'
-import { SyncCallbackError } from '../errors.js'
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
 import callbackStateUpdate from './callbackStateUpdate.function.js'
-import { TagGlobal } from '../tag/index.js'
 import { AnySupport } from '../tag/Support.class.js'
+import { setUseMemory } from './setUse.function.js'
+import { SyncCallbackError } from '../errors.js'
 import { State } from './state.types.js'
 
 export type Callback<A,B,C,D,E,F, T> = (
@@ -11,11 +10,10 @@ export type Callback<A,B,C,D,E,F, T> = (
 ) => T
 
 
-let innerCallback = <A,B,C,D,E,F, T>(
-  callback: Callback<A,B,C,D,E,F,T>
-) => (a?:A, b?:B, c?:C, d?:D, e?:E, f?:F): T => {
-  throw new SyncCallbackError('Callback function was called immediately in sync and must instead be call async')
-}
+type innerCallback = <A,B,C,D,E,F, T>(
+  _callback: Callback<A,B,C,D,E,F,T>
+) => (_a?:A, _b?:B, _c?:C, _d?:D, _e?:E, _f?: F) => T
+
 export const callbackMaker = () => {
   const support = getSupportInCycle()
   // callback as typeof innerCallback
@@ -29,7 +27,7 @@ export const callbackMaker = () => {
     callback: Callback<A, B, C, D, E, F, T>
   ) {
     return createTrigger(support, oldState, callback)
-  } as typeof innerCallback
+  } as innerCallback
 }
 
 const syncError = new SyncCallbackError('callback() was called outside of synchronous rendering. Use `callback = callbackMaker()` to create a callback that could be called out of sync with rendering')
@@ -53,8 +51,7 @@ function createTrigger<A,B,C,D,E,F, T>(
   toCallback: Callback<A, B, C, D, E, F, T>,
 ) {
   return function trigger(...args: any[]) {
-    const global = support.subject.global as TagGlobal
-    const callbackMaker = global.renderCount > 0
+    const callbackMaker = support.subject.renderCount > 0
 
     if(callbackMaker) {
       return callbackStateUpdate(support, toCallback, oldState, ...args)

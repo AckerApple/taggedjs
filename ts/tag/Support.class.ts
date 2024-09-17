@@ -32,6 +32,8 @@ export type BaseSupport = HtmlSupport & {
 
 export type SupportContextItem = ContextItem & {
   global: SupportTagGlobal
+  /** Indicator of re-rending. Saves from double rending something already rendered */
+  renderCount: number
 }
 
 /** used only for apps, otherwise use Support */
@@ -46,7 +48,7 @@ export function getBaseSupport(
     castedProps,
     state: [], // TODO: this is not needed for every type of  tag
 
-    appSupport: undefined as any as BaseSupport,
+    appSupport: undefined as unknown as BaseSupport,
   } as BaseSupport
   
   baseSupport.appSupport = baseSupport
@@ -99,7 +101,7 @@ export function getHtmlSupport(
     subject,
     castedProps,
 
-    appSupport: undefined as any as BaseSupport,
+    appSupport: undefined as unknown as BaseSupport,
   } as HtmlSupport
   
   support.ownerSupport = ownerSupport

@@ -6,9 +6,11 @@ import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 import { setUseMemory } from '../state/setUse.function.js'
 import { Props } from '../Props.js'
 
+type ReturnStringTag = (...n: unknown[]) => StringTag
+
 export function executeWrap(
   templater: TemplaterResult,
-  result: TagWrapper<any>,
+  result: TagWrapper<unknown>,
   useSupport: AnySupport,
   castedProps?: Props
 ): AnySupport {
@@ -17,13 +19,13 @@ export function executeWrap(
 
   let tag: StringTag;
   if(stateless) {
-    tag = (templater as any)()
+    tag = (templater as unknown as ReturnStringTag)()
   } else {
-    tag = originalFunction(...castedProps as unknown[])
+    tag = originalFunction(...castedProps as unknown[]) as StringTag
 
     // CALL ORIGINAL COMPONENT FUNCTION
     if(typeof(tag) === BasicTypes.function) {
-      tag = (tag as any)()
+      tag = (tag as unknown as ReturnStringTag)()
     }
   }
 

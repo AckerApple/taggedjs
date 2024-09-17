@@ -1,7 +1,7 @@
 import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { Counts } from'../../interpolations/interpolateTemplate.js'
 import { processFirstTagResult, processReplaceTagResult } from'./processTagResult.function.js'
-import { BaseSupport, getSupport, PropsConfig, Support } from '../Support.class.js'
+import { BaseSupport, getSupport, PropsConfig, Support, SupportContextItem } from '../Support.class.js'
 import { renderWithSupport } from '../render/renderWithSupport.function.js'
 import { ContextItem } from '../Context.types.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
@@ -9,7 +9,7 @@ import { getCastedProps } from '../getTagWrap.function.js'
 
 export function processReplacementComponent(
   templater: TemplaterResult,
-  subject: ContextItem,
+  subject: SupportContextItem,
   ownerSupport: BaseSupport | Support,
   counts: Counts,
 ): BaseSupport | Support {
@@ -37,7 +37,7 @@ export function processReplacementComponent(
   const {support} = renderWithSupport(
     newSupport,
     global.newest, // existing tag
-    subject as ContextItem,
+    subject,
     ownerSupport,
   )
 
@@ -52,7 +52,7 @@ export function processReplacementComponent(
 
 export function processFirstSubjectComponent(
   templater: TemplaterResult,
-  subject: ContextItem,
+  subject: SupportContextItem,
   ownerSupport: BaseSupport | Support,
   counts: Counts,
   appendTo: Element,
@@ -81,7 +81,7 @@ export function processFirstSubjectComponent(
   const {support} = renderWithSupport(
     newSupport,
     global.newest, // existing tag   
-    subject as ContextItem,
+    subject,
     ownerSupport,
   )
 

@@ -1,22 +1,21 @@
 import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from'../hasSupportChanged.function.js'
-import { AnySupport, BaseSupport, PropsConfig, Support } from '../Support.class.js'
-import { renderSupport } from'../render/renderSupport.function.js'
-import { castProps, isSkipPropValue } from'../../alterProp.function.js'
-import { isLikeTags } from'../isLikeTags.function.js'
-import { Props } from '../../Props.js'
-import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
-import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js'
-import { ContextItem } from '../Context.types.js'
+import { AnySupport, BaseSupport, PropsConfig, Support, SupportContextItem } from '../Support.class.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
-import { getNewGlobal } from './getNewGlobal.function.js'
+import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import { castProps, isSkipPropValue, WrapRunner } from'../../alterProp.function.js'
+import { renderSupport } from'../render/renderSupport.function.js'
+import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js'
 import { destroySupport } from '../destroySupport.function.js'
-import { PropWatches } from '../tag.js'
+import { getNewGlobal } from './getNewGlobal.function.js'
+import { isLikeTags } from'../isLikeTags.function.js'
 import { isArray } from '../../isInstance.js'
+import { PropWatches } from '../tag.js'
+import { Props } from '../../Props.js'
 
 export function updateExistingTagComponent(
   ownerSupport: BaseSupport | Support,
   support: AnySupport, // lastest
-  subject: ContextItem,
+  subject: SupportContextItem,
 ): void {
   const global = subject.global as SupportTagGlobal
   const lastSupport = global.newest
@@ -81,7 +80,7 @@ export function syncFunctionProps(
   newSupport: AnySupport,
   lastSupport: AnySupport,
   ownerSupport: BaseSupport | Support,
-  newPropsArray: any[], // templater.props
+  newPropsArray: unknown[], // templater.props
   maxDepth: number,
   depth = -1,
 ): Props {
@@ -110,7 +109,10 @@ export function syncFunctionProps(
     const priorProp = priorPropsArray[index]
 
     const newValue = syncPriorPropFunction(
-      priorProp, prop, newSupport, ownerSupport,
+      priorProp,
+      prop as WrapRunner,
+      newSupport,
+      ownerSupport,
       depth + 1,
       maxDepth,
     )
@@ -125,8 +127,8 @@ export function syncFunctionProps(
 }
 
 function syncPriorPropFunction(
-  priorProp: any,
-  prop: any,
+  priorProp: WrapRunner,
+  prop: WrapRunner,
   newSupport: BaseSupport | Support,
   ownerSupport: BaseSupport | Support,
   maxDepth: number,
@@ -154,27 +156,42 @@ function syncPriorPropFunction(
   }
 
   if(isArray(prop)) {
-    for (let index = prop.length - 1; index >= 0; --index) {
-      const x = prop[index]
-      prop[index] = syncPriorPropFunction(
-        priorProp[index], x, newSupport, ownerSupport,
-        depth + 1,
-        index,
-      )
-    }
-
-    return prop
+    return updateExistingArray(
+      prop as unknown as WrapRunner[],
+      priorProp,
+      newSupport,
+      ownerSupport,
+      depth,
+    )
   }
 
   if(priorProp === undefined) {
     return prop
   }
 
+  return updateExistingObject(
+    prop as unknown as Record<string, WrapRunner>,
+    priorProp as unknown as Record<string, WrapRunner>,
+    newSupport,
+    ownerSupport,
+    depth,
+    maxDepth,
+  )
+}
+
+function updateExistingObject(
+  prop: Record<string, WrapRunner>,
+  priorProp: Record<string, WrapRunner>,
+  newSupport: AnySupport,
+  ownerSupport: AnySupport,
+  depth: number,
+  maxDepth: number,
+) {
   const keys = Object.keys(prop) 
   for(const name of keys){
-    const subValue = (prop as any)[name]
+    const subValue = (prop as unknown as Record<string, WrapRunner>)[name]
     const result = syncPriorPropFunction(
-      priorProp[name],
+      (priorProp as unknown as Record<string, WrapRunner>)[name],
       subValue,
       newSupport,
       ownerSupport,
@@ -182,7 +199,7 @@ function syncPriorPropFunction(
       depth + 1,
     )
 
-    if(prop[name] === result) {
+    if((prop as unknown as Record<string, WrapRunner>)[name] === result) {
       continue
     }
     
@@ -192,9 +209,31 @@ function syncPriorPropFunction(
       continue
     }
 
-    prop[name] = result
+    ;(prop as unknown as Record<string, WrapRunner>)[name] = result as WrapRunner
   }
   
+  return prop
+}
+
+function updateExistingArray(
+  prop: WrapRunner[],
+  priorProp: WrapRunner,
+  newSupport: AnySupport,
+  ownerSupport: AnySupport,
+  depth: number,
+) {
+  for (let index = prop.length - 1; index >= 0; --index) {
+    const x = prop[index]
+    prop[index] = syncPriorPropFunction(
+      (priorProp as unknown as unknown[])[index] as WrapRunner,
+      x,
+      newSupport,
+      ownerSupport,
+      depth + 1,
+      index,
+    ) as WrapRunner
+  }
+
   return prop
 }
 
@@ -252,16 +291,17 @@ function syncSupports<T extends AnySupport>(
   return lastSupport // its the same tag component  
 }
 
+/** Was tag, will be tag */
 function swapTags(
-  subject: ContextItem,
-  templater: TemplaterResult,
+  subject: SupportContextItem,
+  templater: TemplaterResult, // new tag
   ownerSupport: AnySupport
 ) {
   const global = subject.global as SupportTagGlobal
   const oldestSupport = global.oldest as Support
   destroySupport(oldestSupport, 0)
   
-  subject.global = getNewGlobal()
+  getNewGlobal(subject) as SupportTagGlobal
 
   const newSupport = processReplacementComponent(
     templater,

@@ -20,14 +20,16 @@ export function oneRenderToSupport(
 
   let tag: StringTag
   function wrap() {
-    templater.tag = tag || ((wrapper as any)())
+    templater.tag = tag || ((wrapper as (UnknownFunction))())
     return support
   }
 
-  templater.wrapper = wrap as any as Wrapper
-  wrap.parentWrap = wrap as any as TagWrapper<any>
+  templater.wrapper = wrap as unknown as Wrapper
+  wrap.parentWrap = wrap as unknown as TagWrapper<unknown>
   wrap.tagJsType = wrapper.tagJsType
-  wrap.parentWrap.original = wrapper as any as Original
+  wrap.parentWrap.original = wrapper as unknown as Original
 
   return support
 }
+
+export type UnknownFunction = (...n:unknown[]) => unknown

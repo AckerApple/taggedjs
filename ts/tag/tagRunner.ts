@@ -1,9 +1,8 @@
+import { getSupportInCycle } from'./getSupportInCycle.function.js'
+import { SupportTagGlobal } from './TemplaterResult.class.js'
 import { BaseSupport, Support } from './Support.class.js'
 import { setUseMemory } from'../state/index.js'
 import { Subject } from'../subject/index.js'
-import { getSupportInCycle } from'./getSupportInCycle.function.js'
-import { SupportTagGlobal } from './TemplaterResult.class.js'
-import { afterRender } from '../state/state.utils.js'
 
 // Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
 setUseMemory.tagClosed$ = new Subject<Support>(undefined, function tagCloser(subscription) {
@@ -11,15 +10,6 @@ setUseMemory.tagClosed$ = new Subject<Support>(undefined, function tagCloser(sub
     subscription.next() // we are not currently processing so process now
   }
 })
-
-// Life cycle 2
-export function runAfterRender(
-  support: BaseSupport | Support,
-  ownerSupport?: Support | BaseSupport,
-) {
-  afterRender(support)
-  setUseMemory.tagClosed$.next(ownerSupport)
-}
 
 // Life cycle 4 - end of life
 export function runBeforeDestroy(
@@ -39,4 +29,6 @@ export function runBeforeDestroy(
       }
     }
   }
+  
+  support.subject.renderCount = 0 // if it comes back, wont be considered an update
 }

@@ -1,11 +1,11 @@
-import { firstLetState } from './letState.function.js'
 import { setUseMemory } from './setUse.function.js'
 import { State, StateConfigItem } from './state.types.js'
 import { Config } from './state.utils.js'
 import { getStateValue } from './getStateValue.function.js'
 import { BasicTypes } from '../tag/ValueTypes.enum.js'
+import { UnknownFunction } from '../tag/index.js'
 
-export function runRestate <T>() {
+export function runRestate () {
   const config: Config = setUseMemory.stateConfig
   const rearray = config.rearray as State
 
@@ -23,12 +23,12 @@ export function runFirstState <T>(
   let initValue = defaultValue
   
   if(typeof(defaultValue) === BasicTypes.function) {
-    initValue = (defaultValue as Function)()
+    initValue = (defaultValue as () => T)()
   }
 
   // the state is actually intended to be a function
   if(typeof(initValue) === BasicTypes.function) {
-    const original = initValue as Function
+    const original = initValue as UnknownFunction
     
     initValue = function initValueFun(...args: any[]) {
       const result = original(...args)

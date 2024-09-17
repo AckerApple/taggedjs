@@ -1,9 +1,9 @@
-import { runBeforeDestroy } from './tagRunner.js'
 import { getChildTagsToDestroy } from './getChildTagsToDestroy.function.js'
-import { AnySupport } from './Support.class.js'
 import { smartRemoveKids } from './smartRemoveKids.function.js'
-import { Context } from './Context.types.js'
 import { SupportTagGlobal } from './TemplaterResult.class.js'
+import { runBeforeDestroy } from './tagRunner.js'
+import { AnySupport } from './Support.class.js'
+import { Context } from './Context.types.js'
 
 export function destroySupport(
   support: AnySupport,
@@ -11,6 +11,7 @@ export function destroySupport(
 ): number | Promise<number> {
   const global = support.subject.global as SupportTagGlobal
   global.deleted = true
+  support.subject.renderCount = 0 // if it comes back, wont be considered an update
 
   const context = global.context as Context
   getChildTagsToDestroy(context)
@@ -27,5 +28,6 @@ export function destroySupport(
   if(promises.length) {
     return Promise.all(promises).then(() => stagger)
   }
+
   return stagger
 }

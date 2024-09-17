@@ -1,6 +1,5 @@
-import { Provider } from './providers.js'
 import { Support } from '../tag/Support.class.js'
-import { TagGlobal } from '../tag/index.js'
+import { Provider } from './providers.js'
 
 export function handleProviderChanges(
   appSupport: Support,
@@ -17,20 +16,20 @@ function getTagsWithProvider(
   provider: Provider,
   memory: TagWithProvider[] = []
 ): TagWithProvider[] {
-  const global = support.subject.global as TagGlobal
+  const subject = support.subject
   memory.push({
     support,
-    renderCount: global.renderCount,
+    renderCount: subject.renderCount,
     provider,
   })
 
   const childTags = provider.children
   for (let index = childTags.length - 1; index >= 0; --index) {
     const child = childTags[index]
-    const cGlobal = child.subject.global as TagGlobal
+    const cSubject = child.subject
     memory.push({
       support: child,
-      renderCount: cGlobal.renderCount,
+      renderCount: cSubject.renderCount,
       provider,
     })
   }

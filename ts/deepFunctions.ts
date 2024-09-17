@@ -1,5 +1,6 @@
 import { isArray, isFunction } from './isInstance.js';
-import { BasicTypes, ValueTypes } from './tag/ValueTypes.enum.js';
+import { UnknownFunction } from './tag/index.js';
+import { BasicTypes } from './tag/ValueTypes.enum.js';
 
 export function deepClone<T>(
   obj: T,
@@ -154,9 +155,9 @@ function isArrayDeepEqual(
 }
 
 function isSameFunctions(
-  fn0: Function,
-  fn1: Function
-): Boolean {
+  fn0: UnknownFunction,
+  fn1: UnknownFunction,
+): boolean {
   const bothFunction = isFunction(fn0) && isFunction(fn1)
   return bothFunction && fn0.toString() === fn1.toString()
 }

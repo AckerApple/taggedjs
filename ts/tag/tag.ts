@@ -6,6 +6,7 @@ import { getTemplaterResult, TemplaterResult, Wrapper } from './TemplaterResult.
 import { Original, TagComponent, TagWrapper, tags } from './tag.utils.js'
 import { getTagWrap } from './getTagWrap.function.js'
 import { RouteProps, RouteTag, StateToTag, ToTag } from './tag.types.js'
+import { UnknownFunction } from './update/oneRenderToSupport.function.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { key } from './key.js'
 
@@ -15,7 +16,7 @@ export type TaggedFunction<T extends ToTag> = ((...x:Parameters<T>) => ReturnTyp
   key: KeyFunction
   original?: Original
   compareTo?: string
-}) & { original: Function }
+}) & { original: UnknownFunction }
 
 export enum PropWatches {
   DEEP = 'deep',
@@ -45,7 +46,7 @@ export function tag<T extends ToTag>(
     )
 
     if(!innerTagWrap.parentWrap) {
-      innerTagWrap.parentWrap = parentWrap
+      innerTagWrap.parentWrap = parentWrap as TagWrapper<unknown>
     }
     
     templater.wrapper = innerTagWrap as Wrapper
@@ -53,20 +54,20 @@ export function tag<T extends ToTag>(
     return templater
   }) as TagWrapper<T>// we override the function provided and pretend original is what's returned
   
-  ;(parentWrap as any).original = tagComponent
+  ;(parentWrap as unknown as TagWrapper<T>).original = tagComponent as unknown as Original
   // parentWrap.compareTo = (tagComponent as any).toString()
 
   const tag = tagComponent as unknown as TagComponent
-  parentWrap.original = tag as any as Original
+  parentWrap.original = tag as unknown as Original
 
   // group tags together and have hmr pickup
   tag.tags = tags
   tag.setUse = setUseMemory
   tag.ValueTypes = ValueTypes
   tag.tagIndex = tagCount++ // needed for things like HMR
-  tags.push(parentWrap)
+  tags.push(parentWrap as TagWrapper<unknown>)
 
-  return parentWrap as TaggedFunction<any>
+  return parentWrap as unknown as TaggedFunction<T>
 }
 
 type ReturnTag = DomTag | StringTag | StateToTag | null | undefined
@@ -86,7 +87,7 @@ tag.state = function(): ReturnTag {
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
  */
-tag.route = function(routeProps: RouteProps): StateToTag {
+tag.route = function(_routeProps: RouteProps): StateToTag {
   throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
 }
 
@@ -95,7 +96,7 @@ tag.key = key
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
  */
-tag.app = function(routeTag: RouteTag): StateToTag {
+tag.app = function(_routeTag: RouteTag): StateToTag {
   throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
 }
 
@@ -114,19 +115,19 @@ tag.watchProps = function watchProps<T extends ToTag>(
 }
 
 Object.defineProperty(tag, 'renderOnce', {
-  set(oneRenderFunction: Function) {
+  set(oneRenderFunction: UnknownFunction) {
     (oneRenderFunction as Wrapper).tagJsType = ValueTypes.renderOnce
   },
 })
 
 Object.defineProperty(tag, 'state', {
-  set(renderFunction: Function) {
+  set(renderFunction: UnknownFunction) {
     ;(renderFunction as Wrapper).parentWrap = {
       original: {
         setUse: setUseMemory,
         tags,
-      } as any as Original
-    } as TagWrapper<any>
+      } as unknown as Original
+    } as TagWrapper<unknown>
     ;(renderFunction as Wrapper).tagJsType = ValueTypes.stateRender
   },
 })

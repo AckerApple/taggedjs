@@ -1,9 +1,9 @@
-import { AnySupport } from './Support.class.js'
-import { DomTag, StringTag } from './Tag.class.js'
-import { updateExistingValue } from './update/updateExistingValue.function.js'
-import { Context } from './Context.types.js'
-import { isSubjectInstance } from '../isInstance.js'
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
+import { updateExistingValue } from './update/updateExistingValue.function.js'
+import { isSubjectInstance } from '../isInstance.js'
+import { DomTag, StringTag } from './Tag.class.js'
+import { AnySupport } from './Support.class.js'
+import { Context } from './Context.types.js'
 
 export function processUpdateContext(
   support: AnySupport,

@@ -25,8 +25,8 @@ export function updateSupportValuesBy(
   newerSupport: AnySupport,
 ) {
   const tempTag = (newerSupport.templater.tag || newerSupport.templater) as DomTag | StringTag
-  const values = (newerSupport.templater as any as Tag).values || tempTag.values
-  const tag = olderSupport.templater.tag as any
+  const values = (newerSupport.templater as unknown as Tag).values || tempTag.values
+  const tag = olderSupport.templater.tag as DomTag
   
   tag.values = values
 }

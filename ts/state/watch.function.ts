@@ -166,9 +166,10 @@ function defineOnMethod<R>(
 
             if(nowSupport !== firstSupport) {
               const newestState = setUseMemory.stateConfig.array
+              const oldestState = firstSupport.subject.global.oldest.state
               syncStates(
                 newestState,
-                firstSupport.state,
+                oldestState, // firstSupport.state,
               )
             }
 

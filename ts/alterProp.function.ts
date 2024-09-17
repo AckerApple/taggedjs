@@ -1,14 +1,16 @@
-import { isInlineHtml, renderInlineHtml, renderSupport } from './tag/render/renderSupport.function.js'
+import { isInlineHtml, renderInlineHtml } from './tag/render/renderSupport.function.js'
 import { renderExistingReadyTag } from './tag/render/renderExistingTag.function.js'
 import { AnySupport, BaseSupport, Support } from './tag/Support.class.js'
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { deepCompareDepth } from './tag/hasSupportChanged.function.js'
-import { SupportTagGlobal } from './tag/TemplaterResult.class.js'
+import { SupportTagGlobal, TemplaterResult } from './tag/TemplaterResult.class.js'
 import { isArray, isStaticTag } from './isInstance.js'
 import { BasicTypes } from './tag/ValueTypes.enum.js'
 import { setUseMemory } from './state/index.js'
 import { Tag } from './tag/Tag.class.js'
 import { Props } from './Props.js'
+import { UnknownFunction } from './tag/index.js'
+import { Subject } from './subject/Subject.class.js'
 
 export function castProps(
   props: Props,
@@ -42,7 +44,7 @@ export function alterProp(
 }
 
 export function checkProp(
-  value: any,
+  value: unknown | TemplaterResult | SubableProp | unknown[] | Record<string, unknown>,
   ownerSupport: BaseSupport | Support,
   newSupport: BaseSupport | Support,
   depth: number,
@@ -51,7 +53,7 @@ export function checkProp(
     return value
   }
 
-  if(value.tagJsType) {
+  if((value as TemplaterResult).tagJsType) {
     return value
   }
 
@@ -69,33 +71,56 @@ export function checkProp(
   }
 
   if(isArray(value)) {
-    for (let index = value.length - 1; index >= 0; --index) {
-      const subValue = value[index]
-  
-      value[index] = checkProp(
-        subValue, ownerSupport, newSupport, depth + 1,
-      )
-
-      if(typeof(subValue) === BasicTypes.function) {
-        if(subValue.mem) {
-          continue
-        }
-
-        afterCheckProp(depth + 1, index, subValue, value, newSupport)
-      }
-    }
-
-    return value
+    return checkArrayProp(value as unknown[], newSupport, ownerSupport, depth)
   }
 
+  return checkObjectProp(value as Record<string, unknown>, newSupport, ownerSupport, depth)
+}
+
+function checkArrayProp(
+  value: unknown[],
+  newSupport: AnySupport,
+  ownerSupport: AnySupport,
+  depth: number,
+) {
+  for (let index = value.length - 1; index >= 0; --index) {
+    const subValue = value[index] as WrapRunner
+
+    value[index] = checkProp(
+      subValue, ownerSupport, newSupport, depth + 1,
+    )
+
+    if(typeof(subValue) === BasicTypes.function) {
+      if(subValue.mem as unknown) {
+        continue
+      }
+
+      afterCheckProp(
+        depth + 1, index, subValue,
+        value as unknown as SubableProp,
+        newSupport,
+      )
+    }
+  }
+
+  return value
+}
+
+function checkObjectProp(
+  value: Record<string, unknown>,
+  newSupport: AnySupport,
+  ownerSupport: AnySupport,
+  depth: number,
+) {
   const keys = Object.keys(value)
   for(const name of keys){
-    const subValue = value[name]
+    const subValue = value[name] as WrapRunner
     const result = checkProp(
       subValue, ownerSupport, newSupport, depth + 1,
     )
 
-    if(value[name] === result) {
+    const newSubValue = value[name] as unknown
+    if(newSubValue === result) {
       continue
     }
     
@@ -107,35 +132,47 @@ export function checkProp(
 
     value[name] = result
     if(typeof(result) === BasicTypes.function) {
-      if(subValue.mem) {
+      if(subValue.mem as unknown) {
         continue
       }
   
-      afterCheckProp(depth + 1, name, subValue, value, newSupport)
+      afterCheckProp(
+        depth + 1, name, subValue,
+        value as SubableProp,
+        newSupport,
+      )
     }
   }
   
   return value
 }
 
+type SubableProp = {[name:string]: {subscription: Subject<void>}}
+
 function afterCheckProp(
   depth: number,
   index: string | number,
-  originalValue: any,
-  newProp: any,
+  originalValue: unknown,
+  newProp: SubableProp,
   newSupport: BaseSupport | Support
 ) {
   // restore object to have original function on destroy
   if(depth > 0) {    
     const global = newSupport.subject.global as SupportTagGlobal
     newProp[index].subscription = global.destroy$.toCallback(function alterCheckProcessor() {
-      newProp[index] = originalValue
+      newProp[index] = originalValue as unknown as {subscription: Subject<void>}
     })
   }
 }
 
+export type WrapRunner = (() => unknown) & {
+  original: unknown
+  mem: UnknownFunction
+  toCall: UnknownFunction
+}
+
 export function getPropWrap(
-  value: any,
+  value: {mem?: unknown},
   ownerSupport: BaseSupport | Support,
 ) {
   const already = value.mem
@@ -145,17 +182,17 @@ export function getPropWrap(
     return value
   }
 
-  const wrap = function wrapRunner(...args: any[]) {
+  const wrap = function wrapRunner(...args: unknown[]) {
     return wrap.toCall(...args)
-  } // what gets called can switch over parent state changes
-  
+  } as WrapRunner // what gets called can switch over parent state changes
+
+  wrap.original = value
+  wrap.mem = value as UnknownFunction
+
   // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
-  wrap.toCall = function toCallRunner(...args: any[]) {
+  wrap.toCall = function toCallRunner(...args: unknown[]) {
     return callbackPropOwner(wrap.mem, args, ownerSupport)
   }
-  
-  wrap.original = value
-  wrap.mem = value
 
   // copy data properties that maybe on source function
   Object.assign(wrap, value)
@@ -165,8 +202,8 @@ export function getPropWrap(
 
 /** Function shared by alterProps() and updateExistingTagComponent... TODO: May want to have to functions to reduce cycle checking?  */
 export function callbackPropOwner(
-  toCall: Function,
-  callWith: any,
+  toCall: UnknownFunction,
+  callWith: unknown[],
   ownerSupport: BaseSupport | Support, // <-- WHEN called from alterProp its owner OTHERWISE its previous
 ) {
   const global = ownerSupport.subject.global as SupportTagGlobal
@@ -186,14 +223,6 @@ export function callbackPropOwner(
         return callbackResult // owner did not change
       }
     }
-
-    /*
-    const oldest = global.oldest
-    const wasInstant = oldest === newest && global.renderCount === 0
-    if(wasInstant) {
-      return // prop was called immediately
-    }
-    */
 
     safeRenderSupport(newest, ownerSupport)
 

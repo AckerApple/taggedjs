@@ -5,6 +5,7 @@ import { hasPropLengthsChanged } from './render/renderSupport.function.js'
 import { BaseSupport, PropsConfig } from './Support.class.js'
 import { PropWatches } from './tag.js'
 import { TemplaterResult } from './TemplaterResult.class.js'
+import { UnknownFunction } from './update/oneRenderToSupport.function.js'
 import { BasicTypes } from './ValueTypes.enum.js'
 
 export function hasSupportChanged(
@@ -183,7 +184,7 @@ function compareProps(
     return deepEqual(value, compare, deepCompareDepth) ? 4 : false
   }
 
-  const compareFn = compare as Function
+  const compareFn = compare as UnknownFunction
   if(!(typeof(compareFn) === BasicTypes.function)) {
     return false // its a function now but was not before
   }

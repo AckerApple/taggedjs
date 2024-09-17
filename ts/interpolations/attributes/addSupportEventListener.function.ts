@@ -1,6 +1,6 @@
-import { EventCallback } from '../../tag/index.js'
+import { BaseTagGlobal, EventCallback } from '../../tag/index.js'
+import { Events } from '../../tag/TemplaterResult.class.js'
 import { AnySupport } from '../../tag/Support.class.js'
-import { Events, TagGlobal } from '../../tag/TemplaterResult.class.js'
 
 export function addSupportEventListener(
   support: AnySupport,
@@ -18,7 +18,7 @@ export function addSupportEventListener(
   const replaceEventName = '_' + eventName
   // const replaceEventName = eventName
 
-  const global = support.subject.global as TagGlobal
+  const global = support.subject.global as BaseTagGlobal
   const eventReg = global.events as Events
   
   if(!eventReg[eventName]) {
