@@ -8,6 +8,7 @@ import { updateSupportBy } from '../updateSupportBy.function.js';
 import { isArray, isTagComponent } from '../../isInstance.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { processTagArray } from './processTagArray.js';
+/** Used for all tag value updates. Determines if value changed since last render */
 export function updateExistingValue(contextItem, value, ownerSupport) {
     // Do not continue if the value is just the same
     if (value === contextItem.value) {

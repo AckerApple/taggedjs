@@ -14,11 +14,21 @@ ownerSupport, counts, appendTo) {
     let runtimeInsertBefore = subject.placeholder;
     let removed = 0;
     /** 🗑️ remove previous items first */
-    const filteredLast = subject.lastArray = lastArray.filter(function lastArrayFilter(item, index) {
+    const filteredLast = [];
+    for (let index = 0; index < lastArray.length; ++index) {
+        const item = lastArray[index];
         const newRemoved = reviewLastArrayItem(item, value, index, lastArray, removed, counts);
+        if (newRemoved === 0) {
+            filteredLast.push(item);
+            continue;
+        }
         removed = removed + newRemoved;
-        return newRemoved === 0;
-    });
+        // do the same number again because it was a mid delete
+        if (newRemoved === 2) {
+            index = index - 1;
+        }
+    }
+    subject.lastArray = filteredLast;
     // const eAppendTo = existed ? undefined : appendTo
     const eAppendTo = appendTo; // existed ? undefined : appendTo
     const length = value.length;
@@ -37,14 +47,14 @@ counts, appendTo) {
     return processAddTagArrayItem(item, runtimeInsertBefore, // thisInsert as any,
     ownerSupport, counts, lastArray, appendTo);
 }
-function reviewPreviousArrayItem(item, itemSubject, lastArray, ownerSupport, index, runtimeInsertBefore, // used during updates
+function reviewPreviousArrayItem(value, itemSubject, lastArray, ownerSupport, index, runtimeInsertBefore, // used during updates
 counts, appendTo) {
     const couldBeSame = lastArray.length > index;
     if (couldBeSame) {
-        updateExistingValue(itemSubject, item, ownerSupport);
+        updateExistingValue(itemSubject, value, ownerSupport);
         return itemSubject;
     }
-    const result = processAddTagArrayItem(item, runtimeInsertBefore, // thisInsert as any,
+    const result = processAddTagArrayItem(value, runtimeInsertBefore, // thisInsert as any,
     ownerSupport, counts, lastArray, appendTo);
     return result;
 }
@@ -81,10 +91,11 @@ ownerSupport, counts, lastArray, appendTo) {
 }
 export function destroyArrayItem(item, counts) {
     const global = item.global;
-    const support = global.newest;
-    global.deleted = true;
-    if (support) {
+    if (global) {
+        const support = global.oldest;
+        global.deleted = true;
         destroySupport(support, counts.removed);
+        global.deleted = true;
     }
     else {
         const element = item.simpleValueElm;
@@ -98,10 +109,17 @@ value, index, lastArray, removed, counts) {
     const newLength = value.length - 1;
     const at = index - removed;
     const lessLength = at < 0 || newLength < at;
+    const prev = lastArray[index];
     if (lessLength) {
-        destroyArrayItem(lastArray[index], counts);
+        destroyArrayItem(prev, counts);
         ++removed;
         return 1;
+    }
+    if (lastArray[index].value.arrayValue !== value[index].arrayValue) {
+        destroyArrayItem(prev, counts);
+        lastArray.splice(index, 1);
+        ++removed;
+        return 2;
     }
     /*
     const nowValue = getArrayValueByItem(subTag)

@@ -7,9 +7,8 @@ export function initState(support, config) {
     config.array = [];
     config.support = support;
 }
-export function reState(support, config) {
-    const state = support.state;
-    config.rearray = state;
+export function reState(support, config, prevState) {
+    config.rearray = prevState;
     config.array = [];
     config.handlers.handler = runRestate;
     config.handlers.letHandler = reLetState;

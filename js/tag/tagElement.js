@@ -11,6 +11,7 @@ import { executeWrap } from './executeWrap.function.js';
 import { paint, painting } from './paint.function.js';
 import { initState } from '../state/state.utils.js';
 import { isTagComponent } from '../isInstance.js';
+import { beforeRerender } from './render/beforeRerender.function.js';
 const appElements = [];
 /**
  *
@@ -38,8 +39,10 @@ export function tagElement(app, element, props) {
     const global = subject.global;
     initState(global.newest, setUseMemory.stateConfig);
     let templater2 = app(props);
-    if (typeof templater2 !== BasicTypes.function) {
+    const isAppFunction = typeof templater2 == BasicTypes.function;
+    if (!isAppFunction) {
         if (!isTagComponent(templater2)) {
+            templater.tag = templater2;
             templater2 = app;
         }
         else {
@@ -54,8 +57,13 @@ export function tagElement(app, element, props) {
         }
     }
     const placeholder = document.createTextNode('');
-    const support = runWrapper(templater, placeholder, element, subject);
+    const support = runWrapper(templater, placeholder, element, subject, isAppFunction);
     global.isApp = true;
+    if (isAppFunction) {
+        templater2.tag = support.templater.tag;
+    }
+    // enables hmr destroy so it can control entire app
+    ;
     element.destroy = function () {
         const events = global.events;
         for (const eventName in events) {
@@ -96,7 +104,6 @@ export function tagElement(app, element, props) {
     --painting.locks;
     paint();
     element.appendChild(newFragment);
-    // ++subject.renderCount
     return {
         support,
         tags,
@@ -113,26 +120,43 @@ function getNewSubject(templater, appElement) {
     };
     const global = getNewGlobal(subject);
     global.events = {};
+    loadNewBaseSupport(templater, subject, appElement);
+    return subject;
+}
+function loadNewBaseSupport(templater, subject, appElement) {
+    const global = subject.global;
     const newSupport = getBaseSupport(templater, subject);
     newSupport.appElement = appElement;
     global.oldest = global.oldest || newSupport;
     global.newest = newSupport;
-    return subject;
+    return newSupport;
 }
-export function runWrapper(templater, placeholder, appElement, subject) {
+export function runWrapper(templater, placeholder, appElement, subject, isAppFunction) {
     subject.placeholder = placeholder;
     const global = subject.global;
-    const newSupport = global.newest;
+    const useSupport = global.newest;
+    const oldest = global.oldest;
+    const isFirstRender = useSupport === oldest;
+    if (!isFirstRender) {
+        beforeRerender(useSupport, oldest.state);
+    }
     if (templater.tagJsType === ValueTypes.stateRender) {
         const result = (templater.wrapper || { original: templater });
-        const nowSupport = executeWrap(templater, result, newSupport);
-        runAfterRender(newSupport, nowSupport);
+        if (!isAppFunction) {
+            const newSupport = loadNewBaseSupport(templater, subject, appElement);
+            const nowState = setUseMemory.stateConfig.array;
+            newSupport.state = nowState;
+            runAfterRender(newSupport);
+            return newSupport;
+        }
+        const nowSupport = executeWrap(templater, result, useSupport);
+        runAfterRender(nowSupport);
         return nowSupport;
     }
     // Call the apps function for our tag templater
     const wrapper = templater.wrapper;
-    const nowSupport = wrapper(newSupport, subject);
-    runAfterRender(newSupport, nowSupport);
+    const nowSupport = wrapper(useSupport, subject);
+    runAfterRender(nowSupport);
     return nowSupport;
 }
 function putOneDomDown(dom, newFragment) {
