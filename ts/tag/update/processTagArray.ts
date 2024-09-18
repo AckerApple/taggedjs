@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 
-import { paintAppends, paintInsertBefores, paintRemoves } from '../paint.function.js'
+import { paint, paintAppends, painting, paintInsertBefores, paintRemoves } from '../paint.function.js'
 import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
 import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { checkSimpleValueChange } from '../checkDestroyPrevious.function.js'
@@ -31,16 +31,28 @@ export function processTagArray(
 
   let removed = 0
   /** 🗑️ remove previous items first */
-  const filteredLast = subject.lastArray = lastArray.filter(function lastArrayFilter(
-    item: ContextItem,
-    index: number,
-  ) {
+  const filteredLast: Context = []
+  
+  for (let index=0; index < lastArray.length; ++index) {
+    const item: ContextItem = lastArray[index]
     const newRemoved = reviewLastArrayItem(
       item, value, index, lastArray, removed, counts,
     )
+
+    if(newRemoved === 0) {
+      filteredLast.push(item)
+      continue
+    }
+    
     removed = removed + newRemoved
-    return newRemoved === 0
-  })
+
+    // do the same number again because it was a mid delete
+    if(newRemoved === 2) {
+      index = index - 1
+    }
+  }
+
+  subject.lastArray = filteredLast
 
   // const eAppendTo = existed ? undefined : appendTo
   const eAppendTo = appendTo // existed ? undefined : appendTo
@@ -90,7 +102,7 @@ function reviewArrayItem(
 }
 
 function reviewPreviousArrayItem(
-  item: unknown,
+  value: unknown,
   itemSubject: ContextItem,
   lastArray: Context,
   ownerSupport: AnySupport,
@@ -101,12 +113,12 @@ function reviewPreviousArrayItem(
 ) {
   const couldBeSame = lastArray.length > index
   if (couldBeSame) {
-    updateExistingValue(itemSubject, item as TemplateValue, ownerSupport)
+    updateExistingValue(itemSubject, value as TemplateValue, ownerSupport)
     return itemSubject
   }
 
   const result = processAddTagArrayItem(
-    item,
+    value,
     runtimeInsertBefore as Text, // thisInsert as any,
     ownerSupport,
     counts,
@@ -174,11 +186,12 @@ export function destroyArrayItem(
   counts: Counts,
 ) {
   const global = item.global as SupportTagGlobal
-  const support = global.newest
-  global.deleted = true
-
-  if(support) {
+  
+  if(global) {    
+    const support = global.oldest
+    global.deleted = true
     destroySupport(support, counts.removed)
+    global.deleted = true
   } else {
     const element = item.simpleValueElm as Element
     delete item.simpleValueElm
@@ -199,11 +212,19 @@ function reviewLastArrayItem(
   const newLength = value.length - 1
   const at = index - removed
   const lessLength = at < 0 || newLength < at
+  const prev = lastArray[index]
 
   if(lessLength) {
-    destroyArrayItem(lastArray[index], counts)
+    destroyArrayItem(prev, counts)
     ++removed
     return 1
+  }
+
+  if(lastArray[index].value.arrayValue !== (value[index] as any).arrayValue) {
+    destroyArrayItem(prev, counts)
+    lastArray.splice(index, 1)
+    ++removed
+    return 2
   }
 
   /*

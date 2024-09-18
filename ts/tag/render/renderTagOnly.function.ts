@@ -1,10 +1,12 @@
 import { SupportTagGlobal, Wrapper } from '../TemplaterResult.class.js'
 import { AnySupport, getSupport, Support, SupportContextItem } from '../Support.class.js'
-import { beforeRender } from './beforeRender.function.js'
+import { beforeRerender } from './beforeRerender.function.js'
 import { executeWrap } from '../executeWrap.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { TagWrapper } from '../tag.utils.js'
 import { runAfterRender } from '../afterRender.function.js'
+import { initState } from '../../state/state.utils.js'
+import { setUseMemory } from '../../state/setUse.function.js'
 
 export function renderTagOnly(
   newSupport: AnySupport,
@@ -14,8 +16,13 @@ export function renderTagOnly(
 ): AnySupport {
   const global = subject.global as SupportTagGlobal
   const oldRenderCount = subject.renderCount
+  const prevState = prevSupport?.state
 
-  beforeRender(newSupport, prevSupport?.state)
+  if(prevState) {
+    beforeRerender(newSupport, prevState)
+  } else {
+    initState(newSupport, setUseMemory.stateConfig)
+  }
   
   const templater = newSupport.templater
   let reSupport: AnySupport
@@ -50,8 +57,6 @@ export function renderTagOnly(
 
   runAfterRender(reSupport, ownerSupport)
   
-  global.newest = reSupport
-
   // When we rendered, only 1 render should have taken place OTHERWISE rendering caused another render and that is the latest instead
   // TODO: below most likely not needed
   if(subject.renderCount > oldRenderCount + 1) {

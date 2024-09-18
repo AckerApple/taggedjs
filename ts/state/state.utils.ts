@@ -2,6 +2,7 @@ import { firstLetState, reLetState } from './letState.function.js'
 import { BaseSupport, Support } from '../tag/Support.class.js'
 import { runFirstState, runRestate } from './stateHandlers.js'
 import { State, StateConfig } from './state.types.js'
+import { checkStateMismatch } from '../tag/checkStateMismatch.function.js'
 
 export type Config = {
   version: number
@@ -31,9 +32,9 @@ export function initState(
 export function reState(
   support: Support | BaseSupport,
   config: Config,
+  prevState: State,
 ) {
-  const state = support.state
-  config.rearray = state
+  config.rearray = prevState
   config.array = []
 
   config.handlers.handler = runRestate as any

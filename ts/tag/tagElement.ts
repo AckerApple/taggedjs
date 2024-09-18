@@ -1,22 +1,22 @@
 import { DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { Events, SupportTagGlobal, TemplaterResult, Wrapper } from './TemplaterResult.class.js'
-import { BaseSupport, getBaseSupport, Support, SupportContextItem } from './Support.class.js'
+import { BaseSupport, getBaseSupport, SupportContextItem } from './Support.class.js'
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
 import { buildBeforeElement } from './buildBeforeElement.function.js'
 import { TagComponent, TagWrapper } from './tag.utils.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 import { destroySupport } from './destroySupport.function.js'
-import { BaseTagGlobal, checkTagValueChange, PropWatches } from './index.js'
+import { BaseTagGlobal, checkTagValueChange, DomTag, PropWatches } from './index.js'
 import { setUseMemory, UseMemory } from '../state/setUse.function.js'
 import { runAfterRender } from './afterRender.function.js'
 import { executeWrap } from './executeWrap.function.js'
 import { paint, painting } from './paint.function.js'
 import { initState } from '../state/state.utils.js'
 import { isTagComponent } from '../isInstance.js'
-import { ContextItem } from './Context.types.js'
 import { Props } from '../Props.js'
 import { TagMaker } from './TagMaker.type.js'
+import { beforeRerender } from './render/beforeRerender.function.js'
 
 export type TagAppElement = Element & {
   ValueTypes: typeof ValueTypes
@@ -66,9 +66,11 @@ export function tagElement(
   initState(global.newest, setUseMemory.stateConfig)
 
   let templater2 = app(props) as unknown as TemplaterResult
+  const isAppFunction = typeof templater2 == BasicTypes.function
   
-  if(typeof templater2 !== BasicTypes.function) {
+  if(!isAppFunction) {
     if(!isTagComponent(templater2)) {
+      templater.tag = templater2 as unknown as DomTag
       templater2 = app as unknown as TemplaterResult
     } else {
       global.newest.propsConfig = {
@@ -83,10 +85,14 @@ export function tagElement(
   }
 
   const placeholder = document.createTextNode('')
-  const support = runWrapper(templater, placeholder, element, subject)
+  const support = runWrapper(templater, placeholder, element, subject, isAppFunction)
   
   global.isApp = true
   
+  if(isAppFunction) {
+    templater2.tag = support.templater.tag
+  }
+
   // enables hmr destroy so it can control entire app
   ;(element as TagJsElement).destroy = function() {
     const events = global.events as Events
@@ -142,8 +148,6 @@ export function tagElement(
   paint()
   element.appendChild(newFragment)
 
-  // ++subject.renderCount
-
   return {
     support,
     tags,
@@ -155,7 +159,6 @@ function getNewSubject(
   templater: TemplaterResult,
   appElement: Element,
 ) {
-
   const subject: SupportContextItem = {
     value: templater,
     checkValueChange: checkTagValueChange,
@@ -168,6 +171,17 @@ function getNewSubject(
   const global = getNewGlobal(subject) as BaseTagGlobal
   global.events = {}
 
+  loadNewBaseSupport(templater, subject, appElement)
+
+  return subject
+}
+
+function loadNewBaseSupport(
+  templater: TemplaterResult,
+  subject: SupportContextItem,
+  appElement: Element,
+) {
+  const global = subject.global
   const newSupport = getBaseSupport(
     templater,
     subject as SupportContextItem,
@@ -175,32 +189,46 @@ function getNewSubject(
 
   newSupport.appElement = appElement
   global.oldest = global.oldest || newSupport
-  global.newest = newSupport as Support
-
-  return subject
+  global.newest = newSupport
+  return newSupport
 }
 
 export function runWrapper(
   templater: TemplaterResult,
   placeholder: Text,
   appElement: Element,
-  subject: ContextItem,
+  subject: SupportContextItem,
+  isAppFunction: boolean,
 ) {
   subject.placeholder = placeholder
   
   const global = subject.global as SupportTagGlobal
-  const newSupport = global.newest
+  const useSupport = global.newest
+  const oldest = global.oldest
+  const isFirstRender = useSupport === oldest
+  
+  if(!isFirstRender) {
+    beforeRerender(useSupport, oldest.state)
+  }
 
   if(templater.tagJsType === ValueTypes.stateRender) {
     const result = (templater.wrapper || {original: templater}) as unknown as TagWrapper<unknown>
 
+    if(!isAppFunction) {
+      const newSupport = loadNewBaseSupport(templater, subject, appElement)
+      const nowState = setUseMemory.stateConfig.array
+      newSupport.state = nowState
+      runAfterRender(newSupport)
+      return newSupport
+    }
+
     const nowSupport = executeWrap(
       templater,
       result,
-      newSupport,
+      useSupport,
     )
 
-    runAfterRender(newSupport, nowSupport)
+    runAfterRender(nowSupport)
 
     return nowSupport
   }
@@ -208,11 +236,11 @@ export function runWrapper(
   // Call the apps function for our tag templater
   const wrapper = templater.wrapper as Wrapper
   const nowSupport = wrapper(
-    newSupport,
+    useSupport,
     subject,
   )
 
-  runAfterRender(newSupport, nowSupport)
+  runAfterRender(nowSupport)
 
   return nowSupport
 }

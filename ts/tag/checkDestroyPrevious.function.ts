@@ -32,11 +32,12 @@ export function destroyArray(
   lastArray: any[]
 ) {
   const counts = {added:0, removed:0}
-  delete subject.lastArray
   
   for (let index=0; index < lastArray.length; ++index) {
     destroyArrayItem(lastArray[index], counts)
   }
+  
+  delete subject.lastArray
 }
 
 export function checkSimpleValueChange(

@@ -15,6 +15,7 @@ export default function callbackStateUpdate<T>(
   const global = support.subject.global as SupportTagGlobal
   support = global.newest // || support
   const state = support.state
+
   // ensure that the oldest has the latest values first
   syncStates(state, oldState)
   
