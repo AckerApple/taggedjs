@@ -11,9 +11,10 @@ export const Item = tag.immutableProps((
         <li class.completed=${todo.completed} class.editing=${editing}>
             ${!editing ? html`
                 <div class="view">
+                    ${ todo.completed && '✅' }
                     <input type="button" onclick=${e => dispatch.toggleItem(todo, index)} value="toggle" />
                     
-                    <input class="toggle" type="checkbox" ${todo.completed && 'checked'} onchange=${() => dispatch.completeItem(todo, index)} />
+                    <input class="toggle" type="checkbox" ${todo.completed && 'checked'} onchange=${() => dispatch.toggleItem(todo, index)} />
                     
                     <label data-testid="todo-item-label" ondoubleclick=${() => editing = !editing}
                     >${todo.title}</label>

@@ -1,3 +1,4 @@
+import webpack from 'webpack'
 import * as path from 'path'
 import TerserPlugin from 'terser-webpack-plugin'
 // import CompressionPlugin from 'compression-webpack-plugin'
@@ -59,4 +60,4 @@ export default {
     }),
     */
   ]
-}
+} as any as webpack.Configuration

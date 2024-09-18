@@ -120,7 +120,7 @@ async function updateByElement(
 
   /** @type {TagComponent[]} */
   const oldTags = lastTags
-  const oldSetUse = tagAppElm.setUse // placed on element by tagElement command
+  const oldSetUse = tagAppElm.setUse as any // placed on element by tagElement command
     
   const tags = await discoverTags()
 
@@ -141,20 +141,7 @@ async function updateByElement(
     // share direct comparisons
     // Object.assign(tagAppElm.ValueTypes, newSetup.ValueTypes)
     ;(window as any).hmr = true
-    console.log('old new window', {
-      newSetUse,
-      oldSetUse,
-      oldVersion: oldSetUse.version,
-      newVersion: newSetUse.version,
-      myV: setUseMemory.stateConfig.version,
-/*
-      old: tagAppElm.ValueTypes, // from
-      new: newSetup.ValueTypes,
-      oldVersion: tagAppElm.ValueTypes.version,
-      newVersion: newSetup.ValueTypes.version,
-      ValueTypes,
-*/
-    })
+
     // Object.assign(newSetUse, oldSetUse) // update the new with the old
     newSetUse.stateConfig = oldSetUse.stateConfig // update the new with the old
     setUseMemory.stateConfig = oldSetUse.stateConfig
@@ -358,14 +345,6 @@ function rebuildApps() {
         
         // tagElement.ValueTypes = result.ValueTypes
         tagElement.ValueTypes = ValueTypes
-
-        console.log('resultedxtss', {
-          version: ValueTypes.version,
-          result,
-          oldValueTypes,
-          ValueTypes,
-          elemVT: (element as any).ValueTypes,
-        })
         ;(element as any).ValueTypes = ValueTypes
   
         return result

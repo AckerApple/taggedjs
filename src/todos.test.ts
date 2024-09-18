@@ -1,10 +1,14 @@
-import { blur, click, clickOne, focus, keydownOn, query } from "./elmSelectors"
-import { describe, expect, it } from "./expect"
+import { click, clickOne, focus, keydownOn, query } from "./testing/elmSelectors"
+import { describe, expect, it } from "./testing/expect"
+import { sleep } from "./testing/expect.html"
 
 describe('todos', function todos() {
   const todoInput = query('.new-todo')[0] as HTMLInputElement
 
-  it('add one remove one', function addOneRemoveOne() {
+  it('add one remove one', async function addOneRemoveOne() {
+    click('#todo-view-all-link')
+    await sleep(1) // window route change takes a tick
+
     expect(query('button.destroy').length).toBe(0)
     expect(todoInput).toBeDefined()
     
@@ -17,7 +21,7 @@ describe('todos', function todos() {
     expect(query('button.destroy').length).toBe(0)
   })  
   
-  it('basic', function basic() {
+  it('basic', async function basic() {
     todoInput.value = 'one'
     keydownOn(todoInput, 'Enter')
     
@@ -43,6 +47,19 @@ describe('todos', function todos() {
     keydownOn(todoInput, 'Enter')
     
     expect(query('input.toggle').length).toBe(3)
+
+    click('#todo-view-active-link')
+    expect(query('input.toggle').length).toBe(3, 'active todo count before page change')
+    await sleep(1) // window route change takes a tick
+    expect(query('input.toggle').length).toBe(2, 'active todo count after page change')
+    
+    click('#todo-view-completed-link')
+    await sleep(1) // window route change takes a tick
+    expect(query('input.toggle').length).toBe(1, 'completed todo count')
+    
+    click('#todo-view-all-link')
+    await sleep(1) // window route change takes a tick
+    expect(query('input.toggle').length).toBe(3, 'view all todo count')
 
     // delete 0
     clickOne('button.destroy')

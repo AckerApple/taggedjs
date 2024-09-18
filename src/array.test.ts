@@ -1,5 +1,5 @@
-import { byId, elmCount } from "./elmSelectors"
-import { describe, expect, it } from "./expect"
+import { byId, elmCount } from "./testing/elmSelectors"
+import { describe, expect, it } from "./testing/expect"
 
 
 describe('array testing', () => {

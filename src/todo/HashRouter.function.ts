@@ -1,16 +1,30 @@
-import { callback, onDestroy, state } from "taggedjs";
+import { callback, onDestroy, state } from "taggedjs"
 
-const getHash = () => window.location.hash.substring(1) || '/';
+const getHash = () => window.location.hash.substring(1) || '/'
 
-const HashRouter = () => {
-    const memory = {route: getHash()};
-    const onHashChange = callback(() => memory.route = getHash());
-    window.addEventListener('hashchange', onHashChange);
-    return {memory, onHashChange};
+/** only should run once */
+const HashRouter = (onHashChange: (route: string) => unknown) => {
+    const listener = () => onHashChange(getHash())
+    window.addEventListener('hashchange', listener)
+    return listener
 }
 
+/** Hook into browser window hash changes and cause state to render after change */
 export const useHashRouter = () => {
-    const {memory, onHashChange} = state(() => HashRouter());
-    onDestroy(() => window.removeEventListener('hashchange', onHashChange));
+    const memory = state(() => ({
+            route: getHash()
+        }
+    ))
+
+    // What to run on change and signify a state change will occur. Only first instance is used below in listener
+    const onHashChange = callback((route: string) => memory.route = getHash())
+    
+    // runs function call only once
+    const listener = state(() => {
+        return HashRouter(onHashChange)
+    })
+    
+    onDestroy(() => window.removeEventListener('hashchange', listener))
+    
     return memory
-};
+}

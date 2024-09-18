@@ -1,5 +1,13 @@
 import { expect } from "./expect"
 
+export function sleep(ms:number) {
+  return new Promise(res => {
+    setTimeout(() => {
+      res(undefined)
+    }, ms)
+  })
+}
+
 /* all elements in each query must have the same html */
 export function expectMatchedHtml(
   ...queries: string[]

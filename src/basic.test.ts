@@ -1,5 +1,5 @@
-import { byId, click, textContent } from "./elmSelectors"
-import { expect, it } from "./expect"
+import { byId, click, textContent } from "./testing/elmSelectors"
+import { expect, it } from "./testing/expect"
 
 it('elements exists', () => {
   expect(byId('h1-app')).toBeDefined()

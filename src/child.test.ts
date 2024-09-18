@@ -1,5 +1,5 @@
-import { it } from "./expect"
-import { testCounterElements, testDuelCounterElements } from "./expect.html"
+import { it } from "./testing/expect"
+import { testCounterElements, testDuelCounterElements } from "./testing/expect.html"
 
 it('child tests', () => {
   testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display')

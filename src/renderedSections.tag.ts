@@ -1,4 +1,4 @@
-import { html, Subject } from "taggedjs"
+import { html, Subject, tag } from "taggedjs"
 import { oneRender } from "./oneRender.tag"
 import { storage, ViewTypes } from "./sections.tag"
 import funInPropsTag from "./funInProps.tag"
@@ -29,7 +29,7 @@ export function renderedSections(
         <legend>${title}</legend>
         ${output}
       </fieldset>
-    `)}
+    `.key(view))}
 
     ${storage.views.includes(ViewTypes.Props) && html`
       <fieldset style="flex:2 2 20em">
@@ -111,7 +111,7 @@ export function renderedSections(
     ${storage.views.includes(ViewTypes.Todo) && html`
       <fieldset style="flex:2 2 20em">
         <legend>todo</legend>
-        ${todoApp()}
+        ${tag(todoApp)()}
       </fieldset>
     `}
 

@@ -40,11 +40,14 @@ function templaterToSupport(
   templater: TemplaterResult,
 ) {
   const subject: SupportContextItem = {
+    renderCount: 0,
     value: templater,
-    global: getNewGlobal() as SupportTagGlobal,
+    global: undefined as any, // populated below in getNewGlobal
     checkValueChange: checkSimpleValueChange,
     withinOwnerElement: false,
   }
+  
+  getNewGlobal(subject) as SupportTagGlobal
   templater.props = templater.props || []
   const support = getBaseSupport(templater, subject) as any as Support
 
@@ -55,9 +58,9 @@ function templaterToSupport(
 
 function readySupport(
   support: Support,
-  subject: ContextItem,
+  subject: SupportContextItem,
 ) {
-  const global = subject.global as SupportTagGlobal
+  const global = subject.global
   global.newest = support
   global.oldest = support
 
@@ -112,7 +115,7 @@ function processValue(
           support, // ownerTagSupport as TagSupport,
         )
   
-        readySupport(tSupport, subject as ContextItem)
+        readySupport(tSupport, subject as SupportContextItem)
   
         const fnString = templaterToHtml(tSupport.templater)
         strings.splice(index+1, 0, fnString)
@@ -131,7 +134,7 @@ function processValue(
             support,
             {
               value,
-              global: getNewGlobal(),
+              global: getNewGlobal(subject as ContextItem),
               checkValueChange: checkSimpleValueChange,
               withinOwnerElement: subject?.withinOwnerElement || false,
             }

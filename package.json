@@ -3,7 +3,7 @@
   "scripts": {
     "save": "git add . && git commit -m \"patch\" && git push",
     "start": "run-p start:hmr",
-    "start:hmr": "ts-node tagged-hmr.ts --dir \"./src\"",
+    "start:hmr": "ts-node hmr-server.ts --dir \"./src\"",
     "build": "run-s build:hmr build:bundle",
     "build:bundle": "ts-node runBundleScript.ts",
     "build:js": "rm -rf assets/js && mkdir assets/js && tsc -p tsconfig.build.json",
@@ -33,6 +33,6 @@
     "ws": "^8.15.1"
   },
   "dependencies": {
-    "taggedjs-cli": "^0.0.21"
+    "taggedjs-cli": "file:../../taggedjs-cli/main"
   }
 }

@@ -1,6 +1,6 @@
-import { byId, click, html, htmlById, keyupOn } from "./elmSelectors"
-import { describe, expect, it } from "./expect"
-import { expectElmCount, testCounterElements } from "./expect.html"
+import { byId, html, htmlById, keyupOn } from "./testing/elmSelectors"
+import { describe, expect, it } from "./testing/expect"
+import { expectElmCount, testCounterElements } from "./testing/expect.html"
 
 describe('counters', () => {    
   const slowCount = html('#🍄-slowChangeCount')

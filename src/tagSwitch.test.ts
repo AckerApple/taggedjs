@@ -1,6 +1,6 @@
-import { byId, elmCount } from "./elmSelectors"
-import { describe, expect, it } from "./expect"
-import { expectElmCount } from "./expect.html"
+import { byId, elmCount } from "./testing/elmSelectors"
+import { describe, expect, it } from "./testing/expect"
+import { expectElmCount } from "./testing/expect.html"
 
 describe('tagSwitching', () => {
   it('0', () => {

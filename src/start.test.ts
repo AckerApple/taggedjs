@@ -1,5 +1,5 @@
-import { click, textContent } from "./elmSelectors"
-import { expect, it } from "./expect"
+import { click, textContent } from "./testing/elmSelectors"
+import { expect, it } from "./testing/expect"
 
 /*
 it('no template tags', () => {

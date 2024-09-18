@@ -1,6 +1,6 @@
-import { byId, click, html, htmlById, query } from "./elmSelectors"
-import { describe, expect, it } from "./expect"
-import { expectHTML, expectMatchedHtml, testCounterElements, testDuelCounterElements } from "./expect.html"
+import { byId, html, htmlById, query } from "./testing/elmSelectors"
+import { describe, expect, it } from "./testing/expect"
+import { expectHTML, expectMatchedHtml, testCounterElements, testDuelCounterElements } from "./testing/expect.html"
 
 describe('props', () => {    
   it('test duels', () => {

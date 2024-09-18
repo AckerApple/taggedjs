@@ -13,11 +13,11 @@ const dispatch = todoReducer(todos)
 export const todoApp = () => {
     const route = useHashRouter().route
     const activeTodoCount = todos.filter((todo) => !todo.completed).length
-    const visibleTodos = todos.filter((todo) => {
-        if (route === "/active")return !todo.completed
-        if (route === "/completed") return todo.completed;
-        return true;
-    })
+    const isActiveRoute = route === "/active"
+    const isCompletedRoute = route === "/completed"
+    const visibleTodos = isActiveRoute && todos.filter(todo => !todo.completed) ||
+        isCompletedRoute && todos.filter(todo => todo.completed) || todos
+
     const todoCount = todos.length
 
     return html`

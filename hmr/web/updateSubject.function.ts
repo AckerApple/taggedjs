@@ -27,14 +27,13 @@ export async function updateSubject(
   oldTag: TaggedFunction<any>,
   hmr: HmrImport,
 ) {
-  const global = contextSubject.global as SupportTagGlobal
-  
+  const global = contextSubject.global as SupportTagGlobal  
   const oldest = global.oldest as Support
   const newest = global.newest as Support
-
   const toString = newTag.original.toString()
   // contextSupport.templater.wrapper.original.compareTo = toString
-  if(oldTag.original) {
+  if((oldTag as any).original) {
+    // TODO: we may not ever get in here due to above bad data typed condition
     (oldTag as any).compareTo = toString
   }
   
@@ -53,28 +52,18 @@ export async function updateSubject(
   const prevConstructors = pros ? pros.map(provider => provider.constructMethod) : []
 
   const placeholder = contextSubject.placeholder
-  console.log('before destroy', {placeholder, parent: placeholder?.parentNode, onDoc: document.contains(placeholder as Node)})
 
   await destroySupport(oldest, 0)
   const reGlobal = contextSubject.global as SupportTagGlobal
   delete reGlobal.deleted
-
-// console.log('before render', {reGlobal, placeholder, parent: placeholder?.parentNode, onDoc: document.contains(placeholder as Node)})
   
   const reSupport = hmr.renderTagOnly(
     newest,
     newest,
-    contextSubject,
+    contextSubject as SupportContextItem,
     newest.ownerSupport,
   )
-/*
-  console.log('after render', {
-    reSupport,
-    placeholder: reSupport.subject.placeholder,
-    parent: reSupport.subject.placeholder?.parentNode,
-    onDoc: document.contains(placeholder as Node)
-  })
-*/
+
   const appSupport = oldest.appSupport
   const ownGlobal = oldest.ownerSupport.subject.global as SupportTagGlobal
   const providers = global.providers
@@ -121,7 +110,6 @@ function recurseContext(
 
   context.forEach(contextItem => {
     if(isSubjectInstance(contextItem.value)) {
-      console.log('found right here ---2----', contextItem.value, contextItem)
       processSubUpdate(contextItem.value, contextItem, reSupport)
       /*
       processFirstSubjectValue(

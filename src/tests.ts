@@ -1,8 +1,8 @@
-import { execute } from "./expect"
+import { execute } from "./testing/expect"
 
 export async function runTests() {
   await import('./basic.test') // not in gh-pages
-  await import('./start.test')
+  await import('./start.test.js')
   
   await import('./content.test')
   await import('./counters.test')
@@ -16,7 +16,6 @@ export async function runTests() {
   await import('./oneRender.test')
   await import('./funInProps.test')
   await import('./todos.test')
-  await import('./last.test')
 
   try {
     const start = Date.now() //performance.now()

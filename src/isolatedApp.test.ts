@@ -1,4 +1,4 @@
-import { execute } from "./expect"
+import { execute } from "./testing/expect"
 import { ViewTypes } from "./sections.tag"
 
 export async function runIsolatedTests(
@@ -6,7 +6,7 @@ export async function runIsolatedTests(
   runStartEndTests = true,
 ) {
   if(runStartEndTests) {
-    await import('./start.test')
+    await import('./start.test.js')
   }
 
   if(views.includes(ViewTypes.Content)) {
@@ -55,10 +55,6 @@ export async function runIsolatedTests(
 
   if(views.includes(ViewTypes.Todo)) {
     await import('./todos.test')
-  }
-
-  if(runStartEndTests) {
-    await import('./last.test')
   }
 
   try {
