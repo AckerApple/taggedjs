@@ -11,14 +11,14 @@ export function isLikeTags(
   const templater1 = support1.templater as TemplaterResult
 
   const tag0 = templater0?.tag || (support0 as StringTag | DomTag)
-  const tag1 = templater1.tag as StringTag | DomTag // || (support1 as any)
+  const tag1 = templater1.tag as undefined | StringTag | DomTag // || (support1 as any)
 
   if(templater0?.tagJsType === ValueTypes.stateRender) {
     return (templater0 as any).dom === (templater1 as any).dom
   }
 
   if(tag0.tagJsType === ValueTypes.dom) {
-    if(tag1.tagJsType !== ValueTypes.dom) {
+    if(tag1?.tagJsType !== ValueTypes.dom) {
       return false // tag0 is not even same type
     }
 
