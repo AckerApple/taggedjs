@@ -21,7 +21,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "npm-run-all": "^4.1.5",
     "serve-static": "^1.15.0",
-    "taggedjs": "github:ackerapple/taggedjs",
+    "taggedjs-cli": "file:../../taggedjs-cli/main",
     "taggedjs-animate-css": "github:ackerapple/taggedjs-animate-css",
     "terser-webpack-plugin": "^5.3.10",
     "ts-jest": "^29.1.5",
@@ -31,8 +31,5 @@
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
     "ws": "^8.15.1"
-  },
-  "dependencies": {
-    "taggedjs-cli": "file:../../taggedjs-cli/main"
   }
 }

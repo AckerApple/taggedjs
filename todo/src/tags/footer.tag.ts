@@ -8,6 +8,8 @@ export const Footer = tag.immutableProps((
   activeTodoCount: number,
 ) => html`
   <footer class="footer" data-testid="footer">
+    <p>Double-click to edit a todo</p>
+
     <div>
       <span class="todo-count">${activeTodoCount} item${activeTodoCount > 1 && "s"} left!</span>
       <ul class="filters">

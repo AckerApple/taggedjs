@@ -12,7 +12,7 @@
   "devDependencies": {
     "chokidar-cli": "^3.0.0",
     "live-server": "^1.2.2",
-    "taggedjs": "^2.6.7",
+    "taggedjs": "^2.6.12",
     "taggedjs-cli": "^0.0.21",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
