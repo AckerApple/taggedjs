@@ -18,6 +18,10 @@ export function isLikeTags(
   }
 
   if(tag0.tagJsType === ValueTypes.dom) {
+    if(tag1.tagJsType !== ValueTypes.dom) {
+      return false // tag0 is not even same type
+    }
+
     return isLikeDomTags(
       tag0 as DomTag,
       tag1 as DomTag,
