@@ -9,7 +9,7 @@ support1) {
         return templater0.dom === templater1.dom;
     }
     if (tag0.tagJsType === ValueTypes.dom) {
-        if (tag1.tagJsType !== ValueTypes.dom) {
+        if (tag1?.tagJsType !== ValueTypes.dom) {
             return false; // tag0 is not even same type
         }
         return isLikeDomTags(tag0, tag1);
