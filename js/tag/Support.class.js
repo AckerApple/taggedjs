@@ -6,7 +6,8 @@ export function getBaseSupport(templater, subject, castedProps) {
         templater,
         subject,
         castedProps,
-        state: [], // TODO: this is not needed for every type of  tag
+        state: [], // TODO: this is not needed for every type of tag
+        states: [], // TODO: this is not needed for every type of tag
         appSupport: undefined,
     };
     baseSupport.appSupport = baseSupport;

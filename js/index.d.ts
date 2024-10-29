@@ -2,6 +2,7 @@ export * from './tag/index.js';
 export * from './errors.js';
 export * from './isInstance.js';
 export * from './state/index.js';
+export { states } from './state/states.function.js';
 export * from './subject/index.js';
 export * from './interpolations/index.js';
 export * from './tag/Support.class.js';

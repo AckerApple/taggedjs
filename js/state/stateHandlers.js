@@ -4,8 +4,8 @@ import { BasicTypes } from '../tag/ValueTypes.enum.js';
 export function runRestate() {
     const config = setUseMemory.stateConfig;
     const rearray = config.rearray;
-    const restate = rearray[config.array.length];
-    config.array.push(restate);
+    const restate = rearray[config.stateArray.length];
+    config.stateArray.push(restate);
     return restate.defaultValue;
 }
 export function runFirstState(defaultValue) {
@@ -30,7 +30,7 @@ export function runFirstState(defaultValue) {
         },
         defaultValue: initValue,
     };
-    config.array.push(push);
+    config.stateArray.push(push);
     return initValue;
 }
 //# sourceMappingURL=stateHandlers.js.map

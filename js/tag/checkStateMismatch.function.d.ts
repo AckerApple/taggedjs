@@ -1,3 +1,3 @@
-import { BaseSupport, Support } from './Support.class.js';
-import { Config } from '../state/state.utils.js';
-export declare function checkStateMismatch(config: Config, support: BaseSupport | Support): void;
+import { AnySupport } from './Support.class.js';
+import { StateMemory } from '../state/StateMemory.type.js';
+export declare function checkStateMismatch(config: StateMemory, support: AnySupport): void;

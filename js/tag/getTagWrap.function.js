@@ -14,7 +14,7 @@ export function getTagWrap(templater, result) {
         // wrap any prop functions that are passed in
         const castedProps = getCastedProps(templater, newSupport, lastSupport);
         const ownerSupport = newSupport.ownerSupport;
-        const useSupport = getSupport(templater, ownerSupport, newSupport.appSupport, // ownerSupport.appSupport as Support,
+        const useSupport = getSupport(templater, ownerSupport, newSupport.appSupport, // ownerSupport.appSupport as AnySupport,
         subject, castedProps);
         return executeWrap(templater, result, useSupport, castedProps);
     };

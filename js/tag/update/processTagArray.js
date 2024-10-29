@@ -75,8 +75,7 @@ ownerSupport, counts, lastArray, appendTo) {
         });
     }
     processNewArrayValue(value, ownerSupport, itemSubject);
-    processFirstSubjectValue(value, itemSubject, ownerSupport, // support,
-    counts, `rvp_${lastArray.length}_array`, appendTo);
+    processFirstSubjectValue(value, itemSubject, ownerSupport, counts, `rvp_${lastArray.length}_array`, appendTo);
     // after processing
     itemSubject.value = value;
     // Added to previous array

@@ -1,10 +1,10 @@
-import { Support } from '../tag/Support.class.js';
+import { AnySupport } from '../tag/Support.class.js';
 export type Provider = {
     constructMethod: any;
     instance: any;
     stateDiff: number;
-    owner: Support;
-    children: Support[];
+    owner: AnySupport;
+    children: AnySupport[];
 };
 type ProviderConstructor<T> = (new (...args: any[]) => T) | (() => T);
 type functionProvider<T> = () => T;

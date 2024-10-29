@@ -144,8 +144,7 @@ export function processAttributeSubjectValue(newAttrValue, element, attrName, is
 }
 function callbackFun(support, newAttrValue, element, attrName, isSpecial, howToSet, subject) {
     const wrapper = support.templater.wrapper;
-    const parentWrap = wrapper?.parentWrap;
-    const tagJsType = wrapper?.tagJsType || parentWrap?.tagJsType;
+    const tagJsType = wrapper?.tagJsType || wrapper?.original?.tagJsType;
     const oneRender = tagJsType === ValueTypes.renderOnce;
     if (!oneRender) {
         return processTagCallbackFun(subject, newAttrValue, support, attrName, element);

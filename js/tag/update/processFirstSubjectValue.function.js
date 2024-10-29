@@ -10,7 +10,7 @@ import { getNewGlobal } from './getNewGlobal.function.js';
 import { processTagArray } from './processTagArray.js';
 import { processNewSubjectTag } from './processNewSubjectTag.function.js';
 export function processFirstSubjectValue(value, subject, // could be tag via result.tag
-ownerSupport, // owning support
+ownerSupport, // owningSupport
 counts, // {added:0, removed:0}
 valueId, appendTo) {
     const tagJsType = value?.tagJsType;
@@ -55,8 +55,7 @@ valueId, appendTo) {
             case ValueTypes.renderOnce: {
                 getNewGlobal(subject);
                 const support = oneRenderToSupport(value, subject, ownerSupport);
-                renderTagOnly(support, undefined, // support (no prev support)
-                subject, ownerSupport);
+                renderTagOnly(support, undefined, subject, ownerSupport);
                 const result = processNewSubjectTag(support.templater, ownerSupport, subject, appendTo);
                 // ++subject.global.renderCount
                 subject.checkValueChange = checkTagValueChange;

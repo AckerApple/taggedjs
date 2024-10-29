@@ -1,6 +1,7 @@
 import { getBaseSupport } from './Support.class.js';
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js';
 import { buildBeforeElement } from './buildBeforeElement.function.js';
+import { tags } from './tag.utils.js';
 import { getNewGlobal } from './update/getNewGlobal.function.js';
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js';
 import { destroySupport } from './destroySupport.function.js';
@@ -34,6 +35,7 @@ export function tagElement(app, element, props) {
     templater.tagJsType = ValueTypes.stateRender;
     // todo: props should be an array
     templater.props = [props];
+    templater.isApp = true;
     // create observable the app lives on
     const subject = getNewSubject(templater, element);
     const global = subject.global;
@@ -57,6 +59,7 @@ export function tagElement(app, element, props) {
         }
     }
     const placeholder = document.createTextNode('');
+    tags.push((templater.wrapper || { original: templater }));
     const support = runWrapper(templater, placeholder, element, subject, isAppFunction);
     global.isApp = true;
     if (isAppFunction) {
@@ -74,7 +77,6 @@ export function tagElement(app, element, props) {
         destroySupport(support, 0); // never return anything here
         paint();
     };
-    let tags = []; // TagWrapper<unknown>[]
     ++painting.locks;
     const result = buildBeforeElement(support, element);
     global.oldest = support;
@@ -83,11 +85,8 @@ export function tagElement(app, element, props) {
     if (templater.tagJsType !== ValueTypes.stateRender) {
         const wrap = app;
         const original = wrap.original;
-        // const parentWrap = wrap.parentWrap
-        // const original = (wrap as unknown).original || parentWrap.original as Original
-        //  const original = parentWrap.original as Original
         setUse = original.setUse;
-        tags = original.tags;
+        original.isApp = true;
     }
     ;
     element.setUse = setUse;
@@ -144,8 +143,9 @@ export function runWrapper(templater, placeholder, appElement, subject, isAppFun
         const result = (templater.wrapper || { original: templater });
         if (!isAppFunction) {
             const newSupport = loadNewBaseSupport(templater, subject, appElement);
-            const nowState = setUseMemory.stateConfig.array;
-            newSupport.state = nowState;
+            const config = setUseMemory.stateConfig;
+            newSupport.state = config.stateArray;
+            newSupport.states = config.states;
             runAfterRender(newSupport);
             return newSupport;
         }

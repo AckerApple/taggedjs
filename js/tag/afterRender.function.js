@@ -9,7 +9,7 @@ export function runAfterRender(support, ownerSupport) {
     ++subject.renderCount;
     const config = setUseMemory.stateConfig;
     delete config.support;
-    support.state = config.array;
+    support.state = config.stateArray;
     setUseMemory.tagClosed$.next(ownerSupport);
     checkStateMismatch(config, support);
     subject.global.newest = support;

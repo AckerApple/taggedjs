@@ -21,8 +21,8 @@ subject) {
         isSameTag = support.templater.tagJsType === ValueTypes.renderOnce || isLikeTags(lastSupport, support);
     }
     else if (oldWrapper && newWrapper) {
-        const oldFunction = oldWrapper.parentWrap.original;
-        const newFunction = newWrapper.parentWrap.original;
+        const oldFunction = oldWrapper.original;
+        const newFunction = newWrapper.original;
         // string compare both functions
         isSameTag = oldFunction === newFunction;
     }

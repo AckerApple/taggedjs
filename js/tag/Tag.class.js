@@ -8,7 +8,7 @@ export function getStringTag(strings, values) {
         values,
         ownerSupport: getSupportInCycle(),
         tagJsType: ValueTypes.tag,
-        strings: strings,
+        strings,
         key(arrayValue) {
             tag.arrayValue = arrayValue;
             return tag;

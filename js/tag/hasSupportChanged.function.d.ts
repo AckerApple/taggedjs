@@ -1,5 +1,5 @@
 import { Props } from '../Props.js';
-import { BaseSupport } from './Support.class.js';
+import { BaseSupport } from './BaseSupport.type.js';
 import { TemplaterResult } from './TemplaterResult.class.js';
 export declare function hasSupportChanged(lastSupport: BaseSupport, newTemplater: TemplaterResult): number | string | false;
 export declare function immutablePropMatch(props: Props, pastCloneProps: Props): false | 2;

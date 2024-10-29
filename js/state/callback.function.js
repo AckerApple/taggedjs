@@ -8,7 +8,7 @@ export function callback(callback) {
     if (!support) {
         throw syncError;
     }
-    return createTrigger(support, setUseMemory.stateConfig.array, callback);
+    return createTrigger(support, setUseMemory.stateConfig.stateArray, callback);
 }
 export function createTrigger(support, oldState, toCallback) {
     return function trigger(...args) {

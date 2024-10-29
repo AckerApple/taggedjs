@@ -3,7 +3,7 @@ import { syncStates } from './syncStates.function.js';
 import { isPromise } from '../isInstance.js';
 export default function callbackStateUpdate(support, callback, oldState, ...args) {
     const global = support.subject.global;
-    support = global.newest; // || support
+    support = global.newest;
     const state = support.state;
     // ensure that the oldest has the latest values first
     syncStates(state, oldState);

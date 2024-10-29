@@ -1,12 +1,14 @@
-import { firstLetState } from './letState.function.js';
+import { firstLetState } from './letState.utils.js';
+import { firstStatesHandler } from './states.utils.js';
 import { runFirstState } from './stateHandlers.js';
 export const setUseMemory = {
     stateConfig: {
-        array: [], // state memory on the first render
+        stateArray: [], // state memory on the first render
         version: Date.now(),
         handlers: {
             handler: runFirstState,
             letHandler: firstLetState,
+            statesHandler: firstStatesHandler,
         }
     },
 };

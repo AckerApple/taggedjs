@@ -13,7 +13,7 @@ export function bindSubjectCallback(value, support) {
         if (global.deleted === true) {
             return;
         }
-        // const newest = global.newest as Support // || subjectFunction.support
+        // const newest = global.newest as AnySupport // || subjectFunction.support
         return runTagCallback(subjectFunction.tagFunction, subjectFunction.support, // newest
         element, args);
     };

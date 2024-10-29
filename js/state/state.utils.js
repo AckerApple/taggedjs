@@ -1,17 +1,25 @@
-import { firstLetState, reLetState } from './letState.function.js';
 import { runFirstState, runRestate } from './stateHandlers.js';
+import { firstLetState, reLetState } from './letState.utils.js';
+import { firstStatesHandler, reStatesHandler } from './states.utils.js';
 export function initState(support, config) {
     config.handlers.handler = runFirstState;
     config.handlers.letHandler = firstLetState;
+    config.handlers.statesHandler = firstStatesHandler;
     config.rearray = [];
-    config.array = [];
+    config.stateArray = [];
+    config.states = [];
+    config.statesIndex = 0;
     config.support = support;
 }
 export function reState(support, config, prevState) {
+    // set previous state memory
     config.rearray = prevState;
-    config.array = [];
+    config.stateArray = [];
+    config.states = [];
+    config.statesIndex = 0;
     config.handlers.handler = runRestate;
     config.handlers.letHandler = reLetState;
+    config.handlers.statesHandler = reStatesHandler;
     config.support = support;
 }
 export class StateEchoBack {

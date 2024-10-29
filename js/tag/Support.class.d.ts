@@ -1,7 +1,7 @@
 import { SupportTagGlobal, TemplaterResult } from './TemplaterResult.class.js';
 import { ContextItem } from './Context.types.js';
-import { State } from '../state/index.js';
 import { Props } from '../Props.js';
+import { BaseSupport } from './BaseSupport.type.js';
 export type AnySupport = (BaseSupport & {});
 export type PropsConfig = {
     latest: Props;
@@ -15,22 +15,18 @@ export type HtmlSupport = {
     templater: TemplaterResult;
     subject: ContextItem;
 };
-export type BaseSupport = HtmlSupport & {
-    state: State;
-    subject: SupportContextItem;
-};
 export type SupportContextItem = ContextItem & {
     global: SupportTagGlobal;
     /** Indicator of re-rending. Saves from double rending something already rendered */
     renderCount: number;
 };
 /** used only for apps, otherwise use Support */
-export declare function getBaseSupport(templater: TemplaterResult, subject: SupportContextItem, castedProps?: Props): BaseSupport;
-export type Support = BaseSupport & {
+export declare function getBaseSupport(templater: TemplaterResult, subject: SupportContextItem, castedProps?: Props): AnySupport;
+export type Support = AnySupport & {
     ownerSupport: AnySupport;
     appSupport: BaseSupport;
 };
 export declare function getSupport(templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
-ownerSupport: AnySupport, appSupport: BaseSupport, subject: ContextItem, castedProps?: Props): Support;
+ownerSupport: AnySupport, appSupport: BaseSupport, subject: ContextItem, castedProps?: Props): AnySupport;
 export declare function getHtmlSupport(templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
-ownerSupport: AnySupport, appSupport: BaseSupport, subject: ContextItem, castedProps?: Props): Support;
+ownerSupport: AnySupport, appSupport: BaseSupport, subject: ContextItem, castedProps?: Props): AnySupport;

@@ -6,7 +6,7 @@ import { syncStates } from './syncStates.function.js';
 /** Create a Subject that on updates will sync state values to keep chained functions using latest variables */
 export function subject(value, onSubscription) {
     const oldestState = state(function subjectState() {
-        return setUseMemory.stateConfig.array;
+        return setUseMemory.stateConfig.stateArray;
     });
     const nowSupport = getSupportInCycle();
     return state(function subjectState() {
@@ -19,7 +19,7 @@ export function subject(value, onSubscription) {
 }
 subject._value = (value) => {
     const oldestState = state(function subjectValue() {
-        return setUseMemory.stateConfig.array;
+        return setUseMemory.stateConfig.stateArray;
     });
     const nowSupport = getSupportInCycle();
     return state(function subjectValue() {
@@ -31,7 +31,7 @@ subject._value = (value) => {
     });
 };
 function all(args) {
-    const oldestState = state(() => setUseMemory.stateConfig.array);
+    const oldestState = state(() => setUseMemory.stateConfig.stateArray);
     const nowSupport = getSupportInCycle();
     return Subject.all(args).pipe(x => {
         syncStates(nowSupport.state, oldestState);

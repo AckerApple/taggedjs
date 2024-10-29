@@ -15,7 +15,7 @@ export function getUpTags(support, supports = []) {
     if (inlineHtml) {
         return getUpTags(ownerSupport, supports);
     }
-    const newSupport = support; // global.newest as Support
+    const newSupport = support; // global.newest as AnySupport
     const isComponent = isTagComponent(newSupport.templater);
     const tagJsType = support.templater.tagJsType;
     const canContinueUp = ownerSupport && tagJsType !== ValueTypes.stateRender;

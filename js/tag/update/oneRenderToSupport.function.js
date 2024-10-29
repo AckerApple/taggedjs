@@ -11,9 +11,8 @@ export function oneRenderToSupport(wrapper, subject, ownerSupport) {
         return support;
     }
     templater.wrapper = wrap;
-    wrap.parentWrap = wrap;
     wrap.tagJsType = wrapper.tagJsType;
-    wrap.parentWrap.original = wrapper;
+    wrap.original = wrapper.original || wrapper;
     return support;
 }
 //# sourceMappingURL=oneRenderToSupport.function.js.map

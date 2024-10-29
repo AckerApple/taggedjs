@@ -8,7 +8,7 @@ export const callbackMaker = () => {
     if (!support) {
         throw syncError;
     }
-    const oldState = setUseMemory.stateConfig.array;
+    const oldState = setUseMemory.stateConfig.stateArray;
     return function triggerMaker(callback) {
         return createTrigger(support, oldState, callback);
     };

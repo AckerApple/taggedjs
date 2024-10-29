@@ -1,8 +1,9 @@
-import { Support } from '../tag/Support.class.js';
+import { BaseSupport } from '../tag/BaseSupport.type.js';
+import { AnySupport } from '../tag/Support.class.js';
 import { Provider } from './providers.js';
-export declare function handleProviderChanges(appSupport: Support, provider: Provider): TagWithProvider[];
+export declare function handleProviderChanges(appSupport: BaseSupport, provider: Provider): TagWithProvider[];
 type TagWithProvider = {
-    support: Support;
+    support: AnySupport;
     renderCount: number;
     provider: Provider;
 };

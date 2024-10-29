@@ -78,7 +78,7 @@ function defineOnMethod(getWatch, attachTo) {
                     const nowSupport = getSupportInCycle();
                     const setTo = callback(currentValues, previousValues);
                     if (nowSupport !== firstSupport) {
-                        const newestState = setUseMemory.stateConfig.array;
+                        const newestState = setUseMemory.stateConfig.stateArray;
                         const oldestState = firstSupport.subject.global.oldest.state;
                         syncStates(newestState, oldestState);
                     }

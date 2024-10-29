@@ -16,7 +16,7 @@ export function executeWrap(templater, result, useSupport, castedProps) {
     }
     tag.templater = templater;
     templater.tag = tag;
-    const nowState = setUseMemory.stateConfig.array;
+    const nowState = setUseMemory.stateConfig.stateArray;
     useSupport.state = nowState;
     return useSupport;
 }

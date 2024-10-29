@@ -1,15 +1,15 @@
 import { Subject } from '../subject/Subject.class.js';
-import { BaseSupport, Support } from '../tag/Support.class.js';
-import { Config } from './state.utils.js';
+import { AnySupport } from '../tag/Support.class.js';
+import { StateMemory } from './StateMemory.type.js';
 export type UseOptions = {
-    beforeRender?: (support: Support | BaseSupport, ownerTag?: Support | BaseSupport) => void;
-    beforeRedraw?: (support: BaseSupport | Support, tag: Support | BaseSupport) => void;
-    afterRender?: (support: BaseSupport | Support, ownerSupport?: Support | BaseSupport) => void;
-    beforeDestroy?: (support: BaseSupport | Support, tag: Support | BaseSupport) => void;
+    beforeRender?: (support: AnySupport, ownerTag?: AnySupport) => void;
+    beforeRedraw?: (support: AnySupport, tag: AnySupport) => void;
+    afterRender?: (support: AnySupport, ownerSupport?: AnySupport) => void;
+    beforeDestroy?: (support: AnySupport, tag: AnySupport) => void;
 };
 export declare const setUseMemory: UseMemory;
 export type UseMemory = (Record<string, unknown> & {
-    stateConfig: Config;
-    currentSupport: Support;
-    tagClosed$: Subject<Support>;
+    stateConfig: StateMemory;
+    currentSupport: AnySupport;
+    tagClosed$: Subject<AnySupport>;
 });

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 // taggedjs-no-compile
 import { setUseMemory } from '../state/index.js';
 import { getTemplaterResult } from './TemplaterResult.class.js';
@@ -18,22 +19,22 @@ export var PropWatches;
  */
 export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
     /** function developer triggers */
-    const parentWrap = (function tagWrapper(...props) {
+    const parentWrap = function tagWrapper(...props) {
         const templater = getTemplaterResult(propWatch, props);
         templater.tagJsType = ValueTypes.tagComponent;
         // attach memory back to original function that contains developer display logic
         const innerTagWrap = getTagWrap(templater, parentWrap);
-        if (!innerTagWrap.parentWrap) {
-            innerTagWrap.parentWrap = parentWrap;
-        }
+        innerTagWrap.original = tagComponent;
+        /*
+            if(!innerTagWrap.parentWrap) {
+              innerTagWrap.parentWrap = parentWrap as TagWrapper<unknown>
+            }
+        */
         templater.wrapper = innerTagWrap;
         return templater;
-    }) // we override the function provided and pretend original is what's returned
-    ;
-    parentWrap.original = tagComponent;
-    // parentWrap.compareTo = (tagComponent as any).toString()
+    }; // we override the function provided and pretend original is what's returned
     const tag = tagComponent;
-    parentWrap.original = tag;
+    parentWrap.original = tagComponent;
     // group tags together and have hmr pickup
     tag.tags = tags;
     tag.setUse = setUseMemory;
@@ -42,25 +43,24 @@ export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
     tags.push(parentWrap);
     return parentWrap;
 }
-/** Used to create a tag component that renders once and has no addition rendering cycles */
-tag.renderOnce = function () {
+tag.renderOnce = renderOnceFn;
+function renderOnceFn() {
     throw new Error('Do not call tag.renderOnce as a function but instead set it as: `(props) => tag.renderOnce = () => html`` `');
-};
+}
 /** Used to create variable scoping when calling a function that lives within a prop container function */
-tag.state = function () {
-    throw new Error('Do not call tag.state as a function but instead set it as: `(props) => tag.state = (state) => html`` `');
-};
-// TODO???: Is tag.route and tag.app in use?
-/** Use to structure and define a browser tag route handler
- * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
- */
-tag.route = function (_routeProps) {
+function tagUseFn() {
+    throw new Error('Do not call tag.use as a function but instead set it as: `(props) => tag.use = (use) => html`` `');
+}
+/** deprecated */
+;
+tag.state = tagUseFn;
+tag.use = tagUseFn;
+tag.route = routeFn;
+function routeFn(_routeProps) {
     throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `');
-};
+}
+;
 tag.key = key;
-/** Use to structure and define a browser tag route handler
- * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
- */
 tag.app = function (_routeTag) {
     throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `');
 };
@@ -71,19 +71,29 @@ tag.immutableProps = function immutableProps(tagComponent) {
 tag.watchProps = function watchProps(tagComponent) {
     return tag(tagComponent, PropWatches.SHALLOW);
 };
+/* BELOW: Cast functions into setters with no getters */
 Object.defineProperty(tag, 'renderOnce', {
     set(oneRenderFunction) {
         oneRenderFunction.tagJsType = ValueTypes.renderOnce;
     },
 });
+// TODO: deprecate this
 Object.defineProperty(tag, 'state', {
     set(renderFunction) {
         ;
-        renderFunction.parentWrap = {
-            original: {
-                setUse: setUseMemory,
-                tags,
-            }
+        renderFunction.original = {
+            setUse: setUseMemory,
+            tags,
+        };
+        renderFunction.tagJsType = ValueTypes.stateRender;
+    },
+});
+Object.defineProperty(tag, 'use', {
+    set(renderFunction) {
+        ;
+        renderFunction.original = {
+            setUse: setUseMemory,
+            tags,
         };
         renderFunction.tagJsType = ValueTypes.stateRender;
     },

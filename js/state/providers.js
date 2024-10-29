@@ -15,11 +15,11 @@ export const providers = {
         }
         const result = state(() => {
             const stateConfig = setUseMemory.stateConfig;
-            const oldStateCount = stateConfig.array.length;
+            const oldStateCount = stateConfig.stateArray.length;
             // Providers with provider requirements just need to use providers.create() and providers.inject()
             const instance = constructMethod.prototype ? new constructMethod() : constructMethod();
             const support = stateConfig.support;
-            const stateDiff = stateConfig.array.length - oldStateCount;
+            const stateDiff = stateConfig.stateArray.length - oldStateCount;
             const provider = {
                 constructMethod,
                 instance,
@@ -50,7 +50,7 @@ export const providers = {
             // const memory = setUse.memory
             const cm = constructor;
             const compareTo = cm.compareTo = cm.compareTo || constructor.toString();
-            const support = getSupportInCycle(); // memory.stateConfig.support as Support
+            const support = getSupportInCycle(); // memory.stateConfig.support as AnySupport
             const providers = [];
             let owner = {
                 ownerSupport: support.ownerSupport

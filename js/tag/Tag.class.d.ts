@@ -5,6 +5,8 @@ import { TagValues } from './html.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/LikeObjectElement.type.js';
 import { AnySupport } from './Support.class.js';
+import { StringTag } from './StringTag.type.js';
+export { StringTag };
 export declare const variablePrefix = ":tagvar";
 export declare const variableSuffix = ":";
 export type EventCallback = (event: Event) => any;
@@ -30,16 +32,6 @@ export type Tag = {
     arrayValue?: any;
 };
 export type KeyFunction = (arrayValue: unknown) => StringTag;
-export type StringTag = Tag & {
-    children?: {
-        strings: string[] | TemplateStringsArray;
-        values: TagValues;
-    };
-    strings: string[];
-    values: unknown[];
-    key: KeyFunction;
-    html: (strings: string[] | TemplateStringsArray, values: TagValues) => StringTag;
-};
 export declare function getStringTag(strings: string[], values: unknown[]): StringTag;
 export type DomTag = Tag & {
     children?: {

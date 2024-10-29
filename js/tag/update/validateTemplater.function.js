@@ -5,7 +5,7 @@ export function validateTemplater(templater) {
         return;
     }
     const wrapper = templater.wrapper;
-    const original = wrapper?.parentWrap.original || templater;
+    const original = wrapper?.original || templater;
     let name = original.name || original.constructor?.name;
     if (name === 'Function') {
         name = undefined;

@@ -1,4 +1,4 @@
-import { AnySupport, BaseSupport, Support } from '../Support.class.js';
+import { AnySupport } from '../Support.class.js';
 import { TemplaterResult } from '../TemplaterResult.class.js';
 import { StringTag, DomTag } from '../Tag.class.js';
 import { ContextItem } from '../Context.types.js';
@@ -7,8 +7,8 @@ import { ContextItem } from '../Context.types.js';
  * Intended use only for updates
 */
 export declare function processTag(ownerSupport: AnySupport, // owner
-subject: ContextItem): Support;
+subject: ContextItem): AnySupport;
 export declare function tagFakeTemplater(tag: StringTag | DomTag): TemplaterResult;
 export declare function getFakeTemplater(): TemplaterResult;
-/** Create Support for a tag component */
-export declare function newSupportByTemplater(templater: TemplaterResult, ownerSupport: BaseSupport | Support, subject: ContextItem): Support;
+/** Create support for a tag component */
+export declare function newSupportByTemplater(templater: TemplaterResult, ownerSupport: AnySupport, subject: ContextItem): AnySupport;

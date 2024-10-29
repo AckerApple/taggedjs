@@ -32,7 +32,7 @@ export function getFakeTemplater() {
     };
     return fake;
 }
-/** Create Support for a tag component */
+/** Create support for a tag component */
 export function newSupportByTemplater(templater, ownerSupport, subject) {
     const support = getHtmlSupport(templater, ownerSupport, ownerSupport.appSupport, subject);
     const global = subject.global;

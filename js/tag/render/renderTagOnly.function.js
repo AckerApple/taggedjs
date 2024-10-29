@@ -10,26 +10,31 @@ subject, ownerSupport) {
     const global = subject.global;
     const oldRenderCount = subject.renderCount;
     const prevState = prevSupport?.state;
+    const config = setUseMemory.stateConfig;
     if (prevState) {
+        config.prevSupport = prevSupport;
         beforeRerender(newSupport, prevState);
     }
     else {
-        initState(newSupport, setUseMemory.stateConfig);
+        initState(newSupport, config);
     }
     const templater = newSupport.templater;
     let reSupport;
     // NEW TAG CREATED HERE
     if (templater.tagJsType === ValueTypes.stateRender) {
         const result = templater; // .wrapper as any// || {original: templater} as any
-        const useSupport = getSupport(templater, ownerSupport, newSupport.appSupport, // ownerSupport.appSupport as Support,
+        // TODO: Not sure if useSupport could be replaced by just using "newSupport"
+        const useSupport = getSupport(templater, ownerSupport, newSupport.appSupport, // ownerSupport.appSupport as AnySupport,
         subject);
         reSupport = executeWrap(templater, result, useSupport);
+        reSupport.states = newSupport.states;
     }
     else {
         // functions wrapped in tag()
         const wrapper = templater.wrapper;
         // calls the function returned from getTagWrap()
         reSupport = wrapper(newSupport, subject, prevSupport);
+        reSupport.states = newSupport.states;
     }
     runAfterRender(reSupport, ownerSupport);
     // When we rendered, only 1 render should have taken place OTHERWISE rendering caused another render and that is the latest instead

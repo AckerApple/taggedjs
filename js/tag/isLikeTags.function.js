@@ -8,14 +8,19 @@ support1) {
     if (templater0?.tagJsType === ValueTypes.stateRender) {
         return templater0.dom === templater1.dom;
     }
-    if (tag0.tagJsType === ValueTypes.dom) {
-        if (tag1?.tagJsType !== ValueTypes.dom) {
-            return false; // tag0 is not even same type
+    switch (tag0.tagJsType) {
+        case ValueTypes.dom: {
+            if (tag1?.tagJsType !== ValueTypes.dom) {
+                return false; // tag0 is not even same type
+            }
+            return isLikeDomTags(tag0, tag1);
         }
-        return isLikeDomTags(tag0, tag1);
+        case ValueTypes.tag: {
+            const like = isLikeStringTags(tag0, tag1, support0, support1);
+            return like;
+        }
     }
-    const like = isLikeStringTags(tag0, tag1, support0, support1);
-    return like;
+    throw new Error(`unknown tagJsType of ${tag0.tagJsType}`);
 }
 // used when compiler was used
 export function isLikeDomTags(tag0, tag1) {
