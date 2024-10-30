@@ -153,6 +153,10 @@ function defineOnMethod<R>(
       const oldWatch = getWatch()
       const firstSupport = state(() => (getSupportInCycle() as AnySupport))
       const subject = state(() => new ValueSubject<any>(undefined))
+      const oldState = state(() => ({
+        stateArray: setUseMemory.stateConfig.stateArray,
+        states: setUseMemory.stateConfig.states,
+      }))
       
       const method = <T>(
         currentValues: any[],
@@ -161,15 +165,23 @@ function defineOnMethod<R>(
         setupWatch(
           currentValues,
           (currentValues, previousValues) => {
-            const nowSupport = getSupportInCycle()
+            const nowSupport = getSupportInCycle() as AnySupport
             const setTo = callback(currentValues, previousValues)
 
             if(nowSupport !== firstSupport) {
-              const newestState = setUseMemory.stateConfig.stateArray
-              const oldestState = firstSupport.subject.global.oldest.state
+              const newestState = oldState.stateArray
+              const global = firstSupport.subject.global
+              const oldest = global.oldest
+              const oldestState = oldest.state
+              
+              const newStates = oldState.states
+              const oldStates = oldest.states
+              
               syncStates(
                 newestState,
-                oldestState, // firstSupport.state,
+                oldestState,
+                newStates,
+                oldStates,
               )
             }
 

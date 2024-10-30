@@ -11,13 +11,23 @@ export function subject<T>(
   onSubscription?: OnSubscription<T>
 ) {
   const oldestState = state(function subjectState() {
-    return setUseMemory.stateConfig.stateArray
+    // return setUseMemory.stateConfig.stateArray
+    // return setUseMemory.stateConfig.support as AnySupport
+    return {
+      stateArray: setUseMemory.stateConfig.stateArray,
+      states: setUseMemory.stateConfig.states,
+    }
   })
   
   const nowSupport = getSupportInCycle() as AnySupport
   return state(function subjectState() {
     const subject = new Subject(value, onSubscription).pipe(x => {
-      syncStates(nowSupport.state, oldestState)
+      syncStates(
+        nowSupport.state,
+        oldestState.stateArray,
+        nowSupport.states,
+        oldestState.states,
+      )
       return x
     })
     return subject
@@ -26,13 +36,21 @@ export function subject<T>(
 
 subject._value = <T>(value: T) => {
   const oldestState = state(function subjectValue() {
-    return setUseMemory.stateConfig.stateArray
+    return {
+      stateArray: setUseMemory.stateConfig.stateArray,
+      states: setUseMemory.stateConfig.states,
+    }
   })
 
   const nowSupport = getSupportInCycle() as AnySupport
   return state(function subjectValue() {
     const subject = new ValueSubject(value).pipe(x => {
-      syncStates(nowSupport.state, oldestState)
+      syncStates(
+        nowSupport.state,
+        oldestState.stateArray,
+        nowSupport.states,
+        oldestState.states,
+      )
       return x
     })
     return subject
@@ -46,10 +64,18 @@ function all<A, B, C>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C]): S
 function all<A, B>(args: [Subject<A> | A, Subject<B> | B]): Subject<[A,B]>
 function all<A>(args: [Subject<A> | A]): Subject<[A]>
 function all(args: any[]): Subject<any> {
-  const oldestState = state(() => setUseMemory.stateConfig.stateArray)
+  const oldestState = state(() => ({
+    stateArray: setUseMemory.stateConfig.stateArray,
+    states: setUseMemory.stateConfig.states,
+  }))
   const nowSupport = getSupportInCycle() as AnySupport
   return Subject.all(args as any).pipe(x => {
-    syncStates(nowSupport.state, oldestState)
+    syncStates(
+      nowSupport.state,
+      oldestState.stateArray,
+      nowSupport.states,
+      oldestState.states,
+    )
     return x
   })
 }

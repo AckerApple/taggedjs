@@ -1,15 +1,18 @@
 import { AnySupport } from '../tag/Support.class.js'
-import { State } from './state.types.js'
+// import { State } from './state.types.js'
 import { renderSupport } from '../tag/render/renderSupport.function.js'
 import { syncStates } from './syncStates.function.js'
 import { Callback } from './callbackMaker.function.js'
 import {SupportTagGlobal } from '../tag/index.js'
 import { isPromise } from '../isInstance.js'
+import { StateMemory } from './StateMemory.type.js'
+import { StatesSetter } from './states.utils.js'
+import { State } from './state.types.js'
 
 export default function callbackStateUpdate<T>(
   support: AnySupport,
   callback: Callback<any, any,any, any, any, any, T>,
-  oldState: State,
+  oldState: { stateArray: State, states: StatesSetter[] },// State,
   ...args: any[]
 ): T {
   const global = support.subject.global as SupportTagGlobal
@@ -17,19 +20,34 @@ export default function callbackStateUpdate<T>(
   const state = support.state
 
   // ensure that the oldest has the latest values first
-  syncStates(state, oldState)
+  syncStates(
+    state,
+    oldState.stateArray,
+    support.states,
+    oldState.states,
+  )
   
   // run the callback
   const maybePromise = callback(...args as [any,any,any,any,any,any])
 
   // send the oldest state changes into the newest
-  syncStates(oldState, state)
+  syncStates(
+    oldState.stateArray,
+    state,
+    oldState.states,
+    support.states,
+  )
   renderSupport(support)
 
   if(isPromise(maybePromise)) {
     (maybePromise as Promise<any>).finally(() => {
       // send the oldest state changes into the newest
-      syncStates(oldState, state)
+      syncStates(
+        oldState.stateArray,
+        state,
+        oldState.states,
+        support.states,
+      )
 
       renderSupport(support)
     })

@@ -4,6 +4,7 @@ import { setUseMemory } from './setUse.function.js'
 import { State } from './state.types.js'
 import { Callback, syncError } from './callbackMaker.function.js'
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
+import { StateMemory } from './StateMemory.type.js'
 
 /** Wrap a function that will be called back. After the wrapper and function are called, a rendering cycle will update display */
 export function callback<A,B,C,D,E,F, T>(
@@ -15,19 +16,34 @@ export function callback<A,B,C,D,E,F, T>(
     throw syncError
   }
 
-  return createTrigger(support, setUseMemory.stateConfig.stateArray, callback)
+  return createTrigger(
+    support,
+    setUseMemory.stateConfig, // setUseMemory.stateConfig.stateArray
+    callback,
+  )
 }
 
 export function createTrigger<A,B,C,D,E,F, T>(
   support: AnySupport,
-  oldState: State,
+  oldState: StateMemory,
   toCallback: Callback<A, B, C, D, E, F, T>,
 ) {
+  const oldStateArray = oldState.stateArray
+  const oldStates = oldState.states
+
   return function trigger(...args: any[]) {
     const callbackMaker = support.subject.renderCount > 0
 
     if(callbackMaker) {
-      return callbackStateUpdate(support, toCallback, oldState, ...args)
+      return callbackStateUpdate(
+        support,
+        toCallback,
+        {
+          stateArray: oldStateArray,
+          states: oldStates,
+        },
+        ...args
+      )
     }
 
     // we are in sync with rendering, just run callback naturally
