@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-namespace */
 // taggedjs-no-compile
 import { setUseMemory } from '../state/index.js';
 import { getTemplaterResult } from './TemplaterResult.class.js';
