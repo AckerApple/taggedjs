@@ -1,4 +1,4 @@
-import { html, tag, letState, onInit, state, Subject, callbackMaker, onDestroy } from "taggedjs"
+import { html, tag, letState, onInit, state, Subject, callbackMaker, onDestroy, states } from "taggedjs"
 import { renderedSections } from "./renderedSections.tag"
 import { renderCountDiv } from "./renderCount.component"
 import { sections } from "./sections.tag"
@@ -32,6 +32,7 @@ appFun.isApp = true
 export const App = tag(appFun)
 
 export const homePage = () => tag.use = (
+  // appCounter = 0,
   appCounter = letState(0)(x => [appCounter, appCounter=x]),
   toggleValue = letState(false)(x => [toggleValue, toggleValue=x]),
   testTimeout = letState(null)(x => [testTimeout, testTimeout=x]),
@@ -39,6 +40,8 @@ export const homePage = () => tag.use = (
   renderCount = letState(0)(x => [renderCount, renderCount=x]),
   toggle = () => toggleValue = !toggleValue,
 ) => {
+  // states(get => ({ appCounter } = get({ appCounter })))
+
   const callbacks = callbackMaker()
   let testEmoji = letState('🟦')(x => [testEmoji, testEmoji = x])
   const onTestComplete = callbacks(success => testEmoji = success ? '✅' : '❌')

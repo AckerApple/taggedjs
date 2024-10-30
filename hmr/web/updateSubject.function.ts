@@ -57,7 +57,7 @@ export async function updateSubject(
       
       const strings = (global.oldest.templater.tag as StringTag).strings
       const dom = (global.oldest.templater.tag as DomTag).dom
-      // console.log('xxxxxx', {toString, oldTemplater, strings, dom})
+
       if(original.toString().includes('sections') || strings?.includes('sections')) {
         console.log('we are swapping sections......')
       }

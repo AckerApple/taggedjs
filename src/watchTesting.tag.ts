@@ -1,23 +1,37 @@
-import { watch, letState, html, tag } from "taggedjs"
+import { watch, letState, html, tag, states } from "taggedjs"
 
 export const watchTesting = tag.deepPropWatch(() => (
   stateNum = letState(0)(x => [stateNum, stateNum=x]),
-  stateNumChangeCount = letState(0)(x => [stateNumChangeCount, stateNumChangeCount=x]),
+  stateNumChangeCount = 0,
+  slowChangeCount = 0,
+  subjectChangeCount = 0,
+  truthChange = false,
+  truthChangeCount = 0,
+  truthSubChangeCount = 0,
+
+  _states = states(get => {
+    ({
+    stateNum, stateNumChangeCount, slowChangeCount, subjectChangeCount,
+    truthChange, truthChangeCount,
+    truthSubChangeCount,
+  } = get({
+    stateNum, stateNumChangeCount, slowChangeCount, subjectChangeCount,
+    truthChange, truthChangeCount,
+    truthSubChangeCount,
+  }))
+}),
+
   _ = watch([stateNum], () => ++stateNumChangeCount),
-  slowChangeCount = letState(0)(x => [slowChangeCount, slowChangeCount=x]),
   watchPropNumSlow = watch.noInit([stateNum], () => ++slowChangeCount),
-  subjectChangeCount = letState(0)(x => [subjectChangeCount, subjectChangeCount=x]),
   
   watchPropNumSubject = watch.asSubject([stateNum], () => {
     return ++subjectChangeCount
   }),
 
-  truthChange = letState(false)(x => [truthChange, truthChange=x]),
-  truthChangeCount = letState(0)(x => [truthChangeCount, truthChangeCount=x]),
   watchTruth = watch.truthy([truthChange], () => ++truthChangeCount),
   
-  truthSubChangeCount = letState(0)(x => [truthSubChangeCount, truthSubChangeCount=x]),
-  
+  // truthSubChangeCount = letState(0)(x => [truthSubChangeCount, truthSubChangeCount=x]),
+
   watchTruthAsSub = watch.truthy.asSubject([truthChange], () => {
     ++truthSubChangeCount
     return truthChange
@@ -26,8 +40,8 @@ export const watchTesting = tag.deepPropWatch(() => (
       if(x === undefined) {
         return 'undefined'
       }      
-
-      return x ? truthSubChangeCount : truthSubChangeCount
+      
+      return truthSubChangeCount
     }
   ),
 ) => html`<!-- watchTesting.tag.ts -->

@@ -62,6 +62,8 @@ describe('⌚️ watch tests', () => {
     click('#🦷-truthChange-button') // reset so tests can pass every time
     click('#🦷-reset-button') // reset so tests can pass every time
 
-    expect(html('#🦷-watchTruthAsSub')).toBe(html('#🦷-watchTruth'))
+    const display = html('#🦷-watchTruth')
+    const actual = html('#🦷-watchTruthAsSub')
+    expect(actual).toBe(display, `Last test expected #🦷-watchTruthAsSub ${display} but it was ${actual}`)
   })
 })

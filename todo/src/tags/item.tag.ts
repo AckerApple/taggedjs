@@ -1,5 +1,5 @@
 import { Dispatch, Todo } from '../reducer'
-import { html, letState, tag } from "taggedjs"
+import { html, states, tag } from 'taggedjs'
 
 // Performance boost to not render if props non-mutating props did not change
 export const Item = tag.immutableProps((
@@ -7,7 +7,9 @@ export const Item = tag.immutableProps((
   dispatch: Dispatch,
   index: number,
 ) => (
-  editing = letState(false)(x => [editing, editing = x]),
+  // editing = letState(false)(x => [editing, editing = x]),
+  editing = false,
+  _ = states(get => ({ editing } = get({editing}))),
 ) => {
   return html`
     <li class.completed=${todo.completed} class.editing=${editing}>
