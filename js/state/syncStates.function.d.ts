@@ -1,2 +1,3 @@
 import { State } from './state.types.js';
-export declare function syncStates(stateFrom: State, stateTo: State): void;
+import { StatesSetter } from './states.utils.js';
+export declare function syncStates(stateFrom: State, stateTo: State, oldStates: StatesSetter[], statesFrom: StatesSetter[]): void;

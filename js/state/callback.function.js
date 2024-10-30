@@ -8,13 +8,19 @@ export function callback(callback) {
     if (!support) {
         throw syncError;
     }
-    return createTrigger(support, setUseMemory.stateConfig.stateArray, callback);
+    return createTrigger(support, setUseMemory.stateConfig, // setUseMemory.stateConfig.stateArray
+    callback);
 }
 export function createTrigger(support, oldState, toCallback) {
+    const oldStateArray = oldState.stateArray;
+    const oldStates = oldState.states;
     return function trigger(...args) {
         const callbackMaker = support.subject.renderCount > 0;
         if (callbackMaker) {
-            return callbackStateUpdate(support, toCallback, oldState, ...args);
+            return callbackStateUpdate(support, toCallback, {
+                stateArray: oldStateArray,
+                states: oldStates,
+            }, ...args);
         }
         // we are in sync with rendering, just run callback naturally
         return toCallback(...args);
