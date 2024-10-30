@@ -9,7 +9,9 @@ import { ValueTypes } from './ValueTypes.enum.js'
 import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/LikeObjectElement.type.js'
 import { AnySupport } from './Support.class.js'
 import { getSupportInCycle } from './getSupportInCycle.function.js'
+import { StringTag } from './StringTag.type.js'
 
+export { StringTag }
 export const variablePrefix = ':tagvar'
 export const variableSuffix = ':'
 
@@ -39,22 +41,6 @@ export type Tag = {
 
 export type KeyFunction = (arrayValue: unknown) => StringTag
 
-export type StringTag = Tag & {
-  children?: {
-    strings: string[] | TemplateStringsArray
-    values: TagValues
-  }
-  strings: string[],
-  values: unknown[],
-
-  key: KeyFunction
-
-  html: (
-    strings: string[] | TemplateStringsArray,
-    values: TagValues,
-  ) => StringTag
-}
-
 export function getStringTag(
   strings: string[],
   values: unknown[],
@@ -64,7 +50,7 @@ export function getStringTag(
     ownerSupport: getSupportInCycle(),
     
     tagJsType: ValueTypes.tag,
-    strings: strings,
+    strings,
     key(arrayValue: unknown) {
       tag.arrayValue = arrayValue
       return tag

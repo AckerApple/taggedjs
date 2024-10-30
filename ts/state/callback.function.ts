@@ -15,7 +15,7 @@ export function callback<A,B,C,D,E,F, T>(
     throw syncError
   }
 
-  return createTrigger(support, setUseMemory.stateConfig.array, callback)
+  return createTrigger(support, setUseMemory.stateConfig.stateArray, callback)
 }
 
 export function createTrigger<A,B,C,D,E,F, T>(

@@ -5,7 +5,7 @@ import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode
 import { InterpolateSubject } from "../../tag/update/processFirstSubject.utils.js"
 import { howToSetInputValue } from "../attributes/howToSetInputValue.function.js"
 import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
-import { AnySupport, BaseSupport, Support } from "../../tag/Support.class.js"
+import { AnySupport } from "../../tag/Support.class.js"
 import { processAttribute } from "../attributes/processAttribute.function.js"
 import { SubToTemplateOptions } from "../subscribeToTemplate.function.js"
 import { Context, ContextItem } from "../../tag/Context.types.js"
@@ -19,7 +19,7 @@ import { Counts } from "../interpolateTemplate.js"
 export function attachDomElements(
   nodes: ObjectChildren,
   values: any[],
-  support: BaseSupport | Support,
+  support: AnySupport,
   counts: Counts, // used for animation stagger computing
   context: Context,
   depth: number, // used to know if dynamic variables live within parent owner tag/support
@@ -87,7 +87,7 @@ export function attachDomElements(
           values,
           attr[0], // name
           domElement,
-          support,
+           support,
           howToSetInputValue,
           context,
           attr[1], // value

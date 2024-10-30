@@ -1,6 +1,6 @@
 import { handleProviderChanges } from './handleProviderChanges.function.js'
 import { AnySupport } from '../tag/Support.class.js'
-import { SupportTagGlobal } from '../tag/TemplaterResult.class.js'
+import {SupportTagGlobal } from '../tag/TemplaterResult.class.js'
 
 export function providersChangeCheck(
   support: AnySupport

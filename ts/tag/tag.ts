@@ -12,6 +12,7 @@ import { key } from './key.js'
 
 let tagCount = 0
 
+/** TODO: This might be a duplicate typing of Wrapper */
 export type TaggedFunction<T extends ToTag> = ((...x:Parameters<T>) => ReturnType<T> & {
   key: KeyFunction
   original?: Original
@@ -33,7 +34,7 @@ export function tag<T extends ToTag>(
   propWatch: PropWatches = PropWatches.SHALLOW, // PropWatches.DEEP,
 ): TaggedFunction<T> {
   /** function developer triggers */
-  const parentWrap = (function tagWrapper(
+  const parentWrap = function tagWrapper(
     ...props: (T | StringTag | StringTag[])[]
   ): TemplaterResult {
     const templater: TemplaterResult = getTemplaterResult(propWatch, props)
@@ -45,20 +46,19 @@ export function tag<T extends ToTag>(
       parentWrap
     )
 
+    innerTagWrap.original = tagComponent as any
+/*
     if(!innerTagWrap.parentWrap) {
       innerTagWrap.parentWrap = parentWrap as TagWrapper<unknown>
     }
-    
+*/
     templater.wrapper = innerTagWrap as Wrapper
 
     return templater
-  }) as TagWrapper<T>// we override the function provided and pretend original is what's returned
+  } as TagWrapper<T>// we override the function provided and pretend original is what's returned
   
-  ;(parentWrap as unknown as TagWrapper<T>).original = tagComponent as unknown as Original
-  // parentWrap.compareTo = (tagComponent as any).toString()
-
   const tag = tagComponent as unknown as TagComponent
-  parentWrap.original = tag as unknown as Original
+  parentWrap.original = tagComponent as unknown as Original
 
   // group tags together and have hmr pickup
   tag.tags = tags
@@ -70,49 +70,77 @@ export function tag<T extends ToTag>(
   return parentWrap as unknown as TaggedFunction<T>
 }
 
+// Used to declare all the variable attachments on the "tag" function
+export declare namespace tag {
+  /** @deprecated use "use" instead */
+  let state: typeof tagUseFn
+  
+  /** Used to declare a function has state in the form of a function, that when called, returns content for rendering
+   * Example () => tag.use = (counter = 0)
+   */
+  let use: typeof tagUseFn
+
+  /** Used to create a tag component that renders once and has no addition rendering cycles */
+  let renderOnce: typeof renderOnceFn
+  
+  let route: typeof routeFn;
+  let key: typeof import("./key.js").key;
+  let app: (_routeTag: RouteTag) => StateToTag;
+  let deepPropWatch: typeof tag;
+  let immutableProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
+  let watchProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
+}
+
 type ReturnTag = DomTag | StringTag | StateToTag | null | undefined
 
-/** Used to create a tag component that renders once and has no addition rendering cycles */
-tag.renderOnce = function(): ReturnTag {
+;(tag as any).renderOnce = renderOnceFn
+function renderOnceFn(): ReturnTag {
   throw new Error('Do not call tag.renderOnce as a function but instead set it as: `(props) => tag.renderOnce = () => html`` `')
 }
 
 /** Used to create variable scoping when calling a function that lives within a prop container function */
-tag.state = function(): ReturnTag {
-  throw new Error('Do not call tag.state as a function but instead set it as: `(props) => tag.state = (state) => html`` `')
+function tagUseFn(): ReturnTag {
+  throw new Error('Do not call tag.use as a function but instead set it as: `(props) => tag.use = (use) => html`` `')
 }
+
+/** deprecated */
+;(tag as any).state = tagUseFn
+;(tag as any).use = tagUseFn
 
 // TODO???: Is tag.route and tag.app in use?
 
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
  */
-tag.route = function(_routeProps: RouteProps): StateToTag {
+;(tag as any).route = routeFn
+function routeFn(_routeProps: RouteProps): StateToTag {
   throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
 }
 
-tag.key = key
+;(tag as any).key = key
 
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
  */
-tag.app = function(_routeTag: RouteTag): StateToTag {
+;(tag as any).app = function(_routeTag: RouteTag): StateToTag {
   throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
 }
 
-tag.deepPropWatch = tag
+;(tag as any).deepPropWatch = tag
 
-tag.immutableProps = function immutableProps<T extends ToTag>(
+;(tag as any).immutableProps = function immutableProps<T extends ToTag>(
   tagComponent: T,
 ): TaggedFunction<T> {
   return tag(tagComponent, PropWatches.IMMUTABLE)
 }
 
-tag.watchProps = function watchProps<T extends ToTag>(
+;(tag as any).watchProps = function watchProps<T extends ToTag>(
   tagComponent: T,
 ): TaggedFunction<T> {
   return tag(tagComponent, PropWatches.SHALLOW)
 }
+
+/* BELOW: Cast functions into setters with no getters */
 
 Object.defineProperty(tag, 'renderOnce', {
   set(oneRenderFunction: UnknownFunction) {
@@ -120,14 +148,23 @@ Object.defineProperty(tag, 'renderOnce', {
   },
 })
 
+// TODO: deprecate this
 Object.defineProperty(tag, 'state', {
   set(renderFunction: UnknownFunction) {
-    ;(renderFunction as Wrapper).parentWrap = {
-      original: {
-        setUse: setUseMemory,
-        tags,
-      } as unknown as Original
-    } as TagWrapper<unknown>
+    ;(renderFunction as Wrapper).original = {
+      setUse: setUseMemory,
+      tags,
+    } as unknown as Original
+    ;(renderFunction as Wrapper).tagJsType = ValueTypes.stateRender
+  },
+})
+
+Object.defineProperty(tag, 'use', {
+  set(renderFunction: UnknownFunction) {
+    ;(renderFunction as Wrapper).original = {
+      setUse: setUseMemory,
+      tags,
+    } as unknown as Original
     ;(renderFunction as Wrapper).tagJsType = ValueTypes.stateRender
   },
 })

@@ -1,5 +1,5 @@
 import { SubjectLike } from './subject/subject.utils.js'
-import { Support } from './tag/Support.class.js'
+import { AnySupport } from './tag/Support.class.js'
 import { StringTag } from './tag/Tag.class.js'
 import { TemplaterResult } from './tag/TemplaterResult.class.js'
 import { BasicTypes, ImmutableTypes, ValueTypes } from './tag/ValueTypes.enum.js'
@@ -30,7 +30,7 @@ export function isStaticTag(
 
 /** passed in is expected to be a TemplaterResult */
 export function isTagComponent(
-  value?: TemplaterResult | Exclude<unknown, Support>
+  value?: TemplaterResult | Exclude<unknown,AnySupport>
 ) {
   const tagType = (value as TemplaterResult)?.tagJsType
   return tagType === ValueTypes.tagComponent || tagType === ValueTypes.stateRender

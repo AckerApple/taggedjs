@@ -1,5 +1,5 @@
 import { Subject, ValueSubject } from'../subject/index.js'
-import { Support } from '../tag/Support.class.js'
+import { AnySupport } from '../tag/Support.class.js'
 import { getSupportInCycle } from'../tag/getSupportInCycle.function.js'
 import { setUseMemory } from'./setUse.function.js'
 import { state } from'./state.function.js'
@@ -151,7 +151,7 @@ function defineOnMethod<R>(
   Object.defineProperty(attachTo, 'asSubject', {
     get() {
       const oldWatch = getWatch()
-      const firstSupport = state(() => (getSupportInCycle() as Support))
+      const firstSupport = state(() => (getSupportInCycle() as AnySupport))
       const subject = state(() => new ValueSubject<any>(undefined))
       
       const method = <T>(
@@ -165,7 +165,7 @@ function defineOnMethod<R>(
             const setTo = callback(currentValues, previousValues)
 
             if(nowSupport !== firstSupport) {
-              const newestState = setUseMemory.stateConfig.array
+              const newestState = setUseMemory.stateConfig.stateArray
               const oldestState = firstSupport.subject.global.oldest.state
               syncStates(
                 newestState,

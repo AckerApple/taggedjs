@@ -3,7 +3,7 @@ import { newSupportByTemplater } from './processTag.function.js'
 import { AnySupport } from '../Support.class.js'
 import { StringTag } from '../Tag.class.js'
 import { ContextItem } from '../Context.types.js'
-import { Original, TagWrapper } from '../tag.utils.js'
+import { Original } from '../tag.utils.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { PropWatches } from '../tag.js'
 
@@ -25,9 +25,8 @@ export function oneRenderToSupport(
   }
 
   templater.wrapper = wrap as unknown as Wrapper
-  wrap.parentWrap = wrap as unknown as TagWrapper<unknown>
   wrap.tagJsType = wrapper.tagJsType
-  wrap.parentWrap.original = wrapper as unknown as Original
+  wrap.original = wrapper.original || wrapper as unknown as Original
 
   return support
 }

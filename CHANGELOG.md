@@ -1,6 +1,8 @@
 ## CHANGELOG
 
 ### v2.7.0 - 7-2024
+- new states() let coordinator has been added! yay!
+- oneRender is now renderOnce
 - oneRender is now renderOnce
 - added tag() === tag.shallowPropWatch
 - added tag.deepPropWatch()

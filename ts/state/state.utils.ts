@@ -1,44 +1,42 @@
-import { firstLetState, reLetState } from './letState.function.js'
-import { BaseSupport, Support } from '../tag/Support.class.js'
+import { AnySupport } from '../tag/Support.class.js'
 import { runFirstState, runRestate } from './stateHandlers.js'
 import { State, StateConfig } from './state.types.js'
-import { checkStateMismatch } from '../tag/checkStateMismatch.function.js'
-
-export type Config = {
-  version: number
-  support?: BaseSupport | Support
-  array: State // state memory on the first render
-  rearray?: State // state memory to be used before the next render
-  handlers: {
-    handler: typeof runFirstState,
-    letHandler: typeof firstLetState,
-  }
-}
+import { firstLetState, reLetState } from './letState.utils.js'
+import { firstStatesHandler, reStatesHandler } from './states.utils.js'
+import { StateMemory } from './StateMemory.type.js'
 
 export type GetSet<T> = (y: T) => [T, T]
 
 export function initState(
-  support: Support | BaseSupport,
-  config: Config,
+  support: AnySupport,
+  config: StateMemory,
 ) {
   config.handlers.handler = runFirstState
   config.handlers.letHandler = firstLetState as <T>(defaultValue: T | (() => T)) => (y: unknown) => T
+  config.handlers.statesHandler = firstStatesHandler as <T>(defaultValue: T | (() => T)) => (y: unknown) => T
   
   config.rearray = []
-  config.array = []
+  config.stateArray = []
+  config.states = []
+  config.statesIndex = 0
   config.support = support
 }
 
 export function reState(
-  support: Support | BaseSupport,
-  config: Config,
+  support: AnySupport,
+  config: StateMemory,
   prevState: State,
 ) {
+  // set previous state memory
   config.rearray = prevState
-  config.array = []
+  config.stateArray = []
+  config.states = []
+  config.statesIndex = 0
 
-  config.handlers.handler = runRestate as any
-  config.handlers.letHandler = reLetState as any
+  config.handlers.handler = runRestate
+  config.handlers.letHandler = reLetState
+  config.handlers.statesHandler = reStatesHandler
+  
   config.support = support
 }
 

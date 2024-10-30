@@ -1,15 +1,15 @@
-import { AnySupport, BaseSupport, Support } from './Support.class.js'
-import { Config } from'../state/state.utils.js'
+import { AnySupport } from './Support.class.js'
 import { State } from '../state/state.types.js'
-import { Wrapper } from './index.js'
+import { Original, Wrapper } from './index.js'
 import { StateMismatchError } from '../errors.js'
+import { StateMemory } from '../state/StateMemory.type.js'
 
 export function checkStateMismatch(
-  config: Config,
-  support: BaseSupport | Support,
+  config: StateMemory,
+  support: AnySupport,
 ) {
   const rearray = config.rearray as unknown as State
-  if(rearray.length && rearray.length !== config.array.length) {
+  if(rearray.length && rearray.length !== config.stateArray.length) {
     throwStateMismatch(rearray, support, config)
   }
 }
@@ -19,20 +19,20 @@ const hint = 'State tracking requires same number of state calls on every render
 function throwStateMismatch(
   rearray: State,
   support: AnySupport,
-  config: Config,
+  config: StateMemory,
 ) {
-  const message = `Saved states between renders are inconsistent. Expected ${rearray.length} states got ${config.array.length}.`
+  const message = `Saved states between renders are inconsistent. Expected ${rearray.length} states got ${config.stateArray.length}.`
   const wrapper = support.templater?.wrapper as Wrapper
-  let tagFunction = wrapper
+  let tagFunction: Wrapper | Original = wrapper
   
   if((wrapper as any)?.original) {
     tagFunction = (wrapper as any).original
-  } else if(wrapper?.parentWrap.original) {
-    tagFunction = wrapper.parentWrap.original as any
+  } else if(wrapper?.original) {
+    tagFunction = wrapper.original as Original
   }
   
   const details = {
-    oldStates: config.array,
+    oldStates: config.stateArray,
     newStates: config.rearray,
     tagFunction,
     templater: support.templater,

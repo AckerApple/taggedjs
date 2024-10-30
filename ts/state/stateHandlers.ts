@@ -1,23 +1,23 @@
 import { setUseMemory } from './setUse.function.js'
 import { State, StateConfigItem } from './state.types.js'
-import { Config } from './state.utils.js'
 import { getStateValue } from './getStateValue.function.js'
 import { BasicTypes } from '../tag/ValueTypes.enum.js'
 import { UnknownFunction } from '../tag/index.js'
+import { StateMemory } from './StateMemory.type.js'
 
 export function runRestate () {
-  const config: Config = setUseMemory.stateConfig
+  const config: StateMemory = setUseMemory.stateConfig
   const rearray = config.rearray as State
 
-  const restate = rearray[config.array.length]
-  config.array.push(restate)
+  const restate = rearray[config.stateArray.length]
+  config.stateArray.push(restate)
   return restate.defaultValue
 }
 
 export function runFirstState <T>(
   defaultValue: T | (() => T),
 ) {
-  const config: Config = setUseMemory.stateConfig
+  const config: StateMemory = setUseMemory.stateConfig
 
   // State first time run
   let initValue = defaultValue
@@ -44,7 +44,7 @@ export function runFirstState <T>(
     },
     defaultValue: initValue as T,
   }
-  config.array.push(push)
+  config.stateArray.push(push)
   
   return initValue as T
 }

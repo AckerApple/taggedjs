@@ -2,7 +2,7 @@ import { isTagComponent } from "../../isInstance.js"
 import { providersChangeCheck } from "../../state/providersChangeCheck.function.js"
 import { checkRenderUp, isInlineHtml } from "../../tag/render/renderSupport.function.js"
 import { AnySupport, Support } from "../../tag/Support.class.js"
-import { SupportTagGlobal } from "../../tag/TemplaterResult.class.js"
+import {SupportTagGlobal } from "../../tag/TemplaterResult.class.js"
 import { ValueTypes } from "../../tag/ValueTypes.enum.js"
 
 export function getUpTags(
@@ -24,7 +24,7 @@ export function getUpTags(
       return getUpTags(ownerSupport, supports)
     }
 
-    const newSupport = support // global.newest as Support
+    const newSupport = support // global.newest as AnySupport
     const isComponent = isTagComponent(newSupport.templater)
     const tagJsType = support.templater.tagJsType
     const canContinueUp = ownerSupport && tagJsType !== ValueTypes.stateRender

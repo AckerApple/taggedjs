@@ -1,8 +1,9 @@
-import { Support } from '../tag/Support.class.js'
+import { BaseSupport } from '../tag/BaseSupport.type.js'
+import { AnySupport } from '../tag/Support.class.js'
 import { Provider } from './providers.js'
 
 export function handleProviderChanges(
-  appSupport: Support,
+  appSupport: BaseSupport,
   provider: Provider,
 ): TagWithProvider[] {
   const tagsWithProvider = getTagsWithProvider(appSupport, provider)
@@ -12,7 +13,7 @@ export function handleProviderChanges(
 
 /** Updates and returns memory of tag providers */
 function getTagsWithProvider(
-  support: Support,
+  support: AnySupport,
   provider: Provider,
   memory: TagWithProvider[] = []
 ): TagWithProvider[] {
@@ -38,7 +39,7 @@ function getTagsWithProvider(
 }
 
 type TagWithProvider = {
-  support: Support
+  support: AnySupport
   renderCount: number
-  provider: Provider,
+  provider: Provider
 }

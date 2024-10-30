@@ -1,4 +1,4 @@
-import { SupportTagGlobal } from './TemplaterResult.class.js'
+import {SupportTagGlobal } from './TemplaterResult.class.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { isTagComponent } from '../isInstance.js'
 import { runBeforeDestroy } from './tagRunner.js'

@@ -1,11 +1,11 @@
 // taggedjs-no-compile
 
-import { paint, paintAppends, painting, paintInsertBefores, paintRemoves } from '../paint.function.js'
+import { paintAppends, paintInsertBefores, paintRemoves } from '../paint.function.js'
 import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
-import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import {SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { checkSimpleValueChange } from '../checkDestroyPrevious.function.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
-import { AnySupport, BaseSupport, Support } from '../Support.class.js'
+import { AnySupport } from '../Support.class.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { processNewArrayValue } from './processNewValue.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
@@ -16,7 +16,7 @@ import { StringTag } from '../Tag.class.js'
 export function processTagArray(
   subject: ContextItem,
   value: (TemplaterResult | StringTag)[], // arry of Tag classes
-  ownerSupport: BaseSupport | Support,
+  ownerSupport: AnySupport,
   counts: Counts,
   appendTo?: Element,
 ) {
@@ -159,7 +159,7 @@ function processAddTagArrayItem(
   processFirstSubjectValue(
     value as TemplateValue,
     itemSubject,
-    ownerSupport, // support,
+    ownerSupport,
     counts,
     `rvp_${lastArray.length}_array`,
     appendTo,

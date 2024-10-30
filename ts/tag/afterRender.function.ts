@@ -1,6 +1,6 @@
+import { StateMemory } from '../state/StateMemory.type.js'
 import { setUseMemory } from '../state/setUse.function.js'
-import { BaseSupport, Support } from './Support.class.js'
-import { Config } from'../state/state.utils.js'
+import { AnySupport } from './Support.class.js'
 import { checkStateMismatch } from './checkStateMismatch.function.js'
 
 /** Compares states of previous renders
@@ -8,15 +8,15 @@ import { checkStateMismatch } from './checkStateMismatch.function.js'
  * @property ownerSupport - undefined when "support" is the app element
  */
 export function runAfterRender(
-  support: BaseSupport | Support,
-  ownerSupport?: Support | BaseSupport,
+  support: AnySupport,
+  ownerSupport?: AnySupport,
 ) {
   const subject = support.subject
   ++subject.renderCount
 
-  const config: Config = setUseMemory.stateConfig
+  const config: StateMemory = setUseMemory.stateConfig
   delete config.support
-  support.state = config.array
+  support.state = config.stateArray
   
   setUseMemory.tagClosed$.next(ownerSupport)
   checkStateMismatch(config, support)

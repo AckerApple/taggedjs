@@ -1,6 +1,6 @@
-import { AnySupport, BaseSupport, getSupport, Support, SupportContextItem } from '../Support.class.js'
+import { AnySupport, getSupport,SupportContextItem } from '../Support.class.js'
 import { getFakeTemplater, newSupportByTemplater, processTag } from './processTag.function.js'
-import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import {SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { processNowRegularValue, RegularValue } from './processRegularValue.function.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { updateExistingTagComponent } from './updateExistingTagComponent.function.js'
@@ -15,9 +15,9 @@ import { ContextItem } from '../Context.types.js'
 
 /** Used for all tag value updates. Determines if value changed since last render */
 export function updateExistingValue(
-  contextItem: ContextItem | SupportContextItem,
+  contextItem: ContextItem |SupportContextItem,
   value: TemplateValue,
-  ownerSupport: BaseSupport | Support,
+  ownerSupport: AnySupport,
 ) {
   // Do not continue if the value is just the same
   if(value === contextItem.value) {
@@ -61,7 +61,7 @@ export function updateExistingValue(
     const support = global.newest
     if( support ) {
       updateContextItemBySupport(
-        support,
+         support,
         contextItem as SupportContextItem,
         value as TemplaterResult,
         ownerSupport,
@@ -132,7 +132,7 @@ function handleStillTag(
   lastSupport: AnySupport,
   subject: ContextItem,
   value: StringTag | TemplateValue,
-  ownerSupport: BaseSupport | Support,
+  ownerSupport: AnySupport,
 ) {
   const templater = (value as Tag).templater || value
 
@@ -151,8 +151,8 @@ function handleStillTag(
 
 function prepareUpdateToComponent(
   templater: TemplaterResult,
-  contextItem: SupportContextItem,
-  ownerSupport: BaseSupport | Support,
+  contextItem:SupportContextItem,
+  ownerSupport: AnySupport,
 ): void {
   const global = contextItem.global as SupportTagGlobal
   // When last value was not a component
@@ -183,7 +183,7 @@ function prepareUpdateToComponent(
 /** Used to destro */
 function updateContextItemBySupport(
   support: AnySupport,
-  contextItem: SupportContextItem,
+  contextItem:SupportContextItem,
   value: TemplaterResult,
   ownerSupport: AnySupport,
 ) {

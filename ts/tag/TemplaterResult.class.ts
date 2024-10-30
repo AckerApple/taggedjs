@@ -1,11 +1,10 @@
 import { StringTag, DomTag, EventCallback } from './Tag.class.js'
 import { ContextItem } from './Context.types.js'
-import { BaseSupport, Support, SupportContextItem } from './Support.class.js'
+import { AnySupport, SupportContextItem } from './Support.class.js'
 import { Props } from '../Props.js'
 import { TagWrapper } from './tag.utils.js'
 import { Provider } from '../state/providers.js'
 import { OnDestroyCallback } from '../state/onDestroy.js'
-import { OnInitCallback } from '../state/onInit.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { Subject } from '../subject/index.js'
 import { ValueType, ValueTypes } from './ValueTypes.enum.js'
@@ -13,16 +12,14 @@ import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types
 import { PropWatches } from './tag.js'
 
 export type Wrapper = ((
-  newSupport: BaseSupport | Support,
+  newSupport: AnySupport,
   subject: ContextItem,
-  prevSupport?: BaseSupport | Support,
-) => Support) & {
+  prevSupport?: AnySupport,
+) => AnySupport) & TagWrapper<unknown> & {
   tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater
-  parentWrap: TagWrapper<unknown>
 }
 
 export type TagGlobal = {
-  // SUPPORTS
   htmlDomMeta?: DomObjectChildren
 
   deleted?: true
@@ -39,16 +36,15 @@ export type TagGlobal = {
 
 export type SupportTagGlobal = TagGlobal & {
   destroy$: Subject<void>
-  blocked: (BaseSupport | Support)[], // renders that did not occur because an event was processing
-  oldest: BaseSupport | Support
-  newest: BaseSupport | Support
+  blocked: AnySupport[], // renders that did not occur because an event was processing
+  oldest: AnySupport
+  newest: AnySupport
   context: SupportContextItem[] // populated after reading interpolated.values array converted to an object {variable0, variable:1}
   
-  init?: OnInitCallback // what to run when init complete, used for onInit
   providers?: Provider[]
 }
 
-export type BaseTagGlobal = SupportTagGlobal & {
+export type BaseTagGlobal =SupportTagGlobal & {
   // only appears on app
   events?: Events
 }

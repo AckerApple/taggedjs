@@ -1,13 +1,13 @@
 import { getChildTagsToSoftDestroy } from '../getChildTagsToDestroy.function.js'
-import { SupportTagGlobal, TagGlobal } from '../TemplaterResult.class.js'
-import { AnySupport, BaseSupport, Support } from '../Support.class.js'
+import {SupportTagGlobal, TagGlobal } from '../TemplaterResult.class.js'
+import { AnySupport } from '../Support.class.js'
 import { getNewGlobal } from '../update/getNewGlobal.function.js'
 import { smartRemoveKids } from '../smartRemoveKids.function.js'
 import { Context } from '../Context.types.js'
 
 /** used when a tag swaps content returned */
 export function softDestroySupport(
-  lastSupport: BaseSupport | Support,
+  lastSupport: AnySupport,
 ) {
   const global = lastSupport.subject.global as SupportTagGlobal
   const {subs, tags} = getChildTagsToSoftDestroy(global.context as Context)

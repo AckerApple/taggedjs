@@ -1,6 +1,6 @@
 import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
 import { TagWrapper } from './tag.utils.js'
-import { AnySupport, BaseSupport, getSupport, PropsConfig, Support } from './Support.class.js'
+import { AnySupport, getSupport, PropsConfig, Support } from './Support.class.js'
 import { castProps } from'../alterProp.function.js'
 import { ContextItem } from './Context.types.js'
 import { Props } from '../Props.js'
@@ -18,9 +18,9 @@ export function getTagWrap(
 ): Wrapper {
   // this function gets called by taggedjs
   const wrapper = function tagFunWrap(
-    newSupport: Support,
+    newSupport: AnySupport,
     subject: ContextItem,
-    lastSupport?: Support | BaseSupport | undefined // subject.global.newest
+    lastSupport?: AnySupport| undefined // subject.global.newest
   ) {
     // wrap any prop functions that are passed in
     const castedProps = getCastedProps(
@@ -29,11 +29,11 @@ export function getTagWrap(
       lastSupport,
     )
   
-    const ownerSupport = newSupport.ownerSupport as Support
+    const ownerSupport = newSupport.ownerSupport as AnySupport
     const useSupport = getSupport(
       templater,
       ownerSupport,
-      newSupport.appSupport, // ownerSupport.appSupport as Support,
+      newSupport.appSupport, // ownerSupport.appSupport as AnySupport,
       subject,
       castedProps,
     )
@@ -66,7 +66,7 @@ export function getCastedProps(
     propsConfig.castProps = lastCastProps
     preCastedProps = syncFunctionProps(
       newSupport,
-      lastSupport as Support,
+      lastSupport as AnySupport,
       (lastSupport as Support).ownerSupport,
       props,
       maxDepth,

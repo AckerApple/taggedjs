@@ -1,11 +1,11 @@
 // Functions in here are attached as ContextItem.checkValueChange
 
 import { processUpdateRegularValue, RegularValue } from './update/processRegularValue.function.js'
-import { Support, SupportContextItem } from './Support.class.js'
+import {AnySupport, SupportContextItem } from './Support.class.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { destroyArrayItem } from'./update/processTagArray.js'
 import { destroySupport } from './destroySupport.function.js'
-import { SupportTagGlobal } from './TemplaterResult.class.js'
+import {SupportTagGlobal } from './TemplaterResult.class.js'
 import { isArray, isStaticTag } from'../isInstance.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { paintRemoves } from './paint.function.js'
@@ -64,12 +64,12 @@ export function checkSimpleValueChange(
 
 export function checkTagValueChange(
   newValue: unknown,
-  subject: SupportContextItem,
+  subject:SupportContextItem,
 ) {
   const global = subject.global as SupportTagGlobal
   const lastSupport = global?.newest
   const isValueTag = isStaticTag(newValue)
-  const newTag = newValue as Support
+  const newTag = newValue as AnySupport
   
   if(isValueTag) {
     // its a different tag now

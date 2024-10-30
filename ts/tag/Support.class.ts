@@ -1,9 +1,9 @@
-import { SupportTagGlobal, TemplaterResult } from './TemplaterResult.class.js'
+import {SupportTagGlobal, TemplaterResult } from './TemplaterResult.class.js'
 import { clonePropsBy } from './clonePropsBy.function.js'
 import { Subject } from '../subject/Subject.class.js'
 import { ContextItem } from './Context.types.js'
-import { State } from '../state/index.js'
 import { Props } from '../Props.js'
+import { BaseSupport } from './BaseSupport.type.js'
 
 export type AnySupport = (BaseSupport & {
 })
@@ -25,13 +25,8 @@ export type HtmlSupport = {
   subject: ContextItem
 }
 
-export type BaseSupport = HtmlSupport & {
-  state: State, // TODO: this is not needed for every type of  tag
-  subject: SupportContextItem,
-}
-
 export type SupportContextItem = ContextItem & {
-  global: SupportTagGlobal
+  global:SupportTagGlobal
   /** Indicator of re-rending. Saves from double rending something already rendered */
   renderCount: number
 }
@@ -39,14 +34,16 @@ export type SupportContextItem = ContextItem & {
 /** used only for apps, otherwise use Support */
 export function getBaseSupport(
   templater: TemplaterResult,
-  subject: SupportContextItem,
+  subject:SupportContextItem,
   castedProps?: Props,
-): BaseSupport {
+): AnySupport {
   const baseSupport = {
     templater,
     subject,
     castedProps,
-    state: [], // TODO: this is not needed for every type of  tag
+    
+    state: [], // TODO: this is not needed for every type of tag
+    states: [], // TODO: this is not needed for every type of tag
 
     appSupport: undefined as unknown as BaseSupport,
   } as BaseSupport
@@ -65,7 +62,7 @@ export function getBaseSupport(
   return baseSupport
 }
 
-export type Support = BaseSupport & {
+export type Support = AnySupport & {
   ownerSupport: AnySupport
   appSupport: BaseSupport
 }
@@ -76,7 +73,7 @@ export function getSupport(
   appSupport: BaseSupport,
   subject: ContextItem,
   castedProps?: Props,
-): Support {
+): AnySupport {
   const support = getBaseSupport(
     templater,
     subject as SupportContextItem,
@@ -86,7 +83,7 @@ export function getSupport(
   support.ownerSupport = ownerSupport
   support.appSupport = appSupport
   
-  return support as Support
+  return support as AnySupport
 }
 
 export function getHtmlSupport(
@@ -95,7 +92,7 @@ export function getHtmlSupport(
   appSupport: BaseSupport,
   subject: ContextItem,
   castedProps?: Props,
-): Support {
+): AnySupport {
   const support = {
     templater,
     subject,
@@ -106,5 +103,5 @@ export function getHtmlSupport(
   
   support.ownerSupport = ownerSupport
   support.appSupport = appSupport
-  return support as Support
+  return support as AnySupport
 }

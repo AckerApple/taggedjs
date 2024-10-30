@@ -1,5 +1,5 @@
 import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
-import { AnySupport, Support } from '../Support.class.js'
+import { AnySupport } from '../Support.class.js'
 import { TemplaterResult } from '../TemplaterResult.class.js'
 import { checkTagValueChange } from '../checkDestroyPrevious.function.js'
 import { buildBeforeElement } from '../buildBeforeElement.function.js'
@@ -12,7 +12,7 @@ export function processNewSubjectTag(
   ownerSupport: AnySupport, // owner
   subject: ContextItem, // could be tag via result.tag
   appendTo: Element,
-): Support {
+): AnySupport {
   subject.checkValueChange = checkTagValueChange
   const support = newSupportByTemplater(templater, ownerSupport, subject)
 

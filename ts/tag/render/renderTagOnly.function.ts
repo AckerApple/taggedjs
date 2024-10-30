@@ -1,5 +1,5 @@
-import { SupportTagGlobal, Wrapper } from '../TemplaterResult.class.js'
-import { AnySupport, getSupport, Support, SupportContextItem } from '../Support.class.js'
+import {SupportTagGlobal, Wrapper } from '../TemplaterResult.class.js'
+import { AnySupport, getSupport,SupportContextItem } from '../Support.class.js'
 import { beforeRerender } from './beforeRerender.function.js'
 import { executeWrap } from '../executeWrap.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
@@ -11,17 +11,20 @@ import { setUseMemory } from '../../state/setUse.function.js'
 export function renderTagOnly(
   newSupport: AnySupport,
   prevSupport: AnySupport | undefined, // causes restate
-  subject: SupportContextItem,
+  subject:SupportContextItem,
   ownerSupport?: AnySupport,
 ): AnySupport {
   const global = subject.global as SupportTagGlobal
   const oldRenderCount = subject.renderCount
   const prevState = prevSupport?.state
-
+  const config = setUseMemory.stateConfig
+  
+  
   if(prevState) {
+    config.prevSupport = prevSupport
     beforeRerender(newSupport, prevState)
   } else {
-    initState(newSupport, setUseMemory.stateConfig)
+    initState(newSupport, config)
   }
   
   const templater = newSupport.templater
@@ -31,10 +34,11 @@ export function renderTagOnly(
   if(templater.tagJsType === ValueTypes.stateRender) {
     const result = templater as any as TagWrapper<any> // .wrapper as any// || {original: templater} as any
 
+    // TODO: Not sure if useSupport could be replaced by just using "newSupport"
     const useSupport = getSupport(
       templater,
       ownerSupport as AnySupport,
-      newSupport.appSupport, // ownerSupport.appSupport as Support,
+      newSupport.appSupport, // ownerSupport.appSupport as AnySupport,
       subject,
     )
 
@@ -43,6 +47,8 @@ export function renderTagOnly(
       result,
       useSupport,
     )
+
+    reSupport.states = newSupport.states
   } else {
     // functions wrapped in tag()
     const wrapper = templater.wrapper as Wrapper
@@ -53,6 +59,8 @@ export function renderTagOnly(
       subject,
       prevSupport,
     )
+
+    reSupport.states = newSupport.states
   }
 
   runAfterRender(reSupport, ownerSupport)
@@ -60,7 +68,7 @@ export function renderTagOnly(
   // When we rendered, only 1 render should have taken place OTHERWISE rendering caused another render and that is the latest instead
   // TODO: below most likely not needed
   if(subject.renderCount > oldRenderCount + 1) {
-    return global.newest as Support
+    return global.newest as AnySupport
   }
 
   return reSupport

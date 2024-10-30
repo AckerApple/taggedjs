@@ -2,7 +2,7 @@ import { checkArrayValueChange, checkSimpleValueChange, checkTagValueChange } fr
 import { processFirstSubjectComponent, processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { newSupportByTemplater, processTag, tagFakeTemplater } from './processTag.function.js'
 import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function.js'
-import { SupportTagGlobal, TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
+import {SupportTagGlobal, TemplaterResult, Wrapper } from '../TemplaterResult.class.js'
 import { oneRenderToSupport } from './oneRenderToSupport.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { AnySupport, SupportContextItem } from '../Support.class.js'
@@ -20,7 +20,7 @@ import { processNewSubjectTag } from './processNewSubjectTag.function.js'
 export function processFirstSubjectValue(
   value: TemplateValue | StringTag,
   subject: ContextItem, // could be tag via result.tag
-  ownerSupport: AnySupport, // owning support
+  ownerSupport: AnySupport, // owningSupport
   counts: Counts, // {added:0, removed:0}
   valueId: string,
   appendTo?: Element,
@@ -120,7 +120,7 @@ export function processFirstSubjectValue(
         
         renderTagOnly(
           support,
-          undefined, // support (no prev support)
+          undefined,
           subject as SupportContextItem,
           ownerSupport,
         )

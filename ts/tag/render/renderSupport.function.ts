@@ -1,9 +1,9 @@
-import { AnySupport, PropsConfig, Support } from '../Support.class.js'
+import { PropsConfig, AnySupport, Support } from '../Support.class.js'
 import { deepEqual } from '../../deepFunctions.js'
 import { renderExistingReadyTag } from'./renderExistingTag.function.js'
 import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
-import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import {SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { PropWatches } from '../index.js'
 import { deepCompareDepth, immutablePropMatch, shallowPropMatch } from '../hasSupportChanged.function.js'
 
@@ -41,7 +41,7 @@ export function renderSupport<T extends AnySupport>(
   delete global.locked
 
   const tag = renderExistingReadyTag(
-    global.newest as Support,
+    global.newest as AnySupport,
     support,
     ownerSupport,
     subject,
@@ -62,7 +62,7 @@ export function renderInlineHtml(
 
   // ??? new change
   const newest = ownGlobal.newest || ownerSupport
-  const result = renderSupport(newest as Support)
+  const result = renderSupport(newest as AnySupport)
 
   return result
 }

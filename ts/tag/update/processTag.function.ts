@@ -1,6 +1,6 @@
 import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
-import { AnySupport, BaseSupport, getHtmlSupport, Support } from '../Support.class.js'
-import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import { AnySupport, getHtmlSupport } from '../Support.class.js'
+import {SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { checkTagValueChange } from '../checkDestroyPrevious.function.js'
 import { buildBeforeElement } from '../buildBeforeElement.function.js'
 import { StringTag, DomTag } from '../Tag.class.js'
@@ -14,9 +14,9 @@ import { ContextItem } from '../Context.types.js'
 export function processTag(
   ownerSupport: AnySupport, // owner
   subject: ContextItem, // could be tag via result.tag
-): Support {
+): AnySupport {
   const global = subject.global as SupportTagGlobal
-  const support = global.newest as Support
+  const support = global.newest as AnySupport
   support.ownerSupport = ownerSupport
   subject.checkValueChange = checkTagValueChange
   
@@ -48,10 +48,10 @@ export function getFakeTemplater() {
   return fake
 }
 
-/** Create Support for a tag component */
+/** Create support for a tag component */
 export function newSupportByTemplater(
   templater: TemplaterResult,
-  ownerSupport: BaseSupport | Support,
+  ownerSupport: AnySupport,
   subject: ContextItem,
 ) {
   const support = getHtmlSupport(

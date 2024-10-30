@@ -1,9 +1,9 @@
 import { isInlineHtml, renderInlineHtml } from './tag/render/renderSupport.function.js'
 import { renderExistingReadyTag } from './tag/render/renderExistingTag.function.js'
-import { AnySupport, BaseSupport, Support } from './tag/Support.class.js'
+import { AnySupport } from './tag/Support.class.js'
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { deepCompareDepth } from './tag/hasSupportChanged.function.js'
-import { SupportTagGlobal, TemplaterResult } from './tag/TemplaterResult.class.js'
+import {SupportTagGlobal, TemplaterResult } from './tag/TemplaterResult.class.js'
 import { isArray, isStaticTag } from './isInstance.js'
 import { BasicTypes } from './tag/ValueTypes.enum.js'
 import { setUseMemory } from './state/index.js'
@@ -14,12 +14,12 @@ import { Subject } from './subject/Subject.class.js'
 
 export function castProps(
   props: Props,
-  newSupport: BaseSupport | Support,
+  newSupport: AnySupport,
   depth: number,
 ) {
   return props.map(prop => alterProp(
     prop,
-    (newSupport as Support).ownerSupport,
+    newSupport.ownerSupport as AnySupport,
     newSupport,
     depth,
   ))
@@ -28,8 +28,8 @@ export function castProps(
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
 export function alterProp(
   prop: unknown,
-  ownerSupport: BaseSupport | Support,
-  newSupport: BaseSupport | Support,
+  ownerSupport: AnySupport,
+  newSupport: AnySupport,
   depth: number,
 ) {
   if(isStaticTag(prop) || !prop) {
@@ -45,8 +45,8 @@ export function alterProp(
 
 export function checkProp(
   value: unknown | TemplaterResult | SubableProp | unknown[] | Record<string, unknown>,
-  ownerSupport: BaseSupport | Support,
-  newSupport: BaseSupport | Support,
+  ownerSupport: AnySupport,
+  newSupport: AnySupport,
   depth: number,
 ) {
   if(!value) {
@@ -154,7 +154,7 @@ function afterCheckProp(
   index: string | number,
   originalValue: unknown,
   newProp: SubableProp,
-  newSupport: BaseSupport | Support
+  newSupport: AnySupport
 ) {
   // restore object to have original function on destroy
   if(depth > 0) {    
@@ -173,7 +173,7 @@ export type WrapRunner = (() => unknown) & {
 
 export function getPropWrap(
   value: {mem?: unknown},
-  ownerSupport: BaseSupport | Support,
+  ownerSupport: AnySupport,
 ) {
   const already = value.mem
 
@@ -204,10 +204,10 @@ export function getPropWrap(
 export function callbackPropOwner(
   toCall: UnknownFunction,
   callWith: unknown[],
-  ownerSupport: BaseSupport | Support, // <-- WHEN called from alterProp its owner OTHERWISE its previous
+  ownerSupport: AnySupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
 ) {
   const global = ownerSupport.subject.global as SupportTagGlobal
-  const newest = global?.newest || ownerSupport as Support
+  const newest = global?.newest || ownerSupport as AnySupport
   const supportInCycle = getSupportInCycle()
   const noCycle = supportInCycle === undefined
   const callbackResult = toCall(...callWith)
@@ -265,7 +265,7 @@ export function safeRenderSupport(
   global.locked = true
 
   renderExistingReadyTag(
-    global.newest as Support,
+    global.newest as AnySupport,
     newest,
     ownerSupport,
     subject,

@@ -32,7 +32,7 @@ export function executeWrap(
   tag.templater = templater
   templater.tag = tag
 
-  const nowState = setUseMemory.stateConfig.array
+  const nowState = setUseMemory.stateConfig.stateArray
   useSupport.state = nowState
 
   return useSupport

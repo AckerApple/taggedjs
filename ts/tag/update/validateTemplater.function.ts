@@ -10,7 +10,7 @@ export function validateTemplater(
   }
 
   const wrapper = templater.wrapper
-  const original: () => unknown = wrapper?.parentWrap.original || templater as unknown as () => unknown
+  const original: () => unknown = wrapper?.original || templater as unknown as () => unknown
   let name: string | undefined = original.name || original.constructor?.name
 
   if(name === 'Function') {

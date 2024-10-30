@@ -20,7 +20,7 @@ export const callbackMaker = () => {
     throw syncError
   }
 
-  const oldState = setUseMemory.stateConfig.array
+  const oldState = setUseMemory.stateConfig.stateArray
   return function triggerMaker<A,B,C,D,E,F, T>(
     callback: Callback<A, B, C, D, E, F, T>
   ) {

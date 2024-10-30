@@ -18,6 +18,7 @@ export default [
     ],
     files: ["ts/**/*.ts"],
     rules: {
+      '@typescript-eslint/no-namespace': 'warn',
       'no-prototype-builtins': 'warn',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-empty-object-type': 'warn',

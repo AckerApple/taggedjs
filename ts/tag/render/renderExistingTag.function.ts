@@ -1,4 +1,4 @@
-import { AnySupport, BaseSupport, Support, SupportContextItem } from '../Support.class.js'
+import { AnySupport,SupportContextItem } from '../Support.class.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
 import { processTag } from '../update/processTag.function.js'
 import { updateSupportBy } from '../updateSupportBy.function.js'
@@ -7,7 +7,7 @@ import { updateSupportBy } from '../updateSupportBy.function.js'
 export function renderExistingReadyTag(
   lastSupport: AnySupport,
   newSupport: AnySupport, // new to be rendered
-  ownerSupport: BaseSupport | Support, // ownerSupport
+  ownerSupport: AnySupport, // ownerSupport
   subject: SupportContextItem,
 ) {
   const global = subject.global
@@ -15,7 +15,7 @@ export function renderExistingReadyTag(
     newSupport,
     lastSupport, // renderCount <= 0 ? undefined : lastSupport
     subject,
-    ownerSupport as Support,
+    ownerSupport as AnySupport,
   )
 
   if( wasLikeTags ) {

@@ -1,7 +1,7 @@
-import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import {SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { Counts } from'../../interpolations/interpolateTemplate.js'
 import { processFirstTagResult, processReplaceTagResult } from'./processTagResult.function.js'
-import { BaseSupport, getSupport, PropsConfig, Support, SupportContextItem } from '../Support.class.js'
+import { AnySupport, getSupport, PropsConfig,SupportContextItem } from '../Support.class.js'
 import { renderWithSupport } from '../render/renderWithSupport.function.js'
 import { ContextItem } from '../Context.types.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
@@ -9,10 +9,10 @@ import { getCastedProps } from '../getTagWrap.function.js'
 
 export function processReplacementComponent(
   templater: TemplaterResult,
-  subject: SupportContextItem,
-  ownerSupport: BaseSupport | Support,
+  subject:SupportContextItem,
+  ownerSupport: AnySupport,
   counts: Counts,
-): BaseSupport | Support {
+): AnySupport {
   // TODO: This below check not needed in production mode
   // validateTemplater(templater)
 
@@ -52,11 +52,11 @@ export function processReplacementComponent(
 
 export function processFirstSubjectComponent(
   templater: TemplaterResult,
-  subject: SupportContextItem,
-  ownerSupport: BaseSupport | Support,
+  subject:SupportContextItem,
+  ownerSupport: AnySupport,
   counts: Counts,
   appendTo: Element,
-): BaseSupport | Support {
+): AnySupport {
   // TODO: This below check not needed in production mode
   // validateTemplater(templater)
 

@@ -3,8 +3,8 @@
 
 import { isPromise, isTagComponent } from '../../isInstance.js'
 import { renderSupport } from '../../tag/render/renderSupport.function.js'
-import { AnySupport, BaseSupport, Support } from '../../tag/Support.class.js'
-import { SupportTagGlobal, TagGlobal } from '../../tag/TemplaterResult.class.js'
+import { AnySupport } from '../../tag/Support.class.js'
+import {SupportTagGlobal, TagGlobal } from '../../tag/TemplaterResult.class.js'
 import { getUpTags } from './getUpTags.function.js'
 import { renderTagUpdateArray } from './renderTagArray.function.js'
 
@@ -27,7 +27,7 @@ export function bindSubjectCallback(
       return
     }
     
-    // const newest = global.newest as Support // || subjectFunction.support
+    // const newest = global.newest as AnySupport // || subjectFunction.support
     return runTagCallback(
       subjectFunction.tagFunction,
       subjectFunction.support, // newest
@@ -45,14 +45,14 @@ export function bindSubjectCallback(
 
 export function runTagCallback(
   value: Callback,
-  support: BaseSupport | Support,
+  support: AnySupport,
   bindTo: unknown,
   args: any[],
 ) {
   // get actual component owner not just the html`` support
-  let component = support as Support
+  let component = support as AnySupport
   while(component.ownerSupport && !isTagComponent(component.templater)) {
-    component = component.ownerSupport as Support
+    component = component.ownerSupport as AnySupport
   }
 
   const global = component.subject.global as SupportTagGlobal // tag.subject.global as TagGlobal
@@ -75,7 +75,7 @@ export function afterTagCallback(
   delete global.locked
 
   return renderCallbackSupport(
-    eventHandlerSupport as Support,
+    eventHandlerSupport as AnySupport,
     callbackResult,
     global, // eventHandlerSupport.subject.global as TagGlobal,
   )
@@ -84,7 +84,7 @@ export function afterTagCallback(
 function renderCallbackSupport(
   last: AnySupport,
   callbackResult: any,
-  global: SupportTagGlobal, // TagGlobal,
+  global:SupportTagGlobal, // TagGlobal,
 ) {
   const tagsToUpdate = getUpTags(last)
   renderTagUpdateArray(tagsToUpdate)
@@ -93,7 +93,7 @@ function renderCallbackSupport(
 
 export function checkAfterCallbackPromise(
   callbackResult: any,
-  last: BaseSupport | Support,
+  last: AnySupport,
   global: TagGlobal,
 ) {
   if(isPromise(callbackResult)) {
@@ -118,7 +118,7 @@ export function checkAfterCallbackPromise(
 }
 
 export function runBlocked(
-  tag: BaseSupport | Support,
+  tag: AnySupport,
 ) {
   const global = tag.subject.global as SupportTagGlobal
   const blocked = global.blocked

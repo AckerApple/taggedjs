@@ -1,5 +1,5 @@
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
-import { Support } from '../tag/Support.class.js'
+import { AnySupport } from '../tag/Support.class.js'
 import { SupportTagGlobal } from '../tag/TemplaterResult.class.js'
 import { setUseMemory } from'./setUse.function.js'
 import { state } from'./state.function.js'
@@ -8,8 +8,8 @@ export type Provider = {
   constructMethod: any
   instance: any
   stateDiff: number
-  owner: Support // create at
-  children: Support[] // injected into
+  owner: AnySupport // create at
+  children: AnySupport[] // injected into
 }
 
 type ProviderConstructor<T> = (new (...args: any[]) => T) | (() => T)
@@ -39,12 +39,12 @@ export const providers = {
 
     const result = state(() => {
       const stateConfig = setUseMemory.stateConfig
-      const oldStateCount = stateConfig.array.length
+      const oldStateCount = stateConfig.stateArray.length
       // Providers with provider requirements just need to use providers.create() and providers.inject()
       const instance: T = constructMethod.prototype ? new (constructMethod as classProvider<T>)() : (constructMethod as functionProvider<T>)()
   
-      const support = stateConfig.support as Support
-      const stateDiff = stateConfig.array.length - oldStateCount
+      const support = stateConfig.support as AnySupport
+      const stateDiff = stateConfig.stateArray.length - oldStateCount
       
       const provider: Provider = {
         constructMethod,
@@ -81,19 +81,19 @@ export const providers = {
       // const memory = setUse.memory
       const cm = constructor as ConstructMethod<T>
       const compareTo = cm.compareTo = cm.compareTo || constructor.toString()
-      const support =  getSupportInCycle() as Support // memory.stateConfig.support as Support
+      const support =  getSupportInCycle() as AnySupport // memory.stateConfig.support as AnySupport
       const providers: Provider[] = []
 
       let owner = {
         ownerSupport: support.ownerSupport
-      } as Support
+      } as AnySupport
     
       while(owner.ownerSupport) {
         const ownGlobal = owner.ownerSupport.subject.global as SupportTagGlobal
         const ownerProviders = ownGlobal.providers
   
         if(!ownerProviders) {
-          owner = owner.ownerSupport as Support // cause reloop checking next parent
+          owner = owner.ownerSupport as AnySupport // cause reloop checking next parent
           continue
         }
 
@@ -114,7 +114,7 @@ export const providers = {
           return provider.instance
         }
   
-        owner = owner.ownerSupport as Support // cause reloop checking next parent
+        owner = owner.ownerSupport as AnySupport // cause reloop checking next parent
       }
       
       const msg = `Could not inject provider: ${constructor.name} ${constructor}`

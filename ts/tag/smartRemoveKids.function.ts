@@ -4,7 +4,7 @@ import { elementDestroyCheck } from './elementDestroyCheck.function.js'
 import { paint, paintRemoves } from './paint.function.js'
 import { AnySupport } from './Support.class.js'
 import { ContextItem } from './Context.types.js'
-import { SupportTagGlobal } from './TemplaterResult.class.js'
+import {SupportTagGlobal } from './TemplaterResult.class.js'
 import { isPromise } from '../isInstance.js'
 
 /** sets global.deleted on support and all children */

@@ -1,11 +1,11 @@
 import { StringTag, DomTag, Tag } from './Tag.class.js'
-import { BaseSupport, Support } from './Support.class.js'
+import { AnySupport } from './Support.class.js'
 import { TemplaterResult } from './TemplaterResult.class.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 
 export function isLikeTags(
-  support0: BaseSupport | Support | StringTag, // new
-  support1: Support | BaseSupport, // previous
+  support0: AnySupport | StringTag, // new
+  support1: AnySupport, // previous
 ): boolean {
   const templater0 = support0.templater as TemplaterResult | undefined
   const templater1 = support1.templater as TemplaterResult
@@ -17,25 +17,31 @@ export function isLikeTags(
     return (templater0 as any).dom === (templater1 as any).dom
   }
 
-  if(tag0.tagJsType === ValueTypes.dom) {
-    if(tag1?.tagJsType !== ValueTypes.dom) {
-      return false // tag0 is not even same type
+  switch (tag0.tagJsType) {
+    case ValueTypes.dom: {
+      if(tag1?.tagJsType !== ValueTypes.dom) {
+        return false // tag0 is not even same type
+      }
+  
+      return isLikeDomTags(
+        tag0 as DomTag,
+        tag1 as DomTag,
+      )
     }
 
-    return isLikeDomTags(
-      tag0 as DomTag,
-      tag1 as DomTag,
-    )
+    case ValueTypes.tag: {
+      const like = isLikeStringTags(
+        tag0 as StringTag,
+        tag1 as StringTag,
+        support0,
+        support1
+      )
+      
+      return like
+    }
   }
 
-  const like = isLikeStringTags(
-    tag0 as StringTag,
-    tag1 as StringTag,
-    support0,
-    support1
-  )
-  
-  return like
+  throw new Error(`unknown tagJsType of ${tag0.tagJsType}`)
 }
 
 // used when compiler was used
@@ -52,8 +58,8 @@ export function isLikeDomTags(
 function isLikeStringTags(
   tag0: StringTag,
   tag1: StringTag,
-  support0: BaseSupport | Support | Tag, // new
-  support1: Support | BaseSupport, // previous
+  support0: AnySupport | Tag, // new
+  support1: AnySupport, // previous
 ) {
   const strings0 = tag0.strings
   const strings1 = tag1.strings

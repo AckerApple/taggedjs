@@ -9,7 +9,7 @@ import { AnySupport } from '../../tag/Support.class.js'
 import { paintContent } from '../../tag/paint.function.js'
 import { Context, ContextItem } from '../../tag/Context.types.js'
 import { processDynamicNameValueAttribute, processNonDynamicAttr } from './processNameValueAttribute.function.js'
-import { addOneContext, checkSimpleValueChange, TagGlobal } from '../../tag/index.js'
+import { addOneContext, checkSimpleValueChange, Original, TagGlobal } from '../../tag/index.js'
 import { processAttributeFunction } from './processAttributeCallback.function.js'
 import { isSpecialAttr } from './isSpecialAttribute.function.js'
 
@@ -311,8 +311,7 @@ function callbackFun(
   subject: ContextItem,
 ) {
   const wrapper = support.templater.wrapper
-  const parentWrap = wrapper?.parentWrap
-  const tagJsType = wrapper?.tagJsType || parentWrap?.tagJsType
+  const tagJsType = wrapper?.tagJsType || (wrapper?.original as any)?.tagJsType
   const oneRender = tagJsType === ValueTypes.renderOnce
   
   if(!oneRender) {

@@ -1,19 +1,19 @@
-import { BaseSupport, Support } from '../tag/Support.class.js'
+import { AnySupport } from '../tag/Support.class.js'
 import { State } from './state.types.js'
 import { renderSupport } from '../tag/render/renderSupport.function.js'
 import { syncStates } from './syncStates.function.js'
 import { Callback } from './callbackMaker.function.js'
-import { SupportTagGlobal } from '../tag/index.js'
+import {SupportTagGlobal } from '../tag/index.js'
 import { isPromise } from '../isInstance.js'
 
 export default function callbackStateUpdate<T>(
-  support: Support | BaseSupport,
+  support: AnySupport,
   callback: Callback<any, any,any, any, any, any, T>,
   oldState: State,
   ...args: any[]
 ): T {
   const global = support.subject.global as SupportTagGlobal
-  support = global.newest // || support
+  support = global.newest
   const state = support.state
 
   // ensure that the oldest has the latest values first

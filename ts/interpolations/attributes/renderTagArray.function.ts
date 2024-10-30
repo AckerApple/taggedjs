@@ -1,6 +1,6 @@
 
 import { AnySupport } from '../../tag/Support.class.js'
-import { SupportTagGlobal } from '../../tag/TemplaterResult.class.js'
+import {SupportTagGlobal } from '../../tag/TemplaterResult.class.js'
 import { paint, painting } from '../../tag/paint.function.js'
 import { renderSupport } from'../../tag/render/renderSupport.function.js'
 

@@ -2,7 +2,7 @@ import { SpecialDefinition } from '../interpolations/attributes/processAttribute
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 import { InterpolateSubject } from './update/processFirstSubject.utils.js'
 import { Clone, TagGlobal } from './TemplaterResult.class.js'
-import { SupportContextItem } from './Support.class.js'
+import {SupportContextItem } from './Support.class.js'
 
 export type ContextItem = {
   isAttr?: true
@@ -32,4 +32,4 @@ export type ContextItem = {
 export type Context = ContextItem[]
 
 export type CheckValueChange = (value:unknown, subject: ContextItem) => number | boolean
-export type CheckSupportValueChange = (value:unknown, subject: SupportContextItem) => number | boolean
+export type CheckSupportValueChange = (value:unknown, subject:SupportContextItem) => number | boolean

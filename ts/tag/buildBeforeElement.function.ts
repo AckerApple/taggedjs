@@ -2,7 +2,7 @@ import { attachDomElements } from '../interpolations/optimizers/attachDomElement
 import { DomMetaMap } from '../interpolations/optimizers/LikeObjectElement.type.js'
 import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js'
 import { AnySupport, SupportContextItem } from './Support.class.js'
-import { SupportTagGlobal } from './TemplaterResult.class.js'
+import {SupportTagGlobal } from './TemplaterResult.class.js'
 import { ContextItem, Context } from './Context.types.js'
 import { ParsedHtml } from '../interpolations/index.js'
 import { checkSimpleValueChange } from './index.js'
@@ -43,7 +43,7 @@ function getHtmlDomMeta(
   const domMeta = loadDomMeta(support)
   const thisTag = support.templater.tag as StringTag | DomTag
   const values = thisTag.values
-  const context: SupportContextItem[] = []
+  const context:SupportContextItem[] = []
 
   const global = support.subject.global as SupportTagGlobal
   global.context = context

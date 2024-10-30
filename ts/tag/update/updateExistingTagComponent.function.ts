@@ -1,7 +1,7 @@
 import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from'../hasSupportChanged.function.js'
-import { AnySupport, BaseSupport, PropsConfig, Support, SupportContextItem } from '../Support.class.js'
+import { AnySupport, PropsConfig,SupportContextItem } from '../Support.class.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
-import { SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import {SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { castProps, isSkipPropValue, WrapRunner } from'../../alterProp.function.js'
 import { renderSupport } from'../render/renderSupport.function.js'
 import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js'
@@ -11,11 +11,12 @@ import { isLikeTags } from'../isLikeTags.function.js'
 import { isArray } from '../../isInstance.js'
 import { PropWatches } from '../tag.js'
 import { Props } from '../../Props.js'
+import { BaseSupport } from '../BaseSupport.type.js'
 
 export function updateExistingTagComponent(
-  ownerSupport: BaseSupport | Support,
+  ownerSupport: AnySupport,
   support: AnySupport, // lastest
-  subject: SupportContextItem,
+  subject:SupportContextItem,
 ): void {
   const global = subject.global as SupportTagGlobal
   const lastSupport = global.newest
@@ -29,8 +30,8 @@ export function updateExistingTagComponent(
   if(skipComparing) {
     isSameTag = support.templater.tagJsType === ValueTypes.renderOnce || isLikeTags(lastSupport,support)
   } else if(oldWrapper && newWrapper) {
-    const oldFunction = oldWrapper.parentWrap.original
-    const newFunction = newWrapper.parentWrap.original
+    const oldFunction = oldWrapper.original
+    const newFunction = newWrapper.original
 
     // string compare both functions
     isSameTag = oldFunction === newFunction
@@ -79,7 +80,7 @@ export function updateExistingTagComponent(
 export function syncFunctionProps(
   newSupport: AnySupport,
   lastSupport: AnySupport,
-  ownerSupport: BaseSupport | Support,
+  ownerSupport: AnySupport,
   newPropsArray: unknown[], // templater.props
   maxDepth: number,
   depth = -1,
@@ -99,7 +100,7 @@ export function syncFunctionProps(
     return newPropsArray
   }
 
-  lastSupport = newest || lastSupport as Support
+  lastSupport = newest || lastSupport as AnySupport
 
   const priorPropConfig = lastSupport.propsConfig as PropsConfig
   const priorPropsArray = priorPropConfig.castProps as Props
@@ -129,8 +130,8 @@ export function syncFunctionProps(
 function syncPriorPropFunction(
   priorProp: WrapRunner,
   prop: WrapRunner,
-  newSupport: BaseSupport | Support,
-  ownerSupport: BaseSupport | Support,
+  newSupport: AnySupport,
+  ownerSupport: AnySupport,
   maxDepth: number,
   depth: number,
 ) {
@@ -238,7 +239,7 @@ function updateExistingArray(
 }
 
 export function moveProviders(
-  lastSupport: Support,
+  lastSupport: AnySupport,
   newSupport: AnySupport,
 ) {
   const global = lastSupport.subject.global as SupportTagGlobal
@@ -255,7 +256,7 @@ export function moveProviders(
       const wasSameGlobals = global === child.subject.global
       if(wasSameGlobals) {
         provider.children.splice(index, 1)
-        provider.children.push(newSupport as Support)
+        provider.children.push(newSupport as AnySupport)
         return
       }
     }
@@ -273,7 +274,7 @@ function syncSupports<T extends AnySupport>(
   const newProps = templater.props as Props
   const castedProps = syncFunctionProps(
     support,
-    lastSupport as Support,
+    lastSupport as AnySupport,
     ownerSupport,
     newProps,
     maxDepth,
@@ -293,12 +294,12 @@ function syncSupports<T extends AnySupport>(
 
 /** Was tag, will be tag */
 function swapTags(
-  subject: SupportContextItem,
+  subject:SupportContextItem,
   templater: TemplaterResult, // new tag
   ownerSupport: AnySupport
 ) {
   const global = subject.global as SupportTagGlobal
-  const oldestSupport = global.oldest as Support
+  const oldestSupport = global.oldest as AnySupport
   destroySupport(oldestSupport, 0)
   
   getNewGlobal(subject) as SupportTagGlobal

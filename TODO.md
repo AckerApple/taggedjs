@@ -98,7 +98,7 @@ In many cases, since TaggedJs is natively compatible with browser vanilla Javasc
   - async hook - move
 
 ### Angular similarities
-- Support for bracket element definitions
+- support for bracket element definitions
   - `<div style.background-color]="red"></div>`
   - NOT [style.background-color]="'red'"
   - NOT [style.backgroundColor]="'red'" NOR [style.backgroundColor]="red"

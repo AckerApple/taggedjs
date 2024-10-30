@@ -1,4 +1,4 @@
-import { getTemplaterResult, SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import { getTemplaterResult,SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { checkTagValueChange } from '../checkDestroyPrevious.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { ValueTypes, ValueType } from '../ValueTypes.enum.js'
