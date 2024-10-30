@@ -36,8 +36,6 @@ export interface UnaryFunction<T, R, RESOLVE> {
   ): R;
 }
 
-export interface OperatorFunction<T, R, RESOLVE> extends UnaryFunction<T, R, RESOLVE> {}
-
 export type PipeUtils<H> = {
   setHandler: setHandler<H>
   next: (newValue: any) => any
@@ -87,12 +85,12 @@ export function getSubscription<T>(
 
 export function runPipedMethods(
   value: any,
-  methods: OperatorFunction<any, any, any>[],
+  methods: UnaryFunction<any, any, any>[],
   onComplete: (lastValue: any) => any
 ) {
   const cloneMethods = [...methods]
   
-  const firstMethod = cloneMethods.shift() as OperatorFunction<any, any, any>
+  const firstMethod = cloneMethods.shift() as UnaryFunction<any, any, any>
 
   const next = (newValue: any) => {
     if(cloneMethods.length) {

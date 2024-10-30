@@ -1,12 +1,12 @@
 import { Subject } from './Subject.class.js'
-import { OperatorFunction, PipeUtils, SubjectLike } from './subject.utils.js'
+import { PipeUtils, SubjectLike, UnaryFunction } from './subject.utils.js'
 
 
 type WillCallback<T, R> = (lastValue: T, resolve: (result: R) => void) => void;
 
 export function willCallback<T = any, R = any>(
   callback: WillCallback<T, R>,
-): OperatorFunction<T, R, any> {
+): UnaryFunction<T, R, any> {
   return ((lastValue: any, utils: any) => {
     utils.setHandler(() => {
       return undefined as any;
@@ -21,7 +21,7 @@ export function willPromise<T, H>(
   callback: (
     lastValue: T,
   ) => Promise<H>
-): OperatorFunction<T, H, any> {
+): UnaryFunction<T, H, any> {
   return ((lastValue: T, utils: any) => {
     utils.setHandler(() => {
       return undefined as any
@@ -38,7 +38,7 @@ export const willSubscribe = <T, H>(
   callback: (
     lastValue: T,
   ) => SubjectLike<H>
-): OperatorFunction<T, H, any> => {
+): UnaryFunction<T, H, any> => {
   return ((lastValue: T, utils: PipeUtils<H>) => {
     utils.setHandler(() => {
       return undefined as any

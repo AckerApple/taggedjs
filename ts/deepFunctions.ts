@@ -49,7 +49,7 @@ function makeDeepClone(
     }
   } else {
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         clone[key] = makeDeepClone(obj[key], maxDepth - 1)
       }
     }

@@ -1,6 +1,6 @@
 import { isSubjectInstance } from '../isInstance.js'
 import { combineLatest } from './combineLatest.function.js'
-import { OperatorFunction, SubjectLike, SubjectSubscriber, Subscription, getSubscription, runPipedMethods } from './subject.utils.js'
+import { UnaryFunction as OperatorFunction, SubjectLike, SubjectSubscriber, Subscription, getSubscription, runPipedMethods } from './subject.utils.js'
 
 export type OnSubscription<T> = (subscription: Subscription<T>) => unknown
 
