@@ -1,17 +1,21 @@
 import { storage, ViewTypes } from "./sections.tag"
 import { runIsolatedTests } from "./isolatedApp.test"
 
-let testTimeout = null
+let testTimeout: NodeJS.Timeout | null = null
 export function runTesting(
   manual = true,
   tests?: ViewTypes[],
   runStartEndTests?: boolean
 ) {
+  if(testTimeout !== null) {
+    clearTimeout(testTimeout)
+    console.debug(`🏃 Cleared previous testing to start again...`)
+  }
+  
   const waitFor = 2000
-
   testTimeout = setTimeout(async () => {
     tests = tests || storage.views
-    console.debug(`🏃 Running ${tests.length} test suites...`)
+    console.debug(`🏃 Prepare test suites...`)
     const result = await runIsolatedTests(tests, runStartEndTests)
 
     if(!manual) {

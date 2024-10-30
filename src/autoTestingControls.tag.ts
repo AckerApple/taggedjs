@@ -5,15 +5,15 @@ import { runTesting } from "./runTesting.function"
 export const autoTestingControls = (
   tests?: ViewTypes[],
   runStartEndTests?: boolean,
-) => tag.state = (
+) => tag.use = (
   _ = onInit(() => {
     if(storage.autoTest) {
       runTesting(false, tests, runStartEndTests)
     }
-  })
+  }),
 ) => html`
-    auto testing <input type="checkbox" ${storage.autoTest && 'checked'} onchange=${toggleAutoTesting} />
-    <button type="button" onclick=${() => runTesting(true, tests, runStartEndTests)}>run tests</button>
+  auto testing <input type="checkbox" ${storage.autoTest && 'checked'} onchange=${toggleAutoTesting} />
+  <button type="button" onclick=${() => runTesting(true, tests, runStartEndTests)}>run tests</button>
 `
 
 function toggleAutoTesting() {

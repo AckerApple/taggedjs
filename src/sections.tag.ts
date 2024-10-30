@@ -31,37 +31,41 @@ export enum ViewTypes {
 }
 const viewTypes = Object.values(ViewTypes)
 
-export const sections = () => html`
-  <div>
-    <h3>Sections</h3>
-    <!-- checkbox menu -->
-    <div style="display:flex;gap:1em;flex-wrap:wrap;margin:1em;">
-      ${viewTypes.map(type => html`
+export const sections = (x = 'sections') => {
+  return html`
+    <div>
+      <h3>Sections</h3>
+      <!-- checkbox menu -->
+      <div style="display:flex;gap:1em;flex-wrap:wrap;margin:1em;">
+        ${viewTypes.map(type => html`
+          <div>
+            <input type="checkbox"
+              id=${'view-type-' + type} name=${'view-type-' + type}
+              ${storage.views.includes(type) && 'checked'}
+              onclick=${() => toggleViewType(type)}
+            />
+            <label for=${'view-type-' + type}>&nbsp;${type}</label>
+          </div>
+        `.key(type))}
         <div>
-          <input type="checkbox"
-            id=${'view-type-' + type} name=${'view-type-' + type}
-            ${storage.views.includes(type) && 'checked'}
-            onclick=${() => toggleViewType(type)}
-          />
-          <label for=${'view-type-' + type}>&nbsp;${type}</label>
+          <label onclick=${() => viewTypes.forEach(viewType => {
+            // viewChanged.next({viewType, checkTesting: false})
+            activate(viewType, false)
+            saveScopedStorage()
+          })}>&nbsp;all</label>
         </div>
-      `.key(type))}
-      <div>
-        <label onclick=${() => viewTypes.forEach(viewType => {
-          // viewChanged.next({viewType, checkTesting: false})
-          activate(viewType, false)
-          saveScopedStorage()
-        })}>&nbsp;all</label>
-      </div>
-      <div>
-        <label onclick=${() => viewTypes.forEach(viewType => {
-          deactivate(viewType)
-          saveScopedStorage()
-        })}>&nbsp;none</label>
+        <div>
+          <label onclick=${() => viewTypes.forEach(viewType => {
+            deactivate(viewType)
+            saveScopedStorage()
+          })}>&nbsp;none</label>
+        </div>
       </div>
     </div>
-  </div>
-`
+  `
+}
+
+sections.tempNote = 'sections'
 
 function toggleViewType(
   type: ViewTypes,
@@ -89,7 +93,7 @@ export function activate(
   checkTesting = true,
 ) {
   storage.views.push(type)
-    
+
   if(checkTesting && storage.autoTest) {
     runTesting()
   }

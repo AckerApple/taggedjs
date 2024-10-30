@@ -8,9 +8,10 @@
  * @typedef {import("taggedjs").renderTagSupport} renderTagSupport
  */
 
+import { LikeObjectChildren } from "taggedjs/js/interpolations/optimizers/LikeObjectElement.type"
 import { HmrImport } from "./hmr"
 import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function"
-import { processSubUpdate, processFirstSubjectValue, buildBeforeElement, ContextItem, destroySupport, paint, Support, SupportTagGlobal, TaggedFunction, isSubjectInstance, Wrapper, Context, AnySupport, SupportContextItem, ValueTypes, Original } from "taggedjs"
+import { processSubUpdate, DomTag, StringTag, buildBeforeElement, ContextItem, destroySupport, paint, Support, SupportTagGlobal, TaggedFunction, isSubjectInstance, Wrapper, Context, AnySupport, SupportContextItem, ValueTypes, Original } from "taggedjs"
 
 /** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 
@@ -30,33 +31,70 @@ export async function updateSubject(
   const global = contextSubject.global as SupportTagGlobal  
   const oldest = global.oldest as Support
   const newest = global.newest as Support
-  const toString = newTag.original.toString()
-  // contextSupport.templater.wrapper.original.compareTo = toString
-  if((oldTag as any).original) {
-    // TODO: we may not ever get in here due to above bad data typed condition
-    (oldTag as any).compareTo = toString
+
+  const oldTemplater = oldest.templater
+  const oldWrapper = oldTemplater.wrapper as Wrapper | undefined
+  
+  if(oldWrapper) {
+    if(oldWrapper.original.toString() === oldTag.original.toString()) {
+      oldWrapper.original = newTag.original as Original
+
+      const toString = newTag.original.toString()
+      const original = (oldTag as any).original
+      // contextSupport.templater.wrapper.original.compareTo = toString
+      if(original) {
+        // TODO: we may not ever get in here due to above bad data typed condition
+        (oldTag as any).compareTo = toString
+      }
+      
+      // everytime an old owner tag redraws, it will use the new function
+      oldTag.original = newTag.original
+      const contextWrapper = newest.templater.wrapper as Wrapper
+      contextWrapper.original = newTag.original as Original
+      
+      const newWrapper = newest.templater.wrapper as Wrapper
+      newWrapper.original = newTag.original as Original
+      
+      const strings = (global.oldest.templater.tag as StringTag).strings
+      const dom = (global.oldest.templater.tag as DomTag).dom
+      // console.log('xxxxxx', {toString, oldTemplater, strings, dom})
+      if(original.toString().includes('sections') || strings?.includes('sections')) {
+        console.log('we are swapping sections......')
+      }
+    
+      if(dom && findText('sections', dom)) {
+        console.log('we found it!!!!')
+      }
+    
+      console.log('swapping supports-----', {
+        oldest,
+        state: oldest?.state
+      })    
+    }
   }
-  
-  // everytime an old owner tag redraws, it will use the new function
-  oldTag.original = newTag.original
-  const contextWrapper = newest.templater.wrapper as Wrapper
-  contextWrapper.parentWrap.original = newTag.original as Original
-  
-  const newWrapper = newest.templater.wrapper as Wrapper
-  newWrapper.parentWrap.original = newTag.original as Original
-  
-  const oldWrapper = oldest.templater.wrapper as Wrapper
-  oldWrapper.parentWrap.original = newTag.original as Original
+
+  await swapSupport(
+    contextSubject, hmr,
+  )
+}
+
+async function swapSupport(
+  contextSubject: ContextItem,
+  hmr: HmrImport,
+) {
+  const global = contextSubject.global as SupportTagGlobal  
+  const oldest = global.oldest as Support
+  const newest = global.newest as Support
 
   const pros = global.providers
   const prevConstructors = pros ? pros.map(provider => provider.constructMethod) : []
-
   const placeholder = contextSubject.placeholder
 
+  console.log('being destroy', {oldest})
   await destroySupport(oldest, 0)
   const reGlobal = contextSubject.global as SupportTagGlobal
   delete reGlobal.deleted
-  
+
   const reSupport = hmr.renderTagOnly(
     newest,
     newest,
@@ -65,7 +103,8 @@ export async function updateSubject(
   )
 
   const appSupport = oldest.appSupport
-  const ownGlobal = oldest.ownerSupport.subject.global as SupportTagGlobal
+  const ownerSupport = oldest.ownerSupport as AnySupport
+  const ownGlobal = ownerSupport.subject.global as SupportTagGlobal
   const providers = global.providers
   const owner = ownGlobal.oldest as Support
 
@@ -146,4 +185,23 @@ function recurseContext(
     }
 
   })
+}
+
+function findText(
+  text: string,
+  dom: LikeObjectChildren,
+) {
+  const found = dom.find(x => {
+    if(x.tc && x.tc.includes(text)) {
+      return true
+    }
+
+    if(x.ch) {
+      return findText(text, x.ch)
+    }
+  })
+
+  if(found) {
+    return true
+  }
 }

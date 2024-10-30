@@ -5,7 +5,9 @@ import { sleep } from "./testing/expect.html"
 describe('todos', function todos() {
   const todoInput = query('.new-todo')[0] as HTMLInputElement
 
-  it('add one remove one', async function addOneRemoveOne() {
+  it('todos add one remove one', async function addOneRemoveOne() {
+    expect(query('button.destroy').length).toBe(0)
+
     click('#todo-view-all-link')
     await sleep(1) // window route change takes a tick
 
@@ -21,7 +23,12 @@ describe('todos', function todos() {
     expect(query('button.destroy').length).toBe(0)
   })  
   
-  it('basic', async function basic() {
+  it('todos basic', async function basic() {
+    // click('#todo-view-all-link')
+    window.location.hash = '#/'
+    await sleep(1) // window route change takes a tick
+    expect(query('button.destroy').length).toBe(0)
+
     todoInput.value = 'one'
     keydownOn(todoInput, 'Enter')
     
@@ -50,6 +57,7 @@ describe('todos', function todos() {
 
     click('#todo-view-active-link')
     expect(query('input.toggle').length).toBe(3, 'active todo count before page change')
+    expect(window.location.hash).toBe('#/active')
     await sleep(1) // window route change takes a tick
     expect(query('input.toggle').length).toBe(2, 'active todo count after page change')
     
@@ -74,7 +82,7 @@ describe('todos', function todos() {
     expect(query('input.toggle').length).toBe(0)
   })
 
-  it('editing', function editing() {
+  it('todos editing', function editing() {
     // create todo
     todoInput.value = 'one'
     keydownOn(todoInput, 'Enter')
@@ -113,7 +121,7 @@ describe('todos', function todos() {
     expect(query('input#edit-todo-input').length).toBe(0)
   })
 
-  it('⌚️ speedometer', runTodoSpeedometer)
+  it('⌚️ todos speedometer', runTodoSpeedometer)
 })
 
 function runTodoSpeedometer() {

@@ -1,7 +1,7 @@
 import { Header } from "./components/header.js";
 import { Footer } from "./components/footer.js";
 import { Todo, todoReducer } from "./reducer.js";
-import { html, key } from "taggedjs";
+import { html } from "taggedjs";
 import { useHashRouter } from "./HashRouter.function.js";
 import { Item } from "./components/item.js";
 import { ViewTypes } from "../sections.tag.js";
@@ -21,7 +21,7 @@ export const todoApp = () => {
     const todoCount = todos.length
 
     return html`
-        ${autoTestingControls([ViewTypes.Todo], false)}
+        ${/*autoTestingControls([ViewTypes.Todo], false)*/false}
         ${Header(dispatch)}
         ${todoCount > 0 && html`
             <main class="main">

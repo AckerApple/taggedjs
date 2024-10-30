@@ -3,8 +3,9 @@ import { renderCountDiv } from "./renderCount.component"
 import { activate, sections, viewChanged } from "./sections.tag"
 import { renderedSections } from "./renderedSections.tag"
 import { autoTestingControls } from "./autoTestingControls.tag"
+import { menu } from "./menu.tag"
 
-export default () => tag.state = (
+export default () => tag.use = (
   _ = state('isolated app state'),
   renderCount = letState(0)(x => [renderCount, renderCount = x]),
   appCounter = letState(0)(x => [appCounter, appCounter=x]),
@@ -26,6 +27,8 @@ export default () => tag.state = (
   return html`<!--isolatedApp.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
     <div style="opacity:.6">(no HMR)</div>
+
+    ${menu()}
 
     <div>
       <fieldset>

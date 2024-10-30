@@ -5,57 +5,74 @@ export async function runIsolatedTests(
   views: ViewTypes[],
   runStartEndTests = true,
 ) {
+  let testCount = 0
+
   if(runStartEndTests) {
     await import('./start.test.js')
+    ++testCount
   }
 
   if(views.includes(ViewTypes.Content)) {
     await import('./content.test')
+    ++testCount
   }
 
   if(views.includes(ViewTypes.Counters)) {
     await import('./counters.test')
+    ++testCount
   }
 
   if(views.includes(ViewTypes.Props)) {
     await import('./props.test')
+    ++testCount
   }
 
   if(views.includes(ViewTypes.ProviderDebug)) {
     await import('./providers.test')
+    ++testCount
   }
 
   if(views.includes(ViewTypes.TagSwitchDebug)) {
     await import('./tagSwitch.test')
+    ++testCount
   }
 
   if(views.includes(ViewTypes.Child)) {
     await import('./child.test')
+    ++testCount
   }
 
   if(views.includes(ViewTypes.Arrays)) {
     await import('./array.test')
+    ++testCount
   }
 
   if(views.includes(ViewTypes.Mirroring)) {
     await import('./mirror.test')
+    ++testCount
   }
 
   if(views.includes(ViewTypes.WatchTesting)) {
     await import('./watch.test')
+    ++testCount
   }
 
   if(views.includes(ViewTypes.FunInPropsTag)) {
     await import('./funInProps.test')
+    ++testCount
   }
 
   if(views.includes(ViewTypes.OneRender)) {
     await import('./oneRender.test')
+    ++testCount
   }
 
   if(views.includes(ViewTypes.Todo)) {
     await import('./todos.test')
+    ++testCount
   }
+
+  console.debug(`🏃 Running ${testCount} test suites...`)
 
   try {
     const start = Date.now() //performance.now()

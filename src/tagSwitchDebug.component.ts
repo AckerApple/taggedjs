@@ -1,11 +1,14 @@
-import { html, tag, letState, InputElementTargetEvent, Tag } from "taggedjs"
+import { letState, states, html, tag, InputElementTargetEvent, Tag } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component.js"
 
 type SelectedTag = null | string | undefined
 
 export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
-  let selectedTag = letState(null as SelectedTag)(x => [selectedTag, selectedTag = x])
-  let renderCount = letState(0)(x => [renderCount, renderCount = x])
+  // let selectedTag = letState(null as SelectedTag)(x => [selectedTag, selectedTag = x])
+  // let renderCount = letState(0)(x => [renderCount, renderCount = x])
+  let selectedTag = null as SelectedTag
+  let renderCount = 0
+  states(get => ({renderCount, selectedTag} = get({renderCount, selectedTag})))
   
   function changeSelectedTag(event: InputElementTargetEvent) {
     selectedTag = event.target.value
@@ -112,8 +115,12 @@ export const ternaryPropTest = tag((
 })
 
 export const tag1 = tag(({title}: {title: string}) => {
-  let counter = letState(0)(x => [counter, counter = x])
-  let renderCount = letState(0)(x => [renderCount, renderCount = x])
+  // let counter = letState(0)(x => [counter, counter = x])
+  // let renderCount = letState(0)(x => [renderCount, renderCount = x])
+  let counter = 0
+  let renderCount = 0
+  states(get => ({counter, renderCount} = get({counter, renderCount})))
+
   ++renderCount
   return html`
     <div id="tag1" style="border:1px solid orange;">
@@ -125,8 +132,12 @@ export const tag1 = tag(({title}: {title: string}) => {
 })
 
 export const tag2 = tag(({title}: {title: string}) => {
-  let counter = letState(0)(x => [counter, counter = x])
-  let renderCount = letState(0)(x => [renderCount, renderCount = x])
+  // let counter = letState(0)(x => [counter, counter = x])
+  // let renderCount = letState(0)(x => [counter, counter = x])
+  let counter = 0
+  let renderCount = 0
+  states(get => ({counter, renderCount} = get({counter, renderCount})))
+
   ++renderCount
   return html`
     <div id="tag2" style="border:1px solid orange;">
@@ -138,8 +149,12 @@ export const tag2 = tag(({title}: {title: string}) => {
 })
 
 export const tag3 = tag(({title}: {title: string}) => {
-  let counter = letState(0)(x => [counter, counter = x])
-  let renderCount = letState(0)(x => [renderCount, renderCount = x])
+  // let counter = letState(0)(x => [counter, counter = x])
+  // let renderCount = letState(0)(x => [counter, counter = x])
+  let counter = 0
+  let renderCount = 0
+  states(get => ({counter, renderCount} = get({counter, renderCount})))
+
   ++renderCount
   return html`
     <div  id="tag3" style="border:1px solid orange;">

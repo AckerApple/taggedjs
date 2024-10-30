@@ -1,4 +1,4 @@
-import { RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, StringTag, ContextItem, getNewGlobal, getBaseSupport, Context, SupportTagGlobal, checkSimpleValueChange, SupportContextItem } from 'taggedjs'
+import { AnySupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, StringTag, ContextItem, getNewGlobal, getBaseSupport, Context, SupportTagGlobal, checkSimpleValueChange, SupportContextItem } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -57,7 +57,7 @@ function templaterToSupport(
 }
 
 function readySupport(
-  support: Support,
+  support: AnySupport,
   subject: SupportContextItem,
 ) {
   const global = subject.global

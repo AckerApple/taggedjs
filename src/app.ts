@@ -1,5 +1,5 @@
-import { run as app } from "./run.function.js"
+import { run } from "./run.function.js"
 
-app()
+run()
 
-export default app
+export default run

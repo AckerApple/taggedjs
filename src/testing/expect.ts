@@ -93,6 +93,7 @@ function clearTests() {
 
 export async function execute() {
   if(onlyTests.length) {
+    console.log('🏃 Running only mode...')
     return runTests(onlyTests)
   }
   

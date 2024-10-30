@@ -4,23 +4,64 @@ import { renderCountDiv } from "./renderCount.component"
 import { sections } from "./sections.tag"
 import { tagDebug } from "./tagJsDebug"
 import { runTests } from "./tests"
+import { menu, useMenuName } from "./menu.tag"
+import { innerCounterContent } from "./countersDebug";
 
-export const App = tag(() => (
+const appDate = Date.now()
+
+const appFun = () => (
   _firstState = letState('app first state')(x => [_firstState, _firstState=x]),
+  menuName = useMenuName(),
+) => {
+  console.log('🍒 App rendered', appDate)
+
+  const content = html`<!--app.js-->
+    <h1 id="h1-app">🏷️ TaggedJs - ${2+2}</h1>
+
+    ${menu()}
+
+    ${menuName === 'home' && homePage()}
+    ${menuName === 'counters' && innerCounterContent()}
+  `
+
+  return content
+}
+
+appFun.isApp = true
+
+export const App = tag(appFun)
+
+export const homePage = () => tag.use = (
   appCounter = letState(0)(x => [appCounter, appCounter=x]),
   toggleValue = letState(false)(x => [toggleValue, toggleValue=x]),
-  toggle = () => toggleValue = !toggleValue,
+  testTimeout = letState(null)(x => [testTimeout, testTimeout=x]),
   appCounterSubject = state(() => new Subject<number>(appCounter)),
   renderCount = letState(0)(x => [renderCount, renderCount=x]),
-  testTimeout = letState(null)(x => [testTimeout, testTimeout=x]),
+  toggle = () => toggleValue = !toggleValue,
 ) => {
+  const callbacks = callbackMaker()
+  let testEmoji = letState('🟦')(x => [testEmoji, testEmoji = x])
+  const onTestComplete = callbacks(success => testEmoji = success ? '✅' : '❌')
+
   // if I am destroyed before my test runs, prevent test from running
   onDestroy(() => {
     clearTimeout(testTimeout as any)
     testTimeout = null
   })
 
-  function runTesting(
+  onInit(() => {
+    console.info('1️⃣ app init should only run once')
+    
+    fireTesting(false, onTestComplete)
+
+    appCounterSubject.subscribe(
+      callbacks(y => {
+        appCounter = y
+      })
+    )
+  })
+
+  function fireTesting(
     manual = true,
     onComplete: (success: boolean) => any = () => undefined,
   ) {
@@ -47,27 +88,8 @@ export const App = tag(() => (
 
   ++renderCount
 
-  const callbacks = callbackMaker()
-
-  let testEmoji = letState('🟦')(x => [testEmoji, testEmoji = x])
-  const onTestComplete = callbacks(success => testEmoji = success ? '✅' : '❌')
-
-  onInit(() => {
-    console.info('1️⃣ app init should only run once')
-    
-    runTesting(false, onTestComplete)
-
-    appCounterSubject.subscribe(
-      callbacks(y => {
-        appCounter = y
-      })
-    )
-  })
-
-  const content = html`<!--app.js-->
-    <h1 id="h1-app">🏷️ TaggedJs - ${2+2}</h1>
-
-    <button onclick=${() => runTesting(true, onTestComplete)}>run tests ${testEmoji}</button>
+  return html`
+    <button onclick=${() => fireTesting(true, onTestComplete)}>run tests ${testEmoji}</button>
 
     <fieldset>
         <legend>direct app tests</legend>        
@@ -99,6 +121,4 @@ export const App = tag(() => (
       ${tagDebug()}
     </div>
   `
-
-  return content
-})
+}

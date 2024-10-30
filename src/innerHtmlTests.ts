@@ -1,4 +1,4 @@
-import { html, letState, tag, isSubjectInstance, Tag } from "taggedjs"
+import { letState, html, states, tag, isSubjectInstance, Tag } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
 
 export const innerHtmlTest = tag((
@@ -6,8 +6,11 @@ export const innerHtmlTest = tag((
   b:number,
   children: Tag,
 ) => {
-  let renderCount = letState(0)(x => [renderCount, renderCount = x])
-  let counter = letState(0)(x => [counter, counter = x])
+  // let counter = letState(0)(x => [counter, counter = x])
+  // let renderCount = letState(0)(x => [renderCount, renderCount = x])
+  let counter = 0
+  let renderCount = 0
+  states(get => ({counter, renderCount} = get({counter, renderCount})))
 
   ++renderCount
 
@@ -28,9 +31,13 @@ export const innerHtmlTest = tag((
 export const innerHtmlPropsTest = tag((
   x: number, children: Tag,
 ) => {
-  let renderCount = letState(0)(x => [renderCount, renderCount = x])
-  let counter = letState(0)(x => [counter, counter = x])
-  
+  // let counter = letState(0)(x => [counter, counter = x])
+  // let renderCount = letState(0)(x => [renderCount, renderCount = x])
+
+  let counter = 0
+  let renderCount = 0
+  states(get => ({counter, renderCount} = get({counter, renderCount})))
+
   ++renderCount
   
   return html`<!--innerHtmlTests.js-->
