@@ -22,11 +22,9 @@ export interface UnaryFunction<T, R, RESOLVE> {
     (source: T, // lastValue
     pipeUtils: PipeUtils<RESOLVE>): R;
 }
-export interface OperatorFunction<T, R, RESOLVE> extends UnaryFunction<T, R, RESOLVE> {
-}
 export type PipeUtils<H> = {
     setHandler: setHandler<H>;
     next: (newValue: any) => any;
 };
 export declare function getSubscription<T>(subject: Subject<T>, callback: SubjectSubscriber<any>, subscribers: Subscription<T>[]): Subscription<any>;
-export declare function runPipedMethods(value: any, methods: OperatorFunction<any, any, any>[], onComplete: (lastValue: any) => any): void;
+export declare function runPipedMethods(value: any, methods: UnaryFunction<any, any, any>[], onComplete: (lastValue: any) => any): void;

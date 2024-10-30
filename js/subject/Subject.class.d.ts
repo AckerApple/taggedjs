@@ -1,4 +1,4 @@
-import { OperatorFunction, SubjectLike, SubjectSubscriber, Subscription } from './subject.utils.js';
+import { UnaryFunction as OperatorFunction, SubjectLike, SubjectSubscriber, Subscription } from './subject.utils.js';
 export type OnSubscription<T> = (subscription: Subscription<T>) => unknown;
 export declare class Subject<T> implements SubjectLike<T> {
     value?: T | undefined;
