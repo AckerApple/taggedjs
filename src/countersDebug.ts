@@ -41,38 +41,38 @@ const innerCounters = tag.deepPropWatch(({
 }: {
   propCounter: number,
   increasePropCounter: () => void
-}) => {
-  // let otherCounter = letState(0)(x => [otherCounter, otherCounter = x])
-  // let renderCount = letState(0)(x => [renderCount, renderCount = x])
-  let otherCounter = 0
-  let renderCount = 0
-  states(get => ({otherCounter, renderCount} = get({otherCounter, renderCount})))
-
-  ++renderCount // for debugging
-
-  return html`
-    <div style="display:flex;flex-wrap:wrap;gap:1em;">
-      <div style="border:1px dashed black;padding:1em;">
-        <button id="❤️-inner-counter" onclick=${increasePropCounter}
-        >❤️ propCounter:${propCounter}</button>
-        <span>
-          ❤️ <span id="❤️-inner-display">${propCounter}</span>
-        </span>
-      </div>
-
-      <div style="border:1px dashed black;padding:1em;">
-        <button id="🤿-deep-counter" onclick=${() => ++otherCounter}
-        >🤿 otherCounter:${otherCounter}</button>
-        <span>
-        🤿 <span id="🤿-deep-display">${otherCounter}</span>
-        </span>
-      </div>
+}) => (
+  otherCounter = 0,
+  renderCount = 0,
+  elmInitCount = 0,
+  _ = states(get => ({elmInitCount, otherCounter, renderCount} = get({elmInitCount, otherCounter, renderCount}))),
+  __ = ++renderCount, // for debugging
+) => html`
+  <div style="display:flex;flex-wrap:wrap;gap:1em;" oninit=${() => ++elmInitCount}>
+    <div style="border:1px dashed black;padding:1em;">
+      🔥 elmInitCount:<span id="🔥-init-counter">${elmInitCount}</span>
     </div>
 
-    <div>renderCount:${renderCount}</div>
-    ${renderCountDiv({renderCount, name: 'inner_counters'})}
-  `
-})
+    <div style="border:1px dashed black;padding:1em;">
+      <button id="❤️-inner-counter" onclick=${increasePropCounter}
+      >❤️ propCounter:${propCounter}</button>
+      <span>
+        ❤️ <span id="❤️-inner-display">${propCounter}</span>
+      </span>
+    </div>
+
+    <div style="border:1px dashed black;padding:1em;">
+      <button id="🤿-deep-counter" onclick=${() => ++otherCounter}
+      >🤿 otherCounter:${otherCounter}</button>
+      <span>
+      🤿 <span id="🤿-deep-display">${otherCounter}</span>
+      </span>
+    </div>
+  </div>
+
+  <div>renderCount:${renderCount}</div>
+  ${renderCountDiv({renderCount, name: 'inner_counters'})}
+`)
 
 const shallowPropCounters = tag.watchProps(({
   propCounter,
@@ -268,7 +268,6 @@ export const innerCounterContent = () => tag.use = (
     😱 statesRenderCount:${statesRenderCount}
     <button type="button" onclick=${() => {
       ++statesRenderCount
-      console.log('button statesRenderCount', statesRenderCount)
     }}>😱 ++statesRenderCount</button>
   </div>
 
@@ -276,7 +275,6 @@ export const innerCounterContent = () => tag.use = (
     😱😱 statesRenderCount2:${statesRenderCount2}
     <button type="button" onclick=${() => {
       ++statesRenderCount2
-      console.log('button statesRenderCount2', statesRenderCount2)
     }}>😱😱 ++statesRenderCount2</button>
   </div>
 

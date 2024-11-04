@@ -28,6 +28,8 @@ describe('counters', () => {
     let renderCount = html('#inner_counters_render_count')
     expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`)
 
+    const preInitCounter = html('#🔥-init-counter')
+    expect(preInitCounter).toBe('1')
     testCounterElements('#❤️-inner-counter', '#❤️-inner-display')
 
     toBe = (beforeRenderCount + 4).toString()
