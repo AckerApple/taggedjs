@@ -1,9 +1,8 @@
 import { getSupport } from '../Support.class.js';
-import { beforeRerender } from './beforeRerender.function.js';
 import { executeWrap } from '../executeWrap.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 import { runAfterRender } from '../afterRender.function.js';
-import { initState } from '../../state/state.utils.js';
+import { initState, reState } from '../../state/state.utils.js';
 import { setUseMemory } from '../../state/setUse.function.js';
 export function renderTagOnly(newSupport, prevSupport, // causes restate
 subject, ownerSupport) {
@@ -12,8 +11,9 @@ subject, ownerSupport) {
     const prevState = prevSupport?.state;
     const config = setUseMemory.stateConfig;
     if (prevState) {
+        const prevStates = prevSupport.states;
         config.prevSupport = prevSupport;
-        beforeRerender(newSupport, prevState);
+        reState(newSupport, setUseMemory.stateConfig, prevState, prevStates);
     }
     else {
         initState(newSupport, config);

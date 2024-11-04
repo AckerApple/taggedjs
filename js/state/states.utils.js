@@ -33,7 +33,6 @@ export function reStatesHandler(setter) {
         ++index;
         return lastValue;
     };
-    config.restates = setter;
     support.states[config.statesIndex] = setter;
     ++config.statesIndex;
     return setter(resetter);

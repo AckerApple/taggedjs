@@ -11,7 +11,6 @@ export type StateMemory = {
     states: StatesSetter[];
     statesIndex: number;
     rearray?: State;
-    restates?: StatesSetter;
     handlers: {
         handler: typeof runFirstState;
         letHandler: typeof firstLetState;

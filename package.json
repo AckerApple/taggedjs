@@ -1,6 +1,6 @@
 {
   "name": "taggedjs",
-  "version": "2.7.4",
+  "version": "2.7.6",
   "description": "tagged template reactive html",
   "main": "js/index.js",
   "type": "module",

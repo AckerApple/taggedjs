@@ -6,6 +6,7 @@ const fragReplacer = /(^:tagvar\d+:|:tagvar\d+:$)/g;
 const safeVar = '__safeTagVar';
 const regexAttr = /([:_a-zA-Z0-9\-.]+)\s*(?:=\s*"([^"]*)"|=\s*(\S+))?/g;
 const regexTagOrg = /<\/?([a-zA-Z0-9-]+)((?:\s+[a-zA-Z_:][\w:.-]*(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)+\s*|\s*)\/?>/g;
+/** Run only during compile step OR when no compile step occurred at runtime */
 export function htmlInterpolationToDomMeta(strings, values) {
     htmlInterpolationToPlaceholders(strings, values);
     // Parse the modified fragments
@@ -100,7 +101,7 @@ export function parseHTML(html) {
                 attrValue = attrMatch[2];
             }
             const attrSet = [fixedName, attrValue];
-            const isSpecial = isSpecialAttr(fixedName);
+            const isSpecial = isSpecialAttr(lowerName); // check original name for "oninit" or "autofocus"
             if (isSpecial) {
                 attrSet.push(isSpecial);
             }

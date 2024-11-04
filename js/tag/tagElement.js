@@ -10,9 +10,8 @@ import { setUseMemory } from '../state/setUse.function.js';
 import { runAfterRender } from './afterRender.function.js';
 import { executeWrap } from './executeWrap.function.js';
 import { paint, painting } from './paint.function.js';
-import { initState } from '../state/state.utils.js';
+import { initState, reState } from '../state/state.utils.js';
 import { isTagComponent } from '../isInstance.js';
-import { beforeRerender } from './render/beforeRerender.function.js';
 const appElements = [];
 /**
  *
@@ -137,15 +136,12 @@ export function runWrapper(templater, placeholder, appElement, subject, isAppFun
     const oldest = global.oldest;
     const isFirstRender = useSupport === oldest;
     if (!isFirstRender) {
-        beforeRerender(useSupport, oldest.state);
+        reState(useSupport, setUseMemory.stateConfig, oldest.state, oldest.states);
     }
     if (templater.tagJsType === ValueTypes.stateRender) {
         const result = (templater.wrapper || { original: templater });
         if (!isAppFunction) {
             const newSupport = loadNewBaseSupport(templater, subject, appElement);
-            const config = setUseMemory.stateConfig;
-            newSupport.state = config.stateArray;
-            newSupport.states = config.states;
             runAfterRender(newSupport);
             return newSupport;
         }

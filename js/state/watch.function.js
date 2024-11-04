@@ -4,7 +4,8 @@ import { setUseMemory } from './setUse.function.js';
 import { state } from './state.function.js';
 import { syncStates } from './syncStates.function.js';
 /**
- * When an item in watch array changes, callback function will be triggered. Triggers on initial watch setup. TIP: try watch.noInit()
+ * When an item in watch array changes, callback function will be triggered.
+ * Triggers on initial watch setup. TIP: try watch.noInit()
  * @param currentValues T[]
  * @param callback WatchCallback
  * @returns T[]

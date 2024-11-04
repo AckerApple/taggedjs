@@ -11,11 +11,12 @@ export function initState(support, config) {
     config.statesIndex = 0;
     config.support = support;
 }
-export function reState(support, config, prevState) {
+export function reState(support, config, prevState, prevStates) {
     // set previous state memory
     config.rearray = prevState;
     config.stateArray = [];
-    config.states = [];
+    // config.states = []
+    config.states = prevStates;
     config.statesIndex = 0;
     config.handlers.handler = runRestate;
     config.handlers.letHandler = reLetState;

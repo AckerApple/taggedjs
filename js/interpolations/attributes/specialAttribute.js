@@ -1,9 +1,13 @@
 import { paintAfters, paintContent } from "../../tag/paint.function.js";
-import { elementInitCheck } from "./elementInitCheck.js";
 export function specialAttribute(name, value, element, specialName) {
     switch (specialName) {
         case 'oninit':
-            paintAfters.push(() => elementInitCheck(element, { added: 0, removed: 0 }));
+        case 'init':
+            paintAfters.push(() => {
+                const event = { target: element, stagger: 0 };
+                const onInit = value;
+                onInit(event);
+            });
             return;
         case 'autofocus':
             paintAfters.push(() => element.focus());

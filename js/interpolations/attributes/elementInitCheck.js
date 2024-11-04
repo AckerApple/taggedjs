@@ -1,5 +1,6 @@
 export function elementInitCheck(nextSibling, counts) {
-    const onInitDoubleWrap = nextSibling.oninit;
+    // const onInitDoubleWrap = (nextSibling as any).oninit
+    const onInitDoubleWrap = nextSibling.init;
     if (!onInitDoubleWrap) {
         return counts.added;
     }

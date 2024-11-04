@@ -4,7 +4,7 @@ export function isSpecialAttr(attrName) {
         return 'class';
     }
     const specialAction = isSpecialAction(attrName);
-    if (specialAction) {
+    if (specialAction !== false) {
         return true;
     }
     if (attrName.startsWith('style.')) {
@@ -18,7 +18,8 @@ export function isSpecialAction(attrName) {
             return 'autoselect';
         case 'autofocus':
             return 'autofocus';
-        case 'oninit':
+        case 'oninit': // when read in compile process
+        case 'init': // when read in realtime
             return 'oninit';
     }
     return false;

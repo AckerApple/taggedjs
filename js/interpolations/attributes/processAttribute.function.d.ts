@@ -4,7 +4,7 @@ import { Context, ContextItem } from '../../tag/Context.types.js';
 type TagVarIdNum = {
     tagJsVar: number;
 };
-export type SpecialDefinition = boolean | 'class' | 'style' | 'oninit' | 'autofocus' | 'autoselect';
+export type SpecialDefinition = boolean | 'class' | 'style' | 'init' | 'autofocus' | 'autoselect';
 /** Sets attribute value, subscribes to value updates  */
 export declare function processAttribute(values: unknown[], attrName: string | TagVarIdNum, element: Element, support: AnySupport, howToSet: HowToSet, //  = howToSetInputValue
 context: Context, value?: string | null | TagVarIdNum, isSpecial?: SpecialDefinition): void;

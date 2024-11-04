@@ -7,6 +7,10 @@ export function processDynamicNameValueAttribute(attrName, value, contextItem, e
     contextItem.element = element;
     contextItem.howToSet = howToSet;
     if (typeof (value) === BasicTypes.function) {
+        if (isSpecial && attrName === 'init') {
+            specialAttribute(attrName, value, element, attrName);
+            return;
+        }
         return processTagCallbackFun(contextItem, value, support, attrName, element);
     }
     contextItem.attrName = attrName;

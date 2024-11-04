@@ -44,9 +44,12 @@ owner, insertBefore, subs = []) {
         const domElement = newNode.domElement = document.createElement(node.nn);
         // attributes that may effect style, come first
         if (node.at) {
-            node.at.map(attr => processAttribute(values, attr[0], // name
-            domElement, support, howToSetInputValue, context, attr[1], // value
-            attr[2]));
+            node.at.map(attr => {
+                const name = attr[0];
+                const value = attr[1];
+                const isSpecial = attr[2];
+                processAttribute(values, name, domElement, support, howToSetInputValue, context, value, isSpecial);
+            });
         }
         if (owner) {
             paintAppends.push({

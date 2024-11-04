@@ -10,6 +10,7 @@ export function runAfterRender(support, ownerSupport) {
     const config = setUseMemory.stateConfig;
     delete config.support;
     support.state = config.stateArray;
+    // support.states = config.states
     setUseMemory.tagClosed$.next(ownerSupport);
     checkStateMismatch(config, support);
     subject.global.newest = support;
