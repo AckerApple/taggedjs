@@ -1,5 +1,5 @@
 import { paintAfters, paintContent } from "../../tag/paint.function.js"
-import { elementInitCheck } from "./elementInitCheck.js";
+import { InputElementTargetEvent } from "./ElementTargetEvent.interface.js";
 import { SpecialDefinition } from "./processAttribute.function.js";
 
 export function specialAttribute(
@@ -9,8 +9,13 @@ export function specialAttribute(
   specialName: SpecialDefinition
 ) {
   switch (specialName) {
-    case 'oninit':
-      paintAfters.push(() => elementInitCheck(element, {added:0, removed:0}))
+    case 'oninit' as any:
+    case 'init':
+      paintAfters.push(() => {
+        const event = { target: element, stagger: 0 } as unknown as InputElementTargetEvent
+        const onInit = value
+        onInit(event)
+      })
       return
 
     case 'autofocus':

@@ -10,6 +10,7 @@ const safeVar = '__safeTagVar'
 const regexAttr = /([:_a-zA-Z0-9\-.]+)\s*(?:=\s*"([^"]*)"|=\s*(\S+))?/g;
 const regexTagOrg = /<\/?([a-zA-Z0-9-]+)((?:\s+[a-zA-Z_:][\w:.-]*(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)+\s*|\s*)\/?>/g;
 
+/** Run only during compile step OR when no compile step occurred at runtime */
 export function htmlInterpolationToDomMeta(
   strings: string[],
   values: unknown[],
@@ -123,7 +124,6 @@ export function parseHTML(html: string): ParsedHtml {
       
 
       const fixedName = lowerName.startsWith('on') ? cleanEventName(lowerName) : lowerName
-
       if (noValue) {
         const standAloneVar = attrName.slice(0, variablePrefix.length) === variablePrefix;
   
@@ -150,8 +150,7 @@ export function parseHTML(html: string): ParsedHtml {
       }
 
       const attrSet: Attribute = [fixedName, attrValue]
-
-      const isSpecial = isSpecialAttr(fixedName)
+      const isSpecial = isSpecialAttr(lowerName) // check original name for "oninit" or "autofocus"
       if(isSpecial) {
         attrSet.push(isSpecial)
       }

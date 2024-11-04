@@ -22,6 +22,11 @@ export function processDynamicNameValueAttribute(
   contextItem.howToSet = howToSet
 
   if(typeof(value) === BasicTypes.function ) {
+    if (isSpecial && attrName === 'init') {
+      specialAttribute(attrName, value, element, attrName)
+      return
+    }
+  
     return processTagCallbackFun(
       contextItem,
       value,

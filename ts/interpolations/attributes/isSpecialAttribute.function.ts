@@ -7,7 +7,7 @@ export function isSpecialAttr(
   }
 
   const specialAction = isSpecialAction(attrName)
-  if(specialAction) {
+  if(specialAction !== false) {
     return true
   }
 
@@ -24,7 +24,9 @@ export function isSpecialAction(attrName: string) {
       return 'autoselect'
     case 'autofocus':
       return 'autofocus'
-    case 'oninit':
+    
+    case 'oninit': // when read in compile process
+    case 'init': // when read in realtime
       return 'oninit'
   }
   return false

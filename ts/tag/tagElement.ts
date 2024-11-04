@@ -12,11 +12,10 @@ import { setUseMemory, UseMemory } from '../state/setUse.function.js'
 import { runAfterRender } from './afterRender.function.js'
 import { executeWrap } from './executeWrap.function.js'
 import { paint, painting } from './paint.function.js'
-import { initState } from '../state/state.utils.js'
+import { initState, reState } from '../state/state.utils.js'
 import { isTagComponent } from '../isInstance.js'
 import { Props } from '../Props.js'
 import { TagMaker } from './TagMaker.type.js'
-import { beforeRerender } from './render/beforeRerender.function.js'
 import { BaseSupport } from './BaseSupport.type.js'
 
 export type TagAppElement = Element & {
@@ -206,7 +205,7 @@ export function runWrapper(
   const isFirstRender = useSupport === oldest
   
   if(!isFirstRender) {
-    beforeRerender(useSupport, oldest.state)
+    reState(useSupport, setUseMemory.stateConfig, oldest.state, oldest.states)
   }
 
   if(templater.tagJsType === ValueTypes.stateRender) {
@@ -214,9 +213,6 @@ export function runWrapper(
 
     if(!isAppFunction) {
       const newSupport = loadNewBaseSupport(templater, subject, appElement)
-      const config = setUseMemory.stateConfig
-      newSupport.state = config.stateArray
-      newSupport.states = config.states
       runAfterRender(newSupport)
       return newSupport
     }

@@ -1,11 +1,10 @@
 import {SupportTagGlobal, Wrapper } from '../TemplaterResult.class.js'
 import { AnySupport, getSupport,SupportContextItem } from '../Support.class.js'
-import { beforeRerender } from './beforeRerender.function.js'
 import { executeWrap } from '../executeWrap.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { TagWrapper } from '../tag.utils.js'
 import { runAfterRender } from '../afterRender.function.js'
-import { initState } from '../../state/state.utils.js'
+import { initState, reState } from '../../state/state.utils.js'
 import { setUseMemory } from '../../state/setUse.function.js'
 
 export function renderTagOnly(
@@ -21,8 +20,9 @@ export function renderTagOnly(
   
   
   if(prevState) {
+    const prevStates = prevSupport.states
     config.prevSupport = prevSupport
-    beforeRerender(newSupport, prevState)
+    reState(newSupport, setUseMemory.stateConfig, prevState, prevStates)
   } else {
     initState(newSupport, config)
   }

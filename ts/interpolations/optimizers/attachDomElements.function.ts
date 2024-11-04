@@ -82,18 +82,22 @@ export function attachDomElements(
 
     // attributes that may effect style, come first
     if (node.at) {
-      node.at.map(attr =>
+      node.at.map(attr => {
+        const name = attr[0]
+        const value = attr[1]
+        const isSpecial = attr[2] as boolean | undefined
+        
         processAttribute(
           values,
-          attr[0], // name
+          name,
           domElement,
            support,
           howToSetInputValue,
           context,
-          attr[1], // value
-          attr[2] as boolean | undefined, // isSpecial
+          value,
+          isSpecial,
         )
-      )
+      })
     }
 
     if(owner) {

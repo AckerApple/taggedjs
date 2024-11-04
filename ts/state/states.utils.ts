@@ -56,7 +56,6 @@ export function reStatesHandler(
     return lastValue
   }
 
-  config.restates = setter
   support.states[config.statesIndex] = setter
   ++config.statesIndex
 

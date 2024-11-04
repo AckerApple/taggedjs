@@ -32,8 +32,8 @@ export function executeWrap(
   tag.templater = templater
   templater.tag = tag
 
-  const nowState = setUseMemory.stateConfig.stateArray
-  useSupport.state = nowState
-
+  const config = setUseMemory.stateConfig
+  useSupport.state = config.stateArray
+  useSupport.states = config.states
   return useSupport
 }

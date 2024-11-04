@@ -15,7 +15,6 @@ export type StateMemory = {
   statesIndex: number
   
   rearray?: State // state memory to be used before the next render
-  restates?: StatesSetter
   
   handlers: {
     handler: typeof runFirstState,

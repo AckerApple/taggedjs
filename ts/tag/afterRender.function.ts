@@ -17,6 +17,7 @@ export function runAfterRender(
   const config: StateMemory = setUseMemory.stateConfig
   delete config.support
   support.state = config.stateArray
+  // support.states = config.states
   
   setUseMemory.tagClosed$.next(ownerSupport)
   checkStateMismatch(config, support)

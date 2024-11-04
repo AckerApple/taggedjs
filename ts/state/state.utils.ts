@@ -2,7 +2,7 @@ import { AnySupport } from '../tag/Support.class.js'
 import { runFirstState, runRestate } from './stateHandlers.js'
 import { State, StateConfig } from './state.types.js'
 import { firstLetState, reLetState } from './letState.utils.js'
-import { firstStatesHandler, reStatesHandler } from './states.utils.js'
+import { firstStatesHandler, reStatesHandler, StatesSetter } from './states.utils.js'
 import { StateMemory } from './StateMemory.type.js'
 
 export type GetSet<T> = (y: T) => [T, T]
@@ -26,11 +26,14 @@ export function reState(
   support: AnySupport,
   config: StateMemory,
   prevState: State,
+  prevStates: StatesSetter[],
 ) {
   // set previous state memory
   config.rearray = prevState
+
   config.stateArray = []
-  config.states = []
+  // config.states = []
+  config.states = prevStates
   config.statesIndex = 0
 
   config.handlers.handler = runRestate

@@ -14,7 +14,7 @@ import { processAttributeFunction } from './processAttributeCallback.function.js
 import { isSpecialAttr } from './isSpecialAttribute.function.js'
 
 type TagVarIdNum = {tagJsVar: number}
-export type SpecialDefinition = boolean | 'class' | 'style' | 'oninit' | 'autofocus' | 'autoselect'
+export type SpecialDefinition = boolean | 'class' | 'style' | 'init' | 'autofocus' | 'autoselect'
 
 /** Sets attribute value, subscribes to value updates  */
 export function processAttribute(
