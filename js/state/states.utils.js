@@ -1,4 +1,4 @@
-import { setUseMemory } from './setUse.function.js';
+import { setUseMemory } from './setUseMemory.object.js';
 import { state } from './state.function.js';
 export function firstStatesHandler(setter) {
     const config = setUseMemory.stateConfig;

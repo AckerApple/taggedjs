@@ -1,5 +1,5 @@
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js';
-import { setUseMemory } from '../state/setUse.function.js';
+import { setUseMemory } from '../state/setUseMemory.object.js';
 export function executeWrap(templater, result, useSupport, castedProps) {
     const originalFunction = result.original; // (innerTagWrap as any).original as unknown as TagComponent
     const stateless = templater.tagJsType === ValueTypes.stateRender;

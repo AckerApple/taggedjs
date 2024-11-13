@@ -3,7 +3,7 @@ import { executeWrap } from '../executeWrap.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 import { runAfterRender } from '../afterRender.function.js';
 import { initState, reState } from '../../state/state.utils.js';
-import { setUseMemory } from '../../state/setUse.function.js';
+import { setUseMemory } from '../../state/setUseMemory.object.js';
 export function renderTagOnly(newSupport, prevSupport, // causes restate
 subject, ownerSupport) {
     const global = subject.global;

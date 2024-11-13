@@ -1,5 +1,5 @@
 import callbackStateUpdate from './callbackStateUpdate.function.js';
-import { setUseMemory } from './setUse.function.js';
+import { setUseMemory } from './setUseMemory.object.js';
 import { syncError } from './callbackMaker.function.js';
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
 /** Wrap a function that will be called back. After the wrapper and function are called, a rendering cycle will update display */

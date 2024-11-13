@@ -62,8 +62,14 @@ export class Subject {
     }
     /** like toPromise but faster */
     toCallback(callback) {
-        const subscription = this.subscribe((x, _subscription) => {
-            subscription.unsubscribe();
+        const subscription = this.subscribe((x, runtimeSub) => {
+            const tagJsUnsub = runtimeSub?.unsubscribe;
+            if (tagJsUnsub) {
+                tagJsUnsub(); // its from taggedjs
+            }
+            else {
+                setTimeout(() => subscription.unsubscribe(), 0);
+            }
             callback(x);
         });
         return this;

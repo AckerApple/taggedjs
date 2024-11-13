@@ -1,6 +1,6 @@
 import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue.function.js';
 import { processSubUpdate } from './processSubscriptionUpdate.function.js';
-import { setUseMemory } from '../state/setUse.function.js';
+import { setUseMemory } from '../state/setUseMemory.object.js';
 import { paint } from '../tag/paint.function.js';
 export function subscribeToTemplate({ subject, support, counts, contextItem, appendTo, }) {
     let onValue = function onSubValue(value) {

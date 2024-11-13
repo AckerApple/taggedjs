@@ -1,4 +1,4 @@
-import { setUseMemory } from './setUse.function.js';
+import { setUseMemory } from './setUseMemory.object.js';
 import { getStateValue } from './getStateValue.function.js';
 import { BasicTypes } from '../tag/ValueTypes.enum.js';
 export function runRestate() {

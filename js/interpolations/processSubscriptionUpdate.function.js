@@ -1,5 +1,5 @@
 import { updateExistingValue } from '../tag/update/updateExistingValue.function.js';
-import { setUseMemory } from '../state/setUse.function.js';
+import { setUseMemory } from '../state/setUseMemory.object.js';
 import { paint } from '../tag/paint.function.js';
 export function processSubUpdate(value, contextItem, support) {
     if (value === contextItem.value) {

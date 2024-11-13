@@ -1,4 +1,4 @@
-import { setUseMemory } from '../state/setUse.function.js';
+import { setUseMemory } from '../state/setUseMemory.object.js';
 import { checkStateMismatch } from './checkStateMismatch.function.js';
 /** Compares states of previous renders
  * @property support - The workflow that supports a single tag

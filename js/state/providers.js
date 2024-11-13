@@ -1,5 +1,5 @@
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
-import { setUseMemory } from './setUse.function.js';
+import { setUseMemory } from './setUseMemory.object.js';
 import { state } from './state.function.js';
 export const providers = {
     create: (constructMethod) => {

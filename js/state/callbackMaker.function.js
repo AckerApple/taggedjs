@@ -1,5 +1,5 @@
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
-import { setUseMemory } from './setUse.function.js';
+import { setUseMemory } from './setUseMemory.object.js';
 import { SyncCallbackError } from '../errors.js';
 import { createTrigger } from './callback.function.js';
 export const callbackMaker = () => {

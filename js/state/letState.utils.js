@@ -1,6 +1,6 @@
 import { getStateValue } from './getStateValue.function.js';
 import { BasicTypes } from '../tag/ValueTypes.enum.js';
-import { setUseMemory } from './setUse.function.js';
+import { setUseMemory } from './setUseMemory.object.js';
 export function firstLetState(defaultValue) {
     const config = setUseMemory.stateConfig;
     // State first time run

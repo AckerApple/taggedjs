@@ -6,12 +6,12 @@ import { getNewGlobal } from './update/getNewGlobal.function.js';
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js';
 import { destroySupport } from './destroySupport.function.js';
 import { checkTagValueChange, PropWatches } from './index.js';
-import { setUseMemory } from '../state/setUse.function.js';
 import { runAfterRender } from './afterRender.function.js';
 import { executeWrap } from './executeWrap.function.js';
 import { paint, painting } from './paint.function.js';
 import { initState, reState } from '../state/state.utils.js';
 import { isTagComponent } from '../isInstance.js';
+import { setUseMemory } from '../state/setUseMemory.object.js';
 const appElements = [];
 /**
  *

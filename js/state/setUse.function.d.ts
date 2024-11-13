@@ -7,7 +7,6 @@ export type UseOptions = {
     afterRender?: (support: AnySupport, ownerSupport?: AnySupport) => void;
     beforeDestroy?: (support: AnySupport, tag: AnySupport) => void;
 };
-export declare const setUseMemory: UseMemory;
 export type UseMemory = (Record<string, unknown> & {
     stateConfig: StateMemory;
     currentSupport: AnySupport;
