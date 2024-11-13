@@ -82,8 +82,14 @@ export class Subject<T> implements SubjectLike<T> {
 
   /** like toPromise but faster */
   toCallback(callback: (x: T) => any) {
-    const subscription = this.subscribe((x, _subscription) => {
-      subscription.unsubscribe()
+    const subscription = this.subscribe((x, runtimeSub) => {
+      const tagJsUnsub = runtimeSub?.unsubscribe
+      if(tagJsUnsub) {
+        tagJsUnsub() // its from taggedjs
+      } else {
+        setTimeout(() => subscription.unsubscribe(), 0)
+      }
+
       callback(x)
     })
     return this

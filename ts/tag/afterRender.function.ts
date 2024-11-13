@@ -1,5 +1,5 @@
 import { StateMemory } from '../state/StateMemory.type.js'
-import { setUseMemory } from '../state/setUse.function.js'
+import { setUseMemory } from '../state/setUseMemory.object.js'
 import { AnySupport } from './Support.class.js'
 import { checkStateMismatch } from './checkStateMismatch.function.js'
 

@@ -8,7 +8,7 @@ import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 import { destroySupport } from './destroySupport.function.js'
 import { BaseTagGlobal, checkTagValueChange, DomTag, PropWatches } from './index.js'
-import { setUseMemory, UseMemory } from '../state/setUse.function.js'
+import { UseMemory } from '../state/setUse.function.js'
 import { runAfterRender } from './afterRender.function.js'
 import { executeWrap } from './executeWrap.function.js'
 import { paint, painting } from './paint.function.js'
@@ -17,6 +17,7 @@ import { isTagComponent } from '../isInstance.js'
 import { Props } from '../Props.js'
 import { TagMaker } from './TagMaker.type.js'
 import { BaseSupport } from './BaseSupport.type.js'
+import { setUseMemory } from '../state/setUseMemory.object.js'
 
 export type TagAppElement = Element & {
   ValueTypes: typeof ValueTypes

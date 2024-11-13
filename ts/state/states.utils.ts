@@ -1,4 +1,4 @@
-import { setUseMemory } from './setUse.function.js'
+import { setUseMemory } from './setUseMemory.object.js'
 import { state } from './state.function.js'
 import { AnySupport } from '../tag/Support.class.js'
 import { StateMemory } from './StateMemory.type.js'

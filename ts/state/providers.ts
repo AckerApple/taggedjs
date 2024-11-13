@@ -1,7 +1,7 @@
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
 import { AnySupport } from '../tag/Support.class.js'
 import { SupportTagGlobal } from '../tag/TemplaterResult.class.js'
-import { setUseMemory } from'./setUse.function.js'
+import { setUseMemory } from'./setUseMemory.object.js'
 import { state } from'./state.function.js'
 
 export type Provider = {

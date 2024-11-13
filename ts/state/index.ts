@@ -1,5 +1,6 @@
 export * from './watch.function.js'
 export * from './setUse.function.js'
+export { setUseMemory } from './setUseMemory.object.js'
 export * from './subject.function.js'
 export * from './letProp.function.js'
 export * from './state.types.js'

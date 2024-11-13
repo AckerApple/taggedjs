@@ -16,9 +16,11 @@ export { key } from './tag/key.js'
 
 import { tagElement } from './tag/tagElement.js'
 import { paint } from './tag/paint.function.js'
+
 export const hmr = {
   tagElement, renderWithSupport, renderSupport,
   renderTagOnly, paint,
 }
 
 export { type Wrapper } from './tag/TemplaterResult.class.js'
+

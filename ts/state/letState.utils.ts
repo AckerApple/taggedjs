@@ -1,7 +1,7 @@
 import { getStateValue } from './getStateValue.function.js'
 import { State, StateConfigItem } from './state.types.js'
 import { BasicTypes } from '../tag/ValueTypes.enum.js'
-import { setUseMemory } from './setUse.function.js'
+import { setUseMemory } from './setUseMemory.object.js'
 import { UnknownFunction } from '../tag/index.js'
 import { StateMemory } from './StateMemory.type.js'
 

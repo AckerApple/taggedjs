@@ -5,7 +5,7 @@ import { ValueTypes } from '../ValueTypes.enum.js'
 import { TagWrapper } from '../tag.utils.js'
 import { runAfterRender } from '../afterRender.function.js'
 import { initState, reState } from '../../state/state.utils.js'
-import { setUseMemory } from '../../state/setUse.function.js'
+import { setUseMemory } from '../../state/setUseMemory.object.js'
 
 export function renderTagOnly(
   newSupport: AnySupport,

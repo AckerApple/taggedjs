@@ -1,7 +1,6 @@
 import callbackStateUpdate from './callbackStateUpdate.function.js'
 import { AnySupport } from '../tag/Support.class.js'
-import { setUseMemory } from './setUse.function.js'
-import { State } from './state.types.js'
+import { setUseMemory } from './setUseMemory.object.js'
 import { Callback, syncError } from './callbackMaker.function.js'
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
 import { StateMemory } from './StateMemory.type.js'

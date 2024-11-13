@@ -3,7 +3,7 @@ import { TagWrapper } from './tag.utils.js'
 import { AnySupport } from './Support.class.js'
 import { StringTag } from './Tag.class.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
-import { setUseMemory } from '../state/setUse.function.js'
+import { setUseMemory } from '../state/setUseMemory.object.js'
 import { Props } from '../Props.js'
 
 type ReturnStringTag = (...n: unknown[]) => StringTag
