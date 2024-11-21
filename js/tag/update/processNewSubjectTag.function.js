@@ -5,11 +5,11 @@ import { paintAppends } from '../paint.function.js';
 import { newSupportByTemplater } from './processTag.function.js';
 export function processNewSubjectTag(templater, ownerSupport, // owner
 subject, // could be tag via result.tag
-appendTo) {
+appendTo, counts) {
     subject.checkValueChange = checkTagValueChange;
     const support = newSupportByTemplater(templater, ownerSupport, subject);
     support.ownerSupport = ownerSupport;
-    const result = buildBeforeElement(support, appendTo, undefined, { counts: { added: 0, removed: 0 } });
+    const result = buildBeforeElement(support, counts, appendTo, undefined);
     for (const dom of result.dom) {
         if (dom.marker) {
             paintAppends.push({

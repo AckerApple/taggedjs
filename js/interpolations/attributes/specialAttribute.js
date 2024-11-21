@@ -1,14 +1,33 @@
 import { paintAfters, paintContent } from "../../tag/paint.function.js";
-export function specialAttribute(name, value, element, specialName) {
+export function specialAttribute(name, value, element, specialName, support, counts) {
     switch (specialName) {
-        case 'oninit':
-        case 'init':
+        // case 'oninit' as any:
+        case 'init': {
+            const stagger = counts.added;
+            // run delayed after elements placed down
             paintAfters.push(() => {
-                const event = { target: element, stagger: 0 };
-                const onInit = value;
-                onInit(event);
+                const event = {
+                    target: element,
+                    stagger,
+                };
+                value(event); // call init/oninit
             });
             return;
+        }
+        // case 'ondestroy' as any:
+        case 'destroy': {
+            const stagger = ++counts.removed;
+            const global = support.subject.global;
+            global.destroys = global.destroys || [];
+            global.destroys.push(() => {
+                const event = {
+                    target: element,
+                    stagger,
+                };
+                return value(event); // call destroy/ondestroy
+            });
+            return;
+        }
         case 'autofocus':
             paintAfters.push(() => element.focus());
             return;

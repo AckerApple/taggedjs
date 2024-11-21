@@ -5,9 +5,8 @@ import { checkTagValueChange } from '../index.js';
 export function processReplaceTagResult(support, counts, contextItem) {
     contextItem.checkValueChange = checkTagValueChange;
     const ph = contextItem.placeholder;
-    const result = buildBeforeElement(support, undefined, // element for append child
-    ph, // placeholder
-    { counts });
+    const result = buildBeforeElement(support, counts, undefined, // element for append child
+    ph);
     const subs = result.subs;
     for (const sub of subs) {
         subscribeToTemplate(sub);
@@ -16,7 +15,7 @@ export function processReplaceTagResult(support, counts, contextItem) {
 }
 export function processFirstTagResult(support, counts, appendTo) {
     let appendIndex = paintAppends.length;
-    const result = buildBeforeElement(support, appendTo, undefined, { counts });
+    const result = buildBeforeElement(support, counts, appendTo, undefined);
     for (const dom of result.dom) {
         if (dom.domElement) {
             paintAppends.splice(appendIndex++, 0, {

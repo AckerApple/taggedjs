@@ -1,4 +1,4 @@
-export function elementDestroyCheck(nextSibling, stagger) {
+export function runElementDestroyCall(nextSibling, stagger) {
     const onDestroyDoubleWrap = nextSibling.destroy; // nextSibling.ondestroy
     const onDestroyWrap = onDestroyDoubleWrap.tagFunction;
     if (!onDestroyWrap) {
@@ -11,4 +11,4 @@ export function elementDestroyCheck(nextSibling, stagger) {
     };
     return onDestroy(event);
 }
-//# sourceMappingURL=elementDestroyCheck.function.js.map
+//# sourceMappingURL=runElementDestroyCall.function.js.map

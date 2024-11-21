@@ -6,11 +6,10 @@ import { processAttribute } from "../attributes/processAttribute.function.js";
 import { addOneContext } from "../../tag/index.js";
 import { isSubjectInstance } from "../../isInstance.js";
 import { empty } from "../../tag/ValueTypes.enum.js";
-// ??? TODO: This could be done within exchangeParsedForValues to reduce loops
+const someDiv = (typeof document === 'object' && document.createElement('div')); // used for content cleaning
 export function attachDomElements(nodes, values, support, counts, // used for animation stagger computing
 context, depth, // used to know if dynamic variables live within parent owner tag/support
 owner, insertBefore, subs = []) {
-    const x = document.createElement('div');
     const dom = [];
     for (const node of nodes) {
         const newNode = {}; // DomObjectText
@@ -24,8 +23,8 @@ owner, insertBefore, subs = []) {
         if (node.nn === 'text') {
             const textNode = newNode;
             const string = textNode.tc = node.tc;
-            x.innerHTML = string;
-            const domElement = textNode.domElement = document.createTextNode(x.innerText);
+            someDiv.innerHTML = string;
+            const domElement = textNode.domElement = document.createTextNode(someDiv.innerText);
             domElement.id = `tp_${context.length}_${values.length}`;
             if (owner) {
                 paintAppends.push({
@@ -47,8 +46,8 @@ owner, insertBefore, subs = []) {
             node.at.map(attr => {
                 const name = attr[0];
                 const value = attr[1];
-                const isSpecial = attr[2];
-                processAttribute(values, name, domElement, support, howToSetInputValue, context, value, isSpecial);
+                const isSpecial = attr[2] || false;
+                processAttribute(values, name, domElement, support, howToSetInputValue, context, isSpecial, counts, value);
             });
         }
         if (owner) {

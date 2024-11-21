@@ -21,6 +21,7 @@ export type TagGlobal = {
     destroyCallback?: OnDestroyCallback;
     locked?: true;
     callbackMaker?: true;
+    destroys?: (() => any)[];
 };
 export type SupportTagGlobal = TagGlobal & {
     destroy$: Subject<void>;

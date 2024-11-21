@@ -8,6 +8,7 @@ import { updateSupportBy } from '../updateSupportBy.function.js';
 import { isArray, isTagComponent } from '../../isInstance.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { processTagArray } from './processTagArray.js';
+const fooCounts = { added: 0, removed: 0 };
 /** Used for all tag value updates. Determines if value changed since last render */
 export function updateExistingValue(contextItem, value, ownerSupport) {
     // Do not continue if the value is just the same
@@ -45,7 +46,7 @@ export function updateExistingValue(contextItem, value, ownerSupport) {
     if (tagJsType) {
         switch (tagJsType) {
             case ValueTypes.templater:
-                processTag(ownerSupport, contextItem);
+                processTag(ownerSupport, contextItem, fooCounts);
                 return;
             case ValueTypes.tag:
             case ValueTypes.dom: {
@@ -58,7 +59,7 @@ export function updateExistingValue(contextItem, value, ownerSupport) {
                 }
                 const nowGlobal = (contextItem.global ? contextItem.global : getNewGlobal(contextItem));
                 nowGlobal.newest = newSupportByTemplater(templater, ownerSupport, contextItem);
-                processTag(ownerSupport, contextItem);
+                processTag(ownerSupport, contextItem, fooCounts);
                 return;
             }
         }

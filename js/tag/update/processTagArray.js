@@ -93,7 +93,7 @@ export function destroyArrayItem(item, counts) {
     if (global) {
         const support = global.oldest;
         global.deleted = true;
-        destroySupport(support, counts.removed);
+        destroySupport(support);
         global.deleted = true;
     }
     else {

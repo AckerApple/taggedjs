@@ -13,6 +13,3 @@ export type Counts = {
     added: number;
     removed: number;
 };
-export type ElementBuildOptions = {
-    counts: Counts;
-};

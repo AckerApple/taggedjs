@@ -8,13 +8,14 @@ import { ValueTypes } from '../ValueTypes.enum.js';
  * Intended use only for updates
 */
 export function processTag(ownerSupport, // owner
-subject) {
+subject, // could be tag via result.tag
+counts) {
     const global = subject.global;
     const support = global.newest;
     support.ownerSupport = ownerSupport;
     subject.checkValueChange = checkTagValueChange;
     const ph = subject.placeholder;
-    const result = buildBeforeElement(support, undefined, ph, { counts: { added: 0, removed: 0 } });
+    const result = buildBeforeElement(support, counts, undefined, ph);
     for (const sub of result.subs) {
         subscribeToTemplate(sub);
     }

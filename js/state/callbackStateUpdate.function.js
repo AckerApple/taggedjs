@@ -1,4 +1,3 @@
-// import { State } from './state.types.js'
 import { renderSupport } from '../tag/render/renderSupport.function.js';
 import { syncStates } from './syncStates.function.js';
 import { isPromise } from '../isInstance.js';

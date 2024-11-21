@@ -10,7 +10,7 @@ import { processAttributeFunction } from './processAttributeCallback.function.js
 import { isSpecialAttr } from './isSpecialAttribute.function.js';
 /** Sets attribute value, subscribes to value updates  */
 export function processAttribute(values, attrName, element, support, howToSet, //  = howToSetInputValue
-context, value, isSpecial) {
+context, isSpecial, counts, value) {
     const nameVar = getTagJsVar(attrName);
     const isNameVar = nameVar >= 0;
     if (isNameVar) {
@@ -20,7 +20,7 @@ context, value, isSpecial) {
         contextItem.element = element;
         contextItem.howToSet = howToSet;
         contextItem.isNameOnly = true;
-        processNameOnlyAttrValue(values, value, element, support, howToSet, context);
+        processNameOnlyAttrValue(values, value, element, support, howToSet, context, counts);
         return;
     }
     const valueVar = getTagJsVar(value);
@@ -36,15 +36,15 @@ context, value, isSpecial) {
         context.push(contextItem);
         const isSubject = isSubjectInstance(contextItem.value);
         if (isSubject) {
-            return processNameValueAttributeAttrSubject(attrName, contextItem, element, support, howToSet, isSpecial);
+            return processNameValueAttributeAttrSubject(attrName, contextItem, element, support, howToSet, isSpecial, counts);
         }
-        processDynamicNameValueAttribute(attrName, value, contextItem, element, howToSet, support, isSpecial);
+        processDynamicNameValueAttribute(attrName, value, contextItem, element, howToSet, support, counts, isSpecial);
         contextItem.value = value;
         return;
     }
-    return processNonDynamicAttr(attrName, value, element, howToSet, isSpecial);
+    return processNonDynamicAttr(attrName, value, element, howToSet, counts, support, isSpecial);
 }
-export function updateNameOnlyAttrValue(values, attrValue, lastValue, element, ownerSupport, howToSet, context) {
+export function updateNameOnlyAttrValue(values, attrValue, lastValue, element, ownerSupport, howToSet, context, counts) {
     // check to remove previous attribute(s)
     if (lastValue) {
         if (isNoDisplayValue(attrValue)) {
@@ -73,9 +73,9 @@ export function updateNameOnlyAttrValue(values, attrValue, lastValue, element, o
             }
         }
     }
-    processNameOnlyAttrValue(values, attrValue, element, ownerSupport, howToSet, context);
+    processNameOnlyAttrValue(values, attrValue, element, ownerSupport, howToSet, context, counts);
 }
-export function processNameOnlyAttrValue(values, attrValue, element, ownerSupport, howToSet, context) {
+export function processNameOnlyAttrValue(values, attrValue, element, ownerSupport, howToSet, context, counts) {
     if (isNoDisplayValue(attrValue)) {
         return;
     }
@@ -83,7 +83,8 @@ export function processNameOnlyAttrValue(values, attrValue, element, ownerSuppor
     if (typeof attrValue === BasicTypes.object) {
         for (const name in attrValue) {
             const value = attrValue[name];
-            processAttribute(values, name, element, ownerSupport, howToSet, context, value, isSpecialAttr(name));
+            processAttribute(values, name, element, ownerSupport, howToSet, context, isSpecialAttr(name), // only object variables are evaluated for is special attr
+            counts, value);
         }
         return;
     }
@@ -94,7 +95,7 @@ export function processNameOnlyAttrValue(values, attrValue, element, ownerSuppor
     howToSet(element, attrValue, empty);
 }
 /** Processor for flat attributes and object attributes */
-function processNameValueAttributeAttrSubject(attrName, result, element, support, howToSet, isSpecial) {
+function processNameValueAttributeAttrSubject(attrName, result, element, support, howToSet, isSpecial, counts) {
     if (isSpecial) {
         paintContent.push(function paintContent() {
             element.removeAttribute(attrName);
@@ -103,7 +104,7 @@ function processNameValueAttributeAttrSubject(attrName, result, element, support
     const contextValueSubject = result.value;
     if (isSubjectInstance(contextValueSubject)) {
         const callback = function processAttrCallback(newAttrValue) {
-            processAttributeEmit(newAttrValue, attrName, result, element, support, howToSet, isSpecial);
+            processAttributeEmit(newAttrValue, attrName, result, element, support, howToSet, isSpecial, counts);
         };
         // 🗞️ Subscribe. Above callback called immediately since its a ValueSubject()
         const sub = contextValueSubject.subscribe(callback);
@@ -112,24 +113,17 @@ function processNameValueAttributeAttrSubject(attrName, result, element, support
         const subs = global.subscriptions = global.subscriptions || [];
         subs.push(sub);
     }
-    processAttributeEmit(result.value, attrName, result, element, support, howToSet, isSpecial);
+    processAttributeEmit(result.value, attrName, result, element, support, howToSet, isSpecial, counts);
     return;
 }
-export function processAttributeEmit(newAttrValue, attrName, subject, element, support, howToSet, isSpecial) {
+export function processAttributeEmit(newAttrValue, attrName, subject, element, support, howToSet, isSpecial, counts) {
     // should the function be wrapped so every time its called we re-render?
     if (isFunction(newAttrValue)) {
-        return callbackFun(support, newAttrValue, element, attrName, isSpecial, howToSet, subject);
+        return callbackFun(support, newAttrValue, element, attrName, isSpecial, howToSet, subject, counts);
     }
-    return processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support);
+    return processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support, counts);
 }
-export function processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support) {
-    if (isFunction(newAttrValue)) {
-        return processAttributeFunction(element, newAttrValue, support, attrName);
-    }
-    if (isSpecial) {
-        specialAttribute(attrName, newAttrValue, element, isSpecial);
-        return;
-    }
+export function processAttributeSubjectValue(newAttrValue, element, attrName, special, howToSet, support, counts) {
     switch (newAttrValue) {
         case undefined:
         case false:
@@ -139,17 +133,25 @@ export function processAttributeSubjectValue(newAttrValue, element, attrName, is
             });
             return;
     }
+    if (special !== false) {
+        specialAttribute(attrName, newAttrValue, element, special, // name
+        support, counts);
+        return;
+    }
+    if (isFunction(newAttrValue)) {
+        return processAttributeFunction(element, newAttrValue, support, attrName);
+    }
     // value is 0
     howToSet(element, attrName, newAttrValue);
 }
-function callbackFun(support, newAttrValue, element, attrName, isSpecial, howToSet, subject) {
+function callbackFun(support, newAttrValue, element, attrName, isSpecial, howToSet, subject, counts) {
     const wrapper = support.templater.wrapper;
     const tagJsType = wrapper?.tagJsType || wrapper?.original?.tagJsType;
     const oneRender = tagJsType === ValueTypes.renderOnce;
     if (!oneRender) {
         return processTagCallbackFun(subject, newAttrValue, support, attrName, element);
     }
-    return processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support);
+    return processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support, counts);
 }
 export function processTagCallbackFun(subject, newAttrValue, support, attrName, element) {
     const prevFun = subject.value;

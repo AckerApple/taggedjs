@@ -1,6 +1,7 @@
 import { renderWithSupport } from './renderWithSupport.function.js';
 import { processTag } from '../update/processTag.function.js';
 import { updateSupportBy } from '../updateSupportBy.function.js';
+const fooCounts = { added: 0, removed: 0 };
 // TODO: This function is being called for 1st time renders WHEN renderCount === 1
 export function renderExistingReadyTag(lastSupport, newSupport, // new to be rendered
 ownerSupport, // ownerSupport
@@ -12,7 +13,7 @@ subject) {
         updateSupportBy(global.oldest, support);
         return support;
     }
-    processTag(ownerSupport, subject);
+    processTag(ownerSupport, subject, fooCounts);
     return support;
 }
 //# sourceMappingURL=renderExistingTag.function.js.map

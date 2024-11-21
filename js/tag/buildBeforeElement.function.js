@@ -4,27 +4,25 @@ import { getDomMeta } from './domMetaCollector.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 import { painting } from './paint.function.js';
 /** Function that kicks off actually putting tags down as HTML elements */
-export function buildBeforeElement(support, element, insertBefore, options) {
+export function buildBeforeElement(support, counts, element, insertBefore) {
     const global = support.subject.global;
     global.oldest = support;
     global.newest = support;
     ++painting.locks;
-    const result = getHtmlDomMeta(support, options, element, insertBefore);
+    const result = getHtmlDomMeta(support, counts, element, insertBefore);
     global.htmlDomMeta = result.dom;
     --painting.locks;
     // return fragment
     return result;
 }
-function getHtmlDomMeta(support, options = {
-    counts: { added: 0, removed: 0 },
-}, appendTo, insertBefore) {
+function getHtmlDomMeta(support, counts, appendTo, insertBefore) {
     const domMeta = loadDomMeta(support);
     const thisTag = support.templater.tag;
     const values = thisTag.values;
     const context = [];
     const global = support.subject.global;
     global.context = context;
-    const result = attachDomElements(domMeta, values, support, options.counts, context, 0, appendTo, insertBefore);
+    const result = attachDomElements(domMeta, values, support, counts, context, 0, appendTo, insertBefore);
     return result;
 }
 function loadDomMeta(support) {

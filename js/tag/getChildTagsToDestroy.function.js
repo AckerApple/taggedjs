@@ -1,10 +1,10 @@
 import { isTagComponent } from '../isInstance.js';
 import { runBeforeDestroy } from './tagRunner.js';
-export function getChildTagsToDestroy(childTags) {
+export function getChildTagsToDestroy(childTags, promises) {
     for (const child of childTags) {
         const lastArray = child.lastArray;
         if (lastArray) {
-            getChildTagsToDestroy(lastArray);
+            getChildTagsToDestroy(lastArray, promises);
             continue;
         }
         const global = child.global;
@@ -20,7 +20,7 @@ export function getChildTagsToDestroy(childTags) {
             runBeforeDestroy(support);
         }
         const subTags = global.context;
-        getChildTagsToDestroy(subTags);
+        getChildTagsToDestroy(subTags, promises);
     }
 }
 export function getChildTagsToSoftDestroy(childTags, tags = [], subs = []) {

@@ -20,9 +20,9 @@ valueId, appendTo) {
             case ValueTypes.templater:
                 subject.checkValueChange = checkTagValueChange;
                 if (appendTo) {
-                    return processNewSubjectTag(value, ownerSupport, subject, appendTo);
+                    return processNewSubjectTag(value, ownerSupport, subject, appendTo, counts);
                 }
-                return processTag(ownerSupport, subject);
+                return processTag(ownerSupport, subject, counts);
             case ValueTypes.dom:
             case ValueTypes.tag: {
                 subject.checkValueChange = checkTagValueChange;
@@ -33,11 +33,11 @@ valueId, appendTo) {
                 }
                 const global = getNewGlobal(subject);
                 if (appendTo) {
-                    return processNewSubjectTag(templater, ownerSupport, subject, appendTo);
+                    return processNewSubjectTag(templater, ownerSupport, subject, appendTo, counts);
                 }
                 global.newest = newSupportByTemplater(templater, ownerSupport, subject);
                 subject.checkValueChange = checkTagValueChange;
-                return processTag(ownerSupport, subject);
+                return processTag(ownerSupport, subject, counts);
             }
             case ValueTypes.stateRender:
             case ValueTypes.tagComponent: {
@@ -56,7 +56,7 @@ valueId, appendTo) {
                 getNewGlobal(subject);
                 const support = oneRenderToSupport(value, subject, ownerSupport);
                 renderTagOnly(support, undefined, subject, ownerSupport);
-                const result = processNewSubjectTag(support.templater, ownerSupport, subject, appendTo);
+                const result = processNewSubjectTag(support.templater, ownerSupport, subject, appendTo, counts);
                 // ++subject.global.renderCount
                 subject.checkValueChange = checkTagValueChange;
                 return result;

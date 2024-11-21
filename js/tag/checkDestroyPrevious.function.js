@@ -44,7 +44,7 @@ export function checkTagValueChange(newValue, subject) {
         // its a different tag now
         const likeTags = isLikeTags(newTag, lastSupport);
         if (!likeTags) {
-            destroySupport(lastSupport, 0);
+            destroySupport(lastSupport);
             getNewGlobal(subject);
             return 7; // 'tag-swap'
         }
@@ -55,7 +55,7 @@ export function checkTagValueChange(newValue, subject) {
         return false; // its still a tag component
     }
     // destroy old component, value is not a component
-    destroySupport(lastSupport, 0);
+    destroySupport(lastSupport);
     delete subject.global;
     subject.renderCount = 0;
     return 8; // 'no-longer-tag'
