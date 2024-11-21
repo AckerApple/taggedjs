@@ -36,6 +36,6 @@ function softDestroyOne(
   }
 
   global.deleted = true // the children are truly destroyed but the main support will be swapped
-  subject.renderCount = 0
-  smartRemoveKids(child, [], 0)
+  subject.renderCount = 0 // TODO: most likely can be removed
+  smartRemoveKids(child)
 }

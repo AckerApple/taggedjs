@@ -3,10 +3,13 @@
 import { specialAttribute } from './specialAttribute.js'
 import { HowToSet } from './howToSetInputValue.function.js'
 import { TagGlobal } from '../../tag/TemplaterResult.class.js'
-import { processTagCallbackFun, SpecialDefinition } from './processAttribute.function.js'
+import { processTagCallbackFun, SpecialAction, SpecialDefinition } from './processAttribute.function.js'
 import { ContextItem } from '../../tag/Context.types.js'
 import { AnySupport } from '../../tag/Support.class.js'
 import { BasicTypes } from '../../tag/ValueTypes.enum.js'
+import { Counts } from '../interpolateTemplate.js'
+
+const actions = ['init','destroy'] // oninit ondestroy
 
 export function processDynamicNameValueAttribute(
   attrName: string,
@@ -15,15 +18,23 @@ export function processDynamicNameValueAttribute(
   element: Element,
   howToSet: HowToSet,
   support: AnySupport,
-  isSpecial?: SpecialDefinition,
+  counts: Counts,
+  isSpecial: SpecialDefinition,
 ) {  
   contextItem.attrName = attrName
   contextItem.element = element
   contextItem.howToSet = howToSet
 
   if(typeof(value) === BasicTypes.function ) {
-    if (isSpecial && attrName === 'init') {
-      specialAttribute(attrName, value, element, attrName)
+    if (isSpecial && actions.includes(attrName)) {
+      specialAttribute(
+        attrName,
+        value,
+        element,
+        attrName as SpecialAction,
+        support,
+        counts,
+      )
       return
     }
   
@@ -41,7 +52,15 @@ export function processDynamicNameValueAttribute(
   contextItem.howToSet = howToSet
   contextItem.isSpecial = isSpecial
 
-  return processNonDynamicAttr(attrName, value, element, howToSet, isSpecial)
+  return processNonDynamicAttr(
+    attrName,
+    value,
+    element,
+    howToSet,
+    counts,
+    support,
+    isSpecial,
+  )
 }
 
 export function processNonDynamicAttr(
@@ -49,10 +68,19 @@ export function processNonDynamicAttr(
   value: string,
   element: Element,
   howToSet: HowToSet,
-  isSpecial?: SpecialDefinition,
+  counts: Counts,
+  support: AnySupport,
+  isSpecial: SpecialDefinition,
 ) {
   if (isSpecial) {
-    return specialAttribute(attrName, value, element, isSpecial)
+    return specialAttribute(
+      attrName,
+      value,
+      element,
+      isSpecial,
+      support,
+      counts,
+    )
   }
 
   howToSet(element, attrName, value as string)  

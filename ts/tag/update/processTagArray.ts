@@ -190,7 +190,7 @@ export function destroyArrayItem(
   if(global) {    
     const support = global.oldest
     global.deleted = true
-    destroySupport(support, counts.removed)
+    destroySupport(support)
     global.deleted = true
   } else {
     const element = item.simpleValueElm as Element

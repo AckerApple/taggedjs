@@ -1,4 +1,6 @@
 import { paintAfters, paintContent } from "../../tag/paint.function.js"
+import { AnySupport } from "../../tag/Support.class.js";
+import { Counts } from "../interpolateTemplate.js";
 import { InputElementTargetEvent } from "./ElementTargetEvent.interface.js";
 import { SpecialDefinition } from "./processAttribute.function.js";
 
@@ -6,17 +8,44 @@ export function specialAttribute(
   name: string,
   value: any,
   element: Element,
-  specialName: SpecialDefinition
+  specialName: SpecialDefinition,
+  support: AnySupport,
+  counts: Counts,
 ) {
   switch (specialName) {
-    case 'oninit' as any:
-    case 'init':
+    // case 'oninit' as any:
+    case 'init': {
+      const stagger = counts.added
+
+      // run delayed after elements placed down
       paintAfters.push(() => {
-        const event = { target: element, stagger: 0 } as unknown as InputElementTargetEvent
-        const onInit = value
-        onInit(event)
+        const event = {
+          target: element,
+          stagger,
+        } as unknown as InputElementTargetEvent
+        value(event) // call init/oninit
       })
+
       return
+    }
+
+    // case 'ondestroy' as any:
+    case 'destroy': {
+      const stagger = ++counts.removed
+      const global = support.subject.global      
+      global.destroys = global.destroys || []
+      
+      global.destroys.push(() => {
+        const event = {
+          target: element,
+          stagger,
+        } as unknown as InputElementTargetEvent
+
+        return value(event) // call destroy/ondestroy
+      })
+            
+      return
+    }
 
     case 'autofocus':
       paintAfters.push(() => (element as any).focus())

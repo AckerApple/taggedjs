@@ -12,6 +12,9 @@ import { getNewGlobal } from './getNewGlobal.function.js'
 import { StringTag, DomTag, Tag } from '../Tag.class.js'
 import { processTagArray } from './processTagArray.js'
 import { ContextItem } from '../Context.types.js'
+import { Counts } from '../../interpolations/interpolateTemplate.js'
+
+const fooCounts: Counts = { added: 0, removed: 0 }
 
 /** Used for all tag value updates. Determines if value changed since last render */
 export function updateExistingValue(
@@ -77,6 +80,7 @@ export function updateExistingValue(
         processTag(
           ownerSupport,
           contextItem,
+          fooCounts,
         )
         return
       
@@ -97,6 +101,7 @@ export function updateExistingValue(
         processTag(
           ownerSupport,
           contextItem,
+          fooCounts,
         )
       
         return

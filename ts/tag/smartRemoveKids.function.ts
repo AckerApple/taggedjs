@@ -1,25 +1,53 @@
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { destroyArray } from './checkDestroyPrevious.function.js'
-import { elementDestroyCheck } from './elementDestroyCheck.function.js'
 import { paint, paintRemoves } from './paint.function.js'
 import { AnySupport } from './Support.class.js'
 import { ContextItem } from './Context.types.js'
 import {SupportTagGlobal } from './TemplaterResult.class.js'
-import { isPromise } from '../isInstance.js'
 
 /** sets global.deleted on support and all children */
 export function smartRemoveKids(
   support: AnySupport,
-  promises: Promise<any>[],
-  stagger: number,
 ) {
-  const startStagger = stagger
   const subject = support.subject
-  const thisGlobal = subject.global as SupportTagGlobal
-  const htmlDomMeta = thisGlobal.htmlDomMeta as DomObjectChildren
-  const context = thisGlobal.context as ContextItem[]
-  thisGlobal.deleted = true
+  const global = subject.global as SupportTagGlobal
+  const htmlDomMeta = global.htmlDomMeta as DomObjectChildren
+  const context = global.context as ContextItem[]
+  global.deleted = true
 
+  const destroys = global.destroys
+  if( destroys ) {
+    const promises: any[] = []
+
+    destroys.forEach(destroy => {
+      const maybePromise = destroy()
+      const isPromise = maybePromise instanceof Promise
+
+      
+      if( isPromise ) {
+        promises.push(maybePromise)
+      }
+    })
+
+    // run destroy animations
+    Promise.all(promises)
+      .then(() => {
+        // continue to remove as planned
+        smartRemoveByContext(context)
+        destroyClones(htmlDomMeta)
+        paint()
+      })
+
+    return
+  }
+
+  smartRemoveByContext(context)
+  destroyClones(htmlDomMeta)
+}
+
+function smartRemoveByContext(
+  context: ContextItem[],
+) {
   for (const subject of context) {
     if(subject.withinOwnerElement) {
       continue // i live within my owner variable. I will be deleted with owner
@@ -40,36 +68,29 @@ export function smartRemoveKids(
     }
 
 
-    const global = subject.global as SupportTagGlobal
-    if(global === undefined) {
+    const subGlobal = subject.global as SupportTagGlobal
+    if(subGlobal === undefined) {
       continue // subject
     }
 
-    if(global.deleted === true) {
-      continue
+    if(subGlobal.deleted === true) {
+      continue // already deleted
     }
 
-    global.deleted = true
-    const oldest = global.oldest
+    subGlobal.deleted = true
+    const oldest = subGlobal.oldest
     if(oldest) {
-      // recurse
-      stagger = stagger + smartRemoveKids(oldest, promises, stagger)
+      smartRemoveKids(oldest)
       continue
     }
   }
-  
-  destroyClones(htmlDomMeta, startStagger, promises)
-    
-  return stagger
 }
 
 function destroyClones(
   oldClones: DomObjectChildren,
-  stagger: number,
-  promises: Promise<any>[]
 ) {
   // check subjects that may have clones attached to them
-  const newPromises = oldClones.map(clone => {
+  oldClones.forEach(clone => {
     const marker = clone.marker
     if(marker) {
       paintRemoves.push(marker)
@@ -80,33 +101,6 @@ function destroyClones(
       return
     }
   
-    return checkCloneRemoval(dom, stagger)
-  }).filter(x => x) // only return promises
-
-  if(newPromises.length) {
-    promises.push(Promise.all(newPromises))
-    return stagger
-  }
-
-  return stagger
-}
-
-/** Reviews elements for the presences of ondestroy */
-function checkCloneRemoval(
-  clone: Element | Text | ChildNode,
-  stagger: number,
-) {
-  const customElm = clone as any
-  if( customElm.ondestroy ) {
-    const promise = elementDestroyCheck(customElm, stagger)
-
-    if(isPromise(promise)) {
-      return (promise as Promise<any>).then(() => {
-        paintRemoves.push(clone)
-        paint()
-      })
-    }
-  }
-
-  paintRemoves.push(clone)
+    paintRemoves.push(dom)
+  })
 }

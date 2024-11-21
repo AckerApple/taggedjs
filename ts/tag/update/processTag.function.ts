@@ -6,6 +6,7 @@ import { buildBeforeElement } from '../buildBeforeElement.function.js'
 import { StringTag, DomTag } from '../Tag.class.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { ContextItem } from '../Context.types.js'
+import { Counts } from '../../interpolations/interpolateTemplate.js'
 
 /** When first time render, adds to owner childTags
  * Used for BOTH inserts & updates to values that were something else
@@ -14,6 +15,7 @@ import { ContextItem } from '../Context.types.js'
 export function processTag(
   ownerSupport: AnySupport, // owner
   subject: ContextItem, // could be tag via result.tag
+  counts: Counts,
 ): AnySupport {
   const global = subject.global as SupportTagGlobal
   const support = global.newest as AnySupport
@@ -21,7 +23,12 @@ export function processTag(
   subject.checkValueChange = checkTagValueChange
   
   const ph = subject.placeholder as Text
-  const result = buildBeforeElement(support, undefined, ph, {counts: {added:0, removed:0}})
+  const result = buildBeforeElement(
+    support,
+    counts,
+    undefined,
+    ph,
+  )
 
   for(const sub of result.subs) {
     subscribeToTemplate(sub)

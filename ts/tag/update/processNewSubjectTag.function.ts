@@ -6,19 +6,24 @@ import { buildBeforeElement } from '../buildBeforeElement.function.js'
 import { paintAppends } from '../paint.function.js'
 import { ContextItem } from '../Context.types.js'
 import { newSupportByTemplater } from './processTag.function.js'
+import { Counts } from '../../interpolations/interpolateTemplate.js'
 
 export function processNewSubjectTag(
   templater: TemplaterResult,
   ownerSupport: AnySupport, // owner
   subject: ContextItem, // could be tag via result.tag
   appendTo: Element,
+  counts: Counts,
 ): AnySupport {
   subject.checkValueChange = checkTagValueChange
   const support = newSupportByTemplater(templater, ownerSupport, subject)
 
   support.ownerSupport = ownerSupport
   const result = buildBeforeElement(
-    support, appendTo, undefined, {counts: {added:0, removed:0}}
+    support,
+    counts,
+    appendTo,
+    undefined,
   )
 
   for(const dom of result.dom) {

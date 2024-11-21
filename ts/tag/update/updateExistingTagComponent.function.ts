@@ -300,7 +300,7 @@ function swapTags(
 ) {
   const global = subject.global as SupportTagGlobal
   const oldestSupport = global.oldest as AnySupport
-  destroySupport(oldestSupport, 0)
+  destroySupport(oldestSupport)
   
   getNewGlobal(subject) as SupportTagGlobal
 

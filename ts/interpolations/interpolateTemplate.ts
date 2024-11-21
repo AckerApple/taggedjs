@@ -13,7 +13,3 @@ export type Counts = {
   added: number
   removed: number // increased when item removed from array
 }
-
-export type ElementBuildOptions = {
-  counts: Counts
-}

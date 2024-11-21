@@ -1,11 +1,9 @@
 import { AnySupport } from '../tag/Support.class.js'
-// import { State } from './state.types.js'
 import { renderSupport } from '../tag/render/renderSupport.function.js'
 import { syncStates } from './syncStates.function.js'
 import { Callback } from './callbackMaker.function.js'
 import {SupportTagGlobal } from '../tag/index.js'
 import { isPromise } from '../isInstance.js'
-import { StateMemory } from './StateMemory.type.js'
 import { StatesSetter } from './states.utils.js'
 import { State } from './state.types.js'
 

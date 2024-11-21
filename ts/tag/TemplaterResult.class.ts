@@ -10,6 +10,7 @@ import { Subject } from '../subject/index.js'
 import { ValueType, ValueTypes } from './ValueTypes.enum.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { PropWatches } from './tag.js'
+import { Callback } from '../state/callbackMaker.function.js'
 
 export type Wrapper = ((
   newSupport: AnySupport,
@@ -32,10 +33,13 @@ export type TagGlobal = {
   locked?: true
   
   callbackMaker?: true
+  
+  destroys?: (() => any)[]
 }
 
 export type SupportTagGlobal = TagGlobal & {
-  destroy$: Subject<void>
+  destroy$: Subject<void> // not on non-tags
+
   blocked: AnySupport[], // renders that did not occur because an event was processing
   oldest: AnySupport
   newest: AnySupport

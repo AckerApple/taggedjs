@@ -16,9 +16,9 @@ export function processReplaceTagResult(
 
   const result = buildBeforeElement(
     support,
+    counts,
     undefined, // element for append child
     ph, // placeholder
-    {counts},
   )
 
   const subs = result.subs
@@ -35,7 +35,13 @@ export function processFirstTagResult(
   appendTo: Element,
 ) {
   let appendIndex = paintAppends.length
-  const result = buildBeforeElement(support, appendTo, undefined, {counts})
+  const result = buildBeforeElement(
+    support,
+    counts,
+    appendTo,
+    undefined,
+  )
+
   for(const dom of result.dom) {
     if(dom.domElement) {
       paintAppends.splice(appendIndex++, 0, {

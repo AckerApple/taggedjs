@@ -12,9 +12,11 @@ import { processDynamicNameValueAttribute, processNonDynamicAttr } from './proce
 import { addOneContext, checkSimpleValueChange, TagGlobal } from '../../tag/index.js'
 import { processAttributeFunction } from './processAttributeCallback.function.js'
 import { isSpecialAttr } from './isSpecialAttribute.function.js'
+import { Counts } from '../interpolateTemplate.js'
 
 type TagVarIdNum = {tagJsVar: number}
-export type SpecialDefinition = boolean | 'class' | 'style' | 'init' | 'autofocus' | 'autoselect'
+export type SpecialAction = 'init' | 'destroy'
+export type SpecialDefinition = boolean | SpecialAction | 'class' | 'style' | 'autofocus' | 'autoselect'
 
 /** Sets attribute value, subscribes to value updates  */
 export function processAttribute(
@@ -24,8 +26,9 @@ export function processAttribute(
   support: AnySupport,
   howToSet: HowToSet, //  = howToSetInputValue
   context: Context,
-  value?: string | null | TagVarIdNum,
-  isSpecial?: SpecialDefinition,
+  isSpecial: SpecialDefinition,
+  counts: Counts,
+  value: string | null | undefined | TagVarIdNum,
 ) {
   const nameVar = getTagJsVar(attrName)
   const isNameVar = nameVar >= 0
@@ -50,6 +53,7 @@ export function processAttribute(
       support,
       howToSet as HowToSet,
       context,
+      counts,
     )
   
     return
@@ -78,6 +82,7 @@ export function processAttribute(
         support,
         howToSet,
         isSpecial,
+        counts,
       )
     }
 
@@ -88,6 +93,7 @@ export function processAttribute(
       element,
       howToSet,
       support,
+      counts,
       isSpecial,
     )
 
@@ -101,6 +107,8 @@ export function processAttribute(
     value as string,
     element,
     howToSet,
+    counts,
+    support,
     isSpecial,
   )
 }
@@ -113,6 +121,7 @@ export function updateNameOnlyAttrValue(
   ownerSupport: AnySupport,
   howToSet: HowToSet,
   context: Context,
+  counts: Counts,
 ) {
   // check to remove previous attribute(s)
   if(lastValue) {
@@ -143,7 +152,15 @@ export function updateNameOnlyAttrValue(
     }
   }
 
-  processNameOnlyAttrValue(values, attrValue, element, ownerSupport, howToSet, context)
+  processNameOnlyAttrValue(
+    values,
+    attrValue,
+    element,
+    ownerSupport,
+    howToSet,
+    context,
+    counts,
+  )
 }
 
 export function processNameOnlyAttrValue(
@@ -153,6 +170,7 @@ export function processNameOnlyAttrValue(
   ownerSupport: AnySupport,
   howToSet: HowToSet,
   context: Context,
+  counts: Counts,
 ) {
   if(isNoDisplayValue(attrValue)) {
     return
@@ -169,8 +187,9 @@ export function processNameOnlyAttrValue(
         ownerSupport,
         howToSet,
         context,
-        value,
         isSpecialAttr(name), // only object variables are evaluated for is special attr
+        counts,
+        value,
       )
     }
     return
@@ -191,7 +210,8 @@ function processNameValueAttributeAttrSubject(
   element: Element,
   support: AnySupport,
   howToSet: HowToSet,
-  isSpecial?: SpecialDefinition,
+  isSpecial: SpecialDefinition,
+  counts: Counts,
 ) {
   if(isSpecial) {
     paintContent.push(function paintContent() {
@@ -210,6 +230,7 @@ function processNameValueAttributeAttrSubject(
         support,
         howToSet,
         isSpecial,
+        counts,
       )
     }
   
@@ -230,6 +251,7 @@ function processNameValueAttributeAttrSubject(
     support,
     howToSet,
     isSpecial,
+    counts,
   )
 
   return
@@ -242,7 +264,8 @@ export function processAttributeEmit(
   element: Element,
   support: AnySupport,
   howToSet: HowToSet,
-  isSpecial?: SpecialDefinition,
+  isSpecial: SpecialDefinition,
+  counts: Counts,
 ) {
   // should the function be wrapped so every time its called we re-render?
   if(isFunction(newAttrValue)) {
@@ -254,6 +277,7 @@ export function processAttributeEmit(
       isSpecial,
       howToSet,
       subject,
+      counts,
     )
   }
   
@@ -264,6 +288,7 @@ export function processAttributeEmit(
     isSpecial,
     howToSet,
     support,
+    counts,
   )
 }
 
@@ -274,19 +299,11 @@ export function processAttributeSubjectValue(
   newAttrValue: DisplayValue | NoDisplayValue,
   element: Element,
   attrName: string,
-  isSpecial: SpecialDefinition | undefined,
+  special: SpecialDefinition,
   howToSet: HowToSet,
   support: AnySupport,
+  counts: Counts,
 ) {
-  if(isFunction(newAttrValue)) {
-    return processAttributeFunction(element, newAttrValue as Callback, support, attrName)
-  }
-  
-  if (isSpecial) {
-    specialAttribute(attrName, newAttrValue, element, isSpecial)
-    return
-  }
-
   switch (newAttrValue) {
     case undefined:
     case false:
@@ -295,6 +312,22 @@ export function processAttributeSubjectValue(
         element.removeAttribute(attrName)
       })
       return
+  }
+
+  if ( special !== false ) {
+    specialAttribute(
+      attrName,
+      newAttrValue,
+      element,
+      special, // name
+      support,
+      counts,
+    )
+    return
+  }
+
+  if( isFunction(newAttrValue) ) {
+    return processAttributeFunction(element, newAttrValue as Callback, support, attrName)
   }
 
   // value is 0
@@ -306,9 +339,10 @@ function callbackFun(
   newAttrValue: any,
   element: Element,
   attrName: string,
-  isSpecial: SpecialDefinition | undefined,
+  isSpecial: SpecialDefinition,
   howToSet: HowToSet,
   subject: ContextItem,
+  counts: Counts,
 ) {
   const wrapper = support.templater.wrapper
   const tagJsType = wrapper?.tagJsType || (wrapper?.original as any)?.tagJsType
@@ -331,6 +365,7 @@ function callbackFun(
     isSpecial,
     howToSet,
     support,
+    counts,
   )
 }
 

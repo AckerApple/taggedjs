@@ -28,6 +28,10 @@ export function isSpecialAction(attrName: string) {
     case 'oninit': // when read in compile process
     case 'init': // when read in realtime
       return 'oninit'
+    
+    case 'ondestroy': // when read in compile process
+    case 'destroy': // when read in realtime
+      return 'destroy'
   }
   return false
 }

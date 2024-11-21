@@ -26,7 +26,7 @@ export type HtmlSupport = {
 }
 
 export type SupportContextItem = ContextItem & {
-  global:SupportTagGlobal
+  global: SupportTagGlobal
   /** Indicator of re-rending. Saves from double rending something already rendered */
   renderCount: number
 }

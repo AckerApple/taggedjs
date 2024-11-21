@@ -75,7 +75,7 @@ export function checkTagValueChange(
     // its a different tag now
     const likeTags = isLikeTags(newTag, lastSupport)
     if(!likeTags) {
-      destroySupport(lastSupport, 0)
+      destroySupport(lastSupport)
       getNewGlobal(subject) as SupportTagGlobal
       return 7 // 'tag-swap'
     }
@@ -89,7 +89,7 @@ export function checkTagValueChange(
   }
 
   // destroy old component, value is not a component
-  destroySupport(lastSupport, 0)
+  destroySupport(lastSupport)
   delete (subject as ContextItem).global
   subject.renderCount = 0
    

@@ -2,6 +2,9 @@ import { AnySupport,SupportContextItem } from '../Support.class.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
 import { processTag } from '../update/processTag.function.js'
 import { updateSupportBy } from '../updateSupportBy.function.js'
+import { Counts } from '../../interpolations/interpolateTemplate.js'
+
+const fooCounts: Counts = { added:0, removed:0 }
 
 // TODO: This function is being called for 1st time renders WHEN renderCount === 1
 export function renderExistingReadyTag(
@@ -26,6 +29,7 @@ export function renderExistingReadyTag(
   processTag(
     ownerSupport,
     subject,
+    fooCounts,
   )
 
   return support

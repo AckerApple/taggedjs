@@ -7,11 +7,12 @@ import { Context } from './Context.types.js'
 
 export function getChildTagsToDestroy(
   childTags: Context,
+  promises: Promise<any>[]
 ) {
   for (const child of childTags) {
     const lastArray = child.lastArray
     if(lastArray) {
-      getChildTagsToDestroy(lastArray)
+      getChildTagsToDestroy(lastArray, promises)
       continue
     }
 
@@ -31,7 +32,7 @@ export function getChildTagsToDestroy(
     }
 
     const subTags = global.context as Context
-    getChildTagsToDestroy(subTags)
+    getChildTagsToDestroy(subTags, promises)
   }
 }
 

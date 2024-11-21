@@ -38,12 +38,14 @@ export function processFirstSubjectValue(
             ownerSupport,
             subject,
             appendTo,
+            counts,
           )
         }
         
         return processTag(
           ownerSupport,
           subject,
+          counts,
         )
 
       case ValueTypes.dom:
@@ -64,6 +66,7 @@ export function processFirstSubjectValue(
             ownerSupport,
             subject as ContextItem,
             appendTo,
+            counts,
           )
         }
   
@@ -73,6 +76,7 @@ export function processFirstSubjectValue(
         return processTag(
           ownerSupport,
           subject,
+          counts,
         )
       }
 
@@ -130,6 +134,7 @@ export function processFirstSubjectValue(
           ownerSupport,
           subject as ContextItem,
           appendTo as Element,
+          counts,
         )
 
         // ++subject.global.renderCount

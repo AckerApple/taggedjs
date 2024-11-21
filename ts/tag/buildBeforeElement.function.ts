@@ -1,6 +1,6 @@
 import { attachDomElements } from '../interpolations/optimizers/attachDomElements.function.js'
 import { DomMetaMap } from '../interpolations/optimizers/LikeObjectElement.type.js'
-import { ElementBuildOptions } from '../interpolations/interpolateTemplate.js'
+import { Counts } from '../interpolations/interpolateTemplate.js'
 import { AnySupport, SupportContextItem } from './Support.class.js'
 import {SupportTagGlobal } from './TemplaterResult.class.js'
 import { ContextItem, Context } from './Context.types.js'
@@ -14,9 +14,9 @@ import { painting } from './paint.function.js'
 /** Function that kicks off actually putting tags down as HTML elements */
 export function buildBeforeElement(
   support: AnySupport,
+  counts: Counts,
   element?: Element,
   insertBefore?: Text,
-  options?: ElementBuildOptions,
 ) {
   const global = support.subject.global as SupportTagGlobal
 
@@ -24,7 +24,7 @@ export function buildBeforeElement(
   global.newest = support
 
   ++painting.locks
-  const result = getHtmlDomMeta(support, options, element, insertBefore)
+  const result = getHtmlDomMeta(support, counts, element, insertBefore)
   global.htmlDomMeta = result.dom
   --painting.locks
 
@@ -34,9 +34,7 @@ export function buildBeforeElement(
 
 function getHtmlDomMeta(
   support: AnySupport,
-  options: ElementBuildOptions = {
-    counts: {added:0, removed: 0},
-  },
+  counts: Counts,
   appendTo?: Element,
   insertBefore?: Text,
 ) {
@@ -52,7 +50,7 @@ function getHtmlDomMeta(
     domMeta,
     values,
     support,
-    options.counts,
+    counts,
     context,
     0,
     appendTo,

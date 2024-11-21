@@ -15,7 +15,8 @@ import { isSubjectInstance } from "../../isInstance.js"
 import { empty } from "../../tag/ValueTypes.enum.js"
 import { Counts } from "../interpolateTemplate.js"
 
-// ??? TODO: This could be done within exchangeParsedForValues to reduce loops
+const someDiv = (typeof document === 'object' && document.createElement('div')) as HTMLDivElement // used for content cleaning
+
 export function attachDomElements(
   nodes: ObjectChildren,
   values: any[],
@@ -31,7 +32,6 @@ export function attachDomElements(
   subs:SubToTemplateOptions[]
   dom: DomObjectChildren
 } {
-  const x = document.createElement('div')
   const dom: DomObjectChildren = []
 
   for (const node of nodes as  DomObjectElement[]) {
@@ -58,8 +58,8 @@ export function attachDomElements(
       const textNode = (newNode as any as DomObjectText)
       const string = textNode.tc = (node as any as DomObjectText).tc
       
-      x.innerHTML = string
-      const domElement = textNode.domElement = document.createTextNode(x.innerText)
+      someDiv.innerHTML = string
+      const domElement = textNode.domElement = document.createTextNode(someDiv.innerText)
 
       // TODO: for debugging only
       ;(domElement as any).id = `tp_${context.length}_${values.length}`
@@ -85,17 +85,18 @@ export function attachDomElements(
       node.at.map(attr => {
         const name = attr[0]
         const value = attr[1]
-        const isSpecial = attr[2] as boolean | undefined
+        const isSpecial = attr[2] || false
         
         processAttribute(
           values,
           name,
           domElement,
-           support,
+          support,
           howToSetInputValue,
           context,
-          value,
           isSpecial,
+          counts,
+          value,
         )
       })
     }

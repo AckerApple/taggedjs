@@ -47,7 +47,7 @@ export function tagElement(
 } {
   const appElmIndex = appElements.findIndex(appElm => appElm.element === element)
   if(appElmIndex >= 0) {
-    destroySupport(appElements[appElmIndex].support, 0)
+    destroySupport(appElements[appElmIndex].support)
     appElements.splice(appElmIndex, 1)
     // an element already had an app on it
     console.warn('Found and destroyed app element already rendered to element', {element})
@@ -105,14 +105,19 @@ export function tagElement(
     }
     global.events = {}
 
-    destroySupport(support, 0) // never return anything here
+    destroySupport(support) // never return anything here
 
     paint()
   }
   
   ++painting.locks
 
-  const result = buildBeforeElement(support, element)
+  const result = buildBeforeElement(
+    support,
+    {added:0, removed:0},
+    element,
+    undefined,
+  )
 
   global.oldest = support
   global.newest = support
