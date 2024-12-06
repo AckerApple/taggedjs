@@ -1,6 +1,6 @@
 import { DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { Events,SupportTagGlobal, TemplaterResult, Wrapper } from './TemplaterResult.class.js'
-import { AnySupport, getBaseSupport,SupportContextItem } from './Support.class.js'
+import { AnySupport, getBaseSupport,SupportContextItem, upgradeBaseToSupport } from './Support.class.js'
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
 import { buildBeforeElement } from './buildBeforeElement.function.js'
 import { tags, TagWrapper } from './tag.utils.js'
@@ -105,9 +105,11 @@ export function tagElement(
     }
     global.events = {}
 
-    destroySupport(support) // never return anything here
+    const toAwait = destroySupport(support) // never return anything here
 
     paint()
+
+    return toAwait
   }
   
   ++painting.locks
@@ -188,11 +190,14 @@ function loadNewBaseSupport(
   const newSupport = getBaseSupport(
     templater,
     subject as SupportContextItem,
-  )
+  ) as AnySupport
 
+  upgradeBaseToSupport(templater, newSupport, newSupport)
+  
   newSupport.appElement = appElement
   global.oldest = global.oldest || newSupport
   global.newest = newSupport
+
   return newSupport
 }
 

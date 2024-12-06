@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### v2.7.8 - 12-2024
+- added signals()
+- ensured proper sequencing of destroy calls
+
 ### v2.7.0 - 7-2024
 - new states() let coordinator has been added! yay!
 - oneRender is now renderOnce

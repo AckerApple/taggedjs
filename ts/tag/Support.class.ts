@@ -4,8 +4,12 @@ import { Subject } from '../subject/Subject.class.js'
 import { ContextItem } from './Context.types.js'
 import { Props } from '../Props.js'
 import { BaseSupport } from './BaseSupport.type.js'
+import { State } from '../state/index.js'
+import { StatesSetter } from '../state/states.utils.js'
 
 export type AnySupport = (BaseSupport & {
+  state: State
+  states: StatesSetter[]
 })
 
 export type PropsConfig = {
@@ -14,7 +18,7 @@ export type PropsConfig = {
 }
 
 export type HtmlSupport = {
-  appSupport: BaseSupport
+  appSupport: AnySupport
   ownerSupport?: AnySupport
   appElement?: Element // only seen on this.getAppSupport().appElement
   propsConfig?: PropsConfig
@@ -36,28 +40,20 @@ export function getBaseSupport(
   templater: TemplaterResult,
   subject:SupportContextItem,
   castedProps?: Props,
-): AnySupport {
+): BaseSupport {
   const baseSupport = {
     templater,
     subject,
     castedProps,
-    
-    state: [], // TODO: this is not needed for every type of tag
-    states: [], // TODO: this is not needed for every type of tag
 
-    appSupport: undefined as unknown as BaseSupport,
+    appSupport: undefined as unknown as AnySupport,
   } as BaseSupport
   
-  baseSupport.appSupport = baseSupport
+  // baseSupport.appSupport = baseSupport
 
   const global = subject.global
   global.blocked = []
   global.destroy$ = new Subject<void>()
-
-  const props = templater.props  // natural props
-  if(props) {
-    baseSupport.propsConfig = clonePropsBy(baseSupport, props, castedProps)
-  }
 
   return baseSupport
 }
@@ -67,29 +63,29 @@ export type Support = AnySupport & {
   appSupport: BaseSupport
 }
 
-export function getSupport(
+export function upgradeBaseToSupport(
   templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
-  ownerSupport: AnySupport,
-  appSupport: BaseSupport,
-  subject: ContextItem,
+  support: BaseSupport,
+  appSupport: AnySupport,
   castedProps?: Props,
 ): AnySupport {
-  const support = getBaseSupport(
-    templater,
-    subject as SupportContextItem,
-    castedProps
-  )
+  ;(support as AnySupport).state = []
+  ;(support as AnySupport).states = []
 
-  support.ownerSupport = ownerSupport
   support.appSupport = appSupport
   
+  const props = templater.props  // natural props
+  if(props) {
+    support.propsConfig = clonePropsBy(support as AnySupport, props, castedProps)
+  }
+
   return support as AnySupport
 }
 
 export function getHtmlSupport(
   templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
   ownerSupport: AnySupport,
-  appSupport: BaseSupport,
+  appSupport: AnySupport,
   subject: ContextItem,
   castedProps?: Props,
 ): AnySupport {
@@ -98,7 +94,7 @@ export function getHtmlSupport(
     subject,
     castedProps,
 
-    appSupport: undefined as unknown as BaseSupport,
+    appSupport: undefined as unknown as AnySupport,
   } as HtmlSupport
   
   support.ownerSupport = ownerSupport

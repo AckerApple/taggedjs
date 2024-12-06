@@ -1,9 +1,8 @@
-import { BaseSupport } from '../tag/BaseSupport.type.js'
 import { AnySupport } from '../tag/Support.class.js'
 import { Provider } from './providers.js'
 
 export function handleProviderChanges(
-  appSupport: BaseSupport,
+  appSupport: AnySupport,
   provider: Provider,
 ): TagWithProvider[] {
   const tagsWithProvider = getTagsWithProvider(appSupport, provider)

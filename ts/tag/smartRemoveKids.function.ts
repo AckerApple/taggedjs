@@ -8,6 +8,7 @@ import {SupportTagGlobal } from './TemplaterResult.class.js'
 /** sets global.deleted on support and all children */
 export function smartRemoveKids(
   support: AnySupport,
+  allPromises: Promise<any>[]
 ) {
   const subject = support.subject
   const global = subject.global as SupportTagGlobal
@@ -17,37 +18,57 @@ export function smartRemoveKids(
 
   const destroys = global.destroys
   if( destroys ) {
-    const promises: any[] = []
+    return processContextDestroys(destroys, context, allPromises, htmlDomMeta)
+  }
 
-    destroys.forEach(destroy => {
-      const maybePromise = destroy()
-      const isPromise = maybePromise instanceof Promise
+  smartRemoveByContext(context, allPromises)
+  destroyClones(htmlDomMeta)
+}
 
-      
-      if( isPromise ) {
-        promises.push(maybePromise)
-      }
-    })
+// Elements that have a destroy or ondestroy attribute
+function processContextDestroys(
+  destroys: (() => any)[],
+  context: ContextItem[],
+  allPromises: Promise<any>[],
+  htmlDomMeta: DomObjectChildren,
+) {
+  const promises: any[] = []
 
-    // run destroy animations
-    Promise.all(promises)
+  destroys.forEach(destroy => {
+    const maybePromise = destroy()
+    const isPromise = maybePromise instanceof Promise
+
+
+    if (isPromise) {
+      promises.push(maybePromise)
+    }
+  })
+
+  if(promises.length) {
+    const lastPromise = Promise.all(promises)
       .then(() => {
-        // continue to remove as planned
-        smartRemoveByContext(context)
+        // continue to remove
+        smartRemoveByContext(context, allPromises)
         destroyClones(htmlDomMeta)
         paint()
       })
 
+    // run destroy animations
+    allPromises.push(lastPromise)
+    
     return
   }
 
-  smartRemoveByContext(context)
+  smartRemoveByContext(context, allPromises)
   destroyClones(htmlDomMeta)
+  paint()
 }
 
 function smartRemoveByContext(
   context: ContextItem[],
+  allPromises: Promise<any>[],
 ) {
+
   for (const subject of context) {
     if(subject.withinOwnerElement) {
       continue // i live within my owner variable. I will be deleted with owner
@@ -80,7 +101,7 @@ function smartRemoveByContext(
     subGlobal.deleted = true
     const oldest = subGlobal.oldest
     if(oldest) {
-      smartRemoveKids(oldest)
+      smartRemoveKids(oldest, allPromises)
       continue
     }
   }

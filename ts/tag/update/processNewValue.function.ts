@@ -3,11 +3,12 @@ import { checkTagValueChange } from '../checkDestroyPrevious.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { ValueTypes, ValueType } from '../ValueTypes.enum.js'
 import { ValueSubject } from '../../subject/ValueSubject.js'
-import { AnySupport, getSupport } from '../Support.class.js'
+import { AnySupport } from '../Support.class.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { StringTag, DomTag } from '../Tag.class.js'
 import { ContextItem } from '../Context.types.js'
 import { PropWatches } from '../tag.js'
+import { getSupport } from '../getSupport.function.js'
 
 export function processNewArrayValue(
   value: TemplateValue | ValueSubject<unknown>,

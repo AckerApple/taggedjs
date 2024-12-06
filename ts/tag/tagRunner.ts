@@ -18,6 +18,7 @@ export function runBeforeDestroy(
   // TODO: We don't need to remove from parents if parent is being destroyed
   // remove me from my parents
   const global = support.subject.global as SupportTagGlobal
+
   const providers = global.providers
   if(providers) {
     for(const provider of providers) {
@@ -29,6 +30,10 @@ export function runBeforeDestroy(
       }
     }
   }
-  
+
+  if(global.destroy$) {
+    global.destroy$.next()
+  }
+
   support.subject.renderCount = 0 // if it comes back, wont be considered an update
 }

@@ -7,23 +7,20 @@ import { Context } from './Context.types.js'
 
 export function destroySupport(
   support: AnySupport,
-): void | Promise<void> {
+): Promise<void>[] {
   const global = support.subject.global as SupportTagGlobal
   global.deleted = true
   support.subject.renderCount = 0 // if it comes back, wont be considered an update
   const promises: Promise<any>[] = []
 
   const context = global.context as Context
-  getChildTagsToDestroy(context, promises)
+  getChildTagsToDestroy(context)
 
   if(global.destroy$) {
-    global.destroy$.next()
     runBeforeDestroy(support)
   }
-  
-  if(promises.length) {
-    return Promise.all(promises).then(() => smartRemoveKids(support))
-  }
 
-  smartRemoveKids(support)
+  smartRemoveKids(support, promises)
+
+  return promises
 }

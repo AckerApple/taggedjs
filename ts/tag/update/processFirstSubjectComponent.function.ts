@@ -1,11 +1,12 @@
 import {SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { Counts } from'../../interpolations/interpolateTemplate.js'
 import { processFirstTagResult, processReplaceTagResult } from'./processTagResult.function.js'
-import { AnySupport, getSupport, PropsConfig,SupportContextItem } from '../Support.class.js'
+import { AnySupport, PropsConfig,SupportContextItem } from '../Support.class.js'
 import { renderWithSupport } from '../render/renderWithSupport.function.js'
 import { ContextItem } from '../Context.types.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { getCastedProps } from '../getTagWrap.function.js'
+import { getSupport } from '../getSupport.function.js'
 
 export function processReplacementComponent(
   templater: TemplaterResult,

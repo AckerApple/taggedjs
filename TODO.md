@@ -1,11 +1,12 @@
 tests
 
+- The todo app is leaving things crossed out even after unchecking them
+
 - important - two events firing at same time
   - in an array we had an input that had a blur event
   - in testing, a click occurred and caused both the click and the blur to occur at same time
   - During the click the item was deleted, during the blur the event errors when deleting items already deleted
 
-- Set max recuse depth of 15
 - Test a tag that sometimes returns null and has providers
   - looking to ensure as tag changes the providers are moved
   - test going back to null and back and that no elements find themselves back on page

@@ -1,4 +1,4 @@
-import { AnySupport, getSupport,SupportContextItem } from '../Support.class.js'
+import { AnySupport, SupportContextItem } from '../Support.class.js'
 import { getFakeTemplater, newSupportByTemplater, processTag } from './processTag.function.js'
 import {SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
 import { processNowRegularValue, RegularValue } from './processRegularValue.function.js'
@@ -13,6 +13,7 @@ import { StringTag, DomTag, Tag } from '../Tag.class.js'
 import { processTagArray } from './processTagArray.js'
 import { ContextItem } from '../Context.types.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
+import { getSupport } from '../getSupport.function.js'
 
 const fooCounts: Counts = { added: 0, removed: 0 }
 
