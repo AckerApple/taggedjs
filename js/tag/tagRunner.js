@@ -23,6 +23,9 @@ export function runBeforeDestroy(support) {
             }
         }
     }
+    if (global.destroy$) {
+        global.destroy$.next();
+    }
     support.subject.renderCount = 0; // if it comes back, wont be considered an update
 }
 //# sourceMappingURL=tagRunner.js.map

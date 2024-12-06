@@ -6,25 +6,24 @@ export function getBaseSupport(templater, subject, castedProps) {
         templater,
         subject,
         castedProps,
-        state: [], // TODO: this is not needed for every type of tag
-        states: [], // TODO: this is not needed for every type of tag
         appSupport: undefined,
     };
-    baseSupport.appSupport = baseSupport;
+    // baseSupport.appSupport = baseSupport
     const global = subject.global;
     global.blocked = [];
     global.destroy$ = new Subject();
-    const props = templater.props; // natural props
-    if (props) {
-        baseSupport.propsConfig = clonePropsBy(baseSupport, props, castedProps);
-    }
     return baseSupport;
 }
-export function getSupport(templater, // at runtime rendering of a tag, it needs to be married to a new Support()
-ownerSupport, appSupport, subject, castedProps) {
-    const support = getBaseSupport(templater, subject, castedProps);
-    support.ownerSupport = ownerSupport;
+export function upgradeBaseToSupport(templater, // at runtime rendering of a tag, it needs to be married to a new Support()
+support, appSupport, castedProps) {
+    ;
+    support.state = [];
+    support.states = [];
     support.appSupport = appSupport;
+    const props = templater.props; // natural props
+    if (props) {
+        support.propsConfig = clonePropsBy(support, props, castedProps);
+    }
     return support;
 }
 export function getHtmlSupport(templater, // at runtime rendering of a tag, it needs to be married to a new Support()

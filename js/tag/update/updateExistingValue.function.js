@@ -1,4 +1,3 @@
-import { getSupport } from '../Support.class.js';
 import { getFakeTemplater, newSupportByTemplater, processTag } from './processTag.function.js';
 import { processNowRegularValue } from './processRegularValue.function.js';
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js';
@@ -8,6 +7,7 @@ import { updateSupportBy } from '../updateSupportBy.function.js';
 import { isArray, isTagComponent } from '../../isInstance.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { processTagArray } from './processTagArray.js';
+import { getSupport } from '../getSupport.function.js';
 const fooCounts = { added: 0, removed: 0 };
 /** Used for all tag value updates. Determines if value changed since last render */
 export function updateExistingValue(contextItem, value, ownerSupport) {

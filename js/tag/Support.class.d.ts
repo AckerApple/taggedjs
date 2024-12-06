@@ -2,13 +2,18 @@ import { SupportTagGlobal, TemplaterResult } from './TemplaterResult.class.js';
 import { ContextItem } from './Context.types.js';
 import { Props } from '../Props.js';
 import { BaseSupport } from './BaseSupport.type.js';
-export type AnySupport = (BaseSupport & {});
+import { State } from '../state/index.js';
+import { StatesSetter } from '../state/states.utils.js';
+export type AnySupport = (BaseSupport & {
+    state: State;
+    states: StatesSetter[];
+});
 export type PropsConfig = {
     latest: Props;
     castProps?: Props;
 };
 export type HtmlSupport = {
-    appSupport: BaseSupport;
+    appSupport: AnySupport;
     ownerSupport?: AnySupport;
     appElement?: Element;
     propsConfig?: PropsConfig;
@@ -21,12 +26,12 @@ export type SupportContextItem = ContextItem & {
     renderCount: number;
 };
 /** used only for apps, otherwise use Support */
-export declare function getBaseSupport(templater: TemplaterResult, subject: SupportContextItem, castedProps?: Props): AnySupport;
+export declare function getBaseSupport(templater: TemplaterResult, subject: SupportContextItem, castedProps?: Props): BaseSupport;
 export type Support = AnySupport & {
     ownerSupport: AnySupport;
     appSupport: BaseSupport;
 };
-export declare function getSupport(templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
-ownerSupport: AnySupport, appSupport: BaseSupport, subject: ContextItem, castedProps?: Props): AnySupport;
+export declare function upgradeBaseToSupport(templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
+support: BaseSupport, appSupport: AnySupport, castedProps?: Props): AnySupport;
 export declare function getHtmlSupport(templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
-ownerSupport: AnySupport, appSupport: BaseSupport, subject: ContextItem, castedProps?: Props): AnySupport;
+ownerSupport: AnySupport, appSupport: AnySupport, subject: ContextItem, castedProps?: Props): AnySupport;

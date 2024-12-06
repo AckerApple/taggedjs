@@ -7,14 +7,11 @@ export function destroySupport(support) {
     support.subject.renderCount = 0; // if it comes back, wont be considered an update
     const promises = [];
     const context = global.context;
-    getChildTagsToDestroy(context, promises);
+    getChildTagsToDestroy(context);
     if (global.destroy$) {
-        global.destroy$.next();
         runBeforeDestroy(support);
     }
-    if (promises.length) {
-        return Promise.all(promises).then(() => smartRemoveKids(support));
-    }
-    smartRemoveKids(support);
+    smartRemoveKids(support, promises);
+    return promises;
 }
 //# sourceMappingURL=destroySupport.function.js.map

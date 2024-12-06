@@ -1,9 +1,9 @@
 import { getTemplaterResult } from '../TemplaterResult.class.js';
 import { checkTagValueChange } from '../checkDestroyPrevious.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
-import { getSupport } from '../Support.class.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { PropWatches } from '../tag.js';
+import { getSupport } from '../getSupport.function.js';
 export function processNewArrayValue(value, ownerSupport, contextItem) {
     const tagJsType = value.tagJsType;
     if (tagJsType) {

@@ -1,8 +1,8 @@
 import { processFirstTagResult, processReplaceTagResult } from './processTagResult.function.js';
-import { getSupport } from '../Support.class.js';
 import { renderWithSupport } from '../render/renderWithSupport.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 import { getCastedProps } from '../getTagWrap.function.js';
+import { getSupport } from '../getSupport.function.js';
 export function processReplacementComponent(templater, subject, ownerSupport, counts) {
     // TODO: This below check not needed in production mode
     // validateTemplater(templater)

@@ -1,4 +1,4 @@
-import { getBaseSupport } from './Support.class.js';
+import { getBaseSupport, upgradeBaseToSupport } from './Support.class.js';
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js';
 import { buildBeforeElement } from './buildBeforeElement.function.js';
 import { tags } from './tag.utils.js';
@@ -73,8 +73,9 @@ export function tagElement(app, element, props) {
             element.removeEventListener(eventName, callback);
         }
         global.events = {};
-        destroySupport(support); // never return anything here
+        const toAwait = destroySupport(support); // never return anything here
         paint();
+        return toAwait;
     };
     ++painting.locks;
     const result = buildBeforeElement(support, { added: 0, removed: 0 }, element, undefined);
@@ -124,6 +125,7 @@ function getNewSubject(templater, appElement) {
 function loadNewBaseSupport(templater, subject, appElement) {
     const global = subject.global;
     const newSupport = getBaseSupport(templater, subject);
+    upgradeBaseToSupport(templater, newSupport, newSupport);
     newSupport.appElement = appElement;
     global.oldest = global.oldest || newSupport;
     global.newest = newSupport;
