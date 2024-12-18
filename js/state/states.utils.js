@@ -7,7 +7,10 @@ export function firstStatesHandler(setter) {
     const support = config.support;
     support.states[config.statesIndex] = setter;
     ++config.statesIndex;
-    return setter(state);
+    return setter((...args) => {
+        state(args);
+        return args;
+    });
 }
 export function reStatesHandler(setter) {
     const config = setUseMemory.stateConfig;
@@ -16,18 +19,18 @@ export function reStatesHandler(setter) {
     const prevSupport = config.prevSupport;
     const oldStates = prevSupport?.states[statesIndex];
     const lastValues = [];
-    const regetter = (value) => {
-        lastValues.push(value);
-        return value;
+    const regetter = (...args) => {
+        lastValues.push(args);
+        return args;
     };
     oldStates(regetter);
     let index = 0;
-    const resetter = (value) => {
+    const resetter = (...args) => {
         // state(value) // fake call and do not care about result
         // fake state() having been called
         config.stateArray.push({
-            get: () => value,
-            defaultValue: value,
+            get: () => args,
+            defaultValue: args,
         });
         const lastValue = lastValues[index];
         ++index;

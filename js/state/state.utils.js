@@ -1,9 +1,7 @@
 import { runFirstState, runRestate } from './stateHandlers.js';
-import { firstLetState, reLetState } from './letState.utils.js';
 import { firstStatesHandler, reStatesHandler } from './states.utils.js';
 export function initState(support, config) {
     config.handlers.handler = runFirstState;
-    config.handlers.letHandler = firstLetState;
     config.handlers.statesHandler = firstStatesHandler;
     config.rearray = [];
     config.stateArray = [];
@@ -15,11 +13,9 @@ export function reState(support, config, prevState, prevStates) {
     // set previous state memory
     config.rearray = prevState;
     config.stateArray = [];
-    // config.states = []
     config.states = prevStates;
     config.statesIndex = 0;
     config.handlers.handler = runRestate;
-    config.handlers.letHandler = reLetState;
     config.handlers.statesHandler = reStatesHandler;
     config.support = support;
 }

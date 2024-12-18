@@ -1,4 +1,15 @@
+import { state } from '../state/index.js';
+import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
+/** Checks if rendering cycle in process. Then creates object with "value" key and ability to "subscribe" to value changes */
 export function signal(initialValue) {
+    const support = getSupportInCycle();
+    if (support) {
+        return state(() => Signal(initialValue));
+    }
+    return Signal(initialValue);
+}
+/** Creates object with "value" key and ability to "subscribe" to value changes */
+export function Signal(initialValue) {
     let value = initialValue;
     const subscribers = new Set();
     return {
@@ -13,7 +24,7 @@ export function signal(initialValue) {
             }
         },
         subscribe(callback) {
-            callback(value);
+            callback(value); // emit initial value
             subscribers.add(callback);
             // Return an unsubscribe function
             const unsub = () => subscribers.delete(callback);

@@ -9,6 +9,5 @@ export type UseOptions = {
 };
 export type UseMemory = (Record<string, unknown> & {
     stateConfig: StateMemory;
-    currentSupport: AnySupport;
     tagClosed$: Subject<AnySupport>;
 });

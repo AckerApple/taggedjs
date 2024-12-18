@@ -13,6 +13,7 @@ export function subscribeToTemplate({ subject, support, counts, contextItem, app
             processSubUpdate(value, contextItem, support);
         };
     };
+    // onValue mutates so function below calls original and mutation
     const callback = function subValueProcessor(value) {
         onValue(value);
     };
