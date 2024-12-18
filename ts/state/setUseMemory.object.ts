@@ -1,4 +1,3 @@
-import { firstLetState } from './letState.utils.js'
 import { firstStatesHandler } from './states.utils.js'
 import { State } from './state.types.js'
 import { runFirstState } from './stateHandlers.js'
@@ -10,7 +9,6 @@ export const setUseMemory = {
     version: Date.now(),
     handlers: {
       handler: runFirstState,
-      letHandler: firstLetState,
       statesHandler: firstStatesHandler,
     }
   },

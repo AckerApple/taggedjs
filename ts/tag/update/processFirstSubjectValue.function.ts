@@ -113,7 +113,6 @@ export function processFirstSubjectValue(
       }
 
       case ValueTypes.renderOnce: {
-
         getNewGlobal(subject) as SupportTagGlobal
 
         const support = oneRenderToSupport(

@@ -4,7 +4,7 @@
 import { isPromise, isTagComponent } from '../../isInstance.js'
 import { renderSupport } from '../../tag/render/renderSupport.function.js'
 import { AnySupport } from '../../tag/Support.class.js'
-import {SupportTagGlobal, TagGlobal } from '../../tag/TemplaterResult.class.js'
+import { SupportTagGlobal, TagGlobal } from '../../tag/TemplaterResult.class.js'
 import { getUpTags } from './getUpTags.function.js'
 import { renderTagUpdateArray } from './renderTagArray.function.js'
 

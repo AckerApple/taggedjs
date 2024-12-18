@@ -49,10 +49,10 @@ type MasterWatch<T> = ((
  * @returns T[]
  */
 export const watch = (<T>(
-  currentValues: any[],
+  currentValues: unknown[],
   callback: WatchCallback<T>
-): T => {
-  return setupWatch(currentValues, callback)
+): MasterWatch<T> => {
+  return setupWatch(currentValues, callback) as any
 }) as MasterWatch<any>
 
 const defaultFinally = <T>(x: T) => x

@@ -1,7 +1,6 @@
 import { AnySupport } from '../tag/Support.class.js'
 import { runFirstState, runRestate } from './stateHandlers.js'
 import { State, StateConfig } from './state.types.js'
-import { firstLetState, reLetState } from './letState.utils.js'
 import { firstStatesHandler, reStatesHandler, StatesSetter } from './states.utils.js'
 import { StateMemory } from './StateMemory.type.js'
 
@@ -12,7 +11,6 @@ export function initState(
   config: StateMemory,
 ) {
   config.handlers.handler = runFirstState
-  config.handlers.letHandler = firstLetState as <T>(defaultValue: T | (() => T)) => (y: unknown) => T
   config.handlers.statesHandler = firstStatesHandler as <T>(defaultValue: T | (() => T)) => (y: unknown) => T
   
   config.rearray = []
@@ -32,12 +30,10 @@ export function reState(
   config.rearray = prevState
 
   config.stateArray = []
-  // config.states = []
   config.states = prevStates
   config.statesIndex = 0
 
   config.handlers.handler = runRestate
-  config.handlers.letHandler = reLetState
   config.handlers.statesHandler = reStatesHandler
   
   config.support = support

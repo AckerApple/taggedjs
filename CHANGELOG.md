@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+### v2.8.0 - 12-2024
+- removed letState() in favor or states(get => [x] = get(x))
+
 ### v2.7.8 - 12-2024
 - added signals()
 - ensured proper sequencing of destroy calls

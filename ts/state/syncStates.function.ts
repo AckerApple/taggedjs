@@ -7,7 +7,7 @@ export function syncStates(
   oldStates: StatesSetter[],
   statesFrom: StatesSetter[],
 ) {
-  // sync state() and letState()
+  // sync state()
   for (let index = stateFrom.length - 1; index >= 0; --index) {
     const fromValue = stateFrom[index].get()
     const callback = stateTo[index].callback // is it a let state?
@@ -22,9 +22,9 @@ export function syncStates(
   for (let index = statesFrom.length - 1; index >= 0; --index) {
     const oldValues: any[] = []
 
-    const oldGetCallback = <T>(oldValue: T) => {
-      oldValues.push(oldValue)
-      return oldValue
+    const oldGetCallback = <T>(...args: T[]) => {
+      oldValues.push(args)
+      return args
     }
 
     

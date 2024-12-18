@@ -14,6 +14,5 @@ export type UseOptions = {
 
 export type UseMemory = (Record<string, unknown> & {
   stateConfig: StateMemory
-  currentSupport: AnySupport // tag being rendered
   tagClosed$: Subject<AnySupport>
 })

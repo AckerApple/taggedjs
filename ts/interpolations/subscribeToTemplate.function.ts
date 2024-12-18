@@ -48,6 +48,7 @@ export function subscribeToTemplate({
     }
   }
   
+  // onValue mutates so function below calls original and mutation
   const callback = function subValueProcessor(value: TemplateValue) {
     onValue(value)
   } as unknown as (ValueSubjectSubscriber<Callback> & ValueSubjectSubscriber<unknown>)

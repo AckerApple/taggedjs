@@ -18,8 +18,7 @@ export function renderTagOnly(
   const oldRenderCount = subject.renderCount
   const prevState = prevSupport?.state
   const config = setUseMemory.stateConfig
-  
-  
+
   if(prevState) {
     const prevStates = prevSupport.states
     config.prevSupport = prevSupport
