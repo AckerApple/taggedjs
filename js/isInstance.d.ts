@@ -1,7 +1,7 @@
 import { SubjectLike } from './subject/subject.utils.js';
-import { AnySupport } from './tag/Support.class.js';
-import { StringTag } from './tag/Tag.class.js';
-import { TemplaterResult } from './tag/TemplaterResult.class.js';
+import { AnySupport } from './tag/getSupport.function.js';
+import { StringTag } from './tag/getDomTag.function.js';
+import { TemplaterResult } from './tag/getTemplaterResult.function.js';
 export declare function isSimpleType(value: any): boolean;
 export declare function isStaticTag(value?: TemplaterResult | StringTag | unknown): boolean;
 /** passed in is expected to be a TemplaterResult */

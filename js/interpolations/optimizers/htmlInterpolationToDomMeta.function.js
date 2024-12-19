@@ -1,4 +1,4 @@
-import { variablePrefix, variableSuffix } from "../../tag/Tag.class.js";
+import { variablePrefix, variableSuffix } from "../../tag/getDomTag.function.js";
 import { isSpecialAttr } from "../attributes/isSpecialAttribute.function.js";
 const ondoubleclick = 'ondoubleclick';
 const fragFindAny = /(:tagvar\d+:)/;

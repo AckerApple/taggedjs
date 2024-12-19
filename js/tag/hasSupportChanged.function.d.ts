@@ -1,6 +1,6 @@
 import { Props } from '../Props.js';
 import { BaseSupport } from './BaseSupport.type.js';
-import { TemplaterResult } from './TemplaterResult.class.js';
+import { TemplaterResult } from './getTemplaterResult.function.js';
 export declare function hasSupportChanged(lastSupport: BaseSupport, newTemplater: TemplaterResult): number | string | false;
 export declare function immutablePropMatch(props: Props, pastCloneProps: Props): false | 2;
 export declare function shallowPropMatch(props: Props, pastCloneProps: Props): false | 3 | 3.1 | 3.3;

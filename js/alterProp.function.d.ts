@@ -1,5 +1,5 @@
-import { AnySupport } from './tag/Support.class.js';
-import { TemplaterResult } from './tag/TemplaterResult.class.js';
+import { AnySupport } from './tag/getSupport.function.js';
+import { TemplaterResult } from './tag/getTemplaterResult.function.js';
 import { Props } from './Props.js';
 import { UnknownFunction } from './tag/index.js';
 import { Subject } from './subject/Subject.class.js';

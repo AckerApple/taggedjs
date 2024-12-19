@@ -124,6 +124,12 @@ export function processAttributeEmit(newAttrValue, attrName, subject, element, s
     return processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support, counts);
 }
 export function processAttributeSubjectValue(newAttrValue, element, attrName, special, howToSet, support, counts) {
+    // process adding/removing style. class. (false means remove)
+    if (special !== false) {
+        specialAttribute(attrName, newAttrValue, element, special, // string name of special
+        support, counts);
+        return;
+    }
     switch (newAttrValue) {
         case undefined:
         case false:
@@ -132,11 +138,6 @@ export function processAttributeSubjectValue(newAttrValue, element, attrName, sp
                 element.removeAttribute(attrName);
             });
             return;
-    }
-    if (special !== false) {
-        specialAttribute(attrName, newAttrValue, element, special, // name
-        support, counts);
-        return;
     }
     if (isFunction(newAttrValue)) {
         return processAttributeFunction(element, newAttrValue, support, attrName);

@@ -1,4 +1,4 @@
-import { DomTag, KeyFunction, StringTag } from './Tag.class.js';
+import { DomTag, KeyFunction, StringTag } from './getDomTag.function.js';
 import { Original } from './tag.utils.js';
 import { RouteProps, RouteTag, StateToTag, ToTag } from './tag.types.js';
 import { UnknownFunction } from './update/oneRenderToSupport.function.js';

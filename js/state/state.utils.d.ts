@@ -1,4 +1,4 @@
-import { AnySupport } from '../tag/Support.class.js';
+import { AnySupport } from '../tag/getSupport.function.js';
 import { State, StateConfig } from './state.types.js';
 import { StatesSetter } from './states.utils.js';
 import { StateMemory } from './StateMemory.type.js';

@@ -1,4 +1,4 @@
-import { getTemplaterResult } from '../TemplaterResult.class.js';
+import { getTemplaterResult } from '../getTemplaterResult.function.js';
 import { newSupportByTemplater } from './processTag.function.js';
 import { PropWatches } from '../tag.js';
 export function oneRenderToSupport(wrapper, subject, ownerSupport) {

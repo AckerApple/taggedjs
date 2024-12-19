@@ -1,5 +1,5 @@
 import { Counts } from '../interpolations/interpolateTemplate.js';
-import { AnySupport } from './Support.class.js';
+import { AnySupport } from './getSupport.function.js';
 import { ContextItem, Context } from './Context.types.js';
 /** Function that kicks off actually putting tags down as HTML elements */
 export declare function buildBeforeElement(support: AnySupport, counts: Counts, element?: Element, insertBefore?: Text): {

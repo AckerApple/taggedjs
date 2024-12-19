@@ -1,6 +1,6 @@
-import { AnySupport } from '../Support.class.js';
+import { AnySupport } from '../getSupport.function.js';
 import { Props } from '../../Props.js';
-import { TemplaterResult } from '../TemplaterResult.class.js';
+import { TemplaterResult } from '../getTemplaterResult.function.js';
 export declare function isInlineHtml(templater: TemplaterResult): boolean;
 /** Main function used by all other callers to render/update display of a tag component */
 export declare function renderSupport<T extends AnySupport>(support: T): T;

@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 import { setUseMemory } from '../state/index.js';
-import { getTemplaterResult } from './TemplaterResult.class.js';
+import { getTemplaterResult } from './getTemplaterResult.function.js';
 import { tags } from './tag.utils.js';
 import { getTagWrap } from './getTagWrap.function.js';
 import { ValueTypes } from './ValueTypes.enum.js';

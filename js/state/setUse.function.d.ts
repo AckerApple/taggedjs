@@ -1,5 +1,5 @@
 import { Subject } from '../subject/Subject.class.js';
-import { AnySupport } from '../tag/Support.class.js';
+import { AnySupport } from '../tag/getSupport.function.js';
 import { StateMemory } from './StateMemory.type.js';
 export type UseOptions = {
     beforeRender?: (support: AnySupport, ownerTag?: AnySupport) => void;

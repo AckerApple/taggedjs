@@ -1,4 +1,4 @@
-import { getBaseSupport, upgradeBaseToSupport } from './Support.class.js';
+import { getBaseSupport, upgradeBaseToSupport } from './getSupport.function.js';
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js';
 import { buildBeforeElement } from './buildBeforeElement.function.js';
 import { tags } from './tag.utils.js';

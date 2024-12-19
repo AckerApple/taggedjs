@@ -1,4 +1,4 @@
-import { AnySupport } from '../tag/Support.class.js';
+import { AnySupport } from '../tag/getSupport.function.js';
 import { Callback } from './callbackMaker.function.js';
 import { StatesSetter } from './states.utils.js';
 import { State } from './state.types.js';

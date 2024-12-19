@@ -1,4 +1,4 @@
-import { AnySupport, SupportContextItem } from '../Support.class.js';
+import { AnySupport, SupportContextItem } from '../getSupport.function.js';
 import { TemplateValue } from './processFirstSubject.utils.js';
 import { ContextItem } from '../Context.types.js';
 /** Used for all tag value updates. Determines if value changed since last render */

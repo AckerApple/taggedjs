@@ -1,5 +1,5 @@
 import { DomObjectChildren } from "./ObjectNode.types.js";
-import { AnySupport } from "../../tag/Support.class.js";
+import { AnySupport } from "../../tag/getSupport.function.js";
 import { SubToTemplateOptions } from "../subscribeToTemplate.function.js";
 import { Context } from "../../tag/Context.types.js";
 import { ObjectChildren } from "./LikeObjectElement.type.js";

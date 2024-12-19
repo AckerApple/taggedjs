@@ -1,2 +1,2 @@
-import { AnySupport } from "../../tag/Support.class.js";
+import { AnySupport } from "../../tag/getSupport.function.js";
 export declare function getUpTags(support: AnySupport, supports?: AnySupport[]): AnySupport[];

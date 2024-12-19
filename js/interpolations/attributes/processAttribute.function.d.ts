@@ -1,5 +1,5 @@
 import { HowToSet } from './howToSetInputValue.function.js';
-import { AnySupport } from '../../tag/Support.class.js';
+import { AnySupport } from '../../tag/getSupport.function.js';
 import { Context, ContextItem } from '../../tag/Context.types.js';
 import { Counts } from '../interpolateTemplate.js';
 type TagVarIdNum = {

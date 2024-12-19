@@ -1,4 +1,5 @@
 import { paintAfters, paintContent } from "../../tag/paint.function.js";
+/** handles init, destroy, autofocus, autoselect, style., class. */
 export function specialAttribute(name, value, element, specialName, support, counts) {
     switch (specialName) {
         // case 'oninit' as any:
@@ -14,7 +15,6 @@ export function specialAttribute(name, value, element, specialName, support, cou
             });
             return;
         }
-        // case 'ondestroy' as any:
         case 'destroy': {
             const stagger = ++counts.removed;
             const global = support.subject.global;
@@ -36,7 +36,6 @@ export function specialAttribute(name, value, element, specialName, support, cou
             return;
         case 'style': {
             const names = name.split('.');
-            // names.shift() // remove 'style'
             paintContent.push(() => element.style[names[1]] = value); // attribute changes should come first
             return;
         }

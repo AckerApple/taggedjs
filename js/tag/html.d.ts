@@ -4,5 +4,5 @@ import { RegularValue } from './update/processRegularValue.function.js';
 export type TagValues = (((e: InputElementTargetEvent) => any) | RegularValue | null | undefined | object)[];
 export declare function html(strings: string[] | TemplateStringsArray, ...values: TagValues): import("./StringTag.type.js").StringTag;
 export declare namespace html {
-    var dom: (dom: LikeObjectChildren, ...values: TagValues) => import("./Tag.class.js").DomTag;
+    var dom: (dom: LikeObjectChildren, ...values: TagValues) => import("./getDomTag.function.js").DomTag;
 }

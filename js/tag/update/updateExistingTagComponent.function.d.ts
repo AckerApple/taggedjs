@@ -1,4 +1,4 @@
-import { AnySupport, SupportContextItem } from '../Support.class.js';
+import { AnySupport, SupportContextItem } from '../getSupport.function.js';
 import { Props } from '../../Props.js';
 export declare function updateExistingTagComponent(ownerSupport: AnySupport, support: AnySupport, // lastest
 subject: SupportContextItem): void;

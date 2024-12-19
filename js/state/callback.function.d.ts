@@ -1,4 +1,4 @@
-import { AnySupport } from '../tag/Support.class.js';
+import { AnySupport } from '../tag/getSupport.function.js';
 import { Callback } from './callbackMaker.function.js';
 import { StateMemory } from './StateMemory.type.js';
 /** Wrap a function that will be called back. After the wrapper and function are called, a rendering cycle will update display */

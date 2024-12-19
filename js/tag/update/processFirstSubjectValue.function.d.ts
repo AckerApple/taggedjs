@@ -1,7 +1,7 @@
 import { Counts } from '../../interpolations/interpolateTemplate.js';
-import { AnySupport } from '../Support.class.js';
+import { AnySupport } from '../getSupport.function.js';
 import { TemplateValue } from './processFirstSubject.utils.js';
-import { StringTag } from '../Tag.class.js';
+import { StringTag } from '../getDomTag.function.js';
 import { ContextItem } from '../Context.types.js';
 export declare function processFirstSubjectValue(value: TemplateValue | StringTag, subject: ContextItem, // could be tag via result.tag
 ownerSupport: AnySupport, // owningSupport

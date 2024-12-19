@@ -1,6 +1,6 @@
 import { InterpolateSubject } from '../tag/update/processFirstSubject.utils.js';
 import { ContextItem } from '../tag/Context.types.js';
-import { AnySupport } from '../tag/Support.class.js';
+import { AnySupport } from '../tag/getSupport.function.js';
 import { Counts } from './interpolateTemplate.js';
 export type SubToTemplateOptions = {
     insertBefore: Text;

@@ -1,6 +1,6 @@
-import { AnySupport } from '../Support.class.js';
-import { TemplaterResult } from '../TemplaterResult.class.js';
-import { StringTag, DomTag } from '../Tag.class.js';
+import { AnySupport } from '../getSupport.function.js';
+import { TemplaterResult } from '../getTemplaterResult.function.js';
+import { StringTag, DomTag } from '../getDomTag.function.js';
 import { ContextItem } from '../Context.types.js';
 import { Counts } from '../../interpolations/interpolateTemplate.js';
 /** When first time render, adds to owner childTags

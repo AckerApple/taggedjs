@@ -1,4 +1,4 @@
-import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
+import { variableSuffix, variablePrefix } from "../../tag/getDomTag.function.js";
 import { ImmutableTypes } from "../../tag/ValueTypes.enum.js";
 export const safeVar = '__safeTagVar';
 export function restorePlaceholders(elements) {

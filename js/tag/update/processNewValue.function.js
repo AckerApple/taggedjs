@@ -1,4 +1,4 @@
-import { getTemplaterResult } from '../TemplaterResult.class.js';
+import { getTemplaterResult } from '../getTemplaterResult.function.js';
 import { checkTagValueChange } from '../checkDestroyPrevious.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
