@@ -2,13 +2,14 @@ import { byId, elmCount } from "./testing/elmSelectors"
 import { describe, expect, it } from "./testing/expect"
 
 
-describe('array testing', () => {
+describe('⠇ array testing', () => {
   it('array basics', () => {
     expect(elmCount('#array-test-push-item')).toBe(1)
     
+    const buttons = document.querySelectorAll('#score-data-0-1-outside-button')
+    expect(buttons.length).toBe(0, 'Did not expect scoring button 0-1 to be present')
     const insideCount = elmCount('#score-data-0-1-inside-button')
     expect(insideCount).toBe(0)
-    expect(elmCount('#score-data-0-1-outside-button')).toBe(0)
     
     // add player 0
     byId('array-test-push-item').click()
@@ -48,7 +49,7 @@ describe('array testing', () => {
 
     const result = await (byId('player-remove-promise-btn-0') as any)._click()
     expect(result).toBe('promise-no-data-ever')
-    await delay(1000) // animation
+    await delay(1500) // animation
 
     expect(elmCount('#player-remove-promise-btn-0')).toBe(0)
     expect(elmCount('#player-edit-btn-0')).toBe(0)

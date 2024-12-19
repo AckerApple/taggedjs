@@ -1,11 +1,12 @@
-import { InputElementTargetEvent, html, letState, tag } from "taggedjs";
+import { InputElementTargetEvent, html, states, tag } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
 
 export const addArrayComponent = tag((
   addArrayItem: (x: any) => any
 ) => (
-  renderCount = letState(0)(x => [renderCount, renderCount=x]),
-  _ = ++renderCount,
+  renderCount = 0,
+  _ = states(get => [renderCount] = get(renderCount)),
+  __ = ++renderCount,
   handleKeyUp = (e: InputElementTargetEvent & KeyboardEvent) => {
     if (e.key === "Enter") {
         const value = e.target.value.trim();

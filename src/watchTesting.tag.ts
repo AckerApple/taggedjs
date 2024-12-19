@@ -1,7 +1,7 @@
-import { watch, letState, html, tag, states } from "taggedjs"
+import { watch, html, tag, states } from "taggedjs"
 
 export const watchTesting = tag.deepPropWatch(() => (
-  stateNum = letState(0)(x => [stateNum, stateNum=x]),
+  stateNum = 0,
   stateNumChangeCount = 0,
   slowChangeCount = 0,
   subjectChangeCount = 0,
@@ -9,17 +9,15 @@ export const watchTesting = tag.deepPropWatch(() => (
   truthChangeCount = 0,
   truthSubChangeCount = 0,
 
-  _states = states(get => {
-    ({
+  _states = states(get => [{
     stateNum, stateNumChangeCount, slowChangeCount, subjectChangeCount,
     truthChange, truthChangeCount,
     truthSubChangeCount,
-  } = get({
+  }] = get({
     stateNum, stateNumChangeCount, slowChangeCount, subjectChangeCount,
     truthChange, truthChangeCount,
     truthSubChangeCount,
-  }))
-}),
+  })),
 
   _ = watch([stateNum], () => ++stateNumChangeCount),
   watchPropNumSlow = watch.noInit([stateNum], () => ++slowChangeCount),
@@ -29,9 +27,6 @@ export const watchTesting = tag.deepPropWatch(() => (
   }),
 
   watchTruth = watch.truthy([truthChange], () => ++truthChangeCount),
-  
-  // truthSubChangeCount = letState(0)(x => [truthSubChangeCount, truthSubChangeCount=x]),
-
   watchTruthAsSub = watch.truthy.asSubject([truthChange], () => {
     ++truthSubChangeCount
     return truthChange

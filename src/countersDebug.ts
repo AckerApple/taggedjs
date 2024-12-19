@@ -1,6 +1,6 @@
 import { mouseOverTag } from "./mouseover.tag.js"
 import { renderCountDiv } from "./renderCount.component.js"
-import { states, html, tag, Subject, onInit, letState, callbackMaker, state, ValueSubject, callback, subject } from "taggedjs"
+import { states, html, tag, Subject, onInit, callbackMaker, state, ValueSubject, callback, subject } from "taggedjs"
 
 const loadStartTime = Date.now()
 
@@ -45,7 +45,7 @@ const innerCounters = tag.deepPropWatch(({
   otherCounter = 0,
   renderCount = 0,
   elmInitCount = 0,
-  _ = states(get => ({elmInitCount, otherCounter, renderCount} = get({elmInitCount, otherCounter, renderCount}))),
+  _ = states(get => [{elmInitCount, otherCounter, renderCount}] = get({elmInitCount, otherCounter, renderCount})),
   __ = ++renderCount, // for debugging
 ) => html`
   <div style="display:flex;flex-wrap:wrap;gap:1em;" oninit=${() => ++elmInitCount}>
@@ -81,11 +81,9 @@ const shallowPropCounters = tag.watchProps(({
   propCounter: number,
   increasePropCounter: () => void
 }) => {
-  // let otherCounter = letState(0)(x => [otherCounter, otherCounter = x])
-  // let renderCount = letState(0)(x => [renderCount, renderCount = x])
   let otherCounter = 0
   let renderCount = 0
-  states(get => ({otherCounter, renderCount} = get({otherCounter, renderCount})))
+  states(get => [{otherCounter, renderCount}] = get({otherCounter, renderCount}))
 
   ++renderCount // for debugging
 
@@ -120,11 +118,9 @@ const immutablePropCounters = tag.immutableProps(({
   propCounter: number,
   increasePropCounter: () => void
 }) => {
-  // let otherCounter = letState(0)(x => [otherCounter, otherCounter = x])
-  // let renderCount = letState(0)(x => [renderCount, renderCount = x])
   let otherCounter = 0
   let renderCount = 0
-  states(get => ({otherCounter, renderCount} = get({otherCounter, renderCount})))
+  states(get => [{otherCounter, renderCount}] = get({otherCounter, renderCount}))
 
   ++renderCount // for debugging
 
@@ -159,12 +155,9 @@ const noWatchPropCounters = ({
   propCounter: number,
   increasePropCounter: () => void
 }) => {
-  // let otherCounter = letState(0)(x => [otherCounter, otherCounter = x])
-  // let renderCount = letState(0)(x => [renderCount, renderCount = x])
-
   let otherCounter = 0
   let renderCount = 0
-  states(get => ({otherCounter, renderCount} = get({otherCounter, renderCount})))
+  states(get => [{otherCounter, renderCount}] = get({otherCounter, renderCount}))
 
   ++renderCount // for debugging
 
@@ -197,20 +190,25 @@ export const innerCounterContent = () => tag.use = (
   statesRenderCount2 = 0,
   callbacks = callbackMaker(),
   
-  // counter = 0,
-  counter = letState(0)(x => [counter, counter = x]),
-  
-  // renderCount = 0,
-  renderCount = letState(0)(x => [renderCount, renderCount = x]),
+  counter = 0,  
+  renderCount = 0,
+  propCounter = 0,  
+  initCounter = 0,
 
-  // propCounter = 0,
-  propCounter = letState(0)(x => [propCounter, propCounter = x]),
-  
-  // initCounter = 0,
-  initCounter = letState(0)(x => [initCounter, initCounter = x]),
   increasePropCounter = () => {
     ++propCounter
   },
+
+  immutableProps = state(() => ({propCounter, increasePropCounter})),
+
+  _ = states(get => [{
+    counter,renderCount,propCounter,initCounter,immutableProps,
+    statesRenderCount, statesRenderCount2,
+  }] = get({
+    counter,renderCount,propCounter,initCounter,immutableProps,
+    statesRenderCount, statesRenderCount2,
+  })),
+
 
   callbackTestSub = state(() => new Subject(counter)),
   pipedSubject0 = state(() => new ValueSubject('222')),
@@ -227,7 +225,6 @@ export const innerCounterContent = () => tag.use = (
   pipedSubject2 = subject.all([pipedSubject0, callbackTestSub]).pipe(x => counter),
   memory = state(() => ({counter: 0})),
   // create an object that remains the same
-  immutableProps = letState(() => ({propCounter, increasePropCounter}))(x => [immutableProps, immutableProps]),
   readStartTime = state(() => Date.now()),
 
   __ = onInit(() => {
@@ -241,20 +238,6 @@ export const innerCounterContent = () => tag.use = (
     )
   }),
 ) => {
-  states(set => ({
-    statesRenderCount, statesRenderCount2,
-    // renderCount,
-    // counter,
-    // propCounter,
-    // initCounter,
-  } = set({
-    statesRenderCount, statesRenderCount2,
-    // renderCount,
-    // counter,
-    // propCounter,
-    // initCounter,
-  })))
-
   if(immutableProps.propCounter !== propCounter) {
     immutableProps = {propCounter, increasePropCounter}
   }

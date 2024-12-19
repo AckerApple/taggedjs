@@ -1,4 +1,4 @@
-import { html, letState, tag } from "taggedjs";
+import { html, states, tag } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
 import { arrayFunTag } from "./arrayFun.tag";
 import { main } from "./funInProps.tag";
@@ -14,9 +14,12 @@ export const funInPropsChild = tag((
   mainProp: typeof main,
   myFunction3: () => any
 ) => (
-  other = letState('other')(x => [other, other = x]),
-  counter = letState(0)(x => [counter, counter = x]),
-  renderCount = letState(0)(x => [renderCount, renderCount = x]),
+  other = 'other',
+  counter = 0,
+  renderCount = 0,
+
+  __ = states(get => [{other,counter, renderCount}] = get({other,counter,renderCount})),
+
   _ = ++renderCount,
   {addArrayItem, myFunction, deleteItem, child, array} = arg0,
 ) => html`

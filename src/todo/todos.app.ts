@@ -4,7 +4,7 @@ import { Todo, todoReducer } from "./reducer.js";
 import { html } from "taggedjs";
 import { useHashRouter } from "./HashRouter.function.js";
 import { Item } from "./components/item.js";
-import { ViewTypes } from "../sections.tag.js";
+import { ViewTypes } from "../sectionSelector.tag.js";
 import { autoTestingControls } from "../autoTestingControls.tag.js";
 
 export const todos: Todo[] = []

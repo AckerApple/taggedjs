@@ -2,7 +2,7 @@ import { byId, html, htmlById, keyupOn } from "./testing/elmSelectors"
 import { describe, expect, it } from "./testing/expect"
 import { expectElmCount, testCounterElements } from "./testing/expect.html"
 
-describe('counters', () => {    
+describe('💯 counters', () => {    
   const slowCount = html('#🍄-slowChangeCount')
   // tests can be run multiple times. Only the first time will this expect below work
   const firstRun = slowCount === '0'

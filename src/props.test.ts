@@ -2,7 +2,7 @@ import { byId, html, htmlById, query } from "./testing/elmSelectors"
 import { describe, expect, it } from "./testing/expect"
 import { expectHTML, expectMatchedHtml, testCounterElements, testDuelCounterElements } from "./testing/expect.html"
 
-describe('props', () => {    
+describe('🧳 props', () => {    
   it('test duels', () => {
     testDuelCounterElements(
       ['#propsDebug-🥩-0-button', '#propsDebug-🥩-0-display'],
@@ -17,27 +17,13 @@ describe('props', () => {
     )
   })
 
-  it('letProp', () => {
-    // local and outside currently match
-    expectMatchedHtml('#propsDebug-🥩-0-display', '#propsDebug-🥩-2-display')
-    const propCounter = Number(html('#propsDebug-🥩-0-display'))
-    
-    const result = (query('#propsDebug-🥩-2-button')[0] as any)._click()
-    expect(result).toBe('no-data-ever')
-
-    // outer should not have changed
-    expect(html('#propsDebug-🥩-0-display')).toBe( propCounter.toString() )
-    expect(html('#propsDebug-🥩-2-display')).toBe( (propCounter + 1).toString() )      
-  })
-
   it('basics', () => {
     // the number of times the watch counted a change happens to match that increase counter
-    const funUpdateValue = byId('propsOneLevelFunUpdate-🥩-display').innerHTML
-    const changed = html('#propsDebug-🥩-change-display')
-    
+    const funUpdateValue = html('#propsOneLevelFunUpdate-🥩-display')
+    const changed = html('#propsDebug-🥩-change-count-display')
+
     // test that watch runs onInit
     expect(changed).toBe( (Number(funUpdateValue) + 1).toString() )
-    // expect(changed).toBe( (Number(funUpdateValue) - 4).toString() )
 
     const ownerHTML = byId('propsDebug-🥩-0-display').innerHTML
     const parentHTML = byId('propsDebug-🥩-1-display').innerHTML
@@ -49,7 +35,21 @@ describe('props', () => {
 
     expect(parentNum).toBe(childNum)
     expect(ownerNum + 2).toBe(parentNum) // testing of setProp() doesn't change owner
+  })
 
+  it('letProp', () => {
+    // local and outside currently match
+    expectMatchedHtml('#propsDebug-🥩-0-display', '#propsDebug-🥩-2-display')
+    const propCounter = Number(html('#propsDebug-🥩-0-display'))
+    
+    const result = (query('#propsDebug-🥩-2-button')[0] as any)._click()
+    expect(result).toBe('no-data-ever')
+
+    // outer should not have changed
+    expect(html('#propsDebug-🥩-0-display')).toBe( propCounter.toString() )
+    expect(html('#propsDebug-🥩-2-display')).toBe( (propCounter + 1).toString() )      
+
+    // end of test put all in sync
     byId('propsDebug-🥩-1-button').click()
   })
 

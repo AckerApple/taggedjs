@@ -15,7 +15,9 @@ export async function runTests() {
   await import('./watch.test')
   await import('./oneRender.test')
   await import('./funInProps.test')
+  await import('./attributes.test')
   await import('./todos.test')
+  await import('./destroys.test')
 
   try {
     const start = Date.now() //performance.now()

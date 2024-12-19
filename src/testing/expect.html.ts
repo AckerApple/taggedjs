@@ -1,3 +1,4 @@
+import { html, htmlById } from "./elmSelectors"
 import { expect } from "./expect"
 
 export function sleep(ms:number) {
@@ -118,6 +119,8 @@ function testCounterSelectedElements(
 
     let counterValue = Number(counterDisplay?.innerText)
     expect(typeof increaseCounter.click).toBe('function')
+
+    // will increase by one
     increaseCounter.click()
 
     expect(counterDisplay).toBeDefined()
@@ -127,6 +130,8 @@ function testCounterSelectedElements(
     counterValue = Number(counterDisplay.innerText)
     expect(document.body.contains(counterDisplay)).toBe(true)
     expect(newCounterValue).toBe(counterValue, () => `After click ${counterButtonSelect}, counter test ${testQuantifier + 1} of ${testQuantifier + 2} expected ${counterDisplaySelect} to be value ${newCounterValue} but it is ${counterValue}`)
+
+    // will increase by one
     increaseCounter.click()
 
     counterValue = Number(counterDisplay?.innerText)

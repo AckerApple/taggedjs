@@ -1,14 +1,20 @@
-import { letState, html, tag, onInit, callbackMaker, onDestroy } from "taggedjs"
+import { html, tag, onInit, callbackMaker, onDestroy, states } from "taggedjs"
 
 const test0interval = 3000
 const test1interval = 6000
 
 export const intervalTester0 = tag(() => {
-  let intervalCount: number = letState(0)(x => [intervalCount, intervalCount = x])
-  let intervalId: any = letState(undefined)(x => [intervalId, intervalId = x])
-  let intervalId2: any = letState(undefined)(x => [intervalId2, intervalId2 = x])
-  let renderCounter: number = letState(0)(x => [renderCounter, renderCounter = x])
-  let currentTime: number = letState(0)(x => [currentTime, currentTime = x])
+  let intervalCount: number = 0
+  let intervalId: any = undefined
+  let intervalId2: any = undefined
+  let renderCounter: number = 0
+  let currentTime: number = 0
+
+  states(get => [{
+    intervalCount,intervalId,intervalId2,renderCounter,currentTime,
+  }] = get({
+    intervalCount,intervalId,intervalId2,renderCounter,currentTime,
+  }))
   
   const callback = callbackMaker()
   const increase = () => ++intervalCount
@@ -78,11 +84,17 @@ export const intervalTester0 = tag(() => {
 })
 
 export const intervalTester1 = tag(() => {  
-  let intervalCount: number = letState(0)(x => [intervalCount, intervalCount = x])
-  let intervalId: any = letState(undefined)(x => [intervalId, intervalId = x])
-  let intervalId2: any = letState(undefined)(x => [intervalId2, intervalId2 = x])
-  let renderCounter: number = letState(0)(x => [renderCounter, renderCounter = x])
-  let currentTime: number = letState(0)(x => [currentTime, currentTime = x])
+  let intervalCount: number = 0
+  let intervalId: any = undefined
+  let intervalId2: any = undefined
+  let renderCounter: number = 0
+  let currentTime: number = 0
+
+  states(get => [{
+    intervalCount,intervalId,intervalId2,renderCounter,currentTime
+  }] = get({
+    intervalCount,intervalId,intervalId2,renderCounter,currentTime
+  }))
   
   const callback = callbackMaker()
   const increase = () => ++intervalCount

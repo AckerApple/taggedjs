@@ -1,4 +1,4 @@
-import { storage, ViewTypes } from "./sections.tag"
+import { storage, ViewTypes } from "./sectionSelector.tag"
 import { runIsolatedTests } from "./isolatedApp.test"
 
 let testTimeout: NodeJS.Timeout | null = null

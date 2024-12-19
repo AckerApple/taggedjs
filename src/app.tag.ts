@@ -1,7 +1,7 @@
-import { html, tag, letState, onInit, state, Subject, callbackMaker, onDestroy, states } from "taggedjs"
+import { html, tag, onInit, state, Subject, callbackMaker, onDestroy, states } from "taggedjs"
 import { renderedSections } from "./renderedSections.tag"
 import { renderCountDiv } from "./renderCount.component"
-import { sections } from "./sections.tag"
+import { sectionSelector } from "./sectionSelector.tag"
 import { tagDebug } from "./tagJsDebug"
 import { runTests } from "./tests"
 import { menu, useMenuName } from "./menu.tag"
@@ -10,7 +10,6 @@ import { innerCounterContent } from "./countersDebug";
 const appDate = Date.now()
 
 const appFun = () => (
-  _firstState = letState('app first state')(x => [_firstState, _firstState=x]),
   menuName = useMenuName(),
 ) => {
   console.log('🍒 App rendered', appDate)
@@ -32,18 +31,32 @@ appFun.isApp = true
 export const App = tag(appFun)
 
 export const homePage = () => tag.use = (
-  // appCounter = 0,
-  appCounter = letState(0)(x => [appCounter, appCounter=x]),
-  toggleValue = letState(false)(x => [toggleValue, toggleValue=x]),
-  testTimeout = letState(null)(x => [testTimeout, testTimeout=x]),
+  appCounter = 0,
+  toggleValue = false,
+  testTimeout = null,
   appCounterSubject = state(() => new Subject<number>(appCounter)),
-  renderCount = letState(0)(x => [renderCount, renderCount=x]),
+  renderCount = 0,
+  testEmoji = '🟦',
+
+  _ = states(get => [{
+    appCounter,
+    toggleValue,
+    testTimeout,
+    renderCount,
+    testEmoji,
+  }] = get({
+    appCounter,
+    toggleValue,
+    testTimeout,
+    renderCount,
+    testEmoji,
+  })),
+
   toggle = () => toggleValue = !toggleValue,
 ) => {
   // states(get => ({ appCounter } = get({ appCounter })))
 
   const callbacks = callbackMaker()
-  let testEmoji = letState('🟦')(x => [testEmoji, testEmoji = x])
   const onTestComplete = callbacks(success => testEmoji = success ? '✅' : '❌')
 
   // if I am destroyed before my test runs, prevent test from running
@@ -71,7 +84,7 @@ export const homePage = () => tag.use = (
     testEmoji = '🟦'
     const waitFor = 2000
     testTimeout = setTimeout(async () => {
-      console.debug('🏃 Running tests...')
+      console.debug('🏃 🏃‍♀️ 🏃‍♂️ Running tests... 🏃‍♂️‍➡️ 🏃‍♀️‍➡️ 🏃‍➡️x')
       const result = await runTests()
 
       onComplete(result)
@@ -114,12 +127,12 @@ export const homePage = () => tag.use = (
 
     ${renderCountDiv({name:'app', renderCount})}
 
-    ${sections()}
+    <a name="top" id="top"></a>
+
+    ${sectionSelector()}
 
     <div id="tagDebug-fx-wrap">
-      <div style="display:flex;flex-wrap:wrap;gap:1em">
-        ${renderedSections(appCounterSubject)}
-      </div>
+      ${renderedSections(appCounterSubject)}
 
       ${tagDebug()}
     </div>

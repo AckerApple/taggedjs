@@ -1,7 +1,7 @@
-import { fadeInDown, fadeOutUp } from './animations.js'
+import { fadeIn, fadeInDown, fadeOut, fadeOutUp } from './animations.js'
 import { renderCountDiv } from './renderCount.component.js'
 import { arrayScoreData } from './arrayScoreData.tag.js'
-import { html, state, letState, tag } from 'taggedjs'
+import { html, state, tag, states } from 'taggedjs'
 
 const frameCount = 4
 type Player = {
@@ -10,10 +10,11 @@ type Player = {
   scores: any[]
 }
 
-export const arrayTests = tag(() => (
+export const arrays = tag(() => (
   players: Player[] = state([]),
-  renderCount: number = letState(0)(x => [renderCount, renderCount = x]),
-  counter: number = letState(0)(x => [counter, counter = x]),
+  renderCount: number = 0,
+  counter: number = 0,
+  _ = states(get => [{counter, renderCount}] = get({counter, renderCount})),
 ) => {/* ArrayTests */
 
   const getNewPlayer = () => ({
@@ -91,9 +92,7 @@ const playersDisplay = tag(({
         scores:
         ${player.scores.map((score, playerIndex) => {
           return html`
-            <div style="border:1px solid white;--animate-duration: .1s;"
-              oninit=${fadeInDown} ondestroy=${fadeOutUp}
-            >
+            <div class="animate__slow" init=${fadeIn} ondestroy=${fadeOut}>
               <fieldset>
                 <legend>
                   <button id=${`score-data-${playerIndex}-${score.frame}-outside-button`}

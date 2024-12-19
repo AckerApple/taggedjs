@@ -1,5 +1,5 @@
 import { tag, html, onInit } from "taggedjs"
-import { saveScopedStorage, storage, ViewTypes } from "./sections.tag"
+import { saveScopedStorage, storage, ViewTypes } from "./sectionSelector.tag"
 import { runTesting } from "./runTesting.function"
 
 export const autoTestingControls = (

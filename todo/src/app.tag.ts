@@ -10,7 +10,6 @@ const dispatch = todoReducer(todos)
 
 export const app = () => {
   const route = useHashRouter().route
-  console.log('route', route)
   return html`
     ${route === '/info' ? infoTag() : todosTag(route)}
     <a href="#/info">info</a>
@@ -25,7 +24,7 @@ const infoTag = () => html`
   </div>
 `
 
-const todosTag = (route: string) => tag.state = (
+const todosTag = (route: string) => tag.use = (
   activeTodoCount = todos.filter((todo) => !todo.completed).length,
   isActiveRoute = route === "/active",
   isCompletedRoute = route === "/completed",

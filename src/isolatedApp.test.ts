@@ -1,5 +1,5 @@
 import { execute } from "./testing/expect"
-import { ViewTypes } from "./sections.tag"
+import { ViewTypes } from "./sectionSelector.tag"
 
 export async function runIsolatedTests(
   views: ViewTypes[],
@@ -62,6 +62,11 @@ export async function runIsolatedTests(
     ++testCount
   }
 
+  if(views.includes(ViewTypes.AttributeDebug)) {
+    await import('./attributes.test')
+    ++testCount
+  }
+
   if(views.includes(ViewTypes.OneRender)) {
     await import('./oneRender.test')
     ++testCount
@@ -69,6 +74,11 @@ export async function runIsolatedTests(
 
   if(views.includes(ViewTypes.Todo)) {
     await import('./todos.test')
+    ++testCount
+  }
+
+  if(views.includes(ViewTypes.Destroys)) {
+    await import('./destroys.test')
     ++testCount
   }
 

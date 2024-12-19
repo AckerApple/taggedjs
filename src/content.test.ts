@@ -4,7 +4,7 @@ import { click, html, query } from "./testing/elmSelectors"
 import { expect, describe, it } from "./testing/expect"
 import { expectMatchedHtml } from "./testing/expect.html"
 
-describe('content', () => {    
+describe('📰 content', () => {    
   it('basic', () => {
     expectMatchedHtml('#content-subject-pipe-display0', '#content-subject-pipe-display1')
     expectMatchedHtml('#content-combineLatest-pipe-display0', '#content-combineLatest-pipe-display1')

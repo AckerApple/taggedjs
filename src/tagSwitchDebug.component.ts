@@ -1,14 +1,12 @@
-import { letState, states, html, tag, InputElementTargetEvent, Tag } from "taggedjs"
+import { states, html, tag, InputElementTargetEvent, Tag } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component.js"
 
 type SelectedTag = null | string | undefined
 
 export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
-  // let selectedTag = letState(null as SelectedTag)(x => [selectedTag, selectedTag = x])
-  // let renderCount = letState(0)(x => [renderCount, renderCount = x])
   let selectedTag = null as SelectedTag
   let renderCount = 0
-  states(get => ({renderCount, selectedTag} = get({renderCount, selectedTag})))
+  states(get => [{renderCount, selectedTag}] = get({renderCount, selectedTag}))
   
   function changeSelectedTag(event: InputElementTargetEvent) {
     selectedTag = event.target.value
@@ -115,11 +113,9 @@ export const ternaryPropTest = tag((
 })
 
 export const tag1 = tag(({title}: {title: string}) => {
-  // let counter = letState(0)(x => [counter, counter = x])
-  // let renderCount = letState(0)(x => [renderCount, renderCount = x])
   let counter = 0
   let renderCount = 0
-  states(get => ({counter, renderCount} = get({counter, renderCount})))
+  states(get => [{counter, renderCount}] = get({counter, renderCount}))
 
   ++renderCount
   return html`
@@ -132,11 +128,9 @@ export const tag1 = tag(({title}: {title: string}) => {
 })
 
 export const tag2 = tag(({title}: {title: string}) => {
-  // let counter = letState(0)(x => [counter, counter = x])
-  // let renderCount = letState(0)(x => [counter, counter = x])
   let counter = 0
   let renderCount = 0
-  states(get => ({counter, renderCount} = get({counter, renderCount})))
+  states(get => [{counter, renderCount}] = get({counter, renderCount}))
 
   ++renderCount
   return html`
@@ -149,11 +143,9 @@ export const tag2 = tag(({title}: {title: string}) => {
 })
 
 export const tag3 = tag(({title}: {title: string}) => {
-  // let counter = letState(0)(x => [counter, counter = x])
-  // let renderCount = letState(0)(x => [counter, counter = x])
   let counter = 0
   let renderCount = 0
-  states(get => ({counter, renderCount} = get({counter, renderCount})))
+  states(get => [{counter, renderCount}] = get({counter, renderCount}))
 
   ++renderCount
   return html`

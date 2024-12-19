@@ -2,7 +2,7 @@ import { click, clickOne, focus, keydownOn, query } from "./testing/elmSelectors
 import { describe, expect, it } from "./testing/expect"
 import { sleep } from "./testing/expect.html"
 
-describe('todos', function todos() {
+describe('☑️ todos', function todos() {
   const todoInput = query('.new-todo')[0] as HTMLInputElement
 
   it('todos add one remove one', async function addOneRemoveOne() {

@@ -1,4 +1,4 @@
-import { InputElementTargetEvent, html, letState, tag } from "taggedjs";
+import { html, states, tag } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
 import { funInPropsChild } from "./funInPropsChild.tag";
 import { addArrayComponent } from "./addArrayComponent.tag";
@@ -9,12 +9,19 @@ export const main = {
 }
 
 export default tag(() => (
-  array = letState([] as string[])(x => [array, array = x]),
-  counter = letState(0)(x => [counter, counter = x]),
+  array = [] as string[],
+  counter = 0,
+  renderCount = 0,
+  showChild = true,
+  somethingElse = 'a',
   myFunction = () => ++counter,
-  renderCount = letState(0)(x => [renderCount, renderCount = x]),
-  showChild = letState(true)(x => [showChild, showChild = x]),
-  somethingElse = letState('a')(x => [somethingElse, somethingElse = x]),
+
+  _states = states(get => [{
+    array, counter, renderCount, showChild, somethingElse
+  }] = get({
+    array, counter, renderCount, showChild, somethingElse
+  })),
+
   _ = ++renderCount,
   addArrayItem = (x?: string) => {array = array.map(x => x);array.push(typeof(x) === 'string' ? x : 'push'+array.length)},
   deleteItem = (item: string) => array = array.filter(x => x !== item),

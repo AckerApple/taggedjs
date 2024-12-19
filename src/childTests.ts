@@ -1,4 +1,4 @@
-import { Tag, html, letState, tag } from "taggedjs"
+import { Tag, html, states, tag } from "taggedjs"
 import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests.js"
 import { renderCountDiv } from "./renderCount.component.js"
 
@@ -10,10 +10,12 @@ const test22 = tag((a:number, b:number, children: Tag) => html`
   </fieldset>
 `)
 
-export const childTests = tag((_: string = 'childTests') => (
-  renderCount = letState(0)(x => [renderCount, renderCount = x]),
-  counter = letState(0)(x => [counter, counter = x]),
-  _ = ++renderCount,
+export const child = tag((_: string = 'childTests') => (
+  renderCount = 0,
+  counter = 0,
+
+  _ = states(get => [{renderCount, counter}] = get({renderCount, counter})),
+  __ = ++renderCount,
 ) => html`
   <fieldset id="children-test" style="flex:2 2 20em">
     <legend>childTests</legend>

@@ -1,13 +1,10 @@
-import { html, tag, letState, ValueSubject, state, combineLatest, willPromise } from "taggedjs"
-import { LikeObjectChildren } from "taggedjs/js/interpolations/optimizers/exchangeParsedForValues.function"
+import { LikeObjectChildren, html, tag, ValueSubject, state, combineLatest, willPromise, states } from "taggedjs"
 
-export const contentDebug = tag(() => {
+export const content = tag(() => {
   const vs0 = state(() => new ValueSubject(0))
   const vs1 = state(() => new ValueSubject(1))
 
-  let renderCount: number = letState(0)(x => [renderCount, renderCount=x])
-
-  ++renderCount
+  let renderCount: number = 0
 
   const dom: LikeObjectChildren = [{
     nn: 'b', ch:[{
@@ -16,8 +13,12 @@ export const contentDebug = tag(() => {
     }]
   }]
 
-  let orangeToggle = letState(true)(x => [orangeToggle, orangeToggle = x])
-  let boldToggle = letState(false)(x => [boldToggle, boldToggle = x])
+  let orangeToggle = true
+  let boldToggle = false
+
+  states(get => [{renderCount, orangeToggle, boldToggle}] = get({renderCount, orangeToggle, boldToggle}))
+
+  ++renderCount
 
   const injectionTest = '<script>alert("i should never run")</script>'
 

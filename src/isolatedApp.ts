@@ -1,19 +1,33 @@
-import { Subject, callbackMaker, html, onInit, letState, tag, state } from "taggedjs"
+import { Subject, callbackMaker, html, onInit, tag, state, states } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
-import { activate, sections, viewChanged } from "./sections.tag"
+import { activate, sectionSelector, viewChanged, ViewTypes } from "./sectionSelector.tag"
 import { renderedSections } from "./renderedSections.tag"
 import { autoTestingControls } from "./autoTestingControls.tag"
 import { menu } from "./menu.tag"
+import { useHashRouter } from "./todo/HashRouter.function"
 
 export default () => tag.use = (
   _ = state('isolated app state'),
-  renderCount = letState(0)(x => [renderCount, renderCount = x]),
-  appCounter = letState(0)(x => [appCounter, appCounter=x]),
+  renderCount = 0,
+  appCounter = 0,
   appCounterSubject = state(() => new Subject(appCounter)),
-  toggleValue = letState(false)(x => [toggleValue, toggleValue=x]),
+  toggleValue = false,
+
+  __ = states(get => [{renderCount,appCounter,toggleValue}] = get({renderCount,appCounter,toggleValue})),
+
   toggle = () => toggleValue = !toggleValue,
   callback = callbackMaker(),
 ) => {
+  const route = useHashRouter().route.split('/')
+    .map(x => x.trim())
+    .filter(hasLength => hasLength.length)
+    
+  let viewTypes: ViewTypes[] | undefined = undefined
+
+  if(route.length) {
+    viewTypes = route as ViewTypes[]
+  }
+
   onInit(() => {
     console.info('1️⃣ app init should only run once')    
     
@@ -27,6 +41,7 @@ export default () => tag.use = (
   return html`<!--isolatedApp.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
     <div style="opacity:.6">(no HMR)</div>
+    <div style="opacity:.6">route: ${route}</div>
 
     ${menu()}
 
@@ -49,17 +64,15 @@ export default () => tag.use = (
         <button id="toggle-test" onclick=${toggle}>toggle test ${toggleValue}</button>
       </fieldset>  
 
-      ${autoTestingControls()}
+      ${autoTestingControls(viewTypes)}
     </div>
 
     ${renderCountDiv({name:'app', renderCount})}
 
-    ${sections()}
+    ${sectionSelector(viewTypes)}
 
     <div id="tagDebug-fx-wrap">
-      <div style="display:flex;flex-wrap:wrap;gap:1em">
-        ${renderedSections(appCounterSubject)}
-      </div>
+      ${renderedSections(appCounterSubject, viewTypes)}
       ${renderCountDiv({renderCount, name:'isolatedApp'})}
     </div>
   `

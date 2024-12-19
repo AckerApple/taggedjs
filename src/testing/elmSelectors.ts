@@ -1,7 +1,9 @@
 
-export function elmCount(selector: string) {
+export function count(selector: string) {
   return document.querySelectorAll(selector).length
 }
+
+export const elmCount = count
 
 export function query(
   query: string

@@ -1,11 +1,13 @@
 import { intervalTester0, intervalTester1 } from "./intervalDebug"
-import { html, tag, letState } from "taggedjs"
+import { html, tag, states } from "taggedjs"
 import { fadeInDown, fadeOutUp } from "./animations"
 
 export const tagDebug = tag(() => {// tagDebug.js
-  let _firstState: string = letState('tagJsDebug.js')(x => [_firstState, _firstState = x])
-  let showIntervals: boolean = letState(false)(x => [showIntervals, showIntervals = x])
-  let renderCount: number = letState(0)(x => [renderCount, renderCount = x])
+  let _firstState: string = 'tagJsDebug.js'
+  let showIntervals: boolean = false
+  let renderCount: number = 0
+
+  states(get => [{_firstState,showIntervals,renderCount}] = get({_firstState,showIntervals,renderCount}))
 
   ++renderCount
 

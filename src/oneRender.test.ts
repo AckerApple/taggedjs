@@ -8,6 +8,7 @@ it('oneRender', () => {
   testCounterElements('#👍-counter-button', '#👍-counter-display')
   testCounterElements('#👍🔨-counter-button', '#👍🔨-counter-display')
   testCounterElements('#👍🔨-counter-button', '#👍🔨-counter-subject-display')
+  testCounterElements('#👍🔨-counter-button', '#📡-signal-counter-display')
 
   expect(html('#oneRender_tag_ts_render_count')).toBe('1')
 })

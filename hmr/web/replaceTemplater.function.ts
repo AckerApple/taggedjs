@@ -70,7 +70,6 @@ export async function replaceTemplater(
     const support = childGlobal.oldest as Support
 
     if(support) {
-      console.log('replaceTemplater 2')
       const newCount = await replaceTemplater(
         support,
         {oldTag, newTag},
@@ -138,7 +137,7 @@ async function checkToUpdateSubject(
   const newOriginal = oldest?.templater.wrapper?.original
   if(oldTag.original.toString() === newOriginal?.toString()) {
     oldTag.original = newOriginal
-console.log('we have been found!!!', {oldTag, newTag, contextItem})
+
     await updateSubject(
       contextItem, newTag, oldTag, hmr
     )

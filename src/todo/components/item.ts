@@ -1,14 +1,14 @@
 import { Dispatch, Todo } from "../reducer.js";
-import { letState, states, html, tag } from "taggedjs";
+import { states, html, tag } from "taggedjs";
 
 export const Item = tag.immutableProps((
     todo: Todo,
     dispatch: Dispatch,
     index: number,
+) => (
+    editing = false,
+    _ = states(get => [editing] = get(editing))
 ) => {
-    // let editing = letState(false)(x => [editing, editing = x])
-    let editing = false
-    states(get => editing = get(editing))
     return html`
         <li class.completed=${todo.completed} class.editing=${editing}>
             ${!editing ? html`

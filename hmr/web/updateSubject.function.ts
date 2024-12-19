@@ -8,10 +8,10 @@
  * @typedef {import("taggedjs").renderTagSupport} renderTagSupport
  */
 
-import { LikeObjectChildren } from "taggedjs/js/interpolations/optimizers/LikeObjectElement.type"
-import { HmrImport } from "./hmr"
+import { LikeObjectChildren } from "taggedjs/js/interpolations/optimizers/LikeObjectElement.type.js"
+import { HmrImport } from "./hmr.js"
 import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function"
-import { processSubUpdate, DomTag, StringTag, buildBeforeElement, ContextItem, destroySupport, paint, Support, SupportTagGlobal, TaggedFunction, isSubjectInstance, Wrapper, Context, AnySupport, SupportContextItem, ValueTypes, Original } from "taggedjs"
+import { processSubUpdate, DomTag, StringTag, buildBeforeElement, ContextItem, destroySupport, paint, Support, SupportTagGlobal, TaggedFunction, isSubjectInstance, Wrapper, AnySupport, SupportContextItem, ValueTypes, Original } from "taggedjs"
 
 /** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 
@@ -90,8 +90,7 @@ async function swapSupport(
   const prevConstructors = pros ? pros.map(provider => provider.constructMethod) : []
   const placeholder = contextSubject.placeholder
 
-  console.log('being destroy', {oldest})
-  await destroySupport(oldest, 0)
+  await destroySupport(oldest)
   const reGlobal = contextSubject.global as SupportTagGlobal
   delete reGlobal.deleted
 
@@ -119,7 +118,12 @@ async function swapSupport(
     })
   }
 
-  buildBeforeElement(reSupport, undefined, placeholder, {counts: {added:0, removed: 0}})
+  buildBeforeElement(
+    reSupport,
+    {added:0, removed: 0},
+    undefined,
+    placeholder,
+  )
 
   recurseContext(global.context, reSupport)
 

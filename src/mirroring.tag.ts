@@ -1,4 +1,4 @@
-import { html, tag, letState } from "taggedjs"
+import { html, tag, states } from "taggedjs"
 
 export const mirroring = tag(() => {
   const tag = tagCounter()
@@ -17,7 +17,8 @@ export const mirroring = tag(() => {
 
 
 const tagCounter = () => {
-  let counter = letState(0)(x => [counter, counter = x])
+  let counter = 0
+  states(get => [counter] = get(counter))
 
   return html`
     counter:<span>🪞<span id="mirror-counter-display">${counter}</span></span>

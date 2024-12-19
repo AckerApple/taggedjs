@@ -15,6 +15,7 @@ export function saveScopedStorage() {
 }
 
 export enum ViewTypes {
+  Destroys = 'destroys',
   Todo = 'todo',
   FunInPropsTag = 'funInPropsTag',
   OneRender = 'oneRender',
@@ -27,11 +28,12 @@ export enum ViewTypes {
   Props = 'props',
   Child = 'child',
   TagSwitchDebug = 'tagSwitchDebug',
-  ProviderDebug = 'providerDebug'
+  ProviderDebug = 'providerDebug',
+  AttributeDebug = 'attributeDebug',
 }
-const viewTypes = Object.values(ViewTypes)
+const defaultViewTypes = Object.values(ViewTypes)
 
-export const sections = (x = 'sections') => {
+export const sectionSelector = (viewTypes = defaultViewTypes) => {
   return html`
     <div>
       <h3>Sections</h3>
@@ -45,27 +47,32 @@ export const sections = (x = 'sections') => {
               onclick=${() => toggleViewType(type)}
             />
             <label for=${'view-type-' + type}>&nbsp;${type}</label>
+            &nbsp;<a href=${`isolated.html#${type}`} style="font-size:.6em;text-decoration:none;">🔗</a>
+            &nbsp;<a href=${`#${type}`} style="font-size:.6em;">↗️</a>
           </div>
         `.key(type))}
-        <div>
-          <label onclick=${() => viewTypes.forEach(viewType => {
-            // viewChanged.next({viewType, checkTesting: false})
-            activate(viewType, false)
-            saveScopedStorage()
-          })}>&nbsp;all</label>
-        </div>
-        <div>
-          <label onclick=${() => viewTypes.forEach(viewType => {
-            deactivate(viewType)
-            saveScopedStorage()
-          })}>&nbsp;none</label>
-        </div>
+
+        ${viewTypes.length > 1 && html`
+          <div>
+            <label onclick=${() => viewTypes.forEach(viewType => {
+              // viewChanged.next({viewType, checkTesting: false})
+              activate(viewType, false)
+              saveScopedStorage()
+            })}>&nbsp;all</label>
+          </div>
+          <div>
+            <label onclick=${() => viewTypes.forEach(viewType => {
+              deactivate(viewType)
+              saveScopedStorage()
+            })}>&nbsp;none</label>
+          </div>
+        `}
       </div>
     </div>
   `
 }
 
-sections.tempNote = 'sections'
+sectionSelector.tempNote = 'sections'
 
 function toggleViewType(
   type: ViewTypes,
