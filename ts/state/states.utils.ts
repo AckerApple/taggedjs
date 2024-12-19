@@ -1,6 +1,6 @@
 import { setUseMemory } from './setUseMemory.object.js'
 import { state } from './state.function.js'
-import { AnySupport } from '../tag/Support.class.js'
+import { AnySupport } from '../tag/getSupport.function.js'
 import { StateMemory } from './StateMemory.type.js'
 
 export type StatesSetter = (

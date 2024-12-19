@@ -1,4 +1,4 @@
-import { AnySupport } from './Support.class.js'
+import { AnySupport } from './getSupport.function.js'
 import { ContextItem } from './Context.types.js'
 import { processAttributeEmit, updateNameOnlyAttrValue } from '../interpolations/attributes/processAttribute.function.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'

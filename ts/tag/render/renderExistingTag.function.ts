@@ -1,4 +1,4 @@
-import { AnySupport,SupportContextItem } from '../Support.class.js'
+import { AnySupport,SupportContextItem } from '../getSupport.function.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
 import { processTag } from '../update/processTag.function.js'
 import { updateSupportBy } from '../updateSupportBy.function.js'

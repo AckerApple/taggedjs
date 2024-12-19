@@ -1,8 +1,8 @@
 import { isTagComponent } from "../../isInstance.js"
 import { providersChangeCheck } from "../../state/providersChangeCheck.function.js"
 import { checkRenderUp, isInlineHtml } from "../../tag/render/renderSupport.function.js"
-import { AnySupport, Support } from "../../tag/Support.class.js"
-import {SupportTagGlobal } from "../../tag/TemplaterResult.class.js"
+import { AnySupport, Support } from "../../tag/getSupport.function.js"
+import {SupportTagGlobal } from "../../tag/getTemplaterResult.function.js"
 import { ValueTypes } from "../../tag/ValueTypes.enum.js"
 
 export function getUpTags(

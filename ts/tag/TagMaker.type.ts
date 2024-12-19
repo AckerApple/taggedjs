@@ -1,4 +1,4 @@
-import { DomTag, StringTag } from './Tag.class.js'
+import { DomTag, StringTag } from './getDomTag.function.js'
 
 // export type TagMaker = ((...args: unknown[]) => (StringTag | DomTag)) | ((...args: unknown[]) => (...args: unknown[]) => (StringTag | DomTag))
 

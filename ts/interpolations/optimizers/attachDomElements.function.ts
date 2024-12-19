@@ -5,7 +5,7 @@ import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode
 import { InterpolateSubject } from "../../tag/update/processFirstSubject.utils.js"
 import { howToSetInputValue } from "../attributes/howToSetInputValue.function.js"
 import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
-import { AnySupport } from "../../tag/Support.class.js"
+import { AnySupport } from "../../tag/getSupport.function.js"
 import { processAttribute } from "../attributes/processAttribute.function.js"
 import { SubToTemplateOptions } from "../subscribeToTemplate.function.js"
 import { Context, ContextItem } from "../../tag/Context.types.js"

@@ -1,8 +1,8 @@
 // taggedjs-no-compile
 
-import { DomTag, KeyFunction, StringTag } from './Tag.class.js'
+import { DomTag, KeyFunction, StringTag } from './getDomTag.function.js'
 import { setUseMemory } from '../state/index.js'
-import { getTemplaterResult, TemplaterResult, Wrapper } from './TemplaterResult.class.js'
+import { getTemplaterResult, TemplaterResult, Wrapper } from './getTemplaterResult.function.js'
 import { Original, TagComponent, TagWrapper, tags } from './tag.utils.js'
 import { getTagWrap } from './getTagWrap.function.js'
 import { RouteProps, RouteTag, StateToTag, ToTag } from './tag.types.js'

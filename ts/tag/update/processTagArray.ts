@@ -2,16 +2,16 @@
 
 import { paintAppends, paintInsertBefores, paintRemoves } from '../paint.function.js'
 import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
-import {SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { checkSimpleValueChange } from '../checkDestroyPrevious.function.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
-import { AnySupport } from '../Support.class.js'
+import { AnySupport } from '../getSupport.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { processNewArrayValue } from './processNewValue.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { destroySupport } from '../destroySupport.function.js'
 import { Context, ContextItem } from '../Context.types.js'
-import { StringTag } from '../Tag.class.js'
+import { StringTag } from '../getDomTag.function.js'
 
 export function processTagArray(
   subject: ContextItem,

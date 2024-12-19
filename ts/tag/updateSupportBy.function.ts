@@ -1,9 +1,9 @@
 import { paint, painting } from './paint.function.js'
 import { processUpdateContext } from './processUpdateContext.function.js'
 import { StringTag } from './StringTag.type.js'
-import { AnySupport } from './Support.class.js'
-import { DomTag, Tag } from './Tag.class.js'
-import {SupportTagGlobal } from './TemplaterResult.class.js'
+import { AnySupport } from './getSupport.function.js'
+import { DomTag, Tag } from './getDomTag.function.js'
+import {SupportTagGlobal } from './getTemplaterResult.function.js'
 
 export function updateSupportBy(
   olderSupport: AnySupport,

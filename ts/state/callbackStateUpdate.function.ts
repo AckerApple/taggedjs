@@ -1,4 +1,4 @@
-import { AnySupport } from '../tag/Support.class.js'
+import { AnySupport } from '../tag/getSupport.function.js'
 import { renderSupport } from '../tag/render/renderSupport.function.js'
 import { syncStates } from './syncStates.function.js'
 import { Callback } from './callbackMaker.function.js'

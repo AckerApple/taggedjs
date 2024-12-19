@@ -1,10 +1,10 @@
-import { AnySupport,SupportContextItem } from '../Support.class.js'
+import { AnySupport,SupportContextItem } from '../getSupport.function.js'
 import { moveProviders } from '../update/updateExistingTagComponent.function.js'
 import { softDestroySupport } from './softDestroySupport.function.js'
-import {SupportTagGlobal } from '../TemplaterResult.class.js'
+import {SupportTagGlobal } from '../getTemplaterResult.function.js'
 import { renderTagOnly } from'./renderTagOnly.function.js'
 import { isLikeTags } from'../isLikeTags.function.js'
-import { DomTag, StringTag } from '../Tag.class.js'
+import { DomTag, StringTag } from '../getDomTag.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 
 /** TODO: This seems to support both new and updates and should be separated? */

@@ -1,5 +1,5 @@
-import {SupportTagGlobal, Wrapper } from '../TemplaterResult.class.js'
-import { AnySupport, SupportContextItem } from '../Support.class.js'
+import {SupportTagGlobal, Wrapper } from '../getTemplaterResult.function.js'
+import { AnySupport, SupportContextItem } from '../getSupport.function.js'
 import { executeWrap } from '../executeWrap.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { TagWrapper } from '../tag.utils.js'

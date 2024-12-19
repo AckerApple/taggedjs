@@ -1,7 +1,7 @@
 import { SubjectLike } from './subject/subject.utils.js'
-import { AnySupport } from './tag/Support.class.js'
-import { StringTag } from './tag/Tag.class.js'
-import { TemplaterResult } from './tag/TemplaterResult.class.js'
+import { AnySupport } from './tag/getSupport.function.js'
+import { StringTag } from './tag/getDomTag.function.js'
+import { TemplaterResult } from './tag/getTemplaterResult.function.js'
 import { BasicTypes, ImmutableTypes, ValueTypes } from './tag/ValueTypes.enum.js'
 
 export function isSimpleType(value: any) {

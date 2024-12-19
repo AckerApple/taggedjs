@@ -3,11 +3,11 @@
 import { State } from'../state/index.js'
 import { InterpolatedTemplates } from '../interpolations/interpolations.js'
 
-import { TemplaterResult } from './TemplaterResult.class.js'
+import { TemplaterResult } from './getTemplaterResult.function.js'
 import { TagValues } from'./html.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/LikeObjectElement.type.js'
-import { AnySupport } from './Support.class.js'
+import { AnySupport } from './getSupport.function.js'
 import { getSupportInCycle } from './getSupportInCycle.function.js'
 import { StringTag } from './StringTag.type.js'
 

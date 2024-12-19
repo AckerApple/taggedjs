@@ -1,5 +1,5 @@
 import { Props } from '../Props.js'
-import { AnySupport } from './Support.class.js'
+import { AnySupport } from './getSupport.function.js'
 import {  ValueTypes } from './ValueTypes.enum.js'
 import { cloneTagJsValue } from './cloneValueArray.function.js'
 import { deepCompareDepth, shallowCompareDepth } from './hasSupportChanged.function.js'

@@ -1,4 +1,4 @@
-import { variablePrefix, variableSuffix } from "../../tag/Tag.class.js"
+import { variablePrefix, variableSuffix } from "../../tag/getDomTag.function.js"
 import { isSpecialAttr } from "../attributes/isSpecialAttribute.function.js"
 import { Attribute, DomObjectElement, ObjectElement, ObjectText } from "./ObjectNode.types.js"
 import { ParsedHtml } from "./types.js"

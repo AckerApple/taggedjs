@@ -3,11 +3,11 @@ import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue
 import { processSubUpdate } from './processSubscriptionUpdate.function.js'
 import { Callback } from './attributes/bindSubjectCallback.function.js'
 import { ValueSubjectSubscriber } from '../subject/ValueSubject.js'
-import { TagGlobal } from '../tag/TemplaterResult.class.js'
+import { TagGlobal } from '../tag/getTemplaterResult.function.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { ContextItem } from '../tag/Context.types.js'
-import { AnySupport } from '../tag/Support.class.js'
+import { AnySupport } from '../tag/getSupport.function.js'
 import { Counts } from './interpolateTemplate.js'
 import { paint } from '../tag/paint.function.js'
 

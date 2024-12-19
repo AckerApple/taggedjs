@@ -1,6 +1,6 @@
 import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
-import { AnySupport } from '../Support.class.js'
-import { TemplaterResult } from '../TemplaterResult.class.js'
+import { AnySupport } from '../getSupport.function.js'
+import { TemplaterResult } from '../getTemplaterResult.function.js'
 import { checkTagValueChange } from '../checkDestroyPrevious.function.js'
 import { buildBeforeElement } from '../buildBeforeElement.function.js'
 import { paintAppends } from '../paint.function.js'

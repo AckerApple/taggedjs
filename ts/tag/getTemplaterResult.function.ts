@@ -1,6 +1,6 @@
-import { StringTag, DomTag, EventCallback } from './Tag.class.js'
+import { StringTag, DomTag, EventCallback } from './getDomTag.function.js'
 import { ContextItem } from './Context.types.js'
-import { AnySupport, SupportContextItem } from './Support.class.js'
+import { AnySupport, SupportContextItem } from './getSupport.function.js'
 import { Props } from '../Props.js'
 import { TagWrapper } from './tag.utils.js'
 import { Provider } from '../state/providers.js'

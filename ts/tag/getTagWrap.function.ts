@@ -1,6 +1,6 @@
-import { TemplaterResult, Wrapper } from './TemplaterResult.class.js'
+import { TemplaterResult, Wrapper } from './getTemplaterResult.function.js'
 import { TagWrapper } from './tag.utils.js'
-import { AnySupport, PropsConfig, Support } from './Support.class.js'
+import { AnySupport, PropsConfig, Support } from './getSupport.function.js'
 import { castProps } from'../alterProp.function.js'
 import { ContextItem } from './Context.types.js'
 import { Props } from '../Props.js'

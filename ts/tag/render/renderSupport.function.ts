@@ -1,9 +1,9 @@
-import { PropsConfig, AnySupport, Support } from '../Support.class.js'
+import { PropsConfig, AnySupport, Support } from '../getSupport.function.js'
 import { deepEqual } from '../../deepFunctions.js'
 import { renderExistingReadyTag } from'./renderExistingTag.function.js'
 import { Props } from '../../Props.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
-import {SupportTagGlobal, TemplaterResult } from '../TemplaterResult.class.js'
+import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { PropWatches } from '../index.js'
 import { deepCompareDepth, immutablePropMatch, shallowPropMatch } from '../hasSupportChanged.function.js'
 

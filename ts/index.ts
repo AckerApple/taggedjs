@@ -5,7 +5,7 @@ export * from './state/index.js'
 export { states } from './state/states.function.js'
 export * from './subject/index.js'
 export * from './interpolations/index.js'
-export * from './tag/Support.class.js'
+export * from './tag/getSupport.function.js'
 export * from './interpolations/attributes/howToSetInputValue.function.js'
 export * from './interpolations/attributes/ElementTargetEvent.interface.js'
 
@@ -22,5 +22,5 @@ export const hmr = {
   renderTagOnly, paint,
 }
 
-export { type Wrapper } from './tag/TemplaterResult.class.js'
+export { type Wrapper } from './tag/getTemplaterResult.function.js'
 

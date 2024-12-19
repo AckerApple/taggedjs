@@ -1,5 +1,5 @@
-import { DomTag, StringTag, TagTemplate } from './Tag.class.js'
-import { TemplaterResult } from './TemplaterResult.class.js'
+import { DomTag, StringTag, TagTemplate } from './getDomTag.function.js'
+import { TemplaterResult } from './getTemplaterResult.function.js'
 import { ValueSubject } from '../subject/ValueSubject.js'
 import { setUseMemory } from '../state/index.js'
 import { ValueTypes } from './ValueTypes.enum.js'

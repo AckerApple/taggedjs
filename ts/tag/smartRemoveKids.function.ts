@@ -1,9 +1,9 @@
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { destroyArray } from './checkDestroyPrevious.function.js'
 import { paint, paintRemoves } from './paint.function.js'
-import { AnySupport } from './Support.class.js'
+import { AnySupport } from './getSupport.function.js'
 import { ContextItem } from './Context.types.js'
-import {SupportTagGlobal } from './TemplaterResult.class.js'
+import {SupportTagGlobal } from './getTemplaterResult.function.js'
 
 /** sets global.deleted on support and all children */
 export function smartRemoveKids(

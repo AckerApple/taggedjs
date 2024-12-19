@@ -1,11 +1,11 @@
 // Functions in here are attached as ContextItem.checkValueChange
 
 import { processUpdateRegularValue, RegularValue } from './update/processRegularValue.function.js'
-import {AnySupport, SupportContextItem } from './Support.class.js'
+import {AnySupport, SupportContextItem } from './getSupport.function.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { destroyArrayItem } from'./update/processTagArray.js'
 import { destroySupport } from './destroySupport.function.js'
-import {SupportTagGlobal } from './TemplaterResult.class.js'
+import {SupportTagGlobal } from './getTemplaterResult.function.js'
 import { isArray, isStaticTag } from'../isInstance.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { paintRemoves } from './paint.function.js'

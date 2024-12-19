@@ -1,9 +1,10 @@
 import { paintAfters, paintContent } from "../../tag/paint.function.js"
-import { AnySupport } from "../../tag/Support.class.js";
+import { AnySupport } from "../../tag/getSupport.function.js";
 import { Counts } from "../interpolateTemplate.js";
 import { InputElementTargetEvent } from "./ElementTargetEvent.interface.js";
 import { SpecialDefinition } from "./processAttribute.function.js";
 
+/** handles init, destroy, autofocus, autoselect, style., class. */
 export function specialAttribute(
   name: string,
   value: any,
@@ -29,7 +30,6 @@ export function specialAttribute(
       return
     }
 
-    // case 'ondestroy' as any:
     case 'destroy': {
       const stagger = ++counts.removed
       const global = support.subject.global      
@@ -56,9 +56,9 @@ export function specialAttribute(
       return
 
     case 'style': {
-      const names = name.split('.')
-      // names.shift() // remove 'style'
+      const names = name.split('.')      
       paintContent.push(() => (element as any).style[names[1]] = value) // attribute changes should come first
+      
       return
     }
 

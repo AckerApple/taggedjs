@@ -1,6 +1,6 @@
-import { StringTag, DomTag, Tag } from './Tag.class.js'
-import { AnySupport } from './Support.class.js'
-import { TemplaterResult } from './TemplaterResult.class.js'
+import { StringTag, DomTag, Tag } from './getDomTag.function.js'
+import { AnySupport } from './getSupport.function.js'
+import { TemplaterResult } from './getTemplaterResult.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 
 export function isLikeTags(

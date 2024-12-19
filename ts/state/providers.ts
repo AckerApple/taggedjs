@@ -1,6 +1,6 @@
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
-import { AnySupport } from '../tag/Support.class.js'
-import { SupportTagGlobal } from '../tag/TemplaterResult.class.js'
+import { AnySupport } from '../tag/getSupport.function.js'
+import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 import { setUseMemory } from'./setUseMemory.object.js'
 import { state } from'./state.function.js'
 

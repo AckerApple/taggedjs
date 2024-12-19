@@ -1,4 +1,4 @@
-import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
+import { variableSuffix, variablePrefix } from "../../tag/getDomTag.function.js";
 import { ObjectChildren } from "./LikeObjectElement.type.js";
 import { ObjectText } from "./ObjectNode.types.js";
 import { ImmutableTypes } from "../../tag/ValueTypes.enum.js";

@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 
-import { variableSuffix, variablePrefix } from "../../tag/Tag.class.js";
+import { variableSuffix, variablePrefix } from "../../tag/getDomTag.function.js";
 import { Attribute, ObjectText } from "./ObjectNode.types.js";
 import { ValuePos } from "./LikeObjectElement.type.js";
 import { OneUnparsedHtml, ParsedHtml, UnparsedHtml } from "./types.js";

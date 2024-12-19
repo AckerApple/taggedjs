@@ -5,7 +5,7 @@ import { isFunction, isObject, isSubjectInstance } from '../../isInstance.js'
 import { HowToSet } from './howToSetInputValue.function.js'
 import { bindSubjectCallback, Callback } from './bindSubjectCallback.function.js'
 import { BasicTypes, ValueTypes, empty } from '../../tag/ValueTypes.enum.js'
-import { AnySupport } from '../../tag/Support.class.js'
+import { AnySupport } from '../../tag/getSupport.function.js'
 import { paintContent } from '../../tag/paint.function.js'
 import { Context, ContextItem } from '../../tag/Context.types.js'
 import { processDynamicNameValueAttribute, processNonDynamicAttr } from './processNameValueAttribute.function.js'
@@ -304,6 +304,19 @@ export function processAttributeSubjectValue(
   support: AnySupport,
   counts: Counts,
 ) {
+  // process adding/removing style. class. (false means remove)
+  if ( special !== false ) {
+    specialAttribute(
+      attrName,
+      newAttrValue,
+      element,
+      special, // string name of special
+      support,
+      counts,
+    )
+    return
+  }
+
   switch (newAttrValue) {
     case undefined:
     case false:
@@ -312,18 +325,6 @@ export function processAttributeSubjectValue(
         element.removeAttribute(attrName)
       })
       return
-  }
-
-  if ( special !== false ) {
-    specialAttribute(
-      attrName,
-      newAttrValue,
-      element,
-      special, // name
-      support,
-      counts,
-    )
-    return
   }
 
   if( isFunction(newAttrValue) ) {

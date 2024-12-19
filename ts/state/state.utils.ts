@@ -1,4 +1,4 @@
-import { AnySupport } from '../tag/Support.class.js'
+import { AnySupport } from '../tag/getSupport.function.js'
 import { runFirstState, runRestate } from './stateHandlers.js'
 import { State, StateConfig } from './state.types.js'
 import { firstStatesHandler, reStatesHandler, StatesSetter } from './states.utils.js'

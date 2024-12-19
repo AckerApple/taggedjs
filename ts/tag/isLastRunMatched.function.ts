@@ -1,4 +1,4 @@
-import { TagTemplate } from './Tag.class.js'
+import { TagTemplate } from './getDomTag.function.js'
 
 export function isLastRunMatched(
   strings: string[],

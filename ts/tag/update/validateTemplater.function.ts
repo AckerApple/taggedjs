@@ -1,5 +1,5 @@
 import { isTagComponent } from '../../isInstance.js'
-import { TemplaterResult } from '../TemplaterResult.class.js'
+import { TemplaterResult } from '../getTemplaterResult.function.js'
 
 export function validateTemplater(
   templater: TemplaterResult

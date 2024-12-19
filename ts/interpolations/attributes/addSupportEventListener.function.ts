@@ -1,6 +1,6 @@
 import { BaseTagGlobal, EventCallback } from '../../tag/index.js'
-import { Events } from '../../tag/TemplaterResult.class.js'
-import { AnySupport } from '../../tag/Support.class.js'
+import { Events } from '../../tag/getTemplaterResult.function.js'
+import { AnySupport } from '../../tag/getSupport.function.js'
 
 export function addSupportEventListener(
   support: AnySupport,

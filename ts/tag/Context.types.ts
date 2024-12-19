@@ -1,8 +1,8 @@
 import { SpecialDefinition } from '../interpolations/attributes/processAttribute.function.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 import { InterpolateSubject } from './update/processFirstSubject.utils.js'
-import { Clone, TagGlobal } from './TemplaterResult.class.js'
-import {SupportContextItem } from './Support.class.js'
+import { Clone, TagGlobal } from './getTemplaterResult.function.js'
+import {SupportContextItem } from './getSupport.function.js'
 
 export type ContextItem = {
   isAttr?: true

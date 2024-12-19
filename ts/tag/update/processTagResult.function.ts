@@ -4,7 +4,7 @@ import { Counts } from'../../interpolations/interpolateTemplate.js'
 import { paintAppends } from '../paint.function.js'
 import { ContextItem } from '../Context.types.js'
 import { checkTagValueChange } from '../index.js'
-import { AnySupport } from '../Support.class.js'
+import { AnySupport } from '../getSupport.function.js'
 
 export function processReplaceTagResult(
   support: AnySupport,

@@ -1,5 +1,5 @@
 import { ValueSubject } from '../subject/index.js'
-import { DomTag, StringTag } from './Tag.class.js'
+import { DomTag, StringTag } from './getDomTag.function.js'
 
 export class RouteQuery {
   get(_name: string): string | undefined {

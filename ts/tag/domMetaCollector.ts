@@ -7,7 +7,7 @@ import { DomMetaMap } from '../interpolations/optimizers/LikeObjectElement.type.
 import { isLastRunMatched } from './isLastRunMatched.function.js'
 import { getStringsId } from './getStringsId.function.js'
 import { ParsedHtml } from '../interpolations/index.js'
-import { TagTemplate } from './Tag.class.js'
+import { TagTemplate } from './getDomTag.function.js'
 
 const lastRuns: {[index: number]: TagTemplate} = {}
 

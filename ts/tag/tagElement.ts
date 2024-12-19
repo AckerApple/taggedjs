@@ -1,6 +1,6 @@
 import { DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
-import { Events,SupportTagGlobal, TemplaterResult, Wrapper } from './TemplaterResult.class.js'
-import { AnySupport, getBaseSupport,SupportContextItem, upgradeBaseToSupport } from './Support.class.js'
+import { Events,SupportTagGlobal, TemplaterResult, Wrapper } from './getTemplaterResult.function.js'
+import { AnySupport, getBaseSupport,SupportContextItem, upgradeBaseToSupport } from './getSupport.function.js'
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
 import { buildBeforeElement } from './buildBeforeElement.function.js'
 import { tags, TagWrapper } from './tag.utils.js'
