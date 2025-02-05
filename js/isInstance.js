@@ -9,7 +9,11 @@ export function isSimpleType(value) {
     return false;
 }
 export function isStaticTag(value) {
-    switch (value?.tagJsType) {
+    if (!value) {
+        return false;
+    }
+    const tagJsType = value.tagJsType;
+    switch (tagJsType) {
         case ValueTypes.dom:
         case ValueTypes.tag:
         case ValueTypes.templater:

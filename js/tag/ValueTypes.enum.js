@@ -16,15 +16,15 @@ export var BasicTypes;
 const version = Date.now();
 /** Used as direct memory comparisons, the strings are never compared, just the array */
 export const ValueTypes = {
-    tag: ['html'], // html'' aka StringTag | DomTag
-    dom: ['dom'], // compiled version of html''
-    templater: ['templater'],
-    tagComponent: ['tagComponent'],
-    tagArray: ['tagArray'],
-    subject: ['subject'],
-    tagJsSubject: ['tagJsSubject'],
-    renderOnce: ['renderOnce'],
-    stateRender: ['stateRender'],
+    tag: 'html', // html'' aka StringTag | DomTag
+    dom: 'dom', // compiled version of html''
+    templater: 'templater',
+    tagComponent: 'tagComponent',
+    tagArray: 'tagArray',
+    subject: 'subject',
+    tagJsSubject: 'tagJsSubject',
+    renderOnce: 'renderOnce',
+    stateRender: 'stateRender',
     version,
 };
 //# sourceMappingURL=ValueTypes.enum.js.map

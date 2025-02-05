@@ -24,5 +24,6 @@ export function subscribeToTemplate({ subject, support, counts, contextItem, app
     const global = support.subject.global;
     const subs = global.subscriptions = global.subscriptions || [];
     subs.push(sub);
+    // contextItem.handler = blankHandler
 }
 //# sourceMappingURL=subscribeToTemplate.function.js.map

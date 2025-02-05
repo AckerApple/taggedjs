@@ -8,6 +8,8 @@ import { processDynamicNameValueAttribute, processNonDynamicAttr } from './proce
 import { addOneContext, checkSimpleValueChange } from '../../tag/index.js';
 import { processAttributeFunction } from './processAttributeCallback.function.js';
 import { isSpecialAttr } from './isSpecialAttribute.function.js';
+import { processUpdateAttrContext } from '../../tag/processUpdateAttrContext.function.js';
+import { blankHandler } from '../optimizers/attachDomElements.function.js';
 /** Sets attribute value, subscribes to value updates  */
 export function processAttribute(values, attrName, element, support, howToSet, //  = howToSetInputValue
 context, isSpecial, counts, value) {
@@ -20,6 +22,8 @@ context, isSpecial, counts, value) {
         contextItem.element = element;
         contextItem.howToSet = howToSet;
         contextItem.isNameOnly = true;
+        // how to process value updates
+        contextItem.handler = (newValue, newValues) => processUpdateAttrContext(newValues, newValue, contextItem, support);
         processNameOnlyAttrValue(values, value, element, support, howToSet, context, counts);
         return;
     }
@@ -38,6 +42,18 @@ context, isSpecial, counts, value) {
         if (isSubject) {
             return processNameValueAttributeAttrSubject(attrName, contextItem, element, support, howToSet, isSpecial, counts);
         }
+        contextItem.handler = (newValue, newValues) => processUpdateAttrContext(newValues, newValue, contextItem, support);
+        /*
+        processNameOnlyAttrValue(
+          values,
+          newValue as any,
+          element as Element,
+          support,
+          howToSet as HowToSet,
+          context,
+          counts,
+        )
+        */
         processDynamicNameValueAttribute(attrName, value, contextItem, element, howToSet, support, counts, isSpecial);
         contextItem.value = value;
         return;
@@ -95,25 +111,26 @@ export function processNameOnlyAttrValue(values, attrValue, element, ownerSuppor
     howToSet(element, attrValue, empty);
 }
 /** Processor for flat attributes and object attributes */
-function processNameValueAttributeAttrSubject(attrName, result, element, support, howToSet, isSpecial, counts) {
+function processNameValueAttributeAttrSubject(attrName, contextItem, element, support, howToSet, isSpecial, counts) {
     if (isSpecial) {
         paintContent.push(function paintContent() {
             element.removeAttribute(attrName);
         });
     }
-    const contextValueSubject = result.value;
+    const contextValueSubject = contextItem.value;
     if (isSubjectInstance(contextValueSubject)) {
+        contextItem.handler = blankHandler;
         const callback = function processAttrCallback(newAttrValue) {
-            processAttributeEmit(newAttrValue, attrName, result, element, support, howToSet, isSpecial, counts);
+            processAttributeEmit(newAttrValue, attrName, contextItem, element, support, howToSet, isSpecial, counts);
         };
         // 🗞️ Subscribe. Above callback called immediately since its a ValueSubject()
         const sub = contextValueSubject.subscribe(callback);
         // Record subscription for later unsubscribe when element destroyed
-        const global = result.global;
+        const global = contextItem.global;
         const subs = global.subscriptions = global.subscriptions || [];
         subs.push(sub);
     }
-    processAttributeEmit(result.value, attrName, result, element, support, howToSet, isSpecial, counts);
+    processAttributeEmit(contextItem.value, attrName, contextItem, element, support, howToSet, isSpecial, counts);
     return;
 }
 export function processAttributeEmit(newAttrValue, attrName, subject, element, support, howToSet, isSpecial, counts) {

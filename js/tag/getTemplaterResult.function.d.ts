@@ -7,7 +7,7 @@ import { Provider } from '../state/providers.js';
 import { OnDestroyCallback } from '../state/onDestroy.js';
 import { Subscription } from '../subject/subject.utils.js';
 import { Subject } from '../subject/index.js';
-import { ValueType, ValueTypes } from './ValueTypes.enum.js';
+import { ValueTypes } from './ValueTypes.enum.js';
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
 import { PropWatches } from './tag.js';
 export type Wrapper = ((newSupport: AnySupport, subject: ContextItem, prevSupport?: AnySupport) => AnySupport) & TagWrapper<unknown> & {
@@ -40,7 +40,7 @@ export type Events = {
 export type Clone = (Element | Text | ChildNode);
 export type TemplaterResult = {
     propWatch: PropWatches;
-    tagJsType: ValueType;
+    tagJsType: string;
     wrapper?: Wrapper;
     tag?: StringTag | DomTag;
     props?: Props;

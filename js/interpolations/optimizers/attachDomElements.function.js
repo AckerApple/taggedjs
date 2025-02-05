@@ -6,6 +6,8 @@ import { processAttribute } from "../attributes/processAttribute.function.js";
 import { addOneContext } from "../../tag/index.js";
 import { isSubjectInstance } from "../../isInstance.js";
 import { empty } from "../../tag/ValueTypes.enum.js";
+import { updateExistingValue } from "../../tag/update/updateExistingValue.function.js";
+export const blankHandler = () => undefined;
 const someDiv = (typeof document === 'object' && document.createElement('div')); // used for content cleaning
 export function attachDomElements(nodes, values, support, counts, // used for animation stagger computing
 context, depth, // used to know if dynamic variables live within parent owner tag/support
@@ -96,8 +98,11 @@ depth) {
             counts,
             contextItem,
         });
+        contextItem.handler = blankHandler;
         return;
     }
+    // how to handle value updates
+    contextItem.handler = (newValue, _newValues, newSupport, newContextItem) => updateExistingValue(newContextItem, newValue, newSupport);
     const global = support.subject.global;
     global.locked = true;
     processFirstSubjectValue(subVal, contextItem, support, counts, `rvp_${context.length}_${values.length}`, owner);

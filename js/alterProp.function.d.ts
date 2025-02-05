@@ -23,6 +23,6 @@ export declare function getPropWrap(value: {
 };
 /** Function shared by alterProps() and updateExistingTagComponent... TODO: May want to have to functions to reduce cycle checking?  */
 export declare function callbackPropOwner(toCall: UnknownFunction, callWith: unknown[], ownerSupport: AnySupport): unknown;
-export declare function isSkipPropValue(value: unknown): true | import("./tag/ValueTypes.enum.js").ValueType | undefined;
+export declare function isSkipPropValue(value: unknown): string | true | undefined;
 export declare function safeRenderSupport(newest: AnySupport, ownerSupport: AnySupport): AnySupport | undefined;
 export {};

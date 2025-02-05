@@ -9,7 +9,7 @@ import { ValueTypes } from '../ValueTypes.enum.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { processTagArray } from './processTagArray.js';
 import { processNewSubjectTag } from './processNewSubjectTag.function.js';
-export function processFirstSubjectValue(value, subject, // could be tag via result.tag
+export function processFirstSubjectValue(value, contextItem, // could be tag via result.tag
 ownerSupport, // owningSupport
 counts, // {added:0, removed:0}
 valueId, appendTo) {
@@ -18,60 +18,60 @@ valueId, appendTo) {
         switch (tagJsType) {
             // TODO: Do we ever get in here? because dom, tag, and component are covered below
             case ValueTypes.templater:
-                subject.checkValueChange = checkTagValueChange;
+                contextItem.checkValueChange = checkTagValueChange;
                 if (appendTo) {
-                    return processNewSubjectTag(value, ownerSupport, subject, appendTo, counts);
+                    return processNewSubjectTag(value, ownerSupport, contextItem, appendTo, counts);
                 }
-                return processTag(ownerSupport, subject, counts);
+                return processTag(ownerSupport, contextItem, counts);
             case ValueTypes.dom:
             case ValueTypes.tag: {
-                subject.checkValueChange = checkTagValueChange;
+                contextItem.checkValueChange = checkTagValueChange;
                 const tag = value;
                 let templater = tag.templater;
                 if (!templater) {
                     templater = tagFakeTemplater(tag); // TODO: most likely a not needed performance hit
                 }
-                const global = getNewGlobal(subject);
+                const global = getNewGlobal(contextItem);
                 if (appendTo) {
-                    return processNewSubjectTag(templater, ownerSupport, subject, appendTo, counts);
+                    return processNewSubjectTag(templater, ownerSupport, contextItem, appendTo, counts);
                 }
-                global.newest = newSupportByTemplater(templater, ownerSupport, subject);
-                subject.checkValueChange = checkTagValueChange;
-                return processTag(ownerSupport, subject, counts);
+                global.newest = newSupportByTemplater(templater, ownerSupport, contextItem);
+                contextItem.checkValueChange = checkTagValueChange;
+                return processTag(ownerSupport, contextItem, counts);
             }
             case ValueTypes.stateRender:
             case ValueTypes.tagComponent: {
-                getNewGlobal(subject);
-                subject.checkValueChange = checkTagValueChange;
+                getNewGlobal(contextItem);
+                contextItem.checkValueChange = checkTagValueChange;
                 if (appendTo) {
-                    const processResult = processFirstSubjectComponent(value, subject, ownerSupport, counts, appendTo);
-                    // ++subject.global.renderCount
+                    const processResult = processFirstSubjectComponent(value, contextItem, ownerSupport, counts, appendTo);
+                    // ++contextItem.global.renderCount
                     return processResult;
                 }
-                const processResult = processReplacementComponent(value, subject, ownerSupport, counts);
-                // ++subject.global.renderCount
+                const processResult = processReplacementComponent(value, contextItem, ownerSupport, counts);
+                // ++contextItem.global.renderCount
                 return processResult;
             }
             case ValueTypes.renderOnce: {
-                getNewGlobal(subject);
-                const support = oneRenderToSupport(value, subject, ownerSupport);
-                renderTagOnly(support, undefined, subject, ownerSupport);
-                const result = processNewSubjectTag(support.templater, ownerSupport, subject, appendTo, counts);
-                // ++subject.global.renderCount
-                subject.checkValueChange = checkTagValueChange;
+                getNewGlobal(contextItem);
+                const support = oneRenderToSupport(value, contextItem, ownerSupport);
+                renderTagOnly(support, undefined, contextItem, ownerSupport);
+                const result = processNewSubjectTag(support.templater, ownerSupport, contextItem, appendTo, counts);
+                // ++contextItem.global.renderCount
+                contextItem.checkValueChange = checkTagValueChange;
                 return result;
             }
         }
     }
     if (isArray(value)) {
-        processTagArray(subject, value, ownerSupport, counts, appendTo);
-        subject.checkValueChange = checkArrayValueChange;
+        processTagArray(contextItem, value, ownerSupport, counts, appendTo);
+        contextItem.checkValueChange = checkArrayValueChange;
         return;
     }
     if (isSubjectInstance(value)) {
         return; // will be subscribed to for value
     }
-    processFirstRegularValue(value, subject, subject.placeholder, valueId);
+    processFirstRegularValue(value, contextItem, contextItem.placeholder, valueId);
 }
 function processFirstRegularValue(value, subject, // could be tag via subject.tag
 insertBefore, // <template end interpolate /> (will be removed)
