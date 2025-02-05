@@ -3,13 +3,15 @@ import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue
 import { processSubUpdate } from './processSubscriptionUpdate.function.js'
 import { Callback } from './attributes/bindSubjectCallback.function.js'
 import { ValueSubjectSubscriber } from '../subject/ValueSubject.js'
-import { TagGlobal } from '../tag/getTemplaterResult.function.js'
+import { SupportTagGlobal, TagGlobal } from '../tag/getTemplaterResult.function.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { ContextItem } from '../tag/Context.types.js'
 import { AnySupport } from '../tag/getSupport.function.js'
 import { Counts } from './interpolateTemplate.js'
 import { paint } from '../tag/paint.function.js'
+import { updateExistingValue } from '../tag/update/updateExistingValue.function.js'
+import { blankHandler } from './optimizers/attachDomElements.function.js'
 
 export type SubToTemplateOptions = {
   insertBefore: Text
@@ -58,7 +60,9 @@ export function subscribeToTemplate({
   contextItem.subject = subject
   syncRun = false
   
-  const global = support.subject.global as TagGlobal
+  const global = support.subject.global as SupportTagGlobal
   const subs = global.subscriptions = global.subscriptions || []
   subs.push(sub as unknown as Subscription<unknown>)
+  
+  // contextItem.handler = blankHandler
 }

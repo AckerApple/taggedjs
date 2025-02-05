@@ -10,7 +10,6 @@ import { Subject } from '../subject/index.js'
 import { ValueType, ValueTypes } from './ValueTypes.enum.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { PropWatches } from './tag.js'
-import { Callback } from '../state/callbackMaker.function.js'
 
 export type Wrapper = ((
   newSupport: AnySupport,
@@ -61,7 +60,7 @@ export type Clone = (Element | Text | ChildNode)
 
 export type TemplaterResult = {
   propWatch: PropWatches
-  tagJsType: ValueType
+  tagJsType: string // ValueType
   wrapper?: Wrapper
   tag?: StringTag | DomTag
   props?: Props

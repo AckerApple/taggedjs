@@ -17,30 +17,6 @@ export function subject<T>(
   }
 
   return new Subject(initialValue)
-  /*
-  const oldestState = state(function subjectState() {
-    // return setUseMemory.stateConfig.stateArray
-    // return setUseMemory.stateConfig.support as AnySupport
-    return {
-      stateArray: setUseMemory.stateConfig.stateArray,
-      states: setUseMemory.stateConfig.states,
-    }
-  })
-  
-  const nowSupport = getSupportInCycle() as AnySupport
-  return state(function subjectState() {
-    const subject = new Subject(initialValue, onSubscription).pipe(x => {
-      syncStates(
-        nowSupport.state,
-        oldestState.stateArray,
-        nowSupport.states,
-        oldestState.states,
-      )
-      return x
-    })
-    return subject
-  })
-  */
 }
 
 subject._value = <T>(value: T) => {

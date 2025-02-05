@@ -2,7 +2,7 @@ import { SubjectLike } from './subject/subject.utils.js'
 import { AnySupport } from './tag/getSupport.function.js'
 import { StringTag } from './tag/getDomTag.function.js'
 import { TemplaterResult } from './tag/getTemplaterResult.function.js'
-import { BasicTypes, ImmutableTypes, ValueTypes } from './tag/ValueTypes.enum.js'
+import { BasicTypes, ImmutableTypes, ValueType, ValueTypes } from './tag/ValueTypes.enum.js'
 
 export function isSimpleType(value: any) {
   switch (value) {
@@ -18,7 +18,13 @@ export function isSimpleType(value: any) {
 export function isStaticTag(
   value?: TemplaterResult | StringTag | unknown
 ) {
-  switch ((value as any)?.tagJsType) {
+  if(!value) {
+    return false
+  }
+
+  const tagJsType = (value as StringTag).tagJsType as ValueType
+  
+  switch (tagJsType) {
     case ValueTypes.dom:
     case ValueTypes.tag:
     case ValueTypes.templater:

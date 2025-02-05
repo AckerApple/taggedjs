@@ -1,9 +1,6 @@
-import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
-import { updateExistingValue } from './update/updateExistingValue.function.js'
-import { isSubjectInstance } from '../isInstance.js'
 import { DomTag, StringTag } from './getDomTag.function.js'
 import { AnySupport } from './getSupport.function.js'
-import { Context } from './Context.types.js'
+import { Context, ContextHandler } from './Context.types.js'
 
 export function processUpdateContext(
   support: AnySupport,
@@ -30,7 +27,7 @@ export function processUpdateContext(
 
 /** returns boolean of did render */
 export function processUpdateOneContext(
-  values: unknown[],
+  values: unknown[], // the interpolated values
   index: number,
   context: Context,
   ownerSupport: AnySupport,
@@ -40,29 +37,13 @@ export function processUpdateOneContext(
   // is something already there?
   const contextItem = context[index]
 
-  if(isSubjectInstance(value)) {
-    return // emits on its own
+  // Do not continue if the value is just the same
+  if(value === contextItem.value) {
+    return
   }
 
-  if(contextItem.isAttr) {
-    // Do not continue if the value is just the same
-    if(value === contextItem.value) {
-      return
-    }
-
-    processUpdateAttrContext(
-      values, value, contextItem, ownerSupport
-    )
-
-    contextItem.value = value
-  }
-
-  // listeners will evaluate updated values to possibly update display(s)
-  updateExistingValue(
-    contextItem,
-    value,
-    ownerSupport,
-  )
+  const handler = contextItem.handler as ContextHandler
   
+  handler(value, values, ownerSupport, contextItem)
   contextItem.value = value
 }

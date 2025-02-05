@@ -19,7 +19,7 @@ import { processNewSubjectTag } from './processNewSubjectTag.function.js'
 
 export function processFirstSubjectValue(
   value: TemplateValue | StringTag,
-  subject: ContextItem, // could be tag via result.tag
+  contextItem: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owningSupport
   counts: Counts, // {added:0, removed:0}
   valueId: string,
@@ -30,13 +30,13 @@ export function processFirstSubjectValue(
     switch (tagJsType) {
       // TODO: Do we ever get in here? because dom, tag, and component are covered below
       case ValueTypes.templater:
-        subject.checkValueChange = checkTagValueChange
+        contextItem.checkValueChange = checkTagValueChange
 
         if(appendTo) {
           return processNewSubjectTag(
             value as TemplaterResult,
             ownerSupport,
-            subject,
+            contextItem,
             appendTo,
             counts,
           )
@@ -44,13 +44,13 @@ export function processFirstSubjectValue(
         
         return processTag(
           ownerSupport,
-          subject,
+          contextItem,
           counts,
         )
 
       case ValueTypes.dom:
       case ValueTypes.tag: {
-        subject.checkValueChange = checkTagValueChange
+        contextItem.checkValueChange = checkTagValueChange
         const tag = value as StringTag | DomTag
         let templater = tag.templater
   
@@ -58,24 +58,24 @@ export function processFirstSubjectValue(
           templater = tagFakeTemplater(tag) // TODO: most likely a not needed performance hit
         }
 
-        const global = getNewGlobal(subject) as SupportTagGlobal
+        const global = getNewGlobal(contextItem) as SupportTagGlobal
   
         if(appendTo) {
           return processNewSubjectTag(
             templater,
             ownerSupport,
-            subject as ContextItem,
+            contextItem as ContextItem,
             appendTo,
             counts,
           )
         }
   
-        global.newest = newSupportByTemplater(templater, ownerSupport, subject)
-        subject.checkValueChange = checkTagValueChange
+        global.newest = newSupportByTemplater(templater, ownerSupport, contextItem)
+        contextItem.checkValueChange = checkTagValueChange
   
         return processTag(
           ownerSupport,
-          subject,
+          contextItem,
           counts,
         )
       }
@@ -83,61 +83,61 @@ export function processFirstSubjectValue(
       case ValueTypes.stateRender:
       case ValueTypes.tagComponent: {
 
-        getNewGlobal(subject) as SupportTagGlobal
-        subject.checkValueChange = checkTagValueChange
+        getNewGlobal(contextItem) as SupportTagGlobal
+        contextItem.checkValueChange = checkTagValueChange
 
         if(appendTo) {
           const processResult = processFirstSubjectComponent(
             value as TemplaterResult,
-            subject as SupportContextItem,
+            contextItem as SupportContextItem,
             ownerSupport,
             counts,
             appendTo as Element,
           )
           
-          // ++subject.global.renderCount
+          // ++contextItem.global.renderCount
 
           return processResult
         }
   
         const processResult = processReplacementComponent(
           value as TemplaterResult,
-          subject as SupportContextItem,
+          contextItem as SupportContextItem,
           ownerSupport,
           counts,
         )
         
-        // ++subject.global.renderCount
+        // ++contextItem.global.renderCount
         
         return processResult
       }
 
       case ValueTypes.renderOnce: {
-        getNewGlobal(subject) as SupportTagGlobal
+        getNewGlobal(contextItem) as SupportTagGlobal
 
         const support = oneRenderToSupport(
           value as Wrapper,
-          subject as ContextItem,
+          contextItem as ContextItem,
           ownerSupport,
         )
         
         renderTagOnly(
           support,
           undefined,
-          subject as SupportContextItem,
+          contextItem as SupportContextItem,
           ownerSupport,
         )
         
         const result = processNewSubjectTag(
           support.templater,
           ownerSupport,
-          subject as ContextItem,
+          contextItem as ContextItem,
           appendTo as Element,
           counts,
         )
 
-        // ++subject.global.renderCount
-        subject.checkValueChange = checkTagValueChange
+        // ++contextItem.global.renderCount
+        contextItem.checkValueChange = checkTagValueChange
 
         return result
       }
@@ -146,14 +146,14 @@ export function processFirstSubjectValue(
 
   if(isArray(value)) {
     processTagArray(
-      subject,
+      contextItem,
       value as (StringTag | TemplaterResult)[],
       ownerSupport,
       counts,
       appendTo,
     )
 
-    subject.checkValueChange = checkArrayValueChange
+    contextItem.checkValueChange = checkArrayValueChange
 
     return
   }
@@ -164,8 +164,8 @@ export function processFirstSubjectValue(
 
   processFirstRegularValue(
     value as RegularValue,
-    subject,
-    subject.placeholder as Text,
+    contextItem,
+    contextItem.placeholder as Text,
     valueId,
   )
 }

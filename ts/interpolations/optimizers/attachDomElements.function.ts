@@ -2,7 +2,7 @@
 
 import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
 import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode.types.js"
-import { InterpolateSubject } from "../../tag/update/processFirstSubject.utils.js"
+import { InterpolateSubject, TemplateValue } from "../../tag/update/processFirstSubject.utils.js"
 import { howToSetInputValue } from "../attributes/howToSetInputValue.function.js"
 import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
 import { AnySupport } from "../../tag/getSupport.function.js"
@@ -14,7 +14,9 @@ import { ObjectChildren } from "./LikeObjectElement.type.js"
 import { isSubjectInstance } from "../../isInstance.js"
 import { empty } from "../../tag/ValueTypes.enum.js"
 import { Counts } from "../interpolateTemplate.js"
+import { updateExistingValue } from "../../tag/update/updateExistingValue.function.js"
 
+export const blankHandler = () => undefined
 const someDiv = (typeof document === 'object' && document.createElement('div')) as HTMLDivElement // used for content cleaning
 
 export function attachDomElements(
@@ -175,8 +177,20 @@ function attachDynamicDom(
       counts,
       contextItem,
     })
+
+    contextItem.handler = blankHandler
+
     return
   }
+
+  // how to handle value updates
+  contextItem.handler = (newValue, _newValues, newSupport, newContextItem) =>
+    updateExistingValue(
+      newContextItem,
+      newValue as TemplateValue,
+      newSupport,
+    )
+
 
   const global = support.subject.global as TagGlobal
   global.locked = true

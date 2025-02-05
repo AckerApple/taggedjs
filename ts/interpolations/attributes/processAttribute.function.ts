@@ -13,6 +13,8 @@ import { addOneContext, checkSimpleValueChange, TagGlobal } from '../../tag/inde
 import { processAttributeFunction } from './processAttributeCallback.function.js'
 import { isSpecialAttr } from './isSpecialAttribute.function.js'
 import { Counts } from '../interpolateTemplate.js'
+import { processUpdateAttrContext } from '../../tag/processUpdateAttrContext.function.js'
+import { blankHandler } from '../optimizers/attachDomElements.function.js'
 
 type TagVarIdNum = {tagJsVar: number}
 export type SpecialAction = 'init' | 'destroy'
@@ -45,6 +47,15 @@ export function processAttribute(
     contextItem.element = element
     contextItem.howToSet = howToSet
     contextItem.isNameOnly = true
+
+    // how to process value updates
+    contextItem.handler = (newValue, newValues) => 
+      processUpdateAttrContext(
+        newValues,
+        newValue,
+        contextItem,
+        support,
+      )  
 
     processNameOnlyAttrValue(
       values,
@@ -85,6 +96,25 @@ export function processAttribute(
         counts,
       )
     }
+
+    contextItem.handler = (newValue, newValues) => 
+      processUpdateAttrContext(
+        newValues,
+        newValue,
+        contextItem,
+        support,
+      )
+      /*
+      processNameOnlyAttrValue(
+        values,
+        newValue as any,
+        element as Element,
+        support,
+        howToSet as HowToSet,
+        context,
+        counts,
+      )
+      */
 
     processDynamicNameValueAttribute(
       attrName as string,
@@ -206,7 +236,7 @@ export function processNameOnlyAttrValue(
 /** Processor for flat attributes and object attributes */
 function processNameValueAttributeAttrSubject(
   attrName: string,
-  result: ContextItem,
+  contextItem: ContextItem,
   element: Element,
   support: AnySupport,
   howToSet: HowToSet,
@@ -219,13 +249,15 @@ function processNameValueAttributeAttrSubject(
     })
   }
 
-  const contextValueSubject = result.value
+  const contextValueSubject = contextItem.value
   if(isSubjectInstance(contextValueSubject)) {
+    contextItem.handler = blankHandler
+
     const callback = function processAttrCallback(newAttrValue: any) {
       processAttributeEmit(
         newAttrValue,
         attrName,
-        result,
+        contextItem,
         element,
         support,
         howToSet,
@@ -238,15 +270,15 @@ function processNameValueAttributeAttrSubject(
     const sub = contextValueSubject.subscribe(callback as any)
     
     // Record subscription for later unsubscribe when element destroyed
-    const global = result.global as TagGlobal
+    const global = contextItem.global as TagGlobal
     const subs = global.subscriptions = global.subscriptions || []
     subs.push(sub)
   }
 
   processAttributeEmit(
-    result.value,
+    contextItem.value,
     attrName,
-    result,
+    contextItem,
     element,
     support,
     howToSet,
