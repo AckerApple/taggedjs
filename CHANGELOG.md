@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+### v2.8.4 - 2-2025
+- Corrected data typing for watch
+
 ### v2.8.0 - 12-2024
 - removed letState() in favor or states(get => [x] = get(x))
 

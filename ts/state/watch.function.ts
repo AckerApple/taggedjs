@@ -53,7 +53,7 @@ export const watch = (<T>(
   callback: WatchCallback<T>
 ): MasterWatch<T> => {
   return setupWatch(currentValues, callback) as any
-}) as MasterWatch<any>
+})// as MasterWatch<any>
 
 const defaultFinally = <T>(x: T) => x
 
