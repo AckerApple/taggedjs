@@ -5,13 +5,14 @@ import { tags } from './tag.utils.js';
 import { getNewGlobal } from './update/getNewGlobal.function.js';
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js';
 import { destroySupport } from './destroySupport.function.js';
-import { checkTagValueChange, PropWatches } from './index.js';
+import { PropWatches } from './index.js';
 import { runAfterRender } from './afterRender.function.js';
 import { executeWrap } from './executeWrap.function.js';
 import { paint, painting } from './paint.function.js';
 import { initState, reState } from '../state/state.utils.js';
 import { isTagComponent } from '../isInstance.js';
 import { setUseMemory } from '../state/setUseMemory.object.js';
+import { checkTagValueChange } from './checkTagValueChange.function.js';
 const appElements = [];
 /**
  *
@@ -63,6 +64,9 @@ export function tagElement(app, element, props) {
     global.isApp = true;
     if (isAppFunction) {
         templater2.tag = support.templater.tag;
+    }
+    if (!element) {
+        throw new Error(`Cannot tagElement, element received is type ${typeof element} and not type Element`);
     }
     // enables hmr destroy so it can control entire app
     ;

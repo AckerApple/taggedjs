@@ -1,6 +1,6 @@
 import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js';
 import { getHtmlSupport } from '../getSupport.function.js';
-import { checkTagValueChange } from '../checkDestroyPrevious.function.js';
+import { checkTagValueChange } from '../checkTagValueChange.function.js';
 import { buildBeforeElement } from '../buildBeforeElement.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 /** When first time render, adds to owner childTags

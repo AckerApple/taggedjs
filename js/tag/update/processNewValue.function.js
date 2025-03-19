@@ -1,5 +1,5 @@
 import { getTemplaterResult } from '../getTemplaterResult.function.js';
-import { checkTagValueChange } from '../checkDestroyPrevious.function.js';
+import { checkTagValueChange } from '../checkTagValueChange.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { PropWatches } from '../tag.js';

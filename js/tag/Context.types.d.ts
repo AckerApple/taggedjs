@@ -14,13 +14,12 @@ export type ContextItem = {
     isSpecial?: SpecialDefinition;
     placeholder?: Text;
     simpleValueElm?: Clone;
-    lastArray?: Context;
+    lastArray?: ContextItem[];
     subject?: InterpolateSubject;
     global?: TagGlobal;
     value?: any;
     withinOwnerElement: boolean;
     checkValueChange: CheckValueChange | CheckSupportValueChange;
 };
-export type Context = ContextItem[];
 export type CheckValueChange = (value: unknown, subject: ContextItem) => number | boolean;
 export type CheckSupportValueChange = (value: unknown, subject: SupportContextItem) => number | boolean;

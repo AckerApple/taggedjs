@@ -1,9 +1,11 @@
 export let paintRemoves = [];
 export let paintContent = [];
 export let setContent = [];
+/** array memory that runs and completes BEFORE paintInsertBefores array */
 export let paintAppends = [];
+/** array memory that runs and completes AFTER paintAppends array */
 export let paintInsertBefores = [];
-export let paintAfters = [];
+export let paintAfters = []; // callbacks after all painted
 export const painting = {
     locks: 0
 };

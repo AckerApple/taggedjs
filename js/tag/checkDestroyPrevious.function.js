@@ -1,10 +1,7 @@
 // Functions in here are attached as ContextItem.checkValueChange
 import { processUpdateRegularValue } from './update/processRegularValue.function.js';
-import { getNewGlobal } from './update/getNewGlobal.function.js';
 import { destroyArrayItem } from './update/processTagArray.js';
-import { destroySupport } from './destroySupport.function.js';
-import { isArray, isStaticTag } from '../isInstance.js';
-import { isLikeTags } from './isLikeTags.function.js';
+import { isArray } from '../isInstance.js';
 import { paintRemoves } from './paint.function.js';
 import { BasicTypes } from './ValueTypes.enum.js';
 export function checkArrayValueChange(newValue, subject) {
@@ -34,30 +31,5 @@ export function checkSimpleValueChange(newValue, subject) {
     delete subject.simpleValueElm;
     paintRemoves.push(elm);
     return 6; // 'changed-simple-value'
-}
-export function checkTagValueChange(newValue, subject) {
-    const global = subject.global;
-    const lastSupport = global?.newest;
-    const isValueTag = isStaticTag(newValue);
-    const newTag = newValue;
-    if (isValueTag) {
-        // its a different tag now
-        const likeTags = isLikeTags(newTag, lastSupport);
-        if (!likeTags) {
-            destroySupport(lastSupport);
-            getNewGlobal(subject);
-            return 7; // 'tag-swap'
-        }
-        return false;
-    }
-    const isTag = newValue?.tagJsType;
-    if (isTag) {
-        return false; // its still a tag component
-    }
-    // destroy old component, value is not a component
-    destroySupport(lastSupport);
-    delete subject.global;
-    subject.renderCount = 0;
-    return 8; // 'no-longer-tag'
 }
 //# sourceMappingURL=checkDestroyPrevious.function.js.map

@@ -25,6 +25,7 @@ export interface TagTemplate {
     domMetaMap?: DomMetaMap;
 }
 export type Tag = {
+    debug?: boolean;
     values: unknown[];
     tagJsType?: typeof ValueTypes.tag | typeof ValueTypes.dom;
     templater?: TemplaterResult;

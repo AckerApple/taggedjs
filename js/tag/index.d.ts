@@ -12,6 +12,7 @@ export * from './update/oneRenderToSupport.function.js';
 export * from './getTemplaterResult.function.js';
 export * from './destroySupport.function.js';
 export * from './checkDestroyPrevious.function.js';
+export * from './checkTagValueChange.function.js';
 export * from './Context.types.js';
 export * from './tagElement.js';
 export { Tag, DomTag, variablePrefix } from './getDomTag.function.js';

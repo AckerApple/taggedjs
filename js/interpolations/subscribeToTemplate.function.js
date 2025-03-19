@@ -2,9 +2,10 @@ import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue
 import { processSubUpdate } from './processSubscriptionUpdate.function.js';
 import { setUseMemory } from '../state/setUseMemory.object.js';
 import { paint } from '../tag/paint.function.js';
+/** Used for when dynamic value is truly something to subscribe to */
 export function subscribeToTemplate({ subject, support, counts, contextItem, appendTo, }) {
     let onValue = function onSubValue(value) {
-        processFirstSubjectValue(value, contextItem, support, { ...counts }, `rvp_-1_${support.templater.tag?.values.length}`, syncRun ? appendTo : undefined);
+        processFirstSubjectValue(value, contextItem, support, { ...counts }, syncRun ? appendTo : undefined);
         if (!syncRun && !setUseMemory.stateConfig.support) {
             paint();
         }

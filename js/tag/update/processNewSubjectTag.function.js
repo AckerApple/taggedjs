@@ -1,27 +1,55 @@
 import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js';
-import { checkTagValueChange } from '../checkDestroyPrevious.function.js';
+import { checkTagValueChange } from '../checkTagValueChange.function.js';
 import { buildBeforeElement } from '../buildBeforeElement.function.js';
-import { paintAppends } from '../paint.function.js';
+import { paintAppends, paintInsertBefores } from '../paint.function.js';
 import { newSupportByTemplater } from './processTag.function.js';
 export function processNewSubjectTag(templater, ownerSupport, // owner
 subject, // could be tag via result.tag
-appendTo, counts) {
+counts, appendTo, insertBefore) {
     subject.checkValueChange = checkTagValueChange;
     const support = newSupportByTemplater(templater, ownerSupport, subject);
     support.ownerSupport = ownerSupport;
-    const result = buildBeforeElement(support, counts, appendTo, undefined);
+    const result = buildBeforeElement(support, counts, appendTo, appendTo ? undefined : insertBefore);
     for (const dom of result.dom) {
         if (dom.marker) {
+            /*
             paintAppends.push({
-                element: dom.marker,
-                relative: appendTo, // ph.parentNode as Element,
-            });
+              element: dom.marker,
+              relative: appendTo as Element, // ph.parentNode as Element,
+            })
+            */
+            if (appendTo) {
+                paintAppends.push({
+                    element: dom.marker,
+                    relative: appendTo, // ph.parentNode as Element,
+                });
+            }
+            else {
+                paintInsertBefores.push({
+                    element: dom.marker,
+                    relative: insertBefore, // ph.parentNode as Element,
+                });
+            }
         }
         if (dom.domElement) {
+            /*
             paintAppends.push({
-                element: dom.domElement,
-                relative: appendTo, // ph.parentNode as Element,
-            });
+              element: dom.domElement,
+              relative: appendTo as Element, // ph.parentNode as Element,
+            })
+            */
+            if (appendTo) {
+                paintAppends.push({
+                    element: dom.domElement,
+                    relative: appendTo, // ph.parentNode as Element,
+                });
+            }
+            else {
+                paintInsertBefores.push({
+                    element: dom.domElement,
+                    relative: insertBefore, // ph.parentNode as Element,
+                });
+            }
         }
     }
     let index = -1;

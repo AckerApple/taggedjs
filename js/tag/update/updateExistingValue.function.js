@@ -10,71 +10,50 @@ import { processTagArray } from './processTagArray.js';
 import { getSupport } from '../getSupport.function.js';
 const fooCounts = { added: 0, removed: 0 };
 /** Used for all tag value updates. Determines if value changed since last render */
-export function updateExistingValue(contextItem, value, ownerSupport) {
+export function updateExistingValue(contextItem, newValue, // newValue
+ownerSupport) {
     // Do not continue if the value is just the same
-    if (value === contextItem.value) {
+    if (newValue === contextItem.value) {
         return;
     }
-    const wasDestroyed = contextItem.checkValueChange(value, contextItem);
-    if (wasDestroyed === -1) {
+    // Have the context check itself (avoid having to detect old value)
+    const ignoreOrDestroyed = contextItem.checkValueChange(newValue, contextItem);
+    // ignore
+    if (ignoreOrDestroyed === -1) {
         return; // do nothing
     }
-    // handle already seen tag components
-    const tagJsType = value && value.tagJsType;
+    // is new value a tag?
+    const tagJsType = newValue && newValue.tagJsType;
     if (tagJsType) {
         if (tagJsType === ValueTypes.renderOnce) {
             return;
         }
-        const isComp = isTagComponent(value);
-        if (isComp) {
-            if (!contextItem.global) {
-                getNewGlobal(contextItem);
-            }
-            prepareUpdateToComponent(value, contextItem, ownerSupport);
-            return;
-        }
-    }
-    const global = contextItem.global;
-    if (global) {
-        // its html/dom based tag
-        const support = global.newest;
-        if (support) {
-            updateContextItemBySupport(support, contextItem, value, ownerSupport);
-            return;
-        }
-    }
-    if (tagJsType) {
-        switch (tagJsType) {
-            case ValueTypes.templater:
-                processTag(ownerSupport, contextItem, fooCounts);
-                return;
-            case ValueTypes.tag:
-            case ValueTypes.dom: {
-                const tag = value;
-                let templater = tag.templater;
-                if (!templater) {
-                    templater = getFakeTemplater();
-                    tag.templater = templater;
-                    templater.tag = tag;
-                }
-                const nowGlobal = (contextItem.global ? contextItem.global : getNewGlobal(contextItem));
-                nowGlobal.newest = newSupportByTemplater(templater, ownerSupport, contextItem);
-                processTag(ownerSupport, contextItem, fooCounts);
-                return;
-            }
-        }
-    }
-    if (isArray(value)) {
-        processTagArray(contextItem, value, ownerSupport, { added: 0, removed: 0 });
+        tryUpdateToTag(contextItem, newValue, ownerSupport);
         return;
     }
-    if (typeof (value) === BasicTypes.function) {
-        contextItem.value = value; // do not render functions that are not explicity defined as tag html processing
+    if (isArray(newValue)) {
+        processTagArray(contextItem, newValue, ownerSupport, { added: 0, removed: 0 });
         return;
     }
-    if (wasDestroyed) {
-        processNowRegularValue(value, contextItem);
+    if (typeof (newValue) === BasicTypes.function) {
+        contextItem.value = newValue; // do not render functions that are not explicity defined as tag html processing
+        return;
     }
+    if (ignoreOrDestroyed) {
+        processNowRegularValue(newValue, contextItem);
+    }
+}
+function updateToTag(value, contextItem, ownerSupport) {
+    const tag = value;
+    let templater = tag.templater;
+    if (!templater) {
+        templater = getFakeTemplater();
+        tag.templater = templater;
+        templater.tag = tag;
+    }
+    const nowGlobal = (contextItem.global ? contextItem.global : getNewGlobal(contextItem));
+    nowGlobal.newest = newSupportByTemplater(templater, ownerSupport, contextItem);
+    processTag(ownerSupport, contextItem, fooCounts);
 }
 function handleStillTag(lastSupport, subject, value, ownerSupport) {
     const templater = value.templater || value;
@@ -84,7 +63,7 @@ function handleStillTag(lastSupport, subject, value, ownerSupport) {
     const oldest = newGlobal.oldest;
     updateSupportBy(oldest, valueSupport);
 }
-function prepareUpdateToComponent(templater, contextItem, ownerSupport) {
+export function prepareUpdateToComponent(templater, contextItem, ownerSupport) {
     const global = contextItem.global;
     // When last value was not a component
     if (!global.newest) {
@@ -95,12 +74,46 @@ function prepareUpdateToComponent(templater, contextItem, ownerSupport) {
     updateExistingTagComponent(ownerSupport, support, // latest value
     contextItem);
 }
-/** Used to destro */
-function updateContextItemBySupport(support, contextItem, value, ownerSupport) {
+export function updateContextItemBySupport(support, contextItem, value, ownerSupport) {
     if (typeof (value) === BasicTypes.function) {
         return;
     }
     handleStillTag(support, contextItem, value, ownerSupport);
     return;
+}
+/** result is an indication to ignore further processing but that does not seem in use anymore */
+export function tryUpdateToTag(contextItem, newValue, // newValue
+ownerSupport) {
+    const tagJsType = newValue.tagJsType;
+    const isComp = isTagComponent(newValue);
+    if (isComp) {
+        if (contextItem.global === undefined) {
+            getNewGlobal(contextItem);
+        }
+        prepareUpdateToComponent(newValue, contextItem, ownerSupport);
+        return true;
+    }
+    // detect if previous value was a tag
+    const global = contextItem.global;
+    if (global) {
+        // its html/dom based tag
+        const support = global.newest;
+        if (support) {
+            updateContextItemBySupport(support, contextItem, newValue, ownerSupport);
+            return true;
+        }
+    }
+    switch (tagJsType) {
+        case ValueTypes.templater:
+            processTag(ownerSupport, contextItem, fooCounts);
+            return true;
+        // when value was not a Tag before
+        case ValueTypes.tag:
+        case ValueTypes.dom: {
+            updateToTag(newValue, contextItem, ownerSupport);
+            return true;
+        }
+    }
+    return false;
 }
 //# sourceMappingURL=updateExistingValue.function.js.map

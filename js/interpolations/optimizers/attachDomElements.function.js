@@ -11,89 +11,109 @@ export const blankHandler = () => undefined;
 const someDiv = (typeof document === 'object' && document.createElement('div')); // used for content cleaning
 export function attachDomElements(nodes, values, support, counts, // used for animation stagger computing
 context, depth, // used to know if dynamic variables live within parent owner tag/support
-owner, insertBefore, subs = []) {
+appendTo, insertBefore, subs = []) {
+    // TODO: This appears unused
     const dom = [];
-    for (const node of nodes) {
+    if (appendTo && insertBefore === undefined && depth > 0) {
+        insertBefore = document.createTextNode(empty);
+        paintAppends.push({
+            element: insertBefore,
+            relative: appendTo,
+        });
+        appendTo = undefined;
+    }
+    for (let index = 0; index < nodes.length; ++index) {
+        const node = nodes[index];
+        // TODO: This appears unused
         const newNode = {}; // DomObjectText
         dom.push(newNode);
         const value = node.v;
         const isNum = !isNaN(value);
         if (isNum) {
-            attachDynamicDom(values, context, owner, support, subs, counts, depth);
+            const index = context.length;
+            const value = values[index];
+            attachDynamicDom(value, index, context, support, subs, counts, depth, appendTo, insertBefore);
             continue;
         }
         if (node.nn === 'text') {
-            const textNode = newNode;
-            const string = textNode.tc = node.tc;
-            someDiv.innerHTML = string;
-            const domElement = textNode.domElement = document.createTextNode(someDiv.innerText);
-            domElement.id = `tp_${context.length}_${values.length}`;
-            if (owner) {
-                paintAppends.push({
-                    element: domElement,
-                    relative: owner,
-                });
-            }
-            else {
-                paintInsertBefores.push({
-                    element: domElement,
-                    relative: insertBefore,
-                });
-            }
+            attachDomText(newNode, node, appendTo, insertBefore);
             continue;
         }
-        const domElement = newNode.domElement = document.createElement(node.nn);
-        // attributes that may effect style, come first
-        if (node.at) {
-            node.at.map(attr => {
-                const name = attr[0];
-                const value = attr[1];
-                const isSpecial = attr[2] || false;
-                processAttribute(values, name, domElement, support, howToSetInputValue, context, isSpecial, counts, value);
-            });
-        }
-        if (owner) {
-            paintAppends.push({
-                element: domElement,
-                relative: owner,
-            });
-        }
-        else {
-            paintInsertBefores.push({
-                element: domElement,
-                relative: insertBefore,
-            });
-        }
+        // one single html element
+        const domElement = attachDomElement(newNode, node, values, support, context, counts, appendTo, insertBefore);
         if (node.ch) {
             newNode.ch = attachDomElements(node.ch, values, support, counts, context, depth + 1, domElement, insertBefore, subs).dom;
         }
     }
     return { subs, dom, context };
 }
-function attachDynamicDom(values, context, owner, support, subs, counts, // used for animation stagger computing
-depth) {
-    const subVal = values[context.length];
-    const marker = document.createTextNode(empty);
-    marker.id = `dvp_${context.length}_${values.length}`;
-    const contextItem = addOneContext(subVal, context, depth > 0);
-    contextItem.placeholder = marker;
+function attachDomElement(newNode, node, values, support, context, counts, appendTo, insertBefore) {
+    const domElement = newNode.domElement = document.createElement(node.nn);
+    // attributes that may effect style, come first for performance
+    if (node.at) {
+        node.at.map(attr => {
+            const name = attr[0];
+            const value = attr[1];
+            const isSpecial = attr[2] || false;
+            processAttribute(values, name, domElement, support, howToSetInputValue, context, isSpecial, counts, value);
+        });
+    }
+    if (appendTo) {
+        paintAppends.push({
+            element: domElement,
+            relative: appendTo,
+        });
+    }
+    else {
+        paintInsertBefores.push({
+            element: domElement,
+            relative: insertBefore,
+        });
+    }
+    return domElement;
+}
+function attachDomText(newNode, node, owner, insertBefore) {
+    const textNode = newNode;
+    const string = textNode.tc = node.tc;
+    someDiv.innerHTML = string;
+    const domElement = textNode.domElement = document.createTextNode(someDiv.innerText);
     if (owner) {
         paintAppends.push({
+            element: domElement,
             relative: owner,
+        });
+    }
+    else {
+        paintInsertBefores.push({
+            element: domElement,
+            relative: insertBefore,
+        });
+    }
+}
+function attachDynamicDom(value, index, context, support, subs, counts, // used for animation stagger computing
+depth, // used to indicate if variable lives within an owner's element
+appendTo, insertBefore) {
+    const marker = document.createTextNode(empty);
+    const isWithinOwnerElement = depth > 0;
+    const contextItem = addOneContext(value, context, isWithinOwnerElement);
+    contextItem.placeholder = marker;
+    if (appendTo) {
+        paintAppends.push({
+            relative: appendTo,
             element: marker,
         });
     }
     else {
         paintInsertBefores.push({
+            relative: insertBefore,
             element: marker,
-            relative: support.subject.placeholder,
         });
     }
-    if (isSubjectInstance(subVal)) {
+    if (isSubjectInstance(value)) {
         subs.push({
             insertBefore: marker,
-            appendTo: owner,
-            subject: subVal,
+            appendTo,
+            subject: value,
             support, // ownerSupport,
             counts,
             contextItem,
@@ -105,10 +125,10 @@ depth) {
     contextItem.handler = (newValue, _newValues, newSupport, newContextItem) => updateExistingValue(newContextItem, newValue, newSupport);
     const global = support.subject.global;
     global.locked = true;
-    processFirstSubjectValue(subVal, contextItem, support, counts, `rvp_${context.length}_${values.length}`, owner);
+    processFirstSubjectValue(value, contextItem, support, counts, appendTo, insertBefore);
     const global2 = support.subject.global;
     delete global2.locked;
-    contextItem.value = subVal;
+    contextItem.value = value;
     return;
 }
 //# sourceMappingURL=attachDomElements.function.js.map
