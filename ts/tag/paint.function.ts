@@ -6,9 +6,14 @@ type PaintAppend = {
 export let paintRemoves = [] as (Element | Text | ChildNode)[]
 export let paintContent: (() => any)[] = []
 export let setContent: [string, Text][] = []
+
+/** array memory that runs and completes BEFORE paintInsertBefores array */
 export let paintAppends: PaintAppend[] = []
+
+/** array memory that runs and completes AFTER paintAppends array */
 export let paintInsertBefores: PaintAppend[] = []
-export let paintAfters: (() => any)[] = []
+
+export let paintAfters: (() => any)[] = [] // callbacks after all painted
 
 export const painting = {
   locks: 0

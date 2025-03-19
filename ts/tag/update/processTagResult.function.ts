@@ -35,6 +35,7 @@ export function processFirstTagResult(
   appendTo: Element,
 ) {
   let appendIndex = paintAppends.length
+
   const result = buildBeforeElement(
     support,
     counts,

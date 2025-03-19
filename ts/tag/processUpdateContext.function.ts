@@ -1,10 +1,10 @@
 import { DomTag, StringTag } from './getDomTag.function.js'
 import { AnySupport } from './getSupport.function.js'
-import { Context, ContextHandler } from './Context.types.js'
+import { ContextItem, ContextHandler } from './Context.types.js'
 
 export function processUpdateContext(
   support: AnySupport,
-  context: Context,
+  context: ContextItem[],
 ) {
   const thisTag = support.templater.tag as StringTag | DomTag
   const values = thisTag.values
@@ -29,7 +29,7 @@ export function processUpdateContext(
 export function processUpdateOneContext(
   values: unknown[], // the interpolated values
   index: number,
-  context: Context,
+  context: ContextItem[],
   ownerSupport: AnySupport,
 ) {
   const value = values[index] as any

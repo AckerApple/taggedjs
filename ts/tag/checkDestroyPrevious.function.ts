@@ -1,13 +1,8 @@
 // Functions in here are attached as ContextItem.checkValueChange
 
 import { processUpdateRegularValue, RegularValue } from './update/processRegularValue.function.js'
-import {AnySupport, SupportContextItem } from './getSupport.function.js'
-import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { destroyArrayItem } from'./update/processTagArray.js'
-import { destroySupport } from './destroySupport.function.js'
-import {SupportTagGlobal } from './getTemplaterResult.function.js'
-import { isArray, isStaticTag } from'../isInstance.js'
-import { isLikeTags } from'./isLikeTags.function.js'
+import { isArray } from'../isInstance.js'
 import { paintRemoves } from './paint.function.js'
 import { BasicTypes } from './ValueTypes.enum.js'
 import { ContextItem } from './Context.types.js'
@@ -60,38 +55,4 @@ export function checkSimpleValueChange(
   paintRemoves.push(elm)
   
   return 6 // 'changed-simple-value'
-}
-
-export function checkTagValueChange(
-  newValue: unknown,
-  subject:SupportContextItem,
-) {
-  const global = subject.global as SupportTagGlobal
-  const lastSupport = global?.newest
-  const isValueTag = isStaticTag(newValue)
-  const newTag = newValue as AnySupport
-  
-  if(isValueTag) {
-    // its a different tag now
-    const likeTags = isLikeTags(newTag, lastSupport)
-    if(!likeTags) {
-      destroySupport(lastSupport)
-      getNewGlobal(subject) as SupportTagGlobal
-      return 7 // 'tag-swap'
-    }
-
-    return false
-  }
-
-  const isTag = (newValue as any)?.tagJsType
-  if(isTag) {
-    return false // its still a tag component
-  }
-
-  // destroy old component, value is not a component
-  destroySupport(lastSupport)
-  delete (subject as ContextItem).global
-  subject.renderCount = 0
-   
-  return 8 // 'no-longer-tag'
 }

@@ -4,11 +4,11 @@ import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectVa
 import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode.types.js"
 import { InterpolateSubject, TemplateValue } from "../../tag/update/processFirstSubject.utils.js"
 import { howToSetInputValue } from "../attributes/howToSetInputValue.function.js"
-import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
+import { paintAfters, paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
 import { AnySupport } from "../../tag/getSupport.function.js"
 import { processAttribute } from "../attributes/processAttribute.function.js"
 import { SubToTemplateOptions } from "../subscribeToTemplate.function.js"
-import { Context, ContextItem } from "../../tag/Context.types.js"
+import { ContextItem } from "../../tag/Context.types.js"
 import { addOneContext, TagGlobal } from "../../tag/index.js"
 import { ObjectChildren } from "./LikeObjectElement.type.js"
 import { isSubjectInstance } from "../../isInstance.js"
@@ -24,19 +24,34 @@ export function attachDomElements(
   values: any[],
   support: AnySupport,
   counts: Counts, // used for animation stagger computing
-  context: Context,
+  context: ContextItem[],
   depth: number, // used to know if dynamic variables live within parent owner tag/support
-  owner?: Element,
+  appendTo?: Element,
   insertBefore?: Text,
   subs: SubToTemplateOptions[] = [],
 ): {
-  context: Context
-  subs:SubToTemplateOptions[]
+  context: ContextItem[]
+  subs: SubToTemplateOptions[]
   dom: DomObjectChildren
 } {
+  // TODO: This appears unused
   const dom: DomObjectChildren = []
 
-  for (const node of nodes as  DomObjectElement[]) {
+  if(appendTo && insertBefore === undefined && depth > 0) {
+    insertBefore = document.createTextNode(empty)
+
+    paintAppends.push({
+      element: insertBefore,
+      relative: appendTo,
+    })
+
+    appendTo = undefined
+  }
+
+  for (let index=0; index < nodes.length; ++index) {
+    const node = (nodes as DomObjectElement[])[index]
+    
+    // TODO: This appears unused
     const newNode = {} as DomObjectElement // DomObjectText
     dom.push(newNode)
 
@@ -44,76 +59,39 @@ export function attachDomElements(
     const isNum = !isNaN(value as unknown as number)
     
     if(isNum) {
+      const index = context.length
+      const value = values[ index ]
+
       attachDynamicDom(
-        values,
+        value,
+        index,
         context,
-        owner,
         support,
         subs,
         counts,
         depth,
+        appendTo,
+        insertBefore,
       )
       continue
     }
 
     if (node.nn === 'text') {
-      const textNode = (newNode as any as DomObjectText)
-      const string = textNode.tc = (node as any as DomObjectText).tc
-      
-      someDiv.innerHTML = string
-      const domElement = textNode.domElement = document.createTextNode(someDiv.innerText)
-
-      // TODO: for debugging only
-      ;(domElement as any).id = `tp_${context.length}_${values.length}`
-      
-      if(owner) {
-        paintAppends.push({
-          element: domElement,
-          relative: owner,
-        })
-      } else {
-        paintInsertBefores.push({
-          element: domElement,
-          relative: insertBefore as Text,
-        })
-      }
+      attachDomText(newNode, node, appendTo, insertBefore)
       continue
     }
-  
-    const domElement = newNode.domElement = document.createElement(node.nn)
 
-    // attributes that may effect style, come first
-    if (node.at) {
-      node.at.map(attr => {
-        const name = attr[0]
-        const value = attr[1]
-        const isSpecial = attr[2] || false
-        
-        processAttribute(
-          values,
-          name,
-          domElement,
-          support,
-          howToSetInputValue,
-          context,
-          isSpecial,
-          counts,
-          value,
-        )
-      })
-    }
-
-    if(owner) {
-      paintAppends.push({
-        element: domElement,
-        relative: owner,
-      })
-    } else {
-      paintInsertBefores.push({
-        element: domElement,
-        relative: insertBefore as Text,
-      })
-    }
+    // one single html element
+    const domElement = attachDomElement(
+      newNode,
+      node,
+      values,
+      support,
+      context,
+      counts,
+      appendTo,
+      insertBefore,
+    )
 
     if (node.ch) {
       newNode.ch = attachDomElements(
@@ -133,46 +111,116 @@ export function attachDomElements(
   return {subs, dom, context}
 }
 
-function attachDynamicDom(
+function attachDomElement(
+  newNode: DomObjectElement,
+  node: DomObjectElement,
   values: any[],
-  context: Context,
+  support: AnySupport,
+  context: ContextItem[],
+  counts: Counts,
+  appendTo: Element | undefined,
+  insertBefore: Text | undefined,
+) {
+  const domElement = newNode.domElement = document.createElement(node.nn)
+  
+  // attributes that may effect style, come first for performance
+  if (node.at) {
+    node.at.map(attr => {
+      const name = attr[0]
+      const value = attr[1]
+      const isSpecial = attr[2] || false
+
+      processAttribute(
+        values,
+        name,
+        domElement,
+        support,
+        howToSetInputValue,
+        context,
+        isSpecial,
+        counts,
+        value
+      )
+    })
+  }
+
+  if (appendTo) {
+    paintAppends.push({
+      element: domElement,
+      relative: appendTo,
+    })
+  } else {
+    paintInsertBefores.push({
+      element: domElement,
+      relative: insertBefore as Text,
+    })
+  }
+  return domElement
+}
+
+function attachDomText(
+  newNode: DomObjectElement,
+  node: DomObjectElement,
   owner: Element | undefined,
+  insertBefore: Text | undefined
+) {
+  const textNode = (newNode as any as DomObjectText)
+  const string = textNode.tc = (node as any as DomObjectText).tc
+
+  someDiv.innerHTML = string
+  const domElement = textNode.domElement = document.createTextNode(someDiv.innerText);
+
+  if (owner) {
+    paintAppends.push({
+      element: domElement,
+      relative: owner,
+    })
+  } else {
+    paintInsertBefores.push({
+      element: domElement,
+      relative: insertBefore as Text,
+    })
+  }
+}
+
+function attachDynamicDom(
+  value: any,
+  index: number,
+  context: ContextItem[],
   support: AnySupport,
   subs:SubToTemplateOptions[],
   counts: Counts, // used for animation stagger computing
   depth: number, // used to indicate if variable lives within an owner's element
-) {
-  const subVal = values[ context.length ]
+  appendTo?: Element,
+  insertBefore?: Text
+) {  
   const marker = document.createTextNode(empty)
-
-  // attach an identifier that can be read in dom reader
-  ;(marker as any).id = `dvp_${context.length}_${values.length}`
-  
+  const isWithinOwnerElement = depth > 0
   const contextItem = addOneContext(
-    subVal,
+    value,
     context,
-    depth > 0,
+    isWithinOwnerElement,
   )
+
   contextItem.placeholder = marker
 
-  if(owner) {
+  if(appendTo) {
     paintAppends.push({
-      relative: owner,
+      relative: appendTo,
       element: marker,
     })
   } else {
     paintInsertBefores.push({
+      relative: insertBefore as Text,
       element: marker,
-      relative: support.subject.placeholder as Text,
     })
   }
 
-  if(isSubjectInstance(subVal)) {
+  if(isSubjectInstance(value)) {
     subs.push({
       insertBefore: marker,
-      appendTo: owner,
-      
-      subject: subVal as InterpolateSubject,
+      appendTo,
+      subject: value as InterpolateSubject,
       support, // ownerSupport,
       counts,
       contextItem,
@@ -194,19 +242,19 @@ function attachDynamicDom(
 
   const global = support.subject.global as TagGlobal
   global.locked = true
-  
+
   processFirstSubjectValue(
-    subVal,
+    value,
     contextItem,
     support,
     counts,
-    `rvp_${context.length}_${values.length}`,
-    owner,
+    appendTo,
+    insertBefore,
   )
 
   const global2 = support.subject.global as TagGlobal
   delete global2.locked
-  contextItem.value = subVal
+  contextItem.value = value
 
   return
 }

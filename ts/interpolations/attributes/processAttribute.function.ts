@@ -7,7 +7,7 @@ import { bindSubjectCallback, Callback } from './bindSubjectCallback.function.js
 import { BasicTypes, ValueTypes, empty } from '../../tag/ValueTypes.enum.js'
 import { AnySupport } from '../../tag/getSupport.function.js'
 import { paintContent } from '../../tag/paint.function.js'
-import { Context, ContextItem } from '../../tag/Context.types.js'
+import { ContextItem } from '../../tag/Context.types.js'
 import { processDynamicNameValueAttribute, processNonDynamicAttr } from './processNameValueAttribute.function.js'
 import { addOneContext, checkSimpleValueChange, TagGlobal } from '../../tag/index.js'
 import { processAttributeFunction } from './processAttributeCallback.function.js'
@@ -27,7 +27,7 @@ export function processAttribute(
   element: Element,
   support: AnySupport,
   howToSet: HowToSet, //  = howToSetInputValue
-  context: Context,
+  context: ContextItem[],
   isSpecial: SpecialDefinition,
   counts: Counts,
   value: string | null | undefined | TagVarIdNum,
@@ -150,7 +150,7 @@ export function updateNameOnlyAttrValue(
   element: Element,
   ownerSupport: AnySupport,
   howToSet: HowToSet,
-  context: Context,
+  context: ContextItem[],
   counts: Counts,
 ) {
   // check to remove previous attribute(s)
@@ -199,7 +199,7 @@ export function processNameOnlyAttrValue(
   element: Element,
   ownerSupport: AnySupport,
   howToSet: HowToSet,
-  context: Context,
+  context: ContextItem[],
   counts: Counts,
 ) {
   if(isNoDisplayValue(attrValue)) {

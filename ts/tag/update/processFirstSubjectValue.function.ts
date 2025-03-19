@@ -1,4 +1,5 @@
-import { checkArrayValueChange, checkSimpleValueChange, checkTagValueChange } from '../checkDestroyPrevious.function.js'
+import { checkArrayValueChange, checkSimpleValueChange } from '../checkDestroyPrevious.function.js'
+import { checkTagValueChange } from '../checkTagValueChange.function.js'
 import { processFirstSubjectComponent, processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { newSupportByTemplater, processTag, tagFakeTemplater } from './processTag.function.js'
 import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function.js'
@@ -22,126 +23,21 @@ export function processFirstSubjectValue(
   contextItem: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owningSupport
   counts: Counts, // {added:0, removed:0}
-  valueId: string,
   appendTo?: Element,
+  insertBefore?: Text,
 ): AnySupport | undefined {
   const tagJsType = (value as TemplaterResult)?.tagJsType as ValueType
+  
   if(tagJsType) {
-    switch (tagJsType) {
-      // TODO: Do we ever get in here? because dom, tag, and component are covered below
-      case ValueTypes.templater:
-        contextItem.checkValueChange = checkTagValueChange
-
-        if(appendTo) {
-          return processNewSubjectTag(
-            value as TemplaterResult,
-            ownerSupport,
-            contextItem,
-            appendTo,
-            counts,
-          )
-        }
-        
-        return processTag(
-          ownerSupport,
-          contextItem,
-          counts,
-        )
-
-      case ValueTypes.dom:
-      case ValueTypes.tag: {
-        contextItem.checkValueChange = checkTagValueChange
-        const tag = value as StringTag | DomTag
-        let templater = tag.templater
-  
-        if(!templater) {
-          templater = tagFakeTemplater(tag) // TODO: most likely a not needed performance hit
-        }
-
-        const global = getNewGlobal(contextItem) as SupportTagGlobal
-  
-        if(appendTo) {
-          return processNewSubjectTag(
-            templater,
-            ownerSupport,
-            contextItem as ContextItem,
-            appendTo,
-            counts,
-          )
-        }
-  
-        global.newest = newSupportByTemplater(templater, ownerSupport, contextItem)
-        contextItem.checkValueChange = checkTagValueChange
-  
-        return processTag(
-          ownerSupport,
-          contextItem,
-          counts,
-        )
-      }
-
-      case ValueTypes.stateRender:
-      case ValueTypes.tagComponent: {
-
-        getNewGlobal(contextItem) as SupportTagGlobal
-        contextItem.checkValueChange = checkTagValueChange
-
-        if(appendTo) {
-          const processResult = processFirstSubjectComponent(
-            value as TemplaterResult,
-            contextItem as SupportContextItem,
-            ownerSupport,
-            counts,
-            appendTo as Element,
-          )
-          
-          // ++contextItem.global.renderCount
-
-          return processResult
-        }
-  
-        const processResult = processReplacementComponent(
-          value as TemplaterResult,
-          contextItem as SupportContextItem,
-          ownerSupport,
-          counts,
-        )
-        
-        // ++contextItem.global.renderCount
-        
-        return processResult
-      }
-
-      case ValueTypes.renderOnce: {
-        getNewGlobal(contextItem) as SupportTagGlobal
-
-        const support = oneRenderToSupport(
-          value as Wrapper,
-          contextItem as ContextItem,
-          ownerSupport,
-        )
-        
-        renderTagOnly(
-          support,
-          undefined,
-          contextItem as SupportContextItem,
-          ownerSupport,
-        )
-        
-        const result = processNewSubjectTag(
-          support.templater,
-          ownerSupport,
-          contextItem as ContextItem,
-          appendTo as Element,
-          counts,
-        )
-
-        // ++contextItem.global.renderCount
-        contextItem.checkValueChange = checkTagValueChange
-
-        return result
-      }
-    }
+    return processFirstTagValue(
+      tagJsType,
+      contextItem,
+      value,
+      ownerSupport,
+      counts,
+      appendTo,
+      insertBefore,
+    )
   }
 
   if(isArray(value)) {
@@ -166,7 +62,6 @@ export function processFirstSubjectValue(
     value as RegularValue,
     contextItem,
     contextItem.placeholder as Text,
-    valueId,
   )
 }
 
@@ -174,7 +69,6 @@ function processFirstRegularValue(
   value: RegularValue,
   subject: ContextItem, // could be tag via subject.tag
   insertBefore: Text, // <template end interpolate /> (will be removed)
-  valueId: string,
 ) {
   const castedValue = castTextValue(value)
   const clone = updateBeforeTemplate(
@@ -182,9 +76,135 @@ function processFirstRegularValue(
     insertBefore, // this will be removed
   )
 
-  // TODO: for debugging purposes only
-  ;(clone as unknown as Element).id = valueId
-
   subject.simpleValueElm = clone  
   subject.checkValueChange = checkSimpleValueChange
+}
+
+function processFirstTagValue(
+  tagJsType: ValueType,
+  contextItem: ContextItem,
+  value: TemplateValue | StringTag,
+  ownerSupport: AnySupport, // owningSupport
+  counts: Counts, // {added:0, removed:0}
+  appendTo?: Element,
+  insertBefore?: Text,
+){
+  switch (tagJsType) {
+    // TODO: Do we ever get in here? because dom, tag, and component are covered below
+    case ValueTypes.templater:
+      contextItem.checkValueChange = checkTagValueChange
+
+      if(appendTo) {
+        return processNewSubjectTag(
+          value as TemplaterResult,
+          ownerSupport,
+          contextItem,
+          counts,
+          appendTo,
+          insertBefore,
+        )
+      }
+      
+      return processTag(
+        ownerSupport,
+        contextItem,
+        counts,
+      )
+
+    case ValueTypes.dom:
+    case ValueTypes.tag: {
+      contextItem.checkValueChange = checkTagValueChange
+      const tag = value as StringTag | DomTag
+      let templater = tag.templater
+
+      if(!templater) {
+        templater = tagFakeTemplater(tag) // TODO: most likely a not needed performance hit
+      }
+
+      const global = getNewGlobal(contextItem) as SupportTagGlobal
+
+      if(appendTo) {
+        return processNewSubjectTag(
+          templater,
+          ownerSupport,
+          contextItem as ContextItem,
+          counts,
+          appendTo,
+          insertBefore,
+        )
+      }
+
+      global.newest = newSupportByTemplater(templater, ownerSupport, contextItem)
+      contextItem.checkValueChange = checkTagValueChange
+
+      return processTag(
+        ownerSupport,
+        contextItem,
+        counts,
+      )
+    }
+
+    case ValueTypes.stateRender:
+    case ValueTypes.tagComponent: {
+
+      getNewGlobal(contextItem) as SupportTagGlobal
+      contextItem.checkValueChange = checkTagValueChange
+
+      if(appendTo) {
+        const processResult = processFirstSubjectComponent(
+          value as TemplaterResult,
+          contextItem as SupportContextItem,
+          ownerSupport,
+          counts,
+          appendTo as Element,
+        )
+        
+        // ++contextItem.global.renderCount
+
+        return processResult
+      }
+
+      const processResult = processReplacementComponent(
+        value as TemplaterResult,
+        contextItem as SupportContextItem,
+        ownerSupport,
+        counts,
+      )
+      
+      // ++contextItem.global.renderCount
+      
+      return processResult
+    }
+
+    case ValueTypes.renderOnce: {
+      getNewGlobal(contextItem) as SupportTagGlobal
+
+      const support = oneRenderToSupport(
+        value as Wrapper,
+        contextItem as ContextItem,
+        ownerSupport,
+      )
+      
+      renderTagOnly(
+        support,
+        undefined,
+        contextItem as SupportContextItem,
+        ownerSupport,
+      )
+
+      const result = processNewSubjectTag(
+        support.templater,
+        ownerSupport,
+        contextItem as ContextItem,
+        counts,
+        appendTo,
+        insertBefore,
+      )
+
+      // ++contextItem.global.renderCount
+      contextItem.checkValueChange = checkTagValueChange
+
+      return result
+    }
+  }
 }

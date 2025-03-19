@@ -31,6 +31,8 @@ export interface TagTemplate {
 }
 
 export type Tag = {
+  debug?: boolean
+
   values: unknown[]
   tagJsType?: typeof ValueTypes.tag | typeof ValueTypes.dom
   templater?: TemplaterResult

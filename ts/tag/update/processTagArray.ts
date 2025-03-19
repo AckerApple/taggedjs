@@ -10,7 +10,7 @@ import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { processNewArrayValue } from './processNewValue.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { destroySupport } from '../destroySupport.function.js'
-import { Context, ContextItem } from '../Context.types.js'
+import { ContextItem } from '../Context.types.js'
 import { StringTag } from '../getDomTag.function.js'
 
 export function processTagArray(
@@ -22,7 +22,7 @@ export function processTagArray(
 ) {
   
   if(!subject.lastArray){
-    subject.lastArray = [] as Context
+    subject.lastArray = [] as ContextItem[]
   }
   
   const lastArray = subject.lastArray
@@ -31,7 +31,7 @@ export function processTagArray(
 
   let removed = 0
   /** 🗑️ remove previous items first */
-  const filteredLast: Context = []
+  const filteredLast: ContextItem[] = []
   
   for (let index=0; index < lastArray.length; ++index) {
     const item: ContextItem = lastArray[index]
@@ -76,7 +76,7 @@ export function processTagArray(
 function reviewArrayItem(
   array: unknown[],
   index: number,
-  lastArray: Context,
+  lastArray: ContextItem[],
   ownerSupport: AnySupport,
   runtimeInsertBefore: Text | undefined, // used during updates
   counts: Counts,
@@ -104,7 +104,7 @@ function reviewArrayItem(
 function reviewPreviousArrayItem(
   value: unknown,
   itemSubject: ContextItem,
-  lastArray: Context,
+  lastArray: ContextItem[],
   ownerSupport: AnySupport,
   index: number,
   runtimeInsertBefore: Text | undefined, // used during updates
@@ -161,7 +161,6 @@ function processAddTagArrayItem(
     itemSubject,
     ownerSupport,
     counts,
-    `rvp_${lastArray.length}_array`,
     appendTo,
   )
   
@@ -205,7 +204,7 @@ function reviewLastArrayItem(
   _subTag: unknown, // used to compare arrays
   value: unknown[],
   index: number,
-  lastArray: Context,
+  lastArray: ContextItem[],
   removed: number,
   counts: Counts,
 ) {

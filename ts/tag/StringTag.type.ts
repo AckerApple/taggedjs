@@ -1,7 +1,7 @@
 import { KeyFunction, Tag } from "./index.js"
 import { TagValues } from "./html.js"
 
-export type StringTag = Tag & {
+export type StringTag = Tag & {  
   children?: {
     strings: string[] | TemplateStringsArray
     values: TagValues

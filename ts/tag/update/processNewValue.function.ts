@@ -1,5 +1,5 @@
 import { getTemplaterResult,SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { checkTagValueChange } from '../checkDestroyPrevious.function.js'
+import { checkTagValueChange } from '../checkTagValueChange.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { ValueTypes, ValueType } from '../ValueTypes.enum.js'
 import { ValueSubject } from '../../subject/ValueSubject.js'

@@ -12,6 +12,7 @@ export type WatchCallback<T> = (
 
 type WatchOperators<T> = {
   setup: WatchSetup<T>,
+
   /** When an item in watch array changes, callback function will be triggered. Does not trigger on initial watch setup. */
   noInit: (<T>(
     currentValues: any[],
@@ -53,7 +54,10 @@ export const watch = (<T>(
   callback: WatchCallback<T>
 ): MasterWatch<T> => {
   return setupWatch(currentValues, callback) as any
-})// as MasterWatch<any>
+}) as (<T>(
+  currentValues: unknown[],
+  callback: WatchCallback<T>
+) => MasterWatch<T>) & WatchOperators<any>
 
 const defaultFinally = <T>(x: T) => x
 

@@ -1,7 +1,7 @@
 import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
 import { AnySupport, getHtmlSupport } from '../getSupport.function.js'
 import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { checkTagValueChange } from '../checkDestroyPrevious.function.js'
+import { checkTagValueChange } from '../checkTagValueChange.function.js'
 import { buildBeforeElement } from '../buildBeforeElement.function.js'
 import { StringTag, DomTag } from '../getDomTag.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'

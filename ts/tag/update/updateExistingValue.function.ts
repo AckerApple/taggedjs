@@ -20,100 +20,46 @@ const fooCounts: Counts = { added: 0, removed: 0 }
 /** Used for all tag value updates. Determines if value changed since last render */
 export function updateExistingValue(
   contextItem: ContextItem |SupportContextItem,
-  value: TemplateValue,
+  newValue: TemplateValue, // newValue
   ownerSupport: AnySupport,
 ) {
   // Do not continue if the value is just the same
-  if(value === contextItem.value) {
+  if(newValue === contextItem.value) {
     return
   }
 
-  const wasDestroyed = contextItem.checkValueChange(
-    value, contextItem as SupportContextItem
+  // Have the context check itself (avoid having to detect old value)
+  const ignoreOrDestroyed = contextItem.checkValueChange(
+    newValue,
+    contextItem as SupportContextItem
   )
 
-  if(wasDestroyed === -1) {
+  // ignore
+  if(ignoreOrDestroyed === -1) {
     return // do nothing
   }
 
-  // handle already seen tag components
-  const tagJsType = value && (value as TemplaterResult).tagJsType as ValueType
+  // is new value a tag?
+  const tagJsType = newValue && (newValue as TemplaterResult).tagJsType as ValueType
   if(tagJsType) {
     if(tagJsType === ValueTypes.renderOnce) {
       return
     }
 
-    const isComp = isTagComponent(value)
-    if(isComp) {
-      if(!contextItem.global) {
-        getNewGlobal(contextItem)
-      }
+    tryUpdateToTag(
+      contextItem,
+      newValue as TemplaterResult,
+      ownerSupport,
+    )
 
-      prepareUpdateToComponent(
-        value as TemplaterResult,
-        contextItem as SupportContextItem,
-        ownerSupport,
-      )
-
-      return
-    }
+    return
   }
   
-  const global = contextItem.global as SupportTagGlobal
-  if(global) {
-    // its html/dom based tag
-    const support = global.newest
-    if( support ) {
-      updateContextItemBySupport(
-         support,
-        contextItem as SupportContextItem,
-        value as TemplaterResult,
-        ownerSupport,
-      )
 
-      return
-    }
-  }
-
-  if(tagJsType) {
-    switch (tagJsType) {
-      case ValueTypes.templater:
-        processTag(
-          ownerSupport,
-          contextItem,
-          fooCounts,
-        )
-        return
-      
-      case ValueTypes.tag:
-      case ValueTypes.dom: {
-        const tag = value as StringTag | DomTag
-        let templater = tag.templater
-
-        if(!templater) {
-          templater = getFakeTemplater()
-          tag.templater = templater
-          templater.tag = tag
-        }
-  
-        const nowGlobal = (contextItem.global ? contextItem.global : getNewGlobal(contextItem)) as SupportTagGlobal
-        nowGlobal.newest = newSupportByTemplater(templater, ownerSupport, contextItem)
-    
-        processTag(
-          ownerSupport,
-          contextItem,
-          fooCounts,
-        )
-      
-        return
-      }
-    }
-  }
-
-  if(isArray(value)) {
+  if( isArray(newValue) ) {
     processTagArray(
       contextItem,
-      value as (TemplaterResult | StringTag)[],
+      newValue as (TemplaterResult | StringTag)[],
       ownerSupport,
       {added: 0, removed: 0}
     )
@@ -121,17 +67,41 @@ export function updateExistingValue(
     return
   }
 
-  if(typeof(value) === BasicTypes.function) {
-    contextItem.value = value // do not render functions that are not explicity defined as tag html processing
+  if(typeof(newValue) === BasicTypes.function) {
+    contextItem.value = newValue // do not render functions that are not explicity defined as tag html processing
     return
   }
   
-  if(wasDestroyed) {
+  if(ignoreOrDestroyed) {
     processNowRegularValue(
-      value as RegularValue,
+      newValue as RegularValue,
       contextItem,
     )
   }
+}
+
+function updateToTag(
+  value: TemplateValue,
+  contextItem: ContextItem | SupportContextItem,
+  ownerSupport: AnySupport
+) {
+  const tag = value as StringTag | DomTag
+  let templater = tag.templater
+
+  if (!templater) {
+    templater = getFakeTemplater()
+    tag.templater = templater
+    templater.tag = tag
+  }
+
+  const nowGlobal = (contextItem.global ? contextItem.global : getNewGlobal(contextItem)) as SupportTagGlobal
+  nowGlobal.newest = newSupportByTemplater(templater, ownerSupport, contextItem)
+
+  processTag(
+    ownerSupport,
+    contextItem,
+    fooCounts
+  )
 }
 
 function handleStillTag(
@@ -155,7 +125,7 @@ function handleStillTag(
   updateSupportBy(oldest, valueSupport)
 }
 
-function prepareUpdateToComponent(
+export function prepareUpdateToComponent(
   templater: TemplaterResult,
   contextItem:SupportContextItem,
   ownerSupport: AnySupport,
@@ -186,8 +156,7 @@ function prepareUpdateToComponent(
   )
 }
 
-/** Used to destro */
-function updateContextItemBySupport(
+export function updateContextItemBySupport(
   support: AnySupport,
   contextItem:SupportContextItem,
   value: TemplaterResult,
@@ -206,4 +175,64 @@ function updateContextItemBySupport(
 
   return
 
+}
+
+/** result is an indication to ignore further processing but that does not seem in use anymore */
+export function tryUpdateToTag(
+  contextItem: ContextItem |SupportContextItem,
+  newValue: TemplaterResult, // newValue
+  ownerSupport: AnySupport, 
+): boolean {
+  const tagJsType = newValue.tagJsType
+  const isComp = isTagComponent(newValue)
+  if(isComp) {
+    if(contextItem.global === undefined) {
+      getNewGlobal(contextItem)
+    }
+
+    prepareUpdateToComponent(
+      newValue,
+      contextItem as SupportContextItem,
+      ownerSupport,
+    )
+
+    return true
+  }
+
+  // detect if previous value was a tag
+  const global = contextItem.global as SupportTagGlobal
+  if(global) {
+    // its html/dom based tag
+    const support = global.newest
+    if( support ) {
+      updateContextItemBySupport(
+        support,
+        contextItem as SupportContextItem,
+        newValue,
+        ownerSupport,
+      )
+
+      return true
+    }
+  }
+
+  
+  switch (tagJsType) {
+    case ValueTypes.templater:
+      processTag(
+        ownerSupport,
+        contextItem,
+        fooCounts,
+      )
+      return true
+    
+    // when value was not a Tag before
+    case ValueTypes.tag:
+    case ValueTypes.dom: {
+      updateToTag(newValue, contextItem, ownerSupport)
+      return true
+    }
+  }
+
+  return false
 }

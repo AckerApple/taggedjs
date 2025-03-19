@@ -2,7 +2,7 @@ import { SpecialDefinition } from '../interpolations/attributes/processAttribute
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 import { InterpolateSubject } from './update/processFirstSubject.utils.js'
 import { Clone, TagGlobal } from './getTemplaterResult.function.js'
-import {AnySupport, SupportContextItem } from './getSupport.function.js'
+import { AnySupport, SupportContextItem } from './getSupport.function.js'
 
 export type ContextHandler = (
   value: unknown,
@@ -28,7 +28,7 @@ export type ContextItem = {
   simpleValueElm?: Clone
 
   // array only
-  lastArray?: Context
+  lastArray?: ContextItem[]
 
   // observable as variable
   subject?: InterpolateSubject
@@ -39,7 +39,6 @@ export type ContextItem = {
   withinOwnerElement: boolean
   checkValueChange: CheckValueChange | CheckSupportValueChange
 }
-export type Context = ContextItem[]
 
 export type CheckValueChange = (value:unknown, subject: ContextItem) => number | boolean
 export type CheckSupportValueChange = (value:unknown, subject:SupportContextItem) => number | boolean

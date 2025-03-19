@@ -1,12 +1,12 @@
-import {SupportTagGlobal } from './getTemplaterResult.function.js'
+import { SupportTagGlobal } from './getTemplaterResult.function.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { isTagComponent } from '../isInstance.js'
 import { runBeforeDestroy } from './tagRunner.js'
 import { AnySupport } from './getSupport.function.js'
-import { Context } from './Context.types.js'
+import { ContextItem } from './Context.types.js'
 
 export function getChildTagsToDestroy(
-  childTags: Context,
+  childTags: ContextItem[],
 ) {
   for (const child of childTags) {
     const lastArray = child.lastArray
@@ -30,13 +30,13 @@ export function getChildTagsToDestroy(
       runBeforeDestroy(support)
     }
 
-    const subTags = global.context as Context
+    const subTags = global.context as ContextItem[]
     getChildTagsToDestroy(subTags)
   }
 }
 
 export function getChildTagsToSoftDestroy(
-  childTags: Context,
+  childTags: ContextItem[],
   tags: AnySupport[] = [],
   subs: Subscription<any>[] = []
 ): {subs: Subscription<any>[], tags: AnySupport[]} {
@@ -56,7 +56,7 @@ export function getChildTagsToSoftDestroy(
       }
     }
 
-    const subTags = global.context as Context
+    const subTags = global.context as ContextItem[]
     if(subTags) {
       getChildTagsToSoftDestroy(subTags, tags, subs)
     }

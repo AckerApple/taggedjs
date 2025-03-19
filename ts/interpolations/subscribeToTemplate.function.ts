@@ -3,15 +3,13 @@ import { processFirstSubjectValue } from '../tag/update/processFirstSubjectValue
 import { processSubUpdate } from './processSubscriptionUpdate.function.js'
 import { Callback } from './attributes/bindSubjectCallback.function.js'
 import { ValueSubjectSubscriber } from '../subject/ValueSubject.js'
-import { SupportTagGlobal, TagGlobal } from '../tag/getTemplaterResult.function.js'
+import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { ContextItem } from '../tag/Context.types.js'
 import { AnySupport } from '../tag/getSupport.function.js'
 import { Counts } from './interpolateTemplate.js'
 import { paint } from '../tag/paint.function.js'
-import { updateExistingValue } from '../tag/update/updateExistingValue.function.js'
-import { blankHandler } from './optimizers/attachDomElements.function.js'
 
 export type SubToTemplateOptions = {
   insertBefore: Text
@@ -23,6 +21,7 @@ export type SubToTemplateOptions = {
   appendTo?: Element
 }
 
+/** Used for when dynamic value is truly something to subscribe to */
 export function subscribeToTemplate({
   subject,
   support,
@@ -36,7 +35,6 @@ export function subscribeToTemplate({
       contextItem,
       support,
       {...counts},
-      `rvp_-1_${support.templater.tag?.values.length}`,
       syncRun ? appendTo : undefined,
     )
 

@@ -7,7 +7,7 @@ import { tags, TagWrapper } from './tag.utils.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 import { destroySupport } from './destroySupport.function.js'
-import { BaseTagGlobal, checkTagValueChange, DomTag, PropWatches } from './index.js'
+import { BaseTagGlobal, DomTag, PropWatches } from './index.js'
 import { UseMemory } from '../state/setUse.function.js'
 import { runAfterRender } from './afterRender.function.js'
 import { executeWrap } from './executeWrap.function.js'
@@ -18,6 +18,7 @@ import { Props } from '../Props.js'
 import { TagMaker } from './TagMaker.type.js'
 import { BaseSupport } from './BaseSupport.type.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
+import { checkTagValueChange } from './checkTagValueChange.function.js'
 
 export type TagAppElement = Element & {
   ValueTypes: typeof ValueTypes
@@ -94,6 +95,10 @@ export function tagElement(
   
   if(isAppFunction) {
     templater2.tag = support.templater.tag
+  }
+
+  if(!element) {
+    throw new Error(`Cannot tagElement, element received is type ${typeof element} and not type Element`)
   }
 
   // enables hmr destroy so it can control entire app
