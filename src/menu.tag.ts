@@ -6,9 +6,12 @@ export function useMenuName() {
   const route = router.route
   const pathname = router.location.pathname
   
-  const isCounters = pathname && route === 'counters/'
-  if(isCounters) {
+  if(pathname && route === 'counters/') {
     return 'counters'
+  }
+
+  if(pathname && route === 'content/') {
+    return 'content'
   }
   
   const isIsolated = pathname.endsWith('isolated.html')
@@ -39,6 +42,10 @@ export const menu = () => tag.state = (
     <a style.opacity=${menuName === 'counters' ? '.5' : '1'}
       href=${menuName === 'counters' ? undefined : '#counters/'}
     >counters</a>
+    &nbsp;-&nbsp;
+    <a style.opacity=${menuName === 'content' ? '.5' : '1'}
+      href=${menuName === 'content' ? undefined : '#content/'}
+    >content</a>
     &nbsp;-&nbsp;
     <a style.opacity=${menuName === 'todo' ? '.5' : '1'}
       href=${menuName === 'todo' ? undefined : 'todo/www/'}

@@ -20,13 +20,21 @@ export const content = tag(() => {
 
   ++renderCount
 
-  const injectionTest = '<script>alert("i should never run")</script>'
+  const injectionTest = '<script>alert("i should never run but be seen on page")</script>'
 
   return html`<!-- content-debug-testing -->
+  <fieldset id="noParentTagFieldset">
+      <legend>No Parent Test</legend>
+      ${numberedNoParents()}
+    </fieldset>
+    
     <div style="display:flex;flex-wrap:wrap;gap:1em;">
-      <div id="injection-test">injection test ${injectionTest}</div>
-      <div id="hello-big-dom-world">hello ${html.dom(dom)} world</div>
-      <div id="hello-big-string-world">hello ${html`<b>big</b>`} world</div>
+      <fieldset>
+        <legend>injection test</legend>        
+        <div id="injection-test">injection test ${injectionTest}</div>
+        <div id="hello-big-dom-world">hello ${html.dom(dom)} world</div>
+        <div id="hello-big-string-world">hello ${html`<b>big</b>`} world</div>
+      </fieldset>
       
       <div id="style-simple-border-orange" style.border="3px solid orange">simple orange border</div>
       <div id="style-var-border-orange" style.border=${"3px solid orange"}>var orange border</div>
@@ -130,3 +138,27 @@ export const content = tag(() => {
     (render count ${renderCount})
   `
 })
+
+export function numberedNoParents() {
+  const output = html`
+    <hr />
+    content1
+    <hr />
+    ${'test0'}
+    <hr />
+    content2
+    <hr />
+    ${'test1'}
+    <hr />
+    content3
+    <hr />
+    ${'test3'}
+    <hr />
+    content4
+    <hr />
+  `
+  
+  output.debug = true
+
+  return output
+}

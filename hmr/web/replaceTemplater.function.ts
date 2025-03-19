@@ -1,4 +1,4 @@
-import { ValueTypes, Context, ContextItem, paint, Tag, Support, TaggedFunction, SupportTagGlobal } from "taggedjs"
+import { ValueTypes, ContextItem, paint, Tag, Support, TaggedFunction, SupportTagGlobal } from "taggedjs"
 import { updateSubject } from "./updateSubject.function"
 import { HmrImport } from "./hmr"
 
@@ -31,7 +31,7 @@ export async function replaceTemplater(
   // loop all values looking for original functions that match oldTag to replace newTag with
   const promises = values.map(async (value: unknown, index) => {
     const matchGlobal = ownerSupport.subject.global as SupportTagGlobal
-    const matchContext = matchGlobal.context as Context
+    const matchContext = matchGlobal.context as ContextItem[]
     const contextItem = matchContext[ index ]
 /*
     console.log('contextItem check', {

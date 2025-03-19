@@ -21,7 +21,7 @@ describe('📰 content', () => {
     expect(html('#hello-spacing-dom-world')).toBe('54 hello worlds')
   })
 
-  it('style.', async () => {
+  it('style.', () => {
     expect(query('#style-simple-border-orange')[0].style.border).toBe('3px solid orange')
     expect(query('#style-var-border-orange')[0].style.border).toBe('3px solid orange')
     expect(query('#style-toggle-border-orange')[0].style.border).toBe('3px solid orange')
@@ -31,11 +31,24 @@ describe('📰 content', () => {
     expect(query('#style-toggle-border-orange')[0].style.border).toBe('3px solid orange')
   })
 
-  it('style set as object', async () => {
+  it('style set as object', () => {
     expect(query('#style-toggle-bold')[0].style.fontWeight).toBe('')
     click('#toggle-bold')
     expect(query('#style-toggle-bold')[0].style.fontWeight).toBe('bold')
     click('#toggle-bold')
     expect(query('#style-toggle-bold')[0].style.fontWeight).toBe('')
+  })
+
+  it('#noParentTagFieldset', () => {
+    const element = document.getElementById('noParentTagFieldset')
+
+    expect(element?.innerText).toBe(`No Parent Test
+content1
+test0
+content2
+test1
+content3
+test3
+content4`)
   })
 })

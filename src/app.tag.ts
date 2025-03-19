@@ -6,6 +6,7 @@ import { tagDebug } from "./tagJsDebug"
 import { runTests } from "./tests"
 import { menu, useMenuName } from "./menu.tag"
 import { innerCounterContent } from "./countersDebug";
+import { content } from "./ContentDebug.component"
 
 const appDate = Date.now()
 
@@ -14,16 +15,15 @@ const appFun = () => (
 ) => {
   console.log('🍒 App rendered', appDate)
 
-  const content = html`<!--app.js-->
+  return html`<!--app.js-->
     <h1 id="h1-app">🏷️ TaggedJs - ${2+2}</h1>
 
     ${menu()}
 
     ${menuName === 'home' && homePage()}
     ${menuName === 'counters' && innerCounterContent()}
+    ${menuName === 'content' && content()}
   `
-
-  return content
 }
 
 appFun.isApp = true
