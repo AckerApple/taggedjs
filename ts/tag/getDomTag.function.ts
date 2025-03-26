@@ -31,7 +31,7 @@ export interface TagTemplate {
 }
 
 export type Tag = {
-  debug?: boolean
+  debug?: boolean // Attach as () => {const h=html``;h.debug=true;return true}
 
   values: unknown[]
   tagJsType?: typeof ValueTypes.tag | typeof ValueTypes.dom

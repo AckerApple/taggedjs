@@ -3,8 +3,8 @@
 import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
 import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode.types.js"
 import { InterpolateSubject, TemplateValue } from "../../tag/update/processFirstSubject.utils.js"
-import { howToSetInputValue } from "../attributes/howToSetInputValue.function.js"
-import { paintAfters, paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
+import { howToSetFirstInputValue } from "../attributes/howToSetInputValue.function.js"
+import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
 import { AnySupport } from "../../tag/getSupport.function.js"
 import { processAttribute } from "../attributes/processAttribute.function.js"
 import { SubToTemplateOptions } from "../subscribeToTemplate.function.js"
@@ -32,12 +32,11 @@ export function attachDomElements(
 ): {
   context: ContextItem[]
   subs: SubToTemplateOptions[]
-  dom: DomObjectChildren
+  dom: DomObjectChildren // return of children created. Used to attach `ch` for children to a node
 } {
-  // TODO: This appears unused
   const dom: DomObjectChildren = []
 
-  if(appendTo && insertBefore === undefined && depth > 0) {
+  if(appendTo && insertBefore === undefined) {
     insertBefore = document.createTextNode(empty)
 
     paintAppends.push({
@@ -51,7 +50,6 @@ export function attachDomElements(
   for (let index=0; index < nodes.length; ++index) {
     const node = (nodes as DomObjectElement[])[index]
     
-    // TODO: This appears unused
     const newNode = {} as DomObjectElement // DomObjectText
     dom.push(newNode)
 
@@ -125,7 +123,7 @@ function attachDomElement(
   
   // attributes that may effect style, come first for performance
   if (node.at) {
-    node.at.map(attr => {
+    node.at.forEach(attr => {
       const name = attr[0]
       const value = attr[1]
       const isSpecial = attr[2] || false
@@ -135,7 +133,8 @@ function attachDomElement(
         name,
         domElement,
         support,
-        howToSetInputValue,
+        // howToSetInputValue, // maybe more performant for updates but not first renders
+        howToSetFirstInputValue,
         context,
         isSpecial,
         counts,

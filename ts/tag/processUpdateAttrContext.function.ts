@@ -1,8 +1,9 @@
 import { AnySupport } from './getSupport.function.js'
 import { ContextItem } from './Context.types.js'
-import { processAttributeEmit, updateNameOnlyAttrValue } from '../interpolations/attributes/processAttribute.function.js'
+import { processAttributeEmit } from '../interpolations/attributes/processAttribute.function.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 import { Counts } from '../interpolations/interpolateTemplate.js'
+import { updateNameOnlyAttrValue } from '../interpolations/attributes/updateAttribute.function.js'
 
 const emptyCounts: Counts = {added: 0, removed: 0}
 
