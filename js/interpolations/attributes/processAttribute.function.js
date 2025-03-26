@@ -10,7 +10,7 @@ import { processAttributeFunction } from './processAttributeCallback.function.js
 import { isSpecialAttr } from './isSpecialAttribute.function.js';
 import { processUpdateAttrContext } from '../../tag/processUpdateAttrContext.function.js';
 import { blankHandler } from '../optimizers/attachDomElements.function.js';
-/** Sets attribute value, subscribes to value updates  */
+/** MAIN FUNCTION. Sets attribute value, subscribes to value updates  */
 export function processAttribute(values, attrName, element, support, howToSet, //  = howToSetInputValue
 context, isSpecial, counts, value) {
     const nameVar = getTagJsVar(attrName);
@@ -59,37 +59,6 @@ context, isSpecial, counts, value) {
         return;
     }
     return processNonDynamicAttr(attrName, value, element, howToSet, counts, support, isSpecial);
-}
-export function updateNameOnlyAttrValue(values, attrValue, lastValue, element, ownerSupport, howToSet, context, counts) {
-    // check to remove previous attribute(s)
-    if (lastValue) {
-        if (isNoDisplayValue(attrValue)) {
-            element.removeAttribute(lastValue);
-            return;
-        }
-        if (typeof (lastValue) === BasicTypes.object) {
-            const isObStill = typeof (attrValue) === BasicTypes.object;
-            if (isObStill) {
-                for (const name in lastValue) {
-                    // if((attrValue as any)[name]) {
-                    if (name in attrValue) {
-                        continue;
-                    }
-                    paintContent.push(function paintContent() {
-                        element.removeAttribute(name);
-                    });
-                }
-            }
-            else {
-                for (const name in lastValue) {
-                    paintContent.push(function paintContent() {
-                        element.removeAttribute(name);
-                    });
-                }
-            }
-        }
-    }
-    processNameOnlyAttrValue(values, attrValue, element, ownerSupport, howToSet, context, counts);
 }
 export function processNameOnlyAttrValue(values, attrValue, element, ownerSupport, howToSet, context, counts) {
     if (isNoDisplayValue(attrValue)) {

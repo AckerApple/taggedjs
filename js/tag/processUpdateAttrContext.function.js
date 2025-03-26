@@ -1,4 +1,5 @@
-import { processAttributeEmit, updateNameOnlyAttrValue } from '../interpolations/attributes/processAttribute.function.js';
+import { processAttributeEmit } from '../interpolations/attributes/processAttribute.function.js';
+import { updateNameOnlyAttrValue } from '../interpolations/attributes/updateAttribute.function.js';
 const emptyCounts = { added: 0, removed: 0 };
 export function processUpdateAttrContext(values, value, contextItem, ownerSupport) {
     if (contextItem.isNameOnly) {

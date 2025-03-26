@@ -7,10 +7,9 @@ type TagVarIdNum = {
 };
 export type SpecialAction = 'init' | 'destroy';
 export type SpecialDefinition = boolean | SpecialAction | 'class' | 'style' | 'autofocus' | 'autoselect';
-/** Sets attribute value, subscribes to value updates  */
+/** MAIN FUNCTION. Sets attribute value, subscribes to value updates  */
 export declare function processAttribute(values: unknown[], attrName: string | TagVarIdNum, element: Element, support: AnySupport, howToSet: HowToSet, //  = howToSetInputValue
 context: ContextItem[], isSpecial: SpecialDefinition, counts: Counts, value: string | null | undefined | TagVarIdNum): void;
-export declare function updateNameOnlyAttrValue(values: unknown[], attrValue: string | boolean | Record<string, any>, lastValue: string | Record<string, any> | undefined, element: Element, ownerSupport: AnySupport, howToSet: HowToSet, context: ContextItem[], counts: Counts): void;
 export declare function processNameOnlyAttrValue(values: unknown[], attrValue: string | boolean | Record<string, any>, element: Element, ownerSupport: AnySupport, howToSet: HowToSet, context: ContextItem[], counts: Counts): void;
 export declare function processAttributeEmit(newAttrValue: any, attrName: string, subject: ContextItem, element: Element, support: AnySupport, howToSet: HowToSet, isSpecial: SpecialDefinition, counts: Counts): any;
 export type NoDisplayValue = false | null | undefined;

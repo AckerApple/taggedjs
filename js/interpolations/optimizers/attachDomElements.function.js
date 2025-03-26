@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js";
-import { howToSetInputValue } from "../attributes/howToSetInputValue.function.js";
+import { howToSetFirstInputValue } from "../attributes/howToSetInputValue.function.js";
 import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js";
 import { processAttribute } from "../attributes/processAttribute.function.js";
 import { addOneContext } from "../../tag/index.js";
@@ -12,9 +12,8 @@ const someDiv = (typeof document === 'object' && document.createElement('div'));
 export function attachDomElements(nodes, values, support, counts, // used for animation stagger computing
 context, depth, // used to know if dynamic variables live within parent owner tag/support
 appendTo, insertBefore, subs = []) {
-    // TODO: This appears unused
     const dom = [];
-    if (appendTo && insertBefore === undefined && depth > 0) {
+    if (appendTo && insertBefore === undefined) {
         insertBefore = document.createTextNode(empty);
         paintAppends.push({
             element: insertBefore,
@@ -24,7 +23,6 @@ appendTo, insertBefore, subs = []) {
     }
     for (let index = 0; index < nodes.length; ++index) {
         const node = nodes[index];
-        // TODO: This appears unused
         const newNode = {}; // DomObjectText
         dom.push(newNode);
         const value = node.v;
@@ -51,11 +49,13 @@ function attachDomElement(newNode, node, values, support, context, counts, appen
     const domElement = newNode.domElement = document.createElement(node.nn);
     // attributes that may effect style, come first for performance
     if (node.at) {
-        node.at.map(attr => {
+        node.at.forEach(attr => {
             const name = attr[0];
             const value = attr[1];
             const isSpecial = attr[2] || false;
-            processAttribute(values, name, domElement, support, howToSetInputValue, context, isSpecial, counts, value);
+            processAttribute(values, name, domElement, support, 
+            // howToSetInputValue, // maybe more performant for updates but not first renders
+            howToSetFirstInputValue, context, isSpecial, counts, value);
         });
     }
     if (appendTo) {
