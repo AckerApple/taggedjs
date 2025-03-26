@@ -4,7 +4,7 @@ import { setUseMemory } from './setUseMemory.object.js';
 import { state } from './state.function.js';
 import { syncStates } from './syncStates.function.js';
 /** Create a Subject that on updates will sync state values to keep chained functions using latest variables */
-export function subject(initialValue, onSubscription) {
+export function subject(initialValue) {
     const support = getSupportInCycle();
     if (support) {
         return state(() => new Subject(initialValue));
