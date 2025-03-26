@@ -117,21 +117,8 @@ async function checkToUpdateSubject(
   ].includes(tagJsType[0])
   
   if(!isTemplater) {
-    if(ValueTypes.dom[0] !== 'dom') {
-      console.log('also not a value for us?', {value, typeString: tagJsType[0]})
-    }
     return count
   }
-/*
-  if(!value.wrapper) {
-    return count
-  }
-*/
-  /*
-  if(isApp) {
-    console.log('updating this subject---->', contextItem)
-  }
-    */
 
   const oldest = (contextItem.global as SupportTagGlobal)?.oldest
   const newOriginal = oldest?.templater.wrapper?.original

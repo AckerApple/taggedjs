@@ -50,5 +50,7 @@ export const menu = () => tag.state = (
     <a style.opacity=${menuName === 'todo' ? '.5' : '1'}
       href=${menuName === 'todo' ? undefined : 'todo/www/'}
     >todo app</a>
+    &nbsp;-&nbsp;
+    <a href="https://github.com/AckerApple/taggedjs" target="_blank">repo</a>
   </div>
 `

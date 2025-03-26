@@ -39,10 +39,11 @@ describe('📰 content', () => {
     expect(query('#style-toggle-bold')[0].style.fontWeight).toBe('')
   })
 
-  it('#noParentTagFieldset', () => {
-    const element = document.getElementById('noParentTagFieldset')
-
-    expect(element?.innerText).toBe(`No Parent Test
+  describe('no parent element tests', () => {
+    it('no immediate parent', () => {
+      const element = document.getElementById('noParentTagFieldset')
+  
+      expect(element?.innerText).toBe(`No Parent Test
 content1
 test0
 content2
@@ -50,5 +51,14 @@ test1
 content3
 test3
 content4`)
+    })
+
+    it('multiple no parent - ensure dynamic content rendered in order', () => {
+      const element = document.getElementById('noParentTagFieldset') as HTMLElement
+      const parent = element.parentNode as HTMLElement
+  
+      const html = parent.innerHTML.replace(/(^.+<hr id="noParentsTest2-start">|)/g,'').replace(/<hr id="noParentsTest2-end">.*/g,'').trim()
+      expect(html).toBe('<hr>content1<hr>test0<hr>content2<hr>test1<hr>content3<hr>test3<hr>content4<hr>')
+    })
   })
 })

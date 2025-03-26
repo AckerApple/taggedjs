@@ -23,11 +23,15 @@ export const content = tag(() => {
   const injectionTest = '<script>alert("i should never run but be seen on page")</script>'
 
   return html`<!-- content-debug-testing -->
-  <fieldset id="noParentTagFieldset">
+    <fieldset id="noParentTagFieldset">
       <legend>No Parent Test</legend>
       ${numberedNoParents()}
     </fieldset>
-    
+
+    <hr id="noParentsTest2-start" />
+    ${numberedNoParents()}
+    <hr id="noParentsTest2-end" />
+
     <div style="display:flex;flex-wrap:wrap;gap:1em;">
       <fieldset>
         <legend>injection test</legend>        
@@ -140,7 +144,7 @@ export const content = tag(() => {
 })
 
 export function numberedNoParents() {
-  const output = html`
+  return html`
     <hr />
     content1
     <hr />
@@ -156,9 +160,5 @@ export function numberedNoParents() {
     <hr />
     content4
     <hr />
-  `
-  
-  output.debug = true
-
-  return output
+  `  
 }

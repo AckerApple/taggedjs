@@ -20,12 +20,13 @@ export function renderedSections(
   appCounterSubject: Subject<number>,
   viewTypes: ViewTypes[] = storage.views,
 ) {
-  const outputSections = [] as {
+  const outputSections: {
     view: ViewTypes
     title: string
     output: any
     emoji?: string
-  }[]
+    debug?: boolean
+  }[] = [];
 
   [{
     view: ViewTypes.OneRender, tag: oneRender,
@@ -45,6 +46,7 @@ export function renderedSections(
     view: ViewTypes.Arrays, tag: arrays, emoji:'⠇',
   },{
     view: ViewTypes.Content, tag: content, emoji:'📰',
+    debug: true,
   },{
     view: ViewTypes.Child, tag: child, emoji:'👶',
   },{
@@ -57,23 +59,23 @@ export function renderedSections(
     view: ViewTypes.Todo, tag: tag(todoApp),
   }/*,{
     view: ViewTypes.Counters, tag: counters, emoji:'🔀',
-  }*/].forEach(({emoji, view, tag}) => {
+  }*/].forEach(({emoji, view, tag, ...extra}) => {
     if(viewTypes.includes(view)) {
       outputSections.push({
         title: view,
         output: tag(),
-        view, emoji,
+        view,
+        emoji,
+        ...extra,
       })
     }
   })
 
-
   return html`
     <div style="display:flex;flex-wrap:wrap;gap:1em">
-      ${outputSections.map(({emoji, view, title, output}) => html`
+      ${outputSections.map(({emoji, view, title, output, debug}) => html`
         <div style="flex:2 2 20em">
           <a id=${view}><!-- ⚓️ --></a>
-
           <fieldset>
             <legend>${emoji} ${title}</legend>
             ${output}
