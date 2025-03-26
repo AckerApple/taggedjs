@@ -7,7 +7,7 @@ import { Provider } from '../state/providers.js'
 import { OnDestroyCallback } from '../state/onDestroy.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { Subject } from '../subject/index.js'
-import { ValueType, ValueTypes } from './ValueTypes.enum.js'
+import { ValueTypes } from './ValueTypes.enum.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { PropWatches } from './tag.js'
 
