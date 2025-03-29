@@ -214,54 +214,19 @@ function reviewLastArrayItem(
   const prev = lastArray[index]
 
   if(lessLength) {
+    console.log('lessLength destroy array item', {at})
     destroyArrayItem(prev, counts)
     ++removed
     return 1
   }
 
   if(lastArray[index].value.arrayValue !== (value[index] as any).arrayValue) {
+    console.log('destroy unequal array item', {at})
     destroyArrayItem(prev, counts)
     lastArray.splice(index, 1)
     ++removed
     return 2
   }
 
-  /*
-  const nowValue = getArrayValueByItem(subTag)
-  const lastArrayValue = lastArray.array[index].arrayValue
-  */
-
-  // check for html``.key()
-  /*
-  const keySet = 'arrayValue' in tag
-  if (!keySet) {
-    const details = {
-      array: value.map(item => item.values || item),
-      vdom: (tag as any)?.support.templater.tag.dom,
-      tag,
-      lastArray: lastArray.array[index]
-    }
-    const message = 'Found Tag in array without key value, during array update. Be sure to use "html`...`.key(unique)" OR import TaggedJs "key" "key(unique).html = CustomTag(props)"'
-    console.error(message, details)
-    const err = new ArrayNoKeyError(message, details)
-    throw err
-  }
-  */
-
-  /*
-  const destroyItem = nowValue !== lastArrayValue
-  if(destroyItem) {
-    destroyArrayItem(lastArray.array, index, counts)
-    ++removed
-    return 1
-  }
-  */
-
   return 0
 }
-
-/*
-function getArrayValueByItem(item: any) {
-  return item?.arrayValue || item
-}
-*/

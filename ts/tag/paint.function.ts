@@ -28,6 +28,9 @@ export function paint() {
 
   for(const toRemove of paintRemoves) {
     const parentNode = toRemove.parentNode as ParentNode
+    if(!parentNode) {
+      console.log('xxxxxxx', {toRemove, hint: (toRemove as any).hint})
+    }
     parentNode.removeChild(toRemove as Element)
   }
 

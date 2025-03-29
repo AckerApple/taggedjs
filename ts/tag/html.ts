@@ -5,7 +5,7 @@ import { PropWatches } from './tag.js'
 import { getTemplaterResult } from './getTemplaterResult.function.js'
 import { RegularValue } from './update/processRegularValue.function.js'
 
-export type TagValues = (((e: InputElementTargetEvent) => any) | RegularValue | null | undefined | object)[]
+export type TagValues = (((e: InputElementTargetEvent) => any) | RegularValue | null | unknown | undefined | object)[]
 
 export function html(
   strings: string[] | TemplateStringsArray,

@@ -121,7 +121,7 @@ function destroyClones(
     if(!dom) {
       return
     }
-  
+
     paintRemoves.push(dom)
   })
 }
