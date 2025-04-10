@@ -33,13 +33,6 @@ export async function replaceTemplater(
     const matchGlobal = ownerSupport.subject.global as SupportTagGlobal
     const matchContext = matchGlobal.context as ContextItem[]
     const contextItem = matchContext[ index ]
-/*
-    console.log('contextItem check', {
-      index,
-      contextItem,
-      oldest: (contextItem?.global as SupportTagGlobal)?.oldest,
-    })
-*/
     count = await checkToUpdateSubject(
       value,
       contextItem,

@@ -30,6 +30,7 @@ export type HmrImport = {
 }
 
 function reconnect() {
+  console.log('reconnect?')
   const socket = new WebSocket('ws://localhost:3000');
 
   // Listen for WebSocket errors
@@ -91,6 +92,14 @@ async function discoverTags(): Promise<DiscoveredTag[]> {
 
     const newApp = await import(`${url}?${Date.now()}`)
 
+    if(!newApp[tagName]) {
+      throw new Error(`Cannot find export ${tagName} from ${url}`)
+    }
+
+    if(!newApp.hmr) {
+      throw new Error(`Cannot find export hmr from ${url}`)
+    }
+
     try {
       const newTemplater = newApp[tagName]() as TemplaterResult
       return {
@@ -126,6 +135,7 @@ async function updateByElement(
   const oldSetUse = tagAppElm.setUse // as any // placed on element by tagElement command
     
   // load via import() new code for browser to use
+  console.log('updateByElement?')
   const tags = await discoverTags()
 
   // loop new tags looking for matching old

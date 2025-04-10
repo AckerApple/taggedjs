@@ -1,4 +1,4 @@
-import { watch, html, tag, letProp, state, states } from "taggedjs"
+import { watch, html, tag, letProp, state, states, InputElementTargetEvent } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component.js"
 import statePropDebugTag from "./statePropDebug.tag.js"
 
@@ -21,7 +21,7 @@ export const propsDebugMain = tag((
 ) => html`
   <div style="display:flex;flex-wrap:wrap" id="textareawrap">
     <textarea id="props-debug-textarea" wrap="off"
-      onchange=${event => propsJson = JSON.parse(event.target.value)}
+      onchange=${(event: InputElementTargetEvent) => propsJson = JSON.parse(event.target.value)}
       style="height:200px;font-size:0.6em;width:100%;max-width:400px"
     >${ json }</textarea>
     
@@ -70,7 +70,7 @@ export const propsDebugMain = tag((
   <fieldset>
     <legend>date prop</legend>
     date:${date}
-    <input type="date" value=${timestampToValues(date).date} onchange=${event => {
+    <input type="date" value=${timestampToValues(date).date} onchange=${(event: InputElementTargetEvent) => {
       const newDateString = event.target.value
       date = new Date(newDateString)
     }} />
@@ -156,7 +156,7 @@ const propsDebug = tag((
 ) => html`<!--propsDebug.js-->
   <h3>Props Json</h3>
   <textarea style="font-size:0.6em;height:200px;width:100%;;max-width:400px" wrap="off"
-    onchange=${event=> {
+    onchange=${(event: InputElementTargetEvent)=> {
       const value = JSON.parse(event.target.value)
       Object.assign(propsJson, value)
     }}

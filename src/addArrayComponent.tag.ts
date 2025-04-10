@@ -15,7 +15,7 @@ export const addArrayComponent = tag((
     }
   },
 ) => html`
-  <input type="text" onkeyup=${handleKeyUp} onchange=${e => {addArrayItem(e.target.value);e.target.value=''}} />
+  <input type="text" onkeyup=${handleKeyUp} onchange=${(e: InputElementTargetEvent) => {addArrayItem(e.target.value);e.target.value=''}} />
   <button type="button" onclick=${addArrayItem}>add by outside</button>
   ${renderCountDiv({renderCount, name:'addArrayComponent'})}
 `)

@@ -4,7 +4,7 @@ import TerserPlugin from 'terser-webpack-plugin'
 // import CompressionPlugin from 'compression-webpack-plugin'
 
 import { fileURLToPath } from 'url'
-import ResolveTsForJsPlugin from './ResolveTsForJsPlugin.class.js'
+import { ResolveTsForJsPlugin } from './node_modules/taggedjs-cli/bin/bundle'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -28,7 +28,7 @@ export default {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     alias: {
-      // taggedjs: path.resolve(__dirname, '../main/ts'),
+      taggedjs: path.resolve(__dirname, '../main/ts'),
     }
   },
   module: {

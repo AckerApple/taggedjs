@@ -1,7 +1,7 @@
 import { Header } from "./components/header.js";
 import { Footer } from "./components/footer.js";
 import { Todo, todoReducer } from "./reducer.js";
-import { html } from "taggedjs";
+import { html, InputElementTargetEvent } from "taggedjs";
 import { useHashRouter } from "./HashRouter.function.js";
 import { Item } from "./components/item.js";
 import { ViewTypes } from "../sectionSelector.tag.js";
@@ -26,7 +26,13 @@ export const todoApp = () => {
         ${todoCount > 0 && html`
             <main class="main">
                 <div class="toggle-all-container">
-                    <input id="toggle-all" class="toggle-all" type="checkbox" checked=${activeTodoCount < 1} onChange=${e => dispatch.toggleAll(e.target.checked)} />
+                    <input
+                        id="toggle-all"
+                        class="toggle-all"
+                        type="checkbox"
+                        checked=${activeTodoCount < 1}
+                        onChange=${(e: InputElementTargetEvent) => dispatch.toggleAll(e.target.checked)}
+                    />
                     <label class="toggle-all-label" for="toggle-all">
                         Toggle All Input
                     </label>

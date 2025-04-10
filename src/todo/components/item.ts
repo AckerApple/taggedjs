@@ -1,5 +1,5 @@
-import { Dispatch, Todo } from "../reducer.js";
-import { states, html, tag } from "taggedjs";
+import { Dispatch, Todo } from '../reducer.js'
+import { states, html, tag, InputElementTargetEvent } from 'taggedjs'
 
 export const Item = tag.immutableProps((
     todo: Todo,
@@ -14,7 +14,7 @@ export const Item = tag.immutableProps((
             ${!editing ? html`
                 <div class="view">
                     ${ todo.completed && '✅' }
-                    <input type="button" onclick=${e => dispatch.toggleItem(todo, index)} value="toggle" />
+                    <input type="button" onclick=${(e: InputElementTargetEvent) => dispatch.toggleItem(todo, index)} value="toggle" />
                     
                     <input class="toggle" type="checkbox" ${todo.completed && 'checked'} onchange=${() => dispatch.toggleItem(todo, index)} />
                     
@@ -29,7 +29,7 @@ export const Item = tag.immutableProps((
                     <input id="edit-todo-input" type="text" autofocus class="edit"
                         value=${todo.title}
                         onblur=${() => editing = false}
-                        onKeyDown=${e => handleKey(e, title => {
+                        onKeyDown=${(e: InputElementTargetEvent) => handleKey(e, title => {
                             handleUpdate(title, todo, index, dispatch)
                             editing = false
                         })}

@@ -3,9 +3,9 @@
   "scripts": {
     "save": "git add . && git commit -m \"patch\" && git push",
     "start": "run-p start:hmr",
-    "start:hmr": "ts-node hmr-server.ts --dir \"./src\"",
+    "start:hmr": "node --loader ts-node/esm ./hmr/hmr-server.ts --dir \"./src\"",
     "build": "run-s build:hmr build:bundle",
-    "build:bundle": "ts-node runBundleScript.ts",
+    "build:bundle": "node --loader ts-node/esm ./runBundleScript.ts",
     "build:js": "rm -rf assets/js && mkdir assets/js && tsc -p tsconfig.build.json",
     "build:hmr": "node hmr/runBundleScript.hmr.mjs",
     "build:test": "ts-node src/testbuild.ts -p tsconfig.build.json",
@@ -26,13 +26,13 @@
     "ts-jest": "^29.1.5",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3",
+    "typescript": "^5.8.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
     "ws": "^8.15.1"
   },
   "dependencies": {
-    "taggedjs": "^2.7.8",
-    "taggedjs-cli": "^0.1.13"
+    "taggedjs": "^2.8.8",
+    "taggedjs-cli": "^0.1.18"
   }
 }

@@ -1,4 +1,6 @@
 import { LikeObjectChildren, html, tag, ValueSubject, state, combineLatest, willPromise, states } from "taggedjs"
+import { dumpContent } from "./dumpContent.tag"
+import { renderCountDiv } from "./renderCount.component"
 
 export const content = tag(() => {
   const vs0 = state(() => new ValueSubject(0))
@@ -23,6 +25,12 @@ export const content = tag(() => {
   const injectionTest = '<script>alert("i should never run but be seen on page")</script>'
 
   return html`<!-- content-debug-testing -->
+    <fieldset>
+      <legend>Dump Content</legend>
+      ${dumpContent()}
+      ${renderCountDiv({renderCount, name: 'ContentDebug'})}
+    </fieldset>
+
     <fieldset id="noParentTagFieldset">
       <legend>No Parent Test</legend>
       ${numberedNoParents()}
@@ -139,7 +147,7 @@ export const content = tag(() => {
         </fieldset>
       </div>
     </div>
-    (render count ${renderCount})
+    ${renderCountDiv({renderCount, name: 'ContentDebug'})}
   `
 })
 

@@ -1,4 +1,4 @@
-import { byId, click, textContent } from "./testing/elmSelectors"
+import { byId } from "./testing/elmSelectors"
 import { expect, it } from "./testing/expect"
 
 it('elements exists', () => {

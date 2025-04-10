@@ -1,6 +1,6 @@
 import { mouseOverTag } from "./mouseover.tag.js"
 import { renderCountDiv } from "./renderCount.component.js"
-import { states, html, tag, Subject, onInit, callbackMaker, state, ValueSubject, callback, subject } from "taggedjs"
+import { states, html, tag, Subject, onInit, callbackMaker, state, ValueSubject, callback, subject, InputElementTargetEvent } from "taggedjs"
 
 const loadStartTime = Date.now()
 
@@ -263,7 +263,7 @@ export const innerCounterContent = () => tag.use = (
 
   <div style="display:flex;flex-wrap:wrap;gap:1em">
     <input id="set-main-counter-input" placeholder="input counter value"
-      onkeyup=${e => (counter = Number(e.target.value) || 0)}
+      onkeyup=${(e: InputElementTargetEvent) => (counter = Number(e.target.value) || 0)}
     />
   
     <div>
@@ -354,10 +354,10 @@ export const innerCounterContent = () => tag.use = (
   </fieldset>
 
   <div style="font-size:0.8em;opacity:0.8">
-    ⌚️ page load to display in&nbsp;<span oninit=${event => event.target.innerText = (Date.now()-loadStartTime).toString()}>-</span>ms
+    ⌚️ page load to display in&nbsp;<span oninit=${(event: InputElementTargetEvent) => event.target.innerText = (Date.now()-loadStartTime).toString()}>-</span>ms
   </div>
   <div style="font-size:0.8em;opacity:0.8">
-    ⌚️ read in&nbsp;<span oninit=${event => event.target.innerText = (Date.now()-readStartTime).toString()}>-</span>ms
+    ⌚️ read in&nbsp;<span oninit=${(event: InputElementTargetEvent) => event.target.innerText = (Date.now()-readStartTime).toString()}>-</span>ms
   </div>
 
   ${renderCountDiv({renderCount, name: 'counters'})}
