@@ -86,6 +86,7 @@ function reviewArrayItem(
 ) {
   const item = array[index]
   const previous = lastArray[index]
+
   if(previous) {
     return reviewPreviousArrayItem(
       item, previous, lastArray, ownerSupport, index,

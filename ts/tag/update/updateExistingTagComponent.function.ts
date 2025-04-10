@@ -135,6 +135,10 @@ function syncPriorPropFunction(
   maxDepth: number,
   depth: number,
 ) {
+  if(priorProp === undefined) {
+    return prop
+  }
+
   if(typeof(priorProp) === BasicTypes.function) {
     // the prop i am receiving, is already being monitored/controlled by another parent
     if(prop.mem) {
@@ -166,10 +170,6 @@ function syncPriorPropFunction(
     )
   }
 
-  if(priorProp === undefined) {
-    return prop
-  }
-
   return updateExistingObject(
     prop as unknown as Record<string, WrapRunner>,
     priorProp as unknown as Record<string, WrapRunner>,
@@ -190,9 +190,11 @@ function updateExistingObject(
 ) {
   const keys = Object.keys(prop) 
   for(const name of keys){
-    const subValue = (prop as unknown as Record<string, WrapRunner>)[name]
+    const subValue = prop[name]
+    const oldProp = (priorProp as unknown as Record<string, WrapRunner>)[name]
+
     const result = syncPriorPropFunction(
-      (priorProp as unknown as Record<string, WrapRunner>)[name],
+      oldProp,
       subValue,
       newSupport,
       ownerSupport,
@@ -200,17 +202,16 @@ function updateExistingObject(
       depth + 1,
     )
 
-    if((prop as unknown as Record<string, WrapRunner>)[name] === result) {
+    if(subValue === result) {
       continue
     }
-    
     
     const hasSetter = Object.getOwnPropertyDescriptor(prop, name)?.set
     if(hasSetter) {
       continue
     }
 
-    ;(prop as unknown as Record<string, WrapRunner>)[name] = result as WrapRunner
+    prop[name] = result as WrapRunner
   }
   
   return prop
@@ -225,8 +226,9 @@ function updateExistingArray(
 ) {
   for (let index = prop.length - 1; index >= 0; --index) {
     const x = prop[index]
+    const oldProp = (priorProp as unknown as unknown[])[index] as WrapRunner
     prop[index] = syncPriorPropFunction(
-      (priorProp as unknown as unknown[])[index] as WrapRunner,
+      oldProp,
       x,
       newSupport,
       ownerSupport,
