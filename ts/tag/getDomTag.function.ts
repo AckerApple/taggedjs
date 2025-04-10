@@ -11,7 +11,7 @@ import { AnySupport } from './getSupport.function.js'
 import { getSupportInCycle } from './getSupportInCycle.function.js'
 import { StringTag } from './StringTag.type.js'
 
-export { StringTag }
+export type { StringTag }
 export const variablePrefix = ':tagvar'
 export const variableSuffix = ':'
 
@@ -41,7 +41,14 @@ export type Tag = {
   arrayValue?: any
 }
 
-export type KeyFunction = (arrayValue: unknown) => StringTag
+type ArrayItemStringTag<T> = StringTag & { arrayValue: T }
+
+export type KeyFunction = 
+/** Used in array.map() as array.map(x => html``.key(x))
+ * - NEVER USE inline object key: array.map(x => html``.key({x}))
+ * - NEVER USE inline array key: array.map((x, index) => html``.key([x, index]))
+ */
+<T>(arrayValue: T) => ArrayItemStringTag<T>
 
 export function getStringTag(
   strings: string[],
@@ -53,10 +60,13 @@ export function getStringTag(
     
     tagJsType: ValueTypes.tag,
     strings,
-    key(arrayValue: unknown) {
+    
+    /** Used within an array.map() that returns html aka array.map(x => html``.key(x)) */
+    key<T>(arrayValue: T) {
       tag.arrayValue = arrayValue
-      return tag
-    },  
+      return tag as ArrayItemStringTag<T>
+    },
+
     html: function html(
       strings: string[] | TemplateStringsArray,
       values: TagValues,
@@ -76,6 +86,8 @@ export type DomTag = Tag & {
   }
   dom: LikeObjectChildren
   values: unknown[]
+
+  /** used in array.map() */
   key: (arrayValue: unknown) => DomTag
 
   html: {

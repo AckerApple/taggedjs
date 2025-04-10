@@ -24,13 +24,9 @@ export function paint() {
     return
   }
 
-  ++painting.locks
-
-  for(const toRemove of paintRemoves) {
+  for (let index = paintRemoves.length - 1; index >= 0; --index) {
+    const toRemove = paintRemoves[index]
     const parentNode = toRemove.parentNode as ParentNode
-    if(!parentNode) {
-      console.log('xxxxxxx', {toRemove, hint: (toRemove as any).hint})
-    }
     parentNode.removeChild(toRemove as Element)
   }
 
@@ -50,15 +46,15 @@ export function paint() {
     (relative.parentNode as ParentNode).insertBefore(element, relative)
   }
 
-  for(const now of paintAfters) {
-    now()
-  }
-
   paintRemoves = []
   paintContent = []
   paintAppends = []
   paintInsertBefores = []
-  paintAfters = []
   setContent = []
-  --painting.locks
+
+  for(const now of paintAfters) {
+    now()
+  }
+
+  paintAfters = []
 }

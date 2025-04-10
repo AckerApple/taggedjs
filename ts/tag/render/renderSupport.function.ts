@@ -27,7 +27,8 @@ export function renderSupport<T extends AnySupport>(
 
   // is it just a vanilla tag, not component?
   if( inlineHtml ) {
-    return renderInlineHtml(ownerSupport, support) as T
+    const result = renderInlineHtml(ownerSupport, support) as T
+    return result
   }
 
   global.locked = true
@@ -38,14 +39,14 @@ export function renderSupport<T extends AnySupport>(
     global.blocked = []
   }
 
-  delete global.locked
-
   const tag = renderExistingReadyTag(
     global.newest as AnySupport,
     support,
     ownerSupport,
     subject,
   )
+
+  delete global.locked
 
   return tag as T
 }

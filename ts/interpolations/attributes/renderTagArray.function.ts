@@ -8,7 +8,7 @@ export function renderTagUpdateArray(
   supports: AnySupport[],
 ) {
   ++painting.locks
-
+  
   supports.forEach(mapTagUpdate)
 
   --painting.locks
@@ -22,6 +22,5 @@ function mapTagUpdate(support: AnySupport) {
     return // while rendering a parent, a child may have been deleted (pinbowl)
   }
 
-  // renderSupport(support)
   renderSupport(global.newest)
 }

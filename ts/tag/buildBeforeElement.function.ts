@@ -24,7 +24,8 @@ export function buildBeforeElement(
   global.newest = support
 
   ++painting.locks
-  const result = getHtmlDomMeta(support, counts, appendTo, insertBefore)
+  const result = attachHtmlDomMeta(support, counts, appendTo, insertBefore)
+    
   global.htmlDomMeta = result.dom
   --painting.locks
 
@@ -32,7 +33,7 @@ export function buildBeforeElement(
   return result
 }
 
-function getHtmlDomMeta(
+function attachHtmlDomMeta(
   support: AnySupport,
   counts: Counts,
   appendTo?: Element,
@@ -68,7 +69,9 @@ function loadDomMeta(support: AnySupport): ParsedHtml {
     return (thisTag as DomTag).dom as DomMetaMap
   }
 
-  return getDomMeta((thisTag as StringTag).strings, thisTag.values)
+  const strings = (thisTag as StringTag).strings
+
+  return getDomMeta(strings, thisTag.values)
 }
 
 export function addOneContext(

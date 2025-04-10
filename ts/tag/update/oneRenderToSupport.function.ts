@@ -18,9 +18,9 @@ export function oneRenderToSupport(
     templater, ownerSupport, subject
   )
 
-  let tag: StringTag
+  let tag: StringTag | undefined
   function wrap() {
-    templater.tag = tag || ((wrapper as (UnknownFunction))())
+    templater.tag = (tag as StringTag) || wrapper()
     return support
   }
 

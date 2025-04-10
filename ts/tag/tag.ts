@@ -8,7 +8,6 @@ import { getTagWrap } from './getTagWrap.function.js'
 import { RouteProps, RouteTag, StateToTag, ToTag } from './tag.types.js'
 import { UnknownFunction } from './update/oneRenderToSupport.function.js'
 import { ValueTypes } from './ValueTypes.enum.js'
-import { key } from './key.js'
 
 let tagCount = 0
 
@@ -84,7 +83,6 @@ export declare namespace tag {
   let renderOnce: typeof renderOnceFn
   
   let route: typeof routeFn;
-  let key: typeof import("./key.js").key;
   let app: (_routeTag: RouteTag) => StateToTag;
   let deepPropWatch: typeof tag;
   let immutableProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
@@ -116,8 +114,6 @@ function tagUseFn(): ReturnTag {
 function routeFn(_routeProps: RouteProps): StateToTag {
   throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
 }
-
-;(tag as any).key = key
 
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``

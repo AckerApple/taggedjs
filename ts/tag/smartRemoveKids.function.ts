@@ -1,7 +1,7 @@
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { destroyArray } from './checkDestroyPrevious.function.js'
-import { paint, paintRemoves } from './paint.function.js'
-import { AnySupport } from './getSupport.function.js'
+import { paint, painting, paintRemoves } from './paint.function.js'
+import { AnySupport, SupportContextItem } from './getSupport.function.js'
 import { ContextItem } from './Context.types.js'
 import {SupportTagGlobal } from './getTemplaterResult.function.js'
 
@@ -12,26 +12,27 @@ export function smartRemoveKids(
 ) {
   const subject = support.subject
   const global = subject.global as SupportTagGlobal
-  const htmlDomMeta = global.htmlDomMeta as DomObjectChildren
   const context = global.context as ContextItem[]
-  global.deleted = true
+  
+  // already set
+  // global.deleted = true
 
   const destroys = global.destroys
   if( destroys ) {
-    return processContextDestroys(destroys, context, allPromises, htmlDomMeta)
+    return processContextDestroys(destroys, allPromises, subject)
   }
 
   smartRemoveByContext(context, allPromises)
-  destroyClones(htmlDomMeta)
+  destroyClones(global, subject)
 }
 
 // Elements that have a destroy or ondestroy attribute
 function processContextDestroys(
   destroys: (() => any)[],
-  context: ContextItem[],
   allPromises: Promise<any>[],
-  htmlDomMeta: DomObjectChildren,
+  subject: SupportContextItem,
 ) {
+  const global = subject.global as SupportTagGlobal
   const promises: any[] = []
 
   destroys.forEach(destroy => {
@@ -47,9 +48,14 @@ function processContextDestroys(
   if(promises.length) {
     const lastPromise = Promise.all(promises)
       .then(() => {
+        ++painting.locks
+        
         // continue to remove
-        smartRemoveByContext(context, allPromises)
-        destroyClones(htmlDomMeta)
+        smartRemoveByContext(global.context, allPromises)
+        destroyClones(global, subject)
+        
+        --painting.locks
+
         paint()
       })
 
@@ -59,8 +65,13 @@ function processContextDestroys(
     return
   }
 
-  smartRemoveByContext(context, allPromises)
-  destroyClones(htmlDomMeta)
+  ++painting.locks
+
+  smartRemoveByContext(global.context, allPromises)
+  destroyClones(global, subject)
+
+  --painting.locks
+  
   paint()
 }
 
@@ -88,7 +99,6 @@ function smartRemoveByContext(
       continue
     }
 
-
     const subGlobal = subject.global as SupportTagGlobal
     if(subGlobal === undefined) {
       continue // subject
@@ -108,10 +118,15 @@ function smartRemoveByContext(
 }
 
 function destroyClones(
-  oldClones: DomObjectChildren,
+  global: SupportTagGlobal,
+  subject: SupportContextItem,
+  //oldClones: DomObjectChildren,
 ) {
+  // const global = subject.global
+  const htmlDomMeta = global.htmlDomMeta as DomObjectChildren
+  
   // check subjects that may have clones attached to them
-  oldClones.forEach(clone => {
+  htmlDomMeta.forEach(clone => {
     const marker = clone.marker
     if(marker) {
       paintRemoves.push(marker)
@@ -124,4 +139,6 @@ function destroyClones(
 
     paintRemoves.push(dom)
   })
+  
+  // htmlDomMeta.length = 0
 }

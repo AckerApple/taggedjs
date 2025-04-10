@@ -159,8 +159,6 @@ function processFirstTagValue(
           appendTo as Element,
         )
         
-        // ++contextItem.global.renderCount
-
         return processResult
       }
 
@@ -170,9 +168,7 @@ function processFirstTagValue(
         ownerSupport,
         counts,
       )
-      
-      // ++contextItem.global.renderCount
-      
+            
       return processResult
     }
 
@@ -201,7 +197,6 @@ function processFirstTagValue(
         insertBefore,
       )
 
-      // ++contextItem.global.renderCount
       contextItem.checkValueChange = checkTagValueChange
 
       return result

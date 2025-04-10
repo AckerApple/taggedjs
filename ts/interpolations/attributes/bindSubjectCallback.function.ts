@@ -55,16 +55,21 @@ export function runTagCallback(
     component = component.ownerSupport as AnySupport
   }
 
-  const global = component.subject.global as SupportTagGlobal // tag.subject.global as TagGlobal
+  const subject = component.subject
+  const global = subject.global as SupportTagGlobal // tag.subject.global as TagGlobal
   global.locked = true // prevent another render from re-rendering this tag
 
   // ACTUAL CALLBACK TO ORIGINAL FUNCTION
   const callbackResult = value.apply(bindTo, args)
-  
-  return afterTagCallback(
+
+  delete global.locked
+
+  const result = afterTagCallback(
     callbackResult,
     component,
   )
+
+  return result
 }
 
 export function afterTagCallback(
@@ -72,7 +77,6 @@ export function afterTagCallback(
   eventHandlerSupport: AnySupport,
 ) {
   const global = eventHandlerSupport.subject.global as SupportTagGlobal // tag.subject.global as SupportTagGlobal
-  delete global.locked
 
   return renderCallbackSupport(
     eventHandlerSupport as AnySupport,

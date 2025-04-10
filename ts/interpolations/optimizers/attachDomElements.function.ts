@@ -50,9 +50,6 @@ export function attachDomElements(
   for (let index=0; index < nodes.length; ++index) {
     const node = (nodes as DomObjectElement[])[index]
     
-    const newNode = {} as DomObjectElement // DomObjectText
-    dom.push(newNode)
-
     const value = node.v as ContextItem
     const isNum = !isNaN(value as unknown as number)
     
@@ -73,6 +70,9 @@ export function attachDomElements(
       )
       continue
     }
+
+    const newNode = {} as DomObjectElement // DomObjectText
+    dom.push(newNode)
 
     if (node.nn === 'text') {
       attachDomText(newNode, node, appendTo, insertBefore)

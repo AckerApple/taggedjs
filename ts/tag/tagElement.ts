@@ -110,7 +110,11 @@ export function tagElement(
     }
     global.events = {}
 
+    ++painting.locks
+
     const toAwait = destroySupport(support) // never return anything here
+
+    --painting.locks
 
     paint()
 
@@ -119,40 +123,8 @@ export function tagElement(
   
   ++painting.locks
 
-  const result = buildBeforeElement(
-    support,
-    {added:0, removed:0},
-    element,
-    undefined,
-  )
+  const newFragment = registerTagElement(support, element, global, templater, app, placeholder)
 
-  global.oldest = support
-  global.newest = support
-  
-  let setUse = (templater as unknown as TagAppElement).setUse
-  
-  if(templater.tagJsType !== ValueTypes.stateRender) {
-    const wrap = app as unknown as Wrapper
-    const original = (wrap as unknown as TagWrapper<unknown>).original    
-    setUse = original.setUse as unknown as UseMemory
-    // tags = original.tags as unknown as TagWrapper<unknown>[]
-    ;(original as any).isApp = true
-  }
-
-  ;(element as TagAppElement).setUse = setUse
-  ;(element as TagAppElement).ValueTypes = ValueTypes
-  appElements.push({element, support})
-
-  const newFragment = document.createDocumentFragment()
-  newFragment.appendChild(placeholder)
-
-  for(const domItem of result.dom) {
-    putOneDomDown(domItem, newFragment)
-  }
-
-  for(const sub of result.subs) {
-    subscribeToTemplate(sub)
-  }
   --painting.locks
 
   paint()
@@ -163,6 +135,41 @@ export function tagElement(
     tags,
     ValueTypes,
   }
+}
+
+function registerTagElement(support: AnySupport, element: Element | HTMLElement, global: BaseTagGlobal, templater: TemplaterResult, app: TagMaker, placeholder: Text) {
+  const result = buildBeforeElement(
+    support,
+    { added: 0, removed: 0 },
+    element,
+    undefined
+  )
+
+  global.oldest = support
+  global.newest = support
+
+  let setUse = (templater as unknown as TagAppElement).setUse
+
+  if (templater.tagJsType !== ValueTypes.stateRender) {
+    const wrap = app as unknown as Wrapper
+    const original = (wrap as unknown as TagWrapper<unknown>).original
+    setUse = original.setUse as unknown as UseMemory; (original as any).isApp = true
+  }
+
+  ; (element as TagAppElement).setUse = setUse; (element as TagAppElement).ValueTypes = ValueTypes
+  appElements.push({ element, support })
+
+  const newFragment = document.createDocumentFragment()
+  newFragment.appendChild(placeholder)
+
+  for (const domItem of result.dom) {
+    putOneDomDown(domItem, newFragment)
+  }
+
+  for (const sub of result.subs) {
+    subscribeToTemplate(sub)
+  }
+  return newFragment
 }
 
 function getNewSubject(

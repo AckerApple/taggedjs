@@ -65,9 +65,14 @@ export type TemplaterResult = {
   tag?: StringTag | DomTag
   props?: Props
 
-  arrayValue?: unknown
-  key: (arrayValue: unknown) => TemplaterResult
+  /** Used inside of an array.map() function */
+  key: <T>(arrayValue: T) => TemplaterResultArrayItem<T>
 }
+
+export type TemplaterResultArrayItem<T> = TemplaterResult & {
+  arrayValue?: T  
+}
+
 
 export function getTemplaterResult(
   propWatch: PropWatches,
@@ -77,8 +82,8 @@ export function getTemplaterResult(
     propWatch,
     props,
     tagJsType: ValueTypes.templater,
-    key: function keyTemplate(arrayValue: unknown) {
-      templater.arrayValue = arrayValue
+    key: function keyTemplate<T>(arrayValue: T) {
+      (templater as TemplaterResultArrayItem<T>).arrayValue = arrayValue
       return templater
     }
   }

@@ -9,8 +9,8 @@ import { watch } from'./watch.function.js'
  */
 export function letProp<T>(
   setter: (
-    set: (...args: T[]) => any
-  ) => T[]
+    set: <T>(...args: T[]) => T[]
+  ) => any
 ) {
   const propStates2 = signal([])
   const passes = signal(0)
@@ -31,7 +31,7 @@ export function letProp<T>(
 
     propStates2.value = nowValues as any
 
-    setter(() => nowValues)
+    setter(() => nowValues as any)
   }) as any
 
   // called and only used during sync'ing processes

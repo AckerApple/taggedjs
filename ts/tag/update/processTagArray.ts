@@ -1,17 +1,17 @@
 // taggedjs-no-compile
 
-import { paintAppends, paintInsertBefores, paintRemoves } from '../paint.function.js'
+import { paintAppends, paintInsertBefores } from '../paint.function.js'
 import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
-import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
+import { TemplaterResult } from '../getTemplaterResult.function.js'
 import { checkSimpleValueChange } from '../checkDestroyPrevious.function.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
 import { AnySupport } from '../getSupport.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { processNewArrayValue } from './processNewValue.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
-import { destroySupport } from '../destroySupport.function.js'
 import { ContextItem } from '../Context.types.js'
 import { StringTag } from '../getDomTag.function.js'
+import { compareArrayItems } from './compareArrayItems.function.js'
 
 export function processTagArray(
   subject: ContextItem,
@@ -35,7 +35,9 @@ export function processTagArray(
   
   for (let index=0; index < lastArray.length; ++index) {
     const item: ContextItem = lastArray[index]
-    const newRemoved = reviewLastArrayItem(
+    
+    // 👁️ COMPARE & REMOVE
+    const newRemoved = compareArrayItems(
       item, value, index, lastArray, removed, counts,
     )
 
@@ -178,55 +180,4 @@ function processAddTagArrayItem(
   }
 
   return itemSubject
-}
-
-export function destroyArrayItem(
-  item: ContextItem,
-  counts: Counts,
-) {
-  const global = item.global as SupportTagGlobal
-  
-  if(global) {    
-    const support = global.oldest
-    global.deleted = true
-    destroySupport(support)
-    global.deleted = true
-  } else {
-    const element = item.simpleValueElm as Element
-    delete item.simpleValueElm
-    paintRemoves.push(element)
-  }
-
-  ++counts.removed
-}
-
-function reviewLastArrayItem(
-  _subTag: unknown, // used to compare arrays
-  value: unknown[],
-  index: number,
-  lastArray: ContextItem[],
-  removed: number,
-  counts: Counts,
-) {
-  const newLength = value.length - 1
-  const at = index - removed
-  const lessLength = at < 0 || newLength < at
-  const prev = lastArray[index]
-
-  if(lessLength) {
-    console.log('lessLength destroy array item', {at})
-    destroyArrayItem(prev, counts)
-    ++removed
-    return 1
-  }
-
-  if(lastArray[index].value.arrayValue !== (value[index] as any).arrayValue) {
-    console.log('destroy unequal array item', {at})
-    destroyArrayItem(prev, counts)
-    lastArray.splice(index, 1)
-    ++removed
-    return 2
-  }
-
-  return 0
 }

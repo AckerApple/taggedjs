@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+### v2.8.9 - 4-2025
+- Detect bad array key
+
 ### v2.8.4 - 2-2025
 - Corrected data typing for watch
 

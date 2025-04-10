@@ -30,13 +30,6 @@ export function processNewSubjectTag(
 
   for(const dom of result.dom) {
     if(dom.marker) {
-      /*
-      paintAppends.push({
-        element: dom.marker,
-        relative: appendTo as Element, // ph.parentNode as Element,
-      })
-      */
-
       if(appendTo) {
         paintAppends.push({
           element: dom.marker,
