@@ -11,9 +11,9 @@ export * from './interpolations/attributes/ElementTargetEvent.interface.js';
 import { renderTagOnly } from './tag/render/renderTagOnly.function.js';
 import { renderSupport } from './tag/render/renderSupport.function.js';
 import { renderWithSupport } from './tag/render/renderWithSupport.function.js';
-export { key } from './tag/key.js';
 import { tagElement } from './tag/tagElement.js';
 import { paint } from './tag/paint.function.js';
+export { tagElement, renderWithSupport, renderSupport, renderTagOnly, paint, };
 export const hmr = {
     tagElement, renderWithSupport, renderSupport,
     renderTagOnly, paint,

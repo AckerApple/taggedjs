@@ -3,4 +3,4 @@
  * @param prop typically the name of an existing prop
  * @returns immediately call the returned function: letProp(y)(x => [y, y=x])
  */
-export declare function letProp<T>(setter: (set: (...args: T[]) => any) => T[]): never[];
+export declare function letProp<T>(setter: (set: <T>(...args: T[]) => T[]) => any): never[];

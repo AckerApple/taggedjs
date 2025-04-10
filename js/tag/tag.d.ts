@@ -30,7 +30,6 @@ export declare namespace tag {
     /** Used to create a tag component that renders once and has no addition rendering cycles */
     let renderOnce: typeof renderOnceFn;
     let route: typeof routeFn;
-    let key: typeof import("./key.js").key;
     let app: (_routeTag: RouteTag) => StateToTag;
     let deepPropWatch: typeof tag;
     let immutableProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;

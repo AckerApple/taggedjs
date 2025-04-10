@@ -2,7 +2,7 @@ type PaintAppend = {
     element: Text | Element;
     relative: Text | Element;
 };
-export declare let paintRemoves: (Text | Element | ChildNode)[];
+export declare let paintRemoves: (Element | Text | ChildNode)[];
 export declare let paintContent: (() => any)[];
 export declare let setContent: [string, Text][];
 /** array memory that runs and completes BEFORE paintInsertBefores array */

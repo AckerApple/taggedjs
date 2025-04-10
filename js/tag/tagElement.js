@@ -77,11 +77,24 @@ export function tagElement(app, element, props) {
             element.removeEventListener(eventName, callback);
         }
         global.events = {};
+        ++painting.locks;
         const toAwait = destroySupport(support); // never return anything here
+        --painting.locks;
         paint();
         return toAwait;
     };
     ++painting.locks;
+    const newFragment = registerTagElement(support, element, global, templater, app, placeholder);
+    --painting.locks;
+    paint();
+    element.appendChild(newFragment);
+    return {
+        support,
+        tags,
+        ValueTypes,
+    };
+}
+function registerTagElement(support, element, global, templater, app, placeholder) {
     const result = buildBeforeElement(support, { added: 0, removed: 0 }, element, undefined);
     global.oldest = support;
     global.newest = support;
@@ -104,14 +117,7 @@ export function tagElement(app, element, props) {
     for (const sub of result.subs) {
         subscribeToTemplate(sub);
     }
-    --painting.locks;
-    paint();
-    element.appendChild(newFragment);
-    return {
-        support,
-        tags,
-        ValueTypes,
-    };
+    return newFragment;
 }
 function getNewSubject(templater, appElement) {
     const subject = {

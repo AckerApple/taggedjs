@@ -9,6 +9,7 @@ export function getStringTag(strings, values) {
         ownerSupport: getSupportInCycle(),
         tagJsType: ValueTypes.tag,
         strings,
+        /** Used within an array.map() that returns html aka array.map(x => html``.key(x)) */
         key(arrayValue) {
             tag.arrayValue = arrayValue;
             return tag;

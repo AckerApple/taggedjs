@@ -11,7 +11,6 @@ function mapTagUpdate(support) {
     if (!global) {
         return; // while rendering a parent, a child may have been deleted (pinbowl)
     }
-    // renderSupport(support)
     renderSupport(global.newest);
 }
 //# sourceMappingURL=renderTagArray.function.js.map

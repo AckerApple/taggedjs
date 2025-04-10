@@ -4,7 +4,7 @@ export declare function signal<T>(initialValue: T): {
     value: T;
     subscribe(callback: Subscriber): {
         (): boolean;
-        unsubscribe: any;
+        unsubscribe: /*elided*/ any;
     };
 };
 /** Creates object with "value" key and ability to "subscribe" to value changes */
@@ -12,7 +12,7 @@ export declare function Signal<T>(initialValue: T): {
     value: T;
     subscribe(callback: Subscriber): {
         (): boolean;
-        unsubscribe: any;
+        unsubscribe: /*elided*/ any;
     };
 };
 export {};

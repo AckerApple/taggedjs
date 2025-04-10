@@ -1,10 +1,10 @@
 // taggedjs-no-compile
-import { paintAppends, paintInsertBefores, paintRemoves } from '../paint.function.js';
+import { paintAppends, paintInsertBefores } from '../paint.function.js';
 import { processFirstSubjectValue } from './processFirstSubjectValue.function.js';
 import { checkSimpleValueChange } from '../checkDestroyPrevious.function.js';
 import { updateExistingValue } from './updateExistingValue.function.js';
 import { processNewArrayValue } from './processNewValue.function.js';
-import { destroySupport } from '../destroySupport.function.js';
+import { compareArrayItems } from './compareArrayItems.function.js';
 export function processTagArray(subject, value, // arry of Tag classes
 ownerSupport, counts, appendTo) {
     if (!subject.lastArray) {
@@ -17,7 +17,8 @@ ownerSupport, counts, appendTo) {
     const filteredLast = [];
     for (let index = 0; index < lastArray.length; ++index) {
         const item = lastArray[index];
-        const newRemoved = reviewLastArrayItem(item, value, index, lastArray, removed, counts);
+        // 👁️ COMPARE & REMOVE
+        const newRemoved = compareArrayItems(item, value, index, lastArray, removed, counts);
         if (newRemoved === 0) {
             filteredLast.push(item);
             continue;
@@ -88,71 +89,4 @@ ownerSupport, counts, lastArray, appendTo) {
     }
     return itemSubject;
 }
-export function destroyArrayItem(item, counts) {
-    const global = item.global;
-    if (global) {
-        const support = global.oldest;
-        global.deleted = true;
-        destroySupport(support);
-        global.deleted = true;
-    }
-    else {
-        const element = item.simpleValueElm;
-        delete item.simpleValueElm;
-        paintRemoves.push(element);
-    }
-    ++counts.removed;
-}
-function reviewLastArrayItem(_subTag, // used to compare arrays
-value, index, lastArray, removed, counts) {
-    const newLength = value.length - 1;
-    const at = index - removed;
-    const lessLength = at < 0 || newLength < at;
-    const prev = lastArray[index];
-    if (lessLength) {
-        destroyArrayItem(prev, counts);
-        ++removed;
-        return 1;
-    }
-    if (lastArray[index].value.arrayValue !== value[index].arrayValue) {
-        destroyArrayItem(prev, counts);
-        lastArray.splice(index, 1);
-        ++removed;
-        return 2;
-    }
-    /*
-    const nowValue = getArrayValueByItem(subTag)
-    const lastArrayValue = lastArray.array[index].arrayValue
-    */
-    // check for html``.key()
-    /*
-    const keySet = 'arrayValue' in tag
-    if (!keySet) {
-      const details = {
-        array: value.map(item => item.values || item),
-        vdom: (tag as any)?.support.templater.tag.dom,
-        tag,
-        lastArray: lastArray.array[index]
-      }
-      const message = 'Found Tag in array without key value, during array update. Be sure to use "html`...`.key(unique)" OR import TaggedJs "key" "key(unique).html = CustomTag(props)"'
-      console.error(message, details)
-      const err = new ArrayNoKeyError(message, details)
-      throw err
-    }
-    */
-    /*
-    const destroyItem = nowValue !== lastArrayValue
-    if(destroyItem) {
-      destroyArrayItem(lastArray.array, index, counts)
-      ++removed
-      return 1
-    }
-    */
-    return 0;
-}
-/*
-function getArrayValueByItem(item: any) {
-  return item?.arrayValue || item
-}
-*/
 //# sourceMappingURL=processTagArray.js.map

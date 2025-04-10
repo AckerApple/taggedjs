@@ -10,4 +10,4 @@ export declare function isSubjectInstance(subject?: SubjectLike<any> | any): boo
 export declare function isPromise(value: any): any;
 export declare function isFunction(value: any): boolean;
 export declare function isObject(value: any): boolean;
-export declare function isArray(value: any): boolean;
+export declare function isArray(value: any): value is any[];

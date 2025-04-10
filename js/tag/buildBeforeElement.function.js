@@ -9,13 +9,13 @@ export function buildBeforeElement(support, counts, appendTo, insertBefore) {
     global.oldest = support;
     global.newest = support;
     ++painting.locks;
-    const result = getHtmlDomMeta(support, counts, appendTo, insertBefore);
+    const result = attachHtmlDomMeta(support, counts, appendTo, insertBefore);
     global.htmlDomMeta = result.dom;
     --painting.locks;
     // return fragment
     return result;
 }
-function getHtmlDomMeta(support, counts, appendTo, insertBefore) {
+function attachHtmlDomMeta(support, counts, appendTo, insertBefore) {
     const domMeta = loadDomMeta(support);
     const thisTag = support.templater.tag;
     const values = thisTag.values;
@@ -31,7 +31,8 @@ function loadDomMeta(support) {
     if (thisTag.tagJsType === ValueTypes.dom) {
         return thisTag.dom;
     }
-    return getDomMeta(thisTag.strings, thisTag.values);
+    const strings = thisTag.strings;
+    return getDomMeta(strings, thisTag.values);
 }
 export function addOneContext(value, context, withinOwnerElement) {
     const contextItem = {

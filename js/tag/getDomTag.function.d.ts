@@ -6,7 +6,7 @@ import { ValueTypes } from './ValueTypes.enum.js';
 import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/LikeObjectElement.type.js';
 import { AnySupport } from './getSupport.function.js';
 import { StringTag } from './StringTag.type.js';
-export { StringTag };
+export type { StringTag };
 export declare const variablePrefix = ":tagvar";
 export declare const variableSuffix = ":";
 export type EventCallback = (event: Event) => any;
@@ -32,7 +32,15 @@ export type Tag = {
     ownerSupport?: AnySupport;
     arrayValue?: any;
 };
-export type KeyFunction = (arrayValue: unknown) => StringTag;
+type ArrayItemStringTag<T> = StringTag & {
+    arrayValue: T;
+};
+export type KeyFunction = 
+/** Used in array.map() as array.map(x => html``.key(x))
+ * - NEVER USE inline object key: array.map(x => html``.key({x}))
+ * - NEVER USE inline array key: array.map((x, index) => html``.key([x, index]))
+ */
+<T>(arrayValue: T) => ArrayItemStringTag<T>;
 export declare function getStringTag(strings: string[], values: unknown[]): StringTag;
 export type DomTag = Tag & {
     children?: {
@@ -41,6 +49,7 @@ export type DomTag = Tag & {
     };
     dom: LikeObjectChildren;
     values: unknown[];
+    /** used in array.map() */
     key: (arrayValue: unknown) => DomTag;
     html: {
         dom: (dom: LikeObjectChildren, // ObjectChildren

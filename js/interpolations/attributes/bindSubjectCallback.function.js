@@ -28,15 +28,17 @@ export function runTagCallback(value, support, bindTo, args) {
     while (component.ownerSupport && !isTagComponent(component.templater)) {
         component = component.ownerSupport;
     }
-    const global = component.subject.global; // tag.subject.global as TagGlobal
+    const subject = component.subject;
+    const global = subject.global; // tag.subject.global as TagGlobal
     global.locked = true; // prevent another render from re-rendering this tag
     // ACTUAL CALLBACK TO ORIGINAL FUNCTION
     const callbackResult = value.apply(bindTo, args);
-    return afterTagCallback(callbackResult, component);
+    delete global.locked;
+    const result = afterTagCallback(callbackResult, component);
+    return result;
 }
 export function afterTagCallback(callbackResult, eventHandlerSupport) {
     const global = eventHandlerSupport.subject.global; // tag.subject.global as SupportTagGlobal
-    delete global.locked;
     return renderCallbackSupport(eventHandlerSupport, callbackResult, global);
 }
 function renderCallbackSupport(last, callbackResult, global) {

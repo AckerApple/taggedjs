@@ -4,7 +4,6 @@ import { getTemplaterResult } from './getTemplaterResult.function.js';
 import { tags } from './tag.utils.js';
 import { getTagWrap } from './getTagWrap.function.js';
 import { ValueTypes } from './ValueTypes.enum.js';
-import { key } from './key.js';
 let tagCount = 0;
 export var PropWatches;
 (function (PropWatches) {
@@ -58,8 +57,10 @@ tag.route = routeFn;
 function routeFn(_routeProps) {
     throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `');
 }
+/** Use to structure and define a browser tag route handler
+ * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
+ */
 ;
-tag.key = key;
 tag.app = function (_routeTag) {
     throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `');
 };

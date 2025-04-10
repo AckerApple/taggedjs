@@ -68,11 +68,9 @@ appendTo, insertBefore) {
             contextItem.checkValueChange = checkTagValueChange;
             if (appendTo) {
                 const processResult = processFirstSubjectComponent(value, contextItem, ownerSupport, counts, appendTo);
-                // ++contextItem.global.renderCount
                 return processResult;
             }
             const processResult = processReplacementComponent(value, contextItem, ownerSupport, counts);
-            // ++contextItem.global.renderCount
             return processResult;
         }
         case ValueTypes.renderOnce: {
@@ -80,7 +78,6 @@ appendTo, insertBefore) {
             const support = oneRenderToSupport(value, contextItem, ownerSupport);
             renderTagOnly(support, undefined, contextItem, ownerSupport);
             const result = processNewSubjectTag(support.templater, ownerSupport, contextItem, counts, appendTo, insertBefore);
-            // ++contextItem.global.renderCount
             contextItem.checkValueChange = checkTagValueChange;
             return result;
         }

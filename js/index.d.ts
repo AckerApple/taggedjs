@@ -8,12 +8,13 @@ export * from './interpolations/index.js';
 export * from './tag/getSupport.function.js';
 export * from './interpolations/attributes/howToSetInputValue.function.js';
 export * from './interpolations/attributes/ElementTargetEvent.interface.js';
+export { type Wrapper } from './tag/getTemplaterResult.function.js';
 import { renderTagOnly } from './tag/render/renderTagOnly.function.js';
 import { renderSupport } from './tag/render/renderSupport.function.js';
 import { renderWithSupport } from './tag/render/renderWithSupport.function.js';
-export { key } from './tag/key.js';
 import { tagElement } from './tag/tagElement.js';
 import { paint } from './tag/paint.function.js';
+export { tagElement, renderWithSupport, renderSupport, renderTagOnly, paint, };
 export declare const hmr: {
     tagElement: typeof tagElement;
     renderWithSupport: typeof renderWithSupport;
@@ -21,4 +22,3 @@ export declare const hmr: {
     renderTagOnly: typeof renderTagOnly;
     paint: typeof paint;
 };
-export { type Wrapper } from './tag/getTemplaterResult.function.js';

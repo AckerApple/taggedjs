@@ -23,8 +23,6 @@ appendTo, insertBefore, subs = []) {
     }
     for (let index = 0; index < nodes.length; ++index) {
         const node = nodes[index];
-        const newNode = {}; // DomObjectText
-        dom.push(newNode);
         const value = node.v;
         const isNum = !isNaN(value);
         if (isNum) {
@@ -33,6 +31,8 @@ appendTo, insertBefore, subs = []) {
             attachDynamicDom(value, index, context, support, subs, counts, depth, appendTo, insertBefore);
             continue;
         }
+        const newNode = {}; // DomObjectText
+        dom.push(newNode);
         if (node.nn === 'text') {
             attachDomText(newNode, node, appendTo, insertBefore);
             continue;

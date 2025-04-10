@@ -1,6 +1,8 @@
 import { DomTag, StringTag } from "./index.js";
 import { ToTag } from "./tag.types.js";
-/** Used to give unique value to an array of tag content. Should not be an object */
+/** Used to give unique value to an array of tag content. Should not be an object
+ * TODO: This might not be in use?
+ */
 export declare function key(arrayValue: string | number | null): {
-    html: StringTag | DomTag | ToTag;
+    html: ToTag | StringTag | DomTag;
 };

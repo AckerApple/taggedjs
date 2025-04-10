@@ -18,7 +18,8 @@ export function renderSupport(support) {
     }
     // is it just a vanilla tag, not component?
     if (inlineHtml) {
-        return renderInlineHtml(ownerSupport, support);
+        const result = renderInlineHtml(ownerSupport, support);
+        return result;
     }
     global.locked = true;
     const subject = support.subject;
@@ -26,8 +27,8 @@ export function renderSupport(support) {
         support = global.blocked.pop();
         global.blocked = [];
     }
-    delete global.locked;
     const tag = renderExistingReadyTag(global.newest, support, ownerSupport, subject);
+    delete global.locked;
     return tag;
 }
 export function renderInlineHtml(ownerSupport, support) {

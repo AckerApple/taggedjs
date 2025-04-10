@@ -13,8 +13,8 @@ export function paint() {
     if (painting.locks > 0) {
         return;
     }
-    ++painting.locks;
-    for (const toRemove of paintRemoves) {
+    for (let index = paintRemoves.length - 1; index >= 0; --index) {
+        const toRemove = paintRemoves[index];
         const parentNode = toRemove.parentNode;
         parentNode.removeChild(toRemove);
     }
@@ -30,15 +30,14 @@ export function paint() {
     for (const { element, relative } of paintInsertBefores) {
         relative.parentNode.insertBefore(element, relative);
     }
-    for (const now of paintAfters) {
-        now();
-    }
     paintRemoves = [];
     paintContent = [];
     paintAppends = [];
     paintInsertBefores = [];
-    paintAfters = [];
     setContent = [];
-    --painting.locks;
+    for (const now of paintAfters) {
+        now();
+    }
+    paintAfters = [];
 }
 //# sourceMappingURL=paint.function.js.map

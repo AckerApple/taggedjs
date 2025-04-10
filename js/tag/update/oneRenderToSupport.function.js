@@ -7,7 +7,7 @@ export function oneRenderToSupport(wrapper, subject, ownerSupport) {
     const support = newSupportByTemplater(templater, ownerSupport, subject);
     let tag;
     function wrap() {
-        templater.tag = tag || (wrapper());
+        templater.tag = tag || wrapper();
         return support;
     }
     templater.wrapper = wrap;

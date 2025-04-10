@@ -1,6 +1,6 @@
 // Functions in here are attached as ContextItem.checkValueChange
 import { processUpdateRegularValue } from './update/processRegularValue.function.js';
-import { destroyArrayItem } from './update/processTagArray.js';
+import { destroyArrayItem } from './update/compareArrayItems.function.js';
 import { isArray } from '../isInstance.js';
 import { paintRemoves } from './paint.function.js';
 import { BasicTypes } from './ValueTypes.enum.js';

@@ -44,7 +44,10 @@ export type TemplaterResult = {
     wrapper?: Wrapper;
     tag?: StringTag | DomTag;
     props?: Props;
-    arrayValue?: unknown;
-    key: (arrayValue: unknown) => TemplaterResult;
+    /** Used inside of an array.map() function */
+    key: <T>(arrayValue: T) => TemplaterResultArrayItem<T>;
+};
+export type TemplaterResultArrayItem<T> = TemplaterResult & {
+    arrayValue?: T;
 };
 export declare function getTemplaterResult(propWatch: PropWatches, props?: Props): TemplaterResult;
