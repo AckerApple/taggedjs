@@ -14,7 +14,7 @@ value, index, lastArray, removed, counts) {
     const newKey = value[index].arrayValue;
     if (oldKey !== newKey) {
         if (prevContext.renderCount === 0) {
-            console.warn('Possible array key indexing issue. Array is attempting to both create and delete same items', {
+            console.warn('Possible array issue. Array is attempting to create/delete same items. Either html``.key is not unique or array changes with every render', {
                 oldKey,
                 newKey,
             });

@@ -71,6 +71,9 @@ maxDepth, depth = -1) {
     return newArray;
 }
 function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, maxDepth, depth) {
+    if (priorProp === undefined) {
+        return prop;
+    }
     if (typeof (priorProp) === BasicTypes.function) {
         // the prop i am receiving, is already being monitored/controlled by another parent
         if (prop.mem) {
@@ -90,24 +93,21 @@ function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, maxDep
     if (isArray(prop)) {
         return updateExistingArray(prop, priorProp, newSupport, ownerSupport, depth);
     }
-    if (priorProp === undefined) {
-        return prop;
-    }
     return updateExistingObject(prop, priorProp, newSupport, ownerSupport, depth, maxDepth);
 }
 function updateExistingObject(prop, priorProp, newSupport, ownerSupport, depth, maxDepth) {
     const keys = Object.keys(prop);
     for (const name of keys) {
         const subValue = prop[name];
-        const result = syncPriorPropFunction(priorProp[name], subValue, newSupport, ownerSupport, maxDepth, depth + 1);
-        if (prop[name] === result) {
+        const oldProp = priorProp[name];
+        const result = syncPriorPropFunction(oldProp, subValue, newSupport, ownerSupport, maxDepth, depth + 1);
+        if (subValue === result) {
             continue;
         }
         const hasSetter = Object.getOwnPropertyDescriptor(prop, name)?.set;
         if (hasSetter) {
             continue;
         }
-        ;
         prop[name] = result;
     }
     return prop;
@@ -115,7 +115,8 @@ function updateExistingObject(prop, priorProp, newSupport, ownerSupport, depth, 
 function updateExistingArray(prop, priorProp, newSupport, ownerSupport, depth) {
     for (let index = prop.length - 1; index >= 0; --index) {
         const x = prop[index];
-        prop[index] = syncPriorPropFunction(priorProp[index], x, newSupport, ownerSupport, depth + 1, index);
+        const oldProp = priorProp[index];
+        prop[index] = syncPriorPropFunction(oldProp, x, newSupport, ownerSupport, depth + 1, index);
     }
     return prop;
 }
