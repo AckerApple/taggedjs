@@ -33,6 +33,6 @@
   },
   "dependencies": {
     "taggedjs": "^2.8.8",
-    "taggedjs-cli": "^0.1.18"
+    "taggedjs-cli": "^0.1.19"
   }
 }

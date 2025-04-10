@@ -25,17 +25,20 @@ export const arrayDisplay = tag(({
     ${array.map((
       item: any,
       index: number
-    ) => html`${dump({
-      value: paramValueKeys(item, columnNames),
-      showLevels,
-      showAll,
-      showKids:showAll || showKids,
-      isRootDump:false,
-      formatChange,
-      onHeaderClick: toggleColumnDialog,
-      allowMaximize,
-      everySimpleValue,
-    })}`.key(item))}
+    ) => {
+      const value = paramValueKeys(item, columnNames)
+      return html`${dump({
+        value,
+        showLevels,
+        showAll,
+        showKids:showAll || showKids,
+        isRootDump:false,
+        formatChange,
+        onHeaderClick: toggleColumnDialog,
+        allowMaximize,
+        everySimpleValue,
+      })}`.key(index)
+    })}
   `
 })
 
@@ -47,6 +50,10 @@ function paramValueKeys(
     return inputObject
   }
 
+  if(Array.isArray(inputObject)) {
+    return inputObject
+  }
+
   return filterObjectByKeys(inputObject as Record<string, any>, keysArray)
 }
 
@@ -54,13 +61,13 @@ function filterObjectByKeys(
   inputObject: Record<string, any>,
   keysArray: string[]
 ) {
-  const filteredObject: Record<string, any> = {};
+  const filteredObject: Record<string, any> = {}
 
   keysArray.forEach(key => {
-    if (inputObject.hasOwnProperty(key)) {
-      filteredObject[key] = inputObject[key];
+    if (inputObject.hasOwnProperty(key) || key in inputObject) {
+      filteredObject[key] = inputObject[key]
     }
-  });
+  })
 
-  return filteredObject;
+  return filteredObject
 }

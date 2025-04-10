@@ -45,11 +45,7 @@ export const dumpObject = tag(<T>({// dumpObject
   const minimize = () => (document.getElementById(maximizeId) as any).close()
 
   const getHead = (allowMaximize?: boolean) => html`
-    <div style=${
-        "padding:0.2em;display:flex;justify-content:space-between;font-size:65%;color:white;border-color:white;flex-grow:1;background-color:#387ef5;" +
-        (showLower ? 'border-bottom-width:1px;border-bottom-style:solid;border-color:black;' : '')
-      }
-    >
+    <div class="taggedjs-object-label" style=${showLower ? 'border-bottom-width:1px;border-bottom-style:solid;border-color:black;' : ''}>
       <a onclick=${() => {
         if(showLower === undefined) {
           return showAll = showKids = showLower = !(showAll || showKids || showLower)
@@ -72,11 +68,8 @@ export const dumpObject = tag(<T>({// dumpObject
     <div style="display:flex;flex-wrap:wrap">
       ${Object.entries(value as any).map(([key, value]) => html`
         <!-- recurse -->
-        <div
-          style=${
-            'margin:0.2em;padding:0.2em;overflow:auto;display:flex;flex-wrap:wrap;' +
-            (!value || typeof(value) !== 'object' ? 'flex: 1 1 10em;' : 'flex-grow:1;')
-          }
+        <div class="taggedjs-object"
+          style=${!value || typeof(value) !== 'object' ? 'flex: 1 1 10em;' : 'flex-grow:1;'}
         >
           ${dump({
             value,
@@ -91,7 +84,7 @@ export const dumpObject = tag(<T>({// dumpObject
             allowMaximize,
             everySimpleValue,
           })}
-      `.key(value))}
+      `.key(key))}
     </div>
   `
 
@@ -117,7 +110,7 @@ export const dumpObject = tag(<T>({// dumpObject
           ${maximize && getDumpBody(false)}
 
           <div style="padding:.25em">
-            <button type="button" onclick=${minimize} style="width:100%">🅧 close</button>
+            <button type="button" onclick=${minimize} style="width:100%">🅧 close object</button>
           </div>
         </dialog>
       </div>

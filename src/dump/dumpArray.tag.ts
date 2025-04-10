@@ -83,7 +83,7 @@ export const dumpArray = tag(({// dumpArray
     everySimpleValue,
   }
 
-  const body = html`
+  const getBody = () => html`
     <!-- array displays wrap -->
     <div style="text-align:left;display:flex;flex-wrap:wrap;margin:0.2em;gap:0.2em">
       ${arraysDisplay(displayOptions)}
@@ -95,7 +95,7 @@ export const dumpArray = tag(({// dumpArray
       style="color:#111111;background-color:#f2dede;border:1px solid black;border-radius:5px;flex-direction: column;display:flex"
     >
       ${getHeader(allowMaximize)}
-      ${(showAll || showLower || showKids || (showLower==undefined && showLevels > 0)) && body}
+      ${(showAll || showLower || showKids || (showLower==undefined && showLevels > 0)) && getBody()}
     </div>
 
     <!-- maximize -->
@@ -116,7 +116,7 @@ export const dumpArray = tag(({// dumpArray
       `}
 
       <div style="padding:.25em">
-        <button type="button" onclick=${minimize} style="width:100%">🅧 close</button>
+        <button type="button" onclick=${minimize} style="width:100%">🅧 close array</button>
       </div>
     </dialog>
   `

@@ -25,7 +25,7 @@ export function dumpSimple({
   return html`
     <div style="font-size:75%;flex:1 1 10em;color:#111111">
       ${key && html`
-        <div style="border-bottom-width:1px;border-bottom-style:solid;border-color:black;font-size:65%;border-color:white;line-height: 95%;font-weight:bold;"
+        <div class="taggedjs-simple-label"
           style.cursor=${ onHeaderClick && "pointer" }
           onclick=${onHeaderClick}
         >${key}</div>

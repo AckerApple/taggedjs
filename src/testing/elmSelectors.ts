@@ -81,11 +81,16 @@ export function lastById(id: string): Element {
   return elms[elms.length - 1]
 }
 
-
 export function blur(
   q: string
 ) {
-  return query(q).forEach(elm => blurElm((elm as HTMLElement)))
+  return query(q).forEach(elm => triggerBlurElm((elm as HTMLElement)))
+}
+
+export function change(
+  q: string
+) {
+  return query(q).forEach(elm => triggerChangeElm((elm as HTMLElement)))
 }
 
 const blurEvent = new Event('focusout', {
@@ -94,6 +99,15 @@ const blurEvent = new Event('focusout', {
 })
 
 
-function blurElm(elm: Element) {
+export function triggerBlurElm(elm: Element) {
   elm.dispatchEvent(blurEvent)
+}
+
+const changeEvent = new Event('change', {
+  bubbles: true, // Blur events typically do not bubble, but this can be set to true if needed
+  cancelable: false // Blur events are not cancelable
+})
+
+export function triggerChangeElm(elm: Element) {
+  elm.dispatchEvent(changeEvent)
 }

@@ -52,13 +52,13 @@ export const dumpContent = tag(() => {
 
   return html`
     <div style="display:flex;flex-wrap:wrap;align-item:center;justify-content: center;gap:.5em;padding:.5em;">
-      <textarea wrap="off" placeholder="paste json here"
+      <textarea id="taggedjs-dump-user-textarea" wrap="off" placeholder="paste json here"
         onchange=${change}
         style="min-width:300px;min-height:400px;flex:1"
       >${userJson === "" ? "" : userJsonString}</textarea>
 
       ${userJson === "" ? "" : html`
-        <div style="flex:1;min-width:110px;width:100%;max-width:900px;background-color:rgba(255,255,255,.5);min-width:300px">
+        <div id="taggedjs-dump-user-result" style="flex:1;min-width:110px;width:100%;max-width:900px;background-color:rgba(255,255,255,.5);min-width:300px">
           ${dump({
             value: userJson
           })}

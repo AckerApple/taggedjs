@@ -24,6 +24,17 @@ export const controlPanel = tag(({
       .taggedjs-dump .active-bg-energized:active {background-color:#ffc900}
       .taggedjs-dump .bg-dark {background-color:#444444}
       .taggedjs-dump .bg-balanced {background-color:#33cd5f}
+      
+      .taggedjs-dump .taggedjs-object {margin:0.2em;padding:0.2em;overflow:auto;display:flex;flex-wrap:wrap;}
+      .taggedjs-dump .taggedjs-object-label {
+        padding:0.2em;display:flex;justify-content:space-between;font-size:65%;color:white;
+        border-color:white;flex-grow:1;
+        background-color:#387ef5;
+      }
+
+      .taggedjs-dump .taggedjs-simple-label {
+        border-bottom-width:1px;border-bottom-style:solid;border-color:black;font-size:65%;border-color:white;line-height: 95%;font-weight:bold;
+      }
     </style>
     <div style="width: 100%;line-height: 90%;">
       <div style="position:relative;">
