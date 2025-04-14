@@ -65,7 +65,7 @@ export const dumpObject = tag(<T>({// dumpObject
   `
 
   const getDumpBody = (allowMaximize?: boolean) => html`
-    <div style="display:flex;flex-wrap:wrap">
+    <div class="taggedjs-object-body-wrap">
       ${Object.entries(value as any).map(([key, value]) => html`
         <!-- recurse -->
         <div class="taggedjs-object"
@@ -90,9 +90,7 @@ export const dumpObject = tag(<T>({// dumpObject
 
   return html`
     <div style="flex: 1 1 10em;text-align:left;">
-      <div
-        style="font-size:90%;color:#111111;background-color:#d9edf7;border:1px solid black;border-radius:5px;flex-direction: column;display:flex;"
-      >
+      <div class="taggedjs-object-wrap">
         ${key && getHead(allowMaximize)}
         ${continueDump && getDumpBody(allowMaximize)}
 

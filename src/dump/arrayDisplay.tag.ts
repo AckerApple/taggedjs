@@ -1,6 +1,7 @@
 import { html, tag } from "taggedjs"
 import { FormatChange, dump } from "./index"
 import { EverySimpleValue } from "./dump.props"
+import { getAllKeys } from "./arraysDisplay.component"
 
 export const arrayDisplay = tag(({
   array, showLevels,
@@ -15,7 +16,7 @@ export const arrayDisplay = tag(({
   showLevels: number
   showAll?: boolean
   showKids: boolean
-  columnNames: string[]
+  columnNames?: string[]
   formatChange: FormatChange
   toggleColumnDialog: () => any
   allowMaximize?: boolean,
@@ -31,7 +32,7 @@ export const arrayDisplay = tag(({
         value,
         showLevels,
         showAll,
-        showKids:showAll || showKids,
+        showKids: true, // showAll || showKids,
         isRootDump:false,
         formatChange,
         onHeaderClick: toggleColumnDialog,
@@ -44,7 +45,7 @@ export const arrayDisplay = tag(({
 
 function paramValueKeys(
   inputObject: Record<string, any> | string,
-  keysArray: string[]
+  keysArray?: string[]
 ) {
   if(['string','number','boolean'].includes(typeof(inputObject))) {
     return inputObject
@@ -59,8 +60,14 @@ function paramValueKeys(
 
 function filterObjectByKeys(
   inputObject: Record<string, any>,
-  keysArray: string[]
+  keysArray?: string[]
 ) {
+  if(!keysArray) {
+    // keysArray = Object.keys(inputObject)
+    // return {...inputObject} // must be clone so unchecking items does not change original object
+    return inputObject
+  }
+
   const filteredObject: Record<string, any> = {}
 
   keysArray.forEach(key => {

@@ -91,19 +91,25 @@ function clearTests() {
   tests.length = 0
 }
 
-export async function execute() {
+export async function execute(
+  afterEachSuite?: (test: Test) => any,
+) {
   if(onlyTests.length) {
     console.log('🏃 Running only mode...')
-    return runTests(onlyTests)
+    return runTests(onlyTests, afterEachSuite)
   }
   
-  return runTests(tests)
+  return runTests(tests, afterEachSuite)
 }
 
-async function runTests(tests: Test[]) {
+async function runTests(
+  tests: Test[],
+  afterEachSuite: (test: Test) => any = () => undefined,
+) {
   for (const test of tests) {
     try {
       await test()
+      afterEachSuite(test)
     } catch (err) {
       console.error(`Error testing ${test.name}`)
       clearTests()

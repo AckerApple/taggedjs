@@ -47,11 +47,8 @@ export const dumpArray = tag(({// dumpArray
   const minimize = () => (document.getElementById(maximizeId) as any).close()
 
   const getHeader = (allowMaximize?: boolean) => html`
-    <div
-      style=${
-        "padding:0.2em;display:flex;justify-content:space-between;flex-grow:1;font-size:65%;border-color:white;color:white;background-color:#ef473a;" +
-        (showLower ? 'border-bottom-width:1px;border-bottom-style:solid;border-color:black;':'')
-      }
+    <div class="taggedjs-array-label"
+      style=${showLower ? 'border-bottom-width:1px;border-bottom-style:solid;border-color:black;':''}
     >
       <a style="flex-grow:1" onclick=${() => {
         if(showLower === undefined) {
@@ -85,15 +82,13 @@ export const dumpArray = tag(({// dumpArray
 
   const getBody = () => html`
     <!-- array displays wrap -->
-    <div style="text-align:left;display:flex;flex-wrap:wrap;margin:0.2em;gap:0.2em">
+    <div class="taggedjs-array-body">
       ${arraysDisplay(displayOptions)}
     </div>
   `
 
   return html`<!-- array -->
-    <div
-      style="color:#111111;background-color:#f2dede;border:1px solid black;border-radius:5px;flex-direction: column;display:flex"
-    >
+    <div class="taggedjs-array-wrap">
       ${getHeader(allowMaximize)}
       ${(showAll || showLower || showKids || (showLower==undefined && showLevels > 0)) && getBody()}
     </div>

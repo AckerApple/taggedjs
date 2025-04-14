@@ -99,7 +99,7 @@ const getObjectTemplate = <T>({
 }): StringTag | DomTag => {
   if(value === null) {
     if(!showKids) {
-      return html``
+      return html`no kids`
     }
 
     return dumpSimple({
@@ -112,6 +112,38 @@ const getObjectTemplate = <T>({
 
   const isArray = (!format || format==='flex') && ((value as any).push && (value as any).pop)
 
+  const getArrayDump = () => dumpArray({
+    key,
+    value,
+    show,
+    // arrayView,
+    showAll,
+    showKids,
+    showLevels,
+    formatChange,
+    allowMaximize,
+    everySimpleValue,
+  })
+
+  const getObjectDump = () => dumpObject({
+    key,
+    show,
+    // showChange: x => showChangeValue(show = x),
+    showKids,
+    showLevels,
+    value,
+    showAll,
+    formatChange,
+    onHeaderClick,
+    allowMaximize,
+    everySimpleValue,
+  })
+
+  const getJsonDump = () => html`
+    <textarea *ngIf="" disabled wrap="off" style="width:100%;height:25vh;min-height:400px;color:white;"
+    >${ JSON.stringify(value, null, 2) }</textarea>
+  `
+
   return html`
     <div id=${`taggedjs-dump-${++dumpCount}`} class="taggedjs-dump">
       ${isRootDump && controlPanel({
@@ -121,36 +153,7 @@ const getObjectTemplate = <T>({
         showAllChange,
         formatChange,
       })}
-      ${(format==='json' && html`
-        <textarea *ngIf="" disabled wrap="off" style="width:100%;height:25vh;min-height:400px;color:white;"
-        >${ JSON.stringify(value, null, 2) }</textarea>
-      `) || (
-        (isArray && dumpArray({
-          key,
-          value,
-          show,
-          // arrayView,
-          showAll,
-          showKids,
-          showLevels,
-          formatChange,
-          allowMaximize,
-          everySimpleValue,
-        })) ||
-        dumpObject({
-          key,
-          show,
-          // showChange: x => showChangeValue(show = x),
-          showKids,
-          showLevels,
-          value,
-          showAll,
-          formatChange,
-          onHeaderClick,
-          allowMaximize,
-          everySimpleValue,
-        })
-      )}
+      ${(format==='json' && getJsonDump()) || isArray ? getArrayDump() : getObjectDump()}
     </div>
   `
 }

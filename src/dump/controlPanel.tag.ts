@@ -35,6 +35,26 @@ export const controlPanel = tag(({
       .taggedjs-dump .taggedjs-simple-label {
         border-bottom-width:1px;border-bottom-style:solid;border-color:black;font-size:65%;border-color:white;line-height: 95%;font-weight:bold;
       }
+
+      .taggedjs-dump .taggedjs-object-body-wrap {
+        display:flex;flex-wrap:wrap
+      }
+
+      .taggedjs-dump .taggedjs-object-wrap {
+        font-size:90%;color:#111111;background-color:#d9edf7;border:1px solid black;border-radius:5px;flex-direction: column;display:flex;
+      }
+      
+      .taggedjs-dump .taggedjs-array-label {
+        padding:0.2em;display:flex;justify-content:space-between;flex-grow:1;font-size:65%;border-color:white;color:white;background-color:#ef473a;
+      }
+
+      .taggedjs-dump .taggedjs-array-body {
+        text-align:left;display:flex;flex-wrap:wrap;margin:0.2em;gap:0.2em
+      }
+      
+      .taggedjs-dump .taggedjs-array-wrap {
+        color:#111111;background-color:#f2dede;border:1px solid black;border-radius:5px;flex-direction: column;display:flex
+      }
     </style>
     <div style="width: 100%;line-height: 90%;">
       <div style="position:relative;">

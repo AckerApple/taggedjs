@@ -23,7 +23,7 @@ export async function runTests() {
 
   try {
     const start = Date.now() //performance.now()
-    await execute()  
+    await execute()
     const time = Date.now() - start // performance.now() - start
     console.info(`✅ all tests passed in ${time}ms`)
 

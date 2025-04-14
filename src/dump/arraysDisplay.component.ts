@@ -1,5 +1,5 @@
 import { columnEditor } from "./columnEditor.component"
-import { html, state, states, tag } from "taggedjs"
+import { html, state, states, tag, watch } from "taggedjs"
 import { FormatChange } from "./index"
 import { arrayTable } from "./arrayTable.component"
 import { arrayDisplay } from "./arrayDisplay.tag"
@@ -24,12 +24,25 @@ export const arraysDisplay = tag(({
   allowMaximize?: boolean
   everySimpleValue?: EverySimpleValue
 }) => {
-  const allColumnNames: string[] = array.length ? getAllKeys(array) : []
-  let columnNames = allColumnNames
+  // used to display list of all possible columns
+  const allColumnNames = watch([array, array.length], () =>
+    array.length ? getAllKeys(array) : []
+  )
+  
+  // an editable list of column names
+  let columnNames: string[] | undefined = undefined
+  const defaultColumnNames: string[] = watch([allColumnNames], () => [...allColumnNames])
+
   let showColumnDialog = false
   const uniqueId = state(() => 'columnDialog' + performance.now())
 
   states(get => [{columnNames, showColumnDialog}] = get({columnNames, showColumnDialog}))
+
+  watch.noInit([defaultColumnNames.length], () => {
+    if(!columnNames) {
+      columnNames = defaultColumnNames
+    }
+  })
 
   const toggleColumnDialog = () => {
     showColumnDialog = !showColumnDialog
@@ -44,12 +57,13 @@ export const arraysDisplay = tag(({
 
   const arrayTag = arrayView === 'table' ? arrayTable({
     showAll, showKids,
-    array, toggleColumnDialog, columnNames,
+    array, toggleColumnDialog,
+    columnNames: columnNames || allColumnNames,
     formatChange, everySimpleValue,
   }) : arrayDisplay({
     array, showLevels, showAll, showKids,
     formatChange,
-    columnNames,
+    columnNames: columnNames || allColumnNames,
     toggleColumnDialog,
     allowMaximize, everySimpleValue
   })
@@ -69,7 +83,7 @@ export const arraysDisplay = tag(({
       >Column Modifier</div>
       <div style="padding:.25em">
         ${allColumnNames.map(name => {
-          const included = columnNames.includes(name)
+          const included = columnNames === undefined || columnNames.includes(name)
           return html`
             <div
               style="display:flex;justify-content: space-between;flex-wrap:wrap"
@@ -79,7 +93,7 @@ export const arraysDisplay = tag(({
                 name,
                 array,
                 included,
-                columnNames,
+                columnNames: columnNames || defaultColumnNames,
                 allColumnNames,
               })}
             </div>
@@ -91,7 +105,7 @@ export const arraysDisplay = tag(({
   `
 })
 
-function getAllKeys(array: any[]): string[] {
+export function getAllKeys(array: any[]): string[] {
   return array.reduce((all, x) => {
     if(x && typeof(x) === 'object') {
       if(Array.isArray(x)) {
