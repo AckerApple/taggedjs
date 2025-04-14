@@ -12,7 +12,7 @@ export function smartRemoveKids(support, allPromises) {
         return processContextDestroys(destroys, allPromises, subject);
     }
     smartRemoveByContext(context, allPromises);
-    destroyClones(global, subject);
+    destroyClones(global);
 }
 // Elements that have a destroy or ondestroy attribute
 function processContextDestroys(destroys, allPromises, subject) {
@@ -31,7 +31,7 @@ function processContextDestroys(destroys, allPromises, subject) {
             ++painting.locks;
             // continue to remove
             smartRemoveByContext(global.context, allPromises);
-            destroyClones(global, subject);
+            destroyClones(global);
             --painting.locks;
             paint();
         });
@@ -41,7 +41,7 @@ function processContextDestroys(destroys, allPromises, subject) {
     }
     ++painting.locks;
     smartRemoveByContext(global.context, allPromises);
-    destroyClones(global, subject);
+    destroyClones(global);
     --painting.locks;
     paint();
 }
@@ -77,7 +77,7 @@ function smartRemoveByContext(context, allPromises) {
         }
     }
 }
-function destroyClones(global, subject) {
+function destroyClones(global) {
     // const global = subject.global
     const htmlDomMeta = global.htmlDomMeta;
     // check subjects that may have clones attached to them
