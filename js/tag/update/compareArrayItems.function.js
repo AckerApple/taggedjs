@@ -11,9 +11,14 @@ value, index, lastArray, removed, counts) {
         return 1;
     }
     const oldKey = lastArray[index].value.arrayValue;
-    const newKey = value[index].arrayValue;
-    if (oldKey !== newKey) {
+    const oldValueTag = value[index];
+    return runArrayItemDiff(oldKey, oldValueTag, prevContext, counts, lastArray, index);
+}
+function runArrayItemDiff(oldKey, oldValueTag, prevContext, counts, lastArray, index) {
+    const isDiff = oldValueTag && oldKey !== oldValueTag.arrayValue;
+    if (isDiff) {
         if (prevContext.renderCount === 0) {
+            const newKey = oldValueTag.arrayValue;
             console.warn('Possible array issue. Array is attempting to create/delete same items. Either html``.key is not unique or array changes with every render', {
                 oldKey,
                 newKey,

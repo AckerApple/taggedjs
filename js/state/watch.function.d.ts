@@ -17,7 +17,7 @@ type MasterWatch<T> = ((currentValues: any[], callback: WatchCallback<T>) => T) 
  * @param callback WatchCallback
  * @returns T[]
  */
-export declare const watch: (<T>(currentValues: unknown[], callback: WatchCallback<T>) => MasterWatch<T>) & WatchOperators<any>;
+export declare const watch: (<T>(currentValues: unknown[], callback: WatchCallback<T>) => T) & WatchOperators<any>;
 type WatchSetup<R> = {
     init?: (currentValues: any[], previousValues: any[]) => R;
     final?: (x: any) => any;
