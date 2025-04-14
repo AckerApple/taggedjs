@@ -23,7 +23,7 @@ export function smartRemoveKids(
   }
 
   smartRemoveByContext(context, allPromises)
-  destroyClones(global, subject)
+  destroyClones(global)
 }
 
 // Elements that have a destroy or ondestroy attribute
@@ -52,7 +52,7 @@ function processContextDestroys(
         
         // continue to remove
         smartRemoveByContext(global.context, allPromises)
-        destroyClones(global, subject)
+        destroyClones(global)
         
         --painting.locks
 
@@ -68,7 +68,7 @@ function processContextDestroys(
   ++painting.locks
 
   smartRemoveByContext(global.context, allPromises)
-  destroyClones(global, subject)
+  destroyClones(global)
 
   --painting.locks
   
@@ -119,7 +119,7 @@ function smartRemoveByContext(
 
 function destroyClones(
   global: SupportTagGlobal,
-  subject: SupportContextItem,
+  // subject: SupportContextItem,
   //oldClones: DomObjectChildren,
 ) {
   // const global = subject.global

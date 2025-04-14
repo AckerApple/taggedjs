@@ -70,6 +70,7 @@ export function tag<T extends ToTag>(
 }
 
 // Used to declare all the variable attachments on the "tag" function
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export declare namespace tag {
   /** @deprecated use "use" instead */
   let state: typeof tagUseFn

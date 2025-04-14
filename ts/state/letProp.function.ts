@@ -11,7 +11,7 @@ export function letProp<T>(
   setter: (
     set: <T>(...args: T[]) => T[]
   ) => any
-) {
+): T[] {
   const propStates2 = signal([])
   const passes = signal(0)
   const passedOn = signal(0)
