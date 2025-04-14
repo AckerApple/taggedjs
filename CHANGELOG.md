@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+### v2.8.10 - 5-2025
+- Fixed array deleting
+
 ### v2.8.9 - 4-2025
 - Detect bad array key
 

@@ -1,13 +1,14 @@
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { ContextItem } from '../Context.types.js'
-import {SupportTagGlobal } from '../getTemplaterResult.function.js'
+import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { paint, paintAfters, paintRemoves } from '../paint.function.js'
 import { destroySupport } from '../destroySupport.function.js'
 import { SupportContextItem } from '../getSupport.function.js'
+import type { StringTag } from '../StringTag.type.js'
 
 export function compareArrayItems(
   _subTag: unknown, // used to compare arrays
-  value: unknown[],
+  value: (TemplaterResult | StringTag)[],
   index: number,
   lastArray: ContextItem[],
   removed: number,
@@ -24,9 +25,31 @@ export function compareArrayItems(
   }
 
   const oldKey = lastArray[index].value.arrayValue
-  const newKey = (value[index] as any).arrayValue
-  if(oldKey !== newKey) {
+  const oldValueTag = value[index]
+
+  return runArrayItemDiff(
+    oldKey,
+    oldValueTag as StringTag,
+    prevContext,
+    counts,
+    lastArray,
+    index,
+  )
+}
+
+function runArrayItemDiff(
+  oldKey: string,
+  oldValueTag: StringTag,
+  prevContext: SupportContextItem,
+  counts: Counts,
+  lastArray: ContextItem[],
+  index: number
+) {
+  const isDiff = oldValueTag && oldKey !== oldValueTag.arrayValue
+
+  if( isDiff ) {
     if(prevContext.renderCount === 0) {
+      const newKey = oldValueTag.arrayValue
       console.warn('Possible array issue. Array is attempting to create/delete same items. Either html``.key is not unique or array changes with every render', {
         oldKey,
         newKey,
