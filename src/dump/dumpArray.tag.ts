@@ -44,15 +44,15 @@ export const dumpArray = tag(({// dumpArray
       (document.getElementById(maximizeId) as any).showModal()
     }
   }
+  
   const minimize = () => (document.getElementById(maximizeId) as any).close()
+  const dumpBody = (showAll || showLower || showKids || (showLower==undefined && showLevels > 0))
 
   const getHeader = (allowMaximize?: boolean) => html`
-    <div class="taggedjs-array-label"
-      style=${showLower ? 'border-bottom-width:1px;border-bottom-style:solid;border-color:black;':''}
-    >
+    <div class="taggedjs-array-label">
       <a style="flex-grow:1" onclick=${() => {
         if(showLower === undefined) {
-          return showAll = showKids = showLower = !(showAll || showKids || showLower)
+          return showAll = showKids = showLower = !dumpBody
         }
 
         showAll = showKids = showLower = !showLower
@@ -90,7 +90,7 @@ export const dumpArray = tag(({// dumpArray
   return html`<!-- array -->
     <div class="taggedjs-array-wrap">
       ${getHeader(allowMaximize)}
-      ${(showAll || showLower || showKids || (showLower==undefined && showLevels > 0)) && getBody()}
+      ${dumpBody && getBody()}
     </div>
 
     <!-- maximize -->

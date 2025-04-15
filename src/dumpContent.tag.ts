@@ -40,13 +40,13 @@ export const dumpContent = tag(() => {
       arrayTest: [{
         name:'something',
         location: {street: '4361'},
-      }/*, {
+      }, {
         name:'in this',
         location: {street: '2235'},
       }, {
         name:'world',
         location: {street: '4785'},
-      }*/]
+      }]
     }
   }))
 

@@ -7,6 +7,7 @@ export async function runTests() {
 
   // cannot be dynamic file names, must be hand typed out
   await import('./content.test')
+  await import('./dumpContent.test')
   await import('./counters.test')
   await import('./props.test')
   await import('./providers.test')

@@ -14,6 +14,7 @@ export async function runIsolatedTests(
 
   if(views.includes(ViewTypes.Content)) {
     await import('./content.test')
+    await import('./dumpContent.test')
     ++testCount
   }
 
