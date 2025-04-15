@@ -113,8 +113,6 @@ const getObjectTemplate = <T>({
   const isArray = Array.isArray(value) // (!format || format==='flex') && ((value as any).push && (value as any).pop)
 
   const getArrayDump = () => {
-    console.log('array here000', {value, isArray})
-
     return dumpArray({
         key,
         value,

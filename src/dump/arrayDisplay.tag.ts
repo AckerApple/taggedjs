@@ -21,7 +21,6 @@ export const arrayDisplay = tag(({
   allowMaximize?: boolean,
   everySimpleValue?: EverySimpleValue,
 }) => {
-  console.log('array', array)
   return html`
     ${array.map((
       item: any,
