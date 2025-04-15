@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+### v2.8.15 - 5-2025
+- Prevent attributes with a * from destroying rendering
+
 ### v2.8.10 - 5-2025
 - Fixed array deleting
 

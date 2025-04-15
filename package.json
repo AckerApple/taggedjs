@@ -1,7 +1,7 @@
 {
   "name": "taggedjs",
   "private": true,
-  "version": "2.8.14",
+  "version": "2.8.15",
   "description": "tagged template reactive html",
   "main": "js/index.js",
   "type": "module",
@@ -24,7 +24,7 @@
     "save": "npm run lint:fix && git add . && git commit -m \"patch\" && git push",
     "build:dist:pack": "cp package.json ./dist/package.json && echo \"✅ copied package.json to ./dist\" && node scripts/package-dist.cjs",
     "patch:version": "npm --no-git-tag-version version patch",
-    "publish": "npm run build:dist && npm run save:dist && npm run save && cd ../dist && npm publish",
+    "publish": "npm run test && npm run build:dist && npm run save:dist && npm run save && cd ../dist && npm publish",
     "build:watch": "chokidar 'ts/**/*' -c 'npm run build'",
     "build:pinbowl": "cp -R dist/. ../../../services/pinbowl/src/taggedjs && cd ../../../services/pinbowl/ && npm run build && echo \"🎳 Built pinbowl\"",
     "build:watch:pinbowl": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:webpack && npm run build:dist:only && npm run build:pinbowl'",

@@ -1,4 +1,4 @@
-import { Subject } from './Subject.class.js'
+import { Subject, Subjective } from './Subject.class.js'
 import { Resolve, Subscription } from './subject.utils.js'
 import { combineLatest } from'./combineLatest.function.js'
 import { willCallback, willPromise, willSubscribe } from './will.functions.js'
@@ -233,25 +233,58 @@ describe('Subject', () => {
   })
 
   describe('combineLatest', () => {
-    it('basic', () => {
-      const subject1 = new Subject(0)
-      const subject2 = new Subject(0)
+    describe('Subjective', () => {
+      it('basic', () => {
+        const subject1 = new Subjective(0)
+        const subject2 = new Subjective(0)
+    
+        const combined = combineLatest([
+          subject1, subject2
+        ])
+    
+        let y = [0,0]
+        combined.subscribe(x => y = x)
+    
+        subject1.value = 1
+        subject2.value = 2
+    
+        expect(subject1.value).toBe(1)
+        expect(subject2.value).toBe(2)
   
-      const combined = combineLatest([
-        subject1, subject2
-      ])
-  
-      let y = [0,0]
-      combined.subscribe(x => y = x)
-  
-      subject1.value = 1
-      subject2.value = 2
-  
-      expect(subject1.value).toBe(1)
-      expect(subject2.value).toBe(2)
+        expect(y[0]).toBe(1)
+        expect(y[1]).toBe(2)
+      })
 
-      expect(y[0]).toBe(1)
-      expect(y[1]).toBe(2)
+
+      it('complex', async () => {
+        const subject1 = new Subjective(0)
+        const subject2 = new Subjective(0)
+    
+        const combined = Subject.all([
+          subject1, subject2, 'something-else'
+        ]).pipe(
+          x => {
+            expect(x).toBeDefined()
+            expect(x.length).toBe(3)
+            expect(x[2]).toBe('something-else')
+            ++z
+            return 33
+          }
+        )
+    
+        let y: number = 0
+        let z: number = 0
+        combined.subscribe(x => y = x)
+    
+        subject1.value = 1
+        subject2.value = 2
+  
+        expect(subject1.value).toBe(1)
+        expect(subject2.value).toBe(2)
+    
+        expect(y).toBe(33)
+        expect(z).toBe(1)
+      })
     })
 
     it('combine pipe', () => {
@@ -304,36 +337,6 @@ describe('Subject', () => {
   
       expect(y[0]).toBe(1)
       expect(y[1]).toBe(2)
-    })
-
-    it('complex', async () => {
-      const subject1 = new Subject(0)
-      const subject2 = new Subject(0)
-  
-      const combined = Subject.all([
-        subject1, subject2, 'something-else'
-      ]).pipe(
-        x => {
-          expect(x).toBeDefined()
-          expect(x.length).toBe(3)
-          expect(x[2]).toBe('something-else')
-          ++z
-          return 33
-        }
-      )
-  
-      let y: number = 0
-      let z: number = 0
-      combined.subscribe(x => y = x)
-  
-      subject1.value = 1
-      subject2.value = 2
-
-      expect(subject1.value).toBe(1)
-      expect(subject2.value).toBe(2)
-  
-      expect(y).toBe(33)
-      expect(z).toBe(1)
     })
   })
 })
