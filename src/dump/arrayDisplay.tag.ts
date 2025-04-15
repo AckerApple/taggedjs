@@ -1,7 +1,6 @@
 import { html, tag } from "taggedjs"
 import { FormatChange, dump } from "./index"
 import { EverySimpleValue } from "./dump.props"
-import { getAllKeys } from "./arraysDisplay.component"
 
 export const arrayDisplay = tag(({
   array, showLevels,
@@ -22,6 +21,7 @@ export const arrayDisplay = tag(({
   allowMaximize?: boolean,
   everySimpleValue?: EverySimpleValue,
 }) => {
+  console.log('array', array)
   return html`
     ${array.map((
       item: any,

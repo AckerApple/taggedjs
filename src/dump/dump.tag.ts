@@ -110,20 +110,24 @@ const getObjectTemplate = <T>({
     })
   }
 
-  const isArray = (!format || format==='flex') && ((value as any).push && (value as any).pop)
+  const isArray = Array.isArray(value) // (!format || format==='flex') && ((value as any).push && (value as any).pop)
 
-  const getArrayDump = () => dumpArray({
-    key,
-    value,
-    show,
-    // arrayView,
-    showAll,
-    showKids,
-    showLevels,
-    formatChange,
-    allowMaximize,
-    everySimpleValue,
-  })
+  const getArrayDump = () => {
+    console.log('array here000', {value, isArray})
+
+    return dumpArray({
+        key,
+        value,
+        show,
+        // arrayView,
+        showAll,
+        showKids,
+        showLevels,
+        formatChange,
+        allowMaximize,
+        everySimpleValue,
+      })
+  }
 
   const getObjectDump = () => dumpObject({
     key,
@@ -140,7 +144,8 @@ const getObjectTemplate = <T>({
   })
 
   const getJsonDump = () => html`
-    <textarea *ngIf="" disabled wrap="off" style="width:100%;height:25vh;min-height:400px;color:white;"
+    <textarea disabled wrap="off"
+      style="width:100%;height:25vh;min-height:400px;color:white;background-color:black;"
     >${ JSON.stringify(value, null, 2) }</textarea>
   `
 
@@ -153,7 +158,7 @@ const getObjectTemplate = <T>({
         showAllChange,
         formatChange,
       })}
-      ${(format==='json' && getJsonDump()) || isArray ? getArrayDump() : getObjectDump()}
+      ${(format==='json' && getJsonDump()) || (isArray ? getArrayDump() : getObjectDump())}
     </div>
   `
 }
