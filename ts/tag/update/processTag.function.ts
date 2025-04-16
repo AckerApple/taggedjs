@@ -1,5 +1,5 @@
 import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
-import { AnySupport, getHtmlSupport } from '../getSupport.function.js'
+import { AnySupport, getHtmlSupport, SupportContextItem } from '../getSupport.function.js'
 import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { checkTagValueChange } from '../checkTagValueChange.function.js'
 import { buildBeforeElement } from '../buildBeforeElement.function.js'
@@ -14,7 +14,7 @@ import { Counts } from '../../interpolations/interpolateTemplate.js'
 */
 export function processTag(
   ownerSupport: AnySupport, // owner
-  subject: ContextItem, // could be tag via result.tag
+  subject: SupportContextItem, // could be tag via result.tag
   counts: Counts,
 ): AnySupport {
   const global = subject.global as SupportTagGlobal

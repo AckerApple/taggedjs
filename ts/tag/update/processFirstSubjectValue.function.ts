@@ -31,7 +31,7 @@ export function processFirstSubjectValue(
   if(tagJsType) {
     return processFirstTagValue(
       tagJsType,
-      contextItem,
+      contextItem as SupportContextItem,
       value,
       ownerSupport,
       counts,
@@ -82,13 +82,15 @@ function processFirstRegularValue(
 
 function processFirstTagValue(
   tagJsType: ValueType,
-  contextItem: ContextItem,
+  contextItem: SupportContextItem,
   value: TemplateValue | StringTag,
   ownerSupport: AnySupport, // owningSupport
   counts: Counts, // {added:0, removed:0}
   appendTo?: Element,
   insertBefore?: Text,
 ){
+  ++contextItem.renderCount
+
   switch (tagJsType) {
     // TODO: Do we ever get in here? because dom, tag, and component are covered below
     case ValueTypes.templater:
@@ -107,7 +109,7 @@ function processFirstTagValue(
       
       return processTag(
         ownerSupport,
-        contextItem,
+        contextItem as SupportContextItem,
         counts,
       )
 
@@ -127,7 +129,7 @@ function processFirstTagValue(
         return processNewSubjectTag(
           templater,
           ownerSupport,
-          contextItem as ContextItem,
+          contextItem,
           counts,
           appendTo,
           insertBefore,
@@ -139,14 +141,13 @@ function processFirstTagValue(
 
       return processTag(
         ownerSupport,
-        contextItem,
+        contextItem as SupportContextItem,
         counts,
       )
     }
 
     case ValueTypes.stateRender:
     case ValueTypes.tagComponent: {
-
       getNewGlobal(contextItem) as SupportTagGlobal
       contextItem.checkValueChange = checkTagValueChange
 

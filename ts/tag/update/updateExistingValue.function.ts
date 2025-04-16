@@ -99,7 +99,7 @@ function updateToTag(
 
   processTag(
     ownerSupport,
-    contextItem,
+    contextItem as SupportContextItem,
     fooCounts
   )
 }
@@ -221,7 +221,7 @@ export function tryUpdateToTag(
     case ValueTypes.templater:
       processTag(
         ownerSupport,
-        contextItem,
+        contextItem as SupportContextItem,
         fooCounts,
       )
       return true

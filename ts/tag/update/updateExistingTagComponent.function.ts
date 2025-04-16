@@ -74,6 +74,8 @@ export function updateExistingTagComponent(
 
   renderSupport(support)
 
+  ++subject.renderCount
+
   return
 }
 

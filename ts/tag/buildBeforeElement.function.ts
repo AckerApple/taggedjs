@@ -18,7 +18,8 @@ export function buildBeforeElement(
   appendTo?: Element,
   insertBefore?: Text,
 ) {
-  const global = support.subject.global as SupportTagGlobal
+  const subject = support.subject
+  const global = subject.global as SupportTagGlobal
 
   global.oldest = support
   global.newest = support
@@ -28,6 +29,8 @@ export function buildBeforeElement(
     
   global.htmlDomMeta = result.dom
   --painting.locks
+
+  // ++global.renderCount
 
   // return fragment
   return result

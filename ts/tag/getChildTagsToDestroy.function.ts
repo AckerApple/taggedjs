@@ -11,7 +11,7 @@ export function getChildTagsToDestroy(
   for (const child of childTags) {
     const lastArray = child.lastArray
     if(lastArray) {
-      getChildTagsToDestroy(lastArray)
+      getChildTagsToDestroy(lastArray.map(x => x.context))
       continue
     }
 

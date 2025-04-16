@@ -35,5 +35,8 @@ export function executeWrap(
   const config = setUseMemory.stateConfig
   useSupport.state = config.stateArray
   useSupport.states = config.states
+  
+  // ++useSupport.subject.renderCount
+
   return useSupport
 }

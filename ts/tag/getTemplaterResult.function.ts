@@ -19,7 +19,9 @@ export type Wrapper = ((
   tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater
 }
 
+/** NOT shared across variable spots. The Subject/ContextItem is more global than this is */
 export type TagGlobal = {
+  // renderCount: number
   htmlDomMeta?: DomObjectChildren
 
   deleted?: true

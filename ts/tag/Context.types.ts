@@ -11,6 +11,8 @@ export type ContextHandler = (
   contextItem: ContextItem,
 ) => void
 
+export type LastArrayItem = {context: ContextItem, global: TagGlobal}
+
 export type ContextItem = {
   element?: Element
 
@@ -28,7 +30,7 @@ export type ContextItem = {
   simpleValueElm?: Clone
 
   // array only
-  lastArray?: ContextItem[]
+  lastArray?: LastArrayItem[]
 
   // observable as variable
   subject?: InterpolateSubject

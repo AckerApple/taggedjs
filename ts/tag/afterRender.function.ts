@@ -13,6 +13,7 @@ export function runAfterRender(
 ) {
   const subject = support.subject
   ++subject.renderCount
+  // ++subject.global.renderCount
 
   const config: StateMemory = setUseMemory.stateConfig
   delete config.support

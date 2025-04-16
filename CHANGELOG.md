@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+### v2.8.16 - 5-2025
+- Adjust array drawing logic
+
 ### v2.8.15 - 5-2025
 - Prevent attributes with a * from destroying rendering
 
