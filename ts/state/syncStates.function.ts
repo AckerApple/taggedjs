@@ -22,7 +22,7 @@ export function syncStates(
   for (let index = statesFrom.length - 1; index >= 0; --index) {
     const oldValues: any[] = []
 
-    const oldGetCallback = <T>(...args: T[]) => {
+    const oldGetCallback = <T extends any[]>(...args: [...T]) => {
       oldValues.push(args)
       return args
     }
@@ -32,7 +32,7 @@ export function syncStates(
     statesFrom[index]( oldGetCallback )
     
     let getIndex = 0
-    const newSetCallback = <T>(_: T) => {
+    const newSetCallback = <T extends any[]>(..._: [...T]) => {
       return oldValues[ getIndex++ ]
     }
 

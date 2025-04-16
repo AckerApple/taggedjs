@@ -3,8 +3,10 @@ import { state } from './state.function.js'
 import { AnySupport } from '../tag/getSupport.function.js'
 import { StateMemory } from './StateMemory.type.js'
 
+export type StateSet = <T extends any[]>(...a: [...T]) => [...T]
+
 export type StatesSetter = (
-  set: <T>(...a: T[]) => T[]
+  set: StateSet
 ) => any
 
 export function firstStatesHandler(
@@ -19,7 +21,7 @@ export function firstStatesHandler(
 
   ++config.statesIndex
   
-  return setter((...args: any[]) => {
+  return setter(<T extends any[]>(...args: [...T]) => {
     state(args)
     return args
   })
@@ -35,7 +37,7 @@ export function reStatesHandler(
   const oldStates = prevSupport?.states[statesIndex] as StatesSetter
   const lastValues: any = []
   
-  const regetter = (...args: any[]) => {
+  const regetter = <T extends any[]>(...args: [...T]) => {
     lastValues.push(args)
     return args
   }

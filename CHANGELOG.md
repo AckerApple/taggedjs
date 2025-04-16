@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+### v2.8.18 - 5-2025
+- Adjust states data typing
+
 ### v2.8.16 - 5-2025
 - Adjust array drawing logic
 

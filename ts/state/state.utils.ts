@@ -4,8 +4,6 @@ import { State, StateConfig } from './state.types.js'
 import { firstStatesHandler, reStatesHandler, StatesSetter } from './states.utils.js'
 import { StateMemory } from './StateMemory.type.js'
 
-export type GetSet<T> = (y: T) => [T, T]
-
 export function initState(
   support: AnySupport,
   config: StateMemory,
