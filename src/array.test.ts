@@ -1,6 +1,7 @@
 import { byId, elmCount } from "./testing/elmSelectors"
 import { describe, expect, it } from "./testing/expect"
 
+const fxTime = 1350
 
 describe('⠇ array testing', () => {
   it('array basics', () => {
@@ -51,7 +52,7 @@ describe('⠇ array testing', () => {
     // remove player 1
     const result = await (byId('player-remove-promise-btn-0') as any)._click()
     expect(result).toBe('promise-no-data-ever')
-    await delay(1500) // animation
+    await delay(fxTime) // animation
 
     expect(elmCount('#player-remove-promise-btn-0')).toBe(0)
     expect(elmCount('#player-edit-btn-0')).toBe(0)
@@ -73,17 +74,17 @@ describe('⠇ array testing', () => {
 
     const result = await (byId('player-remove-promise-btn-0') as any).click()
     expect(result).toBe('promise-no-data-ever')
-    await delay(1500) // animation
+    await delay(fxTime) // animation
 
     expect(elmCount('#score-data-0-1-inside-button')).toBe(1)
     expect(elmCount('#score-data-0-1-outside-button')).toBe(1)
 
-    // edit player 1
+    // edit who is now player 1 who was player 2
     byId('player-edit-btn-0').click()
 
     const result2 = await (byId('player-remove-promise-btn-0') as any).click()
     expect(result2).toBe('promise-no-data-ever')
-    await delay(1500) // animation
+    await delay(fxTime) // animation
 
     expect(elmCount('#score-data-0-1-inside-button')).toBe(0)
     expect(elmCount('#score-data-0-1-outside-button')).toBe(0)

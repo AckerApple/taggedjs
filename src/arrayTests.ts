@@ -77,7 +77,24 @@ const playersDisplay = tag(({
   players: Player[]
   getNewPlayer: () => Player
 }) => {
-  const playersContent = players.map((player,index) => html`
+  const playersContent = players.map((player,index) =>
+    getPlayerDisplay(player, index, players, getNewPlayer).key(player)
+  )
+
+  return html`
+    <!-- playersLoop.js -->
+    ${playersContent}
+    <!-- end:playersLoop.js -->
+  `
+})
+
+function getPlayerDisplay(
+  player: Player,
+  index: number,
+  players: Player[],
+  getNewPlayer: () => Player,
+) {
+  return html`
     <div oninit=${fadeInDown} ondestroy=${fadeOutUp}
       style="background-color:black;--animate-duration: .1s;"
     >
@@ -122,14 +139,8 @@ const playersDisplay = tag(({
       `}
       <button id=${'player-edit-btn-' + index} onclick=${() => player.edit = !player.edit}>edit</button>
       <button onclick=${() => {
-        players.splice(index,0,getNewPlayer())
+        players.splice(index,0, getNewPlayer())
       }}>add before</button>
     </div>
-  `.key(player))
-
-  return html`
-    <!-- playersLoop.js -->
-    ${playersContent}
-    <!-- end:playersLoop.js -->
   `
-})
+}
