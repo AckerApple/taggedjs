@@ -43,6 +43,7 @@ subject) {
         return;
     }
     renderSupport(support);
+    ++subject.renderCount;
     return;
 }
 export function syncFunctionProps(newSupport, lastSupport, ownerSupport, newPropsArray, // templater.props

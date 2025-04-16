@@ -38,6 +38,7 @@ insertBefore) {
 function processFirstTagValue(tagJsType, contextItem, value, ownerSupport, // owningSupport
 counts, // {added:0, removed:0}
 appendTo, insertBefore) {
+    ++contextItem.renderCount;
     switch (tagJsType) {
         // TODO: Do we ever get in here? because dom, tag, and component are covered below
         case ValueTypes.templater:

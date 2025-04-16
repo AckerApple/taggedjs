@@ -4,6 +4,10 @@ import { InterpolateSubject } from './update/processFirstSubject.utils.js';
 import { Clone, TagGlobal } from './getTemplaterResult.function.js';
 import { AnySupport, SupportContextItem } from './getSupport.function.js';
 export type ContextHandler = (value: unknown, values: unknown[], newSupport: AnySupport, contextItem: ContextItem) => void;
+export type LastArrayItem = {
+    context: ContextItem;
+    global: TagGlobal;
+};
 export type ContextItem = {
     element?: Element;
     handler?: ContextHandler;
@@ -14,7 +18,7 @@ export type ContextItem = {
     isSpecial?: SpecialDefinition;
     placeholder?: Text;
     simpleValueElm?: Clone;
-    lastArray?: ContextItem[];
+    lastArray?: LastArrayItem[];
     subject?: InterpolateSubject;
     global?: TagGlobal;
     value?: any;

@@ -7,6 +7,7 @@ import { checkStateMismatch } from './checkStateMismatch.function.js';
 export function runAfterRender(support, ownerSupport) {
     const subject = support.subject;
     ++subject.renderCount;
+    // ++subject.global.renderCount
     const config = setUseMemory.stateConfig;
     delete config.support;
     support.state = config.stateArray;

@@ -5,13 +5,15 @@ import { ValueTypes } from './ValueTypes.enum.js';
 import { painting } from './paint.function.js';
 /** Function that kicks off actually putting tags down as HTML elements */
 export function buildBeforeElement(support, counts, appendTo, insertBefore) {
-    const global = support.subject.global;
+    const subject = support.subject;
+    const global = subject.global;
     global.oldest = support;
     global.newest = support;
     ++painting.locks;
     const result = attachHtmlDomMeta(support, counts, appendTo, insertBefore);
     global.htmlDomMeta = result.dom;
     --painting.locks;
+    // ++global.renderCount
     // return fragment
     return result;
 }

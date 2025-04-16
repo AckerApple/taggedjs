@@ -19,6 +19,7 @@ export function executeWrap(templater, result, useSupport, castedProps) {
     const config = setUseMemory.stateConfig;
     useSupport.state = config.stateArray;
     useSupport.states = config.states;
+    // ++useSupport.subject.renderCount
     return useSupport;
 }
 //# sourceMappingURL=executeWrap.function.js.map

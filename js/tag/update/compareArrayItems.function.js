@@ -1,35 +1,44 @@
-import { paint, paintAfters, paintRemoves } from '../paint.function.js';
+import { paintRemoves } from '../paint.function.js';
 import { destroySupport } from '../destroySupport.function.js';
-export function compareArrayItems(_subTag, // used to compare arrays
-value, index, lastArray, removed, counts) {
+export function compareArrayItems(value, index, lastArray, removed, counts) {
     const newLength = value.length - 1;
     const at = index - removed;
     const lessLength = at < 0 || newLength < at;
-    const prevContext = lastArray[index];
+    const prevContext = lastArray[index].context;
     if (lessLength) {
         destroyArrayItem(prevContext, counts);
         return 1;
     }
-    const oldKey = lastArray[index].value.arrayValue;
-    const oldValueTag = value[index];
-    return runArrayItemDiff(oldKey, oldValueTag, prevContext, counts, lastArray, index);
+    const oldKey = prevContext.value.arrayValue;
+    const newValueTag = value[index];
+    const result = runArrayItemDiff(oldKey, newValueTag, prevContext, counts, lastArray, index);
+    return result;
 }
-function runArrayItemDiff(oldKey, oldValueTag, prevContext, counts, lastArray, index) {
-    const isDiff = oldValueTag && oldKey !== oldValueTag.arrayValue;
+function runArrayItemDiff(oldKey, newValueTag, prevContext, counts, lastArray, index) {
+    const isDiff = newValueTag && oldKey !== newValueTag.arrayValue;
     if (isDiff) {
-        if (prevContext.renderCount === 0) {
-            const newKey = oldValueTag.arrayValue;
-            console.warn('Possible array issue. Array is attempting to create/delete same items. Either html``.key is not unique or array changes with every render', {
-                oldKey,
-                newKey,
-            });
-            paintAfters.push(() => {
-                destroyArrayItemByGlobal(prevContext.global, prevContext);
-                paintAfters.shift(); // prevent endless recursion
-                paint();
-            });
-            return 1;
+        // Intended to protect an array from adding and then immediately deleting
+        /*
+        // TODO: Does this code protect bad array keying?
+        if(prevContext.renderCount === 0) {
+          const newKey = newValueTag.arrayValue
+          console.warn('Possible array issue. Array is attempting to create/delete same items. Either html``.key is not unique or array changes with every render', {
+            oldKey,
+            newKey,
+            
+            prevValue: prevContext.value,
+            prevContext,
+          })
+    
+          paintAfters.push(() => {
+            destroyArrayItemByGlobal(prevContext.global, prevContext)
+            paintAfters.shift() // prevent endless recursion
+            paint()
+          })
+    
+          return 1
         }
+        */
         destroyArrayItem(prevContext, counts);
         lastArray.splice(index, 1);
         return 2;

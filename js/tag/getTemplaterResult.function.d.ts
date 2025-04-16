@@ -13,6 +13,7 @@ import { PropWatches } from './tag.js';
 export type Wrapper = ((newSupport: AnySupport, subject: ContextItem, prevSupport?: AnySupport) => AnySupport) & TagWrapper<unknown> & {
     tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater;
 };
+/** NOT shared across variable spots. The Subject/ContextItem is more global than this is */
 export type TagGlobal = {
     htmlDomMeta?: DomObjectChildren;
     deleted?: true;

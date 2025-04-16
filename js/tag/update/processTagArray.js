@@ -7,7 +7,8 @@ import { processNewArrayValue } from './processNewValue.function.js';
 import { compareArrayItems } from './compareArrayItems.function.js';
 export function processTagArray(subject, value, // arry of Tag classes
 ownerSupport, counts, appendTo) {
-    if (!subject.lastArray) {
+    const noLast = subject.lastArray === undefined;
+    if (noLast) {
         subject.lastArray = [];
     }
     const lastArray = subject.lastArray;
@@ -15,26 +16,29 @@ ownerSupport, counts, appendTo) {
     let removed = 0;
     /** 🗑️ remove previous items first */
     const filteredLast = [];
-    for (let index = 0; index < lastArray.length; ++index) {
-        const item = lastArray[index];
-        // 👁️ COMPARE & REMOVE
-        const newRemoved = compareArrayItems(item, value, index, lastArray, removed, counts);
-        if (newRemoved === 0) {
-            filteredLast.push(item);
-            continue;
+    // if not first time, then check for deletes
+    if (!noLast) {
+        // on each loop check the new length
+        for (let index = 0; index < lastArray.length; ++index) {
+            const item = lastArray[index];
+            // 👁️ COMPARE & REMOVE
+            const newRemoved = compareArrayItems(value, index, lastArray, removed, counts);
+            if (newRemoved === 0) {
+                filteredLast.push(item);
+                continue;
+            }
+            // do the same number again because it was a mid delete
+            if (newRemoved === 2) {
+                index = index - 1;
+                continue;
+            }
+            removed = removed + newRemoved;
         }
-        removed = removed + newRemoved;
-        // do the same number again because it was a mid delete
-        if (newRemoved === 2) {
-            index = index - 1;
-        }
+        subject.lastArray = filteredLast;
     }
-    subject.lastArray = filteredLast;
-    // const eAppendTo = existed ? undefined : appendTo
-    const eAppendTo = appendTo; // existed ? undefined : appendTo
     const length = value.length;
     for (let index = 0; index < length; ++index) {
-        const newSubject = reviewArrayItem(value, index, filteredLast, ownerSupport, runtimeInsertBefore, counts, eAppendTo);
+        const newSubject = reviewArrayItem(value, index, subject.lastArray, ownerSupport, runtimeInsertBefore, counts, appendTo);
         runtimeInsertBefore = newSubject.placeholder;
     }
 }
@@ -43,7 +47,7 @@ counts, appendTo) {
     const item = array[index];
     const previous = lastArray[index];
     if (previous) {
-        return reviewPreviousArrayItem(item, previous, lastArray, ownerSupport, index, runtimeInsertBefore, counts, appendTo);
+        return reviewPreviousArrayItem(item, previous.context, lastArray, ownerSupport, index, runtimeInsertBefore, counts, appendTo);
     }
     return processAddTagArrayItem(item, runtimeInsertBefore, // thisInsert as any,
     ownerSupport, counts, lastArray, appendTo);
@@ -80,7 +84,10 @@ ownerSupport, counts, lastArray, appendTo) {
     // after processing
     itemSubject.value = value;
     // Added to previous array
-    lastArray.push(itemSubject);
+    lastArray.push({
+        context: itemSubject,
+        global: itemSubject.global,
+    });
     if (appendTo) {
         paintAppends.push({
             element: subPlaceholder,

@@ -4,7 +4,7 @@ export function getChildTagsToDestroy(childTags) {
     for (const child of childTags) {
         const lastArray = child.lastArray;
         if (lastArray) {
-            getChildTagsToDestroy(lastArray);
+            getChildTagsToDestroy(lastArray.map(x => x.context));
             continue;
         }
         const global = child.global;
