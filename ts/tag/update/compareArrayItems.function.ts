@@ -1,7 +1,7 @@
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { ContextItem, LastArrayItem } from '../Context.types.js'
 import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { paint, paintAfters, paintRemoves } from '../paint.function.js'
+import { paintRemoves } from '../paint.function.js'
 import { destroySupport } from '../destroySupport.function.js'
 import { SupportContextItem } from '../getSupport.function.js'
 import type { StringTag } from '../StringTag.type.js'
