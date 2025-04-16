@@ -17,7 +17,7 @@ export function syncStates(stateFrom, stateTo, oldStates, statesFrom) {
         // trigger getting all old values
         statesFrom[index](oldGetCallback);
         let getIndex = 0;
-        const newSetCallback = (_) => {
+        const newSetCallback = (..._) => {
             return oldValues[getIndex++];
         };
         // trigger setting updated values
