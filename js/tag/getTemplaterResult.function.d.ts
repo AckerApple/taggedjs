@@ -1,4 +1,6 @@
-import { StringTag, DomTag, EventCallback } from './getDomTag.function.js';
+import { EventCallback } from './getDomTag.function.js';
+import { StringTag } from './StringTag.type.js';
+import { DomTag } from './DomTag.type.js';
 import { ContextItem } from './Context.types.js';
 import { AnySupport, SupportContextItem } from './getSupport.function.js';
 import { Props } from '../Props.js';
@@ -9,7 +11,7 @@ import { Subscription } from '../subject/subject.utils.js';
 import { Subject } from '../subject/index.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
-import { PropWatches } from './tag.js';
+import { PropWatches } from './tag.function.js';
 export type Wrapper = ((newSupport: AnySupport, subject: ContextItem, prevSupport?: AnySupport) => AnySupport) & TagWrapper<unknown> & {
     tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater;
 };

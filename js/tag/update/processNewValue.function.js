@@ -2,7 +2,7 @@ import { getTemplaterResult } from '../getTemplaterResult.function.js';
 import { checkTagValueChange } from '../checkTagValueChange.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
-import { PropWatches } from '../tag.js';
+import { PropWatches } from '../tag.function.js';
 import { getSupport } from '../getSupport.function.js';
 export function processNewArrayValue(value, ownerSupport, contextItem) {
     const tagJsType = value.tagJsType;

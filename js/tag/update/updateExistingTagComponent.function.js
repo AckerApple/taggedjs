@@ -7,7 +7,7 @@ import { destroySupport } from '../destroySupport.function.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { isLikeTags } from '../isLikeTags.function.js';
 import { isArray } from '../../isInstance.js';
-import { PropWatches } from '../tag.js';
+import { PropWatches } from '../tag.function.js';
 export function updateExistingTagComponent(ownerSupport, support, // lastest
 subject) {
     const global = subject.global;

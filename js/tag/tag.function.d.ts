@@ -1,9 +1,8 @@
 import { KeyFunction } from './getDomTag.function.js';
-import type { StringTag } from './StringTag.type.js';
-import type { DomTag } from './DomTag.type.js';
 import { Original } from './tag.utils.js';
 import { RouteProps, RouteTag, StateToTag, ToTag } from './tag.types.js';
 import { UnknownFunction } from './update/oneRenderToSupport.function.js';
+import { AnyTag } from './AnyTag.type.js';
 /** TODO: This might be a duplicate typing of Wrapper */
 export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnType<T> & {
     key: KeyFunction;
@@ -37,7 +36,7 @@ export declare namespace tag {
     let immutableProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
     let watchProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
 }
-type ReturnTag = DomTag | StringTag | StateToTag | null | undefined;
+type ReturnTag = AnyTag | StateToTag | null | undefined;
 declare function renderOnceFn(): ReturnTag;
 /** Used to create variable scoping when calling a function that lives within a prop container function */
 declare function tagUseFn(): ReturnTag;

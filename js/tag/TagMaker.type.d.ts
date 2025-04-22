@@ -1,2 +1,2 @@
-import { DomTag, StringTag } from './getDomTag.function.js';
-export type TagMaker<Args extends any[] = any[]> = ((...args: Args) => StringTag | DomTag | TagMaker) | ((...args: Args) => (...args: Args) => StringTag | DomTag | TagMaker);
+import { AnyTag } from './AnyTag.type.js';
+export type TagMaker<Args extends any[] = any[]> = ((...args: Args) => AnyTag | TagMaker) | ((...args: Args) => (...args: Args) => AnyTag | TagMaker);

@@ -2,7 +2,7 @@ export { getNewGlobal } from './update/getNewGlobal.function.js';
 export * from './tag.types.js';
 export { getDomMeta } from './domMetaCollector.js';
 export * from './buildBeforeElement.function.js';
-export * from './tag.js';
+export * from './tag.function.js';
 export * from './getDomTag.function.js';
 export * from './tag.utils.js';
 export * from './html.js';

@@ -1,4 +1,6 @@
-import { DomTag, StringTag, TagTemplate } from './getDomTag.function.js';
+import { TagTemplate } from './getDomTag.function.js';
+import { StringTag } from './StringTag.type.js';
+import { DomTag } from './DomTag.type.js';
 import { TemplaterResult } from './getTemplaterResult.function.js';
 import { ValueSubject } from '../subject/ValueSubject.js';
 import { setUseMemory } from '../state/index.js';

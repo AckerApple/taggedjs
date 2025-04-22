@@ -1,7 +1,7 @@
 import { deepEqual } from '../deepFunctions.js';
 import { isArray } from '../isInstance.js';
 import { hasPropLengthsChanged } from './render/renderSupport.function.js';
-import { PropWatches } from './tag.js';
+import { PropWatches } from './tag.function.js';
 import { BasicTypes } from './ValueTypes.enum.js';
 export function hasSupportChanged(lastSupport, newTemplater) {
     const latestProps = newTemplater.props;

@@ -1,6 +1,7 @@
 import { getStringTag, getDomTag } from './getDomTag.function.js';
-import { PropWatches } from './tag.js';
+import { PropWatches } from './tag.function.js';
 import { getTemplaterResult } from './getTemplaterResult.function.js';
+/** Used as html`<div></div>` */
 export function html(strings, ...values) {
     const stringTag = getStringTag(strings, values);
     const templater = getTemplaterResult(PropWatches.NONE);
