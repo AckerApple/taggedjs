@@ -1,4 +1,4 @@
-import { StringTag } from './getDomTag.function.js'
+import { StringTag } from './StringTag.type.js'
 import { deepClone } from '../deepFunctions.js'
 import { ValueType, ValueTypes } from './ValueTypes.enum.js'
 import { isArray } from '../isInstance.js'

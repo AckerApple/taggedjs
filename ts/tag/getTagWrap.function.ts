@@ -6,7 +6,7 @@ import { ContextItem } from './Context.types.js'
 import { Props } from '../Props.js'
 import { syncFunctionProps } from './update/updateExistingTagComponent.function.js'
 import { executeWrap } from './executeWrap.function.js'
-import { PropWatches } from './tag.js'
+import { PropWatches } from './tag.function.js'
 import { deepCompareDepth, shallowCompareDepth } from './hasSupportChanged.function.js'
 import { getSupport } from './getSupport.function.js'
 

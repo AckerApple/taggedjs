@@ -3,15 +3,13 @@
 import { State } from'../state/index.js'
 import { InterpolatedTemplates } from '../interpolations/interpolations.js'
 
-import { TemplaterResult } from './getTemplaterResult.function.js'
 import { TagValues } from'./html.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/LikeObjectElement.type.js'
-import { AnySupport } from './getSupport.function.js'
 import { getSupportInCycle } from './getSupportInCycle.function.js'
 import { StringTag } from './StringTag.type.js'
+import { DomTag } from './DomTag.type.js'
 
-export type { StringTag }
 export const variablePrefix = ':tagvar'
 export const variableSuffix = ':'
 
@@ -28,17 +26,6 @@ export interface TagTemplate {
   strings: string[]
   values: unknown[]  
   domMetaMap?: DomMetaMap
-}
-
-export type Tag = {
-  debug?: boolean // Attach as () => {const h=html``;h.debug=true;return true}
-
-  values: unknown[]
-  tagJsType?: typeof ValueTypes.tag | typeof ValueTypes.dom
-  templater?: TemplaterResult
-  ownerSupport?: AnySupport
-
-  arrayValue?: any
 }
 
 type ArrayItemStringTag<T> = StringTag & { arrayValue: T }
@@ -77,25 +64,6 @@ export function getStringTag(
   }
 
   return tag
-}
-
-export type DomTag = Tag & {
-  children?: {
-    dom: LikeObjectChildren
-    values: TagValues
-  }
-  dom: LikeObjectChildren
-  values: unknown[]
-
-  /** used in array.map() */
-  key: (arrayValue: unknown) => DomTag
-
-  html: {
-    dom: (
-      dom: LikeObjectChildren, // ObjectChildren
-      values: TagValues,
-    ) => DomTag
-  }
 }
 
 export function getDomTag(

@@ -1,4 +1,5 @@
-import { DomTag, StringTag } from './getDomTag.function.js'
+import { StringTag } from './StringTag.type.js'
+import type { DomTag } from './DomTag.type.js'
 import { AnySupport } from './getSupport.function.js'
 import { ContextItem, ContextHandler } from './Context.types.js'
 

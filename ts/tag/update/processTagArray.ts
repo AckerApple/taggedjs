@@ -10,7 +10,7 @@ import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { processNewArrayValue } from './processNewValue.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { ContextItem, LastArrayItem } from '../Context.types.js'
-import { StringTag } from '../getDomTag.function.js'
+import { StringTag } from '../StringTag.type.js'
 import { compareArrayItems } from './compareArrayItems.function.js'
 
 export function processTagArray(

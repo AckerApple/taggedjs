@@ -7,7 +7,7 @@ import {SupportTagGlobal, TemplaterResult } from './tag/getTemplaterResult.funct
 import { isArray, isStaticTag } from './isInstance.js'
 import { BasicTypes } from './tag/ValueTypes.enum.js'
 import { setUseMemory } from './state/index.js'
-import { Tag } from './tag/getDomTag.function.js'
+import { Tag } from './tag/Tag.type.js'
 import { Props } from './Props.js'
 import { UnknownFunction } from './tag/index.js'
 import { Subject } from './subject/Subject.class.js'

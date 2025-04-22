@@ -4,7 +4,8 @@ import { softDestroySupport } from './softDestroySupport.function.js'
 import {SupportTagGlobal } from '../getTemplaterResult.function.js'
 import { renderTagOnly } from'./renderTagOnly.function.js'
 import { isLikeTags } from'../isLikeTags.function.js'
-import { DomTag, StringTag } from '../getDomTag.function.js'
+import { StringTag } from '../StringTag.type.js'
+import { DomTag } from '../DomTag.type.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 
 /** TODO: This seems to support both new and updates and should be separated? */

@@ -1,15 +1,18 @@
 ## CHANGELOG
 
-### v2.8.18 - 5-2025
+### v2.8.19 - 4-2025
+- html`` data typing Tag created
+
+### v2.8.18 - 4-2025
 - Adjust states data typing
 
-### v2.8.16 - 5-2025
+### v2.8.16 - 4-2025
 - Adjust array drawing logic
 
-### v2.8.15 - 5-2025
+### v2.8.15 - 4-2025
 - Prevent attributes with a * from destroying rendering
 
-### v2.8.10 - 5-2025
+### v2.8.10 - 4-2025
 - Fixed array deleting
 
 ### v2.8.9 - 4-2025

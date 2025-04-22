@@ -9,7 +9,7 @@ import { destroySupport } from '../destroySupport.function.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { isLikeTags } from'../isLikeTags.function.js'
 import { isArray } from '../../isInstance.js'
-import { PropWatches } from '../tag.js'
+import { PropWatches } from '../tag.function.js'
 import { Props } from '../../Props.js'
 import { BaseSupport } from '../BaseSupport.type.js'
 

@@ -1,4 +1,6 @@
-import { StringTag, DomTag, Tag } from './getDomTag.function.js'
+import type { StringTag } from './StringTag.type.js'
+import type { Tag } from './Tag.type.js'
+import type { DomTag } from './DomTag.type.js'
 import { AnySupport } from './getSupport.function.js'
 import { TemplaterResult } from './getTemplaterResult.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'

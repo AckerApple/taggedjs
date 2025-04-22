@@ -5,9 +5,10 @@ import { ValueTypes, ValueType } from '../ValueTypes.enum.js'
 import { ValueSubject } from '../../subject/ValueSubject.js'
 import { AnySupport } from '../getSupport.function.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
-import { StringTag, DomTag } from '../getDomTag.function.js'
+import { StringTag } from '../StringTag.type.js'
+import { DomTag } from '../DomTag.type.js'
 import { ContextItem } from '../Context.types.js'
-import { PropWatches } from '../tag.js'
+import { PropWatches } from '../tag.function.js'
 import { getSupport } from '../getSupport.function.js'
 
 export function processNewArrayValue(

@@ -1,6 +1,8 @@
 // taggedjs-no-compile
 
-import { DomTag, KeyFunction, StringTag } from './getDomTag.function.js'
+import { KeyFunction } from './getDomTag.function.js'
+import type { StringTag } from './StringTag.type.js'
+import type { DomTag } from './DomTag.type.js'
 import { setUseMemory } from '../state/index.js'
 import { getTemplaterResult, TemplaterResult, Wrapper } from './getTemplaterResult.function.js'
 import { Original, TagComponent, TagWrapper, tags } from './tag.utils.js'
@@ -8,6 +10,8 @@ import { getTagWrap } from './getTagWrap.function.js'
 import { RouteProps, RouteTag, StateToTag, ToTag } from './tag.types.js'
 import { UnknownFunction } from './update/oneRenderToSupport.function.js'
 import { ValueTypes } from './ValueTypes.enum.js'
+import { Tag } from './Tag.type.js'
+import { AnyTag } from './AnyTag.type.js'
 
 let tagCount = 0
 
@@ -90,7 +94,7 @@ export declare namespace tag {
   let watchProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
 }
 
-type ReturnTag = DomTag | StringTag | StateToTag | null | undefined
+type ReturnTag = AnyTag | StateToTag | null | undefined
 
 ;(tag as any).renderOnce = renderOnceFn
 function renderOnceFn(): ReturnTag {
