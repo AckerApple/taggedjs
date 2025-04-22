@@ -6,8 +6,10 @@ import { getTemplaterResult } from './getTemplaterResult.function.js'
 import { RegularValue } from './update/processRegularValue.function.js'
 import { Tag } from './Tag.type.js'
 
-type InputCallback = ((e: InputElementTargetEvent) => any)
-export type TagValues = (InputCallback | RegularValue | null | unknown | undefined | object)[]
+export type InputCallback = ((e: InputElementTargetEvent) => unknown)
+/** represents a single value within html`<div>${value}</div>`. The data typing of "& unknown" is to allow anything AND STILL infer functions have one argument if "e"  */
+export type TagValue = (InputCallback | RegularValue | object) & unknown
+export type TagValues = TagValue[]
 
 /** Used as html`<div></div>` */
 export function html(

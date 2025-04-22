@@ -1,7 +1,4 @@
 import { ValueSubject } from '../subject/index.js'
-import type { StringTag } from './StringTag.type.js'
-import type { DomTag } from './DomTag.type.js'
-import type { Tag } from './Tag.type.js'
 import { AnyTag } from './AnyTag.type.js'
 
 export class RouteQuery {

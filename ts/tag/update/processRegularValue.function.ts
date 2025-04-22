@@ -3,7 +3,7 @@ import { setContent } from '../paint.function.js'
 import { ContextItem } from '../Context.types.js'
 import { checkSimpleValueChange } from '../checkDestroyPrevious.function.js'
 
-export type RegularValue = string | number | undefined | boolean
+export type RegularValue = string | number | undefined | boolean | null
 
 export function processUpdateRegularValue(
   value: RegularValue,
