@@ -1,4 +1,5 @@
 export { signal } from './signal.function.js'
+export type { Subscription } from './subject.utils.js'
 
 export * from './Subject.class.js'
 export * from './ValueSubject.js'

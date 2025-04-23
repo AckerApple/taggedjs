@@ -12,6 +12,7 @@ import { isArray } from '../../isInstance.js'
 import { PropWatches } from '../tag.function.js'
 import { Props } from '../../Props.js'
 import { BaseSupport } from '../BaseSupport.type.js'
+import { syncPriorPropFunction } from './syncPriorPropFunction.function.js'
 
 export function updateExistingTagComponent(
   ownerSupport: AnySupport,
@@ -127,119 +128,6 @@ export function syncFunctionProps(
   newPropsConfig.castProps = newArray
 
   return newArray
-}
-
-function syncPriorPropFunction(
-  priorProp: WrapRunner,
-  prop: WrapRunner,
-  newSupport: AnySupport,
-  ownerSupport: AnySupport,
-  maxDepth: number,
-  depth: number,
-) {
-  if(priorProp === undefined) {
-    return prop
-  }
-
-  if(typeof(priorProp) === BasicTypes.function) {
-    // the prop i am receiving, is already being monitored/controlled by another parent
-    if(prop.mem) {
-      priorProp.mem = prop.mem
-      return prop
-    }
-
-    priorProp.mem = prop
-
-    return priorProp
-  }
-
-  // prevent infinite recursion
-  if(depth === maxDepth) {
-    return prop
-  }
-
-  if( isSkipPropValue(prop) ) {
-    return prop // no children to crawl through
-  }
-
-  if(isArray(prop)) {
-    return updateExistingArray(
-      prop as unknown as WrapRunner[],
-      priorProp,
-      newSupport,
-      ownerSupport,
-      depth,
-    )
-  }
-
-  return updateExistingObject(
-    prop as unknown as Record<string, WrapRunner>,
-    priorProp as unknown as Record<string, WrapRunner>,
-    newSupport,
-    ownerSupport,
-    depth,
-    maxDepth,
-  )
-}
-
-function updateExistingObject(
-  prop: Record<string, WrapRunner>,
-  priorProp: Record<string, WrapRunner>,
-  newSupport: AnySupport,
-  ownerSupport: AnySupport,
-  depth: number,
-  maxDepth: number,
-) {
-  const keys = Object.keys(prop) 
-  for(const name of keys){
-    const subValue = prop[name]
-    const oldProp = (priorProp as unknown as Record<string, WrapRunner>)[name]
-
-    const result = syncPriorPropFunction(
-      oldProp,
-      subValue,
-      newSupport,
-      ownerSupport,
-      maxDepth,
-      depth + 1,
-    )
-
-    if(subValue === result) {
-      continue
-    }
-    
-    const hasSetter = Object.getOwnPropertyDescriptor(prop, name)?.set
-    if(hasSetter) {
-      continue
-    }
-
-    prop[name] = result as WrapRunner
-  }
-  
-  return prop
-}
-
-function updateExistingArray(
-  prop: WrapRunner[],
-  priorProp: WrapRunner,
-  newSupport: AnySupport,
-  ownerSupport: AnySupport,
-  depth: number,
-) {
-  for (let index = prop.length - 1; index >= 0; --index) {
-    const x = prop[index]
-    const oldProp = (priorProp as unknown as unknown[])[index] as WrapRunner
-    prop[index] = syncPriorPropFunction(
-      oldProp,
-      x,
-      newSupport,
-      ownerSupport,
-      depth + 1,
-      index,
-    ) as WrapRunner
-  }
-
-  return prop
 }
 
 export function moveProviders(

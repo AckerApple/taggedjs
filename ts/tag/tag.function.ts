@@ -20,9 +20,13 @@ export type TaggedFunction<T extends ToTag> = ((...x:Parameters<T>) => ReturnTyp
   compareTo?: string
 }) & { original: UnknownFunction }
 
+/** How to handle checking for prop changes aka argument changes */
 export enum PropWatches {
   DEEP = 'deep',
+  
+  /** checks all values up to 2 levels deep */
   SHALLOW = 'shallow',
+  
   NONE = 'none',
   IMMUTABLE = 'immutable'
 }
