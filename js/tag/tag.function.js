@@ -5,9 +5,11 @@ import { tags } from './tag.utils.js';
 import { getTagWrap } from './getTagWrap.function.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 let tagCount = 0;
+/** How to handle checking for prop changes aka argument changes */
 export var PropWatches;
 (function (PropWatches) {
     PropWatches["DEEP"] = "deep";
+    /** checks all values up to 2 levels deep */
     PropWatches["SHALLOW"] = "shallow";
     PropWatches["NONE"] = "none";
     PropWatches["IMMUTABLE"] = "immutable";

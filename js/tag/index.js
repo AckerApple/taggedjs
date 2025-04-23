@@ -20,4 +20,6 @@ export { renderSupport } from './render/renderSupport.function.js';
 export { renderWithSupport } from './render/renderWithSupport.function.js';
 export { paint } from './paint.function.js';
 export { processFirstSubjectValue } from './update/processFirstSubjectValue.function.js';
+export { hasPropChanges } from './hasPropChanges.function.js';
+export { PropWatches } from './tag.function.js';
 //# sourceMappingURL=index.js.map

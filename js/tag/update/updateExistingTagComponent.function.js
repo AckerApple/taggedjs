@@ -1,13 +1,13 @@
 import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from '../hasSupportChanged.function.js';
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js';
-import { castProps, isSkipPropValue } from '../../alterProp.function.js';
+import { castProps } from '../../alterProp.function.js';
 import { renderSupport } from '../render/renderSupport.function.js';
-import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js';
+import { ValueTypes } from '../ValueTypes.enum.js';
 import { destroySupport } from '../destroySupport.function.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { isLikeTags } from '../isLikeTags.function.js';
-import { isArray } from '../../isInstance.js';
 import { PropWatches } from '../tag.function.js';
+import { syncPriorPropFunction } from './syncPriorPropFunction.function.js';
 export function updateExistingTagComponent(ownerSupport, support, // lastest
 subject) {
     const global = subject.global;
@@ -70,56 +70,6 @@ maxDepth, depth = -1) {
     const newPropsConfig = newSupport.propsConfig;
     newPropsConfig.castProps = newArray;
     return newArray;
-}
-function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, maxDepth, depth) {
-    if (priorProp === undefined) {
-        return prop;
-    }
-    if (typeof (priorProp) === BasicTypes.function) {
-        // the prop i am receiving, is already being monitored/controlled by another parent
-        if (prop.mem) {
-            priorProp.mem = prop.mem;
-            return prop;
-        }
-        priorProp.mem = prop;
-        return priorProp;
-    }
-    // prevent infinite recursion
-    if (depth === maxDepth) {
-        return prop;
-    }
-    if (isSkipPropValue(prop)) {
-        return prop; // no children to crawl through
-    }
-    if (isArray(prop)) {
-        return updateExistingArray(prop, priorProp, newSupport, ownerSupport, depth);
-    }
-    return updateExistingObject(prop, priorProp, newSupport, ownerSupport, depth, maxDepth);
-}
-function updateExistingObject(prop, priorProp, newSupport, ownerSupport, depth, maxDepth) {
-    const keys = Object.keys(prop);
-    for (const name of keys) {
-        const subValue = prop[name];
-        const oldProp = priorProp[name];
-        const result = syncPriorPropFunction(oldProp, subValue, newSupport, ownerSupport, maxDepth, depth + 1);
-        if (subValue === result) {
-            continue;
-        }
-        const hasSetter = Object.getOwnPropertyDescriptor(prop, name)?.set;
-        if (hasSetter) {
-            continue;
-        }
-        prop[name] = result;
-    }
-    return prop;
-}
-function updateExistingArray(prop, priorProp, newSupport, ownerSupport, depth) {
-    for (let index = prop.length - 1; index >= 0; --index) {
-        const x = prop[index];
-        const oldProp = priorProp[index];
-        prop[index] = syncPriorPropFunction(oldProp, x, newSupport, ownerSupport, depth + 1, index);
-    }
-    return prop;
 }
 export function moveProviders(lastSupport, newSupport) {
     const global = lastSupport.subject.global;
