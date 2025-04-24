@@ -14,6 +14,7 @@ export function callback(callback) {
 export function createTrigger(support, oldState, toCallback) {
     const oldStateArray = oldState.stateArray;
     const oldStates = oldState.states;
+    // const oldStates = support.states
     return function trigger(...args) {
         const callbackMaker = support.subject.renderCount > 0;
         if (callbackMaker) {

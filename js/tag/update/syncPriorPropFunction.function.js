@@ -7,6 +7,10 @@ export function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport,
     if (priorProp === undefined || priorProp === null) {
         return prop;
     }
+    // prevent infinite recursion
+    if (depth > maxDepth) {
+        return prop;
+    }
     if (typeof (priorProp) === BasicTypes.function) {
         // the prop i am receiving, is already being monitored/controlled by another parent
         if (prop.mem) {
@@ -16,15 +20,11 @@ export function syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport,
         priorProp.mem = prop;
         return priorProp;
     }
-    // prevent infinite recursion
-    if (depth === maxDepth) {
-        return prop;
-    }
     if (isSkipPropValue(prop)) {
         return prop; // no children to crawl through
     }
     if (isArray(prop)) {
-        return updateExistingArray(prop, priorProp, newSupport, ownerSupport, depth);
+        return updateExistingArray(prop, priorProp, newSupport, ownerSupport, depth, maxDepth);
     }
     return updateExistingObject(prop, priorProp, newSupport, ownerSupport, depth, maxDepth);
 }

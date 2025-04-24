@@ -48,6 +48,9 @@ subject) {
 }
 export function syncFunctionProps(newSupport, lastSupport, ownerSupport, newPropsArray, // templater.props
 maxDepth, depth = -1) {
+    if (maxDepth === 0) {
+        throw new Error('before here');
+    }
     const global = lastSupport.subject.global;
     const newest = global.newest;
     if (!newest) {
@@ -64,7 +67,7 @@ maxDepth, depth = -1) {
     for (let index = 0; index < newPropsArray.length; ++index) {
         const prop = newPropsArray[index];
         const priorProp = priorPropsArray[index];
-        const newValue = syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, depth + 1, maxDepth);
+        const newValue = syncPriorPropFunction(priorProp, prop, newSupport, ownerSupport, maxDepth, depth + 1);
         newArray.push(newValue);
     }
     const newPropsConfig = newSupport.propsConfig;
@@ -91,6 +94,7 @@ export function moveProviders(lastSupport, newSupport) {
         }
     }
 }
+/** Exchanges entire propsConfigs */
 function syncSupports(templater, support, lastSupport, ownerSupport, maxDepth) {
     // update function refs to use latest references
     const newProps = templater.props;

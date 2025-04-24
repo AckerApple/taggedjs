@@ -6,4 +6,5 @@ export declare function initState(support: AnySupport, config: StateMemory): voi
 export declare function reState(support: AnySupport, config: StateMemory, prevState: State, prevStates: StatesSetter[]): void;
 export declare class StateEchoBack {
 }
+/** sends a fake value and then sets back to received value */
 export declare function getCallbackValue<T>(callback: StateConfig<T>): [T, T];
