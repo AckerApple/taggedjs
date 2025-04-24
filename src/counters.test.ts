@@ -1,4 +1,4 @@
-import { byId, html, htmlById, keyupOn } from "./testing/elmSelectors"
+import { byId, click, html, htmlById, keyupOn } from "./testing/elmSelectors"
 import { describe, expect, it } from "./testing/expect"
 import { expectElmCount, testCounterElements } from "./testing/expect.html"
 
@@ -78,8 +78,8 @@ describe('💯 counters', () => {
     // expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`)
 
   })
-/* TODO - bring this back
-  it.skip('piped subject', () => {
+
+  it('piped subject', () => {
     if(firstRun) {
       expect(html('#🪈-pipedSubject')).toBe('')
       expect(html('#🪈-pipedSubject-2')).toBe('')
@@ -92,7 +92,6 @@ describe('💯 counters', () => {
     expect(pipedSubDisplay).toBe(subjectCountDisplay, `Expected #🪈-pipedSubject value(${pipedSubDisplay}) to match #🥦-standalone-display value(${subjectCountDisplay})`)
     expect(html('#🪈-pipedSubject-2')).toBe(html('#🥦-standalone-display') )
   })
-*/
 })
 
 export const clickSpeedAmount = 600

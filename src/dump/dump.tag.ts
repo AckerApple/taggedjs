@@ -1,4 +1,4 @@
-import { html, onInit, tag, letProp, states, StringTag, DomTag } from "taggedjs"
+import { html, onInit, tag, letProp, states, StringTag, DomTag, Tag } from "taggedjs"
 import { dumpArray } from "./dumpArray.tag"
 import { dumpSimple } from "./dumpSimple.tag"
 import { dumpObject } from "./dumpObject.tag"
@@ -96,7 +96,7 @@ const getObjectTemplate = <T>({
   showAllChange: any
   showKids: boolean
   showLevels: number
-}): StringTag | DomTag => {
+}): Tag => {
   if(value === null) {
     if(!showKids) {
       return html`no kids`

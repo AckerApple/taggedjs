@@ -55,7 +55,7 @@ const innerCounters = tag.deepPropWatch(({
 
     <div style="border:1px dashed black;padding:1em;">
       <button id="❤️-inner-counter" onclick=${increasePropCounter}
-      >❤️ propCounter:${propCounter}</button>
+      >❤️-inner-counter propCounter:${propCounter}</button>
       <span>
         ❤️ <span id="❤️-inner-display">${propCounter}</span>
       </span>
@@ -187,13 +187,18 @@ const noWatchPropCounters = ({
 
 export const innerCounterContent = () => tag.use = (
   statesRenderCount = 0,
-  statesRenderCount2 = 0,
-  callbacks = callbackMaker(),
-  
+  statesRenderCount2 = 0,  
   counter = 0,  
+  counter2 = 0,  
   renderCount = 0,
   propCounter = 0,  
   initCounter = 0,
+
+  callbacks = callbackMaker(),
+  callbackTo = callback(z => {
+    counter2 = z as number
+  }),
+
 
   increasePropCounter = () => {
     ++propCounter
@@ -211,6 +216,7 @@ export const innerCounterContent = () => tag.use = (
 
 
   callbackTestSub = state(() => new Subject(counter)),
+  callbackTestSub2 = state(() => new Subject(0)),
   pipedSubject0 = state(() => new ValueSubject('222')),
 
   // State as a callback only needed so pipedSubject1 has the latest value
@@ -236,6 +242,8 @@ export const innerCounterContent = () => tag.use = (
         counter = y
       })
     )
+
+    callbackTestSub.subscribe(callbackTo)
   }),
 ) => {
   if(immutableProps.propCounter !== propCounter) {
@@ -301,6 +309,19 @@ export const innerCounterContent = () => tag.use = (
       >++subject&lt;&gt;</button>
       <span>
         🥦&lt;<span id="subject-counter-subject-display">${callbackTestSub}</span>&gt;
+      </span>
+    </div>
+
+    <div>
+      <button id="🥦-subject-increase-async-counter"
+        onclick=${() => {
+          setTimeout(() => {
+            callbackTestSub2.next(callbackTestSub2.value as number + 1)
+          }, 10)
+        }}
+      >🔀 🥦 ++subject&lt;&gt;</button>
+      <span>
+        🔀 🥦&lt;<span id="subject-async-counter-subject-display">${callbackTestSub2}</span>&gt;
       </span>
     </div>
   </div>
