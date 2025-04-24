@@ -8,6 +8,7 @@ export function updateExistingArray(
   newSupport: AnySupport,
   ownerSupport: AnySupport,
   depth: number,
+  maxDepth: number,
 ) {
   for (let index = prop.length - 1; index >= 0; --index) {
     const x = prop[index]
@@ -17,8 +18,8 @@ export function updateExistingArray(
       x,
       newSupport,
       ownerSupport,
+      maxDepth,
       depth + 1,
-      index,
     ) as WrapRunner
   }
 

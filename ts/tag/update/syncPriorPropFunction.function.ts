@@ -13,7 +13,13 @@ export function syncPriorPropFunction(
   maxDepth: number,
   depth: number,
 ) {
+
   if(priorProp === undefined || priorProp === null) {
+    return prop
+  }
+
+  // prevent infinite recursion
+  if(depth > maxDepth) {
     return prop
   }
 
@@ -29,11 +35,6 @@ export function syncPriorPropFunction(
     return priorProp
   }
 
-  // prevent infinite recursion
-  if(depth === maxDepth) {
-    return prop
-  }
-
   if( isSkipPropValue(prop) ) {
     return prop // no children to crawl through
   }
@@ -45,6 +46,7 @@ export function syncPriorPropFunction(
       newSupport,
       ownerSupport,
       depth,
+      maxDepth,
     )
   }
 

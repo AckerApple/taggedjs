@@ -39,13 +39,11 @@ export function reState(
 
 export class StateEchoBack {}
 
-// sends a fake value and then sets back to received value
+/** sends a fake value and then sets back to received value */
 export function getCallbackValue<T>(
   callback: StateConfig<T>
 ): [T, T] {
-  const oldState = callback(StateEchoBack as any) // get value and set to undefined
-  const [value] = oldState
-  
+  const [ value ] = callback(StateEchoBack as any) // get value and set to undefined
   const [checkValue] = callback( value ) // set back to original value
   return [value, checkValue]
 }

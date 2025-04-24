@@ -29,10 +29,11 @@ export function createTrigger<A,B,C,D,E,F, T>(
 ) {
   const oldStateArray = oldState.stateArray
   const oldStates = oldState.states
+  // const oldStates = support.states
 
   return function trigger(...args: any[]) {
     const callbackMaker = support.subject.renderCount > 0
-
+    
     if(callbackMaker) {
       return callbackStateUpdate(
         support,

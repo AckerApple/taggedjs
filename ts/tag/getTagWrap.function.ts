@@ -58,11 +58,12 @@ export function getCastedProps(
   const maxDepth = templater.propWatch === PropWatches.DEEP ? deepCompareDepth : shallowCompareDepth
   const props = templater.props as Props
   const propsConfig = newSupport.propsConfig as PropsConfig
+
   // When defined, this must be an update where my new props have already been made for me
   let preCastedProps: Props | undefined = propsConfig.castProps
-
   const lastPropsConfig = lastSupport?.propsConfig
   const lastCastProps = lastPropsConfig?.castProps
+  
   if(lastCastProps) {
     propsConfig.castProps = lastCastProps
     preCastedProps = syncFunctionProps(

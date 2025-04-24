@@ -1,6 +1,6 @@
 import { AnySupport } from '../tag/getSupport.function.js'
 import { renderSupport } from '../tag/render/renderSupport.function.js'
-import { syncStates } from './syncStates.function.js'
+import { syncStates, syncSupports } from './syncStates.function.js'
 import { Callback } from './callbackMaker.function.js'
 import {SupportTagGlobal } from '../tag/index.js'
 import { isPromise } from '../isInstance.js'
@@ -14,40 +14,50 @@ export default function callbackStateUpdate<T>(
   ...args: any[]
 ): T {
   const global = support.subject.global as SupportTagGlobal
-  support = global.newest
-  const state = support.state
+  const newestSupport = global.newest
+  // const state = newestSupport.state
 
-  // ensure that the oldest has the latest values first
+  // NEWEST UPDATE OLDEST: ensure that the oldest has the latest values first
+  syncSupports(newestSupport, support)
+  /*
   syncStates(
-    state,
-    oldState.stateArray,
-    support.states,
-    oldState.states,
+    state, // stateFrom
+    oldState.stateArray, // stateTo
+    newestSupport.states, // intoStates
+    oldState.states, // statesFrom
   )
-  
+  */
+
   // run the callback
   const maybePromise = callback(...args as [any,any,any,any,any,any])
 
-  // send the oldest state changes into the newest
+  // OLDEST UPDATE NEWEST: send the oldest state changes into the newest
+  syncSupports(support, newestSupport)
+  /*
   syncStates(
-    oldState.stateArray,
-    state,
-    oldState.states,
-    support.states,
+    oldState.stateArray, // stateFrom
+    state, // stateTo
+    oldState.states, // intoStates
+    newestSupport.states, // statesFrom
   )
-  renderSupport(support)
+  */
+
+  renderSupport(newestSupport)
 
   if(isPromise(maybePromise)) {
     (maybePromise as Promise<any>).finally(() => {
       // send the oldest state changes into the newest
+      syncSupports(support, newestSupport)
+      /*
       syncStates(
         oldState.stateArray,
         state,
         oldState.states,
-        support.states,
+        newestSupport.states,
       )
+      */
 
-      renderSupport(support)
+      renderSupport(newestSupport)
     })
   }
 

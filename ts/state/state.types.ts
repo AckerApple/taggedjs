@@ -4,5 +4,7 @@ export type StateConfigItem<T> = {
   callback?: StateConfig<T>
   defaultValue?: T
   watch?: T // when this value changes, the state becomes this value
+
+  // lastValue?: T
 }
 export type State = StateConfigItem<any>[]

@@ -87,6 +87,9 @@ export function syncFunctionProps(
   maxDepth: number,
   depth = -1,
 ): Props {
+  if(maxDepth === 0) {
+    throw new Error('before here')
+  }
   const global = lastSupport.subject.global as SupportTagGlobal
   const newest = global.newest
 
@@ -116,8 +119,8 @@ export function syncFunctionProps(
       prop as WrapRunner,
       newSupport,
       ownerSupport,
-      depth + 1,
       maxDepth,
+      depth + 1,
     )
 
     newArray.push(newValue)
@@ -154,6 +157,7 @@ export function moveProviders(
   }
 }
 
+/** Exchanges entire propsConfigs */
 function syncSupports<T extends AnySupport>(
   templater: TemplaterResult,
   support: AnySupport,
