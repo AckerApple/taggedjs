@@ -97,7 +97,7 @@ function destroyArrayItemByGlobal(
 ) {
   if(global) {
     const support = global.oldest
-    destroySupport(support)
+    destroySupport(support, global)
   } else {
     const element = item.simpleValueElm as Element
     delete item.simpleValueElm

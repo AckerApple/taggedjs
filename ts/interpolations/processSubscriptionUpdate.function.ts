@@ -5,12 +5,16 @@ import { ContextItem } from '../tag/Context.types.js'
 import { AnySupport } from '../tag/getSupport.function.js'
 import { paint } from '../tag/paint.function.js'
 
+/** Used for values that are to subscribe to */
 export function processSubUpdate(
-  value: TemplateValue,
+  value: TemplateValue, // Observable | Subject
   contextItem: ContextItem,
   support: AnySupport,
 ) {
-  if(value === contextItem.value) {
+  const global = support.subject.global
+  const isSameValue = value === contextItem.value
+
+  if(global.deleted || isSameValue) {
     return // same value emitted
   }
 

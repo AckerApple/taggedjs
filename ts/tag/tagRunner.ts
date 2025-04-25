@@ -1,24 +1,11 @@
-import { getSupportInCycle } from'./getSupportInCycle.function.js'
 import {SupportTagGlobal } from './getTemplaterResult.function.js'
 import { AnySupport } from './getSupport.function.js'
-import { setUseMemory } from'../state/index.js'
-import { Subject } from'../subject/index.js'
-
-// Emits event at the end of a tag being rendered. Use tagClosed$.toPromise() to render a tag after a current tag is done rendering
-setUseMemory.tagClosed$ = new Subject<AnySupport>(undefined, function tagCloser(subscription) {
-  if( !getSupportInCycle() ) {
-    subscription.next() // we are not currently processing so process now
-  }
-})
 
 // Life cycle 4 - end of life
 export function runBeforeDestroy(
   support: AnySupport,
+  global: SupportTagGlobal,
 ) {
-  // TODO: We don't need to remove from parents if parent is being destroyed
-  // remove me from my parents
-  const global = support.subject.global as SupportTagGlobal
-
   const providers = global.providers
   if(providers) {
     for(const provider of providers) {

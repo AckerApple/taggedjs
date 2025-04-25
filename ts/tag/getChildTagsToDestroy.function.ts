@@ -27,7 +27,7 @@ export function getChildTagsToDestroy(
     }
 
     if(isTagComponent(support.templater)) {
-      runBeforeDestroy(support)
+      runBeforeDestroy(support, global)
     }
 
     const subTags = global.context as ContextItem[]

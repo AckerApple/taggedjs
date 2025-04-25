@@ -1,5 +1,6 @@
-tests
+## TODO
 
+- Test for a subject that emits twice in one cycle
 - The todo app is leaving things crossed out even after unchecking them
 
 - important - two events firing at same time

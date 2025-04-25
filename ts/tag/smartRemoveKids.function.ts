@@ -3,15 +3,15 @@ import { destroyArray } from './checkDestroyPrevious.function.js'
 import { paint, painting, paintRemoves } from './paint.function.js'
 import { AnySupport, SupportContextItem } from './getSupport.function.js'
 import { ContextItem } from './Context.types.js'
-import {SupportTagGlobal } from './getTemplaterResult.function.js'
+import {SupportTagGlobal, TagGlobal } from './getTemplaterResult.function.js'
 
 /** sets global.deleted on support and all children */
 export function smartRemoveKids(
   support: AnySupport,
+  global: SupportTagGlobal,
   allPromises: Promise<any>[]
 ) {
   const subject = support.subject
-  const global = subject.global as SupportTagGlobal
   const context = global.context as ContextItem[]
   
   // already set
@@ -19,7 +19,7 @@ export function smartRemoveKids(
 
   const destroys = global.destroys
   if( destroys ) {
-    return processContextDestroys(destroys, allPromises, subject)
+    return processContextDestroys(destroys, global, allPromises)
   }
 
   smartRemoveByContext(context, allPromises)
@@ -29,10 +29,9 @@ export function smartRemoveKids(
 // Elements that have a destroy or ondestroy attribute
 function processContextDestroys(
   destroys: (() => any)[],
+  global: SupportTagGlobal,
   allPromises: Promise<any>[],
-  subject: SupportContextItem,
 ) {
-  const global = subject.global as SupportTagGlobal
   const promises: any[] = []
 
   destroys.forEach(destroy => {
@@ -111,12 +110,13 @@ function smartRemoveByContext(
     subGlobal.deleted = true
     const oldest = subGlobal.oldest
     if(oldest) {
-      smartRemoveKids(oldest, allPromises)
+      smartRemoveKids(oldest, subGlobal, allPromises)
       continue
     }
   }
 }
 
+/** Destroy dom elements and dom space markers */
 function destroyClones(
   global: SupportTagGlobal,
   // subject: SupportContextItem,

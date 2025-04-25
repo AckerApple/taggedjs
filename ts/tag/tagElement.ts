@@ -48,7 +48,8 @@ export function tagElement(
 } {
   const appElmIndex = appElements.findIndex(appElm => appElm.element === element)
   if(appElmIndex >= 0) {
-    destroySupport(appElements[appElmIndex].support)
+    const support = appElements[appElmIndex].support
+    destroySupport(support, support.subject.global)
     appElements.splice(appElmIndex, 1)
     // an element already had an app on it
     console.warn('Found and destroyed app element already rendered to element', {element})
@@ -112,7 +113,7 @@ export function tagElement(
 
     ++painting.locks
 
-    const toAwait = destroySupport(support) // never return anything here
+    const toAwait = destroySupport(support, global) // never return anything here
 
     --painting.locks
 

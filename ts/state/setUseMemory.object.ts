@@ -2,6 +2,7 @@ import { firstStatesHandler } from './states.utils.js'
 import { State } from './state.types.js'
 import { runFirstState } from './stateHandlers.js'
 import { UseMemory } from './setUse.function.js'
+import { tagClosed$ } from './tagClosed$.subject.js'
 
 export const setUseMemory = {
   stateConfig: {
@@ -12,4 +13,6 @@ export const setUseMemory = {
       statesHandler: firstStatesHandler,
     }
   },
+
+  tagClosed$,
 } as UseMemory

@@ -29,7 +29,7 @@ function softDestroyOne(
   child: AnySupport
 ) {
   const subject = child.subject
-  const global = subject.global as TagGlobal
+  const global = subject.global
 
   if(global.deleted === true) {
     return
@@ -37,5 +37,5 @@ function softDestroyOne(
 
   global.deleted = true // the children are truly destroyed but the main support will be swapped
   subject.renderCount = 0 // TODO: most likely can be removed
-  smartRemoveKids(child, [])
+  smartRemoveKids(child, global, [])
 }

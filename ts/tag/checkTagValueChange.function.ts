@@ -6,6 +6,7 @@ import { isStaticTag } from'../isInstance.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { ContextItem } from './Context.types.js'
 import { tryUpdateToTag } from './update/updateExistingValue.function.js'
+import { paint, paintAfters } from './paint.function.js'
 
 export function checkTagValueChange(
   newValue: unknown,
@@ -20,7 +21,7 @@ export function checkTagValueChange(
     // its a different tag now
     const likeTags = isLikeTags(newTag, lastSupport)
     if(!likeTags) {
-      destroySupport(lastSupport)
+      destroySupport(lastSupport, global)
       getNewGlobal(contextItem)
       return 7 // 'tag-swap'
     }
@@ -35,9 +36,22 @@ export function checkTagValueChange(
     const result = tryUpdateToTag(contextItem, newValue as TemplaterResult, ownerSupport)
     return result === true ? -1 : false
   }
+  
+  // A subject could have emitted twice in one render cycle
+  if(lastSupport.subject.renderCount === 0) {
+    delete (contextItem as ContextItem).global
+    contextItem.renderCount = 0
+
+    paintAfters.push(() => {
+      destroySupport(lastSupport, global)
+      paintAfters.shift() // prevent endless recursion
+      paint()
+    })
+    return 8 // never rendered
+  }
 
   // destroy old component, value is not a component
-  destroySupport(lastSupport)
+  destroySupport(lastSupport, global)
   delete (contextItem as ContextItem).global
   contextItem.renderCount = 0
    
