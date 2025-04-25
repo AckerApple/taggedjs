@@ -22,7 +22,7 @@ export function destroySupport(
     runBeforeDestroy(support, global)
   }
 
-  smartRemoveKids(support, global, promises)
+  smartRemoveKids(global, promises)
 
   return promises
 }

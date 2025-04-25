@@ -1,17 +1,14 @@
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { destroyArray } from './checkDestroyPrevious.function.js'
 import { paint, painting, paintRemoves } from './paint.function.js'
-import { AnySupport, SupportContextItem } from './getSupport.function.js'
 import { ContextItem } from './Context.types.js'
-import {SupportTagGlobal, TagGlobal } from './getTemplaterResult.function.js'
+import {SupportTagGlobal } from './getTemplaterResult.function.js'
 
 /** sets global.deleted on support and all children */
 export function smartRemoveKids(
-  support: AnySupport,
   global: SupportTagGlobal,
   allPromises: Promise<any>[]
 ) {
-  const subject = support.subject
   const context = global.context as ContextItem[]
   
   // already set
@@ -110,7 +107,7 @@ function smartRemoveByContext(
     subGlobal.deleted = true
     const oldest = subGlobal.oldest
     if(oldest) {
-      smartRemoveKids(oldest, subGlobal, allPromises)
+      smartRemoveKids(subGlobal, allPromises)
       continue
     }
   }
