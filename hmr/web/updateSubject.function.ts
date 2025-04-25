@@ -90,7 +90,7 @@ async function swapSupport(
   const prevConstructors = pros ? pros.map(provider => provider.constructMethod) : []
   const placeholder = contextSubject.placeholder
 
-  await destroySupport(oldest)
+  await destroySupport(oldest, global)
   const reGlobal = contextSubject.global as SupportTagGlobal
   delete reGlobal.deleted
 
