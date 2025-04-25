@@ -112,7 +112,7 @@ function swapTags(subject, templater, // new tag
 ownerSupport) {
     const global = subject.global;
     const oldestSupport = global.oldest;
-    destroySupport(oldestSupport);
+    destroySupport(oldestSupport, global);
     getNewGlobal(subject);
     const newSupport = processReplacementComponent(templater, subject, ownerSupport, { added: 0, removed: 0 });
     return newSupport;

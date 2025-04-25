@@ -3,6 +3,7 @@ import { destroySupport } from './destroySupport.function.js';
 import { isStaticTag } from '../isInstance.js';
 import { isLikeTags } from './isLikeTags.function.js';
 import { tryUpdateToTag } from './update/updateExistingValue.function.js';
+import { paint, paintAfters } from './paint.function.js';
 export function checkTagValueChange(newValue, contextItem) {
     const global = contextItem.global;
     const lastSupport = global?.newest;
@@ -12,7 +13,7 @@ export function checkTagValueChange(newValue, contextItem) {
         // its a different tag now
         const likeTags = isLikeTags(newTag, lastSupport);
         if (!likeTags) {
-            destroySupport(lastSupport);
+            destroySupport(lastSupport, global);
             getNewGlobal(contextItem);
             return 7; // 'tag-swap'
         }
@@ -25,8 +26,19 @@ export function checkTagValueChange(newValue, contextItem) {
         const result = tryUpdateToTag(contextItem, newValue, ownerSupport);
         return result === true ? -1 : false;
     }
+    // A subject could have emitted twice in one render cycle
+    if (lastSupport.subject.renderCount === 0) {
+        delete contextItem.global;
+        contextItem.renderCount = 0;
+        paintAfters.push(() => {
+            destroySupport(lastSupport, global);
+            paintAfters.shift(); // prevent endless recursion
+            paint();
+        });
+        return 8; // never rendered
+    }
     // destroy old component, value is not a component
-    destroySupport(lastSupport);
+    destroySupport(lastSupport, global);
     delete contextItem.global;
     contextItem.renderCount = 0;
     return 8; // 'no-longer-tag'

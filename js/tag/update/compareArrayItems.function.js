@@ -53,7 +53,7 @@ export function destroyArrayItem(item, counts) {
 function destroyArrayItemByGlobal(global, item) {
     if (global) {
         const support = global.oldest;
-        destroySupport(support);
+        destroySupport(support, global);
     }
     else {
         const element = item.simpleValueElm;

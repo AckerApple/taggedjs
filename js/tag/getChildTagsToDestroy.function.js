@@ -17,7 +17,7 @@ export function getChildTagsToDestroy(childTags) {
             iSubs.forEach(iSub => iSub.unsubscribe());
         }
         if (isTagComponent(support.templater)) {
-            runBeforeDestroy(support);
+            runBeforeDestroy(support, global);
         }
         const subTags = global.context;
         getChildTagsToDestroy(subTags);

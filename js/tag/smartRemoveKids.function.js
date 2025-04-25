@@ -1,22 +1,20 @@
 import { destroyArray } from './checkDestroyPrevious.function.js';
 import { paint, painting, paintRemoves } from './paint.function.js';
 /** sets global.deleted on support and all children */
-export function smartRemoveKids(support, allPromises) {
+export function smartRemoveKids(support, global, allPromises) {
     const subject = support.subject;
-    const global = subject.global;
     const context = global.context;
     // already set
     // global.deleted = true
     const destroys = global.destroys;
     if (destroys) {
-        return processContextDestroys(destroys, allPromises, subject);
+        return processContextDestroys(destroys, global, allPromises);
     }
     smartRemoveByContext(context, allPromises);
     destroyClones(global);
 }
 // Elements that have a destroy or ondestroy attribute
-function processContextDestroys(destroys, allPromises, subject) {
-    const global = subject.global;
+function processContextDestroys(destroys, global, allPromises) {
     const promises = [];
     destroys.forEach(destroy => {
         const maybePromise = destroy();
@@ -72,11 +70,12 @@ function smartRemoveByContext(context, allPromises) {
         subGlobal.deleted = true;
         const oldest = subGlobal.oldest;
         if (oldest) {
-            smartRemoveKids(oldest, allPromises);
+            smartRemoveKids(oldest, subGlobal, allPromises);
             continue;
         }
     }
 }
+/** Destroy dom elements and dom space markers */
 function destroyClones(global) {
     // const global = subject.global
     const htmlDomMeta = global.htmlDomMeta;

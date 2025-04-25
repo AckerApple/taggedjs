@@ -60,7 +60,7 @@ export class Subject {
             });
         });
     }
-    /** like toPromise but faster */
+    /** like toPromise but faster. Only get called once. No subscription to manage */
     toCallback(callback) {
         const subscription = this.subscribe((x, runtimeSub) => {
             const tagJsUnsub = runtimeSub?.unsubscribe;

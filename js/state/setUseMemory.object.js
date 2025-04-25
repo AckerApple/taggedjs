@@ -1,5 +1,6 @@
 import { firstStatesHandler } from './states.utils.js';
 import { runFirstState } from './stateHandlers.js';
+import { tagClosed$ } from './tagClosed$.subject.js';
 export const setUseMemory = {
     stateConfig: {
         stateArray: [], // state memory on the first render
@@ -9,5 +10,6 @@ export const setUseMemory = {
             statesHandler: firstStatesHandler,
         }
     },
+    tagClosed$,
 };
 //# sourceMappingURL=setUseMemory.object.js.map

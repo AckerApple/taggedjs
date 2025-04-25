@@ -13,7 +13,7 @@ export declare class Subject<T> implements SubjectLike<T> {
     set: (value?: any) => void;
     emit(): void;
     toPromise(): Promise<T>;
-    /** like toPromise but faster */
+    /** like toPromise but faster. Only get called once. No subscription to manage */
     toCallback(callback: (x: T) => any): this;
     pipe(): Subject<T>;
     pipe<A, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>): Subject<A>;

@@ -1,6 +1,6 @@
-import { Subject } from '../subject/Subject.class.js';
 import { AnySupport } from '../tag/getSupport.function.js';
 import { StateMemory } from './StateMemory.type.js';
+import { tagClosed$ } from './tagClosed$.subject.js';
 export type UseOptions = {
     beforeRender?: (support: AnySupport, ownerTag?: AnySupport) => void;
     beforeRedraw?: (support: AnySupport, tag: AnySupport) => void;
@@ -9,5 +9,5 @@ export type UseOptions = {
 };
 export type UseMemory = (Record<string, unknown> & {
     stateConfig: StateMemory;
-    tagClosed$: Subject<AnySupport>;
+    tagClosed$: typeof tagClosed$;
 });
