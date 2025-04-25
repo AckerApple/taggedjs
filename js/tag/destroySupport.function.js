@@ -11,7 +11,7 @@ export function destroySupport(support, global) {
     if (global.destroy$) {
         runBeforeDestroy(support, global);
     }
-    smartRemoveKids(support, global, promises);
+    smartRemoveKids(global, promises);
     return promises;
 }
 //# sourceMappingURL=destroySupport.function.js.map

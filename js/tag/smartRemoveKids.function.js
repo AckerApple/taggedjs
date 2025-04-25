@@ -1,8 +1,7 @@
 import { destroyArray } from './checkDestroyPrevious.function.js';
 import { paint, painting, paintRemoves } from './paint.function.js';
 /** sets global.deleted on support and all children */
-export function smartRemoveKids(support, global, allPromises) {
-    const subject = support.subject;
+export function smartRemoveKids(global, allPromises) {
     const context = global.context;
     // already set
     // global.deleted = true
@@ -70,7 +69,7 @@ function smartRemoveByContext(context, allPromises) {
         subGlobal.deleted = true;
         const oldest = subGlobal.oldest;
         if (oldest) {
-            smartRemoveKids(oldest, subGlobal, allPromises);
+            smartRemoveKids(subGlobal, allPromises);
             continue;
         }
     }
