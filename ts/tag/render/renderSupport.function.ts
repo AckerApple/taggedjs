@@ -40,7 +40,7 @@ export function renderSupport<T extends AnySupport>(
   }
 
   const tag = renderExistingReadyTag(
-    global.newest as AnySupport,
+    global.newest,
     support,
     ownerSupport,
     subject,

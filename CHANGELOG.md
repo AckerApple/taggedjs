@@ -1,5 +1,10 @@
 ## CHANGELOG
 
+### v2.9.0 - 5-2025
+- subscribing is no longer automatic
+  - BEFORE: html`${observable}`
+  - AFTER: html`${subscribe(observable)}`
+
 ### v2.8.19 - 4-2025
 - html`` data typing Tag created
 

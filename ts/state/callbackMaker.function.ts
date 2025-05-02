@@ -21,7 +21,6 @@ export const callbackMaker = () => {
   }
 
   const oldState = setUseMemory.stateConfig // .stateArray
-  // oldState.support = support // TODO: should not be need and already set
 
   return function triggerMaker<A,B,C,D,E,F, T>(
     callback: Callback<A, B, C, D, E, F, T>

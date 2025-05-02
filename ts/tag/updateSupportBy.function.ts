@@ -5,6 +5,7 @@ import type { AnySupport } from './getSupport.function.js'
 import type { DomTag } from './DomTag.type.js'
 import type { Tag } from './Tag.type.js'
 import { SupportTagGlobal } from './getTemplaterResult.function.js'
+import { ContextItem } from './Context.types.js'
 
 export function updateSupportBy(
   olderSupport: AnySupport,
@@ -16,7 +17,7 @@ export function updateSupportBy(
   updateSupportValuesBy(olderSupport, newerSupport)
   
   ++painting.locks
-  processUpdateContext(olderSupport, context)
+  processUpdateContext(olderSupport, context as unknown as ContextItem[])
   --painting.locks
 
   paint()

@@ -2,7 +2,7 @@
 
 import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
 import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode.types.js"
-import { InterpolateSubject, TemplateValue } from "../../tag/update/processFirstSubject.utils.js"
+import { TemplateValue } from "../../tag/update/processFirstSubject.utils.js"
 import { howToSetFirstInputValue } from "../attributes/howToSetInputValue.function.js"
 import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
 import { AnySupport } from "../../tag/getSupport.function.js"
@@ -214,22 +214,7 @@ function attachDynamicDom(
       element: marker,
     })
   }
-
-  if(isSubjectInstance(value)) {
-    subs.push({
-      insertBefore: marker,
-      appendTo,
-      subject: value as InterpolateSubject,
-      support, // ownerSupport,
-      counts,
-      contextItem,
-    })
-
-    contextItem.handler = blankHandler
-
-    return
-  }
-
+  
   // how to handle value updates
   contextItem.handler = (newValue, _newValues, newSupport, newContextItem) =>
     updateExistingValue(

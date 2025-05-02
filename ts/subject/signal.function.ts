@@ -1,5 +1,11 @@
+import { Counts } from '../interpolations/interpolateTemplate.js'
 import { state } from '../state/index.js'
+import { ContextItem } from '../tag/Context.types.js'
+import { AnySupport } from '../tag/getSupport.function.js'
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
+import { processSignal } from '../tag/update/processSubscribe.function.js'
+import { ValueTypes } from '../tag/ValueTypes.enum.js'
+import { ProcessInit } from './ProcessInit.type.js'
 
 type Subscriber = <T>(newValue?: T) => any
 
@@ -14,12 +20,22 @@ export function signal<T>(initialValue: T) {
     return Signal(initialValue)
 }
 
+export type SignalObject = {
+    tagJsType: typeof ValueTypes.signal
+    value: any
+    subscribe: any
+    processInit: ProcessInit
+}
+
 /** Creates object with "value" key and ability to "subscribe" to value changes */
-export function Signal<T>(initialValue: T) {
+export function Signal<T>(initialValue: T): SignalObject {
     let value: T = initialValue
     const subscribers: Set<Subscriber> = new Set()
 
     return {
+        tagJsType: ValueTypes.signal,
+        processInit: processSignal,
+        
         get value() {
           return value
         },

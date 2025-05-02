@@ -13,14 +13,19 @@ export function runAfterRender(
 ) {
   const subject = support.subject
   ++subject.renderCount
-  // ++subject.global.renderCount
 
   const config: StateMemory = setUseMemory.stateConfig
-  delete config.support
+    
   support.state = config.stateArray
-  // support.states = config.states
+  support.states = config.states
+  subject.global.newest = support
+  
+  checkStateMismatch(config, support)
+  
+  delete config.prevSupport // only this one really needed
+  delete config.support
+  delete (config as any).stateArray
+  delete (config as any).states
   
   setUseMemory.tagClosed$.next(ownerSupport)
-  checkStateMismatch(config, support)
-  subject.global.newest = support
 }

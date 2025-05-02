@@ -12,27 +12,39 @@ export function syncSupports(
   support: AnySupport, // from
   newestSupport: AnySupport, // onto
 ) {
+  return syncStatesArray(support.states, newestSupport.states)
+}
 
-  for (let index=0; index < support.states.length; ++index) {
-    let got: any
-    const getter = support.states[index]
-    const setter = newestSupport.states[index]
+export function syncStatesArray(
+  from: StatesSetter[],
+  onto: StatesSetter[],
+) {
+  for (let index=0; index < from.length; ++index) {
+    const getter = from[index]
+    const setter = onto[index]
     
-    getter((...x: any) => {
-      got = x
-      return x as any
-    })
-
-    setter(() => {
-      return got
-    })
+    syncStates(getter, setter)
   }
+}
 
-  return
+export function syncStates(
+  from: StatesSetter,
+  onto: StatesSetter,
+) {
+  let got: any
+
+  from((...x: any) => {
+    got = x
+    return x as any
+  }, 1)
+
+  onto(() => {
+    return got
+  }, 2)
 }
 
 /** @deprecated favor using syncSupports */
-export function syncStates(
+export function oldSyncStates(
   stateFrom: State,
   stateTo: State,
   intoStates: StatesSetter[],

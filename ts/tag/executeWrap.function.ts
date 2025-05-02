@@ -16,6 +16,9 @@ export function executeWrap(
 ): AnySupport {
   const originalFunction = result.original // (innerTagWrap as any).original as unknown as TagComponent
   const stateless = templater.tagJsType === ValueTypes.stateRender
+  const config = setUseMemory.stateConfig
+
+  config.support = useSupport
 
   let tag: StringTag;
   if(stateless) {
@@ -32,11 +35,9 @@ export function executeWrap(
   tag.templater = templater
   templater.tag = tag
 
-  const config = setUseMemory.stateConfig
   useSupport.state = config.stateArray
   useSupport.states = config.states
-  
-  // ++useSupport.subject.renderCount
+  // useSupport.states = [...config.states]
 
   return useSupport
 }

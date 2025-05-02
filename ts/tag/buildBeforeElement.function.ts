@@ -5,7 +5,7 @@ import { AnySupport, SupportContextItem } from './getSupport.function.js'
 import {SupportTagGlobal } from './getTemplaterResult.function.js'
 import { ContextItem } from './Context.types.js'
 import { ParsedHtml } from '../interpolations/index.js'
-import { checkSimpleValueChange } from './index.js'
+import { checkSimpleValueChange, deleteSimpleValue, destorySupportByContextItem } from './index.js'
 import { getDomMeta } from './domMetaCollector.js'
 import type { DomTag } from './DomTag.type.js'
 import type { StringTag } from './StringTag.type.js'
@@ -20,6 +20,7 @@ export function buildBeforeElement(
   insertBefore?: Text,
 ) {
   const subject = support.subject
+  subject.delete = destorySupportByContextItem
   const global = subject.global as SupportTagGlobal
 
   global.oldest = support
@@ -86,6 +87,7 @@ export function addOneContext(
   const contextItem: ContextItem = {
     value,
     checkValueChange: checkSimpleValueChange,
+    delete: deleteSimpleValue,
     withinOwnerElement,
   }
 

@@ -9,7 +9,7 @@ import { AnySupport } from '../../tag/getSupport.function.js'
 import { paintContent } from '../../tag/paint.function.js'
 import { ContextItem } from '../../tag/Context.types.js'
 import { processDynamicNameValueAttribute, processNonDynamicAttr } from './processNameValueAttribute.function.js'
-import { addOneContext, checkSimpleValueChange, TagGlobal } from '../../tag/index.js'
+import { addOneContext, checkSimpleValueChange, deleteSimpleValue, TagGlobal } from '../../tag/index.js'
 import { processAttributeFunction } from './processAttributeCallback.function.js'
 import { isSpecialAttr } from './isSpecialAttribute.function.js'
 import { Counts } from '../interpolateTemplate.js'
@@ -79,6 +79,7 @@ export function processAttribute(
       element,
       attrName: attrName as string,
       checkValueChange: checkSimpleValueChange,
+      delete: deleteSimpleValue,
       withinOwnerElement: true,
     }
 
@@ -359,13 +360,6 @@ export function processTagCallbackFun(
   attrName: string,
   element: Element,
 ) {
-  const prevFun = subject.value
-  if(prevFun && prevFun.tagFunction && prevFun.support) {
-    prevFun.tagFunction = newAttrValue
-    prevFun.support = support
-    return prevFun
-  }
-
   // tag has state and will need all functions wrapped to cause re-renders
   newAttrValue = bindSubjectCallback(newAttrValue, support)
 

@@ -63,14 +63,15 @@ export type Support = AnySupport & {
   appSupport: BaseSupport
 }
 
+/** Sets support states to empty array and clones props */
 export function upgradeBaseToSupport(
   templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
   support: BaseSupport,
   appSupport: AnySupport,
   castedProps?: Props,
 ): AnySupport {
-  ;(support as AnySupport).state = []
-  ;(support as AnySupport).states = []
+  // ;(support as AnySupport).state = []
+  // ;(support as AnySupport).states = []
 
   support.appSupport = appSupport
   

@@ -50,9 +50,15 @@ export function checkSimpleValueChange(
     return -1  // no need to destroy, just update display
   }
 
+  deleteSimpleValue(subject)
+  
+  return 6 // 'changed-simple-value'
+}
+
+export function deleteSimpleValue(
+  subject: ContextItem,
+) {
   const elm = subject.simpleValueElm as Element
   delete subject.simpleValueElm
   paintRemoves.push(elm)
-  
-  return 6 // 'changed-simple-value'
 }

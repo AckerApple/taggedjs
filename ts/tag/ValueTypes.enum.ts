@@ -22,12 +22,14 @@ type ValueTypeObject = {
   templater: string
   tagComponent: string
   tagArray: string
-  subject: string
-  tagJsSubject: string
+  // subject: string
+  // tagJsSubject: string
   renderOnce: string
   stateRender: string
-
   version: number
+  
+  subscribe: string,
+  signal: string,
 }
 
 const version = Date.now()
@@ -40,8 +42,10 @@ export const ValueTypes: ValueTypeObject = {
   templater: 'templater',
   tagComponent: 'tagComponent', 
   tagArray: 'tagArray',
-  subject: 'subject',
-  tagJsSubject: 'tagJsSubject',
+  // subject: 'subject',
+  // tagJsSubject: 'tagJsSubject',
+  subscribe: 'subscribe',
+  signal: 'signal',
   
   renderOnce: 'renderOnce',
   stateRender: 'stateRender',

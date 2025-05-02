@@ -8,7 +8,7 @@ const fooCounts: Counts = { added:0, removed:0 }
 
 // TODO: This function is being called for 1st time renders WHEN renderCount === 1
 export function renderExistingReadyTag(
-  lastSupport: AnySupport,
+  lastSupport: AnySupport, // should be global.newest
   newSupport: AnySupport, // new to be rendered
   ownerSupport: AnySupport, // ownerSupport
   subject: SupportContextItem,

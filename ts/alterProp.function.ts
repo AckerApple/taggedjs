@@ -250,13 +250,6 @@ export function safeRenderSupport(
   const isInline = isInlineHtml(newest.templater)
   if( isInline ) {
     const result = renderInlineHtml(ownerSupport, newest)
-    // TODO: below maybe never true
-    /*
-    const global = subject.global as TagGlobal
-    if(global) {
-      delete global.locked
-    }
-    */
     return result
   }
   
@@ -265,7 +258,7 @@ export function safeRenderSupport(
   global.locked = true
 
   renderExistingReadyTag(
-    global.newest as AnySupport,
+    global.newest,
     newest,
     ownerSupport,
     subject,

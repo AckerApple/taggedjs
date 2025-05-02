@@ -3,7 +3,7 @@ import { AnySupport } from '../tag/getSupport.function.js'
 import { getSupportInCycle } from'../tag/getSupportInCycle.function.js'
 import { setUseMemory } from'./setUseMemory.object.js'
 import { state } from'./state.function.js'
-import { syncStates } from'./syncStates.function.js'
+import { oldSyncStates } from'./syncStates.function.js'
 
 export type WatchCallback<T> = (
   currentValues: any[],
@@ -184,7 +184,7 @@ function defineOnMethod<R>(
               const newStates = oldState.states
               const oldStates = oldest.states
               
-              syncStates(
+              oldSyncStates(
                 newestState,
                 oldestState,
                 newStates,

@@ -50,10 +50,20 @@ export function checkTagValueChange(
     return 8 // never rendered
   }
 
+  destorySupportByContextItem(contextItem)
+   
+  return 8 // 'no-longer-tag'
+}
+
+export function destorySupportByContextItem(
+  contextItem: ContextItem,
+) {
+  const global = contextItem.global as SupportTagGlobal
+  const lastSupport = global?.newest
+
   // destroy old component, value is not a component
   destroySupport(lastSupport, global)
   delete (contextItem as ContextItem).global
-  contextItem.renderCount = 0
-   
-  return 8 // 'no-longer-tag'
+  
+  ;(contextItem as SupportContextItem).renderCount = 0
 }

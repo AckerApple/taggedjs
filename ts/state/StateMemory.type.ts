@@ -9,9 +9,13 @@ export type StateMemory = {
   prevSupport?: AnySupport
   
   // STATE MEMORIES
+  
   /** state memory on the first render */
   stateArray: State
+  
+  /** let states */
   states: StatesSetter[]
+  
   statesIndex: number
   
   rearray?: State // state memory to be used before the next render

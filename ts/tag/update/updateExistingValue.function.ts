@@ -6,8 +6,8 @@ import { processReplacementComponent } from './processFirstSubjectComponent.func
 import { updateExistingTagComponent } from './updateExistingTagComponent.function.js'
 import { BasicTypes, ValueType, ValueTypes } from '../ValueTypes.enum.js'
 import { updateSupportBy } from '../updateSupportBy.function.js'
-import { TemplateValue } from './processFirstSubject.utils.js'
-import { isArray, isTagComponent } from '../../isInstance.js'
+import { InterpolateSubject, TemplateValue } from './processFirstSubject.utils.js'
+import { isArray, isSubjectInstance, isTagComponent } from '../../isInstance.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import type { StringTag } from '../StringTag.type.js'
 import type { DomTag } from '../DomTag.type.js'
@@ -16,12 +16,13 @@ import { processTagArray } from './processTagArray.js'
 import { ContextItem } from '../Context.types.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { getSupport } from '../getSupport.function.js'
+import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
 
 const fooCounts: Counts = { added: 0, removed: 0 }
 
-/** Used for all tag value updates. Determines if value changed since last render */
+/** Checks if value has changed before updating. Used for all tag value updates. Determines if value changed since last render */
 export function updateExistingValue(
-  contextItem: ContextItem |SupportContextItem,
+  contextItem: ContextItem | SupportContextItem,
   newValue: TemplateValue, // newValue
   ownerSupport: AnySupport,
 ) {
@@ -30,10 +31,19 @@ export function updateExistingValue(
     return
   }
 
+  forceUpdateExistingValue(contextItem, newValue, ownerSupport)
+}
+
+/** Used for all tag value updates. Determines if value changed since last render */
+export function forceUpdateExistingValue(
+  contextItem: ContextItem | SupportContextItem,
+  newValue: TemplateValue, // newValue
+  ownerSupport: AnySupport,
+) {
   // Have the context check itself (avoid having to detect old value)
   const ignoreOrDestroyed = contextItem.checkValueChange(
     newValue,
-    contextItem as SupportContextItem
+    contextItem as unknown as SupportContextItem,
   )
 
   // ignore
@@ -41,6 +51,15 @@ export function updateExistingValue(
     return // do nothing
   }
 
+  updateToDiffValue(newValue, contextItem, ownerSupport, ignoreOrDestroyed)
+}
+
+function updateToDiffValue(
+  newValue: TemplateValue,
+  contextItem: ContextItem | SupportContextItem,
+  ownerSupport: AnySupport,
+  ignoreOrDestroyed: number | boolean,
+) {
   // is new value a tag?
   const tagJsType = newValue && (newValue as TemplaterResult).tagJsType as ValueType
   if(tagJsType) {
@@ -63,7 +82,7 @@ export function updateExistingValue(
       contextItem,
       newValue as (TemplaterResult | StringTag)[],
       ownerSupport,
-      {added: 0, removed: 0}
+      {added: 0, removed: 0},
     )
   
     return
@@ -73,6 +92,21 @@ export function updateExistingValue(
     contextItem.value = newValue // do not render functions that are not explicity defined as tag html processing
     return
   }
+/*
+  if(isSubjectInstance(newValue)) {
+    subscribeToTemplate({
+      insertBefore: contextItem.placeholder as Text,
+      // appendTo: undefined,
+      subject: newValue as InterpolateSubject,
+      support: ownerSupport,
+      counts: {added: 0, removed: 0},
+      contextItem,
+    })
+
+    contextItem.checkValueChange = subjectCheckValueChange
+    return
+  }
+  */
   
   if(ignoreOrDestroyed) {
     processNowRegularValue(
@@ -80,6 +114,17 @@ export function updateExistingValue(
       contextItem,
     )
   }
+}
+
+export function subjectCheckValueChange(value: any, contextItem: ContextItem) {
+  // if (isSubjectInstance(value) && value === newValue) {
+  if (isSubjectInstance(value)) {
+    return -1 // ignore same observable
+  }
+  
+  contextItem.delete(contextItem)
+  
+  return 66
 }
 
 function updateToTag(
@@ -181,7 +226,7 @@ export function updateContextItemBySupport(
 
 /** result is an indication to ignore further processing but that does not seem in use anymore */
 export function tryUpdateToTag(
-  contextItem: ContextItem |SupportContextItem,
+  contextItem: ContextItem | SupportContextItem,
   newValue: TemplaterResult, // newValue
   ownerSupport: AnySupport, 
 ): boolean {
@@ -189,7 +234,7 @@ export function tryUpdateToTag(
   const isComp = isTagComponent(newValue)
   if(isComp) {
     if(contextItem.global === undefined) {
-      getNewGlobal(contextItem)
+      getNewGlobal(contextItem as ContextItem)
     }
 
     prepareUpdateToComponent(

@@ -12,6 +12,8 @@ import { Subject } from '../subject/index.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { PropWatches } from './tag.function.js'
+import { ProcessInit } from '../subject/ProcessInit.type.js'
+import { processTagInit } from './update/processTagInit.function.js'
 
 export type Wrapper = ((
   newSupport: AnySupport,
@@ -19,6 +21,7 @@ export type Wrapper = ((
   prevSupport?: AnySupport,
 ) => AnySupport) & TagWrapper<unknown> & {
   tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater
+  processInit: ProcessInit
 }
 
 /** NOT shared across variable spots. The Subject/ContextItem is more global than this is */
@@ -63,8 +66,10 @@ export type Events = {
 export type Clone = (Element | Text | ChildNode)
 
 export type TemplaterResult = {
-  propWatch: PropWatches
   tagJsType: string // ValueType
+  processInit: ProcessInit
+
+  propWatch: PropWatches
   wrapper?: Wrapper
   tag?: StringTag | DomTag
   props?: Props
@@ -83,9 +88,11 @@ export function getTemplaterResult(
   props?: Props,
 ) {
   const templater: TemplaterResult = {
+    tagJsType: ValueTypes.templater,
+    processInit: processTagInit,
+
     propWatch,
     props,
-    tagJsType: ValueTypes.templater,
     key: function keyTemplate<T>(arrayValue: T) {
       (templater as TemplaterResultArrayItem<T>).arrayValue = arrayValue
       return templater

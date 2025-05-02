@@ -49,29 +49,6 @@ function runArrayItemDiff(
   const isDiff = newValueTag && oldKey !== newValueTag.arrayValue
 
   if( isDiff ) {
-    // Intended to protect an array from adding and then immediately deleting
-    /*
-    // TODO: Does this code protect bad array keying?
-    if(prevContext.renderCount === 0) {
-      const newKey = newValueTag.arrayValue
-      console.warn('Possible array issue. Array is attempting to create/delete same items. Either html``.key is not unique or array changes with every render', {
-        oldKey,
-        newKey,
-        
-        prevValue: prevContext.value,
-        prevContext,
-      })
-
-      paintAfters.push(() => {
-        destroyArrayItemByGlobal(prevContext.global, prevContext)
-        paintAfters.shift() // prevent endless recursion
-        paint()
-      })
-
-      return 1
-    }
-    */
-  
     destroyArrayItem(prevContext, counts)
     lastArray.splice(index, 1)
     return 2

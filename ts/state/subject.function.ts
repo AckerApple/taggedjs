@@ -3,7 +3,7 @@ import { Subject, ValueSubject } from '../subject/index.js'
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
 import { setUseMemory } from './setUseMemory.object.js'
 import { state } from './state.function.js'
-import { syncStates } from './syncStates.function.js'
+import { oldSyncStates } from './syncStates.function.js'
 
 /** Create a Subject that on updates will sync state values to keep chained functions using latest variables */
 export function subject<T>(
@@ -29,7 +29,7 @@ subject._value = <T>(value: T) => {
   const nowSupport = getSupportInCycle() as AnySupport
   return state(function subjectValue() {
     const subject = new ValueSubject(value).pipe(x => {
-      syncStates(
+      oldSyncStates(
         nowSupport.state,
         oldestState.stateArray,
         nowSupport.states,
@@ -54,7 +54,7 @@ function all(args: any[]): Subject<any> {
   }))
   const nowSupport = getSupportInCycle() as AnySupport
   return Subject.all(args as any).pipe(x => {
-    syncStates(
+    oldSyncStates(
       nowSupport.state,
       oldestState.stateArray,
       nowSupport.states,

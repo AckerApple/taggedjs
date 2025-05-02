@@ -3,7 +3,7 @@
 import { paintAppends, paintInsertBefores } from '../paint.function.js'
 import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
 import { TagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { checkSimpleValueChange } from '../checkDestroyPrevious.function.js'
+import { checkSimpleValueChange, deleteSimpleValue } from '../checkDestroyPrevious.function.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
 import { AnySupport } from '../getSupport.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
@@ -146,7 +146,8 @@ function processAddTagArrayItem(
   const itemSubject: ContextItem = {
     value,
     checkValueChange: checkSimpleValueChange,
-    withinOwnerElement: false, // TODO: we need to pass down depth so we can answer this truthfully
+    delete: deleteSimpleValue,
+    withinOwnerElement: false,
   }
 
   counts.added = counts.added + 1 // index

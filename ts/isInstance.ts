@@ -23,7 +23,6 @@ export function isStaticTag(
   }
 
   const tagJsType = (value as StringTag).tagJsType as ValueType
-  
   switch (tagJsType) {
     case ValueTypes.dom:
     case ValueTypes.tag:

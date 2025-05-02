@@ -46,7 +46,6 @@ function processNewTag(
   
   let templater = tag.templater
 
-  // TODO: Can this ever happen?
   if(!templater) {
     templater = getTemplaterResult(PropWatches.DEEP)
     templater.tag = tag

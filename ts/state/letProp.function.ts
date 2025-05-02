@@ -15,6 +15,7 @@ export function letProp<T>(
   const propStates2 = signal([])
   const passes = signal(0)
   const passedOn = signal(0)
+
   let nowValues: unknown[] = []
   let passed = 0
 
@@ -22,7 +23,7 @@ export function letProp<T>(
   
   setter((...values: any[]) => {
     nowValues = values
-    return values
+    return propStates2.value
   })
   
   // When the watched variable changes, then the local prop variable has to update
@@ -35,16 +36,15 @@ export function letProp<T>(
   }) as any
 
   // called and only used during sync'ing processes
-  states(() => {
-    if(passed) {      
+  states((_x: any, direction) => {
+    // now its collection of variables time
+    if(passed) {
       setter((...values: any[]) => {
-        propStates2.value = values as any
-
-        if(passes!=passedOn) {
-          return propStates2.value
+        if(!direction || direction === 1) {
+          propStates2.value = values as any
         }
-
-        return values // propStates2.value
+        
+        return propStates2.value
       })
 
       passedOn.value = passes.value
@@ -53,7 +53,10 @@ export function letProp<T>(
       return
     }
 
-    setter(() => propStates2.value)
+    // this in an insync call, we do not care about the values here
+    setter(() => {
+      return propStates2.value
+    })
   })
   
   ++passed

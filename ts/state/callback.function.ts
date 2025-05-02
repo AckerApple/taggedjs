@@ -27,9 +27,8 @@ export function createTrigger<A,B,C,D,E,F, T>(
   oldState: StateMemory,
   toCallback: Callback<A, B, C, D, E, F, T>,
 ) {
-  const oldStateArray = oldState.stateArray
+  // const oldStates = [...oldState.states]
   const oldStates = oldState.states
-  // const oldStates = support.states
 
   return function trigger(...args: any[]) {
     const callbackMaker = support.subject.renderCount > 0
@@ -37,11 +36,8 @@ export function createTrigger<A,B,C,D,E,F, T>(
     if(callbackMaker) {
       return callbackStateUpdate(
         support,
+        oldStates,
         toCallback,
-        {
-          stateArray: oldStateArray,
-          states: oldStates,
-        },
         ...args
       )
     }

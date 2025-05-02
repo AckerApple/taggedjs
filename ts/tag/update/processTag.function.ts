@@ -8,6 +8,7 @@ import type { DomTag } from '../DomTag.type.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { ContextItem } from '../Context.types.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
+import { processTagInit } from './processTagInit.function.js'
 
 /** When first time render, adds to owner childTags
  * Used for BOTH inserts & updates to values that were something else
@@ -51,6 +52,7 @@ export function tagFakeTemplater(
 export function getFakeTemplater() {
   const fake = {
     tagJsType: ValueTypes.templater,
+    processInit: processTagInit,
   } as TemplaterResult
 
   return fake

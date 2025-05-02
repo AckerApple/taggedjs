@@ -1,11 +1,11 @@
 import { SpecialDefinition } from '../interpolations/attributes/processAttribute.function.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
-import { InterpolateSubject } from './update/processFirstSubject.utils.js'
+import { InterpolateSubject, TemplateValue } from './update/processFirstSubject.utils.js'
 import { Clone, TagGlobal } from './getTemplaterResult.function.js'
 import { AnySupport, SupportContextItem } from './getSupport.function.js'
 
 export type ContextHandler = (
-  value: unknown,
+  value: TemplateValue,
   values: unknown[],
   newSupport: AnySupport,
   contextItem: ContextItem,
@@ -40,6 +40,7 @@ export type ContextItem = {
 
   withinOwnerElement: boolean
   checkValueChange: CheckValueChange | CheckSupportValueChange
+  delete: (contextItem: ContextItem) => any
 }
 
 export type CheckValueChange = (value:unknown, subject: ContextItem) => number | boolean

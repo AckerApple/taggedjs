@@ -14,15 +14,17 @@ export function renderTagOnly(
   subject:SupportContextItem,
   ownerSupport?: AnySupport,
 ): AnySupport {
-  const global = subject.global as SupportTagGlobal
-  const oldRenderCount = subject.renderCount
   const prevState = prevSupport?.state
   const config = setUseMemory.stateConfig
 
   if(prevState) {
-    const prevStates = prevSupport.states
-    config.prevSupport = prevSupport
-    reState(newSupport, setUseMemory.stateConfig, prevState, prevStates)
+    reState(
+      newSupport,
+      prevSupport,
+      setUseMemory.stateConfig,
+      prevState,
+      prevSupport.states,
+    )
   } else {
     initState(newSupport, config)
   }
@@ -34,21 +36,18 @@ export function renderTagOnly(
   if(templater.tagJsType === ValueTypes.stateRender) {
     const result = templater as any as TagWrapper<any> // .wrapper as any// || {original: templater} as any
 
-    // TODO: Not sure if useSupport could be replaced by just using "newSupport"
-    const useSupport = getSupport(
+    reSupport = getSupport(
       templater,
       ownerSupport as AnySupport,
       newSupport.appSupport, // ownerSupport.appSupport as AnySupport,
       subject,
     )
 
-    reSupport = executeWrap(
+    executeWrap(
       templater,
       result,
-      useSupport,
+      reSupport,
     )
-
-    reSupport.states = newSupport.states
   } else {
     // functions wrapped in tag()
     const wrapper = templater.wrapper as Wrapper
@@ -59,17 +58,9 @@ export function renderTagOnly(
       subject,
       prevSupport,
     )
-
-    reSupport.states = newSupport.states
   }
 
   runAfterRender(reSupport, ownerSupport)
-  
-  // When we rendered, only 1 render should have taken place OTHERWISE rendering caused another render and that is the latest instead
-  // TODO: below most likely not needed
-  if(subject.renderCount > oldRenderCount + 1) {
-    return global.newest as AnySupport
-  }
 
   return reSupport
 }

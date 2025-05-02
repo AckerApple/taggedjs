@@ -10,6 +10,8 @@ import { RouteProps, RouteTag, StateToTag, ToTag } from './tag.types.js'
 import { UnknownFunction } from './update/oneRenderToSupport.function.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { AnyTag } from './AnyTag.type.js'
+import { processRenderOnceInit } from './update/processRenderOnceInit.function.js'
+import { processTagComponentInit } from './update/processTagComponentInit.function.js'
 
 let tagCount = 0
 
@@ -43,7 +45,9 @@ export function tag<T extends ToTag>(
     ...props: (T | StringTag | StringTag[])[]
   ): TemplaterResult {
     const templater: TemplaterResult = getTemplaterResult(propWatch, props)
+    
     templater.tagJsType = ValueTypes.tagComponent
+    templater.processInit = processTagComponentInit
     
     // attach memory back to original function that contains developer display logic
     const innerTagWrap: Wrapper = getTagWrap(
@@ -108,7 +112,7 @@ function tagUseFn(): ReturnTag {
   throw new Error('Do not call tag.use as a function but instead set it as: `(props) => tag.use = (use) => html`` `')
 }
 
-/** deprecated */
+/** @deprecated use tag.use() instead */
 ;(tag as any).state = tagUseFn
 ;(tag as any).use = tagUseFn
 
@@ -147,11 +151,12 @@ function routeFn(_routeProps: RouteProps): StateToTag {
 
 Object.defineProperty(tag, 'renderOnce', {
   set(oneRenderFunction: UnknownFunction) {
-    (oneRenderFunction as Wrapper).tagJsType = ValueTypes.renderOnce
+    ;(oneRenderFunction as Wrapper).tagJsType = ValueTypes.renderOnce
+    ;(oneRenderFunction as Wrapper).processInit = processRenderOnceInit
   },
 })
 
-// TODO: deprecate this
+// TODO: deprecate this in favor of tag.use
 Object.defineProperty(tag, 'state', {
   set(renderFunction: UnknownFunction) {
     ;(renderFunction as Wrapper).original = {
@@ -159,6 +164,7 @@ Object.defineProperty(tag, 'state', {
       tags,
     } as unknown as Original
     ;(renderFunction as Wrapper).tagJsType = ValueTypes.stateRender
+    ;(renderFunction as Wrapper).processInit = processTagComponentInit
   },
 })
 
@@ -169,5 +175,6 @@ Object.defineProperty(tag, 'use', {
       tags,
     } as unknown as Original
     ;(renderFunction as Wrapper).tagJsType = ValueTypes.stateRender
+    ;(renderFunction as Wrapper).processInit = processTagComponentInit
   },
 })

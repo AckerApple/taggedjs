@@ -1,5 +1,8 @@
 ## TODO
 
+- Fix switching from null to observable
+- Test a value that was a subject and then becomes something else
+  - Expect unsubscribe
 - Test for a subject that emits twice in one cycle
 - The todo app is leaving things crossed out even after unchecking them
 

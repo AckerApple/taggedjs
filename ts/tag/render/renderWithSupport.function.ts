@@ -11,7 +11,7 @@ import { ValueTypes } from '../ValueTypes.enum.js'
 /** TODO: This seems to support both new and updates and should be separated? */
 export function renderWithSupport(
   newSupport: AnySupport,
-  lastSupport: AnySupport| undefined, // previous
+  lastSupport: AnySupport| undefined, // previous (global.newest)
   subject: SupportContextItem, // events & memory
   ownerSupport?: AnySupport, // who to report to
 ): {support: AnySupport, wasLikeTags: boolean} {

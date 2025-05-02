@@ -10,8 +10,8 @@ import { Counts } from '../../interpolations/interpolateTemplate.js'
 
 export function processNewSubjectTag(
   templater: TemplaterResult,
-  ownerSupport: AnySupport, // owner
   subject: ContextItem, // could be tag via result.tag
+  ownerSupport: AnySupport, // owner
   counts: Counts,
   appendTo?: Element,
   insertBefore?: Text,

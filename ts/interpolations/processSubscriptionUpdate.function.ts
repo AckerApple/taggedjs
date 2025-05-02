@@ -12,12 +12,11 @@ export function processSubUpdate(
   support: AnySupport,
 ) {
   const global = support.subject.global
-  const isSameValue = value === contextItem.value
-
-  if(global.deleted || isSameValue) {
+  if(global.deleted) {
     return // same value emitted
   }
 
+  // checks if same value
   updateExistingValue(
     contextItem,
     value,

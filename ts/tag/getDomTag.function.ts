@@ -9,6 +9,7 @@ import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/Lik
 import { getSupportInCycle } from './getSupportInCycle.function.js'
 import { StringTag } from './StringTag.type.js'
 import { DomTag } from './DomTag.type.js'
+import { processDomTagInit } from './update/processDomTagInit.function.js'
 
 export const variablePrefix = ':tagvar'
 export const variableSuffix = ':'
@@ -46,6 +47,8 @@ export function getStringTag(
     ownerSupport: getSupportInCycle(),
     
     tagJsType: ValueTypes.tag,
+    processInit: processDomTagInit,
+
     strings,
     
     /** Used within an array.map() that returns html aka array.map(x => html``.key(x)) */
@@ -74,7 +77,10 @@ export function getDomTag(
     values,
     ownerSupport: getSupportInCycle(),
     dom,
+    
     tagJsType: ValueTypes.dom,
+    processInit: processDomTagInit,
+
     key: function keyFun(arrayValue: unknown) {
       tag.arrayValue = arrayValue
       return tag

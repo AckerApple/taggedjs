@@ -7,6 +7,9 @@ import { AnySupport } from '../../tag/getSupport.function.js'
 import { SupportTagGlobal, TagGlobal } from '../../tag/getTemplaterResult.function.js'
 import { getUpTags } from './getUpTags.function.js'
 import { renderTagUpdateArray } from './renderTagArray.function.js'
+import { StatesSetter } from '../../state/states.utils.js'
+import { getSupportWithState } from './getSupportWithState.function.js'
+import { syncStatesArray } from '../../state/syncStates.function.js'
 
 const noData = 'no-data-ever'
 const promiseNoData = 'promise-no-data-ever'
@@ -31,6 +34,7 @@ export function bindSubjectCallback(
     return runTagCallback(
       subjectFunction.tagFunction,
       subjectFunction.support, // newest
+      subjectFunction.states, // newest
       element,
       args,
     )
@@ -38,7 +42,14 @@ export function bindSubjectCallback(
 
   // link back to original. Mostly used for <div oninit ondestroy> animations
   subjectFunction.tagFunction = value
+  
+  const component = getSupportWithState(support)
   subjectFunction.support = support
+
+  // subjectFunction.otherSupport = component
+  const states = component.states // ?.[0]
+  subjectFunction.states = states
+  // subjectFunction.states = [...states]
 
   return subjectFunction
 }
@@ -46,21 +57,25 @@ export function bindSubjectCallback(
 export function runTagCallback(
   value: Callback,
   support: AnySupport,
+  states: StatesSetter[],
   bindTo: unknown,
   args: any[],
 ) {
   // get actual component owner not just the html`` support
-  let component = support as AnySupport
-  while(component.ownerSupport && !isTagComponent(component.templater)) {
-    component = component.ownerSupport as AnySupport
-  }
-
+  const component = getSupportWithState(support)
   const subject = component.subject
   const global = subject.global as SupportTagGlobal // tag.subject.global as TagGlobal
+  
   global.locked = true // prevent another render from re-rendering this tag
+
+  // sync the new states to the old before the old does any processing
+  // syncStatesArray(component.subject.global.newest.states, states)
 
   // ACTUAL CALLBACK TO ORIGINAL FUNCTION
   const callbackResult = value.apply(bindTo, args)
+
+  // sync the old states to the new
+  // syncStatesArray(states, component.subject.global.newest.states)
 
   delete global.locked
 

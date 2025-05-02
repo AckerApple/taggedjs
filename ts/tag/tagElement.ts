@@ -1,6 +1,6 @@
 import { DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { Events,SupportTagGlobal, TemplaterResult, Wrapper } from './getTemplaterResult.function.js'
-import { AnySupport, getBaseSupport,SupportContextItem, upgradeBaseToSupport } from './getSupport.function.js'
+import { AnySupport, getBaseSupport,getSupport,SupportContextItem, upgradeBaseToSupport } from './getSupport.function.js'
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
 import { buildBeforeElement } from './buildBeforeElement.function.js'
 import { tags, TagWrapper } from './tag.utils.js'
@@ -18,7 +18,7 @@ import { Props } from '../Props.js'
 import { TagMaker } from './TagMaker.type.js'
 import { BaseSupport } from './BaseSupport.type.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
-import { checkTagValueChange } from './checkTagValueChange.function.js'
+import { checkTagValueChange, destorySupportByContextItem } from './checkTagValueChange.function.js'
 
 export type TagAppElement = Element & {
   ValueTypes: typeof ValueTypes
@@ -177,9 +177,10 @@ function getNewSubject(
   templater: TemplaterResult,
   appElement: Element,
 ) {
-  const subject:SupportContextItem = {
+  const subject: SupportContextItem = {
     value: templater,
     checkValueChange: checkTagValueChange,
+    delete: destorySupportByContextItem,
     withinOwnerElement: false, // i am the highest owner
     renderCount: 0,
 
@@ -224,42 +225,45 @@ export function runWrapper(
   subject.placeholder = placeholder
   
   const global = subject.global as SupportTagGlobal
-  const useSupport = global.newest
   const oldest = global.oldest
-  const isFirstRender = useSupport === oldest
-  
+  const isFirstRender = global.newest === oldest
+
+  const newSupport = getSupport(
+    templater,
+    global.newest,
+    global.newest.appSupport, // ownerSupport.appSupport as AnySupport,
+    subject,
+    // castedProps,
+  )
+
   if(!isFirstRender) {
-    reState(useSupport, setUseMemory.stateConfig, oldest.state, oldest.states)
+    reState(
+      newSupport,
+      global.newest, // global.oldest, // global.newest,
+      setUseMemory.stateConfig,
+      oldest.state,
+      oldest.states,
+    )
   }
 
   if(templater.tagJsType === ValueTypes.stateRender) {
-    const result = (templater.wrapper || {original: templater}) as unknown as TagWrapper<unknown>
-
-    if(!isAppFunction) {
-      const newSupport = loadNewBaseSupport(templater, subject, appElement)
-      runAfterRender(newSupport)
-      return newSupport
-    }
-
-    const nowSupport = executeWrap(
+    return executeStateWrap(
       templater,
-      result,
-      useSupport,
+      isAppFunction,
+      newSupport,
+      subject,
+      appElement,    
     )
-
-    runAfterRender(nowSupport)
-
-    return nowSupport
   }
   
   // Call the apps function for our tag templater
   const wrapper = templater.wrapper as Wrapper
   const nowSupport = wrapper(
-    useSupport,
+    newSupport,
     subject,
   )
 
-  runAfterRender(nowSupport)
+  runAfterRender(newSupport)
 
   return nowSupport
 }
@@ -278,4 +282,30 @@ function putOneDomDown(
 
 type TagJsElement = Element & {
   destroy?: (...n: unknown[]) => unknown
+}
+
+function executeStateWrap(
+  templater: TemplaterResult,
+  isAppFunction: boolean,
+  newSupport: AnySupport,
+  subject: SupportContextItem,
+  appElement: Element,
+) {
+  const result = (templater.wrapper || {original: templater}) as unknown as TagWrapper<unknown>
+
+  if(!isAppFunction) {
+    const newSupport = loadNewBaseSupport(templater, subject, appElement)
+    runAfterRender(newSupport)
+    return newSupport
+  }
+
+  executeWrap(
+    templater,
+    result,
+    newSupport,
+  )
+
+  runAfterRender(newSupport)
+
+  return newSupport
 }
