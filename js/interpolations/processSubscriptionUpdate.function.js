@@ -5,10 +5,10 @@ import { paint } from '../tag/paint.function.js';
 export function processSubUpdate(value, // Observable | Subject
 contextItem, support) {
     const global = support.subject.global;
-    const isSameValue = value === contextItem.value;
-    if (global.deleted || isSameValue) {
+    if (global.deleted) {
         return; // same value emitted
     }
+    // checks if same value
     updateExistingValue(contextItem, value, support);
     if (!setUseMemory.stateConfig.support) {
         paint();

@@ -1,6 +1,7 @@
 // taggedjs-no-compile
 import { ValueTypes } from './ValueTypes.enum.js';
 import { getSupportInCycle } from './getSupportInCycle.function.js';
+import { processDomTagInit } from './update/processDomTagInit.function.js';
 export const variablePrefix = ':tagvar';
 export const variableSuffix = ':';
 export function getStringTag(strings, values) {
@@ -8,6 +9,7 @@ export function getStringTag(strings, values) {
         values,
         ownerSupport: getSupportInCycle(),
         tagJsType: ValueTypes.tag,
+        processInit: processDomTagInit,
         strings,
         /** Used within an array.map() that returns html aka array.map(x => html``.key(x)) */
         key(arrayValue) {
@@ -27,6 +29,7 @@ export function getDomTag(dom, values) {
         ownerSupport: getSupportInCycle(),
         dom,
         tagJsType: ValueTypes.dom,
+        processInit: processDomTagInit,
         key: function keyFun(arrayValue) {
             tag.arrayValue = arrayValue;
             return tag;

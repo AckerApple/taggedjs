@@ -4,6 +4,8 @@ import { getTemplaterResult } from './getTemplaterResult.function.js';
 import { tags } from './tag.utils.js';
 import { getTagWrap } from './getTagWrap.function.js';
 import { ValueTypes } from './ValueTypes.enum.js';
+import { processRenderOnceInit } from './update/processRenderOnceInit.function.js';
+import { processTagComponentInit } from './update/processTagComponentInit.function.js';
 let tagCount = 0;
 /** How to handle checking for prop changes aka argument changes */
 export var PropWatches;
@@ -22,6 +24,7 @@ export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
     const parentWrap = function tagWrapper(...props) {
         const templater = getTemplaterResult(propWatch, props);
         templater.tagJsType = ValueTypes.tagComponent;
+        templater.processInit = processTagComponentInit;
         // attach memory back to original function that contains developer display logic
         const innerTagWrap = getTagWrap(templater, parentWrap);
         innerTagWrap.original = tagComponent;
@@ -51,7 +54,7 @@ function renderOnceFn() {
 function tagUseFn() {
     throw new Error('Do not call tag.use as a function but instead set it as: `(props) => tag.use = (use) => html`` `');
 }
-/** deprecated */
+/** @deprecated use tag.use() instead */
 ;
 tag.state = tagUseFn;
 tag.use = tagUseFn;
@@ -76,10 +79,12 @@ tag.watchProps = function watchProps(tagComponent) {
 /* BELOW: Cast functions into setters with no getters */
 Object.defineProperty(tag, 'renderOnce', {
     set(oneRenderFunction) {
+        ;
         oneRenderFunction.tagJsType = ValueTypes.renderOnce;
+        oneRenderFunction.processInit = processRenderOnceInit;
     },
 });
-// TODO: deprecate this
+// TODO: deprecate this in favor of tag.use
 Object.defineProperty(tag, 'state', {
     set(renderFunction) {
         ;
@@ -88,6 +93,7 @@ Object.defineProperty(tag, 'state', {
             tags,
         };
         renderFunction.tagJsType = ValueTypes.stateRender;
+        renderFunction.processInit = processTagComponentInit;
     },
 });
 Object.defineProperty(tag, 'use', {
@@ -98,6 +104,7 @@ Object.defineProperty(tag, 'use', {
             tags,
         };
         renderFunction.tagJsType = ValueTypes.stateRender;
+        renderFunction.processInit = processTagComponentInit;
     },
 });
 //# sourceMappingURL=tag.function.js.map

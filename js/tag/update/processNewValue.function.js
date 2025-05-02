@@ -26,7 +26,6 @@ function processNewTag(value, ownerSupport, contextItem) {
     contextItem.checkValueChange = checkTagValueChange;
     const tag = value;
     let templater = tag.templater;
-    // TODO: Can this ever happen?
     if (!templater) {
         templater = getTemplaterResult(PropWatches.DEEP);
         templater.tag = tag;

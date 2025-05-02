@@ -2,7 +2,7 @@ import { ValueSubject } from '../subject/index.js';
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
 import { setUseMemory } from './setUseMemory.object.js';
 import { state } from './state.function.js';
-import { syncStates } from './syncStates.function.js';
+import { oldSyncStates } from './syncStates.function.js';
 /**
  * When an item in watch array changes, callback function will be triggered.
  * Triggers on initial watch setup. TIP: try watch.noInit()
@@ -89,7 +89,7 @@ function defineOnMethod(getWatch, attachTo) {
                         const oldestState = oldest.state;
                         const newStates = oldState.states;
                         const oldStates = oldest.states;
-                        syncStates(newestState, oldestState, newStates, oldStates);
+                        oldSyncStates(newestState, oldestState, newStates, oldStates);
                     }
                     subject.next(setTo);
                 }, oldWatch.setup);

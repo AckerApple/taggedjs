@@ -37,10 +37,15 @@ export function checkTagValueChange(newValue, contextItem) {
         });
         return 8; // never rendered
     }
+    destorySupportByContextItem(contextItem);
+    return 8; // 'no-longer-tag'
+}
+export function destorySupportByContextItem(contextItem) {
+    const global = contextItem.global;
+    const lastSupport = global?.newest;
     // destroy old component, value is not a component
     destroySupport(lastSupport, global);
     delete contextItem.global;
     contextItem.renderCount = 0;
-    return 8; // 'no-longer-tag'
 }
 //# sourceMappingURL=checkTagValueChange.function.js.map

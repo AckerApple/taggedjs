@@ -18,11 +18,11 @@ type ValueTypeObject = {
     templater: string;
     tagComponent: string;
     tagArray: string;
-    subject: string;
-    tagJsSubject: string;
     renderOnce: string;
     stateRender: string;
     version: number;
+    subscribe: string;
+    signal: string;
 };
 /** Used as direct memory comparisons, the strings are never compared, just the array */
 export declare const ValueTypes: ValueTypeObject;

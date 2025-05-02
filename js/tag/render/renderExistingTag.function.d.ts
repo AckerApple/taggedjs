@@ -1,4 +1,5 @@
 import { AnySupport, SupportContextItem } from '../getSupport.function.js';
-export declare function renderExistingReadyTag(lastSupport: AnySupport, newSupport: AnySupport, // new to be rendered
+export declare function renderExistingReadyTag(lastSupport: AnySupport, // should be global.newest
+newSupport: AnySupport, // new to be rendered
 ownerSupport: AnySupport, // ownerSupport
 subject: SupportContextItem): AnySupport;

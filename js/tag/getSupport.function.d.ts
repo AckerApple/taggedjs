@@ -31,6 +31,7 @@ export type Support = AnySupport & {
     ownerSupport: AnySupport;
     appSupport: BaseSupport;
 };
+/** Sets support states to empty array and clones props */
 export declare function upgradeBaseToSupport(templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
 support: BaseSupport, appSupport: AnySupport, castedProps?: Props): AnySupport;
 export declare function getHtmlSupport(templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()

@@ -1,11 +1,12 @@
 import { attachDomElements } from '../interpolations/optimizers/attachDomElements.function.js';
-import { checkSimpleValueChange } from './index.js';
+import { checkSimpleValueChange, deleteSimpleValue, destorySupportByContextItem } from './index.js';
 import { getDomMeta } from './domMetaCollector.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 import { painting } from './paint.function.js';
 /** Function that kicks off actually putting tags down as HTML elements */
 export function buildBeforeElement(support, counts, appendTo, insertBefore) {
     const subject = support.subject;
+    subject.delete = destorySupportByContextItem;
     const global = subject.global;
     global.oldest = support;
     global.newest = support;
@@ -40,6 +41,7 @@ export function addOneContext(value, context, withinOwnerElement) {
     const contextItem = {
         value,
         checkValueChange: checkSimpleValueChange,
+        delete: deleteSimpleValue,
         withinOwnerElement,
     };
     context.push(contextItem);

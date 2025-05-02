@@ -5,7 +5,7 @@ import { bindSubjectCallback } from './bindSubjectCallback.function.js';
 import { BasicTypes, ValueTypes, empty } from '../../tag/ValueTypes.enum.js';
 import { paintContent } from '../../tag/paint.function.js';
 import { processDynamicNameValueAttribute, processNonDynamicAttr } from './processNameValueAttribute.function.js';
-import { addOneContext, checkSimpleValueChange } from '../../tag/index.js';
+import { addOneContext, checkSimpleValueChange, deleteSimpleValue } from '../../tag/index.js';
 import { processAttributeFunction } from './processAttributeCallback.function.js';
 import { isSpecialAttr } from './isSpecialAttribute.function.js';
 import { processUpdateAttrContext } from '../../tag/processUpdateAttrContext.function.js';
@@ -35,6 +35,7 @@ context, isSpecial, counts, value) {
             element,
             attrName: attrName,
             checkValueChange: checkSimpleValueChange,
+            delete: deleteSimpleValue,
             withinOwnerElement: true,
         };
         context.push(contextItem);
@@ -141,12 +142,6 @@ function callbackFun(support, newAttrValue, element, attrName, isSpecial, howToS
     return processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support, counts);
 }
 export function processTagCallbackFun(subject, newAttrValue, support, attrName, element) {
-    const prevFun = subject.value;
-    if (prevFun && prevFun.tagFunction && prevFun.support) {
-        prevFun.tagFunction = newAttrValue;
-        prevFun.support = support;
-        return prevFun;
-    }
     // tag has state and will need all functions wrapped to cause re-renders
     newAttrValue = bindSubjectCallback(newAttrValue, support);
     return processAttributeFunction(element, newAttrValue, support, attrName);

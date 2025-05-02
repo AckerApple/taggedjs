@@ -4,7 +4,7 @@ import { renderTagOnly } from './renderTagOnly.function.js';
 import { isLikeTags } from '../isLikeTags.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 /** TODO: This seems to support both new and updates and should be separated? */
-export function renderWithSupport(newSupport, lastSupport, // previous
+export function renderWithSupport(newSupport, lastSupport, // previous (global.newest)
 subject, // events & memory
 ownerSupport) {
     const lastTemplater = lastSupport?.templater;

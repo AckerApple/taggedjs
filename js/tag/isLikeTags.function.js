@@ -37,7 +37,6 @@ support1) {
         return false;
     }
     const everyStringMatched = strings0.every((string, index) => strings1[index].length === string.length // performance, just compare length of strings // TODO: Document this
-    // strings1[index] === string // slower
     );
     if (!everyStringMatched) {
         return false;

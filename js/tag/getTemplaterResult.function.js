@@ -1,9 +1,11 @@
 import { ValueTypes } from './ValueTypes.enum.js';
+import { processTagInit } from './update/processTagInit.function.js';
 export function getTemplaterResult(propWatch, props) {
     const templater = {
+        tagJsType: ValueTypes.templater,
+        processInit: processTagInit,
         propWatch,
         props,
-        tagJsType: ValueTypes.templater,
         key: function keyTemplate(arrayValue) {
             templater.arrayValue = arrayValue;
             return templater;

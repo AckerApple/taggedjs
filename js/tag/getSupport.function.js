@@ -14,11 +14,11 @@ export function getBaseSupport(templater, subject, castedProps) {
     global.destroy$ = new Subject();
     return baseSupport;
 }
+/** Sets support states to empty array and clones props */
 export function upgradeBaseToSupport(templater, // at runtime rendering of a tag, it needs to be married to a new Support()
 support, appSupport, castedProps) {
-    ;
-    support.state = [];
-    support.states = [];
+    // ;(support as AnySupport).state = []
+    // ;(support as AnySupport).states = []
     support.appSupport = appSupport;
     const props = templater.props; // natural props
     if (props) {

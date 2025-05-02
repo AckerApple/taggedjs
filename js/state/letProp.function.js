@@ -15,7 +15,7 @@ export function letProp(setter) {
     passedOn.value = passes.value;
     setter((...values) => {
         nowValues = values;
-        return values;
+        return propStates2.value;
     });
     // When the watched variable changes, then the local prop variable has to update
     watch(nowValues, () => {
@@ -24,20 +24,23 @@ export function letProp(setter) {
         setter(() => nowValues);
     });
     // called and only used during sync'ing processes
-    states(() => {
+    states((_x, direction) => {
+        // now its collection of variables time
         if (passed) {
             setter((...values) => {
-                propStates2.value = values;
-                if (passes != passedOn) {
-                    return propStates2.value;
+                if (!direction || direction === 1) {
+                    propStates2.value = values;
                 }
-                return values; // propStates2.value
+                return propStates2.value;
             });
             passedOn.value = passes.value;
             ++passes.value;
             return;
         }
-        setter(() => propStates2.value);
+        // this in an insync call, we do not care about the values here
+        setter(() => {
+            return propStates2.value;
+        });
     });
     ++passed;
     return propStates2.value;

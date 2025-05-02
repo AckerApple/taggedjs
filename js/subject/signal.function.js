@@ -1,5 +1,7 @@
 import { state } from '../state/index.js';
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
+import { processSignal } from '../tag/update/processSubscribe.function.js';
+import { ValueTypes } from '../tag/ValueTypes.enum.js';
 /** Checks if rendering cycle in process. Then creates object with "value" key and ability to "subscribe" to value changes */
 export function signal(initialValue) {
     const support = getSupportInCycle();
@@ -13,6 +15,8 @@ export function Signal(initialValue) {
     let value = initialValue;
     const subscribers = new Set();
     return {
+        tagJsType: ValueTypes.signal,
+        processInit: processSignal,
         get value() {
             return value;
         },

@@ -4,24 +4,32 @@ import { processReplacementComponent } from './processFirstSubjectComponent.func
 import { updateExistingTagComponent } from './updateExistingTagComponent.function.js';
 import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js';
 import { updateSupportBy } from '../updateSupportBy.function.js';
-import { isArray, isTagComponent } from '../../isInstance.js';
+import { isArray, isSubjectInstance, isTagComponent } from '../../isInstance.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { processTagArray } from './processTagArray.js';
 import { getSupport } from '../getSupport.function.js';
 const fooCounts = { added: 0, removed: 0 };
-/** Used for all tag value updates. Determines if value changed since last render */
+/** Checks if value has changed before updating. Used for all tag value updates. Determines if value changed since last render */
 export function updateExistingValue(contextItem, newValue, // newValue
 ownerSupport) {
     // Do not continue if the value is just the same
     if (newValue === contextItem.value) {
         return;
     }
+    forceUpdateExistingValue(contextItem, newValue, ownerSupport);
+}
+/** Used for all tag value updates. Determines if value changed since last render */
+export function forceUpdateExistingValue(contextItem, newValue, // newValue
+ownerSupport) {
     // Have the context check itself (avoid having to detect old value)
     const ignoreOrDestroyed = contextItem.checkValueChange(newValue, contextItem);
     // ignore
     if (ignoreOrDestroyed === -1) {
         return; // do nothing
     }
+    updateToDiffValue(newValue, contextItem, ownerSupport, ignoreOrDestroyed);
+}
+function updateToDiffValue(newValue, contextItem, ownerSupport, ignoreOrDestroyed) {
     // is new value a tag?
     const tagJsType = newValue && newValue.tagJsType;
     if (tagJsType) {
@@ -39,9 +47,32 @@ ownerSupport) {
         contextItem.value = newValue; // do not render functions that are not explicity defined as tag html processing
         return;
     }
+    /*
+      if(isSubjectInstance(newValue)) {
+        subscribeToTemplate({
+          insertBefore: contextItem.placeholder as Text,
+          // appendTo: undefined,
+          subject: newValue as InterpolateSubject,
+          support: ownerSupport,
+          counts: {added: 0, removed: 0},
+          contextItem,
+        })
+    
+        contextItem.checkValueChange = subjectCheckValueChange
+        return
+      }
+      */
     if (ignoreOrDestroyed) {
         processNowRegularValue(newValue, contextItem);
     }
+}
+export function subjectCheckValueChange(value, contextItem) {
+    // if (isSubjectInstance(value) && value === newValue) {
+    if (isSubjectInstance(value)) {
+        return -1; // ignore same observable
+    }
+    contextItem.delete(contextItem);
+    return 66;
 }
 function updateToTag(value, contextItem, ownerSupport) {
     const tag = value;

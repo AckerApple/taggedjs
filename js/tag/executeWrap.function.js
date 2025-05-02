@@ -3,6 +3,8 @@ import { setUseMemory } from '../state/setUseMemory.object.js';
 export function executeWrap(templater, result, useSupport, castedProps) {
     const originalFunction = result.original; // (innerTagWrap as any).original as unknown as TagComponent
     const stateless = templater.tagJsType === ValueTypes.stateRender;
+    const config = setUseMemory.stateConfig;
+    config.support = useSupport;
     let tag;
     if (stateless) {
         tag = templater();
@@ -16,10 +18,9 @@ export function executeWrap(templater, result, useSupport, castedProps) {
     }
     tag.templater = templater;
     templater.tag = tag;
-    const config = setUseMemory.stateConfig;
     useSupport.state = config.stateArray;
     useSupport.states = config.states;
-    // ++useSupport.subject.renderCount
+    // useSupport.states = [...config.states]
     return useSupport;
 }
 //# sourceMappingURL=executeWrap.function.js.map

@@ -3,7 +3,8 @@ import { processTag } from '../update/processTag.function.js';
 import { updateSupportBy } from '../updateSupportBy.function.js';
 const fooCounts = { added: 0, removed: 0 };
 // TODO: This function is being called for 1st time renders WHEN renderCount === 1
-export function renderExistingReadyTag(lastSupport, newSupport, // new to be rendered
+export function renderExistingReadyTag(lastSupport, // should be global.newest
+newSupport, // new to be rendered
 ownerSupport, // ownerSupport
 subject) {
     const global = subject.global;

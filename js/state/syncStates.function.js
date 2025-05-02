@@ -6,22 +6,27 @@
  */
 export function syncSupports(support, // from
 newestSupport) {
-    for (let index = 0; index < support.states.length; ++index) {
-        let got;
-        const getter = support.states[index];
-        const setter = newestSupport.states[index];
-        getter((...x) => {
-            got = x;
-            return x;
-        });
-        setter(() => {
-            return got;
-        });
+    return syncStatesArray(support.states, newestSupport.states);
+}
+export function syncStatesArray(from, onto) {
+    for (let index = 0; index < from.length; ++index) {
+        const getter = from[index];
+        const setter = onto[index];
+        syncStates(getter, setter);
     }
-    return;
+}
+export function syncStates(from, onto) {
+    let got;
+    from((...x) => {
+        got = x;
+        return x;
+    }, 1);
+    onto(() => {
+        return got;
+    }, 2);
 }
 /** @deprecated favor using syncSupports */
-export function syncStates(stateFrom, stateTo, intoStates, statesFrom) {
+export function oldSyncStates(stateFrom, stateTo, intoStates, statesFrom) {
     for (let index = stateFrom.length - 1; index >= 0; --index) {
         const stateFromTarget = stateFrom[index];
         const fromValue = stateFromTarget.get(); // get without setting

@@ -3,6 +3,7 @@ import { getHtmlSupport } from '../getSupport.function.js';
 import { checkTagValueChange } from '../checkTagValueChange.function.js';
 import { buildBeforeElement } from '../buildBeforeElement.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
+import { processTagInit } from './processTagInit.function.js';
 /** When first time render, adds to owner childTags
  * Used for BOTH inserts & updates to values that were something else
  * Intended use only for updates
@@ -30,6 +31,7 @@ export function tagFakeTemplater(tag) {
 export function getFakeTemplater() {
     const fake = {
         tagJsType: ValueTypes.templater,
+        processInit: processTagInit,
     };
     return fake;
 }

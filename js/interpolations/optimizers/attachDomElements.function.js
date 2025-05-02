@@ -4,7 +4,6 @@ import { howToSetFirstInputValue } from "../attributes/howToSetInputValue.functi
 import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js";
 import { processAttribute } from "../attributes/processAttribute.function.js";
 import { addOneContext } from "../../tag/index.js";
-import { isSubjectInstance } from "../../isInstance.js";
 import { empty } from "../../tag/ValueTypes.enum.js";
 import { updateExistingValue } from "../../tag/update/updateExistingValue.function.js";
 export const blankHandler = () => undefined;
@@ -108,18 +107,6 @@ appendTo, insertBefore) {
             relative: insertBefore,
             element: marker,
         });
-    }
-    if (isSubjectInstance(value)) {
-        subs.push({
-            insertBefore: marker,
-            appendTo,
-            subject: value,
-            support, // ownerSupport,
-            counts,
-            contextItem,
-        });
-        contextItem.handler = blankHandler;
-        return;
     }
     // how to handle value updates
     contextItem.handler = (newValue, _newValues, newSupport, newContextItem) => updateExistingValue(newContextItem, newValue, newSupport);

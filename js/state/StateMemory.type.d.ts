@@ -8,6 +8,7 @@ export type StateMemory = {
     prevSupport?: AnySupport;
     /** state memory on the first render */
     stateArray: State;
+    /** let states */
     states: StatesSetter[];
     statesIndex: number;
     rearray?: State;

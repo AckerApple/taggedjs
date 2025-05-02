@@ -10,5 +10,5 @@ export type SubToTemplateOptions = {
     contextItem: ContextItem;
     appendTo?: Element;
 };
-/** Used for when dynamic value is truly something to subscribe to */
+/** @deprecated Used for when dynamic value is truly something to subscribe to */
 export declare function subscribeToTemplate({ subject, support, counts, contextItem, appendTo, }: SubToTemplateOptions): void;

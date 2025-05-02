@@ -1,4 +1,4 @@
-import { getBaseSupport, upgradeBaseToSupport } from './getSupport.function.js';
+import { getBaseSupport, getSupport, upgradeBaseToSupport } from './getSupport.function.js';
 import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js';
 import { buildBeforeElement } from './buildBeforeElement.function.js';
 import { tags } from './tag.utils.js';
@@ -12,7 +12,7 @@ import { paint, painting } from './paint.function.js';
 import { initState, reState } from '../state/state.utils.js';
 import { isTagComponent } from '../isInstance.js';
 import { setUseMemory } from '../state/setUseMemory.object.js';
-import { checkTagValueChange } from './checkTagValueChange.function.js';
+import { checkTagValueChange, destorySupportByContextItem } from './checkTagValueChange.function.js';
 const appElements = [];
 /**
  *
@@ -124,6 +124,7 @@ function getNewSubject(templater, appElement) {
     const subject = {
         value: templater,
         checkValueChange: checkTagValueChange,
+        delete: destorySupportByContextItem,
         withinOwnerElement: false, // i am the highest owner
         renderCount: 0,
         global: undefined, // gets set below in getNewGlobal()
@@ -145,27 +146,21 @@ function loadNewBaseSupport(templater, subject, appElement) {
 export function runWrapper(templater, placeholder, appElement, subject, isAppFunction) {
     subject.placeholder = placeholder;
     const global = subject.global;
-    const useSupport = global.newest;
     const oldest = global.oldest;
-    const isFirstRender = useSupport === oldest;
+    const isFirstRender = global.newest === oldest;
+    const newSupport = getSupport(templater, global.newest, global.newest.appSupport, // ownerSupport.appSupport as AnySupport,
+    subject);
     if (!isFirstRender) {
-        reState(useSupport, setUseMemory.stateConfig, oldest.state, oldest.states);
+        reState(newSupport, global.newest, // global.oldest, // global.newest,
+        setUseMemory.stateConfig, oldest.state, oldest.states);
     }
     if (templater.tagJsType === ValueTypes.stateRender) {
-        const result = (templater.wrapper || { original: templater });
-        if (!isAppFunction) {
-            const newSupport = loadNewBaseSupport(templater, subject, appElement);
-            runAfterRender(newSupport);
-            return newSupport;
-        }
-        const nowSupport = executeWrap(templater, result, useSupport);
-        runAfterRender(nowSupport);
-        return nowSupport;
+        return executeStateWrap(templater, isAppFunction, newSupport, subject, appElement);
     }
     // Call the apps function for our tag templater
     const wrapper = templater.wrapper;
-    const nowSupport = wrapper(useSupport, subject);
-    runAfterRender(nowSupport);
+    const nowSupport = wrapper(newSupport, subject);
+    runAfterRender(newSupport);
     return nowSupport;
 }
 function putOneDomDown(dom, newFragment) {
@@ -175,5 +170,16 @@ function putOneDomDown(dom, newFragment) {
     if (dom.marker) {
         newFragment.appendChild(dom.marker);
     }
+}
+function executeStateWrap(templater, isAppFunction, newSupport, subject, appElement) {
+    const result = (templater.wrapper || { original: templater });
+    if (!isAppFunction) {
+        const newSupport = loadNewBaseSupport(templater, subject, appElement);
+        runAfterRender(newSupport);
+        return newSupport;
+    }
+    executeWrap(templater, result, newSupport);
+    runAfterRender(newSupport);
+    return newSupport;
 }
 //# sourceMappingURL=tagElement.js.map

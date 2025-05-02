@@ -11,3 +11,4 @@ export * from './onInit.js';
 export * from './onDestroy.js';
 export * from './state.function.js';
 export * from './states.function.js';
+export { subscribe } from './subscribe.function.js';

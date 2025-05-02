@@ -7,13 +7,15 @@ import { checkStateMismatch } from './checkStateMismatch.function.js';
 export function runAfterRender(support, ownerSupport) {
     const subject = support.subject;
     ++subject.renderCount;
-    // ++subject.global.renderCount
     const config = setUseMemory.stateConfig;
-    delete config.support;
     support.state = config.stateArray;
-    // support.states = config.states
-    setUseMemory.tagClosed$.next(ownerSupport);
-    checkStateMismatch(config, support);
+    support.states = config.states;
     subject.global.newest = support;
+    checkStateMismatch(config, support);
+    delete config.prevSupport; // only this one really needed
+    delete config.support;
+    delete config.stateArray;
+    delete config.states;
+    setUseMemory.tagClosed$.next(ownerSupport);
 }
 //# sourceMappingURL=afterRender.function.js.map

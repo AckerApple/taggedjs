@@ -12,8 +12,10 @@ import { Subject } from '../subject/index.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
 import { PropWatches } from './tag.function.js';
+import { ProcessInit } from '../subject/ProcessInit.type.js';
 export type Wrapper = ((newSupport: AnySupport, subject: ContextItem, prevSupport?: AnySupport) => AnySupport) & TagWrapper<unknown> & {
     tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater;
+    processInit: ProcessInit;
 };
 /** NOT shared across variable spots. The Subject/ContextItem is more global than this is */
 export type TagGlobal = {
@@ -42,8 +44,9 @@ export type Events = {
 };
 export type Clone = (Element | Text | ChildNode);
 export type TemplaterResult = {
-    propWatch: PropWatches;
     tagJsType: string;
+    processInit: ProcessInit;
+    propWatch: PropWatches;
     wrapper?: Wrapper;
     tag?: StringTag | DomTag;
     props?: Props;
