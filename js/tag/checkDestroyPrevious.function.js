@@ -20,14 +20,14 @@ export function destroyArray(subject, lastArray) {
     }
     delete subject.lastArray;
 }
-export function checkSimpleValueChange(newValue, subject) {
+export function checkSimpleValueChange(newValue, contextItem) {
     const isBadValue = newValue === null || newValue === undefined;
     if (isBadValue || !(typeof (newValue) === BasicTypes.object)) {
         // This will cause all other values to render
-        processUpdateRegularValue(newValue, subject);
+        processUpdateRegularValue(newValue, contextItem);
         return -1; // no need to destroy, just update display
     }
-    deleteSimpleValue(subject);
+    deleteSimpleValue(contextItem);
     return 6; // 'changed-simple-value'
 }
 export function deleteSimpleValue(subject) {

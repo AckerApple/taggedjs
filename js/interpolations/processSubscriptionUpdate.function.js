@@ -9,7 +9,7 @@ contextItem, support) {
         return; // same value emitted
     }
     // checks if same value
-    updateExistingValue(contextItem, value, support);
+    updateExistingValue(value, support, contextItem);
     if (!setUseMemory.stateConfig.support) {
         paint();
     }

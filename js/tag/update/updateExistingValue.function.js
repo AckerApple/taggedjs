@@ -3,8 +3,8 @@ import { updateExistingTagComponent } from './updateExistingTagComponent.functio
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js';
 import { createSupport } from '../createSupport.function.js';
 /** Checks if value has changed before updating. Used for all tag value updates. Determines if value changed since last render */
-export function updateExistingValue(contextItem, newValue, // newValue
-ownerSupport) {
+export function updateExistingValue(newValue, // newValue
+ownerSupport, contextItem) {
     // Do not continue if the value is just the same
     if (newValue === contextItem.value) {
         return;

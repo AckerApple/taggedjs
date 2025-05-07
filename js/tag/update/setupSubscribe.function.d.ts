@@ -12,7 +12,9 @@ callback?: SubscribeCallback<any>, insertBefore?: Text): SubscribeMemory;
 type SubscribeMemory = {
     hasEmitted: boolean;
     states: StatesSetter[];
+    /** Handles emissions from subject and figures out what to display */
     handler: (value: TemplateValue) => void;
+    /** Needed so we can update the callback whenever we want */
     getLastValue: () => any;
     callback?: SubscribeCallback<any>;
     subscription: Subscription;

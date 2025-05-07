@@ -20,7 +20,7 @@ index, context, ownerSupport) {
         return;
     }
     const handler = contextItem.handler;
-    handler(value, values, ownerSupport, contextItem);
+    handler(value, ownerSupport, contextItem, values);
     contextItem.value = value;
 }
 //# sourceMappingURL=processUpdateContext.function.js.map

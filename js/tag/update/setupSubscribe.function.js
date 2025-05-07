@@ -14,29 +14,19 @@ export function setupSubscribe(observable, contextItem, ownerSupport, counts, ca
             element: insertBefore,
             relative: appendTo,
         });
-        // appendTo = undefined
     }
-    const setup = setupSubscribeCallbackProcessor(observable, contextItem, ownerSupport, counts, callback, insertBefore);
-    const deleteMe = contextItem.delete = () => {
-        setup.contextItem.delete(setup.contextItem);
-        setup.subscription.unsubscribe();
+    const subscription = setupSubscribeCallbackProcessor(observable, contextItem, ownerSupport, counts, callback, insertBefore);
+    contextItem.delete = () => {
+        console.log('🗑️ delete subscribe');
+        subscription.contextItem.delete(subscription.contextItem);
+        subscription.subscription.unsubscribe();
         if (appendMarker) {
             const parentNode = appendMarker.parentNode;
             parentNode.removeChild(appendMarker);
         }
     };
-    contextItem.handler = (value, values, newSupport) => {
-        if (!value || !value.tagJsType || value.tagJsType !== ValueTypes.subscribe) {
-            deleteMe();
-            return 99;
-        }
-        if (!setup.hasEmitted) {
-            return;
-        }
-        setup.callback = value.callback;
-        setup.handler(setup.getLastValue());
-        const newComponent = getSupportWithState(newSupport);
-        setup.states = newComponent.states;
+    contextItem.handler = (value, newSupport, contextItem) => {
+        checkSubscribeFrom(value, newSupport, contextItem, subscription);
     };
 }
 export function setupSubscribeCallbackProcessor(observable, contextItem, ownerSupport, // ownerSupport ?
@@ -46,11 +36,8 @@ callback, insertBefore) {
     let lastValue = undefined;
     const getLastValue = () => lastValue;
     let onValue = function onSubValue(value) {
-        if (memory.callback) {
-            value = memory.callback(value);
-        }
         memory.hasEmitted = true;
-        memory.contextItem = createAndProcessContextItem(value, ownerSupport, counts, insertBefore);
+        memory.contextItem = createAndProcessContextItem(value, ownerSupport, counts, undefined, insertBefore);
         // from now on just run update
         onValue = function subscriptionUpdate(value) {
             forceUpdateExistingValue(memory.contextItem, value, ownerSupport);
@@ -77,9 +64,24 @@ callback, insertBefore) {
         callback,
         states: component.states,
     };
+    contextItem.subscription = memory;
     let syncRun = true;
     memory.subscription = observable.subscribe(valueChangeHandler);
     syncRun = false;
     return memory;
+}
+function checkSubscribeFrom(value, newSupport, contextItem, subscription) {
+    if (!value || !value.tagJsType || value.tagJsType !== ValueTypes.subscribe) {
+        contextItem.delete(contextItem);
+        return 99;
+    }
+    if (!subscription.hasEmitted) {
+        return -1;
+    }
+    subscription.callback = value.callback;
+    subscription.handler(subscription.getLastValue());
+    const newComponent = getSupportWithState(newSupport);
+    subscription.states = newComponent.states;
+    return -1;
 }
 //# sourceMappingURL=setupSubscribe.function.js.map

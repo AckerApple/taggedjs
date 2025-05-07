@@ -4,23 +4,24 @@ import { InterpolateSubject, TemplateValue } from './update/processFirstSubject.
 import { Clone, TagGlobal } from './getTemplaterResult.function.js';
 import { AnySupport } from './AnySupport.type.js';
 import { SupportContextItem } from './createHtmlSupport.function.js';
-export type ContextHandler = (value: TemplateValue, values: unknown[], newSupport: AnySupport, contextItem: ContextItem) => void;
+export type ContextHandler = (value: TemplateValue, newSupport: AnySupport, contextItem: ContextItem, values: unknown[]) => void;
 export type LastArrayItem = ContextItem;
 export type ContextItem = {
     element?: Element;
-    handler?: ContextHandler;
     isAttr?: true;
     howToSet?: HowToSet;
     isNameOnly?: boolean;
     attrName?: string;
     isSpecial?: SpecialDefinition;
     placeholder?: Text;
+    withinOwnerElement: boolean;
     simpleValueElm?: Clone;
     lastArray?: LastArrayItem[];
     subject?: InterpolateSubject;
     global?: TagGlobal;
     value?: any;
-    withinOwnerElement: boolean;
+    /** Called on value update detected, within processUpdateOneContext(). Return value is ignored */
+    handler?: ContextHandler;
     checkValueChange: CheckValueChange | CheckSupportValueChange;
     delete: (contextItem: ContextItem) => any;
 };

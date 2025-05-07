@@ -23,7 +23,7 @@ context, isSpecial, counts, value) {
         contextItem.howToSet = howToSet;
         contextItem.isNameOnly = true;
         // how to process value updates
-        contextItem.handler = (newValue, newValues) => processUpdateAttrContext(newValues, newValue, contextItem, support);
+        contextItem.handler = processUpdateAttrContext;
         processNameOnlyAttrValue(values, value, element, support, howToSet, context, counts);
         return;
     }
@@ -43,18 +43,7 @@ context, isSpecial, counts, value) {
         if (isSubject) {
             return processNameValueAttributeAttrSubject(attrName, contextItem, element, support, howToSet, isSpecial, counts);
         }
-        contextItem.handler = (newValue, newValues) => processUpdateAttrContext(newValues, newValue, contextItem, support);
-        /*
-        processNameOnlyAttrValue(
-          values,
-          newValue as any,
-          element as Element,
-          support,
-          howToSet as HowToSet,
-          context,
-          counts,
-        )
-        */
+        contextItem.handler = processUpdateAttrContext;
         processDynamicNameValueAttribute(attrName, value, contextItem, element, howToSet, support, counts, isSpecial);
         contextItem.value = value;
         return;
