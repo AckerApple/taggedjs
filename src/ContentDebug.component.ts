@@ -213,8 +213,20 @@ const passSubscription = tag(({
   states(get => [onOff] = get(onOff))
 
   return html`
-    test:${onOff && subscribe(sub0)}:end
-    <button onclick=${() => sub0.next((sub0.value || 0) + 1)}>increase</button>
-    <button onclick=${() => onOff = !onOff}>on/off - ${onOff}</button>
+    <span>sub-value:<span id="passed-in-output">${subscribe(sub0)}</span></span>
+    <span>test:${onOff && subscribe(sub0)}:end</span>
+    <button id="passed-in-sub-increase" onclick=${() => sub0.next((sub0.value || 0) + 1)}>increase</button>
+    <button id="passed-in-sub-hide-show" onclick=${() => onOff = !onOff}>on/off - ${onOff}</button>
+    <div id="passed-in-sub-ex0">0||${onOff && subscribe(sub0)}||0</div>
+    <div id="passed-in-sub-ex1">1||${onOff && subscribe(sub0, numberFun)}||1</div>
+    <div id="passed-in-sub-ex2">2||${onOff && subscribe(sub0, numberTag)}||2</div>
   `
+})
+
+const numberFun = (x: number) => {
+  return html`your fun number ${x}`
+}
+
+const numberTag = tag((x: number) => {
+  return html`your tag number ${x}`
 })

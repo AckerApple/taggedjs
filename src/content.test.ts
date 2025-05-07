@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 
-import { byId, change, triggerChangeElm, click, html, query } from "./testing/elmSelectors"
+import { byId, change, triggerChangeElm, click, html, query, htmlById } from "./testing/elmSelectors"
 import { expect, describe, it } from "./testing/expect"
 import { expectMatchedHtml } from "./testing/expect.html"
 
@@ -52,6 +52,42 @@ describe('📰 content', () => {
   
       const html = parent.innerHTML.replace(/(^(.|\n)+<hr id="noParentsTest2-start">|)/g,'').replace(/<hr id="noParentsTest2-end">(.|\n)*/g,'').trim()
       expect(html).toBe('<hr>content1<hr>test0<hr>content2<hr>test1<hr>content3<hr>test3<hr>content4<hr>')
+    })
+  })
+
+  describe('passed in subscription', () => {
+    it('increase test', async () => {
+      const increase = byId('passed-in-sub-increase')
+      const hideShow = byId('passed-in-sub-hide-show')
+
+      expect(htmlById('passed-in-sub-ex0')).toBe('0||||0')
+      expect(htmlById('passed-in-sub-ex1')).toBe('1||||1')
+      expect(htmlById('passed-in-sub-ex2')).toBe('2||||2')
+
+      increase.click()
+
+      expect(htmlById('passed-in-sub-ex0')).toBe(`0||||0`)
+      expect(htmlById('passed-in-sub-ex1')).toBe('1||||1')
+      expect(htmlById('passed-in-sub-ex2')).toBe('2||||2')
+
+      hideShow.click()
+
+      expect(htmlById('passed-in-sub-ex0')).toBe(`0||||0`)
+      expect(htmlById('passed-in-sub-ex1')).toBe('1||||1')
+      expect(htmlById('passed-in-sub-ex2')).toBe('2||||2')
+
+      increase.click()
+
+      const subValue = htmlById('passed-in-output')
+      expect(htmlById('passed-in-sub-ex0')).toBe(`0||${subValue}||0`)
+      expect(htmlById('passed-in-sub-ex1')).toBe(`1||your fun number ${subValue}||1`)
+      expect(htmlById('passed-in-sub-ex2')).toBe(`2||your tag number ${subValue}||2`)
+
+      hideShow.click()
+
+      expect(htmlById('passed-in-sub-ex0')).toBe('0||||0')
+      expect(htmlById('passed-in-sub-ex1')).toBe('1||||1')
+      expect(htmlById('passed-in-sub-ex2')).toBe('2||||2')
     })
   })
 })
