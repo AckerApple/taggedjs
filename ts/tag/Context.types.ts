@@ -8,26 +8,26 @@ import { SupportContextItem } from './createHtmlSupport.function.js'
 
 export type ContextHandler = (
   value: TemplateValue,
-  values: unknown[],
   newSupport: AnySupport,
   contextItem: ContextItem,
+  values: unknown[],
 ) => void
 
 export type LastArrayItem = ContextItem // {context: ContextItem, global: TagGlobal}
 
 export type ContextItem = {
   element?: Element
-
-  handler?: ContextHandler
   
+  // ATTRIBUTES
   isAttr?: true
   howToSet?: HowToSet
   isNameOnly?: boolean
   attrName?: string
   isSpecial?: SpecialDefinition
   
+  // ELEMENTS
   placeholder?: Text // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
-  
+  withinOwnerElement: boolean  
   // used only for strings, numbers, booleans
   simpleValueElm?: Clone
 
@@ -40,7 +40,8 @@ export type ContextItem = {
   global?: TagGlobal
   value?: any,
 
-  withinOwnerElement: boolean
+  /** Called on value update detected, within processUpdateOneContext(). Return value is ignored */
+  handler?: ContextHandler
   checkValueChange: CheckValueChange | CheckSupportValueChange
   delete: (contextItem: ContextItem) => any
 }

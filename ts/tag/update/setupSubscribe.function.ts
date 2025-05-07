@@ -9,9 +9,11 @@ import { syncSupports } from '../../state/syncStates.function.js'
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js'
 import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js'
 import { StatesSetter } from '../../state/states.utils.js'
-import { ValueTypes } from '../ValueTypes.enum.js'
+import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
+import { deleteSimpleValue } from '../checkDestroyPrevious.function.js'
+import { processUpdateRegularValue, RegularValue } from './processRegularValue.function.js'
 
 export function setupSubscribe(
   observable: LikeObservable<any>,
@@ -32,11 +34,9 @@ export function setupSubscribe(
       element: insertBefore,
       relative: appendTo,
     })
-
-    // appendTo = undefined
   }
 
-  const setup = setupSubscribeCallbackProcessor(
+  const subscription = setupSubscribeCallbackProcessor(
     observable,
     contextItem,
     ownerSupport,
@@ -45,9 +45,10 @@ export function setupSubscribe(
     insertBefore,
   )
 
-  const deleteMe = contextItem.delete = () => {
-    setup.contextItem.delete(setup.contextItem)
-    setup.subscription.unsubscribe()
+  contextItem.delete = () => {
+    console.log('🗑️ delete subscribe')
+    subscription.contextItem.delete(subscription.contextItem)
+    subscription.subscription.unsubscribe()
 
     if(appendMarker) {
       const parentNode = appendMarker.parentNode as ParentNode
@@ -57,23 +58,16 @@ export function setupSubscribe(
 
   contextItem.handler = (
     value: TemplateValue,
-    values: unknown[],
-    newSupport: AnySupport
+    newSupport: AnySupport,
+    contextItem: ContextItem,
+    // values: unknown[],
   ) => {
-    if(!value || !(value as any).tagJsType || (value as any).tagJsType !== ValueTypes.subscribe) {
-      deleteMe()
-      return 99
-    }
-
-    if (!setup.hasEmitted) {
-      return
-    }
-
-    setup.callback = (value as SubscribeValue).callback
-    setup.handler(setup.getLastValue())
-
-    const newComponent = getSupportWithState(newSupport)
-    setup.states = newComponent.states
+    checkSubscribeFrom(
+      value,
+      newSupport,
+      contextItem,
+      subscription,
+    )
   }
 }
 
@@ -90,16 +84,12 @@ export function setupSubscribeCallbackProcessor(
   const getLastValue = () => lastValue
 
   let onValue = function onSubValue(value: TemplateValue) {
-    if(memory.callback) {
-      value = memory.callback(value)
-    }
-
     memory.hasEmitted = true
-
     memory.contextItem = createAndProcessContextItem(
       value as TemplateValue,
       ownerSupport,
       counts,
+      undefined as any,
       insertBefore,
     )
 
@@ -136,6 +126,8 @@ export function setupSubscribeCallbackProcessor(
     states: component.states,
   } as SubscribeMemory
 
+  ;(contextItem as any).subscription = memory
+
   let syncRun = true
   memory.subscription = observable.subscribe( valueChangeHandler )
   syncRun = false
@@ -146,11 +138,39 @@ export function setupSubscribeCallbackProcessor(
 type SubscribeMemory = {
   hasEmitted: boolean
   states: StatesSetter[]
+  
+  /** Handles emissions from subject and figures out what to display */
   handler: (value: TemplateValue) => void
+  
+  /** Needed so we can update the callback whenever we want */
   getLastValue: () => any
+  
   callback?: SubscribeCallback<any>
   subscription: Subscription
   
-  // context: ContextItem[]
   contextItem: ContextItem
+}
+
+function checkSubscribeFrom(
+  value: unknown,
+  newSupport: AnySupport,
+  contextItem: ContextItem,
+  subscription: SubscribeMemory,
+) {
+  if(!value || !(value as any).tagJsType || (value as any).tagJsType !== ValueTypes.subscribe) {
+    contextItem.delete(contextItem)
+    return 99
+  }
+
+  if (!subscription.hasEmitted) {
+    return -1
+  }
+
+  subscription.callback = (value as SubscribeValue).callback
+  subscription.handler(subscription.getLastValue())
+
+  const newComponent = getSupportWithState(newSupport)
+  subscription.states = newComponent.states
+
+  return -1
 }

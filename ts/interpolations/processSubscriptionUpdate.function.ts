@@ -18,9 +18,9 @@ export function processSubUpdate(
 
   // checks if same value
   updateExistingValue(
-    contextItem,
     value,
     support,
+    contextItem,
   )
 
   if(!setUseMemory.stateConfig.support) {

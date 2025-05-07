@@ -9,6 +9,7 @@ import { StringTag } from '../StringTag.type.js'
 import { compareArrayItems } from './compareArrayItems.function.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
+import { checkSimpleValueChange } from '../checkDestroyPrevious.function.js'
 
 export function processTagArray(
   subject: ContextItem,
@@ -98,6 +99,7 @@ function reviewArrayItem(
     item as TemplateValue,
     ownerSupport,
     counts,
+    checkSimpleValueChange,
     runtimeInsertBefore as Text,
     appendTo,
   )
@@ -120,7 +122,11 @@ function reviewPreviousArrayItem(
 ) {
   const couldBeSame = lastArray.length > index
   if (couldBeSame) {
-    updateExistingValue(itemSubject, value as TemplateValue, ownerSupport)
+    updateExistingValue(
+      value as TemplateValue,
+      ownerSupport,
+      itemSubject,
+    )
     return itemSubject
   }
 
@@ -128,6 +134,7 @@ function reviewPreviousArrayItem(
     value as TemplateValue,
     ownerSupport,
     counts,
+    checkSimpleValueChange,
     runtimeInsertBefore as Text,
     appendTo,
   )

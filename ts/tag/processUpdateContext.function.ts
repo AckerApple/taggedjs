@@ -45,6 +45,11 @@ export function processUpdateOneContext(
 
   const handler = contextItem.handler as ContextHandler
   
-  handler(value, values, ownerSupport, contextItem)
+  handler(
+    value,
+    ownerSupport,
+    contextItem,
+    values,
+  )
   contextItem.value = value
 }

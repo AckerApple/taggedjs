@@ -10,9 +10,9 @@ import { AnySupport } from '../AnySupport.type.js'
 
 /** Checks if value has changed before updating. Used for all tag value updates. Determines if value changed since last render */
 export function updateExistingValue(
-  contextItem: ContextItem | SupportContextItem,
   newValue: TemplateValue, // newValue
   ownerSupport: AnySupport,
+  contextItem: ContextItem | SupportContextItem,
 ) {
   // Do not continue if the value is just the same
   if(newValue === contextItem.value) {

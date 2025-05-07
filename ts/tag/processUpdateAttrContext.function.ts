@@ -8,10 +8,10 @@ import { updateNameOnlyAttrValue } from '../interpolations/attributes/updateAttr
 const emptyCounts: Counts = {added: 0, removed: 0}
 
 export function processUpdateAttrContext(
-  values: unknown[],
   value: unknown,
-  contextItem: ContextItem,
   ownerSupport: AnySupport,
+  contextItem: ContextItem,
+  values: unknown[],
 ) {  
   if(contextItem.isNameOnly) {
     updateNameOnlyAttrValue(

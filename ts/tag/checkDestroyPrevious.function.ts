@@ -37,20 +37,20 @@ export function destroyArray(
 
 export function checkSimpleValueChange(
   newValue: unknown,
-  subject: ContextItem,
+  contextItem: ContextItem,
 ) {
   const isBadValue = newValue === null || newValue === undefined
   if(isBadValue || !(typeof(newValue) === BasicTypes.object)) {
     // This will cause all other values to render
     processUpdateRegularValue(
       newValue as RegularValue,
-      subject,
+      contextItem,
     )
 
     return -1  // no need to destroy, just update display
   }
 
-  deleteSimpleValue(subject)
+  deleteSimpleValue(contextItem)
   
   return 6 // 'changed-simple-value'
 }

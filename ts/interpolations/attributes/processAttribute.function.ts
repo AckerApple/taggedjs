@@ -49,13 +49,7 @@ export function processAttribute(
     contextItem.isNameOnly = true
 
     // how to process value updates
-    contextItem.handler = (newValue, newValues) => 
-      processUpdateAttrContext(
-        newValues,
-        newValue,
-        contextItem,
-        support,
-      )  
+    contextItem.handler = processUpdateAttrContext
 
     processNameOnlyAttrValue(
       values,
@@ -98,24 +92,7 @@ export function processAttribute(
       )
     }
 
-    contextItem.handler = (newValue, newValues) => 
-      processUpdateAttrContext(
-        newValues,
-        newValue,
-        contextItem,
-        support,
-      )
-      /*
-      processNameOnlyAttrValue(
-        values,
-        newValue as any,
-        element as Element,
-        support,
-        howToSet as HowToSet,
-        context,
-        counts,
-      )
-      */
+    contextItem.handler = processUpdateAttrContext
 
     processDynamicNameValueAttribute(
       attrName as string,
