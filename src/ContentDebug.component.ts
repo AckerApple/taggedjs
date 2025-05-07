@@ -1,12 +1,24 @@
-import { LikeObjectChildren, html, tag, ValueSubject, state, combineLatest, willPromise, states } from "taggedjs"
+import { LikeObjectChildren, html, tag, ValueSubject, state, combineLatest, willPromise, states, subscribe, Subject } from "taggedjs"
 import { dumpContent } from "./dumpContent.tag"
 import { renderCountDiv } from "./renderCount.component"
 
 export const content = tag(() => {
+  const sub0 = state(() => new Subject<number>())
   const vs0 = state(() => new ValueSubject(0))
   const vs1 = state(() => new ValueSubject(1))
 
   let renderCount: number = 0
+  let orangeToggle = true
+  let boldToggle = false
+  let counter = 0
+
+  states(get => [{
+    renderCount, orangeToggle, boldToggle, counter,
+  }] = get({
+    renderCount, orangeToggle, boldToggle, counter,
+  }))
+
+  ++renderCount
 
   const dom: LikeObjectChildren = [{
     nn: 'b', ch:[{
@@ -14,17 +26,28 @@ export const content = tag(() => {
       tc: 'big',
     }]
   }]
-
-  let orangeToggle = true
-  let boldToggle = false
-
-  states(get => [{renderCount, orangeToggle, boldToggle}] = get({renderCount, orangeToggle, boldToggle}))
-
-  ++renderCount
-
   const injectionTest = '<script>alert("i should never run but be seen on page")</script>'
 
+  const pipe = subscribe(vs0, () => {
+    return html`
+      <button type="button" onclick=${() => {
+        ++counter
+      }}>increase inside ${counter}</button>
+      <button type="button" onclick=${() => vs0.next( vs0.value + 1 )}>increase vs0</button>
+    `
+  })
+
+  ;(pipe as any).label = 'acker'
+
   return html`<!-- content-debug-testing -->
+    <fieldset style="flex-grow:1">
+      <legend>
+        piped subject click <span id="pipe-counter-click-display">${counter}</span>
+      </legend>
+      ${pipe}
+      <button type="button" onclick=${() => ++counter}>increase outside ${counter}</button>
+    </fieldset>
+
     <fieldset>
       <legend>Dump Content</legend>
       ${dumpContent()}
@@ -34,6 +57,11 @@ export const content = tag(() => {
     <fieldset id="noParentTagFieldset">
       <legend>No Parent Test</legend>
       ${numberedNoParents()}
+    </fieldset>
+
+    <fieldset id="noParentTagFieldset">
+      <legend>Pass subscription</legend>
+      ${passSubscription({sub0})}
     </fieldset>
 
     <hr id="noParentsTest2-start" />
@@ -127,21 +155,25 @@ export const content = tag(() => {
         <fieldset style="flex-grow:1">
           <legend>piped subject</legend>        
           <span id="content-subject-pipe-display0">55</span>&nbsp;===&nbsp;
-          <span id="content-subject-pipe-display1">${vs0.pipe(() => 55)}</span>
+          <span id="content-subject-pipe-display1">
+            ${subscribe(vs0, () => 55)}
+          </span>
         </fieldset>
         
         <fieldset style="flex-grow:1">
           <legend>combineLatest</legend>
           <span id="content-combineLatest-pipe-display0">1</span>&nbsp;===&nbsp;
-          <span id="content-combineLatest-pipe-display1">${combineLatest([vs0, vs1]).pipe(x => x[1])}</span>
+          <span id="content-combineLatest-pipe-display1">${subscribe(combineLatest([vs0, vs1]).pipe(x => x[1]))}</span>
         </fieldset>
         
         <fieldset style="flex-grow:1">
           <legend>combineLatest piped html</legend>
           <span id="content-combineLatest-pipeHtml-display0"><b>bold 77</b></span>&nbsp;===&nbsp;
           <span id="content-combineLatest-pipeHtml-display1">${
-            combineLatest([vs0, vs1]).pipe(
-              willPromise(x => Promise.resolve(html`<b>bold 77</b>`))
+            subscribe(
+              combineLatest([vs0, vs1]).pipe(
+                willPromise(x => Promise.resolve(html`<b>bold 77</b>`))
+              )
             )
           }</span>
         </fieldset>
@@ -170,3 +202,19 @@ export function numberedNoParents() {
     <hr />
   `  
 }
+
+const passSubscription = tag(({
+  sub0
+}: {
+  sub0: Subject<number>
+}) => {
+  let onOff = false
+
+  states(get => [onOff] = get(onOff))
+
+  return html`
+    test:${onOff && subscribe(sub0)}:end
+    <button onclick=${() => sub0.next((sub0.value || 0) + 1)}>increase</button>
+    <button onclick=${() => onOff = !onOff}>on/off - ${onOff}</button>
+  `
+})

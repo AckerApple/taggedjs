@@ -1,4 +1,4 @@
-import { AnySupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, StringTag, ContextItem, getNewGlobal, getBaseSupport, SupportTagGlobal, checkSimpleValueChange, SupportContextItem } from 'taggedjs'
+import { AnySupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, StringTag, ContextItem, getNewGlobal, getBaseSupport, SupportTagGlobal, checkSimpleValueChange, SupportContextItem, destorySupportByContextItem, deleteSimpleValue } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -44,6 +44,7 @@ function templaterToSupport(
     value: templater,
     global: undefined as any, // populated below in getNewGlobal
     checkValueChange: checkSimpleValueChange,
+    delete: deleteSimpleValue,
     withinOwnerElement: false,
   }
   
@@ -136,6 +137,7 @@ function processValue(
               value,
               global: getNewGlobal(subject as ContextItem),
               checkValueChange: checkSimpleValueChange,
+              delete: destorySupportByContextItem,
               withinOwnerElement: subject?.withinOwnerElement || false,
             }
           )

@@ -1,4 +1,4 @@
-import { watch, html, tag, states } from "taggedjs"
+import { watch, html, tag, states, subscribe, callback } from "taggedjs"
 
 export const watchTesting = tag.deepPropWatch(() => (
   stateNum = 0,
@@ -20,25 +20,19 @@ export const watchTesting = tag.deepPropWatch(() => (
   })),
 
   _ = watch([stateNum], () => ++stateNumChangeCount),
-  watchPropNumSlow = watch.noInit([stateNum], () => ++slowChangeCount),
+  watchPropNumSlow = watch.noInit([stateNum], callback(() => ++slowChangeCount)),
   
-  watchPropNumSubject = watch.asSubject([stateNum], () => {
+  watchPropNumSubject = watch.asSubject([stateNum], callback(() => {
     return ++subjectChangeCount
-  }),
+  })),
 
-  watchTruth = watch.truthy([truthChange], () => ++truthChangeCount),
-  watchTruthAsSub = watch.truthy.asSubject([truthChange], () => {
+  watchTruth = watch.truthy([truthChange], callback(() => ++truthChangeCount)),
+  watchTruthAsSub = watch.truthy.asSubject([truthChange], callback((truthChange) => {
     ++truthSubChangeCount
-    return truthChange
-  }).pipe(
-    x => {
-      if(x === undefined) {
-        return 'undefined'
-      }      
-      
-      return truthSubChangeCount
-    }
-  ),
+    
+    return truthSubChangeCount
+
+  })),
 ) => html`<!-- watchTesting.tag.ts -->
   stateNum:<span id="watch-testing-num-display">${stateNum}</span>
   <button id="watch-testing-num-button" type="button"
@@ -70,7 +64,7 @@ export const watchTesting = tag.deepPropWatch(() => (
     </div>
     <div>
       <small>
-        (watchPropNumSubject:<span id="🍄‍🟫-watchPropNumSubject">${watchPropNumSubject}</span>)
+        (watchPropNumSubject:<span id="🍄‍🟫-watchPropNumSubject">${subscribe(watchPropNumSubject)}</span>)
       </small>
     </div>
   </fieldset>
@@ -99,7 +93,7 @@ export const watchTesting = tag.deepPropWatch(() => (
       <legend>truth subject</legend>      
       <div>
         <small>
-        watchTruthAsSub:<span id="🦷-watchTruthAsSub">${watchTruthAsSub}</span>
+        watchTruthAsSub:<span id="🦷-watchTruthAsSub">${subscribe(watchTruthAsSub)}</span>
         </small>
       </div>
       <div>

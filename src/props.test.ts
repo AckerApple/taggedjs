@@ -39,7 +39,7 @@ describe('🧳 props', () => {
 
   it('letProp', () => {
     // local and outside currently match
-    expectMatchedHtml('#propsDebug-🥩-0-display', '#propsDebug-🥩-2-display')
+    expectMatchedHtml('#propsDebug-🥩-0-display', '#propsDebug-🥩-let-prop-display')
     const propCounter = Number(html('#propsDebug-🥩-0-display'))
     
     const result = (query('#propsDebug-🥩-2-button')[0] as any)._click()
@@ -47,7 +47,9 @@ describe('🧳 props', () => {
 
     // outer should not have changed
     expect(html('#propsDebug-🥩-0-display')).toBe( propCounter.toString() )
-    expect(html('#propsDebug-🥩-2-display')).toBe( (propCounter + 1).toString() )      
+    expect(html('#propsDebug-🥩-let-prop-display')).toBe(
+      (propCounter + 1).toString(), '#propsDebug-🥩-let-prop-display'
+    )
 
     // end of test put all in sync
     byId('propsDebug-🥩-1-button').click()

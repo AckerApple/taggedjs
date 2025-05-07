@@ -117,5 +117,5 @@ function speedClickCountTest(
   console.timeEnd(`⌚️ outer ${counterQuery}`)
 
   const displayQueryTime = (Number(clickCount) + clickSpeedAmount).toString()
-  expect(htmlById(displayQuery)).toBe(displayQueryTime)
+  expect(htmlById(displayQuery)).toBe(displayQueryTime, displayQuery)
 }

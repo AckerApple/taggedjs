@@ -1,4 +1,4 @@
-import { html, tag, onInit, state, Subject, callbackMaker, onDestroy, states } from "taggedjs"
+import { html, tag, onInit, state, Subject, callbackMaker, onDestroy, states, subscribe } from "taggedjs"
 import { renderedSections } from "./renderedSections.tag"
 import { renderCountDiv } from "./renderCount.component"
 import { sectionSelector } from "./sectionSelector.tag"
@@ -71,9 +71,7 @@ export const homePage = () => tag.use = (
     fireTesting(false, onTestComplete)
 
     appCounterSubject.subscribe(
-      callbacks(y => {
-        appCounter = y
-      })
+      callbacks(x => appCounter = x)
     )
   })
 
@@ -108,24 +106,31 @@ export const homePage = () => tag.use = (
     <button onclick=${() => fireTesting(true, onTestComplete)}>run tests ${testEmoji}</button>
 
     <fieldset>
-        <legend>direct app tests</legend>        
-        <button id="app-counter-subject-button"
-          onclick=${() => appCounterSubject.next(appCounter + 1)}
-        >🍒 ++app subject</button>
-        <button id="app-counter-button" onclick=${() => ++appCounter}>🍒 ++app</button>
-        <span>
-          🍒 <span id="app-counter-display">${appCounter}</span>
-        </span>
-        <span>
-          🍒$&lt;<span id="app-counter-subject-display">${appCounterSubject}</span>&gt;
-        </span>
-        <span>
-          🍒$.value&lt;<span id="app-counter-subject-value-display">${appCounterSubject.value}</span>&gt;
-        </span>
-        <button id="toggle-test" onclick=${toggle}>toggle test ${toggleValue}</button>
-      </fieldset>  
+      <legend>direct app tests</legend>        
+      <button id="app-counter-subject-button"
+        onclick=${() => {
+          appCounterSubject.next(appCounter + 1)
+        }}
+      >🍒 ++app subject</button>
+      <button id="app-counter-button" onclick=${() => ++appCounter}>🍒 ++app</button>
+      <span>
+        🍒 <span id="app-counter-display">${appCounter}</span>
+      </span>
+      <span>
+        🍒$&lt;<span id="app-counter-subject-display">${subscribe(appCounterSubject)}</span>&gt;
+      </span>
+      <span>
+        🍒$.value&lt;<span id="app-counter-subject-value-display">${appCounterSubject.value}</span>&gt;
+      </span>
+      <button id="toggle-test" onclick=${toggle}>toggle test ${toggleValue}</button>
+    </fieldset>  
 
-    ${renderCountDiv({name:'app', renderCount})}
+    <div style="display:flex;flex-wrap:nowrap;gap:1em;justify-content: center;">
+      ${renderCountDiv({name:'app', renderCount})}
+      <div>
+        <small>(subscription count: ${subscribe(Subject.globalSubCount$)})</small>
+      </div>
+    </div>
 
     <a name="top" id="top"></a>
 

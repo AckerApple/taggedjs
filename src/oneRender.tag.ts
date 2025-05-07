@@ -1,4 +1,4 @@
-import { html, Subject, subject, tag, states, ValueSubjective, signal } from "taggedjs"
+import { html, Subject, subject, tag, states, ValueSubjective, signal, subscribe } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component.js"
 
 /** this tag renders only once */
@@ -11,9 +11,9 @@ export const oneRender = () => tag.renderOnce = (
   const x = Subject.all([0, 'all', 4])
   
   return html`
-    ${x.pipe(x => JSON.stringify(x))}
+    ${subscribe(x.pipe(x => JSON.stringify(x)))}
     <div>
-      <span>👍<span id="👍-counter-display">${counter}</span></span>
+      <span>👍<span id="👍-counter-display">${subscribe(counter)}</span></span>
       <button type="button" id="👍-counter-button"
         onclick=${() => ++counter.value}
       >++👍</button>
@@ -38,7 +38,7 @@ const insideMultiRender = tag(() => (
 ) => {
   ++renderCount
   return html`
-  <div>👍🔨 sub counter-subject-display:<span id="👍🔨-counter-subject-display">${counter$}</span></div>
+  <div>👍🔨 sub counter-subject-display:<span id="👍🔨-counter-subject-display">${subscribe(counter$)}</span></div>
   <div>👍📡 signal counter:<span id="📡-signal-counter-display">${counterSignal$}</span></div>
   <br />
   <span>👍🔨 sub counter<span id="👍🔨-counter-display">${counter}</span></span>

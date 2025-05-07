@@ -10,17 +10,18 @@ export async function runTests() {
   await import('./dumpContent.test')
   await import('./counters.test')
   await import('./props.test')
-  await import('./providers.test')
   await import('./tagSwitch.test')
-  await import('./child.test')
   await import('./array.test')  
   await import('./mirror.test')
-  await import('./watch.test')
   await import('./oneRender.test')
   await import('./funInProps.test')
   await import('./attributes.test')
-  await import('./todos.test')
   await import('./destroys.test')
+  
+  await import('./watch.test')
+  await import('./child.test')
+  await import('./providers.test')
+  await import('./todos.test')
 
   try {
     const start = Date.now() //performance.now()

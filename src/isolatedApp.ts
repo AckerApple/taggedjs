@@ -1,4 +1,4 @@
-import { Subject, callbackMaker, html, onInit, tag, state, states } from "taggedjs"
+import { Subject, callbackMaker, html, onInit, tag, state, states, subscribe } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
 import { activate, sectionSelector, viewChanged, ViewTypes } from "./sectionSelector.tag"
 import { renderedSections } from "./renderedSections.tag"
@@ -32,7 +32,9 @@ export default () => tag.use = (
     console.info('1️⃣ app init should only run once')    
     
     appCounterSubject.subscribe(
-      callback(x => appCounter = x) // a let variable is expected to maintain new value over render cycles forward
+      callback(x => {
+        appCounter = x
+      }) // a let variable is expected to maintain new value over render cycles forward
     )
   })
 
@@ -49,14 +51,18 @@ export default () => tag.use = (
       <fieldset>
         <legend>direct app tests</legend>        
         <button id="app-counter-subject-button"
-          onclick=${() => appCounterSubject.next(appCounter + 1)}
+          onclick=${() => {
+            appCounterSubject.next(appCounter + 1)
+          }}
         >🍒 ++app subject</button>
-        <button id="app-counter-button" onclick=${() => ++appCounter}>🍒 ++app</button>
+        <button id="app-counter-button" onclick=${() => {
+          ++appCounter
+        }}>🍒 ++app</button>
         <span>
           🍒 <span id="app-counter-display">${appCounter}</span>
         </span>
         <span>
-          🍒$&lt;<span id="app-counter-subject-display">${appCounterSubject}</span>&gt;
+          🍒$&lt;<span id="app-counter-subject-display">${subscribe(appCounterSubject)}</span>&gt;
         </span>
         <span>
           🍒$.value&lt;<span id="app-counter-subject-value-display">${appCounterSubject.value}</span>&gt;
@@ -67,7 +73,12 @@ export default () => tag.use = (
       ${autoTestingControls(viewTypes)}
     </div>
 
-    ${renderCountDiv({name:'app', renderCount})}
+    <div style="display:flex;flex-wrap:nowrap;gap:1em;justify-content: center;">
+      ${renderCountDiv({name:'app', renderCount})}
+      <div>
+        <small>(subscription count: ${subscribe(Subject.globalSubCount$)})</small>
+      </div>
+    </div>
 
     ${sectionSelector(viewTypes)}
 

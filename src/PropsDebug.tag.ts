@@ -176,11 +176,9 @@ const propsDebug = tag((
   </div>
 
   <div>
-    <button id="propsDebug-🥩-2-button" onclick=${() => {
-      ++propNumber
-    }}
+    <button id="propsDebug-🥩-2-button" onclick=${() => ++propNumber}
     >🐄 🥩 local letProp propNumber ${propNumber}</button>
-    <span id="propsDebug-🥩-2-display">${propNumber}</span>
+    <span id="propsDebug-🥩-let-prop-display">${propNumber}</span>
   </div>
 
   <button

@@ -1,6 +1,6 @@
 import { mouseOverTag } from "./mouseover.tag.js"
 import { renderCountDiv } from "./renderCount.component.js"
-import { states, html, tag, Subject, onInit, callbackMaker, state, ValueSubject, callback, subject, InputElementTargetEvent } from "taggedjs"
+import { states, html, tag, Subject, onInit, callbackMaker, state, ValueSubject, callback, subject, InputElementTargetEvent, subscribe } from "taggedjs"
 
 const loadStartTime = Date.now()
 
@@ -15,15 +15,19 @@ _ = 'countersDebug'
 
   return html`<!--counters-->
     <div style="display:flex;flex-wrap:wrap;gap:1em">
-      <div>👉 Subscriptionszzzzp:<span id="👉-counter-sub-count">${(Subject as any).globalSubCount$}</span></div>
-      <button onclick=${() => console.info('subs', (Subject as any).globalSubs)}>log subs</button>
+      <div>👉 Subscription count:<span id="👉-counter-sub-count">
+        ${ subscribe((Subject as any).globalSubCount$) }</span>
+      </div>
+      <button
+        onclick=${() => console.info('subs', (Subject as any).globalSubs)}
+      >log subs</button>
   
       <div>
         <button id="counters-app-counter-subject-button"
           onclick=${() => appCounterSubject.next((appCounterSubject.value || 0) + 1)}
         >🍒 ++app subject</button>
         <span>
-          🍒 <span id="app-counters-display">${appCounterSubject.value}</span>
+          🍒 <span id="app-counters-display">${subscribe(appCounterSubject)}</span>
         </span>
         <span>
           🍒 <span id="app-counters-subject-display">${appCounterSubject.value}</span>
@@ -157,7 +161,9 @@ const noWatchPropCounters = ({
 }) => {
   let otherCounter = 0
   let renderCount = 0
-  states(get => [{otherCounter, renderCount}] = get({otherCounter, renderCount}))
+  let noWatchPropCounters = 'noWatchPropCounters' // just a name to pickup
+
+  states(get => [{otherCounter, renderCount, noWatchPropCounters}] = get({otherCounter, renderCount, noWatchPropCounters}))
 
   ++renderCount // for debugging
 
@@ -225,10 +231,8 @@ export const innerCounterContent = () => tag.use = (
     pipedSubject0.next('333-' + counter)
   },
 
-  pipedSubject1 = Subject.all([pipedSubject0, callbackTestSub]).pipe(callback(x => {
-    return counter
-  })),
-  pipedSubject2 = subject.all([pipedSubject0, callbackTestSub]).pipe(x => counter),
+  pipedSubject1 = Subject.all([pipedSubject0, callbackTestSub]),
+  pipedSubject2 = subject.all([pipedSubject0, callbackTestSub]),
   memory = state(() => ({counter: 0})),
   // create an object that remains the same
   readStartTime = state(() => Date.now()),
@@ -308,7 +312,7 @@ export const innerCounterContent = () => tag.use = (
         onclick=${() => callbackTestSub.next(counter + 1)}
       >++subject&lt;&gt;</button>
       <span>
-        🥦&lt;<span id="subject-counter-subject-display">${callbackTestSub}</span>&gt;
+        🥦&lt;<span id="subject-counter-subject-display">${subscribe(callbackTestSub)}</span>&gt;
       </span>
     </div>
 
@@ -321,7 +325,7 @@ export const innerCounterContent = () => tag.use = (
         }}
       >🔀 🥦 ++subject&lt;&gt;</button>
       <span>
-        🔀 🥦&lt;<span id="subject-async-counter-subject-display">${callbackTestSub2}</span>&gt;
+        🔀 🥦&lt;<span id="subject-async-counter-subject-display">${subscribe(callbackTestSub2)}</span>&gt;
       </span>
     </div>
   </div>
@@ -330,7 +334,7 @@ export const innerCounterContent = () => tag.use = (
     <legend>🪈 pipedSubject 1</legend>
     <div>
       <small>
-        <span id="🪈-pipedSubject">${pipedSubject1}</span>
+        <span id="🪈-pipedSubject">${subscribe(pipedSubject1, () => counter)}</span>
       </small>
     </div>
   </fieldset>
@@ -339,7 +343,7 @@ export const innerCounterContent = () => tag.use = (
     <legend>🪈 pipedSubject 2</legend>
     <div>
       <small>
-        <span id="🪈-pipedSubject-2">${pipedSubject2}</span>
+        <span id="🪈-pipedSubject-2">${subscribe(pipedSubject2, () => counter)}</span>
       </small>
     </div>
   </fieldset>
