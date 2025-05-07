@@ -1,4 +1,4 @@
-import { AnySupport } from './getSupport.function.js'
+import { AnySupport } from './AnySupport.type.js'
 import { ContextItem } from './Context.types.js'
 import { processAttributeEmit } from '../interpolations/attributes/processAttribute.function.js'
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'

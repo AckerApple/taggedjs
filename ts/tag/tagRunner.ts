@@ -1,5 +1,5 @@
 import {SupportTagGlobal } from './getTemplaterResult.function.js'
-import { AnySupport } from './getSupport.function.js'
+import { AnySupport } from './AnySupport.type.js'
 
 // Life cycle 4 - end of life
 export function runBeforeDestroy(

@@ -2,7 +2,9 @@ import { SpecialDefinition } from '../interpolations/attributes/processAttribute
 import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 import { InterpolateSubject, TemplateValue } from './update/processFirstSubject.utils.js'
 import { Clone, TagGlobal } from './getTemplaterResult.function.js'
-import { AnySupport, SupportContextItem } from './getSupport.function.js'
+import { AnySupport } from './AnySupport.type.js'
+import { SupportContextItem } from './createHtmlSupport.function.js'
+
 
 export type ContextHandler = (
   value: TemplateValue,
@@ -11,7 +13,7 @@ export type ContextHandler = (
   contextItem: ContextItem,
 ) => void
 
-export type LastArrayItem = {context: ContextItem, global: TagGlobal}
+export type LastArrayItem = ContextItem // {context: ContextItem, global: TagGlobal}
 
 export type ContextItem = {
   element?: Element

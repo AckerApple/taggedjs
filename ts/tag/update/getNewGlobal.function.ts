@@ -1,4 +1,4 @@
-import { SupportContextItem } from '../getSupport.function.js'
+import { SupportContextItem } from '../createHtmlSupport.function.js'
 import { TagGlobal } from '../getTemplaterResult.function.js'
 import { ContextItem } from '../Context.types.js'
 

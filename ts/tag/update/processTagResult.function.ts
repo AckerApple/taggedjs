@@ -1,10 +1,9 @@
-import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
 import { buildBeforeElement } from '../buildBeforeElement.function.js'
 import { Counts } from'../../interpolations/interpolateTemplate.js'
 import { paintAppends } from '../paint.function.js'
 import { ContextItem } from '../Context.types.js'
 import { checkTagValueChange } from '../index.js'
-import { AnySupport } from '../getSupport.function.js'
+import { AnySupport } from '../AnySupport.type.js'
 
 export function processReplaceTagResult(
   support: AnySupport,
@@ -14,17 +13,12 @@ export function processReplaceTagResult(
   contextItem.checkValueChange = checkTagValueChange
   const ph = contextItem.placeholder as Text
 
-  const result = buildBeforeElement(
+  buildBeforeElement(
     support,
     counts,
     undefined, // element for append child
     ph, // placeholder
   )
-
-  const subs = result.subs
-  for(const sub of subs) {
-    subscribeToTemplate(sub)
-  }
 
   return support
 }
@@ -56,11 +50,6 @@ export function processFirstTagResult(
         relative: appendTo,
       })
     }
-  }
-
-  const subs = result.subs
-  for(const sub of subs) {
-    subscribeToTemplate(sub)
   }
 
   return support

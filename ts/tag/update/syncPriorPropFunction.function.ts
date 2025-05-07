@@ -1,4 +1,4 @@
-import { AnySupport } from '../getSupport.function.js'
+import { AnySupport } from '../AnySupport.type.js'
 import { isSkipPropValue, WrapRunner } from'../../alterProp.function.js'
 import { BasicTypes } from '../ValueTypes.enum.js'
 import { isArray } from '../../isInstance.js'

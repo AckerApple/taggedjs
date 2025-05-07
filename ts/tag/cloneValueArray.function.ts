@@ -19,6 +19,8 @@ export function cloneTagJsValue<T>(
   const tagJsType = (value as any)?.tagJsType as ValueType
   if(tagJsType) {
     switch( tagJsType ) {
+      case ValueTypes.signal:
+      case ValueTypes.subscribe:
       case ValueTypes.stateRender:
         return undefined as any
 

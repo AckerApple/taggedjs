@@ -1,5 +1,3 @@
-import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js'
-import { AnySupport } from '../getSupport.function.js'
 import { TemplaterResult } from '../getTemplaterResult.function.js'
 import { checkTagValueChange } from '../checkTagValueChange.function.js'
 import { buildBeforeElement } from '../buildBeforeElement.function.js'
@@ -7,6 +5,7 @@ import { paintAppends, paintInsertBefores } from '../paint.function.js'
 import { ContextItem } from '../Context.types.js'
 import { newSupportByTemplater } from './processTag.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
+import { AnySupport } from '../AnySupport.type.js'
 
 export function processNewSubjectTag(
   templater: TemplaterResult,
@@ -44,13 +43,6 @@ export function processNewSubjectTag(
     }
 
     if(dom.domElement) {
-      /*
-      paintAppends.push({
-        element: dom.domElement,
-        relative: appendTo as Element, // ph.parentNode as Element,
-      })
-      */
-
       if(appendTo) {
         paintAppends.push({
           element: dom.domElement,
@@ -63,14 +55,6 @@ export function processNewSubjectTag(
         })
       }
     }
-  }
-
-  let index = -1
-  const length = result.subs.length - 1
-  //++painting.locks
-  while(index++ < length) {
-    const sub = result.subs[index]
-    subscribeToTemplate(sub)
   }
 
   return support

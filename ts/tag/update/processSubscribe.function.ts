@@ -1,9 +1,9 @@
 import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { AnySupport } from '../getSupport.function.js'
 import { ContextItem } from '../Context.types.js'
 import { SubscribeValue } from '../../state/subscribe.function.js'
 import { setupSubscribe } from './setupSubscribe.function.js'
 import { SignalObject } from '../../subject/signal.function.js'
+import { AnySupport } from '../AnySupport.type.js'
 
 export function processSubscribe(
   value: SubscribeValue,
@@ -11,6 +11,7 @@ export function processSubscribe(
   ownerSupport: AnySupport,
   counts: Counts, // {added:0, removed:0}
   appendTo?: Element,
+  insertBefore?: Text,
 ) {
   return setupSubscribe(
     value.Observable,
@@ -19,6 +20,7 @@ export function processSubscribe(
     counts,
     value.callback,
     appendTo,
+    insertBefore,
   )
 }
 

@@ -1,6 +1,6 @@
-import { getChildTagsToSoftDestroy } from '../getChildTagsToDestroy.function.js'
+import { getChildTagsToSoftDestroy } from '../destroyContext.function.js'
 import { SupportTagGlobal } from '../getTemplaterResult.function.js'
-import { AnySupport } from '../getSupport.function.js'
+import { AnySupport } from '../AnySupport.type.js'
 import { getNewGlobal } from '../update/getNewGlobal.function.js'
 import { smartRemoveKids } from '../smartRemoveKids.function.js'
 import { ContextItem } from '../Context.types.js'

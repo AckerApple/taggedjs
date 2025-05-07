@@ -1,12 +1,13 @@
-import {SupportTagGlobal, Wrapper } from '../getTemplaterResult.function.js'
-import { AnySupport, SupportContextItem } from '../getSupport.function.js'
+import { Wrapper } from '../getTemplaterResult.function.js'
+import { SupportContextItem } from '../createHtmlSupport.function.js'
 import { executeWrap } from '../executeWrap.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { TagWrapper } from '../tag.utils.js'
 import { runAfterRender } from '../afterRender.function.js'
 import { initState, reState } from '../../state/state.utils.js'
 import { setUseMemory } from '../../state/setUseMemory.object.js'
-import { getSupport } from '../getSupport.function.js'
+import { createSupport } from '../createSupport.function.js'
+import { AnySupport } from '../AnySupport.type.js'
 
 export function renderTagOnly(
   newSupport: AnySupport,
@@ -23,7 +24,6 @@ export function renderTagOnly(
       prevSupport,
       setUseMemory.stateConfig,
       prevState,
-      prevSupport.states,
     )
   } else {
     initState(newSupport, config)
@@ -36,7 +36,7 @@ export function renderTagOnly(
   if(templater.tagJsType === ValueTypes.stateRender) {
     const result = templater as any as TagWrapper<any> // .wrapper as any// || {original: templater} as any
 
-    reSupport = getSupport(
+    reSupport = createSupport(
       templater,
       ownerSupport as AnySupport,
       newSupport.appSupport, // ownerSupport.appSupport as AnySupport,

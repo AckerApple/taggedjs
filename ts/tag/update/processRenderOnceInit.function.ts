@@ -2,12 +2,13 @@ import { checkTagValueChange } from '../checkTagValueChange.function.js'
 import { SupportTagGlobal, Wrapper } from '../getTemplaterResult.function.js'
 import { oneRenderToSupport } from './oneRenderToSupport.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { AnySupport, SupportContextItem } from '../getSupport.function.js'
+import { SupportContextItem } from '../createHtmlSupport.function.js'
 import { renderTagOnly } from '../render/renderTagOnly.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { ContextItem } from '../Context.types.js'
 import { processNewSubjectTag } from './processNewSubjectTag.function.js'
+import { AnySupport } from '../AnySupport.type.js'
 
 export function processRenderOnceInit(
   value: TemplateValue,

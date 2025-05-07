@@ -1,6 +1,6 @@
 import { StateMemory } from '../state/StateMemory.type.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
-import { AnySupport } from './getSupport.function.js'
+import { AnySupport } from './AnySupport.type.js'
 import { checkStateMismatch } from './checkStateMismatch.function.js'
 
 /** Compares states of previous renders

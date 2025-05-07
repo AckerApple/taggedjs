@@ -3,7 +3,7 @@ import { ContextItem, LastArrayItem } from '../Context.types.js'
 import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { paintRemoves } from '../paint.function.js'
 import { destroySupport } from '../destroySupport.function.js'
-import { SupportContextItem } from '../getSupport.function.js'
+import { SupportContextItem } from '../createHtmlSupport.function.js'
 import type { StringTag } from '../StringTag.type.js'
 
 export function compareArrayItems(
@@ -16,7 +16,7 @@ export function compareArrayItems(
   const newLength = value.length - 1
   const at = index - removed
   const lessLength = at < 0 || newLength < at
-  const prevContext = lastArray[index].context as SupportContextItem
+  const prevContext = lastArray[index] as SupportContextItem
 
   if(lessLength) {
     destroyArrayItem(prevContext, counts)

@@ -1,6 +1,6 @@
 import { Counts } from '../interpolations/interpolateTemplate.js'
 import { ContextItem } from '../tag/Context.types.js'
-import { AnySupport } from '../tag/getSupport.function.js'
+import { AnySupport } from '../tag/AnySupport.type.js'
 
 // import { StringTag } from '../tag/DomTag.type.js'
 // import { SubscribeValue } from '../state/subscribe.function.js'
@@ -14,4 +14,5 @@ export type ProcessInit = (
     ownerSupport: AnySupport,
     counts: Counts, // {added:0, removed:0}
     appendTo?: Element,      
+    insertBefore?: Text,      
 ) => any

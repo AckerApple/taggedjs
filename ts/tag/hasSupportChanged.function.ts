@@ -1,7 +1,7 @@
 import { isArray } from '../isInstance.js'
 import { Props } from '../Props.js'
 import { BaseSupport } from './BaseSupport.type.js'
-import { PropsConfig } from './getSupport.function.js'
+import { PropsConfig } from './createHtmlSupport.function.js'
 import { TemplaterResult } from './getTemplaterResult.function.js'
 import { hasPropChanges } from './hasPropChanges.function.js'
 import { BasicTypes } from './ValueTypes.enum.js'

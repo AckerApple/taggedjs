@@ -1,8 +1,9 @@
 import { attachDomElements } from '../interpolations/optimizers/attachDomElements.function.js'
 import { DomMetaMap } from '../interpolations/optimizers/LikeObjectElement.type.js'
 import { Counts } from '../interpolations/interpolateTemplate.js'
-import { AnySupport, SupportContextItem } from './getSupport.function.js'
-import {SupportTagGlobal } from './getTemplaterResult.function.js'
+import { AnySupport } from './AnySupport.type.js'
+import { SupportContextItem } from './createHtmlSupport.function.js'
+import { SupportTagGlobal } from './getTemplaterResult.function.js'
 import { ContextItem } from './Context.types.js'
 import { ParsedHtml } from '../interpolations/index.js'
 import { checkSimpleValueChange, deleteSimpleValue, destorySupportByContextItem } from './index.js'
@@ -31,8 +32,6 @@ export function buildBeforeElement(
     
   global.htmlDomMeta = result.dom
   --painting.locks
-
-  // ++global.renderCount
 
   // return fragment
   return result
@@ -92,7 +91,6 @@ export function addOneContext(
   }
 
   context.push(contextItem)
-
 
   return contextItem
 }

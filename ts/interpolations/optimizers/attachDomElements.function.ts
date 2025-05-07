@@ -1,20 +1,15 @@
 // taggedjs-no-compile
 
-import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
 import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode.types.js"
-import { TemplateValue } from "../../tag/update/processFirstSubject.utils.js"
 import { howToSetFirstInputValue } from "../attributes/howToSetInputValue.function.js"
 import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
-import { AnySupport } from "../../tag/getSupport.function.js"
+import { AnySupport } from "../../tag/AnySupport.type.js"
 import { processAttribute } from "../attributes/processAttribute.function.js"
-import { SubToTemplateOptions } from "../subscribeToTemplate.function.js"
 import { ContextItem } from "../../tag/Context.types.js"
-import { addOneContext, TagGlobal } from "../../tag/index.js"
 import { ObjectChildren } from "./LikeObjectElement.type.js"
-import { isSubjectInstance } from "../../isInstance.js"
 import { empty } from "../../tag/ValueTypes.enum.js"
 import { Counts } from "../interpolateTemplate.js"
-import { updateExistingValue } from "../../tag/update/updateExistingValue.function.js"
+import { attachDynamicDom } from "./attachDynamicDom.function.js"
 
 export const blankHandler = () => undefined
 const someDiv = (typeof document === 'object' && document.createElement('div')) as HTMLDivElement // used for content cleaning
@@ -28,10 +23,8 @@ export function attachDomElements(
   depth: number, // used to know if dynamic variables live within parent owner tag/support
   appendTo?: Element,
   insertBefore?: Text,
-  subs: SubToTemplateOptions[] = [],
 ): {
   context: ContextItem[]
-  subs: SubToTemplateOptions[]
   dom: DomObjectChildren // return of children created. Used to attach `ch` for children to a node
 } {
   const dom: DomObjectChildren = []
@@ -59,10 +52,8 @@ export function attachDomElements(
 
       attachDynamicDom(
         value,
-        index,
         context,
         support,
-        subs,
         counts,
         depth,
         appendTo,
@@ -101,12 +92,11 @@ export function attachDomElements(
         depth + 1,
         domElement,
         insertBefore,
-        subs,
       ).dom
     }
   }
 
-  return {subs, dom, context}
+  return {dom, context}
 }
 
 function attachDomElement(
@@ -180,65 +170,4 @@ function attachDomText(
       relative: insertBefore as Text,
     })
   }
-}
-
-function attachDynamicDom(
-  value: any,
-  index: number,
-  context: ContextItem[],
-  support: AnySupport,
-  subs:SubToTemplateOptions[],
-  counts: Counts, // used for animation stagger computing
-  depth: number, // used to indicate if variable lives within an owner's element
-  appendTo?: Element,
-  insertBefore?: Text
-) {  
-  const marker = document.createTextNode(empty)
-  const isWithinOwnerElement = depth > 0
-  const contextItem = addOneContext(
-    value,
-    context,
-    isWithinOwnerElement,
-  )
-
-  contextItem.placeholder = marker
-
-  if(appendTo) {
-    paintAppends.push({
-      relative: appendTo,
-      element: marker,
-    })
-  } else {
-    paintInsertBefores.push({
-      relative: insertBefore as Text,
-      element: marker,
-    })
-  }
-  
-  // how to handle value updates
-  contextItem.handler = (newValue, _newValues, newSupport, newContextItem) =>
-    updateExistingValue(
-      newContextItem,
-      newValue as TemplateValue,
-      newSupport,
-    )
-
-
-  const global = support.subject.global as TagGlobal
-  global.locked = true
-
-  processFirstSubjectValue(
-    value,
-    contextItem,
-    support,
-    counts,
-    appendTo,
-    insertBefore,
-  )
-
-  const global2 = support.subject.global as TagGlobal
-  delete global2.locked
-  contextItem.value = value
-
-  return
 }

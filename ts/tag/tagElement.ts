@@ -1,7 +1,6 @@
 import { DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { Events,SupportTagGlobal, TemplaterResult, Wrapper } from './getTemplaterResult.function.js'
-import { AnySupport, getBaseSupport,getSupport,SupportContextItem, upgradeBaseToSupport } from './getSupport.function.js'
-import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js'
+import { getBaseSupport, SupportContextItem, upgradeBaseToSupport } from './createHtmlSupport.function.js'
 import { buildBeforeElement } from './buildBeforeElement.function.js'
 import { tags, TagWrapper } from './tag.utils.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
@@ -19,6 +18,8 @@ import { TagMaker } from './TagMaker.type.js'
 import { BaseSupport } from './BaseSupport.type.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
 import { checkTagValueChange, destorySupportByContextItem } from './checkTagValueChange.function.js'
+import { createSupport } from './createSupport.function.js'
+import { AnySupport } from './AnySupport.type.js'
 
 export type TagAppElement = Element & {
   ValueTypes: typeof ValueTypes
@@ -138,12 +139,19 @@ export function tagElement(
   }
 }
 
-function registerTagElement(support: AnySupport, element: Element | HTMLElement, global: BaseTagGlobal, templater: TemplaterResult, app: TagMaker, placeholder: Text) {
+function registerTagElement(
+  support: AnySupport,
+  element: Element | HTMLElement,
+  global: BaseTagGlobal,
+  templater: TemplaterResult,
+  app: TagMaker,
+  placeholder: Text,
+) {
   const result = buildBeforeElement(
     support,
     { added: 0, removed: 0 },
     element,
-    undefined
+    undefined,
   )
 
   global.oldest = support
@@ -157,7 +165,7 @@ function registerTagElement(support: AnySupport, element: Element | HTMLElement,
     setUse = original.setUse as unknown as UseMemory; (original as any).isApp = true
   }
 
-  ; (element as TagAppElement).setUse = setUse; (element as TagAppElement).ValueTypes = ValueTypes
+  ;(element as TagAppElement).setUse = setUse; (element as TagAppElement).ValueTypes = ValueTypes
   appElements.push({ element, support })
 
   const newFragment = document.createDocumentFragment()
@@ -167,9 +175,6 @@ function registerTagElement(support: AnySupport, element: Element | HTMLElement,
     putOneDomDown(domItem, newFragment)
   }
 
-  for (const sub of result.subs) {
-    subscribeToTemplate(sub)
-  }
   return newFragment
 }
 
@@ -228,7 +233,7 @@ export function runWrapper(
   const oldest = global.oldest
   const isFirstRender = global.newest === oldest
 
-  const newSupport = getSupport(
+  const newSupport = createSupport(
     templater,
     global.newest,
     global.newest.appSupport, // ownerSupport.appSupport as AnySupport,
@@ -242,7 +247,6 @@ export function runWrapper(
       global.newest, // global.oldest, // global.newest,
       setUseMemory.stateConfig,
       oldest.state,
-      oldest.states,
     )
   }
 

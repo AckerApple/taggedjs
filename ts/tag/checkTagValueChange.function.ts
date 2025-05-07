@@ -1,11 +1,12 @@
-import {AnySupport, SupportContextItem } from './getSupport.function.js'
+import { AnySupport } from './AnySupport.type.js'
+import { SupportContextItem } from './createHtmlSupport.function.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { destroySupport } from './destroySupport.function.js'
 import {SupportTagGlobal, TemplaterResult } from './getTemplaterResult.function.js'
 import { isStaticTag } from'../isInstance.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { ContextItem } from './Context.types.js'
-import { tryUpdateToTag } from './update/updateExistingValue.function.js'
+import { tryUpdateToTag } from './update/tryUpdateToTag.function.js'
 import { paint, paintAfters } from './paint.function.js'
 
 export function checkTagValueChange(

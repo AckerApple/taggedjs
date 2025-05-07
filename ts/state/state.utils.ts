@@ -1,7 +1,7 @@
-import { AnySupport } from '../tag/getSupport.function.js'
+import { AnySupport } from '../tag/AnySupport.type.js'
 import { runFirstState, runRestate } from './stateHandlers.js'
 import { State, StateConfig } from './state.types.js'
-import { firstStatesHandler, reStatesHandler, StatesSetter } from './states.utils.js'
+import { firstStatesHandler, reStatesHandler } from './states.utils.js'
 import { StateMemory } from './StateMemory.type.js'
 
 export function initState(
@@ -23,23 +23,17 @@ export function reState(
   prevSupport: AnySupport,
   config: StateMemory,
   prevState: State,
-  prevStates: StatesSetter[],
 ) {
   // set previous state memory
   config.rearray = prevState
 
   config.stateArray = []
   config.states = []
-  //config.states = prevStates
-  //config.states = [...prevStates]
-  // newSupport.states = [...prevStates]
-  // support.states = config.states
   config.statesIndex = 0
   
   config.handlers.handler = runRestate
   config.handlers.statesHandler = reStatesHandler
   
-  // config.support = support
   config.prevSupport = prevSupport
 }
 

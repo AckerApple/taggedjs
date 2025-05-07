@@ -1,7 +1,4 @@
-import { Counts } from '../interpolations/interpolateTemplate.js'
 import { state } from '../state/index.js'
-import { ContextItem } from '../tag/Context.types.js'
-import { AnySupport } from '../tag/getSupport.function.js'
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
 import { processSignal } from '../tag/update/processSubscribe.function.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'

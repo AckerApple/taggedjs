@@ -2,7 +2,7 @@
 
 import { HowToSet } from './howToSetInputValue.function.js'
 import { BasicTypes } from '../../tag/ValueTypes.enum.js'
-import { AnySupport } from '../../tag/getSupport.function.js'
+import { AnySupport } from '../../tag/AnySupport.type.js'
 import { paintContent } from '../../tag/paint.function.js'
 import { ContextItem } from '../../tag/Context.types.js'
 import { Counts } from '../interpolateTemplate.js'

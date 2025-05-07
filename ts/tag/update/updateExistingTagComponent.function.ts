@@ -1,5 +1,5 @@
 import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from'../hasSupportChanged.function.js'
-import { AnySupport, PropsConfig,SupportContextItem } from '../getSupport.function.js'
+import { PropsConfig, SupportContextItem } from '../createHtmlSupport.function.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { castProps, WrapRunner } from'../../alterProp.function.js'
@@ -12,6 +12,7 @@ import { PropWatches } from '../tag.function.js'
 import { Props } from '../../Props.js'
 import { BaseSupport } from '../BaseSupport.type.js'
 import { syncPriorPropFunction } from './syncPriorPropFunction.function.js'
+import { AnySupport } from '../AnySupport.type.js'
 
 export function updateExistingTagComponent(
   ownerSupport: AnySupport,

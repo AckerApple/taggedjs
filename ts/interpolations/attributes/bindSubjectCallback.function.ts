@@ -1,15 +1,14 @@
 // taggedjs-no-compile
 /** File largely responsible for reacting to element events, such as onclick */
 
-import { isPromise, isTagComponent } from '../../isInstance.js'
+import { isPromise } from '../../isInstance.js'
 import { renderSupport } from '../../tag/render/renderSupport.function.js'
-import { AnySupport } from '../../tag/getSupport.function.js'
+import { AnySupport } from '../../tag/AnySupport.type.js'
 import { SupportTagGlobal, TagGlobal } from '../../tag/getTemplaterResult.function.js'
 import { getUpTags } from './getUpTags.function.js'
 import { renderTagUpdateArray } from './renderTagArray.function.js'
 import { StatesSetter } from '../../state/states.utils.js'
 import { getSupportWithState } from './getSupportWithState.function.js'
-import { syncStatesArray } from '../../state/syncStates.function.js'
 
 const noData = 'no-data-ever'
 const promiseNoData = 'promise-no-data-ever'

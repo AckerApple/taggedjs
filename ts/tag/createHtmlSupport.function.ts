@@ -4,13 +4,7 @@ import { Subject } from '../subject/Subject.class.js'
 import { ContextItem } from './Context.types.js'
 import { Props } from '../Props.js'
 import { BaseSupport } from './BaseSupport.type.js'
-import { State } from '../state/index.js'
-import { StatesSetter } from '../state/states.utils.js'
-
-export type AnySupport = (BaseSupport & {
-  state: State
-  states: StatesSetter[]
-})
+import { AnySupport } from './AnySupport.type.js'
 
 export type PropsConfig = {
   latest: Props // new props NOT cloned props
@@ -83,7 +77,7 @@ export function upgradeBaseToSupport(
   return support as AnySupport
 }
 
-export function getHtmlSupport(
+export function createHtmlSupport(
   templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
   ownerSupport: AnySupport,
   appSupport: AnySupport,
@@ -101,22 +95,4 @@ export function getHtmlSupport(
   support.ownerSupport = ownerSupport
   support.appSupport = appSupport
   return support as AnySupport
-}
-
-export function getSupport(
-  templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
-  ownerSupport: AnySupport,
-  appSupport: AnySupport,
-  subject: ContextItem,
-  castedProps?: Props,
-): AnySupport {
-  const support = getBaseSupport(
-    templater,
-    subject as SupportContextItem,
-    castedProps
-  ) as AnySupport
-
-  support.ownerSupport = ownerSupport
-
-  return upgradeBaseToSupport(templater, support, appSupport, castedProps)
 }

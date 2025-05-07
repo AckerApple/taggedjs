@@ -1,5 +1,5 @@
 import { paintAfters, paintContent } from "../../tag/paint.function.js"
-import { AnySupport } from "../../tag/getSupport.function.js";
+import { AnySupport } from "../../tag/AnySupport.type.js";
 import { Counts } from "../interpolateTemplate.js";
 import { InputElementTargetEvent } from "./ElementTargetEvent.interface.js";
 import { SpecialDefinition } from "./processAttribute.function.js";

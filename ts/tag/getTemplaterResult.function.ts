@@ -1,8 +1,7 @@
 import { EventCallback } from './getDomTag.function.js'
-import { StringTag } from './StringTag.type.js'
-import { DomTag } from './DomTag.type.js'
 import { ContextItem } from './Context.types.js'
-import { AnySupport, SupportContextItem } from './getSupport.function.js'
+import { AnySupport } from './AnySupport.type.js'
+import { SupportContextItem } from './createHtmlSupport.function.js'
 import { Props } from '../Props.js'
 import { TagWrapper } from './tag.utils.js'
 import { Provider } from '../state/providers.js'
@@ -14,6 +13,7 @@ import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types
 import { PropWatches } from './tag.function.js'
 import { ProcessInit } from '../subject/ProcessInit.type.js'
 import { processTagInit } from './update/processTagInit.function.js'
+import { Tag } from './Tag.type.js'
 
 export type Wrapper = ((
   newSupport: AnySupport,
@@ -71,7 +71,7 @@ export type TemplaterResult = {
 
   propWatch: PropWatches
   wrapper?: Wrapper
-  tag?: StringTag | DomTag
+  tag?: Tag // StringTag | DomTag
   props?: Props
 
   /** Used inside of an array.map() function */

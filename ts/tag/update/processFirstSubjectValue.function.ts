@@ -2,7 +2,6 @@ import { checkArrayValueChange, checkSimpleValueChange } from '../checkDestroyPr
 import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function.js'
 import { TemplaterResult } from '../getTemplaterResult.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { AnySupport, SupportContextItem } from '../getSupport.function.js'
 import { RegularValue } from './processRegularValue.function.js'
 import { isArray } from '../../isInstance.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
@@ -10,6 +9,7 @@ import { ValueType } from '../ValueTypes.enum.js'
 import { processTagArray } from './processTagArray.js'
 import type { StringTag } from '../StringTag.type.js'
 import { ContextItem } from '../Context.types.js'
+import { AnySupport } from '../AnySupport.type.js'
 
 export function processFirstSubjectValue(
   value: TemplateValue | StringTag,
@@ -22,8 +22,6 @@ export function processFirstSubjectValue(
   const tagJsType = (value as TemplaterResult)?.tagJsType as ValueType
   
   if(tagJsType) {
-    ++(contextItem as SupportContextItem).renderCount
-
     return (value as any).processInit(
       value,
       contextItem,

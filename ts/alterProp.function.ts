@@ -1,6 +1,6 @@
 import { isInlineHtml, renderInlineHtml } from './tag/render/renderSupport.function.js'
 import { renderExistingReadyTag } from './tag/render/renderExistingTag.function.js'
-import { AnySupport } from './tag/getSupport.function.js'
+import { AnySupport } from './tag/AnySupport.type.js'
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
 import { deepCompareDepth } from './tag/hasSupportChanged.function.js'
 import {SupportTagGlobal, TemplaterResult } from './tag/getTemplaterResult.function.js'
@@ -48,6 +48,7 @@ export function checkProp(
   ownerSupport: AnySupport,
   newSupport: AnySupport,
   depth: number,
+  owner?: any,
 ) {
   if(!value) {
     return value
@@ -58,7 +59,7 @@ export function checkProp(
   }
 
   if(typeof(value) === BasicTypes.function) {
-    return getPropWrap(value, ownerSupport)
+    return getPropWrap(value, owner, ownerSupport)
   }
 
   if(depth === deepCompareDepth) {
@@ -87,7 +88,11 @@ function checkArrayProp(
     const subValue = value[index] as WrapRunner
 
     value[index] = checkProp(
-      subValue, ownerSupport, newSupport, depth + 1,
+      subValue,
+      ownerSupport,
+      newSupport,
+      depth + 1,
+      value
     )
 
     if(typeof(subValue) === BasicTypes.function) {
@@ -116,7 +121,11 @@ function checkObjectProp(
   for(const name of keys){
     const subValue = value[name] as WrapRunner
     const result = checkProp(
-      subValue, ownerSupport, newSupport, depth + 1,
+      subValue,
+      ownerSupport,
+      newSupport,
+      depth + 1,
+      value,
     )
 
     const newSubValue = value[name] as unknown
@@ -173,6 +182,7 @@ export type WrapRunner = (() => unknown) & {
 
 export function getPropWrap(
   value: {mem?: unknown},
+  owner: any,
   ownerSupport: AnySupport,
 ) {
   const already = value.mem
@@ -191,7 +201,7 @@ export function getPropWrap(
 
   // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
   wrap.toCall = function toCallRunner(...args: unknown[]) {
-    return callbackPropOwner(wrap.mem, args, ownerSupport)
+    return callbackPropOwner(wrap.mem, owner, args, ownerSupport)
   }
 
   // copy data properties that maybe on source function
@@ -203,6 +213,7 @@ export function getPropWrap(
 /** Function shared by alterProps() and updateExistingTagComponent... TODO: May want to have to functions to reduce cycle checking?  */
 export function callbackPropOwner(
   toCall: UnknownFunction,
+  owner: any,
   callWith: unknown[],
   ownerSupport: AnySupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
 ) {
@@ -210,18 +221,25 @@ export function callbackPropOwner(
   const newest = global?.newest || ownerSupport as AnySupport
   const supportInCycle = getSupportInCycle()
   const noCycle = supportInCycle === undefined
-  const callbackResult = toCall(...callWith)
+  
+  // actual function call to original method
+  const callbackResult = toCall.apply(owner, callWith)
 
   const run = function propCallbackProcessor() {
     const global = newest.subject.global as SupportTagGlobal
 
     // are we in a rendering cycle? then its being called by alterProps
+    /*
     if(noCycle === false) {
       const allMatched = global.locked === true
     
       if(allMatched) {
         return callbackResult // owner did not change
       }
+    }*/
+    
+    if(!global || global.locked === true) {
+      return callbackResult // currently in the middle of rendering
     }
 
     safeRenderSupport(newest, ownerSupport)

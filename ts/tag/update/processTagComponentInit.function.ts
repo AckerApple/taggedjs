@@ -1,10 +1,11 @@
 import { checkTagValueChange } from '../checkTagValueChange.function.js'
 import { processFirstSubjectComponent, processReplacementComponent } from './processFirstSubjectComponent.function.js'
-import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
+import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { AnySupport, SupportContextItem } from '../getSupport.function.js'
+import { SupportContextItem } from '../createHtmlSupport.function.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { ContextItem } from '../Context.types.js'
+import { AnySupport } from '../AnySupport.type.js'
 
 export function processTagComponentInit(
   value: any,

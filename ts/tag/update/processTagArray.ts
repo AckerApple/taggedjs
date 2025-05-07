@@ -1,17 +1,14 @@
 // taggedjs-no-compile
 
-import { paintAppends, paintInsertBefores } from '../paint.function.js'
-import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
-import { TagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { checkSimpleValueChange, deleteSimpleValue } from '../checkDestroyPrevious.function.js'
+import { TemplaterResult } from '../getTemplaterResult.function.js'
 import { updateExistingValue } from './updateExistingValue.function.js'
-import { AnySupport } from '../getSupport.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { processNewArrayValue } from './processNewValue.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { ContextItem, LastArrayItem } from '../Context.types.js'
 import { StringTag } from '../StringTag.type.js'
 import { compareArrayItems } from './compareArrayItems.function.js'
+import { AnySupport } from '../AnySupport.type.js'
+import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
 
 export function processTagArray(
   subject: ContextItem,
@@ -92,19 +89,23 @@ function reviewArrayItem(
 
   if(previous) {
     return reviewPreviousArrayItem(
-      item, previous.context, lastArray, ownerSupport, index,
+      item, previous, lastArray, ownerSupport, index,
       runtimeInsertBefore, counts, appendTo,
     )
   }
 
-  return processAddTagArrayItem(
-    item,
-    runtimeInsertBefore as Text, // thisInsert as any,
+  const contextItem = createAndProcessContextItem(
+    item as TemplateValue,
     ownerSupport,
     counts,
-    lastArray,
+    runtimeInsertBefore as Text,
     appendTo,
   )
+
+  // Added to previous array
+  lastArray.push(contextItem)
+
+  return contextItem
 }
 
 function reviewPreviousArrayItem(
@@ -123,69 +124,16 @@ function reviewPreviousArrayItem(
     return itemSubject
   }
 
-  const result = processAddTagArrayItem(
-    value,
-    runtimeInsertBefore as Text, // thisInsert as any,
-    ownerSupport,
-    counts,
-    lastArray,
-    appendTo,
-  )
-
-  return result
-}
-
-function processAddTagArrayItem(
-  value: unknown,
-  before: Text, // used during updates
-  ownerSupport: AnySupport,
-  counts: Counts,
-  lastArray: LastArrayItem[],
-  appendTo?: Element, // used during initial entire array rendering
-): ContextItem {
-  const itemSubject: ContextItem = {
-    value,
-    checkValueChange: checkSimpleValueChange,
-    delete: deleteSimpleValue,
-    withinOwnerElement: false,
-  }
-
-  counts.added = counts.added + 1 // index
-  const subPlaceholder = document.createTextNode('')
-  itemSubject.placeholder = subPlaceholder
-
-  if( !appendTo ) {
-    paintInsertBefores.push({
-      element: subPlaceholder,
-      relative: before,
-    })
-  }
-
-  processNewArrayValue(value as TemplateValue, ownerSupport, itemSubject)
-
-  processFirstSubjectValue(
+  const contextItem = createAndProcessContextItem(
     value as TemplateValue,
-    itemSubject,
     ownerSupport,
     counts,
+    runtimeInsertBefore as Text,
     appendTo,
   )
-  
-  // after processing
-  itemSubject.value = value
 
   // Added to previous array
-  lastArray.push({
-    context: itemSubject,
-    global: itemSubject.global as TagGlobal,
-  })
+  lastArray.push(contextItem)
 
-  if( appendTo ) {
-    paintAppends.push({
-      element: subPlaceholder,
-      relative: appendTo,
-    })
-  }
-
-  return itemSubject
+  return contextItem
 }

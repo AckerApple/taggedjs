@@ -1,4 +1,4 @@
-import { AnySupport } from '../tag/getSupport.function.js'
+import { AnySupport } from '../tag/AnySupport.type.js'
 import { Subject, ValueSubject } from '../subject/index.js'
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
 import { setUseMemory } from './setUseMemory.object.js'

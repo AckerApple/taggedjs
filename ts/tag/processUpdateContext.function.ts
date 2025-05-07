@@ -1,6 +1,6 @@
 import { StringTag } from './StringTag.type.js'
 import type { DomTag } from './DomTag.type.js'
-import { AnySupport } from './getSupport.function.js'
+import { AnySupport } from './AnySupport.type.js'
 import { ContextItem, ContextHandler } from './Context.types.js'
 
 export function processUpdateContext(

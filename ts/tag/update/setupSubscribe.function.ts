@@ -1,16 +1,17 @@
 import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { AnySupport } from '../getSupport.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { ContextItem } from '../Context.types.js'
 import { LikeObservable, SubscribeCallback, SubscribeValue } from '../../state/subscribe.function.js'
-import { paint } from '../paint.function.js'
+import { paint, paintAppends } from '../paint.function.js'
 import { setUseMemory } from '../../state/setUseMemory.object.js'
 import { Subscription } from '../../state/subscribe.function.js'
-import { processFirstSubjectValue } from './processFirstSubjectValue.function.js'
 import { syncSupports } from '../../state/syncStates.function.js'
-import { forceUpdateExistingValue } from './updateExistingValue.function.js'
+import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js'
 import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js'
 import { StatesSetter } from '../../state/states.utils.js'
+import { ValueTypes } from '../ValueTypes.enum.js'
+import { AnySupport } from '../AnySupport.type.js'
+import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
 
 export function setupSubscribe(
   observable: LikeObservable<any>,
@@ -18,19 +19,40 @@ export function setupSubscribe(
   ownerSupport: AnySupport,
   counts: Counts,
   callback?: SubscribeCallback<any>,
-  appendTo?: Element | undefined,
+  appendTo?: Element,
+  insertBefore?: Text,
 ) {
+  let appendMarker: Text | undefined
+
+  // do we need to append now but process subscription later?
+  if(appendTo) {
+    appendMarker = insertBefore = document.createTextNode('')
+
+    paintAppends.push({
+      element: insertBefore,
+      relative: appendTo,
+    })
+
+    // appendTo = undefined
+  }
+
   const setup = setupSubscribeCallbackProcessor(
     observable,
     contextItem,
     ownerSupport,
     counts,
     callback,
-    appendTo
+    insertBefore,
   )
 
-  contextItem.delete = () => {
+  const deleteMe = contextItem.delete = () => {
+    setup.contextItem.delete(setup.contextItem)
     setup.subscription.unsubscribe()
+
+    if(appendMarker) {
+      const parentNode = appendMarker.parentNode as ParentNode
+      parentNode.removeChild(appendMarker)
+    }
   }
 
   contextItem.handler = (
@@ -38,6 +60,11 @@ export function setupSubscribe(
     values: unknown[],
     newSupport: AnySupport
   ) => {
+    if(!value || !(value as any).tagJsType || (value as any).tagJsType !== ValueTypes.subscribe) {
+      deleteMe()
+      return 99
+    }
+
     if (!setup.hasEmitted) {
       return
     }
@@ -53,12 +80,12 @@ export function setupSubscribe(
 export function setupSubscribeCallbackProcessor(
   observable: LikeObservable<any>,
   contextItem: ContextItem,
-  support: AnySupport, // ownerSupport ?
+  ownerSupport: AnySupport, // ownerSupport ?
   counts: Counts, // used for animation stagger computing
   callback?: SubscribeCallback<any>,
-  appendTo?: Element,
-) {
-  const component = getSupportWithState(support)
+  insertBefore?: Text,
+): SubscribeMemory {
+  const component = getSupportWithState(ownerSupport)
   let lastValue: TemplateValue = undefined
   const getLastValue = () => lastValue
 
@@ -69,27 +96,20 @@ export function setupSubscribeCallbackProcessor(
 
     memory.hasEmitted = true
 
-    processFirstSubjectValue(
-      value,
-      contextItem,
-      support,
-      {...counts},
-      syncRun ? appendTo : undefined,
+    memory.contextItem = createAndProcessContextItem(
+      value as TemplateValue,
+      ownerSupport,
+      counts,
+      insertBefore,
     )
-
-    if(!syncRun && !setUseMemory.stateConfig.support) {
-      paint()
-    }
 
     // from now on just run update
     onValue = function subscriptionUpdate(value: TemplateValue) {  
-      // processSubUpdate(value, contextItem, support)
-      forceUpdateExistingValue(contextItem, value, support)
+      forceUpdateExistingValue(memory.contextItem, value, ownerSupport)
 
       if(!syncRun && !setUseMemory.stateConfig.support) {
         paint()
       }
-      //paint()
     }
   }
   
@@ -105,7 +125,7 @@ export function setupSubscribeCallbackProcessor(
     }
 
     onValue(value)
-  } // as unknown as (ValueSubjectSubscriber<Callback> & ValueSubjectSubscriber<unknown>)
+  }
 
   // aka setup
   const memory = {
@@ -113,21 +133,24 @@ export function setupSubscribeCallbackProcessor(
     handler: valueChangeHandler,
     getLastValue,
     callback,
-    // states: [...component.states],
     states: component.states,
-  } as {
-    hasEmitted: boolean
-    states: StatesSetter[]
-    handler: typeof valueChangeHandler
-    getLastValue: typeof getLastValue
-    callback: typeof callback
-    subscription: Subscription
-  }
+  } as SubscribeMemory
 
   let syncRun = true
   memory.subscription = observable.subscribe( valueChangeHandler )
-  // contextItem.subject = value.Observable as any
   syncRun = false
 
   return memory
+}
+
+type SubscribeMemory = {
+  hasEmitted: boolean
+  states: StatesSetter[]
+  handler: (value: TemplateValue) => void
+  getLastValue: () => any
+  callback?: SubscribeCallback<any>
+  subscription: Subscription
+  
+  // context: ContextItem[]
+  contextItem: ContextItem
 }

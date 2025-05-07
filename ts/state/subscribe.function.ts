@@ -1,6 +1,6 @@
 import { getSupportWithState } from "../interpolations/attributes/getSupportWithState.function.js"
 import { ProcessInit } from "../subject/ProcessInit.type.js"
-import { AnySupport } from "../tag/getSupport.function.js"
+import { AnySupport } from "../tag/AnySupport.type.js"
 import { getSupportInCycle } from "../tag/getSupportInCycle.function.js"
 import { ValueTypes } from "../tag/index.js"
 import { processSubscribe } from "../tag/update/processSubscribe.function.js"
