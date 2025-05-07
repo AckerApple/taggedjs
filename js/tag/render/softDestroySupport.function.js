@@ -1,4 +1,4 @@
-import { getChildTagsToSoftDestroy } from '../getChildTagsToDestroy.function.js';
+import { getChildTagsToSoftDestroy } from '../destroyContext.function.js';
 import { getNewGlobal } from '../update/getNewGlobal.function.js';
 import { smartRemoveKids } from '../smartRemoveKids.function.js';
 /** used when a tag swaps content returned */

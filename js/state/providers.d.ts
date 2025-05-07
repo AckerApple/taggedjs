@@ -1,4 +1,4 @@
-import { AnySupport } from '../tag/getSupport.function.js';
+import { AnySupport } from '../tag/AnySupport.type.js';
 export type Provider = {
     constructMethod: any;
     instance: any;

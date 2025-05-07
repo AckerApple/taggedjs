@@ -8,7 +8,6 @@ counts, // {added:0, removed:0}
 appendTo, insertBefore) {
     const tagJsType = value?.tagJsType;
     if (tagJsType) {
-        ++contextItem.renderCount;
         return value.processInit(value, contextItem, ownerSupport, counts, appendTo, insertBefore);
     }
     if (isArray(value)) {

@@ -1,5 +1,5 @@
 import { SubjectLike } from './subject/subject.utils.js';
-import { AnySupport } from './tag/getSupport.function.js';
+import { AnySupport } from './tag/AnySupport.type.js';
 import { StringTag } from './tag/StringTag.type.js';
 import { TemplaterResult } from './tag/getTemplaterResult.function.js';
 export declare function isSimpleType(value: any): boolean;

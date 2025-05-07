@@ -14,7 +14,6 @@ export function buildBeforeElement(support, counts, appendTo, insertBefore) {
     const result = attachHtmlDomMeta(support, counts, appendTo, insertBefore);
     global.htmlDomMeta = result.dom;
     --painting.locks;
-    // ++global.renderCount
     // return fragment
     return result;
 }

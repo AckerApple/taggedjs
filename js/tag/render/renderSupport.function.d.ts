@@ -1,4 +1,4 @@
-import { AnySupport } from '../getSupport.function.js';
+import { AnySupport } from '../AnySupport.type.js';
 import { Props } from '../../Props.js';
 import { TemplaterResult } from '../getTemplaterResult.function.js';
 export declare function isInlineHtml(templater: TemplaterResult): boolean;

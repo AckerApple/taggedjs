@@ -3,7 +3,8 @@ import { checkTagValueChange } from '../checkTagValueChange.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { PropWatches } from '../tag.function.js';
-import { getSupport } from '../getSupport.function.js';
+import { createSupport } from '../createSupport.function.js';
+/** Detect type and process */
 export function processNewArrayValue(value, ownerSupport, contextItem) {
     const tagJsType = value.tagJsType;
     if (tagJsType) {
@@ -32,7 +33,7 @@ function processNewTag(value, ownerSupport, contextItem) {
         tag.templater = templater;
     }
     const global = contextItem.global = getNewGlobal(contextItem); // contextItem.global as SupportTagGlobal
-    const newest = global.newest = getSupport(templater, ownerSupport, ownerSupport.appSupport, contextItem);
+    const newest = global.newest = createSupport(templater, ownerSupport, ownerSupport.appSupport, contextItem);
     global.oldest = newest;
     return contextItem;
 }

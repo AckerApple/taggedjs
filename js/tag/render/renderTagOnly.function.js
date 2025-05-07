@@ -3,13 +3,13 @@ import { ValueTypes } from '../ValueTypes.enum.js';
 import { runAfterRender } from '../afterRender.function.js';
 import { initState, reState } from '../../state/state.utils.js';
 import { setUseMemory } from '../../state/setUseMemory.object.js';
-import { getSupport } from '../getSupport.function.js';
+import { createSupport } from '../createSupport.function.js';
 export function renderTagOnly(newSupport, prevSupport, // causes restate
 subject, ownerSupport) {
     const prevState = prevSupport?.state;
     const config = setUseMemory.stateConfig;
     if (prevState) {
-        reState(newSupport, prevSupport, setUseMemory.stateConfig, prevState, prevSupport.states);
+        reState(newSupport, prevSupport, setUseMemory.stateConfig, prevState);
     }
     else {
         initState(newSupport, config);
@@ -19,7 +19,7 @@ subject, ownerSupport) {
     // NEW TAG CREATED HERE
     if (templater.tagJsType === ValueTypes.stateRender) {
         const result = templater; // .wrapper as any// || {original: templater} as any
-        reSupport = getSupport(templater, ownerSupport, newSupport.appSupport, // ownerSupport.appSupport as AnySupport,
+        reSupport = createSupport(templater, ownerSupport, newSupport.appSupport, // ownerSupport.appSupport as AnySupport,
         subject);
         executeWrap(templater, result, reSupport);
     }

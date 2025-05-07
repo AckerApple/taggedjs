@@ -4,7 +4,7 @@ export function compareArrayItems(value, index, lastArray, removed, counts) {
     const newLength = value.length - 1;
     const at = index - removed;
     const lessLength = at < 0 || newLength < at;
-    const prevContext = lastArray[index].context;
+    const prevContext = lastArray[index];
     if (lessLength) {
         destroyArrayItem(prevContext, counts);
         return 1;

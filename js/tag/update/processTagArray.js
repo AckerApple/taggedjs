@@ -1,10 +1,7 @@
 // taggedjs-no-compile
-import { paintAppends, paintInsertBefores } from '../paint.function.js';
-import { processFirstSubjectValue } from './processFirstSubjectValue.function.js';
-import { checkSimpleValueChange, deleteSimpleValue } from '../checkDestroyPrevious.function.js';
 import { updateExistingValue } from './updateExistingValue.function.js';
-import { processNewArrayValue } from './processNewValue.function.js';
 import { compareArrayItems } from './compareArrayItems.function.js';
+import { createAndProcessContextItem } from './createAndProcessContextItem.function.js';
 export function processTagArray(subject, value, // arry of Tag classes
 ownerSupport, counts, appendTo) {
     const noLast = subject.lastArray === undefined;
@@ -47,10 +44,12 @@ counts, appendTo) {
     const item = array[index];
     const previous = lastArray[index];
     if (previous) {
-        return reviewPreviousArrayItem(item, previous.context, lastArray, ownerSupport, index, runtimeInsertBefore, counts, appendTo);
+        return reviewPreviousArrayItem(item, previous, lastArray, ownerSupport, index, runtimeInsertBefore, counts, appendTo);
     }
-    return processAddTagArrayItem(item, runtimeInsertBefore, // thisInsert as any,
-    ownerSupport, counts, lastArray, appendTo);
+    const contextItem = createAndProcessContextItem(item, ownerSupport, counts, runtimeInsertBefore, appendTo);
+    // Added to previous array
+    lastArray.push(contextItem);
+    return contextItem;
 }
 function reviewPreviousArrayItem(value, itemSubject, lastArray, ownerSupport, index, runtimeInsertBefore, // used during updates
 counts, appendTo) {
@@ -59,42 +58,9 @@ counts, appendTo) {
         updateExistingValue(itemSubject, value, ownerSupport);
         return itemSubject;
     }
-    const result = processAddTagArrayItem(value, runtimeInsertBefore, // thisInsert as any,
-    ownerSupport, counts, lastArray, appendTo);
-    return result;
-}
-function processAddTagArrayItem(value, before, // used during updates
-ownerSupport, counts, lastArray, appendTo) {
-    const itemSubject = {
-        value,
-        checkValueChange: checkSimpleValueChange,
-        delete: deleteSimpleValue,
-        withinOwnerElement: false,
-    };
-    counts.added = counts.added + 1; // index
-    const subPlaceholder = document.createTextNode('');
-    itemSubject.placeholder = subPlaceholder;
-    if (!appendTo) {
-        paintInsertBefores.push({
-            element: subPlaceholder,
-            relative: before,
-        });
-    }
-    processNewArrayValue(value, ownerSupport, itemSubject);
-    processFirstSubjectValue(value, itemSubject, ownerSupport, counts, appendTo);
-    // after processing
-    itemSubject.value = value;
+    const contextItem = createAndProcessContextItem(value, ownerSupport, counts, runtimeInsertBefore, appendTo);
     // Added to previous array
-    lastArray.push({
-        context: itemSubject,
-        global: itemSubject.global,
-    });
-    if (appendTo) {
-        paintAppends.push({
-            element: subPlaceholder,
-            relative: appendTo,
-        });
-    }
-    return itemSubject;
+    lastArray.push(contextItem);
+    return contextItem;
 }
 //# sourceMappingURL=processTagArray.js.map

@@ -10,6 +10,8 @@ export function cloneTagJsValue(value, maxDepth) {
     const tagJsType = value?.tagJsType;
     if (tagJsType) {
         switch (tagJsType) {
+            case ValueTypes.signal:
+            case ValueTypes.subscribe:
             case ValueTypes.stateRender:
                 return undefined;
             case ValueTypes.dom:

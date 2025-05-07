@@ -1,4 +1,4 @@
-import { AnySupport } from './getSupport.function.js';
+import { AnySupport } from './AnySupport.type.js';
 import { ContextItem } from './Context.types.js';
 export declare function processUpdateContext(support: AnySupport, context: ContextItem[]): ContextItem[];
 /** returns boolean of did render */

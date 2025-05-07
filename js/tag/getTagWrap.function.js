@@ -3,7 +3,7 @@ import { syncFunctionProps } from './update/updateExistingTagComponent.function.
 import { executeWrap } from './executeWrap.function.js';
 import { PropWatches } from './tag.function.js';
 import { deepCompareDepth, shallowCompareDepth } from './hasSupportChanged.function.js';
-import { getSupport } from './getSupport.function.js';
+import { createSupport } from './createSupport.function.js';
 /** creates/returns a function that when called then calls the original component function
  * Gets used as templater.wrapper()
  */
@@ -14,7 +14,7 @@ export function getTagWrap(templater, result) {
         // wrap any prop functions that are passed in
         const castedProps = getCastedProps(templater, newSupport, lastSupport);
         const ownerSupport = newSupport.ownerSupport;
-        const useSupport = getSupport(templater, ownerSupport, newSupport.appSupport, // ownerSupport.appSupport as AnySupport,
+        const useSupport = createSupport(templater, ownerSupport, newSupport.appSupport, // ownerSupport.appSupport as AnySupport,
         subject, castedProps);
         return executeWrap(templater, result, useSupport, castedProps);
     };

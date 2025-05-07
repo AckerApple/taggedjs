@@ -1,1 +1,1 @@
-export declare function getSupportInCycle(): import("./getSupport.function.js").AnySupport | undefined;
+export declare function getSupportInCycle(): import("./AnySupport.type.js").AnySupport | undefined;

@@ -1,5 +1,4 @@
-import { getBaseSupport, getSupport, upgradeBaseToSupport } from './getSupport.function.js';
-import { subscribeToTemplate } from '../interpolations/subscribeToTemplate.function.js';
+import { getBaseSupport, upgradeBaseToSupport } from './createHtmlSupport.function.js';
 import { buildBeforeElement } from './buildBeforeElement.function.js';
 import { tags } from './tag.utils.js';
 import { getNewGlobal } from './update/getNewGlobal.function.js';
@@ -13,6 +12,7 @@ import { initState, reState } from '../state/state.utils.js';
 import { isTagComponent } from '../isInstance.js';
 import { setUseMemory } from '../state/setUseMemory.object.js';
 import { checkTagValueChange, destorySupportByContextItem } from './checkTagValueChange.function.js';
+import { createSupport } from './createSupport.function.js';
 const appElements = [];
 /**
  *
@@ -115,9 +115,6 @@ function registerTagElement(support, element, global, templater, app, placeholde
     for (const domItem of result.dom) {
         putOneDomDown(domItem, newFragment);
     }
-    for (const sub of result.subs) {
-        subscribeToTemplate(sub);
-    }
     return newFragment;
 }
 function getNewSubject(templater, appElement) {
@@ -148,11 +145,11 @@ export function runWrapper(templater, placeholder, appElement, subject, isAppFun
     const global = subject.global;
     const oldest = global.oldest;
     const isFirstRender = global.newest === oldest;
-    const newSupport = getSupport(templater, global.newest, global.newest.appSupport, // ownerSupport.appSupport as AnySupport,
+    const newSupport = createSupport(templater, global.newest, global.newest.appSupport, // ownerSupport.appSupport as AnySupport,
     subject);
     if (!isFirstRender) {
         reState(newSupport, global.newest, // global.oldest, // global.newest,
-        setUseMemory.stateConfig, oldest.state, oldest.states);
+        setUseMemory.stateConfig, oldest.state);
     }
     if (templater.tagJsType === ValueTypes.stateRender) {
         return executeStateWrap(templater, isAppFunction, newSupport, subject, appElement);

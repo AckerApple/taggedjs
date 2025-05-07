@@ -1,4 +1,3 @@
-import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js';
 import { checkTagValueChange } from '../checkTagValueChange.function.js';
 import { buildBeforeElement } from '../buildBeforeElement.function.js';
 import { paintAppends, paintInsertBefores } from '../paint.function.js';
@@ -26,12 +25,6 @@ counts, appendTo, insertBefore) {
             }
         }
         if (dom.domElement) {
-            /*
-            paintAppends.push({
-              element: dom.domElement,
-              relative: appendTo as Element, // ph.parentNode as Element,
-            })
-            */
             if (appendTo) {
                 paintAppends.push({
                     element: dom.domElement,
@@ -45,13 +38,6 @@ counts, appendTo, insertBefore) {
                 });
             }
         }
-    }
-    let index = -1;
-    const length = result.subs.length - 1;
-    //++painting.locks
-    while (index++ < length) {
-        const sub = result.subs[index];
-        subscribeToTemplate(sub);
     }
     return support;
 }

@@ -1,16 +1,14 @@
 // taggedjs-no-compile
-import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js";
 import { howToSetFirstInputValue } from "../attributes/howToSetInputValue.function.js";
 import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js";
 import { processAttribute } from "../attributes/processAttribute.function.js";
-import { addOneContext } from "../../tag/index.js";
 import { empty } from "../../tag/ValueTypes.enum.js";
-import { updateExistingValue } from "../../tag/update/updateExistingValue.function.js";
+import { attachDynamicDom } from "./attachDynamicDom.function.js";
 export const blankHandler = () => undefined;
 const someDiv = (typeof document === 'object' && document.createElement('div')); // used for content cleaning
 export function attachDomElements(nodes, values, support, counts, // used for animation stagger computing
 context, depth, // used to know if dynamic variables live within parent owner tag/support
-appendTo, insertBefore, subs = []) {
+appendTo, insertBefore) {
     const dom = [];
     if (appendTo && insertBefore === undefined) {
         insertBefore = document.createTextNode(empty);
@@ -27,7 +25,7 @@ appendTo, insertBefore, subs = []) {
         if (isNum) {
             const index = context.length;
             const value = values[index];
-            attachDynamicDom(value, index, context, support, subs, counts, depth, appendTo, insertBefore);
+            attachDynamicDom(value, context, support, counts, depth, appendTo, insertBefore);
             continue;
         }
         const newNode = {}; // DomObjectText
@@ -39,10 +37,10 @@ appendTo, insertBefore, subs = []) {
         // one single html element
         const domElement = attachDomElement(newNode, node, values, support, context, counts, appendTo, insertBefore);
         if (node.ch) {
-            newNode.ch = attachDomElements(node.ch, values, support, counts, context, depth + 1, domElement, insertBefore, subs).dom;
+            newNode.ch = attachDomElements(node.ch, values, support, counts, context, depth + 1, domElement, insertBefore).dom;
         }
     }
-    return { subs, dom, context };
+    return { dom, context };
 }
 function attachDomElement(newNode, node, values, support, context, counts, appendTo, insertBefore) {
     const domElement = newNode.domElement = document.createElement(node.nn);
@@ -88,34 +86,5 @@ function attachDomText(newNode, node, owner, insertBefore) {
             relative: insertBefore,
         });
     }
-}
-function attachDynamicDom(value, index, context, support, subs, counts, // used for animation stagger computing
-depth, // used to indicate if variable lives within an owner's element
-appendTo, insertBefore) {
-    const marker = document.createTextNode(empty);
-    const isWithinOwnerElement = depth > 0;
-    const contextItem = addOneContext(value, context, isWithinOwnerElement);
-    contextItem.placeholder = marker;
-    if (appendTo) {
-        paintAppends.push({
-            relative: appendTo,
-            element: marker,
-        });
-    }
-    else {
-        paintInsertBefores.push({
-            relative: insertBefore,
-            element: marker,
-        });
-    }
-    // how to handle value updates
-    contextItem.handler = (newValue, _newValues, newSupport, newContextItem) => updateExistingValue(newContextItem, newValue, newSupport);
-    const global = support.subject.global;
-    global.locked = true;
-    processFirstSubjectValue(value, contextItem, support, counts, appendTo, insertBefore);
-    const global2 = support.subject.global;
-    delete global2.locked;
-    contextItem.value = value;
-    return;
 }
 //# sourceMappingURL=attachDomElements.function.js.map

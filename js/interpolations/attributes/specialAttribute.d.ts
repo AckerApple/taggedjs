@@ -1,4 +1,4 @@
-import { AnySupport } from "../../tag/getSupport.function.js";
+import { AnySupport } from "../../tag/AnySupport.type.js";
 import { Counts } from "../interpolateTemplate.js";
 import { SpecialDefinition } from "./processAttribute.function.js";
 /** handles init, destroy, autofocus, autoselect, style., class. */

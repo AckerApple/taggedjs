@@ -1,10 +1,11 @@
 import { TemplaterResult } from './getTemplaterResult.function.js';
-import { AnySupport, SupportContextItem } from './getSupport.function.js';
+import { SupportContextItem } from './createHtmlSupport.function.js';
 import { TagWrapper } from './tag.utils.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 import { TagMaker } from './TagMaker.type.js';
 import { BaseSupport } from './BaseSupport.type.js';
 import { setUseMemory } from '../state/setUseMemory.object.js';
+import { AnySupport } from './AnySupport.type.js';
 export type TagAppElement = Element & {
     ValueTypes: typeof ValueTypes;
     setUse: typeof setUseMemory;

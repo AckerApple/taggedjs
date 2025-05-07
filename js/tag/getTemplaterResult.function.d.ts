@@ -1,8 +1,7 @@
 import { EventCallback } from './getDomTag.function.js';
-import { StringTag } from './StringTag.type.js';
-import { DomTag } from './DomTag.type.js';
 import { ContextItem } from './Context.types.js';
-import { AnySupport, SupportContextItem } from './getSupport.function.js';
+import { AnySupport } from './AnySupport.type.js';
+import { SupportContextItem } from './createHtmlSupport.function.js';
 import { Props } from '../Props.js';
 import { TagWrapper } from './tag.utils.js';
 import { Provider } from '../state/providers.js';
@@ -13,6 +12,7 @@ import { ValueTypes } from './ValueTypes.enum.js';
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
 import { PropWatches } from './tag.function.js';
 import { ProcessInit } from '../subject/ProcessInit.type.js';
+import { Tag } from './Tag.type.js';
 export type Wrapper = ((newSupport: AnySupport, subject: ContextItem, prevSupport?: AnySupport) => AnySupport) & TagWrapper<unknown> & {
     tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater;
     processInit: ProcessInit;
@@ -48,7 +48,7 @@ export type TemplaterResult = {
     processInit: ProcessInit;
     propWatch: PropWatches;
     wrapper?: Wrapper;
-    tag?: StringTag | DomTag;
+    tag?: Tag;
     props?: Props;
     /** Used inside of an array.map() function */
     key: <T>(arrayValue: T) => TemplaterResultArrayItem<T>;

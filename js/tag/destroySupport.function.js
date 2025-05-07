@@ -1,4 +1,4 @@
-import { getChildTagsToDestroy } from './getChildTagsToDestroy.function.js';
+import { destroyContext } from './destroyContext.function.js';
 import { smartRemoveKids } from './smartRemoveKids.function.js';
 import { runBeforeDestroy } from './tagRunner.js';
 export function destroySupport(support, global) {
@@ -7,7 +7,7 @@ export function destroySupport(support, global) {
     subject.renderCount = 0; // if it comes back, wont be considered an update
     const promises = [];
     const context = global.context;
-    getChildTagsToDestroy(context);
+    destroyContext(context);
     if (global.destroy$) {
         runBeforeDestroy(support, global);
     }

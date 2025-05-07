@@ -18,7 +18,7 @@ export function alterProp(prop, ownerSupport, newSupport, depth) {
     }
     return checkProp(prop, ownerSupport, newSupport, depth);
 }
-export function checkProp(value, ownerSupport, newSupport, depth) {
+export function checkProp(value, ownerSupport, newSupport, depth, owner) {
     if (!value) {
         return value;
     }
@@ -26,7 +26,7 @@ export function checkProp(value, ownerSupport, newSupport, depth) {
         return value;
     }
     if (typeof (value) === BasicTypes.function) {
-        return getPropWrap(value, ownerSupport);
+        return getPropWrap(value, owner, ownerSupport);
     }
     if (depth === deepCompareDepth) {
         return value;
@@ -43,7 +43,7 @@ export function checkProp(value, ownerSupport, newSupport, depth) {
 function checkArrayProp(value, newSupport, ownerSupport, depth) {
     for (let index = value.length - 1; index >= 0; --index) {
         const subValue = value[index];
-        value[index] = checkProp(subValue, ownerSupport, newSupport, depth + 1);
+        value[index] = checkProp(subValue, ownerSupport, newSupport, depth + 1, value);
         if (typeof (subValue) === BasicTypes.function) {
             if (subValue.mem) {
                 continue;
@@ -57,7 +57,7 @@ function checkObjectProp(value, newSupport, ownerSupport, depth) {
     const keys = Object.keys(value);
     for (const name of keys) {
         const subValue = value[name];
-        const result = checkProp(subValue, ownerSupport, newSupport, depth + 1);
+        const result = checkProp(subValue, ownerSupport, newSupport, depth + 1, value);
         const newSubValue = value[name];
         if (newSubValue === result) {
             continue;
@@ -86,7 +86,7 @@ function afterCheckProp(depth, index, originalValue, newProp, newSupport) {
         });
     }
 }
-export function getPropWrap(value, ownerSupport) {
+export function getPropWrap(value, owner, ownerSupport) {
     const already = value.mem;
     // already previously converted by a parent?
     if (already) {
@@ -99,27 +99,33 @@ export function getPropWrap(value, ownerSupport) {
     wrap.mem = value;
     // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
     wrap.toCall = function toCallRunner(...args) {
-        return callbackPropOwner(wrap.mem, args, ownerSupport);
+        return callbackPropOwner(wrap.mem, owner, args, ownerSupport);
     };
     // copy data properties that maybe on source function
     Object.assign(wrap, value);
     return wrap;
 }
 /** Function shared by alterProps() and updateExistingTagComponent... TODO: May want to have to functions to reduce cycle checking?  */
-export function callbackPropOwner(toCall, callWith, ownerSupport) {
+export function callbackPropOwner(toCall, owner, callWith, ownerSupport) {
     const global = ownerSupport.subject.global;
     const newest = global?.newest || ownerSupport;
     const supportInCycle = getSupportInCycle();
     const noCycle = supportInCycle === undefined;
-    const callbackResult = toCall(...callWith);
+    // actual function call to original method
+    const callbackResult = toCall.apply(owner, callWith);
     const run = function propCallbackProcessor() {
         const global = newest.subject.global;
         // are we in a rendering cycle? then its being called by alterProps
-        if (noCycle === false) {
-            const allMatched = global.locked === true;
-            if (allMatched) {
-                return callbackResult; // owner did not change
-            }
+        /*
+        if(noCycle === false) {
+          const allMatched = global.locked === true
+        
+          if(allMatched) {
+            return callbackResult // owner did not change
+          }
+        }*/
+        if (!global || global.locked === true) {
+            return callbackResult; // currently in the middle of rendering
         }
         safeRenderSupport(newest, ownerSupport);
         return callbackResult;

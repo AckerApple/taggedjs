@@ -2,7 +2,7 @@ import { getNewGlobal } from './update/getNewGlobal.function.js';
 import { destroySupport } from './destroySupport.function.js';
 import { isStaticTag } from '../isInstance.js';
 import { isLikeTags } from './isLikeTags.function.js';
-import { tryUpdateToTag } from './update/updateExistingValue.function.js';
+import { tryUpdateToTag } from './update/tryUpdateToTag.function.js';
 import { paint, paintAfters } from './paint.function.js';
 export function checkTagValueChange(newValue, contextItem) {
     const global = contextItem.global;

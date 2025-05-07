@@ -1,5 +1,5 @@
 /** File largely responsible for reacting to element events, such as onclick */
-import { AnySupport } from '../../tag/getSupport.function.js';
+import { AnySupport } from '../../tag/AnySupport.type.js';
 import { TagGlobal } from '../../tag/getTemplaterResult.function.js';
 import { StatesSetter } from '../../state/states.utils.js';
 export type Callback = (...args: any[]) => any;

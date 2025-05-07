@@ -1,5 +1,4 @@
-import { subscribeToTemplate } from '../../interpolations/subscribeToTemplate.function.js';
-import { getHtmlSupport } from '../getSupport.function.js';
+import { createHtmlSupport } from '../createHtmlSupport.function.js';
 import { checkTagValueChange } from '../checkTagValueChange.function.js';
 import { buildBeforeElement } from '../buildBeforeElement.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
@@ -16,10 +15,7 @@ counts) {
     support.ownerSupport = ownerSupport;
     subject.checkValueChange = checkTagValueChange;
     const ph = subject.placeholder;
-    const result = buildBeforeElement(support, counts, undefined, ph);
-    for (const sub of result.subs) {
-        subscribeToTemplate(sub);
-    }
+    buildBeforeElement(support, counts, undefined, ph);
     return support;
 }
 export function tagFakeTemplater(tag) {
@@ -37,7 +33,7 @@ export function getFakeTemplater() {
 }
 /** Create support for a tag component */
 export function newSupportByTemplater(templater, ownerSupport, subject) {
-    const support = getHtmlSupport(templater, ownerSupport, ownerSupport.appSupport, subject);
+    const support = createHtmlSupport(templater, ownerSupport, ownerSupport.appSupport, subject);
     const global = subject.global;
     global.context = [];
     return support;

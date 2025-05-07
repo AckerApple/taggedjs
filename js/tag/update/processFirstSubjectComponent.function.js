@@ -2,11 +2,11 @@ import { processFirstTagResult, processReplaceTagResult } from './processTagResu
 import { renderWithSupport } from '../render/renderWithSupport.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 import { getCastedProps } from '../getTagWrap.function.js';
-import { getSupport } from '../getSupport.function.js';
+import { createSupport } from '../createSupport.function.js';
 export function processReplacementComponent(templater, subject, ownerSupport, counts) {
     // TODO: This below check not needed in production mode
     // validateTemplater(templater)
-    const newSupport = getSupport(templater, ownerSupport, ownerSupport.appSupport, subject);
+    const newSupport = createSupport(templater, ownerSupport, ownerSupport.appSupport, subject);
     const newPropsConfig = newSupport.propsConfig;
     if (newPropsConfig) {
         const castedProps = templater.tagJsType !== ValueTypes.tagComponent ? [] : getCastedProps(templater, newSupport);
@@ -21,7 +21,7 @@ export function processReplacementComponent(templater, subject, ownerSupport, co
 export function processFirstSubjectComponent(templater, subject, ownerSupport, counts, appendTo) {
     // TODO: This below check not needed in production mode
     // validateTemplater(templater)
-    const newSupport = getSupport(templater, ownerSupport, ownerSupport.appSupport, subject);
+    const newSupport = createSupport(templater, ownerSupport, ownerSupport.appSupport, subject);
     const newPropsConfig = newSupport.propsConfig;
     if (newPropsConfig) {
         const castedProps = templater.tagJsType !== ValueTypes.tagComponent ? [] : getCastedProps(templater, newSupport);

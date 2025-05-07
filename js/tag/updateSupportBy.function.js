@@ -10,8 +10,9 @@ export function updateSupportBy(olderSupport, newerSupport) {
     paint();
 }
 export function updateSupportValuesBy(olderSupport, newerSupport) {
-    const tempTag = (newerSupport.templater.tag || newerSupport.templater);
-    const values = newerSupport.templater.values || tempTag.values;
+    const newTemplate = newerSupport.templater;
+    const tempTag = newerSupport.templater.tag;
+    const values = newTemplate.values || tempTag.values;
     const tag = olderSupport.templater.tag;
     tag.values = values;
 }

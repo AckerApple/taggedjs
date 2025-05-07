@@ -1,2 +1,2 @@
-import { AnySupport } from '../tag/getSupport.function.js';
+import { AnySupport } from '../tag/AnySupport.type.js';
 export declare function providersChangeCheck(support: AnySupport): AnySupport[];
