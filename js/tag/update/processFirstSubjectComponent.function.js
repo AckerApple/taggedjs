@@ -1,5 +1,5 @@
 import { processFirstTagResult, processReplaceTagResult } from './processTagResult.function.js';
-import { renderWithSupport } from '../render/renderWithSupport.function.js';
+import { renderWithSupport } from '../../render/renderWithSupport.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 import { getCastedProps } from '../getTagWrap.function.js';
 import { createSupport } from '../createSupport.function.js';

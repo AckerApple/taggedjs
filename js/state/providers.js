@@ -1,9 +1,12 @@
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
 import { setUseMemory } from './setUseMemory.object.js';
 import { state } from './state.function.js';
+function getBlankDiffMemory() {
+    return { stateDiff: 0, provider: undefined };
+}
 export const providers = {
     create: (constructMethod) => {
-        const stateDiffMemory = state(() => ({ stateDiff: 0, provider: undefined }));
+        const stateDiffMemory = state(getBlankDiffMemory);
         // mimic how many states were called the first time
         if (stateDiffMemory.stateDiff) {
             let x = stateDiffMemory.stateDiff;
@@ -44,44 +47,45 @@ export const providers = {
      * @param {(new (...args: any[]) => T) | () => T} constructor
      * @returns {T}
      */
-    inject: (constructor) => {
-        // find once, return same every time after
-        return state(() => {
-            // const memory = setUse.memory
-            const cm = constructor;
-            const compareTo = cm.compareTo = cm.compareTo || constructor.toString();
-            const support = getSupportInCycle(); // memory.stateConfig.support as AnySupport
-            const providers = [];
-            let owner = {
-                ownerSupport: support.ownerSupport
-            };
-            while (owner.ownerSupport) {
-                const ownGlobal = owner.ownerSupport.subject.global;
-                const ownerProviders = ownGlobal.providers;
-                if (!ownerProviders) {
-                    owner = owner.ownerSupport; // cause reloop checking next parent
-                    continue;
-                }
-                const provider = ownerProviders.find(provider => {
-                    providers.push(provider);
-                    const constructorMatch = provider.constructMethod.compareTo === compareTo;
-                    if (constructorMatch) {
-                        return true;
-                    }
-                });
-                if (provider) {
-                    const global = support.subject.global;
-                    const providers = global.providers = global.providers || [];
-                    providers.push(provider);
-                    provider.children.push(support);
-                    return provider.instance;
-                }
-                owner = owner.ownerSupport; // cause reloop checking next parent
-            }
-            const msg = `Could not inject provider: ${constructor.name} ${constructor}`;
-            console.warn(`${msg}. Available providers`, providers);
-            throw new Error(msg);
-        });
-    }
+    inject: providerInject
 };
+function providerInject(constructor) {
+    // find once, return same every time after
+    return state(function providerInjectState() {
+        // const memory = setUse.memory
+        const cm = constructor;
+        const compareTo = cm.compareTo = cm.compareTo || constructor.toString();
+        const support = getSupportInCycle(); // memory.stateConfig.support as AnySupport
+        const providers = [];
+        let owner = {
+            ownerSupport: support.ownerSupport
+        };
+        while (owner.ownerSupport) {
+            const ownGlobal = owner.ownerSupport.subject.global;
+            const ownerProviders = ownGlobal.providers;
+            if (!ownerProviders) {
+                owner = owner.ownerSupport; // cause reloop checking next parent
+                continue;
+            }
+            const provider = ownerProviders.find(provider => {
+                providers.push(provider);
+                const constructorMatch = provider.constructMethod.compareTo === compareTo;
+                if (constructorMatch) {
+                    return true;
+                }
+            });
+            if (provider) {
+                const global = support.subject.global;
+                const providers = global.providers = global.providers || [];
+                providers.push(provider);
+                provider.children.push(support);
+                return provider.instance;
+            }
+            owner = owner.ownerSupport; // cause reloop checking next parent
+        }
+        const msg = `Could not inject provider: ${constructor.name} ${constructor}`;
+        console.warn(`${msg}. Available providers`, providers);
+        throw new Error(msg);
+    });
+}
 //# sourceMappingURL=providers.js.map

@@ -1,10 +1,10 @@
 // taggedjs-no-compile
 import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js";
-import { updateExistingValue } from "../../tag/update/updateExistingValue.function.js";
-export function domProcessContextItem(value, contextItem, support, counts, // used for animation stagger computing
+import { tagValueUpdateHandler } from "../../tag/update/tagValueUpdateHandler.function.js";
+export function domProcessContextItem(value, support, contextItem, counts, // used for animation stagger computing
 appendTo, insertBefore) {
     // how to handle value updates
-    contextItem.handler = updateExistingValue;
+    contextItem.handler = tagValueUpdateHandler;
     const global = support.subject.global;
     global.locked = true;
     processFirstSubjectValue(value, contextItem, support, counts, appendTo, insertBefore);

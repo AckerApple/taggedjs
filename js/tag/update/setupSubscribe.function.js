@@ -1,46 +1,44 @@
-import { paint, paintAppends } from '../paint.function.js';
+import { paint, paintAppend, paintAppends, paintCommands, paintRemover } from '../../render/paint.function.js';
 import { setUseMemory } from '../../state/setUseMemory.object.js';
 import { syncSupports } from '../../state/syncStates.function.js';
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js';
 import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js';
-import { ValueTypes } from '../ValueTypes.enum.js';
+import { empty, ValueTypes } from '../ValueTypes.enum.js';
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js';
+import { tagValueUpdateHandler } from './tagValueUpdateHandler.function.js';
+import { updateToDiffValue } from './updateToDiffValue.function.js';
 export function setupSubscribe(observable, contextItem, ownerSupport, counts, callback, appendTo, insertBefore) {
     let appendMarker;
     // do we need to append now but process subscription later?
     if (appendTo) {
-        appendMarker = insertBefore = document.createTextNode('');
+        appendMarker = insertBefore = document.createTextNode(empty);
         paintAppends.push({
-            element: insertBefore,
-            relative: appendTo,
+            processor: paintAppend,
+            args: [appendTo, insertBefore]
         });
     }
-    const subscription = setupSubscribeCallbackProcessor(observable, contextItem, ownerSupport, counts, callback, insertBefore);
-    contextItem.delete = () => {
-        console.log('🗑️ delete subscribe');
-        subscription.contextItem.delete(subscription.contextItem);
-        subscription.subscription.unsubscribe();
-        if (appendMarker) {
-            const parentNode = appendMarker.parentNode;
-            parentNode.removeChild(appendMarker);
-        }
-    };
-    contextItem.handler = (value, newSupport, contextItem) => {
-        checkSubscribeFrom(value, newSupport, contextItem, subscription);
-    };
+    const subscription = setupSubscribeCallbackProcessor(observable, ownerSupport, counts, callback, insertBefore);
+    subscription.appendMarker = appendMarker;
+    contextItem.subscription = subscription;
+    contextItem.delete = deleteSubscribe;
+    contextItem.handler = checkSubscribeFrom;
+    return subscription;
 }
-export function setupSubscribeCallbackProcessor(observable, contextItem, ownerSupport, // ownerSupport ?
+export function setupSubscribeCallbackProcessor(observable, ownerSupport, // ownerSupport ?
 counts, // used for animation stagger computing
 callback, insertBefore) {
     const component = getSupportWithState(ownerSupport);
-    let lastValue = undefined;
-    const getLastValue = () => lastValue;
     let onValue = function onSubValue(value) {
-        memory.hasEmitted = true;
-        memory.contextItem = createAndProcessContextItem(value, ownerSupport, counts, undefined, insertBefore);
+        subscription.hasEmitted = true;
+        subscription.contextItem = createAndProcessContextItem(value, ownerSupport, counts, insertBefore);
+        /*
+            if(!syncRun && !setUseMemory.stateConfig.support) {
+              paint()
+            }
+        */
         // from now on just run update
         onValue = function subscriptionUpdate(value) {
-            forceUpdateExistingValue(memory.contextItem, value, ownerSupport);
+            forceUpdateExistingValue(subscription.contextItem, value, ownerSupport);
             if (!syncRun && !setUseMemory.stateConfig.support) {
                 paint();
             }
@@ -48,40 +46,64 @@ callback, insertBefore) {
     };
     // onValue mutates so function below calls original and mutation
     const valueChangeHandler = function subValueProcessor(value) {
-        lastValue = value;
+        subscription.lastValue = value;
         const newComponent = component.subject.global.newest;
         syncSupports(newComponent, component);
-        if (memory.callback) {
-            value = memory.callback(value);
+        if (subscription.callback) {
+            value = subscription.callback(value);
         }
         onValue(value);
     };
+    let syncRun = true;
     // aka setup
-    const memory = {
+    const subscription = {
         hasEmitted: false,
         handler: valueChangeHandler,
-        getLastValue,
         callback,
         states: component.states,
+        lastValue: undefined,
+        subscription: undefined, // must be populated AFTER "subscription" variable defined incase called on subscribe
     };
-    contextItem.subscription = memory;
-    let syncRun = true;
-    memory.subscription = observable.subscribe(valueChangeHandler);
+    subscription.subscription = observable.subscribe(valueChangeHandler);
     syncRun = false;
-    return memory;
+    return subscription;
 }
-function checkSubscribeFrom(value, newSupport, contextItem, subscription) {
-    if (!value || !value.tagJsType || value.tagJsType !== ValueTypes.subscribe) {
-        contextItem.delete(contextItem);
+function checkSubscribeFrom(newValue, ownerSupport, contextItem) {
+    if (!newValue || !newValue.tagJsType || newValue.tagJsType !== ValueTypes.subscribe) {
+        contextItem.delete(contextItem, ownerSupport);
+        updateToDiffValue(newValue, contextItem, ownerSupport, 99);
         return 99;
     }
+    const subscription = contextItem.subscription;
     if (!subscription.hasEmitted) {
         return -1;
     }
-    subscription.callback = value.callback;
-    subscription.handler(subscription.getLastValue());
-    const newComponent = getSupportWithState(newSupport);
+    subscription.callback = newValue.callback;
+    subscription.handler(subscription.lastValue);
+    const newComponent = getSupportWithState(ownerSupport);
     subscription.states = newComponent.states;
     return -1;
+}
+function deleteSubscribe(contextItem, ownerSupport) {
+    const subscription = contextItem.subscription;
+    subscription.deleted = true;
+    delete contextItem.subscription;
+    subscription.subscription.unsubscribe();
+    const appendMarker = subscription.appendMarker;
+    if (appendMarker) {
+        paintCommands.push({
+            processor: paintRemover,
+            args: [appendMarker],
+        });
+        delete subscription.appendMarker;
+    }
+    delete contextItem.delete;
+    // delete contextItem.handler
+    contextItem.handler = tagValueUpdateHandler;
+    if (!subscription.hasEmitted) {
+        return;
+    }
+    subscription.contextItem.delete(subscription.contextItem, ownerSupport);
+    return 77;
 }
 //# sourceMappingURL=setupSubscribe.function.js.map

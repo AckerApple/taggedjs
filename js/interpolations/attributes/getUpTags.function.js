@@ -1,6 +1,6 @@
 import { isTagComponent } from "../../isInstance.js";
 import { providersChangeCheck } from "../../state/providersChangeCheck.function.js";
-import { checkRenderUp, isInlineHtml } from "../../tag/render/renderSupport.function.js";
+import { checkRenderUp, isInlineHtml } from "../../render/renderSupport.function.js";
 import { ValueTypes } from "../../tag/ValueTypes.enum.js";
 export function getUpTags(support, supports = []) {
     const global = support.subject.global;

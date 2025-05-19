@@ -7,7 +7,7 @@ export function destroySupport(support, global) {
     subject.renderCount = 0; // if it comes back, wont be considered an update
     const promises = [];
     const context = global.context;
-    destroyContext(context);
+    destroyContext(context, support);
     if (global.destroy$) {
         runBeforeDestroy(support, global);
     }

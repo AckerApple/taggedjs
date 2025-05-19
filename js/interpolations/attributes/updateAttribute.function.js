@@ -1,7 +1,7 @@
 // taggedjs-no-compile
 import { BasicTypes } from '../../tag/ValueTypes.enum.js';
-import { paintContent } from '../../tag/paint.function.js';
-import { isNoDisplayValue, processNameOnlyAttrValue } from './processAttribute.function.js';
+import { paintContent } from '../../render/paint.function.js';
+import { isNoDisplayValue, processNameOnlyAttrValue } from '../../render/attributes/processAttribute.function.js';
 export function updateNameOnlyAttrValue(values, attrValue, lastValue, element, ownerSupport, howToSet, context, counts) {
     // check to remove previous attribute(s)
     if (lastValue) {

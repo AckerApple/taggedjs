@@ -1,12 +1,13 @@
 import { setUseMemory } from './setUseMemory.object.js';
 import { getSupportWithState } from '../interpolations/attributes/getSupportWithState.function.js';
+function returnArgs(...args) {
+    return args;
+}
 export function firstStatesHandler(setter) {
     const config = setUseMemory.stateConfig;
     config.states[config.statesIndex] = setter;
     ++config.statesIndex;
-    return setter((...args) => {
-        return args;
-    });
+    return setter(returnArgs);
 }
 /** aka statesHandler */
 export function reStatesHandler(setter) {
@@ -21,7 +22,7 @@ export function reStatesHandler(setter) {
         lastValues = args;
         return args;
     });
-    const resetter = (..._args) => {
+    const resetter = function stateResetter(..._args) {
         return lastValues;
     };
     config.states[config.statesIndex] = setter;

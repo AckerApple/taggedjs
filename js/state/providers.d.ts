@@ -17,6 +17,7 @@ export declare const providers: {
      * @param {(new (...args: any[]) => T) | () => T} constructor
      * @returns {T}
      */
-    inject: <T>(constructor: ProviderConstructor<T>) => T;
+    inject: typeof providerInject;
 };
+declare function providerInject<T>(constructor: ProviderConstructor<T>): T;
 export {};

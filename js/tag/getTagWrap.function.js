@@ -1,6 +1,6 @@
-import { castProps } from '../alterProp.function.js';
-import { syncFunctionProps } from './update/updateExistingTagComponent.function.js';
-import { executeWrap } from './executeWrap.function.js';
+import { castProps } from './props/alterProp.function.js';
+import { syncFunctionProps } from '../render/update/updateExistingTagComponent.function.js';
+import { executeWrap } from '../render/executeWrap.function.js';
 import { PropWatches } from './tag.function.js';
 import { deepCompareDepth, shallowCompareDepth } from './hasSupportChanged.function.js';
 import { createSupport } from './createSupport.function.js';

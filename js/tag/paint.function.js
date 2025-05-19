@@ -1,10 +1,7 @@
-export let paintRemoves = [];
+export let paintCommands = [];
 export let paintContent = [];
 export let setContent = [];
-/** array memory that runs and completes BEFORE paintInsertBefores array */
 export let paintAppends = [];
-/** array memory that runs and completes AFTER paintAppends array */
-export let paintInsertBefores = [];
 export let paintAfters = []; // callbacks after all painted
 export const painting = {
     locks: 0
@@ -12,11 +9,6 @@ export const painting = {
 export function paint() {
     if (painting.locks > 0) {
         return;
-    }
-    for (let index = paintRemoves.length - 1; index >= 0; --index) {
-        const toRemove = paintRemoves[index];
-        const parentNode = toRemove.parentNode;
-        parentNode.removeChild(toRemove);
     }
     for (const content of paintContent) {
         content();
@@ -27,17 +19,26 @@ export function paint() {
     for (const now of paintAppends) {
         now.relative.appendChild(now.element);
     }
-    for (const { element, relative } of paintInsertBefores) {
-        relative.parentNode.insertBefore(element, relative);
+    for (const item of paintCommands) {
+        item.processor(item.element, item.relative);
     }
-    paintRemoves = [];
-    paintContent = [];
-    paintAppends = [];
-    paintInsertBefores = [];
-    setContent = [];
+    paintReset();
     for (const now of paintAfters) {
         now();
     }
     paintAfters = [];
+}
+function paintReset() {
+    paintCommands = [];
+    paintContent = [];
+    paintAppends = [];
+    setContent = [];
+}
+export function paintRemover(element) {
+    const parentNode = element.parentNode;
+    parentNode.removeChild(element);
+}
+export function paintBefore(element, relative) {
+    relative.parentNode.insertBefore(element, relative);
 }
 //# sourceMappingURL=paint.function.js.map

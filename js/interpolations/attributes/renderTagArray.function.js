@@ -1,5 +1,5 @@
-import { paint, painting } from '../../tag/paint.function.js';
-import { renderSupport } from '../../tag/render/renderSupport.function.js';
+import { paint, painting } from '../../render/paint.function.js';
+import { renderSupport } from '../../render/renderSupport.function.js';
 export function renderTagUpdateArray(supports) {
     ++painting.locks;
     supports.forEach(mapTagUpdate);

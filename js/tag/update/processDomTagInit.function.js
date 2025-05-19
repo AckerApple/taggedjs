@@ -1,5 +1,5 @@
 import { checkTagValueChange } from '../checkTagValueChange.function.js';
-import { newSupportByTemplater, processTag, tagFakeTemplater } from './processTag.function.js';
+import { newSupportByTemplater, processTag, tagFakeTemplater } from '../../render/update/processTag.function.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { processNewSubjectTag } from './processNewSubjectTag.function.js';
 export function processDomTagInit(value, contextItem, // could be tag via result.tag

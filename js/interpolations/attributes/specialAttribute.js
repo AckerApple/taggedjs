@@ -1,4 +1,4 @@
-import { paintAfters, paintContent } from "../../tag/paint.function.js";
+import { paintAfters, paintContent } from "../../render/paint.function.js";
 /** handles init, destroy, autofocus, autoselect, style., class. */
 export function specialAttribute(name, value, element, specialName, support, counts) {
     switch (specialName) {
@@ -6,7 +6,7 @@ export function specialAttribute(name, value, element, specialName, support, cou
         case 'init': {
             const stagger = counts.added;
             // run delayed after elements placed down
-            paintAfters.push(() => {
+            paintAfters.push(function paintSpecialAttribute() {
                 const event = {
                     target: element,
                     stagger,

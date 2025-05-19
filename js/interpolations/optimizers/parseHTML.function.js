@@ -26,12 +26,12 @@ export function parseHTML(html) {
             const textContent = html.slice(position, tagMatch.index);
             if (textContent.trim()) {
                 const textVarMatches = splitByTagVar(textContent);
-                textVarMatches.forEach(textContent => {
+                for (let textContent of textVarMatches) {
                     if (textContent.startsWith(variablePrefix)) {
                         textContent = variablePrefix + (++valueIndex) + variableSuffix;
                     }
                     pushTextTo(currentElement, elements, textContent);
-                });
+                }
             }
         }
         position = tagMatch.index + fullMatch.length;
@@ -103,12 +103,12 @@ export function parseHTML(html) {
         const textContent = html.slice(position);
         if (textContent.trim()) {
             const textVarMatches = splitByTagVar(textContent);
-            textVarMatches.forEach(textContent => {
+            for (const textContent of textVarMatches) {
                 if (textContent.startsWith(variablePrefix)) {
                     ++valueIndex;
                 }
-                return pushTextTo(currentElement, elements, textContent);
-            });
+                pushTextTo(currentElement, elements, textContent);
+            }
         }
     }
     return elements;
@@ -160,7 +160,10 @@ function splitByTagVar(inputString) {
     // Split the string using the regular expression, keep delimiters in the output
     const parts = inputString.split(fragFindAny);
     // Filter out any empty strings from the results
-    const filteredParts = parts.filter(part => part !== '');
+    const filteredParts = parts.filter(notEmptyStringMapper);
     return filteredParts;
+}
+function notEmptyStringMapper(part) {
+    return part !== '';
 }
 //# sourceMappingURL=parseHTML.function.js.map

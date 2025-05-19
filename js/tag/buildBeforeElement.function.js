@@ -1,5 +1,5 @@
 import { attachDomElements } from '../interpolations/optimizers/attachDomElements.function.js';
-import { checkSimpleValueChange, deleteSimpleValue, destorySupportByContextItem } from './index.js';
+import { destorySupportByContextItem } from './index.js';
 import { getDomMeta } from './domMetaCollector.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 import { painting } from './paint.function.js';
@@ -39,8 +39,8 @@ function loadDomMeta(support) {
 export function addOneContext(value, context, withinOwnerElement) {
     const contextItem = {
         value,
-        checkValueChange: checkSimpleValueChange,
-        delete: deleteSimpleValue,
+        checkValueChange: undefined, // checkSimpleValueChange,
+        delete: undefined, // deleteSimpleValue,
         withinOwnerElement,
     };
     context.push(contextItem);

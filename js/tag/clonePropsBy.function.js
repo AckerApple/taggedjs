@@ -15,13 +15,19 @@ export function clonePropsBy(support, props, castProps) {
             };
         case PropWatches.SHALLOW:
             return support.propsConfig = {
-                latest: props.map(x => cloneTagJsValue(x, shallowCompareDepth)),
+                latest: props.map(shallowMapper),
                 castProps,
             };
     }
     return support.propsConfig = {
-        latest: props.map(props => cloneTagJsValue(props, deepCompareDepth)),
+        latest: props.map(deepMapper),
         castProps,
     };
+}
+function shallowMapper(x) {
+    return cloneTagJsValue(x, shallowCompareDepth);
+}
+function deepMapper(props) {
+    return cloneTagJsValue(props, deepCompareDepth);
 }
 //# sourceMappingURL=clonePropsBy.function.js.map

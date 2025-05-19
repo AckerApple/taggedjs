@@ -1,4 +1,4 @@
-import { clonePropsBy } from './clonePropsBy.function.js';
+import { clonePropsBy } from './props/clonePropsBy.function.js';
 import { Subject } from '../subject/Subject.class.js';
 /** used only for apps, otherwise use Support */
 export function getBaseSupport(templater, subject, castedProps) {

@@ -2,16 +2,20 @@ type PaintAppend = {
     element: Text | Element;
     relative: Text | Element;
 };
-export declare let paintRemoves: (Element | Text | ChildNode)[];
+type PaintCommand = {
+    processor: (element: Text | Element, relative?: Text | Element) => any;
+    element: Text | Element;
+    relative?: Text | Element;
+};
+export declare let paintCommands: PaintCommand[];
 export declare let paintContent: (() => any)[];
 export declare let setContent: [string, Text][];
-/** array memory that runs and completes BEFORE paintInsertBefores array */
 export declare let paintAppends: PaintAppend[];
-/** array memory that runs and completes AFTER paintAppends array */
-export declare let paintInsertBefores: PaintAppend[];
 export declare let paintAfters: (() => any)[];
 export declare const painting: {
     locks: number;
 };
 export declare function paint(): void;
+export declare function paintRemover(element: Text | Element): void;
+export declare function paintBefore(element: Text | Element, relative?: Text | Element): void;
 export {};

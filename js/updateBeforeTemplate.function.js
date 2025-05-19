@@ -1,14 +1,12 @@
-import { paintInsertBefores } from './tag/paint.function.js';
+import { paintBeforeText, paintCommands } from './render/paint.function.js';
 import { empty } from './tag/ValueTypes.enum.js';
 // Function to update the value of x
 export function updateBeforeTemplate(value, // value should be casted before calling here
-lastFirstChild) {
-    const textNode = document.createTextNode(value); // never innerHTML
-    paintInsertBefores.push({
-        element: textNode,
-        relative: lastFirstChild,
+lastFirstChild, subject) {
+    paintCommands.push({
+        processor: paintBeforeText,
+        args: [lastFirstChild, value, (x) => subject.simpleValueElm = x],
     });
-    return textNode;
 }
 export function castTextValue(value) {
     switch (value) {

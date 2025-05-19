@@ -1,6 +1,6 @@
 // taggedjs-no-compile
-import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js";
-import { addOneContext } from "../../tag/index.js";
+import { paintAppend, paintAppends, paintBefore, paintCommands } from "../../render/paint.function.js";
+import { addOneContext } from "../../render/index.js";
 import { empty } from "../../tag/ValueTypes.enum.js";
 import { domProcessContextItem } from "./domProcessContextItem.function.js";
 export function attachDynamicDom(value, context, support, // owner
@@ -13,16 +13,16 @@ appendTo, insertBefore) {
     contextItem.placeholder = marker;
     if (appendTo) {
         paintAppends.push({
-            relative: appendTo,
-            element: marker,
+            processor: paintAppend,
+            args: [appendTo, marker],
         });
     }
     else {
-        paintInsertBefores.push({
-            relative: insertBefore,
-            element: marker,
+        paintCommands.push({
+            processor: paintBefore,
+            args: [insertBefore, marker],
         });
     }
-    domProcessContextItem(value, contextItem, support, counts, appendTo, insertBefore);
+    domProcessContextItem(value, support, contextItem, counts, appendTo, insertBefore);
 }
 //# sourceMappingURL=attachDynamicDom.function.js.map

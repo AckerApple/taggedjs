@@ -50,7 +50,7 @@ export function isLikeValueSets(values0, values1) {
     if (!valuesLengthsMatch) {
         return false;
     }
-    const allVarsMatch = values1.every((value, index) => {
+    const allVarsMatch = values1.every(function isEveryValueAlike(value, index) {
         const compareTo = values0[index];
         const isFunctions = typeof (value) === BasicTypes.function && typeof (compareTo) === BasicTypes.function;
         if (isFunctions) {

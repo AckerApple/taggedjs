@@ -4,7 +4,7 @@ import { getTemplaterResult } from './getTemplaterResult.function.js';
 import { tags } from './tag.utils.js';
 import { getTagWrap } from './getTagWrap.function.js';
 import { ValueTypes } from './ValueTypes.enum.js';
-import { processRenderOnceInit } from './update/processRenderOnceInit.function.js';
+import { processRenderOnceInit } from '../render/update/processRenderOnceInit.function.js';
 import { processTagComponentInit } from './update/processTagComponentInit.function.js';
 let tagCount = 0;
 /** How to handle checking for prop changes aka argument changes */

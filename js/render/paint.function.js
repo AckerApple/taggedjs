@@ -1,0 +1,61 @@
+import { blankHandler } from "./dom/attachDomElements.function.js";
+export let paintCommands = [];
+export let paintContent = [];
+export let setContent = [];
+export let paintAppends = [];
+export let paintAfters = []; // callbacks after all painted
+export const painting = {
+    locks: 0
+};
+export function paint() {
+    if (painting.locks > 0) {
+        return;
+    }
+    for (const content of paintContent) {
+        content();
+    }
+    for (const [text, textNode] of setContent) {
+        textNode.textContent = text;
+    }
+    for (const now of paintAppends) {
+        now.processor(...now.args);
+    }
+    for (const item of paintCommands) {
+        item.processor(...item.args);
+    }
+    paintReset();
+    for (const now of paintAfters) {
+        now();
+    }
+    paintAfters = [];
+}
+function paintReset() {
+    paintCommands = [];
+    paintContent = [];
+    paintAppends = [];
+    setContent = [];
+}
+export function paintRemover(element) {
+    const parentNode = element.parentNode;
+    parentNode.removeChild(element);
+}
+export function paintBefore(relative, element) {
+    relative.parentNode.insertBefore(element, relative);
+}
+export function paintAppend(relative, element) {
+    relative.appendChild(element);
+}
+const someDiv = (typeof document === 'object' && document.createElement('div')); // used for content cleaning
+export function paintBeforeText(relative, text, callback = blankHandler) {
+    someDiv.innerHTML = text;
+    const textElm = document.createTextNode(someDiv.innerHTML);
+    paintBefore(relative, textElm);
+    callback(textElm);
+}
+export function paintAppendText(relative, text, callback) {
+    someDiv.innerHTML = text;
+    const textElm = document.createTextNode(someDiv.textContent);
+    paintAppend(relative, textElm);
+    callback(textElm);
+}
+//# sourceMappingURL=paint.function.js.map

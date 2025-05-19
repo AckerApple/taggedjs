@@ -1,6 +1,7 @@
 import { isArray } from '../isInstance.js';
 import { hasPropChanges } from './hasPropChanges.function.js';
 import { BasicTypes } from './ValueTypes.enum.js';
+/** Used when deciding if a support will even change (are the arguments the same?) */
 export function hasSupportChanged(lastSupport, newTemplater) {
     const latestProps = newTemplater.props;
     const propsConfig = lastSupport.propsConfig;

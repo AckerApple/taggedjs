@@ -8,6 +8,7 @@ export function isSimpleType(value) {
     }
     return false;
 }
+/** Indicates if tag() was used */
 export function isStaticTag(value) {
     if (!value) {
         return false;

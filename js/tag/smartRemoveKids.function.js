@@ -1,5 +1,5 @@
 import { destroyArray } from './checkDestroyPrevious.function.js';
-import { paint, painting, paintRemoves } from './paint.function.js';
+import { paint, paintCommands, painting, paintRemover } from '../render/paint.function.js';
 /** sets global.deleted on support and all children */
 export function smartRemoveKids(global, allPromises) {
     const context = global.context;
@@ -12,16 +12,18 @@ export function smartRemoveKids(global, allPromises) {
     smartRemoveByContext(context, allPromises);
     destroyClones(global);
 }
+const promises = [];
+function destroyCall(destroy) {
+    const maybePromise = destroy();
+    const isPromise = maybePromise instanceof Promise;
+    if (isPromise) {
+        promises.push(maybePromise);
+    }
+}
 // Elements that have a destroy or ondestroy attribute
 function processContextDestroys(destroys, global, allPromises) {
-    const promises = [];
-    destroys.forEach(destroy => {
-        const maybePromise = destroy();
-        const isPromise = maybePromise instanceof Promise;
-        if (isPromise) {
-            promises.push(maybePromise);
-        }
-    });
+    promises.length = 0;
+    destroys.forEach(destroyCall);
     if (promises.length) {
         const lastPromise = Promise.all(promises)
             .then(() => {
@@ -56,7 +58,10 @@ function smartRemoveByContext(context, allPromises) {
         const elm = subject.simpleValueElm;
         if (elm) {
             delete subject.simpleValueElm;
-            paintRemoves.push(elm);
+            paintCommands.push({
+                processor: paintRemover,
+                args: [elm],
+            });
             continue;
         }
         const subGlobal = subject.global;
@@ -76,20 +81,25 @@ function smartRemoveByContext(context, allPromises) {
 }
 /** Destroy dom elements and dom space markers */
 function destroyClones(global) {
-    // const global = subject.global
     const htmlDomMeta = global.htmlDomMeta;
     // check subjects that may have clones attached to them
-    htmlDomMeta.forEach(clone => {
-        const marker = clone.marker;
-        if (marker) {
-            paintRemoves.push(marker);
-        }
-        const dom = clone.domElement;
-        if (!dom) {
-            return;
-        }
-        paintRemoves.push(dom);
+    htmlDomMeta.forEach(destroyClone);
+}
+function destroyClone(clone) {
+    const marker = clone.marker;
+    if (marker) {
+        paintCommands.push({
+            processor: paintRemover,
+            args: [marker],
+        });
+    }
+    const dom = clone.domElement;
+    if (!dom) {
+        return;
+    }
+    paintCommands.push({
+        processor: paintRemover,
+        args: [dom],
     });
-    // htmlDomMeta.length = 0
 }
 //# sourceMappingURL=smartRemoveKids.function.js.map

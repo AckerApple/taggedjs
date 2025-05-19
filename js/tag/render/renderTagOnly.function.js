@@ -1,6 +1,6 @@
 import { executeWrap } from '../executeWrap.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
-import { runAfterRender } from '../afterRender.function.js';
+import { runAfterRender } from './afterRender.function.js';
 import { initState, reState } from '../../state/state.utils.js';
 import { setUseMemory } from '../../state/setUseMemory.object.js';
 import { createSupport } from '../createSupport.function.js';

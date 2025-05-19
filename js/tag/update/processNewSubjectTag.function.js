@@ -1,7 +1,7 @@
 import { checkTagValueChange } from '../checkTagValueChange.function.js';
-import { buildBeforeElement } from '../buildBeforeElement.function.js';
-import { paintAppends, paintInsertBefores } from '../paint.function.js';
-import { newSupportByTemplater } from './processTag.function.js';
+import { buildBeforeElement } from '../../render/buildBeforeElement.function.js';
+import { paintAppend, paintAppends, paintBefore, paintCommands } from '../../render/paint.function.js';
+import { newSupportByTemplater } from '../../render/update/processTag.function.js';
 export function processNewSubjectTag(templater, subject, // could be tag via result.tag
 ownerSupport, // owner
 counts, appendTo, insertBefore) {
@@ -13,28 +13,28 @@ counts, appendTo, insertBefore) {
         if (dom.marker) {
             if (appendTo) {
                 paintAppends.push({
-                    element: dom.marker,
-                    relative: appendTo, // ph.parentNode as Element,
+                    args: [appendTo, dom.marker],
+                    processor: paintAppend,
                 });
             }
             else {
-                paintInsertBefores.push({
-                    element: dom.marker,
-                    relative: insertBefore, // ph.parentNode as Element,
+                paintCommands.push({
+                    processor: paintBefore,
+                    args: [insertBefore, dom.marker],
                 });
             }
         }
         if (dom.domElement) {
             if (appendTo) {
                 paintAppends.push({
-                    element: dom.domElement,
-                    relative: appendTo, // ph.parentNode as Element,
+                    args: [appendTo, dom.domElement],
+                    processor: paintAppend,
                 });
             }
             else {
-                paintInsertBefores.push({
-                    element: dom.domElement,
-                    relative: insertBefore, // ph.parentNode as Element,
+                paintCommands.push({
+                    processor: paintBefore,
+                    args: [insertBefore, dom.domElement],
                 });
             }
         }

@@ -3,6 +3,7 @@ import { AnySupport } from './tag/AnySupport.type.js';
 import { StringTag } from './tag/StringTag.type.js';
 import { TemplaterResult } from './tag/getTemplaterResult.function.js';
 export declare function isSimpleType(value: any): boolean;
+/** Indicates if tag() was used */
 export declare function isStaticTag(value?: TemplaterResult | StringTag | unknown): boolean;
 /** passed in is expected to be a TemplaterResult */
 export declare function isTagComponent(value?: TemplaterResult | Exclude<unknown, AnySupport>): boolean;

@@ -1,10 +1,12 @@
 // taggedjs-no-compile
 import { howToSetFirstInputValue } from "../attributes/howToSetInputValue.function.js";
-import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js";
-import { processAttribute } from "../attributes/processAttribute.function.js";
+import { paintAppends, paintBefore, paintCommands } from "../../render/paint.function.js";
+import { processAttribute } from "../../render/attributes/processAttribute.function.js";
 import { empty } from "../../tag/ValueTypes.enum.js";
 import { attachDynamicDom } from "./attachDynamicDom.function.js";
-export const blankHandler = () => undefined;
+export const blankHandler = function () {
+    return undefined;
+};
 const someDiv = (typeof document === 'object' && document.createElement('div')); // used for content cleaning
 export function attachDomElements(nodes, values, support, counts, // used for animation stagger computing
 context, depth, // used to know if dynamic variables live within parent owner tag/support
@@ -46,14 +48,12 @@ function attachDomElement(newNode, node, values, support, context, counts, appen
     const domElement = newNode.domElement = document.createElement(node.nn);
     // attributes that may effect style, come first for performance
     if (node.at) {
-        node.at.forEach(attr => {
+        for (const attr of node.at) {
             const name = attr[0];
             const value = attr[1];
             const isSpecial = attr[2] || false;
-            processAttribute(values, name, domElement, support, 
-            // howToSetInputValue, // maybe more performant for updates but not first renders
-            howToSetFirstInputValue, context, isSpecial, counts, value);
-        });
+            processAttribute(values, name, domElement, support, howToSetFirstInputValue, context, isSpecial, counts, value);
+        }
     }
     if (appendTo) {
         paintAppends.push({
@@ -62,7 +62,8 @@ function attachDomElement(newNode, node, values, support, context, counts, appen
         });
     }
     else {
-        paintInsertBefores.push({
+        paintCommands.push({
+            processor: paintBefore,
             element: domElement,
             relative: insertBefore,
         });
@@ -81,7 +82,8 @@ function attachDomText(newNode, node, owner, insertBefore) {
         });
     }
     else {
-        paintInsertBefores.push({
+        paintCommands.push({
+            processor: paintBefore,
             element: domElement,
             relative: insertBefore,
         });

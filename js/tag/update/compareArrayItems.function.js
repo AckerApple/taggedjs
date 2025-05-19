@@ -1,5 +1,5 @@
-import { paintRemoves } from '../paint.function.js';
-import { destroySupport } from '../destroySupport.function.js';
+import { paintCommands, paintRemover } from '../../render/paint.function.js';
+import { destroySupport } from '../../render/destroySupport.function.js';
 export function compareArrayItems(value, index, lastArray, removed, counts) {
     const newLength = value.length - 1;
     const at = index - removed;
@@ -36,7 +36,10 @@ function destroyArrayItemByGlobal(global, item) {
     else {
         const element = item.simpleValueElm;
         delete item.simpleValueElm;
-        paintRemoves.push(element);
+        paintCommands.push({
+            processor: paintRemover,
+            args: [element],
+        });
     }
 }
 //# sourceMappingURL=compareArrayItems.function.js.map

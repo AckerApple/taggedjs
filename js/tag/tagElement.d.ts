@@ -1,5 +1,3 @@
-import { TemplaterResult } from './getTemplaterResult.function.js';
-import { SupportContextItem } from './createHtmlSupport.function.js';
 import { TagWrapper } from './tag.utils.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 import { TagMaker } from './TagMaker.type.js';
@@ -10,6 +8,10 @@ export type TagAppElement = Element & {
     ValueTypes: typeof ValueTypes;
     setUse: typeof setUseMemory;
 };
+export declare const appElements: {
+    support: AnySupport;
+    element: Element;
+}[];
 /**
  *
  * @param app taggedjs tag
@@ -22,4 +24,3 @@ export declare function tagElement(app: TagMaker, element: HTMLElement | Element
     tags: TagWrapper<unknown>[];
     ValueTypes: typeof ValueTypes;
 };
-export declare function runWrapper(templater: TemplaterResult, placeholder: Text, appElement: Element, subject: SupportContextItem, isAppFunction: boolean): AnySupport;

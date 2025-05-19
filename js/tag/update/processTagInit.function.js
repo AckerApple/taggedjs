@@ -1,5 +1,5 @@
 import { checkTagValueChange } from '../checkTagValueChange.function.js';
-import { processTag } from './processTag.function.js';
+import { processTag } from '../../render/update/processTag.function.js';
 import { processNewSubjectTag } from './processNewSubjectTag.function.js';
 export function processTagInit(value, contextItem, ownerSupport, counts, appendTo, insertBefore) {
     contextItem.checkValueChange = checkTagValueChange;

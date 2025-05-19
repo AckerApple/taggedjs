@@ -1,8 +1,7 @@
 // taggedjs-no-compile
-import { updateExistingValue } from './updateExistingValue.function.js';
+import { tagValueUpdateHandler } from './tagValueUpdateHandler.function.js';
 import { compareArrayItems } from './compareArrayItems.function.js';
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js';
-import { checkSimpleValueChange } from '../checkDestroyPrevious.function.js';
 export function processTagArray(subject, value, // arry of Tag classes
 ownerSupport, counts, appendTo) {
     const noLast = subject.lastArray === undefined;
@@ -47,7 +46,7 @@ counts, appendTo) {
     if (previous) {
         return reviewPreviousArrayItem(item, previous, lastArray, ownerSupport, index, runtimeInsertBefore, counts, appendTo);
     }
-    const contextItem = createAndProcessContextItem(item, ownerSupport, counts, checkSimpleValueChange, runtimeInsertBefore, appendTo);
+    const contextItem = createAndProcessContextItem(item, ownerSupport, counts, runtimeInsertBefore, appendTo);
     // Added to previous array
     lastArray.push(contextItem);
     return contextItem;
@@ -56,10 +55,10 @@ function reviewPreviousArrayItem(value, itemSubject, lastArray, ownerSupport, in
 counts, appendTo) {
     const couldBeSame = lastArray.length > index;
     if (couldBeSame) {
-        updateExistingValue(value, ownerSupport, itemSubject);
+        tagValueUpdateHandler(value, ownerSupport, itemSubject);
         return itemSubject;
     }
-    const contextItem = createAndProcessContextItem(value, ownerSupport, counts, checkSimpleValueChange, runtimeInsertBefore, appendTo);
+    const contextItem = createAndProcessContextItem(value, ownerSupport, counts, runtimeInsertBefore, appendTo);
     // Added to previous array
     lastArray.push(contextItem);
     return contextItem;

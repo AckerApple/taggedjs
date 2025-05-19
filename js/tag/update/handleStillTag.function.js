@@ -1,4 +1,4 @@
-import { updateSupportBy } from '../updateSupportBy.function.js';
+import { updateSupportBy } from '../../render/update/updateSupportBy.function.js';
 import { createSupport } from '../createSupport.function.js';
 export function handleStillTag(lastSupport, subject, value, ownerSupport) {
     const templater = value.templater || value;

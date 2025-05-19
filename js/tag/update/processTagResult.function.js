@@ -1,5 +1,5 @@
-import { buildBeforeElement } from '../buildBeforeElement.function.js';
-import { paintAppends } from '../paint.function.js';
+import { buildBeforeElement } from '../../render/buildBeforeElement.function.js';
+import { paintAppend, paintAppends } from '../../render/paint.function.js';
 import { checkTagValueChange } from '../index.js';
 export function processReplaceTagResult(support, counts, contextItem) {
     contextItem.checkValueChange = checkTagValueChange;
@@ -14,14 +14,14 @@ export function processFirstTagResult(support, counts, appendTo) {
     for (const dom of result.dom) {
         if (dom.domElement) {
             paintAppends.splice(appendIndex++, 0, {
-                element: dom.domElement,
-                relative: appendTo,
+                args: [appendTo, dom.domElement],
+                processor: paintAppend,
             });
         }
         if (dom.marker) {
             paintAppends.splice(appendIndex++, 0, {
-                element: dom.marker,
-                relative: appendTo,
+                args: [appendTo, dom.marker],
+                processor: paintAppend,
             });
         }
     }

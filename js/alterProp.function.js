@@ -1,5 +1,5 @@
-import { isInlineHtml, renderInlineHtml } from './tag/render/renderSupport.function.js';
-import { renderExistingReadyTag } from './tag/render/renderExistingTag.function.js';
+import { isInlineHtml, renderInlineHtml } from './render/renderSupport.function.js';
+import { renderExistingReadyTag } from './render/renderExistingTag.function.js';
 import { getSupportInCycle } from './tag/getSupportInCycle.function.js';
 import { deepCompareDepth } from './tag/hasSupportChanged.function.js';
 import { isArray, isStaticTag } from './isInstance.js';
@@ -18,7 +18,7 @@ export function alterProp(prop, ownerSupport, newSupport, depth) {
     }
     return checkProp(prop, ownerSupport, newSupport, depth);
 }
-export function checkProp(value, ownerSupport, newSupport, depth, owner) {
+export function checkProp(value, ownerSupport, newSupport, depth, owner, keyName) {
     if (!value) {
         return value;
     }
@@ -26,7 +26,7 @@ export function checkProp(value, ownerSupport, newSupport, depth, owner) {
         return value;
     }
     if (typeof (value) === BasicTypes.function) {
-        return getPropWrap(value, owner, ownerSupport);
+        return getPropWrap(value, owner, ownerSupport, keyName);
     }
     if (depth === deepCompareDepth) {
         return value;
@@ -57,7 +57,7 @@ function checkObjectProp(value, newSupport, ownerSupport, depth) {
     const keys = Object.keys(value);
     for (const name of keys) {
         const subValue = value[name];
-        const result = checkProp(subValue, ownerSupport, newSupport, depth + 1, value);
+        const result = checkProp(subValue, ownerSupport, newSupport, depth + 1, value, name);
         const newSubValue = value[name];
         if (newSubValue === result) {
             continue;
@@ -86,7 +86,7 @@ function afterCheckProp(depth, index, originalValue, newProp, newSupport) {
         });
     }
 }
-export function getPropWrap(value, owner, ownerSupport) {
+export function getPropWrap(value, owner, ownerSupport, keyName) {
     const already = value.mem;
     // already previously converted by a parent?
     if (already) {
@@ -99,20 +99,25 @@ export function getPropWrap(value, owner, ownerSupport) {
     wrap.mem = value;
     // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
     wrap.toCall = function toCallRunner(...args) {
-        return callbackPropOwner(wrap.mem, owner, args, ownerSupport);
+        return callbackPropOwner(wrap.mem, owner, args, ownerSupport, keyName);
     };
     // copy data properties that maybe on source function
     Object.assign(wrap, value);
     return wrap;
 }
 /** Function shared by alterProps() and updateExistingTagComponent... TODO: May want to have to functions to reduce cycle checking?  */
-export function callbackPropOwner(toCall, owner, callWith, ownerSupport) {
+export function callbackPropOwner(toCall, // original function
+owner, callWith, ownerSupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
+keyName) {
     const global = ownerSupport.subject.global;
     const newest = global?.newest || ownerSupport;
     const supportInCycle = getSupportInCycle();
     const noCycle = supportInCycle === undefined;
+    global.locked = true;
     // actual function call to original method
+    console.log('--- calling prop function ---', { keyName, toCall, owner, callWith });
     const callbackResult = toCall.apply(owner, callWith);
+    delete global.locked;
     const run = function propCallbackProcessor() {
         const global = newest.subject.global;
         // are we in a rendering cycle? then its being called by alterProps
@@ -127,13 +132,21 @@ export function callbackPropOwner(toCall, owner, callWith, ownerSupport) {
         if (!global || global.locked === true) {
             return callbackResult; // currently in the middle of rendering
         }
+        console.log('** calling for a render now **', {
+            locked: global.locked,
+            supportInCycle,
+        });
         safeRenderSupport(newest, ownerSupport);
         return callbackResult;
     };
     if (noCycle) {
+        console.log('no cycle run');
         return run();
     }
-    setUseMemory.tagClosed$.toCallback(run);
+    setUseMemory.tagClosed$.toCallback(() => {
+        console.log('closed tag run');
+        run();
+    });
     return callbackResult;
 }
 export function isSkipPropValue(value) {

@@ -1,4 +1,4 @@
-import { isSkipPropValue } from '../../alterProp.function.js';
+import { isSkipPropValue } from '../props/alterProp.function.js';
 import { BasicTypes } from '../ValueTypes.enum.js';
 import { isArray } from '../../isInstance.js';
 import { updateExistingObject } from './updateExistingObject.function.js';

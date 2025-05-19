@@ -1,3 +1,3 @@
 import { AnySupport } from '../AnySupport.type.js';
-import { WrapRunner } from '../../alterProp.function.js';
+import { WrapRunner } from '../props/alterProp.function.js';
 export declare function syncPriorPropFunction(priorProp: WrapRunner, prop: WrapRunner, newSupport: AnySupport, ownerSupport: AnySupport, maxDepth: number, depth: number): WrapRunner | Record<string, WrapRunner> | WrapRunner[];

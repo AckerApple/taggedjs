@@ -50,21 +50,25 @@ function examineChild(child, valueCount, children, index) {
     return index;
 }
 function processAttributes(attributes, valueCount) {
-    return attributes.map(attrSet => {
+    const mapped = [];
+    for (const attrSet of attributes) {
         const [key, value, isSpecial] = attrSet;
         if (key.startsWith(variablePrefix)) {
             const index = parseInt(key.replace(variablePrefix, ''), 10);
             if (!isNaN(index) && index < valueCount) {
-                return [{ tagJsVar: index }];
+                mapped.push([{ tagJsVar: index }]);
+                continue;
             }
         }
         if (typeof value === ImmutableTypes.string && value.startsWith(variablePrefix)) {
             const index = parseInt(value.replace(variablePrefix, ''), 10);
             if (!isNaN(index) && index < valueCount) {
-                return [key, { tagJsVar: index }, isSpecial];
+                mapped.push([key, { tagJsVar: index }, isSpecial]);
+                continue;
             }
         }
-        return attrSet;
-    });
+        mapped.push(attrSet);
+    }
+    return mapped;
 }
 //# sourceMappingURL=replacePlaceholders.function.js.map

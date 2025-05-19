@@ -3,9 +3,9 @@ import { specialAttribute } from './specialAttribute.js';
 import { isFunction, isObject, isSubjectInstance } from '../../isInstance.js';
 import { bindSubjectCallback } from './bindSubjectCallback.function.js';
 import { BasicTypes, ValueTypes, empty } from '../../tag/ValueTypes.enum.js';
-import { paintContent } from '../../tag/paint.function.js';
+import { paintContent } from '../../render/paint.function.js';
 import { processDynamicNameValueAttribute, processNonDynamicAttr } from './processNameValueAttribute.function.js';
-import { addOneContext, checkSimpleValueChange, deleteSimpleValue } from '../../tag/index.js';
+import { addOneContext } from '../../render/index.js';
 import { processAttributeFunction } from './processAttributeCallback.function.js';
 import { isSpecialAttr } from './isSpecialAttribute.function.js';
 import { processUpdateAttrContext } from '../../tag/processUpdateAttrContext.function.js';
@@ -34,15 +34,25 @@ context, isSpecial, counts, value) {
             isAttr: true,
             element,
             attrName: attrName,
-            checkValueChange: checkSimpleValueChange,
-            delete: deleteSimpleValue,
+            // checkValueChange: undefined as any,
+            // delete: undefined as any,
             withinOwnerElement: true,
         };
         context.push(contextItem);
-        const isSubject = isSubjectInstance(contextItem.value);
-        if (isSubject) {
-            return processNameValueAttributeAttrSubject(attrName, contextItem, element, support, howToSet, isSpecial, counts);
-        }
+        /*
+            const isSubject = isSubjectInstance(contextItem.value)
+            if ( isSubject ) {
+              return processNameValueAttributeAttrSubject(
+                attrName as string,
+                contextItem,
+                element,
+                support,
+                howToSet,
+                isSpecial,
+                counts,
+              )
+            }
+        */
         contextItem.handler = processUpdateAttrContext;
         processDynamicNameValueAttribute(attrName, value, contextItem, element, howToSet, support, counts, isSpecial);
         contextItem.value = value;

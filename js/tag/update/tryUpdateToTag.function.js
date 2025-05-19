@@ -1,9 +1,9 @@
-import { getFakeTemplater, newSupportByTemplater, processTag } from './processTag.function.js';
+import { getFakeTemplater, newSupportByTemplater, processTag } from '../../render/update/processTag.function.js';
 import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js';
 import { isTagComponent } from '../../isInstance.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { handleStillTag } from './handleStillTag.function.js';
-import { prepareUpdateToComponent } from './updateExistingValue.function.js';
+import { prepareUpdateToComponent } from './tagValueUpdateHandler.function.js';
 const fooCounts = { added: 0, removed: 0 };
 /** result is an indication to ignore further processing but that does not seem in use anymore */
 export function tryUpdateToTag(contextItem, newValue, // newValue

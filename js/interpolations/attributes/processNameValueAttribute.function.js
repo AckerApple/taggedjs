@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 import { specialAttribute } from './specialAttribute.js';
-import { processTagCallbackFun } from './processAttribute.function.js';
+import { processTagCallbackFun } from '../../render/attributes/processAttribute.function.js';
 import { BasicTypes } from '../../tag/ValueTypes.enum.js';
 const actions = ['init', 'destroy']; // oninit ondestroy
 export function processDynamicNameValueAttribute(attrName, value, contextItem, element, howToSet, support, counts, isSpecial) {

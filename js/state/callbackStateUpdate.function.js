@@ -1,20 +1,19 @@
-import { renderSupport } from '../tag/render/renderSupport.function.js';
-import { syncStatesArray } from './syncStates.function.js';
+import { renderSupport } from '../render/renderSupport.function.js';
 import { isPromise } from '../isInstance.js';
 export default function callbackStateUpdate(support, oldStates, callback, ...args) {
     const global = support.subject.global;
     const newestSupport = global.newest;
     // NEWEST UPDATE OLDEST: ensure that the oldest has the latest values first
-    syncStatesArray(newestSupport.states, oldStates);
+    //syncStatesArray(newestSupport.states, oldStates)
     // run the callback
     const maybePromise = callback(...args);
     // OLDEST UPDATE NEWEST: send the oldest state changes into the newest
-    syncStatesArray(oldStates, newestSupport.states);
+    //syncStatesArray(oldStates, newestSupport.states)
     renderSupport(newestSupport);
     if (isPromise(maybePromise)) {
         maybePromise.finally(() => {
             // send the oldest state changes into the newest
-            syncStatesArray(oldStates, newestSupport.states);
+            // syncStatesArray(oldStates, newestSupport.states)
             renderSupport(newestSupport);
         });
     }

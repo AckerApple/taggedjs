@@ -17,15 +17,21 @@ export function htmlInterpolationToPlaceholders(strings, values) {
     return addPlaceholders(sanitizedFragments, values);
 }
 function sanitizePlaceholders(fragments) {
-    return fragments.map(fragment => fragment.replace(fragReplacer, (match, index) => safeVar + index));
+    return fragments.map(santizeFragment);
+}
+function santizeFragment(fragment) {
+    return fragment.replace(fragReplacer, (match, index) => safeVar + index);
 }
 function addPlaceholders(strings, values) {
-    const results = strings.map((fragment, index) => {
+    const results = [];
+    for (let index = 0; index < strings.length; ++index) {
+        const fragment = strings[index];
         if (index < values.length) {
-            return fragment + variablePrefix + index + variableSuffix;
+            results.push(fragment + variablePrefix + index + variableSuffix);
+            continue;
         }
-        return fragment;
-    });
+        results.push(fragment);
+    }
     balanceArrayByArrays(results, strings, values);
     return results;
 }

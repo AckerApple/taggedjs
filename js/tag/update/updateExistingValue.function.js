@@ -1,5 +1,5 @@
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js';
-import { updateExistingTagComponent } from './updateExistingTagComponent.function.js';
+import { updateExistingTagComponent } from '../../render/update/updateExistingTagComponent.function.js';
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js';
 import { createSupport } from '../createSupport.function.js';
 /** Checks if value has changed before updating. Used for all tag value updates. Determines if value changed since last render */

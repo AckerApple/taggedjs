@@ -10,7 +10,7 @@ export function processUpdateContext(support, context) {
     return context;
 }
 /** returns boolean of did render */
-export function processUpdateOneContext(values, // the interpolated values
+function processUpdateOneContext(values, // the interpolated values
 index, context, ownerSupport) {
     const value = values[index];
     // is something already there?
