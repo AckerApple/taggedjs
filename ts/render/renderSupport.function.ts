@@ -1,12 +1,12 @@
-import { PropsConfig, Support } from '../createHtmlSupport.function.js'
-import { AnySupport } from '../AnySupport.type.js'
-import { deepEqual } from '../../deepFunctions.js'
+import { PropsConfig, Support } from '../tag/createHtmlSupport.function.js'
+import { AnySupport } from '../tag/AnySupport.type.js'
+import { deepEqual } from '../deepFunctions.js'
 import { renderExistingReadyTag } from'./renderExistingTag.function.js'
-import { Props } from '../../Props.js'
-import { ValueTypes } from '../ValueTypes.enum.js'
-import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
+import { Props } from '../Props.js'
+import { ValueTypes } from '../tag/ValueTypes.enum.js'
+import {SupportTagGlobal, TemplaterResult } from '../tag/getTemplaterResult.function.js'
 import { PropWatches } from '../index.js'
-import { deepCompareDepth, immutablePropMatch, shallowPropMatch } from '../hasSupportChanged.function.js'
+import { deepCompareDepth, immutablePropMatch, shallowPropMatch } from '../tag/hasSupportChanged.function.js'
 
 export function isInlineHtml(templater: TemplaterResult) {
   return ValueTypes.templater === templater.tagJsType
@@ -87,6 +87,7 @@ export function checkRenderUp(
   return false
 }
 
+/** Used when crawling up the chain of child-to-parent tags. See hasSupportChanged for the downward direction */
 function hasPropsToOwnerChanged(
   templater: TemplaterResult,
   support: AnySupport,

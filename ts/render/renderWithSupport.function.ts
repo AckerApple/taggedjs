@@ -1,14 +1,14 @@
-import { AnySupport } from '../AnySupport.type.js'
-import { SupportContextItem } from '../createHtmlSupport.function.js'
-import { moveProviders } from '../update/updateExistingTagComponent.function.js'
+import { AnySupport } from '../tag/AnySupport.type.js'
+import { SupportContextItem } from '../tag/createHtmlSupport.function.js'
+import { moveProviders } from './update/updateExistingTagComponent.function.js'
 import { softDestroySupport } from './softDestroySupport.function.js'
-import {SupportTagGlobal } from '../getTemplaterResult.function.js'
+import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 import { renderTagOnly } from'./renderTagOnly.function.js'
-import { isLikeTags } from'../isLikeTags.function.js'
-import { StringTag } from '../StringTag.type.js'
-import { DomTag } from '../DomTag.type.js'
-import { ValueTypes } from '../ValueTypes.enum.js'
-import { Tag } from '../Tag.type.js'
+import { isLikeTags } from'../tag/isLikeTags.function.js'
+import { StringTag } from '../tag/StringTag.type.js'
+import { DomTag } from '../tag/DomTag.type.js'
+import { ValueTypes } from '../tag/ValueTypes.enum.js'
+import { Tag } from '../tag/Tag.type.js'
 
 /** TODO: This seems to support both new and updates and should be separated? */
 export function renderWithSupport(

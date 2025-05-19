@@ -5,6 +5,10 @@ import { getSupportWithState } from '../interpolations/attributes/getSupportWith
 
 export type StateSet = <T extends any[]>(...a: [...T]) => [...T]
 
+function returnArgs<T extends any[]>(...args: [...T]) {
+  return args
+}
+
 export type StatesSetter = (
   set: StateSet,
   syncDirection?: number
@@ -18,9 +22,7 @@ export function firstStatesHandler(
 
   ++config.statesIndex
   
-  return setter(<T extends any[]>(...args: [...T]) => {
-    return args
-  })
+  return setter(returnArgs)
 }
 
 /** aka statesHandler */
@@ -42,7 +44,7 @@ export function reStatesHandler(
     return args
   })
 
-  const resetter = <T extends any[]>(..._args: [...T]): T => {
+  const resetter = function stateResetter<T extends any[]>(..._args: [...T]): T {
     return lastValues as T
   }
 

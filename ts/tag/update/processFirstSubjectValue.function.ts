@@ -1,5 +1,6 @@
-import { checkArrayValueChange, checkSimpleValueChange } from '../checkDestroyPrevious.function.js'
-import { castTextValue, updateBeforeTemplate } from '../../updateBeforeTemplate.function.js'
+import { checkArrayValueChange } from '../checkDestroyPrevious.function.js'
+import { checkSimpleValueChange, deleteSimpleValue } from '../checkSimpleValueChange.function.js'
+import { castTextValue } from '../../castTextValue.function.js'
 import { TemplaterResult } from '../getTemplaterResult.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { RegularValue } from './processRegularValue.function.js'
@@ -10,6 +11,7 @@ import { processTagArray } from './processTagArray.js'
 import type { StringTag } from '../StringTag.type.js'
 import { ContextItem } from '../Context.types.js'
 import { AnySupport } from '../AnySupport.type.js'
+import { paintBeforeText, paintCommands } from '../../render/paint.function.js'
 
 export function processFirstSubjectValue(
   value: TemplateValue | StringTag,
@@ -59,11 +61,17 @@ function processFirstRegularValue(
   insertBefore: Text, // <template end interpolate /> (will be removed)
 ) {
   const castedValue = castTextValue(value)
-  const clone = updateBeforeTemplate(
-    castedValue,
-    insertBefore, // this will be removed
-  )
 
-  subject.simpleValueElm = clone  
+  const paint = subject.paint = {
+    processor: paintBeforeText,
+    args: [insertBefore, castedValue, (x: Text) => {
+      subject.simpleValueElm = x
+      delete subject.paint
+    }],
+  }
+
+  paintCommands.push(paint)
+
   subject.checkValueChange = checkSimpleValueChange
+  subject.delete = deleteSimpleValue
 }

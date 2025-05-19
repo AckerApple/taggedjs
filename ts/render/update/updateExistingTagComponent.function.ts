@@ -1,18 +1,18 @@
-import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from'../hasSupportChanged.function.js'
-import { PropsConfig, SupportContextItem } from '../createHtmlSupport.function.js'
-import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
-import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { castProps, WrapRunner } from'../../alterProp.function.js'
-import { renderSupport } from'../render/renderSupport.function.js'
-import { ValueTypes } from '../ValueTypes.enum.js'
+import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from'../../tag/hasSupportChanged.function.js'
+import { PropsConfig, SupportContextItem } from '../../tag/createHtmlSupport.function.js'
+import { processReplacementComponent } from '../../tag/update/processFirstSubjectComponent.function.js'
+import {SupportTagGlobal, TemplaterResult } from '../../tag/getTemplaterResult.function.js'
+import { castProps, WrapRunner } from'../../tag/props/alterProp.function.js'
+import { renderSupport } from'../renderSupport.function.js'
+import { ValueTypes } from '../../tag/ValueTypes.enum.js'
 import { destroySupport } from '../destroySupport.function.js'
-import { getNewGlobal } from './getNewGlobal.function.js'
-import { isLikeTags } from'../isLikeTags.function.js'
-import { PropWatches } from '../tag.function.js'
+import { getNewGlobal } from '../../tag/update/getNewGlobal.function.js'
+import { isLikeTags } from'../../tag/isLikeTags.function.js'
+import { PropWatches } from '../../tag/tag.function.js'
 import { Props } from '../../Props.js'
-import { BaseSupport } from '../BaseSupport.type.js'
-import { syncPriorPropFunction } from './syncPriorPropFunction.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { BaseSupport } from '../../tag/BaseSupport.type.js'
+import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.function.js'
+import { AnySupport } from '../../tag/AnySupport.type.js'
 
 export function updateExistingTagComponent(
   ownerSupport: AnySupport,
@@ -86,12 +86,10 @@ export function syncFunctionProps(
   ownerSupport: AnySupport,
   newPropsArray: unknown[], // templater.props
   maxDepth: number,
-  depth = -1,
+  depth = -1, // 10 or 3
 ): Props {
-  if(maxDepth === 0) {
-    throw new Error('before here')
-  }
-  const global = lastSupport.subject.global as SupportTagGlobal
+  const subject = lastSupport.subject
+  const global = subject.global as SupportTagGlobal
   const newest = global.newest
 
   if(!newest) {
@@ -110,7 +108,7 @@ export function syncFunctionProps(
 
   const priorPropConfig = lastSupport.propsConfig as PropsConfig
   const priorPropsArray = priorPropConfig.castProps as Props
-  const newArray = []
+  const newArray: any[] = []
   for (let index = 0; index < newPropsArray.length; ++index) {
     const prop = newPropsArray[index]
     const priorProp = priorPropsArray[index]
@@ -184,7 +182,7 @@ function syncSupports<T extends AnySupport>(
   const lastPropsConfig = lastSupport.propsConfig as PropsConfig
   // update support to think it has different cloned props
   lastPropsConfig.latest = propsConfig.latest
-
+  
   return lastSupport // its the same tag component  
 }
 

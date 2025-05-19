@@ -1,18 +1,19 @@
 // taggedjs-no-compile
 
-import { DomObjectChildren, DomObjectElement, DomObjectText } from "./ObjectNode.types.js"
-import { howToSetFirstInputValue } from "../attributes/howToSetInputValue.function.js"
-import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
+import { DomObjectChildren, DomObjectElement, DomObjectText } from "../../interpolations/optimizers/ObjectNode.types.js"
+import { howToSetFirstInputValue } from "../../interpolations/attributes/howToSetInputValue.function.js"
+import { paintAppend, paintAppends, paintAppendText, paintBefore, paintBeforeText, paintCommands } from "../paint.function.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
 import { processAttribute } from "../attributes/processAttribute.function.js"
 import { ContextItem } from "../../tag/Context.types.js"
-import { ObjectChildren } from "./LikeObjectElement.type.js"
+import { ObjectChildren } from "../../interpolations/optimizers/LikeObjectElement.type.js"
 import { empty } from "../../tag/ValueTypes.enum.js"
-import { Counts } from "../interpolateTemplate.js"
-import { attachDynamicDom } from "./attachDynamicDom.function.js"
+import { Counts } from "../../interpolations/interpolateTemplate.js"
+import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicDom.function.js"
 
-export const blankHandler = () => undefined
-const someDiv = (typeof document === 'object' && document.createElement('div')) as HTMLDivElement // used for content cleaning
+export const blankHandler = function () {
+  return undefined
+}
 
 export function attachDomElements(
   nodes: ObjectChildren,
@@ -33,8 +34,8 @@ export function attachDomElements(
     insertBefore = document.createTextNode(empty)
 
     paintAppends.push({
-      element: insertBefore,
-      relative: appendTo,
+      args: [appendTo, insertBefore],
+      processor: paintAppend,
     })
 
     appendTo = undefined
@@ -113,7 +114,7 @@ function attachDomElement(
   
   // attributes that may effect style, come first for performance
   if (node.at) {
-    node.at.forEach(attr => {
+    for (const attr of node.at) {      
       const name = attr[0]
       const value = attr[1]
       const isSpecial = attr[2] || false
@@ -123,25 +124,24 @@ function attachDomElement(
         name,
         domElement,
         support,
-        // howToSetInputValue, // maybe more performant for updates but not first renders
         howToSetFirstInputValue,
         context,
         isSpecial,
         counts,
         value
       )
-    })
+    }
   }
 
   if (appendTo) {
     paintAppends.push({
-      element: domElement,
-      relative: appendTo,
+      args: [appendTo, domElement],
+      processor: paintAppend,
     })
   } else {
-    paintInsertBefores.push({
-      element: domElement,
-      relative: insertBefore as Text,
+    paintCommands.push({
+      processor: paintBefore,
+      args: [insertBefore, domElement],
     })
   }
   return domElement
@@ -156,18 +156,15 @@ function attachDomText(
   const textNode = (newNode as any as DomObjectText)
   const string = textNode.tc = (node as any as DomObjectText).tc
 
-  someDiv.innerHTML = string
-  const domElement = textNode.domElement = document.createTextNode(someDiv.innerText);
-
   if (owner) {
     paintAppends.push({
-      element: domElement,
-      relative: owner,
+      processor: paintAppendText,
+      args: [owner, string, (elm: Text) => textNode.domElement = elm],
     })
   } else {
-    paintInsertBefores.push({
-      element: domElement,
-      relative: insertBefore as Text,
+    paintCommands.push({
+      processor: paintBeforeText,
+      args: [insertBefore, string, (elm: Text) => textNode.domElement = elm]
     })
   }
 }

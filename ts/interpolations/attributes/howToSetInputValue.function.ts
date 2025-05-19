@@ -1,4 +1,4 @@
-import { paintContent } from "../../tag/paint.function.js"
+import { paintContent } from "../../render/paint.function.js"
 
 export type HowToSet = (element: Element, name: string, value: string) => any
 
@@ -8,9 +8,9 @@ export function howToSetInputValue(
   name: string,
   value: string | undefined | boolean
 ) {
-  paintContent.push(() => {
+  paintContent.push(() =>
     howToSetFirstInputValue(element, name, value)
-  })
+  )
 }
 
 export function howToSetFirstInputValue(

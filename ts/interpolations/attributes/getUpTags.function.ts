@@ -1,6 +1,6 @@
 import { isTagComponent } from "../../isInstance.js"
 import { providersChangeCheck } from "../../state/providersChangeCheck.function.js"
-import { checkRenderUp, isInlineHtml } from "../../tag/render/renderSupport.function.js"
+import { checkRenderUp, isInlineHtml } from "../../render/renderSupport.function.js"
 import { Support } from "../../tag/createHtmlSupport.function.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
 import {SupportTagGlobal } from "../../tag/getTemplaterResult.function.js"

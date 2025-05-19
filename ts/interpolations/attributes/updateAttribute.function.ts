@@ -3,10 +3,10 @@
 import { HowToSet } from './howToSetInputValue.function.js'
 import { BasicTypes } from '../../tag/ValueTypes.enum.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
-import { paintContent } from '../../tag/paint.function.js'
+import { paintContent } from '../../render/paint.function.js'
 import { ContextItem } from '../../tag/Context.types.js'
 import { Counts } from '../interpolateTemplate.js'
-import { isNoDisplayValue, processNameOnlyAttrValue } from './processAttribute.function.js'
+import { isNoDisplayValue, processNameOnlyAttrValue } from '../../render/attributes/processAttribute.function.js'
 
 
 export function updateNameOnlyAttrValue(

@@ -27,20 +27,21 @@ export function syncStatesArray(
   }
 }
 
+let got: any
+function syncFromState(...x: any) {
+  got = x
+  return x as any
+}
+function syncOntoState() {
+  return got
+}
+
 export function syncStates(
   from: StatesSetter,
   onto: StatesSetter,
 ) {
-  let got: any
-
-  from((...x: any) => {
-    got = x
-    return x as any
-  }, 1)
-
-  onto(() => {
-    return got
-  }, 2)
+  from(syncFromState, 1)
+  onto(syncOntoState, 2)
 }
 
 /** @deprecated favor using syncSupports */
@@ -68,26 +69,28 @@ export function oldSyncStates(
 
   // loop statesFrom to set on the oldStates
   for (let index = statesFrom.length - 1; index >= 0; --index) {
-    const oldValues: any[] = []
-
-    const oldGetCallback = <T extends any[]>(...args: [...T]) => {
-      oldValues.push(args)
-      return args
-    }
+    oldValues.length = 0
+    getIndex = 0
 
     const stateFromTarget = statesFrom[index]
-    
+
     // trigger getting all old values
     stateFromTarget( oldGetCallback )
-    
-    let getIndex = 0
-
-    // This is the "get" argument that will be called and all arguments are ignored
-    const newSetCallback = <T extends any[]>(..._: [...T]) => {
-      return oldValues[ getIndex++ ]
-    }
 
     // trigger setting updated values
     intoStates[index]( newSetCallback )
   }
+}
+
+let getIndex = 0
+const oldValues: any[] = []
+
+function oldGetCallback<T extends any[]>(...args: [...T]) {
+  oldValues.push(args)
+  return args
+}
+
+// This is the "get" argument that will be called and all arguments are ignored
+function newSetCallback <T extends any[]>(..._: [...T]) {
+  return oldValues[ getIndex++ ]
 }

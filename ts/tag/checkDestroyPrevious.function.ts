@@ -1,10 +1,7 @@
 // Functions in here are attached as ContextItem.checkValueChange
 
-import { processUpdateRegularValue, RegularValue } from './update/processRegularValue.function.js'
 import { destroyArrayItem } from'./update/compareArrayItems.function.js'
 import { isArray } from'../isInstance.js'
-import { paintRemoves } from './paint.function.js'
-import { BasicTypes } from './ValueTypes.enum.js'
 import { ContextItem } from './Context.types.js'
 
 export function checkArrayValueChange(
@@ -33,32 +30,4 @@ export function destroyArray(
   }
   
   delete subject.lastArray
-}
-
-export function checkSimpleValueChange(
-  newValue: unknown,
-  contextItem: ContextItem,
-) {
-  const isBadValue = newValue === null || newValue === undefined
-  if(isBadValue || !(typeof(newValue) === BasicTypes.object)) {
-    // This will cause all other values to render
-    processUpdateRegularValue(
-      newValue as RegularValue,
-      contextItem,
-    )
-
-    return -1  // no need to destroy, just update display
-  }
-
-  deleteSimpleValue(contextItem)
-  
-  return 6 // 'changed-simple-value'
-}
-
-export function deleteSimpleValue(
-  subject: ContextItem,
-) {
-  const elm = subject.simpleValueElm as Element
-  delete subject.simpleValueElm
-  paintRemoves.push(elm)
 }

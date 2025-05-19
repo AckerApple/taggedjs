@@ -1,15 +1,15 @@
 import { SupportContextItem } from '../createHtmlSupport.function.js'
 import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
-import { updateExistingTagComponent } from './updateExistingTagComponent.function.js'
+import { updateExistingTagComponent } from '../../render/update/updateExistingTagComponent.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
-import { ContextItem } from '../Context.types.js'
+import { AdvancedContextItem, ContextItem } from '../Context.types.js'
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js'
 import { createSupport } from '../createSupport.function.js'
 import { AnySupport } from '../AnySupport.type.js'
 
 /** Checks if value has changed before updating. Used for all tag value updates. Determines if value changed since last render */
-export function updateExistingValue(
+export function tagValueUpdateHandler(
   newValue: TemplateValue, // newValue
   ownerSupport: AnySupport,
   contextItem: ContextItem | SupportContextItem,
@@ -19,7 +19,7 @@ export function updateExistingValue(
     return
   }
 
-  forceUpdateExistingValue(contextItem, newValue, ownerSupport)
+  forceUpdateExistingValue(contextItem as AdvancedContextItem, newValue, ownerSupport)
 }
 
 export function prepareUpdateToComponent(

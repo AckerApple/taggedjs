@@ -21,11 +21,15 @@ type ConstructMethod<T> = Construct<T> & {
   compareTo: string
 }
 
+function getBlankDiffMemory() {
+  return {stateDiff: 0, provider: undefined as any as Provider}
+}
+
 export const providers = {
   create: <T>(
     constructMethod: Construct<T>
   ): T => {
-    const stateDiffMemory = state(() => ({stateDiff: 0, provider: undefined as any as Provider}))
+    const stateDiffMemory = state(getBlankDiffMemory)
 
     // mimic how many states were called the first time
     if(stateDiffMemory.stateDiff) {
@@ -75,51 +79,53 @@ export const providers = {
    * @param {(new (...args: any[]) => T) | () => T} constructor 
    * @returns {T}
    */
-  inject: <T>(constructor: ProviderConstructor<T>): T => {
-    // find once, return same every time after
-    return state(() => {
-      // const memory = setUse.memory
-      const cm = constructor as ConstructMethod<T>
-      const compareTo = cm.compareTo = cm.compareTo || constructor.toString()
-      const support =  getSupportInCycle() as AnySupport // memory.stateConfig.support as AnySupport
-      const providers: Provider[] = []
+  inject: providerInject
+}
 
-      let owner = {
-        ownerSupport: support.ownerSupport
-      } as AnySupport
-    
-      while(owner.ownerSupport) {
-        const ownGlobal = owner.ownerSupport.subject.global as SupportTagGlobal
-        const ownerProviders = ownGlobal.providers
+function providerInject<T>(constructor: ProviderConstructor<T>): T {
+  // find once, return same every time after
+  return state(function providerInjectState() {
+    // const memory = setUse.memory
+    const cm = constructor as ConstructMethod<T>
+    const compareTo = cm.compareTo = cm.compareTo || constructor.toString()
+    const support =  getSupportInCycle() as AnySupport // memory.stateConfig.support as AnySupport
+    const providers: Provider[] = []
+
+    let owner = {
+      ownerSupport: support.ownerSupport
+    } as AnySupport
   
-        if(!ownerProviders) {
-          owner = owner.ownerSupport as AnySupport // cause reloop checking next parent
-          continue
-        }
+    while(owner.ownerSupport) {
+      const ownGlobal = owner.ownerSupport.subject.global as SupportTagGlobal
+      const ownerProviders = ownGlobal.providers
 
-        const provider = ownerProviders.find(provider => {
-          providers.push(provider as Provider)
-          const constructorMatch = provider.constructMethod.compareTo === compareTo
-          
-          if(constructorMatch) {
-            return true
-          }
-        })
-
-        if(provider) {
-          const global = support.subject.global as SupportTagGlobal
-          const providers = global.providers = global.providers || []
-          providers.push(provider)
-          provider.children.push(support)
-          return provider.instance
-        }
-  
+      if(!ownerProviders) {
         owner = owner.ownerSupport as AnySupport // cause reloop checking next parent
+        continue
       }
-      
-      const msg = `Could not inject provider: ${constructor.name} ${constructor}`
-      console.warn(`${msg}. Available providers`, providers)
-      throw new Error(msg)  
-    })
-  }
+
+      const provider = ownerProviders.find(provider => {
+        providers.push(provider as Provider)
+        const constructorMatch = provider.constructMethod.compareTo === compareTo
+        
+        if(constructorMatch) {
+          return true
+        }
+      })
+
+      if(provider) {
+        const global = support.subject.global as SupportTagGlobal
+        const providers = global.providers = global.providers || []
+        providers.push(provider)
+        provider.children.push(support)
+        return provider.instance
+      }
+
+      owner = owner.ownerSupport as AnySupport // cause reloop checking next parent
+    }
+    
+    const msg = `Could not inject provider: ${constructor.name} ${constructor}`
+    console.warn(`${msg}. Available providers`, providers)
+    throw new Error(msg)  
+  })
 }

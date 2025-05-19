@@ -1,6 +1,6 @@
-import { buildBeforeElement } from '../buildBeforeElement.function.js'
+import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
 import { Counts } from'../../interpolations/interpolateTemplate.js'
-import { paintAppends } from '../paint.function.js'
+import { paintAppend, paintAppends } from '../../render/paint.function.js'
 import { ContextItem } from '../Context.types.js'
 import { checkTagValueChange } from '../index.js'
 import { AnySupport } from '../AnySupport.type.js'
@@ -40,14 +40,14 @@ export function processFirstTagResult(
   for(const dom of result.dom) {
     if(dom.domElement) {
       paintAppends.splice(appendIndex++, 0, {
-        element: dom.domElement,
-        relative: appendTo,
+        args: [appendTo, dom.domElement],
+        processor: paintAppend,
       })
     }
     if(dom.marker) {
       paintAppends.splice(appendIndex++, 0, {
-        element: dom.marker,
-        relative: appendTo,
+        args: [appendTo, dom.marker],
+        processor: paintAppend,
       })
     }
   }

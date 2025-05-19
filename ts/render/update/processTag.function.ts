@@ -1,14 +1,14 @@
-import { createHtmlSupport, SupportContextItem } from '../createHtmlSupport.function.js'
-import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { checkTagValueChange } from '../checkTagValueChange.function.js'
+import { createHtmlSupport, SupportContextItem } from '../../tag/createHtmlSupport.function.js'
+import { SupportTagGlobal, TemplaterResult } from '../../tag/getTemplaterResult.function.js'
+import { checkTagValueChange } from '../../tag/checkTagValueChange.function.js'
 import { buildBeforeElement } from '../buildBeforeElement.function.js'
-import type { StringTag } from '../StringTag.type.js'
-import type { DomTag } from '../DomTag.type.js'
-import { ValueTypes } from '../ValueTypes.enum.js'
-import { ContextItem } from '../Context.types.js'
+import type { StringTag } from '../../tag/StringTag.type.js'
+import type { DomTag } from '../../tag/DomTag.type.js'
+import { ValueTypes } from '../../tag/ValueTypes.enum.js'
+import { ContextItem } from '../../tag/Context.types.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { processTagInit } from './processTagInit.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { processTagInit } from '../../tag/update/processTagInit.function.js'
+import { AnySupport } from '../../tag/AnySupport.type.js'
 
 /** When first time render, adds to owner childTags
  * Used for BOTH inserts & updates to values that were something else

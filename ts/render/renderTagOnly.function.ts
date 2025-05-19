@@ -1,13 +1,13 @@
-import { Wrapper } from '../getTemplaterResult.function.js'
-import { SupportContextItem } from '../createHtmlSupport.function.js'
-import { executeWrap } from '../executeWrap.function.js'
-import { ValueTypes } from '../ValueTypes.enum.js'
-import { TagWrapper } from '../tag.utils.js'
-import { runAfterRender } from '../afterRender.function.js'
-import { initState, reState } from '../../state/state.utils.js'
-import { setUseMemory } from '../../state/setUseMemory.object.js'
-import { createSupport } from '../createSupport.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { Wrapper } from '../tag/getTemplaterResult.function.js'
+import { SupportContextItem } from '../tag/createHtmlSupport.function.js'
+import { executeWrap } from './executeWrap.function.js'
+import { ValueTypes } from '../tag/ValueTypes.enum.js'
+import { TagWrapper } from '../tag/tag.utils.js'
+import { runAfterRender } from './afterRender.function.js'
+import { initState, reState } from '../state/state.utils.js'
+import { setUseMemory } from '../state/setUseMemory.object.js'
+import { createSupport } from '../tag/createSupport.function.js'
+import { AnySupport } from '../tag/AnySupport.type.js'
 
 export function renderTagOnly(
   newSupport: AnySupport,
@@ -15,19 +15,7 @@ export function renderTagOnly(
   subject:SupportContextItem,
   ownerSupport?: AnySupport,
 ): AnySupport {
-  const prevState = prevSupport?.state
-  const config = setUseMemory.stateConfig
-
-  if(prevState) {
-    reState(
-      newSupport,
-      prevSupport,
-      setUseMemory.stateConfig,
-      prevState,
-    )
-  } else {
-    initState(newSupport, config)
-  }
+  runBeforeRender(newSupport, prevSupport)
   
   const templater = newSupport.templater
   let reSupport: AnySupport
@@ -63,4 +51,25 @@ export function renderTagOnly(
   runAfterRender(reSupport, ownerSupport)
 
   return reSupport
+}
+
+function runBeforeRender(
+  newSupport: AnySupport,
+  prevSupport?: AnySupport,
+) {
+  const prevState = prevSupport?.state
+  const config = setUseMemory.stateConfig
+
+  if(prevState) {
+    reState(
+      newSupport,
+      prevSupport,
+      setUseMemory.stateConfig,
+      prevState,
+    )
+    
+    return
+  }
+  
+  initState(newSupport, config)
 }

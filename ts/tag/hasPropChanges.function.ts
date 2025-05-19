@@ -1,7 +1,7 @@
 import { deepEqual } from '../deepFunctions.js'
 import { Props } from '../Props.js'
 import { deepCompareDepth, immutablePropMatch, shallowPropMatch } from './hasSupportChanged.function.js'
-import { hasPropLengthsChanged } from './render/renderSupport.function.js'
+import { hasPropLengthsChanged } from '../render/renderSupport.function.js'
 import { PropWatches } from './tag.function.js'
 import { UnknownFunction } from './update/oneRenderToSupport.function.js'
 import { BasicTypes } from './ValueTypes.enum.js'
@@ -81,7 +81,7 @@ function onePropCompare(
     return matched
   }
 
-  return compareProps(value, compare, () => {
+  return compareProps(value, compare, function propComparer() {
     castedProps.splice(index, 1)
     castedPastProps.splice(index, 1)
   })

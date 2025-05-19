@@ -3,7 +3,7 @@
 import { specialAttribute } from './specialAttribute.js'
 import { HowToSet } from './howToSetInputValue.function.js'
 import { TagGlobal } from '../../tag/getTemplaterResult.function.js'
-import { processTagCallbackFun, SpecialAction, SpecialDefinition } from './processAttribute.function.js'
+import { processTagCallbackFun, SpecialAction, SpecialDefinition } from '../../render/attributes/processAttribute.function.js'
 import { ContextItem } from '../../tag/Context.types.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
 import { BasicTypes } from '../../tag/ValueTypes.enum.js'

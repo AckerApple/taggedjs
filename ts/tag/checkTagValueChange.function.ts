@@ -1,19 +1,23 @@
 import { AnySupport } from './AnySupport.type.js'
 import { SupportContextItem } from './createHtmlSupport.function.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
-import { destroySupport } from './destroySupport.function.js'
+import { destroySupport } from '../render/destroySupport.function.js'
 import {SupportTagGlobal, TemplaterResult } from './getTemplaterResult.function.js'
 import { isStaticTag } from'../isInstance.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { ContextItem } from './Context.types.js'
 import { tryUpdateToTag } from './update/tryUpdateToTag.function.js'
-import { paint, paintAfters } from './paint.function.js'
 
 export function checkTagValueChange(
   newValue: unknown,
   contextItem: SupportContextItem,
 ) {
   const global = contextItem.global as SupportTagGlobal
+  
+  if(!global) {
+    return 663 // its not a tag this time
+  }
+  
   const lastSupport = global?.newest
   const isValueTag = isStaticTag(newValue)
   const newTag = newValue as AnySupport
@@ -27,7 +31,7 @@ export function checkTagValueChange(
       return 7 // 'tag-swap'
     }
 
-    return false
+    return 77 // always cause a redraw of static tags (was false)
   }
 
   const isTag = (newValue as any)?.tagJsType
@@ -35,22 +39,16 @@ export function checkTagValueChange(
     const support = global.newest
     const ownerSupport = support.ownerSupport as AnySupport
     const result = tryUpdateToTag(contextItem, newValue as TemplaterResult, ownerSupport)
-    return result === true ? -1 : false
+
+    const doNotRedraw = result === true
+
+    if(doNotRedraw) {
+      return -1
+    }
+
+    return 88 // its same tag with new values
   }
   
-  // A subject could have emitted twice in one render cycle
-  if(lastSupport.subject.renderCount === 0) {
-    delete (contextItem as ContextItem).global
-    contextItem.renderCount = 0
-
-    paintAfters.push(() => {
-      destroySupport(lastSupport, global)
-      paintAfters.shift() // prevent endless recursion
-      paint()
-    })
-    return 8 // never rendered
-  }
-
   destorySupportByContextItem(contextItem)
    
   return 8 // 'no-longer-tag'

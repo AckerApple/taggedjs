@@ -1,9 +1,9 @@
-import { AnySupport } from '../AnySupport.type.js'
-import { SupportContextItem } from '../createHtmlSupport.function.js'
+import { AnySupport } from '../tag/AnySupport.type.js'
+import { SupportContextItem } from '../tag/createHtmlSupport.function.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
-import { processTag } from '../update/processTag.function.js'
-import { updateSupportBy } from '../updateSupportBy.function.js'
-import { Counts } from '../../interpolations/interpolateTemplate.js'
+import { processTag } from './update/processTag.function.js'
+import { updateSupportBy } from './update/updateSupportBy.function.js'
+import { Counts } from '../interpolations/interpolateTemplate.js'
 
 const fooCounts: Counts = { added:0, removed:0 }
 

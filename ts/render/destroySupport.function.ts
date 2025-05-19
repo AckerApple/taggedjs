@@ -1,9 +1,9 @@
-import { destroyContext } from './destroyContext.function.js'
-import { smartRemoveKids } from './smartRemoveKids.function.js'
-import { SupportTagGlobal } from './getTemplaterResult.function.js'
-import { runBeforeDestroy } from './tagRunner.js'
-import { AnySupport } from './AnySupport.type.js'
-import { ContextItem } from './Context.types.js'
+import { destroyContext } from '../tag/destroyContext.function.js'
+import { smartRemoveKids } from '../tag/smartRemoveKids.function.js'
+import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
+import { runBeforeDestroy } from '../tag/tagRunner.js'
+import { AnySupport } from '../tag/AnySupport.type.js'
+import { ContextItem } from '../tag/Context.types.js'
 
 export function destroySupport(
   support: AnySupport,
@@ -16,7 +16,7 @@ export function destroySupport(
   const promises: Promise<any>[] = []
 
   const context = global.context as ContextItem[]
-  destroyContext(context)
+  destroyContext(context, support)
 
   if(global.destroy$) {
     runBeforeDestroy(support, global)

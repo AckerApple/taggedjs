@@ -1,4 +1,4 @@
-import { handleProviderChanges } from './handleProviderChanges.function.js'
+import { handleProviderChanges, TagWithProvider } from './handleProviderChanges.function.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
 import {SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 
@@ -18,8 +18,12 @@ export function providersChangeCheck(
   for (const provider of providers) {
     const owner = provider.owner
     const hasChange = handleProviderChanges(owner, provider)
-    prosWithChanges.push(...hasChange.map(x => x.support))    
+    prosWithChanges.push(...hasChange.map(mapToSupport))
   }
 
   return prosWithChanges
+}
+
+function mapToSupport(x: TagWithProvider) {
+  return x.support
 }

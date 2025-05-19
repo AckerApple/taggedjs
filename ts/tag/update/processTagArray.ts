@@ -1,7 +1,7 @@
 // taggedjs-no-compile
 
 import { TemplaterResult } from '../getTemplaterResult.function.js'
-import { updateExistingValue } from './updateExistingValue.function.js'
+import { tagValueUpdateHandler } from './tagValueUpdateHandler.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import { ContextItem, LastArrayItem } from '../Context.types.js'
@@ -9,7 +9,6 @@ import { StringTag } from '../StringTag.type.js'
 import { compareArrayItems } from './compareArrayItems.function.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
-import { checkSimpleValueChange } from '../checkDestroyPrevious.function.js'
 
 export function processTagArray(
   subject: ContextItem,
@@ -99,7 +98,6 @@ function reviewArrayItem(
     item as TemplateValue,
     ownerSupport,
     counts,
-    checkSimpleValueChange,
     runtimeInsertBefore as Text,
     appendTo,
   )
@@ -122,7 +120,7 @@ function reviewPreviousArrayItem(
 ) {
   const couldBeSame = lastArray.length > index
   if (couldBeSame) {
-    updateExistingValue(
+    tagValueUpdateHandler(
       value as TemplateValue,
       ownerSupport,
       itemSubject,
@@ -134,7 +132,6 @@ function reviewPreviousArrayItem(
     value as TemplateValue,
     ownerSupport,
     counts,
-    checkSimpleValueChange,
     runtimeInsertBefore as Text,
     appendTo,
   )

@@ -1,8 +1,8 @@
-import { paintAfters, paintContent } from "../../tag/paint.function.js"
+import { paintAfters, paintContent } from "../../render/paint.function.js"
 import { AnySupport } from "../../tag/AnySupport.type.js";
 import { Counts } from "../interpolateTemplate.js";
 import { InputElementTargetEvent } from "./ElementTargetEvent.interface.js";
-import { SpecialDefinition } from "./processAttribute.function.js";
+import { SpecialDefinition } from "../../render/attributes/processAttribute.function.js";
 
 /** handles init, destroy, autofocus, autoselect, style., class. */
 export function specialAttribute(
@@ -19,7 +19,7 @@ export function specialAttribute(
       const stagger = counts.added
 
       // run delayed after elements placed down
-      paintAfters.push(() => {
+      paintAfters.push(function paintSpecialAttribute() {
         const event = {
           target: element,
           stagger,

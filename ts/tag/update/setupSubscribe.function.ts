@@ -1,101 +1,83 @@
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
-import { ContextItem } from '../Context.types.js'
+import { AdvancedContextItem, ContextItem } from '../Context.types.js'
 import { LikeObservable, SubscribeCallback, SubscribeValue } from '../../state/subscribe.function.js'
-import { paint, paintAppends } from '../paint.function.js'
+import { paint, paintAppend, paintAppends, paintCommands, paintRemover } from '../../render/paint.function.js'
 import { setUseMemory } from '../../state/setUseMemory.object.js'
 import { Subscription } from '../../state/subscribe.function.js'
 import { syncSupports } from '../../state/syncStates.function.js'
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js'
 import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js'
 import { StatesSetter } from '../../state/states.utils.js'
-import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js'
+import { empty, ValueTypes } from '../ValueTypes.enum.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
-import { deleteSimpleValue } from '../checkDestroyPrevious.function.js'
-import { processUpdateRegularValue, RegularValue } from './processRegularValue.function.js'
+import { tagValueUpdateHandler } from './tagValueUpdateHandler.function.js'
+import { updateToDiffValue } from './updateToDiffValue.function.js'
 
 export function setupSubscribe(
   observable: LikeObservable<any>,
-  contextItem: ContextItem,
+  contextItem: AdvancedContextItem,
   ownerSupport: AnySupport,
   counts: Counts,
   callback?: SubscribeCallback<any>,
   appendTo?: Element,
   insertBefore?: Text,
-) {
+): SubscribeMemory {
   let appendMarker: Text | undefined
 
   // do we need to append now but process subscription later?
   if(appendTo) {
-    appendMarker = insertBefore = document.createTextNode('')
+    appendMarker = insertBefore = document.createTextNode(empty)
 
     paintAppends.push({
-      element: insertBefore,
-      relative: appendTo,
+      processor: paintAppend,
+      args: [appendTo, insertBefore]
     })
   }
 
   const subscription = setupSubscribeCallbackProcessor(
     observable,
-    contextItem,
     ownerSupport,
     counts,
     callback,
     insertBefore,
   )
 
-  contextItem.delete = () => {
-    console.log('🗑️ delete subscribe')
-    subscription.contextItem.delete(subscription.contextItem)
-    subscription.subscription.unsubscribe()
+  subscription.appendMarker = appendMarker
 
-    if(appendMarker) {
-      const parentNode = appendMarker.parentNode as ParentNode
-      parentNode.removeChild(appendMarker)
-    }
-  }
+  contextItem.subscription = subscription
+  contextItem.delete = deleteSubscribe
+  contextItem.handler = checkSubscribeFrom
 
-  contextItem.handler = (
-    value: TemplateValue,
-    newSupport: AnySupport,
-    contextItem: ContextItem,
-    // values: unknown[],
-  ) => {
-    checkSubscribeFrom(
-      value,
-      newSupport,
-      contextItem,
-      subscription,
-    )
-  }
+  return subscription
 }
 
 export function setupSubscribeCallbackProcessor(
   observable: LikeObservable<any>,
-  contextItem: ContextItem,
   ownerSupport: AnySupport, // ownerSupport ?
   counts: Counts, // used for animation stagger computing
   callback?: SubscribeCallback<any>,
   insertBefore?: Text,
 ): SubscribeMemory {
   const component = getSupportWithState(ownerSupport)
-  let lastValue: TemplateValue = undefined
-  const getLastValue = () => lastValue
-
+  
   let onValue = function onSubValue(value: TemplateValue) {
-    memory.hasEmitted = true
-    memory.contextItem = createAndProcessContextItem(
+    subscription.hasEmitted = true
+    subscription.contextItem = createAndProcessContextItem(
       value as TemplateValue,
       ownerSupport,
       counts,
-      undefined as any,
       insertBefore,
     )
-
+/*
+    if(!syncRun && !setUseMemory.stateConfig.support) {
+      paint()
+    }
+*/
     // from now on just run update
-    onValue = function subscriptionUpdate(value: TemplateValue) {  
-      forceUpdateExistingValue(memory.contextItem, value, ownerSupport)
+    onValue = function subscriptionUpdate(value: TemplateValue) {
+      forceUpdateExistingValue(subscription.contextItem, value, ownerSupport)
 
       if(!syncRun && !setUseMemory.stateConfig.support) {
         paint()
@@ -105,72 +87,112 @@ export function setupSubscribeCallbackProcessor(
   
   // onValue mutates so function below calls original and mutation
   const valueChangeHandler = function subValueProcessor(value: TemplateValue) {
-    lastValue = value
+    subscription.lastValue = value
 
     const newComponent = component.subject.global.newest
     syncSupports(newComponent, component)
 
-    if(memory.callback) {
-      value = memory.callback(value)
+    if(subscription.callback) {
+      value = subscription.callback(value)
     }
 
     onValue(value)
   }
 
+  let syncRun = true
+
   // aka setup
-  const memory = {
+  const subscription = {
     hasEmitted: false,
     handler: valueChangeHandler,
-    getLastValue,
     callback,
     states: component.states,
-  } as SubscribeMemory
+    lastValue: undefined,
+    subscription: undefined, // must be populated AFTER "subscription" variable defined incase called on subscribe
+  } as any as SubscribeMemory
 
-  ;(contextItem as any).subscription = memory
-
-  let syncRun = true
-  memory.subscription = observable.subscribe( valueChangeHandler )
+  subscription.subscription = observable.subscribe( valueChangeHandler )
   syncRun = false
 
-  return memory
+  return subscription
 }
 
-type SubscribeMemory = {
+export type SubscribeMemory = {
   hasEmitted: boolean
+  deleted: boolean
   states: StatesSetter[]
   
   /** Handles emissions from subject and figures out what to display */
   handler: (value: TemplateValue) => void
-  
-  /** Needed so we can update the callback whenever we want */
-  getLastValue: () => any
+  lastValue: any
   
   callback?: SubscribeCallback<any>
   subscription: Subscription
+  appendMarker?: Text
   
-  contextItem: ContextItem
+  contextItem: AdvancedContextItem
 }
 
 function checkSubscribeFrom(
-  value: unknown,
-  newSupport: AnySupport,
+  newValue: unknown,
+  ownerSupport: AnySupport,
   contextItem: ContextItem,
-  subscription: SubscribeMemory,
 ) {
-  if(!value || !(value as any).tagJsType || (value as any).tagJsType !== ValueTypes.subscribe) {
-    contextItem.delete(contextItem)
+  if(!newValue || !(newValue as any).tagJsType || (newValue as any).tagJsType !== ValueTypes.subscribe) {
+    (contextItem as AdvancedContextItem).delete(contextItem, ownerSupport)
+
+    updateToDiffValue(
+      newValue as TemplateValue,
+      contextItem,
+      ownerSupport,
+      99
+    )
     return 99
   }
 
+  const subscription = contextItem.subscription as SubscribeMemory
   if (!subscription.hasEmitted) {
     return -1
   }
 
-  subscription.callback = (value as SubscribeValue).callback
-  subscription.handler(subscription.getLastValue())
+  subscription.callback = (newValue as SubscribeValue).callback
+  subscription.handler(subscription.lastValue)
 
-  const newComponent = getSupportWithState(newSupport)
+  const newComponent = getSupportWithState(ownerSupport)
   subscription.states = newComponent.states
 
   return -1
+}
+
+function deleteSubscribe(
+  contextItem: ContextItem,
+  ownerSupport: AnySupport,
+) {
+  const subscription = contextItem.subscription as SubscribeMemory
+
+  subscription.deleted = true
+  delete contextItem.subscription
+  subscription.subscription.unsubscribe()
+  
+  const appendMarker = subscription.appendMarker
+  if(appendMarker) {
+    paintCommands.push({
+      processor: paintRemover,
+      args: [appendMarker],
+    })
+    delete subscription.appendMarker
+  }
+  
+  delete (contextItem as any).delete
+  // delete contextItem.handler
+  contextItem.handler = tagValueUpdateHandler
+  
+  
+  if(!subscription.hasEmitted) {
+    return
+  }
+
+  subscription.contextItem.delete(subscription.contextItem, ownerSupport)
+
+  return 77
 }

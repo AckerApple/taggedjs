@@ -1,13 +1,13 @@
 import { SupportContextItem } from '../createHtmlSupport.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
-import { ContextItem } from '../Context.types.js'
+import { AdvancedContextItem, ContextItem } from '../Context.types.js'
 import { updateToDiffValue } from './updateToDiffValue.function.js'
 import { AnySupport } from '../AnySupport.type.js'
 
 
 /** Used for all tag value updates. Determines if value changed since last render */
 export function forceUpdateExistingValue(
-  contextItem: ContextItem | SupportContextItem,
+  contextItem: AdvancedContextItem | SupportContextItem,
   newValue: TemplateValue, // newValue
   ownerSupport: AnySupport,
 ) {

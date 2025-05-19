@@ -1,5 +1,5 @@
 import { checkTagValueChange } from '../checkTagValueChange.function.js'
-import { processTag } from './processTag.function.js'
+import { processTag } from '../../render/update/processTag.function.js'
 import { TemplaterResult } from '../getTemplaterResult.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { SupportContextItem } from '../createHtmlSupport.function.js'

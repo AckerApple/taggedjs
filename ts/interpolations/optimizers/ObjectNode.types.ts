@@ -1,4 +1,4 @@
-import { SpecialDefinition } from "../attributes/processAttribute.function.js"
+import { SpecialDefinition } from "../../render/attributes/processAttribute.function.js"
 import { ObjectChildren } from "./LikeObjectElement.type.js"
 
 type ObjectNode = {

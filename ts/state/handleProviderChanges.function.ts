@@ -37,7 +37,7 @@ function getTagsWithProvider(
   return memory
 }
 
-type TagWithProvider = {
+export type TagWithProvider = {
   support: AnySupport
   renderCount: number
   provider: Provider

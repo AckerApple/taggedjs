@@ -33,11 +33,13 @@ export function htmlInterpolationToPlaceholders(
 }
 
 function sanitizePlaceholders(fragments: string[]) {
-  return fragments.map(fragment =>
-    fragment.replace(
-      fragReplacer,
-      (match, index) => safeVar + index)
-  )
+  return fragments.map(santizeFragment)
+}
+
+function santizeFragment(fragment: string) {
+  return fragment.replace(
+    fragReplacer,
+    (match, index) => safeVar + index)
 }
 
 function addPlaceholders(
@@ -45,12 +47,16 @@ function addPlaceholders(
   values: any[],
 ) {
 
-  const results = strings.map((fragment, index) => {
+  const results = []
+  
+  for (let index=0; index < strings.length; ++index) {
+    const fragment = strings[index]
     if (index < values.length) {
-      return fragment + variablePrefix + index + variableSuffix
+      results.push(fragment + variablePrefix + index + variableSuffix)
+      continue
     }
-    return fragment;
-  })
+    results.push(fragment)
+  }
 
   balanceArrayByArrays(results, strings, values)
 

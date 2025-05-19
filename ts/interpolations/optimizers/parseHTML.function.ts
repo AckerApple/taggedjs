@@ -36,13 +36,13 @@ export function parseHTML(html: string): ParsedHtml {
       if (textContent.trim()) {
         const textVarMatches = splitByTagVar(textContent);
 
-        textVarMatches.forEach(textContent => {
+        for (let textContent of textVarMatches) {
           if(textContent.startsWith(variablePrefix)) {
             textContent = variablePrefix + (++valueIndex) + variableSuffix
           }
 
           pushTextTo(currentElement, elements, textContent)
-        })
+        }
       }
     }
 
@@ -132,12 +132,12 @@ export function parseHTML(html: string): ParsedHtml {
     const textContent = html.slice(position);
     if (textContent.trim()) {
       const textVarMatches = splitByTagVar(textContent);
-      textVarMatches.forEach(textContent => {
+      for (const textContent of textVarMatches) {
         if(textContent.startsWith(variablePrefix)) {
           ++valueIndex
         }
-        return pushTextTo(currentElement, elements, textContent)
-      })
+        pushTextTo(currentElement, elements, textContent)
+      }
     }
   }
 
@@ -204,10 +204,14 @@ function pushTo(
 
 function splitByTagVar(inputString: string) {
   // Split the string using the regular expression, keep delimiters in the output
-  const parts = inputString.split(fragFindAny);
+  const parts = inputString.split(fragFindAny)
 
   // Filter out any empty strings from the results
-  const filteredParts = parts.filter(part => part !== '');
+  const filteredParts = parts.filter(notEmptyStringMapper)
 
   return filteredParts;
+}
+
+function notEmptyStringMapper(part: string) {
+  return part !== ''
 }

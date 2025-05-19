@@ -1,32 +1,27 @@
-import { DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
-import { Events,SupportTagGlobal, TemplaterResult, Wrapper } from './getTemplaterResult.function.js'
-import { getBaseSupport, SupportContextItem, upgradeBaseToSupport } from './createHtmlSupport.function.js'
-import { buildBeforeElement } from './buildBeforeElement.function.js'
-import { tags, TagWrapper } from './tag.utils.js'
+import { SupportTagGlobal, TemplaterResult } from './getTemplaterResult.function.js'
+import { SupportContextItem } from './createHtmlSupport.function.js'
+import { TagWrapper } from './tag.utils.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
-import { destroySupport } from './destroySupport.function.js'
+import { destroySupport } from '../render/destroySupport.function.js'
 import { BaseTagGlobal, DomTag, PropWatches } from './index.js'
-import { UseMemory } from '../state/setUse.function.js'
-import { runAfterRender } from './afterRender.function.js'
-import { executeWrap } from './executeWrap.function.js'
-import { paint, painting } from './paint.function.js'
-import { initState, reState } from '../state/state.utils.js'
+import { initState } from '../state/state.utils.js'
 import { isTagComponent } from '../isInstance.js'
 import { Props } from '../Props.js'
 import { TagMaker } from './TagMaker.type.js'
 import { BaseSupport } from './BaseSupport.type.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
 import { checkTagValueChange, destorySupportByContextItem } from './checkTagValueChange.function.js'
-import { createSupport } from './createSupport.function.js'
 import { AnySupport } from './AnySupport.type.js'
+import { renderTagElement } from '../render/renderTagElement.function.js'
+import { loadNewBaseSupport } from './loadNewBaseSupport.function.js'
 
 export type TagAppElement = Element & {
   ValueTypes: typeof ValueTypes
   setUse: typeof setUseMemory
 }
 
-const appElements: {
+export const appElements: {
   support: AnySupport
   element: Element
 }[] = []
@@ -58,7 +53,7 @@ export function tagElement(
 
   // Create the app which returns [props, runOneTimeFunction]
   
-  let templater = (() => (templater2 as unknown as (...n:unknown[]) => unknown)(props)) as unknown as TemplaterResult
+  let templater = (() => (templater2 as any)(props)) as unknown as TemplaterResult
   templater.propWatch = PropWatches.NONE
   templater.tagJsType = ValueTypes.stateRender
   // todo: props should be an array
@@ -89,93 +84,10 @@ export function tagElement(
     }
   }
 
-  const placeholder = document.createTextNode('')
-  tags.push((templater.wrapper || {original: templater}) as unknown as TagWrapper<unknown>)
-  const support = runWrapper(templater, placeholder, element, subject, isAppFunction)
-  
-  global.isApp = true
-  
-  if(isAppFunction) {
-    templater2.tag = support.templater.tag
-  }
-
-  if(!element) {
-    throw new Error(`Cannot tagElement, element received is type ${typeof element} and not type Element`)
-  }
-
-  // enables hmr destroy so it can control entire app
-  ;(element as TagJsElement).destroy = function() {
-    const events = global.events as Events
-    for (const eventName in events) {
-      const callback = events[eventName]
-      element.removeEventListener(eventName, callback)
-    }
-    global.events = {}
-
-    ++painting.locks
-
-    const toAwait = destroySupport(support, global) // never return anything here
-
-    --painting.locks
-
-    paint()
-
-    return toAwait
-  }
-  
-  ++painting.locks
-
-  const newFragment = registerTagElement(support, element, global, templater, app, placeholder)
-
-  --painting.locks
-
-  paint()
-  element.appendChild(newFragment)
-
-  return {
-    support,
-    tags,
-    ValueTypes,
-  }
-}
-
-function registerTagElement(
-  support: AnySupport,
-  element: Element | HTMLElement,
-  global: BaseTagGlobal,
-  templater: TemplaterResult,
-  app: TagMaker,
-  placeholder: Text,
-) {
-  const result = buildBeforeElement(
-    support,
-    { added: 0, removed: 0 },
-    element,
-    undefined,
+  return renderTagElement(
+    app, global, templater, templater2,
+    element, subject, isAppFunction,
   )
-
-  global.oldest = support
-  global.newest = support
-
-  let setUse = (templater as unknown as TagAppElement).setUse
-
-  if (templater.tagJsType !== ValueTypes.stateRender) {
-    const wrap = app as unknown as Wrapper
-    const original = (wrap as unknown as TagWrapper<unknown>).original
-    setUse = original.setUse as unknown as UseMemory; (original as any).isApp = true
-  }
-
-  ;(element as TagAppElement).setUse = setUse; (element as TagAppElement).ValueTypes = ValueTypes
-  appElements.push({ element, support })
-
-  const newFragment = document.createDocumentFragment()
-  newFragment.appendChild(placeholder)
-
-  for (const domItem of result.dom) {
-    putOneDomDown(domItem, newFragment)
-  }
-
-  return newFragment
 }
 
 function getNewSubject(
@@ -198,118 +110,4 @@ function getNewSubject(
   loadNewBaseSupport(templater, subject, appElement)
 
   return subject
-}
-
-function loadNewBaseSupport(
-  templater: TemplaterResult,
-  subject:SupportContextItem,
-  appElement: Element,
-) {
-  const global = subject.global
-  const newSupport = getBaseSupport(
-    templater,
-    subject as SupportContextItem,
-  ) as AnySupport
-
-  upgradeBaseToSupport(templater, newSupport, newSupport)
-  
-  newSupport.appElement = appElement
-  global.oldest = global.oldest || newSupport
-  global.newest = newSupport
-
-  return newSupport
-}
-
-export function runWrapper(
-  templater: TemplaterResult,
-  placeholder: Text,
-  appElement: Element,
-  subject:SupportContextItem,
-  isAppFunction: boolean,
-) {
-  subject.placeholder = placeholder
-  
-  const global = subject.global as SupportTagGlobal
-  const oldest = global.oldest
-  const isFirstRender = global.newest === oldest
-
-  const newSupport = createSupport(
-    templater,
-    global.newest,
-    global.newest.appSupport, // ownerSupport.appSupport as AnySupport,
-    subject,
-    // castedProps,
-  )
-
-  if(!isFirstRender) {
-    reState(
-      newSupport,
-      global.newest, // global.oldest, // global.newest,
-      setUseMemory.stateConfig,
-      oldest.state,
-    )
-  }
-
-  if(templater.tagJsType === ValueTypes.stateRender) {
-    return executeStateWrap(
-      templater,
-      isAppFunction,
-      newSupport,
-      subject,
-      appElement,    
-    )
-  }
-  
-  // Call the apps function for our tag templater
-  const wrapper = templater.wrapper as Wrapper
-  const nowSupport = wrapper(
-    newSupport,
-    subject,
-  )
-
-  runAfterRender(newSupport)
-
-  return nowSupport
-}
-
-function putOneDomDown(
-  dom: DomObjectText | DomObjectElement,
-  newFragment: DocumentFragment,
-) {
-  if(dom.domElement) {
-    newFragment.appendChild(dom.domElement)
-  }
-  if(dom.marker) {
-    newFragment.appendChild(dom.marker)
-  }
-}
-
-type TagJsElement = Element & {
-  destroy?: (...n: unknown[]) => unknown
-}
-
-function executeStateWrap(
-  templater: TemplaterResult,
-  isAppFunction: boolean,
-  newSupport: AnySupport,
-  subject: SupportContextItem,
-  appElement: Element,
-) {
-  const result = (templater.wrapper || {original: templater}) as unknown as TagWrapper<unknown>
-
-  if(!isAppFunction) {
-    const newSupport = loadNewBaseSupport(templater, subject, appElement)
-    runAfterRender(newSupport)
-    return newSupport
-  }
-
-  executeWrap(
-    templater,
-    result,
-    newSupport,
-  )
-
-  runAfterRender(newSupport)
-
-  return newSupport
 }

@@ -1,20 +1,21 @@
 // taggedjs-no-compile
 
-import { specialAttribute } from './specialAttribute.js'
+import { specialAttribute } from '../../interpolations/attributes/specialAttribute.js'
 import { isFunction, isObject, isSubjectInstance } from '../../isInstance.js'
-import { HowToSet } from './howToSetInputValue.function.js'
-import { bindSubjectCallback, Callback } from './bindSubjectCallback.function.js'
+import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.function.js'
+import { bindSubjectCallback, Callback } from '../../interpolations/attributes/bindSubjectCallback.function.js'
 import { BasicTypes, ValueTypes, empty } from '../../tag/ValueTypes.enum.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
-import { paintContent } from '../../tag/paint.function.js'
+import { paintContent } from '../paint.function.js'
 import { ContextItem } from '../../tag/Context.types.js'
-import { processDynamicNameValueAttribute, processNonDynamicAttr } from './processNameValueAttribute.function.js'
-import { addOneContext, checkSimpleValueChange, deleteSimpleValue, TagGlobal } from '../../tag/index.js'
-import { processAttributeFunction } from './processAttributeCallback.function.js'
-import { isSpecialAttr } from './isSpecialAttribute.function.js'
-import { Counts } from '../interpolateTemplate.js'
-import { processUpdateAttrContext } from '../../tag/processUpdateAttrContext.function.js'
-import { blankHandler } from '../optimizers/attachDomElements.function.js'
+import { processDynamicNameValueAttribute, processNonDynamicAttr } from '../../interpolations/attributes/processNameValueAttribute.function.js'
+import { TagGlobal } from '../../tag/index.js'
+import { addOneContext } from '../index.js'
+import { processAttributeFunction } from '../../interpolations/attributes/processAttributeCallback.function.js'
+import { isSpecialAttr } from '../../interpolations/attributes/isSpecialAttribute.function.js'
+import { Counts } from '../../interpolations/interpolateTemplate.js'
+import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
+import { blankHandler } from '../dom/attachDomElements.function.js'
 
 type TagVarIdNum = {tagJsVar: number}
 export type SpecialAction = 'init' | 'destroy'
@@ -72,13 +73,13 @@ export function processAttribute(
       isAttr: true,
       element,
       attrName: attrName as string,
-      checkValueChange: checkSimpleValueChange,
-      delete: deleteSimpleValue,
+      // checkValueChange: undefined as any,
+      // delete: undefined as any,
       withinOwnerElement: true,
     }
 
     context.push(contextItem)
-
+/*
     const isSubject = isSubjectInstance(contextItem.value)
     if ( isSubject ) {
       return processNameValueAttributeAttrSubject(
@@ -91,7 +92,7 @@ export function processAttribute(
         counts,
       )
     }
-
+*/
     contextItem.handler = processUpdateAttrContext
 
     processDynamicNameValueAttribute(

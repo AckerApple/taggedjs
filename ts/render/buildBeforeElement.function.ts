@@ -1,16 +1,16 @@
-import { attachDomElements } from '../interpolations/optimizers/attachDomElements.function.js'
+import { attachDomElements } from './dom/attachDomElements.function.js'
 import { DomMetaMap } from '../interpolations/optimizers/LikeObjectElement.type.js'
 import { Counts } from '../interpolations/interpolateTemplate.js'
-import { AnySupport } from './AnySupport.type.js'
-import { SupportContextItem } from './createHtmlSupport.function.js'
-import { SupportTagGlobal } from './getTemplaterResult.function.js'
-import { ContextItem } from './Context.types.js'
+import { AnySupport } from '../tag/AnySupport.type.js'
+import { SupportContextItem } from '../tag/createHtmlSupport.function.js'
+import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
+import { ContextItem } from '../tag/Context.types.js'
 import { ParsedHtml } from '../interpolations/index.js'
-import { checkSimpleValueChange, deleteSimpleValue, destorySupportByContextItem } from './index.js'
-import { getDomMeta } from './domMetaCollector.js'
-import type { DomTag } from './DomTag.type.js'
-import type { StringTag } from './StringTag.type.js'
-import { ValueTypes } from './ValueTypes.enum.js'
+import { destorySupportByContextItem } from '../tag/index.js'
+import { getDomMeta } from '../tag/domMetaCollector.js'
+import type { DomTag } from '../tag/DomTag.type.js'
+import type { StringTag } from '../tag/StringTag.type.js'
+import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { painting } from './paint.function.js'
 
 /** Function that kicks off actually putting tags down as HTML elements */
@@ -85,8 +85,8 @@ export function addOneContext(
 ): ContextItem {
   const contextItem: ContextItem = {
     value,
-    checkValueChange: checkSimpleValueChange,
-    delete: deleteSimpleValue,
+    checkValueChange: undefined as any, // checkSimpleValueChange,
+    delete: undefined as any, // deleteSimpleValue,
     withinOwnerElement,
   }
 

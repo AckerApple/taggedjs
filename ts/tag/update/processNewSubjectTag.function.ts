@@ -1,9 +1,9 @@
 import { TemplaterResult } from '../getTemplaterResult.function.js'
 import { checkTagValueChange } from '../checkTagValueChange.function.js'
-import { buildBeforeElement } from '../buildBeforeElement.function.js'
-import { paintAppends, paintInsertBefores } from '../paint.function.js'
+import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
+import { paintAppend, paintAppends, paintBefore, paintCommands } from '../../render/paint.function.js'
 import { ContextItem } from '../Context.types.js'
-import { newSupportByTemplater } from './processTag.function.js'
+import { newSupportByTemplater } from '../../render/update/processTag.function.js'
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { AnySupport } from '../AnySupport.type.js'
 
@@ -31,13 +31,13 @@ export function processNewSubjectTag(
     if(dom.marker) {
       if(appendTo) {
         paintAppends.push({
-          element: dom.marker,
-          relative: appendTo, // ph.parentNode as Element,
+          args: [appendTo, dom.marker],
+          processor: paintAppend,
         })
       } else {
-        paintInsertBefores.push({
-          element: dom.marker,
-          relative: insertBefore as Text, // ph.parentNode as Element,
+        paintCommands.push({
+          processor: paintBefore,
+          args: [insertBefore, dom.marker],
         })
       }
     }
@@ -45,13 +45,13 @@ export function processNewSubjectTag(
     if(dom.domElement) {
       if(appendTo) {
         paintAppends.push({
-          element: dom.domElement,
-          relative: appendTo, // ph.parentNode as Element,
+          args: [appendTo, dom.domElement],
+          processor: paintAppend,
         })
       } else {
-        paintInsertBefores.push({
-          element: dom.domElement,
-          relative: insertBefore as Text, // ph.parentNode as Element,
+        paintCommands.push({
+          processor: paintBefore,
+          args: [insertBefore, dom.domElement],
         })
       }
     }

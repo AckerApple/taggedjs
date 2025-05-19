@@ -1,9 +1,9 @@
 // taggedjs-no-compile
 
-import { paintAppends, paintInsertBefores } from "../../tag/paint.function.js"
+import { paintAppend, paintAppends, paintBefore, paintCommands } from "../../render/paint.function.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
 import { ContextItem } from "../../tag/Context.types.js"
-import { addOneContext } from "../../tag/index.js"
+import { addOneContext } from "../../render/index.js"
 import { empty } from "../../tag/ValueTypes.enum.js"
 import { Counts } from "../interpolateTemplate.js"
 import { domProcessContextItem } from "./domProcessContextItem.function.js"
@@ -29,15 +29,22 @@ export function attachDynamicDom(
 
   if(appendTo) {
     paintAppends.push({
-      relative: appendTo,
-      element: marker,
+      processor: paintAppend,
+      args: [appendTo, marker],
     })
   } else {
-    paintInsertBefores.push({
-      relative: insertBefore as Text,
-      element: marker,
+    paintCommands.push({
+      processor: paintBefore,
+      args: [insertBefore, marker],
     })
   }
 
-  domProcessContextItem(value, contextItem, support, counts, appendTo, insertBefore)
+  domProcessContextItem(
+    value,
+    support,
+    contextItem,
+    counts,
+    appendTo,
+    insertBefore,
+  )
 }

@@ -1,7 +1,7 @@
 import {SupportTagGlobal, TemplaterResult } from './getTemplaterResult.function.js'
-import { clonePropsBy } from './clonePropsBy.function.js'
+import { clonePropsBy } from './props/clonePropsBy.function.js'
 import { Subject } from '../subject/Subject.class.js'
-import { ContextItem } from './Context.types.js'
+import { AdvancedContextItem, ContextItem } from './Context.types.js'
 import { Props } from '../Props.js'
 import { BaseSupport } from './BaseSupport.type.js'
 import { AnySupport } from './AnySupport.type.js'
@@ -23,7 +23,7 @@ export type HtmlSupport = {
   subject: ContextItem
 }
 
-export type SupportContextItem = ContextItem & {
+export interface SupportContextItem extends AdvancedContextItem {
   global: SupportTagGlobal
   /** Indicator of re-rending. Saves from double rending something already rendered */
   renderCount: number

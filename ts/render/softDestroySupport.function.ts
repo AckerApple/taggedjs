@@ -1,9 +1,9 @@
-import { getChildTagsToSoftDestroy } from '../destroyContext.function.js'
-import { SupportTagGlobal } from '../getTemplaterResult.function.js'
-import { AnySupport } from '../AnySupport.type.js'
-import { getNewGlobal } from '../update/getNewGlobal.function.js'
-import { smartRemoveKids } from '../smartRemoveKids.function.js'
-import { ContextItem } from '../Context.types.js'
+import { getChildTagsToSoftDestroy, unsubscribeFrom } from '../tag/destroyContext.function.js'
+import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
+import { AnySupport } from '../tag/AnySupport.type.js'
+import { getNewGlobal } from '../tag/update/getNewGlobal.function.js'
+import { smartRemoveKids } from '../tag/smartRemoveKids.function.js'
+import { ContextItem } from '../tag/Context.types.js'
 
 /** used when a tag swaps content returned */
 export function softDestroySupport(
@@ -24,7 +24,7 @@ export function softDestroySupport(
   
   const mySubs = global.subscriptions
   if(mySubs) {
-    subs.forEach(sub => sub.unsubscribe())
+    subs.forEach(unsubscribeFrom)
   }
 
   getNewGlobal(subject)

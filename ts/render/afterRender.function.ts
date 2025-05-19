@@ -1,7 +1,7 @@
 import { StateMemory } from '../state/StateMemory.type.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
-import { AnySupport } from './AnySupport.type.js'
-import { checkStateMismatch } from './checkStateMismatch.function.js'
+import { AnySupport } from '../tag/AnySupport.type.js'
+import { checkStateMismatch } from '../tag/checkStateMismatch.function.js'
 
 /** Compares states of previous renders
  * @property support - The workflow that supports a single tag 

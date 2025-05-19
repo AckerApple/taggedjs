@@ -15,6 +15,7 @@ export function isSimpleType(value: any) {
   return false
 }
 
+/** Indicates if tag() was used */
 export function isStaticTag(
   value?: TemplaterResult | StringTag | unknown
 ) {

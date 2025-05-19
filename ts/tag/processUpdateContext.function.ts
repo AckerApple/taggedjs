@@ -9,9 +9,9 @@ export function processUpdateContext(
 ) {
   const thisTag = support.templater.tag as StringTag | DomTag
   const values = thisTag.values
-
   let index = 0
   const len = values.length
+
   while (index < len) {
     processUpdateOneContext(
       values,
@@ -27,7 +27,7 @@ export function processUpdateContext(
 }
 
 /** returns boolean of did render */
-export function processUpdateOneContext(
+function processUpdateOneContext(
   values: unknown[], // the interpolated values
   index: number,
   context: ContextItem[],

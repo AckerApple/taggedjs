@@ -10,7 +10,7 @@ import { RouteProps, RouteTag, StateToTag, ToTag } from './tag.types.js'
 import { UnknownFunction } from './update/oneRenderToSupport.function.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { AnyTag } from './AnyTag.type.js'
-import { processRenderOnceInit } from './update/processRenderOnceInit.function.js'
+import { processRenderOnceInit } from '../render/update/processRenderOnceInit.function.js'
 import { processTagComponentInit } from './update/processTagComponentInit.function.js'
 
 let tagCount = 0

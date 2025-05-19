@@ -1,5 +1,5 @@
 import { AnySupport } from '../AnySupport.type.js'
-import { isSkipPropValue, WrapRunner } from'../../alterProp.function.js'
+import { isSkipPropValue, WrapRunner } from'../props/alterProp.function.js'
 import { BasicTypes } from '../ValueTypes.enum.js'
 import { isArray } from '../../isInstance.js'
 import { updateExistingObject } from './updateExistingObject.function.js'
@@ -13,7 +13,6 @@ export function syncPriorPropFunction(
   maxDepth: number,
   depth: number,
 ) {
-
   if(priorProp === undefined || priorProp === null) {
     return prop
   }

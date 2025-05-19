@@ -3,7 +3,7 @@ import { ProcessInit } from "../subject/ProcessInit.type.js"
 import { AnySupport } from "../tag/AnySupport.type.js"
 import { getSupportInCycle } from "../tag/getSupportInCycle.function.js"
 import { ValueTypes } from "../tag/index.js"
-import { processSubscribe } from "../tag/update/processSubscribe.function.js"
+import { processSubscribe, processSubscribeWith } from "../tag/update/processSubscribe.function.js"
 import { StatesSetter } from "./states.utils.js"
 
 export type Subscription = {
@@ -16,6 +16,7 @@ export type LikeObservable<T> = {
 
 export type SubscribeCallback<T> = (data: T) => any
 
+/** Have an html tagged value as value of subscribe emissions. Automatically unsubscribes for you */
 export function subscribe<T>(
   Observable: LikeObservable<T>,
   callback?: SubscribeCallback<T>,
@@ -36,5 +37,6 @@ export type SubscribeValue = {
 
   states: StatesSetter[]
   Observable: LikeObservable<any>
+  withDefault?: any
   callback?: SubscribeCallback<any>
 }

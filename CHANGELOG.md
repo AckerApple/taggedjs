@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### v2.10.0 - 5-2025
+- Only 2 levels of arguments are now watched
+  - Use output() for deeper arguments
+
 ### v2.9.0 - 5-2025
 - subscribing is no longer automatic
   - BEFORE: html`${observable}`

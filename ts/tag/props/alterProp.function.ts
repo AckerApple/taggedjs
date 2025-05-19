@@ -1,32 +1,34 @@
-import { isInlineHtml, renderInlineHtml } from './tag/render/renderSupport.function.js'
-import { renderExistingReadyTag } from './tag/render/renderExistingTag.function.js'
-import { AnySupport } from './tag/AnySupport.type.js'
-import { getSupportInCycle } from './tag/getSupportInCycle.function.js'
-import { deepCompareDepth } from './tag/hasSupportChanged.function.js'
-import {SupportTagGlobal, TemplaterResult } from './tag/getTemplaterResult.function.js'
-import { isArray, isStaticTag } from './isInstance.js'
-import { BasicTypes } from './tag/ValueTypes.enum.js'
-import { setUseMemory } from './state/index.js'
-import { Tag } from './tag/Tag.type.js'
-import { Props } from './Props.js'
-import { UnknownFunction } from './tag/index.js'
-import { Subject } from './subject/Subject.class.js'
+import { isInlineHtml, renderInlineHtml } from '../../render/renderSupport.function.js'
+import { renderExistingReadyTag } from '../../render/renderExistingTag.function.js'
+import { AnySupport } from '../AnySupport.type.js'
+import { getSupportInCycle } from '../getSupportInCycle.function.js'
+import { deepCompareDepth } from '../hasSupportChanged.function.js'
+import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
+import { isArray, isStaticTag } from '../../isInstance.js'
+import { BasicTypes } from '../ValueTypes.enum.js'
+import { setUseMemory } from '../../state/index.js'
+import { Tag } from '../Tag.type.js'
+import { Props } from '../../Props.js'
+import { UnknownFunction } from '../index.js'
+import { Subject } from '../../subject/Subject.class.js'
 
 export function castProps(
   props: Props,
   newSupport: AnySupport,
   depth: number,
 ) {
-  return props.map(prop => alterProp(
-    prop,
-    newSupport.ownerSupport as AnySupport,
-    newSupport,
-    depth,
-  ))
+  return props.map(function eachCastProp(prop) {
+    return alterProp(
+      prop,
+      newSupport.ownerSupport as AnySupport,
+      newSupport,
+      depth,
+    )
+  })
 }
 
 /* Used to rewrite props that are functions. When they are called it should cause parent rendering */
-export function alterProp(
+function alterProp(
   prop: unknown,
   ownerSupport: AnySupport,
   newSupport: AnySupport,
@@ -49,6 +51,7 @@ export function checkProp(
   newSupport: AnySupport,
   depth: number,
   owner?: any,
+  keyName?: string,
 ) {
   if(!value) {
     return value
@@ -59,7 +62,11 @@ export function checkProp(
   }
 
   if(typeof(value) === BasicTypes.function) {
-    return getPropWrap(value, owner, ownerSupport)
+    if(depth <= 1) {
+       // only wrap function at depth 0 and 1
+      return getPropWrap(value, owner, ownerSupport, keyName)
+    }
+    return value
   }
 
   if(depth === deepCompareDepth) {
@@ -126,6 +133,7 @@ function checkObjectProp(
       newSupport,
       depth + 1,
       value,
+      name,
     )
 
     const newSubValue = value[name] as unknown
@@ -140,13 +148,15 @@ function checkObjectProp(
     }
 
     value[name] = result
-    if(typeof(result) === BasicTypes.function) {
+    if(typeof(result) === BasicTypes.function) {  
       if(subValue.mem as unknown) {
         continue
       }
   
       afterCheckProp(
-        depth + 1, name, subValue,
+        depth + 1,
+        name,
+        subValue,
         value as SubableProp,
         newSupport,
       )
@@ -184,6 +194,7 @@ export function getPropWrap(
   value: {mem?: unknown},
   owner: any,
   ownerSupport: AnySupport,
+  keyName?: string,
 ) {
   const already = value.mem
 
@@ -193,16 +204,12 @@ export function getPropWrap(
   }
 
   const wrap = function wrapRunner(...args: unknown[]) {
-    return wrap.toCall(...args)
+    return callbackPropOwner(wrap.mem, owner, args, ownerSupport, keyName)
   } as WrapRunner // what gets called can switch over parent state changes
 
   wrap.original = value
   wrap.mem = value as UnknownFunction
-
-  // Currently, call self but over parent state changes, I may need to call a newer parent tag owner
-  wrap.toCall = function toCallRunner(...args: unknown[]) {
-    return callbackPropOwner(wrap.mem, owner, args, ownerSupport)
-  }
+  
 
   // copy data properties that maybe on source function
   Object.assign(wrap, value)
@@ -212,10 +219,11 @@ export function getPropWrap(
 
 /** Function shared by alterProps() and updateExistingTagComponent... TODO: May want to have to functions to reduce cycle checking?  */
 export function callbackPropOwner(
-  toCall: UnknownFunction,
+  toCall: UnknownFunction, // original function
   owner: any,
   callWith: unknown[],
   ownerSupport: AnySupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
+  keyName?: string,
 ) {
   const global = ownerSupport.subject.global as SupportTagGlobal
   const newest = global?.newest || ownerSupport as AnySupport
@@ -227,16 +235,6 @@ export function callbackPropOwner(
 
   const run = function propCallbackProcessor() {
     const global = newest.subject.global as SupportTagGlobal
-
-    // are we in a rendering cycle? then its being called by alterProps
-    /*
-    if(noCycle === false) {
-      const allMatched = global.locked === true
-    
-      if(allMatched) {
-        return callbackResult // owner did not change
-      }
-    }*/
     
     if(!global || global.locked === true) {
       return callbackResult // currently in the middle of rendering

@@ -1,8 +1,8 @@
 import { Counts } from '../../interpolations/interpolateTemplate.js'
 import { ContextItem, LastArrayItem } from '../Context.types.js'
 import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { paintRemoves } from '../paint.function.js'
-import { destroySupport } from '../destroySupport.function.js'
+import { paintCommands, paintRemover } from '../../render/paint.function.js'
+import { destroySupport } from '../../render/destroySupport.function.js'
 import { SupportContextItem } from '../createHtmlSupport.function.js'
 import type { StringTag } from '../StringTag.type.js'
 
@@ -78,6 +78,10 @@ function destroyArrayItemByGlobal(
   } else {
     const element = item.simpleValueElm as Element
     delete item.simpleValueElm
-    paintRemoves.push(element)
+    paintCommands.push({
+      processor: paintRemover,
+      args: [element],
+    })
+
   }
 }

@@ -1,5 +1,5 @@
 import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { updateSupportBy } from '../updateSupportBy.function.js'
+import { updateSupportBy } from '../../render/update/updateSupportBy.function.js'
 import { TemplateValue } from './processFirstSubject.utils.js'
 import type { StringTag } from '../StringTag.type.js'
 import type { Tag } from '../Tag.type.js'
