@@ -48,7 +48,6 @@ export async function replaceTemplater(
   
   paint()
   hmr.paint()
-
   
   // loop children to process the context they have
   const global = ownerSupport.subject.global as SupportTagGlobal

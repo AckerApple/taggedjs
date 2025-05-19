@@ -11,7 +11,7 @@
 import { LikeObjectChildren } from "taggedjs/js/interpolations/optimizers/LikeObjectElement.type.js"
 import { HmrImport } from "./hmr.js"
 import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function"
-import { processSubUpdate, DomTag, StringTag, buildBeforeElement, ContextItem, destroySupport, paint, Support, SupportTagGlobal, TaggedFunction, isSubjectInstance, Wrapper, AnySupport, SupportContextItem, ValueTypes, Original } from "taggedjs"
+import { DomTag, StringTag, buildBeforeElement, ContextItem, destroySupport, paint, Support, SupportTagGlobal, TaggedFunction, Wrapper, AnySupport, SupportContextItem, Original } from "taggedjs"
 
 /** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 
@@ -94,6 +94,8 @@ async function swapSupport(
   const reGlobal = contextSubject.global as SupportTagGlobal
   delete reGlobal.deleted
 
+  // TODO: ISSUE I believe is here using the other context. Need to ensure handler and processors are NOT arrow functions
+
   const reSupport = hmr.renderTagOnly(
     newest,
     newest,
@@ -137,6 +139,7 @@ function recurseContext(
   context: SupportContextItem[],
   reSupport: AnySupport,
 ) {
+  /*
   switch (reSupport.templater.tagJsType[0]) {
     case ValueTypes.dom[0]:
       reSupport.templater.tagJsType = ValueTypes.dom
@@ -150,21 +153,14 @@ function recurseContext(
       reSupport.templater.tagJsType = ValueTypes.tagComponent
       break
   }
+  */
 
   context.forEach(contextItem => {
+    /*
     if(isSubjectInstance(contextItem.value)) {
       processSubUpdate(contextItem.value, contextItem, reSupport)
-      /*
-      processFirstSubjectValue(
-        contextItem.value,
-        contextItem,
-        reSupport,
-        {added:0, removed:0},
-        `rvp_-1_${reSupport.templater.tag?.values.length}`,
-        undefined // syncRun ? appendTo : undefined,
-      )
-      */
     }
+    */
     /*
     if(contextItem.subject) {
       processFirstSubjectValue(

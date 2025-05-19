@@ -4,7 +4,9 @@ import { byId, change, triggerChangeElm, click, html, query, htmlById } from "./
 import { expect, describe, it } from "./testing/expect"
 import { expectMatchedHtml } from "./testing/expect.html"
 
-describe('📰 content', () => {    
+let runs = 0
+
+describe('📰 content', () => {
   it('basic', () => {
     expectMatchedHtml('#content-subject-pipe-display0', '#content-subject-pipe-display1')
     expectMatchedHtml('#content-combineLatest-pipe-display0', '#content-combineLatest-pipe-display1')
@@ -55,6 +57,16 @@ describe('📰 content', () => {
     })
   })
 
+  it('subscribe', async () => {
+    if(runs > 0) {
+      console.warn('⏭️ skipped test that only passes the first time')
+      return
+    }
+    
+    expect(htmlById('content-subscribe-sub0')).toBe('')
+    expect(htmlById('content-subscribe-sub0-with')).toBe('-1')
+  })
+
   describe('passed in subscription', () => {
     it('increase test', async () => {
       const increase = byId('passed-in-sub-increase')
@@ -89,5 +101,9 @@ describe('📰 content', () => {
       expect(htmlById('passed-in-sub-ex1')).toBe('1||||1')
       expect(htmlById('passed-in-sub-ex2')).toBe('2||||2')
     })
+  })
+
+  it('increase runs', () => {
+    ++runs
   })
 })

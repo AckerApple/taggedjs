@@ -1,4 +1,4 @@
-import { html, states, tag } from "taggedjs";
+import { html, output, states, tag } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
 import { arrayFunTag } from "./arrayFun.tag";
 import { main } from "./funInProps.tag";
@@ -24,18 +24,18 @@ export const funInPropsChild = tag((
   {addArrayItem, myFunction, deleteItem, child, array} = arg0,
 ) => html`
   <div>
-    <strong>mainFunction:</strong>${(mainProp.function as any).toCall ? 'taggjedjs-wrapped' : 'nowrap'}:
+    <strong>mainFunction:</strong>${(mainProp.function as any).original ? 'taggjedjs-wrapped' : 'nowrap'}:
     <span>${mainProp.count}</span>
   </div>
   <div>
-    <strong>childFunction:</strong>${(child.myChildFunction as any).toCall ? 'taggjedjs-wrapped' : 'nowrap'}
+    <strong>childFunction:</strong>${(child.myChildFunction as any).original ? 'taggjedjs-wrapped' : 'nowrap'}
   </div>
   <div>
-    <strong>myFunction:</strong>${(myFunction as any).toCall ? 'taggjedjs-wrapped' : 'nowrap'}
+    <strong>myFunction:</strong>${(myFunction as any).original ? 'taggjedjs-wrapped' : 'nowrap'}
   </div>
 
   <button id="fun_in_prop1" onclick=${myFunction}>🤰 ++object argument</button>
-  <button id="fun_in_prop2" onclick=${child.myChildFunction}>🤰 ++child.myChildFunction</button>
+  <button id="fun_in_prop2" onclick=${output(child.myChildFunction)}>🤰 ++child.myChildFunction</button>
   <button id="fun_in_prop3" onclick=${myFunction3}>+🤰 +argument</button>
   <button onclick=${main.function}>🆎 ++main</button>
   <button onclick=${() => ++counter}>++me</button>

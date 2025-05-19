@@ -12,7 +12,7 @@ import { propsDebugMain } from "./PropsDebug.tag"
 import { providerDebug } from "./providerDebug"
 import { counters } from "./countersDebug"
 import { tableDebug } from "./tableDebug.component"
-import { content } from "./ContentDebug.component"
+import { content } from "./ContentDebug.tag"
 import { watchTesting } from "./watchTesting.tag"
 import { attributeDebug } from "./attributeDebug.tag"
 

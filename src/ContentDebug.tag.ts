@@ -1,9 +1,11 @@
-import { LikeObjectChildren, html, tag, ValueSubject, state, combineLatest, willPromise, states, subscribe, Subject } from "taggedjs"
+import { subscribeWith, LikeObjectChildren, html, tag, ValueSubject, state, combineLatest, willPromise, states, subscribe, Subject } from "taggedjs"
 import { dumpContent } from "./dumpContent.tag"
 import { renderCountDiv } from "./renderCount.component"
+import { Observable, Subject as RxSubject, startWith } from "rxjs"
 
 export const content = tag(() => {
   const sub0 = state(() => new Subject<number>())
+  const sub1 = state(() => new ValueSubject<number>(3))
   const vs0 = state(() => new ValueSubject(0))
   const vs1 = state(() => new ValueSubject(1))
 
@@ -37,8 +39,6 @@ export const content = tag(() => {
     `
   })
 
-  ;(pipe as any).label = 'acker'
-
   return html`<!-- content-debug-testing -->
     <fieldset style="flex-grow:1">
       <legend>
@@ -61,7 +61,7 @@ export const content = tag(() => {
 
     <fieldset id="noParentTagFieldset">
       <legend>Pass subscription</legend>
-      ${passSubscription({sub0})}
+      ${passSubscription({sub0, sub1})}
     </fieldset>
 
     <hr id="noParentsTest2-start" />
@@ -146,10 +146,23 @@ export const content = tag(() => {
       <div style="flex-grow:1">
         should be a safe string no html <span id="content-dom-parse-0-0">"&lt;div&gt;hello&lt;/div&gt;"</span> here => <span id="content-dom-parse-0-1">"${'<div>hello</div>'}"</span>
       </div>
+    </div>
+    <strong>Subscribe</strong>
+    <div style="display:flex;flex-wrap:wrap;gap:1em;font-size:0.8em">
       <div style="display:flex;flex-wrap:wrap;gap:1em">
         <fieldset style="flex-grow:1">
+          <legend> subscribe</legend>
+          0 === <span id="content-subscribe-sub0">${subscribe(sub0)}</span>
+        </fieldset>
+
+        <fieldset style="flex-grow:1">
+          <legend> subscribe with default</legend>
+          0 === <span id="content-subscribe-sub0-with">${subscribeWith(sub0, -1)}</span>
+        </fieldset>
+
+        <fieldset style="flex-grow:1">
           <legend>value subject</legend>
-          0 === ${vs0}
+          0 === ${subscribe(vs0)}
         </fieldset>
         
         <fieldset style="flex-grow:1">
@@ -159,13 +172,13 @@ export const content = tag(() => {
             ${subscribe(vs0, () => 55)}
           </span>
         </fieldset>
-        
+
         <fieldset style="flex-grow:1">
           <legend>combineLatest</legend>
           <span id="content-combineLatest-pipe-display0">1</span>&nbsp;===&nbsp;
           <span id="content-combineLatest-pipe-display1">${subscribe(combineLatest([vs0, vs1]).pipe(x => x[1]))}</span>
         </fieldset>
-        
+
         <fieldset style="flex-grow:1">
           <legend>combineLatest piped html</legend>
           <span id="content-combineLatest-pipeHtml-display0"><b>bold 77</b></span>&nbsp;===&nbsp;
@@ -204,22 +217,35 @@ export function numberedNoParents() {
 }
 
 const passSubscription = tag(({
-  sub0
+  sub0, sub1,
 }: {
   sub0: Subject<number>
+  sub1: Subject<number>
 }) => {
   let onOff = false
+  // const ob = state(() => new Observable()) as any
+  const ob = state(() => new RxSubject()) as any
 
   states(get => [onOff] = get(onOff))
 
   return html`
     <span>sub-value:<span id="passed-in-output">${subscribe(sub0)}</span></span>
     <span>test:${onOff && subscribe(sub0)}:end</span>
-    <button id="passed-in-sub-increase" onclick=${() => sub0.next((sub0.value || 0) + 1)}>increase</button>
+    <button id="passed-in-sub-increase"
+      onclick=${() => sub0.next((sub0.value || 0) + 1)}
+    >sub0 increase</button>
+    <button id="passed-in-sub-next"
+      onclick=${() => ob.next(sub0.value = (sub0.value || 0) + 1)}
+    >ob increase</button>
     <button id="passed-in-sub-hide-show" onclick=${() => onOff = !onOff}>on/off - ${onOff}</button>
     <div id="passed-in-sub-ex0">0||${onOff && subscribe(sub0)}||0</div>
     <div id="passed-in-sub-ex1">1||${onOff && subscribe(sub0, numberFun)}||1</div>
     <div id="passed-in-sub-ex2">2||${onOff && subscribe(sub0, numberTag)}||2</div>
+    <div id="passed-in-sub-ex3">3||${subscribe(sub1, numberTag)}||3</div>
+    <div id="passed-in-sub-ex4">4||${subscribe(ob, numberTag)}||4</div>
+    <div id="passed-in-sub-ex4">5||${subscribe(ob.pipe( startWith(33) ), numberTag)}||5</div>
+    <div id="passed-in-sub-ex4">6||${subscribe(ob.pipe( startWith(undefined) ), (x: number) => numberTag(x))}||6</div>
+    <div id="passed-in-sub-ex4">7||${subscribe(ob, (x: number) => numberTag(x))}||7</div>
   `
 })
 

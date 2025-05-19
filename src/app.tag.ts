@@ -6,26 +6,24 @@ import { tagDebug } from "./tagJsDebug"
 import { runTests } from "./tests"
 import { menu, useMenuName } from "./menu.tag"
 import { innerCounterContent } from "./countersDebug";
-import { content } from "./ContentDebug.component"
+import { content } from "./ContentDebug.tag"
 
 const appDate = Date.now()
 
-const appFun = () => (
-  menuName = useMenuName(),
-) => {
-  console.log('🍒 App rendered', appDate)
+function appFun(){
+  return function runAppFun(menuName = useMenuName()) {
+    console.log('🍒 App rendered', appDate)
+    return html`<!--app.js-->
+      <h1 id="h1-app">🏷️ TaggedJs - ${2+2}</h1>
 
-  return html`<!--app.js-->
-    <h1 id="h1-app">🏷️ TaggedJs - ${2+2}</h1>
+      ${menu()}
 
-    ${menu()}
-
-    ${menuName === 'home' && homePage()}
-    ${menuName === 'counters' && innerCounterContent()}
-    ${menuName === 'content' && content()}
-  `
+      ${menuName === 'home' && homePage()}
+      ${menuName === 'counters' && innerCounterContent()}
+      ${menuName === 'content' && content()}
+    `
+  }
 }
-
 appFun.isApp = true
 
 export const App = tag(appFun)
@@ -60,12 +58,12 @@ export const homePage = () => tag.use = (
   const onTestComplete = callbacks(success => testEmoji = success ? '✅' : '❌')
 
   // if I am destroyed before my test runs, prevent test from running
-  onDestroy(() => {
+  onDestroy(function appOnDestroy() {
     clearTimeout(testTimeout as any)
     testTimeout = null
   })
 
-  onInit(() => {
+  onInit(function appOnInit() {
     console.info('1️⃣ app init should only run once')
     
     fireTesting(false, onTestComplete)
