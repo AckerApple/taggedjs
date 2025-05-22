@@ -2,7 +2,7 @@ import { state } from '../state/index.js'
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
 import { processSignal } from '../tag/update/processSubscribe.function.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
-import { ProcessInit } from './ProcessInit.type.js'
+import { ProcessInit } from '../tag/ProcessInit.type.js'
 
 type Subscriber = <T>(newValue?: T) => any
 

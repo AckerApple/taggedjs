@@ -4,8 +4,8 @@ import { HowToSet } from './howToSetInputValue.function.js'
 import { BasicTypes } from '../../tag/ValueTypes.enum.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
 import { paintContent } from '../../render/paint.function.js'
-import { ContextItem } from '../../tag/Context.types.js'
-import { Counts } from '../interpolateTemplate.js'
+import { ContextItem } from '../../tag/ContextItem.type.js'
+import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { isNoDisplayValue, processNameOnlyAttrValue } from '../../render/attributes/processAttribute.function.js'
 
 
@@ -17,7 +17,7 @@ export function updateNameOnlyAttrValue(
   ownerSupport: AnySupport,
   howToSet: HowToSet,
   context: ContextItem[],
-  counts: Counts,
+  counts: TagCounts,
 ) {
   // check to remove previous attribute(s)
   if(lastValue) {

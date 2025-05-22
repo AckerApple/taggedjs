@@ -1,17 +1,19 @@
 import { getSupportWithState } from "../interpolations/attributes/getSupportWithState.function.js"
-import { ProcessInit } from "../subject/ProcessInit.type.js"
+import { ProcessInit } from "../tag/ProcessInit.type.js"
 import { AnySupport } from "../tag/AnySupport.type.js"
 import { getSupportInCycle } from "../tag/getSupportInCycle.function.js"
 import { ValueTypes } from "../tag/index.js"
-import { processSubscribe, processSubscribeWith } from "../tag/update/processSubscribe.function.js"
-import { StatesSetter } from "./states.utils.js"
+import { processSubscribe } from "../tag/update/processSubscribe.function.js"
+import { StatesSetter } from "../state/states.utils.js"
+import { deleteAndUnsubscribe } from "../tag/update/setupSubscribe.function.js"
+import { TagJsVar } from "./tagJsVar.type.js"
 
-export type Subscription = {
+export type LikeSubscription = {
   unsubscribe: () => any
 }
 
 export type LikeObservable<T> = {
-  subscribe: (callback: (arg: T) => any) => (Subscription)
+  subscribe: (callback: (arg: T) => any) => (LikeSubscription)
 }
 
 export type SubscribeCallback<T> = (data: T) => any
@@ -24,6 +26,12 @@ export function subscribe<T>(
   return {
     tagJsType: ValueTypes.subscribe,
     processInit: processSubscribe,
+    delete: deleteAndUnsubscribe,
+
+    checkValueChange: function subscribeDoNothing() {
+      console.log('weird to be here')
+      return -1
+    },
 
     Observable,
     callback,
@@ -31,7 +39,7 @@ export function subscribe<T>(
   }
 }
 
-export type SubscribeValue = {
+export type SubscribeValue = TagJsVar & {
   tagJsType: typeof ValueTypes.subscribe
   processInit: ProcessInit
 

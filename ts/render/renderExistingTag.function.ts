@@ -1,11 +1,11 @@
 import { AnySupport } from '../tag/AnySupport.type.js'
-import { SupportContextItem } from '../tag/createHtmlSupport.function.js'
+import { SupportContextItem } from '../tag/SupportContextItem.type.js'
+import { TagCounts } from '../tag/TagCounts.type.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
 import { processTag } from './update/processTag.function.js'
 import { updateSupportBy } from './update/updateSupportBy.function.js'
-import { Counts } from '../interpolations/interpolateTemplate.js'
 
-const fooCounts: Counts = { added:0, removed:0 }
+const fooCounts: TagCounts = { added:0, removed:0 }
 
 // TODO: This function is being called for 1st time renders WHEN renderCount === 1
 export function renderExistingReadyTag(

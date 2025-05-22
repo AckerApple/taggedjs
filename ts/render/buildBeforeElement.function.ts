@@ -1,12 +1,11 @@
 import { attachDomElements } from './dom/attachDomElements.function.js'
 import { DomMetaMap } from '../interpolations/optimizers/LikeObjectElement.type.js'
-import { Counts } from '../interpolations/interpolateTemplate.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
-import { SupportContextItem } from '../tag/createHtmlSupport.function.js'
+import { SupportContextItem } from '../tag/SupportContextItem.type.js'
 import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
-import { ContextItem } from '../tag/Context.types.js'
+import { ContextItem } from '../tag/ContextItem.type.js'
 import { ParsedHtml } from '../interpolations/index.js'
-import { destorySupportByContextItem } from '../tag/index.js'
+import { Tag, TagCounts } from '../tag/index.js'
 import { getDomMeta } from '../tag/domMetaCollector.js'
 import type { DomTag } from '../tag/DomTag.type.js'
 import type { StringTag } from '../tag/StringTag.type.js'
@@ -16,12 +15,11 @@ import { painting } from './paint.function.js'
 /** Function that kicks off actually putting tags down as HTML elements */
 export function buildBeforeElement(
   support: AnySupport,
-  counts: Counts,
+  counts: TagCounts,
   appendTo?: Element,
   insertBefore?: Text,
 ) {
   const subject = support.subject
-  subject.delete = destorySupportByContextItem
   const global = subject.global as SupportTagGlobal
 
   global.oldest = support
@@ -39,7 +37,7 @@ export function buildBeforeElement(
 
 function attachHtmlDomMeta(
   support: AnySupport,
-  counts: Counts,
+  counts: TagCounts,
   appendTo?: Element,
   insertBefore?: Text,
 ) {
@@ -67,7 +65,7 @@ function attachHtmlDomMeta(
 
 function loadDomMeta(support: AnySupport): ParsedHtml {
   const templater = support.templater
-  const thisTag = (templater.tag as StringTag | DomTag) // || templater
+  const thisTag = templater.tag as Tag
 
   if(thisTag.tagJsType === ValueTypes.dom) {
     return (thisTag as DomTag).dom as DomMetaMap
@@ -85,8 +83,6 @@ export function addOneContext(
 ): ContextItem {
   const contextItem: ContextItem = {
     value,
-    checkValueChange: undefined as any, // checkSimpleValueChange,
-    delete: undefined as any, // deleteSimpleValue,
     withinOwnerElement,
   }
 

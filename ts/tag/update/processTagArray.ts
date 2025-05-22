@@ -2,19 +2,20 @@
 
 import { TemplaterResult } from '../getTemplaterResult.function.js'
 import { tagValueUpdateHandler } from './tagValueUpdateHandler.function.js'
-import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { TemplateValue } from './processFirstSubject.utils.js'
-import { ContextItem, LastArrayItem } from '../Context.types.js'
-import { StringTag } from '../StringTag.type.js'
+import type { TagCounts } from '../../tag/TagCounts.type.js'
+import { LastArrayItem } from '../Context.types.js'
 import { compareArrayItems } from './compareArrayItems.function.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
+import { TemplateValue } from '../TemplateValue.type.js'
+import { Tag } from '../Tag.type.js'
+import { ContextItem } from '../ContextItem.type.js'
 
 export function processTagArray(
   subject: ContextItem,
-  value: (TemplaterResult | StringTag)[], // arry of Tag classes
+  value: (TemplaterResult | Tag)[], // arry of Tag classes
   ownerSupport: AnySupport,
-  counts: Counts,
+  counts: TagCounts,
   appendTo?: Element,
 ) {
   const noLast = subject.lastArray === undefined
@@ -81,7 +82,7 @@ function reviewArrayItem(
   lastArray: LastArrayItem[],
   ownerSupport: AnySupport,
   runtimeInsertBefore: Text | undefined, // used during updates
-  counts: Counts,
+  counts: TagCounts,
   appendTo?: Element, // used during initial rendering of entire array
 ) {
   const item = array[index]
@@ -115,7 +116,7 @@ function reviewPreviousArrayItem(
   ownerSupport: AnySupport,
   index: number,
   runtimeInsertBefore: Text | undefined, // used during updates
-  counts: Counts,
+  counts: TagCounts,
   appendTo?: Element, // used during initial rendering of entire array
 ) {
   const couldBeSame = lastArray.length > index

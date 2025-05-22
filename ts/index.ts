@@ -2,6 +2,7 @@ export * from './tag/index.js'
 export * from './state/index.js'
 export * from './render/index.js'
 export * from './subject/index.js'
+export * from './tagJsVars/index.js'
 export * from './interpolations/index.js'
 
 export * from './errors.js'

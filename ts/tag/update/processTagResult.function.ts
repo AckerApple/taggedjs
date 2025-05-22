@@ -1,16 +1,14 @@
 import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
-import { Counts } from'../../interpolations/interpolateTemplate.js'
+import { TagCounts } from'../TagCounts.type.js'
 import { paintAppend, paintAppends } from '../../render/paint.function.js'
-import { ContextItem } from '../Context.types.js'
-import { checkTagValueChange } from '../index.js'
+import { ContextItem } from '../ContextItem.type.js'
 import { AnySupport } from '../AnySupport.type.js'
 
 export function processReplaceTagResult(
   support: AnySupport,
-  counts: Counts,
+  counts: TagCounts,
   contextItem: ContextItem,
 ) {
-  contextItem.checkValueChange = checkTagValueChange
   const ph = contextItem.placeholder as Text
 
   buildBeforeElement(
@@ -25,7 +23,7 @@ export function processReplaceTagResult(
 
 export function processFirstTagResult(
   support: AnySupport,
-  counts: Counts,
+  counts: TagCounts,
   appendTo: Element,
 ) {
   let appendIndex = paintAppends.length

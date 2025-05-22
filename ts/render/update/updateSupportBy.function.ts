@@ -3,7 +3,7 @@ import { processUpdateContext } from '../../tag/processUpdateContext.function.js
 import type { DomTag } from '../../tag/DomTag.type.js'
 import type { Tag } from '../../tag/Tag.type.js'
 import { SupportTagGlobal } from '../../tag/getTemplaterResult.function.js'
-import { ContextItem } from '../../tag/Context.types.js'
+import { ContextItem } from '../../tag/ContextItem.type.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
 
 export function updateSupportBy(

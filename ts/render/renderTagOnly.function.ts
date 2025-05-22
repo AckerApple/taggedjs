@@ -1,5 +1,5 @@
 import { Wrapper } from '../tag/getTemplaterResult.function.js'
-import { SupportContextItem } from '../tag/createHtmlSupport.function.js'
+import { SupportContextItem } from '../tag/SupportContextItem.type.js'
 import { executeWrap } from './executeWrap.function.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { TagWrapper } from '../tag/tag.utils.js'

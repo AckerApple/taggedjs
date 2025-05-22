@@ -1,17 +1,19 @@
-import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { ContextItem, LastArrayItem } from '../Context.types.js'
-import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
+import type { TagCounts } from '../../tag/TagCounts.type.js'
+import { LastArrayItem } from '../Context.types.js'
+import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { paintCommands, paintRemover } from '../../render/paint.function.js'
 import { destroySupport } from '../../render/destroySupport.function.js'
-import { SupportContextItem } from '../createHtmlSupport.function.js'
+import { SupportContextItem } from '../SupportContextItem.type.js'
 import type { StringTag } from '../StringTag.type.js'
+import { Tag } from '../Tag.type.js'
+import { ContextItem } from '../ContextItem.type.js'
 
 export function compareArrayItems(
-  value: (TemplaterResult | StringTag)[],
+  value: (TemplaterResult | Tag)[],
   index: number,
   lastArray: LastArrayItem[],
   removed: number,
-  counts: Counts,
+  counts: TagCounts,
 ) {
   const newLength = value.length - 1
   const at = index - removed
@@ -42,7 +44,7 @@ function runArrayItemDiff(
   oldKey: string,
   newValueTag: StringTag,
   prevContext: SupportContextItem,
-  counts: Counts,
+  counts: TagCounts,
   lastArray: LastArrayItem[],
   index: number
 ) {
@@ -59,7 +61,7 @@ function runArrayItemDiff(
 
 export function destroyArrayItem(
   item: ContextItem,
-  counts: Counts,
+  counts: TagCounts,
 ) {
   const global = item.global as SupportTagGlobal
   
@@ -82,6 +84,5 @@ function destroyArrayItemByGlobal(
       processor: paintRemover,
       args: [element],
     })
-
   }
 }

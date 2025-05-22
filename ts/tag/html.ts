@@ -1,7 +1,7 @@
 import { InputElementTargetEvent } from '../interpolations/attributes/ElementTargetEvent.interface.js'
 import { LikeObjectChildren } from '../interpolations/optimizers/LikeObjectElement.type.js'
 import { getStringTag, getDomTag } from './getDomTag.function.js'
-import { PropWatches } from './tag.function.js'
+import { PropWatches } from '../tagJsVars/tag.function.js'
 import { getTemplaterResult } from './getTemplaterResult.function.js'
 import { RegularValue } from './update/processRegularValue.function.js'
 import { Tag } from './Tag.type.js'

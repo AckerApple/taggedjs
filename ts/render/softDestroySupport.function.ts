@@ -3,7 +3,7 @@ import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
 import { getNewGlobal } from '../tag/update/getNewGlobal.function.js'
 import { smartRemoveKids } from '../tag/smartRemoveKids.function.js'
-import { ContextItem } from '../tag/Context.types.js'
+import { ContextItem } from '../tag/ContextItem.type.js'
 
 /** used when a tag swaps content returned */
 export function softDestroySupport(

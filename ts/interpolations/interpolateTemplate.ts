@@ -8,8 +8,3 @@ export type InterpolateComponentResult = {
   ownerSupport: AnySupport
   variableName: string
 }
-
-export type Counts = {
-  added: number
-  removed: number // increased when item removed from array
-}

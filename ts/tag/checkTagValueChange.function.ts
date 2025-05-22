@@ -1,11 +1,11 @@
 import { AnySupport } from './AnySupport.type.js'
-import { SupportContextItem } from './createHtmlSupport.function.js'
+import { SupportContextItem } from './SupportContextItem.type.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { destroySupport } from '../render/destroySupport.function.js'
-import {SupportTagGlobal, TemplaterResult } from './getTemplaterResult.function.js'
+import { SupportTagGlobal, TemplaterResult } from './getTemplaterResult.function.js'
 import { isStaticTag } from'../isInstance.js'
 import { isLikeTags } from'./isLikeTags.function.js'
-import { ContextItem } from './Context.types.js'
+import { ContextItem } from './ContextItem.type.js'
 import { tryUpdateToTag } from './update/tryUpdateToTag.function.js'
 
 export function checkTagValueChange(
@@ -49,12 +49,12 @@ export function checkTagValueChange(
     return 88 // its same tag with new values
   }
   
-  destorySupportByContextItem(contextItem)
+  destroySupportByContextItem(contextItem)
    
   return 8 // 'no-longer-tag'
 }
 
-export function destorySupportByContextItem(
+export function destroySupportByContextItem(
   contextItem: ContextItem,
 ) {
   const global = contextItem.global as SupportTagGlobal

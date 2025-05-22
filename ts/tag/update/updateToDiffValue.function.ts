@@ -1,12 +1,12 @@
-import { SupportContextItem } from '../createHtmlSupport.function.js'
-import { TemplateValue } from './processFirstSubject.utils.js'
-import { ContextItem } from '../Context.types.js'
-import { BasicTypes, TemplaterResult, ValueType, ValueTypes } from '../index.js'
+import { SupportContextItem } from '../SupportContextItem.type.js'
+import { ContextItem } from '../ContextItem.type.js'
+import { BasicTypes, TemplaterResult, TemplateValue, ValueType, ValueTypes } from '../index.js'
 import { tryUpdateToTag } from './tryUpdateToTag.function.js'
 import { isArray } from '../../isInstance.js'
 import { processTagArray } from './processTagArray.js'
 import { processNowRegularValue, RegularValue } from './processRegularValue.function.js'
 import { AnySupport } from '../AnySupport.type.js'
+import { getArrayTagVar } from '../../tagJsVars/getArrayTagJsVar.function.js'
 
 export function updateToDiffValue(
   newValue: TemplateValue,
@@ -37,6 +37,7 @@ export function updateToDiffValue(
       ownerSupport,
       {added: 0, removed: 0},
     )
+    contextItem.tagJsVar = getArrayTagVar(newValue)
   
     return
   }

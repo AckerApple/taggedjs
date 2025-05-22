@@ -1,5 +1,5 @@
 import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from'../../tag/hasSupportChanged.function.js'
-import { PropsConfig, SupportContextItem } from '../../tag/createHtmlSupport.function.js'
+import { PropsConfig } from '../../tag/createHtmlSupport.function.js'
 import { processReplacementComponent } from '../../tag/update/processFirstSubjectComponent.function.js'
 import {SupportTagGlobal, TemplaterResult } from '../../tag/getTemplaterResult.function.js'
 import { castProps, WrapRunner } from'../../tag/props/alterProp.function.js'
@@ -8,11 +8,12 @@ import { ValueTypes } from '../../tag/ValueTypes.enum.js'
 import { destroySupport } from '../destroySupport.function.js'
 import { getNewGlobal } from '../../tag/update/getNewGlobal.function.js'
 import { isLikeTags } from'../../tag/isLikeTags.function.js'
-import { PropWatches } from '../../tag/tag.function.js'
+import { PropWatches } from '../../tagJsVars/tag.function.js'
 import { Props } from '../../Props.js'
 import { BaseSupport } from '../../tag/BaseSupport.type.js'
 import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.function.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
+import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
 
 export function updateExistingTagComponent(
   ownerSupport: AnySupport,
@@ -196,7 +197,7 @@ function swapTags(
   const oldestSupport = global.oldest as AnySupport
   destroySupport(oldestSupport, global)
   
-  getNewGlobal(subject) as SupportTagGlobal
+  getNewGlobal(subject)
 
   const newSupport = processReplacementComponent(
     templater,

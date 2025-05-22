@@ -1,8 +1,6 @@
-// Functions in here are attached as ContextItem.checkValueChange
-
 import { destroyArrayItem } from'./update/compareArrayItems.function.js'
 import { isArray } from'../isInstance.js'
-import { ContextItem } from './Context.types.js'
+import { ContextItem } from './ContextItem.type.js'
 
 export function checkArrayValueChange(
   newValue: unknown,
@@ -10,13 +8,19 @@ export function checkArrayValueChange(
 ) {  
   // no longer an array?
   if (!isArray(newValue)) {
-    const lastArray = subject.lastArray as unknown[]
-    destroyArray(subject, lastArray)
+    destroyArrayContextItem(subject)
 
     return 9 // 'array'
   }
 
   return false
+}
+
+export function destroyArrayContextItem(
+  subject: ContextItem,
+) {
+  const lastArray = subject.lastArray as unknown[]
+  destroyArray(subject, lastArray)
 }
 
 export function destroyArray(

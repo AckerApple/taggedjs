@@ -1,14 +1,15 @@
-import { createHtmlSupport, SupportContextItem } from '../../tag/createHtmlSupport.function.js'
+import { createHtmlSupport } from '../../tag/createHtmlSupport.function.js'
 import { SupportTagGlobal, TemplaterResult } from '../../tag/getTemplaterResult.function.js'
 import { checkTagValueChange } from '../../tag/checkTagValueChange.function.js'
 import { buildBeforeElement } from '../buildBeforeElement.function.js'
 import type { StringTag } from '../../tag/StringTag.type.js'
 import type { DomTag } from '../../tag/DomTag.type.js'
 import { ValueTypes } from '../../tag/ValueTypes.enum.js'
-import { ContextItem } from '../../tag/Context.types.js'
-import { Counts } from '../../interpolations/interpolateTemplate.js'
+import { ContextItem } from '../../tag/ContextItem.type.js'
+import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { processTagInit } from '../../tag/update/processTagInit.function.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
+import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
 
 /** When first time render, adds to owner childTags
  * Used for BOTH inserts & updates to values that were something else
@@ -17,12 +18,11 @@ import { AnySupport } from '../../tag/AnySupport.type.js'
 export function processTag(
   ownerSupport: AnySupport, // owner
   subject: SupportContextItem, // could be tag via result.tag
-  counts: Counts,
+  counts: TagCounts,
 ): AnySupport {
   const global = subject.global as SupportTagGlobal
   const support = global.newest as AnySupport
   support.ownerSupport = ownerSupport
-  subject.checkValueChange = checkTagValueChange
   
   const ph = subject.placeholder as Text
   buildBeforeElement(
@@ -49,6 +49,7 @@ export function getFakeTemplater() {
   const fake = {
     tagJsType: ValueTypes.templater,
     processInit: processTagInit,
+    checkValueChange: checkTagValueChange,
   } as TemplaterResult
 
   return fake

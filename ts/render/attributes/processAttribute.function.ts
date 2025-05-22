@@ -1,21 +1,19 @@
 // taggedjs-no-compile
 
 import { specialAttribute } from '../../interpolations/attributes/specialAttribute.js'
-import { isFunction, isObject, isSubjectInstance } from '../../isInstance.js'
+import { isFunction, isObject } from '../../isInstance.js'
 import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.function.js'
 import { bindSubjectCallback, Callback } from '../../interpolations/attributes/bindSubjectCallback.function.js'
 import { BasicTypes, ValueTypes, empty } from '../../tag/ValueTypes.enum.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
 import { paintContent } from '../paint.function.js'
-import { ContextItem } from '../../tag/Context.types.js'
+import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processDynamicNameValueAttribute, processNonDynamicAttr } from '../../interpolations/attributes/processNameValueAttribute.function.js'
-import { TagGlobal } from '../../tag/index.js'
 import { addOneContext } from '../index.js'
 import { processAttributeFunction } from '../../interpolations/attributes/processAttributeCallback.function.js'
 import { isSpecialAttr } from '../../interpolations/attributes/isSpecialAttribute.function.js'
-import { Counts } from '../../interpolations/interpolateTemplate.js'
+import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
-import { blankHandler } from '../dom/attachDomElements.function.js'
 
 type TagVarIdNum = {tagJsVar: number}
 export type SpecialAction = 'init' | 'destroy'
@@ -30,7 +28,7 @@ export function processAttribute(
   howToSet: HowToSet, //  = howToSetInputValue
   context: ContextItem[],
   isSpecial: SpecialDefinition,
-  counts: Counts,
+  counts: TagCounts,
   value: string | null | undefined | TagVarIdNum,
 ) {
   const nameVar = getTagJsVar(attrName)
@@ -73,26 +71,10 @@ export function processAttribute(
       isAttr: true,
       element,
       attrName: attrName as string,
-      // checkValueChange: undefined as any,
-      // delete: undefined as any,
       withinOwnerElement: true,
     }
 
     context.push(contextItem)
-/*
-    const isSubject = isSubjectInstance(contextItem.value)
-    if ( isSubject ) {
-      return processNameValueAttributeAttrSubject(
-        attrName as string,
-        contextItem,
-        element,
-        support,
-        howToSet,
-        isSpecial,
-        counts,
-      )
-    }
-*/
     contextItem.handler = processUpdateAttrContext
 
     processDynamicNameValueAttribute(
@@ -129,7 +111,7 @@ export function processNameOnlyAttrValue(
   ownerSupport: AnySupport,
   howToSet: HowToSet,
   context: ContextItem[],
-  counts: Counts,
+  counts: TagCounts,
 ) {
   if(isNoDisplayValue(attrValue)) {
     return
@@ -163,6 +145,7 @@ export function processNameOnlyAttrValue(
 }
 
 /** Processor for flat attributes and object attributes */
+/*
 function processNameValueAttributeAttrSubject(
   attrName: string,
   contextItem: ContextItem,
@@ -170,7 +153,7 @@ function processNameValueAttributeAttrSubject(
   support: AnySupport,
   howToSet: HowToSet,
   isSpecial: SpecialDefinition,
-  counts: Counts,
+  counts: TagCounts,
 ) {
   if(isSpecial) {
     paintContent.push(function paintContent() {
@@ -217,6 +200,7 @@ function processNameValueAttributeAttrSubject(
 
   return
 }
+*/
 
 export function processAttributeEmit(
   newAttrValue: any,
@@ -226,7 +210,7 @@ export function processAttributeEmit(
   support: AnySupport,
   howToSet: HowToSet,
   isSpecial: SpecialDefinition,
-  counts: Counts,
+  counts: TagCounts,
 ) {
   // should the function be wrapped so every time its called we re-render?
   if(isFunction(newAttrValue)) {
@@ -263,7 +247,7 @@ export function processAttributeSubjectValue(
   special: SpecialDefinition,
   howToSet: HowToSet,
   support: AnySupport,
-  counts: Counts,
+  counts: TagCounts,
 ) {
   // process adding/removing style. class. (false means remove)
   if ( special !== false ) {
@@ -304,7 +288,7 @@ function callbackFun(
   isSpecial: SpecialDefinition,
   howToSet: HowToSet,
   subject: ContextItem,
-  counts: Counts,
+  counts: TagCounts,
 ) {
   const wrapper = support.templater.wrapper
   const tagJsType = wrapper?.tagJsType || (wrapper?.original as any)?.tagJsType

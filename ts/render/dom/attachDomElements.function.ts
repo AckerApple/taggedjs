@@ -2,14 +2,14 @@
 
 import { DomObjectChildren, DomObjectElement, DomObjectText } from "../../interpolations/optimizers/ObjectNode.types.js"
 import { howToSetFirstInputValue } from "../../interpolations/attributes/howToSetInputValue.function.js"
-import { paintAppend, paintAppends, paintAppendText, paintBefore, paintBeforeText, paintCommands } from "../paint.function.js"
+import { paintAppend, paintAppendElementString, paintAppends, paintBefore, paintBeforeElementString, paintCommands } from "../paint.function.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
 import { processAttribute } from "../attributes/processAttribute.function.js"
-import { ContextItem } from "../../tag/Context.types.js"
+import { ContextItem } from "../../tag/ContextItem.type.js"
 import { ObjectChildren } from "../../interpolations/optimizers/LikeObjectElement.type.js"
 import { empty } from "../../tag/ValueTypes.enum.js"
-import { Counts } from "../../interpolations/interpolateTemplate.js"
 import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicDom.function.js"
+import { TagCounts } from "../../tag/TagCounts.type.js"
 
 export const blankHandler = function () {
   return undefined
@@ -19,7 +19,7 @@ export function attachDomElements(
   nodes: ObjectChildren,
   values: any[],
   support: AnySupport,
-  counts: Counts, // used for animation stagger computing
+  counts: TagCounts, // used for animation stagger computing
   context: ContextItem[],
   depth: number, // used to know if dynamic variables live within parent owner tag/support
   appendTo?: Element,
@@ -106,7 +106,7 @@ function attachDomElement(
   values: any[],
   support: AnySupport,
   context: ContextItem[],
-  counts: Counts,
+  counts: TagCounts,
   appendTo: Element | undefined,
   insertBefore: Text | undefined,
 ) {
@@ -158,12 +158,12 @@ function attachDomText(
 
   if (owner) {
     paintAppends.push({
-      processor: paintAppendText,
+      processor: paintAppendElementString,
       args: [owner, string, (elm: Text) => textNode.domElement = elm],
     })
   } else {
     paintCommands.push({
-      processor: paintBeforeText,
+      processor: paintBeforeElementString,
       args: [insertBefore, string, (elm: Text) => textNode.domElement = elm]
     })
   }

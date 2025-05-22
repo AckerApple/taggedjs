@@ -1,7 +1,7 @@
 import { Events, TemplaterResult } from '../tag/getTemplaterResult.function.js'
-import { SupportContextItem } from '../tag/createHtmlSupport.function.js'
+import { SupportContextItem } from '../tag/SupportContextItem.type.js'
 import { tags, TagWrapper } from '../tag/tag.utils.js'
-import { ValueTypes } from '../tag/ValueTypes.enum.js'
+import { empty, ValueTypes } from '../tag/ValueTypes.enum.js'
 import { destroySupport } from './destroySupport.function.js'
 import { paint, painting } from './paint.function.js'
 import { TagMaker } from '../tag/TagMaker.type.js'
@@ -22,7 +22,7 @@ export function renderTagElement(
   subject: SupportContextItem,
   isAppFunction: boolean,
 ) {
-  const placeholder = document.createTextNode('')
+  const placeholder = document.createTextNode(empty)
   tags.push((templater.wrapper || {original: templater}) as unknown as TagWrapper<unknown>)
   const support = runWrapper(templater, placeholder, element, subject, isAppFunction)
   

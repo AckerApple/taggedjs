@@ -1,6 +1,6 @@
-import { Counts } from '../interpolations/interpolateTemplate.js'
-import { ContextItem } from '../tag/Context.types.js'
-import { AnySupport } from '../tag/AnySupport.type.js'
+import type { TagCounts } from './TagCounts.type.js'
+import { ContextItem } from './ContextItem.type.js'
+import { AnySupport } from './AnySupport.type.js'
 
 // import { StringTag } from '../tag/DomTag.type.js'
 // import { SubscribeValue } from '../state/subscribe.function.js'
@@ -12,7 +12,7 @@ export type ProcessInit = (
     value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
     contextItem: ContextItem,
     ownerSupport: AnySupport,
-    counts: Counts, // {added:0, removed:0}
+    counts: TagCounts, // {added:0, removed:0}
     appendTo?: Element,      
     insertBefore?: Text,      
 ) => any

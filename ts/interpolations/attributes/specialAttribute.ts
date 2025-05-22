@@ -1,6 +1,6 @@
 import { paintAfters, paintContent } from "../../render/paint.function.js"
 import { AnySupport } from "../../tag/AnySupport.type.js";
-import { Counts } from "../interpolateTemplate.js";
+import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { InputElementTargetEvent } from "./ElementTargetEvent.interface.js";
 import { SpecialDefinition } from "../../render/attributes/processAttribute.function.js";
 
@@ -11,7 +11,7 @@ export function specialAttribute(
   element: Element,
   specialName: SpecialDefinition,
   support: AnySupport,
-  counts: Counts,
+  counts: TagCounts,
 ) {
   switch (specialName) {
     // case 'oninit' as any:

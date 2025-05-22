@@ -3,7 +3,7 @@ import { AnySupport } from '../AnySupport.type.js'
 import {  ValueTypes } from '../ValueTypes.enum.js'
 import { cloneTagJsValue } from '../cloneValueArray.function.js'
 import { deepCompareDepth, shallowCompareDepth } from '../hasSupportChanged.function.js'
-import { PropWatches } from '../tag.function.js'
+import { PropWatches } from '../../tagJsVars/tag.function.js'
 
 export function clonePropsBy(
   support: AnySupport,

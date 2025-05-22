@@ -1,6 +1,6 @@
-import { SupportContextItem } from '../createHtmlSupport.function.js'
+import { SupportContextItem } from '../SupportContextItem.type.js'
 import { TagGlobal } from '../getTemplaterResult.function.js'
-import { ContextItem } from '../Context.types.js'
+import { ContextItem } from '../ContextItem.type.js'
 
 export function getNewGlobal(subject: ContextItem): TagGlobal {
   ;(subject as SupportContextItem).renderCount = (subject as SupportContextItem).renderCount || 0

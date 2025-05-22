@@ -3,7 +3,7 @@ import { smartRemoveKids } from '../tag/smartRemoveKids.function.js'
 import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 import { runBeforeDestroy } from '../tag/tagRunner.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
-import { ContextItem } from '../tag/Context.types.js'
+import { ContextItem } from '../tag/ContextItem.type.js'
 
 export function destroySupport(
   support: AnySupport,

@@ -1,5 +1,5 @@
 import { AnySupport } from '../tag/AnySupport.type.js'
-import { SupportContextItem } from '../tag/createHtmlSupport.function.js'
+import { SupportContextItem } from '../tag/SupportContextItem.type.js'
 import { moveProviders } from './update/updateExistingTagComponent.function.js'
 import { softDestroySupport } from './softDestroySupport.function.js'
 import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'

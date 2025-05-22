@@ -3,8 +3,9 @@ import { Subscription } from '../subject/subject.utils.js'
 import { isTagComponent } from '../isInstance.js'
 import { runBeforeDestroy } from './tagRunner.js'
 import { AnySupport } from './AnySupport.type.js'
-import { AdvancedContextItem, ContextItem } from './Context.types.js'
 import { ValueTypes } from './ValueTypes.enum.js'
+import { ContextItem } from '../index.js'
+import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 
 export function destroyContext(
   childTags: ContextItem[],
@@ -19,8 +20,9 @@ export function destroyContext(
       continue
     }
 
-    if(child.value?.tagJsType === ValueTypes.subscribe) {
-      (child as AdvancedContextItem).delete(child, ownerSupport)
+    const childValue = child.value as TagJsVar | undefined
+    if(childValue?.tagJsType === ValueTypes.subscribe) {
+      childValue.delete(child, ownerSupport)
       continue
     }
 

@@ -1,11 +1,11 @@
 import { AnySupport } from '../../tag/AnySupport.type.js'
-import { ContextItem } from '../../tag/Context.types.js'
+import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processAttributeEmit } from './processAttribute.function.js'
 import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.function.js'
-import { Counts } from '../../interpolations/interpolateTemplate.js'
+import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { updateNameOnlyAttrValue } from '../../interpolations/attributes/updateAttribute.function.js'
 
-const emptyCounts: Counts = {added: 0, removed: 0}
+const emptyCounts: TagCounts = {added: 0, removed: 0}
 
 export function processUpdateAttrContext(
   value: unknown,

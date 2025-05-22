@@ -1,7 +1,9 @@
 import { StringTag } from './StringTag.type.js'
 import type { DomTag } from './DomTag.type.js'
 import { AnySupport } from './AnySupport.type.js'
-import { ContextItem, ContextHandler } from './Context.types.js'
+import { ContextHandler } from './Context.types.js'
+import { ContextItem } from '../index.js'
+import { valueToTagJsVar } from '../tagJsVars/valueToTagJsVar.function.js'
 
 export function processUpdateContext(
   support: AnySupport,
@@ -51,5 +53,7 @@ function processUpdateOneContext(
     contextItem,
     values,
   )
+  
   contextItem.value = value
+  contextItem.tagJsVar = valueToTagJsVar(value)
 }

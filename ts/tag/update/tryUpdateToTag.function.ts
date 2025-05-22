@@ -1,19 +1,19 @@
 import { getFakeTemplater, newSupportByTemplater, processTag } from '../../render/update/processTag.function.js'
 import { AnySupport } from '../AnySupport.type.js'
-import { SupportContextItem } from '../createHtmlSupport.function.js'
+import { SupportContextItem } from '../SupportContextItem.type.js'
 import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { BasicTypes, ValueTypes } from '../ValueTypes.enum.js'
 import { isTagComponent } from '../../isInstance.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
-import { ContextItem } from '../Context.types.js'
+import { ContextItem } from '../ContextItem.type.js'
 import { handleStillTag } from './handleStillTag.function.js'
 import { prepareUpdateToComponent } from './tagValueUpdateHandler.function.js'
 import type { StringTag } from '../StringTag.type.js'
 import type { DomTag } from '../DomTag.type.js'
-import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { TemplateValue } from './processFirstSubject.utils.js'
+import type { TagCounts } from '../../tag/TagCounts.type.js'
+import { TemplateValue } from '../TemplateValue.type.js'
 
-const fooCounts: Counts = { added: 0, removed: 0 }
+const fooCounts: TagCounts = { added: 0, removed: 0 }
 
 /** result is an indication to ignore further processing but that does not seem in use anymore */
 export function tryUpdateToTag(

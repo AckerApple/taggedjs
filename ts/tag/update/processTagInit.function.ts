@@ -1,22 +1,20 @@
-import { checkTagValueChange } from '../checkTagValueChange.function.js'
 import { processTag } from '../../render/update/processTag.function.js'
 import { TemplaterResult } from '../getTemplaterResult.function.js'
-import { Counts } from '../../interpolations/interpolateTemplate.js'
-import { SupportContextItem } from '../createHtmlSupport.function.js'
-import { ContextItem } from '../Context.types.js'
+import type { TagCounts } from '../../tag/TagCounts.type.js'
+import { SupportContextItem } from '../SupportContextItem.type.js'
+import { ContextItem } from '../ContextItem.type.js'
 import { processNewSubjectTag } from './processNewSubjectTag.function.js'
 import { AnySupport } from '../AnySupport.type.js'
+import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 
 export function processTagInit(
-  value: any,
+  value: TagJsVar,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  counts: Counts,
+  counts: TagCounts,
   appendTo?: Element | undefined,
   insertBefore?: Text,
-) {
-  contextItem.checkValueChange = checkTagValueChange
-
+): AnySupport {
   if(appendTo) {
     return processNewSubjectTag(
       value as TemplaterResult,

@@ -1,7 +1,7 @@
 import { castTextValue } from'../../castTextValue.function.js'
 import { paintBeforeText, paintCommands, setContent } from '../../render/paint.function.js'
-import { ContextItem } from '../Context.types.js'
-import { checkSimpleValueChange, deleteSimpleValue } from '../checkSimpleValueChange.function.js'
+import { getSimpleTagVar } from '../../tagJsVars/getSimpleTagVar.function.js'
+import { ContextItem } from '../ContextItem.type.js'
 
 export type RegularValue = string | number | undefined | boolean | null
 
@@ -24,19 +24,19 @@ export function processUpdateRegularValue(
 /** Used during updates that were another value/tag first but now simple string */
 export function processNowRegularValue(
   value: RegularValue,
-  subject: ContextItem, // could be tag via subject.tag
+  contextItem: ContextItem, // could be tag via contextItem.tag
 ) {
-  subject.checkValueChange = checkSimpleValueChange
-  subject.delete = deleteSimpleValue
-  const before = subject.placeholder as Text
+  contextItem.value = value
+  contextItem.tagJsVar = getSimpleTagVar(value)
+
+  const before = contextItem.placeholder as Text
   const castedValue = castTextValue(value)
 
-  const paint = subject.paint = {
+  const paint = contextItem.paint = {
     processor: paintBeforeText,
     args: [before, castedValue, (x: Text) => {
-      subject.simpleValueElm = x
-      subject.simpleValueElm = x
-      delete subject.paint
+      contextItem.simpleValueElm = x
+      delete contextItem.paint
     }],
   }
 

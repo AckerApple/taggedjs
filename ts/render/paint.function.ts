@@ -77,13 +77,20 @@ export function paintAppend(
 
 const someDiv = (typeof document === 'object' && document.createElement('div')) as HTMLDivElement // used for content cleaning
 
+function toPlainTextElm(text: string) {
+  // swap &gt; for >
+  someDiv.innerHTML = text // script tags should have already been sanitized before this step
+
+  // delete <!-- -->
+  return document.createTextNode(someDiv.innerHTML as string)
+}
+
 export function paintBeforeText(
   relative: Text | Element,
   text: string,
   callback: (created: Text) => any = blankHandler
 ) {
-  someDiv.innerHTML = text
-  const textElm = document.createTextNode(someDiv.innerHTML as string)
+  const textElm = toPlainTextElm(text)
   paintBefore(relative, textElm)
   callback(textElm)
 }
@@ -93,8 +100,31 @@ export function paintAppendText(
   text: string,
   callback: (created: Text) => any
 ) {
+  const textElm = toPlainTextElm(text)
+  paintAppend(relative, textElm)
+  callback(textElm)
+}
+
+/** Used when HTML content is safe and expected */
+export function paintBeforeElementString(
+  relative: Text | Element,
+  text: string,
+  callback: (created: Text) => any = blankHandler
+) {
   someDiv.innerHTML = text
-  const textElm = document.createTextNode(someDiv.textContent as string)
+  const textElm = document.createTextNode(someDiv.textContent as string) // toPlainTextElm(text)
+  paintBefore(relative, textElm)
+  callback(textElm)
+}
+
+/** Used when HTML content is safe and expected */
+export function paintAppendElementString(
+  relative: Text | Element,
+  text: string,
+  callback: (created: Text) => any
+) {
+  someDiv.innerHTML = text
+  const textElm = document.createTextNode(someDiv.textContent as string) // toPlainTextElm(text)
   paintAppend(relative, textElm)
   callback(textElm)
 }

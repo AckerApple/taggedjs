@@ -1,5 +1,5 @@
 import { SupportTagGlobal, TemplaterResult } from './getTemplaterResult.function.js'
-import { SupportContextItem } from './createHtmlSupport.function.js'
+import { SupportContextItem } from './SupportContextItem.type.js'
 import { TagWrapper } from './tag.utils.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
@@ -11,7 +11,7 @@ import { Props } from '../Props.js'
 import { TagMaker } from './TagMaker.type.js'
 import { BaseSupport } from './BaseSupport.type.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
-import { checkTagValueChange, destorySupportByContextItem } from './checkTagValueChange.function.js'
+import { checkTagValueChange, destroySupportByContextItem } from './checkTagValueChange.function.js'
 import { AnySupport } from './AnySupport.type.js'
 import { renderTagElement } from '../render/renderTagElement.function.js'
 import { loadNewBaseSupport } from './loadNewBaseSupport.function.js'
@@ -96,15 +96,22 @@ function getNewSubject(
 ) {
   const subject: SupportContextItem = {
     value: templater,
-    checkValueChange: checkTagValueChange,
-    delete: destorySupportByContextItem,
     withinOwnerElement: false, // i am the highest owner
     renderCount: 0,
 
     global: undefined as unknown as SupportTagGlobal, // gets set below in getNewGlobal()
+    tagJsVar: {
+      tagJsType: 'templater',
+      checkValueChange: checkTagValueChange,
+      delete: destroySupportByContextItem,
+      processInit: function appDoNothing() {
+        console.log('do nothing app function')
+      }
+    }
   }
 
   const global = getNewGlobal(subject) as BaseTagGlobal
+  // for click events and such read at a higher level
   global.events = {}
 
   loadNewBaseSupport(templater, subject, appElement)

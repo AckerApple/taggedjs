@@ -1,8 +1,9 @@
 import { TemplaterResult } from './getTemplaterResult.function.js'
-import { ContextItem } from './Context.types.js'
+import { ContextItem } from './ContextItem.type.js'
 import { Props } from '../Props.js'
 import { AnySupport } from './AnySupport.type.js'
-import { getBaseSupport, SupportContextItem, upgradeBaseToSupport } from './createHtmlSupport.function.js'
+import { getBaseSupport, upgradeBaseToSupport } from './createHtmlSupport.function.js'
+import { SupportContextItem } from './SupportContextItem.type.js'
 
 export function createSupport(
   templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()

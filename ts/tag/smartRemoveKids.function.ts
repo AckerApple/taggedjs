@@ -1,7 +1,7 @@
 import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { destroyArray } from './checkDestroyPrevious.function.js'
 import { paint, paintCommands, painting, paintRemover } from '../render/paint.function.js'
-import { ContextItem } from './Context.types.js'
+import { ContextItem } from './ContextItem.type.js'
 import {SupportTagGlobal } from './getTemplaterResult.function.js'
 
 /** sets global.deleted on support and all children */

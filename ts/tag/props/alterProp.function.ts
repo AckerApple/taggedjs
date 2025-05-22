@@ -3,7 +3,7 @@ import { renderExistingReadyTag } from '../../render/renderExistingTag.function.
 import { AnySupport } from '../AnySupport.type.js'
 import { getSupportInCycle } from '../getSupportInCycle.function.js'
 import { deepCompareDepth } from '../hasSupportChanged.function.js'
-import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
+import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { isArray, isStaticTag } from '../../isInstance.js'
 import { BasicTypes } from '../ValueTypes.enum.js'
 import { setUseMemory } from '../../state/index.js'
@@ -51,7 +51,6 @@ export function checkProp(
   newSupport: AnySupport,
   depth: number,
   owner?: any,
-  keyName?: string,
 ) {
   if(!value) {
     return value
@@ -64,7 +63,7 @@ export function checkProp(
   if(typeof(value) === BasicTypes.function) {
     if(depth <= 1) {
        // only wrap function at depth 0 and 1
-      return getPropWrap(value, owner, ownerSupport, keyName)
+      return getPropWrap(value, owner, ownerSupport)
     }
     return value
   }
@@ -133,7 +132,6 @@ function checkObjectProp(
       newSupport,
       depth + 1,
       value,
-      name,
     )
 
     const newSubValue = value[name] as unknown
@@ -194,7 +192,6 @@ export function getPropWrap(
   value: {mem?: unknown},
   owner: any,
   ownerSupport: AnySupport,
-  keyName?: string,
 ) {
   const already = value.mem
 
@@ -204,7 +201,7 @@ export function getPropWrap(
   }
 
   const wrap = function wrapRunner(...args: unknown[]) {
-    return callbackPropOwner(wrap.mem, owner, args, ownerSupport, keyName)
+    return callbackPropOwner(wrap.mem, owner, args, ownerSupport)
   } as WrapRunner // what gets called can switch over parent state changes
 
   wrap.original = value
@@ -223,7 +220,6 @@ export function callbackPropOwner(
   owner: any,
   callWith: unknown[],
   ownerSupport: AnySupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
-  keyName?: string,
 ) {
   const global = ownerSupport.subject.global as SupportTagGlobal
   const newest = global?.newest || ownerSupport as AnySupport

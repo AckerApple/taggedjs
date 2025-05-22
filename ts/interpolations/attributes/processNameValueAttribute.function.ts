@@ -4,10 +4,10 @@ import { specialAttribute } from './specialAttribute.js'
 import { HowToSet } from './howToSetInputValue.function.js'
 import { TagGlobal } from '../../tag/getTemplaterResult.function.js'
 import { processTagCallbackFun, SpecialAction, SpecialDefinition } from '../../render/attributes/processAttribute.function.js'
-import { ContextItem } from '../../tag/Context.types.js'
+import { ContextItem } from '../../tag/ContextItem.type.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
 import { BasicTypes } from '../../tag/ValueTypes.enum.js'
-import { Counts } from '../interpolateTemplate.js'
+import type { TagCounts } from '../../tag/TagCounts.type.js'
 
 const actions = ['init','destroy'] // oninit ondestroy
 
@@ -18,7 +18,7 @@ export function processDynamicNameValueAttribute(
   element: Element,
   howToSet: HowToSet,
   support: AnySupport,
-  counts: Counts,
+  counts: TagCounts,
   isSpecial: SpecialDefinition,
 ) {  
   contextItem.attrName = attrName
@@ -68,7 +68,7 @@ export function processNonDynamicAttr(
   value: string,
   element: Element,
   howToSet: HowToSet,
-  counts: Counts,
+  counts: TagCounts,
   support: AnySupport,
   isSpecial: SpecialDefinition,
 ) {
