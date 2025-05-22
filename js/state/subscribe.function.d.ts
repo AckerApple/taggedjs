@@ -1,4 +1,4 @@
-import { ProcessInit } from "../subject/ProcessInit.type.js";
+import { ProcessInit } from "../tag/ProcessInit.type.js";
 import { ValueTypes } from "../tag/index.js";
 import { StatesSetter } from "./states.utils.js";
 export type Subscription = {

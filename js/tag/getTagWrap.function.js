@@ -1,7 +1,7 @@
 import { castProps } from './props/alterProp.function.js';
 import { syncFunctionProps } from '../render/update/updateExistingTagComponent.function.js';
 import { executeWrap } from '../render/executeWrap.function.js';
-import { PropWatches } from './tag.function.js';
+import { PropWatches } from '../tagJsVars/tag.function.js';
 import { deepCompareDepth, shallowCompareDepth } from './hasSupportChanged.function.js';
 import { createSupport } from './createSupport.function.js';
 /** creates/returns a function that when called then calls the original component function

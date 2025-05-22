@@ -1,14 +1,13 @@
 // taggedjs-no-compile
 import { paintAppend, paintAppends, paintBefore, paintCommands } from '../../render/paint.function.js';
 import { domProcessContextItem } from '../../interpolations/optimizers/domProcessContextItem.function.js';
+import { empty } from '../ValueTypes.enum.js';
 /** Must provide insertBefore OR appendTo */
 export function createAndProcessContextItem(value, ownerSupport, counts, insertBefore, // used during updates
 appendTo) {
-    const element = document.createTextNode('');
+    const element = document.createTextNode(empty);
     const contextItem = {
         value,
-        checkValueChange: undefined, // gets populated in domProcessContextItem
-        delete: undefined, // gets populated in domProcessContextItem
         withinOwnerElement: false,
         placeholder: element,
     };

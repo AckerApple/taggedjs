@@ -10,8 +10,9 @@ export function destroyContext(childTags, ownerSupport) {
             destroyContext(lastArray, ownerSupport);
             continue;
         }
-        if (child.value?.tagJsType === ValueTypes.subscribe) {
-            child.delete(child, ownerSupport);
+        const childValue = child.value;
+        if (childValue?.tagJsType === ValueTypes.subscribe) {
+            childValue.delete(child, ownerSupport);
             continue;
         }
         const global = child.global;

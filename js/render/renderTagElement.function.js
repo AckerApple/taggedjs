@@ -1,5 +1,5 @@
 import { tags } from '../tag/tag.utils.js';
-import { ValueTypes } from '../tag/ValueTypes.enum.js';
+import { empty, ValueTypes } from '../tag/ValueTypes.enum.js';
 import { destroySupport } from './destroySupport.function.js';
 import { paint, painting } from './paint.function.js';
 import { setUseMemory } from '../index.js';
@@ -10,7 +10,7 @@ import { registerTagElement } from './registerNewTagElement.function.js';
 import { loadNewBaseSupport } from '../tag/loadNewBaseSupport.function.js';
 import { reState } from '../state/state.utils.js';
 export function renderTagElement(app, global, templater, templater2, element, subject, isAppFunction) {
-    const placeholder = document.createTextNode('');
+    const placeholder = document.createTextNode(empty);
     tags.push((templater.wrapper || { original: templater }));
     const support = runWrapper(templater, placeholder, element, subject, isAppFunction);
     global.isApp = true;

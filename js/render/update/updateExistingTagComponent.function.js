@@ -6,7 +6,7 @@ import { ValueTypes } from '../../tag/ValueTypes.enum.js';
 import { destroySupport } from '../destroySupport.function.js';
 import { getNewGlobal } from '../../tag/update/getNewGlobal.function.js';
 import { isLikeTags } from '../../tag/isLikeTags.function.js';
-import { PropWatches } from '../../tag/tag.function.js';
+import { PropWatches } from '../../tagJsVars/tag.function.js';
 import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.function.js';
 export function updateExistingTagComponent(ownerSupport, support, // lastest
 subject) {

@@ -4,7 +4,7 @@ import { Props } from '../../Props.js';
 import { UnknownFunction } from '../index.js';
 import { Subject } from '../../subject/Subject.class.js';
 export declare function castProps(props: Props, newSupport: AnySupport, depth: number): unknown[];
-export declare function checkProp(value: unknown | TemplaterResult | SubableProp | unknown[] | Record<string, unknown>, ownerSupport: AnySupport, newSupport: AnySupport, depth: number, owner?: any, keyName?: string): unknown;
+export declare function checkProp(value: unknown | TemplaterResult | SubableProp | unknown[] | Record<string, unknown>, ownerSupport: AnySupport, newSupport: AnySupport, depth: number, owner?: any): unknown;
 type SubableProp = {
     [name: string]: {
         subscription: Subject<void>;
@@ -17,13 +17,12 @@ export type WrapRunner = (() => unknown) & {
 };
 export declare function getPropWrap(value: {
     mem?: unknown;
-}, owner: any, ownerSupport: AnySupport, keyName?: string): {
+}, owner: any, ownerSupport: AnySupport): {
     mem?: unknown;
 };
 /** Function shared by alterProps() and updateExistingTagComponent... TODO: May want to have to functions to reduce cycle checking?  */
 export declare function callbackPropOwner(toCall: UnknownFunction, // original function
-owner: any, callWith: unknown[], ownerSupport: AnySupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
-keyName?: string): unknown;
+owner: any, callWith: unknown[], ownerSupport: AnySupport): unknown;
 export declare function isSkipPropValue(value: unknown): string | true;
 export declare function safeRenderSupport(newest: AnySupport, ownerSupport: AnySupport): AnySupport | undefined;
 export {};

@@ -13,7 +13,6 @@ counts) {
     const global = subject.global;
     const support = global.newest;
     support.ownerSupport = ownerSupport;
-    subject.checkValueChange = checkTagValueChange;
     const ph = subject.placeholder;
     buildBeforeElement(support, counts, undefined, ph);
     return support;
@@ -28,6 +27,7 @@ export function getFakeTemplater() {
     const fake = {
         tagJsType: ValueTypes.templater,
         processInit: processTagInit,
+        checkValueChange: checkTagValueChange,
     };
     return fake;
 }

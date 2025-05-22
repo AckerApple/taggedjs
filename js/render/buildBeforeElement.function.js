@@ -1,12 +1,10 @@
 import { attachDomElements } from './dom/attachDomElements.function.js';
-import { destorySupportByContextItem } from '../tag/index.js';
 import { getDomMeta } from '../tag/domMetaCollector.js';
 import { ValueTypes } from '../tag/ValueTypes.enum.js';
 import { painting } from './paint.function.js';
 /** Function that kicks off actually putting tags down as HTML elements */
 export function buildBeforeElement(support, counts, appendTo, insertBefore) {
     const subject = support.subject;
-    subject.delete = destorySupportByContextItem;
     const global = subject.global;
     global.oldest = support;
     global.newest = support;
@@ -29,7 +27,7 @@ function attachHtmlDomMeta(support, counts, appendTo, insertBefore) {
 }
 function loadDomMeta(support) {
     const templater = support.templater;
-    const thisTag = templater.tag; // || templater
+    const thisTag = templater.tag;
     if (thisTag.tagJsType === ValueTypes.dom) {
         return thisTag.dom;
     }
@@ -39,8 +37,6 @@ function loadDomMeta(support) {
 export function addOneContext(value, context, withinOwnerElement) {
     const contextItem = {
         value,
-        checkValueChange: undefined, // checkSimpleValueChange,
-        delete: undefined, // deleteSimpleValue,
         withinOwnerElement,
     };
     context.push(contextItem);

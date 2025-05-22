@@ -1,7 +1,7 @@
-import { SupportContextItem } from '../createHtmlSupport.function.js';
-import { TemplateValue } from './processFirstSubject.utils.js';
-import { AdvancedContextItem } from '../Context.types.js';
+import { SupportContextItem } from '../SupportContextItem.type.js';
+import { AdvancedContextItem } from '../AdvancedContextItem.type.js';
 import { AnySupport } from '../AnySupport.type.js';
+import { TemplateValue } from '../TemplateValue.type.js';
 /** Used for all tag value updates. Determines if value changed since last render */
 export declare function forceUpdateExistingValue(contextItem: AdvancedContextItem | SupportContextItem, newValue: TemplateValue, // newValue
 ownerSupport: AnySupport): void;

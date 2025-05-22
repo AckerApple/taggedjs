@@ -1,5 +1,5 @@
 import { Props } from '../Props.js';
-import { PropWatches } from './tag.function.js';
+import { PropWatches } from '../tagJsVars/tag.function.js';
 /**
  *
  * @param props

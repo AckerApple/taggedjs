@@ -1,109 +1,57 @@
-import { paint, paintAppend, paintAppends, paintCommands, paintRemover } from '../../render/paint.function.js';
+import { paint } from '../../render/paint.function.js';
 import { setUseMemory } from '../../state/setUseMemory.object.js';
 import { syncSupports } from '../../state/syncStates.function.js';
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js';
 import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js';
-import { empty, ValueTypes } from '../ValueTypes.enum.js';
-import { createAndProcessContextItem } from './createAndProcessContextItem.function.js';
-import { tagValueUpdateHandler } from './tagValueUpdateHandler.function.js';
-import { updateToDiffValue } from './updateToDiffValue.function.js';
-export function setupSubscribe(observable, contextItem, ownerSupport, counts, callback, appendTo, insertBefore) {
-    let appendMarker;
-    // do we need to append now but process subscription later?
-    if (appendTo) {
-        appendMarker = insertBefore = document.createTextNode(empty);
-        paintAppends.push({
-            processor: paintAppend,
-            args: [appendTo, insertBefore]
-        });
-    }
-    const subscription = setupSubscribeCallbackProcessor(observable, ownerSupport, counts, callback, insertBefore);
-    subscription.appendMarker = appendMarker;
-    contextItem.subscription = subscription;
-    contextItem.delete = deleteSubscribe;
-    contextItem.handler = checkSubscribeFrom;
-    return subscription;
+import { deleteSubContext } from './deleteSubContext.function.js';
+import { checkSubContext } from './checkSubContext.function.js';
+import { onFirstSubContext } from './onFirstSubContext.function.js';
+import { guaranteeInsertBefore } from '../guaranteeInsertBefore.function.js';
+export function setupSubscribe(observable, contextItem, ownerSupport, counts, callback, appendTo, insertBeforeOriginal) {
+    const { appendMarker, insertBefore } = guaranteeInsertBefore(appendTo, insertBeforeOriginal);
+    const subContext = setupSubscribeCallbackProcessor(observable, ownerSupport, counts, insertBefore, callback);
+    subContext.appendMarker = appendMarker;
+    contextItem.subContext = subContext;
+    contextItem.handler = checkSubContext;
+    return subContext;
 }
 export function setupSubscribeCallbackProcessor(observable, ownerSupport, // ownerSupport ?
 counts, // used for animation stagger computing
-callback, insertBefore) {
+insertBefore, callback) {
     const component = getSupportWithState(ownerSupport);
     let onValue = function onSubValue(value) {
-        subscription.hasEmitted = true;
-        subscription.contextItem = createAndProcessContextItem(value, ownerSupport, counts, insertBefore);
-        /*
-            if(!syncRun && !setUseMemory.stateConfig.support) {
-              paint()
-            }
-        */
+        onFirstSubContext(value, subContext, ownerSupport, counts, insertBefore);
         // from now on just run update
         onValue = function subscriptionUpdate(value) {
-            forceUpdateExistingValue(subscription.contextItem, value, ownerSupport);
+            forceUpdateExistingValue(subContext.contextItem, value, ownerSupport);
             if (!syncRun && !setUseMemory.stateConfig.support) {
                 paint();
             }
         };
     };
     // onValue mutates so function below calls original and mutation
-    const valueChangeHandler = function subValueProcessor(value) {
-        subscription.lastValue = value;
+    function valueHandler(value) {
+        subContext.lastValue = value;
         const newComponent = component.subject.global.newest;
         syncSupports(newComponent, component);
-        if (subscription.callback) {
-            value = subscription.callback(value);
+        if (subContext.callback) {
+            value = subContext.callback(value);
         }
         onValue(value);
-    };
+    }
     let syncRun = true;
-    // aka setup
-    const subscription = {
-        hasEmitted: false,
-        handler: valueChangeHandler,
+    const subContext = {
+        valueHandler,
         callback,
-        states: component.states,
-        lastValue: undefined,
-        subscription: undefined, // must be populated AFTER "subscription" variable defined incase called on subscribe
     };
-    subscription.subscription = observable.subscribe(valueChangeHandler);
+    // HINT: Must subscribe AFTER initial variable created above incase subscribing causes immediate run
+    subContext.subscription = observable.subscribe(valueHandler);
     syncRun = false;
-    return subscription;
+    return subContext;
 }
-function checkSubscribeFrom(newValue, ownerSupport, contextItem) {
-    if (!newValue || !newValue.tagJsType || newValue.tagJsType !== ValueTypes.subscribe) {
-        contextItem.delete(contextItem, ownerSupport);
-        updateToDiffValue(newValue, contextItem, ownerSupport, 99);
-        return 99;
-    }
-    const subscription = contextItem.subscription;
-    if (!subscription.hasEmitted) {
-        return -1;
-    }
-    subscription.callback = newValue.callback;
-    subscription.handler(subscription.lastValue);
-    const newComponent = getSupportWithState(ownerSupport);
-    subscription.states = newComponent.states;
-    return -1;
-}
-function deleteSubscribe(contextItem, ownerSupport) {
-    const subscription = contextItem.subscription;
-    subscription.deleted = true;
-    delete contextItem.subscription;
+export function deleteAndUnsubscribe(contextItem, ownerSupport) {
+    const subscription = contextItem.subContext;
     subscription.subscription.unsubscribe();
-    const appendMarker = subscription.appendMarker;
-    if (appendMarker) {
-        paintCommands.push({
-            processor: paintRemover,
-            args: [appendMarker],
-        });
-        delete subscription.appendMarker;
-    }
-    delete contextItem.delete;
-    // delete contextItem.handler
-    contextItem.handler = tagValueUpdateHandler;
-    if (!subscription.hasEmitted) {
-        return;
-    }
-    subscription.contextItem.delete(subscription.contextItem, ownerSupport);
-    return 77;
+    return deleteSubContext(contextItem, ownerSupport);
 }
 //# sourceMappingURL=setupSubscribe.function.js.map

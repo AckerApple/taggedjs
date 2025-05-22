@@ -16,3 +16,7 @@ export declare function paintBefore(relative: Text | Element, element: Text | El
 export declare function paintAppend(relative: Text | Element, element: Text | Element): void;
 export declare function paintBeforeText(relative: Text | Element, text: string, callback?: (created: Text) => any): void;
 export declare function paintAppendText(relative: Text | Element, text: string, callback: (created: Text) => any): void;
+/** Used when HTML content is safe and expected */
+export declare function paintBeforeElementString(relative: Text | Element, text: string, callback?: (created: Text) => any): void;
+/** Used when HTML content is safe and expected */
+export declare function paintAppendElementString(relative: Text | Element, text: string, callback: (created: Text) => any): void;

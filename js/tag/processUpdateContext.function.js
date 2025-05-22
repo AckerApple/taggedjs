@@ -1,3 +1,4 @@
+import { valueToTagJsVar } from '../tagJsVars/valueToTagJsVar.function.js';
 export function processUpdateContext(support, context) {
     const thisTag = support.templater.tag;
     const values = thisTag.values;
@@ -22,5 +23,6 @@ index, context, ownerSupport) {
     const handler = contextItem.handler;
     handler(value, ownerSupport, contextItem, values);
     contextItem.value = value;
+    contextItem.tagJsVar = valueToTagJsVar(value);
 }
 //# sourceMappingURL=processUpdateContext.function.js.map

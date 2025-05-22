@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 import { specialAttribute } from '../../interpolations/attributes/specialAttribute.js';
-import { isFunction, isObject, isSubjectInstance } from '../../isInstance.js';
+import { isFunction, isObject } from '../../isInstance.js';
 import { bindSubjectCallback } from '../../interpolations/attributes/bindSubjectCallback.function.js';
 import { BasicTypes, ValueTypes, empty } from '../../tag/ValueTypes.enum.js';
 import { paintContent } from '../paint.function.js';
@@ -9,7 +9,6 @@ import { addOneContext } from '../index.js';
 import { processAttributeFunction } from '../../interpolations/attributes/processAttributeCallback.function.js';
 import { isSpecialAttr } from '../../interpolations/attributes/isSpecialAttribute.function.js';
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js';
-import { blankHandler } from '../dom/attachDomElements.function.js';
 /** MAIN FUNCTION. Sets attribute value, subscribes to value updates  */
 export function processAttribute(values, attrName, element, support, howToSet, //  = howToSetInputValue
 context, isSpecial, counts, value) {
@@ -34,25 +33,9 @@ context, isSpecial, counts, value) {
             isAttr: true,
             element,
             attrName: attrName,
-            // checkValueChange: undefined as any,
-            // delete: undefined as any,
             withinOwnerElement: true,
         };
         context.push(contextItem);
-        /*
-            const isSubject = isSubjectInstance(contextItem.value)
-            if ( isSubject ) {
-              return processNameValueAttributeAttrSubject(
-                attrName as string,
-                contextItem,
-                element,
-                support,
-                howToSet,
-                isSpecial,
-                counts,
-              )
-            }
-        */
         contextItem.handler = processUpdateAttrContext;
         processDynamicNameValueAttribute(attrName, value, contextItem, element, howToSet, support, counts, isSpecial);
         contextItem.value = value;
@@ -80,28 +63,62 @@ export function processNameOnlyAttrValue(values, attrValue, element, ownerSuppor
     howToSet(element, attrValue, empty);
 }
 /** Processor for flat attributes and object attributes */
-function processNameValueAttributeAttrSubject(attrName, contextItem, element, support, howToSet, isSpecial, counts) {
-    if (isSpecial) {
-        paintContent.push(function paintContent() {
-            element.removeAttribute(attrName);
-        });
+/*
+function processNameValueAttributeAttrSubject(
+  attrName: string,
+  contextItem: ContextItem,
+  element: Element,
+  support: AnySupport,
+  howToSet: HowToSet,
+  isSpecial: SpecialDefinition,
+  counts: TagCounts,
+) {
+  if(isSpecial) {
+    paintContent.push(function paintContent() {
+      element.removeAttribute(attrName)
+    })
+  }
+
+  const contextValueSubject = contextItem.value
+  if(isSubjectInstance(contextValueSubject)) {
+    contextItem.handler = blankHandler
+
+    const callback = function processAttrCallback(newAttrValue: any) {
+      processAttributeEmit(
+        newAttrValue,
+        attrName,
+        contextItem,
+        element,
+        support,
+        howToSet,
+        isSpecial,
+        counts,
+      )
     }
-    const contextValueSubject = contextItem.value;
-    if (isSubjectInstance(contextValueSubject)) {
-        contextItem.handler = blankHandler;
-        const callback = function processAttrCallback(newAttrValue) {
-            processAttributeEmit(newAttrValue, attrName, contextItem, element, support, howToSet, isSpecial, counts);
-        };
-        // 🗞️ Subscribe. Above callback called immediately since its a ValueSubject()
-        const sub = contextValueSubject.subscribe(callback);
-        // Record subscription for later unsubscribe when element destroyed
-        const global = contextItem.global;
-        const subs = global.subscriptions = global.subscriptions || [];
-        subs.push(sub);
-    }
-    processAttributeEmit(contextItem.value, attrName, contextItem, element, support, howToSet, isSpecial, counts);
-    return;
+  
+    // 🗞️ Subscribe. Above callback called immediately since its a ValueSubject()
+    const sub = contextValueSubject.subscribe(callback as any)
+    
+    // Record subscription for later unsubscribe when element destroyed
+    const global = contextItem.global as TagGlobal
+    const subs = global.subscriptions = global.subscriptions || []
+    subs.push(sub)
+  }
+
+  processAttributeEmit(
+    contextItem.value,
+    attrName,
+    contextItem,
+    element,
+    support,
+    howToSet,
+    isSpecial,
+    counts,
+  )
+
+  return
 }
+*/
 export function processAttributeEmit(newAttrValue, attrName, subject, element, support, howToSet, isSpecial, counts) {
     // should the function be wrapped so every time its called we re-render?
     if (isFunction(newAttrValue)) {

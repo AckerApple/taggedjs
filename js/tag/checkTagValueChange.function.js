@@ -32,10 +32,10 @@ export function checkTagValueChange(newValue, contextItem) {
         }
         return 88; // its same tag with new values
     }
-    destorySupportByContextItem(contextItem);
+    destroySupportByContextItem(contextItem);
     return 8; // 'no-longer-tag'
 }
-export function destorySupportByContextItem(contextItem) {
+export function destroySupportByContextItem(contextItem) {
     const global = contextItem.global;
     const lastSupport = global?.newest;
     // destroy old component, value is not a component

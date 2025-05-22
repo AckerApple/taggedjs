@@ -1,7 +1,8 @@
 export { getNewGlobal } from './update/getNewGlobal.function.js';
 export * from './tag.types.js';
 export { getDomMeta } from './domMetaCollector.js';
-export * from './tag.function.js';
+export * from './update/index.js';
+export * from '../tagJsVars/tag.function.js';
 export * from './getDomTag.function.js';
 export * from './tag.utils.js';
 export * from './html.js';
@@ -16,7 +17,7 @@ export { variablePrefix } from './getDomTag.function.js';
 export { paint } from '../render/paint.function.js';
 export { processFirstSubjectValue } from './update/processFirstSubjectValue.function.js';
 export { hasPropChanges } from './hasPropChanges.function.js';
-export { PropWatches } from './tag.function.js';
+export { PropWatches } from '../tagJsVars/tag.function.js';
 export { output } from './output.function.js';
-export { checkSimpleValueChange, deleteSimpleValue } from './checkSimpleValueChange.function.js';
+export { guaranteeInsertBefore } from './guaranteeInsertBefore.function.js';
 //# sourceMappingURL=index.js.map

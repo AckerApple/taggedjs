@@ -3,6 +3,7 @@ import { tryUpdateToTag } from './tryUpdateToTag.function.js';
 import { isArray } from '../../isInstance.js';
 import { processTagArray } from './processTagArray.js';
 import { processNowRegularValue } from './processRegularValue.function.js';
+import { getArrayTagVar } from '../../tagJsVars/getArrayTagJsVar.function.js';
 export function updateToDiffValue(newValue, contextItem, ownerSupport, ignoreOrDestroyed) {
     // is new value a tag?
     const tagJsType = newValue && newValue.tagJsType;
@@ -15,6 +16,7 @@ export function updateToDiffValue(newValue, contextItem, ownerSupport, ignoreOrD
     }
     if (isArray(newValue)) {
         processTagArray(contextItem, newValue, ownerSupport, { added: 0, removed: 0 });
+        contextItem.tagJsVar = getArrayTagVar(newValue);
         return;
     }
     if (typeof (newValue) === BasicTypes.function) {

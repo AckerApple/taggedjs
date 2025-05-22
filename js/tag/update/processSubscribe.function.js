@@ -8,7 +8,7 @@ appendTo, insertBefore) {
     const observable = value.Observable;
     const subscription = setupSubscribe(observable, contextItem, ownerSupport, counts, value.callback, appendTo, insertBefore);
     if (!subscription.hasEmitted) {
-        subscription.handler((observable.value || value.withDefault));
+        subscription.valueHandler((observable.value || value.withDefault));
     }
     return subscription;
 }

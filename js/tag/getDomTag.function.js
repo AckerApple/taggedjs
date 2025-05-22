@@ -2,27 +2,11 @@
 import { ValueTypes } from './ValueTypes.enum.js';
 import { getSupportInCycle } from './getSupportInCycle.function.js';
 import { processDomTagInit } from './update/processDomTagInit.function.js';
+import { checkTagValueChange, destroySupportByContextItem } from '../index.js';
+import { forceUpdateExistingValue } from './update/forceUpdateExistingValue.function.js';
 export const variablePrefix = ':tagvar';
 export const variableSuffix = ':';
-export function getStringTag(strings, values) {
-    const tag = {
-        values,
-        ownerSupport: getSupportInCycle(),
-        tagJsType: ValueTypes.tag,
-        processInit: processDomTagInit,
-        strings,
-        /** Used within an array.map() that returns html aka array.map(x => html``.key(x)) */
-        key(arrayValue) {
-            tag.arrayValue = arrayValue;
-            return tag;
-        },
-        html: function html(strings, values) {
-            tag.children = { strings, values };
-            return tag;
-        }
-    };
-    return tag;
-}
+/** When compiled to then run in browser */
 export function getDomTag(dom, values) {
     const tag = {
         values,
@@ -30,8 +14,15 @@ export function getDomTag(dom, values) {
         dom,
         tagJsType: ValueTypes.dom,
         processInit: processDomTagInit,
+        checkValueChange: checkTagValueChange,
+        delete: destroySupportByContextItem,
         key: function keyFun(arrayValue) {
             tag.arrayValue = arrayValue;
+            return tag;
+        },
+        /** Used within the outerHTML tag to signify that it expects innerHTML */
+        setInnerHTML: function setInnerHTML(innerHTML) {
+            innerHTML.owner = tag;
             return tag;
         },
         html: {
@@ -42,6 +33,70 @@ export function getDomTag(dom, values) {
             }
         }
     };
+    Object.defineProperty(tag, 'innerHTML', {
+        set(innerHTML) {
+            innerHTML.outerHTML = tag;
+            tag._innerHTML = innerHTML;
+            innerHTML.oldProcessInit = innerHTML.processInit;
+            // TODO: Not best idea to override the init
+            innerHTML.processInit = processOuterDomTagInit;
+        },
+    });
+    return tag;
+}
+/** Used to override the html`` processing that will first render outerHTML and then its innerHTML */
+function processOuterDomTagInit(value, contextItem, // could be tag via result.tag
+ownerSupport, // owningSupport
+counts, // {added:0, removed:0}
+appendTo, insertBefore) {
+    const outerHTML = value.outerHTML;
+    processDomTagInit(outerHTML, contextItem, // could be tag via result.tag
+    ownerSupport, // owningSupport
+    counts, // {added:0, removed:0}
+    appendTo, insertBefore);
+    contextItem.handler = (value, newSupport, contextItem) => {
+        forceUpdateExistingValue(contextItem, value?.outerHTML || value, newSupport);
+    };
+    // TODO: Not best idea to swap out the original values changeChecker
+    value.checkValueChange = function outerCheckValueChange(newValue, contextItem) {
+        return checkOuterTagValueChange(newValue, contextItem);
+    };
+}
+function checkOuterTagValueChange(newValue, contextItem) {
+    return checkTagValueChange(newValue, // (newValue as Tag)?.outerHTML || newValue,
+    contextItem);
+}
+/** When runtime is in browser */
+export function getStringTag(strings, values) {
+    const tag = {
+        values,
+        ownerSupport: getSupportInCycle(),
+        tagJsType: ValueTypes.tag,
+        processInit: processDomTagInit,
+        checkValueChange: checkTagValueChange,
+        delete: destroySupportByContextItem,
+        strings,
+        /** Used within an array.map() that returns html aka array.map(x => html``.key(x)) */
+        key(arrayValue) {
+            tag.arrayValue = arrayValue;
+            return tag;
+        },
+        /** Used within the outerHTML tag to signify that it expects innerHTML */
+        setInnerHTML: function setInnerHTML(innerHTML) {
+            innerHTML.owner = tag;
+            return tag;
+        },
+        html: function html(strings, values) {
+            tag.children = { strings, values };
+            return tag;
+        }
+    };
+    Object.defineProperty(tag, 'innerHTML', {
+        set(innerHTML) {
+            innerHTML.outerHTML = tag;
+            innerHTML.processInit = processOuterDomTagInit;
+        },
+    });
     return tag;
 }
 //# sourceMappingURL=getDomTag.function.js.map

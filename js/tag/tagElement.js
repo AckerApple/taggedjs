@@ -5,7 +5,7 @@ import { PropWatches } from './index.js';
 import { initState } from '../state/state.utils.js';
 import { isTagComponent } from '../isInstance.js';
 import { setUseMemory } from '../state/setUseMemory.object.js';
-import { checkTagValueChange, destorySupportByContextItem } from './checkTagValueChange.function.js';
+import { checkTagValueChange, destroySupportByContextItem } from './checkTagValueChange.function.js';
 import { renderTagElement } from '../render/renderTagElement.function.js';
 import { loadNewBaseSupport } from './loadNewBaseSupport.function.js';
 export const appElements = [];
@@ -59,13 +59,20 @@ export function tagElement(app, element, props) {
 function getNewSubject(templater, appElement) {
     const subject = {
         value: templater,
-        checkValueChange: checkTagValueChange,
-        delete: destorySupportByContextItem,
         withinOwnerElement: false, // i am the highest owner
         renderCount: 0,
         global: undefined, // gets set below in getNewGlobal()
+        tagJsVar: {
+            tagJsType: 'templater',
+            checkValueChange: checkTagValueChange,
+            delete: destroySupportByContextItem,
+            processInit: function appDoNothing() {
+                console.log('do nothing app function');
+            }
+        }
     };
     const global = getNewGlobal(subject);
+    // for click events and such read at a higher level
     global.events = {};
     loadNewBaseSupport(templater, subject, appElement);
     return subject;

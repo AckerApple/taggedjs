@@ -87,7 +87,7 @@ Object.defineProperty(tag, 'renderOnce', {
 // TODO: deprecate this in favor of tag.use
 Object.defineProperty(tag, 'state', {
     set(renderFunction) {
-        ;
+        console.warn('deprecated, use tag.use instead of tag.state');
         renderFunction.original = {
             setUse: setUseMemory,
             tags,

@@ -29,6 +29,8 @@ export type KeyFunction =
  * - NEVER USE inline array key: array.map((x, index) => html``.key([x, index]))
  */
 <T>(arrayValue: T) => ArrayItemStringTag<T>;
-export declare function getStringTag(strings: string[], values: unknown[]): StringTag;
+/** When compiled to then run in browser */
 export declare function getDomTag(dom: LikeObjectChildren, values: unknown[]): DomTag;
+/** When runtime is in browser */
+export declare function getStringTag(strings: string[], values: unknown[]): StringTag;
 export {};

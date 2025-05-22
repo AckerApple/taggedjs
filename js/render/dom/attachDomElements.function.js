@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 import { howToSetFirstInputValue } from "../../interpolations/attributes/howToSetInputValue.function.js";
-import { paintAppend, paintAppends, paintAppendText, paintBefore, paintBeforeText, paintCommands } from "../paint.function.js";
+import { paintAppend, paintAppendElementString, paintAppends, paintBefore, paintBeforeElementString, paintCommands } from "../paint.function.js";
 import { processAttribute } from "../attributes/processAttribute.function.js";
 import { empty } from "../../tag/ValueTypes.enum.js";
 import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicDom.function.js";
@@ -73,13 +73,13 @@ function attachDomText(newNode, node, owner, insertBefore) {
     const string = textNode.tc = node.tc;
     if (owner) {
         paintAppends.push({
-            processor: paintAppendText,
+            processor: paintAppendElementString,
             args: [owner, string, (elm) => textNode.domElement = elm],
         });
     }
     else {
         paintCommands.push({
-            processor: paintBeforeText,
+            processor: paintBeforeElementString,
             args: [insertBefore, string, (elm) => textNode.domElement = elm]
         });
     }

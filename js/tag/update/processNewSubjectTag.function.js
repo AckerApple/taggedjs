@@ -1,11 +1,9 @@
-import { checkTagValueChange } from '../checkTagValueChange.function.js';
 import { buildBeforeElement } from '../../render/buildBeforeElement.function.js';
 import { paintAppend, paintAppends, paintBefore, paintCommands } from '../../render/paint.function.js';
 import { newSupportByTemplater } from '../../render/update/processTag.function.js';
 export function processNewSubjectTag(templater, subject, // could be tag via result.tag
 ownerSupport, // owner
 counts, appendTo, insertBefore) {
-    subject.checkValueChange = checkTagValueChange;
     const support = newSupportByTemplater(templater, ownerSupport, subject);
     support.ownerSupport = ownerSupport;
     const result = buildBeforeElement(support, counts, appendTo, appendTo ? undefined : insertBefore);

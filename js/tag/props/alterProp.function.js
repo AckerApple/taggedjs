@@ -20,7 +20,7 @@ function alterProp(prop, ownerSupport, newSupport, depth) {
     }
     return checkProp(prop, ownerSupport, newSupport, depth);
 }
-export function checkProp(value, ownerSupport, newSupport, depth, owner, keyName) {
+export function checkProp(value, ownerSupport, newSupport, depth, owner) {
     if (!value) {
         return value;
     }
@@ -30,7 +30,7 @@ export function checkProp(value, ownerSupport, newSupport, depth, owner, keyName
     if (typeof (value) === BasicTypes.function) {
         if (depth <= 1) {
             // only wrap function at depth 0 and 1
-            return getPropWrap(value, owner, ownerSupport, keyName);
+            return getPropWrap(value, owner, ownerSupport);
         }
         return value;
     }
@@ -63,7 +63,7 @@ function checkObjectProp(value, newSupport, ownerSupport, depth) {
     const keys = Object.keys(value);
     for (const name of keys) {
         const subValue = value[name];
-        const result = checkProp(subValue, ownerSupport, newSupport, depth + 1, value, name);
+        const result = checkProp(subValue, ownerSupport, newSupport, depth + 1, value);
         const newSubValue = value[name];
         if (newSubValue === result) {
             continue;
@@ -92,14 +92,14 @@ function afterCheckProp(depth, index, originalValue, newProp, newSupport) {
         });
     }
 }
-export function getPropWrap(value, owner, ownerSupport, keyName) {
+export function getPropWrap(value, owner, ownerSupport) {
     const already = value.mem;
     // already previously converted by a parent?
     if (already) {
         return value;
     }
     const wrap = function wrapRunner(...args) {
-        return callbackPropOwner(wrap.mem, owner, args, ownerSupport, keyName);
+        return callbackPropOwner(wrap.mem, owner, args, ownerSupport);
     }; // what gets called can switch over parent state changes
     wrap.original = value;
     wrap.mem = value;
@@ -109,8 +109,7 @@ export function getPropWrap(value, owner, ownerSupport, keyName) {
 }
 /** Function shared by alterProps() and updateExistingTagComponent... TODO: May want to have to functions to reduce cycle checking?  */
 export function callbackPropOwner(toCall, // original function
-owner, callWith, ownerSupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
-keyName) {
+owner, callWith, ownerSupport) {
     const global = ownerSupport.subject.global;
     const newest = global?.newest || ownerSupport;
     const supportInCycle = getSupportInCycle();

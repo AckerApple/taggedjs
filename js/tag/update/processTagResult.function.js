@@ -1,8 +1,6 @@
 import { buildBeforeElement } from '../../render/buildBeforeElement.function.js';
 import { paintAppend, paintAppends } from '../../render/paint.function.js';
-import { checkTagValueChange } from '../index.js';
 export function processReplaceTagResult(support, counts, contextItem) {
-    contextItem.checkValueChange = checkTagValueChange;
     const ph = contextItem.placeholder;
     buildBeforeElement(support, counts, undefined, // element for append child
     ph);

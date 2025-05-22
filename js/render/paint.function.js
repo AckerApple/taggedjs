@@ -46,15 +46,33 @@ export function paintAppend(relative, element) {
     relative.appendChild(element);
 }
 const someDiv = (typeof document === 'object' && document.createElement('div')); // used for content cleaning
+function toPlainTextElm(text) {
+    // swap &gt; for >
+    someDiv.innerHTML = text; // script tags should have already been sanitized before this step
+    // delete <!-- -->
+    return document.createTextNode(someDiv.innerHTML);
+}
 export function paintBeforeText(relative, text, callback = blankHandler) {
-    someDiv.innerHTML = text;
-    const textElm = document.createTextNode(someDiv.innerHTML);
+    const textElm = toPlainTextElm(text);
     paintBefore(relative, textElm);
     callback(textElm);
 }
 export function paintAppendText(relative, text, callback) {
+    const textElm = toPlainTextElm(text);
+    paintAppend(relative, textElm);
+    callback(textElm);
+}
+/** Used when HTML content is safe and expected */
+export function paintBeforeElementString(relative, text, callback = blankHandler) {
     someDiv.innerHTML = text;
-    const textElm = document.createTextNode(someDiv.textContent);
+    const textElm = document.createTextNode(someDiv.textContent); // toPlainTextElm(text)
+    paintBefore(relative, textElm);
+    callback(textElm);
+}
+/** Used when HTML content is safe and expected */
+export function paintAppendElementString(relative, text, callback) {
+    someDiv.innerHTML = text;
+    const textElm = document.createTextNode(someDiv.textContent); // toPlainTextElm(text)
     paintAppend(relative, textElm);
     callback(textElm);
 }

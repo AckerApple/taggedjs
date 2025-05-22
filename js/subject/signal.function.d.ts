@@ -1,5 +1,5 @@
 import { ValueTypes } from '../tag/ValueTypes.enum.js';
-import { ProcessInit } from './ProcessInit.type.js';
+import { ProcessInit } from '../tag/ProcessInit.type.js';
 /** Checks if rendering cycle in process. Then creates object with "value" key and ability to "subscribe" to value changes */
 export declare function signal<T>(initialValue: T): SignalObject;
 export type SignalObject = {

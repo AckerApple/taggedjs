@@ -1,5 +1,5 @@
 import { TemplaterResult } from '../tag/getTemplaterResult.function.js';
-import { SupportContextItem } from '../tag/createHtmlSupport.function.js';
+import { SupportContextItem } from '../tag/SupportContextItem.type.js';
 import { TagWrapper } from '../tag/tag.utils.js';
 import { TagMaker } from '../tag/TagMaker.type.js';
 import { AnySupport, BaseTagGlobal } from '../index.js';
