@@ -29,6 +29,7 @@ appFun.isApp = true
 export const App = tag(appFun)
 
 export const homePage = () => tag.use = (
+  showSections = true,
   appCounter = 0,
   toggleValue = false,
   testTimeout = null,
@@ -37,12 +38,14 @@ export const homePage = () => tag.use = (
   testEmoji = '🟦',
 
   _ = states(get => [{
+    showSections,
     appCounter,
     toggleValue,
     testTimeout,
     renderCount,
     testEmoji,
   }] = get({
+    showSections,
     appCounter,
     toggleValue,
     testTimeout,
@@ -135,7 +138,8 @@ export const homePage = () => tag.use = (
     ${sectionSelector()}
 
     <div id="tagDebug-fx-wrap">
-      ${renderedSections(appCounterSubject)}
+      <button onclick=${() => showSections = !showSections}>toggle sections</button>
+      ${showSections && renderedSections(appCounterSubject)}
 
       ${tagDebug()}
     </div>

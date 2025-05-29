@@ -1,4 +1,4 @@
-import { Tag, html, states, tag } from "taggedjs"
+import { getInnerHTML, Tag, html, states, tag } from "taggedjs"
 import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests.js"
 import { renderCountDiv } from "./renderCount.component.js"
 
@@ -9,6 +9,17 @@ const test22 = tag((a:number, b:number, children: Tag) => html`
     <div style="border:2px solid red;">***${children}***</div>
   </fieldset>
 `)
+
+const noTagTest = () => {
+  const innerHTML = getInnerHTML()
+  
+  return html`
+    <fieldset>
+      <legend>noTagTest</legend>
+      ${11}---${innerHTML}+++${22}
+    </fieldset>
+  `.setInnerHTML(innerHTML)
+}
 
 export const child = tag((_: string = 'childTests') => (
   renderCount = 0,
@@ -39,6 +50,16 @@ export const child = tag((_: string = 'childTests') => (
       <span id="innerHtmlTest-childTests-display">${counter}</span>
       ${renderCountDiv({renderCount, name: 'childTests-innerHtmlTest'})}
     `)}
+    
+    ${noTagTest().innerHTML = html`
+      <b>Field set body C</b>
+      <hr />
+      <button id="innerHtmlTest-childTests-button-c"
+        onclick=${() => ++counter}
+      >🐮 (C) increase childTests inside ${counter}:${renderCount}</button>
+      <span id="innerHtmlTest-childTests-display-c">${counter}</span>
+      ${renderCountDiv({renderCount, name: 'childTests-innerHtmlTest-c'})}
+    `}
 
     ${innerHtmlPropsTest(22, html`
       <b>Field set body B</b>

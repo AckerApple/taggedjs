@@ -1,5 +1,5 @@
 import { Subject, callbackMaker, html, onInit, tag, state, states } from "taggedjs"
-import { child } from "../childTests.js"
+import { child } from "../childTests.tag.js"
 import { arrays } from "../arrayTests.js"
 import { tagSwitchDebug } from "../tagSwitchDebug.component.js"
 import { mirroring } from "../mirroring.tag.js"

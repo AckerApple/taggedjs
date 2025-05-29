@@ -1,8 +1,8 @@
 // taggedjs-no-compile
 
-import { byId, change, triggerChangeElm, click, html, query, htmlById } from "./testing/elmSelectors"
+import { byId, click, html, query, htmlById, changeOne, textContent, clickOne } from "./testing/elmSelectors"
 import { expect, describe, it } from "./testing/expect"
-import { expectMatchedHtml } from "./testing/expect.html"
+import { expectMatchedHtml, sleep } from "./testing/expect.html"
 
 let runs = 0
 
@@ -105,5 +105,65 @@ describe('📰 content', () => {
 
   it('increase runs', () => {
     ++runs
+  })
+
+  it('concat style', () => {
+    byId('dynamic-border-width').value = 2
+    byId('dynamic-border-color').value = 'white'
+    
+    changeOne('#dynamic-border-width')
+    changeOne('#dynamic-border-color')
+    
+    expect(byId('dynamic-border-element').style.borderColor).toBe('white')
+    expect(byId('dynamic-border-element').style.borderWidth).toBe('2px')
+
+    byId('dynamic-border-width').value = 1
+    byId('dynamic-border-color').value = 'blue'
+    
+    changeOne('#dynamic-border-width')
+    changeOne('#dynamic-border-color')
+    
+    expect(byId('dynamic-border-element').style.borderColor).toBe('blue')
+    expect(byId('dynamic-border-element').style.borderWidth).toBe('1px')
+  })
+
+  it('tagvar injections', () => {
+    expect(byId('inject-tagvar-0').innerText).toBe(byId('inject-read-tagvar-0').innerText)
+    expect(byId('inject-tagvar-1').innerText).toBe(byId('inject-read-tagvar-1').innerText)
+    expect(byId('inject-tagvar-2').innerText).toBe(byId('inject-read-tagvar-2').innerText)
+  })
+
+  it('animates', async () => {
+    const added = Number(textContent('#content-fx-added'))
+    const removed = Number(textContent('#content-fx-removed'))
+    
+    //show
+    click('#content-toggle-fx')
+
+    expect(Number(textContent('#content-fx-added'))).toBe(added)
+    
+    await sleep(10)
+    
+    expect(Number(textContent('#content-fx-added'))).toBe(added + 2)
+
+    await sleep(10)
+
+    expect(Number(textContent('#content-fx-added'))).toBe(added + 3)
+    
+    // hide
+    click('#content-toggle-fx')
+
+    // no changes to remove yet
+    expect(Number(textContent('#content-fx-removed'))).toBe(removed)
+    
+    await sleep(95)
+    
+    // about to start animating
+    expect(Number(textContent('#content-fx-removed'))).toBe(removed)
+    
+    await sleep(75)
+    
+    expect(Number(textContent('#content-fx-removed'))).toBe(removed + 3)
+    expect(Number(textContent('#content-fx-added'))).toBe(added + 3) // still same
   })
 })

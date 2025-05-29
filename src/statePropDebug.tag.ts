@@ -1,7 +1,7 @@
 import { Tag, html, states, state, tag } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
 
-export const statePropDebug = (propCounter: number, child: Tag) => tag.state = (
+export const statePropDebug = (propCounter: number, child: Tag) => tag.use = (
   _ = state('statePropDebug.tag.ts'), // something to be seen in console
   edit = false,
   renderCount = 0,

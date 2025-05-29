@@ -1,7 +1,71 @@
-import { subscribeWith, LikeObjectChildren, html, tag, ValueSubject, state, combineLatest, willPromise, states, subscribe, Subject } from "taggedjs"
+import { TagJsEvent, subscribeWith, LikeObjectChildren, html, tag, ValueSubject, state, combineLatest, willPromise, states, subscribe, Subject, getInnerHTML, TagCounts, subject } from "taggedjs"
 import { dumpContent } from "./dumpContent.tag"
 import { renderCountDiv } from "./renderCount.component"
-import { Observable, Subject as RxSubject, startWith } from "rxjs"
+import { Subject as RxSubject, startWith } from "rxjs"
+import { fadeInDown, fadeOutUp } from "taggedjs-animate-css"
+
+const animateWrap = (counts: ValueSubject<TagCounts>) => {
+  const innerHTML = getInnerHTML()
+
+  const oninit = (a: any) =>
+    fadeInDown({
+      ...a,
+      staggerBy: 10,
+    }).then(() => {
+      ++counts.value.added
+      counts.next(counts.value)
+    })
+  
+  const ondestroy = (b: any)=>
+    fadeOutUp({
+      ...b,
+      staggerBy: 10,
+    } as any).then(() => {
+      ++counts.value.removed
+      counts.next(counts.value)
+    })
+  
+  return html`
+    <div
+      oninit=${oninit}
+      
+      ondestroy=${ondestroy}
+      
+      style.--animate-duration=".1s"
+      style.border="1px solid orange"
+    >${innerHTML}</div>
+  `.setInnerHTML(innerHTML)
+}
+
+export const concatStyles = tag((innerHTML: any) => {
+  let width = 1
+  let borderColor = 'white'
+
+  states(get => [{borderColor, width}] = get({borderColor, width}))
+
+  return html`
+    <div id="dynamic-border-element"
+      style="border-width:${width}px;border-color:${borderColor};border-style:solid;"
+    >${innerHTML}</div>
+    
+    <div>
+      borderWidth:
+      <input id="dynamic-border-width" type="range" min="0" max="10" step="1"
+        value=${width} onchange=${event => width = Number(event.target.value)}
+      /> - ${width}px
+    </div>
+
+    <div>
+      borderColor:
+      <select id="dynamic-border-color" onchange=${event => borderColor = event.target.value}>
+        <option ${borderColor === '' ? 'selected' : ''} value=""></option>
+        <option ${borderColor === 'black' ? 'selected' : ''} value="black">black</option>
+        <option ${borderColor === 'blue' ? 'selected' : ''} value="blue">blue</option>
+        <option ${borderColor === 'white' ? 'selected' : ''} value="white">white</option>
+      </select>
+    </div>
+  `
+})
 
 export const content = tag(() => {
   const sub0 = state(() => new Subject<number>())
@@ -13,11 +77,13 @@ export const content = tag(() => {
   let orangeToggle = true
   let boldToggle = false
   let counter = 0
+  let showHideFx = false
+  const counts = state(() => new Subject({ added: 0, removed: 0})) as ValueSubject<TagCounts>
 
   states(get => [{
-    renderCount, orangeToggle, boldToggle, counter,
+    renderCount, orangeToggle, boldToggle, counter, showHideFx,
   }] = get({
-    renderCount, orangeToggle, boldToggle, counter,
+    renderCount, orangeToggle, boldToggle, counter, showHideFx,
   }))
 
   ++renderCount
@@ -48,6 +114,35 @@ export const content = tag(() => {
       <button type="button" onclick=${() => ++counter}>increase outside ${counter}</button>
     </fieldset>
 
+    <fieldset style="flex-grow:1">
+      <legend>
+        hide show
+      </legend>
+      
+      <button id="content-toggle-fx" type="button" onclick=${() => showHideFx = !showHideFx}>toggle hideshow fx</button>
+
+      ${showHideFx && (animateWrap(counts).innerHTML = html`
+        test the tester - 0
+      `)}
+      ${showHideFx && (animateWrap(counts).innerHTML = html`
+        test the tester - 1
+      `)}
+      ${showHideFx && (animateWrap(counts).innerHTML = html`
+        test the tester - 2
+      `)}
+
+      <div>
+        added: <span id="content-fx-added">${subscribe(counts, counts => counts.added)}</span>
+        removed: <span id="content-fx-removed">${subscribe(counts, counts => counts.removed)}</span>
+      </div>
+
+      <hr />
+      
+      ${concatStyles(html`
+        test the tester2
+      `)}
+    </fieldset>
+
     <fieldset>
       <legend>Dump Content</legend>
       ${dumpContent()}
@@ -74,6 +169,15 @@ export const content = tag(() => {
         <div id="injection-test">injection test ${injectionTest}</div>
         <div id="hello-big-dom-world">hello ${html.dom(dom)} world</div>
         <div id="hello-big-string-world">hello ${html`<b>big</b>`} world</div>
+      </fieldset>
+
+      <fieldset>
+        <legend>tagvar injection</legend>
+        <div>
+          <div id="inject-tagvar-0">&#58;tagvar0&#58;</div>===<div id="inject-read-tagvar-0">:tagvar0:</div>
+          <div id="inject-tagvar-1">&#58;tagvarx0x&#58;</div>===<div id="inject-read-tagvar-1">:tagvarx0x:</div>
+          <div id="inject-tagvar-2">&#58;tagvar0&#58;</div>===<div id="inject-read-tagvar-2">:tagva&#x72;0:</div>
+        </div>        
       </fieldset>
       
       <div id="style-simple-border-orange" style.border="3px solid orange">simple orange border</div>
@@ -144,7 +248,10 @@ export const content = tag(() => {
         </div>
       </fieldset>
       <div style="flex-grow:1">
-        should be a safe string no html <span id="content-dom-parse-0-0">"&lt;div&gt;hello&lt;/div&gt;"</span> here => <span id="content-dom-parse-0-1">"${'<div>hello</div>'}"</span>
+        should be a safe string no html&nbsp;
+        <span id="content-dom-parse-0-0">"&lt;div&gt;hello&lt;/div&gt;"</span>&nbsp;
+        here =>&nbsp;
+        <span id="content-dom-parse-0-1">"${'<div>hello</div>'}"</span>
       </div>
     </div>
     <strong>Subscribe</strong>

@@ -17,12 +17,21 @@ export function focus(
   return query(q).forEach(elm => (elm as HTMLElement).focus())
 }
 
+/** document.querySelectorAll(...).forEach(i => i.click()) */
 export function click(
   q: string
 ) {
   const items = [...query(q)]
-  items.map(elm => (elm as HTMLElement).click())
+  items.forEach(elm => (elm as HTMLElement).click())
   // items.map(elm => elm.dispatchEvent(new MouseEvent('click')))
+}
+
+export function clickOne(
+  q: string,
+  index = 0,
+) {
+  const element = query(q)[index] as HTMLElement
+  element.click()
 }
 
 export function keydownOn(input: Element, key: string) {
@@ -44,12 +53,16 @@ export function keyupOn(input: Element, key?: string) {
   input.dispatchEvent(keyEvent)
 }
 
-export function clickOne(
+export function changeOne(
   q: string,
   index = 0,
 ) {
-  const element = query(q)[index] as HTMLElement
-  element.click()
+  const target = query(q)[index] as HTMLElement
+  changeElm(target)
+}
+
+export function changeElm(target: HTMLElement) {
+  ;(target as any).change({ target })
 }
 
 export function html(
@@ -68,8 +81,8 @@ export function textContent(
   return html
 }
 
-export function byId(id: string): HTMLElement {
-  return document.getElementById(id) as HTMLElement
+export function byId(id: string): HTMLElement & { value: string | number } {
+  return document.getElementById(id) as any
 }
 
 export function htmlById(id: string): string {
@@ -90,7 +103,8 @@ export function blur(
 export function change(
   q: string
 ) {
-  return query(q).forEach(elm => triggerChangeElm((elm as HTMLElement)))
+  // return query(q).forEach(elm => triggerChangeElm((elm as HTMLElement)))
+  return query(q).forEach(elm => changeElm(elm))
 }
 
 const blurEvent = new Event('focusout', {

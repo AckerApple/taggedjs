@@ -3,7 +3,7 @@ import { oneRender } from "./oneRender.tag"
 import { storage, ViewTypes } from "./sectionSelector.tag"
 import funInPropsTag from "./funInProps.tag"
 import { todoApp } from "./todo/todos.app"
-import { child } from "./childTests"
+import { child } from "./childTests.tag"
 import { destroys } from "./destroys.tag"
 import { arrays } from "./arrayTests"
 import { tagSwitchDebug } from "./tagSwitchDebug.component"
@@ -101,7 +101,7 @@ const getSection = (section: OutputSection) => {
             id=${'section_' + section.view}
             onclick=${() => section.contentHide = !section.contentHide}
             style.background-color=${section.contentHide ? 'grey' : ''}
-          >👁️ hide/show - ${section.contentHide? 'true' : 'false'}</button>
+          >👁️ hide/show</button>
         </div>
       </fieldset>
       <div style="font-size:0.6em;text-align:right;">

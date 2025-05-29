@@ -27,7 +27,7 @@ export function useMenuName() {
   return 'home'
 }
 
-export const menu = () => tag.state = (
+export const menu = () => tag.use = (
   menuName = useMenuName(),
 ) => html`
   <div>
