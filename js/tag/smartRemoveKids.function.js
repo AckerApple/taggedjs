@@ -58,10 +58,7 @@ function smartRemoveByContext(context, allPromises) {
         const elm = subject.simpleValueElm;
         if (elm) {
             delete subject.simpleValueElm;
-            paintCommands.push({
-                processor: paintRemover,
-                args: [elm],
-            });
+            paintCommands.push([paintRemover, [elm]]);
             continue;
         }
         const subGlobal = subject.global;
@@ -88,18 +85,12 @@ function destroyClones(global) {
 function destroyClone(clone) {
     const marker = clone.marker;
     if (marker) {
-        paintCommands.push({
-            processor: paintRemover,
-            args: [marker],
-        });
+        paintCommands.push([paintRemover, [marker]]);
     }
     const dom = clone.domElement;
     if (!dom) {
         return;
     }
-    paintCommands.push({
-        processor: paintRemover,
-        args: [dom],
-    });
+    paintCommands.push([paintRemover, [dom]]);
 }
 //# sourceMappingURL=smartRemoveKids.function.js.map

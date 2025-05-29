@@ -6,10 +6,7 @@ export function deleteSubContext(contextItem, ownerSupport) {
     delete contextItem.subContext;
     const appendMarker = subscription.appendMarker;
     if (appendMarker) {
-        paintCommands.push({
-            processor: paintRemover,
-            args: [appendMarker],
-        });
+        paintCommands.push([paintRemover, [appendMarker]]);
         delete subscription.appendMarker;
     }
     delete contextItem.delete;

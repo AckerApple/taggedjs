@@ -11,16 +11,10 @@ export function processFirstTagResult(support, counts, appendTo) {
     const result = buildBeforeElement(support, counts, appendTo, undefined);
     for (const dom of result.dom) {
         if (dom.domElement) {
-            paintAppends.splice(appendIndex++, 0, {
-                args: [appendTo, dom.domElement],
-                processor: paintAppend,
-            });
+            paintAppends.splice(appendIndex++, 0, [paintAppend, [appendTo, dom.domElement]]);
         }
         if (dom.marker) {
-            paintAppends.splice(appendIndex++, 0, {
-                args: [appendTo, dom.marker],
-                processor: paintAppend,
-            });
+            paintAppends.splice(appendIndex++, 0, [paintAppend, [appendTo, dom.marker]]);
         }
     }
     return support;

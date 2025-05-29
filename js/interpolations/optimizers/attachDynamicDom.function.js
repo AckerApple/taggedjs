@@ -12,16 +12,10 @@ appendTo, insertBefore) {
     const contextItem = addOneContext(value, context, isWithinOwnerElement);
     contextItem.placeholder = marker;
     if (appendTo) {
-        paintAppends.push({
-            processor: paintAppend,
-            args: [appendTo, marker],
-        });
+        paintAppends.push([paintAppend, [appendTo, marker]]);
     }
     else {
-        paintCommands.push({
-            processor: paintBefore,
-            args: [insertBefore, marker],
-        });
+        paintCommands.push([paintBefore, [insertBefore, marker]]);
     }
     domProcessContextItem(value, support, contextItem, counts, appendTo, insertBefore);
 }

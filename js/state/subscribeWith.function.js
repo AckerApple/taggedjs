@@ -10,7 +10,6 @@ export function subscribeWith(Observable, withDefault, callback) {
         processInit: processSubscribeWith,
         delete: deleteAndUnsubscribe,
         checkValueChange: function subscribeDoNothing() {
-            console.log('weird to be here subscribeWith');
             return -1;
         },
         Observable,

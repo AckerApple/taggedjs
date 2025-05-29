@@ -1,10 +1,9 @@
-// taggedjs-no-compile
 import { specialAttribute } from './specialAttribute.js';
 import { processTagCallbackFun } from '../../render/attributes/processAttribute.function.js';
 import { BasicTypes } from '../../tag/ValueTypes.enum.js';
 const actions = ['init', 'destroy']; // oninit ondestroy
 export function processDynamicNameValueAttribute(attrName, value, contextItem, element, howToSet, support, counts, isSpecial) {
-    contextItem.attrName = attrName;
+    // contextItem.attrName = attrName
     contextItem.element = element;
     contextItem.howToSet = howToSet;
     if (typeof (value) === BasicTypes.function) {
@@ -15,8 +14,6 @@ export function processDynamicNameValueAttribute(attrName, value, contextItem, e
         return processTagCallbackFun(contextItem, value, support, attrName, element);
     }
     contextItem.attrName = attrName;
-    contextItem.element = element;
-    contextItem.howToSet = howToSet;
     contextItem.isSpecial = isSpecial;
     return processNonDynamicAttr(attrName, value, element, howToSet, counts, support, isSpecial);
 }

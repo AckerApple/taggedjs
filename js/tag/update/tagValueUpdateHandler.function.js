@@ -4,18 +4,18 @@ import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js
 import { createSupport } from '../createSupport.function.js';
 /** Checks if value has changed before updating. Used for all tag value updates. Determines if value changed since last render */
 export function tagValueUpdateHandler(newValue, // newValue
-ownerSupport, contextItem) {
+ownerSupport, contextItem, _values, counts) {
     // Do not continue if the value is just the same
     if (newValue === contextItem.value) {
         return;
     }
-    forceUpdateExistingValue(contextItem, newValue, ownerSupport);
+    forceUpdateExistingValue(contextItem, newValue, ownerSupport, counts);
 }
-export function prepareUpdateToComponent(templater, contextItem, ownerSupport) {
+export function prepareUpdateToComponent(templater, contextItem, ownerSupport, counts) {
     const global = contextItem.global;
     // When last value was not a component
     if (!global.newest) {
-        processReplacementComponent(templater, contextItem, ownerSupport, { added: 0, removed: 0 });
+        processReplacementComponent(templater, contextItem, ownerSupport, counts);
         return;
     }
     const support = createSupport(templater, ownerSupport, ownerSupport.appSupport, contextItem);

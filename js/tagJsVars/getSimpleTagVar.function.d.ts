@@ -7,8 +7,7 @@ export declare function getSimpleTagVar(value: any): {
     delete: typeof deleteSimpleValue;
 };
 declare function processSimpleValueInit(value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
-contextItem: ContextItem, ownerSupport: AnySupport, counts: TagCounts, // {added:0, removed:0}
-appendTo?: Element, insertBefore?: Text): void;
+contextItem: ContextItem, ownerSupport: AnySupport, counts: TagCounts, appendTo?: Element, insertBefore?: Text): void;
 export declare function deleteSimpleValue(contextItem: ContextItem): void;
 export declare function checkSimpleValueChange(newValue: unknown, contextItem: ContextItem): -1 | 6;
 export {};

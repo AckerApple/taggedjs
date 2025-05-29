@@ -12,29 +12,28 @@ export function getSimpleTagVar(value) {
     };
 }
 function processSimpleValueInit(value, // TemplateValue | StringTag | SubscribeValue | SignalObject,
-contextItem, ownerSupport, counts, // {added:0, removed:0}
-appendTo, insertBefore) {
+contextItem, ownerSupport, counts, appendTo, insertBefore) {
     // value = value.value
     const castedValue = castTextValue(value);
     insertBefore = contextItem.placeholder;
     // always insertBefore for content
-    const paint = contextItem.paint = {
-        processor: paintBeforeText,
-        args: [insertBefore, castedValue, (x) => {
+    const paint = contextItem.paint = [paintBeforeText, [insertBefore, castedValue, (x) => {
                 contextItem.simpleValueElm = x;
                 delete contextItem.paint;
-            }],
-    };
+            }]];
     paintCommands.push(paint);
 }
 export function deleteSimpleValue(contextItem) {
     const elm = contextItem.simpleValueElm;
     delete contextItem.simpleValueElm;
     delete contextItem.tagJsVar;
-    paintCommands.push({
-        processor: paintRemover,
-        args: [elm],
-    });
+    // is it being destroyed before it was even built?
+    if (contextItem.paint !== undefined) {
+        const paintIndex = paintCommands.findIndex(paint => paint === contextItem.paint);
+        paintCommands.splice(paintIndex, 1);
+        return;
+    }
+    paintCommands.push([paintRemover, [elm]]);
 }
 export function checkSimpleValueChange(newValue, contextItem) {
     const isBadValue = newValue === null || newValue === undefined;

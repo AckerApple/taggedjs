@@ -4,15 +4,16 @@ export function processUpdateContext(support, context) {
     const values = thisTag.values;
     let index = 0;
     const len = values.length;
+    const counts = { added: 0, removed: 0 };
     while (index < len) {
-        processUpdateOneContext(values, index, context, support);
+        processUpdateOneContext(values, index, context, support, counts);
         ++index;
     }
     return context;
 }
 /** returns boolean of did render */
 function processUpdateOneContext(values, // the interpolated values
-index, context, ownerSupport) {
+index, context, ownerSupport, counts) {
     const value = values[index];
     // is something already there?
     const contextItem = context[index];
@@ -21,7 +22,7 @@ index, context, ownerSupport) {
         return;
     }
     const handler = contextItem.handler;
-    handler(value, ownerSupport, contextItem, values);
+    handler(value, ownerSupport, contextItem, values, counts);
     contextItem.value = value;
     contextItem.tagJsVar = valueToTagJsVar(value);
 }

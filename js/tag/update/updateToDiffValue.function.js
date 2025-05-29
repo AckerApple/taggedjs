@@ -4,18 +4,18 @@ import { isArray } from '../../isInstance.js';
 import { processTagArray } from './processTagArray.js';
 import { processNowRegularValue } from './processRegularValue.function.js';
 import { getArrayTagVar } from '../../tagJsVars/getArrayTagJsVar.function.js';
-export function updateToDiffValue(newValue, contextItem, ownerSupport, ignoreOrDestroyed) {
+export function updateToDiffValue(newValue, contextItem, ownerSupport, ignoreOrDestroyed, counts) {
     // is new value a tag?
     const tagJsType = newValue && newValue.tagJsType;
     if (tagJsType) {
         if (tagJsType === ValueTypes.renderOnce) {
             return;
         }
-        tryUpdateToTag(contextItem, newValue, ownerSupport);
+        tryUpdateToTag(contextItem, newValue, ownerSupport, counts);
         return;
     }
     if (isArray(newValue)) {
-        processTagArray(contextItem, newValue, ownerSupport, { added: 0, removed: 0 });
+        processTagArray(contextItem, newValue, ownerSupport, counts);
         contextItem.tagJsVar = getArrayTagVar(newValue);
         return;
     }

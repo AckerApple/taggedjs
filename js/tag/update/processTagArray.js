@@ -19,7 +19,7 @@ ownerSupport, counts, appendTo) {
         for (let index = 0; index < lastArray.length; ++index) {
             const item = lastArray[index];
             // 👁️ COMPARE & REMOVE
-            const newRemoved = compareArrayItems(value, index, lastArray, removed, counts);
+            const newRemoved = compareArrayItems(value, index, lastArray, removed);
             if (newRemoved === 0) {
                 filteredLast.push(item);
                 continue;
@@ -55,7 +55,7 @@ function reviewPreviousArrayItem(value, itemSubject, lastArray, ownerSupport, in
 counts, appendTo) {
     const couldBeSame = lastArray.length > index;
     if (couldBeSame) {
-        tagValueUpdateHandler(value, ownerSupport, itemSubject);
+        tagValueUpdateHandler(value, ownerSupport, itemSubject, undefined, counts);
         return itemSubject;
     }
     const contextItem = createAndProcessContextItem(value, ownerSupport, counts, runtimeInsertBefore, appendTo);

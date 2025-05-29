@@ -12,20 +12,20 @@ export function paint() {
         return;
     }
     for (const content of paintContent) {
-        content();
+        content[0](...content[1]);
     }
     for (const [text, textNode] of setContent) {
         textNode.textContent = text;
     }
-    for (const now of paintAppends) {
-        now.processor(...now.args);
+    for (const content of paintAppends) {
+        content[0](...content[1]);
     }
-    for (const item of paintCommands) {
-        item.processor(...item.args);
+    for (const content of paintCommands) {
+        content[0](...content[1]);
     }
     paintReset();
-    for (const now of paintAfters) {
-        now();
+    for (const content of paintAfters) {
+        content[0](...content[1]);
     }
     paintAfters = [];
 }

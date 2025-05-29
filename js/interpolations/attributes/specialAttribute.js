@@ -2,21 +2,14 @@ import { paintAfters, paintContent } from "../../render/paint.function.js";
 /** handles init, destroy, autofocus, autoselect, style., class. */
 export function specialAttribute(name, value, element, specialName, support, counts) {
     switch (specialName) {
-        // case 'oninit' as any:
-        case 'init': {
-            const stagger = counts.added;
+        case 'init': { // aka oninit
+            const stagger = counts.added++;
             // run delayed after elements placed down
-            paintAfters.push(function paintSpecialAttribute() {
-                const event = {
-                    target: element,
-                    stagger,
-                };
-                value(event); // call init/oninit
-            });
+            paintAfters.push([paintSpecialAttribute, [element, stagger, value]]);
             return;
         }
-        case 'destroy': {
-            const stagger = ++counts.removed;
+        case 'destroy': { // aka ondestroy
+            const stagger = counts.removed++;
             const global = support.subject.global;
             global.destroys = global.destroys || [];
             global.destroys.push(() => {
@@ -29,14 +22,14 @@ export function specialAttribute(name, value, element, specialName, support, cou
             return;
         }
         case 'autofocus':
-            paintAfters.push(() => element.focus());
+            paintAfters.push([autofocus, [element]]);
             return;
         case 'autoselect':
-            paintAfters.push(() => element.select());
+            paintAfters.push([autoselect, [element]]);
             return;
         case 'style': {
             const names = name.split('.');
-            paintContent.push(() => element.style[names[1]] = value); // attribute changes should come first
+            paintContent.push([paintStyle, [element, names, value]]); // attribute changes should come first
             return;
         }
         case 'class':
@@ -45,19 +38,43 @@ export function specialAttribute(name, value, element, specialName, support, cou
     }
     throw new Error(`Invalid special attribute of ${specialName}. ${name}`);
 }
+function paintStyle(element, names, value) {
+    const smallName = names[1];
+    element.style[smallName] = value;
+    element.style.setProperty(smallName, value);
+}
 function processSpecialClass(name, value, element) {
     const names = name.split('.');
     names.shift(); // remove class
     // truthy
     if (value) {
         for (const name of names) {
-            paintContent.push(() => element.classList.add(name));
+            paintContent.push([classListAdd, [element, name]]);
         }
         return;
     }
     // falsy
     for (const name of names) {
-        paintContent.push(() => element.classList.remove(name));
+        paintContent.push([classListRemove, [element, name]]);
     }
+}
+function classListAdd(element, name) {
+    element.classList.add(name);
+}
+function classListRemove(element, name) {
+    element.classList.remove(name);
+}
+function autoselect(element) {
+    element.select();
+}
+function autofocus(element) {
+    element.focus();
+}
+function paintSpecialAttribute(element, stagger, value) {
+    const event = {
+        target: element,
+        stagger,
+    };
+    value(event); // call init/oninit
 }
 //# sourceMappingURL=specialAttribute.js.map

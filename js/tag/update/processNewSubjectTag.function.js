@@ -10,30 +10,18 @@ counts, appendTo, insertBefore) {
     for (const dom of result.dom) {
         if (dom.marker) {
             if (appendTo) {
-                paintAppends.push({
-                    args: [appendTo, dom.marker],
-                    processor: paintAppend,
-                });
+                paintAppends.push([paintAppend, [appendTo, dom.marker]]);
             }
             else {
-                paintCommands.push({
-                    processor: paintBefore,
-                    args: [insertBefore, dom.marker],
-                });
+                paintCommands.push([paintBefore, [insertBefore, dom.marker]]);
             }
         }
         if (dom.domElement) {
             if (appendTo) {
-                paintAppends.push({
-                    args: [appendTo, dom.domElement],
-                    processor: paintAppend,
-                });
+                paintAppends.push([paintAppend, [appendTo, dom.domElement]]);
             }
             else {
-                paintCommands.push({
-                    processor: paintBefore,
-                    args: [insertBefore, dom.domElement],
-                });
+                paintCommands.push([paintBefore, [insertBefore, dom.domElement]]);
             }
         }
     }

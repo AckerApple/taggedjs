@@ -23,7 +23,7 @@ insertBefore, callback) {
         onFirstSubContext(value, subContext, ownerSupport, counts, insertBefore);
         // from now on just run update
         onValue = function subscriptionUpdate(value) {
-            forceUpdateExistingValue(subContext.contextItem, value, ownerSupport);
+            forceUpdateExistingValue(subContext.contextItem, value, ownerSupport, { added: 0, removed: 0 });
             if (!syncRun && !setUseMemory.stateConfig.support) {
                 paint();
             }

@@ -1,12 +1,9 @@
-export type PaintCommand = {
-    processor: (...args: any[]) => any;
-    args: any[];
-};
+export type PaintCommand = [((...args: any[]) => unknown), any[]];
 export declare let paintCommands: PaintCommand[];
-export declare let paintContent: (() => any)[];
+export declare let paintContent: PaintCommand[];
 export declare let setContent: [string, Text][];
 export declare let paintAppends: PaintCommand[];
-export declare let paintAfters: (() => any)[];
+export declare let paintAfters: PaintCommand[];
 export declare const painting: {
     locks: number;
 };

@@ -13,10 +13,7 @@ appendTo, insertBefore) {
     const dom = [];
     if (appendTo && insertBefore === undefined) {
         insertBefore = document.createTextNode(empty);
-        paintAppends.push({
-            args: [appendTo, insertBefore],
-            processor: paintAppend,
-        });
+        paintAppends.push([paintAppend, [appendTo, insertBefore]]);
         appendTo = undefined;
     }
     for (let index = 0; index < nodes.length; ++index) {
@@ -55,16 +52,10 @@ function attachDomElement(newNode, node, values, support, context, counts, appen
         }
     }
     if (appendTo) {
-        paintAppends.push({
-            args: [appendTo, domElement],
-            processor: paintAppend,
-        });
+        paintAppends.push([paintAppend, [appendTo, domElement]]);
     }
     else {
-        paintCommands.push({
-            processor: paintBefore,
-            args: [insertBefore, domElement],
-        });
+        paintCommands.push([paintBefore, [insertBefore, domElement]]);
     }
     return domElement;
 }
@@ -72,16 +63,10 @@ function attachDomText(newNode, node, owner, insertBefore) {
     const textNode = newNode;
     const string = textNode.tc = node.tc;
     if (owner) {
-        paintAppends.push({
-            processor: paintAppendElementString,
-            args: [owner, string, (elm) => textNode.domElement = elm],
-        });
+        paintAppends.push([paintAppendElementString, [owner, string, (elm) => textNode.domElement = elm]]);
     }
     else {
-        paintCommands.push({
-            processor: paintBeforeElementString,
-            args: [insertBefore, string, (elm) => textNode.domElement = elm]
-        });
+        paintCommands.push([paintBeforeElementString, [insertBefore, string, (elm) => textNode.domElement = elm]]);
     }
 }
 //# sourceMappingURL=attachDomElements.function.js.map

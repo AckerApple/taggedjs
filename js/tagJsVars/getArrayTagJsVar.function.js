@@ -10,8 +10,7 @@ export function getArrayTagVar(value) {
     };
 }
 function processArrayInit(value, // TemplateValue | StringTag | SubscribeValue | SignalObject,
-contextItem, ownerSupport, counts, // {added:0, removed:0}
-appendTo) {
+contextItem, ownerSupport, counts, appendTo) {
     const subValue = value;
     processTagArray(contextItem, subValue, ownerSupport, counts, appendTo);
 }

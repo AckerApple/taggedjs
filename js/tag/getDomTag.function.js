@@ -4,8 +4,6 @@ import { getSupportInCycle } from './getSupportInCycle.function.js';
 import { processDomTagInit } from './update/processDomTagInit.function.js';
 import { checkTagValueChange, destroySupportByContextItem } from '../index.js';
 import { forceUpdateExistingValue } from './update/forceUpdateExistingValue.function.js';
-export const variablePrefix = ':tagvar';
-export const variableSuffix = ':';
 /** When compiled to then run in browser */
 export function getDomTag(dom, values) {
     const tag = {
@@ -47,24 +45,23 @@ export function getDomTag(dom, values) {
 /** Used to override the html`` processing that will first render outerHTML and then its innerHTML */
 function processOuterDomTagInit(value, contextItem, // could be tag via result.tag
 ownerSupport, // owningSupport
-counts, // {added:0, removed:0}
-appendTo, insertBefore) {
+counts, appendTo, insertBefore) {
     const outerHTML = value.outerHTML;
     processDomTagInit(outerHTML, contextItem, // could be tag via result.tag
     ownerSupport, // owningSupport
-    counts, // {added:0, removed:0}
-    appendTo, insertBefore);
-    contextItem.handler = (value, newSupport, contextItem) => {
-        forceUpdateExistingValue(contextItem, value?.outerHTML || value, newSupport);
+    counts, appendTo, insertBefore);
+    contextItem.handler = (value, newSupport, contextItem, _values, counts) => {
+        forceUpdateExistingValue(contextItem, value?.outerHTML || value, newSupport, counts);
     };
     // TODO: Not best idea to swap out the original values changeChecker
-    value.checkValueChange = function outerCheckValueChange(newValue, contextItem) {
-        return checkOuterTagValueChange(newValue, contextItem);
+    value.checkValueChange = function outerCheckValueChange(newValue, contextItem, counts) {
+        return checkOuterTagValueChange(newValue, contextItem, counts);
     };
 }
-function checkOuterTagValueChange(newValue, contextItem) {
+function checkOuterTagValueChange(newValue, contextItem, counts) {
     return checkTagValueChange(newValue, // (newValue as Tag)?.outerHTML || newValue,
-    contextItem);
+    contextItem, // subContext.contextItem as any,
+    counts);
 }
 /** When runtime is in browser */
 export function getStringTag(strings, values) {

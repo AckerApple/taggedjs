@@ -1,7 +1,7 @@
 // taggedjs-no-compile
-import { variableSuffix, variablePrefix } from "../../tag/getDomTag.function.js";
 import { ImmutableTypes } from "../../tag/ValueTypes.enum.js";
-const placeholderRegex = new RegExp(variablePrefix + '(\\d+)' + variableSuffix, 'g');
+import { variablePrefix, variableSuffix } from "../../tag/DomTag.type.js";
+import { placeholderRegex } from "../../render/attributes/getTagVarIndex.function.js";
 const ch = 'ch'; // short for children
 export function replacePlaceholders(dom, valueCount, valuePositions = [], currentTail = []) {
     const elements = dom;
@@ -38,10 +38,10 @@ function examineChild(child, valueCount, children, index) {
         if (examine) {
             const varContent = variablePrefix + wIndex + variableSuffix;
             const after = textContent.slice(match.index + varContent.length);
-            children.splice(index, 1, ...[{
-                    nn: 'text',
-                    v: wIndex
-                }]);
+            children.splice(index, 1, {
+                nn: 'text',
+                v: wIndex
+            });
             textContent = after;
             placeholderRegex.lastIndex = 0; // Reset regex index due to split
         }

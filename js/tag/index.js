@@ -13,7 +13,7 @@ export * from './checkDestroyPrevious.function.js';
 export * from './checkTagValueChange.function.js';
 export * from './Context.types.js';
 export * from './tagElement.js';
-export { variablePrefix } from './getDomTag.function.js';
+export { variablePrefix } from './DomTag.type.js';
 export { paint } from '../render/paint.function.js';
 export { processFirstSubjectValue } from './update/processFirstSubjectValue.function.js';
 export { hasPropChanges } from './hasPropChanges.function.js';

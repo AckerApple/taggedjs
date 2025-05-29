@@ -1,21 +1,23 @@
-import { variableSuffix, variablePrefix } from "../../tag/getDomTag.function.js";
 import { ImmutableTypes } from "../../tag/ValueTypes.enum.js";
-export const safeVar = '__safeTagVar';
+// export const safeVar = '__safeTagVar'
+/** @deprecated - this is most likely not needed nor used anymore */
 export function restorePlaceholders(elements) {
     elements.forEach(traverseAndRestore);
 }
-const safeReplacer = /__safeTagVar(\d+)/g;
+// const safeReplacer = /__safeTagVar(\d+)/g
 function traverseAndRestore(element) {
     if (element.at) {
         element.at = element.at ? element.at.map(attr => {
             if (attr.length === 1) {
                 return attr;
             }
-            const [, value] = attr;
+            /*
+            const [, value] = attr
             if (typeof value === ImmutableTypes.string && value.startsWith(safeVar)) {
-                const index = parseInt(value.replace(safeVar, ''), 10);
-                attr[1] = variablePrefix + index + variableSuffix;
+              const index = parseInt(value.replace(safeVar, ''), 10)
+              attr[1] = variablePrefix + index + variableSuffix
             }
+            */
             return attr;
         }) : [];
     }
@@ -27,9 +29,13 @@ function traverseAndRestore(element) {
                 if (typeof child.tc !== ImmutableTypes.string) {
                     return;
                 }
-                child.tc = child.tc.replace(safeReplacer, (_match, index) => variablePrefix + index + variableSuffix);
+                /*
+                        child.tc = child.tc.replace(safeReplacer, (_match, index) =>
+                          variablePrefix + index + variableSuffix
+                        )
+                */
             }
-            traverseAndRestore(child);
+            // traverseAndRestore(child as OneUnparsedHtml)
         }
         // Remove empty children array
         if (children.length === 0) {

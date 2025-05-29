@@ -1,7 +1,8 @@
 // taggedjs-no-compile
 import { BasicTypes } from '../../tag/ValueTypes.enum.js';
 import { paintContent } from '../../render/paint.function.js';
-import { isNoDisplayValue, processNameOnlyAttrValue } from '../../render/attributes/processAttribute.function.js';
+import { processNameOnlyAttrValue } from '../../render/attributes/processAttribute.function.js';
+import { isNoDisplayValue } from '../../render/attributes/isNoDisplayValue.function.js';
 export function updateNameOnlyAttrValue(values, attrValue, lastValue, element, ownerSupport, howToSet, context, counts) {
     // check to remove previous attribute(s)
     if (lastValue) {
@@ -17,20 +18,19 @@ export function updateNameOnlyAttrValue(values, attrValue, lastValue, element, o
                     if (name in attrValue) {
                         continue;
                     }
-                    paintContent.push(function paintContent() {
-                        element.removeAttribute(name);
-                    });
+                    paintContent.push([removeAttribute, [element, name]]);
                 }
             }
             else {
                 for (const name in lastValue) {
-                    paintContent.push(function paintContent() {
-                        element.removeAttribute(name);
-                    });
+                    paintContent.push([removeAttribute, [element, name]]);
                 }
             }
         }
     }
     processNameOnlyAttrValue(values, attrValue, element, ownerSupport, howToSet, context, counts);
+}
+function removeAttribute(element, name) {
+    element.removeAttribute(name);
 }
 //# sourceMappingURL=updateAttribute.function.js.map

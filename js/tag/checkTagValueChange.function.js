@@ -3,7 +3,7 @@ import { destroySupport } from '../render/destroySupport.function.js';
 import { isStaticTag } from '../isInstance.js';
 import { isLikeTags } from './isLikeTags.function.js';
 import { tryUpdateToTag } from './update/tryUpdateToTag.function.js';
-export function checkTagValueChange(newValue, contextItem) {
+export function checkTagValueChange(newValue, contextItem, counts) {
     const global = contextItem.global;
     if (!global) {
         return 663; // its not a tag this time
@@ -25,7 +25,7 @@ export function checkTagValueChange(newValue, contextItem) {
     if (isTag) {
         const support = global.newest;
         const ownerSupport = support.ownerSupport;
-        const result = tryUpdateToTag(contextItem, newValue, ownerSupport);
+        const result = tryUpdateToTag(contextItem, newValue, ownerSupport, counts);
         const doNotRedraw = result === true;
         if (doNotRedraw) {
             return -1;

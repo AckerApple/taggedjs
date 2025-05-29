@@ -1,3 +1,3 @@
 import { ObjectChildren } from "./LikeObjectElement.type.js";
-export declare const safeVar = "__safeTagVar";
+/** @deprecated - this is most likely not needed nor used anymore */
 export declare function restorePlaceholders(elements: ObjectChildren): void;

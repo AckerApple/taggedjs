@@ -4,8 +4,7 @@ import { getNewGlobal } from '../../tag/update/getNewGlobal.function.js';
 import { processNewSubjectTag } from '../../tag/update/processNewSubjectTag.function.js';
 export function processRenderOnceInit(value, contextItem, // could be tag via result.tag
 ownerSupport, // owningSupport
-counts, // {added:0, removed:0}
-appendTo, insertBefore) {
+counts, appendTo, insertBefore) {
     getNewGlobal(contextItem);
     const support = oneRenderToSupport(value, contextItem, ownerSupport);
     renderTagOnly(support, undefined, contextItem, ownerSupport);

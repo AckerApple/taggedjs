@@ -67,7 +67,7 @@ function getNewSubject(templater, appElement) {
             checkValueChange: checkTagValueChange,
             delete: destroySupportByContextItem,
             processInit: function appDoNothing() {
-                console.log('do nothing app function');
+                console.debug('do nothing app function');
             }
         }
     };

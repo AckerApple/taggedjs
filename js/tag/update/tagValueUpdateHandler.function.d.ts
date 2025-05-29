@@ -3,7 +3,8 @@ import { TemplaterResult } from '../getTemplaterResult.function.js';
 import { AnySupport } from '../AnySupport.type.js';
 import { TemplateValue } from '../TemplateValue.type.js';
 import { ContextItem } from '../ContextItem.type.js';
+import { TagCounts } from '../TagCounts.type.js';
 /** Checks if value has changed before updating. Used for all tag value updates. Determines if value changed since last render */
 export declare function tagValueUpdateHandler(newValue: TemplateValue, // newValue
-ownerSupport: AnySupport, contextItem: ContextItem | SupportContextItem): void;
-export declare function prepareUpdateToComponent(templater: TemplaterResult, contextItem: SupportContextItem, ownerSupport: AnySupport): void;
+ownerSupport: AnySupport, contextItem: ContextItem | SupportContextItem, _values: any[], counts: TagCounts): void;
+export declare function prepareUpdateToComponent(templater: TemplaterResult, contextItem: SupportContextItem, ownerSupport: AnySupport, counts: TagCounts): void;

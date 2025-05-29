@@ -2,8 +2,7 @@ import { processFirstSubjectComponent, processReplacementComponent } from './pro
 import { getNewGlobal } from './getNewGlobal.function.js';
 export function processTagComponentInit(value, contextItem, // could be tag via result.tag
 ownerSupport, // owningSupport
-counts, // {added:0, removed:0}
-appendTo) {
+counts, appendTo) {
     getNewGlobal(contextItem);
     if (appendTo) {
         const processResult = processFirstSubjectComponent(value, contextItem, ownerSupport, counts, appendTo);

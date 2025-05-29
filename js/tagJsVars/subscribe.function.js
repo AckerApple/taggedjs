@@ -10,7 +10,7 @@ export function subscribe(Observable, callback) {
         processInit: processSubscribe,
         delete: deleteAndUnsubscribe,
         checkValueChange: function subscribeDoNothing() {
-            console.log('weird to be here');
+            console.debug('weird to be here');
             return -1;
         },
         Observable,

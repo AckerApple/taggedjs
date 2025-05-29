@@ -3,8 +3,6 @@ import { InterpolatedTemplates } from '../interpolations/interpolations.js';
 import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/LikeObjectElement.type.js';
 import { StringTag } from './StringTag.type.js';
 import { DomTag } from './DomTag.type.js';
-export declare const variablePrefix = ":tagvar";
-export declare const variableSuffix = ":";
 export type EventCallback = (event: Event) => any;
 export type EventMem = {
     elm: Element;

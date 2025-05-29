@@ -11,19 +11,12 @@ appendTo) {
         withinOwnerElement: false,
         placeholder: element,
     };
-    counts.added = counts.added + 1; // index  
     if (!appendTo) {
-        paintCommands.push({
-            processor: paintBefore,
-            args: [insertBefore, element],
-        });
+        paintCommands.push([paintBefore, [insertBefore, element]]);
     }
     domProcessContextItem(value, ownerSupport, contextItem, counts, appendTo, insertBefore);
     if (appendTo) {
-        paintAppends.push({
-            processor: paintAppend,
-            args: [appendTo, element],
-        });
+        paintAppends.push([paintAppend, [appendTo, element]]);
     }
     return contextItem;
 }

@@ -4,8 +4,8 @@ import { getSimpleTagVar } from '../../tagJsVars/getSimpleTagVar.function.js';
 export function processUpdateRegularValue(value, contextItem) {
     const castedValue = castTextValue(value);
     if (contextItem.paint) {
-        // its already painting, just provide new text
-        contextItem.paint.args[1] = castedValue;
+        // its already painting, just provide new text paint[function, [element, text]]
+        contextItem.paint[1][1] = castedValue;
         return;
     }
     const oldClone = contextItem.simpleValueElm; // placeholder
@@ -17,13 +17,10 @@ export function processNowRegularValue(value, contextItem) {
     contextItem.tagJsVar = getSimpleTagVar(value);
     const before = contextItem.placeholder;
     const castedValue = castTextValue(value);
-    const paint = contextItem.paint = {
-        processor: paintBeforeText,
-        args: [before, castedValue, (x) => {
+    const paint = contextItem.paint = [paintBeforeText, [before, castedValue, (x) => {
                 contextItem.simpleValueElm = x;
                 delete contextItem.paint;
-            }],
-    };
+            }]];
     paintCommands.push(paint);
 }
 //# sourceMappingURL=processRegularValue.function.js.map
