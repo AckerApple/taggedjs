@@ -26,11 +26,9 @@ export function destroyArrayContextItem(
 export function destroyArray(
   subject: ContextItem,
   lastArray: any[]
-) {
-  const counts = {added:0, removed:0}
-  
+) {  
   for (let index=0; index < lastArray.length; ++index) {
-    destroyArrayItem(lastArray[index], counts)
+    destroyArrayItem(lastArray[index])
   }
   
   delete subject.lastArray

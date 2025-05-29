@@ -6,11 +6,14 @@ import { SubscriptionContext } from './SubContext.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { TagCounts } from '../TagCounts.type.js'
 
 export function checkSubContext(
   newValue: unknown,
   ownerSupport: AnySupport,
   contextItem: ContextItem,
+  _values: any[],
+  counts: TagCounts,
 ) {
   if(!newValue || !(newValue as any).tagJsType || (newValue as any).tagJsType !== ValueTypes.subscribe) {
     const tagJsVar = contextItem.tagJsVar as TagJsVar
@@ -20,7 +23,8 @@ export function checkSubContext(
       newValue as TemplateValue,
       contextItem,
       ownerSupport,
-      99
+      99,
+      counts,
     )
     return 99
   }

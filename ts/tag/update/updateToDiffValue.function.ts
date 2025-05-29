@@ -1,6 +1,6 @@
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { ContextItem } from '../ContextItem.type.js'
-import { BasicTypes, TemplaterResult, TemplateValue, ValueType, ValueTypes } from '../index.js'
+import { BasicTypes, TagCounts, TemplaterResult, TemplateValue, ValueType, ValueTypes } from '../index.js'
 import { tryUpdateToTag } from './tryUpdateToTag.function.js'
 import { isArray } from '../../isInstance.js'
 import { processTagArray } from './processTagArray.js'
@@ -13,6 +13,7 @@ export function updateToDiffValue(
   contextItem: ContextItem | SupportContextItem,
   ownerSupport: AnySupport,
   ignoreOrDestroyed: number | boolean,
+  counts: TagCounts,
 ) {
   // is new value a tag?
   const tagJsType = newValue && (newValue as TemplaterResult).tagJsType as ValueType
@@ -25,6 +26,7 @@ export function updateToDiffValue(
       contextItem,
       newValue as TemplaterResult,
       ownerSupport,
+      counts,
     )
 
     return
@@ -35,7 +37,7 @@ export function updateToDiffValue(
       contextItem,
       newValue,
       ownerSupport,
-      {added: 0, removed: 0},
+      counts,
     )
     contextItem.tagJsVar = getArrayTagVar(newValue)
   

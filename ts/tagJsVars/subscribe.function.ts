@@ -29,7 +29,7 @@ export function subscribe<T>(
     delete: deleteAndUnsubscribe,
 
     checkValueChange: function subscribeDoNothing() {
-      console.log('weird to be here')
+      console.debug('weird to be here')
       return -1
     },
 

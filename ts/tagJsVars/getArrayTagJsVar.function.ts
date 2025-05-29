@@ -22,7 +22,7 @@ function processArrayInit(
   value: TagJsVar, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts, // {added:0, removed:0}
+  counts: TagCounts,
   appendTo?: Element,      
 ) {
   const subValue = value as any

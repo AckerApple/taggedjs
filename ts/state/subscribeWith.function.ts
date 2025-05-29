@@ -18,7 +18,6 @@ export function subscribeWith<SubValue, DEFAULT>(
     delete: deleteAndUnsubscribe,
 
     checkValueChange: function subscribeDoNothing() {
-      console.log('weird to be here subscribeWith')
       return -1
     },
 

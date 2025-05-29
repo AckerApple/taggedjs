@@ -1,4 +1,4 @@
-import { NoDisplayValue } from'./render/attributes/processAttribute.function.js'
+import { NoDisplayValue } from './render/attributes/NoDisplayValue.type.js';
 import { empty } from './tag/ValueTypes.enum.js'
 
 type TextableValue = string | boolean | number | NoDisplayValue

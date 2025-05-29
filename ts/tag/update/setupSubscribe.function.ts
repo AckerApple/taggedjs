@@ -66,6 +66,7 @@ export function setupSubscribeCallbackProcessor(
         subContext.contextItem as AdvancedContextItem,
         value,
         ownerSupport,
+        { added: 0, removed: 0 }
       )
 
       if(!syncRun && !setUseMemory.stateConfig.support) {

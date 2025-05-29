@@ -7,7 +7,7 @@ import { oldSyncStates } from './syncStates.function.js'
 
 /** Create a Subject that on updates will sync state values to keep chained functions using latest variables */
 export function subject<T>(
-  initialValue?: T,
+  initialValue: T,
 ) {
   const support = getSupportInCycle()
 

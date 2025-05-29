@@ -28,7 +28,7 @@ export function getDomMeta(
   const map = replacePlaceholders(domMeta, values.length)
   
   // Restore any sanitized placeholders in text nodes
-  restorePlaceholders(map)
+  // restorePlaceholders(map)
   
   const template: TagTemplate = {
     interpolation: undefined as any,

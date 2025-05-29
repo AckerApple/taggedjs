@@ -40,7 +40,7 @@ export function processTagArray(
 
       // 👁️ COMPARE & REMOVE
       const newRemoved = compareArrayItems(
-        value, index, lastArray, removed, counts,
+        value, index, lastArray, removed,
       )
   
       if(newRemoved === 0) {
@@ -125,6 +125,8 @@ function reviewPreviousArrayItem(
       value as TemplateValue,
       ownerSupport,
       itemSubject,
+      undefined as any,
+      counts,
     )
     return itemSubject
   }

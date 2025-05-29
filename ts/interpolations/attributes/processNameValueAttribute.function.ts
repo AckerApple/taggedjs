@@ -1,9 +1,8 @@
-// taggedjs-no-compile
-
 import { specialAttribute } from './specialAttribute.js'
 import { HowToSet } from './howToSetInputValue.function.js'
 import { TagGlobal } from '../../tag/getTemplaterResult.function.js'
-import { processTagCallbackFun, SpecialAction, SpecialDefinition } from '../../render/attributes/processAttribute.function.js'
+import { processTagCallbackFun } from '../../render/attributes/processAttribute.function.js'
+import { SpecialAction, SpecialDefinition } from '../../render/attributes/Special.types.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
 import { BasicTypes } from '../../tag/ValueTypes.enum.js'
@@ -20,8 +19,8 @@ export function processDynamicNameValueAttribute(
   support: AnySupport,
   counts: TagCounts,
   isSpecial: SpecialDefinition,
-) {  
-  contextItem.attrName = attrName
+) {
+  // contextItem.attrName = attrName
   contextItem.element = element
   contextItem.howToSet = howToSet
 
@@ -48,8 +47,6 @@ export function processDynamicNameValueAttribute(
   }
 
   contextItem.attrName = attrName
-  contextItem.element = element
-  contextItem.howToSet = howToSet
   contextItem.isSpecial = isSpecial
 
   return processNonDynamicAttr(
@@ -83,5 +80,5 @@ export function processNonDynamicAttr(
     )
   }
 
-  howToSet(element, attrName, value as string)  
+  howToSet(element, attrName, value)  
 }

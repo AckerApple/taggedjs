@@ -1,8 +1,8 @@
 import { paintAfters, paintContent } from "../../render/paint.function.js"
 import { AnySupport } from "../../tag/AnySupport.type.js";
 import type { TagCounts } from '../../tag/TagCounts.type.js'
-import { InputElementTargetEvent } from "./ElementTargetEvent.interface.js";
-import { SpecialDefinition } from "../../render/attributes/processAttribute.function.js";
+import { InputElementTargetEvent, TagJsEvent } from "../../TagJsEvent.type.js";
+import { SpecialDefinition } from "../../render/attributes/Special.types.js";
 
 /** handles init, destroy, autofocus, autoselect, style., class. */
 export function specialAttribute(
@@ -14,24 +14,17 @@ export function specialAttribute(
   counts: TagCounts,
 ) {
   switch (specialName) {
-    // case 'oninit' as any:
-    case 'init': {
-      const stagger = counts.added
+    case 'init': { // aka oninit
+      const stagger = counts.added++
 
       // run delayed after elements placed down
-      paintAfters.push(function paintSpecialAttribute() {
-        const event = {
-          target: element,
-          stagger,
-        } as unknown as InputElementTargetEvent
-        value(event) // call init/oninit
-      })
+      paintAfters.push([paintSpecialAttribute, [element, stagger, value]])
 
       return
     }
 
-    case 'destroy': {
-      const stagger = ++counts.removed
+    case 'destroy': { // aka ondestroy
+      const stagger = counts.removed++
       const global = support.subject.global      
       global.destroys = global.destroys || []
       
@@ -48,16 +41,16 @@ export function specialAttribute(
     }
 
     case 'autofocus':
-      paintAfters.push(() => (element as any).focus())
+      paintAfters.push([autofocus, [element]])
       return
 
     case 'autoselect':
-      paintAfters.push(() => (element as any).select())
+      paintAfters.push([autoselect, [element]])
       return
 
     case 'style': {
       const names = name.split('.')      
-      paintContent.push(() => (element as any).style[names[1]] = value) // attribute changes should come first
+      paintContent.push([paintStyle, [element, names, value]]) // attribute changes should come first
       
       return
     }
@@ -68,6 +61,17 @@ export function specialAttribute(
   }
 
   throw new Error(`Invalid special attribute of ${specialName}. ${name}`)
+}
+
+function paintStyle(
+  element: HTMLElement,
+  names: string[],
+  value: any
+) {
+  const smallName = names[1] as any
+  
+  element.style[ smallName ] = value
+  element.style.setProperty(smallName, value)
 }
 
 function processSpecialClass(
@@ -81,13 +85,45 @@ function processSpecialClass(
   // truthy
   if(value) {
     for (const name of names) {
-      paintContent.push(() => element.classList.add(name))
+      paintContent.push([classListAdd, [element, name]])
     }
     return
   }
 
   // falsy
   for (const name of names) {
-    paintContent.push(() => element.classList.remove(name))
+    paintContent.push([classListRemove, [element, name]])
   }
+}
+
+function classListAdd(
+  element: Element, name: string
+){
+  element.classList.add(name)
+}
+
+function classListRemove(
+  element: Element, name: string
+){
+  element.classList.remove(name)
+}
+
+function autoselect(element: HTMLElement) {
+  (element as any).select()
+}
+
+function autofocus(element: HTMLElement) {
+  (element as any).focus()
+}
+
+function paintSpecialAttribute(
+  element: HTMLElement,
+  stagger: number,
+  value: any
+) {
+  const event = {
+    target: element,
+    stagger,
+  } as TagJsEvent
+  value(event) // call init/oninit
 }

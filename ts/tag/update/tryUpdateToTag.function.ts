@@ -10,19 +10,19 @@ import { handleStillTag } from './handleStillTag.function.js'
 import { prepareUpdateToComponent } from './tagValueUpdateHandler.function.js'
 import type { StringTag } from '../StringTag.type.js'
 import type { DomTag } from '../DomTag.type.js'
-import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
-
-const fooCounts: TagCounts = { added: 0, removed: 0 }
+import { TagCounts } from '../TagCounts.type.js'
+import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 
 /** result is an indication to ignore further processing but that does not seem in use anymore */
 export function tryUpdateToTag(
   contextItem: ContextItem | SupportContextItem,
   newValue: TemplaterResult, // newValue
-  ownerSupport: AnySupport, 
+  ownerSupport: AnySupport,
+  counts: TagCounts,
 ): boolean {
-  const tagJsType = newValue.tagJsType
   const isComp = isTagComponent(newValue)
+
   if(isComp) {
     if(contextItem.global === undefined) {
       getNewGlobal(contextItem as ContextItem)
@@ -32,6 +32,7 @@ export function tryUpdateToTag(
       newValue,
       contextItem as SupportContextItem,
       ownerSupport,
+      counts,
     )
 
     return true
@@ -57,60 +58,15 @@ export function tryUpdateToTag(
       return true
     }
   }
-  
-  switch (tagJsType) {
-    case ValueTypes.templater:
-      processTag(
-        ownerSupport,
-        contextItem as SupportContextItem,
-        fooCounts,
-      )
-      return true
-    
-    // when value was not a Tag before
-    case ValueTypes.tag:
-    case ValueTypes.dom: {
-      updateToTag(newValue, contextItem, ownerSupport)
-      return true
-    }
 
-    case ValueTypes.subscribe: {
-      ;(newValue as any).processInit(
-        newValue,
-        contextItem,
-        ownerSupport,
-        {added: 0, removed: 0},
-        undefined, // appendTo,
-        contextItem.placeholder,
-      )
-
-      return true
-    }
-  }
-
-  return false
-}
-
-function updateToTag(
-  value: TemplateValue,
-  contextItem: ContextItem | SupportContextItem,
-  ownerSupport: AnySupport
-) {
-  const tag = value as StringTag | DomTag
-  let templater = tag.templater
-
-  if (!templater) {
-    templater = getFakeTemplater()
-    tag.templater = templater
-    templater.tag = tag
-  }
-
-  const nowGlobal = (contextItem.global ? contextItem.global : getNewGlobal(contextItem)) as SupportTagGlobal
-  nowGlobal.newest = newSupportByTemplater(templater, ownerSupport, contextItem)
-
-  processTag(
+  ;(newValue as TagJsVar).processInit(
+    newValue,
+    contextItem,
     ownerSupport,
-    contextItem as SupportContextItem,
-    fooCounts
+    counts,
+    undefined, // appendTo,
+    contextItem.placeholder,
   )
+
+  return true
 }

@@ -1,15 +1,16 @@
-import { variableSuffix, variablePrefix } from "../../tag/getDomTag.function.js";
 import { ObjectChildren } from "./LikeObjectElement.type.js";
 import { ObjectText } from "./ObjectNode.types.js";
 import { ImmutableTypes } from "../../tag/ValueTypes.enum.js";
 import { OneUnparsedHtml } from "./types.js";
-export const safeVar = '__safeTagVar'
 
+// export const safeVar = '__safeTagVar'
+
+/** @deprecated - this is most likely not needed nor used anymore */
 export function restorePlaceholders(elements: ObjectChildren) {
   elements.forEach(traverseAndRestore);
 }
 
-const safeReplacer = /__safeTagVar(\d+)/g
+// const safeReplacer = /__safeTagVar(\d+)/g
 
 function traverseAndRestore(element: OneUnparsedHtml) {
   if (element.at) {
@@ -18,11 +19,13 @@ function traverseAndRestore(element: OneUnparsedHtml) {
         return attr
       }
       
+      /*
       const [, value] = attr
       if (typeof value === ImmutableTypes.string && value.startsWith(safeVar)) {
         const index = parseInt(value.replace(safeVar, ''), 10)
         attr[1] = variablePrefix + index + variableSuffix
       }
+      */
       return attr
     }) : []
   }
@@ -35,12 +38,13 @@ function traverseAndRestore(element: OneUnparsedHtml) {
         if(typeof child.tc !== ImmutableTypes.string) {
           return
         }
-
+/*
         child.tc = child.tc.replace(safeReplacer, (_match, index) =>
           variablePrefix + index + variableSuffix
         )
+*/
       }
-      traverseAndRestore(child as OneUnparsedHtml)
+      // traverseAndRestore(child as OneUnparsedHtml)
     }
 
     // Remove empty children array

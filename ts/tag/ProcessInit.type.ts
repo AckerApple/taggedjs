@@ -12,7 +12,7 @@ export type ProcessInit = (
     value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
     contextItem: ContextItem,
     ownerSupport: AnySupport,
-    counts: TagCounts, // {added:0, removed:0}
+    counts: TagCounts,
     appendTo?: Element,      
     insertBefore?: Text,      
 ) => any

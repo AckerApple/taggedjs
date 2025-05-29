@@ -17,10 +17,7 @@ export function deleteSubContext(
   
   const appendMarker = subscription.appendMarker
   if(appendMarker) {
-    paintCommands.push({
-      processor: paintRemover,
-      args: [appendMarker],
-    })
+    paintCommands.push([paintRemover, [appendMarker]])
     delete subscription.appendMarker
   }
   

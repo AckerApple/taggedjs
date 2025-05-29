@@ -12,7 +12,7 @@ export function processSubscribe(
   value: SubscribeValue,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts, // {added:0, removed:0}
+  counts: TagCounts,
   appendTo?: Element,
   insertBefore?: Text,
 ) {
@@ -31,7 +31,7 @@ export function processSubscribeWith(
   value: SubscribeValue,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts, // {added:0, removed:0}
+  counts: TagCounts,
   appendTo?: Element,
   insertBefore?: Text,
 ) {
@@ -57,7 +57,7 @@ export function processSignal(
   value: SignalObject,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts, // {added:0, removed:0}
+  counts: TagCounts,
   appendTo?: Element,
 ) {
   setupSubscribe(

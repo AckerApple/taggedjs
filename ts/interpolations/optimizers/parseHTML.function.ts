@@ -1,7 +1,9 @@
 import { Attribute, DomObjectElement, ObjectElement, ObjectText } from "./ObjectNode.types.js"
-import { variablePrefix, variableSuffix } from "../../tag/getDomTag.function.js"
+import { variablePrefix, variableSuffix } from "../../tag/DomTag.type.js"
 import { isSpecialAttr } from "../attributes/isSpecialAttribute.function.js"
 import { ParsedHtml } from "./types.js"
+import { fakeTagsRegEx, findRealTagsRegEx } from "./htmlInterpolationToDomMeta.function.js"
+import { placeholderRegex } from "../../render/attributes/getTagVarIndex.function.js"
 
 const fragFindAny = /(:tagvar\d+:)/
 const ondoubleclick = 'ondoubleclick'
@@ -37,8 +39,11 @@ export function parseHTML(html: string): ParsedHtml {
         const textVarMatches = splitByTagVar(textContent);
 
         for (let textContent of textVarMatches) {
-          if(textContent.startsWith(variablePrefix)) {
-            textContent = variablePrefix + (++valueIndex) + variableSuffix
+          if(textContent.startsWith(variablePrefix) && textContent.search(fragFindAny) >= 0) {
+            // if its not fake then lets now consider this a real variable
+            if(textContent.search(fakeTagsRegEx) === -1) {
+              textContent = variablePrefix + (++valueIndex) + variableSuffix
+            }
           }
 
           pushTextTo(currentElement, elements, textContent)
@@ -57,52 +62,12 @@ export function parseHTML(html: string): ParsedHtml {
 
     let attrMatch;
     while ((attrMatch = regexAttr.exec(attrString)) !== null) {
-      const attrName = attrMatch[1] || attrMatch[3] || attrMatch[5];
-      const attrChoice = attrMatch[2] || attrMatch[4] || attrMatch[6]
-      let attrValue = attrChoice
-
-      if (attrName === undefined) {
-        continue;
-      }
-
-      const notEmpty = attrMatch[2] !== ''
-      const noValue = attrValue === undefined && notEmpty
-      const lowerName = attrName.toLowerCase()
-      
-
-      const fixedName = lowerName.startsWith('on') ? cleanEventName(lowerName) : lowerName
-      if (noValue) {
-        const standAloneVar = attrName.slice(0, variablePrefix.length) === variablePrefix;
-  
-        if (standAloneVar) {
-          const valueName = variablePrefix + (++valueIndex) + variableSuffix
-          valuePositions.push(['at', valueName]);
-          attributes.push([valueName]); // the name itself is dynamic
-          continue
-        }
-        
-        const startMatched = attrMatch[0].startsWith(attrName)
-        const standAloneAttr = startMatched && attrMatch[0].slice(attrName.length, attrMatch[0].length).search(/\s+$/) >= 0
-        if(standAloneAttr) {
-          attributes.push([fixedName])
-          continue
-        }
-
-        const valueName = variablePrefix + (++valueIndex) + variableSuffix
-        attrValue = valueName
-      }
-
-      if(!notEmpty) {
-        attrValue = attrMatch[2]
-      }
-
-      const attrSet: Attribute = [fixedName, attrValue]
-      const isSpecial = isSpecialAttr(lowerName) // check original name for "oninit" or "autofocus"
-      if(isSpecial) {
-        attrSet.push(isSpecial)
-      }
-
-      attributes.push(attrSet)
+      valueIndex = parseAttrString(
+        attrMatch,
+        valueIndex,
+        valuePositions,
+        attributes,
+      )
     }
 
     const element: ObjectElement = {
@@ -173,13 +138,14 @@ function pushTextTo(
 ) {
   const textNode: ObjectText = {
     nn: 'text', // nodeName
-    tc: postprocessTagsInComments(textContent), // textContent
+    tc: postProcessTagsInComments(textContent), // textContent
   }
 
   pushTo(currentElement, elements, textNode)
 }
 
-function postprocessTagsInComments(html: string) {
+/** TODO: This has got to be too expensive */
+function postProcessTagsInComments(html: string) {
   // Use a regex to find all segments that look like processed comments
   return html.replace(/(\[l t\]!--[\s\S]*?--\[g t\])/g, function(match) {
       // For each processed comment found, replace *lt* and *gt* back to < and >
@@ -214,4 +180,79 @@ function splitByTagVar(inputString: string) {
 
 function notEmptyStringMapper(part: string) {
   return part !== ''
+}
+
+function parseAttrString(
+  attrMatch: any[],
+  valueIndex: number,
+  valuePositions: any[],
+  attributes: any[],
+) {
+  const attrName = attrMatch[1] || attrMatch[3] || attrMatch[5];
+  const attrChoice = attrMatch[2] || attrMatch[4] || attrMatch[6]
+  let attrValue = attrChoice
+
+  if (attrName === undefined) {
+    return valueIndex
+  }
+
+  const notEmpty = attrMatch[2] !== ''
+  const noValue = attrValue === undefined && notEmpty
+  const lowerName = attrName.toLowerCase()
+  
+  const fixedName = lowerName.startsWith('on') ? cleanEventName(lowerName) : lowerName
+  if (noValue) {
+    const standAloneVar = attrName.slice(0, variablePrefix.length) === variablePrefix;
+
+    if (standAloneVar) {
+      const valueName = variablePrefix + (++valueIndex) + variableSuffix
+      valuePositions.push(['at', valueName]);
+      attributes.push([valueName]); // the name itself is dynamic
+      return valueIndex
+    }
+    
+    const startMatched = attrMatch[0].startsWith(attrName)
+    const standAloneAttr = startMatched && attrMatch[0].slice(attrName.length, attrMatch[0].length).search(/\s+$/) >= 0
+    if(standAloneAttr) {
+      attributes.push([fixedName])
+      return valueIndex
+    }
+
+    const wholeValue = attrMatch[3] as string
+    const isFakeTag = wholeValue.search(fakeTagsRegEx) >= 0
+    if(isFakeTag) {
+      attrValue = wholeValue
+      // to restore: wholeValue.replace(fakeTagsRegEx,variablePrefix+'$1$3$4'+variableSuffix)
+      const attrSet: Attribute = [fixedName, attrValue]
+      attributes.push(attrSet)
+      return valueIndex
+    } else {
+      const valueName = variablePrefix + (++valueIndex) + variableSuffix
+      attrValue = valueName
+    }
+  }
+
+  if(!notEmpty) {
+    attrValue = attrMatch[2]
+  }
+
+  // concat attributes as array
+  const attrValueSplit =  (attrValue as string).split(findRealTagsRegEx).filter((x: string) => x.length > 0)
+  if(attrValueSplit.length > 1) {
+    attrValue = attrValueSplit
+    attrValueSplit.forEach((value) => {
+      if(value.search(placeholderRegex) >= 0) {
+        ++valueIndex
+      }
+    })
+  }
+
+  const attrSet: Attribute = [fixedName, attrValue]
+  const isSpecial = isSpecialAttr(lowerName) // check original name for "oninit" or "autofocus"
+  if(isSpecial) {
+    attrSet.push(isSpecial)
+  }
+
+  attributes.push(attrSet)
+  return valueIndex
 }

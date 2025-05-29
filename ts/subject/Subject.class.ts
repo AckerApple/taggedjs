@@ -53,7 +53,7 @@ export class Subject<T> implements SubjectLike<T> {
     return subscription
   }
 
-  next(value?: any) {
+  next(value?: T) {
     this.value = value
     this.emit()
   }

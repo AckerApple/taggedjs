@@ -92,12 +92,8 @@ function smartRemoveByContext(
     // regular values, no placeholders
     const elm = subject.simpleValueElm as Text
     if(elm) {
-      delete subject.simpleValueElm    
-      paintCommands.push({
-        processor: paintRemover,
-        args: [elm],
-      })
-  
+      delete subject.simpleValueElm
+      paintCommands.push([paintRemover, [elm]])
       continue
     }
 
@@ -132,10 +128,7 @@ function destroyClones(
 function destroyClone(clone: DomObjectText | DomObjectElement) {
     const marker = clone.marker
     if(marker) {
-      paintCommands.push({
-        processor: paintRemover,
-        args: [marker],
-      })  
+      paintCommands.push([paintRemover, [marker]])
     }
 
     const dom = clone.domElement
@@ -143,8 +136,5 @@ function destroyClone(clone: DomObjectText | DomObjectElement) {
       return
     }
 
-    paintCommands.push({
-      processor: paintRemover,
-      args: [dom],
-    })
+    paintCommands.push([paintRemover, [dom]])
 }

@@ -1,12 +1,11 @@
 // taggedjs-no-compile
 
-import { variableSuffix, variablePrefix } from "../../tag/getDomTag.function.js";
 import { Attribute, ObjectText } from "./ObjectNode.types.js";
 import { ValuePos } from "./LikeObjectElement.type.js";
 import { OneUnparsedHtml, ParsedHtml, UnparsedHtml } from "./types.js";
 import { ImmutableTypes } from "../../tag/ValueTypes.enum.js";
-
-const placeholderRegex = new RegExp(variablePrefix + '(\\d+)' + variableSuffix, 'g');
+import { variablePrefix, variableSuffix } from "../../tag/DomTag.type.js";
+import { placeholderRegex } from "../../render/attributes/getTagVarIndex.function.js";
 
 const ch = 'ch' // short for children
 
@@ -65,10 +64,10 @@ function examineChild(
       const varContent = variablePrefix + wIndex + variableSuffix
       const after = textContent.slice(match.index + varContent.length)
 
-      children.splice(index, 1, ...[{
+      children.splice(index, 1, {
         nn: 'text',
         v: wIndex
-      }])
+      })
       
       textContent = after;
       placeholderRegex.lastIndex = 0; // Reset regex index due to split

@@ -14,9 +14,6 @@ import { Tag } from './Tag.type.js'
 import { TagCounts, AnySupport, ContextItem, TemplateValue, checkTagValueChange, SupportContextItem, destroySupportByContextItem } from '../index.js'
 import { forceUpdateExistingValue } from './update/forceUpdateExistingValue.function.js'
 
-export const variablePrefix = ':tagvar'
-export const variableSuffix = ':'
-
 export type EventCallback = (event: Event) => any
 export type EventMem = {elm: Element, callback:EventCallback}
 
@@ -97,7 +94,7 @@ function processOuterDomTagInit(
   value: Tag,
   contextItem: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owningSupport
-  counts: TagCounts, // {added:0, removed:0}
+  counts: TagCounts,
   appendTo?: Element,
   insertBefore?: Text,
 ) {
@@ -107,7 +104,7 @@ function processOuterDomTagInit(
     outerHTML,
     contextItem, // could be tag via result.tag
     ownerSupport, // owningSupport
-    counts, // {added:0, removed:0}
+    counts,
     appendTo,
     insertBefore,
   ) as AnySupport
@@ -116,27 +113,36 @@ function processOuterDomTagInit(
     value: TemplateValue,
     newSupport: AnySupport,
     contextItem: ContextItem,
+    _values,
+    counts: TagCounts,
   ) => {
     forceUpdateExistingValue(
       contextItem as any,
       (value as Tag)?.outerHTML as any || value,
       newSupport,
+      counts,
     )
   }
 
   // TODO: Not best idea to swap out the original values changeChecker
-  value.checkValueChange = function outerCheckValueChange(newValue: unknown, contextItem: SupportContextItem) {
-    return checkOuterTagValueChange(newValue, contextItem)
+  value.checkValueChange = function outerCheckValueChange(
+    newValue: unknown,
+    contextItem: SupportContextItem,
+    counts: TagCounts,
+  ) {
+    return checkOuterTagValueChange(newValue, contextItem, counts)
   }
 }
 
 function checkOuterTagValueChange(
   newValue: unknown,
   contextItem: SupportContextItem,
+  counts: TagCounts,
 ) {    
   return checkTagValueChange(
     newValue, // (newValue as Tag)?.outerHTML || newValue,
     contextItem, // subContext.contextItem as any,
+    counts,
   )
 }
 

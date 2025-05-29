@@ -5,8 +5,6 @@ import { renderWithSupport } from'./renderWithSupport.function.js'
 import { processTag } from './update/processTag.function.js'
 import { updateSupportBy } from './update/updateSupportBy.function.js'
 
-const fooCounts: TagCounts = { added:0, removed:0 }
-
 // TODO: This function is being called for 1st time renders WHEN renderCount === 1
 export function renderExistingReadyTag(
   lastSupport: AnySupport, // should be global.newest
@@ -30,7 +28,7 @@ export function renderExistingReadyTag(
   processTag(
     ownerSupport,
     subject,
-    fooCounts,
+    { added: 0, removed: 0 },
   )
 
   return support

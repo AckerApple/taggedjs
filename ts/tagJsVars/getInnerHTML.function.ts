@@ -13,6 +13,8 @@ function handleInnerHTML(
   value: TemplateValue,
   newSupport: AnySupport,
   contextItem: ContextItem,
+  _values: any[],
+  counts: TagCounts,
 ) {
   const owner = (value as any).owner
   const realValue = owner._innerHTML
@@ -24,6 +26,7 @@ function handleInnerHTML(
     context,
     realValue,
     newSupport,
+    counts,
   )
 }
 
@@ -31,12 +34,11 @@ function processInnerHTML(
   value: InnerHTMLValue,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts, // {added:0, removed:0}
+  counts: TagCounts,
   appendTo?: Element,
   insertBefore?: Text,
 ) {
   contextItem.subContext = {} as SubContext
-
   contextItem.handler = handleInnerHTML
 
   checkInnerHTML(
@@ -53,7 +55,7 @@ function checkInnerHTML(
   value: unknown,
   ownerSupport: AnySupport,
   contextItem: ContextItem,
-  counts: TagCounts, // {added:0, removed:0}
+  counts: TagCounts,
   insertBeforeOriginal: Text,
   appendTo?: Element,
 ) {
@@ -82,6 +84,6 @@ export function getInnerHTML(): TagJsVar {
     tagJsType: 'innerHTML',
     processInit: processInnerHTML,
     delete: deleteSubContext,
-    checkValueChange: () => console.log('weird innerHTML check') as any,
+    checkValueChange: () => console.debug('weird innerHTML check') as any,
   }
 }

@@ -13,7 +13,6 @@ export function compareArrayItems(
   index: number,
   lastArray: LastArrayItem[],
   removed: number,
-  counts: TagCounts,
 ) {
   const newLength = value.length - 1
   const at = index - removed
@@ -21,7 +20,7 @@ export function compareArrayItems(
   const prevContext = lastArray[index] as SupportContextItem
 
   if(lessLength) {
-    destroyArrayItem(prevContext, counts)
+    destroyArrayItem(prevContext)
     return 1
   }
 
@@ -32,7 +31,6 @@ export function compareArrayItems(
     oldKey,
     newValueTag as StringTag,
     prevContext,
-    counts,
     lastArray,
     index,
   )
@@ -44,14 +42,13 @@ function runArrayItemDiff(
   oldKey: string,
   newValueTag: StringTag,
   prevContext: SupportContextItem,
-  counts: TagCounts,
   lastArray: LastArrayItem[],
   index: number
 ) {
   const isDiff = newValueTag && oldKey !== newValueTag.arrayValue
 
   if( isDiff ) {
-    destroyArrayItem(prevContext, counts)
+    destroyArrayItem(prevContext)
     lastArray.splice(index, 1)
     return 2
   }
@@ -61,13 +58,9 @@ function runArrayItemDiff(
 
 export function destroyArrayItem(
   item: ContextItem,
-  counts: TagCounts,
 ) {
-  const global = item.global as SupportTagGlobal
-  
+  const global = item.global as SupportTagGlobal  
   destroyArrayItemByGlobal(global, item)
-
-  ++counts.removed
 }
 
 function destroyArrayItemByGlobal(
@@ -77,12 +70,10 @@ function destroyArrayItemByGlobal(
   if(global) {
     const support = global.oldest
     destroySupport(support, global)
-  } else {
-    const element = item.simpleValueElm as Element
-    delete item.simpleValueElm
-    paintCommands.push({
-      processor: paintRemover,
-      args: [element],
-    })
+    return
   }
+  
+  const element = item.simpleValueElm as Element
+  delete item.simpleValueElm
+  paintCommands.push([paintRemover, [element]])
 }

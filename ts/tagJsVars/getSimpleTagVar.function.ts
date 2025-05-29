@@ -19,7 +19,7 @@ function processSimpleValueInit(
   value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts, // {added:0, removed:0}
+  counts: TagCounts,
   appendTo?: Element,      
   insertBefore?: Text,
 ) {
@@ -29,13 +29,10 @@ function processSimpleValueInit(
   insertBefore = contextItem.placeholder as Text
 
   // always insertBefore for content
-  const paint = contextItem.paint = {
-    processor: paintBeforeText,
-    args: [insertBefore, castedValue, (x: Text) => {
-      contextItem.simpleValueElm = x
-      delete contextItem.paint
-    }],
-  }
+  const paint = contextItem.paint = [paintBeforeText, [insertBefore, castedValue, (x: Text) => {
+    contextItem.simpleValueElm = x
+    delete contextItem.paint
+  }]]
   paintCommands.push(paint)
 }
 
@@ -47,10 +44,14 @@ export function deleteSimpleValue(
   delete contextItem.simpleValueElm
   delete contextItem.tagJsVar
 
-  paintCommands.push({
-    processor: paintRemover,
-    args: [elm],
-  })
+  // is it being destroyed before it was even built?
+  if(contextItem.paint !== undefined) {
+    const paintIndex = paintCommands.findIndex(paint => paint === contextItem.paint)
+    paintCommands.splice(paintIndex, 1)
+    return
+  }
+
+  paintCommands.push([paintRemover, [elm]])
 }
 
 export function checkSimpleValueChange(

@@ -5,8 +5,6 @@ import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.fun
 import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { updateNameOnlyAttrValue } from '../../interpolations/attributes/updateAttribute.function.js'
 
-const emptyCounts: TagCounts = {added: 0, removed: 0}
-
 export function processUpdateAttrContext(
   value: unknown,
   ownerSupport: AnySupport,
@@ -22,7 +20,7 @@ export function processUpdateAttrContext(
       ownerSupport,
       contextItem.howToSet as HowToSet,
       [], // Context, but we dont want to alter current
-      emptyCounts,
+      {added: 0, removed: 0},
     )
 
     contextItem.value = value
@@ -39,7 +37,7 @@ export function processUpdateAttrContext(
     ownerSupport,
     contextItem.howToSet as HowToSet,
     contextItem.isSpecial as boolean,
-    emptyCounts,
+    {added: 0, removed: 0},
   )
 
   contextItem.value = value

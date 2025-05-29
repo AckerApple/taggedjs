@@ -6,7 +6,8 @@ import { AnySupport } from '../../tag/AnySupport.type.js'
 import { paintContent } from '../../render/paint.function.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import type { TagCounts } from '../../tag/TagCounts.type.js'
-import { isNoDisplayValue, processNameOnlyAttrValue } from '../../render/attributes/processAttribute.function.js'
+import { processNameOnlyAttrValue } from '../../render/attributes/processAttribute.function.js'
+import { isNoDisplayValue } from '../../render/attributes/isNoDisplayValue.function.js'
 
 
 export function updateNameOnlyAttrValue(
@@ -21,7 +22,7 @@ export function updateNameOnlyAttrValue(
 ) {
   // check to remove previous attribute(s)
   if(lastValue) {
-    if(isNoDisplayValue(attrValue)) {
+    if( isNoDisplayValue(attrValue) ) {
       element.removeAttribute(lastValue as string)
       return
     }
@@ -34,15 +35,11 @@ export function updateNameOnlyAttrValue(
             if(name in (attrValue as any)) {
             continue
           }
-          paintContent.push(function paintContent() {
-            element.removeAttribute(name)
-          })
+          paintContent.push([removeAttribute, [element, name]])
         }
       } else {
         for (const name in (lastValue as object)) {
-          paintContent.push(function paintContent() {
-            element.removeAttribute(name)
-          })
+          paintContent.push([removeAttribute, [element, name]])
         }
       }
     }
@@ -57,4 +54,11 @@ export function updateNameOnlyAttrValue(
     context,
     counts,
   )
+}
+
+function removeAttribute(
+  element: Element,
+  name: string,
+) {
+  element.removeAttribute(name)
 }

@@ -33,10 +33,7 @@ export function attachDomElements(
   if(appendTo && insertBefore === undefined) {
     insertBefore = document.createTextNode(empty)
 
-    paintAppends.push({
-      args: [appendTo, insertBefore],
-      processor: paintAppend,
-    })
+    paintAppends.push([paintAppend, [appendTo, insertBefore]])
 
     appendTo = undefined
   }
@@ -134,15 +131,9 @@ function attachDomElement(
   }
 
   if (appendTo) {
-    paintAppends.push({
-      args: [appendTo, domElement],
-      processor: paintAppend,
-    })
+    paintAppends.push([paintAppend, [appendTo, domElement]])
   } else {
-    paintCommands.push({
-      processor: paintBefore,
-      args: [insertBefore, domElement],
-    })
+    paintCommands.push([paintBefore, [insertBefore, domElement]])
   }
   return domElement
 }
@@ -157,14 +148,8 @@ function attachDomText(
   const string = textNode.tc = (node as any as DomObjectText).tc
 
   if (owner) {
-    paintAppends.push({
-      processor: paintAppendElementString,
-      args: [owner, string, (elm: Text) => textNode.domElement = elm],
-    })
+    paintAppends.push([paintAppendElementString, [owner, string, (elm: Text) => textNode.domElement = elm]])
   } else {
-    paintCommands.push({
-      processor: paintBeforeElementString,
-      args: [insertBefore, string, (elm: Text) => textNode.domElement = elm]
-    })
+    paintCommands.push([paintBeforeElementString, [insertBefore, string, (elm: Text) => textNode.domElement = elm]])
   }
 }

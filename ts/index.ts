@@ -10,9 +10,10 @@ export * from './isInstance.js'
 export { states } from './state/states.function.js'
 export * from './tag/createHtmlSupport.function.js'
 export * from './interpolations/attributes/howToSetInputValue.function.js'
-export * from './interpolations/attributes/ElementTargetEvent.interface.js'
+export * from './TagJsEvent.type.js'
 
 export { type Wrapper } from './tag/getTemplaterResult.function.js'
+export { type TagJsEvent } from './TagJsEvent.type.js'
 
 import { renderTagOnly } from './render/renderTagOnly.function.js'
 import { renderSupport } from './render/renderSupport.function.js'

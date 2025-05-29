@@ -12,8 +12,8 @@ export function processUpdateRegularValue(
   const castedValue = castTextValue(value)
 
   if(contextItem.paint) {
-    // its already painting, just provide new text
-    contextItem.paint.args[1] = castedValue
+    // its already painting, just provide new text paint[function, [element, text]]
+    contextItem.paint[1][1] = castedValue
     return
   }
 
@@ -32,13 +32,10 @@ export function processNowRegularValue(
   const before = contextItem.placeholder as Text
   const castedValue = castTextValue(value)
 
-  const paint = contextItem.paint = {
-    processor: paintBeforeText,
-    args: [before, castedValue, (x: Text) => {
-      contextItem.simpleValueElm = x
-      delete contextItem.paint
-    }],
-  }
+  const paint = contextItem.paint = [paintBeforeText, [before, castedValue, (x: Text) => {
+    contextItem.simpleValueElm = x
+    delete contextItem.paint
+  }]]
 
   paintCommands.push(paint)
 }

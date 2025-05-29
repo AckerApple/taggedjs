@@ -1,19 +1,14 @@
 import { blankHandler } from "./dom/attachDomElements.function.js"
 
-export type PaintCommand = {
-  processor: (
-    ...args: any[]
-  ) => any
-  args: any[]
-}
+export type PaintCommand = [((...args: any[]) => unknown), any[]]
 
-export let paintCommands = [] as PaintCommand[]
-export let paintContent: (() => any)[] = []
+export let paintCommands: PaintCommand[] = []
+export let paintContent: PaintCommand[] = []
 export let setContent: [string, Text][] = []
 
 export let paintAppends: PaintCommand[] = []
 
-export let paintAfters: (() => any)[] = [] // callbacks after all painted
+export let paintAfters: PaintCommand[] = [] // callbacks after all painted
 
 export const painting = {
   locks: 0
@@ -25,25 +20,25 @@ export function paint() {
   }
 
   for(const content of paintContent) {
-    content()
+    content[0](...content[1])
   }
 
   for(const [text, textNode] of setContent) {
     textNode.textContent = text
   }
 
-  for(const now of paintAppends) {
-    now.processor(...now.args)
+  for(const content of paintAppends) {
+    content[0](...content[1])
   }
 
-  for (const item of paintCommands) {
-    item.processor(...item.args)
+  for (const content of paintCommands) {
+    content[0](...content[1])
   }
 
   paintReset()
 
-  for(const now of paintAfters) {
-    now()
+  for(const content of paintAfters) {
+    content[0](...content[1])
   }
 
   paintAfters = []

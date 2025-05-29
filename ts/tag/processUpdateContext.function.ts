@@ -2,7 +2,7 @@ import { StringTag } from './StringTag.type.js'
 import type { DomTag } from './DomTag.type.js'
 import { AnySupport } from './AnySupport.type.js'
 import { ContextHandler } from './Context.types.js'
-import { ContextItem } from '../index.js'
+import { ContextItem, TagCounts } from '../index.js'
 import { valueToTagJsVar } from '../tagJsVars/valueToTagJsVar.function.js'
 
 export function processUpdateContext(
@@ -13,6 +13,7 @@ export function processUpdateContext(
   const values = thisTag.values
   let index = 0
   const len = values.length
+  const counts = { added: 0, removed: 0 }
 
   while (index < len) {
     processUpdateOneContext(
@@ -20,6 +21,7 @@ export function processUpdateContext(
       index,
       context,
       support,
+      counts,
     )
     
     ++index
@@ -34,6 +36,7 @@ function processUpdateOneContext(
   index: number,
   context: ContextItem[],
   ownerSupport: AnySupport,
+  counts: TagCounts,
 ) {
   const value = values[index] as any
 
@@ -52,6 +55,7 @@ function processUpdateOneContext(
     ownerSupport,
     contextItem,
     values,
+    counts,
   )
   
   contextItem.value = value

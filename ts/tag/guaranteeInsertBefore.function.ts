@@ -11,10 +11,7 @@ export function guaranteeInsertBefore(
   if(appendTo) {
     appendMarker = insertBefore = document.createTextNode(empty)
 
-    paintAppends.push({
-      processor: paintAppend,
-      args: [appendTo, insertBefore]
-    })
+    paintAppends.push([paintAppend, [appendTo, insertBefore]])
   }
 
   return {
