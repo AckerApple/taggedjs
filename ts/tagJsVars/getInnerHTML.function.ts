@@ -1,4 +1,4 @@
-import { AdvancedContextItem, AnySupport, ContextItem, deleteSubContext, guaranteeInsertBefore, onFirstSubContext, SubContext, TagCounts } from "../index.js"
+import { AdvancedContextItem, AnySupport, ContextItem, deleteSubContext, guaranteeInsertBefore, onFirstSubContext, SubContext, Tag, TagCounts } from "../index.js"
 import { ProcessInit } from "../tag/ProcessInit.type.js"
 import { TemplateValue } from "../tag/TemplateValue.type.js"
 import { forceUpdateExistingValue } from "../tag/update/index.js"
@@ -79,7 +79,11 @@ function checkInnerHTML(
   )
 }
 
-export function getInnerHTML(): TagJsVar {
+export type TagJsVarInnerHTML = TagJsVar & {
+  owner?: Tag
+}
+
+export function getInnerHTML(): TagJsVarInnerHTML {
   return {
     tagJsType: 'innerHTML',
     processInit: processInnerHTML,

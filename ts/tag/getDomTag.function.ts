@@ -11,8 +11,9 @@ import { StringTag } from './StringTag.type.js'
 import { DomTag } from './DomTag.type.js'
 import { processDomTagInit } from './update/processDomTagInit.function.js'
 import { Tag } from './Tag.type.js'
-import { TagCounts, AnySupport, ContextItem, TemplateValue, checkTagValueChange, SupportContextItem, destroySupportByContextItem } from '../index.js'
+import { TagCounts, AnySupport, ContextItem, TemplateValue, checkTagValueChange, SupportContextItem, destroySupportByContextItem, TagJsVarInnerHTML } from '../index.js'
 import { forceUpdateExistingValue } from './update/forceUpdateExistingValue.function.js'
+import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 
 export type EventCallback = (event: Event) => any
 export type EventMem = {elm: Element, callback:EventCallback}
@@ -58,9 +59,21 @@ export function getDomTag(
       return tag
     },
 
-    /** Used within the outerHTML tag to signify that it expects innerHTML */
-    setInnerHTML: function setInnerHTML(innerHTML: any) {
-      innerHTML.owner = tag
+    setHTML: function setHTML(innerHTML: Tag) {
+      innerHTML.outerHTML = tag
+      tag._innerHTML = innerHTML
+      ;(innerHTML as any).oldProcessInit = innerHTML.processInit
+      
+      // TODO: Not best idea to override the init
+      innerHTML.processInit = processOuterDomTagInit
+
+      return tag
+    },
+
+    /** Used within the outerHTML tag to signify that it can use innerHTML */
+    acceptInnerHTML: function acceptInnerHTML(useTagVar: TagJsVar): Tag {
+      // TODO: datatype
+      (useTagVar as TagJsVarInnerHTML).owner = tag
       return tag
     },
 
@@ -77,12 +90,7 @@ export function getDomTag(
 
   Object.defineProperty(tag, 'innerHTML', {
     set(innerHTML: Tag) {
-      innerHTML.outerHTML = tag
-      tag._innerHTML = innerHTML
-      ;(innerHTML as any).oldProcessInit = innerHTML.processInit
-      
-      // TODO: Not best idea to override the init
-      innerHTML.processInit = processOuterDomTagInit
+      return tag.setHTML(innerHTML)
     },
   })
 
@@ -168,9 +176,22 @@ export function getStringTag(
       return tag as ArrayItemStringTag<T>
     },
 
-    /** Used within the outerHTML tag to signify that it expects innerHTML */
-    setInnerHTML: function setInnerHTML(innerHTML: any) {
-      innerHTML.owner = tag
+    /** aka setInnerHTML */
+    setHTML: function setHTML(innerHTML: Tag) {
+      innerHTML.outerHTML = tag
+      tag._innerHTML = innerHTML
+      ;(innerHTML as any).oldProcessInit = innerHTML.processInit
+      
+      // TODO: Not best idea to override the init
+      innerHTML.processInit = processOuterDomTagInit
+
+      return tag
+    },
+
+    /** Used within the outerHTML tag to signify that it can use innerHTML */
+    acceptInnerHTML: function acceptInnerHTML(useTagVar: TagJsVar): Tag {
+      // TODO: datatype
+      (useTagVar as TagJsVarInnerHTML).owner = tag
       return tag
     },
 
@@ -185,8 +206,7 @@ export function getStringTag(
 
   Object.defineProperty(tag, 'innerHTML', {
     set(innerHTML: Tag) {
-      innerHTML.outerHTML = tag
-      innerHTML.processInit = processOuterDomTagInit
+      return tag.setHTML(innerHTML)
     },
   })
 

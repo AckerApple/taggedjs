@@ -1,6 +1,5 @@
 import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from'../../tag/hasSupportChanged.function.js'
 import { PropsConfig } from '../../tag/createHtmlSupport.function.js'
-import { processReplacementComponent } from '../../tag/update/processFirstSubjectComponent.function.js'
 import {SupportTagGlobal, TemplaterResult } from '../../tag/getTemplaterResult.function.js'
 import { castProps, WrapRunner } from'../../tag/props/alterProp.function.js'
 import { renderSupport } from'../renderSupport.function.js'
