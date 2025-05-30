@@ -4,13 +4,16 @@ import { renderCountDiv } from "./renderCount.component"
 import { Subject as RxSubject, startWith } from "rxjs"
 import { fadeInDown, fadeOutUp } from "taggedjs-animate-css"
 
-const animateWrap = (counts: ValueSubject<TagCounts>) => {
+const animateWrap = (
+  counts: ValueSubject<TagCounts>,
+  staggerBy: number = 10,
+) => {
   const innerHTML = getInnerHTML()
 
   const oninit = (a: any) =>
     fadeInDown({
       ...a,
-      staggerBy: 10,
+      staggerBy,
     }).then(() => {
       ++counts.value.added
       counts.next(counts.value)
@@ -19,18 +22,39 @@ const animateWrap = (counts: ValueSubject<TagCounts>) => {
   const ondestroy = (b: any)=>
     fadeOutUp({
       ...b,
-      staggerBy: 10,
+      staggerBy,
     } as any).then(() => {
       ++counts.value.removed
       counts.next(counts.value)
     })
   
   return html`
-    <div
-      oninit=${oninit}
-      
-      ondestroy=${ondestroy}
-      
+    <div oninit=${oninit} ondestroy=${ondestroy}
+      style.--animate-duration=".1s"
+      style.border="1px solid orange"
+    >${innerHTML}</div>
+  `.setInnerHTML(innerHTML)
+}
+
+const outerHtml = (
+  staggerBy = 10,
+) => {
+  const innerHTML = getInnerHTML()
+
+  const oninit = (a: any) =>
+    fadeInDown({
+      ...a,
+      staggerBy,
+    })
+  
+  const ondestroy = (b: any)=>
+    fadeOutUp({
+      ...b,
+      staggerBy,
+    } as any)
+  
+  return html`
+    <div id="outer-html-fx-test" oninit=${oninit} ondestroy=${ondestroy}
       style.--animate-duration=".1s"
       style.border="1px solid orange"
     >${innerHTML}</div>
@@ -77,13 +101,14 @@ export const content = tag(() => {
   let orangeToggle = true
   let boldToggle = false
   let counter = 0
+  let staggerBy = 10
   let showHideFx = false
   const counts = state(() => new Subject({ added: 0, removed: 0})) as ValueSubject<TagCounts>
 
   states(get => [{
-    renderCount, orangeToggle, boldToggle, counter, showHideFx,
+    renderCount, orangeToggle, boldToggle, counter, showHideFx, staggerBy,
   }] = get({
-    renderCount, orangeToggle, boldToggle, counter, showHideFx,
+    renderCount, orangeToggle, boldToggle, counter, showHideFx, staggerBy,
   }))
 
   ++renderCount
@@ -121,19 +146,25 @@ export const content = tag(() => {
       
       <button id="content-toggle-fx" type="button" onclick=${() => showHideFx = !showHideFx}>toggle hideshow fx</button>
 
-      ${showHideFx && (animateWrap(counts).innerHTML = html`
+      ${showHideFx && (animateWrap(counts, staggerBy).innerHTML = html`
         test the tester - 0
       `)}
-      ${showHideFx && (animateWrap(counts).innerHTML = html`
+      ${showHideFx && (animateWrap(counts, staggerBy).innerHTML = html`
         test the tester - 1
       `)}
-      ${showHideFx && (animateWrap(counts).innerHTML = html`
+      ${showHideFx && (animateWrap(counts, staggerBy).innerHTML = html`
         test the tester - 2
       `)}
+      ${showHideFx && (outerHtml(staggerBy).innerHTML = innerHtmlTag())}
 
       <div>
-        added: <span id="content-fx-added">${subscribe(counts, counts => counts.added)}</span>
-        removed: <span id="content-fx-removed">${subscribe(counts, counts => counts.removed)}</span>
+        <div>
+          added: <span id="content-fx-added">${subscribe(counts, counts => counts.added)}</span>&nbsp;
+          removed: <span id="content-fx-removed">${subscribe(counts, counts => counts.removed)}</span>
+        </div>
+        <div>
+          staggerBy:<input type="range" min="10" max="300" step="1" onchange=${event => staggerBy = Number(event.target.value)} />
+        </div>
       </div>
 
       <hr />
@@ -362,4 +393,8 @@ const numberFun = (x: number) => {
 
 const numberTag = tag((x: number) => {
   return html`your tag number ${x}`
+})
+
+const innerHtmlTag = tag(() => {
+  return html`inner html tag`
 })

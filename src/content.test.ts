@@ -149,6 +149,7 @@ describe('📰 content', () => {
     await sleep(10)
 
     expect(Number(textContent('#content-fx-added'))).toBe(added + 3)
+    expect(textContent('#outer-html-fx-test')).toBe('inner html tag')
     
     // hide
     click('#content-toggle-fx')
