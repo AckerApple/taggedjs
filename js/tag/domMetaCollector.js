@@ -14,8 +14,6 @@ export function getDomMeta(strings, values) {
     }
     const domMeta = htmlInterpolationToDomMeta(strings, values);
     const map = replacePlaceholders(domMeta, values.length);
-    // Restore any sanitized placeholders in text nodes
-    // restorePlaceholders(map)
     const template = {
         interpolation: undefined,
         string: undefined,

@@ -1,4 +1,3 @@
-import { processReplacementComponent } from './processFirstSubjectComponent.function.js';
 import { updateExistingTagComponent } from '../../render/update/updateExistingTagComponent.function.js';
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js';
 import { createSupport } from '../createSupport.function.js';
@@ -15,7 +14,9 @@ export function prepareUpdateToComponent(templater, contextItem, ownerSupport, c
     const global = contextItem.global;
     // When last value was not a component
     if (!global.newest) {
-        processReplacementComponent(templater, contextItem, ownerSupport, counts);
+        ;
+        templater.processInit(templater, contextItem, ownerSupport, counts, undefined, // appendTo,
+        contextItem.placeholder);
         return;
     }
     const support = createSupport(templater, ownerSupport, ownerSupport.appSupport, contextItem);

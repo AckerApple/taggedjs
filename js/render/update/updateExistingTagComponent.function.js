@@ -1,5 +1,4 @@
 import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from '../../tag/hasSupportChanged.function.js';
-import { processReplacementComponent } from '../../tag/update/processFirstSubjectComponent.function.js';
 import { castProps } from '../../tag/props/alterProp.function.js';
 import { renderSupport } from '../renderSupport.function.js';
 import { ValueTypes } from '../../tag/ValueTypes.enum.js';
@@ -106,13 +105,13 @@ function syncSupports(templater, support, lastSupport, ownerSupport, maxDepth) {
     return lastSupport; // its the same tag component  
 }
 /** Was tag, will be tag */
-function swapTags(subject, templater, // new tag
+function swapTags(contextItem, templater, // new tag
 ownerSupport) {
-    const global = subject.global;
+    const global = contextItem.global;
     const oldestSupport = global.oldest;
     destroySupport(oldestSupport, global);
-    getNewGlobal(subject);
-    const newSupport = processReplacementComponent(templater, subject, ownerSupport, { added: 0, removed: 0 });
-    return newSupport;
+    getNewGlobal(contextItem);
+    templater.processInit(templater, contextItem, ownerSupport, { added: 0, removed: 0 }, undefined, // appendTo,
+    contextItem.placeholder);
 }
 //# sourceMappingURL=updateExistingTagComponent.function.js.map
