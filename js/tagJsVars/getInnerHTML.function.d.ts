@@ -1,2 +1,6 @@
+import { Tag } from "../index.js";
 import { TagJsVar } from "./tagJsVar.type.js";
-export declare function getInnerHTML(): TagJsVar;
+export type TagJsVarInnerHTML = TagJsVar & {
+    owner?: Tag;
+};
+export declare function getInnerHTML(): TagJsVarInnerHTML;

@@ -9,11 +9,13 @@ export type Tag = TagJsVar & {
     /** used in array.map() */
     key: (arrayValue: unknown) => Tag;
     arrayValue?: any;
-    /** Used inside a tag/function to signify that innerHTML is expected */
-    setInnerHTML: (innerHTML: any) => Tag;
+    /** Used INSIDE a tag/function to signify that innerHTML is expected */
+    acceptInnerHTML: (useTagVar: TagJsVar) => Tag;
     /** Use this to set content to be render within another component */
     innerHTML?: Tag;
-    /** The true saved variable */
+    /** Same as innerHTML = x */
+    setHTML: (innerHTML: any) => Tag;
+    /** The true saved innerHTML variable */
     _innerHTML?: Tag;
     outerHTML?: Tag;
 };

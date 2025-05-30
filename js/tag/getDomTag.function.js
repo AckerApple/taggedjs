@@ -18,9 +18,18 @@ export function getDomTag(dom, values) {
             tag.arrayValue = arrayValue;
             return tag;
         },
-        /** Used within the outerHTML tag to signify that it expects innerHTML */
-        setInnerHTML: function setInnerHTML(innerHTML) {
-            innerHTML.owner = tag;
+        setHTML: function setHTML(innerHTML) {
+            innerHTML.outerHTML = tag;
+            tag._innerHTML = innerHTML;
+            innerHTML.oldProcessInit = innerHTML.processInit;
+            // TODO: Not best idea to override the init
+            innerHTML.processInit = processOuterDomTagInit;
+            return tag;
+        },
+        /** Used within the outerHTML tag to signify that it can use innerHTML */
+        acceptInnerHTML: function acceptInnerHTML(useTagVar) {
+            // TODO: datatype
+            useTagVar.owner = tag;
             return tag;
         },
         html: {
@@ -33,11 +42,7 @@ export function getDomTag(dom, values) {
     };
     Object.defineProperty(tag, 'innerHTML', {
         set(innerHTML) {
-            innerHTML.outerHTML = tag;
-            tag._innerHTML = innerHTML;
-            innerHTML.oldProcessInit = innerHTML.processInit;
-            // TODO: Not best idea to override the init
-            innerHTML.processInit = processOuterDomTagInit;
+            return tag.setHTML(innerHTML);
         },
     });
     return tag;
@@ -78,9 +83,19 @@ export function getStringTag(strings, values) {
             tag.arrayValue = arrayValue;
             return tag;
         },
-        /** Used within the outerHTML tag to signify that it expects innerHTML */
-        setInnerHTML: function setInnerHTML(innerHTML) {
-            innerHTML.owner = tag;
+        /** aka setInnerHTML */
+        setHTML: function setHTML(innerHTML) {
+            innerHTML.outerHTML = tag;
+            tag._innerHTML = innerHTML;
+            innerHTML.oldProcessInit = innerHTML.processInit;
+            // TODO: Not best idea to override the init
+            innerHTML.processInit = processOuterDomTagInit;
+            return tag;
+        },
+        /** Used within the outerHTML tag to signify that it can use innerHTML */
+        acceptInnerHTML: function acceptInnerHTML(useTagVar) {
+            // TODO: datatype
+            useTagVar.owner = tag;
             return tag;
         },
         html: function html(strings, values) {
@@ -90,8 +105,7 @@ export function getStringTag(strings, values) {
     };
     Object.defineProperty(tag, 'innerHTML', {
         set(innerHTML) {
-            innerHTML.outerHTML = tag;
-            innerHTML.processInit = processOuterDomTagInit;
+            return tag.setHTML(innerHTML);
         },
     });
     return tag;
