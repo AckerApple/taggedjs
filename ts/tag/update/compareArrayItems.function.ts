@@ -1,4 +1,3 @@
-import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { LastArrayItem } from '../Context.types.js'
 import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { paintCommands, paintRemover } from '../../render/paint.function.js'

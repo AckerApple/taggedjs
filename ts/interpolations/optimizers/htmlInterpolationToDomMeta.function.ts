@@ -1,16 +1,13 @@
 import { variablePrefix, variableSuffix } from "../../tag/DomTag.type.js"
 import { parseHTML } from "./parseHTML.function.js"
-// import { safeVar } from "./restorePlaceholders.function.js"
 import { ParsedHtml } from "./types.js"
 
-// const fragReplacer = /(^:tagvar\d+:|:tagvar\d+:$)/g
 export const realTagsRegEx = new RegExp(variablePrefix + '(\\d+)' + variableSuffix, 'gi')
 export const findRealTagsRegEx = new RegExp('(' + variablePrefix + '\\d+' + variableSuffix+')', 'gi')
 
 // without last letter
 const shortFront = variablePrefix.slice(0, variablePrefix.length-1)
 
-// export const fakeTagsRegEx = new RegExp(variablePrefix + '(x)*(x)+(\\d+)(x)*(x)+' + variableSuffix, 'gi')
 export const fakeTagsRegEx = new RegExp(shortFront + '&#x72;(\\d+)' + variableSuffix, 'gi')
 
 // variable prefix minus one letter and then the letter "r" as hex

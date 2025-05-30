@@ -1,6 +1,5 @@
 import { AnySupport } from '../tag/AnySupport.type.js'
 import { SupportContextItem } from '../tag/SupportContextItem.type.js'
-import { TagCounts } from '../tag/TagCounts.type.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
 import { processTag } from './update/processTag.function.js'
 import { updateSupportBy } from './update/updateSupportBy.function.js'

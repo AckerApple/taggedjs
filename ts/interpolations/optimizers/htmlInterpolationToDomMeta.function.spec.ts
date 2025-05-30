@@ -1,4 +1,4 @@
-import { html, StringTag, Tag, TemplaterResult } from "../../tag"
+import { html, StringTag, Tag } from "../../tag"
 import { htmlInterpolationToDomMeta } from "./htmlInterpolationToDomMeta.function"
 import { DomObjectElement } from "./ObjectNode.types"
 

@@ -1,6 +1,5 @@
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { processReplacementComponent } from './processFirstSubjectComponent.function.js'
 import { updateExistingTagComponent } from '../../render/update/updateExistingTagComponent.function.js'
 import { AdvancedContextItem } from '../AdvancedContextItem.type.js'
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js'
@@ -9,6 +8,7 @@ import { AnySupport } from '../AnySupport.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { TagCounts } from '../TagCounts.type.js'
+import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 
 /** Checks if value has changed before updating. Used for all tag value updates. Determines if value changed since last render */
 export function tagValueUpdateHandler(
@@ -40,15 +40,17 @@ export function prepareUpdateToComponent(
   const global = contextItem.global as SupportTagGlobal
   // When last value was not a component
   if(!global.newest) {
-    processReplacementComponent(
+    ;(templater as TagJsVar).processInit(
       templater,
       contextItem,
       ownerSupport,
       counts,
+      undefined, // appendTo,
+      contextItem.placeholder,
     )
     return
   }
-  
+
   const support = createSupport(
     templater,
     ownerSupport,

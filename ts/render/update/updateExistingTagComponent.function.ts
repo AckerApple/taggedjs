@@ -14,6 +14,7 @@ import { BaseSupport } from '../../tag/BaseSupport.type.js'
 import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.function.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
 import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
+import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 
 export function updateExistingTagComponent(
   ownerSupport: AnySupport,
@@ -189,22 +190,22 @@ function syncSupports<T extends AnySupport>(
 
 /** Was tag, will be tag */
 function swapTags(
-  subject:SupportContextItem,
+  contextItem: SupportContextItem,
   templater: TemplaterResult, // new tag
   ownerSupport: AnySupport
 ) {
-  const global = subject.global as SupportTagGlobal
+  const global = contextItem.global as SupportTagGlobal
   const oldestSupport = global.oldest as AnySupport
   destroySupport(oldestSupport, global)
   
-  getNewGlobal(subject)
+  getNewGlobal(contextItem)
 
-  const newSupport = processReplacementComponent(
+  ;(templater as TagJsVar).processInit(
     templater,
-    subject,
+    contextItem,
     ownerSupport,
-    {added: 0, removed: 0},
+    { added: 0, removed: 0 },
+    undefined, // appendTo,
+    contextItem.placeholder,
   )
-
-  return newSupport
 }

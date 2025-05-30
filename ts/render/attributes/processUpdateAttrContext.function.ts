@@ -2,7 +2,6 @@ import { AnySupport } from '../../tag/AnySupport.type.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processAttributeEmit } from './processAttribute.function.js'
 import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.function.js'
-import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { updateNameOnlyAttrValue } from '../../interpolations/attributes/updateAttribute.function.js'
 
 export function processUpdateAttrContext(
