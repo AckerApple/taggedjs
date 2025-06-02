@@ -33,7 +33,7 @@ const animateWrap = (
       style.--animate-duration=".1s"
       style.border="1px solid orange"
     >${innerHTML}</div>
-  `.setInnerHTML(innerHTML)
+  `.acceptInnerHTML(innerHTML)
 }
 
 const outerHtml = (
@@ -58,7 +58,7 @@ const outerHtml = (
       style.--animate-duration=".1s"
       style.border="1px solid orange"
     >${innerHTML}</div>
-  `.setInnerHTML(innerHTML)
+  `.acceptInnerHTML(innerHTML)
 }
 
 export const concatStyles = tag((innerHTML: any) => {

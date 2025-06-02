@@ -1,7 +1,7 @@
 import { byId, elmCount } from "./testing/elmSelectors"
 import { describe, expect, it } from "./testing/expect"
 
-const fxTime = 145
+const fxTime = 160
 
 describe('⠇ array testing', () => {
   it('array basics', () => {

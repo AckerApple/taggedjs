@@ -7,14 +7,23 @@ import { runTests } from "./tests"
 import { menu, useMenuName } from "./menu.tag"
 import { innerCounterContent } from "./countersDebug";
 import { content } from "./ContentDebug.tag"
+import { animateWrap } from "taggedjs-animate-css"
 
 const appDate = Date.now()
 
 function appFun(){
   return function runAppFun(menuName = useMenuName()) {
+    let showHide = false
+
+    states(get => [{ showHide }] = get({ showHide }))
+
     console.log('🍒 App rendered', appDate)
     return html`<!--app.js-->
       <h1 id="h1-app">🏷️ TaggedJs - ${2+2}</h1>
+
+      <button type="button" onclick=${() => showHide = !showHide}>show/hide ${showHide}</button>
+      ${showHide && fxTag()}
+
 
       ${menu()}
 
@@ -145,3 +154,11 @@ export const homePage = () => tag.use = (
     </div>
   `
 }
+
+const fxTag = tag(() => html`
+  <hr />
+  ${animateWrap().innerHTML = html`
+    Hello animated world
+  `}
+  <hr />
+`)

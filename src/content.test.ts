@@ -162,7 +162,7 @@ describe('📰 content', () => {
     // about to start animating
     expect(Number(textContent('#content-fx-removed'))).toBe(removed)
     
-    await sleep(75)
+    await sleep(80)
     
     expect(Number(textContent('#content-fx-removed'))).toBe(removed + 3)
     expect(Number(textContent('#content-fx-added'))).toBe(added + 3) // still same

@@ -18,7 +18,7 @@ const noTagTest = () => {
       <legend>noTagTest</legend>
       ${11}---${innerHTML}+++${22}
     </fieldset>
-  `.setInnerHTML(innerHTML)
+  `.acceptInnerHTML(innerHTML)
 }
 
 export const child = tag((_: string = 'childTests') => (
