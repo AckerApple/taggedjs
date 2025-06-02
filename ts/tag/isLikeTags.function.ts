@@ -6,65 +6,81 @@ import { TemplaterResult } from './getTemplaterResult.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 
 export function isLikeTags(
-  support0: AnySupport | StringTag, // new
-  support1: AnySupport, // previous
+  newSupport: AnySupport | StringTag, // new
+  oldSupport: AnySupport, // previous
 ): boolean {
-  const templater0 = support0.templater as TemplaterResult | undefined
-  const templater1 = support1.templater as TemplaterResult
+  const isLike = isLikeBaseTags(newSupport, oldSupport)
 
-  const tag0 = templater0?.tag || (support0 as StringTag | DomTag)
-  const tag1 = templater1.tag as undefined | StringTag | DomTag // || (support1 as any)
+  // is this perhaps an outerHTML compare?      
+  if(!isLike && oldSupport.templater.tag?._innerHTML) {
+    if( isLikeBaseTags((newSupport as any).outerHTML, oldSupport) ) {
+      return true
+    }
+  }
+
+  return isLike
+}
+
+function isLikeBaseTags(
+    newSupport: AnySupport | StringTag, // new
+    oldSupport: AnySupport, // previous
+  ): boolean {
+  const templater0 = newSupport.templater as TemplaterResult | undefined
+  const templater1 = oldSupport.templater as TemplaterResult
+
+  const newTag = templater0?.tag || (newSupport as StringTag | DomTag)
+  const oldTag = templater1.tag as undefined | StringTag | DomTag // || (oldSupport as any)
 
   if(templater0?.tagJsType === ValueTypes.stateRender) {
     return (templater0 as any).dom === (templater1 as any).dom
   }
 
-  switch (tag0.tagJsType) {
+  switch (newTag.tagJsType) {
     case ValueTypes.dom: {
-      if(tag1?.tagJsType !== ValueTypes.dom) {
-        return false // tag0 is not even same type
+      if(oldTag?.tagJsType !== ValueTypes.dom) {
+        return false // newTag is not even same type
       }
   
       return isLikeDomTags(
-        tag0 as DomTag,
-        tag1 as DomTag,
+        newTag as DomTag,
+        oldTag as DomTag,
       )
     }
 
     case ValueTypes.tag: {
       const like = isLikeStringTags(
-        tag0 as StringTag,
-        tag1 as StringTag,
-        support0,
-        support1
+        newTag as StringTag,
+        oldTag as StringTag,
+        newSupport,
+        oldSupport
       )
       
       return like
     }
   }
 
-  throw new Error(`unknown tagJsType of ${tag0.tagJsType}`)
+  throw new Error(`unknown tagJsType of ${newTag.tagJsType}`)
 }
 
 // used when compiler was used
 export function isLikeDomTags(
-  tag0: DomTag,
-  tag1: DomTag,
+  newTag: DomTag,
+  oldTag: DomTag,
 ) {
-  const domMeta0 = tag0.dom
-  const domMeta1 = tag1.dom
+  const domMeta0 = newTag.dom
+  const domMeta1 = oldTag.dom
   return domMeta0 === domMeta1
 }
 
 // used for no compiling
 function isLikeStringTags(
-  tag0: StringTag,
-  tag1: StringTag,
-  support0: AnySupport | Tag, // new
-  support1: AnySupport, // previous
+  newTag: StringTag,
+  oldTag: StringTag,
+  newSupport: AnySupport | Tag, // new
+  oldSupport: AnySupport, // previous
 ) {
-  const strings0 = tag0.strings
-  const strings1 = tag1.strings
+  const strings0 = newTag.strings
+  const strings1 = oldTag.strings
   if(strings0.length !== strings1.length) {
     return false
   }
@@ -76,8 +92,8 @@ function isLikeStringTags(
     return false
   }
 
-  const values0 = (support0.templater as any).values || tag0.values
-  const values1 = (support1.templater as any).values || tag1.values
+  const values0 = (newSupport.templater as any).values || newTag.values
+  const values1 = (oldSupport.templater as any).values || oldTag.values
   return isLikeValueSets(values0, values1)
 
 }

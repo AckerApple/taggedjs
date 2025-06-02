@@ -1,6 +1,6 @@
 import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from'../../tag/hasSupportChanged.function.js'
 import { PropsConfig } from '../../tag/createHtmlSupport.function.js'
-import {SupportTagGlobal, TemplaterResult } from '../../tag/getTemplaterResult.function.js'
+import {SupportTagGlobal, TemplaterResult, Wrapper } from '../../tag/getTemplaterResult.function.js'
 import { castProps, WrapRunner } from'../../tag/props/alterProp.function.js'
 import { renderSupport } from'../renderSupport.function.js'
 import { ValueTypes } from '../../tag/ValueTypes.enum.js'
@@ -17,21 +17,28 @@ import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 
 export function updateExistingTagComponent(
   ownerSupport: AnySupport,
-  support: AnySupport, // lastest
+  newSupport: AnySupport, // lastest
   subject:SupportContextItem,
 ): void {
   const global = subject.global as SupportTagGlobal
-  const lastSupport = global.newest
+  const oldSupport = global.newest
   
-  const oldWrapper = lastSupport.templater.wrapper
-  const newWrapper = support.templater.wrapper
+  const oldWrapper = oldSupport.templater.wrapper
+  let newWrapper = newSupport.templater.wrapper as Wrapper
   let isSameTag = false
-  const tagJsType = support.templater.tagJsType
+  const tagJsType = newSupport.templater.tagJsType
   const skipComparing = ValueTypes.stateRender === tagJsType || ValueTypes.renderOnce === tagJsType
 
   if(skipComparing) {
-    isSameTag = support.templater.tagJsType === ValueTypes.renderOnce || isLikeTags(lastSupport,support)
+    isSameTag = newSupport.templater.tagJsType === ValueTypes.renderOnce || isLikeTags(oldSupport, newSupport)
   } else if(oldWrapper && newWrapper) {
+    // is this perhaps an outerHTML compare?
+    const innerHTML = oldSupport.templater.tag?._innerHTML
+    if(innerHTML) {
+      // newWrapper = innerHTML.outerHTML as any as Wrapper
+      newWrapper = (newSupport as any).outerHTML
+    }
+
     const oldFunction = oldWrapper.original
     const newFunction = newWrapper.original
 
@@ -39,7 +46,7 @@ export function updateExistingTagComponent(
     isSameTag = oldFunction === newFunction
   }
 
-  const templater = support.templater
+  const templater = newSupport.templater
   if(!isSameTag) {
     swapTags(
       subject,
@@ -51,7 +58,7 @@ export function updateExistingTagComponent(
   }
 
   const hasChanged = skipComparing || hasSupportChanged(
-    lastSupport as unknown as BaseSupport,
+    oldSupport as unknown as BaseSupport,
     templater
   )
 
@@ -60,8 +67,8 @@ export function updateExistingTagComponent(
     const maxDepth = templater.propWatch === PropWatches.DEEP ? deepCompareDepth : shallowCompareDepth
     syncSupports(
       templater,
-      support,
-      lastSupport,
+      newSupport,
+      oldSupport,
       ownerSupport,
       maxDepth,
     )
@@ -70,11 +77,11 @@ export function updateExistingTagComponent(
   }
 
   if(global.locked) {
-    global.blocked.push(support)
+    global.blocked.push( newSupport )
     return
   }
 
-  renderSupport(support)
+  renderSupport( newSupport )
 
   ++subject.renderCount
 
@@ -83,13 +90,13 @@ export function updateExistingTagComponent(
 
 export function syncFunctionProps(
   newSupport: AnySupport,
-  lastSupport: AnySupport,
+  oldSupport: AnySupport,
   ownerSupport: AnySupport,
   newPropsArray: unknown[], // templater.props
   maxDepth: number,
   depth = -1, // 10 or 3
 ): Props {
-  const subject = lastSupport.subject
+  const subject = oldSupport.subject
   const global = subject.global as SupportTagGlobal
   const newest = global.newest
 
@@ -105,9 +112,9 @@ export function syncFunctionProps(
     return newPropsArray
   }
 
-  lastSupport = newest || lastSupport as AnySupport
+  oldSupport = newest || oldSupport as AnySupport
 
-  const priorPropConfig = lastSupport.propsConfig as PropsConfig
+  const priorPropConfig = oldSupport.propsConfig as PropsConfig
   const priorPropsArray = priorPropConfig.castProps as Props
   const newArray: any[] = []
   for (let index = 0; index < newPropsArray.length; ++index) {
@@ -133,10 +140,10 @@ export function syncFunctionProps(
 }
 
 export function moveProviders(
-  lastSupport: AnySupport,
+  oldSupport: AnySupport,
   newSupport: AnySupport,
 ) {
-  const global = lastSupport.subject.global as SupportTagGlobal
+  const global = oldSupport.subject.global as SupportTagGlobal
   let pIndex = -1
   const providers = global.providers = global.providers || []
 
@@ -161,7 +168,7 @@ export function moveProviders(
 function syncSupports<T extends AnySupport>(
   templater: TemplaterResult,
   support: AnySupport,
-  lastSupport: T,
+  oldSupport: T,
   ownerSupport: AnySupport,
   maxDepth: number,
 ) {
@@ -169,7 +176,7 @@ function syncSupports<T extends AnySupport>(
   const newProps = templater.props as Props
   const castedProps = syncFunctionProps(
     support,
-    lastSupport as AnySupport,
+    oldSupport as AnySupport,
     ownerSupport,
     newProps,
     maxDepth,
@@ -180,11 +187,11 @@ function syncSupports<T extends AnySupport>(
   // When new support actually makes call to real function, use these pre casted props
   propsConfig.castProps = castedProps
   
-  const lastPropsConfig = lastSupport.propsConfig as PropsConfig
+  const lastPropsConfig = oldSupport.propsConfig as PropsConfig
   // update support to think it has different cloned props
   lastPropsConfig.latest = propsConfig.latest
   
-  return lastSupport // its the same tag component  
+  return oldSupport // its the same tag component  
 }
 
 /** Was tag, will be tag */

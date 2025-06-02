@@ -43,7 +43,7 @@ export function tryUpdateToTag(
       if(typeof(newValue) === BasicTypes.function) {
         return true
       }
-    
+
       handleStillTag(
         support,
         contextItem as ContextItem,

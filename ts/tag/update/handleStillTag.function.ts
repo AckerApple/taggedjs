@@ -8,12 +8,23 @@ import { AnySupport } from '../AnySupport.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 
 export function handleStillTag(
-  lastSupport: AnySupport,
+  oldSupport: AnySupport,
   subject: ContextItem,
-  value: StringTag | TemplateValue,
+  value: Tag | TemplateValue,
   ownerSupport: AnySupport,
 ) {
-  const templater = (value as Tag).templater || value
+  // Value is result of either tag(() => html``) or () => html``
+  let templater = (value as Tag).templater || value
+
+  const oldTtag = oldSupport.templater.tag
+  if(oldTtag) {
+    const innerHTML = oldTtag._innerHTML
+    if(innerHTML) {
+      // Value has innerHTML that is either tag() or html``
+      templater = (value as Tag).outerHTML || ((value as Tag)._innerHTML as Tag).outerHTML as Tag
+    }
+  }
+
 
   const valueSupport = createSupport(
     templater as TemplaterResult,
@@ -22,7 +33,7 @@ export function handleStillTag(
     subject,
   )
 
-  const lastSubject = lastSupport.subject as ContextItem
+  const lastSubject = oldSupport.subject as ContextItem
   const newGlobal = lastSubject.global as SupportTagGlobal
   const oldest = newGlobal.oldest
 

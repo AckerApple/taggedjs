@@ -20,6 +20,7 @@ export function forceUpdateExistingValue(
     newValue,
     contextItem as unknown as SupportContextItem,
     counts,
+    ownerSupport,
   )
 
   // ignore

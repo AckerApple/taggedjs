@@ -19,6 +19,7 @@ export type CheckValueChange = (
   value:unknown,
   subject: ContextItem,
   counts: TagCounts,
+  ownerSupport: AnySupport,
 ) => number | boolean
 
 export type CheckSupportValueChange = (

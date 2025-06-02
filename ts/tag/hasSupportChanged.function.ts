@@ -8,19 +8,19 @@ import { BasicTypes } from './ValueTypes.enum.js'
 
 /** Used when deciding if a support will even change (are the arguments the same?) */
 export function hasSupportChanged(
-  lastSupport: BaseSupport,
+  oldSupport: BaseSupport,
   newTemplater: TemplaterResult,
 ): number | string | false {
   const latestProps = newTemplater.props as Props
-  const propsConfig = lastSupport.propsConfig as PropsConfig
+  const propsConfig = oldSupport.propsConfig as PropsConfig
   const pastCloneProps = propsConfig.latest
   
   const propsChanged = hasPropChanges(
     latestProps,
     pastCloneProps,
-    lastSupport.templater.propWatch,
+    oldSupport.templater.propWatch,
   )
-  
+
   return propsChanged
 }
 
