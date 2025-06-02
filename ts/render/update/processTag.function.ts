@@ -17,14 +17,15 @@ import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
 */
 export function processTag(
   ownerSupport: AnySupport, // owner
-  subject: SupportContextItem, // could be tag via result.tag
+  contextItem: SupportContextItem, // could be tag via result.tag
   counts: TagCounts,
 ): AnySupport {
-  const global = subject.global as SupportTagGlobal
+  const global = contextItem.global as SupportTagGlobal
   const support = global.newest as AnySupport
-  support.ownerSupport = ownerSupport
+  const ph = contextItem.placeholder as Text
   
-  const ph = subject.placeholder as Text
+  support.ownerSupport = ownerSupport  
+  
   buildBeforeElement(
     support,
     counts,

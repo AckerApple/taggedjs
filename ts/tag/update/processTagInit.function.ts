@@ -25,7 +25,7 @@ export function processTagInit(
       insertBefore,
     )
   }
-  
+
   return processTag(
     ownerSupport,
     contextItem as SupportContextItem,

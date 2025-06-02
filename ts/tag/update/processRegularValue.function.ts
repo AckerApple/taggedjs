@@ -32,7 +32,7 @@ export function processNowRegularValue(
   const before = contextItem.placeholder as Text
   const castedValue = castTextValue(value)
 
-  const paint = contextItem.paint = [paintBeforeText, [before, castedValue, (x: Text) => {
+  const paint = contextItem.paint = [paintBeforeText, [before, castedValue, function cleanRegularValue(x: Text) {
     contextItem.simpleValueElm = x
     delete contextItem.paint
   }]]

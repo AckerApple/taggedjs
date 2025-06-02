@@ -16,6 +16,14 @@ import { AnySupport } from './AnySupport.type.js'
 import { renderTagElement } from '../render/renderTagElement.function.js'
 import { loadNewBaseSupport } from './loadNewBaseSupport.function.js'
 
+if( document ) {
+  if( (document as any).taggedJs ) {
+    console.warn('🏷️🏷️ Multiple versions of taggedjs are loaded. May cause issues.')
+  }
+
+  (document as any).taggedJs = true
+}
+
 export type TagAppElement = Element & {
   ValueTypes: typeof ValueTypes
   setUse: typeof setUseMemory

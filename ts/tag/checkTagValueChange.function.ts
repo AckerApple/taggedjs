@@ -8,8 +8,6 @@ import { isLikeTags } from'./isLikeTags.function.js'
 import { ContextItem } from './ContextItem.type.js'
 import { tryUpdateToTag } from './update/tryUpdateToTag.function.js'
 import { TagCounts } from './TagCounts.type.js'
-import { updateToDiffValue } from './update/updateToDiffValue.function.js'
-import { TemplateValue } from './TemplateValue.type.js'
 
 export function checkTagValueChange(
   newValue: unknown,

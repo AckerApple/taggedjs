@@ -11,7 +11,7 @@ import { empty } from "../../tag/ValueTypes.enum.js"
 import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicDom.function.js"
 import { TagCounts } from "../../tag/TagCounts.type.js"
 
-export const blankHandler = function () {
+export const blankHandler = function blankHandler() {
   return undefined
 }
 
@@ -148,8 +148,13 @@ function attachDomText(
   const string = textNode.tc = (node as any as DomObjectText).tc
 
   if (owner) {
-    paintAppends.push([paintAppendElementString, [owner, string, (elm: Text) => textNode.domElement = elm]])
-  } else {
-    paintCommands.push([paintBeforeElementString, [insertBefore, string, (elm: Text) => textNode.domElement = elm]])
+    paintAppends.push([paintAppendElementString, [owner, string, function afterAppenDomText(elm: Text){
+      textNode.domElement = elm
+    }]])
+    return
   }
+
+  paintCommands.push([paintBeforeElementString, [insertBefore, string, function afterInsertDomText(elm: Text) {
+    textNode.domElement = elm
+  }]])
 }

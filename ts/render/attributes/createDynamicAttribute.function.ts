@@ -34,7 +34,7 @@ export function createDynamicArrayAttribute(
         withinOwnerElement: true,
       }
   
-      contextItem.handler = (value, newSupport, contextItem, newValues) => {
+      contextItem.handler = function arrayItemHanlder(value, newSupport, contextItem, newValues) {
         setBy(newValues)
       }
 

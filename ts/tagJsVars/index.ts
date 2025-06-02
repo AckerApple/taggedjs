@@ -1,4 +1,5 @@
 export * from './subscribe.function.js'
 export * from './getInnerHTML.function.js'
 export * from './tag.function.js'
-export { checkSimpleValueChange, deleteSimpleValue } from './getSimpleTagVar.function.js'
+export { deleteSimpleValue } from './getSimpleTagVar.function.js'
+export { checkSimpleValueChange } from './checkSimpleValueChange.function.js'

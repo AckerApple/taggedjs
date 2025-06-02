@@ -1,6 +1,5 @@
 import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { updateSupportBy } from '../../render/update/updateSupportBy.function.js'
-import type { StringTag } from '../StringTag.type.js'
 import type { Tag } from '../Tag.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { createSupport } from '../createSupport.function.js'

@@ -6,7 +6,6 @@ import { TemplateValue } from '../TemplateValue.type.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { TagCounts } from '../TagCounts.type.js'
 
-
 /** Used for all tag value updates. Determines if value changed since last render */
 export function forceUpdateExistingValue(
   contextItem: AdvancedContextItem | SupportContextItem,

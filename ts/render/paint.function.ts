@@ -60,7 +60,7 @@ export function paintBefore(
   relative: Text | Element,
   element: Text | Element,
 ) {
-  ((relative as Text).parentNode as ParentNode).insertBefore(element, relative as Text)
+  (relative.parentNode as ParentNode).insertBefore(element, relative as Text)
 }
 
 export function paintAppend(
@@ -70,14 +70,14 @@ export function paintAppend(
   (relative as ParentNode).appendChild(element)
 }
 
-const someDiv = (typeof document === 'object' && document.createElement('div')) as HTMLDivElement // used for content cleaning
+const contentCleaner = (typeof document === 'object' && document.createElement('div')) as HTMLDivElement // used for content cleaning
 
 function toPlainTextElm(text: string) {
   // swap &gt; for >
-  someDiv.innerHTML = text // script tags should have already been sanitized before this step
+  contentCleaner.innerHTML = text // script tags should have already been sanitized before this step
 
   // delete <!-- -->
-  return document.createTextNode(someDiv.innerHTML as string)
+  return document.createTextNode(contentCleaner.innerHTML as string)
 }
 
 export function paintBeforeText(
@@ -86,6 +86,7 @@ export function paintBeforeText(
   callback: (created: Text) => any = blankHandler
 ) {
   const textElm = toPlainTextElm(text)
+
   paintBefore(relative, textElm)
   callback(textElm)
 }
@@ -106,8 +107,9 @@ export function paintBeforeElementString(
   text: string,
   callback: (created: Text) => any = blankHandler
 ) {
-  someDiv.innerHTML = text
-  const textElm = document.createTextNode(someDiv.textContent as string) // toPlainTextElm(text)
+  contentCleaner.innerHTML = text
+  const textElm = document.createTextNode(contentCleaner.textContent as string) // toPlainTextElm(text)
+
   paintBefore(relative, textElm)
   callback(textElm)
 }
@@ -118,8 +120,8 @@ export function paintAppendElementString(
   text: string,
   callback: (created: Text) => any
 ) {
-  someDiv.innerHTML = text
-  const textElm = document.createTextNode(someDiv.textContent as string) // toPlainTextElm(text)
+  contentCleaner.innerHTML = text
+  const textElm = document.createTextNode(contentCleaner.textContent as string) // toPlainTextElm(text)
   paintAppend(relative, textElm)
   callback(textElm)
 }
