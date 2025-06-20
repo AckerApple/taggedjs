@@ -14,7 +14,7 @@ import { PropWatches } from '../tagJsVars/tag.function.js'
 import { ProcessInit } from './ProcessInit.type.js'
 import { processTagInit } from './update/processTagInit.function.js'
 import { Tag } from './Tag.type.js'
-import { ProcessDelete, TagJsTag, TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { ProcessDelete, TagJsTag } from '../tagJsVars/tagJsVar.type.js'
 import { checkTagValueChange, destroySupportByContextItem } from './checkTagValueChange.function.js'
 import { CheckSupportValueChange, CheckValueChange } from './Context.types.js'
 

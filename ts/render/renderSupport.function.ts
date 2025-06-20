@@ -1,4 +1,4 @@
-import { PropsConfig, Support } from '../tag/createHtmlSupport.function.js'
+import { PropsConfig } from '../tag/createHtmlSupport.function.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
 import { deepEqual } from '../deepFunctions.js'
 import { renderExistingSupport } from'./renderExistingTag.function.js'

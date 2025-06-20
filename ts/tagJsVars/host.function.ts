@@ -34,7 +34,6 @@ function processHost(
 
 function deleteHost(
   contextItem: ContextItem,
-  ownerSupport: AnySupport,
 ) {
   const tagJsVar = contextItem.tagJsVar as HostValue
   const options = tagJsVar.options

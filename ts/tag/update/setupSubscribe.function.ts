@@ -14,7 +14,6 @@ import { SubContext, SubscriptionContext } from './SubContext.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { guaranteeInsertBefore } from '../guaranteeInsertBefore.function.js'
 import { ContextItem } from '../ContextItem.type.js'
-import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 
 export function setupSubscribe(
   observables: LikeObservable<any>[],
@@ -63,8 +62,6 @@ export function setupSubscribeCallbackProcessor(
       counts,
       insertBefore,
     )
-
-    const orgContext = subContext.contextItem
     
     checkToPaint(syncRun)
 

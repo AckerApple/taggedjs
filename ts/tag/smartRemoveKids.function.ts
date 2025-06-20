@@ -2,7 +2,7 @@ import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpola
 import { destroyArray } from './checkDestroyPrevious.function.js'
 import { paint, paintCommands, painting, paintRemover } from '../render/paint.function.js'
 import { ContextItem } from './ContextItem.type.js'
-import {SupportTagGlobal, TagGlobal } from './getTemplaterResult.function.js'
+import { SupportTagGlobal } from './getTemplaterResult.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { AnySupport } from './index.js'
 

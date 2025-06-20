@@ -28,7 +28,6 @@ function processPipe(
   ownerSupport: AnySupport,
   counts: TagCounts,
   appendTo?: Element,
-  insertBefore?: Text,
 ) {
   return setupSubscribe(
     values,

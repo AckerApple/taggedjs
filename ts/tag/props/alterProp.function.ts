@@ -1,5 +1,3 @@
-import { isInlineHtml, renderInlineHtml } from '../../render/renderSupport.function.js'
-import { renderExistingSupport } from '../../render/renderExistingTag.function.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { getSupportInCycle } from '../getSupportInCycle.function.js'
 import { deepCompareDepth } from '../hasSupportChanged.function.js'

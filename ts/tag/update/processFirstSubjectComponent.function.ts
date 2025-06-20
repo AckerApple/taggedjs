@@ -1,7 +1,6 @@
 import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { processFirstTagResult } from'./processTagResult.function.js'
 import { PropsConfig } from '../createHtmlSupport.function.js'
-import { renderWithSupport } from '../../render/renderWithSupport.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { getCastedProps } from '../getTagWrap.function.js'
 import { createSupport } from '../createSupport.function.js'

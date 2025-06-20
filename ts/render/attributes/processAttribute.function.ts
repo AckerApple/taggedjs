@@ -21,8 +21,6 @@ import { SpecialDefinition } from './Special.types.js'
 import { isNoDisplayValue } from './isNoDisplayValue.function.js'
 import { HostValue } from '../../tagJsVars/host.function.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
-import { SupportTagGlobal } from '../../tag/getTemplaterResult.function.js'
-import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
 import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js'
 
 /** MAIN FUNCTION. Sets attribute value, subscribes to value updates  */
