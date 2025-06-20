@@ -7,7 +7,7 @@ import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { SpecialDefinition } from '../render/attributes/Special.types.js'
 
 export interface ContextItem {
-  element?: Element
+  locked?: true
 
   /** handler(value,newSupport,contextItem,values) Called on value update detected, within processUpdateOneContext(). Return value is ignored */
   handler?: ContextHandler
@@ -35,6 +35,7 @@ export interface ContextItem {
   global?: TagGlobal
 
   // ELEMENTS
+  element?: Element
   placeholder?: Text // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
   withinOwnerElement: boolean
 }

@@ -19,6 +19,11 @@ import { getTagJsVar, TagVarIdNum } from './getTagJsVar.function.js'
 import { NoDisplayValue } from './NoDisplayValue.type.js'
 import { SpecialDefinition } from './Special.types.js'
 import { isNoDisplayValue } from './isNoDisplayValue.function.js'
+import { HostValue } from '../../tagJsVars/host.function.js'
+import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { SupportTagGlobal } from '../../tag/getTemplaterResult.function.js'
+import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
+import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js'
 
 /** MAIN FUNCTION. Sets attribute value, subscribes to value updates  */
 export function processAttribute(
@@ -51,6 +56,15 @@ export function processAttribute(
     // how to process value updates
     contextItem.handler = processUpdateAttrContext
 
+    
+    if((value as HostValue).tagJsType) {
+      contextItem.tagJsVar = value as TagJsVar
+      ;(contextItem as any).stateOwner = getSupportWithState(support)
+      ;(contextItem as any).supportOwner = support
+      return processHost(value as HostValue, element as HTMLInputElement)
+    }
+
+    // stand alone attributes
     processNameOnlyAttrValue(
       values,
       value as any,
@@ -103,9 +117,17 @@ export function processAttribute(
   )
 }
 
+function processHost(
+  hostVar: HostValue,
+  element: HTMLInputElement,
+) {
+  (hostVar as any).processInit(hostVar, element)
+  return
+}
+
 export function processNameOnlyAttrValue(
   values: unknown[],
-  attrValue: string | boolean | Record<string, any>,
+  attrValue: string | boolean | Record<string, any> | HostValue,
   element: Element,
   ownerSupport: AnySupport,
   howToSet: HowToSet,

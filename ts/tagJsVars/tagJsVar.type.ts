@@ -8,6 +8,14 @@ export type TagJsVar = {
   tagJsType: string // typeof ValueTypes.tag | typeof ValueTypes.dom
   processInit: ProcessInit
   delete: ProcessDelete  
+  
+  value?: any
+}
+
+export type TagJsTag = TagJsVar & {
+  tagJsType: string // typeof ValueTypes.tag | typeof ValueTypes.dom
+  processInit: ProcessInit
+  delete: ProcessDelete  
   checkValueChange: CheckValueChange | CheckSupportValueChange
   
   value?: any

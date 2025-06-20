@@ -3,12 +3,12 @@ import type { TagCounts } from '../tag/TagCounts.type.js'
 import { processTagArray } from '../tag/update/processTagArray.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
-import { TagJsVar } from './tagJsVar.type.js'
+import { TagJsTag, TagJsVar } from './tagJsVar.type.js'
 
 
 export function getArrayTagVar(
   value: any,
-): TagJsVar {
+): TagJsTag {
   return {
     tagJsType: 'array',
     value,

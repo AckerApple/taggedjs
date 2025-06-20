@@ -17,13 +17,13 @@ export function deleteSubContext(
   
   const appendMarker = subscription.appendMarker
   if(appendMarker) {
-    paintCommands.push([paintRemover, [appendMarker]])
+    paintCommands.push([paintRemover, [appendMarker, 'subcontext-delete']])
     delete subscription.appendMarker
   }
   
   delete (contextItem as any).delete
   contextItem.handler = tagValueUpdateHandler
-  
+  // ;(contextItem as any).checkValueChange = tagValueUpdateHandler
   
   if(!subscription.hasEmitted) {
     return

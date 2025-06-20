@@ -88,6 +88,5 @@ export function getInnerHTML(): TagJsVarInnerHTML {
     tagJsType: 'innerHTML',
     processInit: processInnerHTML,
     delete: deleteSubContext,
-    checkValueChange: () => console.debug('weird innerHTML check') as any,
   }
 }

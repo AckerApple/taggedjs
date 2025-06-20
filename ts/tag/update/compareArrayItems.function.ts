@@ -74,5 +74,5 @@ function destroyArrayItemByGlobal(
   
   const element = item.simpleValueElm as Element
   delete item.simpleValueElm
-  paintCommands.push([paintRemover, [element]])
+  paintCommands.push([paintRemover, [element, 'array-delete']])
 }

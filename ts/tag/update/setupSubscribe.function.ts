@@ -14,9 +14,10 @@ import { SubContext, SubscriptionContext } from './SubContext.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { guaranteeInsertBefore } from '../guaranteeInsertBefore.function.js'
 import { ContextItem } from '../ContextItem.type.js'
+import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 
 export function setupSubscribe(
-  observable: LikeObservable<any>,
+  observables: LikeObservable<any>[],
   contextItem: AdvancedContextItem,
   ownerSupport: AnySupport,
   counts: TagCounts,
@@ -27,7 +28,7 @@ export function setupSubscribe(
   const { appendMarker, insertBefore } = guaranteeInsertBefore(appendTo, insertBeforeOriginal)
 
   const subContext = setupSubscribeCallbackProcessor(
-    observable,
+    observables,
     ownerSupport,
     counts,
     insertBefore,
@@ -43,7 +44,7 @@ export function setupSubscribe(
 }
 
 export function setupSubscribeCallbackProcessor(
-  observable: LikeObservable<any>,
+  observables: LikeObservable<any>[],
   ownerSupport: AnySupport, // ownerSupport ?
   counts: TagCounts, // used for animation stagger computing
   insertBefore: Text,
@@ -51,7 +52,10 @@ export function setupSubscribeCallbackProcessor(
 ): SubContext {
   const component = getSupportWithState(ownerSupport)
   
-  let onValue = function onSubValue(value: TemplateValue) {
+  let onOutput = function onSubValue(value: TemplateValue) {
+    // const aContext = subContext.contextItem as AdvancedContextItem
+    // aContext.tagJsVar = valueToTagJsVar(value) as any
+
     onFirstSubContext(
       value,
       subContext,
@@ -60,46 +64,68 @@ export function setupSubscribeCallbackProcessor(
       insertBefore,
     )
 
-    // from now on just run update
-    onValue = function subscriptionUpdate(value: TemplateValue) {
+    const orgContext = subContext.contextItem
+    
+    checkToPaint(syncRun)
+
+    // MUTATION: from now on just run update
+    onOutput = function subscriptionUpdate(updateValue: TemplateValue) {
+      const aContext = subContext.contextItem as AdvancedContextItem
+
       forceUpdateExistingValue(
-        subContext.contextItem as AdvancedContextItem,
-        value,
+        aContext,
+        updateValue,
         ownerSupport,
         { added: 0, removed: 0 }
       )
 
-      if(!syncRun && !setUseMemory.stateConfig.support) {
-        paint()
-      }
+      checkToPaint(syncRun)
     }
   }
   
   // onValue mutates so function below calls original and mutation
-  function valueHandler(value: TemplateValue) {
-    subContext.lastValue = value
+  function valueHandler(
+    value: TemplateValue,
+    index: number,
+  ) {
+    subContext.lastValues[index] = value
 
+    valuesHandler( subContext.lastValues )
+  }
+
+  function valuesHandler(
+    values: TemplateValue[],
+  ) {
     const newComponent = component.subject.global.newest
     syncSupports(newComponent, component)
 
     if(subContext.callback) {
-      value = subContext.callback(value)
+      const responseValue = (subContext.callback as any)(...values)
+      onOutput(responseValue)
+      return
     }
 
-    onValue(value)
+    onOutput( values[0] )
   }
 
   let syncRun = true
 
-  const subContext = {
+  const subContext: SubscriptionContext = {
+    lastValues: [],
     valueHandler,
+    valuesHandler,
     callback,
-  } as SubscriptionContext
+    subscriptions: [],
+  }
 
   // HINT: Must subscribe AFTER initial variable created above incase subscribing causes immediate run
-  subContext.subscription = observable.subscribe( valueHandler )
-  
-  syncRun = false
+  observables.forEach((observable, index) => {    
+    syncRun = true
+    subContext.subscriptions.push(
+      observable.subscribe( value => valueHandler(value, index) )
+    )
+    syncRun = false
+  })
 
   return subContext
 }
@@ -110,7 +136,15 @@ export function deleteAndUnsubscribe(
 ) {
   const subscription = contextItem.subContext as SubscriptionContext
 
-  subscription.subscription.unsubscribe()
+  subscription.subscriptions.forEach(sub => sub.unsubscribe())
 
   return deleteSubContext(contextItem, ownerSupport)
+}
+
+function checkToPaint(
+  syncRun: boolean
+) {
+  if(!syncRun && !setUseMemory.stateConfig.support) {
+    paint()
+  }
 }

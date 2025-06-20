@@ -76,7 +76,7 @@ export function updateExistingTagComponent(
     return
   }
 
-  if(global.locked) {
+  if( subject.locked ) {
     global.blocked.push( newSupport )
     return
   }

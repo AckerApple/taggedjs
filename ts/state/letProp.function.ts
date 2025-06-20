@@ -1,4 +1,4 @@
-import { signal } from '../subject/signal.function.js'
+import { signal } from './signal.function.js'
 import { states } from './states.function.js'
 import { watch } from'./watch.function.js'
 

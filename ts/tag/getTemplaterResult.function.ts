@@ -14,7 +14,7 @@ import { PropWatches } from '../tagJsVars/tag.function.js'
 import { ProcessInit } from './ProcessInit.type.js'
 import { processTagInit } from './update/processTagInit.function.js'
 import { Tag } from './Tag.type.js'
-import { ProcessDelete, TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { ProcessDelete, TagJsTag, TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { checkTagValueChange, destroySupportByContextItem } from './checkTagValueChange.function.js'
 import { CheckSupportValueChange, CheckValueChange } from './Context.types.js'
 
@@ -40,9 +40,7 @@ export type TagGlobal = {
   subscriptions?: Subscription<unknown>[] // subscriptions created by clones
 
   destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
-  
-  locked?: true
-  
+    
   callbackMaker?: true
   
   destroys?: (() => any)[]
@@ -70,7 +68,7 @@ export type Events = {
 
 export type Clone = (Element | Text | ChildNode)
 
-export type TemplaterResult = TagJsVar & {
+export type TemplaterResult = TagJsTag & {
   tagJsType: string // ValueType
   processInit: ProcessInit
 

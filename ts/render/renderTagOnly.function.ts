@@ -50,6 +50,8 @@ export function renderTagOnly(
 
   runAfterRender(reSupport, ownerSupport)
 
+  reSupport.ownerSupport = newSupport.ownerSupport// || lastOwnerSupport) as AnySupport
+
   return reSupport
 }
 

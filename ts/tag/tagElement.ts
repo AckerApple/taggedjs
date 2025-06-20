@@ -102,20 +102,22 @@ function getNewSubject(
   templater: TemplaterResult,
   appElement: Element,
 ) {
+  const tagJsVar = {
+    tagJsType: 'templater',
+    checkValueChange: checkTagValueChange,
+    delete: destroySupportByContextItem,
+    processInit: function appDoNothing() {
+      console.debug('do nothing app function')
+    }
+  }
+
   const subject: SupportContextItem = {
     value: templater,
     withinOwnerElement: false, // i am the highest owner
     renderCount: 0,
 
     global: undefined as unknown as SupportTagGlobal, // gets set below in getNewGlobal()
-    tagJsVar: {
-      tagJsType: 'templater',
-      checkValueChange: checkTagValueChange,
-      delete: destroySupportByContextItem,
-      processInit: function appDoNothing() {
-        console.debug('do nothing app function')
-      }
-    }
+    tagJsVar,
   }
 
   const global = getNewGlobal(subject) as BaseTagGlobal

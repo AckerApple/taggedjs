@@ -4,8 +4,8 @@ export type PaintCommand = [((...args: any[]) => unknown), any[]]
 
 export let paintCommands: PaintCommand[] = []
 export let paintContent: PaintCommand[] = []
-export let setContent: [string, Text][] = []
 
+// TODO: This this is duplicate of paintCommands (however timing is currently and issue and cant be removed)
 export let paintAppends: PaintCommand[] = []
 
 export let paintAfters: PaintCommand[] = [] // callbacks after all painted
@@ -14,44 +14,53 @@ export const painting = {
   locks: 0
 }
 
+export function setContent(
+  text: string,
+  textNode: Text,
+) {
+  textNode.textContent = text
+}
+
 export function paint() {
   if(painting.locks > 0) {
     return
   }
 
+  // styles/attributes and textElement.textContent
   for(const content of paintContent) {
     content[0](...content[1])
   }
 
-  for(const [text, textNode] of setContent) {
-    textNode.textContent = text
-  }
-
+  // .appendChild
   for(const content of paintAppends) {
     content[0](...content[1])
   }
 
+  // element.insertBefore and element.parentNode.removeChild
   for (const content of paintCommands) {
     content[0](...content[1])
   }
 
   paintReset()
 
-  for(const content of paintAfters) {
+  const nowPaintAfters = paintAfters
+  paintAfters = [] // prevent paintAfters calls from endless recursion
+
+  for(const content of nowPaintAfters) {
     content[0](...content[1])
   }
-
-  paintAfters = []
 }
 
 function paintReset() {
   paintCommands = []
   paintContent = []
   paintAppends = []
-  setContent = []
 }
 
-export function paintRemover(element: Text | Element) {
+export function paintRemover(
+  element: Text | Element,
+  // _caller: string, can be used for determining who is failing
+) {
   const parentNode = element.parentNode as ParentNode
   parentNode.removeChild(element as Element)
 }

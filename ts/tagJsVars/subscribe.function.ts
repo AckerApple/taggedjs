@@ -12,8 +12,11 @@ export type LikeSubscription = {
   unsubscribe: () => any
 }
 
+export type Subscriber<T> = (arg: T) => any
+export type SubscribeFn<T> = (callback: Subscriber<T>) => (LikeSubscription)
+
 export type LikeObservable<T> = {
-  subscribe: (callback: (arg: T) => any) => (LikeSubscription)
+  subscribe: SubscribeFn<T>
 }
 
 export type SubscribeCallback<T> = (data: T) => any
@@ -27,24 +30,19 @@ export function subscribe<T>(
     tagJsType: ValueTypes.subscribe,
     processInit: processSubscribe,
     delete: deleteAndUnsubscribe,
-
-    checkValueChange: function subscribeDoNothing() {
-      console.debug('weird to be here')
-      return -1
-    },
-
-    Observable,
     callback,
     states: getSupportWithState( getSupportInCycle() as AnySupport).states,
+    
+    Observables: [Observable],
   }
 }
 
 export type SubscribeValue = TagJsVar & {
   tagJsType: typeof ValueTypes.subscribe
-  processInit: ProcessInit
 
   states: StatesSetter[]
-  Observable: LikeObservable<any>
   withDefault?: any
   callback?: SubscribeCallback<any>
+  
+  Observables: LikeObservable<any>[]
 }

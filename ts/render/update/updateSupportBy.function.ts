@@ -12,9 +12,9 @@ export function updateSupportBy(
 ) {
   const global = olderSupport.subject.global as SupportTagGlobal
   const context = global.context
-  
+
   updateSupportValuesBy(olderSupport, newerSupport)
-  
+
   ++painting.locks
   processUpdateContext(olderSupport, context as unknown as ContextItem[])
   --painting.locks

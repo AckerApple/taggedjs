@@ -6,9 +6,10 @@ import { isTagComponent } from '../../isInstance.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { handleStillTag } from './handleStillTag.function.js'
-import { prepareUpdateToComponent } from './tagValueUpdateHandler.function.js'
 import { TagCounts } from '../TagCounts.type.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { updateExistingTagComponent } from '../../render/update/updateExistingTagComponent.function.js'
+import { createSupport } from '../createSupport.function.js'
 
 /** result is an indication to ignore further processing but that does not seem in use anymore */
 export function tryUpdateToTag(
@@ -18,6 +19,8 @@ export function tryUpdateToTag(
   counts: TagCounts,
 ): boolean {
   const isComp = isTagComponent(newValue)
+
+  contextItem.tagJsVar = newValue
 
   if(isComp) {
     if(contextItem.global === undefined) {
@@ -65,4 +68,38 @@ export function tryUpdateToTag(
   )
 
   return true
+}
+
+function prepareUpdateToComponent(
+  templater: TemplaterResult,
+  contextItem:SupportContextItem,
+  ownerSupport: AnySupport,
+  counts: TagCounts,
+): void {
+  const global = contextItem.global as SupportTagGlobal
+  // When last value was not a component
+  if(!global.newest) {
+    ;(templater as TagJsVar).processInit(
+      templater,
+      contextItem,
+      ownerSupport,
+      counts,
+      undefined, // appendTo,
+      contextItem.placeholder,
+    )
+    return
+  }
+
+  const support = createSupport(
+    templater,
+    ownerSupport,
+    ownerSupport.appSupport,
+    contextItem,
+  )
+
+  updateExistingTagComponent(
+    ownerSupport,
+    support, // latest value
+    contextItem,
+  )
 }

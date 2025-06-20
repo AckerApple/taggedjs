@@ -7,6 +7,7 @@ import { AnySupport } from '../AnySupport.type.js'
 import { domProcessContextItem } from '../../interpolations/optimizers/domProcessContextItem.function.js'
 import { empty } from '../ValueTypes.enum.js'
 import { TemplateValue } from '../TemplateValue.type.js'
+import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 
 /** Must provide insertBefore OR appendTo */
 export function createAndProcessContextItem(
@@ -19,6 +20,7 @@ export function createAndProcessContextItem(
   const element = document.createTextNode(empty)
   const contextItem: AdvancedContextItem = {
     value,
+    tagJsVar: valueToTagJsVar(value),
     withinOwnerElement: false,
     placeholder: element,
   }

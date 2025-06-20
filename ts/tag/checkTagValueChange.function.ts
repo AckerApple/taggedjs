@@ -8,15 +8,19 @@ import { isLikeTags } from'./isLikeTags.function.js'
 import { ContextItem } from './ContextItem.type.js'
 import { tryUpdateToTag } from './update/tryUpdateToTag.function.js'
 import { TagCounts } from './TagCounts.type.js'
+import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { ValueTypes } from './ValueTypes.enum.js'
 
 export function checkTagValueChange(
   newValue: unknown,
   contextItem: SupportContextItem,
   counts: TagCounts,
 ) {
+  // const tagJsVar = contextItem.tagJsVar
   const global = contextItem.global as SupportTagGlobal
-  
+
   if(!global) {
+  // if(![ValueTypes.dom, ValueTypes.templater, ValueTypes.tagComponent].includes((tagJsVar as TagJsVar).tagJsType)) {
     return 663 // its not a tag this time
   }
   

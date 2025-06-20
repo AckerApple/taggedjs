@@ -38,26 +38,24 @@ function processUpdateOneContext(
   ownerSupport: AnySupport,
   counts: TagCounts,
 ) {
-  const value = values[index] as any
-
-  // is something already there?
+  const newValue = values[index] as any
   const contextItem = context[index]
 
   // Do not continue if the value is just the same
-  if(value === contextItem.value) {
+  if(newValue === contextItem.value) {
     return
   }
 
   const handler = contextItem.handler as ContextHandler
-  
+
   handler(
-    value,
+    newValue,
     ownerSupport,
     contextItem,
     values,
     counts,
   )
   
-  contextItem.value = value
-  contextItem.tagJsVar = valueToTagJsVar(value)
+  contextItem.value = newValue
+  contextItem.tagJsVar = valueToTagJsVar(newValue)
 }

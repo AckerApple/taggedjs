@@ -29,10 +29,10 @@ export function processRenderOnceInit(
     support,
     undefined,
     contextItem as SupportContextItem,
-    ownerSupport,
+    // ownerSupport,
   )
 
-  const result = processNewSubjectTag(
+  return processNewSubjectTag(
     support.templater,
     contextItem as ContextItem,
     ownerSupport,
@@ -40,6 +40,4 @@ export function processRenderOnceInit(
     appendTo,
     insertBefore,
   )
-
-  return result
 }

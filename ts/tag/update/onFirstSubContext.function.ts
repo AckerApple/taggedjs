@@ -12,7 +12,7 @@ export function onFirstSubContext(
   insertBefore: Text,
 ) {
   subContext.hasEmitted = true
-  subContext.contextItem = createAndProcessContextItem(
+  return subContext.contextItem = createAndProcessContextItem(
     value as TemplateValue,
     ownerSupport,
     counts,

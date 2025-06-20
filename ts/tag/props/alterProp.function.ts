@@ -1,5 +1,5 @@
 import { isInlineHtml, renderInlineHtml } from '../../render/renderSupport.function.js'
-import { renderExistingReadyTag } from '../../render/renderExistingTag.function.js'
+import { renderExistingSupport } from '../../render/renderExistingTag.function.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { getSupportInCycle } from '../getSupportInCycle.function.js'
 import { deepCompareDepth } from '../hasSupportChanged.function.js'
@@ -11,6 +11,7 @@ import { Tag } from '../Tag.type.js'
 import { Props } from '../../Props.js'
 import { UnknownFunction } from '../index.js'
 import { Subject } from '../../subject/Subject.class.js'
+import { safeRenderSupport } from './safeRenderSupport.function.js'
 
 export function castProps(
   props: Props,
@@ -230,13 +231,14 @@ export function callbackPropOwner(
   const callbackResult = toCall.apply(owner, callWith)
 
   const run = function propCallbackProcessor() {
-    const global = newest.subject.global as SupportTagGlobal
+    const subject = newest.subject
+    const global = subject.global as SupportTagGlobal
     
-    if(!global || global.locked === true) {
+    if(!global || subject.locked === true) {
       return callbackResult // currently in the middle of rendering
     }
 
-    safeRenderSupport(newest, ownerSupport)
+    safeRenderSupport(newest)
 
     return callbackResult
   }
@@ -252,29 +254,4 @@ export function callbackPropOwner(
 
 export function isSkipPropValue(value: unknown) {
   return typeof(value)!== BasicTypes.object || !value || (value as Tag).tagJsType
-}
-
-export function safeRenderSupport(
-  newest: AnySupport,
-  ownerSupport: AnySupport,
-) {
-  const subject = newest.subject
-  const isInline = isInlineHtml(newest.templater)
-  if( isInline ) {
-    const result = renderInlineHtml(ownerSupport, newest)
-    return result
-  }
-  
-  const global = subject.global as SupportTagGlobal
-
-  global.locked = true
-
-  renderExistingReadyTag(
-    global.newest,
-    newest,
-    ownerSupport,
-    subject,
-  )
-
-  delete global.locked
 }

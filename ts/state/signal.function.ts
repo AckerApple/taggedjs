@@ -1,10 +1,12 @@
-import { state } from '../state/index.js'
+import { state } from './index.js'
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
 import { processSignal } from '../tag/update/processSubscribe.function.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { ProcessInit } from '../tag/ProcessInit.type.js'
+import { Subscriber, SubscribeFn } from '../tagJsVars/subscribe.function.js'
+import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { deleteAndUnsubscribe } from '../tag/update/setupSubscribe.function.js'
 
-type Subscriber = <T>(newValue?: T) => any
 
 /** Checks if rendering cycle in process. Then creates object with "value" key and ability to "subscribe" to value changes */
 export function signal<T>(initialValue: T) {
@@ -17,17 +19,22 @@ export function signal<T>(initialValue: T) {
     return Signal(initialValue)
 }
 
-export type SignalObject = {
+export type SignalObject<T> = TagJsVar & {
     tagJsType: typeof ValueTypes.signal
     value: any
-    subscribe: any
+    subscribe: SubscribeFn<T>
     processInit: ProcessInit
+    emit: (value: any) => any
 }
 
 /** Creates object with "value" key and ability to "subscribe" to value changes */
-export function Signal<T>(initialValue: T): SignalObject {
+export function Signal<T>(initialValue: T): SignalObject<T> {
     let value: T = initialValue
-    const subscribers: Set<Subscriber> = new Set()
+    const subscribers: Set<Subscriber<T>> = new Set()
+    const emit = (newValue: any) => {
+      // Notify all subscribers
+      subscribers.forEach(callback => callback(newValue))
+    }
 
     return {
         tagJsType: ValueTypes.signal,
@@ -36,14 +43,18 @@ export function Signal<T>(initialValue: T): SignalObject {
         get value() {
           return value
         },
+        
         set value(newValue: T) {
             if (value !== newValue) {
                 value = newValue
-                // Notify all subscribers
-                subscribers.forEach(callback => callback(newValue))
+                emit(newValue)
             }
         },
-        subscribe(callback: Subscriber) {
+
+        delete: deleteAndUnsubscribe,
+        emit,
+
+        subscribe(callback: Subscriber<T>) {
             callback(value) // emit initial value
 
             subscribers.add(callback)

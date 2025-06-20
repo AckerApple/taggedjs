@@ -6,11 +6,18 @@ export interface SubContext {
   hasEmitted?: true
   deleted?: true
   
-  /** Handles emissions from subject and figures out what to display */
+  /** Handles each emission separately */
   valueHandler: (
-    value: TemplateValue
+    value: TemplateValue,
+    index: number,
   ) => void
-  lastValue: any
+
+  /** Handles all emissions collectively */
+  valuesHandler: (
+    values: TemplateValue[],
+  ) => void
+  
+  lastValues: any[]
   
   appendMarker?: Text  
   contextItem?: AdvancedContextItem
@@ -18,5 +25,5 @@ export interface SubContext {
 
 export interface SubscriptionContext extends SubContext {
   callback?: SubscribeCallback<any>
-  subscription: LikeSubscription
+  subscriptions: LikeSubscription[]
 }

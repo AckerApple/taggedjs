@@ -15,16 +15,11 @@ export function renderWithSupport(
   newSupport: AnySupport,
   lastSupport: AnySupport| undefined, // previous (global.newest)
   subject: SupportContextItem, // events & memory
-  ownerSupport?: AnySupport, // who to report to
 ): {support: AnySupport, wasLikeTags: boolean} {
-  const lastTemplater = lastSupport?.templater
-  const lastTag = lastTemplater?.tag
-
   const reSupport = renderTagOnly(
     newSupport,
     lastSupport,
     subject,
-    ownerSupport,
   )
 
   const isLikeTag = !lastSupport || isLikeTags(lastSupport, reSupport)
@@ -37,12 +32,14 @@ export function renderWithSupport(
   } else if(lastSupport) {
     const tag = lastSupport.templater.tag
     if(tag && subject.renderCount > 0) {
+      const lastTemplater = lastSupport?.templater
+      const lastTag = lastTemplater?.tag
+
       checkTagSoftDestroy(tag, lastSupport, lastTag)
     }
   }
 
-  const lastOwnerSupport = (lastSupport as AnySupport)?.ownerSupport
-  reSupport.ownerSupport = (ownerSupport || lastOwnerSupport) as AnySupport
+  reSupport.ownerSupport = newSupport.ownerSupport// || lastOwnerSupport) as AnySupport
 
   return {support: reSupport, wasLikeTags: isLikeTag}
 }
@@ -52,7 +49,7 @@ function checkTagSoftDestroy(
   lastSupport: AnySupport,
   lastTag?: Tag,
 ) {
-  if(tag.tagJsType===ValueTypes.dom) {
+  if(tag.tagJsType === ValueTypes.dom) {
     const lastDom = (lastTag as DomTag)?.dom
     const newDom = (tag as DomTag).dom
     if(lastDom !== newDom) {

@@ -32,9 +32,7 @@ export function attachDomElements(
 
   if(appendTo && insertBefore === undefined) {
     insertBefore = document.createTextNode(empty)
-
     paintAppends.push([paintAppend, [appendTo, insertBefore]])
-
     appendTo = undefined
   }
 

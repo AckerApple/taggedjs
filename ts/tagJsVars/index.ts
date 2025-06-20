@@ -1,5 +1,11 @@
+
 export * from './subscribe.function.js'
 export * from './getInnerHTML.function.js'
 export * from './tag.function.js'
-export { deleteSimpleValue } from './getSimpleTagVar.function.js'
-export { checkSimpleValueChange } from './checkSimpleValueChange.function.js'
+
+export { checkSimpleValueChange, deleteSimpleValue } from './getSimpleTagVar.function.js'
+
+export { pipe } from './pipe.function.js'
+export { host } from './host.function.js'
+export { subscribe } from './subscribe.function.js'
+export { subscribeWith } from './subscribeWith.function.js'

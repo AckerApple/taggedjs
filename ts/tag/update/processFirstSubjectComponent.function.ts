@@ -1,14 +1,15 @@
 import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { processFirstTagResult, processReplaceTagResult } from'./processTagResult.function.js'
+import { processFirstTagResult } from'./processTagResult.function.js'
 import { PropsConfig } from '../createHtmlSupport.function.js'
 import { renderWithSupport } from '../../render/renderWithSupport.function.js'
-import { ContextItem } from '../ContextItem.type.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { getCastedProps } from '../getTagWrap.function.js'
 import { createSupport } from '../createSupport.function.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { TagCounts } from '../TagCounts.type.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
+import { renderTagOnly } from '../../render/renderTagOnly.function.js'
+import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
 
 export function processReplacementComponent(
   templater: TemplaterResult,
@@ -37,17 +38,18 @@ export function processReplacementComponent(
   }
   
   const global = subject.global as SupportTagGlobal
-  const {support} = renderWithSupport(
+  const support = renderTagOnly(
     newSupport,
     global.newest, // existing tag
     subject,
-    ownerSupport,
+    // ownerSupport,
   )
 
-  processReplaceTagResult(
+  buildBeforeElement(
     support,
     counts,
-    subject as ContextItem, // The element set here will be removed from document. Also result.tag will be added in here
+    undefined, // element for append child
+    subject.placeholder as Text, // placeholder
   )
 
   return support
@@ -60,9 +62,6 @@ export function processFirstSubjectComponent(
   counts: TagCounts,
   appendTo: Element,
 ): AnySupport {
-  // TODO: This below check not needed in production mode
-  // validateTemplater(templater)
-
   const newSupport = createSupport(
     templater,
     ownerSupport,
@@ -81,18 +80,15 @@ export function processFirstSubjectComponent(
   }
     
   const global = subject.global as SupportTagGlobal
-  const {support} = renderWithSupport(
+  const support = renderTagOnly(
     newSupport,
-    global.newest, // existing tag   
+    global.newest, // existing tag
     subject,
-    ownerSupport,
   )
 
-  processFirstTagResult(
+  return processFirstTagResult(
     support,
     counts,
     appendTo,
   )
-
-  return support
 }

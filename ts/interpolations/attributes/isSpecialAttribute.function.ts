@@ -8,7 +8,7 @@ export function isSpecialAttr(
 
   const specialAction = isSpecialAction(attrName)
   if(specialAction !== false) {
-    return true
+    return specialAction
   }
 
   if(attrName.startsWith('style.')) {
@@ -27,7 +27,7 @@ export function isSpecialAction(attrName: string) {
     
     case 'oninit': // when read in compile process
     case 'init': // when read in realtime
-      return 'oninit'
+      return 'init'
     
     case 'ondestroy': // when read in compile process
     case 'destroy': // when read in realtime

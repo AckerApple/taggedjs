@@ -30,6 +30,7 @@ type ValueTypeObject = {
   
   subscribe: string,
   signal: string,
+  host: string,
 }
 
 const version = Date.now()
@@ -42,8 +43,8 @@ export const ValueTypes: ValueTypeObject = {
   templater: 'templater',
   tagComponent: 'tagComponent', 
   tagArray: 'tagArray',
-  // subject: 'subject',
-  // tagJsSubject: 'tagJsSubject',
+
+  host: 'host',
   subscribe: 'subscribe',
   signal: 'signal',
   

@@ -3,7 +3,7 @@
 import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
 import { ContextItem } from "../../tag/ContextItem.type.js"
-import { TagCounts, TagGlobal } from "../../tag/index.js"
+import { TagCounts } from "../../tag/index.js"
 import { tagValueUpdateHandler } from "../../tag/update/tagValueUpdateHandler.function.js"
 
 
@@ -18,8 +18,8 @@ export function domProcessContextItem(
   // how to handle value updates
   contextItem.handler = tagValueUpdateHandler
 
-  const global = support.subject.global as TagGlobal
-  global.locked = true
+  const subject = support.subject  
+  subject.locked = true
 
   processFirstSubjectValue(
     value,
@@ -30,7 +30,6 @@ export function domProcessContextItem(
     insertBefore,
   )
 
-  const global2 = support.subject.global as TagGlobal
-  delete global2.locked
+  delete subject.locked
   contextItem.value = value
 }

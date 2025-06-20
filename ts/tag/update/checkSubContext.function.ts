@@ -35,7 +35,7 @@ export function checkSubContext(
   }
 
   subscription.callback = (newValue as SubscribeValue).callback
-  subscription.valueHandler(subscription.lastValue)
+  subscription.valuesHandler( subscription.lastValues )
 
   return -1
 }

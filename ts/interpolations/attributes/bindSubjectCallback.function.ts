@@ -1,17 +1,14 @@
 // taggedjs-no-compile
 /** File largely responsible for reacting to element events, such as onclick */
 
-import { isPromise } from '../../isInstance.js'
 import { renderSupport } from '../../render/renderSupport.function.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
-import { SupportTagGlobal, TagGlobal } from '../../tag/getTemplaterResult.function.js'
+import { SupportTagGlobal } from '../../tag/getTemplaterResult.function.js'
 import { getUpTags } from './getUpTags.function.js'
 import { renderTagUpdateArray } from './renderTagArray.function.js'
 import { StatesSetter } from '../../state/states.utils.js'
 import { getSupportWithState } from './getSupportWithState.function.js'
-
-const noData = 'no-data-ever'
-const promiseNoData = 'promise-no-data-ever'
+import { checkToResolvePromise } from './checkToResolvePromise.function.js'
 
 export type Callback = (...args: any[]) => any
 
@@ -22,7 +19,7 @@ export function bindSubjectCallback(
   const global = support.subject.global as SupportTagGlobal
 
   // MAIN EVENT CALLBACK PROCESSOR
-  const subjectFunction = function (
+  const subjectFunction = function callbackReplacement(
     element: Element, args: any[],
   ) {
     if(global.deleted === true) {
@@ -33,7 +30,7 @@ export function bindSubjectCallback(
     return runTagCallback(
       subjectFunction.tagFunction,
       subjectFunction.support, // newest
-      subjectFunction.states, // newest
+      // subjectFunction.states, // newest
       element,
       args,
     )
@@ -42,13 +39,12 @@ export function bindSubjectCallback(
   // link back to original. Mostly used for <div oninit ondestroy> animations
   subjectFunction.tagFunction = value
   
-  const component = getSupportWithState(support)
+  // const component = getSupportWithState(support)
   subjectFunction.support = support
 
   // subjectFunction.otherSupport = component
-  const states = component.states // ?.[0]
-  subjectFunction.states = states
-  // subjectFunction.states = [...states]
+  //const states = component.states // ?.[0]
+  // subjectFunction.states = states
 
   return subjectFunction
 }
@@ -56,16 +52,16 @@ export function bindSubjectCallback(
 export function runTagCallback(
   value: Callback,
   support: AnySupport,
-  states: StatesSetter[],
+  // states: StatesSetter[],
   bindTo: unknown,
   args: any[],
 ) {
   // get actual component owner not just the html`` support
   const component = getSupportWithState(support)
   const subject = component.subject
-  const global = subject.global as SupportTagGlobal // tag.subject.global as TagGlobal
+  // const global = subject.global as SupportTagGlobal // tag.subject.global as TagGlobal
   
-  global.locked = true // prevent another render from re-rendering this tag
+  subject.locked = true // prevent another render from re-rendering this tag
 
   // sync the new states to the old before the old does any processing
   // syncStatesArray(component.subject.global.newest.states, states)
@@ -76,7 +72,7 @@ export function runTagCallback(
   // sync the old states to the new
   // syncStatesArray(states, component.subject.global.newest.states)
 
-  delete global.locked
+  delete subject.locked
 
   const result = afterTagCallback(
     callbackResult,
@@ -106,47 +102,22 @@ function renderCallbackSupport(
 ) {
   const tagsToUpdate = getUpTags(last)
   renderTagUpdateArray(tagsToUpdate)
-  return checkAfterCallbackPromise(callbackResult, last, global)
+  return checkToResolvePromise(
+    callbackResult,
+    last,
+    global,
+    'bind',
+    { resolvePromise, resolveValue }
+  )
 }
 
-export function checkAfterCallbackPromise(
-  callbackResult: any,
-  last: AnySupport,
-  global: TagGlobal,
-) {
-  if(isPromise(callbackResult)) {
-    const global0 = last.subject.global as TagGlobal
-    global0.locked = true
+const noData = 'no-data-ever'
+const promiseNoData = 'promise-no-data-ever'
 
-    return callbackResult.then(() => {
-      if(global.deleted === true) {
-        return promiseNoData // tag was deleted during event processing
-      }
+function resolvePromise() {
+  return promiseNoData
+}
 
-      const global1 = last.subject.global as TagGlobal
-      delete global1.locked
-      const tagsToUpdate = getUpTags(last)
-      renderTagUpdateArray(tagsToUpdate)
-
-      return promiseNoData
-    })
-  }
-
+function resolveValue() {
   return noData
-}
-
-export function runBlocked(
-  tag: AnySupport,
-) {
-  const global = tag.subject.global as SupportTagGlobal
-  const blocked = global.blocked
-
-  for(const block of blocked) {
-    const lastResult = renderSupport(block)
-    global.newest = lastResult
-  }
-  
-  global.blocked = []
-  
-  return global.newest
 }

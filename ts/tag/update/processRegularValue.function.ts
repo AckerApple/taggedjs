@@ -1,5 +1,5 @@
 import { castTextValue } from'../../castTextValue.function.js'
-import { paintBeforeText, paintCommands, setContent } from '../../render/paint.function.js'
+import { paintBeforeText, paintCommands, paintContent, setContent } from '../../render/paint.function.js'
 import { getSimpleTagVar } from '../../tagJsVars/getSimpleTagVar.function.js'
 import { ContextItem } from '../ContextItem.type.js'
 
@@ -18,7 +18,7 @@ export function processUpdateRegularValue(
   }
 
   const oldClone = contextItem.simpleValueElm as Text // placeholder
-  setContent.push([castedValue, oldClone])
+  paintContent.push([setContent, [castedValue, oldClone]])
 }
 
 /** Used during updates that were another value/tag first but now simple string */

@@ -2,10 +2,9 @@
 
 import { TemplaterResult } from './getTemplaterResult.function.js'
 import { AnySupport } from './AnySupport.type.js'
-import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
-import { TagJsVarInnerHTML } from '../tagJsVars/getInnerHTML.function.js'
+import { TagJsTag, TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 
-export type Tag = TagJsVar & {
+export type Tag = TagJsTag & {
   values: unknown[]
 
   templater?: TemplaterResult

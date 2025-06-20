@@ -2,7 +2,9 @@ import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpola
 import { destroyArray } from './checkDestroyPrevious.function.js'
 import { paint, paintCommands, painting, paintRemover } from '../render/paint.function.js'
 import { ContextItem } from './ContextItem.type.js'
-import {SupportTagGlobal } from './getTemplaterResult.function.js'
+import {SupportTagGlobal, TagGlobal } from './getTemplaterResult.function.js'
+import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { AnySupport } from './index.js'
 
 /** sets global.deleted on support and all children */
 export function smartRemoveKids(
@@ -10,10 +12,6 @@ export function smartRemoveKids(
   allPromises: Promise<any>[]
 ) {
   const context = global.context as ContextItem[]
-  
-  // already set
-  // global.deleted = true
-
   const destroys = global.destroys
   if( destroys ) {
     return processContextDestroys(destroys, global, allPromises)
@@ -77,9 +75,18 @@ function smartRemoveByContext(
   context: ContextItem[],
   allPromises: Promise<any>[],
 ) {
-
   for (const subject of context) {
+    if( subject.locked ) {
+      continue
+    }
+
     if(subject.withinOwnerElement) {
+      const tagJsVar = subject.tagJsVar as TagJsVar
+      if( tagJsVar && tagJsVar.tagJsType === 'host' ) {
+        const newest = (subject as any).supportOwner as AnySupport
+        tagJsVar.delete(subject, newest)
+      }
+
       continue // i live within my owner variable. I will be deleted with owner
     }
 
@@ -93,7 +100,7 @@ function smartRemoveByContext(
     const elm = subject.simpleValueElm as Text
     if(elm) {
       delete subject.simpleValueElm
-      paintCommands.push([paintRemover, [elm]])
+      paintCommands.push([paintRemover, [elm, 'destroy simpleValueElm']])
       continue
     }
 
@@ -120,15 +127,21 @@ function destroyClones(
   global: SupportTagGlobal,
 ) {
   const htmlDomMeta = global.htmlDomMeta as DomObjectChildren
-  
+
   // check subjects that may have clones attached to them
-  htmlDomMeta.forEach(destroyClone)
+  for (let index = htmlDomMeta.length - 1; index >= 0; --index) {
+	  const clone = htmlDomMeta[index]
+    destroyClone(clone)
+    htmlDomMeta.splice(index, 1)
+  }
 }
 
-function destroyClone(clone: DomObjectText | DomObjectElement) {
+function destroyClone(
+  clone: DomObjectText | DomObjectElement
+) {
     const marker = clone.marker
     if(marker) {
-      paintCommands.push([paintRemover, [marker]])
+      paintCommands.push([paintRemover, [marker, 'destroy-marker-clone']])
     }
 
     const dom = clone.domElement
@@ -136,5 +149,5 @@ function destroyClone(clone: DomObjectText | DomObjectElement) {
       return
     }
 
-    paintCommands.push([paintRemover, [dom]])
+    paintCommands.push([paintRemover, [dom, 'destroy-clone']])
 }

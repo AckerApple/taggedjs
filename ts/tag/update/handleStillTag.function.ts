@@ -24,7 +24,6 @@ export function handleStillTag(
     }
   }
 
-
   const valueSupport = createSupport(
     templater as TemplaterResult,
     ownerSupport,
