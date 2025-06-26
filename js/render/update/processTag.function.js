@@ -8,12 +8,12 @@ import { processTagInit } from '../../tag/update/processTagInit.function.js';
  * Intended use only for updates
 */
 export function processTag(ownerSupport, // owner
-subject, // could be tag via result.tag
+contextItem, // could be tag via result.tag
 counts) {
-    const global = subject.global;
+    const global = contextItem.global;
     const support = global.newest;
+    const ph = contextItem.placeholder;
     support.ownerSupport = ownerSupport;
-    const ph = subject.placeholder;
     buildBeforeElement(support, counts, undefined, ph);
     return support;
 }
@@ -35,7 +35,7 @@ export function getFakeTemplater() {
 export function newSupportByTemplater(templater, ownerSupport, subject) {
     const support = createHtmlSupport(templater, ownerSupport, ownerSupport.appSupport, subject);
     const global = subject.global;
-    global.context = [];
+    global.contexts = [];
     return support;
 }
 //# sourceMappingURL=processTag.function.js.map

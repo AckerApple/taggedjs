@@ -9,7 +9,8 @@ function handleInnerHTML(value, newSupport, contextItem, _values, counts) {
 }
 function processInnerHTML(value, contextItem, ownerSupport, counts, appendTo, insertBefore) {
     contextItem.subContext = {};
-    contextItem.handler = handleInnerHTML;
+    // contextItem.handler = handleInnerHTML
+    value.processUpdate = handleInnerHTML;
     checkInnerHTML(value, ownerSupport, contextItem, counts, insertBefore, appendTo);
 }
 function checkInnerHTML(value, ownerSupport, contextItem, counts, insertBeforeOriginal, appendTo) {
@@ -26,8 +27,8 @@ export function getInnerHTML() {
     return {
         tagJsType: 'innerHTML',
         processInit: processInnerHTML,
+        processUpdate: handleInnerHTML,
         delete: deleteSubContext,
-        checkValueChange: () => console.debug('weird innerHTML check'),
     };
 }
 //# sourceMappingURL=getInnerHTML.function.js.map

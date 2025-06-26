@@ -1,6 +1,7 @@
-import { getStringTag, getDomTag } from './getDomTag.function.js';
+import { getDomTag } from './getDomTag.function.js';
 import { PropWatches } from '../tagJsVars/tag.function.js';
 import { getTemplaterResult } from './getTemplaterResult.function.js';
+import { getStringTag } from './processOuterDomTagInit.function.js';
 /** Used as html`<div></div>` */
 export function html(strings, ...values) {
     const stringTag = getStringTag(strings, values);

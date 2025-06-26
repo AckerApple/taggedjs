@@ -4,7 +4,7 @@ export function forceUpdateExistingValue(contextItem, newValue, // newValue
 ownerSupport, counts) {
     // Have the context check itself (avoid having to detect old value)
     const tagJsVar = contextItem.tagJsVar;
-    const ignoreOrDestroyed = tagJsVar.checkValueChange(newValue, contextItem, counts);
+    const ignoreOrDestroyed = tagJsVar.checkValueChange(newValue, contextItem, counts, ownerSupport);
     // ignore
     if (ignoreOrDestroyed === -1) {
         return; // do nothing

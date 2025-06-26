@@ -21,17 +21,6 @@ export function htmlInterpolationToPlaceholders(strings, values) {
     // Add placeholders to the fragments
     return addPlaceholders(sanitizedFragments, values);
 }
-/*
-function sanitizePlaceholders(fragments: string[]) {
-  return fragments.map(santizeFragment)
-}
-
-function santizeFragment(fragment: string) {
-  return fragment.replace(
-    fragReplacer,
-    (match, index) => safeVar + index)
-}
-*/
 function addPlaceholders(strings, values) {
     const results = [];
     for (let index = 0; index < strings.length; ++index) {

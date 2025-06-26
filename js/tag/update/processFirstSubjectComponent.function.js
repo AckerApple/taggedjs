@@ -1,11 +1,10 @@
-import { processFirstTagResult, processReplaceTagResult } from './processTagResult.function.js';
-import { renderWithSupport } from '../../render/renderWithSupport.function.js';
+import { processFirstTagResult } from './processTagResult.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 import { getCastedProps } from '../getTagWrap.function.js';
 import { createSupport } from '../createSupport.function.js';
+import { renderTagOnly } from '../../render/renderTagOnly.function.js';
+import { buildBeforeElement } from '../../render/buildBeforeElement.function.js';
 export function processReplacementComponent(templater, subject, ownerSupport, counts) {
-    // TODO: This below check not needed in production mode
-    // validateTemplater(templater)
     const newSupport = createSupport(templater, ownerSupport, ownerSupport.appSupport, subject);
     const newPropsConfig = newSupport.propsConfig;
     if (newPropsConfig) {
@@ -13,14 +12,13 @@ export function processReplacementComponent(templater, subject, ownerSupport, co
         newPropsConfig.castProps = castedProps;
     }
     const global = subject.global;
-    const { support } = renderWithSupport(newSupport, global.newest, // existing tag
-    subject, ownerSupport);
-    processReplaceTagResult(support, counts, subject);
+    const support = renderTagOnly(newSupport, global.newest, // existing tag
+    subject);
+    buildBeforeElement(support, counts, undefined, // element for append child
+    subject.placeholder);
     return support;
 }
 export function processFirstSubjectComponent(templater, subject, ownerSupport, counts, appendTo) {
-    // TODO: This below check not needed in production mode
-    // validateTemplater(templater)
     const newSupport = createSupport(templater, ownerSupport, ownerSupport.appSupport, subject);
     const newPropsConfig = newSupport.propsConfig;
     if (newPropsConfig) {
@@ -28,9 +26,8 @@ export function processFirstSubjectComponent(templater, subject, ownerSupport, c
         newPropsConfig.castProps = castedProps;
     }
     const global = subject.global;
-    const { support } = renderWithSupport(newSupport, global.newest, // existing tag   
-    subject, ownerSupport);
-    processFirstTagResult(support, counts, appendTo);
-    return support;
+    const support = renderTagOnly(newSupport, global.newest, // existing tag
+    subject);
+    return processFirstTagResult(support, counts, appendTo);
 }
 //# sourceMappingURL=processFirstSubjectComponent.function.js.map

@@ -1,7 +1,6 @@
-export function getNewGlobal(subject) {
+export function getNewGlobal(contextItem) {
     ;
-    subject.renderCount = subject.renderCount || 0;
-    // ;(subject as SupportContextItem).renderCount = 0
-    return subject.global = {};
+    contextItem.renderCount = contextItem.renderCount || 0;
+    return contextItem.global = {};
 }
 //# sourceMappingURL=getNewGlobal.function.js.map

@@ -5,7 +5,7 @@ export function isSpecialAttr(attrName) {
     }
     const specialAction = isSpecialAction(attrName);
     if (specialAction !== false) {
-        return true;
+        return specialAction;
     }
     if (attrName.startsWith('style.')) {
         return 'style';
@@ -20,7 +20,7 @@ export function isSpecialAction(attrName) {
             return 'autofocus';
         case 'oninit': // when read in compile process
         case 'init': // when read in realtime
-            return 'oninit';
+            return 'init';
         case 'ondestroy': // when read in compile process
         case 'destroy': // when read in realtime
             return 'destroy';

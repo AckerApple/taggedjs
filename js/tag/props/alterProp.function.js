@@ -1,10 +1,9 @@
-import { isInlineHtml, renderInlineHtml } from '../../render/renderSupport.function.js';
-import { renderExistingReadyTag } from '../../render/renderExistingTag.function.js';
 import { getSupportInCycle } from '../getSupportInCycle.function.js';
 import { deepCompareDepth } from '../hasSupportChanged.function.js';
 import { isArray, isStaticTag } from '../../isInstance.js';
 import { BasicTypes } from '../ValueTypes.enum.js';
 import { setUseMemory } from '../../state/index.js';
+import { safeRenderSupport } from './safeRenderSupport.function.js';
 export function castProps(props, newSupport, depth) {
     return props.map(function eachCastProp(prop) {
         return alterProp(prop, newSupport.ownerSupport, newSupport, depth);
@@ -86,7 +85,7 @@ function checkObjectProp(value, newSupport, ownerSupport, depth) {
 function afterCheckProp(depth, index, originalValue, newProp, newSupport) {
     // restore object to have original function on destroy
     if (depth > 0) {
-        const global = newSupport.subject.global;
+        const global = newSupport.context.global;
         newProp[index].subscription = global.destroy$.toCallback(function alterCheckProcessor() {
             newProp[index] = originalValue;
         });
@@ -110,18 +109,19 @@ export function getPropWrap(value, owner, ownerSupport) {
 /** Function shared by alterProps() and updateExistingTagComponent... TODO: May want to have to functions to reduce cycle checking?  */
 export function callbackPropOwner(toCall, // original function
 owner, callWith, ownerSupport) {
-    const global = ownerSupport.subject.global;
+    const global = ownerSupport.context.global;
     const newest = global?.newest || ownerSupport;
     const supportInCycle = getSupportInCycle();
     const noCycle = supportInCycle === undefined;
     // actual function call to original method
     const callbackResult = toCall.apply(owner, callWith);
     const run = function propCallbackProcessor() {
-        const global = newest.subject.global;
-        if (!global || global.locked === true) {
+        const subject = newest.context;
+        const global = subject.global;
+        if (!global || subject.locked === true) {
             return callbackResult; // currently in the middle of rendering
         }
-        safeRenderSupport(newest, ownerSupport);
+        safeRenderSupport(newest);
         return callbackResult;
     };
     if (noCycle) {
@@ -132,17 +132,5 @@ owner, callWith, ownerSupport) {
 }
 export function isSkipPropValue(value) {
     return typeof (value) !== BasicTypes.object || !value || value.tagJsType;
-}
-export function safeRenderSupport(newest, ownerSupport) {
-    const subject = newest.subject;
-    const isInline = isInlineHtml(newest.templater);
-    if (isInline) {
-        const result = renderInlineHtml(ownerSupport, newest);
-        return result;
-    }
-    const global = subject.global;
-    global.locked = true;
-    renderExistingReadyTag(global.newest, newest, ownerSupport, subject);
-    delete global.locked;
 }
 //# sourceMappingURL=alterProp.function.js.map

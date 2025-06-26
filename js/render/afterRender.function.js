@@ -5,7 +5,7 @@ import { checkStateMismatch } from '../tag/checkStateMismatch.function.js';
  * @property ownerSupport - undefined when "support" is the app element
  */
 export function runAfterRender(support, ownerSupport) {
-    const subject = support.subject;
+    const subject = support.context;
     ++subject.renderCount;
     const config = setUseMemory.stateConfig;
     support.state = config.stateArray;

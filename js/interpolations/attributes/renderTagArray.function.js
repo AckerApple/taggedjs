@@ -7,7 +7,7 @@ export function renderTagUpdateArray(supports) {
     paint();
 }
 function mapTagUpdate(support) {
-    const global = support.subject.global;
+    const global = support.context.global;
     if (!global) {
         return; // while rendering a parent, a child may have been deleted (pinbowl)
     }

@@ -20,4 +20,5 @@ export { hasPropChanges } from './hasPropChanges.function.js';
 export { PropWatches } from '../tagJsVars/tag.function.js';
 export { output } from './output.function.js';
 export { guaranteeInsertBefore } from './guaranteeInsertBefore.function.js';
+export { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js';
 //# sourceMappingURL=index.js.map

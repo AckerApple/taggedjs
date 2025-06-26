@@ -1,6 +1,6 @@
 import { handleProviderChanges } from './handleProviderChanges.function.js';
 export function providersChangeCheck(support) {
-    const global = support.subject.global;
+    const global = support.context.global;
     const providers = global.providers;
     if (!providers) {
         return [];

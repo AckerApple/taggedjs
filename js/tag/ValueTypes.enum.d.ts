@@ -23,6 +23,7 @@ type ValueTypeObject = {
     version: number;
     subscribe: string;
     signal: string;
+    host: string;
 };
 /** Used as direct memory comparisons, the strings are never compared, just the array */
 export declare const ValueTypes: ValueTypeObject;

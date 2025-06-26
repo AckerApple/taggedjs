@@ -1,13 +1,5 @@
-import { AnySupport, ContextItem, TagCounts } from "../index.js";
-export declare function getSimpleTagVar(value: any): {
-    tagJsType: string;
-    value: any;
-    processInit: typeof processSimpleValueInit;
-    checkValueChange: typeof checkSimpleValueChange;
-    delete: typeof deleteSimpleValue;
-};
-declare function processSimpleValueInit(value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
-contextItem: ContextItem, ownerSupport: AnySupport, counts: TagCounts, appendTo?: Element, insertBefore?: Text): void;
+import { ContextItem } from "../index.js";
+import { TagJsTag } from "./tagJsVar.type.js";
+export declare function getSimpleTagVar(value: any): TagJsTag;
 export declare function deleteSimpleValue(contextItem: ContextItem): void;
 export declare function checkSimpleValueChange(newValue: unknown, contextItem: ContextItem): -1 | 6;
-export {};

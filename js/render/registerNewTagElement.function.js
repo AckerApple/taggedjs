@@ -1,7 +1,7 @@
 import { ValueTypes } from '../tag/ValueTypes.enum.js';
 import { appElements, buildBeforeElement } from '../index.js';
 export function registerTagElement(support, element, global, templater, app, placeholder) {
-    console.debug('🏷️ Building element into tag...', { element, app });
+    console.debug('🏷️ Building element into tag...', { element, app, support });
     const result = buildBeforeElement(support, { added: 0, removed: 0 }, element, undefined);
     global.oldest = support;
     global.newest = support;

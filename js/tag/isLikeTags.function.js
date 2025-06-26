@@ -1,38 +1,49 @@
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js';
-export function isLikeTags(support0, // new
-support1) {
-    const templater0 = support0.templater;
-    const templater1 = support1.templater;
-    const tag0 = templater0?.tag || support0;
-    const tag1 = templater1.tag; // || (support1 as any)
+export function isLikeTags(newSupport, // new
+oldSupport) {
+    const isLike = isLikeBaseTags(newSupport, oldSupport);
+    // is this perhaps an outerHTML compare?      
+    if (!isLike && oldSupport.templater.tag?._innerHTML) {
+        if (isLikeBaseTags(newSupport.outerHTML, oldSupport)) {
+            return true;
+        }
+    }
+    return isLike;
+}
+function isLikeBaseTags(newSupport, // new
+oldSupport) {
+    const templater0 = newSupport.templater;
+    const templater1 = oldSupport.templater;
+    const newTag = templater0?.tag || newSupport;
+    const oldTag = templater1.tag; // || (oldSupport as any)
     if (templater0?.tagJsType === ValueTypes.stateRender) {
         return templater0.dom === templater1.dom;
     }
-    switch (tag0.tagJsType) {
+    switch (newTag.tagJsType) {
         case ValueTypes.dom: {
-            if (tag1?.tagJsType !== ValueTypes.dom) {
-                return false; // tag0 is not even same type
+            if (oldTag?.tagJsType !== ValueTypes.dom) {
+                return false; // newTag is not even same type
             }
-            return isLikeDomTags(tag0, tag1);
+            return isLikeDomTags(newTag, oldTag);
         }
         case ValueTypes.tag: {
-            const like = isLikeStringTags(tag0, tag1, support0, support1);
+            const like = isLikeStringTags(newTag, oldTag, newSupport, oldSupport);
             return like;
         }
     }
-    throw new Error(`unknown tagJsType of ${tag0.tagJsType}`);
+    throw new Error(`unknown tagJsType of ${newTag.tagJsType}`);
 }
 // used when compiler was used
-export function isLikeDomTags(tag0, tag1) {
-    const domMeta0 = tag0.dom;
-    const domMeta1 = tag1.dom;
+export function isLikeDomTags(newTag, oldTag) {
+    const domMeta0 = newTag.dom;
+    const domMeta1 = oldTag.dom;
     return domMeta0 === domMeta1;
 }
 // used for no compiling
-function isLikeStringTags(tag0, tag1, support0, // new
-support1) {
-    const strings0 = tag0.strings;
-    const strings1 = tag1.strings;
+function isLikeStringTags(newTag, oldTag, newSupport, // new
+oldSupport) {
+    const strings0 = newTag.strings;
+    const strings1 = oldTag.strings;
     if (strings0.length !== strings1.length) {
         return false;
     }
@@ -41,8 +52,8 @@ support1) {
     if (!everyStringMatched) {
         return false;
     }
-    const values0 = support0.templater.values || tag0.values;
-    const values1 = support1.templater.values || tag1.values;
+    const values0 = newSupport.templater.values || newTag.values;
+    const values1 = oldSupport.templater.values || oldTag.values;
     return isLikeValueSets(values0, values1);
 }
 export function isLikeValueSets(values0, values1) {

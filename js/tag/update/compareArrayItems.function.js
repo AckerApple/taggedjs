@@ -35,6 +35,6 @@ function destroyArrayItemByGlobal(global, item) {
     }
     const element = item.simpleValueElm;
     delete item.simpleValueElm;
-    paintCommands.push([paintRemover, [element]]);
+    paintCommands.push([paintRemover, [element, 'array-delete']]);
 }
 //# sourceMappingURL=compareArrayItems.function.js.map

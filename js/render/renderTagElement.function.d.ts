@@ -17,6 +17,7 @@ export declare function renderTagElement(app: TagMaker, global: BaseTagGlobal, t
         version: number;
         subscribe: string;
         signal: string;
+        host: string;
     };
 };
 export declare function runWrapper(templater: TemplaterResult, placeholder: Text, appElement: Element, subject: SupportContextItem, isAppFunction: boolean): AnySupport;

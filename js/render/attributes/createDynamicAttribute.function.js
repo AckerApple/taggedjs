@@ -2,6 +2,7 @@
 import { processDynamicNameValueAttribute } from '../../interpolations/attributes/processNameValueAttribute.function.js';
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js';
 import { getTagVarIndex } from './getTagVarIndex.function.js';
+import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js';
 /** Support string attributes with dynamics Ex: <div style="color:black;font-size::${fontSize};"></div> */
 export function createDynamicArrayAttribute(attrName, array, element, context, howToSet, //  = howToSetInputValue
 support, counts, values) {
@@ -11,13 +12,16 @@ support, counts, values) {
         const valueVar = getTagVarIndex(value);
         if (valueVar >= 0) {
             const myIndex = context.length;
+            const tagJsVar = valueToTagJsVar(value);
             const contextItem = {
                 isAttr: true,
                 element,
                 attrName: attrName,
                 withinOwnerElement: true,
+                tagJsVar,
             };
-            contextItem.handler = (value, newSupport, contextItem, newValues) => {
+            // contextItem.handler =
+            tagJsVar.processUpdate = function arrayItemHanlder(value, newSupport, contextItem, newValues) {
                 setBy(newValues);
             };
             const pushValue = values[myIndex];
@@ -46,14 +50,16 @@ function buildNewValueFromArray(array, values, startIndex) {
 }
 export function createDynamicAttribute(attrName, value, element, context, howToSet, //  = howToSetInputValue
 support, counts, isSpecial) {
+    const tagJsVar = valueToTagJsVar(value);
     const contextItem = {
         isAttr: true,
         element,
         attrName,
         withinOwnerElement: true,
+        tagJsVar,
     };
     context.push(contextItem);
-    contextItem.handler = processUpdateAttrContext;
+    tagJsVar.processUpdate = processUpdateAttrContext;
     processDynamicNameValueAttribute(attrName, value, contextItem, element, howToSet, support, counts, isSpecial);
     contextItem.value = value;
 }

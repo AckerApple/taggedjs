@@ -1,5 +1,5 @@
 import { castTextValue } from '../../castTextValue.function.js';
-import { paintBeforeText, paintCommands, setContent } from '../../render/paint.function.js';
+import { paintBeforeText, paintCommands, paintContent, setContent } from '../../render/paint.function.js';
 import { getSimpleTagVar } from '../../tagJsVars/getSimpleTagVar.function.js';
 export function processUpdateRegularValue(value, contextItem) {
     const castedValue = castTextValue(value);
@@ -9,7 +9,7 @@ export function processUpdateRegularValue(value, contextItem) {
         return;
     }
     const oldClone = contextItem.simpleValueElm; // placeholder
-    setContent.push([castedValue, oldClone]);
+    paintContent.push([setContent, [castedValue, oldClone]]);
 }
 /** Used during updates that were another value/tag first but now simple string */
 export function processNowRegularValue(value, contextItem) {
@@ -17,7 +17,7 @@ export function processNowRegularValue(value, contextItem) {
     contextItem.tagJsVar = getSimpleTagVar(value);
     const before = contextItem.placeholder;
     const castedValue = castTextValue(value);
-    const paint = contextItem.paint = [paintBeforeText, [before, castedValue, (x) => {
+    const paint = contextItem.paint = [paintBeforeText, [before, castedValue, function cleanRegularValue(x) {
                 contextItem.simpleValueElm = x;
                 delete contextItem.paint;
             }]];

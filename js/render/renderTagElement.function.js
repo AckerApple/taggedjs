@@ -2,7 +2,6 @@ import { tags } from '../tag/tag.utils.js';
 import { empty, ValueTypes } from '../tag/ValueTypes.enum.js';
 import { destroySupport } from './destroySupport.function.js';
 import { paint, painting } from './paint.function.js';
-import { setUseMemory } from '../index.js';
 import { createSupport } from '../tag/createSupport.function.js';
 import { runAfterRender } from '../render/afterRender.function.js';
 import { executeWrap } from './executeWrap.function.js';
@@ -55,7 +54,7 @@ export function runWrapper(templater, placeholder, appElement, subject, isAppFun
     subject);
     if (!isFirstRender) {
         reState(newSupport, global.newest, // global.oldest, // global.newest,
-        setUseMemory.stateConfig, oldest.state);
+        oldest.state);
     }
     if (templater.tagJsType === ValueTypes.stateRender) {
         return executeStateWrap(templater, isAppFunction, newSupport, subject, appElement);

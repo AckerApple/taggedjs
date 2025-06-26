@@ -7,8 +7,7 @@ ownerSupport, // owningSupport
 counts, appendTo, insertBefore) {
     getNewGlobal(contextItem);
     const support = oneRenderToSupport(value, contextItem, ownerSupport);
-    renderTagOnly(support, undefined, contextItem, ownerSupport);
-    const result = processNewSubjectTag(support.templater, contextItem, ownerSupport, counts, appendTo, insertBefore);
-    return result;
+    renderTagOnly(support, undefined, contextItem);
+    return processNewSubjectTag(support.templater, contextItem, ownerSupport, counts, appendTo, insertBefore);
 }
 //# sourceMappingURL=processRenderOnceInit.function.js.map

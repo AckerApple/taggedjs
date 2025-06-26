@@ -1,15 +1,15 @@
 import { clonePropsBy } from './props/clonePropsBy.function.js';
 import { Subject } from '../subject/Subject.class.js';
 /** used only for apps, otherwise use Support */
-export function getBaseSupport(templater, subject, castedProps) {
+export function getBaseSupport(templater, context, castedProps) {
     const baseSupport = {
         templater,
-        subject,
+        context,
         castedProps,
         appSupport: undefined,
     };
     // baseSupport.appSupport = baseSupport
-    const global = subject.global;
+    const global = context.global;
     global.blocked = [];
     global.destroy$ = new Subject();
     return baseSupport;
@@ -27,10 +27,10 @@ support, appSupport, castedProps) {
     return support;
 }
 export function createHtmlSupport(templater, // at runtime rendering of a tag, it needs to be married to a new Support()
-ownerSupport, appSupport, subject, castedProps) {
+ownerSupport, appSupport, context, castedProps) {
     const support = {
         templater,
-        subject,
+        context,
         castedProps,
         appSupport: undefined,
     };

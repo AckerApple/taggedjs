@@ -1,50 +1,49 @@
 import { deepEqual } from '../deepFunctions.js';
-import { renderExistingReadyTag } from './renderExistingTag.function.js';
+import { renderExistingSupport } from './renderExistingTag.function.js';
 import { ValueTypes } from '../tag/ValueTypes.enum.js';
 import { PropWatches } from '../index.js';
 import { deepCompareDepth, immutablePropMatch, shallowPropMatch } from '../tag/hasSupportChanged.function.js';
+import { getSupportWithState } from '../interpolations/attributes/getSupportWithState.function.js';
 export function isInlineHtml(templater) {
     return ValueTypes.templater === templater.tagJsType;
 }
 /** Main function used by all other callers to render/update display of a tag component */
 export function renderSupport(support) {
-    const global = support.subject.global;
+    const subject = support.context;
+    const global = subject.global;
     const templater = support.templater;
     const inlineHtml = isInlineHtml(templater);
-    const ownerSupport = support.ownerSupport;
-    if (global.locked) {
+    if (subject.locked) {
         global.blocked.push(support);
         return support;
     }
     // is it just a vanilla tag, not component?
     if (inlineHtml) {
-        const result = renderInlineHtml(ownerSupport, support);
+        const result = renderInlineHtml(support);
         return result;
     }
-    global.locked = true;
-    const subject = support.subject;
+    subject.locked = true;
     if (global.blocked.length) {
         support = global.blocked.pop();
         global.blocked = [];
     }
-    const tag = renderExistingReadyTag(global.newest, support, ownerSupport, subject);
-    delete global.locked;
+    const tag = renderExistingSupport(global.newest, support, subject);
+    delete subject.locked;
     return tag;
 }
-export function renderInlineHtml(ownerSupport, support) {
-    const ownGlobal = ownerSupport.subject.global;
-    if (!ownGlobal || ownGlobal.deleted === true) {
-        return support;
-    }
-    // ??? new change
-    const newest = ownGlobal.newest || ownerSupport;
+/** Renders the owner of the inline HTML even if the owner itself is inline html */
+export function renderInlineHtml(support) {
+    const ownerSupport = getSupportWithState(support);
+    const ownGlobal = ownerSupport.context.global;
+    const newest = ownGlobal.newest;
+    // Function below may call renderInlineHtml again if owner is just inline HTML
     const result = renderSupport(newest);
     return result;
 }
-export function checkRenderUp(ownerSupport, templater, support) {
+export function checkRenderUp(templater, support) {
     const selfPropChange = hasPropsToOwnerChanged(templater, support);
     // render owner up first and that will cause me to re-render
-    if (ownerSupport && selfPropChange) {
+    if (selfPropChange) {
         return true;
     }
     return false;
@@ -69,13 +68,6 @@ function hasPropsToOwnerChanged(templater, support) {
 export function hasPropLengthsChanged(nowProps, latestProps) {
     const nowLen = nowProps.length;
     const latestLen = latestProps.length;
-    /*
-    const noLength = nowProps && nowLen === 0 && latestLen === 0
-  
-    if(noLength) {
-      return false
-    }
-    */
     return nowLen !== latestLen;
 }
 //# sourceMappingURL=renderSupport.function.js.map

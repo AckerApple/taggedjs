@@ -20,6 +20,7 @@ export { hasPropChanges } from './hasPropChanges.function.js';
 export { PropWatches } from '../tagJsVars/tag.function.js';
 export { output } from './output.function.js';
 export { guaranteeInsertBefore } from './guaranteeInsertBefore.function.js';
+export { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js';
 export type { Tag } from './Tag.type.js';
 export type { DomTag } from './DomTag.type.js';
 export type { StringTag } from './StringTag.type.js';

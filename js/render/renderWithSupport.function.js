@@ -5,27 +5,25 @@ import { isLikeTags } from '../tag/isLikeTags.function.js';
 import { ValueTypes } from '../tag/ValueTypes.enum.js';
 /** TODO: This seems to support both new and updates and should be separated? */
 export function renderWithSupport(newSupport, lastSupport, // previous (global.newest)
-subject, // events & memory
-ownerSupport) {
-    const lastTemplater = lastSupport?.templater;
-    const lastTag = lastTemplater?.tag;
-    const reSupport = renderTagOnly(newSupport, lastSupport, subject, ownerSupport);
+subject) {
+    const reSupport = renderTagOnly(newSupport, lastSupport, subject);
     const isLikeTag = !lastSupport || isLikeTags(lastSupport, reSupport);
     if (!isLikeTag) {
         moveProviders(lastSupport, reSupport);
         softDestroySupport(lastSupport);
-        const global = reSupport.subject.global;
+        const global = reSupport.context.global;
         global.oldest = reSupport;
         global.newest = reSupport;
     }
     else if (lastSupport) {
         const tag = lastSupport.templater.tag;
         if (tag && subject.renderCount > 0) {
+            const lastTemplater = lastSupport?.templater;
+            const lastTag = lastTemplater?.tag;
             checkTagSoftDestroy(tag, lastSupport, lastTag);
         }
     }
-    const lastOwnerSupport = lastSupport?.ownerSupport;
-    reSupport.ownerSupport = (ownerSupport || lastOwnerSupport);
+    reSupport.ownerSupport = newSupport.ownerSupport; // || lastOwnerSupport) as AnySupport
     return { support: reSupport, wasLikeTags: isLikeTag };
 }
 function checkTagSoftDestroy(tag, lastSupport, lastTag) {

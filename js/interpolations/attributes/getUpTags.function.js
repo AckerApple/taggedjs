@@ -3,11 +3,12 @@ import { providersChangeCheck } from "../../state/providersChangeCheck.function.
 import { checkRenderUp, isInlineHtml } from "../../render/renderSupport.function.js";
 import { ValueTypes } from "../../tag/ValueTypes.enum.js";
 export function getUpTags(support, supports = []) {
-    const global = support.subject.global;
+    const subject = support.context;
+    // const global = support.context.global as SupportTagGlobal
     const templater = support.templater;
     const inlineHtml = isInlineHtml(templater);
     const ownerSupport = support.ownerSupport;
-    if (global.locked) {
+    if (subject.locked) {
         supports.push(support);
         return supports;
     }
@@ -19,7 +20,7 @@ export function getUpTags(support, supports = []) {
     const isComponent = isTagComponent(newSupport.templater);
     const tagJsType = support.templater.tagJsType;
     const canContinueUp = ownerSupport && tagJsType !== ValueTypes.stateRender;
-    const continueUp = canContinueUp && (!isComponent || checkRenderUp(ownerSupport, newSupport.templater, newSupport));
+    const continueUp = canContinueUp && (!isComponent || checkRenderUp(newSupport.templater, newSupport));
     const proSupports = providersChangeCheck(newSupport);
     supports.push(...proSupports);
     if (continueUp) {

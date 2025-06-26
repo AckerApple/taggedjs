@@ -2,9 +2,10 @@ import { attachDomElements } from './dom/attachDomElements.function.js';
 import { getDomMeta } from '../tag/domMetaCollector.js';
 import { ValueTypes } from '../tag/ValueTypes.enum.js';
 import { painting } from './paint.function.js';
+import { valueToTagJsVar } from '../tagJsVars/valueToTagJsVar.function.js';
 /** Function that kicks off actually putting tags down as HTML elements */
 export function buildBeforeElement(support, counts, appendTo, insertBefore) {
-    const subject = support.subject;
+    const subject = support.context;
     const global = subject.global;
     global.oldest = support;
     global.newest = support;
@@ -19,10 +20,10 @@ function attachHtmlDomMeta(support, counts, appendTo, insertBefore) {
     const domMeta = loadDomMeta(support);
     const thisTag = support.templater.tag;
     const values = thisTag.values;
-    const context = [];
-    const global = support.subject.global;
-    global.context = context;
-    const result = attachDomElements(domMeta, values, support, counts, context, 0, appendTo, insertBefore);
+    const contexts = [];
+    const global = support.context.global;
+    global.contexts = contexts;
+    const result = attachDomElements(domMeta, values, support, counts, contexts, 0, appendTo, insertBefore);
     return result;
 }
 function loadDomMeta(support) {
@@ -37,6 +38,7 @@ function loadDomMeta(support) {
 export function addOneContext(value, context, withinOwnerElement) {
     const contextItem = {
         value,
+        tagJsVar: valueToTagJsVar(value),
         withinOwnerElement,
     };
     context.push(contextItem);

@@ -2,11 +2,11 @@ import { isArray } from '../isInstance.js';
 import { hasPropChanges } from './hasPropChanges.function.js';
 import { BasicTypes } from './ValueTypes.enum.js';
 /** Used when deciding if a support will even change (are the arguments the same?) */
-export function hasSupportChanged(lastSupport, newTemplater) {
+export function hasSupportChanged(oldSupport, newTemplater) {
     const latestProps = newTemplater.props;
-    const propsConfig = lastSupport.propsConfig;
+    const propsConfig = oldSupport.propsConfig;
     const pastCloneProps = propsConfig.latest;
-    const propsChanged = hasPropChanges(latestProps, pastCloneProps, lastSupport.templater.propWatch);
+    const propsChanged = hasPropChanges(latestProps, pastCloneProps, oldSupport.templater.propWatch);
     return propsChanged;
 }
 export function immutablePropMatch(props, pastCloneProps) {

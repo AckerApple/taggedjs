@@ -13,11 +13,13 @@ import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types
 import { PropWatches } from '../tagJsVars/tag.function.js';
 import { ProcessInit } from './ProcessInit.type.js';
 import { Tag } from './Tag.type.js';
-import { ProcessDelete, TagJsVar } from '../tagJsVars/tagJsVar.type.js';
+import { ProcessDelete, TagJsTag } from '../tagJsVars/tagJsVar.type.js';
 import { CheckSupportValueChange, CheckValueChange } from './Context.types.js';
+import { ProcessUpdate } from './ProcessUpdate.type.js';
 export type Wrapper = ((newSupport: AnySupport, subject: ContextItem, prevSupport?: AnySupport) => AnySupport) & TagWrapper<unknown> & {
     tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater;
     processInit: ProcessInit;
+    processUpdate: ProcessUpdate;
     checkValueChange: CheckValueChange | CheckSupportValueChange;
     delete: ProcessDelete;
 };
@@ -28,7 +30,6 @@ export type TagGlobal = {
     isApp?: boolean;
     subscriptions?: Subscription<unknown>[];
     destroyCallback?: OnDestroyCallback;
-    locked?: true;
     callbackMaker?: true;
     destroys?: (() => any)[];
 };
@@ -37,7 +38,7 @@ export type SupportTagGlobal = TagGlobal & {
     blocked: AnySupport[];
     oldest: AnySupport;
     newest: AnySupport;
-    context: SupportContextItem[];
+    contexts: SupportContextItem[];
     providers?: Provider[];
 };
 export type BaseTagGlobal = SupportTagGlobal & {
@@ -47,7 +48,7 @@ export type Events = {
     [name: string]: EventCallback;
 };
 export type Clone = (Element | Text | ChildNode);
-export type TemplaterResult = TagJsVar & {
+export type TemplaterResult = TagJsTag & {
     tagJsType: string;
     processInit: ProcessInit;
     propWatch: PropWatches;

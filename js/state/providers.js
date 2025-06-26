@@ -31,7 +31,7 @@ export const providers = {
                 children: [],
             };
             stateDiffMemory.provider = provider;
-            const global = support.subject.global;
+            const global = support.context.global;
             const providers = global.providers = global.providers || [];
             providers.push(provider);
             stateDiffMemory.stateDiff = stateDiff;
@@ -61,7 +61,7 @@ function providerInject(constructor) {
             ownerSupport: support.ownerSupport
         };
         while (owner.ownerSupport) {
-            const ownGlobal = owner.ownerSupport.subject.global;
+            const ownGlobal = owner.ownerSupport.context.global;
             const ownerProviders = ownGlobal.providers;
             if (!ownerProviders) {
                 owner = owner.ownerSupport; // cause reloop checking next parent
@@ -75,7 +75,7 @@ function providerInject(constructor) {
                 }
             });
             if (provider) {
-                const global = support.subject.global;
+                const global = support.context.global;
                 const providers = global.providers = global.providers || [];
                 providers.push(provider);
                 provider.children.push(support);

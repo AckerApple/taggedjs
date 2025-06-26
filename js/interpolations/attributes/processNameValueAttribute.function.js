@@ -3,7 +3,6 @@ import { processTagCallbackFun } from '../../render/attributes/processAttribute.
 import { BasicTypes } from '../../tag/ValueTypes.enum.js';
 const actions = ['init', 'destroy']; // oninit ondestroy
 export function processDynamicNameValueAttribute(attrName, value, contextItem, element, howToSet, support, counts, isSpecial) {
-    // contextItem.attrName = attrName
     contextItem.element = element;
     contextItem.howToSet = howToSet;
     if (typeof (value) === BasicTypes.function) {

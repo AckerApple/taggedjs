@@ -18,7 +18,7 @@ export interface TagTemplate {
     values: unknown[];
     domMetaMap?: DomMetaMap;
 }
-type ArrayItemStringTag<T> = StringTag & {
+export type ArrayItemStringTag<T> = StringTag & {
     arrayValue: T;
 };
 export type KeyFunction = 
@@ -29,6 +29,3 @@ export type KeyFunction =
 <T>(arrayValue: T) => ArrayItemStringTag<T>;
 /** When compiled to then run in browser */
 export declare function getDomTag(dom: LikeObjectChildren, values: unknown[]): DomTag;
-/** When runtime is in browser */
-export declare function getStringTag(strings: string[], values: unknown[]): StringTag;
-export {};

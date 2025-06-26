@@ -1,15 +1,19 @@
 import { runFirstState, runRestate } from './stateHandlers.js';
 import { firstStatesHandler, reStatesHandler } from './states.utils.js';
-export function initState(support, config) {
+import { setUseMemory } from './setUseMemory.object.js';
+import { setSupportInCycle } from '../tag/getSupportInCycle.function.js';
+export function initState(support) {
+    const config = setUseMemory.stateConfig;
     config.handlers.handler = runFirstState;
     config.handlers.statesHandler = firstStatesHandler;
     config.rearray = [];
     config.stateArray = [];
     config.states = [];
     config.statesIndex = 0;
-    config.support = support;
+    setSupportInCycle(support);
 }
-export function reState(newSupport, prevSupport, config, prevState) {
+export function reState(newSupport, prevSupport, prevState) {
+    const config = setUseMemory.stateConfig;
     // set previous state memory
     config.rearray = prevState;
     config.stateArray = [];
@@ -18,6 +22,7 @@ export function reState(newSupport, prevSupport, config, prevState) {
     config.handlers.handler = runRestate;
     config.handlers.statesHandler = reStatesHandler;
     config.prevSupport = prevSupport;
+    setSupportInCycle(newSupport);
 }
 export class StateEchoBack {
 }

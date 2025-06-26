@@ -2,7 +2,6 @@ import { executeWrap } from './executeWrap.function.js';
 import { ValueTypes } from '../tag/ValueTypes.enum.js';
 import { runAfterRender } from './afterRender.function.js';
 import { initState, reState } from '../state/state.utils.js';
-import { setUseMemory } from '../state/setUseMemory.object.js';
 import { createSupport } from '../tag/createSupport.function.js';
 export function renderTagOnly(newSupport, prevSupport, // causes restate
 subject, ownerSupport) {
@@ -23,15 +22,15 @@ subject, ownerSupport) {
         reSupport = wrapper(newSupport, subject, prevSupport);
     }
     runAfterRender(reSupport, ownerSupport);
+    reSupport.ownerSupport = newSupport.ownerSupport; // || lastOwnerSupport) as AnySupport
     return reSupport;
 }
 function runBeforeRender(newSupport, prevSupport) {
     const prevState = prevSupport?.state;
-    const config = setUseMemory.stateConfig;
     if (prevState) {
-        reState(newSupport, prevSupport, setUseMemory.stateConfig, prevState);
+        reState(newSupport, prevSupport, prevState);
         return;
     }
-    initState(newSupport, config);
+    initState(newSupport);
 }
 //# sourceMappingURL=renderTagOnly.function.js.map

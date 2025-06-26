@@ -12,6 +12,7 @@ import { processUpdateAttrContext } from './processUpdateAttrContext.function.js
 import { createDynamicArrayAttribute, createDynamicAttribute } from './createDynamicAttribute.function.js';
 import { getTagJsVar } from './getTagJsVar.function.js';
 import { isNoDisplayValue } from './isNoDisplayValue.function.js';
+import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js';
 /** MAIN FUNCTION. Sets attribute value, subscribes to value updates  */
 export function processAttribute(values, // all the variables inside html``
 attrName, element, support, howToSet, //  = howToSetInputValue
@@ -25,8 +26,15 @@ context, isSpecial, counts, value) {
         contextItem.element = element;
         contextItem.howToSet = howToSet;
         contextItem.isNameOnly = true;
-        // how to process value updates
-        contextItem.handler = processUpdateAttrContext;
+        if (value.tagJsType) {
+            contextItem.tagJsVar = value;
+            contextItem.stateOwner = getSupportWithState(support);
+            contextItem.supportOwner = support;
+            return processHost(element, value, contextItem);
+        }
+        const tagJsVar = contextItem.tagJsVar;
+        tagJsVar.processUpdate = processUpdateAttrContext;
+        // stand alone attributes
         processNameOnlyAttrValue(values, value, element, support, howToSet, context, counts);
         return;
     }
@@ -39,6 +47,10 @@ context, isSpecial, counts, value) {
         return createDynamicAttribute(attrName, value, element, context, howToSet, support, counts, isSpecial);
     }
     return processNonDynamicAttr(attrName, value, element, howToSet, counts, support, isSpecial);
+}
+function processHost(element, hostVar, contextItem) {
+    hostVar.processInit(element, hostVar, contextItem);
+    return;
 }
 export function processNameOnlyAttrValue(values, attrValue, element, ownerSupport, howToSet, context, counts) {
     if (isNoDisplayValue(attrValue)) {
@@ -66,6 +78,7 @@ export function processAttributeEmit(newAttrValue, attrName, subject, element, s
     }
     return processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support, counts);
 }
+/** figure out what type of attribute we are dealing with and/or feed value into handler to figure how to update */
 export function processAttributeSubjectValue(newAttrValue, element, attrName, special, howToSet, support, counts) {
     // process adding/removing style. class. (false means remove)
     if (special !== false) {
@@ -98,6 +111,8 @@ function callbackFun(support, newAttrValue, element, attrName, isSpecial, howToS
 export function processTagCallbackFun(subject, newAttrValue, support, attrName, element) {
     // tag has state and will need all functions wrapped to cause re-renders
     newAttrValue = bindSubjectCallback(newAttrValue, support);
+    const tagJsVar = subject.tagJsVar; // = valueToTagJsVar(newAttrValue)
+    tagJsVar.processUpdate = processUpdateAttrContext;
     return processAttributeFunction(element, newAttrValue, support, attrName);
 }
 function paintContentPush(element, attrName) {

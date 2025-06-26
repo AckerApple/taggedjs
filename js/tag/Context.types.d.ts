@@ -5,5 +5,5 @@ import { SupportContextItem } from './SupportContextItem.type.js';
 import { TagCounts } from './TagCounts.type.js';
 export type ContextHandler = (value: TemplateValue, newSupport: AnySupport, contextItem: ContextItem, values: unknown[], counts: TagCounts) => void;
 export type LastArrayItem = ContextItem;
-export type CheckValueChange = (value: unknown, subject: ContextItem, counts: TagCounts) => number | boolean;
+export type CheckValueChange = (value: unknown, subject: ContextItem, counts: TagCounts, ownerSupport: AnySupport) => number | boolean;
 export type CheckSupportValueChange = (value: unknown, subject: SupportContextItem, counts: TagCounts) => number | boolean;

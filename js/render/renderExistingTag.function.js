@@ -1,19 +1,15 @@
 import { renderWithSupport } from './renderWithSupport.function.js';
 import { processTag } from './update/processTag.function.js';
 import { updateSupportBy } from './update/updateSupportBy.function.js';
-// TODO: This function is being called for 1st time renders WHEN renderCount === 1
-export function renderExistingReadyTag(lastSupport, // should be global.newest
+export function renderExistingSupport(lastSupport, // should be global.newest
 newSupport, // new to be rendered
-ownerSupport, // ownerSupport
 subject) {
     const global = subject.global;
-    const { support, wasLikeTags } = renderWithSupport(newSupport, lastSupport, // renderCount <= 0 ? undefined : lastSupport
-    subject, ownerSupport);
-    if (wasLikeTags) {
-        updateSupportBy(global.oldest, support);
-        return support;
+    const result = renderWithSupport(newSupport, lastSupport, subject);
+    if (result.wasLikeTags) {
+        updateSupportBy(global.oldest, result.support);
+        return result.support;
     }
-    processTag(ownerSupport, subject, { added: 0, removed: 0 });
-    return support;
+    return processTag(newSupport, subject, { added: 0, removed: 0 });
 }
 //# sourceMappingURL=renderExistingTag.function.js.map

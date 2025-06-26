@@ -9,13 +9,11 @@ export function subscribeWith(Observable, withDefault, callback) {
         tagJsType: ValueTypes.subscribe,
         processInit: processSubscribeWith,
         delete: deleteAndUnsubscribe,
-        checkValueChange: function subscribeDoNothing() {
-            return -1;
-        },
-        Observable,
         callback,
         withDefault,
         states: getSupportWithState(getSupportInCycle()).states,
+        Observable,
+        Observables: [Observable],
     };
 }
 //# sourceMappingURL=subscribeWith.function.js.map

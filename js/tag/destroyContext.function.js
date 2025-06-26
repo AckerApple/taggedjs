@@ -27,7 +27,7 @@ export function destroyContext(childTags, ownerSupport) {
         if (isTagComponent(support.templater)) {
             runBeforeDestroy(support, global);
         }
-        const subTags = global.context;
+        const subTags = global.contexts;
         // recurse
         destroyContext(subTags, support);
     }
@@ -46,7 +46,7 @@ export function getChildTagsToSoftDestroy(childTags, tags = [], subs = []) {
                 subs.push(...iSubs);
             }
         }
-        const subTags = global.context;
+        const subTags = global.contexts;
         if (subTags) {
             getChildTagsToSoftDestroy(subTags, tags, subs);
         }

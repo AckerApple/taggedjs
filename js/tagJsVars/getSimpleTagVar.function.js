@@ -1,14 +1,17 @@
-import { BasicTypes } from "../index.js";
 import { castTextValue } from '../castTextValue.function.js';
 import { paintBeforeText, paintCommands, paintRemover } from "../render/paint.function.js";
+import { BasicTypes } from "../index.js";
 import { processUpdateRegularValue } from "../tag/update/processRegularValue.function.js";
+import { tagValueUpdateHandler } from "../tag/update/tagValueUpdateHandler.function.js";
 export function getSimpleTagVar(value) {
     return {
         tagJsType: 'simple',
         value,
         processInit: processSimpleValueInit,
-        checkValueChange: checkSimpleValueChange,
         delete: deleteSimpleValue,
+        // TODO: get down to only one
+        checkValueChange: checkSimpleValueChange,
+        processUpdate: tagValueUpdateHandler,
     };
 }
 function processSimpleValueInit(value, // TemplateValue | StringTag | SubscribeValue | SignalObject,
@@ -17,7 +20,7 @@ contextItem, ownerSupport, counts, appendTo, insertBefore) {
     const castedValue = castTextValue(value);
     insertBefore = contextItem.placeholder;
     // always insertBefore for content
-    const paint = contextItem.paint = [paintBeforeText, [insertBefore, castedValue, (x) => {
+    const paint = contextItem.paint = [paintBeforeText, [insertBefore, castedValue, function afterSimpleValue(x) {
                 contextItem.simpleValueElm = x;
                 delete contextItem.paint;
             }]];
@@ -26,14 +29,7 @@ contextItem, ownerSupport, counts, appendTo, insertBefore) {
 export function deleteSimpleValue(contextItem) {
     const elm = contextItem.simpleValueElm;
     delete contextItem.simpleValueElm;
-    delete contextItem.tagJsVar;
-    // is it being destroyed before it was even built?
-    if (contextItem.paint !== undefined) {
-        const paintIndex = paintCommands.findIndex(paint => paint === contextItem.paint);
-        paintCommands.splice(paintIndex, 1);
-        return;
-    }
-    paintCommands.push([paintRemover, [elm]]);
+    paintCommands.push([paintRemover, [elm, 'simple-tag-remove']]);
 }
 export function checkSimpleValueChange(newValue, contextItem) {
     const isBadValue = newValue === null || newValue === undefined;

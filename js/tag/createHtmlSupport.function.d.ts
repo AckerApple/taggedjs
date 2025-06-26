@@ -13,10 +13,10 @@ export type HtmlSupport = {
     appElement?: Element;
     propsConfig?: PropsConfig;
     templater: TemplaterResult;
-    subject: ContextItem;
+    context: ContextItem;
 };
 /** used only for apps, otherwise use Support */
-export declare function getBaseSupport(templater: TemplaterResult, subject: SupportContextItem, castedProps?: Props): BaseSupport;
+export declare function getBaseSupport(templater: TemplaterResult, context: SupportContextItem, castedProps?: Props): BaseSupport;
 export type Support = AnySupport & {
     ownerSupport: AnySupport;
     appSupport: BaseSupport;
@@ -25,4 +25,4 @@ export type Support = AnySupport & {
 export declare function upgradeBaseToSupport(templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
 support: BaseSupport, appSupport: AnySupport, castedProps?: Props): AnySupport;
 export declare function createHtmlSupport(templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
-ownerSupport: AnySupport, appSupport: AnySupport, subject: ContextItem, castedProps?: Props): AnySupport;
+ownerSupport: AnySupport, appSupport: AnySupport, context: ContextItem, castedProps?: Props): AnySupport;

@@ -1,10 +1,11 @@
 import { BasicTypes, ValueTypes } from '../tag/ValueTypes.enum.js';
 import { setUseMemory } from '../state/setUseMemory.object.js';
+import { setSupportInCycle } from '../tag/getSupportInCycle.function.js';
 export function executeWrap(templater, result, useSupport, castedProps) {
     const originalFunction = result.original; // (innerTagWrap as any).original as unknown as TagComponent
     const stateless = templater.tagJsType === ValueTypes.stateRender;
     const config = setUseMemory.stateConfig;
-    config.support = useSupport;
+    setSupportInCycle(useSupport);
     let tag;
     if (stateless) {
         tag = templater();

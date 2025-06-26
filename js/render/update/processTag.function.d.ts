@@ -10,7 +10,7 @@ import { SupportContextItem } from '../../tag/SupportContextItem.type.js';
  * Intended use only for updates
 */
 export declare function processTag(ownerSupport: AnySupport, // owner
-subject: SupportContextItem, // could be tag via result.tag
+contextItem: SupportContextItem, // could be tag via result.tag
 counts: TagCounts): AnySupport;
 export declare function tagFakeTemplater(tag: StringTag | DomTag): TemplaterResult;
 export declare function getFakeTemplater(): TemplaterResult;

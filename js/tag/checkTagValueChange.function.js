@@ -5,9 +5,6 @@ import { isLikeTags } from './isLikeTags.function.js';
 import { tryUpdateToTag } from './update/tryUpdateToTag.function.js';
 export function checkTagValueChange(newValue, contextItem, counts) {
     const global = contextItem.global;
-    if (!global) {
-        return 663; // its not a tag this time
-    }
     const lastSupport = global?.newest;
     const isValueTag = isStaticTag(newValue);
     const newTag = newValue;
@@ -19,7 +16,9 @@ export function checkTagValueChange(newValue, contextItem, counts) {
             getNewGlobal(contextItem);
             return 7; // 'tag-swap'
         }
-        return 77; // always cause a redraw of static tags (was false)
+        // always cause a redraw of static tags (was false)
+        tryUpdateToTag(contextItem, newValue, lastSupport, counts);
+        return -1;
     }
     const isTag = newValue?.tagJsType;
     if (isTag) {

@@ -6,7 +6,7 @@ export function addSupportEventListener(support, eventName, element, callback) {
     }
     const replaceEventName = '_' + eventName;
     // const replaceEventName = eventName
-    const global = support.subject.global;
+    const global = support.context.global;
     const eventReg = global.events;
     if (!eventReg[eventName]) {
         const listener = function eventCallback(event) {

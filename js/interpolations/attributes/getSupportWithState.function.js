@@ -5,6 +5,6 @@ export function getSupportWithState(support) {
     while (component.ownerSupport && !isTagComponent(component.templater)) {
         component = component.ownerSupport;
     }
-    return component.subject.global.newest || component;
+    return component.context.global.newest || component;
 }
 //# sourceMappingURL=getSupportWithState.function.js.map

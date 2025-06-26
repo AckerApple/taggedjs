@@ -4,7 +4,7 @@ import { paintAppend, paintAppendElementString, paintAppends, paintBefore, paint
 import { processAttribute } from "../attributes/processAttribute.function.js";
 import { empty } from "../../tag/ValueTypes.enum.js";
 import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicDom.function.js";
-export const blankHandler = function () {
+export const blankHandler = function blankHandler() {
     return undefined;
 };
 export function attachDomElements(nodes, values, support, counts, // used for animation stagger computing
@@ -63,10 +63,13 @@ function attachDomText(newNode, node, owner, insertBefore) {
     const textNode = newNode;
     const string = textNode.tc = node.tc;
     if (owner) {
-        paintAppends.push([paintAppendElementString, [owner, string, (elm) => textNode.domElement = elm]]);
+        paintAppends.push([paintAppendElementString, [owner, string, function afterAppenDomText(elm) {
+                    textNode.domElement = elm;
+                }]]);
+        return;
     }
-    else {
-        paintCommands.push([paintBeforeElementString, [insertBefore, string, (elm) => textNode.domElement = elm]]);
-    }
+    paintCommands.push([paintBeforeElementString, [insertBefore, string, function afterInsertDomText(elm) {
+                textNode.domElement = elm;
+            }]]);
 }
 //# sourceMappingURL=attachDomElements.function.js.map

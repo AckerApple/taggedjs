@@ -3,12 +3,12 @@ import { getNewGlobal } from '../tag/update/getNewGlobal.function.js';
 import { smartRemoveKids } from '../tag/smartRemoveKids.function.js';
 /** used when a tag swaps content returned */
 export function softDestroySupport(lastSupport) {
-    const subject = lastSupport.subject;
+    const subject = lastSupport.context;
     const global = subject.global;
-    const { subs, tags } = getChildTagsToSoftDestroy(global.context);
+    const { subs, tags } = getChildTagsToSoftDestroy(global.contexts);
     softDestroyOne(global);
     for (const child of tags) {
-        const cGlobal = child.subject.global;
+        const cGlobal = child.context.global;
         if (cGlobal.deleted === true) {
             return;
         }

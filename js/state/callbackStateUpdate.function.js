@@ -1,7 +1,7 @@
 import { renderSupport } from '../render/renderSupport.function.js';
 import { isPromise } from '../isInstance.js';
 export default function callbackStateUpdate(support, oldStates, callback, ...args) {
-    const global = support.subject.global;
+    const global = support.context.global;
     const newestSupport = global.newest;
     // NEWEST UPDATE OLDEST: ensure that the oldest has the latest values first
     //syncStatesArray(newestSupport.states, oldStates)

@@ -24,5 +24,4 @@ export declare function getPropWrap(value: {
 export declare function callbackPropOwner(toCall: UnknownFunction, // original function
 owner: any, callWith: unknown[], ownerSupport: AnySupport): unknown;
 export declare function isSkipPropValue(value: unknown): string | true;
-export declare function safeRenderSupport(newest: AnySupport, ownerSupport: AnySupport): AnySupport | undefined;
 export {};
