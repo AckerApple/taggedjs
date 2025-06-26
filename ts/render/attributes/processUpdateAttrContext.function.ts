@@ -3,9 +3,10 @@ import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processAttributeEmit } from './processAttribute.function.js'
 import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.function.js'
 import { updateNameOnlyAttrValue } from '../../interpolations/attributes/updateAttribute.function.js'
+import { TemplateValue } from '../../tag/TemplateValue.type.js'
 
 export function processUpdateAttrContext(
-  value: unknown,
+  value: TemplateValue,
   ownerSupport: AnySupport,
   contextItem: ContextItem,
   values: unknown[],

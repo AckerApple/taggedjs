@@ -10,7 +10,7 @@ export interface ContextItem {
   locked?: true
 
   /** handler(value,newSupport,contextItem,values) Called on value update detected, within processUpdateOneContext(). Return value is ignored */
-  handler?: ContextHandler
+  // handler?: ContextHandler
   
   // ATTRIBUTES
   isAttr?: true
@@ -29,7 +29,7 @@ export interface ContextItem {
   subContext?: SubContext // subscribe() and innerHTML
   
   value?: any,
-  tagJsVar?: TagJsVar
+  tagJsVar: TagJsVar
   
   // TAG SUPPORT ONLY BELOW
   global?: TagGlobal

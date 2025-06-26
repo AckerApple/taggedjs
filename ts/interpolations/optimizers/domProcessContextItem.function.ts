@@ -16,9 +16,9 @@ export function domProcessContextItem(
   insertBefore?: Text
 ) {
   // how to handle value updates
-  contextItem.handler = tagValueUpdateHandler
+  // contextItem.handler = tagValueUpdateHandler
 
-  const subject = support.subject  
+  const subject = support.context  
   subject.locked = true
 
   processFirstSubjectValue(

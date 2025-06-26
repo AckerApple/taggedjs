@@ -8,6 +8,7 @@ import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
 import { SpecialDefinition } from './Special.types.js'
 import { getTagVarIndex } from './getTagVarIndex.function.js'
+import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 
 /** Support string attributes with dynamics Ex: <div style="color:black;font-size::${fontSize};"></div> */
 export function createDynamicArrayAttribute(
@@ -27,14 +28,20 @@ export function createDynamicArrayAttribute(
     const valueVar = getTagVarIndex(value)
     if(valueVar >= 0) {
       const myIndex = context.length
+      const tagJsVar = valueToTagJsVar(value)
       const contextItem: ContextItem = {
         isAttr: true,
         element,
         attrName: attrName as string,
         withinOwnerElement: true,
+
+        tagJsVar,
       }
   
-      contextItem.handler = function arrayItemHanlder(value, newSupport, contextItem, newValues) {
+      // contextItem.handler =
+      tagJsVar.processUpdate = function arrayItemHanlder(
+        value, newSupport, contextItem, newValues
+      ) {
         setBy(newValues)
       }
 
@@ -83,15 +90,17 @@ export function createDynamicAttribute(
   counts: TagCounts,
   isSpecial: SpecialDefinition,
 ) {
+  const tagJsVar = valueToTagJsVar(value)
   const contextItem: ContextItem = {
     isAttr: true,
     element,
     attrName,
     withinOwnerElement: true,
+    tagJsVar,
   }
 
   context.push(contextItem)
-  contextItem.handler = processUpdateAttrContext
+  tagJsVar.processUpdate = processUpdateAttrContext
 
   processDynamicNameValueAttribute(
     attrName as string,

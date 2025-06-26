@@ -37,7 +37,8 @@ export function setupSubscribe(
   subContext.appendMarker = appendMarker
 
   contextItem.subContext = subContext
-  contextItem.handler = checkSubContext
+  // contextItem.handler = checkSubContext
+  contextItem.tagJsVar.processUpdate = checkSubContext
 
   return subContext
 }
@@ -52,9 +53,6 @@ export function setupSubscribeCallbackProcessor(
   const component = getSupportWithState(ownerSupport)
   
   let onOutput = function onSubValue(value: TemplateValue) {
-    // const aContext = subContext.contextItem as AdvancedContextItem
-    // aContext.tagJsVar = valueToTagJsVar(value) as any
-
     onFirstSubContext(
       value,
       subContext,
@@ -93,7 +91,7 @@ export function setupSubscribeCallbackProcessor(
   function valuesHandler(
     values: TemplateValue[],
   ) {
-    const newComponent = component.subject.global.newest
+    const newComponent = component.context.global.newest
     syncSupports(newComponent, component)
 
     if(subContext.callback) {

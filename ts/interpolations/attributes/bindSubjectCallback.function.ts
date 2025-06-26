@@ -14,7 +14,7 @@ export function bindSubjectCallback(
   value: Callback,
   support: AnySupport,
 ) {
-  const global = support.subject.global as SupportTagGlobal
+  const global = support.context.global as SupportTagGlobal
 
   // MAIN EVENT CALLBACK PROCESSOR
   const subjectFunction = function callbackReplacement(
@@ -56,7 +56,7 @@ export function runTagCallback(
 ) {
   // get actual component owner not just the html`` support
   const component = getSupportWithState(support)
-  const subject = component.subject
+  const subject = component.context
   // const global = subject.global as SupportTagGlobal // tag.subject.global as TagGlobal
   
   subject.locked = true // prevent another render from re-rendering this tag
@@ -84,12 +84,12 @@ export function afterTagCallback(
   callbackResult: any,
   eventHandlerSupport: AnySupport,
 ) {
-  const global = eventHandlerSupport.subject.global as SupportTagGlobal // tag.subject.global as SupportTagGlobal
+  const global = eventHandlerSupport.context.global as SupportTagGlobal // tag.subject.global as SupportTagGlobal
 
   return renderCallbackSupport(
     eventHandlerSupport as AnySupport,
     callbackResult,
-    global, // eventHandlerSupport.subject.global as TagGlobal,
+    global, // eventHandlersupport.context.global as TagGlobal,
   )
 }
 

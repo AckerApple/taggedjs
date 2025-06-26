@@ -25,7 +25,7 @@ export function specialAttribute(
 
     case 'destroy': { // aka ondestroy
       const stagger = counts.removed++
-      const global = support.subject.global      
+      const global = support.context.global      
       global.destroys = global.destroys || []
       
       global.destroys.push(() => {

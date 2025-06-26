@@ -16,7 +16,7 @@ function getTagsWithProvider(
   provider: Provider,
   memory: TagWithProvider[] = []
 ): TagWithProvider[] {
-  const subject = support.subject
+  const subject = support.context
   memory.push({
     support,
     renderCount: subject.renderCount,
@@ -26,7 +26,7 @@ function getTagsWithProvider(
   const childTags = provider.children
   for (let index = childTags.length - 1; index >= 0; --index) {
     const child = childTags[index]
-    const cSubject = child.subject
+    const cSubject = child.context
     memory.push({
       support: child,
       renderCount: cSubject.renderCount,

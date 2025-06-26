@@ -7,5 +7,6 @@ export { checkSimpleValueChange, deleteSimpleValue } from './getSimpleTagVar.fun
 
 export { pipe } from './pipe.function.js'
 export { host } from './host.function.js'
+export { valueToTagJsVar } from './valueToTagJsVar.function.js'
 export { subscribe } from './subscribe.function.js'
 export { subscribeWith } from './subscribeWith.function.js'

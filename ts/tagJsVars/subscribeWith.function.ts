@@ -1,4 +1,5 @@
 import { getSupportWithState } from "../interpolations/attributes/getSupportWithState.function.js"
+import { blankHandler } from "../render/dom/attachDomElements.function.js"
 import { AnySupport } from "../tag/AnySupport.type.js"
 import { getSupportInCycle } from "../tag/getSupportInCycle.function.js"
 import { ValueTypes } from "../tag/index.js"
@@ -15,6 +16,10 @@ export function subscribeWith<SubValue, DEFAULT>(
   return {
     tagJsType: ValueTypes.subscribe,
     processInit: processSubscribeWith,
+    
+    // processUpdate: tagValueUpdateHandler,
+    processUpdate: blankHandler,
+
     delete: deleteAndUnsubscribe,
 
     callback,

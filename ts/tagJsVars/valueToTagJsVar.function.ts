@@ -8,7 +8,7 @@ import { getSimpleTagVar } from './getSimpleTagVar.function.js'
 import { getArrayTagVar } from './getArrayTagJsVar.function.js'
 
 export function valueToTagJsVar(
-  value: TemplateValue | Tag | TagJsVar,
+  value: TemplateValue | Tag | TagJsVar | unknown,
 ): TagJsVar {
   const tagJsType = (value as TemplaterResult)?.tagJsType as ValueType
   

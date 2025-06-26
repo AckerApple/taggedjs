@@ -11,6 +11,7 @@ import type { DomTag } from '../tag/DomTag.type.js'
 import type { StringTag } from '../tag/StringTag.type.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { painting } from './paint.function.js'
+import { valueToTagJsVar } from '../tagJsVars/valueToTagJsVar.function.js'
 
 /** Function that kicks off actually putting tags down as HTML elements */
 export function buildBeforeElement(
@@ -19,7 +20,7 @@ export function buildBeforeElement(
   appendTo?: Element,
   insertBefore?: Text,
 ) {
-  const subject = support.subject
+  const subject = support.context
   const global = subject.global as SupportTagGlobal
 
   global.oldest = support
@@ -44,17 +45,17 @@ function attachHtmlDomMeta(
   const domMeta = loadDomMeta(support)
   const thisTag = support.templater.tag as StringTag | DomTag
   const values = thisTag.values
-  const context:SupportContextItem[] = []
+  const contexts: SupportContextItem[] = []
 
-  const global = support.subject.global as SupportTagGlobal
-  global.context = context
+  const global = support.context.global as SupportTagGlobal
+  global.contexts = contexts
 
   const result = attachDomElements(
     domMeta,
     values,
     support,
     counts,
-    context,
+    contexts,
     0,
     appendTo,
     insertBefore,
@@ -83,6 +84,7 @@ export function addOneContext(
 ): ContextItem {
   const contextItem: ContextItem = {
     value,
+    tagJsVar: valueToTagJsVar(value),
     withinOwnerElement,
   }
 

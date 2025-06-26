@@ -11,7 +11,7 @@ export function smartRemoveKids(
   global: SupportTagGlobal,
   allPromises: Promise<any>[]
 ) {
-  const context = global.context as ContextItem[]
+  const context = global.contexts as ContextItem[]
   const destroys = global.destroys
   if( destroys ) {
     return processContextDestroys(destroys, global, allPromises)
@@ -47,7 +47,7 @@ function processContextDestroys(
         ++painting.locks
         
         // continue to remove
-        smartRemoveByContext(global.context, allPromises)
+        smartRemoveByContext(global.contexts, allPromises)
         destroyClones(global)
         
         --painting.locks
@@ -63,7 +63,7 @@ function processContextDestroys(
 
   ++painting.locks
 
-  smartRemoveByContext(global.context, allPromises)
+  smartRemoveByContext(global.contexts, allPromises)
   destroyClones(global)
 
   --painting.locks

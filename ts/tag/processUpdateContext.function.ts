@@ -1,13 +1,12 @@
 import { StringTag } from './StringTag.type.js'
 import type { DomTag } from './DomTag.type.js'
 import { AnySupport } from './AnySupport.type.js'
-import { ContextHandler } from './Context.types.js'
 import { ContextItem, TagCounts } from '../index.js'
-import { valueToTagJsVar } from '../tagJsVars/valueToTagJsVar.function.js'
+import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 
 export function processUpdateContext(
   support: AnySupport,
-  context: ContextItem[],
+  contexts: ContextItem[],
 ) {
   const thisTag = support.templater.tag as StringTag | DomTag
   const values = thisTag.values
@@ -19,7 +18,7 @@ export function processUpdateContext(
     processUpdateOneContext(
       values,
       index,
-      context,
+      contexts,
       support,
       counts,
     )
@@ -27,7 +26,7 @@ export function processUpdateContext(
     ++index
   }
 
-  return context
+  return contexts
 }
 
 /** returns boolean of did render */
@@ -46,9 +45,9 @@ function processUpdateOneContext(
     return
   }
 
-  const handler = contextItem.handler as ContextHandler
+  const tagJsVar = contextItem.tagJsVar as TagJsVar
 
-  handler(
+  tagJsVar.processUpdate(
     newValue,
     ownerSupport,
     contextItem,
@@ -57,5 +56,5 @@ function processUpdateOneContext(
   )
   
   contextItem.value = newValue
-  contextItem.tagJsVar = valueToTagJsVar(newValue)
+  // contextItem.tagJsVar = valueToTagJsVar(newValue)
 }

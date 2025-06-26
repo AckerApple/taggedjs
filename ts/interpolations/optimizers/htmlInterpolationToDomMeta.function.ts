@@ -38,17 +38,7 @@ export function htmlInterpolationToPlaceholders(
     sanitizedFragments, values,
   )
 }
-/*
-function sanitizePlaceholders(fragments: string[]) {
-  return fragments.map(santizeFragment)
-}
 
-function santizeFragment(fragment: string) {
-  return fragment.replace(
-    fragReplacer,
-    (match, index) => safeVar + index)
-}
-*/
 function addPlaceholders(
   strings: string[],
   values: any[],

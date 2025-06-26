@@ -31,7 +31,7 @@ export function createTrigger<A,B,C,D,E,F, T>(
   const oldStates = oldState.states
 
   return function trigger(...args: any[]) {
-    const callbackMaker = support.subject.renderCount > 0
+    const callbackMaker = support.context.renderCount > 0
     
     if(callbackMaker) {
       return callbackStateUpdate(

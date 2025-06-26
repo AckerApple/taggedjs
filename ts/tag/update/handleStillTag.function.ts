@@ -31,7 +31,7 @@ export function handleStillTag(
     subject,
   )
 
-  const lastSubject = oldSupport.subject as ContextItem
+  const lastSubject = oldSupport.context as ContextItem
   const newGlobal = lastSubject.global as SupportTagGlobal
   const oldest = newGlobal.oldest
 

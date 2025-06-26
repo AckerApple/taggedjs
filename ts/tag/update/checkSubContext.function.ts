@@ -12,10 +12,39 @@ export function checkSubContext(
   newValue: unknown,
   ownerSupport: AnySupport,
   contextItem: ContextItem,
-  _values: any[],
+  values: any[],
   counts: TagCounts,
 ) {
-  if(!newValue || !(newValue as any).tagJsType || (newValue as any).tagJsType !== ValueTypes.subscribe) {
+  const hasChanged = handleTagTypeChangeFrom(
+    ValueTypes.subscribe,
+    newValue,
+    ownerSupport,
+    contextItem,
+    counts,
+  )
+  if( hasChanged ) {
+    return hasChanged
+  }
+
+  const subscription = contextItem.subContext as SubscriptionContext
+  if (!subscription.hasEmitted) {
+    return -1
+  }
+
+  subscription.callback = (newValue as SubscribeValue).callback
+  subscription.valuesHandler( subscription.lastValues )
+
+  return -1
+}
+
+export function handleTagTypeChangeFrom(
+  originalType: string,
+  newValue: unknown,
+  ownerSupport: AnySupport,
+  contextItem: ContextItem,
+  counts: TagCounts,
+) {
+  if(!newValue || !(newValue as any).tagJsType || (newValue as any).tagJsType !== originalType) {
     const tagJsVar = contextItem.tagJsVar as TagJsVar
     tagJsVar.delete(contextItem, ownerSupport)
 
@@ -28,14 +57,4 @@ export function checkSubContext(
     )
     return 99
   }
-
-  const subscription = contextItem.subContext as SubscriptionContext
-  if (!subscription.hasEmitted) {
-    return -1
-  }
-
-  subscription.callback = (newValue as SubscribeValue).callback
-  subscription.valuesHandler( subscription.lastValues )
-
-  return -1
 }

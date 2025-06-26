@@ -9,6 +9,7 @@ import { Tag } from './Tag.type.js'
 import { TagCounts, AnySupport, ContextItem, TemplateValue, checkTagValueChange, SupportContextItem, destroySupportByContextItem, TagJsVarInnerHTML, ArrayItemStringTag } from '../index.js'
 import { forceUpdateExistingValue } from './update/forceUpdateExistingValue.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
 
 /** Used to override the html`` processing that will first render outerHTML and then its innerHTML */
 export function processOuterDomTagInit(
@@ -30,7 +31,10 @@ export function processOuterDomTagInit(
     insertBefore,
   ) as AnySupport
 
-  contextItem.handler = function outDomTagHanlder(
+  // contextItem.handler = function outDomTagHanlder(
+  const tagJsVar = contextItem.tagJsVar as TagJsVar
+  
+  tagJsVar.processUpdate = function outDomTagHanlder(
     value: TemplateValue,
     newSupport: AnySupport,
     contextItem2: ContextItem,
@@ -72,6 +76,7 @@ export function getStringTag(
     
     tagJsType: ValueTypes.tag,
     processInit: processDomTagInit,
+    processUpdate: tagValueUpdateHandler,
     checkValueChange: checkTagValueChange,
     delete: destroySupportByContextItem,
 

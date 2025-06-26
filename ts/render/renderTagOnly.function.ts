@@ -60,18 +60,16 @@ function runBeforeRender(
   prevSupport?: AnySupport,
 ) {
   const prevState = prevSupport?.state
-  const config = setUseMemory.stateConfig
 
   if(prevState) {
     reState(
       newSupport,
       prevSupport,
-      setUseMemory.stateConfig,
       prevState,
     )
     
     return
   }
   
-  initState(newSupport, config)
+  initState(newSupport)
 }

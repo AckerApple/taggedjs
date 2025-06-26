@@ -17,6 +17,8 @@ import { Tag } from './Tag.type.js'
 import { ProcessDelete, TagJsTag } from '../tagJsVars/tagJsVar.type.js'
 import { checkTagValueChange, destroySupportByContextItem } from './checkTagValueChange.function.js'
 import { CheckSupportValueChange, CheckValueChange } from './Context.types.js'
+import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
+import { ProcessUpdate } from './ProcessUpdate.type.js'
 
 export type Wrapper = ((
   newSupport: AnySupport,
@@ -25,6 +27,7 @@ export type Wrapper = ((
 ) => AnySupport) & TagWrapper<unknown> & {
   tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater
   processInit: ProcessInit
+  processUpdate: ProcessUpdate
   checkValueChange: CheckValueChange | CheckSupportValueChange
   delete: ProcessDelete
 }
@@ -52,7 +55,7 @@ export type SupportTagGlobal = TagGlobal & {
   blocked: AnySupport[], // renders that did not occur because an event was processing
   oldest: AnySupport
   newest: AnySupport
-  context: SupportContextItem[] // populated after reading interpolated.values array converted to an object {variable0, variable:1}
+  contexts: SupportContextItem[] // populated after reading interpolated.values array converted to an object {variable0, variable:1}
   
   providers?: Provider[]
 }
@@ -93,6 +96,7 @@ export function getTemplaterResult(
   const templater: TemplaterResult = {
     tagJsType: ValueTypes.templater,
     processInit: processTagInit,
+    processUpdate: tagValueUpdateHandler,
     checkValueChange: checkTagValueChange,
     delete: destroySupportByContextItem,
 

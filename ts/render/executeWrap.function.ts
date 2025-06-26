@@ -5,6 +5,7 @@ import { StringTag } from '../tag/StringTag.type.js'
 import { BasicTypes, ValueTypes } from '../tag/ValueTypes.enum.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
 import { Props } from '../Props.js'
+import { setSupportInCycle } from '../tag/getSupportInCycle.function.js'
 
 type ReturnStringTag = (...n: unknown[]) => StringTag
 
@@ -18,7 +19,7 @@ export function executeWrap(
   const stateless = templater.tagJsType === ValueTypes.stateRender
   const config = setUseMemory.stateConfig
 
-  config.support = useSupport
+  setSupportInCycle(useSupport)
 
   let tag: StringTag;
   if(stateless) {

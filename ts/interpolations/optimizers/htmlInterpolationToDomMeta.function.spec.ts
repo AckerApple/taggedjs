@@ -96,8 +96,8 @@ describe('#htmlInterpolationToDomMeta', () => {
     const firstDom = result[0] as DomObjectElement
 
     expect(firstDom.at).toEqual([
-      [ 'init', ':tagvar0:', true ],
-      [ 'destroy', ':tagvar1:', true ],
+      [ 'init', ':tagvar0:', 'init' ],
+      [ 'destroy', ':tagvar1:', 'destroy' ],
       [
         'style',
         [

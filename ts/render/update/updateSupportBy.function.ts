@@ -10,8 +10,8 @@ export function updateSupportBy(
   olderSupport: AnySupport,
   newerSupport: AnySupport,
 ) {
-  const global = olderSupport.subject.global as SupportTagGlobal
-  const context = global.context
+  const global = olderSupport.context.global as SupportTagGlobal
+  const context = global.contexts
 
   updateSupportValuesBy(olderSupport, newerSupport)
 

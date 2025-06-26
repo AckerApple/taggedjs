@@ -22,6 +22,7 @@ import { isNoDisplayValue } from './isNoDisplayValue.function.js'
 import { HostValue } from '../../tagJsVars/host.function.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js'
+import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 
 /** MAIN FUNCTION. Sets attribute value, subscribes to value updates  */
 export function processAttribute(
@@ -51,16 +52,15 @@ export function processAttribute(
     contextItem.howToSet = howToSet
     contextItem.isNameOnly = true
 
-    // how to process value updates
-    contextItem.handler = processUpdateAttrContext
-
-    
     if((value as HostValue).tagJsType) {
       contextItem.tagJsVar = value as TagJsVar
       ;(contextItem as any).stateOwner = getSupportWithState(support)
       ;(contextItem as any).supportOwner = support
-      return processHost(value as HostValue, element as HTMLInputElement)
+      return processHost(element as HTMLInputElement, value as HostValue, contextItem)
     }
+
+    const tagJsVar = contextItem.tagJsVar
+    tagJsVar.processUpdate = processUpdateAttrContext
 
     // stand alone attributes
     processNameOnlyAttrValue(
@@ -116,10 +116,11 @@ export function processAttribute(
 }
 
 function processHost(
-  hostVar: HostValue,
   element: HTMLInputElement,
+  hostVar: HostValue,
+  contextItem: ContextItem,
 ) {
-  (hostVar as any).processInit(hostVar, element)
+  (hostVar as any).processInit(element, hostVar, contextItem)
   return
 }
 
@@ -200,6 +201,7 @@ export function processAttributeEmit(
 
 type DisplayValue = ((...args: unknown[]) => unknown) | string | boolean
 
+/** figure out what type of attribute we are dealing with and/or feed value into handler to figure how to update */
 export function processAttributeSubjectValue(
   newAttrValue: DisplayValue | NoDisplayValue,
   element: Element,
@@ -282,6 +284,9 @@ export function processTagCallbackFun(
 ) {
   // tag has state and will need all functions wrapped to cause re-renders
   newAttrValue = bindSubjectCallback(newAttrValue, support)
+
+  const tagJsVar = subject.tagJsVar // = valueToTagJsVar(newAttrValue)
+  tagJsVar.processUpdate = processUpdateAttrContext
 
   return processAttributeFunction(element, newAttrValue, support, attrName)
 }

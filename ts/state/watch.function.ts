@@ -177,7 +177,7 @@ function defineOnMethod<R>(
 
             if(nowSupport !== firstSupport) {
               const newestState = oldState.stateArray
-              const global = firstSupport.subject.global
+              const global = firstSupport.context.global
               const oldest = global.oldest
               const oldestState = oldest.state
               

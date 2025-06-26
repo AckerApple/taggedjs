@@ -17,7 +17,7 @@ export function isInlineHtml(templater: TemplaterResult) {
 export function renderSupport<T extends AnySupport>(
   support: T, // must be latest/newest state render
 ): T {
-  const subject = support.subject
+  const subject = support.context
   const global = subject.global as SupportTagGlobal
   const templater = support.templater
   const inlineHtml = isInlineHtml(templater)
@@ -56,7 +56,7 @@ export function renderInlineHtml(
   support: AnySupport,
 ) {
   const ownerSupport = getSupportWithState(support)
-  const ownGlobal = ownerSupport.subject.global as SupportTagGlobal
+  const ownGlobal = ownerSupport.context.global as SupportTagGlobal
   const newest = ownGlobal.newest
 
   // Function below may call renderInlineHtml again if owner is just inline HTML

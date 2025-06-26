@@ -20,7 +20,6 @@ export function processDynamicNameValueAttribute(
   counts: TagCounts,
   isSpecial: SpecialDefinition,
 ) {
-  // contextItem.attrName = attrName
   contextItem.element = element
   contextItem.howToSet = howToSet
 

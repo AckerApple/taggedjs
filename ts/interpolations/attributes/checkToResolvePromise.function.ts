@@ -21,7 +21,7 @@ export function checkToResolvePromise(
   const isProm = isPromise(callbackResult)
 
   if(isProm) {
-    const subject = last.subject
+    const subject = last.context
     // const global0 = subject.global as SupportTagGlobal
     subject.locked = true
 
@@ -37,15 +37,15 @@ export function thenResolveBy(
   resolvePromise: (value: any) => any, // promiseNoData
 ) {
   return (x: any) => {
-    const global = last.subject.global as SupportTagGlobal
+    const global = last.context.global as SupportTagGlobal
     //clearTimeout(timeout)
 
     if(global.deleted === true) {
       return resolvePromise(x) // tag was deleted during event processing
     }
 
-    const subject = last.subject
-    const global1 = last.subject.global as SupportTagGlobal
+    const subject = last.context
+    const global1 = last.context.global as SupportTagGlobal
     delete subject.locked
 
     // The promise may have then changed old variables, lets update forward

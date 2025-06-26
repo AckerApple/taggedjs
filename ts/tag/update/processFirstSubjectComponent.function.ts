@@ -16,9 +16,6 @@ export function processReplacementComponent(
   ownerSupport: AnySupport,
   counts: TagCounts,
 ): AnySupport {
-  // TODO: This below check not needed in production mode
-  // validateTemplater(templater)
-
   const newSupport = createSupport(
     templater,
     ownerSupport,

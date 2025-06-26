@@ -18,7 +18,7 @@ export function addSupportEventListener(
   const replaceEventName = '_' + eventName
   // const replaceEventName = eventName
 
-  const global = support.subject.global as BaseTagGlobal
+  const global = support.context.global as BaseTagGlobal
   const eventReg = global.events as Events
   
   if(!eventReg[eventName]) {

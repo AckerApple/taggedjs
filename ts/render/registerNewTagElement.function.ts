@@ -13,7 +13,7 @@ export function registerTagElement(
   app: TagMaker,
   placeholder: Text,
 ) {
-  console.debug('🏷️ Building element into tag...', {element, app})
+  console.debug('🏷️ Building element into tag...', {element, app, support})
   const result = buildBeforeElement(
     support,
     { added: 0, removed: 0 },

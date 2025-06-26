@@ -14,14 +14,7 @@ export function checkTagValueChange(
   contextItem: SupportContextItem,
   counts: TagCounts,
 ) {
-  // const tagJsVar = contextItem.tagJsVar
   const global = contextItem.global as SupportTagGlobal
-
-  if(!global) {
-  // if(![ValueTypes.dom, ValueTypes.templater, ValueTypes.tagComponent].includes((tagJsVar as TagJsVar).tagJsType)) {
-    return 663 // its not a tag this time
-  }
-  
   const lastSupport = global?.newest
   const isValueTag = isStaticTag(newValue)
   const newTag = newValue as AnySupport

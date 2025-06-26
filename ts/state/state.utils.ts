@@ -3,11 +3,13 @@ import { runFirstState, runRestate } from './stateHandlers.js'
 import { State, StateConfig } from './state.types.js'
 import { firstStatesHandler, reStatesHandler } from './states.utils.js'
 import { StateMemory } from './StateMemory.type.js'
+import { setUseMemory } from './setUseMemory.object.js'
+import { setSupportInCycle } from '../tag/getSupportInCycle.function.js'
 
 export function initState(
   support: AnySupport,
-  config: StateMemory,
 ) {
+  const config = setUseMemory.stateConfig
   config.handlers.handler = runFirstState
   config.handlers.statesHandler = firstStatesHandler as <T>(defaultValue: T | (() => T)) => (y: unknown) => T
   
@@ -15,15 +17,17 @@ export function initState(
   config.stateArray = []
   config.states = []
   config.statesIndex = 0
-  config.support = support
+  
+  setSupportInCycle(support)
 }
 
 export function reState(
   newSupport: AnySupport,
   prevSupport: AnySupport,
-  config: StateMemory,
   prevState: State,
 ) {
+  const config = setUseMemory.stateConfig
+
   // set previous state memory
   config.rearray = prevState
 
@@ -35,6 +39,7 @@ export function reState(
   config.handlers.statesHandler = reStatesHandler
   
   config.prevSupport = prevSupport
+  setSupportInCycle(newSupport)
 }
 
 export class StateEchoBack {}

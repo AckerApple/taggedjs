@@ -22,16 +22,17 @@ export function deleteSubContext(
   }
   
   delete (contextItem as any).delete
-  contextItem.handler = tagValueUpdateHandler
-  // ;(contextItem as any).checkValueChange = tagValueUpdateHandler
+  // contextItem.handler = tagValueUpdateHandler
+  // const tagJsVar = contextItem.tagJsVar as TagJsVar
+  //tagJsVar.processUpdate = tagValueUpdateHandler
   
   if(!subscription.hasEmitted) {
     return
   }
 
   const subContextItem = subscription.contextItem as AdvancedContextItem
-  const tagJsVar = subContextItem.tagJsVar as TagJsVar
-  tagJsVar.delete(
+  const subTagJsVar = subContextItem.tagJsVar as TagJsVar
+  subTagJsVar.delete(
     subContextItem,
     ownerSupport,
   )

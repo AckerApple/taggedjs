@@ -41,7 +41,7 @@ export function destroyContext(
       runBeforeDestroy(support, global)
     }
 
-    const subTags = global.context as ContextItem[]
+    const subTags = global.contexts
     // recurse
     destroyContext(subTags, support)
   }
@@ -68,7 +68,7 @@ export function getChildTagsToSoftDestroy(
       }
     }
 
-    const subTags = global.context as ContextItem[]
+    const subTags = global.contexts
     if(subTags) {
       getChildTagsToSoftDestroy(subTags, tags, subs)
     }

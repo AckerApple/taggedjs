@@ -15,8 +15,10 @@ import { checkTagValueChange, destroySupportByContextItem } from './checkTagValu
 import { AnySupport } from './AnySupport.type.js'
 import { renderTagElement } from '../render/renderTagElement.function.js'
 import { loadNewBaseSupport } from './loadNewBaseSupport.function.js'
+import { TagJsTag } from '../tagJsVars/tagJsVar.type.js'
+import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
 
-if( document ) {
+if( typeof(document) === 'object' ) {
   if( (document as any).taggedJs ) {
     console.warn('🏷️🏷️ Multiple versions of taggedjs are loaded. May cause issues.')
   }
@@ -53,7 +55,7 @@ export function tagElement(
   const appElmIndex = appElements.findIndex(appElm => appElm.element === element)
   if(appElmIndex >= 0) {
     const support = appElements[appElmIndex].support
-    destroySupport(support, support.subject.global)
+    destroySupport(support, support.context.global)
     appElements.splice(appElmIndex, 1)
     // an element already had an app on it
     console.warn('Found and destroyed app element already rendered to element', {element})
@@ -64,6 +66,7 @@ export function tagElement(
   let templater = (() => (templater2 as any)(props)) as unknown as TemplaterResult
   templater.propWatch = PropWatches.NONE
   templater.tagJsType = ValueTypes.stateRender
+  templater.processUpdate = tagValueUpdateHandler
   // todo: props should be an array
   templater.props = [props]
   ;(templater as any).isApp = true
@@ -71,7 +74,7 @@ export function tagElement(
   // create observable the app lives on
   const subject = getNewSubject(templater, element)
   const global = subject.global as BaseTagGlobal
-  initState(global.newest, setUseMemory.stateConfig)
+  initState(global.newest)
 
   let templater2 = app(props) as unknown as TemplaterResult
   const isAppFunction = typeof templater2 == BasicTypes.function
@@ -102,13 +105,14 @@ function getNewSubject(
   templater: TemplaterResult,
   appElement: Element,
 ) {
-  const tagJsVar = {
+  const tagJsVar: TagJsTag = {
     tagJsType: 'templater',
     checkValueChange: checkTagValueChange,
     delete: destroySupportByContextItem,
     processInit: function appDoNothing() {
       console.debug('do nothing app function')
-    }
+    },
+    processUpdate: tagValueUpdateHandler,
   }
 
   const subject: SupportContextItem = {
@@ -121,6 +125,8 @@ function getNewSubject(
   }
 
   const global = getNewGlobal(subject) as BaseTagGlobal
+  
+  // TODO: events are only needed on the base and not every support
   // for click events and such read at a higher level
   global.events = {}
 

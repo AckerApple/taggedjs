@@ -5,7 +5,7 @@ import { AnySupport } from '../AnySupport.type.js'
 export function safeRenderSupport(
   newest: AnySupport,
 ) {
-  const subject = newest.subject
+  const subject = newest.context
   const isInline = isInlineHtml(newest.templater)
   if( isInline ) {
     return renderInlineHtml(newest)

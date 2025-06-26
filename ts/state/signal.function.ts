@@ -6,66 +6,86 @@ import { ProcessInit } from '../tag/ProcessInit.type.js'
 import { Subscriber, SubscribeFn } from '../tagJsVars/subscribe.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { deleteAndUnsubscribe } from '../tag/update/setupSubscribe.function.js'
+import { tagValueUpdateHandler } from '../tag/update/tagValueUpdateHandler.function.js'
+import { blankHandler } from '../render/dom/attachDomElements.function.js'
+import { AnySupport, checkSubContext, ContextItem, TagCounts } from '../tag/index.js'
+import { handleTagTypeChangeFrom } from '../tag/update/checkSubContext.function.js'
 
 
 /** Checks if rendering cycle in process. Then creates object with "value" key and ability to "subscribe" to value changes */
 export function signal<T>(initialValue: T) {
-    const support = getSupportInCycle()
+  const support = getSupportInCycle()
 
-    if(support) {
-        return state(() => Signal(initialValue))
-    }
+  if(support) {
+    return state(() => Signal(initialValue))
+  }
 
-    return Signal(initialValue)
+  return Signal(initialValue)
 }
 
 export type SignalObject<T> = TagJsVar & {
-    tagJsType: typeof ValueTypes.signal
-    value: any
-    subscribe: SubscribeFn<T>
-    processInit: ProcessInit
-    emit: (value: any) => any
+  tagJsType: typeof ValueTypes.signal
+  value: any
+  subscribe: SubscribeFn<T>
+  processInit: ProcessInit
+  emit: (value: any) => any
 }
 
 /** Creates object with "value" key and ability to "subscribe" to value changes */
 export function Signal<T>(initialValue: T): SignalObject<T> {
-    let value: T = initialValue
-    const subscribers: Set<Subscriber<T>> = new Set()
-    const emit = (newValue: any) => {
-      // Notify all subscribers
-      subscribers.forEach(callback => callback(newValue))
-    }
+  let value: T = initialValue
+  const subscribers: Set<Subscriber<T>> = new Set()
+  const emit = (newValue: any) => {
+    // Notify all subscribers
+    subscribers.forEach(callback => callback(newValue))
+  }
 
-    return {
-        tagJsType: ValueTypes.signal,
-        processInit: processSignal,
-        
-        get value() {
-          return value
-        },
-        
-        set value(newValue: T) {
-            if (value !== newValue) {
-                value = newValue
-                emit(newValue)
-            }
-        },
+  return {
+    tagJsType: ValueTypes.signal,
+    processInit: processSignal,
+    
+    // processUpdate: tagValueUpdateHandler,
+    // processUpdate: checkSubContext,
+    processUpdate: (
+      newValue: unknown,
+      ownerSupport: AnySupport,
+      contextItem: ContextItem,
+      _values: unknown[],
+      counts: TagCounts,
+    ) => handleTagTypeChangeFrom(
+      ValueTypes.signal,
+      newValue,
+      ownerSupport,
+      contextItem,
+      counts,
+    ),
+    
+    get value() {
+      return value
+    },
+    
+    set value(newValue: T) {
+      if (value !== newValue) {
+        value = newValue
+        emit(newValue)
+      }
+    },
 
-        delete: deleteAndUnsubscribe,
-        emit,
+    delete: deleteAndUnsubscribe,
+    emit,
 
-        subscribe(callback: Subscriber<T>) {
-            callback(value) // emit initial value
+    subscribe(callback: Subscriber<T>) {
+      callback(value) // emit initial value
 
-            subscribers.add(callback)
-            
-            // Return an unsubscribe function
-            const unsub = () => subscribers.delete(callback)
-            
-            // support traditional unsubscribe
-            unsub.unsubscribe = unsub
+      subscribers.add(callback)
+      
+      // Return an unsubscribe function
+      const unsub = () => subscribers.delete(callback)
+      
+      // support traditional unsubscribe
+      unsub.unsubscribe = unsub
 
-            return unsub
-        },
-    }
+      return unsub
+    },
+  }
 }

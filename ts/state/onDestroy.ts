@@ -10,7 +10,7 @@ export function onDestroy(
 ) {
   state(function stateDestroy() {
     const support = getSupportInCycle() as AnySupport
-    const global = support.subject.global as SupportTagGlobal
+    const global = support.context.global as SupportTagGlobal
     global.destroy$.toCallback(callback)
   })
 }

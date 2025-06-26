@@ -96,7 +96,7 @@ export function syncFunctionProps(
   maxDepth: number,
   depth = -1, // 10 or 3
 ): Props {
-  const subject = oldSupport.subject
+  const subject = oldSupport.context
   const global = subject.global as SupportTagGlobal
   const newest = global.newest
 
@@ -143,7 +143,7 @@ export function moveProviders(
   oldSupport: AnySupport,
   newSupport: AnySupport,
 ) {
-  const global = oldSupport.subject.global as SupportTagGlobal
+  const global = oldSupport.context.global as SupportTagGlobal
   let pIndex = -1
   const providers = global.providers = global.providers || []
 
@@ -154,7 +154,7 @@ export function moveProviders(
     const pcLen = provider.children.length - 1
     while ( index++ < pcLen) {
       const child = provider.children[index]
-      const wasSameGlobals = global === child.subject.global
+      const wasSameGlobals = global === child.context.global
       if(wasSameGlobals) {
         provider.children.splice(index, 1)
         provider.children.push(newSupport as AnySupport)

@@ -13,10 +13,11 @@ export function processFirstSubjectValue(
   appendTo?: Element,
   insertBefore?: Text,
 ): AnySupport | undefined {
-  const tagJsVar = valueToTagJsVar(value)
-  contextItem.tagJsVar = tagJsVar
+  // const tagJsVar = valueToTagJsVar(value)
+  // contextItem.tagJsVar = tagJsVar
+  const tagJsVar = contextItem.tagJsVar
 
-  return (tagJsVar as any).processInit(
+  return tagJsVar.processInit(
     value,
     contextItem,
     ownerSupport,

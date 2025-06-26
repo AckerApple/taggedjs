@@ -5,7 +5,7 @@ import { empty, ValueTypes } from '../tag/ValueTypes.enum.js'
 import { destroySupport } from './destroySupport.function.js'
 import { paint, painting } from './paint.function.js'
 import { TagMaker } from '../tag/TagMaker.type.js'
-import { AnySupport, BaseTagGlobal, setUseMemory, SupportTagGlobal, Wrapper } from '../index.js'
+import { AnySupport, BaseTagGlobal, SupportTagGlobal, Wrapper } from '../index.js'
 import { createSupport } from '../tag/createSupport.function.js'
 import { runAfterRender } from '../render/afterRender.function.js'
 import { executeWrap } from './executeWrap.function.js'
@@ -95,7 +95,6 @@ export function runWrapper(
     reState(
       newSupport,
       global.newest, // global.oldest, // global.newest,
-      setUseMemory.stateConfig,
       oldest.state,
     )
   }

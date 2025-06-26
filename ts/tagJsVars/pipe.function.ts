@@ -1,8 +1,10 @@
 import { getSupportWithState } from "../interpolations/attributes/getSupportWithState.function.js"
+import { blankHandler } from "../render/dom/attachDomElements.function.js"
 import { AnySupport } from "../tag/AnySupport.type.js"
 import { getSupportInCycle } from "../tag/getSupportInCycle.function.js"
 import { AdvancedContextItem, ContextItem, TagCounts, ValueTypes } from "../tag/index.js"
 import { deleteAndUnsubscribe, setupSubscribe } from "../tag/update/setupSubscribe.function.js"
+import { tagValueUpdateHandler } from "../tag/update/tagValueUpdateHandler.function.js"
 import { LikeObservable, SubscribeCallback, SubscribeValue } from "./subscribe.function.js"
 
 /** Have an html tagged value as value of subscribe emissions, with initial default value emission. Automatically unsubscribes for you */
@@ -13,6 +15,8 @@ export function pipe<SubValue, DEFAULT>(
   return {
     tagJsType: ValueTypes.subscribe,
     processInit: processPipe,
+    // processUpdate: tagValueUpdateHandler,
+    processUpdate: blankHandler,
     delete: deleteAndUnsubscribe,
 
     callback,

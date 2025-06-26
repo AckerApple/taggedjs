@@ -4,7 +4,7 @@ import { TemplateValue } from "../tag/TemplateValue.type.js"
 import { forceUpdateExistingValue } from "../tag/update/index.js"
 import { TagJsVar } from "./tagJsVar.type.js"
 
-type InnerHTMLValue = {
+type InnerHTMLValue = TagJsVar & {
   tagJsType: 'innerHTML'
   processInit: ProcessInit
 }
@@ -39,7 +39,9 @@ function processInnerHTML(
   insertBefore?: Text,
 ) {
   contextItem.subContext = {} as SubContext
-  contextItem.handler = handleInnerHTML
+  
+  // contextItem.handler = handleInnerHTML
+  value.processUpdate = handleInnerHTML
 
   checkInnerHTML(
     value,
@@ -87,6 +89,7 @@ export function getInnerHTML(): TagJsVarInnerHTML {
   return {
     tagJsType: 'innerHTML',
     processInit: processInnerHTML,
+    processUpdate: handleInnerHTML,
     delete: deleteSubContext,
   }
 }

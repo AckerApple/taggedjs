@@ -20,18 +20,18 @@ export type HtmlSupport = {
   templater: TemplaterResult,
 
   // only on support
-  subject: ContextItem
+  context: ContextItem
 }
 
 /** used only for apps, otherwise use Support */
 export function getBaseSupport(
   templater: TemplaterResult,
-  subject: SupportContextItem,
+  context: SupportContextItem,
   castedProps?: Props,
 ): BaseSupport {
   const baseSupport = {
     templater,
-    subject,
+    context,
     castedProps,
 
     appSupport: undefined as unknown as AnySupport,
@@ -39,7 +39,7 @@ export function getBaseSupport(
   
   // baseSupport.appSupport = baseSupport
 
-  const global = subject.global
+  const global = context.global
   global.blocked = []
   global.destroy$ = new Subject<void>()
 
@@ -75,12 +75,12 @@ export function createHtmlSupport(
   templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
   ownerSupport: AnySupport,
   appSupport: AnySupport,
-  subject: ContextItem,
+  context: ContextItem,
   castedProps?: Props,
 ): AnySupport {
   const support = {
     templater,
-    subject,
+    context,
     castedProps,
 
     appSupport: undefined as unknown as AnySupport,

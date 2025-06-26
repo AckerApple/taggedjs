@@ -11,7 +11,7 @@ export function runAfterRender(
   support: AnySupport,
   ownerSupport?: AnySupport,
 ) {
-  const subject = support.subject
+  const subject = support.context
   ++subject.renderCount
 
   const config: StateMemory = setUseMemory.stateConfig

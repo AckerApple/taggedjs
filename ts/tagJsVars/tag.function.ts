@@ -13,6 +13,7 @@ import { AnyTag } from '../tag/AnyTag.type.js'
 import { processRenderOnceInit } from '../render/update/processRenderOnceInit.function.js'
 import { processTagComponentInit } from '../tag/update/processTagComponentInit.function.js'
 import { checkTagValueChange, destroySupportByContextItem } from '../tag/checkTagValueChange.function.js'
+import { tagValueUpdateHandler } from '../tag/update/tagValueUpdateHandler.function.js'
 
 let tagCount = 0
 
@@ -140,6 +141,7 @@ Object.defineProperty(tag, 'renderOnce', {
   set(oneRenderFunction: Wrapper) {
     oneRenderFunction.tagJsType = ValueTypes.renderOnce
     oneRenderFunction.processInit = processRenderOnceInit
+    oneRenderFunction.processUpdate = tagValueUpdateHandler
     oneRenderFunction.delete = destroySupportByContextItem
     oneRenderFunction.checkValueChange = function renderOnceNeverChanges() {
       return -1
@@ -155,6 +157,7 @@ Object.defineProperty(tag, 'use', {
     } as unknown as Original
     renderFunction.tagJsType = ValueTypes.stateRender
     renderFunction.processInit = processTagComponentInit
+    renderFunction.processUpdate = tagValueUpdateHandler
     renderFunction.checkValueChange = checkTagValueChange
     renderFunction.delete = destroySupportByContextItem
   },

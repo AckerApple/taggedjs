@@ -32,7 +32,7 @@ export function syncWrapCallback(
   callback: any,
   ownerSupport: AnySupport,
 ) {
-  const newestOwner = ownerSupport.subject.global.newest
+  const newestOwner = ownerSupport.context.global.newest
   
   // sync the new states to the old before the old does any processing
   syncStatesArray(newestOwner.states, ownerSupport.states)

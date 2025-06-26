@@ -15,7 +15,7 @@ export function onInit(
     return checkToResolvePromise(
       result,
       nowSupport,
-      nowSupport.subject.global,
+      nowSupport.context.global,
       'onInit',
       { resolvePromise, resolveValue },
     )

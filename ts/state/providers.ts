@@ -59,7 +59,7 @@ export const providers = {
       }
 
       stateDiffMemory.provider = provider
-      const global = support.subject.global as SupportTagGlobal
+      const global = support.context.global as SupportTagGlobal
       const providers = global.providers = global.providers || []
       providers.push(provider)
       stateDiffMemory.stateDiff = stateDiff
@@ -96,7 +96,7 @@ function providerInject<T>(constructor: ProviderConstructor<T>): T {
     } as AnySupport
   
     while(owner.ownerSupport) {
-      const ownGlobal = owner.ownerSupport.subject.global as SupportTagGlobal
+      const ownGlobal = owner.ownerSupport.context.global as SupportTagGlobal
       const ownerProviders = ownGlobal.providers
 
       if(!ownerProviders) {
@@ -114,7 +114,7 @@ function providerInject<T>(constructor: ProviderConstructor<T>): T {
       })
 
       if(provider) {
-        const global = support.subject.global as SupportTagGlobal
+        const global = support.context.global as SupportTagGlobal
         const providers = global.providers = global.providers || []
         providers.push(provider)
         provider.children.push(support)

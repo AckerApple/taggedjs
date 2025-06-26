@@ -9,8 +9,8 @@ export function getUpTags(
   support: AnySupport,
   supports: AnySupport[] = []
 ): AnySupport[] {
-  const subject = support.subject
-  // const global = support.subject.global as SupportTagGlobal
+  const subject = support.context
+  // const global = support.context.global as SupportTagGlobal
   const templater = support.templater
   const inlineHtml = isInlineHtml(templater)
   const ownerSupport = (support as Support).ownerSupport

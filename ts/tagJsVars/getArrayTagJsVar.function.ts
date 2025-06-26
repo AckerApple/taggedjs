@@ -4,6 +4,7 @@ import { processTagArray } from '../tag/update/processTagArray.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
 import { TagJsTag, TagJsVar } from './tagJsVar.type.js'
+import { tagValueUpdateHandler } from '../tag/update/tagValueUpdateHandler.function.js'
 
 
 export function getArrayTagVar(
@@ -13,6 +14,7 @@ export function getArrayTagVar(
     tagJsType: 'array',
     value,
     processInit: processArrayInit,
+    processUpdate: tagValueUpdateHandler,
     checkValueChange: checkArrayValueChange,
     delete: destroyArrayContextItem,
   }

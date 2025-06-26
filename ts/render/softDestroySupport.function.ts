@@ -9,13 +9,13 @@ import { ContextItem } from '../tag/ContextItem.type.js'
 export function softDestroySupport(
   lastSupport: AnySupport,
 ) {
-  const subject = lastSupport.subject
+  const subject = lastSupport.context
   const global = subject.global as SupportTagGlobal
-  const {subs, tags} = getChildTagsToSoftDestroy(global.context as ContextItem[])
+  const {subs, tags} = getChildTagsToSoftDestroy(global.contexts)
 
   softDestroyOne(global)
   for (const child of tags) {
-    const cGlobal = child.subject.global
+    const cGlobal = child.context.global
     if(cGlobal.deleted === true) {
       return
     }

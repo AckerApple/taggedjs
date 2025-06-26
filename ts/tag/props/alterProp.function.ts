@@ -174,7 +174,7 @@ function afterCheckProp(
 ) {
   // restore object to have original function on destroy
   if(depth > 0) {    
-    const global = newSupport.subject.global as SupportTagGlobal
+    const global = newSupport.context.global as SupportTagGlobal
     newProp[index].subscription = global.destroy$.toCallback(function alterCheckProcessor() {
       newProp[index] = originalValue as unknown as {subscription: Subject<void>}
     })
@@ -220,7 +220,7 @@ export function callbackPropOwner(
   callWith: unknown[],
   ownerSupport: AnySupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
 ) {
-  const global = ownerSupport.subject.global as SupportTagGlobal
+  const global = ownerSupport.context.global as SupportTagGlobal
   const newest = global?.newest || ownerSupport as AnySupport
   const supportInCycle = getSupportInCycle()
   const noCycle = supportInCycle === undefined
@@ -229,7 +229,7 @@ export function callbackPropOwner(
   const callbackResult = toCall.apply(owner, callWith)
 
   const run = function propCallbackProcessor() {
-    const subject = newest.subject
+    const subject = newest.context
     const global = subject.global as SupportTagGlobal
     
     if(!global || subject.locked === true) {

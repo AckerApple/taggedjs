@@ -26,7 +26,7 @@ export function renderWithSupport(
   if(!isLikeTag) {
     moveProviders(lastSupport as AnySupport, reSupport)
     softDestroySupport(lastSupport)
-    const global = reSupport.subject.global as SupportTagGlobal
+    const global = reSupport.context.global as SupportTagGlobal
     global.oldest = reSupport
     global.newest = reSupport
   } else if(lastSupport) {

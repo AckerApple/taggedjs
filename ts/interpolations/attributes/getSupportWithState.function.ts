@@ -8,5 +8,5 @@ export function getSupportWithState(support: AnySupport) {
     component = component.ownerSupport as AnySupport
   }
 
-  return component.subject.global.newest || component
+  return component.context.global.newest || component
 }

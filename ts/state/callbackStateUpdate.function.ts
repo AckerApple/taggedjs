@@ -11,7 +11,7 @@ export default function callbackStateUpdate<T>(
   callback: Callback<any, any,any, any, any, any, T>,
   ...args: any[]
 ): T {
-  const global = support.subject.global as SupportTagGlobal
+  const global = support.context.global as SupportTagGlobal
   const newestSupport = global.newest
 
   // NEWEST UPDATE OLDEST: ensure that the oldest has the latest values first

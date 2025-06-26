@@ -3,16 +3,21 @@ import { castTextValue } from '../castTextValue.function.js'
 import { paintBeforeText, paintCommands, paintRemover } from "../render/paint.function.js"
 import { BasicTypes, ContextItem } from "../index.js"
 import { processUpdateRegularValue, RegularValue } from "../tag/update/processRegularValue.function.js"
+import { TagJsTag } from "./tagJsVar.type.js"
+import { tagValueUpdateHandler } from "../tag/update/tagValueUpdateHandler.function.js"
 
 export function getSimpleTagVar(
   value: any,
-) {
+): TagJsTag {
   return {
     tagJsType: 'simple',
     value,
     processInit: processSimpleValueInit,
-    checkValueChange: checkSimpleValueChange,
     delete: deleteSimpleValue,
+    
+    // TODO: get down to only one
+    checkValueChange: checkSimpleValueChange,
+    processUpdate: tagValueUpdateHandler,
   }
 }
 
