@@ -21,9 +21,17 @@ export function focus(
 export function click(
   q: string
 ) {
-  const items = [...query(q)]
+  clickEach([...query(q)])
+}
+
+export function clickEach(items: HTMLElement[]) {
   items.forEach(elm => (elm as HTMLElement).click())
-  // items.map(elm => elm.dispatchEvent(new MouseEvent('click')))
+}
+
+export function clickById(
+  id: string
+) {
+  click('#' + id)
 }
 
 export function clickOne(
@@ -85,8 +93,10 @@ export function byId(id: string): HTMLElement & { value: string | number } {
   return document.getElementById(id) as any
 }
 
+/** Returns empty string also when element not found */
 export function htmlById(id: string): string {
-  return (document.getElementById(id) as HTMLElement).innerHTML
+  const element = document.getElementById(id)
+  return element?.innerHTML || ''
 }
 
 export function lastById(id: string): Element {

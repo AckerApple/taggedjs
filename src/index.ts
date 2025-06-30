@@ -1,4 +1,4 @@
-export { hmr } from "taggedjs"
+export { hmr, tagElement } from "taggedjs"
 export { App } from "./app.tag"
 
 import IsolatedApp from "./isolatedApp"

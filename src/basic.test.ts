@@ -10,9 +10,17 @@ it('elements exists', () => {
 
 it('toggle test', () => {
   const toggleTest = byId('toggle-test')
+  
+  expect(toggleTest.innerText).toBe('toggle test')
+  
   toggleTest.click()
+  
+  // after click now true
   expect(toggleTest.innerText).toBe('toggle test true')
+  
   toggleTest.click()
+  
+  // after click now false
   expect(toggleTest.innerText).toBe('toggle test')
   
   const propsTextarea = byId('props-debug-textarea') as HTMLTextAreaElement

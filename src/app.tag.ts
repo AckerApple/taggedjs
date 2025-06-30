@@ -62,7 +62,11 @@ export const homePage = () => tag.use = (
     testEmoji,
   })),
 
-  toggle = () => toggleValue = !toggleValue,
+  toggle = () => {
+    console.log('lets set toggleValue...', toggleValue)
+    toggleValue = !toggleValue
+    console.log('set toggleValue', toggleValue)
+  },
 ) => {
   // states(get => ({ appCounter } = get({ appCounter })))
 
@@ -112,6 +116,8 @@ export const homePage = () => tag.use = (
 
   ++renderCount
 
+  console.log('read toggleValue', toggleValue)
+
   return html`
     <button onclick=${() => fireTesting(true, onTestComplete)}>run tests ${testEmoji}</button>
 
@@ -132,7 +138,7 @@ export const homePage = () => tag.use = (
       <span>
         🍒$.value&lt;<span id="app-counter-subject-value-display">${appCounterSubject.value}</span>&gt;
       </span>
-      <button id="toggle-test" onclick=${toggle}>toggle test ${toggleValue}</button>
+      <button id="toggle-test" onclick=${() => toggle()}>toggle test ${toggleValue}</button>
     </fieldset>  
 
     <div style="display:flex;flex-wrap:nowrap;gap:1em;justify-content: center;">

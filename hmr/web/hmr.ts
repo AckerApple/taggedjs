@@ -418,6 +418,7 @@ function rebuildApps() {
         /** @type {{tagElement: tagElement}} */
         const { tagElement } = newApp.hmr
         if((element as any).destroy) {
+          return
           console.debug('🗑️ destroying tag already on element', { element })
           const destroyRun = (element as any).destroy()
         }

@@ -1,6 +1,7 @@
 // taggedjs-no-compile
 
-import { byId, click, html, query, htmlById, changeOne, textContent, clickOne } from "./testing/elmSelectors"
+import { testStaggerBy } from "./ContentDebug.tag"
+import { byId, click, html, query, htmlById, changeOne, textContent, clickOne, clickById, count } from "./testing/elmSelectors"
 import { expect, describe, it } from "./testing/expect"
 import { expectMatchedHtml, sleep } from "./testing/expect.html"
 
@@ -134,37 +135,70 @@ describe('📰 content', () => {
   })
 
   it('animates', async () => {
-    const added = Number(textContent('#content-fx-added'))
-    const removed = Number(textContent('#content-fx-removed'))
+    expect(count('[name=test-the-tester]')).toBe(0)
     
     //show
     click('#content-toggle-fx')
 
-    expect(Number(textContent('#content-fx-added'))).toBe(added)
+    expect(count('[name=test-the-tester]')).toBe(3)
+    expect(count('.animate__animated[name=test-the-tester]')).toBe(1)
     
-    await sleep(10)
+    await sleep(testStaggerBy * 2)
     
-    expect(Number(textContent('#content-fx-added'))).toBe(added + 2)
-
-    await sleep(10)
-
-    expect(Number(textContent('#content-fx-added'))).toBe(added + 3)
+    // after one stagger
+    expect(count('[name=test-the-tester]')).toBe(3)
+    expect(count('.animate__animated[name=test-the-tester]')).toBe(2)
+    
+    await sleep(testStaggerBy / 2)
+    
+    // almost shown
+    expect(count('[name=test-the-tester]')).toBe(3)
+    expect(count('.animate__animated[name=test-the-tester]')).toBe(2)
     expect(textContent('#outer-html-fx-test')).toBe('inner html tag')
+    /*
+    await sleep(1000 - testStaggerBy)
+    
+    expect(count('.animate__animated[name=test-the-tester]')).toBe(1)
+    */
+    await sleep(100 + testStaggerBy * 3)
+   
+    // completed showing
+    expect(count('[name=test-the-tester]')).toBe(3)
+    expect(count('.animate__animated[name=test-the-tester]')).toBe(0)
     
     // hide
     click('#content-toggle-fx')
 
     // no changes to remove yet
-    expect(Number(textContent('#content-fx-removed'))).toBe(removed)
+    expect(count('[name=test-the-tester]')).toBe(3)
+    expect(count('.animate__animated[name=test-the-tester]')).toBe(1)
     
-    await sleep(95)
+    await sleep(100 + testStaggerBy * 6)
     
-    // about to start animating
-    expect(Number(textContent('#content-fx-removed'))).toBe(removed)
+    // should be done disappearing
+    expect(count('[name=test-the-tester]')).toBe(0)
+    expect(count('.animate__animated[name=test-the-tester]')).toBe(0)
+  })
+
+  it('host', () => {
+    let hostDestroyCount = Number(htmlById('hostDestroyCount'))
+
+    // should be a number
+    expect(isNaN(Number(htmlById('hostedContent')))).toBe(false)
+
+    clickById('hostHideShow')
+
+    expect( Number(htmlById('hostDestroyCount')) ).toBe(hostDestroyCount + 1)
+
+    // should NOT be a number
+    expect(htmlById('hostedContent')).toBe('')
+
+    clickById('hostHideShow')
+
+    // should be a number
+    expect(isNaN(Number(htmlById('hostedContent')))).toBe(false)
     
-    await sleep(80)
-    
-    expect(Number(textContent('#content-fx-removed'))).toBe(removed + 3)
-    expect(Number(textContent('#content-fx-added'))).toBe(added + 3) // still same
+    // still same number
+    expect( Number(htmlById('hostDestroyCount')) ).toBe(hostDestroyCount + 1)
   })
 })

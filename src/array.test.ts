@@ -52,7 +52,9 @@ describe('⠇ array testing', () => {
     // remove player 1
     const result = await (byId('player-remove-promise-btn-0') as any)._click()
     expect(result).toBe('promise-no-data-ever')
+    
     await delay(fxTime) // animation
+    await result
 
     expect(elmCount('#player-remove-promise-btn-0')).toBe(0)
     expect(elmCount('#player-edit-btn-0')).toBe(0)
@@ -74,7 +76,7 @@ describe('⠇ array testing', () => {
 
     const result = await (byId('player-remove-promise-btn-0') as any).click()
     expect(result).toBe('promise-no-data-ever')
-    await delay(fxTime) // animation
+    await delay(fxTime - 10) // animation
 
     expect(elmCount('#score-data-0-1-inside-button')).toBe(1)
     expect(elmCount('#score-data-0-1-outside-button')).toBe(1)
@@ -84,7 +86,8 @@ describe('⠇ array testing', () => {
 
     const result2 = await (byId('player-remove-promise-btn-0') as any).click()
     expect(result2).toBe('promise-no-data-ever')
-    await delay(fxTime) // animation
+    
+    await delay(fxTime + 25) // animation
 
     expect(elmCount('#score-data-0-1-inside-button')).toBe(0)
     expect(elmCount('#score-data-0-1-outside-button')).toBe(0)

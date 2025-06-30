@@ -105,7 +105,7 @@ async function swapSupport(
 
   const appSupport = oldest.appSupport
   const ownerSupport = oldest.ownerSupport as AnySupport
-  const ownGlobal = ownerSupport.subject.global as SupportTagGlobal
+  const ownGlobal = ownerSupport.context.global as SupportTagGlobal
   const providers = global.providers
   const owner = ownGlobal.oldest as Support
 
@@ -127,7 +127,7 @@ async function swapSupport(
     placeholder,
   )
 
-  recurseContext(global.context, reSupport)
+  recurseContext(global.contexts, reSupport)
 
   paint()
 
@@ -177,7 +177,7 @@ function recurseContext(
     const nextGlobal = contextItem.global
 
     if(contextItem.global) {
-      const nextContext = nextGlobal?.context
+      const nextContext = nextGlobal?.contexts
       if(nextContext) {
         const nextSupport = nextGlobal.newest as AnySupport
         recurseContext(nextContext, nextSupport)

@@ -1,20 +1,21 @@
-import { TagJsEvent, subscribeWith, LikeObjectChildren, html, tag, ValueSubject, state, combineLatest, willPromise, states, subscribe, Subject, getInnerHTML, TagCounts, subject } from "taggedjs"
+import { TagJsEvent, subscribeWith, LikeObjectChildren, html, tag, ValueSubject, state, combineLatest, willPromise, states, subscribe, Subject, getInnerHTML, TagCounts, subject, host, onDestroy } from "taggedjs"
 import { dumpContent } from "./dumpContent.tag"
 import { renderCountDiv } from "./renderCount.component"
 import { Subject as RxSubject, startWith } from "rxjs"
-import { fadeInDown, fadeOutUp } from "taggedjs-animate-css"
+import { fadeInDown, fadeOutUp, fx } from "taggedjs-animate-css"
+
+export const testStaggerBy = 20
 
 const animateWrap = (
   counts: ValueSubject<TagCounts>,
-  staggerBy: number = 10,
+  staggerBy: number = testStaggerBy,
 ) => {
   const innerHTML = getInnerHTML()
 
   const oninit = (a: any) =>
     fadeInDown({
       ...a,
-      staggerBy,
-    }).then(() => {
+    }, staggerBy).then(() => {
       ++counts.value.added
       counts.next(counts.value)
     })
@@ -22,8 +23,7 @@ const animateWrap = (
   const ondestroy = (b: any)=>
     fadeOutUp({
       ...b,
-      staggerBy,
-    } as any).then(() => {
+    } as any, staggerBy).then(() => {
       ++counts.value.removed
       counts.next(counts.value)
     })
@@ -94,6 +94,7 @@ export const concatStyles = tag((innerHTML: any) => {
 export const content = tag(() => {
   const sub0 = state(() => new Subject<number>())
   const sub1 = state(() => new ValueSubject<number>(3))
+  const subArray = state(() => new ValueSubject<string[]>(['a','b','c']))
   const vs0 = state(() => new ValueSubject(0))
   const vs1 = state(() => new ValueSubject(1))
 
@@ -101,7 +102,7 @@ export const content = tag(() => {
   let orangeToggle = true
   let boldToggle = false
   let counter = 0
-  let staggerBy = 10
+  let staggerBy = testStaggerBy
   let showHideFx = false
   const counts = state(() => new Subject({ added: 0, removed: 0})) as ValueSubject<TagCounts>
 
@@ -144,16 +145,18 @@ export const content = tag(() => {
         hide show
       </legend>
       
-      <button id="content-toggle-fx" type="button" onclick=${() => showHideFx = !showHideFx}>toggle hideshow fx</button>
+      <button id="content-toggle-fx" type="button"
+        onclick=${() => showHideFx = !showHideFx}
+      >toggle hideshow fx</button>
 
-      ${showHideFx && (animateWrap(counts, staggerBy).innerHTML = html`
-        test the tester - 0
+      ${showHideFx && (html`
+        <div name="test-the-tester" ${fx({duration:'10ms'})}>test the tester - 0</div>
       `)}
-      ${showHideFx && (animateWrap(counts, staggerBy).innerHTML = html`
-        test the tester - 1
+      ${showHideFx && (html`
+        <div name="test-the-tester" ${fx({duration:'10ms', stagger: staggerBy})}>test the tester - 1</div>
       `)}
-      ${showHideFx && (animateWrap(counts, staggerBy).innerHTML = html`
-        test the tester - 2
+      ${showHideFx && (html`
+        <div name="test-the-tester" ${fx({duration:'10ms', stagger: staggerBy * 2})}>test the tester - 2</div>
       `)}
       ${showHideFx && (outerHtml(staggerBy).innerHTML = innerHtmlTag())}
 
@@ -285,51 +288,74 @@ export const content = tag(() => {
         <span id="content-dom-parse-0-1">"${'<div>hello</div>'}"</span>
       </div>
     </div>
-    <strong>Subscribe</strong>
-    <div style="display:flex;flex-wrap:wrap;gap:1em;font-size:0.8em">
-      <div style="display:flex;flex-wrap:wrap;gap:1em">
-        <fieldset style="flex-grow:1">
-          <legend> subscribe</legend>
-          0 === <span id="content-subscribe-sub0">${subscribe(sub0)}</span>
-        </fieldset>
-
-        <fieldset style="flex-grow:1">
-          <legend> subscribe with default</legend>
-          0 === <span id="content-subscribe-sub0-with">${subscribeWith(sub0, -1)}</span>
-        </fieldset>
-
-        <fieldset style="flex-grow:1">
-          <legend>value subject</legend>
-          0 === ${subscribe(vs0)}
-        </fieldset>
+    <fieldset>
+      <legend>Subscribe()</legend>
+      
+      <div style="display:flex;flex-wrap:wrap;gap:1em;font-size:0.8em">
+        <div style="display:flex;flex-wrap:wrap;gap:1em">
+          <fieldset style="flex-grow:1">
+            <legend>subscribe</legend>
+            0 === <span id="content-subscribe-sub0">${subscribe(sub0)}</span>
+          </fieldset>
+  
+          <fieldset style="flex-grow:1">
+            <legend>subscribe map</legend>
+            0 === <span id="content-subscribe-sub-map">${subscribe(subArray, array => {
+              return array.map(x => html`👉<strong>${x}</strong>👈`.key(x))
+            })}</span>
+          </fieldset>
+  
+          <fieldset style="flex-grow:1">
+            <legend>subscribe select</legend>
+            <select>
+              <option value="">select option</option>
+              ${subscribe(subArray, array => {
+                return array.map(x => html`<option value=${x}>${x}</option>`.key(x))
+              })}
+            </select>
         
-        <fieldset style="flex-grow:1">
-          <legend>piped subject</legend>        
-          <span id="content-subject-pipe-display0">55</span>&nbsp;===&nbsp;
-          <span id="content-subject-pipe-display1">
-            ${subscribe(vs0, () => 55)}
-          </span>
-        </fieldset>
-
-        <fieldset style="flex-grow:1">
-          <legend>combineLatest</legend>
-          <span id="content-combineLatest-pipe-display0">1</span>&nbsp;===&nbsp;
-          <span id="content-combineLatest-pipe-display1">${subscribe(combineLatest([vs0, vs1]).pipe(x => x[1]))}</span>
-        </fieldset>
-
-        <fieldset style="flex-grow:1">
-          <legend>combineLatest piped html</legend>
-          <span id="content-combineLatest-pipeHtml-display0"><b>bold 77</b></span>&nbsp;===&nbsp;
-          <span id="content-combineLatest-pipeHtml-display1">${
-            subscribe(
-              combineLatest([vs0, vs1]).pipe(
-                willPromise(x => Promise.resolve(html`<b>bold 77</b>`))
+          </fieldset>
+  
+          <fieldset style="flex-grow:1">
+            <legend>subscribe with default</legend>
+            0 === <span id="content-subscribe-sub0-with">${subscribeWith(sub0, -1)}</span>
+          </fieldset>
+  
+          <fieldset style="flex-grow:1">
+            <legend>value subject</legend>
+            0 === ${subscribe(vs0)}
+          </fieldset>
+          
+          <fieldset style="flex-grow:1">
+            <legend>piped subject</legend>        
+            <span id="content-subject-pipe-display0">55</span>&nbsp;===&nbsp;
+            <span id="content-subject-pipe-display1">
+              ${subscribe(vs0, () => 55)}
+            </span>
+          </fieldset>
+          
+          ${testHost()}
+  
+          <fieldset style="flex-grow:1">
+            <legend>combineLatest</legend>
+            <span id="content-combineLatest-pipe-display0">1</span>&nbsp;===&nbsp;
+            <span id="content-combineLatest-pipe-display1">${subscribe(combineLatest([vs0, vs1]).pipe(x => x[1]))}</span>
+          </fieldset>
+  
+          <fieldset style="flex-grow:1">
+            <legend>combineLatest piped html</legend>
+            <span id="content-combineLatest-pipeHtml-display0"><b>bold 77</b></span>&nbsp;===&nbsp;
+            <span id="content-combineLatest-pipeHtml-display1">${
+              subscribe(
+                combineLatest([vs0, vs1]).pipe(
+                  willPromise(x => Promise.resolve(html`<b>bold 77</b>`))
+                )
               )
-            )
-          }</span>
-        </fieldset>
+            }</span>
+          </fieldset>
+        </div>
       </div>
-    </div>
+    </fieldset>
     ${renderCountDiv({renderCount, name: 'ContentDebug'})}
   `
 })
@@ -375,9 +401,15 @@ const passSubscription = tag(({
     <button id="passed-in-sub-next"
       onclick=${() => ob.next(sub0.value = (sub0.value || 0) + 1)}
     >ob increase</button>
-    <button id="passed-in-sub-hide-show" onclick=${() => onOff = !onOff}>on/off - ${onOff}</button>
-    <div id="passed-in-sub-ex0">0||${onOff && subscribe(sub0)}||0</div>
-    <div id="passed-in-sub-ex1">1||${onOff && subscribe(sub0, numberFun)}||1</div>
+    <button id="passed-in-sub-hide-show" onclick=${() => onOff = !onOff}>hide/show on/off - ${onOff}</button>
+    <div>
+      <strong>test 0</strong>
+      <div id="passed-in-sub-ex0">0||${onOff && subscribe(sub0)}||0</div>
+    </div>
+    <div>
+      <strong>test 1</strong>
+      <div id="passed-in-sub-ex1">1||${onOff && subscribe(sub0, numberFun)}||1</div>
+    </div>
     <div id="passed-in-sub-ex2">2||${onOff && subscribe(sub0, numberTag)}||2</div>
     <div id="passed-in-sub-ex3">3||${subscribe(sub1, numberTag)}||3</div>
     <div id="passed-in-sub-ex4">4||${subscribe(ob, numberTag)}||4</div>
@@ -397,4 +429,39 @@ const numberTag = tag((x: number) => {
 
 const innerHtmlTag = tag(() => {
   return html`inner html tag`
+})
+
+const testHost = tag(() => {
+  let hideShow = true
+  let destroyCount = 0
+  let clickCounter = 0
+
+  states(get => [{
+    hideShow, destroyCount, clickCounter,
+  }] = get({
+    hideShow, destroyCount, clickCounter,
+  }))
+
+  return html`
+    <fieldset style="flex-grow:1">
+      <legend>host</legend>
+      ${hideShow && html`
+        <span id="hostedContent"
+          ${host(
+            element => element.innerHTML = Date.now().toString(),
+            {
+              onDestroy: () => ++destroyCount,
+            }
+          )}
+        ></span>
+        <button type="button" onclick=${() => ++clickCounter}>
+          clickCounter:${clickCounter}
+        </button>
+      `}
+      <button id="hostHideShow"
+        onclick=${() => hideShow = !hideShow}
+      >hide/show</button>
+      <div>destroyCount: <span id="hostDestroyCount">${destroyCount}</span></div>
+    </fieldset>
+  `
 })

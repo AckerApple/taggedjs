@@ -1,4 +1,4 @@
-import { AnySupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, StringTag, ContextItem, getNewGlobal, getBaseSupport, SupportTagGlobal, SupportContextItem } from 'taggedjs'
+import { AnySupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, StringTag, ContextItem, getNewGlobal, getBaseSupport, SupportTagGlobal, SupportContextItem, valueToTagJsVar } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -39,20 +39,21 @@ console.debug(`💾 wrote ${fileSavePath}`)
 function templaterToSupport(
   templater: TemplaterResult,
 ) {
-  const subject: SupportContextItem = {
+  const context: SupportContextItem = {
     renderCount: 0,
     value: templater,
+    tagJsVar: valueToTagJsVar(templater),
     global: undefined as any, // populated below in getNewGlobal
     // checkValueChange: checkSimpleValueChange,
     // delete: deleteSimpleValue,
     withinOwnerElement: false,
   }
   
-  getNewGlobal(subject) as SupportTagGlobal
+  getNewGlobal(context) as SupportTagGlobal
   templater.props = templater.props || []
-  const support = getBaseSupport(templater, subject) as any as Support
+  const support = getBaseSupport(templater, context) as any as Support
 
-  readySupport(support, subject)
+  readySupport(support, context)
 
   return support
 }
@@ -75,8 +76,8 @@ function templaterToHtml(
   templater: TemplaterResult,
 ) {
   const support = templaterToSupport(templater)
-  const global = support.subject.global as SupportTagGlobal
-  const context = global.context as ContextItem[]
+  const global = support.context.global as SupportTagGlobal
+  const context = global.contexts
   const tag = support.templater.tag as StringTag // TODO: most likely do not want strings below
   const template = tag.strings // support.getTemplate()
   const strings = new Array(...template) // clone
@@ -136,6 +137,7 @@ function processValue(
             {
               value,
               global: getNewGlobal(subject as ContextItem),
+              tagJsVar: valueToTagJsVar(value),
               // checkValueChange: checkSimpleValueChange,
               // delete: destorySupportByContextItem,
               withinOwnerElement: subject?.withinOwnerElement || false,

@@ -6,10 +6,12 @@
     "start:hmr": "node --loader ts-node/esm ./hmr/hmr-server.ts --dir \"./src\"",
     "build": "run-s build:hmr build:bundle",
     "build:bundle": "node --loader ts-node/esm ./runBundleScript.ts",
+    "build:watch": "node --loader ts-node/esm ./runBundleScript.ts",
     "build:js": "rm -rf assets/js && mkdir assets/js && tsc -p tsconfig.build.json",
     "build:hmr": "node hmr/runBundleScript.hmr.mjs",
     "build:test": "ts-node src/testbuild.ts -p tsconfig.build.json",
-    "test": "jest"
+    "test": "jest",
+    "update:fx": "cp -R ../../taggedjs-animate-css/main/dist/. ./node_modules/taggedjs-animate-css"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
@@ -34,6 +36,6 @@
     "ws": "^8.15.1"
   },
   "dependencies": {
-    "taggedjs-animate-css": "^0.0.8"
+    "taggedjs-animate-css": "^0.0.14"
   }
 }
