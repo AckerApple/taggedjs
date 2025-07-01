@@ -48,7 +48,8 @@ function attachDomElement(newNode, node, values, support, context, counts, appen
             const name = attr[0];
             const value = attr[1];
             const isSpecial = attr[2] || false;
-            processAttribute(values, name, domElement, support, howToSetFirstInputValue, context, isSpecial, counts, value);
+            const howToSet = howToSetFirstInputValue;
+            processAttribute(values, name, domElement, support, howToSet, context, isSpecial, counts, value);
         }
     }
     if (appendTo) {

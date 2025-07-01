@@ -1,5 +1,5 @@
 import { destroyArray } from './checkDestroyPrevious.function.js';
-import { paint, paintCommands, painting, paintRemover } from '../render/paint.function.js';
+import { paint, painting, addPaintRemover } from '../render/paint.function.js';
 /** sets global.deleted on support and all children */
 export function smartRemoveKids(global, allPromises) {
     const context = global.contexts;
@@ -64,7 +64,7 @@ function smartRemoveByContext(context, allPromises) {
         const elm = subject.simpleValueElm;
         if (elm) {
             delete subject.simpleValueElm;
-            paintCommands.push([paintRemover, [elm, 'destroy simpleValueElm']]);
+            addPaintRemover(elm);
             continue;
         }
         const subGlobal = subject.global;
@@ -95,12 +95,12 @@ function destroyClones(global) {
 function destroyClone(clone) {
     const marker = clone.marker;
     if (marker) {
-        paintCommands.push([paintRemover, [marker, 'destroy-marker-clone']]);
+        addPaintRemover(marker);
     }
     const dom = clone.domElement;
     if (!dom) {
         return;
     }
-    paintCommands.push([paintRemover, [dom, 'destroy-clone']]);
+    addPaintRemover(dom);
 }
 //# sourceMappingURL=smartRemoveKids.function.js.map

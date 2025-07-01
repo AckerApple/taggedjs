@@ -24,7 +24,6 @@ context, isSpecial, counts, value) {
         const contextItem = addOneContext(value, context, true);
         contextItem.isAttr = true;
         contextItem.element = element;
-        contextItem.howToSet = howToSet;
         contextItem.isNameOnly = true;
         if (value.tagJsType) {
             contextItem.tagJsVar = value;
@@ -32,6 +31,7 @@ context, isSpecial, counts, value) {
             contextItem.supportOwner = support;
             return processHost(element, value, contextItem);
         }
+        contextItem.howToSet = howToSet;
         const tagJsVar = contextItem.tagJsVar;
         tagJsVar.processUpdate = processUpdateAttrContext;
         // stand alone attributes

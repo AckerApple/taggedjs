@@ -23,9 +23,7 @@ export function Signal(initialValue) {
     return {
         tagJsType: ValueTypes.signal,
         processInit: processSignal,
-        // processUpdate: tagValueUpdateHandler,
-        // processUpdate: checkSubContext,
-        processUpdate: (newValue, ownerSupport, contextItem, _values, counts) => handleTagTypeChangeFrom(ValueTypes.signal, newValue, ownerSupport, contextItem, counts),
+        processUpdate: (newValue, ownerSupport, contextItem, counts) => handleTagTypeChangeFrom(ValueTypes.signal, newValue, ownerSupport, contextItem, counts),
         get value() {
             return value;
         },

@@ -1,5 +1,5 @@
 import { castTextValue } from '../castTextValue.function.js';
-import { paintBeforeText, paintCommands, paintRemover } from "../render/paint.function.js";
+import { paintBeforeText, paintCommands, addPaintRemover } from "../render/paint.function.js";
 import { BasicTypes } from "../index.js";
 import { processUpdateRegularValue } from "../tag/update/processRegularValue.function.js";
 import { tagValueUpdateHandler } from "../tag/update/tagValueUpdateHandler.function.js";
@@ -29,7 +29,7 @@ contextItem, ownerSupport, counts, appendTo, insertBefore) {
 export function deleteSimpleValue(contextItem) {
     const elm = contextItem.simpleValueElm;
     delete contextItem.simpleValueElm;
-    paintCommands.push([paintRemover, [elm, 'simple-tag-remove']]);
+    addPaintRemover(elm);
 }
 export function checkSimpleValueChange(newValue, contextItem) {
     const isBadValue = newValue === null || newValue === undefined;

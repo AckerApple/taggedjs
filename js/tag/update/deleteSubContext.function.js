@@ -1,11 +1,11 @@
-import { paintCommands, paintRemover } from '../../render/paint.function.js';
+import { addPaintRemover } from '../../render/paint.function.js';
 export function deleteSubContext(contextItem, ownerSupport) {
     const subscription = contextItem.subContext;
     subscription.deleted = true;
     delete contextItem.subContext;
     const appendMarker = subscription.appendMarker;
     if (appendMarker) {
-        paintCommands.push([paintRemover, [appendMarker, 'subcontext-delete']]);
+        addPaintRemover(appendMarker);
         delete subscription.appendMarker;
     }
     delete contextItem.delete;

@@ -1,12 +1,12 @@
 import { ValueTypes } from '../ValueTypes.enum.js';
 import { updateToDiffValue } from './updateToDiffValue.function.js';
-export function checkSubContext(newValue, ownerSupport, contextItem, values, counts) {
+export function checkSubContext(newValue, ownerSupport, contextItem, counts) {
     const hasChanged = handleTagTypeChangeFrom(ValueTypes.subscribe, newValue, ownerSupport, contextItem, counts);
     if (hasChanged) {
         return hasChanged;
     }
     const subscription = contextItem.subContext;
-    if (!subscription.hasEmitted) {
+    if (!subscription || !subscription.hasEmitted) {
         return -1;
     }
     subscription.callback = newValue.callback;

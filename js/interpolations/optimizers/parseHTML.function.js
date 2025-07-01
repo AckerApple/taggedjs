@@ -194,6 +194,11 @@ function parseAttrString(attrMatch, valueIndex, valuePositions, attributes) {
     if (isSpecial) {
         attrSet.push(isSpecial);
     }
+    // force style to be first so other style manipulating attributes do not get overwritten
+    if (fixedName === 'style') {
+        attributes.unshift(attrSet);
+        return valueIndex;
+    }
     attributes.push(attrSet);
     return valueIndex;
 }

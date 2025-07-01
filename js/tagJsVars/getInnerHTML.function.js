@@ -1,6 +1,6 @@
 import { deleteSubContext, guaranteeInsertBefore, onFirstSubContext } from "../index.js";
 import { forceUpdateExistingValue } from "../tag/update/index.js";
-function handleInnerHTML(value, newSupport, contextItem, _values, counts) {
+function handleInnerHTML(value, newSupport, contextItem, counts) {
     const owner = value.owner;
     const realValue = owner._innerHTML;
     realValue.processInit = realValue.oldProcessInit;

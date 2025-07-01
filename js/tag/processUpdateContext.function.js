@@ -20,7 +20,7 @@ index, context, ownerSupport, counts) {
         return;
     }
     const tagJsVar = contextItem.tagJsVar;
-    tagJsVar.processUpdate(newValue, ownerSupport, contextItem, values, counts);
+    tagJsVar.processUpdate(newValue, ownerSupport, contextItem, counts, values);
     contextItem.value = newValue;
     // contextItem.tagJsVar = valueToTagJsVar(newValue)
 }

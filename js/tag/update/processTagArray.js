@@ -55,7 +55,7 @@ function reviewPreviousArrayItem(value, itemSubject, lastArray, ownerSupport, in
 counts, appendTo) {
     const couldBeSame = lastArray.length > index;
     if (couldBeSame) {
-        tagValueUpdateHandler(value, ownerSupport, itemSubject, undefined, counts);
+        tagValueUpdateHandler(value, ownerSupport, itemSubject, counts);
         return itemSubject;
     }
     const contextItem = createAndProcessContextItem(value, ownerSupport, counts, runtimeInsertBefore, appendTo);

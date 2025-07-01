@@ -1,6 +1,6 @@
 import { processAttributeEmit } from './processAttribute.function.js';
 import { updateNameOnlyAttrValue } from '../../interpolations/attributes/updateAttribute.function.js';
-export function processUpdateAttrContext(value, ownerSupport, contextItem, values) {
+export function processUpdateAttrContext(value, ownerSupport, contextItem, _counts, values) {
     if (contextItem.isNameOnly) {
         updateNameOnlyAttrValue(values, value, contextItem.value, contextItem.element, // global.element as Element,
         ownerSupport, contextItem.howToSet, [], // Context, but we dont want to alter current

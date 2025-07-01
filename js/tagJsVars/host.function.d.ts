@@ -1,12 +1,12 @@
 import { ContextItem, ValueTypes } from "../tag/index.js";
 import { TagJsVar } from "./tagJsVar.type.js";
-type HostCallback = (element: HTMLInputElement, newHostValue: HostValue) => any;
+export type HostCallback = (element: HTMLInputElement, newHostValue: HostValue, context: ContextItem) => any;
 type Options = {
-    onDestroy?: (element: HTMLInputElement) => any;
-    onInit?: (element: HTMLInputElement, hostValue: HostValue, context: ContextItem) => any;
+    onDestroy?: HostCallback;
+    onInit?: HostCallback;
 };
 type AllOptions = Options & {
-    onDestroy: (element: HTMLInputElement) => any;
+    onDestroy: HostCallback;
     callback: HostCallback;
 };
 /** Use to gain access to element */

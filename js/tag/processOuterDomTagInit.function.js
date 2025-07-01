@@ -15,7 +15,7 @@ counts, appendTo, insertBefore) {
     counts, appendTo, insertBefore);
     // contextItem.handler = function outDomTagHanlder(
     const tagJsVar = contextItem.tagJsVar;
-    tagJsVar.processUpdate = function outDomTagHanlder(value, newSupport, contextItem2, _values, counts) {
+    tagJsVar.processUpdate = function outDomTagHanlder(value, newSupport, contextItem2, counts) {
         forceUpdateExistingValue(contextItem2, value?.outerHTML || value, newSupport, counts);
     };
     // TODO: Not best idea to swap out the original values changeChecker

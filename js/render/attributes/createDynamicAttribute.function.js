@@ -21,7 +21,7 @@ support, counts, values) {
                 tagJsVar,
             };
             // contextItem.handler =
-            tagJsVar.processUpdate = function arrayItemHanlder(value, newSupport, contextItem, newValues) {
+            tagJsVar.processUpdate = function arrayItemHanlder(value, newSupport, contextItem, counts, newValues) {
                 setBy(newValues);
             };
             const pushValue = values[myIndex];

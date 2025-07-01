@@ -1,11 +1,23 @@
 import { blankHandler } from "./dom/attachDomElements.function.js";
+/** Typically used for animations to run before clearing elements */
+export function addPaintRemoveAwait(promise) {
+    if (paintRemoveAwaits.length) {
+        paintRemoveAwaits[paintRemoveAwaits.length - 1].paintRemoves.push(...paintRemoves);
+        paintRemoves = [];
+    }
+    paintRemoveAwaits.push({ promise, paintRemoves });
+    paintRemoves = [];
+}
+let paintRemoveAwaits = [];
 export let paintCommands = [];
+export let paintRemoves = [];
 export let paintContent = [];
 // TODO: This this is duplicate of paintCommands (however timing is currently and issue and cant be removed)
 export let paintAppends = [];
 export let paintAfters = []; // callbacks after all painted
 export const painting = {
-    locks: 0
+    locks: 0,
+    removeLocks: 0,
 };
 export function setContent(text, textNode) {
     textNode.textContent = text;
@@ -14,6 +26,44 @@ export function paint() {
     if (painting.locks > 0) {
         return;
     }
+    return runCycles();
+}
+function runCycles() {
+    runPaintCycles();
+    runAfterCycle();
+}
+function runAfterCycle() {
+    paintReset();
+    const nowPaintAfters = paintAfters;
+    paintAfters = []; // prevent paintAfters calls from endless recursion
+    for (const content of nowPaintAfters) {
+        content[0](...content[1]);
+    }
+}
+function runPaintRemoves() {
+    if (paintRemoveAwaits.length) {
+        const currentAwaits = paintRemoveAwaits.map(data => data.promise.then(() => {
+            const paintRemoves = data.paintRemoves;
+            for (const content of paintRemoves) {
+                content[0](...content[1]);
+            }
+        }));
+        paintRemoveAwaits = [];
+        const outerPaintRemoves = paintRemoves;
+        return Promise.all(currentAwaits).then(() => {
+            for (const content of outerPaintRemoves) {
+                content[0](...content[1]);
+            }
+        });
+    }
+    // element.parentNode.removeChild
+    for (const content of paintRemoves) {
+        content[0](...content[1]);
+    }
+}
+function runPaintCycles() {
+    runPaintRemoves();
+    paintRemoves = [];
     // styles/attributes and textElement.textContent
     for (const content of paintContent) {
         content[0](...content[1]);
@@ -22,14 +72,8 @@ export function paint() {
     for (const content of paintAppends) {
         content[0](...content[1]);
     }
-    // element.insertBefore and element.parentNode.removeChild
+    // element.insertBefore
     for (const content of paintCommands) {
-        content[0](...content[1]);
-    }
-    paintReset();
-    const nowPaintAfters = paintAfters;
-    paintAfters = []; // prevent paintAfters calls from endless recursion
-    for (const content of nowPaintAfters) {
         content[0](...content[1]);
     }
 }
@@ -38,7 +82,11 @@ function paintReset() {
     paintContent = [];
     paintAppends = [];
 }
-export function paintRemover(element) {
+export function addPaintRemover(element) {
+    paintRemoves.push([paintRemover, [element]]);
+}
+/** must be used with paintRemoves */
+function paintRemover(element) {
     const parentNode = element.parentNode;
     parentNode.removeChild(element);
 }

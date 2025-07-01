@@ -8,7 +8,6 @@ export function checkToResolvePromise(callbackResult, last, global, mode, { reso
     const isProm = isPromise(callbackResult);
     if (isProm) {
         const subject = last.context;
-        // const global0 = subject.global as SupportTagGlobal
         subject.locked = true;
         return callbackResult.then(thenResolveBy(last, resolvePromise));
     }

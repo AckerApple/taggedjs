@@ -1,4 +1,3 @@
-import { paintAfters } from "../render/paint.function.js";
 import { ValueTypes } from "../tag/index.js";
 import { syncWrapCallback } from "../tag/output.function.js";
 import { handleTagTypeChangeFrom } from "../tag/update/checkSubContext.function.js";
@@ -12,7 +11,7 @@ export function host(callback, options = {}) {
         options: { callback, ...options },
     };
 }
-function processHostUpdate(newValue, ownerSupport, contextItem, _values, counts) {
+function processHostUpdate(newValue, ownerSupport, contextItem, counts) {
     const hasChanged = handleTagTypeChangeFrom(ValueTypes.host, newValue, ownerSupport, contextItem, counts);
     if (hasChanged) {
         return hasChanged;
@@ -20,10 +19,10 @@ function processHostUpdate(newValue, ownerSupport, contextItem, _values, counts)
     const tagJsVar = contextItem.tagJsVar;
     const options = tagJsVar.options;
     const element = contextItem.element;
-    options.callback(element, newValue);
+    options.callback(element, newValue, contextItem);
 }
 function processHost(element, tagJsVar, contextItem) {
-    tagJsVar.options.callback(element, tagJsVar);
+    tagJsVar.options.callback(element, tagJsVar, contextItem);
     const options = tagJsVar.options;
     if (options.onInit) {
         const element = contextItem.element;
@@ -36,12 +35,10 @@ function deleteHost(contextItem) {
     if (options.onDestroy) {
         const element = contextItem.element;
         const hostDestroy = function processHostDestroy() {
-            options.onDestroy(element);
+            return options.onDestroy(element, tagJsVar, contextItem);
         };
-        paintAfters.push([function hostCloser() {
-                const stateOwner = contextItem.stateOwner;
-                syncWrapCallback([], hostDestroy, stateOwner);
-            }, []]);
+        const stateOwner = contextItem.stateOwner;
+        syncWrapCallback([], hostDestroy, stateOwner);
     }
 }
 //# sourceMappingURL=host.function.js.map
