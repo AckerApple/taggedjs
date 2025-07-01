@@ -33,6 +33,16 @@ export function host(
   }
 }
 
+/** Attach a host to an element that only runs during initialization */
+host.onInit = (callback: HostCallback): HostValue => {
+  return host(() => {}, { onInit: callback })
+}
+
+/** Attach a host to an element that only runs during element destruction */
+host.onDestroy = (callback: HostCallback): HostValue => {
+  return host(() => {}, { onDestroy: callback })
+}
+
 function processHostUpdate(
   newValue: unknown,
   ownerSupport: AnySupport,

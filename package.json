@@ -15,7 +15,7 @@
     "build:copy:gh-pages": "cp -R dist/. ../gh-pages/node_modules/taggedjs",
     "build:watch:gh-pages": "chokidar 'ts/**/*' -c 'npm run build:js && npm run build:dist:only && npm run build:gh-pages'",
     "build:dist": "run-s build:js build:webpack build:dist:only",
-    "build:dist:only": "cp README.MD ./dist/README.md && npm run build:dist:pack && rm -rf ./dist/js && cp -R js ./dist && cp -R ./dist/. ../dist",
+    "build:dist:only": "cp README.md ./dist/README.md && npm run build:dist:pack && rm -rf ./dist/js && cp -R js ./dist && cp -R ./dist/. ../dist",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest",
