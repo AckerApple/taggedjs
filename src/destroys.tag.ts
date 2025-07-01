@@ -1,4 +1,4 @@
-import { html, onDestroy, signal, states, tag } from "taggedjs"
+import { html, onDestroy, signal, states, tag, host } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component.js"
 
 let destroyCount = signal(0) // lets use Signals
@@ -23,6 +23,6 @@ const toDestroy = tag(() => (
   _ = onDestroy(() => ++destroyCount.value)
 ) => html`
   <div id="destroyable-content" style="border:1px solid orange;"
-    ondestroy=${() => ++destroyCount.value}
+    ${host.onDestroy(() => ++destroyCount.value)}
   >will be destroyed</div>
 `)

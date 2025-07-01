@@ -1,6 +1,6 @@
 import { mouseOverTag } from "./mouseover.tag.js"
 import { renderCountDiv } from "./renderCount.component.js"
-import { states, html, tag, Subject, onInit, callbackMaker, state, ValueSubject, callback, subject, InputElementTargetEvent, subscribe } from "taggedjs"
+import { states, html, tag, Subject, onInit, callbackMaker, state, ValueSubject, callback, subject, InputElementTargetEvent, subscribe, host } from "taggedjs"
 
 const loadStartTime = Date.now()
 
@@ -52,7 +52,7 @@ const innerCounters = tag.deepPropWatch(({
   _ = states(get => [{elmInitCount, otherCounter, renderCount}] = get({elmInitCount, otherCounter, renderCount})),
   __ = ++renderCount, // for debugging
 ) => html`
-  <div style="display:flex;flex-wrap:wrap;gap:1em;" oninit=${() => ++elmInitCount}>
+  <div style="display:flex;flex-wrap:wrap;gap:1em;" ${host.onInit(() => ++elmInitCount)}>
     <div style="border:1px dashed black;padding:1em;">
       🔥 elmInitCount:<span id="🔥-init-counter">${elmInitCount}</span>
     </div>
@@ -379,10 +379,10 @@ export const innerCounterContent = () => tag.use = (
   </fieldset>
 
   <div style="font-size:0.8em;opacity:0.8">
-    ⌚️ page load to display in&nbsp;<span oninit=${(event: InputElementTargetEvent) => event.target.innerText = (Date.now()-loadStartTime).toString()}>-</span>ms
+    ⌚️ page load to display in&nbsp;<span ${host.onInit((element) => element.innerText = (Date.now()-loadStartTime).toString())}>-</span>ms
   </div>
   <div style="font-size:0.8em;opacity:0.8">
-    ⌚️ read in&nbsp;<span oninit=${(event: InputElementTargetEvent) => event.target.innerText = (Date.now()-readStartTime).toString()}>-</span>ms
+    ⌚️ read in&nbsp;<span ${host.onInit((element) => element.innerText = (Date.now()-readStartTime).toString())}>-</span>ms
   </div>
 
   ${renderCountDiv({renderCount, name: 'counters'})}
