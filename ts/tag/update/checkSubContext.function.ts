@@ -12,7 +12,6 @@ export function checkSubContext(
   newValue: unknown,
   ownerSupport: AnySupport,
   contextItem: ContextItem,
-  values: any[],
   counts: TagCounts,
 ) {
   const hasChanged = handleTagTypeChangeFrom(
@@ -27,7 +26,7 @@ export function checkSubContext(
   }
 
   const subscription = contextItem.subContext as SubscriptionContext
-  if (!subscription.hasEmitted) {
+  if (!subscription || !subscription.hasEmitted) {
     return -1
   }
 

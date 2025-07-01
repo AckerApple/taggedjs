@@ -2,7 +2,20 @@ import { blankHandler } from "./dom/attachDomElements.function.js"
 
 export type PaintCommand = [((...args: any[]) => unknown), any[]]
 
+/** Typically used for animations to run before clearing elements */
+export function addPaintRemoveAwait(promise: Promise<any>) {
+  if(paintRemoveAwaits.length) {
+    paintRemoveAwaits[paintRemoveAwaits.length - 1].paintRemoves.push( ...paintRemoves )
+    paintRemoves = []
+  }
+
+  paintRemoveAwaits.push({promise, paintRemoves})
+  paintRemoves = []
+}
+
+let paintRemoveAwaits: {promise: Promise<any>, paintRemoves: PaintCommand[]}[] = []
 export let paintCommands: PaintCommand[] = []
+export let paintRemoves: PaintCommand[] = []
 export let paintContent: PaintCommand[] = []
 
 // TODO: This this is duplicate of paintCommands (however timing is currently and issue and cant be removed)
@@ -11,7 +24,8 @@ export let paintAppends: PaintCommand[] = []
 export let paintAfters: PaintCommand[] = [] // callbacks after all painted
 
 export const painting = {
-  locks: 0
+  locks: 0,
+  removeLocks: 0,
 }
 
 export function setContent(
@@ -21,10 +35,59 @@ export function setContent(
   textNode.textContent = text
 }
 
-export function paint() {
+export function paint(): any {
   if(painting.locks > 0) {
     return
   }
+
+  return runCycles()
+}
+
+function runCycles() {
+  runPaintCycles()
+  runAfterCycle()
+}
+
+function runAfterCycle() {
+  paintReset()
+
+  const nowPaintAfters = paintAfters
+  paintAfters = [] // prevent paintAfters calls from endless recursion
+
+  for(const content of nowPaintAfters) {
+    content[0](...content[1])
+  }
+}
+
+function runPaintRemoves(): any {
+  if( paintRemoveAwaits.length ) {
+    const currentAwaits = paintRemoveAwaits.map(data => data.promise.then(() => {
+      const paintRemoves = data.paintRemoves
+      
+      for (const content of paintRemoves) {
+        content[0](...content[1])
+      }
+    }))
+    
+    paintRemoveAwaits = []
+
+    const outerPaintRemoves = paintRemoves
+    return Promise.all(currentAwaits).then(() => {
+      for (const content of outerPaintRemoves) {
+        content[0](...content[1])
+      }
+    })
+  }
+
+  // element.parentNode.removeChild
+  for (const content of paintRemoves) {
+    content[0](...content[1])
+  }
+}
+
+function runPaintCycles() {
+  runPaintRemoves()
+  paintRemoves = []
 
   // styles/attributes and textElement.textContent
   for(const content of paintContent) {
@@ -36,17 +99,8 @@ export function paint() {
     content[0](...content[1])
   }
 
-  // element.insertBefore and element.parentNode.removeChild
+  // element.insertBefore
   for (const content of paintCommands) {
-    content[0](...content[1])
-  }
-
-  paintReset()
-
-  const nowPaintAfters = paintAfters
-  paintAfters = [] // prevent paintAfters calls from endless recursion
-
-  for(const content of nowPaintAfters) {
     content[0](...content[1])
   }
 }
@@ -57,7 +111,14 @@ function paintReset() {
   paintAppends = []
 }
 
-export function paintRemover(
+export function addPaintRemover(
+  element: Text | Element,
+) {
+  paintRemoves.push([paintRemover, [element]])
+}
+
+/** must be used with paintRemoves */
+function paintRemover(
   element: Text | Element,
   // _caller: string, can be used for determining who is failing
 ) {

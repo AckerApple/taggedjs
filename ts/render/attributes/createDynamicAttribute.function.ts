@@ -14,7 +14,7 @@ import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 export function createDynamicArrayAttribute(
   attrName: string,
   array: any[],
-  element: Element,
+  element: HTMLElement,
   context: ContextItem[],
   howToSet: HowToSet, //  = howToSetInputValue
   support: AnySupport,
@@ -40,7 +40,7 @@ export function createDynamicArrayAttribute(
   
       // contextItem.handler =
       tagJsVar.processUpdate = function arrayItemHanlder(
-        value, newSupport, contextItem, newValues
+        value, newSupport, contextItem, counts, newValues
       ) {
         setBy(newValues)
       }

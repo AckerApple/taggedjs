@@ -4,12 +4,12 @@ import { DomObjectElement } from "./ObjectNode.types"
 
 describe('#htmlInterpolationToDomMeta', () => {
   describe('attributes', () => {    
-    it('basic', () => {
+    it('style becomes first argument', () => {
       const something = 'background-color:black;'
       const htmlResult = html`<div id="22" style=${something}></div>`
       const templater = htmlResult as Tag
       const result = htmlInterpolationToDomMeta((templater as any).strings, templater.values)
-      expect(result).toEqual([{ nn: 'div', at: [[ 'id', '22' ], [ 'style', ':tagvar0:' ] ] }])
+      expect(result).toEqual([{ nn: 'div', at: [[ 'style', ':tagvar0:' ], [ 'id', '22' ] ] }])
     })
     
     it('injection', () => {
@@ -20,9 +20,9 @@ describe('#htmlInterpolationToDomMeta', () => {
       expect(result).toEqual([{
         nn: 'div',
         at: [
+          [ 'style', ':tagvar0:' ],
           [ 'id', ':tagva&#x72;00:' ],
           [ 'name', ':tagva&#x72;11:' ],
-          [ 'style', ':tagvar0:' ]
         ],
         ch: [
           { nn: 'text', tc: ':tagva&#x72;55:' },
@@ -53,11 +53,11 @@ describe('#htmlInterpolationToDomMeta', () => {
       const ats = (result[0] as DomObjectElement).at
 
       expect(ats).toEqual([
-        [ 'id', ':tagvar0:' ],
         [
           'style',
           [ 'background-color:', ':tagvar1:', ';color:', ':tagvar2:', ';' ]
-        ]
+        ],
+        [ 'id', ':tagvar0:' ],
       ])
     })
   })
@@ -96,8 +96,6 @@ describe('#htmlInterpolationToDomMeta', () => {
     const firstDom = result[0] as DomObjectElement
 
     expect(firstDom.at).toEqual([
-      [ 'init', ':tagvar0:', 'init' ],
-      [ 'destroy', ':tagvar1:', 'destroy' ],
       [
         'style',
         [
@@ -107,7 +105,9 @@ describe('#htmlInterpolationToDomMeta', () => {
           ':tagvar3:',
           ';'
         ]
-      ]
+      ],
+      [ 'init', ':tagvar0:', 'init' ],
+      [ 'destroy', ':tagvar1:', 'destroy' ],
     ])
     expect(firstDom.ch).toEqual([
       { nn: 'text', tc: '\n        23' },

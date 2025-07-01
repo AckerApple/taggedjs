@@ -36,16 +36,13 @@ export function subscribe<T>(
     processInit: processSubscribe,
     
     processUpdate: checkSubContext,
-    // processUpdate: tagValueUpdateHandler,
-    // processUpdate: blankHandler,
-    // checkValueChange: checkTagValueChange,
-
+    
     delete: deleteAndUnsubscribe,
     callback,
     states,
     
     Observables: [Observable],
-  } as any
+  }
 }
 
 export type SubscribeValue = TagJsVar & {

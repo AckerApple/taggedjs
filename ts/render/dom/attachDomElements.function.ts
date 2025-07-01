@@ -1,7 +1,7 @@
 // taggedjs-no-compile
 
 import { DomObjectChildren, DomObjectElement, DomObjectText } from "../../interpolations/optimizers/ObjectNode.types.js"
-import { howToSetFirstInputValue } from "../../interpolations/attributes/howToSetInputValue.function.js"
+import { HowToSet, howToSetFirstInputValue } from "../../interpolations/attributes/howToSetInputValue.function.js"
 import { paintAppend, paintAppendElementString, paintAppends, paintBefore, paintBeforeElementString, paintCommands } from "../paint.function.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
 import { processAttribute } from "../attributes/processAttribute.function.js"
@@ -113,13 +113,14 @@ function attachDomElement(
       const name = attr[0]
       const value = attr[1]
       const isSpecial = attr[2] || false
+      const howToSet: HowToSet = howToSetFirstInputValue
 
       processAttribute(
         values,
         name,
         domElement,
         support,
-        howToSetFirstInputValue,
+        howToSet,
         context,
         isSpecial,
         counts,

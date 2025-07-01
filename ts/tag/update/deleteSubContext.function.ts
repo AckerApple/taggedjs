@@ -1,7 +1,6 @@
 import { AdvancedContextItem } from '../AdvancedContextItem.type.js'
-import { paintCommands, paintRemover } from '../../render/paint.function.js'
+import { addPaintRemover } from '../../render/paint.function.js'
 import { AnySupport } from '../AnySupport.type.js'
-import { tagValueUpdateHandler } from './tagValueUpdateHandler.function.js'
 import { SubContext } from './SubContext.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
@@ -17,7 +16,7 @@ export function deleteSubContext(
   
   const appendMarker = subscription.appendMarker
   if(appendMarker) {
-    paintCommands.push([paintRemover, [appendMarker, 'subcontext-delete']])
+    addPaintRemover(appendMarker)
     delete subscription.appendMarker
   }
   

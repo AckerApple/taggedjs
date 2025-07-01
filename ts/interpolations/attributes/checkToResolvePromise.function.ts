@@ -22,15 +22,12 @@ export function checkToResolvePromise(
 
   if(isProm) {
     const subject = last.context
-    // const global0 = subject.global as SupportTagGlobal
     subject.locked = true
-
     return callbackResult.then(thenResolveBy(last, resolvePromise))
   }
 
   return resolveValue(callbackResult)
 }
-
 
 export function thenResolveBy(
   last: AnySupport,

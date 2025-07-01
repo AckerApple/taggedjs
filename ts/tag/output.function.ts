@@ -1,5 +1,6 @@
 import { AnySupport, paint } from "../index.js"
 import { blankHandler } from "../render/dom/attachDomElements.function.js"
+import { paintAfters, painting } from "../render/paint.function.js"
 import { syncStatesArray } from "../state/syncStates.function.js"
 import { getSupportInCycle } from "./getSupportInCycle.function.js"
 import { safeRenderSupport } from "./props/safeRenderSupport.function.js"
@@ -43,9 +44,12 @@ export function syncWrapCallback(
   syncStatesArray(ownerSupport.states, newestOwner.states)
 
   // now render the owner
-  safeRenderSupport(newestOwner)
-
-  paint()
+  paintAfters.push([() => {
+    ++painting.locks
+    safeRenderSupport(newestOwner)
+    --painting.locks
+    paint()
+  }, []])
 
   return c
 }

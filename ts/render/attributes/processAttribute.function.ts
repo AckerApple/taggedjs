@@ -22,13 +22,12 @@ import { isNoDisplayValue } from './isNoDisplayValue.function.js'
 import { HostValue } from '../../tagJsVars/host.function.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js'
-import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 
 /** MAIN FUNCTION. Sets attribute value, subscribes to value updates  */
 export function processAttribute(
   values: unknown[], // all the variables inside html``
   attrName: string | TagVarIdNum,
-  element: Element,
+  element: HTMLElement,
   support: AnySupport,
   howToSet: HowToSet, //  = howToSetInputValue
   context: ContextItem[],
@@ -49,7 +48,6 @@ export function processAttribute(
 
     contextItem.isAttr = true
     contextItem.element = element
-    contextItem.howToSet = howToSet
     contextItem.isNameOnly = true
 
     if((value as HostValue).tagJsType) {
@@ -59,6 +57,7 @@ export function processAttribute(
       return processHost(element as HTMLInputElement, value as HostValue, contextItem)
     }
 
+    contextItem.howToSet = howToSet
     const tagJsVar = contextItem.tagJsVar
     tagJsVar.processUpdate = processUpdateAttrContext
 
@@ -66,7 +65,7 @@ export function processAttribute(
     processNameOnlyAttrValue(
       values,
       value as any,
-      element as Element,
+      element,
       support,
       howToSet as HowToSet,
       context,
@@ -127,7 +126,7 @@ function processHost(
 export function processNameOnlyAttrValue(
   values: unknown[],
   attrValue: string | boolean | Record<string, any> | HostValue,
-  element: Element,
+  element: HTMLElement,
   ownerSupport: AnySupport,
   howToSet: HowToSet,
   context: ContextItem[],
@@ -168,7 +167,7 @@ export function processAttributeEmit(
   newAttrValue: any,
   attrName: string,
   subject: ContextItem,
-  element: Element,
+  element: HTMLElement,
   support: AnySupport,
   howToSet: HowToSet,
   isSpecial: SpecialDefinition,
@@ -204,7 +203,7 @@ type DisplayValue = ((...args: unknown[]) => unknown) | string | boolean
 /** figure out what type of attribute we are dealing with and/or feed value into handler to figure how to update */
 export function processAttributeSubjectValue(
   newAttrValue: DisplayValue | NoDisplayValue,
-  element: Element,
+  element: HTMLElement,
   attrName: string,
   special: SpecialDefinition,
   howToSet: HowToSet,
@@ -243,7 +242,7 @@ export function processAttributeSubjectValue(
 function callbackFun(
   support: AnySupport,
   newAttrValue: any,
-  element: Element,
+  element: HTMLElement,
   attrName: string,
   isSpecial: SpecialDefinition,
   howToSet: HowToSet,

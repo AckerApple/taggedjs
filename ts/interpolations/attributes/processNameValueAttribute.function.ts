@@ -79,5 +79,5 @@ export function processNonDynamicAttr(
     )
   }
 
-  howToSet(element, attrName, value)  
+  howToSet(element as HTMLElement, attrName, value)  
 }

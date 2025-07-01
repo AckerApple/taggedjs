@@ -44,13 +44,10 @@ export function Signal<T>(initialValue: T): SignalObject<T> {
     tagJsType: ValueTypes.signal,
     processInit: processSignal,
     
-    // processUpdate: tagValueUpdateHandler,
-    // processUpdate: checkSubContext,
     processUpdate: (
       newValue: unknown,
       ownerSupport: AnySupport,
       contextItem: ContextItem,
-      _values: unknown[],
       counts: TagCounts,
     ) => handleTagTypeChangeFrom(
       ValueTypes.signal,

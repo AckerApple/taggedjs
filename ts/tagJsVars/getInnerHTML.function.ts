@@ -13,7 +13,6 @@ function handleInnerHTML(
   value: TemplateValue,
   newSupport: AnySupport,
   contextItem: ContextItem,
-  _values: any[],
   counts: TagCounts,
 ) {
   const owner = (value as any).owner

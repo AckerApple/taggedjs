@@ -4,13 +4,15 @@ import { processAttributeEmit } from './processAttribute.function.js'
 import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.function.js'
 import { updateNameOnlyAttrValue } from '../../interpolations/attributes/updateAttribute.function.js'
 import { TemplateValue } from '../../tag/TemplateValue.type.js'
+import { TagCounts } from '../../tag/TagCounts.type.js'
 
 export function processUpdateAttrContext(
   value: TemplateValue,
   ownerSupport: AnySupport,
   contextItem: ContextItem,
+  _counts: TagCounts,
   values: unknown[],
-) {  
+) {
   if(contextItem.isNameOnly) {
     updateNameOnlyAttrValue(
       values,
@@ -33,7 +35,7 @@ export function processUpdateAttrContext(
     value,
     contextItem.attrName as string,
     contextItem,
-    element,
+    element as HTMLElement,
     ownerSupport,
     contextItem.howToSet as HowToSet,
     contextItem.isSpecial as boolean,

@@ -1,6 +1,6 @@
 import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { destroyArray } from './checkDestroyPrevious.function.js'
-import { paint, paintCommands, painting, paintRemover } from '../render/paint.function.js'
+import { paint, paintCommands, painting, addPaintRemover } from '../render/paint.function.js'
 import { ContextItem } from './ContextItem.type.js'
 import { SupportTagGlobal } from './getTemplaterResult.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
@@ -100,7 +100,7 @@ function smartRemoveByContext(
     const elm = subject.simpleValueElm as Text
     if(elm) {
       delete subject.simpleValueElm
-      paintCommands.push([paintRemover, [elm, 'destroy simpleValueElm']])
+      addPaintRemover(elm)
       continue
     }
 
@@ -141,7 +141,7 @@ function destroyClone(
 ) {
     const marker = clone.marker
     if(marker) {
-      paintCommands.push([paintRemover, [marker, 'destroy-marker-clone']])
+      addPaintRemover(marker)
     }
 
     const dom = clone.domElement
@@ -149,5 +149,5 @@ function destroyClone(
       return
     }
 
-    paintCommands.push([paintRemover, [dom, 'destroy-clone']])
+    addPaintRemover(dom)
 }

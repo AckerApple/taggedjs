@@ -125,7 +125,6 @@ function reviewPreviousArrayItem(
       value as TemplateValue,
       ownerSupport,
       itemSubject,
-      undefined as any,
       counts,
     )
     return itemSubject

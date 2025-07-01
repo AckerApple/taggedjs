@@ -1,6 +1,6 @@
 import { LastArrayItem } from '../Context.types.js'
 import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { paintCommands, paintRemover } from '../../render/paint.function.js'
+import { paintCommands, addPaintRemover } from '../../render/paint.function.js'
 import { destroySupport } from '../../render/destroySupport.function.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import type { StringTag } from '../StringTag.type.js'
@@ -74,5 +74,5 @@ function destroyArrayItemByGlobal(
   
   const element = item.simpleValueElm as Element
   delete item.simpleValueElm
-  paintCommands.push([paintRemover, [element, 'array-delete']])
+  addPaintRemover(element)
 }

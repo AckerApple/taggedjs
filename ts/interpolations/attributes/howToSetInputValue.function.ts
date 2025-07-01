@@ -1,10 +1,10 @@
 import { paintContent } from "../../render/paint.function.js"
 
-export type HowToSet = (element: Element, name: string, value: string) => any
+export type HowToSet = (element: HTMLElement, name: string, value: string) => any
 
 // Maybe more performant for updates but seemingly slower for first renders
 export function howToSetInputValue(
-  element: Element,
+  element: HTMLElement,
   name: string,
   value: string | undefined | boolean
 ) {
@@ -12,7 +12,7 @@ export function howToSetInputValue(
 }
 
 export function howToSetFirstInputValue(
-  element: Element,
+  element: HTMLElement,
   name: string,
   value: string | undefined | boolean
 ) {

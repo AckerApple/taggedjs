@@ -38,7 +38,6 @@ export function processOuterDomTagInit(
     value: TemplateValue,
     newSupport: AnySupport,
     contextItem2: ContextItem,
-    _values,
     counts: TagCounts,
   ) {
     forceUpdateExistingValue(

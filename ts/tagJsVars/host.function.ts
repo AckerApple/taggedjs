@@ -1,24 +1,21 @@
-import { paintAfters } from "../render/paint.function.js"
 import { AnySupport, ContextItem, TagCounts, ValueTypes } from "../tag/index.js"
 import { syncWrapCallback } from "../tag/output.function.js"
 import { handleTagTypeChangeFrom } from "../tag/update/checkSubContext.function.js"
 import { TagJsVar } from "./tagJsVar.type.js"
 
-type HostCallback = (
+export type HostCallback = (
   element: HTMLInputElement,
   newHostValue: HostValue,
+  context: ContextItem,
 ) => any
+
 type Options = {
-  onDestroy?: (element: HTMLInputElement) => any
-  onInit?: (
-    element: HTMLInputElement,
-    hostValue: HostValue,
-    context: ContextItem,
-  ) => any
+  onDestroy?: HostCallback
+  onInit?: HostCallback
   // onUpdate?: (element: HTMLInputElement, hostValue: HostValue) => any
 }
 type AllOptions = Options & {
-  onDestroy: (element: HTMLInputElement) => any
+  onDestroy: HostCallback
   callback: HostCallback
 }
 
@@ -40,7 +37,6 @@ function processHostUpdate(
   newValue: unknown,
   ownerSupport: AnySupport,
   contextItem: ContextItem,
-  _values: any[],
   counts: TagCounts,
 ) {
   const hasChanged = handleTagTypeChangeFrom(
@@ -58,7 +54,7 @@ function processHostUpdate(
   const options = tagJsVar.options
 
   const element = contextItem.element as HTMLInputElement
-  options.callback(element, newValue as HostValue)
+  options.callback(element, newValue as HostValue, contextItem)
 
 }
 
@@ -67,7 +63,7 @@ function processHost(
   tagJsVar: HostValue,
   contextItem: ContextItem,
 ) {
-  tagJsVar.options.callback(element, tagJsVar)
+  tagJsVar.options.callback(element, tagJsVar, contextItem)
 
   const options = tagJsVar.options
   if(options.onInit) {
@@ -86,17 +82,16 @@ function deleteHost(
     const element = contextItem.element as Element
     
     const hostDestroy = function processHostDestroy() {
-      options.onDestroy( element as HTMLInputElement)
+      return options.onDestroy(element as HTMLInputElement, tagJsVar, contextItem)
     }
 
-    paintAfters.push([function hostCloser() {
-      const stateOwner = (contextItem as any).stateOwner as AnySupport
-      syncWrapCallback(
-        [],
-        hostDestroy,
-        stateOwner,
-      )
-    }, []])
+    
+    const stateOwner = (contextItem as any).stateOwner as AnySupport
+    syncWrapCallback(
+      [],
+      hostDestroy,
+      stateOwner,
+    )
   }
 }
 

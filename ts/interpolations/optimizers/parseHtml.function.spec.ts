@@ -34,12 +34,12 @@ describe('#parseHTML', () => {
   
     it('variable attribute', () => {
       const result = parseHTML('<div id="22" style=${something}></div>')
-      expect(result).toEqual([{nn: 'div', at: [['id','22'], ['style', ':tagvar0:']]}])
+      expect(result).toEqual([{nn: 'div', at: [['style', ':tagvar0:'], ['id','22']]}])
     })
   
     it.skip('mixed attribute', () => {
       const result = parseHTML('<div id="22" style="background-color:${something}"></div>')
-      expect(result).toEqual([{nn: 'div', at: [['id','22'], ['style', ':tagvar0:']]}])
+      expect(result).toEqual([{nn: 'div', at: [['style', ':tagvar0:'], ['id','22']]}])
     })
   })
 })

@@ -1,6 +1,6 @@
 import { AnySupport, TagCounts } from "../index.js"
 import { castTextValue } from '../castTextValue.function.js'
-import { paintBeforeText, paintCommands, paintRemover } from "../render/paint.function.js"
+import { paintBeforeText, paintCommands, addPaintRemover } from "../render/paint.function.js"
 import { BasicTypes, ContextItem } from "../index.js"
 import { processUpdateRegularValue, RegularValue } from "../tag/update/processRegularValue.function.js"
 import { TagJsTag } from "./tagJsVar.type.js"
@@ -47,7 +47,7 @@ export function deleteSimpleValue(
 ) {
   const elm = contextItem.simpleValueElm as Element
   delete contextItem.simpleValueElm
-  paintCommands.push([paintRemover, [elm, 'simple-tag-remove']])
+  addPaintRemover(elm)
 }
 
 

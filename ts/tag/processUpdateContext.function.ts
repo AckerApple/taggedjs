@@ -51,8 +51,8 @@ function processUpdateOneContext(
     newValue,
     ownerSupport,
     contextItem,
-    values,
     counts,
+    values,
   )
   
   contextItem.value = newValue

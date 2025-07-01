@@ -11,7 +11,6 @@ export function tagValueUpdateHandler(
   newValue: TemplateValue, // newValue
   ownerSupport: AnySupport,
   contextItem: ContextItem | SupportContextItem,
-  _values: any[],
   counts: TagCounts,
 ) {
   // Do not continue if the value is just the same

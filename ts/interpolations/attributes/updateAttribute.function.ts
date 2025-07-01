@@ -48,7 +48,7 @@ export function updateNameOnlyAttrValue(
   processNameOnlyAttrValue(
     values,
     attrValue,
-    element,
+    element as HTMLElement,
     ownerSupport,
     howToSet,
     context,

@@ -7,6 +7,6 @@ export type ProcessUpdate = (
   value: TemplateValue,
   ownerSupport: AnySupport,
   contextItem: ContextItem,
-  values: unknown[],
   counts: TagCounts,
+  values: unknown[],
 ) => any
