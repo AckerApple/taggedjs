@@ -1,5 +1,20 @@
 ## TODO
 
+- remove element oninit ondestroy
+
+- Test going from subscribe value false to subscribe value tag
+- test for hide then show subscribe to array with delayed emission
+- test a click to promise that changes variables
+- test host update
+- test array with empty values
+
+Animation Testing
+- test animation conflicting with style
+
+
+
+The hotel bar is closed. The sign on the door of my mind says do no disturb anymore. My hearts all packed up and ready to go
+
 - Fix switching from null to observable
 - Test a value that was a subject and then becomes something else
   - Expect unsubscribe
