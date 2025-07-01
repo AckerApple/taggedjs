@@ -63,9 +63,7 @@ export const homePage = () => tag.use = (
   })),
 
   toggle = () => {
-    console.log('lets set toggleValue...', toggleValue)
     toggleValue = !toggleValue
-    console.log('set toggleValue', toggleValue)
   },
 ) => {
   // states(get => ({ appCounter } = get({ appCounter })))
@@ -115,8 +113,6 @@ export const homePage = () => tag.use = (
   }
 
   ++renderCount
-
-  console.log('read toggleValue', toggleValue)
 
   return html`
     <button onclick=${() => fireTesting(true, onTestComplete)}>run tests ${testEmoji}</button>
