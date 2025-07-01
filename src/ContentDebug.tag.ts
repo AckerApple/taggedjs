@@ -2,7 +2,7 @@ import { TagJsEvent, subscribeWith, LikeObjectChildren, html, tag, ValueSubject,
 import { dumpContent } from "./dumpContent.tag"
 import { renderCountDiv } from "./renderCount.component"
 import { Subject as RxSubject, startWith } from "rxjs"
-import { fadeInDown, fadeOutUp, fx } from "taggedjs-animate-css"
+import { fx } from "taggedjs-animate-css"
 
 export const testStaggerBy = 20
 
@@ -11,26 +11,9 @@ const animateWrap = (
   staggerBy: number = testStaggerBy,
 ) => {
   const innerHTML = getInnerHTML()
-
-  const oninit = (a: any) =>
-    fadeInDown({
-      ...a,
-    }, staggerBy).then(() => {
-      ++counts.value.added
-      counts.next(counts.value)
-    })
-  
-  const ondestroy = (b: any)=>
-    fadeOutUp({
-      ...b,
-    } as any, staggerBy).then(() => {
-      ++counts.value.removed
-      counts.next(counts.value)
-    })
   
   return html`
-    <div oninit=${oninit} ondestroy=${ondestroy}
-      style.--animate-duration=".1s"
+    <div ${fx({stagger: staggerBy, duration: '.1s'})}
       style.border="1px solid orange"
     >${innerHTML}</div>
   `.acceptInnerHTML(innerHTML)
@@ -40,22 +23,9 @@ const outerHtml = (
   staggerBy = 10,
 ) => {
   const innerHTML = getInnerHTML()
-
-  const oninit = (a: any) =>
-    fadeInDown({
-      ...a,
-      staggerBy,
-    })
-  
-  const ondestroy = (b: any)=>
-    fadeOutUp({
-      ...b,
-      staggerBy,
-    } as any)
   
   return html`
-    <div id="outer-html-fx-test" oninit=${oninit} ondestroy=${ondestroy}
-      style.--animate-duration=".1s"
+    <div id="outer-html-fx-test" ${fx({stagger: staggerBy, duration: '.1s'})}
       style.border="1px solid orange"
     >${innerHTML}</div>
   `.acceptInnerHTML(innerHTML)

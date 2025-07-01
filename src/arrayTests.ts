@@ -1,4 +1,3 @@
-import { fadeIn, fadeInDown, fadeOut, fadeOutUp } from './animations.js'
 import { fx, fxGroup } from 'taggedjs-animate-css'
 import { renderCountDiv } from './renderCount.component.js'
 import { arrayScoreData } from './arrayScoreData.tag.js'
@@ -107,8 +106,7 @@ export const arrays = tag(() => (
     }}>push 9 items</button>
 
     ${players.length > 0 && html`
-      <button oninit=${fadeInDown} ondestroy=${fadeOutUp}
-        style="--animate-duration: .1s;"
+      <button ${fx({duration: '.1s'})}
         onclick=${() => players.length = 0}
       >remove all</button>
     `}
@@ -141,8 +139,8 @@ function getPlayerDisplay(
   getNewPlayer: () => Player,
 ) {
   return html`
-    <div oninit=${fadeInDown} ondestroy=${fadeOutUp}
-      style="background-color:black;--animate-duration: .1s;"
+    <div ${fx({duration: '.1s'})}
+      style="background-color:black;"
     >
       <div>
         name:${player.name}
@@ -155,7 +153,7 @@ function getPlayerDisplay(
         scores:
         ${player.scores.map((score, playerIndex) => {
           return html`
-            <div class="animate__slow" init=${fadeIn} ondestroy=${fadeOut}>
+            <div class="animate__slow" ${fx()}>
               <fieldset>
                 <legend>
                   <button id=${`score-data-${playerIndex}-${score.frame}-outside-button`}

@@ -1,6 +1,6 @@
 import { intervalTester0, intervalTester1 } from "./intervalDebug"
 import { html, tag, states } from "taggedjs"
-import { fadeInDown, fadeOutUp } from "./animations"
+import { fx } from "taggedjs-animate-css"
 
 export const tagDebug = tag(() => {// tagDebug.js
   let _firstState: string = 'tagJsDebug.js'
@@ -23,7 +23,7 @@ export const tagDebug = tag(() => {// tagDebug.js
         >hide/show</button>
 
         ${showIntervals && html`
-          <div oninit=${fadeInDown} ondestroy=${fadeOutUp}>
+          <div ${fx()}>
             <div>${intervalTester0()}</div>
             <hr />
             <div>${intervalTester1()}</div>

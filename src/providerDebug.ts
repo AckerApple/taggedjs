@@ -1,7 +1,7 @@
-import { fadeInDown, fadeOutUp } from "./animations.js"
 import { renderCountDiv } from "./renderCount.component.js"
 import { dialog } from "./providerDialog.tag.js"
 import { html, tag, providers, state, callbackMaker, Subject, onInit, states } from "taggedjs"
+import { fx } from "taggedjs-animate-css"
 
 export class TagDebugProvider {
   tagDebug = 0
@@ -251,7 +251,7 @@ const providerChildDebug = tag(({
     >${showProProps ? 'hide' : 'show'} provider as props</button>
     
     ${showProProps && html`
-      <div oninit=${fadeInDown} ondestroy=${fadeOutUp}>
+      <div ${fx()}>
         <hr />
         <h3>Provider as Props</h3>
         ${testProviderAsProps(providerClass)}
