@@ -1,7 +1,7 @@
-import { byId, elmCount } from "./elmSelectors";
-import { describe, expect, it } from "./expect";
-import { expectElmCount } from "./expect.html";
-describe('tagSwitching', () => {
+import { byId, elmCount } from "./testing/elmSelectors";
+import { describe, expect, it } from "./testing/expect";
+import { expectElmCount } from "./testing/expect.html";
+describe('🔀 tagSwitching', () => {
     it('0', () => {
         expect(elmCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined');
         expect(elmCount('#tag-switch-dropdown')).toBe(1, 'Expected one #tag-switch-dropdown');

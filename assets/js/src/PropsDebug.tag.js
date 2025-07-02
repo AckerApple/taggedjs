@@ -1,10 +1,14 @@
-import { watch, letState, html, tag, letProp, state } from "taggedjs";
+import { watch, html, tag, letProp, state, states } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component.js";
 import statePropDebugTag from "./statePropDebug.tag.js";
-export const propsDebugMain = tag((_ = 'propsDebugMain') => (syncPropNumber = letState(0)(x => [syncPropNumber, syncPropNumber = x]), propNumber = letState(0)(x => [propNumber, propNumber = x]), renderCount = letState(0)(x => [renderCount, renderCount = x]), propsJson = letState({ test: 33, x: 'y' })(x => [propsJson, propsJson = x]), date = letState(() => new Date())(x => [date, date = x]), json = JSON.stringify(propsJson, null, 2), statePropDisplay = letState(true)(x => [statePropDisplay, statePropDisplay = x])) => html `
+export const propsDebugMain = tag((_ = 'propsDebugMain') => (syncPropNumber = 0, propNumber = 0, renderCount = 0, propsJson = { test: 33, x: 'y' }, date = state(() => new Date()), json = JSON.stringify(propsJson, null, 2), statePropDisplay = true, _ = states(get => [{
+        syncPropNumber, propNumber, renderCount, propsJson, date, statePropDisplay,
+    }] = get({
+    syncPropNumber, propNumber, renderCount, propsJson, date, statePropDisplay,
+}))) => html `
   <div style="display:flex;flex-wrap:wrap" id="textareawrap">
     <textarea id="props-debug-textarea" wrap="off"
-      onchange=${event => propsJson = JSON.parse(event.target.value)}
+      onchange=${(event) => propsJson = JSON.parse(event.target.value)}
       style="height:200px;font-size:0.6em;width:100%;max-width:400px"
     >${json}</textarea>
     
@@ -53,7 +57,7 @@ export const propsDebugMain = tag((_ = 'propsDebugMain') => (syncPropNumber = le
   <fieldset>
     <legend>date prop</legend>
     date:${date}
-    <input type="date" value=${timestampToValues(date).date} onchange=${event => {
+    <input type="date" value=${timestampToValues(date).date} onchange=${(event) => {
     const newDateString = event.target.value;
     date = new Date(newDateString);
 }} />
@@ -64,7 +68,7 @@ export const propsDebugMain = tag((_ = 'propsDebugMain') => (syncPropNumber = le
 const propDateDebug = tag(({ date }) => html `date:${date}`);
 /** Tests calling a property that is a function immediately which should cause rendering */
 const syncPropDebug = tag(({ syncPropNumber, propNumberChange, parentTest, }) => (_ = state('syncPropDebug'), // something to see in console
-counter = letState(0)(x => [counter, counter = x]), renderCount = letState(0)(x => [renderCount, renderCount = x])) => {
+counter = 0, renderCount = 0, __ = states(get => [{ counter, renderCount }] = get({ counter, renderCount }))) => {
     ++renderCount;
     if (syncPropNumber % 2 === 1) {
         propNumberChange(syncPropNumber = syncPropNumber + 1);
@@ -89,14 +93,19 @@ counter = letState(0)(x => [counter, counter = x]), renderCount = letState(0)(x 
   `;
 });
 const propsDebug = tag(({ propNumber, propsJson, propNumberChange, }) => (_ = state('propsDebug'), // something to see in console
-renderCount = letState(0)(x => [renderCount, renderCount = x]), propNumberChangeCount = letState(0)(x => [propNumberChangeCount, propNumberChangeCount = x]), 
-// poor way to update an argument
-myPropNumber = letState(propNumber)(x => [myPropNumber, myPropNumber = x]), __ = watch([propNumber], () => myPropNumber = propNumber), watchResults = watch([myPropNumber], () => ++propNumberChangeCount), 
+renderCount = 0, propNumberChangeCount = 0, 
 // simple way to locally only update an argument
-___ = letProp(propNumber)(x => [propNumber, propNumber = x])) => html `<!--propsDebug.js-->
+___ = letProp(get => [propNumber] = get(propNumber)), 
+// ___ = letProp(propNumber)(x => [propNumber, propNumber = x]),
+// poor way to update an argument
+myPropNumber = propNumber, _states = states(get => [{
+        renderCount, propNumberChangeCount, myPropNumber,
+    }] = get({
+    renderCount, propNumberChangeCount, myPropNumber,
+})), __ = watch([propNumber], () => myPropNumber = propNumber), watchResults = watch([myPropNumber], () => ++propNumberChangeCount)) => html `<!--propsDebug.js-->
   <h3>Props Json</h3>
   <textarea style="font-size:0.6em;height:200px;width:100%;;max-width:400px" wrap="off"
-    onchange=${event => {
+    onchange=${(event) => {
     const value = JSON.parse(event.target.value);
     Object.assign(propsJson, value);
 }}
@@ -111,14 +120,14 @@ ___ = letProp(propNumber)(x => [propNumber, propNumber = x])) => html `<!--props
   
   <div>
     <button id="propsDebug-🥩-1-button" onclick=${() => propNumberChange(++myPropNumber)}
-    >🐄 🥩 propNumber ${myPropNumber}</button>
+    >🐄 🥩 my propNumber ${myPropNumber}</button>
     <span id="propsDebug-🥩-1-display">${myPropNumber}</span>
   </div>
 
   <div>
     <button id="propsDebug-🥩-2-button" onclick=${() => ++propNumber}
-    >🐄 🥩 local set propNumber ${propNumber}</button>
-    <span id="propsDebug-🥩-2-display">${propNumber}</span>
+    >🐄 🥩 local letProp propNumber ${propNumber}</button>
+    <span id="propsDebug-🥩-let-prop-display">${propNumber}</span>
   </div>
 
   <button
@@ -132,7 +141,7 @@ ___ = letProp(propNumber)(x => [propNumber, propNumber = x])) => html `<!--props
   
   <div>
     <small>
-      (propNumberChangeCount:<span id="propsDebug-🥩-change-display">${propNumberChangeCount}</span>)
+      (propNumberChangeCount:<span id="propsDebug-🥩-change-count-display">${propNumberChangeCount}</span>)
     </small>
   </div>
   
@@ -145,7 +154,7 @@ ___ = letProp(propNumber)(x => [propNumber, propNumber = x])) => html `<!--props
 })}    
 `);
 const propFnUpdateTest = tag.immutableProps(({ propNumber, callback, }) => (_ = state('propFnUpdateTest'), // something to see in console
-renderCount = letState(0)(x => [renderCount, renderCount = x])) => {
+renderCount = 0, __ = states(get => [renderCount] = get(renderCount))) => {
     ++renderCount;
     return html `
     <button id="propsOneLevelFunUpdate-🥩-button"

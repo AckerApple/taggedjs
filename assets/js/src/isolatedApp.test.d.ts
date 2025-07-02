@@ -1,2 +1,2 @@
-import { ViewTypes } from "./sections.tag";
-export declare function runTests(views: ViewTypes[]): Promise<boolean>;
+import { ViewTypes } from "./sectionSelector.tag";
+export declare function runIsolatedTests(views: ViewTypes[], runStartEndTests?: boolean): Promise<boolean>;

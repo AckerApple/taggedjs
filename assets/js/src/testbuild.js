@@ -1,4 +1,4 @@
-import { RouteQuery, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, getNewGlobal, getBaseSupport, checkSimpleValueChange } from 'taggedjs';
+import { RouteQuery, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, getNewGlobal, getBaseSupport, valueToTagJsVar } from 'taggedjs';
 import App from './pages/app.js';
 import isolatedApp from './pages/isolatedApp.page.js';
 import * as fs from 'fs';
@@ -27,16 +27,19 @@ const fullFileSavePath = path.join(__dirname, fileSavePath);
 fs.writeFileSync(fullFileSavePath, html);
 console.debug(`💾 wrote ${fileSavePath}`);
 function templaterToSupport(templater) {
-    const subject = {
+    const context = {
+        renderCount: 0,
         value: templater,
-        // tagJsType: getValueType(templater),
-        global: getNewGlobal(),
-        checkValueChange: checkSimpleValueChange,
+        tagJsVar: valueToTagJsVar(templater),
+        global: undefined, // populated below in getNewGlobal
+        // checkValueChange: checkSimpleValueChange,
+        // delete: deleteSimpleValue,
         withinOwnerElement: false,
     };
+    getNewGlobal(context);
     templater.props = templater.props || [];
-    const support = getBaseSupport(templater, subject);
-    readySupport(support, subject);
+    const support = getBaseSupport(templater, context);
+    readySupport(support, context);
     return support;
 }
 function readySupport(support, subject) {
@@ -49,8 +52,8 @@ function readySupport(support, subject) {
 }
 function templaterToHtml(templater) {
     const support = templaterToSupport(templater);
-    const global = support.subject.global;
-    const context = global.context;
+    const global = support.context.global;
+    const context = global.contexts;
     const tag = support.templater.tag; // TODO: most likely do not want strings below
     const template = tag.strings; // support.getTemplate()
     const strings = new Array(...template); // clone
@@ -81,8 +84,10 @@ function processValue(value, strings, index, support, subject) {
                     const value = tag.values[index];
                     x + processValue(value, [], tag.strings.length - 1 - index, support, {
                         value,
-                        global: getNewGlobal(),
-                        checkValueChange: checkSimpleValueChange,
+                        global: getNewGlobal(subject),
+                        tagJsVar: valueToTagJsVar(value),
+                        // checkValueChange: checkSimpleValueChange,
+                        // delete: destorySupportByContextItem,
                         withinOwnerElement: subject?.withinOwnerElement || false,
                     });
                 }).join('');

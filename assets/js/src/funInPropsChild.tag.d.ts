@@ -7,7 +7,7 @@ export declare const funInPropsChild: import("taggedjs").TaggedFunction<(arg0: {
     child: {
         myChildFunction: () => any;
     };
-}, mainProp: typeof main, myFunction3: () => any) => (other?: string, counter?: number, renderCount?: number, _?: number, { addArrayItem, myFunction, deleteItem, child, array }?: {
+}, mainProp: typeof main, myFunction3: () => any) => (other?: string, counter?: number, renderCount?: number, __?: void, _?: number, { addArrayItem, myFunction, deleteItem, child, array }?: {
     array: unknown[];
     addArrayItem: (x: any) => any;
     myFunction: () => any;
@@ -15,4 +15,4 @@ export declare const funInPropsChild: import("taggedjs").TaggedFunction<(arg0: {
     child: {
         myChildFunction: () => any;
     };
-}) => import("taggedjs").StringTag>;
+}) => import("taggedjs").Tag>;

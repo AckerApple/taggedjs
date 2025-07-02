@@ -3,4 +3,4 @@ export declare const mouseOverTag: import("taggedjs").TaggedFunction<({ label, m
     memory: {
         counter: number;
     };
-}) => import("taggedjs").StringTag>;
+}) => import("taggedjs").Tag>;

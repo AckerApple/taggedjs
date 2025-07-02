@@ -1,9 +1,12 @@
-import { fadeInDown, fadeOutUp } from './animations.js';
+import { fx, fxGroup } from 'taggedjs-animate-css';
 import { renderCountDiv } from './renderCount.component.js';
 import { arrayScoreData } from './arrayScoreData.tag.js';
-import { html, state, letState, tag } from 'taggedjs';
+import { html, state, tag, states, array, subscribe } from 'taggedjs';
 const frameCount = 4;
-export const arrayTests = tag(() => (players = state([]), renderCount = letState(0)(x => [renderCount, renderCount = x]), counter = letState(0)(x => [counter, counter = x])) => {
+export const arrays = tag(() => (players = state([]), renderCount = 0, counter = 0, _ = states(get => [{ counter, renderCount }] = get({ counter, renderCount }))) => {
+    const signalArray = array(['d', 'e', 'f']);
+    const simpleArray = state(['a', 'b', 'c']);
+    const arrayFx = state(() => fxGroup());
     const getNewPlayer = () => ({
         name: 'Person ' + players.length,
         scores: '0,'.repeat(/*frameCount*/ 0).split(',').map((_v, index) => ({
@@ -11,12 +14,53 @@ export const arrayTests = tag(() => (players = state([]), renderCount = letState
             score: Math.floor(Math.random() * 4) + 1
         }))
     });
+    function addArraySignal(loopTimes) {
+        for (let index = 0; index < loopTimes; ++index) {
+            signalArray[signalArray.length] = signalArray.length.toString();
+        }
+    }
     ++renderCount;
     return html `<!--arrayTests.js-->
+    <fieldset>
+      <legend>signal array test</legend>
+      <div style="display:flex;flex-wrap:wrap;gap:1em">
+        ${subscribe(signalArray, array => {
+        return array.map((x, index) => html `
+            <div ${arrayFx} style="border:1px solid black;border-radius:.2em">
+              index:${index} counter:${counter} content:${x} length:${signalArray.length}
+              <button onclick=${() => signalArray.splice(index, 1)}>🗑️ delete me</button>
+            </div>
+          `.key(x));
+    })}
+      </div>        
+      <div>        
+        <button type="button" onclick=${() => ++counter}>++counter ${counter}</button>
+        <button type="button" onclick=${() => addArraySignal(1)}>add number</button>
+        <button type="button" onclick=${() => addArraySignal(10)}>add 10 number</button>
+        <button type="button" onclick=${() => {
+        setTimeout(() => {
+            signalArray[signalArray.length] = signalArray.length.toString();
+        }, 1000);
+    }}>add number by delay</button>
+        <button type="button" onclick=${() => {
+        setTimeout(() => {
+            signalArray.length = 0;
+        }, 1000);
+    }}>delay clear array</button>
+      </div>
+    </fieldset>
+
     <fieldset style="display:flex;flex-wrap:wrap;gap:1em">
-      <legend>static array test</legend>
-      ${['a', 'b', 'c'].map(x => html `<div>html ${counter} content test ${x}</div>`.key(x))}
-      <button type="button" onclick=${() => ++counter}>++counter ${counter}</button>
+      <legend>simple array test</legend>
+      ${simpleArray.map((x, index) => html `
+        <div>
+          counter:${counter} index:${index} x:${x} length:${simpleArray.length}
+          <button onclick=${() => simpleArray.splice(index, 1)}>🗑️ delete me</button>
+        </div>`.key(x))}
+      <div>
+        <button type="button" onclick=${() => ++counter}>++counter ${counter}</button>
+        <button type="button" onclick=${() => simpleArray[simpleArray.length] = simpleArray.length.toString()}>add number</button>
+      </div>
     </fieldset>
 
     <div style="display:flex;flex-wrap:wrap;gap:1em">
@@ -46,8 +90,7 @@ export const arrayTests = tag(() => (players = state([]), renderCount = letState
     }}>push 9 items</button>
 
     ${players.length > 0 && html `
-      <button oninit=${fadeInDown} ondestroy=${fadeOutUp}
-        style="--animate-duration: .1s;"
+      <button ${fx({ duration: '.1s' })}
         onclick=${() => players.length = 0}
       >remove all</button>
     `}
@@ -56,9 +99,17 @@ export const arrayTests = tag(() => (players = state([]), renderCount = letState
   `;
 });
 const playersDisplay = tag(({ players, getNewPlayer, }) => {
-    const playersContent = players.map((player, index) => html `
-    <div oninit=${fadeInDown} ondestroy=${fadeOutUp}
-      style="background-color:black;--animate-duration: .1s;"
+    const playersContent = players.map((player, index) => getPlayerDisplay(player, index, players, getNewPlayer).key(player));
+    return html `
+    <!-- playersLoop.js -->
+    ${playersContent}
+    <!-- end:playersLoop.js -->
+  `;
+});
+function getPlayerDisplay(player, index, players, getNewPlayer) {
+    return html `
+    <div ${fx({ duration: '.1s' })}
+      style="background-color:black;"
     >
       <div>
         name:${player.name}
@@ -71,9 +122,7 @@ const playersDisplay = tag(({ players, getNewPlayer, }) => {
         scores:
         ${player.scores.map((score, playerIndex) => {
         return html `
-            <div style="border:1px solid white;--animate-duration: .1s;"
-              oninit=${fadeInDown} ondestroy=${fadeOutUp}
-            >
+            <div class="animate__slow" ${fx()}>
               <fieldset>
                 <legend>
                   <button id=${`score-data-${playerIndex}-${score.frame}-outside-button`}
@@ -106,11 +155,6 @@ const playersDisplay = tag(({ players, getNewPlayer, }) => {
         players.splice(index, 0, getNewPlayer());
     }}>add before</button>
     </div>
-  `.key(player));
-    return html `
-    <!-- playersLoop.js -->
-    ${playersContent}
-    <!-- end:playersLoop.js -->
   `;
-});
+}
 //# sourceMappingURL=arrayTests.js.map

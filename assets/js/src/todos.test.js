@@ -1,8 +1,12 @@
-import { click, clickOne, focus, keydownOn, query } from "./elmSelectors";
-import { describe, expect, it } from "./expect";
-describe('todos', function todos() {
+import { click, clickOne, focus, keydownOn, query } from "./testing/elmSelectors";
+import { describe, expect, it } from "./testing/expect";
+import { sleep } from "./testing/expect.html";
+describe('☑️ todos', function todos() {
     const todoInput = query('.new-todo')[0];
-    it('add one remove one', function addOneRemoveOne() {
+    it('todos add one remove one', async function addOneRemoveOne() {
+        expect(query('button.destroy').length).toBe(0);
+        click('#todo-view-all-link');
+        await sleep(1); // window route change takes a tick
         expect(query('button.destroy').length).toBe(0);
         expect(todoInput).toBeDefined();
         todoInput.value = 'one';
@@ -12,7 +16,11 @@ describe('todos', function todos() {
         click('button.destroy');
         expect(query('button.destroy').length).toBe(0);
     });
-    it('basic', function basic() {
+    it('todos basic', async function basic() {
+        // click('#todo-view-all-link')
+        window.location.hash = '#/';
+        await sleep(1); // window route change takes a tick
+        expect(query('button.destroy').length).toBe(0);
         todoInput.value = 'one';
         keydownOn(todoInput, 'Enter');
         // checkbox toggle
@@ -30,6 +38,17 @@ describe('todos', function todos() {
         todoInput.value = 'three';
         keydownOn(todoInput, 'Enter');
         expect(query('input.toggle').length).toBe(3);
+        click('#todo-view-active-link');
+        expect(query('input.toggle').length).toBe(3, 'active todo count before page change');
+        expect(window.location.hash).toBe('#/active');
+        await sleep(1); // window route change takes a tick
+        expect(query('input.toggle').length).toBe(2, 'active todo count after page change');
+        click('#todo-view-completed-link');
+        await sleep(1); // window route change takes a tick
+        expect(query('input.toggle').length).toBe(1, 'completed todo count');
+        click('#todo-view-all-link');
+        await sleep(1); // window route change takes a tick
+        expect(query('input.toggle').length).toBe(3, 'view all todo count');
         // delete 0
         clickOne('button.destroy');
         expect(query('input.toggle').length).toBe(2);
@@ -40,7 +59,7 @@ describe('todos', function todos() {
         clickOne('button.destroy');
         expect(query('input.toggle').length).toBe(0);
     });
-    it('editing', function editing() {
+    it('todos editing', function editing() {
         // create todo
         todoInput.value = 'one';
         keydownOn(todoInput, 'Enter');
@@ -70,7 +89,7 @@ describe('todos', function todos() {
         clickOne('button.destroy');
         expect(query('input#edit-todo-input').length).toBe(0);
     });
-    it('⌚️ speedometer', runTodoSpeedometer);
+    it('⌚️ todos speedometer', runTodoSpeedometer);
 });
 function runTodoSpeedometer() {
     const numberOfItemsToAdd = 500;

@@ -1,12 +1,17 @@
-import { letState, html, tag, onInit, callbackMaker, onDestroy } from "taggedjs";
+import { html, tag, onInit, callbackMaker, onDestroy, states } from "taggedjs";
 const test0interval = 3000;
 const test1interval = 6000;
 export const intervalTester0 = tag(() => {
-    let intervalCount = letState(0)(x => [intervalCount, intervalCount = x]);
-    let intervalId = letState(undefined)(x => [intervalId, intervalId = x]);
-    let intervalId2 = letState(undefined)(x => [intervalId2, intervalId2 = x]);
-    let renderCounter = letState(0)(x => [renderCounter, renderCounter = x]);
-    let currentTime = letState(0)(x => [currentTime, currentTime = x]);
+    let intervalCount = 0;
+    let intervalId = undefined;
+    let intervalId2 = undefined;
+    let renderCounter = 0;
+    let currentTime = 0;
+    states(get => [{
+            intervalCount, intervalId, intervalId2, renderCounter, currentTime,
+        }] = get({
+        intervalCount, intervalId, intervalId2, renderCounter, currentTime,
+    }));
     const callback = callbackMaker();
     const increase = () => ++intervalCount;
     const startInterval = () => {
@@ -61,11 +66,16 @@ export const intervalTester0 = tag(() => {
   `;
 });
 export const intervalTester1 = tag(() => {
-    let intervalCount = letState(0)(x => [intervalCount, intervalCount = x]);
-    let intervalId = letState(undefined)(x => [intervalId, intervalId = x]);
-    let intervalId2 = letState(undefined)(x => [intervalId2, intervalId2 = x]);
-    let renderCounter = letState(0)(x => [renderCounter, renderCounter = x]);
-    let currentTime = letState(0)(x => [currentTime, currentTime = x]);
+    let intervalCount = 0;
+    let intervalId = undefined;
+    let intervalId2 = undefined;
+    let renderCounter = 0;
+    let currentTime = 0;
+    states(get => [{
+            intervalCount, intervalId, intervalId2, renderCounter, currentTime
+        }] = get({
+        intervalCount, intervalId, intervalId2, renderCounter, currentTime
+    }));
     const callback = callbackMaker();
     const increase = () => ++intervalCount;
     function trackTime() {

@@ -1,1 +1,1 @@
-export declare const tagDebug: import("taggedjs").TaggedFunction<() => import("taggedjs").StringTag>;
+export declare const tagDebug: import("taggedjs").TaggedFunction<() => import("taggedjs").Tag>;

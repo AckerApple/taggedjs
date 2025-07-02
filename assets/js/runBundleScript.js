@@ -1,4 +1,7 @@
-import { run } from './bundleScript.js';
-// console.log('run', run)
-run();
+import { run } from './bundleScript';
+import webpack from 'webpack';
+import webpackConfig from './webpack.config';
+// Create a compiler instance with the configuration
+const compiler = webpack(webpackConfig);
+run(compiler);
 //# sourceMappingURL=runBundleScript.js.map

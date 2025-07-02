@@ -1,7 +1,11 @@
 import { outputSections } from "./renderedSections.tag"
-import { execute } from "./testing/expect"
+import { mochaLoaded } from "./testing/initialize-mocha-chai"
 
 export async function runTests() {
+  console.log('🏃 runTests: Waiting for Mocha to load...');
+  await mochaLoaded;
+  console.log('✅ runTests: Mocha loaded, importing tests...');
+  
   await import('./basic.test') // not in gh-pages
   await import('./start.test.js')
 
@@ -25,7 +29,18 @@ export async function runTests() {
 
   try {
     const start = Date.now() //performance.now()
-    await execute()
+    
+    // Run Mocha tests
+    await new Promise((resolve, reject) => {
+      (window as any).mocha.run((failures: number) => {
+        if (failures > 0) {
+          reject(new Error(`${failures} test(s) failed`));
+        } else {
+          resolve(true);
+        }
+      });
+    });
+    
     const time = Date.now() - start // performance.now() - start
     console.info(`✅ all tests passed in ${time}ms`)
 

@@ -19,6 +19,7 @@
 			"DOM.Iterable",
 			"esnext"
 		],
+    "types": ["mocha", "chai"],
     "allowSyntheticDefaultImports": true,
     // "moduleResolution": "Node16",
     "moduleResolution": "Bundler",

@@ -1,8 +1,9 @@
-import { html, tag, letState } from "taggedjs";
+import { states, html, tag } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component.js";
 export const tagSwitchDebug = tag((_t = 'tagSwitchDebug') => {
-    let selectedTag = letState(null)(x => [selectedTag, selectedTag = x]);
-    let renderCount = letState(0)(x => [renderCount, renderCount = x]);
+    let selectedTag = null;
+    let renderCount = 0;
+    states(get => [{ renderCount, selectedTag }] = get({ renderCount, selectedTag }));
     function changeSelectedTag(event) {
         selectedTag = event.target.value;
         if (selectedTag === 'undefined') {
@@ -106,8 +107,9 @@ export const ternaryPropTest = tag(({ selectedTag }) => {
   `;
 });
 export const tag1 = tag(({ title }) => {
-    let counter = letState(0)(x => [counter, counter = x]);
-    let renderCount = letState(0)(x => [renderCount, renderCount = x]);
+    let counter = 0;
+    let renderCount = 0;
+    states(get => [{ counter, renderCount }] = get({ counter, renderCount }));
     ++renderCount;
     return html `
     <div id="tag1" style="border:1px solid orange;">
@@ -118,8 +120,9 @@ export const tag1 = tag(({ title }) => {
   `;
 });
 export const tag2 = tag(({ title }) => {
-    let counter = letState(0)(x => [counter, counter = x]);
-    let renderCount = letState(0)(x => [renderCount, renderCount = x]);
+    let counter = 0;
+    let renderCount = 0;
+    states(get => [{ counter, renderCount }] = get({ counter, renderCount }));
     ++renderCount;
     return html `
     <div id="tag2" style="border:1px solid orange;">
@@ -130,8 +133,9 @@ export const tag2 = tag(({ title }) => {
   `;
 });
 export const tag3 = tag(({ title }) => {
-    let counter = letState(0)(x => [counter, counter = x]);
-    let renderCount = letState(0)(x => [renderCount, renderCount = x]);
+    let counter = 0;
+    let renderCount = 0;
+    states(get => [{ counter, renderCount }] = get({ counter, renderCount }));
     ++renderCount;
     return html `
     <div  id="tag3" style="border:1px solid orange;">

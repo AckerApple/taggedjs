@@ -1,36 +1,42 @@
 import { Header } from "./components/header.js";
 import { Footer } from "./components/footer.js";
 import { todoReducer } from "./reducer.js";
-import { html, tag } from "taggedjs";
+import { html } from "taggedjs";
 import { useHashRouter } from "./HashRouter.function.js";
 import { Item } from "./components/item.js";
 export const todos = [];
 const dispatch = todoReducer(todos);
-export const App = () => tag.state = (route = useHashRouter().route, toggleAll = (e) => dispatch.toggleAll(e.target.checked), visibleTodos = todos.filter((todo) => {
-    if (route === "/active")
-        return !todo.completed;
-    if (route === "/completed")
-        return todo.completed;
-    return todo;
-})) => html `
-    ${Header(dispatch)}
-    start***
-    ${todos.length > 0 && html `
-        <main class="main">
-            <div class="toggle-all-container">
-                <input id="toggle-all" class="toggle-all" type="checkbox" checked=${visibleTodos.every((todo) => todo.completed)} onChange=${toggleAll} />
-                <label class="toggle-all-label" for="toggle-all">
-                    Toggle All Input
-                </label>
-            </div>
-            <ul class="todo-list show-priority">
+export const todoApp = () => {
+    const route = useHashRouter().route;
+    const activeTodoCount = todos.filter((todo) => !todo.completed).length;
+    const isActiveRoute = route === "/active";
+    const isCompletedRoute = route === "/completed";
+    const visibleTodos = isActiveRoute && todos.filter(todo => !todo.completed) ||
+        isCompletedRoute && todos.filter(todo => todo.completed) || todos;
+    const todoCount = todos.length;
+    return html `
+        ${ /*autoTestingControls([ViewTypes.Todo], false)*/false}
+        ${Header(dispatch)}
+        ${todoCount > 0 && html `
+            <main class="main">
+                <div class="toggle-all-container">
+                    <input
+                        id="toggle-all"
+                        class="toggle-all"
+                        type="checkbox"
+                        checked=${activeTodoCount < 1}
+                        onChange=${(e) => dispatch.toggleAll(e.target.checked)}
+                    />
+                    <label class="toggle-all-label" for="toggle-all">
+                        Toggle All Input
+                    </label>
+                </div>
+                <ul class="todo-list show-priority">
                 ${visibleTodos.map((todo, index) => Item(todo, dispatch, index).key(todo.id))}
-            </ul>
-        </main>
-        -- before footer --
-        ${Footer(todos, dispatch, route)}
-        -- after footer --
-    `}
-    ***end
-`;
+                </ul>
+            </main>
+            ${Footer(todoCount, dispatch.removeCompleted, route, activeTodoCount)}
+        `}
+    `;
+};
 //# sourceMappingURL=todos.app.js.map

@@ -1,1 +1,2 @@
-export declare const Header: (dispatch: any) => import("taggedjs").StringTag;
+import { Dispatch } from "../reducer.js";
+export declare const Header: (dispatch: Dispatch) => () => import("taggedjs").Tag;

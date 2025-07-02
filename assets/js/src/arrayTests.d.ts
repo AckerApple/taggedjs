@@ -3,5 +3,5 @@ type Player = {
     edit?: boolean;
     scores: any[];
 };
-export declare const arrayTests: import("taggedjs").TaggedFunction<() => (players?: Player[], renderCount?: number, counter?: number) => import("taggedjs").StringTag>;
+export declare const arrays: import("taggedjs").TaggedFunction<() => (players?: Player[], renderCount?: number, counter?: number, _?: void) => import("taggedjs").Tag>;
 export {};

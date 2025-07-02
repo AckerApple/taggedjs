@@ -1,11 +1,12 @@
-import { html } from "./elmSelectors";
-import { expect, it } from "./expect";
-import { testCounterElements } from "./expect.html";
+import { html } from "./testing/elmSelectors";
+import { expect, it } from "./testing/expect";
+import { testCounterElements } from "./testing/expect.html";
 it('oneRender', () => {
     expect(html('#oneRender_tag_ts_render_count')).toBe('1');
     testCounterElements('#👍-counter-button', '#👍-counter-display');
     testCounterElements('#👍🔨-counter-button', '#👍🔨-counter-display');
     testCounterElements('#👍🔨-counter-button', '#👍🔨-counter-subject-display');
+    testCounterElements('#👍🔨-counter-button', '#📡-signal-counter-display');
     expect(html('#oneRender_tag_ts_render_count')).toBe('1');
 });
 //# sourceMappingURL=oneRender.test.js.map

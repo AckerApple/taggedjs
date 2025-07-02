@@ -1,7 +1,7 @@
-import { fadeInDown, fadeOutUp } from "./animations.js";
 import { renderCountDiv } from "./renderCount.component.js";
 import { dialog } from "./providerDialog.tag.js";
-import { letState, html, tag, providers, state, callbackMaker, Subject, onInit } from "taggedjs";
+import { html, tag, providers, state, callbackMaker, Subject, onInit, states } from "taggedjs";
+import { fx } from "taggedjs-animate-css";
 export class TagDebugProvider {
     constructor() {
         this.tagDebug = 0;
@@ -23,14 +23,15 @@ export function upperTagDebugProvider() {
         test: 0
     };
 }
-export const providerDebugBase = tag((_x = 'providerDebugBase') => {
+export const providerDebug = tag((_x = 'providerDebugBase') => {
     // providerDebugBase, has provider
     providers.create(ProviderFunc); // test that an arrow function can be a provider
     const providerClass = providers.create(TagDebugProvider);
     const provider = providers.create(tagDebugProvider);
-    const test = letState('props debug base');
-    let propCounter = letState(0)(x => [propCounter, propCounter = x]);
-    let renderCount = letState(0)(x => [renderCount, renderCount = x]);
+    const test = 'props debug base';
+    let propCounter = 0;
+    let renderCount = 0;
+    states(get => [{ propCounter, renderCount }] = get({ propCounter, renderCount }));
     if (providerClass.showDialog) {
         document.getElementById('provider_debug_dialog').showModal();
     }
@@ -153,9 +154,9 @@ const providerChildDebug = tag(({ propCounter, propCounterChange, _ = 'providerD
     const provider = providers.inject(tagDebugProvider);
     const providerClass = providers.inject(TagDebugProvider);
     const upperProvider = providers.inject(upperTagDebugProvider);
-    let showProProps = letState(false)(x => [showProProps, showProProps = x]);
-    let renderCount = letState(0)(x => [renderCount, renderCount = x]);
-    // let propCounter: number = letState(0)(x => [propCounter, propCounter = x])
+    let showProProps = false;
+    let renderCount = 0;
+    states(get => [{ showProProps, renderCount }] = get({ showProProps, renderCount }));
     const callbacks = callbackMaker();
     const callbackTestSub = state(() => new Subject());
     onInit(() => {
@@ -224,7 +225,7 @@ const providerChildDebug = tag(({ propCounter, propCounterChange, _ = 'providerD
     >${showProProps ? 'hide' : 'show'} provider as props</button>
     
     ${showProProps && html `
-      <div oninit=${fadeInDown} ondestroy=${fadeOutUp}>
+      <div ${fx()}>
         <hr />
         <h3>Provider as Props</h3>
         ${testProviderAsProps(providerClass)}

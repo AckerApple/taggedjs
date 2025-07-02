@@ -1,7 +1,8 @@
 import { renderCountDiv } from './renderCount.component.js';
-import { html, letState, tag } from 'taggedjs';
+import { html, states, tag } from 'taggedjs';
 export const arrayScoreData = tag(({ score, playerIndex }) => {
-    let renderCount = letState(0)(x => [renderCount, renderCount = x]);
+    let renderCount = 0;
+    states(get => [renderCount] = get(renderCount));
     ++renderCount;
     return html `
     frame:${score.frame}:

@@ -1,4 +1,4 @@
-import { app } from "./app.function.js";
-app();
-export default app;
+import { run } from "./run.function.js";
+run();
+export default run;
 //# sourceMappingURL=app.js.map

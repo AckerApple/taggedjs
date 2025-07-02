@@ -1,1 +1,1 @@
-export declare function Input({ onSubmit, placeholder, label, defaultValue, onBlur }: any): import("taggedjs").StringTag;
+export declare function Input({ onSubmit, placeholder, label, defaultValue, onBlur }: any): import("taggedjs").Tag;

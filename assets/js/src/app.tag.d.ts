@@ -1,2 +1,8 @@
 import { Subject } from "taggedjs";
-export declare const App: import("taggedjs").TaggedFunction<() => (_firstState?: string, appCounter?: number, toggleValue?: boolean, toggle?: () => boolean, appCounterSubject?: Subject<number>, renderCount?: number, testTimeout?: null) => import("taggedjs").StringTag>;
+declare function appFun(): (menuName?: string) => import("taggedjs").Tag;
+declare namespace appFun {
+    var isApp: boolean;
+}
+export declare const App: import("taggedjs").TaggedFunction<typeof appFun>;
+export declare const homePage: () => (showSections?: boolean, appCounter?: number, toggleValue?: boolean, testTimeout?: null, appCounterSubject?: Subject<number>, renderCount?: number, testEmoji?: string, _?: void, toggle?: () => void) => import("taggedjs").Tag;
+export {};

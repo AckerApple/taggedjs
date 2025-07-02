@@ -1,0 +1,48 @@
+import { html, states, tag } from 'taggedjs';
+// Performance boost to not render if props non-mutating props did not change
+export const Item = tag.immutableProps((todo, dispatch, index) => (editing = false, _ = states(get => [{ editing }] = get({ editing }))) => {
+    return html `
+    <li class.completed=${todo.completed} class.editing=${editing}>
+      ${!editing ? html `
+        <div class="view">
+          <input class="toggle" type="checkbox" ${todo.completed && 'checked'} onchange=${() => dispatch.toggleItem(todo, index)} />
+          
+          <label data-testid="todo-item-label" ondoubleclick=${() => editing = !editing}
+          >${todo.title}</label>
+          
+          <button class="destroy" onclick=${() => dispatch.removeItemByIndex(index)}></button>
+        </div>
+      ` : html `
+        <div class="input-container">
+          <input id="edit-todo-input" type="text" autofocus class="edit"
+            value=${todo.title}
+            onblur=${() => editing = false}
+            onKeyDown=${e => handleKey(e, title => {
+        handleUpdate(title, todo, index, dispatch);
+        editing = false;
+    })}
+          />
+          <label class="visually-hidden" htmlFor="todo-input">
+            Edit Todo Input
+          </label>
+        </div>
+      `}
+    </li>
+  `;
+});
+function handleUpdate(title, todo, index, dispatch) {
+    if (title.length === 0) {
+        dispatch.removeItem(todo.id);
+        return;
+    }
+    dispatch.updateToByIndex(todo, { title }, index);
+}
+export function handleKey(e, onValid) {
+    if (e.key === "Enter") {
+        const value = e.target.value.trim();
+        onValid(value);
+        return true;
+    }
+}
+;
+//# sourceMappingURL=item.tag.js.map

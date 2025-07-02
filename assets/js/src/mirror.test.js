@@ -1,6 +1,6 @@
-import { byId, htmlById } from "./elmSelectors";
-import { expect, it } from "./expect";
-import { expectElmCount, expectMatchedHtml } from "./expect.html";
+import { byId, htmlById } from "./testing/elmSelectors";
+import { expect, it } from "./testing/expect";
+import { expectElmCount, expectMatchedHtml } from "./testing/expect.html";
 it('🪞 mirror testing', () => {
     expectElmCount('#mirror-counter-display', 2);
     expectElmCount('#mirror-counter-button', 2);

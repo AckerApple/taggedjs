@@ -1,3 +1,3 @@
 import { Tag } from "taggedjs";
-declare const _default: (propCounter: number, child: Tag) => (_?: string, edit?: boolean, renderCount?: number, __?: number) => import("taggedjs").StringTag;
-export default _default;
+export declare const statePropDebug: (propCounter: number, child: Tag) => (_?: string, edit?: boolean, renderCount?: number, ___?: void, __?: number) => Tag;
+export default statePropDebug;

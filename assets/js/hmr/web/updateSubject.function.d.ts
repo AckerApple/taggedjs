@@ -7,6 +7,7 @@
  * @typedef {import("taggedjs").renderWithSupport} renderWithSupport
  * @typedef {import("taggedjs").renderTagSupport} renderTagSupport
  */
+import { HmrImport } from "./hmr.js";
 import { ContextItem, TaggedFunction } from "taggedjs";
 /** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 /**
@@ -16,4 +17,4 @@ import { ContextItem, TaggedFunction } from "taggedjs";
  * @param {TagComponent} oldTag
  * @param {HmrImport} hmr
  */
-export declare function updateSubject(contextSubject: ContextItem, newTag: TaggedFunction<any>, oldTag: TaggedFunction<any>, hmr: any): Promise<void>;
+export declare function updateSubject(contextSubject: ContextItem, newTag: TaggedFunction<any>, oldTag: TaggedFunction<any>, hmr: HmrImport): Promise<void>;

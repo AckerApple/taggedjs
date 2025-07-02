@@ -1,9 +1,11 @@
-import { click, textContent } from "./elmSelectors";
-import { expect, it } from "./expect";
+import { click, textContent } from "./testing/elmSelectors";
+import { expect, it } from "./testing/expect";
+/*
 it('no template tags', () => {
-    const templateTags = document.getElementsByTagName('template');
-    expect(templateTags.length).toBe(0, 'Expected no templates to be on document');
-});
+  const templateTags = document.getElementsByTagName('template')
+  expect(templateTags.length).toBe(0, 'Expected no templates to be on document')
+})
+*/
 it('subject', () => {
     const current = textContent('#app-counter-subject-value-display');
     click('#app-counter-subject-button');

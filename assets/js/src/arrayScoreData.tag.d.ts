@@ -4,4 +4,4 @@ export declare const arrayScoreData: import("taggedjs").TaggedFunction<({ score,
         score: number;
         frame: number;
     };
-}) => import("taggedjs").StringTag>;
+}) => import("taggedjs").Tag>;

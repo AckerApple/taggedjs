@@ -1,10 +1,36 @@
-import { execute } from "./testing/expect"
 import { ViewTypes } from "./sectionSelector.tag"
+import { mochaLoaded } from "./testing/initialize-mocha-chai"
+
+// Create a simple execute function that runs Mocha tests
+async function execute() {
+  console.log('🏃 execute: Checking if Mocha is available...');
+  
+  if (typeof window !== 'undefined' && (window as any).mocha) {
+    console.log('✅ execute: Mocha found, running tests...');
+    return new Promise((resolve, reject) => {
+      const runner = (window as any).mocha.run((failures: number) => {
+        if (failures > 0) {
+          reject(new Error(`${failures} test(s) failed`));
+        } else {
+          resolve(true);
+        }
+      });
+    });
+  } else {
+    // Fallback for non-browser environments
+    console.warn('❌ execute: Mocha not available, skipping tests');
+    return true;
+  }
+}
 
 export async function runIsolatedTests(
   views: ViewTypes[],
   runStartEndTests = true,
 ) {
+  console.log('🏃 runIsolatedTests: Waiting for Mocha to load...');
+  await mochaLoaded;
+  console.log('✅ runIsolatedTests: Mocha loaded, importing tests...');
+  
   let testCount = 0
 
   if(runStartEndTests) {

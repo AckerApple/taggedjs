@@ -1,6 +1,6 @@
-import { click, html, htmlById } from "./elmSelectors";
-import { describe, expect, it } from "./expect";
-import { expectMatchedHtml } from "./expect.html";
+import { click, html, htmlById } from "./testing/elmSelectors";
+import { describe, expect, it } from "./testing/expect";
+import { expectMatchedHtml } from "./testing/expect.html";
 describe('⌚️ watch tests', () => {
     const slowCount = html('#🍄-slowChangeCount');
     // tests can be run multiple times. Only the first time will this expect below work
@@ -13,7 +13,7 @@ describe('⌚️ watch tests', () => {
         if (firstRun) {
             expect(html('#🍄-watchPropNumSlow')).toBe('');
             expect(html('#🦷-watchTruth')).toBe('false');
-            expect(html('#🦷-watchTruthAsSub')).toBe('undefined');
+            expect(html('#🦷-watchTruthAsSub')).toBe('');
         }
         else {
             expect(html('#🍄-watchPropNumSlow')).toBe(slowCount);
@@ -46,7 +46,9 @@ describe('⌚️ watch tests', () => {
         expect(html('#🦷-truthChangeCount')).toBe(newCount);
         click('#🦷-truthChange-button'); // reset so tests can pass every time
         click('#🦷-reset-button'); // reset so tests can pass every time
-        expect(html('#🦷-watchTruthAsSub')).toBe(html('#🦷-watchTruth'));
+        const display = html('#🦷-watchTruth');
+        const actual = html('#🦷-watchTruthAsSub');
+        expect(actual).toBe(display, `Last test expected #🦷-watchTruthAsSub ${display} but it was ${actual}`);
     });
 });
 //# sourceMappingURL=watch.test.js.map

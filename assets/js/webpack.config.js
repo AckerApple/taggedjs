@@ -2,7 +2,7 @@ import * as path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
 // import CompressionPlugin from 'compression-webpack-plugin'
 import { fileURLToPath } from 'url';
-import ResolveTsForJsPlugin from './ResolveTsForJsPlugin.class.js';
+import { ResolveTsForJsPlugin } from './node_modules/taggedjs-cli/bin/bundle';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const out = path.resolve(__dirname, 'assets', 'dist');
@@ -23,7 +23,7 @@ export default {
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
         alias: {
-        // taggedjs: path.resolve(__dirname, '../main/ts'),
+            taggedjs: path.resolve(__dirname, '../main/ts'),
         }
     },
     module: {
@@ -35,7 +35,8 @@ export default {
             },
             {
                 test: /\.(js|ts)$/, // Adjust the regex to match the files you're interested in
-                use: [path.resolve(__dirname, 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.ts')] // Use the path to your loader
+                // use: [path.resolve(__dirname, 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.ts')] // Use the path to your loader
+                use: [path.resolve(__dirname, 'node_modules', 'taggedjs-cli', 'bin', 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.js')] // Use the path to your loader
             },
         ],
     },

@@ -13,4 +13,4 @@ export declare function upperTagDebugProvider(): {
     name: string;
     test: number;
 };
-export declare const providerDebugBase: import("taggedjs").TaggedFunction<(_x?: any) => import("taggedjs").StringTag>;
+export declare const providerDebug: import("taggedjs").TaggedFunction<(_x?: any) => import("taggedjs").Tag>;

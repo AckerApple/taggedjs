@@ -1,3 +1,6 @@
+// Initialize Mocha/Chai before anything else
+import './testing/initialize-mocha-chai'
+
 export { hmr, tagElement } from "taggedjs"
 export { App } from "./app.tag"
 

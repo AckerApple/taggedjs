@@ -1,10 +1,11 @@
-import { html, letState, state, tag } from "taggedjs";
+import { html, states, state, tag } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
-export default (propCounter, child) => tag.state = (_ = state('statePropDebug.tag.ts'), // something to be seen in console
-edit = letState(false)(x => [edit, edit = x]), renderCount = letState(0)(x => [renderCount, renderCount = x]), __ = ++renderCount) => html `
+export const statePropDebug = (propCounter, child) => tag.use = (_ = state('statePropDebug.tag.ts'), // something to be seen in console
+edit = false, renderCount = 0, ___ = states(get => [{ edit, renderCount }] = get({ edit, renderCount })), __ = ++renderCount) => html `
   propCounter:${propCounter}
   <button type="button" onclick=${() => edit = !edit}>edit ${edit}</button>
   child: ${child}
   ${renderCountDiv({ renderCount, name: 'statePropDebug-tag' })}
 `;
+export default statePropDebug;
 //# sourceMappingURL=statePropDebug.tag.js.map

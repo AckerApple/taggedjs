@@ -1,10 +1,11 @@
 import { intervalTester0, intervalTester1 } from "./intervalDebug";
-import { html, tag, letState } from "taggedjs";
-import { fadeInDown, fadeOutUp } from "./animations";
+import { html, tag, states } from "taggedjs";
+import { fx } from "taggedjs-animate-css";
 export const tagDebug = tag(() => {
-    let _firstState = letState('tagJsDebug.js')(x => [_firstState, _firstState = x]);
-    let showIntervals = letState(false)(x => [showIntervals, showIntervals = x]);
-    let renderCount = letState(0)(x => [renderCount, renderCount = x]);
+    let _firstState = 'tagJsDebug.js';
+    let showIntervals = false;
+    let renderCount = 0;
+    states(get => [{ _firstState, showIntervals, renderCount }] = get({ _firstState, showIntervals, renderCount }));
     ++renderCount;
     return html `<!-- tagDebug.js -->
     <div style="display:flex;flex-wrap:wrap;gap:1em">    
@@ -18,7 +19,7 @@ export const tagDebug = tag(() => {
         >hide/show</button>
 
         ${showIntervals && html `
-          <div oninit=${fadeInDown} ondestroy=${fadeOutUp}>
+          <div ${fx()}>
             <div>${intervalTester0()}</div>
             <hr />
             <div>${intervalTester1()}</div>

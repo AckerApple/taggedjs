@@ -1,6 +1,6 @@
-import { click, html } from "./elmSelectors";
-import { expect, it } from "./expect";
-import { testCounterElements } from "./expect.html";
+import { click, html } from "./testing/elmSelectors";
+import { expect, it } from "./testing/expect";
+import { testCounterElements } from "./testing/expect.html";
 it('function in props', async () => {
     testCounterElements('#fun_in_prop1', '#fun_in_prop_display');
     testCounterElements('#fun_in_prop2', '#fun_in_prop_display');

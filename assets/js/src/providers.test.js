@@ -1,5 +1,5 @@
-import { describe, it } from "./expect";
-import { testDuelCounterElements } from "./expect.html";
+import { describe, it } from "./testing/expect";
+import { testDuelCounterElements } from "./testing/expect.html";
 describe('providers', () => {
     it('basics', () => {
         testDuelCounterElements(['#increase-provider-🍌-0-button', '#increase-provider-🍌-0-display'], ['#increase-provider-🍌-1-button', '#increase-provider-🍌-1-display']);

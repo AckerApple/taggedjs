@@ -24,7 +24,7 @@ export default {
   experiments: {
     outputModule: true,
   },
-  target: 'node',
+  target: 'web',
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     alias: {

@@ -1,2 +1,2 @@
-import { app } from "./app.function.js";
-export default app;
+import { run } from "./run.function.js";
+export default run;

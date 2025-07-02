@@ -1,6 +1,9 @@
-export { hmr } from "taggedjs";
+export { hmr, tagElement } from "taggedjs";
 export { App } from "./app.tag";
 import IsolatedApp from "./isolatedApp";
 export { IsolatedApp };
-export { app } from './app.function';
+import { todoApp } from "./todo/todos.app";
+export { todoApp };
+import { run } from './run.function';
+export { run };
 //# sourceMappingURL=index.js.map
