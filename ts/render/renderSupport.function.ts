@@ -48,6 +48,7 @@ export function renderSupport<T extends AnySupport>(
 
   delete subject.locked
 
+
   return tag as T
 }
 

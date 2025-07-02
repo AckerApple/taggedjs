@@ -1,8 +1,5 @@
 ## TODO
 
-- remove element oninit ondestroy
-
-- Test going from subscribe value false to subscribe value tag
 - test for hide then show subscribe to array with delayed emission
 - test a click to promise that changes variables
 - test host update
@@ -75,7 +72,6 @@ In many cases, since TaggedJs is natively compatible with browser vanilla Javasc
 - The boolean `true` will render to screen
 - An attribute dynamic value of `undefined` will cause `element.removeAttribute(name)` to occur
 - attributes autofocus and autoselect
-- attributes oninit and ondestroy
 - Render template syntax is `${}` instead of `{}`
   - `<div onclick={handler}></div>`
   - `<div onclick=${handler}></div>`

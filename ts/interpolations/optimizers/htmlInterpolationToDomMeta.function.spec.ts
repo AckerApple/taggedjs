@@ -71,14 +71,13 @@ describe('#htmlInterpolationToDomMeta', () => {
   })
 
   it('with standalones', () => {
-    const fxIn = 1
-    const fxOut = 2
+    const fx = () => {}
     const duration = 3
     let borderColor = 'black'
     const innerHTML = 5
 
     const htmlResult = html`
-      <div oninit=${fxIn} ondestroy=${fxOut}
+      <div ${fx}
         style="--animate-duration: ${duration};border-size:1px;border-color:${borderColor};"
       >
         23${innerHTML}23-${borderColor}
@@ -100,20 +99,19 @@ describe('#htmlInterpolationToDomMeta', () => {
         'style',
         [
           '--animate-duration: ',
-          ':tagvar2:',
+          ':tagvar1:',
           ';border-size:1px;border-color:',
-          ':tagvar3:',
+          ':tagvar2:',
           ';'
         ]
       ],
-      [ 'init', ':tagvar0:', 'init' ],
-      [ 'destroy', ':tagvar1:', 'destroy' ],
+      [ ':tagvar0:' ],
     ])
     expect(firstDom.ch).toEqual([
       { nn: 'text', tc: '\n        23' },
-      { nn: 'text', tc: ':tagvar4:' },
+      { nn: 'text', tc: ':tagvar3:' },
       { nn: 'text', tc: '23-' },
-      { nn: 'text', tc: ':tagvar5:' },
+      { nn: 'text', tc: ':tagvar4:' },
       { nn: 'text', tc: '\n      ' }
     ])
   })

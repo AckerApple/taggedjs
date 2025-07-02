@@ -31,9 +31,10 @@ export function output<CallbackReturn, ReceivedArguments extends any[]>(
 export function syncWrapCallback(
   args: any[],
   callback: any,
-  ownerSupport: AnySupport,
+  ownerSupport: AnySupport, // aka stateOwner
 ) {
-  const newestOwner = ownerSupport.context.global.newest
+  const global = ownerSupport.context.global
+  const newestOwner = global.newest
   
   // sync the new states to the old before the old does any processing
   syncStatesArray(newestOwner.states, ownerSupport.states)
@@ -45,8 +46,14 @@ export function syncWrapCallback(
 
   // now render the owner
   paintAfters.push([() => {
+    const newGlobal = newestOwner.context.global
+    if( !newGlobal ) {
+      // paint()
+      return // its not a tag anymore
+    }
     ++painting.locks
     safeRenderSupport(newestOwner)
+    // safeRenderSupport(global.newest)
     --painting.locks
     paint()
   }, []])

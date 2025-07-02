@@ -23,7 +23,7 @@ function firstSignal(
   const editors = ['push', 'pop', 'splice', 'shift', 'unshift']
   const readers = ['map', 'reduce', 'forEach', 'every']
 
-  const overwriteEmitter = (action: string) => {
+  const overwriteEmitter = (action: string): ((...args: any[]) => any) => {
     return (resignal as any)[action] = (...args: any[]) => {
         const result = sig.value[action](...args)
         sig.emit( sig.value )
@@ -31,7 +31,7 @@ function firstSignal(
     }
   }
 
-  const resignal = new Proxy(sig, {
+  const resignal: any = new Proxy(sig, {
     get(target, prop) {
       // If accessing numeric index like '0', '1', etc.
       if (!isNaN(prop as any)) {

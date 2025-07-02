@@ -33,13 +33,22 @@ export function host(
   }
 }
 
-/** Attach a host to an element that only runs during initialization */
-host.onInit = (callback: HostCallback): HostValue => {
+// Declare namespace for TypeScript visibility
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export declare namespace host {
+  /** Attach a host to an element that only runs during initialization */
+  const onInit: (callback: HostCallback) => HostValue
+  
+  /** Attach a host to an element that only runs during element destruction */
+  const onDestroy: (callback: HostCallback) => HostValue
+}
+
+// Attach the functions to the host namespace
+;(host as any).onInit = (callback: HostCallback): HostValue => {
   return host(() => {}, { onInit: callback })
 }
 
-/** Attach a host to an element that only runs during element destruction */
-host.onDestroy = (callback: HostCallback): HostValue => {
+;(host as any).onDestroy = (callback: HostCallback): HostValue => {
   return host(() => {}, { onDestroy: callback })
 }
 
@@ -56,6 +65,7 @@ function processHostUpdate(
     contextItem,
     counts,
   )
+
   if( hasChanged ) {
     return hasChanged
   }

@@ -217,8 +217,6 @@ export function processAttributeSubjectValue(
       newAttrValue,
       element,
       special, // string name of special
-      support,
-      counts,
     )
     return
   }

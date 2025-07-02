@@ -20,15 +20,10 @@ export default function callbackStateUpdate<T>(
   // run the callback
   const maybePromise = callback(...args as [any,any,any,any,any,any])
 
-  // OLDEST UPDATE NEWEST: send the oldest state changes into the newest
-  //syncStatesArray(oldStates, newestSupport.states)
-
   renderSupport(newestSupport)
 
   if(isPromise(maybePromise)) {
     (maybePromise as Promise<any>).finally(() => {
-      // send the oldest state changes into the newest
-      // syncStatesArray(oldStates, newestSupport.states)
       renderSupport(newestSupport)
     })
   }

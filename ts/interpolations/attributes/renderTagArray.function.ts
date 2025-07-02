@@ -13,6 +13,7 @@ export function renderTagUpdateArray(
 
   --painting.locks
 
+
   paint()
 }
 

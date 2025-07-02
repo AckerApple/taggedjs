@@ -1,6 +1,6 @@
 import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { destroyArray } from './checkDestroyPrevious.function.js'
-import { paint, paintCommands, painting, addPaintRemover } from '../render/paint.function.js'
+import { addPaintRemover } from '../render/paint.function.js'
 import { ContextItem } from './ContextItem.type.js'
 import { SupportTagGlobal } from './getTemplaterResult.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
@@ -12,63 +12,9 @@ export function smartRemoveKids(
   allPromises: Promise<any>[]
 ) {
   const context = global.contexts as ContextItem[]
-  const destroys = global.destroys
-  if( destroys ) {
-    return processContextDestroys(destroys, global, allPromises)
-  }
 
   smartRemoveByContext(context, allPromises)
   destroyClones(global)
-}
-
-const promises: any[] = []
-function destroyCall(destroy: () => any) {
-  const maybePromise = destroy()
-  const isPromise = maybePromise instanceof Promise
-
-
-  if (isPromise) {
-    promises.push(maybePromise)
-  }
-}
-
-// Elements that have a destroy or ondestroy attribute
-function processContextDestroys(
-  destroys: (() => any)[],
-  global: SupportTagGlobal,
-  allPromises: Promise<any>[],
-) {
-  promises.length = 0
-  destroys.forEach(destroyCall)
-
-  if(promises.length) {
-    const lastPromise = Promise.all(promises)
-      .then(() => {
-        ++painting.locks
-        
-        // continue to remove
-        smartRemoveByContext(global.contexts, allPromises)
-        destroyClones(global)
-        
-        --painting.locks
-
-        paint()
-      })
-
-    // run destroy animations
-    allPromises.push(lastPromise)
-    
-    return
-  }
-
-  ++painting.locks
-
-  smartRemoveByContext(global.contexts, allPromises)
-  destroyClones(global)
-
-  --painting.locks
-  
-  paint()
 }
 
 function smartRemoveByContext(

@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### v2.11.0 - 7-2025
+- BREAKING: Removed element `oninit`/`ondestroy` attribute support
+  - BEFORE: html`<div oninit=${fx} ondestroy=${fx}>...</div>`
+  - AFTER: html`<div ${host.onInit(fx)} ${host.onDestroy(fx)}>...</div>`
+  - Use `host.onInit()` and `host.onDestroy()` for element lifecycle hooks
+
 ### v2.10.0 - 5-2025
 - Only 2 levels of arguments are now watched
   - Use output() for deeper arguments

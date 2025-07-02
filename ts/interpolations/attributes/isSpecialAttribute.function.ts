@@ -24,14 +24,6 @@ export function isSpecialAction(attrName: string) {
       return 'autoselect'
     case 'autofocus':
       return 'autofocus'
-    
-    case 'oninit': // when read in compile process
-    case 'init': // when read in realtime
-      return 'init'
-    
-    case 'ondestroy': // when read in compile process
-    case 'destroy': // when read in realtime
-      return 'destroy'
   }
   return false
 }

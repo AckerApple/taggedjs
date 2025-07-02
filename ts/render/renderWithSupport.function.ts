@@ -40,8 +40,10 @@ export function renderWithSupport(
   }
 
   reSupport.ownerSupport = newSupport.ownerSupport// || lastOwnerSupport) as AnySupport
-
-  return {support: reSupport, wasLikeTags: isLikeTag}
+  return {
+    support: reSupport,
+    wasLikeTags: isLikeTag
+  }
 }
 
 function checkTagSoftDestroy(

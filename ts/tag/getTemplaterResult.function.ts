@@ -45,8 +45,6 @@ export type TagGlobal = {
   destroyCallback?: OnDestroyCallback // what to run when destroyed, used for onDestroy
     
   callbackMaker?: true
-  
-  destroys?: (() => any)[]
 }
 
 export type SupportTagGlobal = TagGlobal & {

@@ -1,51 +1,21 @@
-import { paintAfters, paintContent } from "../../render/paint.function.js"
-import { AnySupport } from "../../tag/AnySupport.type.js";
-import type { TagCounts } from '../../tag/TagCounts.type.js'
-import { InputElementTargetEvent, TagJsEvent } from "../../TagJsEvent.type.js";
+import { paintContent } from "../../render/paint.function.js"
 import { SpecialDefinition } from "../../render/attributes/Special.types.js";
 
-/** handles init, destroy, autofocus, autoselect, style., class. */
+/** handles autofocus, autoselect, style., class. */
 export function specialAttribute(
   name: string,
   value: any,
   element: Element,
   specialName: SpecialDefinition,
-  support: AnySupport,
-  counts: TagCounts,
 ) {
   switch (specialName) {
-    case 'init': { // aka oninit
-      const stagger = counts.added++
-
-      // run delayed after elements placed down
-      paintAfters.push([paintSpecialAttribute, [element, stagger, value]])
-
-      return
-    }
-
-    case 'destroy': { // aka ondestroy
-      const stagger = counts.removed++
-      const global = support.context.global      
-      global.destroys = global.destroys || []
-      
-      global.destroys.push(() => {
-        const event = {
-          target: element,
-          stagger,
-        } as unknown as InputElementTargetEvent
-
-        return value(event) // call destroy/ondestroy
-      })
-            
-      return
-    }
 
     case 'autofocus':
-      paintAfters.push([autofocus, [element]])
+      paintContent.push([autofocus, [element]])
       return
 
     case 'autoselect':
-      paintAfters.push([autoselect, [element]])
+      paintContent.push([autoselect, [element]])
       return
 
     case 'style': {
@@ -114,16 +84,4 @@ function autoselect(element: HTMLElement) {
 
 function autofocus(element: HTMLElement) {
   (element as any).focus()
-}
-
-function paintSpecialAttribute(
-  element: HTMLElement,
-  stagger: number,
-  value: any
-) {
-  const event = {
-    target: element,
-    stagger,
-  } as TagJsEvent
-  value(event) // call init/oninit
 }

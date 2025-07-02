@@ -9,13 +9,14 @@ export function renderExistingSupport(
   newSupport: AnySupport, // new to be rendered
   subject: SupportContextItem,
 ) {
-  const global = subject.global
   const result = renderWithSupport(
     newSupport,
     lastSupport,
     subject,
   )
 
+  const global = subject.global
+  // lastSupport !== newSupport && 
   if( result.wasLikeTags ) {
     updateSupportBy(global.oldest, result.support)
     return result.support

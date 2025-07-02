@@ -46,7 +46,6 @@ function processUpdateOneContext(
   }
 
   const tagJsVar = contextItem.tagJsVar as TagJsVar
-
   tagJsVar.processUpdate(
     newValue,
     ownerSupport,

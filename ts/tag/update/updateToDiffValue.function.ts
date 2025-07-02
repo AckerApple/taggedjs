@@ -7,6 +7,8 @@ import { processTagArray } from './processTagArray.js'
 import { processNowRegularValue, RegularValue } from './processRegularValue.function.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { getArrayTagVar } from '../../tagJsVars/getArrayTagJsVar.function.js'
+import { Tag } from '../Tag.type.js'
+import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 
 export function updateToDiffValue(
   newValue: TemplateValue,
@@ -17,6 +19,9 @@ export function updateToDiffValue(
 ) {
   // is new value a tag?
   const tagJsType = newValue && (newValue as TemplaterResult).tagJsType as ValueType
+
+  contextItem.tagJsVar = valueToTagJsVar(newValue)
+
   if(tagJsType) {
     if(tagJsType === ValueTypes.renderOnce) {
       return
@@ -35,11 +40,11 @@ export function updateToDiffValue(
   if( isArray(newValue) ) {
     processTagArray(
       contextItem,
-      newValue,
+      newValue as (TemplaterResult | Tag)[],
       ownerSupport,
       counts,
     )
-    contextItem.tagJsVar = getArrayTagVar(newValue)
+    contextItem.tagJsVar = getArrayTagVar(newValue as (TemplaterResult | Tag)[])
   
     return
   }

@@ -98,9 +98,8 @@ export function syncFunctionProps(
 ): Props {
   const subject = oldSupport.context
   const global = subject.global as SupportTagGlobal
-  const newest = global.newest
-
-  if(!newest) {
+  
+  if(!global || !global.newest) {
     const castedProps = castProps(
       newPropsArray,
       newSupport,
@@ -112,6 +111,7 @@ export function syncFunctionProps(
     return newPropsArray
   }
 
+  const newest = global.newest
   oldSupport = newest || oldSupport as AnySupport
 
   const priorPropConfig = oldSupport.propsConfig as PropsConfig
