@@ -8,10 +8,12 @@ export function getBaseSupport(templater, context, castedProps) {
         castedProps,
         appSupport: undefined,
     };
-    // baseSupport.appSupport = baseSupport
+    // const global = context.global || getNewGlobal(context)
     const global = context.global;
     global.blocked = [];
     global.destroy$ = new Subject();
+    // global.oldest = global.oldest || baseSupport as AnySupport
+    // global.oldest = baseSupport as AnySupport
     return baseSupport;
 }
 /** Sets support states to empty array and clones props */

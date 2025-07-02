@@ -11,6 +11,14 @@ export function host(callback, options = {}) {
         options: { callback, ...options },
     };
 }
+// Attach the functions to the host namespace
+;
+host.onInit = (callback) => {
+    return host(() => { }, { onInit: callback });
+};
+host.onDestroy = (callback) => {
+    return host(() => { }, { onDestroy: callback });
+};
 function processHostUpdate(newValue, ownerSupport, contextItem, counts) {
     const hasChanged = handleTagTypeChangeFrom(ValueTypes.host, newValue, ownerSupport, contextItem, counts);
     if (hasChanged) {

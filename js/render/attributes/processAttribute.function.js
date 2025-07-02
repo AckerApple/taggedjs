@@ -82,8 +82,7 @@ export function processAttributeEmit(newAttrValue, attrName, subject, element, s
 export function processAttributeSubjectValue(newAttrValue, element, attrName, special, howToSet, support, counts) {
     // process adding/removing style. class. (false means remove)
     if (special !== false) {
-        specialAttribute(attrName, newAttrValue, element, special, // string name of special
-        support, counts);
+        specialAttribute(attrName, newAttrValue, element, special);
         return;
     }
     switch (newAttrValue) {

@@ -7,13 +7,9 @@ export default function callbackStateUpdate(support, oldStates, callback, ...arg
     //syncStatesArray(newestSupport.states, oldStates)
     // run the callback
     const maybePromise = callback(...args);
-    // OLDEST UPDATE NEWEST: send the oldest state changes into the newest
-    //syncStatesArray(oldStates, newestSupport.states)
     renderSupport(newestSupport);
     if (isPromise(maybePromise)) {
         maybePromise.finally(() => {
-            // send the oldest state changes into the newest
-            // syncStatesArray(oldStates, newestSupport.states)
             renderSupport(newestSupport);
         });
     }

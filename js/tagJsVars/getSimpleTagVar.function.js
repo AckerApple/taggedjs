@@ -33,7 +33,8 @@ export function deleteSimpleValue(contextItem) {
 }
 export function checkSimpleValueChange(newValue, contextItem) {
     const isBadValue = newValue === null || newValue === undefined;
-    if (isBadValue || !(typeof (newValue) === BasicTypes.object)) {
+    const isRegularUpdate = isBadValue || !(typeof (newValue) === BasicTypes.object);
+    if (isRegularUpdate) {
         // This will cause all other values to render
         processUpdateRegularValue(newValue, contextItem);
         return -1; // no need to destroy, just update display

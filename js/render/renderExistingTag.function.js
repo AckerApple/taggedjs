@@ -4,8 +4,9 @@ import { updateSupportBy } from './update/updateSupportBy.function.js';
 export function renderExistingSupport(lastSupport, // should be global.newest
 newSupport, // new to be rendered
 subject) {
-    const global = subject.global;
     const result = renderWithSupport(newSupport, lastSupport, subject);
+    const global = subject.global;
+    // lastSupport !== newSupport && 
     if (result.wasLikeTags) {
         updateSupportBy(global.oldest, result.support);
         return result.support;

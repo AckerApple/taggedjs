@@ -1,31 +1,12 @@
-import { paintAfters, paintContent } from "../../render/paint.function.js";
-/** handles init, destroy, autofocus, autoselect, style., class. */
-export function specialAttribute(name, value, element, specialName, support, counts) {
+import { paintContent } from "../../render/paint.function.js";
+/** handles autofocus, autoselect, style., class. */
+export function specialAttribute(name, value, element, specialName) {
     switch (specialName) {
-        case 'init': { // aka oninit
-            const stagger = counts.added++;
-            // run delayed after elements placed down
-            paintAfters.push([paintSpecialAttribute, [element, stagger, value]]);
-            return;
-        }
-        case 'destroy': { // aka ondestroy
-            const stagger = counts.removed++;
-            const global = support.context.global;
-            global.destroys = global.destroys || [];
-            global.destroys.push(() => {
-                const event = {
-                    target: element,
-                    stagger,
-                };
-                return value(event); // call destroy/ondestroy
-            });
-            return;
-        }
         case 'autofocus':
-            paintAfters.push([autofocus, [element]]);
+            paintContent.push([autofocus, [element]]);
             return;
         case 'autoselect':
-            paintAfters.push([autoselect, [element]]);
+            paintContent.push([autoselect, [element]]);
             return;
         case 'style': {
             const names = name.split('.');
@@ -69,12 +50,5 @@ function autoselect(element) {
 }
 function autofocus(element) {
     element.focus();
-}
-function paintSpecialAttribute(element, stagger, value) {
-    const event = {
-        target: element,
-        stagger,
-    };
-    value(event); // call init/oninit
 }
 //# sourceMappingURL=specialAttribute.js.map

@@ -31,7 +31,6 @@ export type TagGlobal = {
     subscriptions?: Subscription<unknown>[];
     destroyCallback?: OnDestroyCallback;
     callbackMaker?: true;
-    destroys?: (() => any)[];
 };
 export type SupportTagGlobal = TagGlobal & {
     destroy$: Subject<void>;

@@ -55,14 +55,14 @@ export function syncFunctionProps(newSupport, oldSupport, ownerSupport, newProps
 maxDepth, depth = -1) {
     const subject = oldSupport.context;
     const global = subject.global;
-    const newest = global.newest;
-    if (!newest) {
+    if (!global || !global.newest) {
         const castedProps = castProps(newPropsArray, newSupport, depth);
         newPropsArray.push(...castedProps);
         const propsConfig = newSupport.propsConfig;
         propsConfig.castProps = castedProps;
         return newPropsArray;
     }
+    const newest = global.newest;
     oldSupport = newest || oldSupport;
     const priorPropConfig = oldSupport.propsConfig;
     const priorPropsArray = priorPropConfig.castProps;

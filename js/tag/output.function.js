@@ -19,7 +19,8 @@ export function output(callback) {
     };
 }
 export function syncWrapCallback(args, callback, ownerSupport) {
-    const newestOwner = ownerSupport.context.global.newest;
+    const global = ownerSupport.context.global;
+    const newestOwner = global.newest;
     // sync the new states to the old before the old does any processing
     syncStatesArray(newestOwner.states, ownerSupport.states);
     const c = callback(...args); // call the latest callback
@@ -27,8 +28,14 @@ export function syncWrapCallback(args, callback, ownerSupport) {
     syncStatesArray(ownerSupport.states, newestOwner.states);
     // now render the owner
     paintAfters.push([() => {
+            const newGlobal = newestOwner.context.global;
+            if (!newGlobal) {
+                // paint()
+                return; // its not a tag anymore
+            }
             ++painting.locks;
             safeRenderSupport(newestOwner);
+            // safeRenderSupport(global.newest)
             --painting.locks;
             paint();
         }, []]);

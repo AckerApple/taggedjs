@@ -24,7 +24,10 @@ subject) {
         }
     }
     reSupport.ownerSupport = newSupport.ownerSupport; // || lastOwnerSupport) as AnySupport
-    return { support: reSupport, wasLikeTags: isLikeTag };
+    return {
+        support: reSupport,
+        wasLikeTags: isLikeTag
+    };
 }
 function checkTagSoftDestroy(tag, lastSupport, lastTag) {
     if (tag.tagJsType === ValueTypes.dom) {

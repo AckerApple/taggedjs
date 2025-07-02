@@ -4,9 +4,11 @@ import { isArray } from '../../isInstance.js';
 import { processTagArray } from './processTagArray.js';
 import { processNowRegularValue } from './processRegularValue.function.js';
 import { getArrayTagVar } from '../../tagJsVars/getArrayTagJsVar.function.js';
+import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js';
 export function updateToDiffValue(newValue, contextItem, ownerSupport, ignoreOrDestroyed, counts) {
     // is new value a tag?
     const tagJsType = newValue && newValue.tagJsType;
+    contextItem.tagJsVar = valueToTagJsVar(newValue);
     if (tagJsType) {
         if (tagJsType === ValueTypes.renderOnce) {
             return;
