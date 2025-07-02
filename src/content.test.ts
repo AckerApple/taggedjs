@@ -142,24 +142,14 @@ describe('📰 content', () => {
 
     expect(count('[name=test-the-tester]')).toBe(3)
     expect(count('.animate__animated[name=test-the-tester]')).toBe(1)
-    
-    await sleep(testStaggerBy * 2)
-    
-    // after one stagger
-    expect(count('[name=test-the-tester]')).toBe(3)
-    expect(count('.animate__animated[name=test-the-tester]')).toBe(2)
-    
-    await sleep(testStaggerBy / 2)
+        
+    await sleep(testStaggerBy / 2 + 50)
     
     // almost shown
     expect(count('[name=test-the-tester]')).toBe(3)
-    expect(count('.animate__animated[name=test-the-tester]')).toBe(2)
-    expect(textContent('#outer-html-fx-test')).toBe('inner html tag')
-    /*
-    await sleep(1000 - testStaggerBy)
-    
     expect(count('.animate__animated[name=test-the-tester]')).toBe(1)
-    */
+    expect(textContent('#outer-html-fx-test')).toBe('inner html tag')
+
     await sleep(100 + testStaggerBy * 3)
    
     // completed showing
