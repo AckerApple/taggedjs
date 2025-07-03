@@ -1,9 +1,19 @@
 // Browser-compatible expect implementation
 export function createExpect(actual: any) {
+  // Capture the stack trace at the point of expect() call
+  const stack = new Error().stack || ''
+  const callerLine = stack.split('\n')[3] || '' // Get the line that called expect()
+  
   return {
-    toBe(expected: any) {
+    toBe(expected: any, message?: string | (() => string)) {
       if (actual !== expected) {
-        throw new Error(`Expected ${JSON.stringify(expected)} but got ${JSON.stringify(actual)}`)
+        const errorMessage = typeof message === 'function' ? message() : message
+        const fullMessage = errorMessage 
+          ? errorMessage 
+          : `Expected ${JSON.stringify(expected)} but got ${JSON.stringify(actual)}`
+        const error = new Error(fullMessage)
+        error.stack = fullMessage + '\n' + callerLine + (error.stack ? '\n' + error.stack : '')
+        throw error
       }
     },
     toBeDefined() {
