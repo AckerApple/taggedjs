@@ -1,6 +1,6 @@
-import { byId, html, htmlById, query } from "./testing/elmSelectors"
-import { describe, expect, it } from "./testing/expect"
-import { expectHTML, expectMatchedHtml, testCounterElements, testDuelCounterElements } from "./testing/expect.html"
+import { describe, it, expect } from './testing'
+import { byId, html, htmlById, query } from './testing'
+import { expectHTML, expectMatchedHtml, testCounterElements, testDuelCounterElements } from './testing'
 
 describe('🧳 props', () => {    
   it('test duels', () => {
@@ -48,7 +48,7 @@ describe('🧳 props', () => {
     // outer should not have changed
     expect(html('#propsDebug-🥩-0-display')).toBe( propCounter.toString() )
     expect(html('#propsDebug-🥩-let-prop-display')).toBe(
-      (propCounter + 1).toString(), '#propsDebug-🥩-let-prop-display'
+      (propCounter + 1).toString()
     )
 
     // end of test put all in sync

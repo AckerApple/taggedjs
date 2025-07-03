@@ -1,6 +1,6 @@
-import { html, click, count } from "./testing/elmSelectors"
-import { expect, it } from "./testing/expect"
-import { sleep } from "./testing/expect.html"
+import { it, expect } from './testing'
+import { html, click, count } from './testing'
+import { sleep } from './testing'
 
 it('destroys', async () => {
   expect(count('#destroyCount')).toBe(1)

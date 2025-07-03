@@ -1,6 +1,6 @@
-import { click, clickOne, focus, keydownOn, query } from "./testing/elmSelectors"
-import { describe, expect, it } from "./testing/expect"
-import { sleep } from "./testing/expect.html"
+import { describe, it, expect } from './testing'
+import { click, clickOne, focus, keydownOn, query } from './testing'
+import { sleep } from './testing'
 
 describe('☑️ todos', function todos() {
   const todoInput = query('.new-todo')[0] as HTMLInputElement
@@ -16,7 +16,7 @@ describe('☑️ todos', function todos() {
     
     todoInput.value = 'one'
     keydownOn(todoInput, 'Enter')
-    expect(query('button.destroy').length).toBe(1, 'expected one new todo')
+    expect(query('button.destroy').length).toBe(1) // expected one new todo
 
     // delete it
     click('button.destroy')
@@ -38,7 +38,7 @@ describe('☑️ todos', function todos() {
     // delete it
     click('button.destroy')
 
-    expect(query('button.destroy').length).toBe(0, 'expected todo 0 deleted')
+    expect(query('button.destroy').length).toBe(0) // expected todo 0 deleted
 
     todoInput.value = 'one'
     keydownOn(todoInput, 'Enter')
@@ -51,23 +51,23 @@ describe('☑️ todos', function todos() {
     expect(todoToggle2.checked).toBe(true)
 
     todoInput.value = 'three'
-    keydownOn(todoInput, 'Enter')
+    keydownOn(todoInput, 'Enter') // Enter
     
     expect(query('input.toggle').length).toBe(3)
 
     click('#todo-view-active-link')
-    expect(query('input.toggle').length).toBe(3, 'active todo count before page change')
+    expect(query('input.toggle').length).toBe(3) // active todo count before page change
     expect(window.location.hash).toBe('#/active')
     await sleep(1) // window route change takes a tick
-    expect(query('input.toggle').length).toBe(2, 'active todo count after page change')
+    expect(query('input.toggle').length).toBe(2) // active todo count after page change
     
     click('#todo-view-completed-link')
     await sleep(1) // window route change takes a tick
-    expect(query('input.toggle').length).toBe(1, 'completed todo count')
+    expect(query('input.toggle').length).toBe(1) // completed todo count
     
     click('#todo-view-all-link')
     await sleep(1) // window route change takes a tick
-    expect(query('input.toggle').length).toBe(3, 'view all todo count')
+    expect(query('input.toggle').length).toBe(3) // view all todo count
 
     // delete 0
     clickOne('button.destroy')
@@ -108,7 +108,7 @@ describe('☑️ todos', function todos() {
     editInput.value = 'two'
     keydownOn(editInput, 'Enter')
 
-    expect(query('button.destroy').length).toBe(1, 'expected only one delete button')
+    expect(query('button.destroy').length).toBe(1) // expected only one delete button
 
     // main input + array input
     expect(query('input.new-todo').length).toBe(1)

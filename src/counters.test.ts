@@ -1,6 +1,6 @@
-import { byId, click, html, htmlById, keyupOn } from "./testing/elmSelectors"
-import { describe, expect, it } from "./testing/expect"
-import { expectElmCount, testCounterElements } from "./testing/expect.html"
+import { describe, it, expect } from './testing'
+import { byId, click, html, htmlById, keyupOn } from './testing'
+import { expectElmCount, testCounterElements } from './testing'
 
 describe('💯 counters', () => {    
   const slowCount = html('#🍄-slowChangeCount')
@@ -26,7 +26,7 @@ describe('💯 counters', () => {
     // the parent changed a value passed to child as a prop
     let toBe = (beforeInnerRenderCount + 2).toString()
     let renderCount = html('#inner_counters_render_count')
-    expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`)
+    expect(renderCount).toBe(toBe) // expected number of renders to be ${toBe} not ${renderCount}
 
     const preInitCounter = html('#🔥-init-counter')
     expect(preInitCounter).toBe('1')
@@ -34,23 +34,23 @@ describe('💯 counters', () => {
 
     toBe = (beforeRenderCount + 4).toString()
     renderCount = html('#counters_render_count')
-    expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`)
+    expect(renderCount).toBe(toBe) // expected number of renders to be ${toBe} not ${renderCount}
     
     // the child changed a value passed from parent as a prop
     renderCount = html('#inner_counters_render_count')
     toBe = (beforeInnerRenderCount + 4).toString()
-    expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`)
+    expect(renderCount).toBe(toBe) // expected number of renders to be ${toBe} not ${renderCount}
 
     testCounterElements('#🥦-standalone-counter', '#🥦-standalone-display')
 
     toBe = (beforeRenderCount + (firstRun ? 6 : 6)).toString()
     renderCount = html('#counters_render_count')
-    expect(renderCount).toBe(toBe, 'render count check failed' )
+    expect(renderCount).toBe(toBe) // render count check failed
 
     // the child was not rendered again because props did not change so value should be less
     renderCount = html('#inner_counters_render_count')
     toBe = (beforeInnerRenderCount + 4).toString()
-    expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}` )
+    expect(renderCount).toBe(toBe) // expected number of renders to be ${toBe} not ${renderCount}
 
     expectElmCount('#conditional-counter', 1)
     expectElmCount('#conditional-display', 1)
@@ -61,7 +61,7 @@ describe('💯 counters', () => {
     renderCount = htmlById('❤️💧-shallow-display')
     testCounterElements('#conditional-counter', '#conditional-display')
     
-    expect(renderCount).toBe(htmlById('❤️💧-shallow-display'), 'expect shallow render not to have changed')
+    expect(renderCount).toBe(htmlById('❤️💧-shallow-display')) // expect shallow render not to have changed
     
     // test again after higher elements have had reruns
     testCounterElements('#❤️-inner-counter', '#❤️-inner-display')
@@ -75,7 +75,7 @@ describe('💯 counters', () => {
 
     // renderCount = html('#shallow_counters_render_count')
     // toBe = (beforeInnerRenderCount + 4).toString()
-    // expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`)
+    // expect(renderCount).toBe(toBe) // expected number of renders to be ${toBe} not ${renderCount}
 
   })
 
@@ -89,7 +89,7 @@ describe('💯 counters', () => {
 
     const pipedSubDisplay = html('#🪈-pipedSubject')
     const subjectCountDisplay = html('#🥦-standalone-display')
-    expect(pipedSubDisplay).toBe(subjectCountDisplay, `Expected #🪈-pipedSubject value(${pipedSubDisplay}) to match #🥦-standalone-display value(${subjectCountDisplay})`)
+    expect(pipedSubDisplay).toBe(subjectCountDisplay) // Expected #🪈-pipedSubject value(${pipedSubDisplay}) to match #🥦-standalone-display value(${subjectCountDisplay})
     expect(html('#🪈-pipedSubject-2')).toBe(html('#🥦-standalone-display') )
   })
 })
@@ -117,5 +117,5 @@ function speedClickCountTest(
   console.timeEnd(`⌚️ outer ${counterQuery}`)
 
   const displayQueryTime = (Number(clickCount) + clickSpeedAmount).toString()
-  expect(htmlById(displayQuery)).toBe(displayQueryTime, displayQuery)
+  expect(htmlById(displayQuery)).toBe(displayQueryTime) // ${displayQuery}
 }

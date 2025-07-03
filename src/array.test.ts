@@ -1,6 +1,5 @@
-import { byId, elmCount } from "./testing/elmSelectors"
-import { describe, expect, it } from "./testing/expect"
-
+import { describe, it, expect } from './testing'
+import { byId, elmCount } from './testing'
 const fxTime = 160
 
 describe('⠇ array testing', () => {
@@ -8,7 +7,7 @@ describe('⠇ array testing', () => {
     expect(elmCount('#array-test-push-item')).toBe(1)
     
     const buttons = document.querySelectorAll('#score-data-0-1-outside-button')
-    expect(buttons.length).toBe(0, 'Did not expect scoring button 0-1 to be present')
+    expect(buttons.length).toBe(0) // Did not expect scoring button 0-1 to be present
     const insideCount = elmCount('#score-data-0-1-inside-button')
     expect(insideCount).toBe(0)
     
@@ -28,7 +27,7 @@ describe('⠇ array testing', () => {
     // score for player 0
     insideElm.click()
     expect(insideDisplay.innerText).toBe(outsideDisplay.innerText)
-    expect(insideDisplay).toBe(byId('score-data-0-1-inside-display'), 'test element #score-data-0-1-inside-display was not redrawn')
+    expect(insideDisplay).toBe(byId('score-data-0-1-inside-display')) // test element #score-data-0-1-inside-display was not redrawn
     expect(indexValue).toBe((Number(insideDisplay.innerText) - 1).toString())
     expect(indexValue).toBe((Number(outsideDisplay.innerText) - 1).toString())
 

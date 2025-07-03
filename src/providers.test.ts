@@ -1,5 +1,5 @@
-import { describe, it } from "./testing/expect"
-import { testDuelCounterElements } from "./testing/expect.html"
+import { describe, it } from './testing'
+import { testDuelCounterElements } from './testing'
 
 describe('providers', () => {
   it('basics', () => {

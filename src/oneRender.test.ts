@@ -1,6 +1,6 @@
-import { html } from "./testing/elmSelectors"
-import { expect, it } from "./testing/expect"
-import { testCounterElements } from "./testing/expect.html"
+import { it, expect } from './testing'
+import { html } from './testing'
+import { testCounterElements } from './testing'
 
 it('oneRender', () => {
   expect(html('#oneRender_tag_ts_render_count')).toBe('1')

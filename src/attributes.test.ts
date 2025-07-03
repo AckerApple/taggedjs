@@ -1,6 +1,5 @@
-import { byId, click, count, html } from "./testing/elmSelectors"
-import { expect, it, describe } from "./testing/expect"
-
+import { describe, it, expect } from './testing'
+import { byId, click, count, html } from './testing'
 describe('🏹 special attributes', () => {
   it('style and class tests', async () => {
     expect(count('#attr-input-abc')).toBe(1)

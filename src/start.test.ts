@@ -1,10 +1,9 @@
-import { click, textContent } from "./testing/elmSelectors"
-import { expect, it } from "./testing/expect"
-
+import { it, expect } from './testing'
+import { click, textContent } from './testing'
 /*
 it('no template tags', () => {
   const templateTags = document.getElementsByTagName('template')
-  expect(templateTags.length).toBe(0, 'Expected no templates to be on document')
+  expect(templateTags.length).toBe(0) // Expected no templates to be on document
 })
 */
 

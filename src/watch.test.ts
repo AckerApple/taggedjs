@@ -1,6 +1,6 @@
-import { click, html, htmlById } from "./testing/elmSelectors"
-import { describe, expect, it } from "./testing/expect"
-import { expectMatchedHtml } from "./testing/expect.html"
+import { describe, it, expect } from './testing'
+import { click, html, htmlById } from './testing'
+import { expectMatchedHtml } from './testing'
 
 describe('⌚️ watch tests', () => {
   const slowCount = html('#🍄-slowChangeCount')
@@ -21,7 +21,7 @@ describe('⌚️ watch tests', () => {
       expect(html('#🦷-watchTruthAsSub')).toBe('')
     } else {
       expect(html('#🍄-watchPropNumSlow')).toBe( slowCount )
-      expect( Number(html('#🦷-watchTruth')) ).toBeGreaterThan( Number(slowCount) )
+      expect( Number(html('#🦷-watchTruth')) ).to.be.greaterThan( Number(slowCount) )
       expect(html('#🦷-watchTruthAsSub')).toBe( html('#🦷-truthSubChangeCount') )
     }
 
@@ -64,6 +64,6 @@ describe('⌚️ watch tests', () => {
 
     const display = html('#🦷-watchTruth')
     const actual = html('#🦷-watchTruthAsSub')
-    expect(actual).toBe(display, `Last test expected #🦷-watchTruthAsSub ${display} but it was ${actual}`)
+    expect(actual).toBe(display) // Last test expected #🦷-watchTruthAsSub ${display} but it was ${actual}
   })
 })

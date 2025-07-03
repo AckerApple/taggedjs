@@ -8,7 +8,6 @@ export const destroys = tag(() => (
   renderCount = 0,
   _ = states(get => [{renderCount, on}] = get({renderCount, on})),
   __ = ++renderCount,
-  ___ = console.log('render on is ', on),
 ) => html`
   destroyCount: <span id="destroyCount">${destroyCount}</span>
   on/off: ${on}

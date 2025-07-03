@@ -1,5 +1,5 @@
-// Initialize Mocha/Chai before anything else
-import './testing/initialize-mocha-chai'
+// Mocha/Chai initialization no longer needed with dual test system
+// import './testing/initialize-mocha-chai'
 
 export { hmr, tagElement } from "taggedjs"
 export { App } from "./app.tag"

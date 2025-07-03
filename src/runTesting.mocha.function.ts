@@ -1,6 +1,6 @@
 import { storage, ViewTypes } from "./sectionSelector.tag"
 import { runIsolatedTests } from "./isolatedApp.test"
-import { enableMocha } from "./testing/expect"
+// import { enableMocha } from "./testing/expect" // No longer needed with dual test system
 
 let testTimeout: NodeJS.Timeout | null = null
 
@@ -10,8 +10,8 @@ export function runTestingWithMocha(
   tests?: ViewTypes[],
   runStartEndTests?: boolean
 ) {
-  // Enable Mocha/Chai integration
-  enableMocha();
+  // Mocha/Chai integration no longer needed with dual test system
+  // enableMocha();
   
   if(testTimeout !== null) {
     clearTimeout(testTimeout)

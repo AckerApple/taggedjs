@@ -12,6 +12,7 @@ describe('💯 counters', () => {
         keyupOn(counterInput);
         const beforeRenderCount = Number(html('#counters_render_count'));
         const beforeInnerRenderCount = Number(html('#inner_counters_render_count'));
+        expect(html('#counters_render_count')).toBe((beforeRenderCount + 1).toString());
         expectElmCount('#conditional-counter', 0);
         const currentSubs = htmlById('👉-counter-sub-count');
         testCounterElements('#❤️-increase-counter', '#❤️-counter-display');

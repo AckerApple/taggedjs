@@ -1,6 +1,5 @@
-import { byId } from "./testing/elmSelectors"
-import { expect, it } from "./testing/expect"
-
+import { it, expect } from './testing'
+import { byId } from './testing'
 it('elements exists', () => {
   expect(byId('h1-app')).toBeDefined()
   const toggleTest = byId('toggle-test')

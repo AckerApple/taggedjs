@@ -1,12 +1,12 @@
-import { byId, elmCount } from "./testing/elmSelectors"
-import { describe, expect, it } from "./testing/expect"
-import { expectElmCount } from "./testing/expect.html"
+import { describe, it, expect } from './testing'
+import { byId, elmCount } from './testing'
+import { expectElmCount } from './testing'
 
 describe('🔀 tagSwitching', () => {
   it('0', () => {
-    expect(elmCount('#select-tag-above')).toBe(1, 'Expected select-tag-above element to be defined')
-    expect(elmCount('#tag-switch-dropdown')).toBe(1, 'Expected one #tag-switch-dropdown')
-    expect(elmCount('#tagSwitch-1-hello')).toBe(2, 'Expected two #tagSwitch-1-hello elements')
+    expect(elmCount('#select-tag-above')).toBe(1) // Expected select-tag-above element to be defined
+    expect(elmCount('#tag-switch-dropdown')).toBe(1) // Expected one #tag-switch-dropdown
+    expect(elmCount('#tagSwitch-1-hello')).toBe(2) // Expected two #tagSwitch-1-hello elements
     expect(elmCount('#tagSwitch-2-hello')).toBe(0)
     expect(elmCount('#tagSwitch-3-hello')).toBe(0)
   })
@@ -39,8 +39,8 @@ describe('🔀 tagSwitching', () => {
     dropdown.value = "3"
     ;(dropdown as any)._change({target:dropdown})
 
-    expect(elmCount('#tagSwitch-1-hello')).toBe(0,'Expected no hello 1s')
-    expect(elmCount('#tagSwitch-2-hello')).toBe(0, 'Expected no #tagSwitch-2-hello elements')
+    expect(elmCount('#tagSwitch-1-hello')).toBe(0) // Expected no hello 1s
+    expect(elmCount('#tagSwitch-2-hello')).toBe(0) // Expected no #tagSwitch-2-hello elements
     expectElmCount('#tagSwitch-3-hello', 7)
     expect(elmCount('#select-tag-above')).toBe(0)
   })
