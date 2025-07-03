@@ -107,13 +107,13 @@ describe('#htmlInterpolationToDomMeta', () => {
         ]
       ],
       [ ':tagvar0:' ],
-      ['onclick',[':tagvar3:']],
+      ['click', ':tagvar3:'],
     ])
     expect(firstDom.ch).toEqual([
       { nn: 'text', tc: '\n        23' },
-      { nn: 'text', tc: ':tagvar3:' },
-      { nn: 'text', tc: '23-' },
       { nn: 'text', tc: ':tagvar4:' },
+      { nn: 'text', tc: '23-' },
+      { nn: 'text', tc: ':tagvar5:' },
       { nn: 'text', tc: '\n      ' }
     ])
   })
