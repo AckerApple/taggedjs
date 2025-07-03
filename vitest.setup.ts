@@ -84,18 +84,52 @@ beforeEach(async () => {
   // Find the matching view
   for (const [testName, view] of Object.entries(viewMap)) {
     if (testFile.includes(testName)) {
-      // Navigate to the view
-      window.location.hash = view
-      
-      // Click the section checkbox to show the view
-      const checkbox = document.querySelector(`#section_${view}`) as HTMLInputElement
-      if (checkbox && !checkbox.checked) {
-        checkbox.click()
+      // For content test, navigate directly to the content page
+      if (testName === 'content.test') {
+        window.location.hash = 'content/';
+        
+        // Wait for navigation and rendering
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Wait for ContentDebug component to load
+        const maxWait = 5000;
+        const startTime = Date.now();
+        
+        while (Date.now() - startTime < maxWait) {
+          const toggleButton = document.querySelector('#content-toggle-fx');
+          if (toggleButton) {
+            console.log('✅ ContentDebug component loaded successfully');
+            break;
+          }
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        if (!document.querySelector('#content-toggle-fx')) {
+          console.error('❌ ContentDebug component failed to load after 5 seconds');
+          // Try clicking the checkbox as a fallback
+          window.location.hash = '';
+          await new Promise(resolve => setTimeout(resolve, 500));
+          const checkbox = document.querySelector(`#section_${view}`) as HTMLInputElement;
+          if (checkbox && !checkbox.checked) {
+            checkbox.click();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+      } else {
+        // For other tests, use the checkbox method
+        window.location.hash = view;
+        
+        // Click the section checkbox to show the view
+        const checkbox = document.querySelector(`#section_${view}`) as HTMLInputElement;
+        if (checkbox && !checkbox.checked) {
+          checkbox.click();
+        }
+        
+        // Wait for view to render
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
       
-      // Wait for view to render
-      await new Promise(resolve => setTimeout(resolve, 500))
-      break
+      break;
     }
   }
 })

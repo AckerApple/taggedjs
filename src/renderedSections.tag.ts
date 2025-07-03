@@ -77,6 +77,9 @@ export const renderedSections = tag((
       emoji,
       ...extra,
     }
+  }).sort((a, b) => {
+    // Sort alphabetically by view name
+    return a.view.localeCompare(b.view);
   }))
 
   return html`

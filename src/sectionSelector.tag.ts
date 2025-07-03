@@ -34,12 +34,15 @@ export enum ViewTypes {
 const defaultViewTypes = Object.values(ViewTypes)
 
 export const sectionSelector = (viewTypes = defaultViewTypes) => {
+  // Sort viewTypes alphabetically
+  const sortedViewTypes = [...viewTypes].sort((a, b) => a.localeCompare(b));
+  
   return html`
     <div>
       <h3>Sections</h3>
       <!-- checkbox menu -->
       <div style="display:flex;gap:1em;flex-wrap:wrap;margin:1em;">
-        ${viewTypes.map(type => html`
+        ${sortedViewTypes.map(type => html`
           <div>
             <input type="checkbox"
               id=${'view-type-' + type} name=${'view-type-' + type}
