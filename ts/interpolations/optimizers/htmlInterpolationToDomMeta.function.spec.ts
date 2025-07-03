@@ -79,6 +79,7 @@ describe('#htmlInterpolationToDomMeta', () => {
     const htmlResult = html`
       <div ${fx}
         style="--animate-duration: ${duration};border-size:1px;border-color:${borderColor};"
+        onclick=${() => undefined}
       >
         23${innerHTML}23-${borderColor}
       </div>
@@ -106,6 +107,7 @@ describe('#htmlInterpolationToDomMeta', () => {
         ]
       ],
       [ ':tagvar0:' ],
+      ['onclick',[':tagvar3:']],
     ])
     expect(firstDom.ch).toEqual([
       { nn: 'text', tc: '\n        23' },
