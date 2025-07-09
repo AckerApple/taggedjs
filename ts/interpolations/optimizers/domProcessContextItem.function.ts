@@ -4,7 +4,6 @@ import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectVa
 import { AnySupport } from "../../tag/AnySupport.type.js"
 import { ContextItem } from "../../tag/ContextItem.type.js"
 import { TagCounts } from "../../tag/index.js"
-import { tagValueUpdateHandler } from "../../tag/update/tagValueUpdateHandler.function.js"
 
 
 export function domProcessContextItem(

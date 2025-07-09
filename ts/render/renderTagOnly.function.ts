@@ -5,7 +5,6 @@ import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { TagWrapper } from '../tag/tag.utils.js'
 import { runAfterRender } from './afterRender.function.js'
 import { initState, reState } from '../state/state.utils.js'
-import { setUseMemory } from '../state/setUseMemory.object.js'
 import { createSupport } from '../tag/createSupport.function.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
 

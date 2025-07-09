@@ -4,7 +4,7 @@ import { Subject } from '../subject/Subject.class.js'
 import { Props } from '../Props.js'
 import { BaseSupport } from './BaseSupport.type.js'
 import { AnySupport } from './AnySupport.type.js'
-import { ContextItem, getNewGlobal, SupportContextItem } from '../index.js'
+import { ContextItem, SupportContextItem } from '../index.js'
 
 export type PropsConfig = {
   latest: Props // new props NOT cloned props

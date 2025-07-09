@@ -2,7 +2,7 @@ import { HowToSet } from '../interpolations/attributes/howToSetInputValue.functi
 import { Clone, TagGlobal } from './getTemplaterResult.function.js'
 import { SubContext } from './update/SubContext.type.js'
 import { PaintCommand } from '../render/paint.function.js'
-import { ContextHandler, LastArrayItem } from '../index.js'
+import { LastArrayItem } from '../index.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { SpecialDefinition } from '../render/attributes/Special.types.js'
 

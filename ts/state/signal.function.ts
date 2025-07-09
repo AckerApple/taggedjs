@@ -6,9 +6,7 @@ import { ProcessInit } from '../tag/ProcessInit.type.js'
 import { Subscriber, SubscribeFn } from '../tagJsVars/subscribe.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { deleteAndUnsubscribe } from '../tag/update/setupSubscribe.function.js'
-import { tagValueUpdateHandler } from '../tag/update/tagValueUpdateHandler.function.js'
-import { blankHandler } from '../render/dom/attachDomElements.function.js'
-import { AnySupport, checkSubContext, ContextItem, TagCounts } from '../tag/index.js'
+import { AnySupport, ContextItem, TagCounts } from '../tag/index.js'
 import { handleTagTypeChangeFrom } from '../tag/update/checkSubContext.function.js'
 
 

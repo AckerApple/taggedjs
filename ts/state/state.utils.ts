@@ -2,7 +2,6 @@ import { AnySupport } from '../tag/AnySupport.type.js'
 import { runFirstState, runRestate } from './stateHandlers.js'
 import { State, StateConfig } from './state.types.js'
 import { firstStatesHandler, reStatesHandler } from './states.utils.js'
-import { StateMemory } from './StateMemory.type.js'
 import { setUseMemory } from './setUseMemory.object.js'
 import { setSupportInCycle } from '../tag/getSupportInCycle.function.js'
 

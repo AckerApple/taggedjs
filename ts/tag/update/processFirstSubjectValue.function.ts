@@ -3,7 +3,6 @@ import { ContextItem } from '../ContextItem.type.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { Tag } from '../Tag.type.js'
-import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 
 export function processFirstSubjectValue(
   value: TemplateValue | Tag,

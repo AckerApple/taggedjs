@@ -208,7 +208,7 @@ export function processAttributeSubjectValue(
   special: SpecialDefinition,
   howToSet: HowToSet,
   support: AnySupport,
-  counts: TagCounts,
+  _counts: TagCounts,
 ) {
   // process adding/removing style. class. (false means remove)
   if ( special !== false ) {
