@@ -8,6 +8,8 @@ import { SpecialDefinition } from '../render/attributes/Special.types.js'
 
 export interface ContextItem {
   locked?: true
+  valueIndex: number
+  valueIndexSetBy: string
 
   /** handler(value,newSupport,contextItem,values) Called on value update detected, within processUpdateOneContext(). Return value is ignored */
   // handler?: ContextHandler

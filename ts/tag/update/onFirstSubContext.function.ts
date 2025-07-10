@@ -3,6 +3,7 @@ import { AnySupport } from '../AnySupport.type.js'
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
 import { SubContext } from './SubContext.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
+import { ContextItem } from '../ContextItem.type.js'
 
 export function onFirstSubContext(
   value: TemplateValue,
@@ -16,6 +17,7 @@ export function onFirstSubContext(
     value as TemplateValue,
     ownerSupport,
     counts,
+    [] as ContextItem[],
     insertBefore,
   )
 }

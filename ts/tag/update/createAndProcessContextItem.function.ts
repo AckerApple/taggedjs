@@ -8,12 +8,14 @@ import { domProcessContextItem } from '../../interpolations/optimizers/domProces
 import { empty } from '../ValueTypes.enum.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
+import { ContextItem } from '../ContextItem.type.js'
 
 /** Must provide insertBefore OR appendTo */
 export function createAndProcessContextItem(
   value: TemplateValue,
   ownerSupport: AnySupport,
   counts: TagCounts,
+  contexts: ContextItem[],
   insertBefore?: Text, // used during updates
   appendTo?: Element, // used during initial entire array rendering
 ): AdvancedContextItem {
@@ -23,6 +25,9 @@ export function createAndProcessContextItem(
     tagJsVar: valueToTagJsVar(value),
     withinOwnerElement: false,
     placeholder: element,
+    
+    valueIndex: contexts.length,
+    valueIndexSetBy: 'createAndProcessContextItem',
   }
 
   if(!appendTo) {

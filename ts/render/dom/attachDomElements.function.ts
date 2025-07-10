@@ -20,12 +20,12 @@ export function attachDomElements(
   values: any[],
   support: AnySupport,
   counts: TagCounts, // used for animation stagger computing
-  context: ContextItem[],
+  contexts: ContextItem[],
   depth: number, // used to know if dynamic variables live within parent owner tag/support
   appendTo?: Element,
   insertBefore?: Text,
 ): {
-  context: ContextItem[]
+  contexts: ContextItem[]
   dom: DomObjectChildren // return of children created. Used to attach `ch` for children to a node
 } {
   const dom: DomObjectChildren = []
@@ -43,12 +43,12 @@ export function attachDomElements(
     const isNum = !isNaN(value as unknown as number)
     
     if(isNum) {
-      const index = context.length
+      const index = contexts.length
       const value = values[ index ]
 
       attachDynamicDom(
         value,
-        context,
+        contexts,
         support,
         counts,
         depth,
@@ -72,7 +72,7 @@ export function attachDomElements(
       node,
       values,
       support,
-      context,
+      contexts,
       counts,
       appendTo,
       insertBefore,
@@ -84,7 +84,7 @@ export function attachDomElements(
         values,
         support,
         counts,
-        context,
+        contexts,
         depth + 1,
         domElement,
         insertBefore,
@@ -92,7 +92,7 @@ export function attachDomElements(
     }
   }
 
-  return {dom, context}
+  return {dom, contexts}
 }
 
 function attachDomElement(
@@ -100,7 +100,7 @@ function attachDomElement(
   node: DomObjectElement,
   values: any[],
   support: AnySupport,
-  context: ContextItem[],
+  contexts: ContextItem[],
   counts: TagCounts,
   appendTo: Element | undefined,
   insertBefore: Text | undefined,
@@ -121,7 +121,7 @@ function attachDomElement(
         domElement,
         support,
         howToSet,
-        context,
+        contexts,
         isSpecial,
         counts,
         value

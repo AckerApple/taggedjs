@@ -84,8 +84,12 @@ export function addOneContext(
 ): ContextItem {
   const contextItem: ContextItem = {
     value,
+    valueIndex: context.length,
+    valueIndexSetBy: 'addOneContext',
+
     tagJsVar: valueToTagJsVar(value),
     withinOwnerElement,
+    
   }
 
   context.push(contextItem)

@@ -1,6 +1,7 @@
 import { html, StringTag, Tag } from "../../tag"
 import { htmlInterpolationToDomMeta } from "./htmlInterpolationToDomMeta.function"
-import { DomObjectElement } from "./ObjectNode.types"
+import { ObjectChildren } from "./LikeObjectElement.type"
+import { DomObjectChildren, DomObjectElement } from "./ObjectNode.types"
 
 describe('#htmlInterpolationToDomMeta', () => {
   describe('attributes', () => {    
@@ -68,6 +69,63 @@ describe('#htmlInterpolationToDomMeta', () => {
     const templater = htmlResult as Tag
     const result = htmlInterpolationToDomMeta((templater as any).strings, templater.values)
     expect(result).toEqual([{ nn: 'div', at: [[ 'id', '22' ]], ch: [{nn: 'text', tc: ':tagvar0:'}] }])
+  })
+
+  it.only('style and clicks', () => {
+    const htmlResult = html`
+      <td valign=${0} style=${1} class=${2}></td>
+    `
+
+    const templater = htmlResult as Tag
+    const result = htmlInterpolationToDomMeta((templater as any).strings, templater.values)
+    const firstDom = result[0] as DomObjectElement
+
+    // const children = firstDom.ch as (ObjectChildren & DomObjectChildren)
+    // console.log('htmlResult', {x:(htmlResult.values[0] as any).templater})
+    //console.log('firstDom.at', children[3])
+    console.log('firstDom.at', htmlResult)
+  })
+
+  it('with standalones and static style', () => {
+    const fx = () => {}
+    let borderColor = 'black'
+    const innerHTML = 5
+
+    const htmlResult = html`
+      <div ${fx}
+        style="--animate-duration: .1s;border-size:1px;border-color:black;"
+        style.z-index=${20}
+        onclick=${() => undefined}
+      >
+        23${innerHTML}23-${borderColor}
+      </div>
+      borderColor:
+      <select onchange=${event => borderColor = event.target.value}>
+        <option ${borderColor === '' ? 'selected' : '7'} value=""></option>
+        <option ${borderColor === 'black' ? 'selected' : ''} value="black">black</option>
+        <option ${borderColor === 'blue' ? 'selected' : '9'} value="blue">blue</option>
+      </select>
+    `
+
+    const templater = htmlResult as Tag
+    const result = htmlInterpolationToDomMeta((templater as any).strings, templater.values)
+    const firstDom = result[0] as DomObjectElement
+
+    expect(firstDom.at).toEqual([
+      [
+        'style', '--animate-duration: .1s;border-size:1px;border-color:black;'
+      ],
+      [ ':tagvar0:' ],
+      [ 'style.z-index', ':tagvar1:', 'style' ],
+      ['click', ':tagvar2:'],
+    ])
+    expect(firstDom.ch).toEqual([
+      { nn: 'text', tc: '\n        23' },
+      { nn: 'text', tc: ':tagvar3:' },
+      { nn: 'text', tc: '23-' },
+      { nn: 'text', tc: ':tagvar4:' },
+      { nn: 'text', tc: '\n      ' }
+    ])
   })
 
   it('with standalones', () => {

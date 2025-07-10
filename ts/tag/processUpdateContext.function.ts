@@ -37,8 +37,18 @@ function processUpdateOneContext(
   ownerSupport: AnySupport,
   counts: TagCounts,
 ) {
-  const newValue = values[index] as any
   const contextItem = context[index]
+
+  // some values, like style, get rearranged and there value appearance may not match context appearance
+  const valueIndex = contextItem.valueIndex
+  const newValue = values[ valueIndex ] as any
+
+    if(valueIndex !== index ) {
+    console.log('here is a shifted value', {
+      newValue,
+      valueIndex,
+    })
+  }
 
   // Do not continue if the value is just the same
   if(newValue === contextItem.value) {
@@ -55,5 +65,4 @@ function processUpdateOneContext(
   )
   
   contextItem.value = newValue
-  // contextItem.tagJsVar = valueToTagJsVar(newValue)
 }

@@ -20,6 +20,7 @@ export function createDynamicArrayAttribute(
   support: AnySupport,
   counts: TagCounts,
   values: unknown[],
+  varNumber: number,
 ) {
   const startIndex = context.length
 
@@ -34,8 +35,9 @@ export function createDynamicArrayAttribute(
         element,
         attrName: attrName as string,
         withinOwnerElement: true,
-
         tagJsVar,
+        valueIndex: context.length,
+        valueIndexSetBy: 'createDynamicArrayAttribute',
       }
   
       // contextItem.handler =
@@ -89,6 +91,7 @@ export function createDynamicAttribute(
   support: AnySupport,
   counts: TagCounts,
   isSpecial: SpecialDefinition,
+  varIndex: number,
 ) {
   const tagJsVar = valueToTagJsVar(value)
   const contextItem: ContextItem = {
@@ -97,6 +100,9 @@ export function createDynamicAttribute(
     attrName,
     withinOwnerElement: true,
     tagJsVar,
+    
+    valueIndex: varIndex,
+    valueIndexSetBy: 'createDynamicAttribute',
   }
 
   context.push(contextItem)

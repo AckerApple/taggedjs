@@ -99,6 +99,7 @@ function reviewArrayItem(
     item as TemplateValue,
     ownerSupport,
     counts,
+    lastArray,
     runtimeInsertBefore as Text,
     appendTo,
   )
@@ -134,6 +135,7 @@ function reviewPreviousArrayItem(
     value as TemplateValue,
     ownerSupport,
     counts,
+    lastArray,
     runtimeInsertBefore as Text,
     appendTo,
   )

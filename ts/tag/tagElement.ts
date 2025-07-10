@@ -117,6 +117,9 @@ function getNewSubject(
 
   const subject: SupportContextItem = {
     value: templater,
+    valueIndex: 0,
+    valueIndexSetBy: 'getNewSubject',
+
     withinOwnerElement: false, // i am the highest owner
     renderCount: 0,
 

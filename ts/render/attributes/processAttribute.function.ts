@@ -30,22 +30,25 @@ export function processAttribute(
   element: HTMLElement,
   support: AnySupport,
   howToSet: HowToSet, //  = howToSetInputValue
-  context: ContextItem[],
+  contexts: ContextItem[],
   isSpecial: SpecialDefinition,
   counts: TagCounts,
   value: string | null | undefined | TagVarIdNum,
 ) {
-  const nameVar = getTagJsVar(attrName)
-  const isNameVar = nameVar >= 0
+  const varIndex = getTagJsVar(attrName)
+  const isNameVar = varIndex >= 0
 
   if( isNameVar ) {
-    const value = values[nameVar]
+    const value = values[ varIndex ]
+    
     const contextItem = addOneContext(
       value,
-      context,
+      contexts,
       true,
     )
 
+    contextItem.valueIndex = varIndex
+    contextItem.valueIndexSetBy = 'processAttribute'
     contextItem.isAttr = true
     contextItem.element = element
     contextItem.isNameOnly = true
@@ -68,7 +71,7 @@ export function processAttribute(
       element,
       support,
       howToSet as HowToSet,
-      context,
+      contexts,
       counts,
     )
   
@@ -80,11 +83,12 @@ export function processAttribute(
       attrName as string,
       value,
       element,
-      context,
+      contexts,
       howToSet,
       support,
       counts,
       values,
+      varIndex,
     )
   }
 
@@ -95,11 +99,12 @@ export function processAttribute(
       attrName as string,
       value,
       element,
-      context,
+      contexts,
       howToSet,
       support,
       counts,
       isSpecial,
+      valueVar,
     )
   }
 
@@ -212,6 +217,7 @@ export function processAttributeSubjectValue(
 ) {
   // process adding/removing style. class. (false means remove)
   if ( special !== false ) {
+    console.log('special', {attrName, newAttrValue, special})
     specialAttribute(
       attrName,
       newAttrValue,
@@ -261,6 +267,7 @@ function callbackFun(
     )
   }
 
+  console.log('callback fun-------', attrName)
   return processAttributeSubjectValue(
     newAttrValue,
     element,
