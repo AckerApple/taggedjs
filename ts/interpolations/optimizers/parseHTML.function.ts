@@ -255,7 +255,7 @@ function parseAttrString(
 
   // force style to be first so other style manipulating attributes do not get overwritten
   if(fixedName === 'style') {
-    console.log('style to the front', {attrSet, attributes, valuePositions})
+    // console.log('style to the front', {attrSet, attributes, valuePositions})
     attributes.unshift(attrSet)
     return valueIndex
   }
