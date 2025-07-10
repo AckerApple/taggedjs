@@ -31,7 +31,7 @@ export function processUpdateAttrContext(
   }
 
   const element = contextItem.element as Element
-
+/*
   console.log('processAttributeEmit-------', {
     valueIndex: contextItem.valueIndex,
     valueIndexSetBy: contextItem.valueIndexSetBy,
@@ -41,7 +41,7 @@ export function processUpdateAttrContext(
     values,
     contextItem,
   })
-
+*/
   processAttributeEmit(
     value,
     contextItem.attrName as string,

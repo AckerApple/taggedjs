@@ -217,7 +217,7 @@ export function processAttributeSubjectValue(
 ) {
   // process adding/removing style. class. (false means remove)
   if ( special !== false ) {
-    console.log('special', {attrName, newAttrValue, special})
+    // console.log('special', {attrName, newAttrValue, special})
     specialAttribute(
       attrName,
       newAttrValue,
@@ -267,7 +267,7 @@ function callbackFun(
     )
   }
 
-  console.log('callback fun-------', attrName)
+  // console.log('callback fun-------', attrName)
   return processAttributeSubjectValue(
     newAttrValue,
     element,
