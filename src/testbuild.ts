@@ -42,6 +42,8 @@ function templaterToSupport(
   const context: SupportContextItem = {
     renderCount: 0,
     value: templater,
+    valueIndex: 0,
+    valueIndexSetBy: 'testbuild',
     tagJsVar: valueToTagJsVar(templater),
     global: undefined as any, // populated below in getNewGlobal
     // checkValueChange: checkSimpleValueChange,
@@ -129,13 +131,17 @@ function processValue(
         const subStrings = new Array(...tag.strings) // .reverse()
         const string = subStrings.map((x, index) => {
           const value = tag.values[index]
+          const valueIndex = tag.strings.length - 1 -index
+          
           x + processValue(
             value,
             [],
-            tag.strings.length - 1 -index,
+            valueIndex,
             support,
             {
               value,
+              valueIndex,
+              valueIndexSetBy: 'nothing',
               global: getNewGlobal(subject as ContextItem),
               tagJsVar: valueToTagJsVar(value),
               // checkValueChange: checkSimpleValueChange,
