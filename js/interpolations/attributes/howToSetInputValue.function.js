@@ -3,6 +3,9 @@ import { paintContent } from "../../render/paint.function.js";
 export function howToSetInputValue(element, name, value) {
     paintContent.push([howToSetFirstInputValue, [element, name, value]]);
 }
+export function howToSetStandAloneAttr(element, name, _value) {
+    element.setAttribute(name, '');
+}
 export function howToSetFirstInputValue(element, name, value) {
     if (value === undefined || value === false || value === null) {
         element.removeAttribute(name);

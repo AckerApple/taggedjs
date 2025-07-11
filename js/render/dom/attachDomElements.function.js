@@ -1,5 +1,5 @@
 // taggedjs-no-compile
-import { howToSetFirstInputValue } from "../../interpolations/attributes/howToSetInputValue.function.js";
+import { howToSetFirstInputValue, howToSetStandAloneAttr } from "../../interpolations/attributes/howToSetInputValue.function.js";
 import { paintAppend, paintAppendElementString, paintAppends, paintBefore, paintBeforeElementString, paintCommands } from "../paint.function.js";
 import { processAttribute } from "../attributes/processAttribute.function.js";
 import { empty } from "../../tag/ValueTypes.enum.js";
@@ -8,7 +8,7 @@ export const blankHandler = function blankHandler() {
     return undefined;
 };
 export function attachDomElements(nodes, values, support, counts, // used for animation stagger computing
-context, depth, // used to know if dynamic variables live within parent owner tag/support
+contexts, depth, // used to know if dynamic variables live within parent owner tag/support
 appendTo, insertBefore) {
     const dom = [];
     if (appendTo && insertBefore === undefined) {
@@ -21,9 +21,9 @@ appendTo, insertBefore) {
         const value = node.v;
         const isNum = !isNaN(value);
         if (isNum) {
-            const index = context.length;
+            const index = contexts.length;
             const value = values[index];
-            attachDynamicDom(value, context, support, counts, depth, appendTo, insertBefore);
+            attachDynamicDom(value, contexts, support, counts, depth, appendTo, insertBefore);
             continue;
         }
         const newNode = {}; // DomObjectText
@@ -33,14 +33,14 @@ appendTo, insertBefore) {
             continue;
         }
         // one single html element
-        const domElement = attachDomElement(newNode, node, values, support, context, counts, appendTo, insertBefore);
+        const domElement = attachDomElement(newNode, node, values, support, contexts, counts, appendTo, insertBefore);
         if (node.ch) {
-            newNode.ch = attachDomElements(node.ch, values, support, counts, context, depth + 1, domElement, insertBefore).dom;
+            newNode.ch = attachDomElements(node.ch, values, support, counts, contexts, depth + 1, domElement, insertBefore).dom;
         }
     }
-    return { dom, context };
+    return { dom, contexts };
 }
-function attachDomElement(newNode, node, values, support, context, counts, appendTo, insertBefore) {
+function attachDomElement(newNode, node, values, support, contexts, counts, appendTo, insertBefore) {
     const domElement = newNode.domElement = document.createElement(node.nn);
     // attributes that may effect style, come first for performance
     if (node.at) {
@@ -48,8 +48,8 @@ function attachDomElement(newNode, node, values, support, context, counts, appen
             const name = attr[0];
             const value = attr[1];
             const isSpecial = attr[2] || false;
-            const howToSet = howToSetFirstInputValue;
-            processAttribute(values, name, domElement, support, howToSet, context, isSpecial, counts, value);
+            const howToSet = attr.length > 1 ? howToSetFirstInputValue : howToSetStandAloneAttr;
+            processAttribute(values, name, domElement, support, howToSet, contexts, isSpecial, counts, value);
         }
     }
     if (appendTo) {

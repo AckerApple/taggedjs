@@ -13,8 +13,10 @@ export function processUpdateContext(support, contexts) {
 /** returns boolean of did render */
 function processUpdateOneContext(values, // the interpolated values
 index, context, ownerSupport, counts) {
-    const newValue = values[index];
     const contextItem = context[index];
+    // some values, like style, get rearranged and there value appearance may not match context appearance
+    const valueIndex = contextItem.valueIndex;
+    const newValue = values[valueIndex];
     // Do not continue if the value is just the same
     if (newValue === contextItem.value) {
         return;
@@ -22,6 +24,5 @@ index, context, ownerSupport, counts) {
     const tagJsVar = contextItem.tagJsVar;
     tagJsVar.processUpdate(newValue, ownerSupport, contextItem, counts, values);
     contextItem.value = newValue;
-    // contextItem.tagJsVar = valueToTagJsVar(newValue)
 }
 //# sourceMappingURL=processUpdateContext.function.js.map

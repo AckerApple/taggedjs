@@ -46,7 +46,7 @@ counts, appendTo) {
     if (previous) {
         return reviewPreviousArrayItem(item, previous, lastArray, ownerSupport, index, runtimeInsertBefore, counts, appendTo);
     }
-    const contextItem = createAndProcessContextItem(item, ownerSupport, counts, runtimeInsertBefore, appendTo);
+    const contextItem = createAndProcessContextItem(item, ownerSupport, counts, lastArray, runtimeInsertBefore, appendTo);
     // Added to previous array
     lastArray.push(contextItem);
     return contextItem;
@@ -58,7 +58,7 @@ counts, appendTo) {
         tagValueUpdateHandler(value, ownerSupport, itemSubject, counts);
         return itemSubject;
     }
-    const contextItem = createAndProcessContextItem(value, ownerSupport, counts, runtimeInsertBefore, appendTo);
+    const contextItem = createAndProcessContextItem(value, ownerSupport, counts, lastArray, runtimeInsertBefore, appendTo);
     // Added to previous array
     lastArray.push(contextItem);
     return contextItem;

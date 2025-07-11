@@ -4,7 +4,7 @@ import { domProcessContextItem } from '../../interpolations/optimizers/domProces
 import { empty } from '../ValueTypes.enum.js';
 import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js';
 /** Must provide insertBefore OR appendTo */
-export function createAndProcessContextItem(value, ownerSupport, counts, insertBefore, // used during updates
+export function createAndProcessContextItem(value, ownerSupport, counts, contexts, insertBefore, // used during updates
 appendTo) {
     const element = document.createTextNode(empty);
     const contextItem = {
@@ -12,6 +12,8 @@ appendTo) {
         tagJsVar: valueToTagJsVar(value),
         withinOwnerElement: false,
         placeholder: element,
+        valueIndex: contexts.length,
+        valueIndexSetBy: 'createAndProcessContextItem',
     };
     if (!appendTo) {
         paintCommands.push([paintBefore, [insertBefore, element]]);

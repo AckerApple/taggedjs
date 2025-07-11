@@ -38,6 +38,8 @@ function loadDomMeta(support) {
 export function addOneContext(value, context, withinOwnerElement) {
     const contextItem = {
         value,
+        valueIndex: context.length,
+        valueIndexSetBy: 'addOneContext',
         tagJsVar: valueToTagJsVar(value),
         withinOwnerElement,
     };

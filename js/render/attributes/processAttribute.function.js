@@ -16,12 +16,14 @@ import { getSupportWithState } from '../../interpolations/attributes/getSupportW
 /** MAIN FUNCTION. Sets attribute value, subscribes to value updates  */
 export function processAttribute(values, // all the variables inside html``
 attrName, element, support, howToSet, //  = howToSetInputValue
-context, isSpecial, counts, value) {
-    const nameVar = getTagJsVar(attrName);
-    const isNameVar = nameVar >= 0;
+contexts, isSpecial, counts, value) {
+    const varIndex = getTagJsVar(attrName);
+    const isNameVar = varIndex >= 0;
     if (isNameVar) {
-        const value = values[nameVar];
-        const contextItem = addOneContext(value, context, true);
+        const value = values[varIndex];
+        const contextItem = addOneContext(value, contexts, true);
+        contextItem.valueIndex = varIndex;
+        contextItem.valueIndexSetBy = 'processAttribute';
         contextItem.isAttr = true;
         contextItem.element = element;
         contextItem.isNameOnly = true;
@@ -34,17 +36,17 @@ context, isSpecial, counts, value) {
         contextItem.howToSet = howToSet;
         const tagJsVar = contextItem.tagJsVar;
         tagJsVar.processUpdate = processUpdateAttrContext;
-        // stand alone attributes
-        processNameOnlyAttrValue(values, value, element, support, howToSet, context, counts);
+        // single/stand alone attributes
+        processNameOnlyAttrValue(values, value, element, support, howToSet, contexts, counts);
         return;
     }
     if (Array.isArray(value)) {
-        return createDynamicArrayAttribute(attrName, value, element, context, howToSet, support, counts, values);
+        return createDynamicArrayAttribute(attrName, value, element, contexts, howToSet, support, counts, values, varIndex);
     }
     const valueVar = getTagJsVar(value);
     if (valueVar >= 0) {
         const value = values[valueVar];
-        return createDynamicAttribute(attrName, value, element, context, howToSet, support, counts, isSpecial);
+        return createDynamicAttribute(attrName, value, element, contexts, howToSet, support, counts, isSpecial, valueVar);
     }
     return processNonDynamicAttr(attrName, value, element, howToSet, counts, support, isSpecial);
 }
@@ -52,6 +54,7 @@ function processHost(element, hostVar, contextItem) {
     hostVar.processInit(element, hostVar, contextItem);
     return;
 }
+// single/stand alone attributes
 export function processNameOnlyAttrValue(values, attrValue, element, ownerSupport, howToSet, context, counts) {
     if (isNoDisplayValue(attrValue)) {
         return;
@@ -79,7 +82,7 @@ export function processAttributeEmit(newAttrValue, attrName, subject, element, s
     return processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support, counts);
 }
 /** figure out what type of attribute we are dealing with and/or feed value into handler to figure how to update */
-export function processAttributeSubjectValue(newAttrValue, element, attrName, special, howToSet, support, counts) {
+export function processAttributeSubjectValue(newAttrValue, element, attrName, special, howToSet, support, _counts) {
     // process adding/removing style. class. (false means remove)
     if (special !== false) {
         specialAttribute(attrName, newAttrValue, element, special);

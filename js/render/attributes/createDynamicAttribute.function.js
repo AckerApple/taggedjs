@@ -5,7 +5,7 @@ import { getTagVarIndex } from './getTagVarIndex.function.js';
 import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js';
 /** Support string attributes with dynamics Ex: <div style="color:black;font-size::${fontSize};"></div> */
 export function createDynamicArrayAttribute(attrName, array, element, context, howToSet, //  = howToSetInputValue
-support, counts, values) {
+support, counts, values, varNumber) {
     const startIndex = context.length;
     // loop all to attach context and processors
     array.forEach((value) => {
@@ -19,6 +19,8 @@ support, counts, values) {
                 attrName: attrName,
                 withinOwnerElement: true,
                 tagJsVar,
+                valueIndex: context.length,
+                valueIndexSetBy: 'createDynamicArrayAttribute',
             };
             // contextItem.handler =
             tagJsVar.processUpdate = function arrayItemHanlder(value, newSupport, contextItem, counts, newValues) {
@@ -49,7 +51,7 @@ function buildNewValueFromArray(array, values, startIndex) {
     }, []);
 }
 export function createDynamicAttribute(attrName, value, element, context, howToSet, //  = howToSetInputValue
-support, counts, isSpecial) {
+support, counts, isSpecial, varIndex) {
     const tagJsVar = valueToTagJsVar(value);
     const contextItem = {
         isAttr: true,
@@ -57,6 +59,8 @@ support, counts, isSpecial) {
         attrName,
         withinOwnerElement: true,
         tagJsVar,
+        valueIndex: varIndex,
+        valueIndexSetBy: 'createDynamicAttribute',
     };
     context.push(contextItem);
     tagJsVar.processUpdate = processUpdateAttrContext;

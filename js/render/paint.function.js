@@ -45,6 +45,7 @@ function runPaintRemoves() {
         const currentAwaits = paintRemoveAwaits.map(data => data.promise.then(() => {
             const paintRemoves = data.paintRemoves;
             for (const content of paintRemoves) {
+                // call paintRemover()
                 content[0](...content[1]);
             }
         }));
@@ -86,7 +87,7 @@ export function addPaintRemover(element) {
     paintRemoves.push([paintRemover, [element]]);
 }
 /** must be used with paintRemoves */
-function paintRemover(element) {
+function paintRemover(element, _caller) {
     const parentNode = element.parentNode;
     parentNode.removeChild(element);
 }
