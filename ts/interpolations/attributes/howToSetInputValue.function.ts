@@ -11,6 +11,14 @@ export function howToSetInputValue(
   paintContent.push([howToSetFirstInputValue, [element, name, value]])
 }
 
+export function howToSetStandAloneAttr(
+  element: HTMLElement,
+  name: string,
+  _value: string | undefined | boolean
+) {
+  element.setAttribute(name, '')
+}
+
 export function howToSetFirstInputValue(
   element: HTMLElement,
   name: string,

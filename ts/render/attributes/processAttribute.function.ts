@@ -64,7 +64,7 @@ export function processAttribute(
     const tagJsVar = contextItem.tagJsVar
     tagJsVar.processUpdate = processUpdateAttrContext
 
-    // stand alone attributes
+    // single/stand alone attributes
     processNameOnlyAttrValue(
       values,
       value as any,
@@ -128,6 +128,7 @@ function processHost(
   return
 }
 
+// single/stand alone attributes
 export function processNameOnlyAttrValue(
   values: unknown[],
   attrValue: string | boolean | Record<string, any> | HostValue,
@@ -217,7 +218,6 @@ export function processAttributeSubjectValue(
 ) {
   // process adding/removing style. class. (false means remove)
   if ( special !== false ) {
-    // console.log('special', {attrName, newAttrValue, special})
     specialAttribute(
       attrName,
       newAttrValue,
@@ -267,7 +267,6 @@ function callbackFun(
     )
   }
 
-  // console.log('callback fun-------', attrName)
   return processAttributeSubjectValue(
     newAttrValue,
     element,

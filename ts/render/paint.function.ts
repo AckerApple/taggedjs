@@ -65,6 +65,7 @@ function runPaintRemoves(): any {
       const paintRemoves = data.paintRemoves
       
       for (const content of paintRemoves) {
+        // call paintRemover()
         content[0](...content[1])
       }
     }))
@@ -120,7 +121,7 @@ export function addPaintRemover(
 /** must be used with paintRemoves */
 function paintRemover(
   element: Text | Element,
-  // _caller: string, can be used for determining who is failing
+  _caller: string, // can be used for determining who is failing
 ) {
   const parentNode = element.parentNode as ParentNode
   parentNode.removeChild(element as Element)

@@ -71,19 +71,31 @@ describe('#htmlInterpolationToDomMeta', () => {
     expect(result).toEqual([{ nn: 'div', at: [[ 'id', '22' ]], ch: [{nn: 'text', tc: ':tagvar0:'}] }])
   })
 
-  it.only('style and clicks', () => {
+  it('multiple single attributes', () => {
     const htmlResult = html`
-      <td valign=${0} style=${1} class=${2}></td>
+      <input class="hidden" type="file" directory webkitdirectory
+        id=${'robustFolderPicker-' + 1}
+        name=${'robustFolderPicker-' + 1}
+        onchange=${($event) => undefined}
+      />
     `
 
     const templater = htmlResult as Tag
     const result = htmlInterpolationToDomMeta((templater as any).strings, templater.values)
     const firstDom = result[0] as DomObjectElement
-
-    // const children = firstDom.ch as (ObjectChildren & DomObjectChildren)
-    // console.log('htmlResult', {x:(htmlResult.values[0] as any).templater})
-    //console.log('firstDom.at', children[3])
-    console.log('firstDom.at', htmlResult)
+    
+    expect(firstDom).toEqual({
+      nn: 'input',
+      at: [
+        [ 'class', 'hidden' ],
+        [ 'type', 'file' ],
+        [ 'directory' ],
+        [ 'webkitdirectory' ],
+        [ 'id', ':tagvar0:' ],
+        [ 'name', ':tagvar1:' ],
+        [ 'change', ':tagvar2:' ]
+      ]
+    })
   })
 
   it('with standalones and static style', () => {

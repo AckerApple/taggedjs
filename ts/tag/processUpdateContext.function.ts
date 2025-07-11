@@ -43,15 +43,6 @@ function processUpdateOneContext(
   const valueIndex = contextItem.valueIndex
   const newValue = values[ valueIndex ] as any
 
-  /*
-  if(valueIndex !== index ) {
-    console.log('here is a shifted value', {
-      newValue,
-      valueIndex,
-    })
-  }
-    */
-
   // Do not continue if the value is just the same
   if(newValue === contextItem.value) {
     return
