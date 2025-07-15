@@ -1,7 +1,6 @@
 import { html, StringTag, Tag } from "../../tag"
 import { htmlInterpolationToDomMeta } from "./htmlInterpolationToDomMeta.function"
-import { ObjectChildren } from "./LikeObjectElement.type"
-import { DomObjectChildren, DomObjectElement } from "./ObjectNode.types"
+import { DomObjectElement } from "./ObjectNode.types"
 
 describe('#htmlInterpolationToDomMeta', () => {
   describe('attributes', () => {    
