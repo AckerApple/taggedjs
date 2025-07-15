@@ -75,7 +75,7 @@ describe('#htmlInterpolationToDomMeta', () => {
       <input class="hidden" type="file" directory webkitdirectory
         id=${'robustFolderPicker-' + 1}
         name=${'robustFolderPicker-' + 1}
-        onchange=${($event) => undefined}
+        onchange=${() => undefined}
       />
     `
 

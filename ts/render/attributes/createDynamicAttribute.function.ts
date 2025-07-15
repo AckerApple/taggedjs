@@ -20,7 +20,7 @@ export function createDynamicArrayAttribute(
   support: AnySupport,
   counts: TagCounts,
   values: unknown[],
-  varNumber: number,
+  _varNumber: number,
 ) {
   const startIndex = context.length
 
