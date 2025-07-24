@@ -13,7 +13,7 @@ export async function runTests() {
   await import('./counters.test')
   await import('./props.test')
   await import('./tagSwitch.test')
-  await import('./array.test')  
+  await import('./arrays.test')  
   await import('./mirror.test')
   await import('./oneRender.test')
   await import('./funInProps.test')

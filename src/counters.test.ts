@@ -81,8 +81,10 @@ describe('💯 counters', () => {
 
   it('piped subject', () => {
     if(firstRun) {
-      expect(html('#🪈-pipedSubject')).toBe('')
-      expect(html('#🪈-pipedSubject-2')).toBe('')
+      const counter = html('#🥦-standalone-display')
+      const pipe0 = html('#🪈-pipedSubject')
+      expect(pipe0).toBe(counter, `firstRun failure pipe0. Expected "${pipe0}" toBe empty-string`)
+      expect(html('#🪈-pipedSubject-2')).toBe(counter, 'firstRun failure pipe2')
     }
     
     click('#🥦-subject-increase-counter')

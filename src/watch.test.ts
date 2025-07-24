@@ -21,7 +21,7 @@ describe('⌚️ watch tests', () => {
       expect(html('#🦷-watchTruthAsSub')).toBe('')
     } else {
       expect(html('#🍄-watchPropNumSlow')).toBe( slowCount )
-      expect( Number(html('#🦷-watchTruth')) ).to.be.greaterThan( Number(slowCount) )
+      expect( Number(html('#🦷-watchTruth')) ).toBeGreaterThan( Number(slowCount) )
       expect(html('#🦷-watchTruthAsSub')).toBe( html('#🦷-truthSubChangeCount') )
     }
 

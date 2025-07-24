@@ -72,7 +72,7 @@ beforeEach(async () => {
     'providers.test': 'providerDebug',
     'tagSwitch.test': 'tagSwitchDebug',
     'child.test': 'child',
-    'array.test': 'arrays',
+    'arrays.test': 'arrays',
     'mirror.test': 'mirroring',
     'watch.test': 'watchTesting',
     'funInProps.test': 'funInPropsTag',

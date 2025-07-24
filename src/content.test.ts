@@ -104,37 +104,41 @@ describe('📰 content', () => {
   })
 
   describe('passed in subscription', () => {
-    it('increase test', async () => {
+    it('increase subscription', async () => {
       const increase = byId('passed-in-sub-increase')
       const hideShow = byId('passed-in-sub-hide-show')
+      const hideShowValue = byId('passed-in-sub-hideShow-value')
 
+      expect(hideShowValue.textContent).toBe('')
       expect(htmlById('passed-in-sub-ex0')).toBe('0||||0')
-      expect(htmlById('passed-in-sub-ex1')).toBe('1||||1')
+      expect(htmlById('passed-in-sub-ex1')).toBe('1||||1', 'failed before increase')
       expect(htmlById('passed-in-sub-ex2')).toBe('2||||2')
 
       increase.click()
 
       expect(htmlById('passed-in-sub-ex0')).toBe(`0||||0`)
-      expect(htmlById('passed-in-sub-ex1')).toBe('1||||1')
+      expect(htmlById('passed-in-sub-ex1')).toBe('1||||1', 'failed first increase')
       expect(htmlById('passed-in-sub-ex2')).toBe('2||||2')
 
-      hideShow.click()
-
+      hideShow.click() // hide
+      
+      let subValue = htmlById('passed-in-output')
+      expect(hideShowValue.textContent).toBe('true')
       expect(htmlById('passed-in-sub-ex0')).toBe(`0||||0`)
-      expect(htmlById('passed-in-sub-ex1')).toBe('1||||1')
-      expect(htmlById('passed-in-sub-ex2')).toBe('2||||2')
+      expect(htmlById('passed-in-sub-ex1')).toBe(`1||your fun number ${subValue}||1`, 'failed after hide')
+      expect(htmlById('passed-in-sub-ex2')).toBe(`2||your tag number ${subValue}||2`)
 
-      increase.click()
+      increase.click() // show
 
-      const subValue = htmlById('passed-in-output')
+      subValue = htmlById('passed-in-output')
       expect(htmlById('passed-in-sub-ex0')).toBe(`0||${subValue}||0`)
-      expect(htmlById('passed-in-sub-ex1')).toBe(`1||your fun number ${subValue}||1`)
+      expect(htmlById('passed-in-sub-ex1')).toBe(`1||your fun number ${subValue}||1`, 'failed third increase')
       expect(htmlById('passed-in-sub-ex2')).toBe(`2||your tag number ${subValue}||2`)
 
       hideShow.click()
 
       expect(htmlById('passed-in-sub-ex0')).toBe('0||||0')
-      expect(htmlById('passed-in-sub-ex1')).toBe('1||||1')
+      expect(htmlById('passed-in-sub-ex1')).toBe('1||||1', 'failed closing')
       expect(htmlById('passed-in-sub-ex2')).toBe('2||||2')
     })
   })

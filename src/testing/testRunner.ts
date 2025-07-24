@@ -1,5 +1,5 @@
 // Test runner that works in both browser and Vitest environments
-import { createExpect } from './expect'
+import { expect } from './expect-wrapper'
 
 interface Test {
   name: string
@@ -42,9 +42,8 @@ export const describe = isVitest
       currentSuite = previousSuite
     }
 
-export const expect = isVitest 
-  ? (globalThis as any).expect 
-  : createExpect
+// Re-export expect from wrapper
+export { expect }
 
 // Execute tests in browser environment
 export async function executeBrowserTests() {
@@ -79,7 +78,7 @@ export async function executeBrowserTests() {
         failed++
         failures.push({ test: test.name, suite: test.suite, error: error as Error })
         console.error(`${indent}❌ ${test.name}`)
-        console.error(`${indent}   ${error}`)
+        console.error(error)
       }
     }
     
@@ -95,7 +94,7 @@ export async function executeBrowserTests() {
     failures.forEach(({ test, suite, error }) => {
       const fullName = suite ? `${suite} > ${test}` : test
       console.error(`\n${fullName}:`)
-      console.error(error.message)
+      console.error(error)
       if (error.stack) {
         // Try to extract TypeScript file references from stack
         const stackLines = error.stack.split('\n')

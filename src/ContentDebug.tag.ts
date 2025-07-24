@@ -1,4 +1,4 @@
-import { TagJsEvent, subscribeWith, LikeObjectChildren, html, tag, ValueSubject, state, combineLatest, willPromise, states, subscribe, Subject, getInnerHTML, TagCounts, subject, host, onDestroy } from "taggedjs"
+import { subscribeWith, LikeObjectChildren, html, tag, ValueSubject, state, combineLatest, willPromise, states, subscribe, Subject, getInnerHTML, subject, host, onDestroy } from "taggedjs"
 import { dumpContent } from "./dumpContent.tag"
 import { renderCountDiv } from "./renderCount.component"
 import { Subject as RxSubject, startWith } from "rxjs"
@@ -7,7 +7,7 @@ import { fx } from "taggedjs-animate-css"
 export const testStaggerBy = 20
 
 const animateWrap = (
-  counts: ValueSubject<TagCounts>,
+  counts: ValueSubject<{added: number, removed: number}>,
   staggerBy: number = testStaggerBy,
 ) => {
   const innerHTML = getInnerHTML()
@@ -74,7 +74,7 @@ export const content = tag(() => {
   let counter = 0
   let staggerBy = testStaggerBy
   let showHideFx = false
-  const counts = state(() => new Subject({ added: 0, removed: 0})) as ValueSubject<TagCounts>
+  const counts = state(() => new Subject({ added: 0, removed: 0})) as ValueSubject<{added: number, removed: number}>
 
   states(get => [{
     renderCount, orangeToggle, boldToggle, counter, showHideFx, staggerBy,
@@ -202,7 +202,7 @@ export const content = tag(() => {
         >toggle orange border</div>
         <button id="toggle-bold"
           onclick=${() => boldToggle = !boldToggle}
-        >bold toggle ${boldToggle}</button>
+        >bold toggle ${boldToggle ? 'true' : 'false'}</button>
       </div>
       
       <div id="hello-spacing-dom-world">${54} ${'hello'} worlds</div>
@@ -290,7 +290,7 @@ export const content = tag(() => {
             <legend>subscribe with default</legend>
             0 === <span id="content-subscribe-sub0-with">${subscribeWith(sub0, -1)}</span>
           </fieldset>
-  
+
           <fieldset style="flex-grow:1">
             <legend>value subject</legend>
             0 === ${subscribe(vs0)}
@@ -364,14 +364,19 @@ const passSubscription = tag(({
 
   return html`
     <span>sub-value:<span id="passed-in-output">${subscribe(sub0)}</span></span>
-    <span>test:${onOff && subscribe(sub0)}:end</span>
+    
     <button id="passed-in-sub-increase"
       onclick=${() => sub0.next((sub0.value || 0) + 1)}
     >sub0 increase</button>
+    
     <button id="passed-in-sub-next"
       onclick=${() => ob.next(sub0.value = (sub0.value || 0) + 1)}
     >ob increase</button>
-    <button id="passed-in-sub-hide-show" onclick=${() => onOff = !onOff}>hide/show on/off - ${onOff}</button>
+    
+    <button id="passed-in-sub-hide-show" onclick=${() => onOff = !onOff}
+    >hide/show on/off = ${onOff ? 'show' : 'hide'}</button>
+    <span>onOffValue:<span id="passed-in-sub-hideShow-value">${onOff}</span></span>
+    
     <div>
       <strong>test 0</strong>
       <div id="passed-in-sub-ex0">0||${onOff && subscribe(sub0)}||0</div>

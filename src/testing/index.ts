@@ -15,9 +15,7 @@ export const describe = isVitest
   ? (globalThis as any).describe 
   : browserRunner.describe
 
-export const expect = isVitest 
-  ? (globalThis as any).expect 
-  : browserRunner.expect
+export { expect } from './expect-wrapper'
 
 export const beforeEach = isVitest 
   ? (globalThis as any).beforeEach 

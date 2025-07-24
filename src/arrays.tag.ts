@@ -3,7 +3,6 @@ import { renderCountDiv } from './renderCount.component.js'
 import { arrayScoreData } from './arrayScoreData.tag.js'
 import { html, state, tag, states, array, subscribe } from 'taggedjs'
 
-const frameCount = 4
 type Player = {
   name: string
   edit?: boolean
@@ -18,7 +17,7 @@ export const arrays = tag(() => (
 ) => {/* ArrayTests */
   const signalArray = array(['d','e','f'])
   const simpleArray = state(['a','b','c'])
-  const arrayFx = state(() => fxGroup())
+  const arrayFx = state(() => fxGroup({ stagger:10, duration: '.1s' }))
 
   const getNewPlayer = () => ({
     name: 'Person '+players.length,
@@ -37,21 +36,31 @@ export const arrays = tag(() => (
   ++renderCount
 
   return html`<!--arrayTests.js-->
+    <span>count display:<span id="arrays-counter-display">${counter}</span></span>
     <fieldset>
-      <legend>signal array test</legend>
+      <legend>
+        signal array test <sup id="signal-array-count">${signalArray.length}</sup>
+      </legend>
       <div style="display:flex;flex-wrap:wrap;gap:1em">
         ${subscribe(signalArray, array => {
           return array.map((x, index) => html`
-            <div ${arrayFx} style="border:1px solid black;border-radius:.2em">
-              index:${index} counter:${counter} content:${x} length:${signalArray.length}
-              <button onclick=${() => signalArray.splice(index, 1)}>🗑️ delete me</button>
+            <div ${arrayFx} id=${`signal-array-item-${index}`}
+              style="border:1px solid black;border-radius:.2em"
+            >
+              index:${index} counter:<span id=${`signal-array-item-counter-display-${index}`}>${counter}</span> content:${x} length:${signalArray.length}
+              <button id=${`signal-array-item-delete-btn-${index}`}
+                onclick=${() => {
+                  signalArray.splice(index, 1)
+                }}
+              >🗑️ delete me</button>
+              <button type="button" onclick=${() => ++counter}>++counter ${counter}</button>
             </div>
           `.key(x))
         })}
       </div>        
       <div>        
-        <button type="button" onclick=${() => ++counter}>++counter ${counter}</button>
-        <button type="button" onclick=${() => addArraySignal(1)}>add number</button>
+        <button type="button" id="signal-array-increase-counter" onclick=${() => ++counter}>++counter ${counter}</button>
+        <button type="button" id="push-signal-array-btn" onclick=${() => addArraySignal(1)}>add number</button>
         <button type="button" onclick=${() => addArraySignal(10)}>add 10 number</button>
         <button type="button" onclick=${() => {
           setTimeout(() => {
@@ -71,11 +80,19 @@ export const arrays = tag(() => (
       ${simpleArray.map((x, index) => html`
         <div>
           counter:${counter} index:${index} x:${x} length:${simpleArray.length}
-          <button onclick=${() => simpleArray.splice(index, 1)}>🗑️ delete me</button>
+          <button
+            onclick=${() => {
+              simpleArray.splice(index, 1)
+            }}
+          >🗑️ delete me</button>
         </div>`.key(x))}
       <div>
-        <button type="button" onclick=${() => ++counter}>++counter ${counter}</button>
-        <button type="button" onclick=${() => simpleArray[ simpleArray.length ] = simpleArray.length.toString()}>add number</button>
+        <button type="button"
+          onclick=${() => ++counter}
+        >++counter ${counter}</button>
+        <button type="button"
+          onclick=${() => simpleArray[ simpleArray.length ] = simpleArray.length.toString()}
+        >add number</button>
       </div>
     </fieldset>
 

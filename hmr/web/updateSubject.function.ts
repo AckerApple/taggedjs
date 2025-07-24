@@ -122,7 +122,6 @@ async function swapSupport(
 
   buildBeforeElement(
     reSupport,
-    {added:0, removed: 0},
     undefined,
     placeholder,
   )

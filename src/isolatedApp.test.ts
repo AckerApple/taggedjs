@@ -46,7 +46,7 @@ export async function runIsolatedTests(
   }
 
   if(views.includes(ViewTypes.Arrays)) {
-    await import('./array.test')
+    await import('./arrays.test')
     ++testCount
   }
 

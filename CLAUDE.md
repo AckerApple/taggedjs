@@ -36,6 +36,12 @@ tsc --noEmit
 rm -rf assets/
 ```
 
+## Testing Notes
+
+**Important**: Before running tests, ensure the project is built with `npm run build`. Tests rely on the compiled bundle.js file in assets/dist/.
+
+For view-specific tests (like arrays.test.ts), the test setup will automatically navigate to the correct view using the vitest.setup.ts configuration.
+
 ## Architecture & Patterns
 
 ### Component Structure
@@ -58,7 +64,10 @@ export default tag<YourComponentTemplate>("component-name", (tag, { html, state,
 
 ### Key Framework Features
 
-1. **Reactive State**: Use `state()` for reactive values and `states()` for reactive objects
+1. **Reactive State**: 
+   - Use `state()` for **const** declarations (reactive values that cannot be reassigned)
+   - Use `states()` for **let** declarations (reactive values that can be reassigned)
+   - Example: `const mySubject = state(() => new Subject())` vs `let counter = 0; states(get => [counter] = get(counter))`
 2. **Template Literals**: HTML templates with `html` tag support reactive interpolation
 3. **Event Handling**: Direct function binding in templates (e.g., `onclick=${handler}`)
 4. **Lifecycle Hooks**: `onInit()` and `onDestroy()` for component lifecycle

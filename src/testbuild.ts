@@ -41,9 +41,11 @@ function templaterToSupport(
 ) {
   const context: SupportContextItem = {
     renderCount: 0,
+    
     value: templater,
     valueIndex: 0,
-    valueIndexSetBy: 'testbuild',
+    valueIndexSetBy: 'testbuild', // temp
+
     tagJsVar: valueToTagJsVar(templater),
     global: undefined as any, // populated below in getNewGlobal
     // checkValueChange: checkSimpleValueChange,

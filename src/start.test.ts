@@ -7,7 +7,7 @@ it('no template tags', () => {
 })
 */
 
-it('subject', () => {
+it('basic app subject', () => {
   const current = textContent('#app-counter-subject-value-display')
   click('#app-counter-subject-button')
   const afterClick = textContent('#app-counter-subject-value-display')

@@ -1,4 +1,5 @@
 import { html, states, tag } from "taggedjs"
+import { subscribeAttributes } from "./subscribeAttributes.tag"
 
 export const attributeDebug = tag(() => {
   let selected: string = 'a'
@@ -59,5 +60,7 @@ export const attributeDebug = tag(() => {
       .text-black {color:black}
       .text-white {color:white}
     </style>
+    
+    ${subscribeAttributes()}
   `
 })
