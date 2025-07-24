@@ -17,6 +17,7 @@ import { renderTagElement } from '../render/renderTagElement.function.js'
 import { loadNewBaseSupport } from './loadNewBaseSupport.function.js'
 import { TagJsTag } from '../tagJsVars/tagJsVar.type.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
+import { blankHandler } from '../render/dom/attachDomElements.function.js'
 
 if( typeof(document) === 'object' ) {
   if( (document as any).taggedJs ) {
@@ -109,6 +110,7 @@ function getNewSubject(
     tagJsType: 'templater',
     checkValueChange: checkTagValueChange,
     delete: destroySupportByContextItem,
+    processInitAttribute: blankHandler,
     processInit: function appDoNothing() {
       console.debug('do nothing app function')
     },

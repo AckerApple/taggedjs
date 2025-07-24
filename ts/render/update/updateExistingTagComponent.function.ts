@@ -210,7 +210,6 @@ function swapTags(
     templater,
     contextItem,
     ownerSupport,
-    { added: 0, removed: 0 },
     undefined, // appendTo,
     contextItem.placeholder,
   )

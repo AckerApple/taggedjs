@@ -2,7 +2,6 @@
 
 import { TemplaterResult } from '../getTemplaterResult.function.js'
 import { tagValueUpdateHandler } from './tagValueUpdateHandler.function.js'
-import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { LastArrayItem } from '../Context.types.js'
 import { compareArrayItems } from './compareArrayItems.function.js'
 import { AnySupport } from '../AnySupport.type.js'
@@ -12,21 +11,21 @@ import { Tag } from '../Tag.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 
 export function processTagArray(
-  subject: ContextItem,
+  contextItem: ContextItem,
   value: (TemplaterResult | Tag)[], // arry of Tag classes
   ownerSupport: AnySupport,
-  counts: TagCounts,
   appendTo?: Element,
 ) {
-  const noLast = subject.lastArray === undefined
+  const noLast = contextItem.lastArray === undefined
+
   
   if( noLast ){
-    subject.lastArray = []
+    contextItem.lastArray = []
   }
   
-  const lastArray = subject.lastArray as LastArrayItem[]
+  const lastArray = contextItem.lastArray as LastArrayItem[]
   
-  let runtimeInsertBefore = subject.placeholder
+  let runtimeInsertBefore = contextItem.placeholder
   let removed = 0
 
   /** 🗑️ remove previous items first */
@@ -57,7 +56,7 @@ export function processTagArray(
       removed = removed + newRemoved
     }
     
-    subject.lastArray = filteredLast
+    contextItem.lastArray = filteredLast
   }
 
   const length = value.length
@@ -65,10 +64,9 @@ export function processTagArray(
     const newSubject = reviewArrayItem(
       value,
       index,
-      subject.lastArray as LastArrayItem[],
+      contextItem.lastArray as LastArrayItem[],
       ownerSupport,
       runtimeInsertBefore,
-      counts,
       appendTo,
     )
 
@@ -82,7 +80,6 @@ function reviewArrayItem(
   lastArray: LastArrayItem[],
   ownerSupport: AnySupport,
   runtimeInsertBefore: Text | undefined, // used during updates
-  counts: TagCounts,
   appendTo?: Element, // used during initial rendering of entire array
 ) {
   const item = array[index]
@@ -91,14 +88,13 @@ function reviewArrayItem(
   if(previous) {
     return reviewPreviousArrayItem(
       item, previous, lastArray, ownerSupport, index,
-      runtimeInsertBefore, counts, appendTo,
+      runtimeInsertBefore, appendTo,
     )
   }
 
   const contextItem = createAndProcessContextItem(
     item as TemplateValue,
     ownerSupport,
-    counts,
     lastArray,
     runtimeInsertBefore as Text,
     appendTo,
@@ -117,16 +113,14 @@ function reviewPreviousArrayItem(
   ownerSupport: AnySupport,
   index: number,
   runtimeInsertBefore: Text | undefined, // used during updates
-  counts: TagCounts,
   appendTo?: Element, // used during initial rendering of entire array
 ) {
   const couldBeSame = lastArray.length > index
   if (couldBeSame) {
     tagValueUpdateHandler(
       value as TemplateValue,
-      ownerSupport,
       itemSubject,
-      counts,
+      ownerSupport,
     )
     return itemSubject
   }
@@ -134,7 +128,6 @@ function reviewPreviousArrayItem(
   const contextItem = createAndProcessContextItem(
     value as TemplateValue,
     ownerSupport,
-    counts,
     lastArray,
     runtimeInsertBefore as Text,
     appendTo,

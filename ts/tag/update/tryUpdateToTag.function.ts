@@ -6,7 +6,6 @@ import { isTagComponent } from '../../isInstance.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { handleStillTag } from './handleStillTag.function.js'
-import { TagCounts } from '../TagCounts.type.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { updateExistingTagComponent } from '../../render/update/updateExistingTagComponent.function.js'
 import { createSupport } from '../createSupport.function.js'
@@ -16,11 +15,8 @@ export function tryUpdateToTag(
   contextItem: ContextItem | SupportContextItem,
   newValue: TemplaterResult, // newValue
   ownerSupport: AnySupport,
-  counts: TagCounts,
 ): boolean {
   const isComp = isTagComponent(newValue)
-
-  contextItem.tagJsVar = newValue
 
   if(isComp) {
     if(contextItem.global === undefined) {
@@ -31,8 +27,10 @@ export function tryUpdateToTag(
       newValue,
       contextItem as SupportContextItem,
       ownerSupport,
-      counts,
     )
+
+    contextItem.oldTagJsVar = contextItem.tagJsVar
+    contextItem.tagJsVar = newValue
 
     return true
   }
@@ -40,6 +38,9 @@ export function tryUpdateToTag(
   // detect if previous value was a tag
   const global = contextItem.global as SupportTagGlobal
   if(global) {
+    contextItem.oldTagJsVar = contextItem.tagJsVar
+    contextItem.tagJsVar = newValue
+
     // its html/dom based tag
     const support = global.newest
     if( support ) {
@@ -62,10 +63,12 @@ export function tryUpdateToTag(
     newValue,
     contextItem,
     ownerSupport,
-    counts,
     undefined, // appendTo,
     contextItem.placeholder,
   )
+
+  contextItem.oldTagJsVar = contextItem.tagJsVar
+  contextItem.tagJsVar = newValue
 
   return true
 }
@@ -74,7 +77,6 @@ function prepareUpdateToComponent(
   templater: TemplaterResult,
   contextItem:SupportContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts,
 ): void {
   const global = contextItem.global as SupportTagGlobal
   // When last value was not a component
@@ -83,7 +85,6 @@ function prepareUpdateToComponent(
       templater,
       contextItem,
       ownerSupport,
-      counts,
       undefined, // appendTo,
       contextItem.placeholder,
     )

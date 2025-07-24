@@ -5,10 +5,8 @@ import { BasicTypes } from '../../tag/ValueTypes.enum.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
 import { paintContent } from '../../render/paint.function.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
-import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { processNameOnlyAttrValue } from '../../render/attributes/processAttribute.function.js'
 import { isNoDisplayValue } from '../../render/attributes/isNoDisplayValue.function.js'
-
 
 export function updateNameOnlyAttrValue(
   values: unknown[],
@@ -18,7 +16,6 @@ export function updateNameOnlyAttrValue(
   ownerSupport: AnySupport,
   howToSet: HowToSet,
   context: ContextItem[],
-  counts: TagCounts,
 ) {
   // check to remove previous attribute(s)
   if(lastValue) {
@@ -52,7 +49,6 @@ export function updateNameOnlyAttrValue(
     ownerSupport,
     howToSet,
     context,
-    counts,
   )
 }
 

@@ -27,6 +27,8 @@ export function processNowRegularValue(
   contextItem: ContextItem, // could be tag via contextItem.tag
 ) {
   contextItem.value = value
+  
+  contextItem.oldTagJsVar = contextItem.tagJsVar
   contextItem.tagJsVar = getSimpleTagVar(value)
 
   const before = contextItem.placeholder as Text

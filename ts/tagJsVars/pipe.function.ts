@@ -2,9 +2,10 @@ import { getSupportWithState } from "../interpolations/attributes/getSupportWith
 import { blankHandler } from "../render/dom/attachDomElements.function.js"
 import { AnySupport } from "../tag/AnySupport.type.js"
 import { getSupportInCycle } from "../tag/getSupportInCycle.function.js"
-import { AdvancedContextItem, ContextItem, TagCounts, ValueTypes } from "../tag/index.js"
+import { AdvancedContextItem, ContextItem, ValueTypes } from "../tag/index.js"
 import { deleteAndUnsubscribe, setupSubscribe } from "../tag/update/setupSubscribe.function.js"
 import { LikeObservable, SubscribeCallback, SubscribeValue } from "./subscribe.function.js"
+import { checkSubscribeValueChanged } from "./subscribeWith.function.js"
 
 /** Have an html tagged value as value of subscribe emissions, with initial default value emission. Automatically unsubscribes for you */
 export function pipe<SubValue, DEFAULT>(
@@ -12,9 +13,14 @@ export function pipe<SubValue, DEFAULT>(
   callback?: SubscribeCallback<SubValue | DEFAULT>,
 ): SubscribeValue {
   return {
+    onOutput: blankHandler, // gets set within setupSubscribe()
     tagJsType: ValueTypes.subscribe,
+    
+    processInitAttribute: blankHandler,
+    checkValueChange: checkSubscribeValueChanged,
     processInit: processPipe,
-    // processUpdate: tagValueUpdateHandler,
+    
+    
     processUpdate: blankHandler,
     delete: deleteAndUnsubscribe,
 
@@ -29,15 +35,18 @@ function processPipe(
   values: LikeObservable<any>[],
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts,
   appendTo?: Element,
 ) {
+  const subValue: SubscribeValue = {
+    tagJsType: ValueTypes.subscribe,
+    states: [],
+    Observables: values,
+  } as any as SubscribeValue
+
   return setupSubscribe(
-    values,
+    subValue,
     contextItem as AdvancedContextItem,
     ownerSupport,
-    counts,
-    undefined,
     appendTo,
   )
 }

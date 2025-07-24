@@ -5,7 +5,6 @@ import { ValueTypes } from '../ValueTypes.enum.js'
 import { getCastedProps } from '../getTagWrap.function.js'
 import { createSupport } from '../createSupport.function.js'
 import { AnySupport } from '../AnySupport.type.js'
-import { TagCounts } from '../TagCounts.type.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { renderTagOnly } from '../../render/renderTagOnly.function.js'
 import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
@@ -14,7 +13,6 @@ export function processReplacementComponent(
   templater: TemplaterResult,
   subject:SupportContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts,
 ): AnySupport {
   const newSupport = createSupport(
     templater,
@@ -43,7 +41,6 @@ export function processReplacementComponent(
 
   buildBeforeElement(
     support,
-    counts,
     undefined, // element for append child
     subject.placeholder as Text, // placeholder
   )
@@ -55,7 +52,6 @@ export function processFirstSubjectComponent(
   templater: TemplaterResult,
   subject:SupportContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts,
   appendTo: Element,
 ): AnySupport {
   const newSupport = createSupport(
@@ -84,7 +80,6 @@ export function processFirstSubjectComponent(
 
   return processFirstTagResult(
     support,
-    counts,
     appendTo,
   )
 }

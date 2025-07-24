@@ -7,12 +7,10 @@ import { isStaticTag } from'../isInstance.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { ContextItem } from './ContextItem.type.js'
 import { tryUpdateToTag } from './update/tryUpdateToTag.function.js'
-import { TagCounts } from './TagCounts.type.js'
 
 export function checkTagValueChange(
   newValue: unknown,
   contextItem: SupportContextItem,
-  counts: TagCounts,
 ) {
   const global = contextItem.global as SupportTagGlobal
   const lastSupport = global?.newest
@@ -33,7 +31,6 @@ export function checkTagValueChange(
       contextItem,
       newValue as TemplaterResult,
       lastSupport,
-      counts,
     )
 
     return -1
@@ -47,7 +44,6 @@ export function checkTagValueChange(
       contextItem,
       newValue as TemplaterResult,
       ownerSupport,
-      counts,
     )
 
     const doNotRedraw = result === true

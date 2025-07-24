@@ -5,7 +5,7 @@ import { SupportContextItem } from '../tag/SupportContextItem.type.js'
 import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { ParsedHtml } from '../interpolations/index.js'
-import { Tag, TagCounts } from '../tag/index.js'
+import { Tag } from '../tag/index.js'
 import { getDomMeta } from '../tag/domMetaCollector.js'
 import type { DomTag } from '../tag/DomTag.type.js'
 import type { StringTag } from '../tag/StringTag.type.js'
@@ -16,7 +16,6 @@ import { valueToTagJsVar } from '../tagJsVars/valueToTagJsVar.function.js'
 /** Function that kicks off actually putting tags down as HTML elements */
 export function buildBeforeElement(
   support: AnySupport,
-  counts: TagCounts,
   appendTo?: Element,
   insertBefore?: Text,
 ) {
@@ -27,7 +26,7 @@ export function buildBeforeElement(
   global.newest = support
 
   ++painting.locks
-  const result = attachHtmlDomMeta(support, counts, appendTo, insertBefore)
+  const result = attachHtmlDomMeta(support, appendTo, insertBefore)
     
   global.htmlDomMeta = result.dom
   --painting.locks
@@ -38,7 +37,6 @@ export function buildBeforeElement(
 
 function attachHtmlDomMeta(
   support: AnySupport,
-  counts: TagCounts,
   appendTo?: Element,
   insertBefore?: Text,
 ) {
@@ -54,7 +52,6 @@ function attachHtmlDomMeta(
     domMeta,
     values,
     support,
-    counts,
     contexts,
     0,
     appendTo,

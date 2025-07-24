@@ -1,11 +1,11 @@
 import { checkArrayValueChange, destroyArrayContextItem } from '../tag/checkDestroyPrevious.function.js'
-import type { TagCounts } from '../tag/TagCounts.type.js'
 import { processTagArray } from '../tag/update/processTagArray.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
 import { TagJsTag, TagJsVar } from './tagJsVar.type.js'
 import { tagValueUpdateHandler } from '../tag/update/tagValueUpdateHandler.function.js'
-
+import { blankHandler } from '../render/dom/attachDomElements.function.js'
+import { SupportContextItem, Tag, TemplaterResult, TemplateValue } from '../index.js'
 
 export function getArrayTagVar(
   value: any,
@@ -13,10 +13,31 @@ export function getArrayTagVar(
   return {
     tagJsType: 'array',
     value,
+    processInitAttribute: blankHandler,
     processInit: processArrayInit,
-    processUpdate: tagValueUpdateHandler,
+    processUpdate: processArrayUpdates,
     checkValueChange: checkArrayValueChange,
     delete: destroyArrayContextItem,
+  }
+}
+
+function processArrayUpdates(
+  newValue: TemplateValue,
+  contextItem: ContextItem | SupportContextItem,
+  ownerSupport: AnySupport,
+) {
+  const tagUpdateResponse = tagValueUpdateHandler(
+    newValue,
+    contextItem,
+    ownerSupport,
+  )
+  
+  if(tagUpdateResponse === -1) {
+    processTagArray(
+      contextItem,
+      newValue as (TemplaterResult | Tag)[],
+      ownerSupport,
+    )
   }
 }
 
@@ -24,7 +45,6 @@ function processArrayInit(
   value: TagJsVar, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts,
   appendTo?: Element,      
 ) {
   const subValue = value as any
@@ -33,7 +53,6 @@ function processArrayInit(
     contextItem,
     subValue,
     ownerSupport,
-    counts,
     appendTo,
   )
 }

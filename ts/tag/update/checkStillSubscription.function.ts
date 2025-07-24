@@ -6,53 +6,56 @@ import { SubscriptionContext } from './SubContext.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
-import { TagCounts } from '../TagCounts.type.js'
 
-export function checkSubContext(
-  newValue: unknown,
-  ownerSupport: AnySupport,
+export function checkStillSubscription(
+  newValue: TemplateValue,
   contextItem: ContextItem,
-  counts: TagCounts,
+  ownerSupport: AnySupport,
 ) {
+  const subContext = contextItem.subContext as SubscriptionContext
   const hasChanged = handleTagTypeChangeFrom(
     ValueTypes.subscribe,
     newValue,
     ownerSupport,
-    contextItem,
-    counts,
+    contextItem,// subContext as any as ContextItem, // contextItem,
   )
+
   if( hasChanged ) {
     return hasChanged
   }
 
-  const subscription = contextItem.subContext as SubscriptionContext
-  if (!subscription || !subscription.hasEmitted) {
+  if (!subContext || !subContext.hasEmitted) {
     return -1
   }
 
-  subscription.callback = (newValue as SubscribeValue).callback
-  subscription.valuesHandler( subscription.lastValues )
+  subContext.tagJsVar = newValue as SubscribeValue
+  subContext.valuesHandler(
+    subContext.lastValues,
+    0,
+  )
 
   return -1
 }
 
+/** used to handle when value was subscribe but now is something else */
 export function handleTagTypeChangeFrom(
   originalType: string,
-  newValue: unknown,
+  newValue: TemplateValue,
   ownerSupport: AnySupport,
-  contextItem: ContextItem,
-  counts: TagCounts,
+  contextItem: ContextItem, // NOT the subContext
 ) {
-  if(!newValue || !(newValue as any).tagJsType || (newValue as any).tagJsType !== originalType) {
-    const tagJsVar = contextItem.tagJsVar as TagJsVar
-    tagJsVar.delete(contextItem, ownerSupport)
+  const isDifferent = !newValue || !(newValue as any).tagJsType || (newValue as any).tagJsType !== originalType
+
+  if(isDifferent) {
+    const oldTagJsVar = contextItem.tagJsVar as TagJsVar
+    oldTagJsVar.delete(contextItem, ownerSupport)
+
 
     updateToDiffValue(
       newValue as TemplateValue,
-      contextItem,
+      contextItem, // subSubContext,
       ownerSupport,
       99,
-      counts,
     )
     return 99
   }

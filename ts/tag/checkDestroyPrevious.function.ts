@@ -13,7 +13,7 @@ export function checkArrayValueChange(
     return 9 // 'array'
   }
 
-  return false
+  return -1
 }
 
 export function destroyArrayContextItem(

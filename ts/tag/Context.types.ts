@@ -2,28 +2,24 @@ import { AnySupport } from './AnySupport.type.js'
 import { TemplateValue } from './TemplateValue.type.js'
 import { ContextItem } from './ContextItem.type.js'
 import { SupportContextItem } from './SupportContextItem.type.js'
-import { TagCounts } from './TagCounts.type.js'
-
 
 export type ContextHandler = (
   value: TemplateValue,
   newSupport: AnySupport,
   contextItem: ContextItem,
   values: unknown[],
-  counts: TagCounts,
 ) => void
 
 export type LastArrayItem = ContextItem // {context: ContextItem, global: TagGlobal}
 
+/** Return -1 if no change. Any other number tells what changed */
 export type CheckValueChange = (
-  value:unknown,
-  subject: ContextItem,
-  counts: TagCounts,
+  value: unknown,
+  contextItem: ContextItem,
   ownerSupport: AnySupport,
-) => number | boolean
+) => number
 
 export type CheckSupportValueChange = (
-  value:unknown,
-  subject:SupportContextItem,
-  counts: TagCounts,
-) => number | boolean
+  value: unknown,
+  contextItem: SupportContextItem,
+) => number

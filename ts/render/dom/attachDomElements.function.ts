@@ -9,7 +9,6 @@ import { ContextItem } from "../../tag/ContextItem.type.js"
 import { ObjectChildren } from "../../interpolations/optimizers/LikeObjectElement.type.js"
 import { empty } from "../../tag/ValueTypes.enum.js"
 import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicDom.function.js"
-import { TagCounts } from "../../tag/TagCounts.type.js"
 
 export const blankHandler = function blankHandler() {
   return undefined
@@ -19,7 +18,6 @@ export function attachDomElements(
   nodes: ObjectChildren,
   values: any[],
   support: AnySupport,
-  counts: TagCounts, // used for animation stagger computing
   contexts: ContextItem[],
   depth: number, // used to know if dynamic variables live within parent owner tag/support
   appendTo?: Element,
@@ -50,7 +48,6 @@ export function attachDomElements(
         value,
         contexts,
         support,
-        counts,
         depth,
         appendTo,
         insertBefore,
@@ -73,7 +70,6 @@ export function attachDomElements(
       values,
       support,
       contexts,
-      counts,
       appendTo,
       insertBefore,
     )
@@ -83,7 +79,6 @@ export function attachDomElements(
         node.ch,
         values,
         support,
-        counts,
         contexts,
         depth + 1,
         domElement,
@@ -101,7 +96,6 @@ function attachDomElement(
   values: any[],
   support: AnySupport,
   contexts: ContextItem[],
-  counts: TagCounts,
   appendTo: Element | undefined,
   insertBefore: Text | undefined,
 ) {
@@ -123,8 +117,7 @@ function attachDomElement(
         howToSet,
         contexts,
         isSpecial,
-        counts,
-        value
+        value,
       )
     }
   }

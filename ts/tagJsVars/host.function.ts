@@ -1,12 +1,13 @@
-import { AnySupport, ContextItem, TagCounts, ValueTypes } from "../tag/index.js"
+import { AttributeContextItem } from "../tag/AttributeContextItem.type.js"
+import { AnySupport, ContextItem, TemplateValue, ValueTypes } from "../tag/index.js"
 import { syncWrapCallback } from "../tag/output.function.js"
-import { handleTagTypeChangeFrom } from "../tag/update/checkSubContext.function.js"
+import { handleTagTypeChangeFrom } from "../tag/update/checkStillSubscription.function.js"
 import { TagJsVar } from "./tagJsVar.type.js"
 
 export type HostCallback = (
   element: HTMLInputElement,
   newHostValue: HostValue,
-  context: ContextItem,
+  context: AttributeContextItem,
 ) => any
 
 type Options = {
@@ -26,7 +27,10 @@ export function host(
 ): HostValue {
   return {
     tagJsType: ValueTypes.host,
-    processInit: processHost as any,
+    processInitAttribute: processHostAttribute,
+    // TODO: maybe a host value can change?
+    checkValueChange: () => -1,
+    processInit: processHost as any, // This should be a throw error because only attribute is supported
     processUpdate: processHostUpdate,
     delete: deleteHost,
     options: { callback, ...options } as AllOptions,
@@ -53,41 +57,57 @@ export declare namespace host {
 }
 
 function processHostUpdate(
-  newValue: unknown,
-  ownerSupport: AnySupport,
+  newValue: TemplateValue,
   contextItem: ContextItem,
-  counts: TagCounts,
+  ownerSupport: AnySupport,
 ) {
   const hasChanged = handleTagTypeChangeFrom(
     ValueTypes.host,
     newValue,
+    // tagJsVar,
     ownerSupport,
     contextItem,
-    counts,
   )
 
   if( hasChanged ) {
     return hasChanged
   }
 
-  const tagJsVar = contextItem.tagJsVar as HostValue
-  const options = tagJsVar.options
+  const oldTagJsVar = contextItem.tagJsVar as HostValue
+  const options = oldTagJsVar.options
 
-  const element = contextItem.element as HTMLInputElement
-  options.callback(element, newValue as HostValue, contextItem)
+  const element = (contextItem as any as AttributeContextItem).element as HTMLInputElement
+  options.callback(
+    element,
+    newValue as unknown as HostValue,
+    contextItem as any as AttributeContextItem,
+  )
+}
 
+function processHostAttribute(
+  name: string,
+  value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
+  element: HTMLElement,
+  _tagJsVar: TagJsVar, // same as value not needed
+  contextItem: AttributeContextItem,
+) {
+  return processHost(
+    element as HTMLInputElement,
+    value,
+    contextItem as any as AttributeContextItem,
+  )
 }
 
 function processHost(
   element: HTMLInputElement,
   tagJsVar: HostValue,
-  contextItem: ContextItem,
+  contextItem: AttributeContextItem,
 ) {
   tagJsVar.options.callback(element, tagJsVar, contextItem)
 
   const options = tagJsVar.options
   if(options.onInit) {
-    const element = contextItem.element as HTMLInputElement
+    // const element = contextItem.element as HTMLInputElement
     options.onInit(element, tagJsVar, contextItem)
   }
 }
@@ -95,14 +115,19 @@ function processHost(
 function deleteHost(
   contextItem: ContextItem,
 ) {
-  const tagJsVar = contextItem.tagJsVar as HostValue
+  const attrContext = contextItem as any as AttributeContextItem
+  const tagJsVar = attrContext.tagJsVar as HostValue
   const options = tagJsVar.options
 
   if(options.onDestroy) {
-    const element = contextItem.element as Element
+    const element = attrContext.element as Element
     
     const hostDestroy = function processHostDestroy() {
-      return options.onDestroy(element as HTMLInputElement, tagJsVar, contextItem)
+      return options.onDestroy(
+        element as HTMLInputElement,
+        tagJsVar,
+        attrContext,
+      )
     }
 
     

@@ -1,6 +1,5 @@
 import { processTag } from '../../render/update/processTag.function.js'
 import { TemplaterResult } from '../getTemplaterResult.function.js'
-import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { processNewSubjectTag } from './processNewSubjectTag.function.js'
@@ -11,7 +10,6 @@ export function processTagInit(
   value: TagJsVar,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts,
   appendTo?: Element | undefined,
   insertBefore?: Text,
 ): AnySupport {
@@ -20,7 +18,6 @@ export function processTagInit(
       value as TemplaterResult,
       contextItem,
       ownerSupport,
-      counts,
       appendTo,
       insertBefore,
     )
@@ -29,6 +26,5 @@ export function processTagInit(
   return processTag(
     ownerSupport,
     contextItem as SupportContextItem,
-    counts,
   )
 }

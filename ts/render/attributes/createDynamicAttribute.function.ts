@@ -4,11 +4,11 @@ import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.fun
 import { AnySupport } from '../../tag/AnySupport.type.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processDynamicNameValueAttribute } from '../../interpolations/attributes/processNameValueAttribute.function.js'
-import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
 import { SpecialDefinition } from './Special.types.js'
 import { getTagVarIndex } from './getTagVarIndex.function.js'
 import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
+import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
 
 /** Support string attributes with dynamics Ex: <div style="color:black;font-size::${fontSize};"></div> */
 export function createDynamicArrayAttribute(
@@ -17,10 +17,7 @@ export function createDynamicArrayAttribute(
   element: HTMLElement,
   context: ContextItem[],
   howToSet: HowToSet, //  = howToSetInputValue
-  support: AnySupport,
-  counts: TagCounts,
   values: unknown[],
-  _varNumber: number,
 ) {
   const startIndex = context.length
 
@@ -30,7 +27,7 @@ export function createDynamicArrayAttribute(
     if(valueVar >= 0) {
       const myIndex = context.length
       const tagJsVar = valueToTagJsVar(value)
-      const contextItem: ContextItem = {
+      const contextItem: AttributeContextItem = {
         isAttr: true,
         element,
         attrName: attrName as string,
@@ -41,8 +38,8 @@ export function createDynamicArrayAttribute(
       }
   
       // contextItem.handler =
-      tagJsVar.processUpdate = function arrayItemHanlder(
-        value, newSupport, contextItem, counts, newValues
+      tagJsVar.processUpdate = function arrayItemHandler(
+        value, newSupport, contextItem, newValues
       ) {
         setBy(newValues)
       }
@@ -89,12 +86,11 @@ export function createDynamicAttribute(
   context: ContextItem[],
   howToSet: HowToSet, //  = howToSetInputValue
   support: AnySupport,
-  counts: TagCounts,
   isSpecial: SpecialDefinition,
   varIndex: number,
 ) {
   const tagJsVar = valueToTagJsVar(value)
-  const contextItem: ContextItem = {
+  const contextItem: AttributeContextItem = {
     isAttr: true,
     element,
     attrName,
@@ -115,7 +111,6 @@ export function createDynamicAttribute(
     element,
     howToSet,
     support,
-    counts,
     isSpecial,
   )
 

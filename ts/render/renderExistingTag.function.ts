@@ -25,6 +25,5 @@ export function renderExistingSupport(
   return processTag(
     newSupport,
     subject,
-    { added: 0, removed: 0 },
   )
 }

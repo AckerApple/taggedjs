@@ -19,6 +19,7 @@ import { checkTagValueChange, destroySupportByContextItem } from './checkTagValu
 import { CheckSupportValueChange, CheckValueChange } from './Context.types.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
 import { ProcessUpdate } from './ProcessUpdate.type.js'
+import { blankHandler } from '../render/dom/attachDomElements.function.js'
 
 export type Wrapper = ((
   newSupport: AnySupport,
@@ -94,6 +95,7 @@ export function getTemplaterResult(
   const templater: TemplaterResult = {
     tagJsType: ValueTypes.templater,
     processInit: processTagInit,
+    processInitAttribute: blankHandler,
     processUpdate: tagValueUpdateHandler,
     checkValueChange: checkTagValueChange,
     delete: destroySupportByContextItem,

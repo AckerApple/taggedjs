@@ -1,6 +1,5 @@
 import { newSupportByTemplater, processTag, tagFakeTemplater } from '../../render/update/processTag.function.js'
 import { SupportTagGlobal } from '../getTemplaterResult.function.js'
-import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import type { StringTag } from '../StringTag.type.js'
@@ -15,7 +14,6 @@ export function processDomTagInit(
   value: TemplateValue | Tag, // StringTag,
   contextItem: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owningSupport
-  counts: TagCounts,
   appendTo?: Element,
   insertBefore?: Text,
 ): AnySupport | undefined {
@@ -33,7 +31,6 @@ export function processDomTagInit(
       templater,
       contextItem,
       ownerSupport,
-      counts,
       appendTo,
       insertBefore,
     )
@@ -44,6 +41,5 @@ export function processDomTagInit(
   return processTag(
     ownerSupport,
     contextItem as SupportContextItem,
-    counts,
   )
 }

@@ -6,7 +6,6 @@ import type { StringTag } from '../../tag/StringTag.type.js'
 import type { DomTag } from '../../tag/DomTag.type.js'
 import { ValueTypes } from '../../tag/ValueTypes.enum.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
-import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { processTagInit } from '../../tag/update/processTagInit.function.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
 import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
@@ -18,7 +17,6 @@ import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
 export function processTag(
   ownerSupport: AnySupport, // owner
   contextItem: SupportContextItem, // could be tag via result.tag
-  counts: TagCounts,
 ): AnySupport {
   const global = contextItem.global as SupportTagGlobal
   const support = global.newest as AnySupport
@@ -28,7 +26,6 @@ export function processTag(
   
   buildBeforeElement(
     support,
-    counts,
     undefined,
     ph,
   )

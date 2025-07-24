@@ -114,8 +114,9 @@ function paintReset() {
 
 export function addPaintRemover(
   element: Text | Element,
+  caller?: string,
 ) {
-  paintRemoves.push([paintRemover, [element]])
+  paintRemoves.push([paintRemover, [element, caller]])
 }
 
 /** must be used with paintRemoves */
@@ -123,6 +124,7 @@ function paintRemover(
   element: Text | Element,
   _caller: string, // can be used for determining who is failing
 ) {
+
   const parentNode = element.parentNode as ParentNode
   parentNode.removeChild(element as Element)
 }
@@ -131,7 +133,8 @@ export function paintBefore(
   relative: Text | Element,
   element: Text | Element,
 ) {
-  (relative.parentNode as ParentNode).insertBefore(element, relative as Text)
+  const parentNode = relative.parentNode as ParentNode
+  parentNode.insertBefore(element, relative as Text)
 }
 
 export function paintAppend(

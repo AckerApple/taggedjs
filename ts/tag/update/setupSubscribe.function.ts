@@ -1,115 +1,139 @@
-import type { TagCounts } from '../TagCounts.type.js'
 import { AdvancedContextItem } from '../AdvancedContextItem.type.js'
-import { LikeObservable, SubscribeCallback } from '../../tagJsVars/subscribe.function.js'
+import { LikeObservable, SubscribeValue } from '../../tagJsVars/subscribe.function.js'
 import { paint } from '../../render/paint.function.js'
 import { setUseMemory } from '../../state/setUseMemory.object.js'
 import { syncSupports } from '../../state/syncStates.function.js'
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js'
 import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js'
 import { AnySupport } from '../AnySupport.type.js'
-import { deleteSubContext } from './deleteSubContext.function.js'
-import { checkSubContext } from './checkSubContext.function.js'
+import { deleteSubContext } from './deleteContextSubContext.function.js'
 import { onFirstSubContext } from './onFirstSubContext.function.js'
-import { SubContext, SubscriptionContext } from './SubContext.type.js'
+import { OnSubOutput, SubContext, SubscriptionContext } from './SubContext.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { guaranteeInsertBefore } from '../guaranteeInsertBefore.function.js'
 import { ContextItem } from '../ContextItem.type.js'
+import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
+import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { processUpdateSubscribe } from './processUpdateSubscribe.function.js'
+import { processUpdateContext } from '../processUpdateContext.function.js'
 
 export function setupSubscribe(
-  observables: LikeObservable<any>[],
+  value: SubscribeValue,
   contextItem: AdvancedContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts,
-  callback?: SubscribeCallback<any>,
   appendTo?: Element,
   insertBeforeOriginal?: Text, // optional but will always be made
 ): SubContext {
+  const observables = value.Observables
   const { appendMarker, insertBefore } = guaranteeInsertBefore(appendTo, insertBeforeOriginal)
 
-  const subContext = setupSubscribeCallbackProcessor(
-    observables,
-    ownerSupport,
-    counts,
-    insertBefore,
-    callback,
-  )
-
-  subContext.appendMarker = appendMarker
-
-  contextItem.subContext = subContext
-  // contextItem.handler = checkSubContext
-  contextItem.tagJsVar.processUpdate = checkSubContext
-
-  return subContext
-}
-
-export function setupSubscribeCallbackProcessor(
-  observables: LikeObservable<any>[],
-  ownerSupport: AnySupport, // ownerSupport ?
-  counts: TagCounts, // used for animation stagger computing
-  insertBefore: Text,
-  callback?: SubscribeCallback<any>,
-): SubContext {
-  const component = getSupportWithState(ownerSupport)
-  
-  let onOutput = function onSubValue(value: TemplateValue) {
+  let onOutput = function onSubValue(
+    value: TemplateValue,
+    syncRun: boolean,
+    subContext: SubscriptionContext,
+  ) {
     onFirstSubContext(
       value,
       subContext,
       ownerSupport,
-      counts,
       insertBefore,
     )
     
     checkToPaint(syncRun)
 
     // MUTATION: from now on just run update
-    onOutput = function subscriptionUpdate(updateValue: TemplateValue) {
+    onOutput = subContext.tagJsVar.onOutput = function subscriptionUpdate(
+      updateValue: TemplateValue,
+      syncRun: boolean,
+      subContext: SubscriptionContext,
+    ) {
       const aContext = subContext.contextItem as AdvancedContextItem
+      
 
       forceUpdateExistingValue(
         aContext,
         updateValue,
         ownerSupport,
-        { added: 0, removed: 0 }
       )
+
+      aContext.tagJsVar.processUpdate(updateValue, aContext, ownerSupport, [updateValue])
+      // processUpdateContext(ownerSupport)
 
       checkToPaint(syncRun)
     }
   }
+
+  const subContext = setupSubscribeCallbackProcessor(
+    observables,
+    ownerSupport,
+    (
+      value: TemplateValue,
+      syncRun: boolean,
+      subContext,
+    ) => onOutput(value, syncRun, subContext),
+    value,
+  )
+
+  subContext.appendMarker = appendMarker
+
+  contextItem.subContext = subContext
+  value.processUpdate = processUpdateSubscribe
+  value.onOutput = onOutput
+
+  return subContext
+}
+
+/** After calling this function you need to set `contextItem.subContext = subContext` */
+export function setupSubscribeCallbackProcessor(
+  observables: LikeObservable<any>[],
+  ownerSupport: AnySupport, // ownerSupport ?
+  onOutput: OnSubOutput,
+  tagJsVar: SubscribeValue,
+): SubContext {
+  const component = getSupportWithState(ownerSupport)
   
   // onValue mutates so function below calls original and mutation
-  function valueHandler(
+  function subValueHandler(
     value: TemplateValue,
     index: number,
   ) {
-    subContext.lastValues[index] = value
-
-    valuesHandler( subContext.lastValues )
+    subContext.lastValues[index] = {
+      value,
+      tagJsVar: valueToTagJsVar(value),
+      oldTagJsVar: subContext.lastValues[index]?.tagJsVar
+    }
+    
+    valuesHandler(
+      subContext.lastValues,
+      index,
+    )
   }
 
   function valuesHandler(
-    values: TemplateValue[],
+    newValues: {value: TemplateValue, tagJsVar: TagJsVar}[],
+    index: number
   ) {
-    const newComponent = component.context.global.newest
-    syncSupports(newComponent, component)
+    // const newComponent = component.context.global.newest
+    // syncSupports(newComponent, component)
 
-    if(subContext.callback) {
-      const responseValue = (subContext.callback as any)(...values)
-      onOutput(responseValue)
+    const newestParentTagJsVar = subContext.tagJsVar
+    if(newestParentTagJsVar?.callback) {
+      const responseValue = (newestParentTagJsVar.callback as any)( ...newValues.map(x => x.value) )
+      onOutput(responseValue, syncRun, subContext)
+      // oldValues[index].value = responseValue
       return
     }
 
-    onOutput( values[0] )
+    onOutput(newValues[index].value, syncRun, subContext)
   }
 
   let syncRun = true
 
   const subContext: SubscriptionContext = {
     lastValues: [],
-    valueHandler,
+    subValueHandler,
     valuesHandler,
-    callback,
+    tagJsVar,
     subscriptions: [],
   }
 
@@ -117,26 +141,36 @@ export function setupSubscribeCallbackProcessor(
   observables.forEach((observable, index) => {    
     syncRun = true
     subContext.subscriptions.push(
-      observable.subscribe( value => valueHandler(value, index) )
+      observable.subscribe( value => subValueHandler(value, index) )
     )
     syncRun = false
   })
 
+  tagJsVar.onOutput = onOutput
+
   return subContext
+}
+
+export function unsubscribeContext(
+  contextItem: ContextItem,
+) {
+  const subscription = contextItem.subContext as SubscriptionContext
+  const subscriptions = subscription.subscriptions
+  
+  subscriptions.forEach(sub => sub.unsubscribe())
+  delete contextItem.subContext
 }
 
 export function deleteAndUnsubscribe(
   contextItem: ContextItem,
   ownerSupport: AnySupport,
 ) {
-  const subscription = contextItem.subContext as SubscriptionContext
-
-  subscription.subscriptions.forEach(sub => sub.unsubscribe())
-
-  return deleteSubContext(contextItem, ownerSupport)
+  const subContext = contextItem.subContext as SubContext
+  unsubscribeContext(contextItem)
+  return deleteSubContext(subContext, ownerSupport)
 }
 
-function checkToPaint(
+export function checkToPaint(
   syncRun: boolean
 ) {
   if(!syncRun && !setUseMemory.stateConfig.support) {

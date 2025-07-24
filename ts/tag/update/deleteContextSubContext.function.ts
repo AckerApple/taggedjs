@@ -5,31 +5,35 @@ import { SubContext } from './SubContext.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 
-export function deleteSubContext(
+export function deleteContextSubContext(
   contextItem: ContextItem,
   ownerSupport: AnySupport,
 ) {
   const subscription = contextItem.subContext as SubContext
-
-  subscription.deleted = true
+  const result = deleteSubContext(subscription, ownerSupport)
   delete contextItem.subContext
+  return result
+}
+
+export function deleteSubContext(
+  subContext: SubContext,
+  ownerSupport: AnySupport,
+) {
+  subContext.deleted = true
   
-  const appendMarker = subscription.appendMarker
+  const appendMarker = subContext.appendMarker
   if(appendMarker) {
-    addPaintRemover(appendMarker)
-    delete subscription.appendMarker
+    addPaintRemover(appendMarker, 'deleteSubContext')
+    delete subContext.appendMarker
   }
   
-  delete (contextItem as any).delete
-  // contextItem.handler = tagValueUpdateHandler
-  // const tagJsVar = contextItem.tagJsVar as TagJsVar
-  //tagJsVar.processUpdate = tagValueUpdateHandler
+  // delete (contextItem as any).delete
   
-  if(!subscription.hasEmitted) {
+  if(!subContext.hasEmitted) {
     return
   }
 
-  const subContextItem = subscription.contextItem as AdvancedContextItem
+  const subContextItem = subContext.contextItem as AdvancedContextItem
   const subTagJsVar = subContextItem.tagJsVar as TagJsVar
   subTagJsVar.delete(
     subContextItem,

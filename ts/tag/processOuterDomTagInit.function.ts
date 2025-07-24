@@ -6,17 +6,17 @@ import { getSupportInCycle } from './getSupportInCycle.function.js'
 import { StringTag } from './StringTag.type.js'
 import { processDomTagInit } from './update/processDomTagInit.function.js'
 import { Tag } from './Tag.type.js'
-import { TagCounts, AnySupport, ContextItem, TemplateValue, checkTagValueChange, SupportContextItem, destroySupportByContextItem, TagJsVarInnerHTML, ArrayItemStringTag } from '../index.js'
+import { AnySupport, ContextItem, TemplateValue, checkTagValueChange, SupportContextItem, destroySupportByContextItem, TagJsVarInnerHTML, ArrayItemStringTag } from '../index.js'
 import { forceUpdateExistingValue } from './update/forceUpdateExistingValue.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
+import { blankHandler } from '../render/dom/attachDomElements.function.js'
 
 /** Used to override the html`` processing that will first render outerHTML and then its innerHTML */
 export function processOuterDomTagInit(
   value: Tag,
   contextItem: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owningSupport
-  counts: TagCounts,
   appendTo?: Element,
   insertBefore?: Text,
 ) {
@@ -26,7 +26,6 @@ export function processOuterDomTagInit(
     outerHTML,
     contextItem, // could be tag via result.tag
     ownerSupport, // owningSupport
-    counts,
     appendTo,
     insertBefore,
   ) as AnySupport
@@ -36,15 +35,13 @@ export function processOuterDomTagInit(
   
   tagJsVar.processUpdate = function outDomTagHanlder(
     value: TemplateValue,
-    newSupport: AnySupport,
     contextItem2: ContextItem,
-    counts: TagCounts,
+    newSupport: AnySupport,
   ) {
     forceUpdateExistingValue(
       contextItem2 as any,
       (value as Tag)?.outerHTML as any || value,
       newSupport,
-      counts,
     )
   }
 
@@ -55,12 +52,10 @@ export function processOuterDomTagInit(
 function checkOuterTagValueChange(
   newValue: unknown,
   contextItem: SupportContextItem,
-  counts: TagCounts,
 ) {    
   return checkTagValueChange(
     newValue, // (newValue as Tag)?.outerHTML || newValue,
     contextItem, // subContext.contextItem as any,
-    counts,
   )
 }
 
@@ -74,6 +69,7 @@ export function getStringTag(
     ownerSupport: getSupportInCycle(),
     
     tagJsType: ValueTypes.tag,
+    processInitAttribute: blankHandler,
     processInit: processDomTagInit,
     processUpdate: tagValueUpdateHandler,
     checkValueChange: checkTagValueChange,

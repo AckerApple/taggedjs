@@ -1,6 +1,6 @@
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { ContextItem } from '../ContextItem.type.js'
-import { BasicTypes, TagCounts, TemplaterResult, TemplateValue, ValueType, ValueTypes } from '../index.js'
+import { BasicTypes, TemplaterResult, TemplateValue, ValueType, ValueTypes } from '../index.js'
 import { tryUpdateToTag } from './tryUpdateToTag.function.js'
 import { isArray } from '../../isInstance.js'
 import { processTagArray } from './processTagArray.js'
@@ -8,19 +8,18 @@ import { processNowRegularValue, RegularValue } from './processRegularValue.func
 import { AnySupport } from '../AnySupport.type.js'
 import { getArrayTagVar } from '../../tagJsVars/getArrayTagJsVar.function.js'
 import { Tag } from '../Tag.type.js'
-import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 
 export function updateToDiffValue(
   newValue: TemplateValue,
   contextItem: ContextItem | SupportContextItem,
   ownerSupport: AnySupport,
   ignoreOrDestroyed: number | boolean,
-  counts: TagCounts,
 ) {
   // is new value a tag?
   const tagJsType = newValue && (newValue as TemplaterResult).tagJsType as ValueType
 
-  contextItem.tagJsVar = valueToTagJsVar(newValue)
+  // contextItem.oldTagJsVar = contextItem.tagJsVar
+  // contextItem.tagJsVar = valueToTagJsVar(newValue)
 
   if(tagJsType) {
     if(tagJsType === ValueTypes.renderOnce) {
@@ -31,7 +30,6 @@ export function updateToDiffValue(
       contextItem,
       newValue as TemplaterResult,
       ownerSupport,
-      counts,
     )
 
     return
@@ -42,8 +40,8 @@ export function updateToDiffValue(
       contextItem,
       newValue as (TemplaterResult | Tag)[],
       ownerSupport,
-      counts,
     )
+    contextItem.oldTagJsVar = contextItem.tagJsVar
     contextItem.tagJsVar = getArrayTagVar(newValue as (TemplaterResult | Tag)[])
   
     return

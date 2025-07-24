@@ -1,13 +1,14 @@
 import { state } from './index.js'
 import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
-import { processSignal } from '../tag/update/processSubscribe.function.js'
+import { processSignal } from '../tag/update/processSubscribeWith.function.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { ProcessInit } from '../tag/ProcessInit.type.js'
 import { Subscriber, SubscribeFn } from '../tagJsVars/subscribe.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { deleteAndUnsubscribe } from '../tag/update/setupSubscribe.function.js'
-import { AnySupport, ContextItem, TagCounts } from '../tag/index.js'
-import { handleTagTypeChangeFrom } from '../tag/update/checkSubContext.function.js'
+import { blankHandler } from '../render/dom/attachDomElements.function.js'
+import { checkSubscribeValueChanged } from '../tagJsVars/subscribeWith.function.js'
+import { processUpdateSubscribe } from '../tag/update/processUpdateSubscribe.function.js'
 
 
 /** Checks if rendering cycle in process. Then creates object with "value" key and ability to "subscribe" to value changes */
@@ -40,21 +41,12 @@ export function Signal<T>(initialValue: T): SignalObject<T> {
 
   return {
     tagJsType: ValueTypes.signal,
+    
+    checkValueChange: checkSubscribeValueChanged,
+    processInitAttribute: blankHandler,
     processInit: processSignal,
-    
-    processUpdate: (
-      newValue: unknown,
-      ownerSupport: AnySupport,
-      contextItem: ContextItem,
-      counts: TagCounts,
-    ) => handleTagTypeChangeFrom(
-      ValueTypes.signal,
-      newValue,
-      ownerSupport,
-      contextItem,
-      counts,
-    ),
-    
+    processUpdate: processUpdateSubscribe,
+
     get value() {
       return value
     },

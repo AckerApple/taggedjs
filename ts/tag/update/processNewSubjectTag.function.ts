@@ -3,14 +3,12 @@ import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
 import { paintAppend, paintAppends, paintBefore, paintCommands } from '../../render/paint.function.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { newSupportByTemplater } from '../../render/update/processTag.function.js'
-import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { AnySupport } from '../AnySupport.type.js'
 
 export function processNewSubjectTag(
   templater: TemplaterResult,
   subject: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owner
-  counts: TagCounts,
   appendTo?: Element,
   insertBefore?: Text,
 ): AnySupport {
@@ -20,7 +18,6 @@ export function processNewSubjectTag(
 
   const result = buildBeforeElement(
     support,
-    counts,
     appendTo,
     appendTo ? undefined : insertBefore,
   )

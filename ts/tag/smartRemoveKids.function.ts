@@ -95,5 +95,5 @@ function destroyClone(
       return
     }
 
-    addPaintRemover(dom)
+    addPaintRemover(dom, 'destroyClone')
 }

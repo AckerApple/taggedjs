@@ -15,6 +15,7 @@ import { checkTagValueChange, destroySupportByContextItem, TagJsVarInnerHTML } f
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { processOuterDomTagInit } from './processOuterDomTagInit.function.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
+import { blankHandler } from '../render/dom/attachDomElements.function.js'
 
 export type EventCallback = (event: Event) => any
 export type EventMem = {elm: Element, callback:EventCallback}
@@ -51,6 +52,7 @@ export function getDomTag(
     dom,
     
     tagJsType: ValueTypes.dom,
+    processInitAttribute: blankHandler,
     processInit: processDomTagInit,
     processUpdate: tagValueUpdateHandler,
     checkValueChange: checkTagValueChange,

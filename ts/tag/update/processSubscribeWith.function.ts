@@ -1,4 +1,3 @@
-import type { TagCounts } from '../../tag/TagCounts.type.js'
 import { AdvancedContextItem } from '../AdvancedContextItem.type.js'
 import { SubscribeValue } from '../../tagJsVars/subscribe.function.js'
 import { setupSubscribe } from './setupSubscribe.function.js'
@@ -6,69 +5,59 @@ import { SignalObject } from '../../state/signal.function.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { ContextItem } from '../ContextItem.type.js'
-
-export function processSubscribe(
-  value: SubscribeValue,
-  contextItem: ContextItem,
-  ownerSupport: AnySupport,
-  counts: TagCounts,
-  appendTo?: Element,
-  insertBefore?: Text,
-) {
-  return setupSubscribe(
-    value.Observables,
-    contextItem as AdvancedContextItem,
-    ownerSupport,
-    counts,
-    value.callback,
-    appendTo,
-    insertBefore,
-  )
-}
+import { ValueTypes } from '../ValueTypes.enum.js'
+import { SubContext } from './SubContext.type.js'
 
 export function processSubscribeWith(
   value: SubscribeValue,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts,
   appendTo?: Element,
   insertBefore?: Text,
 ) {
-  const observables = value.Observables
-  const subscription = setupSubscribe(
-    observables,
+  const subContext = setupSubscribe(
+    value,
     contextItem as AdvancedContextItem,
     ownerSupport,
-    counts,
-    value.callback,
     appendTo,
     insertBefore,
   )
 
-  if(!subscription.hasEmitted) {
-    const obValue = (observables[0] as any)?.value
-    subscription.valueHandler(
-      (obValue || value.withDefault) as TemplateValue,
-      0
-    )
+  if(!subContext.hasEmitted) {
+    emitSubContext(value, subContext)
   }
 
-  return subscription
+  return subContext
+}
+
+export function emitSubContext(
+  value: SubscribeValue,
+  subContext: SubContext,
+) {
+  const observables = value.Observables
+  const obValue = (observables[0] as any)?.value
+  subContext.subValueHandler(
+    (obValue || value.withDefault) as TemplateValue,
+    0
+  )
 }
 
 export function processSignal(
   value: SignalObject<any>,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts,
   appendTo?: Element,
 ) {
+  const subValue: SubscribeValue = {
+    tagJsType: ValueTypes.subscribe,
+    states: [],
+    Observables: [value],
+  } as any as SubscribeValue
+
   setupSubscribe(
-    [value],
+    subValue,
     contextItem as AdvancedContextItem,
     ownerSupport,
-    counts,
-    undefined,
     appendTo,
   )
 }

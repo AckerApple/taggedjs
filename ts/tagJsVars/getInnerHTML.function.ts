@@ -1,4 +1,5 @@
-import { AdvancedContextItem, AnySupport, ContextItem, deleteSubContext, guaranteeInsertBefore, onFirstSubContext, SubContext, Tag, TagCounts } from "../index.js"
+import { AdvancedContextItem, AnySupport, ContextItem, deleteContextSubContext, guaranteeInsertBefore, onFirstSubContext, SubContext, Tag } from "../index.js"
+import { blankHandler } from "../render/dom/attachDomElements.function.js"
 import { ProcessInit } from "../tag/ProcessInit.type.js"
 import { TemplateValue } from "../tag/TemplateValue.type.js"
 import { forceUpdateExistingValue } from "../tag/update/index.js"
@@ -11,9 +12,8 @@ type InnerHTMLValue = TagJsVar & {
 
 function handleInnerHTML(
   value: TemplateValue,
-  newSupport: AnySupport,
   contextItem: ContextItem,
-  counts: TagCounts,
+  newSupport: AnySupport,
 ) {
   const owner = (value as any).owner
   const realValue = owner._innerHTML
@@ -25,7 +25,6 @@ function handleInnerHTML(
     context,
     realValue,
     newSupport,
-    counts,
   )
 }
 
@@ -33,7 +32,6 @@ function processInnerHTML(
   value: InnerHTMLValue,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  counts: TagCounts,
   appendTo?: Element,
   insertBefore?: Text,
 ) {
@@ -46,7 +44,6 @@ function processInnerHTML(
     value,
     ownerSupport,
     contextItem,
-    counts,
     insertBefore as Text,
     appendTo,
   )
@@ -56,7 +53,6 @@ function checkInnerHTML(
   value: unknown,
   ownerSupport: AnySupport,
   contextItem: ContextItem,
-  counts: TagCounts,
   insertBeforeOriginal: Text,
   appendTo?: Element,
 ) {
@@ -75,7 +71,6 @@ function checkInnerHTML(
     realValue,
     subContext,
     ownerSupport,
-    counts,
     insertBefore,
   )
 }
@@ -87,8 +82,10 @@ export type TagJsVarInnerHTML = TagJsVar & {
 export function getInnerHTML(): TagJsVarInnerHTML {
   return {
     tagJsType: 'innerHTML',
+    checkValueChange: () => -1, // not expected to do anything
+    processInitAttribute: blankHandler,
     processInit: processInnerHTML,
     processUpdate: handleInnerHTML,
-    delete: deleteSubContext,
+    delete: deleteContextSubContext,
   }
 }
