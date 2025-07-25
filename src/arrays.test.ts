@@ -1,28 +1,8 @@
-import { describe, it, expect, beforeEach } from './testing'
+import { describe, it, expect } from './testing'
 import { byId, elmCount } from './testing'
 export const fxTime = 160
 
 describe('⠇ array testing', () => {
-  beforeEach(async () => {
-    // Debug: Check if arrays section is actually visible
-    const arraySection = document.querySelector('#arrays')
-    if (!arraySection) {
-      console.log('❌ Arrays section not found, checking checkbox state...')
-      const checkbox = document.querySelector('#section_arrays') as HTMLInputElement
-      console.log('Checkbox found:', !!checkbox, 'Checked:', checkbox?.checked)
-      
-      // Try to find the fieldset containing arrays
-      const fieldsets = document.querySelectorAll('fieldset')
-      fieldsets.forEach((fs, i) => {
-        if (fs.textContent?.includes('signal array test')) {
-          console.log(`✅ Found arrays fieldset at index ${i}`)
-        }
-      })
-    }
-    
-    // Wait a bit more for arrays component to fully render
-    await new Promise(resolve => setTimeout(resolve, 100))
-  })
   it('signal array count and items', () => {
     const signalArrayCount = byId('signal-array-count')
     const initialCount = Number(signalArrayCount.innerText)
@@ -98,7 +78,7 @@ describe('⠇ array testing', () => {
     
     const currentCount = Number(signalArrayCount.innerText)
     const indexToDelete = 0
-console.log('aa')
+
     // Verify item exists before deletion
     expect(elmCount(`#signal-array-item-${indexToDelete}`)).toBe(1)
     

@@ -1,7 +1,7 @@
 import { describe, it } from './testing'
 import { testCounterElements, testDuelCounterElements } from './testing'
 
-describe('child tests', () => {
+describe('👶 👧child tests', () => {
   it('child tests', () => {
     testCounterElements('#innerHtmlPropsTest-button', '#innerHtmlPropsTest-display')
     testCounterElements('#innerHtmlTest-counter-button', '#innerHtmlTest-counter-display')    

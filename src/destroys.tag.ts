@@ -17,7 +17,6 @@ export const destroys = tag(() => (
   <button id="toggle-destroys" type="button"
     onclick=${() => {
       on = !on
-      console.log('on is now', on)
     }}
   >${on ? 'destroy' : 'restore'}</button>
   
@@ -27,14 +26,11 @@ export const destroys = tag(() => (
 const toDestroy = tag(() => (
   _ = onDestroy(() => {
     ++destroyCount.value
-    console.log('tag onDestroy called', destroyCount.value)
   }),
-  __ = console.log('toDestroy render'),
 ) => html`
   <div id="destroyable-content" style="border:1px solid orange;"
     ${host.onDestroy(() => {
       ++destroyCount.value
-      console.log('toDestroy on destroy called', destroyCount.value)
     })}
   >will be destroyed</div>
 `)

@@ -1,7 +1,7 @@
 import { describe, it } from './testing'
 import { testDuelCounterElements } from './testing'
 
-describe('providers', () => {
+describe('🫴 providers', () => {
   it('basics', () => {
     testDuelCounterElements(
       ['#increase-provider-🍌-0-button', '#increase-provider-🍌-0-display'],

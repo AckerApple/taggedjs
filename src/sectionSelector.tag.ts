@@ -1,19 +1,6 @@
 import { html, Subject } from "taggedjs"
 import { runTesting } from "./runTesting.function"
 
-export const storage = getScopedStorage()
-
-function getScopedStorage(): {
-  autoTest: boolean, views: ViewTypes[]
-} {
-  const string = localStorage.taggedjs || JSON.stringify({autoTest: true, views: []})
-  return JSON.parse(string)
-}
-
-export function saveScopedStorage() {
-  localStorage.taggedjs = JSON.stringify(storage)
-}
-
 export enum ViewTypes {
   Destroys = 'destroys',
   Todo = 'todo',
@@ -31,6 +18,20 @@ export enum ViewTypes {
   ProviderDebug = 'providerDebug',
   AttributeDebug = 'attributeDebug',
 }
+
+export const storage = getScopedStorage()
+
+function getScopedStorage(): {
+  autoTest: boolean, views: ViewTypes[]
+} {
+  const string = localStorage.taggedjs || JSON.stringify({autoTest: true, views: Object.values(ViewTypes)})
+  return JSON.parse(string)
+}
+
+export function saveScopedStorage() {
+  localStorage.taggedjs = JSON.stringify(storage)
+}
+
 const defaultViewTypes = Object.values(ViewTypes)
 
 export const sectionSelector = (viewTypes = defaultViewTypes) => {
