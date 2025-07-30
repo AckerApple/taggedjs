@@ -23,7 +23,7 @@ export const attributeDebug = tag(() => {
     <div>
       <input type="checkbox" id="toggle-backgrounds"
         onchange=${(event: any) => isOrange = event.target.checked} ${isOrange && 'checked'}
-      /> - ${isOrange ? 'true' : 'false'}
+      /> - toggle backgrounds:${isOrange ? 'true' : 'false'}
     </div>
     <div style="display: flex;flex-wrap:wrap;gap:1em">      
       <ol>
@@ -54,6 +54,28 @@ export const attributeDebug = tag(() => {
         </li>
       </ol>
     </div>
+    
+    <fieldset style="margin-top: 1em">
+      <legend>style object attribute</legend>
+      <div id="style-object-test" style=${{
+        backgroundColor: isOrange ? 'orange' : 'lightgray',
+        padding: '10px',
+        border: '2px solid black',
+        borderRadius: isOrange ? '8px' : '4px',
+        boxShadow: isOrange ? '2px 2px 4px rgba(0,0,0,0.3)' : 'none'
+      }}>
+        Style object test
+      </div>
+      
+      <div id="style-set-property-test" style=${{
+        'background-color': isOrange ? 'red' : 'blue',
+        color: 'white',
+        padding: '5px',
+        'margin-top': '10px'
+      }}>
+        style property test
+      </div>
+    </fieldset>
 			
     <style>
       .background-orange {background-color:orange}

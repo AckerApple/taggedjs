@@ -102,4 +102,67 @@ describe('🏹 special attributes', () => {
     const afterShowCount = Number(subscriptionsCount.innerText)
     expect(afterShowCount).toBe(initialCount)
   })
+
+  it('style object converts to individual CSS properties', () => {
+    const styleObjectTest = byId('style-object-test')
+    const toggleBtn = byId('toggle-backgrounds') as HTMLInputElement
+    
+    // Initial state - checkbox is checked (isOrange = true)
+    expect(toggleBtn.checked).toBe(true)
+        
+    // Check that style object is converted to individual inline style properties
+    // The key test is that the object syntax was converted to individual CSS properties
+    expect(styleObjectTest.style.backgroundColor).toBe('orange')
+    expect(styleObjectTest.style.padding).toBe('10px')
+    expect(styleObjectTest.style.border).toBe('2px solid black')
+    expect(styleObjectTest.style.borderRadius).toBe('8px')
+    expect(styleObjectTest.style.boxShadow).toBe('rgba(0, 0, 0, 0.3) 2px 2px 4px')
+    
+    // Toggle checkbox off
+    toggleBtn.click()
+    
+    // Check styles changed
+    expect(styleObjectTest.style.backgroundColor).toBe('lightgray')
+    expect(styleObjectTest.style.padding).toBe('10px')
+    expect(styleObjectTest.style.border).toBe('2px solid black')
+    expect(styleObjectTest.style.borderRadius).toBe('4px')
+    expect(styleObjectTest.style.boxShadow).toBe('none')
+    
+    // Toggle back on
+    toggleBtn.click()
+    
+    // Check styles reverted
+    expect(styleObjectTest.style.backgroundColor).toBe('orange')
+    expect(styleObjectTest.style.borderRadius).toBe('8px')
+    expect(styleObjectTest.style.boxShadow).toBe('rgba(0, 0, 0, 0.3) 2px 2px 4px')
+  })
+  
+  it('style object with kebab-case properties uses setProperty', () => {
+    const stylePropertyTest = byId('style-set-property-test')
+    const toggleBtn = byId('toggle-backgrounds') as HTMLInputElement
+    
+    // Initial state - checkbox is checked (isOrange = true)
+    expect(toggleBtn.checked).toBe(true)
+    
+    // Check that kebab-case properties are set correctly using setProperty
+    expect(stylePropertyTest.style.backgroundColor).toBe('red')
+    expect(stylePropertyTest.style.color).toBe('white')
+    expect(stylePropertyTest.style.padding).toBe('5px')
+    expect(stylePropertyTest.style.marginTop).toBe('10px')
+    
+    // Toggle checkbox off
+    toggleBtn.click()
+    
+    // Check styles changed
+    expect(stylePropertyTest.style.backgroundColor).toBe('blue')
+    expect(stylePropertyTest.style.color).toBe('white')
+    expect(stylePropertyTest.style.padding).toBe('5px')
+    expect(stylePropertyTest.style.marginTop).toBe('10px')
+    
+    // Toggle back on
+    toggleBtn.click()
+    
+    // Check styles reverted
+    expect(stylePropertyTest.style.backgroundColor).toBe('red')
+  })
 })
