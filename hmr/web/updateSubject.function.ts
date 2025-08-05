@@ -126,7 +126,7 @@ async function swapSupport(
     placeholder,
   )
 
-  recurseContext(global.contexts, reSupport)
+  recurseContext(contextSubject.contexts as SupportContextItem[], reSupport)
 
   paint()
 
@@ -176,7 +176,7 @@ function recurseContext(
     const nextGlobal = contextItem.global
 
     if(contextItem.global) {
-      const nextContext = nextGlobal?.contexts
+      const nextContext = contextItem.contexts
       if(nextContext) {
         const nextSupport = nextGlobal.newest as AnySupport
         recurseContext(nextContext, nextSupport)

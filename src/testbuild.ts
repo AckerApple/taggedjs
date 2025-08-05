@@ -30,7 +30,10 @@ const run = () => {
 
 const templater = run() as any as TemplaterResult
 
-const html = templaterToHtml(templater)
+const html = templaterToHtml(
+  templater,
+  undefined as any as ContextItem, // That app does not have a context parent
+)
 const fileSavePath = './pages/isolatedApp.page.html'
 const fullFileSavePath = path.join(__dirname, fileSavePath)
 fs.writeFileSync(fullFileSavePath, html)
@@ -38,6 +41,7 @@ console.debug(`💾 wrote ${fileSavePath}`)
 
 function templaterToSupport(
   templater: TemplaterResult,
+  parentContext: ContextItem,
 ) {
   const context: SupportContextItem = {
     renderCount: 0,
@@ -48,9 +52,9 @@ function templaterToSupport(
 
     tagJsVar: valueToTagJsVar(templater),
     global: undefined as any, // populated below in getNewGlobal
-    // checkValueChange: checkSimpleValueChange,
-    // delete: deleteSimpleValue,
+    parentContext,
     withinOwnerElement: false,
+    contexts: [],
   }
   
   getNewGlobal(context) as SupportTagGlobal
@@ -78,10 +82,10 @@ function readySupport(
 
 function templaterToHtml(
   templater: TemplaterResult,
+  parentContext: ContextItem,
 ) {
-  const support = templaterToSupport(templater)
-  const global = support.context.global as SupportTagGlobal
-  const context = global.contexts
+  const support = templaterToSupport(templater, parentContext)
+  const context = support.context.contexts
   const tag = support.templater.tag as StringTag // TODO: most likely do not want strings below
   const template = tag.strings // support.getTemplate()
   const strings = new Array(...template) // clone
@@ -110,7 +114,7 @@ function processValue(
   if(value instanceof Object && value.tagJsType) {
     switch (value.tagJsType) {
       case ValueTypes.tagComponent:
-        const tagString = templaterToHtml(value as TemplaterResult)
+        const tagString = templaterToHtml(value as TemplaterResult, support.context)
         strings.splice(index+1, 0, tagString)
         break
   
@@ -123,7 +127,7 @@ function processValue(
   
         readySupport(tSupport, subject as SupportContextItem)
   
-        const fnString = templaterToHtml(tSupport.templater)
+        const fnString = templaterToHtml(tSupport.templater, support.context)
         strings.splice(index+1, 0, fnString)
         break
    
@@ -144,7 +148,8 @@ function processValue(
               value,
               valueIndex,
               valueIndexSetBy: 'nothing',
-              global: getNewGlobal(subject as ContextItem),
+              global: getNewGlobal(subject as SupportContextItem),
+              parentContext: support.context,
               tagJsVar: valueToTagJsVar(value),
               // checkValueChange: checkSimpleValueChange,
               // delete: destorySupportByContextItem,

@@ -1,5 +1,5 @@
 import { html, tag } from "taggedjs"
-import { TagDebugProvider } from './providerDebug'
+import { TagDebugProvider } from './providers.tag'
 
 export const dialog = tag((providerClass: TagDebugProvider) => html`
   <dialog id="provider_debug_dialog" style="padding:0"

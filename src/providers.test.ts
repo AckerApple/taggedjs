@@ -1,4 +1,5 @@
-import { describe, it } from './testing'
+import { delay } from 'rxjs'
+import { describe, it, expect, changeElm } from './testing'
 import { testDuelCounterElements } from './testing'
 
 describe('🫴 providers', () => {
@@ -36,5 +37,103 @@ describe('🫴 providers', () => {
       ['#increase-prop-🐷-0-button', '#increase-prop-🐷-0-display'],
       ['#increase-prop-🐷-1-button', '#increase-prop-🐷-1-display'],
     )
+  })
+
+  describe('host attributes', () => {
+    it('parent has red border', () => {
+      const parentElement = document.getElementById('in-cycle-parent')
+      expect(parentElement).toBeDefined()
+      
+      if (parentElement) {
+        const styles = window.getComputedStyle(parentElement)
+        // Check for red in RGB format (browsers typically return rgb/rgba)
+        const hasRed = styles.borderColor.includes('rgb(255, 0, 0)') || 
+                      styles.borderColor.includes('red')
+        expect(hasRed).toBe(true)
+        expect(styles.borderWidth).toBe('2px')
+        expect(styles.borderStyle).toBe('solid')
+      }
+    })
+
+    it('child has green border', () => {
+      const childElement = document.getElementById('in-cycle-child')
+      expect(childElement).toBeDefined()
+      
+      if (childElement) {
+        const styles = window.getComputedStyle(childElement)
+        // Check for green in RGB format
+        const hasGreen = styles.borderColor.includes('rgb(0, 128, 0)') || 
+                        styles.borderColor.includes('green')
+        expect(hasGreen).toBe(true)
+        expect(styles.borderWidth).toBe('2px')
+        expect(styles.borderStyle).toBe('solid')
+      }
+    })
+
+    it('child has correct innerHTML', () => {
+      const childElement = document.getElementById('in-cycle-child')
+      expect(childElement).toBeDefined()
+      
+      if (childElement) {
+        expect(childElement.innerHTML.trim()).toBe('wonderful')
+      }
+    })
+
+    it('parent contains child element', () => {
+      const parentElement = document.getElementById('in-cycle-parent')
+      const childElement = document.getElementById('in-cycle-child')
+      
+      expect(parentElement).toBeDefined()
+      expect(childElement).toBeDefined()
+      
+      if (parentElement && childElement) {
+        expect(parentElement.contains(childElement)).toBe(true)
+      }
+    })
+
+    it('parent color changes when select is changed', async () => {
+      const parentColorSelect = document.getElementById('parent-color-select') as HTMLSelectElement
+      const parentElement = document.getElementById('in-cycle-parent')
+      
+      expect(parentColorSelect).toBeDefined()
+      expect(parentElement).toBeDefined()
+      
+      if (parentColorSelect && parentElement) {
+        // Change to blue
+        parentColorSelect.value = 'blue'
+        parentColorSelect.dispatchEvent(new Event('change', { bubbles: true }))
+        changeElm(parentColorSelect)
+        
+        await delay(0)
+
+        // Wait a bit for re-render
+        const styles = window.getComputedStyle(parentElement)
+        const hasBlue = styles.borderColor.includes('blue') || 
+                        styles.borderColor.includes('rgb(0, 0, 255)')
+        expect(hasBlue).toBe(true, `in-cycle-parent should be blue not ${styles.borderColor}`)
+      }
+    })
+
+    it('child color changes when select is changed', async () => {
+      const childColorSelect = document.getElementById('child-color-select') as HTMLSelectElement
+      const childElement = document.getElementById('in-cycle-child')
+      
+      expect(childColorSelect).toBeDefined()
+      expect(childElement).toBeDefined()
+      
+      if (childColorSelect && childElement) {
+        // Change to purple
+        childColorSelect.value = 'purple'
+        childColorSelect.dispatchEvent(new Event('change', { bubbles: true }))
+        
+        // Wait a bit for re-render
+        await delay(0)
+
+        const styles = window.getComputedStyle(childElement)
+        const hasPurple = styles.borderColor.includes('purple') || 
+                          styles.borderColor.includes('rgb(128, 0, 128)')
+        expect(hasPurple).toBe(true)
+      }
+    })
   })
 })  

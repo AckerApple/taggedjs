@@ -44,7 +44,7 @@ export const sectionSelector = (viewTypes = defaultViewTypes) => {
       <!-- checkbox menu -->
       <div style="display:flex;gap:1em;flex-wrap:wrap;margin:1em;">
         ${sortedViewTypes.map(type => html`
-          <div>
+          <div style="flex:1;white-space:nowrap;">
             <input type="checkbox"
               id=${'view-type-' + type} name=${'view-type-' + type}
               ${storage.views.includes(type) && 'checked'}

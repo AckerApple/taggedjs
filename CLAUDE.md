@@ -40,6 +40,8 @@ rm -rf assets/
 
 **Important**: Before running tests, ensure the project is built with `npm run build`. Tests rely on the compiled bundle.js file in assets/dist/.
 
+**Browser Testing**: When making changes to components that will be tested in the browser, always run `npm run build` before running tests. The browser tests depend on the bundled JavaScript files being up-to-date.
+
 For view-specific tests (like arrays.test.ts), the test setup will automatically navigate to the correct view using the vitest.setup.ts configuration.
 
 ## Architecture & Patterns

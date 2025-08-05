@@ -1,6 +1,6 @@
 import { renderCountDiv } from "./renderCount.component.js"
 import { dialog } from "./providerDialog.tag.js"
-import { html, tag, providers, state, callbackMaker, Subject, onInit, states } from "taggedjs"
+import { html, tag, providers, state, callbackMaker, Subject, onInit, states, host } from "taggedjs"
 import { fx } from "taggedjs-animate-css"
 
 export class TagDebugProvider {
@@ -34,11 +34,18 @@ export const providerDebug = tag((_x = 'providerDebugBase') => {
   const providerClass: TagDebugProvider = providers.create( TagDebugProvider )
   const provider = providers.create( tagDebugProvider )
 
-  const test = 'props debug base'
+  const colorOptions = ['red', 'blue', 'green', 'purple', 'orange']
   let propCounter = 0
   let renderCount = 0
+  let cycleColorParent = 'red'
+  let cycleColorChild = 'green'
+  let cycleColorChild2 = 'green'
 
-  states(get => [{propCounter, renderCount}] = get({propCounter, renderCount}))
+  states(get => [{
+    propCounter, renderCount, cycleColorParent, cycleColorChild, cycleColorChild2,
+  }] = get({
+    propCounter, renderCount, cycleColorParent, cycleColorChild, cycleColorChild2,
+  }))
 
   if(providerClass.showDialog) {
     (document.getElementById('provider_debug_dialog') as any).showModal()
@@ -112,8 +119,45 @@ export const providerDebug = tag((_x = 'providerDebugBase') => {
 
     ${dialog(providerClass)}
 
-    TODOTODOTODOTODO
-    ${/*tagSwitchingWithProvider()*/false}
+    <fieldset>
+      <legend>In-Cycle Context Communication</legend>
+      <div style="margin-bottom: 1em">
+        <label>
+          Parent Color: 
+          <select id="parent-color-select" onchange=${e => cycleColorParent = e.target.value}>
+            ${colorOptions.map(color => html`
+              <option value=${color} selected=${cycleColorParent === color}>
+                ${color}
+              </option>
+            `.key(color))}
+          </select>
+        </label>
+        <label style="margin-left: 1em">
+          Child Color: 
+          <select id="child-color-select" onchange=${e => cycleColorChild = e.target.value}>
+            ${colorOptions.map(color => html`
+              <option value=${color} selected=${cycleColorChild === color}>
+                ${color}
+              </option>
+            `.key(color))}
+          </select>
+        </label>
+        <label style="margin-left: 1em">
+          Child Color2: 
+          <select id="child-color-select-2" onchange=${e => cycleColorChild2 = e.target.value}>
+            ${colorOptions.map(color => html`
+              <option value=${color} selected=${cycleColorChild2 === color}>
+                ${color}
+              </option>
+            `.key(color))}
+          </select>
+        </label>
+      </div>
+      <div id="in-cycle-parent" ${inCycleParent(cycleColorParent)}>
+        <div id="in-cycle-child" ${inCycleChild(cycleColorChild)}></div>
+        <div id="in-cycle-child-2">${inCycleChild2(cycleColorChild2)}</div>
+      </div>
+    </fieldset>
   `
 })
 /*
@@ -273,3 +317,28 @@ const testProviderAsProps = tag((
     <textarea wrap="off" rows="20" style="width:100%;font-size:0.6em">${JSON.stringify(providerClass, null, 2)}</textarea>
   `
 })
+
+const inCycleParent = (color = 'red') => host(() => {
+  const element = tag.getElement()
+  element.style.border = '2px solid ' + color
+  element.style.display = 'flex'
+  element.style.gap = '1em'
+})
+
+const inCycleChild = (color = 'green') => {
+  return host(() => {
+    const element = tag.getElement()
+    element.style.border = '2px solid ' + color
+    element.style.flex = '1'
+    element.innerHTML = 'wonderful'
+  })
+}
+
+const inCycleChild2 = (color = 'green') => {
+  return host(() => {
+    const element = tag.getElement()
+    element.style.border = '2px solid ' + color
+    element.style.flex = '1'
+    element.innerHTML = 'wonderful too'
+  })
+}

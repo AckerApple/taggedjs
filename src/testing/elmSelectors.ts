@@ -61,6 +61,18 @@ export function keyupOn(input: Element, key?: string) {
   input.dispatchEvent(keyEvent)
 }
 
+/** dispatch the change event on an element */
+export function changed(
+  q: string
+) {
+  changeEach([...query(q)])
+}
+
+export function changeEach(items: HTMLElement[]) {
+  items.forEach(changeElm)
+}
+
+
 export function changeOne(
   q: string,
   index = 0,
@@ -70,7 +82,8 @@ export function changeOne(
 }
 
 export function changeElm(target: HTMLElement) {
-  ;(target as any).change({ target })
+  // ;(target as any).change({ target })
+  target.dispatchEvent(new Event('change', { bubbles: true }))
 }
 
 export function html(
