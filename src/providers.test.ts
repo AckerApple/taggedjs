@@ -135,5 +135,43 @@ describe('🫴 providers', () => {
         expect(hasPurple).toBe(true)
       }
     })
+
+    it('child2 has correct innerHTML and green border', () => {
+      const child2Element = document.getElementById('in-cycle-child-2')
+      expect(child2Element).toBeDefined()
+      
+      if (child2Element) {
+        expect(child2Element.innerHTML.trim()).toBe('wonderful too')
+        
+        const styles = window.getComputedStyle(child2Element)
+        const hasGreen = styles.borderColor.includes('rgb(0, 128, 0)') || 
+                        styles.borderColor.includes('green')
+        expect(hasGreen).toBe(true)
+        expect(styles.borderWidth).toBe('2px')
+        expect(styles.borderStyle).toBe('solid')
+      }
+    })
+
+    it('child2 color changes when select is changed', async () => {
+      const child2ColorSelect = document.getElementById('child-color-select-2') as HTMLSelectElement
+      const child2Element = document.getElementById('in-cycle-child-2')
+      
+      expect(child2ColorSelect).toBeDefined()
+      expect(child2Element).toBeDefined()
+      
+      if (child2ColorSelect && child2Element) {
+        // Change to orange
+        child2ColorSelect.value = 'orange'
+        child2ColorSelect.dispatchEvent(new Event('change', { bubbles: true }))
+        
+        // Wait a bit for re-render
+        await delay(0)
+
+        const styles = window.getComputedStyle(child2Element)
+        const hasOrange = styles.borderColor.includes('orange') || 
+                         styles.borderColor.includes('rgb(255, 165, 0)')
+        expect(hasOrange).toBe(true, `in-cycle-child-2 should be orange not ${styles.borderColor}`)
+      }
+    })
   })
 })  
