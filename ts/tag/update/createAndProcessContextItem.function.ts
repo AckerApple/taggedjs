@@ -1,7 +1,6 @@
 // taggedjs-no-compile
 
 import { paintAppend, paintAppends, paintBefore, paintCommands } from '../../render/paint.function.js'
-import { AdvancedContextItem } from '../AdvancedContextItem.type.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { domProcessContextItem } from '../../interpolations/optimizers/domProcessContextItem.function.js'
 import { empty } from '../ValueTypes.enum.js'
@@ -16,13 +15,16 @@ export function createAndProcessContextItem(
   contexts: ContextItem[],
   insertBefore?: Text, // used during updates
   appendTo?: Element, // used during initial entire array rendering
-): AdvancedContextItem {
+): ContextItem {
   const element = document.createTextNode(empty)
-  const contextItem: AdvancedContextItem = {
+  const contextItem: ContextItem = {
     value,
     tagJsVar: valueToTagJsVar(value),
     withinOwnerElement: false,
     placeholder: element,
+    
+    // TODO: This will need to be passed in
+    parentContext: ownerSupport.context,
     
     valueIndex: contexts.length,
     valueIndexSetBy: 'createAndProcessContextItem',

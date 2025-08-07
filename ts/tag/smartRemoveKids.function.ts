@@ -4,55 +4,56 @@ import { addPaintRemover } from '../render/paint.function.js'
 import { ContextItem } from './ContextItem.type.js'
 import { SupportTagGlobal } from './getTemplaterResult.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
-import { AnySupport } from './index.js'
+import { AnySupport, SupportContextItem } from './index.js'
 
 /** sets global.deleted on support and all children */
 export function smartRemoveKids(
-  global: SupportTagGlobal,
+  context: SupportContextItem,
   allPromises: Promise<any>[]
 ) {
-  const context = global.contexts as ContextItem[]
+  const global: SupportTagGlobal = context.global
+  const subContexts = context.contexts
 
-  smartRemoveByContext(context, allPromises)
+  smartRemoveByContext(subContexts, allPromises)
   destroyClones(global)
 }
 
 function smartRemoveByContext(
-  context: ContextItem[],
+  contexts: ContextItem[],
   allPromises: Promise<any>[],
 ) {
-  for (const subject of context) {
-    if( subject.locked ) {
+  for (const context of contexts) {
+    if( context.locked ) {
       continue
     }
 
-    if(subject.withinOwnerElement) {
-      const tagJsVar = subject.tagJsVar as TagJsVar
+    if(context.withinOwnerElement) {
+      const tagJsVar = context.tagJsVar as TagJsVar
       if( tagJsVar && tagJsVar.tagJsType === 'host' ) {
-        const newest = (subject as any).supportOwner as AnySupport
-        tagJsVar.delete(subject, newest)
+        const newest = (context as any).supportOwner as AnySupport
+        tagJsVar.delete(context, newest)
       }
 
       continue // i live within my owner variable. I will be deleted with owner
     }
 
-    const lastArray = subject.lastArray
+    const lastArray = context.lastArray
     if(lastArray) {
-      destroyArray(subject, lastArray)
+      destroyArray(context, lastArray)
       continue
     }
 
     // regular values, no placeholders
-    const elm = subject.simpleValueElm as Text
+    const elm = context.simpleValueElm as Text
     if(elm) {
-      delete subject.simpleValueElm
+      delete context.simpleValueElm
       addPaintRemover(elm)
       continue
     }
 
-    const subGlobal = subject.global as SupportTagGlobal
+    const subGlobal = context.global as SupportTagGlobal
     if(subGlobal === undefined) {
-      continue // subject
+      continue // context
     }
 
     if(subGlobal.deleted === true) {
@@ -62,7 +63,7 @@ function smartRemoveByContext(
     subGlobal.deleted = true
     const oldest = subGlobal.oldest
     if(oldest) {
-      smartRemoveKids(subGlobal, allPromises)
+      smartRemoveKids(context as SupportContextItem, allPromises)
       continue
     }
   }

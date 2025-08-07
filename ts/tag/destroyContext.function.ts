@@ -23,6 +23,7 @@ export function destroyContext(
     const childValue = child.value as TagJsVar | undefined
     if(childValue?.tagJsType === ValueTypes.subscribe) {
       childValue.delete(child, ownerSupport)
+      child.deleted = true
       continue
     }
 
@@ -41,7 +42,7 @@ export function destroyContext(
       runBeforeDestroy(support, global)
     }
 
-    const subTags = global.contexts
+    const subTags = child.contexts as ContextItem[]
     // recurse
     destroyContext(subTags, support)
   }
@@ -68,7 +69,7 @@ export function getChildTagsToSoftDestroy(
       }
     }
 
-    const subTags = global.contexts
+    const subTags = child.contexts
     if(subTags) {
       getChildTagsToSoftDestroy(subTags, tags, subs)
     }

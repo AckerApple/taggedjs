@@ -1,5 +1,5 @@
 import { AnySupport } from '../AnySupport.type.js'
-import { getSupportInCycle } from '../getSupportInCycle.function.js'
+import { getSupportInCycle } from '../cycles/getSupportInCycle.function.js'
 import { deepCompareDepth } from '../hasSupportChanged.function.js'
 import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { isArray, isStaticTag } from '../../isInstance.js'

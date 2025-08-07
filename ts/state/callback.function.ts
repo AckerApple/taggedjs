@@ -2,7 +2,7 @@ import callbackStateUpdate from './callbackStateUpdate.function.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
 import { setUseMemory } from './setUseMemory.object.js'
 import { Callback, syncError } from './callbackMaker.function.js'
-import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
+import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
 import { StateMemory } from './StateMemory.type.js'
 
 /** Wrap a function that will be called back. After the wrapper and function are called, a rendering cycle will update display */

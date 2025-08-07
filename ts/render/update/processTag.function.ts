@@ -66,8 +66,7 @@ export function newSupportByTemplater(
     subject,
   )
 
-  const global = subject.global as SupportTagGlobal
-  global.contexts = []
+  subject.contexts = []
 
   return support
 }

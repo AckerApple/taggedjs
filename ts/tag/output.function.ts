@@ -1,8 +1,8 @@
 import { AnySupport, paint } from "../index.js"
-import { blankHandler } from "../render/dom/attachDomElements.function.js"
+import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { paintAfters, painting } from "../render/paint.function.js"
 import { syncStatesArray } from "../state/syncStates.function.js"
-import { getSupportInCycle } from "./getSupportInCycle.function.js"
+import { getSupportInCycle } from "./cycles/getSupportInCycle.function.js"
 import { safeRenderSupport } from "./props/safeRenderSupport.function.js"
 
 

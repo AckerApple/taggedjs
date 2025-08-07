@@ -1,3 +1,4 @@
+import { isObject } from "../../index.js"
 import { paintContent } from "../../render/paint.function.js"
 
 export type HowToSet = (element: HTMLElement, name: string, value: string) => any
@@ -6,9 +7,34 @@ export type HowToSet = (element: HTMLElement, name: string, value: string) => an
 export function howToSetInputValue(
   element: HTMLElement,
   name: string,
-  value: string | undefined | boolean
+  value: string | undefined | boolean | Record<string, any>
 ) {
+  if (isObject(value)) {
+    return howToSetInputObjectValue(element, name, value as Record<string, any>)
+  }
+  
   paintContent.push([howToSetFirstInputValue, [element, name, value]])
+}
+
+function howToSetInputObjectValue(
+  element: HTMLElement,
+  name: string,
+  value: Record<string, any>
+) {
+  if( typeof (element as any)[name] !== 'object' ) {
+    (element as any)[name] = {}
+  }
+
+  // Handle object values by setting properties directly
+  for (const key in value) {
+    paintContent.push([setObjectValue, [element, name, key, value[key]]])
+  }
+
+  if((element as any)[name].setProperty) {
+    for (const key in value) {
+      paintContent.push([setPropertyValue, [element, name, key, value[key]]])
+    }
+  }
 }
 
 export function howToSetStandAloneAttr(
@@ -22,12 +48,34 @@ export function howToSetStandAloneAttr(
 export function howToSetFirstInputValue(
   element: HTMLElement,
   name: string,
-  value: string | undefined | boolean
+  value: string | undefined | boolean | Record<string, any>
 ) {
   if(value === undefined || value === false || value === null) {
     element.removeAttribute(name)
     return
   }
 
+  if (isObject(value)) {
+    return howToSetInputObjectValue(element, name, value as Record<string, any>)
+  }
+
   element.setAttribute(name, value as string)
+}
+
+function setPropertyValue(
+  element: HTMLElement,
+  name: string,
+  key: string,
+  value: any
+) {
+  ;(element as any)[name].setProperty(key, value)
+}
+
+function setObjectValue(
+  element: HTMLElement,
+  name: string,
+  key: string,
+  value: any
+) {
+  ;(element as any)[name][key] = value
 }

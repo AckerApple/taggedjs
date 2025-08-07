@@ -4,7 +4,7 @@ import { PaintCommand } from '../render/paint.function.js'
 import { LastArrayItem } from '../index.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 
-export interface BaseContextItem {
+export interface AppContextItem {
   valueIndex: number
   valueIndexSetBy: string
   
@@ -16,11 +16,18 @@ export interface BaseContextItem {
   subContext?: SubContext 
 
   // todo this is most likely only used by an ContextItem only
-  withinOwnerElement: boolean
+  withinOwnerElement: boolean  
+}
+export interface BaseContextItem extends AppContextItem {  
+  element?: HTMLElement
+  parentContext: BaseContextItem
+  isAttrs?: true // when a context is created just to house attributes
 }
 
 export interface ContextItem extends BaseContextItem {
+  contexts?: ContextItem[]
   locked?: true
+  deleted?: true
   
   // used only for strings, numbers, booleans
   simpleValueElm?: Clone

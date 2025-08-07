@@ -40,8 +40,8 @@ function paintStyle(
 ) {
   const smallName = names[1] as any
   
-  element.style[ smallName ] = value
-  element.style.setProperty(smallName, value)
+  element.style[ smallName ] = value // style.backgroundGround
+  element.style.setProperty(smallName, value) // style.background-ground
 }
 
 function processSpecialClass(

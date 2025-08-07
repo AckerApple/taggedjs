@@ -15,7 +15,7 @@ export function processRenderOnceInit(
   appendTo?: Element,
   insertBefore?: Text,
 ) {
-  getNewGlobal(contextItem)
+  getNewGlobal(contextItem as SupportContextItem)
 
   const support = oneRenderToSupport(
     value as Wrapper,

@@ -9,9 +9,12 @@ export interface AttributeContextItem extends BaseContextItem {
   isNameOnly?: boolean
   attrName?: string
   isSpecial?: SpecialDefinition
-  element?: Element
   
   // Currently only used for host()
   stateOwner?: AnySupport
   supportOwner?: AnySupport
+}
+
+export interface HostAttributeContextItem extends AttributeContextItem {
+  state: any // Record<string, any>
 }

@@ -15,17 +15,18 @@ export function createDynamicArrayAttribute(
   attrName: string,
   array: any[],
   element: HTMLElement,
-  context: ContextItem[],
+  contexts: ContextItem[],
   howToSet: HowToSet, //  = howToSetInputValue
   values: unknown[],
+  parentContext: ContextItem,
 ) {
-  const startIndex = context.length
+  const startIndex = contexts.length
 
   // loop all to attach context and processors
   array.forEach((value) => {
     const valueVar = getTagVarIndex(value)
     if(valueVar >= 0) {
-      const myIndex = context.length
+      const myIndex = contexts.length
       const tagJsVar = valueToTagJsVar(value)
       const contextItem: AttributeContextItem = {
         isAttr: true,
@@ -33,8 +34,9 @@ export function createDynamicArrayAttribute(
         attrName: attrName as string,
         withinOwnerElement: true,
         tagJsVar,
-        valueIndex: context.length,
+        valueIndex: contexts.length,
         valueIndexSetBy: 'createDynamicArrayAttribute',
+        parentContext,
       }
   
       // contextItem.handler =
@@ -46,7 +48,7 @@ export function createDynamicArrayAttribute(
 
       const pushValue = values[myIndex]
       contextItem.value = pushValue
-      context.push(contextItem)
+      contexts.push(contextItem)
     }
   })
 
@@ -56,6 +58,8 @@ export function createDynamicArrayAttribute(
   }
 
   setBy(values)
+
+  return contexts
 }
 
 function buildNewValueFromArray(
@@ -82,7 +86,7 @@ function buildNewValueFromArray(
 export function createDynamicAttribute(
   attrName: string,
   value: any,
-  element: Element,
+  element: HTMLElement,
   context: ContextItem[],
   howToSet: HowToSet, //  = howToSetInputValue
   support: AnySupport,
@@ -99,6 +103,7 @@ export function createDynamicAttribute(
     
     valueIndex: varIndex,
     valueIndexSetBy: 'createDynamicAttribute',
+    parentContext: support.context,
   }
 
   context.push(contextItem)
@@ -115,4 +120,6 @@ export function createDynamicAttribute(
   )
 
   contextItem.value = value
+
+  return contextItem
 }

@@ -1,4 +1,4 @@
-import { blankHandler } from "./dom/attachDomElements.function.js"
+import { blankHandler } from "./dom/blankHandler.function.js"
 
 export type PaintCommand = [((...args: any[]) => unknown), any[]]
 

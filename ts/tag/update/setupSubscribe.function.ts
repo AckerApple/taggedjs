@@ -1,4 +1,4 @@
-import { AdvancedContextItem } from '../AdvancedContextItem.type.js'
+import { ContextItem } from '../ContextItem.type.js'
 import { LikeObservable, SubscribeValue } from '../../tagJsVars/subscribe.function.js'
 import { paint } from '../../render/paint.function.js'
 import { setUseMemory } from '../../state/setUseMemory.object.js'
@@ -11,15 +11,13 @@ import { onFirstSubContext } from './onFirstSubContext.function.js'
 import { OnSubOutput, SubContext, SubscriptionContext } from './SubContext.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { guaranteeInsertBefore } from '../guaranteeInsertBefore.function.js'
-import { ContextItem } from '../ContextItem.type.js'
 import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { processUpdateSubscribe } from './processUpdateSubscribe.function.js'
-import { processUpdateContext } from '../processUpdateContext.function.js'
 
 export function setupSubscribe(
   value: SubscribeValue,
-  contextItem: AdvancedContextItem,
+  contextItem: ContextItem,
   ownerSupport: AnySupport,
   appendTo?: Element,
   insertBeforeOriginal?: Text, // optional but will always be made
@@ -47,9 +45,8 @@ export function setupSubscribe(
       syncRun: boolean,
       subContext: SubscriptionContext,
     ) {
-      const aContext = subContext.contextItem as AdvancedContextItem
+      const aContext = subContext.contextItem as ContextItem
       
-
       forceUpdateExistingValue(
         aContext,
         updateValue,
@@ -90,7 +87,7 @@ export function setupSubscribeCallbackProcessor(
   onOutput: OnSubOutput,
   tagJsVar: SubscribeValue,
 ): SubContext {
-  const component = getSupportWithState(ownerSupport)
+  // const component = getSupportWithState(ownerSupport)
   
   // onValue mutates so function below calls original and mutation
   function subValueHandler(

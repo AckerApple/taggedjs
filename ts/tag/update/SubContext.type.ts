@@ -1,4 +1,4 @@
-import { AdvancedContextItem, TemplateValue } from "../../index.js"
+import { ContextItem, TemplateValue } from "../../index.js"
 import { LikeSubscription, SubscribeValue } from '../../tagJsVars/subscribe.function.js'
 import { TagJsVar } from "../../tagJsVars/tagJsVar.type.js"
 
@@ -26,7 +26,7 @@ export interface SubContext {
   }[]
   
   appendMarker?: Text  
-  contextItem?: AdvancedContextItem
+  contextItem?: ContextItem
 }
 
 export type OnSubOutput = (

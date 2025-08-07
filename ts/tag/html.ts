@@ -9,7 +9,7 @@ import { getStringTag } from './processOuterDomTagInit.function.js'
 
 export type InputCallback = ((e: TagJsEvent) => unknown)
 /** represents a single value within html`<div>${value}</div>`. The data typing of "& unknown" is to allow anything AND STILL infer functions have one argument if "e"  */
-export type TagValue = (InputCallback | RegularValue | object) & unknown
+export type TagValue = (InputCallback | RegularValue | object | void) & unknown
 export type TagValues = TagValue[]
 
 /** Used as html`<div></div>` */

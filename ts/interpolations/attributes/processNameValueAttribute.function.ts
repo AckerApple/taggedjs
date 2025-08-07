@@ -18,7 +18,7 @@ export function processDynamicNameValueAttribute(
   support: AnySupport,
   isSpecial: SpecialDefinition,
 ) {
-  contextItem.element = element
+  contextItem.element = element as HTMLElement
   contextItem.howToSet = howToSet
 
   if(typeof(value) === BasicTypes.function ) {

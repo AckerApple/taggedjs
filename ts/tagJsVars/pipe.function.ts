@@ -1,8 +1,8 @@
 import { getSupportWithState } from "../interpolations/attributes/getSupportWithState.function.js"
-import { blankHandler } from "../render/dom/attachDomElements.function.js"
+import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { AnySupport } from "../tag/AnySupport.type.js"
-import { getSupportInCycle } from "../tag/getSupportInCycle.function.js"
-import { AdvancedContextItem, ContextItem, ValueTypes } from "../tag/index.js"
+import { getSupportInCycle } from "../tag/cycles/getSupportInCycle.function.js"
+import { ContextItem, ValueTypes } from "../tag/index.js"
 import { deleteAndUnsubscribe, setupSubscribe } from "../tag/update/setupSubscribe.function.js"
 import { LikeObservable, SubscribeCallback, SubscribeValue } from "./subscribe.function.js"
 import { checkSubscribeValueChanged } from "./subscribeWith.function.js"
@@ -45,7 +45,7 @@ function processPipe(
 
   return setupSubscribe(
     subValue,
-    contextItem as AdvancedContextItem,
+    contextItem,
     ownerSupport,
     appendTo,
   )

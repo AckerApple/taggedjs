@@ -3,7 +3,7 @@ import { runFirstState, runRestate } from './stateHandlers.js'
 import { State, StateConfig } from './state.types.js'
 import { firstStatesHandler, reStatesHandler } from './states.utils.js'
 import { setUseMemory } from './setUseMemory.object.js'
-import { setSupportInCycle } from '../tag/getSupportInCycle.function.js'
+import { setSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
 
 export function initState(
   support: AnySupport,

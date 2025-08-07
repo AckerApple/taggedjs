@@ -1,8 +1,7 @@
-import { AdvancedContextItem } from '../AdvancedContextItem.type.js'
+import { ContextItem } from '../ContextItem.type.js'
 import { addPaintRemover } from '../../render/paint.function.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { SubContext } from './SubContext.type.js'
-import { ContextItem } from '../ContextItem.type.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 
 export function deleteContextSubContext(
@@ -33,7 +32,7 @@ export function deleteSubContext(
     return
   }
 
-  const subContextItem = subContext.contextItem as AdvancedContextItem
+  const subContextItem = subContext.contextItem as ContextItem
   const subTagJsVar = subContextItem.tagJsVar as TagJsVar
   subTagJsVar.delete(
     subContextItem,

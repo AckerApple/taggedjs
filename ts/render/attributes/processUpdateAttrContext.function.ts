@@ -7,6 +7,7 @@ import { TemplateValue } from '../../tag/TemplateValue.type.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
 import { SupportContextItem } from '../../index.js'
+import { removeContextInCycle, setContextInCycle } from '../../tag/cycles/setContextInCycle.function.js'
 
 /** Currently universally used for all attributes */
 export function processUpdateAttrContext(
@@ -23,6 +24,9 @@ export function processUpdateAttrContext(
     // its now a tagVar value but before was not
     if(!oldValue?.tagJsType) {
       tagValue.isAttr = true
+      
+      setContextInCycle(contextItem)
+      
       tagValue.processInitAttribute(
         attrContextItem.attrName as string,
         value,
@@ -31,6 +35,9 @@ export function processUpdateAttrContext(
         attrContextItem,
         ownerSupport,
       )
+      
+      removeContextInCycle()
+      
       attrContextItem.tagJsVar = tagValue
       return
     }

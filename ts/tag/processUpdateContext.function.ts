@@ -3,6 +3,7 @@ import type { DomTag } from './DomTag.type.js'
 import { AnySupport } from './AnySupport.type.js'
 import { ContextItem } from '../index.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { removeContextInCycle, setContextInCycle } from './cycles/setContextInCycle.function.js'
 
 export function processUpdateContext(
   support: AnySupport,
@@ -36,22 +37,34 @@ function processUpdateOneContext(
 ) {
   const contextItem = context[index]
 
+  if( contextItem.deleted ) {
+    return
+  }
+
   // some values, like style, get rearranged and there value appearance may not match context appearance
   const valueIndex = contextItem.valueIndex
   const newValue = values[ valueIndex ] as any
 
+  // Removed, let the tagJsVars do the checking
   // Do not continue if the value is just the same
+  /*
   if(newValue === contextItem.value) {
     return
   }
+  */
 
   const tagJsVar = contextItem.tagJsVar as TagJsVar
+  
+  setContextInCycle(contextItem)
+  
   tagJsVar.processUpdate(
     newValue, // valueToTagJsVar(newValue),
     contextItem,
     ownerSupport,
     values,
   )
+  
+  removeContextInCycle()
   
   contextItem.value = newValue
 }

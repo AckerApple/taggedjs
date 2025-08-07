@@ -8,20 +8,20 @@ export function destroySupport(
   support: AnySupport,
   global: SupportTagGlobal,
 ): Promise<void>[] {
-  const subject = support.context
+  const context = support.context
 
   global.deleted = true
-  subject.renderCount = 0 // if it comes back, wont be considered an update
+  context.renderCount = 0 // if it comes back, wont be considered an update
   const promises: Promise<any>[] = []
 
-  const context = global.contexts
-  destroyContext(context, support)
+  const subContexts = context.contexts
+  destroyContext(subContexts, support)
 
   if(global.destroy$) {
     runBeforeDestroy(support, global)
   }
 
-  smartRemoveKids(global, promises)
+  smartRemoveKids(context, promises)
 
   return promises
 }

@@ -9,7 +9,7 @@ import { AnySupport } from '../../tag/AnySupport.type.js'
 import { paintContent } from '../paint.function.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processNonDynamicAttr } from '../../interpolations/attributes/processNameValueAttribute.function.js'
-import { addOneContext } from '../index.js'
+import { addOneContext } from '../addOneContext.function.js'
 import { processAttributeFunction } from '../../interpolations/attributes/processAttributeCallback.function.js'
 import { isSpecialAttr } from '../../interpolations/attributes/isSpecialAttribute.function.js'
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
@@ -18,6 +18,7 @@ import { getTagJsVar, TagVarIdNum } from './getTagJsVar.function.js'
 import { NoDisplayValue } from './NoDisplayValue.type.js'
 import { SpecialDefinition } from './Special.types.js'
 import { isNoDisplayValue } from './isNoDisplayValue.function.js'
+import { removeContextInCycle, setContextInCycle } from '../../tag/cycles/setContextInCycle.function.js'
 import { HostValue } from '../../tagJsVars/host.function.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js'
@@ -34,7 +35,7 @@ export function processAttribute(
   contexts: ContextItem[],
   isSpecial: SpecialDefinition,
   value: string | null | undefined | TagVarIdNum,
-): number {
+) {
   const varIndex = getTagJsVar(attrName)
   const isNameVar = varIndex >= 0
   const valueInValues = values[ varIndex ] as TemplateValue
@@ -58,6 +59,7 @@ export function processAttribute(
       valueInValues,
       contexts,
       true,
+      support.context,
     ) as any as AttributeContextItem
 
     contextItem.valueIndex = varIndex
@@ -80,26 +82,25 @@ export function processAttribute(
       contexts,
     )
   
-    return 13
+    return contextItem
   }
 
   if(Array.isArray(value)) {
-    createDynamicArrayAttribute(
+    return createDynamicArrayAttribute(
       attrName as string,
       value,
       element,
       contexts,
       howToSet,
       values,
+      support.context,
     )
-    
-    return 14
   }
 
   const valueVar = getTagJsVar(value)
   if(valueVar >= 0) {
     const value = values[valueVar]
-    createDynamicAttribute(
+    return createDynamicAttribute(
       attrName as string,
       value,
       element,
@@ -109,10 +110,9 @@ export function processAttribute(
       isSpecial,
       valueVar,
     )
-
-    return 15
   }
 
+  // simple name/value attribute
   processNonDynamicAttr(
     attrName as string,
     value as string,
@@ -120,8 +120,6 @@ export function processAttribute(
     howToSet,
     isSpecial,
   )
-
-  return 16
 }
 
 function processTagJsVarAttribute(
@@ -137,7 +135,8 @@ function processTagJsVarAttribute(
   const contextItem = addOneContext(
     value,
     contexts,
-    true
+    true,
+    support.context,
   ) as any as AttributeContextItem
 
   contextItem.element = element
@@ -150,6 +149,8 @@ function processTagJsVarAttribute(
   contextItem.stateOwner = getSupportWithState(support)
   contextItem.supportOwner = support
 
+  setContextInCycle(contextItem)
+
   tagJsVar.processInitAttribute(
     attrName as string,
     tagJsVar,
@@ -159,11 +160,12 @@ function processTagJsVarAttribute(
     support,
   )
 
+  removeContextInCycle()
+
   contextItem.oldTagJsVar = contextItem.tagJsVar
   contextItem.tagJsVar = tagJsVar
 
-  // ;(tagJsVar as any).processInit(element, tagJsVar, contextItem)
-  return 12
+  return contextItem
 }
 
 // single/stand alone attributes

@@ -1,6 +1,6 @@
 import { Subject, ValueSubject } from'../subject/index.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
-import { getSupportInCycle } from'../tag/getSupportInCycle.function.js'
+import { getSupportInCycle } from'../tag/cycles/getSupportInCycle.function.js'
 import { setUseMemory } from'./setUseMemory.object.js'
 import { state } from'./state.function.js'
 import { oldSyncStates } from'./syncStates.function.js'

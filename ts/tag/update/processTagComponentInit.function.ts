@@ -12,7 +12,7 @@ export function processTagComponentInit(
   ownerSupport: AnySupport, // owningSupport
   appendTo?: Element,
 ): AnySupport | undefined {
-  getNewGlobal(contextItem) as SupportTagGlobal
+  getNewGlobal(contextItem as SupportContextItem) as SupportTagGlobal
 
   if(appendTo) {
     const processResult = processFirstSubjectComponent(

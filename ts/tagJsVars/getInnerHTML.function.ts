@@ -1,5 +1,5 @@
-import { AdvancedContextItem, AnySupport, ContextItem, deleteContextSubContext, guaranteeInsertBefore, onFirstSubContext, SubContext, Tag } from "../index.js"
-import { blankHandler } from "../render/dom/attachDomElements.function.js"
+import { AnySupport, ContextItem, deleteContextSubContext, guaranteeInsertBefore, onFirstSubContext, SubContext, Tag } from "../index.js"
+import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { ProcessInit } from "../tag/ProcessInit.type.js"
 import { TemplateValue } from "../tag/TemplateValue.type.js"
 import { forceUpdateExistingValue } from "../tag/update/index.js"
@@ -19,7 +19,7 @@ function handleInnerHTML(
   const realValue = owner._innerHTML
   realValue.processInit = realValue.oldProcessInit
 
-  const context = contextItem.subContext?.contextItem as AdvancedContextItem
+  const context = contextItem.subContext?.contextItem as ContextItem
 
   forceUpdateExistingValue(
     context,

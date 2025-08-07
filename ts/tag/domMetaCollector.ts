@@ -10,7 +10,7 @@ import { TagTemplate } from './getDomTag.function.js'
 
 const lastRuns: {[index: number]: TagTemplate} = {}
 
-/** Converts strings & values into dom meta */
+/** Merges strings & values with dom meta into a html array tree */
 export function getDomMeta(
   strings: string[],
   values: unknown[],

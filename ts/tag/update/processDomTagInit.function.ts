@@ -24,7 +24,7 @@ export function processDomTagInit(
     templater = tagFakeTemplater(tag)
   }
 
-  const global = getNewGlobal(contextItem) as SupportTagGlobal
+  const global = getNewGlobal(contextItem as SupportContextItem) as SupportTagGlobal
 
   if(appendTo) {
     return processNewSubjectTag(

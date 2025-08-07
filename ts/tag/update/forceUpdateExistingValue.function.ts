@@ -1,5 +1,5 @@
 import { SupportContextItem } from '../SupportContextItem.type.js'
-import { AdvancedContextItem } from '../AdvancedContextItem.type.js'
+import { ContextItem } from '../ContextItem.type.js'
 import { updateToDiffValue } from './updateToDiffValue.function.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
@@ -7,7 +7,7 @@ import { TagJsTag } from '../../tagJsVars/tagJsVar.type.js'
 
 /** Used for all tag value updates. Determines if value changed since last render */
 export function forceUpdateExistingValue(
-  contextItem: AdvancedContextItem | SupportContextItem,
+  contextItem: ContextItem | SupportContextItem,
   newValue: TemplateValue, // newValue
   ownerSupport: AnySupport,
 ): number {

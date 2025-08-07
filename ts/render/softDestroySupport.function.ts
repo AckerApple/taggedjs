@@ -3,22 +3,23 @@ import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
 import { getNewGlobal } from '../tag/update/getNewGlobal.function.js'
 import { smartRemoveKids } from '../tag/smartRemoveKids.function.js'
+import { SupportContextItem } from '../index.js'
 
 /** used when a tag swaps content returned */
 export function softDestroySupport(
   lastSupport: AnySupport,
 ) {
-  const subject = lastSupport.context
-  const global = subject.global as SupportTagGlobal
-  const {subs, tags} = getChildTagsToSoftDestroy(global.contexts)
+  const context = lastSupport.context
+  const global = context.global as SupportTagGlobal
+  const {subs, tags} = getChildTagsToSoftDestroy(context.contexts)
 
-  softDestroyOne(global)
+  softDestroyOne(context)
   for (const child of tags) {
     const cGlobal = child.context.global
     if(cGlobal.deleted === true) {
       return
     }
-    softDestroyOne( cGlobal )
+    softDestroyOne( child.context )
   }
   
   const mySubs = global.subscriptions
@@ -26,12 +27,12 @@ export function softDestroySupport(
     subs.forEach(unsubscribeFrom)
   }
 
-  getNewGlobal(subject)
+  getNewGlobal(context)
 }
 
 function softDestroyOne(
-  global: SupportTagGlobal
+  context: SupportContextItem
 ) {
-  global.deleted = true // the children are truly destroyed but the main support will be swapped
-  smartRemoveKids(global, [])
+  context.global.deleted = true // the children are truly destroyed but the main support will be swapped
+  smartRemoveKids(context, [])
 }

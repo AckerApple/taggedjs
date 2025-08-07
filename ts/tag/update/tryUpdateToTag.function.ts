@@ -20,7 +20,7 @@ export function tryUpdateToTag(
 
   if(isComp) {
     if(contextItem.global === undefined) {
-      getNewGlobal(contextItem as ContextItem)
+      getNewGlobal(contextItem as SupportContextItem)
     }
 
     prepareUpdateToComponent(

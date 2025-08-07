@@ -21,6 +21,7 @@ import { renderWithSupport } from './render/renderWithSupport.function.js'
 
 import { tagElement } from './tag/tagElement.js'
 import { paint } from './render/paint.function.js'
+export * from './deepFunctions.js'
 
 export const hmr = {
   tagElement, renderWithSupport, renderSupport,

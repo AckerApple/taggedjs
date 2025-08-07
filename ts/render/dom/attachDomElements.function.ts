@@ -9,15 +9,14 @@ import { ContextItem } from "../../tag/ContextItem.type.js"
 import { ObjectChildren } from "../../interpolations/optimizers/LikeObjectElement.type.js"
 import { empty } from "../../tag/ValueTypes.enum.js"
 import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicDom.function.js"
-
-export const blankHandler = function blankHandler() {
-  return undefined
-}
+import { SupportContextItem } from "../../index.js"
+import { TagJsVar } from "../../tagJsVars/tagJsVar.type.js"
 
 export function attachDomElements(
   nodes: ObjectChildren,
   values: any[],
   support: AnySupport,
+  parentContext: ContextItem,
   contexts: ContextItem[],
   depth: number, // used to know if dynamic variables live within parent owner tag/support
   appendTo?: Element,
@@ -34,6 +33,7 @@ export function attachDomElements(
     appendTo = undefined
   }
 
+  // loop map of elements that need to be put down on document
   for (let index=0; index < nodes.length; ++index) {
     const node = (nodes as DomObjectElement[])[index]
     
@@ -41,13 +41,14 @@ export function attachDomElements(
     const isNum = !isNaN(value as unknown as number)
     
     if(isNum) {
-      const index = contexts.length
-      const value = values[ index ]
+      const valueIndex = contexts.length
+      const value = values[ valueIndex ]
 
       attachDynamicDom(
         value,
         contexts,
         support,
+        parentContext,
         depth,
         appendTo,
         insertBefore,
@@ -63,8 +64,8 @@ export function attachDomElements(
       continue
     }
 
-    // one single html element
-    const domElement = attachDomElement(
+    // one single html element. This is where attribute processing takes place
+    const { attributeContexts, domElement } = attachDomElement(
       newNode,
       node,
       values,
@@ -74,11 +75,25 @@ export function attachDomElements(
       insertBefore,
     )
 
+    const newParentContext: ContextItem = {
+      isAttrs: true,
+      parentContext,
+      contexts: attributeContexts,
+      
+      tagJsVar: {
+        tagJsType: 'new-parent-context'
+      } as TagJsVar,
+      valueIndex: -1,
+      valueIndexSetBy: 'attachDomElements',
+      withinOwnerElement: true,
+    }
+
     if (node.ch) {
       newNode.ch = attachDomElements(
         node.ch,
         values,
         support,
+        newParentContext,
         contexts,
         depth + 1,
         domElement,
@@ -98,8 +113,12 @@ function attachDomElement(
   contexts: ContextItem[],
   appendTo: Element | undefined,
   insertBefore: Text | undefined,
-) {
+): {
+  domElement: HTMLElement
+  attributeContexts: ContextItem[]
+} {
   const domElement = newNode.domElement = document.createElement(node.nn)
+  const attributeContexts: ContextItem[] = []
   
   // attributes that may effect style, come first for performance
   if (node.at) {
@@ -109,7 +128,7 @@ function attachDomElement(
       const isSpecial = attr[2] || false
       const howToSet: HowToSet = attr.length > 1 ? howToSetFirstInputValue : howToSetStandAloneAttr
 
-      processAttribute(
+      const newContext = processAttribute(
         values,
         name,
         domElement,
@@ -119,6 +138,10 @@ function attachDomElement(
         isSpecial,
         value,
       )
+
+      if(typeof newContext === 'object') {
+        attributeContexts.push(newContext as ContextItem)
+      }
     }
   }
 
@@ -127,7 +150,8 @@ function attachDomElement(
   } else {
     paintCommands.push([paintBefore, [insertBefore, domElement]])
   }
-  return domElement
+  
+  return { domElement, attributeContexts }
 }
 
 function attachDomText(

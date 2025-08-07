@@ -26,7 +26,12 @@ export function buildBeforeElement(
   global.newest = support
 
   ++painting.locks
-  const result = attachHtmlDomMeta(support, appendTo, insertBefore)
+  const result = attachHtmlDomMeta(
+    support,
+    support.context,
+    appendTo,
+    insertBefore,
+  )
     
   global.htmlDomMeta = result.dom
   --painting.locks
@@ -37,6 +42,7 @@ export function buildBeforeElement(
 
 function attachHtmlDomMeta(
   support: AnySupport,
+  parentContext: ContextItem,
   appendTo?: Element,
   insertBefore?: Text,
 ) {
@@ -45,15 +51,15 @@ function attachHtmlDomMeta(
   const values = thisTag.values
   const contexts: SupportContextItem[] = []
 
-  const global = support.context.global as SupportTagGlobal
-  global.contexts = contexts
+  support.context.contexts = contexts
 
   const result = attachDomElements(
     domMeta,
     values,
     support,
+    parentContext,
     contexts,
-    0,
+    0, // depth
     appendTo,
     insertBefore,
   )
@@ -61,6 +67,7 @@ function attachHtmlDomMeta(
   return result
 }
 
+/** Extracts variables from support in order to merge strings & values with dom meta into a html array tree */
 function loadDomMeta(support: AnySupport): ParsedHtml {
   const templater = support.templater
   const thisTag = templater.tag as Tag
@@ -72,24 +79,4 @@ function loadDomMeta(support: AnySupport): ParsedHtml {
   const strings = (thisTag as StringTag).strings
 
   return getDomMeta(strings, thisTag.values)
-}
-
-export function addOneContext(
-  value: unknown,
-  context: ContextItem[],
-  withinOwnerElement: boolean
-): ContextItem {
-  const contextItem: ContextItem = {
-    value,
-    valueIndex: context.length,
-    valueIndexSetBy: 'addOneContext',
-
-    tagJsVar: valueToTagJsVar(value),
-    withinOwnerElement,
-    
-  }
-
-  context.push(contextItem)
-
-  return contextItem
 }

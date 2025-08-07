@@ -1,5 +1,5 @@
 import { SupportTagGlobal, TemplaterResult } from './getTemplaterResult.function.js'
-import { SupportContextItem } from './SupportContextItem.type.js'
+import { AppSupportContextItem, SupportContextItem } from './SupportContextItem.type.js'
 import { TagWrapper } from './tag.utils.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
@@ -17,7 +17,7 @@ import { renderTagElement } from '../render/renderTagElement.function.js'
 import { loadNewBaseSupport } from './loadNewBaseSupport.function.js'
 import { TagJsTag } from '../tagJsVars/tagJsVar.type.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
-import { blankHandler } from '../render/dom/attachDomElements.function.js'
+import { blankHandler } from '../render/dom/blankHandler.function.js'
 
 if( typeof(document) === 'object' ) {
   if( (document as any).taggedJs ) {
@@ -97,8 +97,13 @@ export function tagElement(
   }
 
   return renderTagElement(
-    app, global, templater, templater2,
-    element, subject, isAppFunction,
+    app,
+    global,
+    templater,
+    templater2,
+    element,
+    subject as SupportContextItem,
+    isAppFunction,
   )
 }
 
@@ -117,7 +122,7 @@ function getNewSubject(
     processUpdate: tagValueUpdateHandler,
   }
 
-  const subject: SupportContextItem = {
+  const subject: AppSupportContextItem = {
     value: templater,
     valueIndex: 0,
     valueIndexSetBy: 'getNewSubject',
@@ -135,7 +140,11 @@ function getNewSubject(
   // for click events and such read at a higher level
   global.events = {}
 
-  loadNewBaseSupport(templater, subject, appElement)
+  loadNewBaseSupport(
+    templater,
+    subject as SupportContextItem,
+    appElement,
+  )
 
   return subject
 }

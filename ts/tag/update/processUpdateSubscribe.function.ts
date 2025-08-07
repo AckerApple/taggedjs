@@ -7,18 +7,18 @@ export function processUpdateSubscribe(
   contextItem: ContextItem,
   ownerSupport: AnySupport,
 ) {
+  if(newValue === contextItem.value) {
+    return
+  }
+
   const resultNum = checkStillSubscription(
     newValue as TemplateValue, // subValue,
     contextItem,
     ownerSupport,
   )
 
-  if(resultNum === -1 && (newValue as SubscribeValue).callback) {
-    
+  if(resultNum === -1 && (newValue as SubscribeValue).callback) {    
     const subContext = contextItem.subContext as SubContext
-    // emitSubScriptionAsIs(newValue as SubscribeValue, subContext)
     emitSubContext(newValue as SubscribeValue, subContext)
-
-    // processUpdateContext(ownerSupport, [subContext.contextItem as ContextItem])
   }
 }

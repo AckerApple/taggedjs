@@ -2,7 +2,7 @@
 
 import { TagValues } from'./html.js'
 import { ValueTypes } from './ValueTypes.enum.js'
-import { getSupportInCycle } from './getSupportInCycle.function.js'
+import { getSupportInCycle } from './cycles/getSupportInCycle.function.js'
 import { StringTag } from './StringTag.type.js'
 import { processDomTagInit } from './update/processDomTagInit.function.js'
 import { Tag } from './Tag.type.js'
@@ -10,7 +10,7 @@ import { AnySupport, ContextItem, TemplateValue, checkTagValueChange, SupportCon
 import { forceUpdateExistingValue } from './update/forceUpdateExistingValue.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
-import { blankHandler } from '../render/dom/attachDomElements.function.js'
+import { blankHandler } from '../render/dom/blankHandler.function.js'
 
 /** Used to override the html`` processing that will first render outerHTML and then its innerHTML */
 export function processOuterDomTagInit(

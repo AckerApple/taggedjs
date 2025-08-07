@@ -1,4 +1,4 @@
-import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
+import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
 import { Subject } from '../subject/Subject.class.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
 

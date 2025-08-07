@@ -18,9 +18,6 @@ export function updateToDiffValue(
   // is new value a tag?
   const tagJsType = newValue && (newValue as TemplaterResult).tagJsType as ValueType
 
-  // contextItem.oldTagJsVar = contextItem.tagJsVar
-  // contextItem.tagJsVar = valueToTagJsVar(newValue)
-
   if(tagJsType) {
     if(tagJsType === ValueTypes.renderOnce) {
       return

@@ -19,7 +19,7 @@ import { checkTagValueChange, destroySupportByContextItem } from './checkTagValu
 import { CheckSupportValueChange, CheckValueChange } from './Context.types.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
 import { ProcessUpdate } from './ProcessUpdate.type.js'
-import { blankHandler } from '../render/dom/attachDomElements.function.js'
+import { blankHandler } from '../render/dom/blankHandler.function.js'
 
 export type Wrapper = ((
   newSupport: AnySupport,
@@ -54,7 +54,6 @@ export type SupportTagGlobal = TagGlobal & {
   blocked: AnySupport[], // renders that did not occur because an event was processing
   oldest: AnySupport
   newest: AnySupport
-  contexts: SupportContextItem[] // populated after reading interpolated.values array converted to an object {variable0, variable:1}
   
   providers?: Provider[]
 }

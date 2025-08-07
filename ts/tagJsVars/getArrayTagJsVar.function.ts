@@ -4,7 +4,7 @@ import { ContextItem } from '../tag/ContextItem.type.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
 import { TagJsTag, TagJsVar } from './tagJsVar.type.js'
 import { tagValueUpdateHandler } from '../tag/update/tagValueUpdateHandler.function.js'
-import { blankHandler } from '../render/dom/attachDomElements.function.js'
+import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { SupportContextItem, Tag, TemplaterResult, TemplateValue } from '../index.js'
 
 export function getArrayTagVar(
@@ -26,6 +26,12 @@ function processArrayUpdates(
   contextItem: ContextItem | SupportContextItem,
   ownerSupport: AnySupport,
 ) {
+  /*
+  if( newValue === contextItem.value) {
+    return
+  }
+  */
+
   const tagUpdateResponse = tagValueUpdateHandler(
     newValue,
     contextItem,

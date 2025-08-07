@@ -1,4 +1,3 @@
-import { AdvancedContextItem } from '../AdvancedContextItem.type.js'
 import { SubscribeValue } from '../../tagJsVars/subscribe.function.js'
 import { setupSubscribe } from './setupSubscribe.function.js'
 import { SignalObject } from '../../state/signal.function.js'
@@ -17,7 +16,7 @@ export function processSubscribeWith(
 ) {
   const subContext = setupSubscribe(
     value,
-    contextItem as AdvancedContextItem,
+    contextItem,
     ownerSupport,
     appendTo,
     insertBefore,
@@ -35,9 +34,33 @@ export function emitSubContext(
   subContext: SubContext,
 ) {
   const observables = value.Observables
-  const obValue = (observables[0] as any)?.value
+  const observable = observables[0]
+
+  if(!subContext.hasEmitted) {
+    if('withDefault' in value) {
+      subContext.subValueHandler(
+        value.withDefault,
+        0
+      )
+      return
+    }
+
+    if('value' in observable) {
+      subContext.subValueHandler(
+        (observable as any).value,
+        0
+      )
+      return
+
+    }
+
+    return // nothing to emit
+  }
+
+
+  const emitValue = subContext.lastValues[0].value  
   subContext.subValueHandler(
-    (obValue || value.withDefault) as TemplateValue,
+    emitValue,
     0
   )
 }
@@ -56,7 +79,7 @@ export function processSignal(
 
   setupSubscribe(
     subValue,
-    contextItem as AdvancedContextItem,
+    contextItem,
     ownerSupport,
     appendTo,
   )

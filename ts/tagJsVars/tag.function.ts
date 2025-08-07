@@ -14,6 +14,7 @@ import { processRenderOnceInit } from '../render/update/processRenderOnceInit.fu
 import { processTagComponentInit } from '../tag/update/processTagComponentInit.function.js'
 import { checkTagValueChange, destroySupportByContextItem } from '../tag/checkTagValueChange.function.js'
 import { tagValueUpdateHandler } from '../tag/update/tagValueUpdateHandler.function.js'
+import { getElement as getTagElement } from '../tag/cycles/setContextInCycle.function.js'
 
 let tagCount = 0
 
@@ -91,6 +92,8 @@ export declare namespace tag {
   let deepPropWatch: typeof tag;
   let immutableProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
   let watchProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
+  
+  let getElement: typeof getTagElement;
 }
 
 type ReturnTag = AnyTag | StateToTag | null | undefined
@@ -111,6 +114,7 @@ function tagUseFn(): ReturnTag {
   throw new Error('Do not call tag.use as a function but instead set it as: `(props) => tag.use = (use) => html`` `')
 }
 
+;(tag as any).getElement = getTagElement
 ;(tag as any).renderOnce = renderOnceFn
 ;(tag as any).use = tagUseFn
 ;(tag as any).deepPropWatch = tag

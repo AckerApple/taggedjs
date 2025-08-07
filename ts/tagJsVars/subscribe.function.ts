@@ -1,6 +1,6 @@
 import { getSupportWithState } from "../interpolations/attributes/getSupportWithState.function.js"
 import { AnySupport } from "../tag/AnySupport.type.js"
-import { getSupportInCycle } from "../tag/getSupportInCycle.function.js"
+import { getSupportInCycle } from "../tag/cycles/getSupportInCycle.function.js"
 import { ValueTypes } from "../tag/index.js"
 import { StatesSetter } from "../state/states.utils.js"
 import { deleteAndUnsubscribe, setupSubscribe } from "../tag/update/setupSubscribe.function.js"
@@ -9,7 +9,7 @@ import { AttributeContextItem } from "../tag/AttributeContextItem.type.js"
 import { checkSubscribeValueChanged } from "./subscribeWith.function.js"
 import { processSubscribeAttribute } from "./processSubscribeAttribute.function.js"
 import { OnSubOutput, SubContext, SubscriptionContext } from "../tag/update/SubContext.type.js"
-import { blankHandler } from "../render/dom/attachDomElements.function.js"
+import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { checkStillSubscription } from "../tag/update/checkStillSubscription.function.js"
 
 export type LikeSubscription = {

@@ -1,5 +1,5 @@
 import { state } from '../index.js'
-import { getSupportInCycle } from '../tag/getSupportInCycle.function.js'
+import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
 import { Signal, SignalObject } from './signal.function.js'
 
 export type SignalArray<T> = SignalObject<Array<T>> & Array<T>

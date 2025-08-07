@@ -6,7 +6,7 @@ import { InterpolatedTemplates } from '../interpolations/interpolations.js'
 import { TagValues } from'./html.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { DomMetaMap, LikeObjectChildren } from '../interpolations/optimizers/LikeObjectElement.type.js'
-import { getSupportInCycle } from './getSupportInCycle.function.js'
+import { getSupportInCycle } from './cycles/getSupportInCycle.function.js'
 import { StringTag } from './StringTag.type.js'
 import { DomTag } from './DomTag.type.js'
 import { processDomTagInit } from './update/processDomTagInit.function.js'
@@ -15,7 +15,7 @@ import { checkTagValueChange, destroySupportByContextItem, TagJsVarInnerHTML } f
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { processOuterDomTagInit } from './processOuterDomTagInit.function.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
-import { blankHandler } from '../render/dom/attachDomElements.function.js'
+import { blankHandler } from '../render/dom/blankHandler.function.js'
 
 export type EventCallback = (event: Event) => any
 export type EventMem = {elm: Element, callback:EventCallback}

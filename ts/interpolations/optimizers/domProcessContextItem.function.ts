@@ -3,6 +3,7 @@
 import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
 import { ContextItem } from "../../tag/ContextItem.type.js"
+import { removeContextInCycle, setContextInCycle } from "../../tag/cycles/setContextInCycle.function.js"
 
 export function domProcessContextItem(
   value: any,
@@ -11,11 +12,11 @@ export function domProcessContextItem(
   appendTo?: Element,
   insertBefore?: Text
 ) {
-  // how to handle value updates
-  // contextItem.handler = tagValueUpdateHandler
-
   const subject = support.context  
   subject.locked = true
+
+  contextItem.element = appendTo as HTMLElement
+  setContextInCycle(contextItem)
 
   processFirstSubjectValue(
     value,
@@ -24,6 +25,8 @@ export function domProcessContextItem(
     appendTo,
     insertBefore,
   )
+
+  removeContextInCycle()
 
   delete subject.locked
   contextItem.value = value
