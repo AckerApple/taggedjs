@@ -34,17 +34,13 @@ export const providerDebug = tag((_x = 'providerDebugBase') => {
   const providerClass: TagDebugProvider = providers.create( TagDebugProvider )
   const provider = providers.create( tagDebugProvider )
 
-  const colorOptions = ['red', 'blue', 'green', 'purple', 'orange']
   let propCounter = 0
   let renderCount = 0
-  let cycleColorParent = 'red'
-  let cycleColorChild = 'green'
-  let cycleColorChild2 = 'green'
 
   states(get => [{
-    propCounter, renderCount, cycleColorParent, cycleColorChild, cycleColorChild2,
+    propCounter, renderCount,
   }] = get({
-    propCounter, renderCount, cycleColorParent, cycleColorChild, cycleColorChild2,
+    propCounter, renderCount,
   }))
 
   if(providerClass.showDialog) {
@@ -119,45 +115,7 @@ export const providerDebug = tag((_x = 'providerDebugBase') => {
 
     ${dialog(providerClass)}
 
-    <fieldset>
-      <legend>In-Cycle Context Communication</legend>
-      <div style="margin-bottom: 1em">
-        <label>
-          Parent Color: 
-          <select id="parent-color-select" onchange=${e => cycleColorParent = e.target.value}>
-            ${colorOptions.map(color => html`
-              <option value=${color} selected=${cycleColorParent === color}>
-                ${color}
-              </option>
-            `.key(color))}
-          </select>
-        </label>
-        <label style="margin-left: 1em">
-          Child Color: 
-          <select id="child-color-select" onchange=${e => cycleColorChild = e.target.value}>
-            ${colorOptions.map(color => html`
-              <option value=${color} selected=${cycleColorChild === color}>
-                ${color}
-              </option>
-            `.key(color))}
-          </select>
-        </label>
-        <label style="margin-left: 1em">
-          Child Color2: 
-          <select id="child-color-select-2" onchange=${e => cycleColorChild2 = e.target.value}>
-            ${colorOptions.map(color => html`
-              <option value=${color} selected=${cycleColorChild2 === color}>
-                ${color}
-              </option>
-            `.key(color))}
-          </select>
-        </label>
-      </div>
-      <div id="in-cycle-parent" ${inCycleParent(cycleColorParent)}>
-        <div id="in-cycle-child" ${inCycleChild(cycleColorChild)}></div>
-        <div id="in-cycle-child-2">${inCycleChild2(cycleColorChild2)}</div>
-      </div>
-    </fieldset>
+    ${inCycleContextComms()}
   `
 })
 /*
@@ -318,27 +276,102 @@ const testProviderAsProps = tag((
   `
 })
 
-const inCycleParent = (color = 'red') => host(() => {
+const inCycleParent = host((color = 'red') => {
   const element = tag.getElement()
   element.style.border = '2px solid ' + color
   element.style.display = 'flex'
   element.style.gap = '1em'
+
+  return { color, title: 'inCycleParent' }
 })
 
-const inCycleChild = (color = 'green') => {
-  return host(() => {
-    const element = tag.getElement()
-    element.style.border = '2px solid ' + color
-    element.style.flex = '1'
-    element.innerHTML = 'wonderful'
-  })
-}
+const inCycleChild = host((color = 'green') => {
+  const parent = tag.inject( inCycleParent )
+  const element = tag.getElement()
+  element.style.border = '2px solid ' + color
+  element.style.flex = '1'
+  element.innerHTML = `wonderful - parent(${parent.color})`
+})
 
-const inCycleChild2 = (color = 'green') => {
-  return host(() => {
-    const element = tag.getElement()
-    element.style.border = '2px solid ' + color
-    element.style.flex = '1'
-    element.innerHTML = 'wonderful too'
-  })
-}
+const inCycleChild2 = host((color = 'green') => {
+  const element = tag.getElement()
+  element.style.border = '2px solid ' + color
+  element.style.flex = '1'
+})
+
+const inCycleChild3 = host((color = 'green') => {
+  const element = tag.getElement()
+  element.style.color = color
+})
+
+const colorOptions = ['red', 'blue', 'green', 'purple', 'orange']
+
+const inCycleContextComms = tag(() => {
+  let cycleColorParent = 'red'
+  let cycleColorChild = 'green'
+  let cycleColorChild2 = 'green'
+  let hideShowCycles = false
+
+  states(get => [{
+    cycleColorParent, cycleColorChild, cycleColorChild2, hideShowCycles,
+  }] = get({
+    cycleColorParent, cycleColorChild, cycleColorChild2, hideShowCycles,
+  }))
+
+  return html`
+    <fieldset id="in-cycle-context-comms">
+      <legend>
+        <label>
+          <input type="checkbox" checked=${!hideShowCycles} onchange=${e => hideShowCycles = !hideShowCycles} />
+          In-Cycle Context Communication
+        </label>
+      </legend>
+      ${!hideShowCycles && html`
+        <div id="fieldset-body-wrap" style="margin-bottom: 1em">
+          <label>
+            Parent Color: 
+            <select id="parent-color-select" onchange=${e => cycleColorParent = e.target.value}>
+              ${colorOptions.map(color => html`
+                <option value=${color} selected=${cycleColorParent === color}>
+                  ${color}
+                </option>
+              `.key(color))}
+            </select>
+          </label>
+          <label style="margin-left: 1em">
+            Child Color: 
+            <select id="child-color-select" onchange=${e => cycleColorChild = e.target.value}>
+              ${colorOptions.map(color => html`
+                <option value=${color} selected=${cycleColorChild === color}>
+                  ${color}
+                </option>
+              `.key(color))}
+            </select>
+          </label>
+          <label style="margin-left: 1em">
+            Child Color2: 
+            <select id="child-color-select-2" onchange=${e => cycleColorChild2 = e.target.value}>
+              ${colorOptions.map(color => html`
+                <option value=${color} selected=${cycleColorChild2 === color}>
+                  ${color}
+                </option>
+              `.key(color))}
+            </select>
+          </label>
+        </div>
+        
+        <div id="drag-drop-wrap">
+        </div>
+        
+        <div id="in-cycle-parent" ${inCycleParent(cycleColorParent)}>
+          <div id="in-cycle-child" ${inCycleChild(cycleColorChild)}></div>
+          <div id="in-cycle-child-2">
+            wonderful too
+            ${inCycleChild2(cycleColorChild2)}
+            <span>part 2${inCycleChild3(cycleColorChild2)}</span>
+          </div>
+        </div>
+      `}
+    </fieldset>
+  `
+})

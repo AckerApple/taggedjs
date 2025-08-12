@@ -96,7 +96,7 @@ const getSection = (section: OutputSection) => {
       <a id=${view}><!-- ⚓️ --></a>
       <fieldset>
         <legend>${emoji} ${title}</legend>
-        <div style.display=${section.contentHide ? 'none' : ''}>
+        <div id="many-section-contents" style.display=${section.contentHide ? 'none' : ''}>
           ${output}
         </div>
         <div style="display:flex;">

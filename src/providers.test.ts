@@ -1,4 +1,3 @@
-import { delay } from 'rxjs'
 import { describe, it, expect, changeElm } from './testing'
 import { testDuelCounterElements } from './testing'
 
@@ -75,7 +74,7 @@ describe('🫴 providers', () => {
       expect(childElement).toBeDefined()
       
       if (childElement) {
-        expect(childElement.innerHTML.trim()).toBe('wonderful')
+        expect(childElement.innerHTML.trim()).toBe('wonderful - parent(red)')
       }
     })
 
@@ -104,9 +103,6 @@ describe('🫴 providers', () => {
         parentColorSelect.dispatchEvent(new Event('change', { bubbles: true }))
         changeElm(parentColorSelect)
         
-        await delay(0)
-
-        // Wait a bit for re-render
         const styles = window.getComputedStyle(parentElement)
         const hasBlue = styles.borderColor.includes('blue') || 
                         styles.borderColor.includes('rgb(0, 0, 255)')
@@ -125,9 +121,6 @@ describe('🫴 providers', () => {
         // Change to purple
         childColorSelect.value = 'purple'
         childColorSelect.dispatchEvent(new Event('change', { bubbles: true }))
-        
-        // Wait a bit for re-render
-        await delay(0)
 
         const styles = window.getComputedStyle(childElement)
         const hasPurple = styles.borderColor.includes('purple') || 
@@ -141,7 +134,7 @@ describe('🫴 providers', () => {
       expect(child2Element).toBeDefined()
       
       if (child2Element) {
-        expect(child2Element.innerHTML.trim()).toBe('wonderful too')
+        expect((child2Element.textContent as string).trim().replace(/\n(\s+)/g,' ')).toBe('wonderful too part 2')
         
         const styles = window.getComputedStyle(child2Element)
         const hasGreen = styles.borderColor.includes('rgb(0, 128, 0)') || 
@@ -163,9 +156,6 @@ describe('🫴 providers', () => {
         // Change to orange
         child2ColorSelect.value = 'orange'
         child2ColorSelect.dispatchEvent(new Event('change', { bubbles: true }))
-        
-        // Wait a bit for re-render
-        await delay(0)
 
         const styles = window.getComputedStyle(child2Element)
         const hasOrange = styles.borderColor.includes('orange') || 

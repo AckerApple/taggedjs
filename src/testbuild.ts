@@ -48,7 +48,6 @@ function templaterToSupport(
     
     value: templater,
     valueIndex: 0,
-    valueIndexSetBy: 'testbuild', // temp
 
     tagJsVar: valueToTagJsVar(templater),
     global: undefined as any, // populated below in getNewGlobal
@@ -147,7 +146,6 @@ function processValue(
             {
               value,
               valueIndex,
-              valueIndexSetBy: 'nothing',
               global: getNewGlobal(subject as SupportContextItem),
               parentContext: support.context,
               tagJsVar: valueToTagJsVar(value),
