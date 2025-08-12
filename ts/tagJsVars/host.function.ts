@@ -3,19 +3,11 @@ import { AnySupport, ContextItem, TemplateValue, ValueTypes } from "../tag/index
 import { syncWrapCallback } from "../tag/output.function.js"
 import { handleTagTypeChangeFrom } from "../tag/update/checkStillSubscription.function.js"
 import { removeContextInCycle, setContextInCycle } from "../tag/cycles/setContextInCycle.function.js"
-import { TagJsVar } from "./tagJsVar.type.js"
+import { MatchesInjection, TagJsVar } from "./tagJsVar.type.js"
 
 /** On specific host life cycles, a callback can be called. 
  * @state always an object */
 export type HostCallback = (...args: any[]) => any
-/*
-export type HostCallback = (
-  element: HTMLInputElement,
-  newHostValue: HostValue,
-  context: AttributeContextItem,
-  state: any,
-) => any
-*/
 
 type Options = {
   onDestroy?: HostCallback
@@ -28,7 +20,7 @@ type AllOptions = Options & {
   callback: HostCallback
 }
 
-type HostValueFunction<T extends ((args: any[]) => any)> = HostValue & T
+export type HostValueFunction<T extends ((args: any[]) => any)> = HostValue & T
 
 /** Use to gain access to element
  * @callback called every render
@@ -46,6 +38,10 @@ export function host<T extends HostCallback>(
     processUpdate: processHostUpdate,
     delete: deleteHost,
     options: { callback, ...options } as AllOptions,
+    matchesInjection(inject: any): boolean {
+      // Check if the inject target is a host with the same callback
+      return inject?.options?.callback === callback
+    },
   }
 
   const returnFunction = function hostWrap(...args: any[]) {
@@ -101,7 +97,7 @@ function processHostUpdate(
   const newHost = newValue as unknown as HostValue
 
   const args = (newHost.options.arguments || oldOptions.arguments || [])
-  newHost.options.callback(...args)
+  contextItem.returnValue = newHost.options.callback(...args)
   /*
   newHost.options.callback(
     element,
@@ -155,7 +151,10 @@ function procesHostTagJsVar(
   // const oldOptions = (contextItem.tagJsVar as HostValue).options
   //const args = (tagJsVar.options.arguments || oldOptions?.arguments || [])
   const args = tagJsVar.options.arguments || []
-  tagJsVar.options.callback(...args)
+  const returnValue = tagJsVar.options.callback(...args)
+  
+  // Store the return value for tag.inject to access
+  contextItem.returnValue = returnValue
 
   const options = tagJsVar.options
   if(options.onInit) {
@@ -199,4 +198,5 @@ function deleteHost(
 export type HostValue = TagJsVar & {
   tagJsType: typeof ValueTypes.host
   options: AllOptions
+  matchesInjection: MatchesInjection
 }

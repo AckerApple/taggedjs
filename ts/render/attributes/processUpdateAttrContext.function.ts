@@ -42,12 +42,11 @@ export function processUpdateAttrContext(
       return
     }
 
-    const checkResult = oldValue.checkValueChange(
+    oldValue.checkValueChange(
       tagValue,
       contextItem as SupportContextItem, // todo: weird typing should just be ContextItem
       ownerSupport,
     )
-
 
     return
   }
@@ -61,6 +60,7 @@ export function processUpdateAttrContext(
       ownerSupport,
       attrContextItem.howToSet as HowToSet,
       [], // Context, but we dont want to alter current
+      attrContextItem.parentContext,
     )
 
     attrContextItem.value = value

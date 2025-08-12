@@ -5,8 +5,9 @@ import { LastArrayItem } from '../index.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 
 export interface AppContextItem {
+  returnValue?: any // used when value results in a return value
+
   valueIndex: number
-  valueIndexSetBy: string
   
   value?: any,
   tagJsVar: TagJsVar  
@@ -21,11 +22,14 @@ export interface AppContextItem {
 export interface BaseContextItem extends AppContextItem {  
   element?: HTMLElement
   parentContext: BaseContextItem
-  isAttrs?: true // when a context is created just to house attributes
+  
+  isAttr?: true // when a context is just one attribute definition
+  isAttrs?: true // when a context is created just to house multiple attributes for one element
+
+  contexts?: ContextItem[]
 }
 
 export interface ContextItem extends BaseContextItem {
-  contexts?: ContextItem[]
   locked?: true
   deleted?: true
   

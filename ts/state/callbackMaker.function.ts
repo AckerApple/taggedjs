@@ -25,7 +25,7 @@ export const callbackMaker = () => {
   return function triggerMaker<A,B,C,D,E,F, T>(
     callback: Callback<A, B, C, D, E, F, T>
   ) {
-    return createTrigger(support, oldState, callback)
+    return createTrigger(support, oldState, { callback })
   } as innerCallback
 }
 

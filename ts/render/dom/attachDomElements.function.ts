@@ -1,16 +1,14 @@
 // taggedjs-no-compile
 
 import { DomObjectChildren, DomObjectElement, DomObjectText } from "../../interpolations/optimizers/ObjectNode.types.js"
-import { HowToSet, howToSetFirstInputValue, howToSetStandAloneAttr } from "../../interpolations/attributes/howToSetInputValue.function.js"
-import { paintAppend, paintAppendElementString, paintAppends, paintBefore, paintBeforeElementString, paintCommands } from "../paint.function.js"
+import { paintAppend, paintAppendElementString, paintAppends, paintBeforeElementString, paintCommands } from "../paint.function.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
-import { processAttribute } from "../attributes/processAttribute.function.js"
 import { ContextItem } from "../../tag/ContextItem.type.js"
 import { ObjectChildren } from "../../interpolations/optimizers/LikeObjectElement.type.js"
 import { empty } from "../../tag/ValueTypes.enum.js"
 import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicDom.function.js"
-import { SupportContextItem } from "../../index.js"
 import { TagJsVar } from "../../tagJsVars/tagJsVar.type.js"
+import { attachDomElement } from "./attachDomElement.function.js"
 
 export function attachDomElements(
   nodes: ObjectChildren,
@@ -53,6 +51,7 @@ export function attachDomElements(
         appendTo,
         insertBefore,
       )
+
       continue
     }
 
@@ -64,6 +63,20 @@ export function attachDomElements(
       continue
     }
 
+    // Create parent context for attributes first
+    const newParentContext: ContextItem = {
+      isAttrs: true,
+      element: undefined as any, // will be set after element creation
+      parentContext,
+      contexts: [],
+      
+      tagJsVar: {
+        tagJsType: 'new-parent-context'
+      } as TagJsVar,
+      valueIndex: -1,
+      withinOwnerElement: true,
+    }
+
     // one single html element. This is where attribute processing takes place
     const { attributeContexts, domElement } = attachDomElement(
       newNode,
@@ -71,22 +84,14 @@ export function attachDomElements(
       values,
       support,
       contexts,
+      newParentContext,
       appendTo,
       insertBefore,
     )
 
-    const newParentContext: ContextItem = {
-      isAttrs: true,
-      parentContext,
-      contexts: attributeContexts,
-      
-      tagJsVar: {
-        tagJsType: 'new-parent-context'
-      } as TagJsVar,
-      valueIndex: -1,
-      valueIndexSetBy: 'attachDomElements',
-      withinOwnerElement: true,
-    }
+    // Update parent context with element and attribute contexts
+    newParentContext.element = domElement
+    newParentContext.contexts = attributeContexts
 
     if (node.ch) {
       newNode.ch = attachDomElements(
@@ -103,55 +108,6 @@ export function attachDomElements(
   }
 
   return {dom, contexts}
-}
-
-function attachDomElement(
-  newNode: DomObjectElement,
-  node: DomObjectElement,
-  values: any[],
-  support: AnySupport,
-  contexts: ContextItem[],
-  appendTo: Element | undefined,
-  insertBefore: Text | undefined,
-): {
-  domElement: HTMLElement
-  attributeContexts: ContextItem[]
-} {
-  const domElement = newNode.domElement = document.createElement(node.nn)
-  const attributeContexts: ContextItem[] = []
-  
-  // attributes that may effect style, come first for performance
-  if (node.at) {
-    for (const attr of node.at) {      
-      const name = attr[0]
-      const value = attr[1]
-      const isSpecial = attr[2] || false
-      const howToSet: HowToSet = attr.length > 1 ? howToSetFirstInputValue : howToSetStandAloneAttr
-
-      const newContext = processAttribute(
-        values,
-        name,
-        domElement,
-        support,
-        howToSet,
-        contexts,
-        isSpecial,
-        value,
-      )
-
-      if(typeof newContext === 'object') {
-        attributeContexts.push(newContext as ContextItem)
-      }
-    }
-  }
-
-  if (appendTo) {
-    paintAppends.push([paintAppend, [appendTo, domElement]])
-  } else {
-    paintCommands.push([paintBefore, [insertBefore, domElement]])
-  }
-  
-  return { domElement, attributeContexts }
 }
 
 function attachDomText(

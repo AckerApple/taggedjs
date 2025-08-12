@@ -10,7 +10,6 @@ export function addOneContext(
   const contextItem: ContextItem = {
     value,
     valueIndex: context.length,
-    valueIndexSetBy: 'addOneContext',
 
     tagJsVar: valueToTagJsVar(value),
     withinOwnerElement,

@@ -33,6 +33,7 @@ export function processAttribute(
   support: AnySupport,
   howToSet: HowToSet, //  = howToSetInputValue
   contexts: ContextItem[],
+  parentContext: ContextItem,
   isSpecial: SpecialDefinition,
   value: string | null | undefined | TagVarIdNum,
 ) {
@@ -45,6 +46,7 @@ export function processAttribute(
     return processTagJsVarAttribute(
       value,
       contexts,
+      parentContext,
       tagJsVar,
       varIndex,
       support,
@@ -59,11 +61,10 @@ export function processAttribute(
       valueInValues,
       contexts,
       true,
-      support.context,
+      parentContext,
     ) as any as AttributeContextItem
 
     contextItem.valueIndex = varIndex
-    contextItem.valueIndexSetBy = 'processAttribute'
     contextItem.isAttr = true
     contextItem.element = element
     contextItem.isNameOnly = true
@@ -80,8 +81,9 @@ export function processAttribute(
       support,
       howToSet as HowToSet,
       contexts,
+      parentContext,
     )
-  
+
     return contextItem
   }
 
@@ -105,6 +107,7 @@ export function processAttribute(
       value,
       element,
       contexts,
+      parentContext,
       howToSet,
       support,
       isSpecial,
@@ -125,6 +128,7 @@ export function processAttribute(
 function processTagJsVarAttribute(
   value: string | TagVarIdNum | null | undefined,
   contexts: ContextItem[],
+  parentContext: ContextItem,
   tagJsVar: TagJsVar,
   varIndex: number,
   support: AnySupport,
@@ -136,12 +140,11 @@ function processTagJsVarAttribute(
     value,
     contexts,
     true,
-    support.context,
+    parentContext,
   ) as any as AttributeContextItem
 
   contextItem.element = element
   contextItem.valueIndex = varIndex
-  contextItem.valueIndexSetBy = 'processTagJsVarAttribute'
 
   contextItem.isAttr = true
   contextItem.isNameOnly = isNameVar
@@ -176,6 +179,7 @@ export function processNameOnlyAttrValue(
   ownerSupport: AnySupport,
   howToSet: HowToSet,
   context: ContextItem[],
+  parentContext: ContextItem,
 ) {
   if(isNoDisplayValue(attrValue)) {
     return
@@ -195,6 +199,7 @@ export function processNameOnlyAttrValue(
         ownerSupport,
         howToSet,
         context,
+        parentContext,
         isSpecial,
         value,
       )

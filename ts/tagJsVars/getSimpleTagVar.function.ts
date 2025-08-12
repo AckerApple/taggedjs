@@ -57,15 +57,12 @@ export function deleteSimpleValue(
 ) {
   const elm = contextItem.simpleValueElm as Element
   delete contextItem.simpleValueElm
-  if(!elm) {
-    throw new Error('issue starts here no elm')
-  }
   addPaintRemover(elm, 'deleteSimpleValue')
 }
 
 export function checkSimpleValueChange(
   newValue: unknown,
-  contextItem: ContextItem,
+  _contextItem: ContextItem,
 ) {
   const isBadValue = newValue === null || newValue === undefined
   const isRegularUpdate = isBadValue || !(typeof(newValue) === BasicTypes.object)

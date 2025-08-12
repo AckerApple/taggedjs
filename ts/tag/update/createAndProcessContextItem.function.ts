@@ -8,7 +8,7 @@ import { TemplateValue } from '../TemplateValue.type.js'
 import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 import { ContextItem } from '../ContextItem.type.js'
 
-/** Must provide insertBefore OR appendTo */
+/** Used by arrays and subcontext creators like subscribe. Must provide insertBefore OR appendTo */
 export function createAndProcessContextItem(
   value: TemplateValue,
   ownerSupport: AnySupport,
@@ -27,7 +27,6 @@ export function createAndProcessContextItem(
     parentContext: ownerSupport.context,
     
     valueIndex: contexts.length,
-    valueIndexSetBy: 'createAndProcessContextItem',
   }
 
   if(!appendTo) {

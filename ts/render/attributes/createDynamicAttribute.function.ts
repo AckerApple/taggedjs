@@ -35,7 +35,6 @@ export function createDynamicArrayAttribute(
         withinOwnerElement: true,
         tagJsVar,
         valueIndex: contexts.length,
-        valueIndexSetBy: 'createDynamicArrayAttribute',
         parentContext,
       }
   
@@ -88,6 +87,7 @@ export function createDynamicAttribute(
   value: any,
   element: HTMLElement,
   context: ContextItem[],
+  parentContext: ContextItem,
   howToSet: HowToSet, //  = howToSetInputValue
   support: AnySupport,
   isSpecial: SpecialDefinition,
@@ -102,8 +102,7 @@ export function createDynamicAttribute(
     tagJsVar,
     
     valueIndex: varIndex,
-    valueIndexSetBy: 'createDynamicAttribute',
-    parentContext: support.context,
+    parentContext,
   }
 
   context.push(contextItem)

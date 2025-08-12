@@ -11,7 +11,6 @@ import type { DomTag } from '../tag/DomTag.type.js'
 import type { StringTag } from '../tag/StringTag.type.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { painting } from './paint.function.js'
-import { valueToTagJsVar } from '../tagJsVars/valueToTagJsVar.function.js'
 
 /** Function that kicks off actually putting tags down as HTML elements */
 export function buildBeforeElement(

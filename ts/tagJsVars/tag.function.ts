@@ -15,6 +15,9 @@ import { processTagComponentInit } from '../tag/update/processTagComponentInit.f
 import { checkTagValueChange, destroySupportByContextItem } from '../tag/checkTagValueChange.function.js'
 import { tagValueUpdateHandler } from '../tag/update/tagValueUpdateHandler.function.js'
 import { getElement as getTagElement } from '../tag/cycles/setContextInCycle.function.js'
+import { tagInject } from './tagInject.function.js'
+import { onInit as tagOnInit } from '../state/onInit.function.js'
+import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js'
 
 let tagCount = 0
 
@@ -94,6 +97,9 @@ export declare namespace tag {
   let watchProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
   
   let getElement: typeof getTagElement;
+  let inject: typeof tagInject;
+  let onInit: typeof tagOnInit;
+  let onDestroy: typeof tagOnDestroy;
 }
 
 type ReturnTag = AnyTag | StateToTag | null | undefined
@@ -119,6 +125,9 @@ function tagUseFn(): ReturnTag {
 ;(tag as any).use = tagUseFn
 ;(tag as any).deepPropWatch = tag
 ;(tag as any).route = routeFn
+;(tag as any).inject = tagInject
+;(tag as any).onInit = tagOnInit
+;(tag as any).onDestroy = tagOnDestroy
 
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``

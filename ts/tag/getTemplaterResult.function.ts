@@ -1,11 +1,10 @@
 import { EventCallback } from './getDomTag.function.js'
 import { ContextItem } from './ContextItem.type.js'
 import { AnySupport } from './AnySupport.type.js'
-import { SupportContextItem } from './SupportContextItem.type.js'
 import { Props } from '../Props.js'
 import { TagWrapper } from './tag.utils.js'
 import { Provider } from '../state/providers.js'
-import { OnDestroyCallback } from '../state/onDestroy.js'
+import { OnDestroyCallback } from '../state/onDestroy.function.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { Subject } from '../subject/index.js'
 import { ValueTypes } from './ValueTypes.enum.js'
@@ -104,6 +103,10 @@ export function getTemplaterResult(
     key: function keyTemplate<T>(arrayValue: T) {
       (templater as TemplaterResultArrayItem<T>).arrayValue = arrayValue
       return templater
+    },
+    matchesInjection(inject: any): boolean {
+      // For templaters, check if the wrapper matches
+      return templater.wrapper === inject || templater.wrapper?.original === inject?.original
     }
   }
   

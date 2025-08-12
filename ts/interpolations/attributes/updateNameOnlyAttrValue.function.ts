@@ -15,7 +15,8 @@ export function updateNameOnlyAttrValue(
   element: Element,
   ownerSupport: AnySupport,
   howToSet: HowToSet,
-  context: ContextItem[],
+  contexts: ContextItem[],
+  parentContext: ContextItem,
 ) {
   // check to remove previous attribute(s)
   if(lastValue) {
@@ -48,7 +49,8 @@ export function updateNameOnlyAttrValue(
     element as HTMLElement,
     ownerSupport,
     howToSet,
-    context,
+    contexts,
+    parentContext,
   )
 }
 

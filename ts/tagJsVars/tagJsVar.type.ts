@@ -15,7 +15,12 @@ export type TagJsVar = {
   
   value?: any
   checkValueChange: CheckValueChange | CheckSupportValueChange
+  
+  /** Optional method to check if this TagJsVar matches an injection request */
+  matchesInjection?: MatchesInjection
 }
+
+export type MatchesInjection = (inject: any) => boolean
 
 export type TagJsTag = TagJsVar & {
   tagJsType: string // typeof ValueTypes.tag | typeof ValueTypes.dom

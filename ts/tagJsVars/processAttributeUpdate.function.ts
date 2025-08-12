@@ -12,7 +12,7 @@ export function processAttributeUpdate(
   element: Element,
   name: string,
 ) {
-  const oldValue = contextItem.value as TagJsVar
+  // const oldValue = contextItem.value as TagJsVar
   // const oldTag2 = valueToTagJsVar(oldValue) // contextItem.tagJsVar as TagJsVar
   const oldTag = contextItem.tagJsVar // contextItem.tagJsVar as TagJsVar
   const tagValue = value as TagJsVar | undefined
