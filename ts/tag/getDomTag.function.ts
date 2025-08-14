@@ -11,11 +11,12 @@ import { StringTag } from './StringTag.type.js'
 import { DomTag } from './DomTag.type.js'
 import { processDomTagInit } from './update/processDomTagInit.function.js'
 import { Tag } from './Tag.type.js'
-import { checkTagValueChange, destroySupportByContextItem, TagJsVarInnerHTML } from '../index.js'
+import { checkTagValueChange, TagJsVarInnerHTML } from '../index.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { processOuterDomTagInit } from './processOuterDomTagInit.function.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
+import { destroySupportByContextItem } from './destroySupportByContextItem.function.js'
 
 export type EventCallback = (event: Event) => any
 export type EventMem = {elm: Element, callback:EventCallback}

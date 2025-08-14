@@ -3,6 +3,8 @@ import { smartRemoveKids } from '../tag/smartRemoveKids.function.js'
 import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 import { runBeforeDestroy } from '../tag/tagRunner.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
+import { ContextItem } from '../index.js'
+import { SupportContextItem } from '../index.js'
 
 export function destroySupport(
   support: AnySupport,
@@ -22,6 +24,8 @@ export function destroySupport(
   }
 
   smartRemoveKids(context, promises)
+
+  delete (context as ContextItem).state
 
   return promises
 }

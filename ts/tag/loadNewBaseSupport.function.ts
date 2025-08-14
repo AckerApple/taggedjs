@@ -8,7 +8,6 @@ export function loadNewBaseSupport(
   subject:SupportContextItem,
   appElement: Element,
 ) {
-  const global = subject.global
   const newSupport = getBaseSupport(
     templater,
     subject as SupportContextItem,
@@ -17,8 +16,14 @@ export function loadNewBaseSupport(
   upgradeBaseToSupport(templater, newSupport, newSupport)
   
   newSupport.appElement = appElement
-  global.oldest = global.oldest || newSupport
-  global.newest = newSupport
+  
+  // Initialize older/newer with empty state if first render
+  if (!subject.state.oldest) {
+    subject.state.oldest = newSupport
+    subject.state.older = subject.state.newer
+  }
+  
+  subject.state.newest = newSupport
 
   return newSupport
 }

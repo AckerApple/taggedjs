@@ -1,12 +1,12 @@
 import { Props } from '../Props.js'
-import { BaseSupport } from './BaseSupport.type.js'
+import { AnySupport } from './AnySupport.type.js'
 import { PropsConfig } from './createHtmlSupport.function.js'
 import { TemplaterResult } from './getTemplaterResult.function.js'
 import { hasPropChanges } from './hasPropChanges.function.js'
 
 /** Used when deciding if a support will even change (are the arguments the same?) */
 export function hasSupportChanged(
-  oldSupport: BaseSupport,
+  oldSupport: AnySupport,
   newTemplater: TemplaterResult,
 ): number | string | false {
   const latestProps = newTemplater.props as Props

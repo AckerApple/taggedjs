@@ -9,7 +9,7 @@ export function checkStateMismatch(
   support: AnySupport,
 ) {
   const rearray = config.rearray as unknown as State
-  if(rearray.length && rearray.length !== config.stateArray.length) {
+  if(rearray.length && rearray.length !== config.state.length) {
     throwStateMismatch(rearray, support, config)
   }
 }
@@ -21,7 +21,7 @@ function throwStateMismatch(
   support: AnySupport,
   config: StateMemory,
 ) {
-  const message = `Saved states between renders are inconsistent. Expected ${rearray.length} states got ${config.stateArray.length}.`
+  const message = `Saved states between renders are inconsistent. Expected ${rearray.length} states got ${config.state.length}.`
   const wrapper = support.templater?.wrapper as Wrapper
   let tagFunction: Wrapper | Original = wrapper
   
@@ -32,7 +32,7 @@ function throwStateMismatch(
   }
   
   const details = {
-    oldStates: config.stateArray,
+    oldStates: config.state,
     newStates: config.rearray,
     tagFunction,
     templater: support.templater,

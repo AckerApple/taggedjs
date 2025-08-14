@@ -220,8 +220,9 @@ export function callbackPropOwner(
   callWith: unknown[],
   ownerSupport: AnySupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
 ) {
-  const global = ownerSupport.context.global as SupportTagGlobal
-  const newest = global?.newest || ownerSupport as AnySupport
+  const ownerContext = ownerSupport.context
+  const global = ownerContext.global as SupportTagGlobal
+  const newest = ownerContext.state?.newest || ownerSupport as AnySupport
   const supportInCycle = getSupportInCycle()
   const noCycle = supportInCycle === undefined
   

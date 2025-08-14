@@ -66,8 +66,8 @@ function destroyArrayItemByGlobal(
   global: SupportTagGlobal,
   item: ContextItem,
 ) {
-  if(global) {
-    const support = global.oldest
+  if(global && item.state?.oldest) {
+    const support = item.state.oldest
     destroySupport(support, global)
     return
   }

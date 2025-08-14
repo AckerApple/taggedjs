@@ -9,7 +9,6 @@ import { getNewGlobal } from '../../tag/update/getNewGlobal.function.js'
 import { isLikeTags } from'../../tag/isLikeTags.function.js'
 import { PropWatches } from '../../tagJsVars/tag.function.js'
 import { Props } from '../../Props.js'
-import { BaseSupport } from '../../tag/BaseSupport.type.js'
 import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.function.js'
 import { AnySupport } from '../../tag/AnySupport.type.js'
 import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
@@ -21,7 +20,7 @@ export function updateExistingTagComponent(
   subject:SupportContextItem,
 ): void {
   const global = subject.global as SupportTagGlobal
-  const oldSupport = global.newest
+  const oldSupport = subject.state.newest as AnySupport
   
   const oldWrapper = oldSupport.templater.wrapper
   let newWrapper = newSupport.templater.wrapper as Wrapper
@@ -58,7 +57,7 @@ export function updateExistingTagComponent(
   }
 
   const hasChanged = skipComparing || hasSupportChanged(
-    oldSupport as unknown as BaseSupport,
+    oldSupport,
     templater
   )
 
@@ -99,7 +98,7 @@ export function syncFunctionProps(
   const subject = oldSupport.context
   const global = subject.global as SupportTagGlobal
   
-  if(!global || !global.newest) {
+  if(!global || !subject.state.newest) {
     const castedProps = castProps(
       newPropsArray,
       newSupport,
@@ -111,7 +110,7 @@ export function syncFunctionProps(
     return newPropsArray
   }
 
-  const newest = global.newest
+  const newest = subject.state.newest
   oldSupport = newest || oldSupport as AnySupport
 
   const priorPropConfig = oldSupport.propsConfig as PropsConfig
@@ -201,9 +200,8 @@ function swapTags(
   ownerSupport: AnySupport
 ) {
   const global = contextItem.global as SupportTagGlobal
-  const oldestSupport = global.oldest as AnySupport
+  const oldestSupport = contextItem.state.oldest as AnySupport
   destroySupport(oldestSupport, global)
-  
   getNewGlobal(contextItem)
 
   ;(templater as TagJsVar).processInit(

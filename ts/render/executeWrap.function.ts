@@ -36,9 +36,7 @@ export function executeWrap(
   tag.templater = templater
   templater.tag = tag
 
-  useSupport.state = config.stateArray
-  useSupport.states = config.states
-  // useSupport.states = [...config.states]
+  useSupport.context.state.newer = { ...config }
 
   return useSupport
 }

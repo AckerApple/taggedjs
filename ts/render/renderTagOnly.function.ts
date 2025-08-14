@@ -3,11 +3,12 @@ import { SupportContextItem } from '../tag/SupportContextItem.type.js'
 import { executeWrap } from './executeWrap.function.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { TagWrapper } from '../tag/tag.utils.js'
-import { runAfterRender } from './afterRender.function.js'
+import { runAfterRender } from './runAfterRender.function.js'
 import { initState, reState } from '../state/state.utils.js'
 import { createSupport } from '../tag/createSupport.function.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
 
+/** Used during first renders of a support only */
 export function renderTagOnly(
   newSupport: AnySupport,
   prevSupport: AnySupport | undefined, // causes restate
@@ -58,12 +59,16 @@ function runBeforeRender(
   newSupport: AnySupport,
   prevSupport?: AnySupport,
 ) {
-  const prevState = prevSupport?.state
+  // Get state from context.state.older instead of support.state
+  const context = prevSupport?.context as SupportContextItem
+  const stateMeta = context?.state
+  const prevState = stateMeta?.older?.state
+  // const prevState = stateMeta?.newer?.state
 
   if(prevState) {
     reState(
       newSupport,
-      prevSupport,
+      prevSupport as AnySupport,
       prevState,
     )
     

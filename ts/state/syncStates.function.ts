@@ -1,4 +1,5 @@
 import { AnySupport } from '../tag/AnySupport.type.js'
+import { ContextStateSupport, ContextStateMeta } from '../tag/ContextStateMeta.type.js'
 import { State } from './state.types.js'
 import { StatesSetter } from './states.utils.js'
 
@@ -12,7 +13,11 @@ export function syncSupports(
   support: AnySupport, // from
   newestSupport: AnySupport, // onto
 ) {
-  return syncStatesArray(support.states, newestSupport.states)
+  const stateMeta = support.context.state as ContextStateMeta
+  const newestStateMeta = newestSupport.context.state as ContextStateMeta
+  const fromStates = (stateMeta.newer as ContextStateSupport).states
+  const toStates = (newestStateMeta.newer as ContextStateSupport).states
+  return syncStatesArray(fromStates, toStates)
 }
 
 export function syncStatesArray(

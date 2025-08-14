@@ -2,7 +2,6 @@ import { AnySupport } from '../tag/AnySupport.type.js'
 import { SupportContextItem } from '../tag/SupportContextItem.type.js'
 import { moveProviders } from './update/updateExistingTagComponent.function.js'
 import { softDestroySupport } from './softDestroySupport.function.js'
-import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 import { renderTagOnly } from'./renderTagOnly.function.js'
 import { isLikeTags } from'../tag/isLikeTags.function.js'
 import { StringTag } from '../tag/StringTag.type.js'
@@ -26,9 +25,11 @@ export function renderWithSupport(
   if(!isLikeTag) {
     moveProviders(lastSupport as AnySupport, reSupport)
     softDestroySupport(lastSupport)
-    const global = reSupport.context.global as SupportTagGlobal
-    global.oldest = reSupport
-    global.newest = reSupport
+    const subject = reSupport.context
+
+    subject.state.oldest = reSupport
+    subject.state.newest = reSupport
+    subject.state.older = subject.state.newer
   } else if(lastSupport) {
     const tag = lastSupport.templater.tag
     if(tag && subject.renderCount > 0) {

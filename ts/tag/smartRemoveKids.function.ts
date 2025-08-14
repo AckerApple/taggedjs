@@ -61,7 +61,7 @@ function smartRemoveByContext(
     }
 
     subGlobal.deleted = true
-    const oldest = subGlobal.oldest
+    const oldest = (context as SupportContextItem).state?.oldest
     if(oldest) {
       smartRemoveKids(context as SupportContextItem, allPromises)
       continue

@@ -1,5 +1,6 @@
 import { Subject, ValueSubject } from'../subject/index.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
+import { ContextStateMeta, ContextStateSupport } from '../tag/ContextStateMeta.type.js'
 import { getSupportInCycle } from'../tag/cycles/getSupportInCycle.function.js'
 import { setUseMemory } from'./setUseMemory.object.js'
 import { state } from'./state.function.js'
@@ -161,7 +162,7 @@ function defineOnMethod<R>(
       const firstSupport = state(() => (getSupportInCycle() as AnySupport))
       const subject = state(() => new ValueSubject<any>(undefined))
       const oldState = state(() => ({
-        stateArray: setUseMemory.stateConfig.stateArray,
+        state: setUseMemory.stateConfig.state,
         states: setUseMemory.stateConfig.states,
       }))
       
@@ -176,13 +177,14 @@ function defineOnMethod<R>(
             const setTo = callback(currentValues, previousValues)
 
             if(nowSupport !== firstSupport) {
-              const newestState = oldState.stateArray
-              const global = firstSupport.context.global
-              const oldest = global.oldest
-              const oldestState = oldest.state
+              const newestState = oldState.state
+              const context = firstSupport.context
+              const stateMeta = context.state as ContextStateMeta
+              const oldestStateSupport = stateMeta.older as ContextStateSupport
+              const oldestState = oldestStateSupport.state
               
               const newStates = oldState.states
-              const oldStates = oldest.states
+              const oldStates = oldestStateSupport.states
               
               oldSyncStates(
                 newestState,

@@ -1,5 +1,6 @@
 import { getSupportWithState } from "../interpolations/attributes/getSupportWithState.function.js"
 import { AnySupport } from "../tag/AnySupport.type.js"
+import { ContextStateMeta, ContextStateSupport } from "../tag/ContextStateMeta.type.js"
 import { getSupportInCycle } from "../tag/cycles/getSupportInCycle.function.js"
 import { ValueTypes } from "../tag/index.js"
 import { StatesSetter } from "../state/states.utils.js"
@@ -75,7 +76,13 @@ export function subscribe<T>(
 ): SubscribeValue {
   const support = getSupportInCycle() as AnySupport
 
-  const states = support ? getSupportWithState(support).states : []
+  let states: StatesSetter[] = []
+  if (support) {
+    const context = getSupportWithState(support).context
+    const stateMeta = context.state as ContextStateMeta
+    const newer = stateMeta.newer as ContextStateSupport
+    states = newer.states
+  }
 
   return {
     onOutput: blankHandler, // gets set within setupSubscribe()

@@ -5,6 +5,7 @@ import { ContextItem } from '../ContextItem.type.js'
 import { createSupport } from '../createSupport.function.js'
 import { AnySupport } from '../AnySupport.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
+import { SupportContextItem } from '../SupportContextItem.type.js'
 
 export function handleStillTag(
   oldSupport: AnySupport,
@@ -31,9 +32,8 @@ export function handleStillTag(
     subject,
   )
 
-  const lastSubject = oldSupport.context as ContextItem
-  const newGlobal = lastSubject.global as SupportTagGlobal
-  const oldest = newGlobal.oldest
+  const lastSubject = oldSupport.context as SupportContextItem
+  const oldest = lastSubject.state.oldest as AnySupport
 
   updateSupportBy(oldest, valueSupport)
 }

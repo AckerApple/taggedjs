@@ -6,11 +6,12 @@ import { getSupportInCycle } from './cycles/getSupportInCycle.function.js'
 import { StringTag } from './StringTag.type.js'
 import { processDomTagInit } from './update/processDomTagInit.function.js'
 import { Tag } from './Tag.type.js'
-import { AnySupport, ContextItem, TemplateValue, checkTagValueChange, SupportContextItem, destroySupportByContextItem, TagJsVarInnerHTML, ArrayItemStringTag } from '../index.js'
+import { AnySupport, ContextItem, TemplateValue, checkTagValueChange, SupportContextItem, TagJsVarInnerHTML, ArrayItemStringTag } from '../index.js'
 import { forceUpdateExistingValue } from './update/forceUpdateExistingValue.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
+import { destroySupportByContextItem } from './destroySupportByContextItem.function.js'
 
 /** Used to override the html`` processing that will first render outerHTML and then its innerHTML */
 export function processOuterDomTagInit(

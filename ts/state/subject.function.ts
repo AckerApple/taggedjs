@@ -1,6 +1,8 @@
 import { AnySupport } from '../tag/AnySupport.type.js'
 import { Subject, ValueSubject } from '../subject/index.js'
 import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
+import { SupportContextItem } from '../tag/SupportContextItem.type.js'
+import { ContextStateMeta, ContextStateSupport } from '../tag/ContextStateMeta.type.js'
 import { setUseMemory } from './setUseMemory.object.js'
 import { state } from './state.function.js'
 import { oldSyncStates } from './syncStates.function.js'
@@ -21,7 +23,7 @@ export function subject<T>(
 subject._value = <T>(value: T) => {
   const oldestState = state(function subjectValue() {
     return {
-      stateArray: setUseMemory.stateConfig.stateArray,
+      state: setUseMemory.stateConfig.state,
       states: setUseMemory.stateConfig.states,
     }
   })
@@ -29,12 +31,17 @@ subject._value = <T>(value: T) => {
   const nowSupport = getSupportInCycle() as AnySupport
   return state(function subjectValue() {
     const subject = new ValueSubject(value).pipe(x => {
+      const context = nowSupport.context as SupportContextItem
+      const stateMeta = context.state as ContextStateMeta
+      const newer = stateMeta.newer as ContextStateSupport
+
       oldSyncStates(
-        nowSupport.state,
-        oldestState.stateArray,
-        nowSupport.states,
+        newer.state,
+        oldestState.state,
+        newer.states,
         oldestState.states,
       )
+
       return x
     })
     return subject
@@ -49,17 +56,22 @@ function all<A, B>(args: [Subject<A> | A, Subject<B> | B]): Subject<[A,B]>
 function all<A>(args: [Subject<A> | A]): Subject<[A]>
 function all(args: any[]): Subject<any> {
   const oldestState = state(() => ({
-    stateArray: setUseMemory.stateConfig.stateArray,
+    state: setUseMemory.stateConfig.state,
     states: setUseMemory.stateConfig.states,
   }))
   const nowSupport = getSupportInCycle() as AnySupport
   return Subject.all(args as any).pipe(x => {
-    oldSyncStates(
-      nowSupport.state,
-      oldestState.stateArray,
-      nowSupport.states,
-      oldestState.states,
-    )
+    const context = nowSupport.context as SupportContextItem
+    const stateMeta = context.state as ContextStateMeta
+    const newer = stateMeta.newer
+    if (newer) {
+      oldSyncStates(
+        newer.state,
+        oldestState.state,
+        newer.states,
+        oldestState.states,
+      )
+    }
     return x
   })
 }

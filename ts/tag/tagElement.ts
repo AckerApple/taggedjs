@@ -9,9 +9,9 @@ import { initState } from '../state/state.utils.js'
 import { isTagComponent } from '../isInstance.js'
 import { Props } from '../Props.js'
 import { TagMaker } from './TagMaker.type.js'
-import { BaseSupport } from './BaseSupport.type.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
-import { checkTagValueChange, destroySupportByContextItem } from './checkTagValueChange.function.js'
+import { checkTagValueChange } from './checkTagValueChange.function.js'
+import { destroySupportByContextItem } from './destroySupportByContextItem.function.js'
 import { AnySupport } from './AnySupport.type.js'
 import { renderTagElement } from '../render/renderTagElement.function.js'
 import { loadNewBaseSupport } from './loadNewBaseSupport.function.js'
@@ -49,7 +49,7 @@ export function tagElement(
   element: HTMLElement | Element,
   props?: unknown,
 ): {
-  support: BaseSupport
+  support: AnySupport
   tags: TagWrapper<unknown>[] // TagComponent[]
   ValueTypes: typeof ValueTypes
 } {
@@ -75,7 +75,7 @@ export function tagElement(
   // create observable the app lives on
   const subject = getNewSubject(templater, element)
   const global = subject.global as BaseTagGlobal
-  initState(global.newest)
+  initState(subject.state.newest as AnySupport)
 
   let templater2 = app(props) as unknown as TemplaterResult
   const isAppFunction = typeof templater2 == BasicTypes.function
@@ -85,7 +85,7 @@ export function tagElement(
       templater.tag = templater2 as unknown as DomTag
       templater2 = app as unknown as TemplaterResult
     } else {
-      global.newest.propsConfig = {
+      (subject.state.newest as AnySupport).propsConfig = {
         latest: [props] as Props,
         castProps: [props] as Props,
       }
@@ -130,6 +130,8 @@ function getNewSubject(
     renderCount: 0,
 
     global: undefined as unknown as SupportTagGlobal, // gets set below in getNewGlobal()
+    state: {},
+    // parentContext: undefined as any,
     tagJsVar,
   }
 

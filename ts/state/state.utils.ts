@@ -13,10 +13,14 @@ export function initState(
   config.handlers.statesHandler = firstStatesHandler as <T>(defaultValue: T | (() => T)) => (y: unknown) => T
   
   config.rearray = []
-  config.stateArray = []
-  config.states = []
+  const state = config.state = []
+  const states = config.states = []
   config.statesIndex = 0
-  
+
+  const context = support.context
+  const stateMeta = context.state = context.state || {}
+  stateMeta.newer = { state, states }
+
   setSupportInCycle(support)
 }
 
@@ -30,7 +34,7 @@ export function reState(
   // set previous state memory
   config.rearray = prevState
 
-  config.stateArray = []
+  config.state = []
   config.states = []
   config.statesIndex = 0
   
@@ -38,6 +42,7 @@ export function reState(
   config.handlers.statesHandler = reStatesHandler
   
   config.prevSupport = prevSupport
+
   setSupportInCycle(newSupport)
 }
 

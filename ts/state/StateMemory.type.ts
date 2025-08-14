@@ -14,7 +14,7 @@ export type StateMemory = {
   // STATE MEMORIES
   
   /** state memory on the first render */
-  stateArray: State
+  state: State
   
   /** let states */
   states: StatesSetter[]

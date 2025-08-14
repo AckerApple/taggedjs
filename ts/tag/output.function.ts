@@ -4,6 +4,7 @@ import { paintAfters, painting } from "../render/paint.function.js"
 import { syncStatesArray } from "../state/syncStates.function.js"
 import { getSupportInCycle } from "./cycles/getSupportInCycle.function.js"
 import { safeRenderSupport } from "./props/safeRenderSupport.function.js"
+import { ContextStateMeta, ContextStateSupport } from "./ContextStateMeta.type.js"
 
 
 /** Used to call a function that belongs to a calling tag but is not with root arguments */
@@ -33,16 +34,18 @@ export function syncWrapCallback(
   callback: any,
   ownerSupport: AnySupport, // aka stateOwner
 ) {
-  const global = ownerSupport.context.global
-  const newestOwner = global.newest
+  const stateMeta = ownerSupport.context.state as ContextStateMeta
+  const newestOwner = stateMeta.newest as AnySupport
+  const newerStates = (stateMeta.newer as ContextStateSupport).states
+  const olderStates = (stateMeta.older as ContextStateSupport).states
   
   // sync the new states to the old before the old does any processing
-  syncStatesArray(newestOwner.states, ownerSupport.states)
+  syncStatesArray(newerStates, olderStates)
 
   const c = callback(...args) // call the latest callback
 
   // sync the old states to the new
-  syncStatesArray(ownerSupport.states, newestOwner.states)
+  syncStatesArray(olderStates, newerStates)
 
   // now render the owner
   paintAfters.push([() => {

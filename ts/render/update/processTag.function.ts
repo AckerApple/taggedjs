@@ -18,8 +18,7 @@ export function processTag(
   ownerSupport: AnySupport, // owner
   contextItem: SupportContextItem, // could be tag via result.tag
 ): AnySupport {
-  const global = contextItem.global as SupportTagGlobal
-  const support = global.newest as AnySupport
+  const support = contextItem.state.newest as AnySupport
   const ph = contextItem.placeholder as Text
   
   support.ownerSupport = ownerSupport  

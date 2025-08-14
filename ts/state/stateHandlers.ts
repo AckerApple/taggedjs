@@ -9,8 +9,8 @@ export function runRestate () {
   const config: StateMemory = setUseMemory.stateConfig
   const rearray = config.rearray as State
 
-  const restate = rearray[config.stateArray.length]
-  config.stateArray.push(restate)
+  const restate = rearray[config.state.length]
+  config.state.push(restate)
   return restate.defaultValue
 }
 
@@ -44,7 +44,7 @@ export function runFirstState <T>(
     },
     defaultValue: initValue as T,
   }
-  config.stateArray.push(push)
+  config.state.push(push)
   
   return initValue as T
 }

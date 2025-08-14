@@ -20,8 +20,12 @@ export function registerTagElement(
     undefined,
   )
 
-  global.oldest = support
-  global.newest = support
+  const subject = support.context
+  subject.state.oldest = support
+  subject.state.newest = support
+  
+  // Copy newer to older when resetting
+  subject.state.older = subject.state.newer
 
   let setUse = (templater as unknown as TagAppElement).setUse
 

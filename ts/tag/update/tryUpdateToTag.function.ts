@@ -42,7 +42,7 @@ export function tryUpdateToTag(
     contextItem.tagJsVar = newValue
 
     // its html/dom based tag
-    const support = global.newest
+    const support = (contextItem as SupportContextItem).state.newest
     if( support ) {
       if(typeof(newValue) === BasicTypes.function) {
         return true
@@ -80,7 +80,7 @@ function prepareUpdateToComponent(
 ): void {
   const global = contextItem.global as SupportTagGlobal
   // When last value was not a component
-  if(!global.newest) {
+  if(!contextItem.state.newest) {
     ;(templater as TagJsVar).processInit(
       templater,
       contextItem,

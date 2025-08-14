@@ -1,5 +1,6 @@
 import { setUseMemory } from './setUseMemory.object.js'
 import { AnySupport } from '../tag/AnySupport.type.js'
+import { ContextStateMeta, ContextStateSupport } from '../tag/ContextStateMeta.type.js'
 import { StateMemory } from './StateMemory.type.js'
 import { getSupportWithState } from '../interpolations/attributes/getSupportWithState.function.js'
 
@@ -32,13 +33,16 @@ export function reStatesHandler(
   const config: StateMemory = setUseMemory.stateConfig
   const statesIndex = config.statesIndex
   const prevSupport = getSupportWithState(config.prevSupport as AnySupport)
-  
-  const prevStates = prevSupport.states as StatesSetter[]
+  const prevContext = prevSupport.context
+  const stateMeta = prevContext.state as ContextStateMeta
+  // const prevStateMeta = stateMeta.older as ContextStateSupport
+  const prevStateMeta = stateMeta.newer as ContextStateSupport
+  const prevStates = prevStateMeta.states
   // const prevStates = config.states
   
   const oldStates = prevStates[statesIndex]
   let lastValues: any[] = []
-  
+
   oldStates(function regetter(...args) {
     lastValues = args
     return args

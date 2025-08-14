@@ -42,11 +42,10 @@ export function thenResolveBy(
     }
 
     const subject = last.context
-    const global1 = last.context.global as SupportTagGlobal
     delete subject.locked
 
     // The promise may have then changed old variables, lets update forward
-    syncSupports(last, global1.newest)
+    syncSupports(last, subject.state.newest as AnySupport)
 
     const tagsToUpdate = getUpTags(last)
     renderTagUpdateArray(tagsToUpdate)

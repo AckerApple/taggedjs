@@ -1,11 +1,14 @@
 import { Clone, TagGlobal } from './getTemplaterResult.function.js'
 import { SubContext } from './update/SubContext.type.js'
 import { PaintCommand } from '../render/paint.function.js'
-import { LastArrayItem } from '../index.js'
+import { AnySupport, LastArrayItem } from '../index.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { ContextStateMeta } from './ContextStateMeta.type.js'
+
 
 export interface AppContextItem {
   returnValue?: any // used when value results in a return value
+  state?: ContextStateMeta
 
   valueIndex: number
   

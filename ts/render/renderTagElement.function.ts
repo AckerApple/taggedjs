@@ -1,13 +1,14 @@
 import { Events, TemplaterResult } from '../tag/getTemplaterResult.function.js'
 import { SupportContextItem } from '../tag/SupportContextItem.type.js'
+import { ContextStateSupport } from '../tag/ContextStateMeta.type.js'
 import { tags, TagWrapper } from '../tag/tag.utils.js'
 import { empty, ValueTypes } from '../tag/ValueTypes.enum.js'
 import { destroySupport } from './destroySupport.function.js'
 import { paint, painting } from './paint.function.js'
 import { TagMaker } from '../tag/TagMaker.type.js'
-import { AnySupport, BaseTagGlobal, SupportTagGlobal, Wrapper } from '../index.js'
+import { AnySupport, BaseTagGlobal, Wrapper } from '../index.js'
 import { createSupport } from '../tag/createSupport.function.js'
-import { runAfterRender } from '../render/afterRender.function.js'
+import { runAfterRender } from './runAfterRender.function.js'
 import { executeWrap } from './executeWrap.function.js'
 import { registerTagElement } from './registerNewTagElement.function.js'
 import { loadNewBaseSupport } from '../tag/loadNewBaseSupport.function.js'
@@ -24,7 +25,13 @@ export function renderTagElement(
 ) {
   const placeholder = document.createTextNode(empty)
   tags.push((templater.wrapper || {original: templater}) as unknown as TagWrapper<unknown>)
-  const support = runWrapper(templater, placeholder, element, subject, isAppFunction)
+  const support = runWrapper(
+    templater,
+    placeholder,
+    element,
+    subject,
+    isAppFunction,
+  )
   
   global.isApp = true
   
@@ -56,7 +63,14 @@ export function renderTagElement(
   
   ++painting.locks
 
-  const newFragment = registerTagElement(support, element, global, templater, app, placeholder)
+  const newFragment = registerTagElement(
+    support,
+    element,
+    global,
+    templater,
+    app,
+    placeholder,
+  )
 
   --painting.locks
 
@@ -79,23 +93,24 @@ export function runWrapper(
 ) {
   subject.placeholder = placeholder
   
-  const global = subject.global as SupportTagGlobal
-  const oldest = global.oldest
-  const isFirstRender = global.newest === oldest
+  const oldest = subject.state.oldest as AnySupport
+  const newest = subject.state.newest as AnySupport
+  const isFirstRender = newest === oldest
 
   const newSupport = createSupport(
     templater,
-    global.newest,
-    global.newest.appSupport, // ownerSupport.appSupport as AnySupport,
+    newest,
+    newest.appSupport, // ownerSupport.appSupport as AnySupport,
     subject,
     // castedProps,
   )
 
   if(!isFirstRender) {
+    const olderStateContext = subject.state.older as ContextStateSupport
     reState(
       newSupport,
-      global.newest, // global.oldest, // global.newest,
-      oldest.state,
+      newest,
+      olderStateContext.state,
     )
   }
 

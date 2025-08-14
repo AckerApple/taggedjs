@@ -2,9 +2,8 @@ import { TemplaterResult } from './getTemplaterResult.function.js'
 import { clonePropsBy } from './props/clonePropsBy.function.js'
 import { Subject } from '../subject/Subject.class.js'
 import { Props } from '../Props.js'
-import { BaseSupport } from './BaseSupport.type.js'
 import { AnySupport } from './AnySupport.type.js'
-import { ContextItem, SupportContextItem } from '../index.js'
+import { ContextItem, setUseMemory, SupportContextItem } from '../index.js'
 
 export type PropsConfig = {
   latest: Props // new props NOT cloned props
@@ -28,41 +27,45 @@ export function getBaseSupport(
   templater: TemplaterResult,
   context: SupportContextItem,
   castedProps?: Props,
-): BaseSupport {
+): AnySupport {
   const baseSupport = {
     templater,
     context,
     castedProps,
 
     appSupport: undefined as unknown as AnySupport,
-  } as BaseSupport
+  } as AnySupport
   
 
-  // const global = context.global || getNewGlobal(context)
   const global = context.global
   global.blocked = []
   global.destroy$ = new Subject<void>()
-  // global.oldest = global.oldest || baseSupport as AnySupport
-  // global.oldest = baseSupport as AnySupport
+
+  // context.state.newer = context.state.newer || { ...setUseMemory.stateConfig }
+  if( !context.state ) {
+    context.state = {
+      newer: {
+        state:[],
+        states: [],
+      }
+    }
+  }
 
   return baseSupport
 }
 
 export type Support = AnySupport & {
   ownerSupport: AnySupport
-  appSupport: BaseSupport
+  appSupport: AnySupport
 }
 
 /** Sets support states to empty array and clones props */
 export function upgradeBaseToSupport(
   templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
-  support: BaseSupport,
+  support: AnySupport,
   appSupport: AnySupport,
   castedProps?: Props,
 ): AnySupport {
-  // ;(support as AnySupport).state = []
-  // ;(support as AnySupport).states = []
-
   support.appSupport = appSupport
   
   const props = templater.props  // natural props

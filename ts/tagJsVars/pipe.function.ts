@@ -1,6 +1,7 @@
 import { getSupportWithState } from "../interpolations/attributes/getSupportWithState.function.js"
 import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { AnySupport } from "../tag/AnySupport.type.js"
+import { ContextStateMeta, ContextStateSupport } from "../tag/ContextStateMeta.type.js"
 import { getSupportInCycle } from "../tag/cycles/getSupportInCycle.function.js"
 import { ContextItem, ValueTypes } from "../tag/index.js"
 import { deleteAndUnsubscribe, setupSubscribe } from "../tag/update/setupSubscribe.function.js"
@@ -12,6 +13,10 @@ export function pipe<SubValue, DEFAULT>(
   Observables: LikeObservable<SubValue>[],
   callback?: SubscribeCallback<SubValue | DEFAULT>,
 ): SubscribeValue {
+  const support = getSupportInCycle() as AnySupport
+  const context = getSupportWithState(support).context
+  const stateMeta = context.state as ContextStateMeta
+  const newer = stateMeta.newer as ContextStateSupport
   return {
     onOutput: blankHandler, // gets set within setupSubscribe()
     tagJsType: ValueTypes.subscribe,
@@ -25,7 +30,7 @@ export function pipe<SubValue, DEFAULT>(
     delete: deleteAndUnsubscribe,
 
     callback,
-    states: getSupportWithState( getSupportInCycle() as AnySupport).states,
+    states: newer.states,
     
     Observables,
   }

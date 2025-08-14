@@ -24,7 +24,7 @@ export function processDomTagInit(
     templater = tagFakeTemplater(tag)
   }
 
-  const global = getNewGlobal(contextItem as SupportContextItem) as SupportTagGlobal
+  getNewGlobal(contextItem as SupportContextItem) as SupportTagGlobal
 
   if(appendTo) {
     return processNewSubjectTag(
@@ -36,7 +36,11 @@ export function processDomTagInit(
     )
   }
 
-  global.newest = newSupportByTemplater(templater, ownerSupport, contextItem)
+  const stateMeta = contextItem.state = contextItem.state || {}
+  
+  stateMeta.newest = newSupportByTemplater(
+    templater, ownerSupport, contextItem,
+  )
 
   return processTag(
     ownerSupport,

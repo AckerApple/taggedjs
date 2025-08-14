@@ -4,7 +4,7 @@ import { isTagComponent } from '../isInstance.js'
 import { runBeforeDestroy } from './tagRunner.js'
 import { AnySupport } from './AnySupport.type.js'
 import { ValueTypes } from './ValueTypes.enum.js'
-import { ContextItem } from '../index.js'
+import { ContextItem, SupportContextItem } from '../index.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 
 export function destroyContext(
@@ -32,7 +32,7 @@ export function destroyContext(
       continue // not a support contextItem
     }
 
-    const support = global.newest
+    const support = (child as SupportContextItem).state.newest as AnySupport
     const iSubs = global.subscriptions
     if(iSubs) {
       iSubs.forEach(unsubscribeFrom)
@@ -53,14 +53,14 @@ export function getChildTagsToSoftDestroy(
   tags: AnySupport[] = [],
   subs: Subscription<any>[] = []
 ): {subs: Subscription<any>[], tags: AnySupport[]} {
-  for (const child of childTags) {
+  for (const child of childTags as SupportContextItem[]) {
     const global = child.global as SupportTagGlobal
 
     if(!global) {
       continue
     }
 
-    const support = global.newest
+    const support = child.state.newest
     if(support) {
       tags.push(support)
       const iSubs = global.subscriptions

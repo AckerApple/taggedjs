@@ -5,15 +5,15 @@ import { destroySupport } from '../render/destroySupport.function.js'
 import { SupportTagGlobal, TemplaterResult } from './getTemplaterResult.function.js'
 import { isStaticTag } from'../isInstance.js'
 import { isLikeTags } from'./isLikeTags.function.js'
-import { ContextItem } from './ContextItem.type.js'
 import { tryUpdateToTag } from './update/tryUpdateToTag.function.js'
+import { destroySupportByContextItem } from './destroySupportByContextItem.function.js'
 
 export function checkTagValueChange(
   newValue: unknown,
   contextItem: SupportContextItem,
 ) {
   const global = contextItem.global as SupportTagGlobal
-  const lastSupport = global?.newest
+  const lastSupport = contextItem.state?.newest as AnySupport
   const isValueTag = isStaticTag(newValue)
   const newTag = newValue as AnySupport
   
@@ -30,7 +30,7 @@ export function checkTagValueChange(
     tryUpdateToTag(
       contextItem,
       newValue as TemplaterResult,
-      lastSupport,
+      lastSupport as AnySupport,
     )
 
     return -1
@@ -38,7 +38,7 @@ export function checkTagValueChange(
 
   const isTag = (newValue as any)?.tagJsType
   if(isTag) {
-    const support = global.newest
+    const support = contextItem.state.newest as AnySupport
     const ownerSupport = support.ownerSupport as AnySupport
     const result = tryUpdateToTag(
       contextItem,
@@ -58,17 +58,4 @@ export function checkTagValueChange(
   destroySupportByContextItem(contextItem)
    
   return 8 // 'no-longer-tag'
-}
-
-export function destroySupportByContextItem(
-  contextItem: ContextItem,
-) {
-  const global = contextItem.global as SupportTagGlobal
-  const lastSupport = global?.newest
-
-  // destroy old component, value is not a component
-  destroySupport(lastSupport, global)
-  delete (contextItem as ContextItem).global
-  
-  ;(contextItem as SupportContextItem).renderCount = 0
 }

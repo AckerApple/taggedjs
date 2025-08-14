@@ -14,7 +14,8 @@ import { ProcessInit } from './ProcessInit.type.js'
 import { processTagInit } from './update/processTagInit.function.js'
 import { Tag } from './Tag.type.js'
 import { ProcessDelete, TagJsTag } from '../tagJsVars/tagJsVar.type.js'
-import { checkTagValueChange, destroySupportByContextItem } from './checkTagValueChange.function.js'
+import { checkTagValueChange } from './checkTagValueChange.function.js'
+import { destroySupportByContextItem } from './destroySupportByContextItem.function.js'
 import { CheckSupportValueChange, CheckValueChange } from './Context.types.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
 import { ProcessUpdate } from './ProcessUpdate.type.js'
@@ -51,8 +52,6 @@ export type SupportTagGlobal = TagGlobal & {
   destroy$: Subject<void> // not on non-tags
 
   blocked: AnySupport[], // renders that did not occur because an event was processing
-  oldest: AnySupport
-  newest: AnySupport
   
   providers?: Provider[]
 }

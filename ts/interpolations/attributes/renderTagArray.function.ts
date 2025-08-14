@@ -18,10 +18,13 @@ export function renderTagUpdateArray(
 }
 
 function mapTagUpdate(support: AnySupport) {
-  const global = support.context.global as SupportTagGlobal
+  const context = support.context
+  const global = context.global as SupportTagGlobal
+  
   if(!global) {
     return // while rendering a parent, a child may have been deleted (pinbowl)
   }
 
-  renderSupport(global.newest)
+  const stateMeta = context.state
+  renderSupport(stateMeta.newest as AnySupport)
 }

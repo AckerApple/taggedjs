@@ -42,13 +42,12 @@ export function renderSupport<T extends AnySupport>(
   }
 
   const tag = renderExistingSupport(
-    global.newest,
+    subject.state.newest as AnySupport,
     support,
     subject,
   )
 
   delete subject.locked
-
 
   return tag as T
 }
@@ -58,8 +57,8 @@ export function renderInlineHtml(
   support: AnySupport,
 ) {
   const ownerSupport = getSupportWithState(support)
-  const ownGlobal = ownerSupport.context.global as SupportTagGlobal
-  const newest = ownGlobal.newest
+  const ownContext = ownerSupport.context
+  const newest = ownContext.state.newest
 
   // Function below may call renderInlineHtml again if owner is just inline HTML
   const result = renderSupport(newest as AnySupport)
@@ -71,6 +70,10 @@ export function checkRenderUp(
   templater: TemplaterResult,
   support: AnySupport,
 ) {
+  if(support.context.global.deleted) {
+    return false
+  }
+
   const selfPropChange = hasPropsToOwnerChanged(
     templater,
     support,

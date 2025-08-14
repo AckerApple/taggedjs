@@ -20,9 +20,15 @@ export function buildBeforeElement(
 ) {
   const subject = support.context
   const global = subject.global as SupportTagGlobal
+  
+  // TODO this is only needed for components and not basic tags
+  subject.state = subject.state || {}
 
-  global.oldest = support
-  global.newest = support
+  const stateMeta = subject.state
+  
+  stateMeta.oldest = support
+  stateMeta.newest = support
+  subject.state.older = subject.state.newer
 
   ++painting.locks
   const result = attachHtmlDomMeta(

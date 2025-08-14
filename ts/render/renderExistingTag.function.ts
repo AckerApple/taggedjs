@@ -15,10 +15,9 @@ export function renderExistingSupport(
     subject,
   )
 
-  const global = subject.global
   // lastSupport !== newSupport && 
   if( result.wasLikeTags ) {
-    updateSupportBy(global.oldest, result.support)
+    updateSupportBy(subject.state.oldest as AnySupport, result.support)
     return result.support
   }
 

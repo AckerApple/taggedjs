@@ -25,6 +25,10 @@ export function getUpTags(
     return getUpTags(ownerSupport, supports)
   }
 
+  if(support.context.global.deleted === true) {
+    return supports
+  }
+
   const newSupport = support // global.newest as AnySupport
   const isComponent = isTagComponent(newSupport.templater)
   const tagJsType = support.templater.tagJsType

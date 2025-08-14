@@ -12,7 +12,7 @@ export default function callbackStateUpdate<T>(
   ...args: any[]
 ): T {
   const global = support.context.global as SupportTagGlobal
-  const newestSupport = global.newest
+  const newestSupport = support.context.state.newest as AnySupport
 
   // NEWEST UPDATE OLDEST: ensure that the oldest has the latest values first
   //syncStatesArray(newestSupport.states, oldStates)

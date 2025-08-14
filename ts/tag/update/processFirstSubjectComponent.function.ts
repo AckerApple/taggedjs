@@ -1,4 +1,4 @@
-import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
+import { TemplaterResult } from '../getTemplaterResult.function.js'
 import { processFirstTagResult } from'./processTagResult.function.js'
 import { PropsConfig } from '../createHtmlSupport.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
@@ -31,12 +31,10 @@ export function processReplacementComponent(
     newPropsConfig.castProps = castedProps
   }
   
-  const global = subject.global as SupportTagGlobal
   const support = renderTagOnly(
     newSupport,
-    global.newest, // existing tag
+    subject.state.newest, // existing tag
     subject,
-    // ownerSupport,
   )
 
   buildBeforeElement(
@@ -71,10 +69,9 @@ export function processFirstSubjectComponent(
     newPropsConfig.castProps = castedProps
   }
     
-  const global = subject.global as SupportTagGlobal
   const support = renderTagOnly(
     newSupport,
-    global.newest, // existing tag
+    subject.state.newest, // existing tag
     subject,
   )
 

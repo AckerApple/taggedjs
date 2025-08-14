@@ -13,6 +13,8 @@ export function processTagInit(
   appendTo?: Element | undefined,
   insertBefore?: Text,
 ): AnySupport {
+  contextItem.state = {}
+  
   if(appendTo) {
     return processNewSubjectTag(
       value as TemplaterResult,
