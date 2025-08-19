@@ -1,6 +1,6 @@
 import { getTemplaterResult, Wrapper } from '../getTemplaterResult.function.js'
 import { newSupportByTemplater } from '../../render/update/processTag.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { StringTag } from '../StringTag.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { Original } from '../tag.utils.js'

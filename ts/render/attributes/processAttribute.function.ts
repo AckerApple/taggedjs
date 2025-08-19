@@ -5,7 +5,7 @@ import { isFunction } from '../../isInstance.js'
 import { HowToSet, howToSetFirstInputValue } from '../../interpolations/attributes/howToSetInputValue.function.js'
 import { bindSubjectCallback, Callback } from '../../interpolations/attributes/bindSubjectCallback.function.js'
 import { BasicTypes, ValueTypes, empty } from '../../tag/ValueTypes.enum.js'
-import { AnySupport } from '../../tag/AnySupport.type.js'
+import { AnySupport } from '../../tag/index.js'
 import { paintContent } from '../paint.function.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processNonDynamicAttr } from '../../interpolations/attributes/processNameValueAttribute.function.js'
@@ -151,6 +151,9 @@ function processTagJsVarAttribute(
 
   contextItem.stateOwner = getSupportWithState(support)
   contextItem.supportOwner = support
+
+  // const parentContexts = parentContext.contexts as ContextItem[]
+  // parentContexts.push(contextItem)
 
   setContextInCycle(contextItem)
 

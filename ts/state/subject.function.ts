@@ -1,4 +1,4 @@
-import { AnySupport } from '../tag/AnySupport.type.js'
+import { AnySupport } from '../tag/index.js'
 import { Subject, ValueSubject } from '../subject/index.js'
 import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
 import { SupportContextItem } from '../tag/SupportContextItem.type.js'

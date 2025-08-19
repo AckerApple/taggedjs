@@ -1,7 +1,7 @@
 // taggedjs-no-compile
 
 import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.function.js'
-import { AnySupport } from '../../tag/AnySupport.type.js'
+import { AnySupport } from '../../tag/index.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processDynamicNameValueAttribute } from '../../interpolations/attributes/processNameValueAttribute.function.js'
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
@@ -9,6 +9,7 @@ import { SpecialDefinition } from './Special.types.js'
 import { getTagVarIndex } from './getTagVarIndex.function.js'
 import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
+import { Subject } from '../../subject/Subject.class.js'
 
 /** Support string attributes with dynamics Ex: <div style="color:black;font-size::${fontSize};"></div> */
 export function createDynamicArrayAttribute(
@@ -36,6 +37,7 @@ export function createDynamicArrayAttribute(
         tagJsVar,
         valueIndex: contexts.length,
         parentContext,
+        destroy$: new Subject(),
       }
   
       // contextItem.handler =
@@ -100,7 +102,7 @@ export function createDynamicAttribute(
     attrName,
     withinOwnerElement: true,
     tagJsVar,
-    
+    destroy$: new Subject(),
     valueIndex: varIndex,
     parentContext,
   }

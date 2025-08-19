@@ -3,7 +3,7 @@ import { LikeObservable, SubscribeValue } from '../../tagJsVars/subscribe.functi
 import { paint } from '../../render/paint.function.js'
 import { setUseMemory } from '../../state/setUseMemory.object.js'
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { deleteSubContext } from './deleteContextSubContext.function.js'
 import { onFirstSubContext } from './onFirstSubContext.function.js'
 import { OnSubOutput, SubContext, SubscriptionContext } from './SubContext.type.js'

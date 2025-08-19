@@ -6,7 +6,7 @@ import { processAttribute } from "../attributes/processAttribute.function.js"
 import { ContextItem } from "../../tag/ContextItem.type.js"
 
 export function attachDomElement(
-  newNode: DomObjectElement,
+  domElement: HTMLElement,
   node: DomObjectElement,
   values: any[],
   support: AnySupport,
@@ -14,11 +14,7 @@ export function attachDomElement(
   parentContext: ContextItem,
   appendTo: Element | undefined,
   insertBefore: Text | undefined,
-): {
-  domElement: HTMLElement
-  attributeContexts: ContextItem[]
-} {
-  const domElement = newNode.domElement = document.createElement(node.nn)
+): ContextItem[] {
   const attributeContexts: ContextItem[] = []
   
   // attributes that may effect style, come first for performance
@@ -53,5 +49,5 @@ export function attachDomElement(
     paintCommands.push([paintBefore, [insertBefore, domElement]])
   }
   
-  return { domElement, attributeContexts }
+  return attributeContexts
 }

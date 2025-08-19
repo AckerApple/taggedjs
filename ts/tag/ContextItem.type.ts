@@ -1,7 +1,7 @@
 import { Clone, TagGlobal } from './getTemplaterResult.function.js'
 import { SubContext } from './update/SubContext.type.js'
 import { PaintCommand } from '../render/paint.function.js'
-import { AnySupport, LastArrayItem } from '../index.js'
+import { LastArrayItem, Subject } from '../index.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { ContextStateMeta } from './ContextStateMeta.type.js'
 
@@ -21,6 +21,8 @@ export interface AppContextItem {
 
   // todo this is most likely only used by an ContextItem only
   withinOwnerElement: boolean  
+
+  destroy$: Subject<void> // not on non-tags
 }
 export interface BaseContextItem extends AppContextItem {  
   element?: HTMLElement

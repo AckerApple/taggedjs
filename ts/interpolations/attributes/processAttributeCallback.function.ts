@@ -1,4 +1,4 @@
-import { AnySupport } from '../../tag/AnySupport.type.js'
+import { AnySupport } from '../../tag/index.js'
 import { addSupportEventListener } from './addSupportEventListener.function.js'
 import { Callback } from './bindSubjectCallback.function.js'
 

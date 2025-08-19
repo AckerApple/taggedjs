@@ -1,6 +1,6 @@
 import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
 import { paintAppend, paintAppends } from '../../render/paint.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 
 export function processFirstTagResult(
   support: AnySupport,

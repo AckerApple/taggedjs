@@ -9,6 +9,7 @@ import { empty } from "../../tag/ValueTypes.enum.js"
 import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicDom.function.js"
 import { TagJsVar } from "../../tagJsVars/tagJsVar.type.js"
 import { attachDomElement } from "./attachDomElement.function.js"
+import { Subject } from "../../subject/Subject.class.js"
 
 export function attachDomElements(
   nodes: ObjectChildren,
@@ -48,7 +49,7 @@ export function attachDomElements(
         support,
         parentContext,
         depth,
-        appendTo,
+        appendTo as HTMLElement,
         insertBefore,
       )
 
@@ -63,13 +64,15 @@ export function attachDomElements(
       continue
     }
 
+    const domElement = newNode.domElement = document.createElement(node.nn)
+
     // Create parent context for attributes first
     const newParentContext: ContextItem = {
       isAttrs: true,
-      element: undefined as any, // will be set after element creation
+      element: domElement,
       parentContext,
       contexts: [],
-      
+      destroy$: new Subject(),
       tagJsVar: {
         tagJsType: 'new-parent-context'
       } as TagJsVar,
@@ -78,8 +81,8 @@ export function attachDomElements(
     }
 
     // one single html element. This is where attribute processing takes place
-    const { attributeContexts, domElement } = attachDomElement(
-      newNode,
+    const attributeContexts = attachDomElement(
+      domElement,
       node,
       values,
       support,

@@ -10,7 +10,7 @@ import { isLikeTags } from'../../tag/isLikeTags.function.js'
 import { PropWatches } from '../../tagJsVars/tag.function.js'
 import { Props } from '../../Props.js'
 import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.function.js'
-import { AnySupport } from '../../tag/AnySupport.type.js'
+import { AnySupport } from '../../tag/index.js'
 import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 

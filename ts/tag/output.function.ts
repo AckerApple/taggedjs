@@ -1,4 +1,4 @@
-import { AnySupport, paint } from "../index.js"
+import { AnySupport, ContextItem, paint } from "../index.js"
 import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { paintAfters, painting } from "../render/paint.function.js"
 import { syncStatesArray } from "../state/syncStates.function.js"
@@ -24,7 +24,7 @@ export function output<CallbackReturn, ReceivedArguments extends any[]>(
     const ownerSupport = support.ownerSupport as AnySupport
 
     return syncWrapCallback(
-      args, callback, ownerSupport,
+      args, callback, ownerSupport.context,
     )
   }
 }
@@ -32,9 +32,9 @@ export function output<CallbackReturn, ReceivedArguments extends any[]>(
 export function syncWrapCallback(
   args: any[],
   callback: any,
-  ownerSupport: AnySupport, // aka stateOwner
+  context: ContextItem, // aka stateOwner
 ) {
-  const stateMeta = ownerSupport.context.state as ContextStateMeta
+  const stateMeta = context.state as ContextStateMeta
   const newestOwner = stateMeta.newest as AnySupport
   const newerStates = (stateMeta.newer as ContextStateSupport).states
   const olderStates = (stateMeta.older as ContextStateSupport).states
@@ -55,6 +55,7 @@ export function syncWrapCallback(
       return // its not a tag anymore
     }
     ++painting.locks
+
     safeRenderSupport(newestOwner)
     // safeRenderSupport(global.newest)
     --painting.locks

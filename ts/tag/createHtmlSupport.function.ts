@@ -2,8 +2,8 @@ import { TemplaterResult } from './getTemplaterResult.function.js'
 import { clonePropsBy } from './props/clonePropsBy.function.js'
 import { Subject } from '../subject/Subject.class.js'
 import { Props } from '../Props.js'
-import { AnySupport } from './AnySupport.type.js'
-import { ContextItem, setUseMemory, SupportContextItem } from '../index.js'
+import { AnySupport } from './index.js'
+import { ContextItem, SupportContextItem } from '../index.js'
 
 export type PropsConfig = {
   latest: Props // new props NOT cloned props
@@ -39,7 +39,6 @@ export function getBaseSupport(
 
   const global = context.global
   global.blocked = []
-  global.destroy$ = new Subject<void>()
 
   // context.state.newer = context.state.newer || { ...setUseMemory.stateConfig }
   if( !context.state ) {

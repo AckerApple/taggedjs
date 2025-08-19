@@ -12,12 +12,14 @@ import { TagMaker } from './TagMaker.type.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
 import { checkTagValueChange } from './checkTagValueChange.function.js'
 import { destroySupportByContextItem } from './destroySupportByContextItem.function.js'
-import { AnySupport } from './AnySupport.type.js'
+import { AnySupport } from './index.js'
 import { renderTagElement } from '../render/renderTagElement.function.js'
 import { loadNewBaseSupport } from './loadNewBaseSupport.function.js'
 import { TagJsTag } from '../tagJsVars/tagJsVar.type.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
+import { setSupportInCycle } from './cycles/getSupportInCycle.function.js'
+import { Subject } from '../subject/Subject.class.js'
 
 if( typeof(document) === 'object' ) {
   if( (document as any).taggedJs ) {
@@ -75,7 +77,10 @@ export function tagElement(
   // create observable the app lives on
   const subject = getNewSubject(templater, element)
   const global = subject.global as BaseTagGlobal
-  initState(subject.state.newest as AnySupport)
+  const newest = subject.state.newest as AnySupport
+  
+  initState(newest.context)
+  setSupportInCycle(newest)
 
   let templater2 = app(props) as unknown as TemplaterResult
   const isAppFunction = typeof templater2 == BasicTypes.function
@@ -125,7 +130,7 @@ function getNewSubject(
   const subject: AppSupportContextItem = {
     value: templater,
     valueIndex: 0,
-
+    destroy$: new Subject(),
     withinOwnerElement: false, // i am the highest owner
     renderCount: 0,
 

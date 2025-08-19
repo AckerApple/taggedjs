@@ -1,8 +1,8 @@
-import { AnySupport } from '../tag/AnySupport.type.js'
+import { AnySupport } from '../tag/index.js'
 import { SupportContextItem } from '../tag/SupportContextItem.type.js'
 import { moveProviders } from './update/updateExistingTagComponent.function.js'
 import { softDestroySupport } from './softDestroySupport.function.js'
-import { renderTagOnly } from'./renderTagOnly.function.js'
+import { firstTagRender, getSupportOlderState, reRenderTag } from'./renderTagOnly.function.js'
 import { isLikeTags } from'../tag/isLikeTags.function.js'
 import { StringTag } from '../tag/StringTag.type.js'
 import { DomTag } from '../tag/DomTag.type.js'
@@ -15,11 +15,21 @@ export function renderWithSupport(
   lastSupport: AnySupport| undefined, // previous (global.newest)
   subject: SupportContextItem, // events & memory
 ): {support: AnySupport, wasLikeTags: boolean} {
-  const reSupport = renderTagOnly(
-    newSupport,
-    lastSupport,
-    subject,
-  )
+  let reSupport: AnySupport
+
+  if( getSupportOlderState(lastSupport) ) {
+    reSupport = reRenderTag(
+      newSupport,
+      lastSupport,
+      subject,
+    )
+  } else {
+    reSupport = firstTagRender(
+      newSupport,
+      lastSupport,
+      subject,
+    )
+  }
 
   const isLikeTag = !lastSupport || isLikeTags(lastSupport, reSupport)
   if(!isLikeTag) {

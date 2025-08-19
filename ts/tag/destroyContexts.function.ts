@@ -2,12 +2,12 @@ import { SupportTagGlobal } from './getTemplaterResult.function.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { isTagComponent } from '../isInstance.js'
 import { runBeforeDestroy } from './tagRunner.js'
-import { AnySupport } from './AnySupport.type.js'
+import { AnySupport } from './index.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { ContextItem, SupportContextItem } from '../index.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 
-export function destroyContext(
+export function destroyContexts(
   childTags: ContextItem[],
   ownerSupport: AnySupport,
 ) {
@@ -16,7 +16,7 @@ export function destroyContext(
     const lastArray = child.lastArray
     if(lastArray) {
       // recurse
-      destroyContext(lastArray, ownerSupport)
+      destroyContexts(lastArray, ownerSupport)
       continue
     }
 
@@ -44,7 +44,9 @@ export function destroyContext(
 
     const subTags = child.contexts as ContextItem[]
     // recurse
-    destroyContext(subTags, support)
+    destroyContexts(subTags, support)
+
+    global.deleted = true
   }
 }
 

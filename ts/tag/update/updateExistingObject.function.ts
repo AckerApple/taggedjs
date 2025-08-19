@@ -1,4 +1,4 @@
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { WrapRunner } from'../props/alterProp.function.js'
 import { syncPriorPropFunction } from './syncPriorPropFunction.function.js'
 

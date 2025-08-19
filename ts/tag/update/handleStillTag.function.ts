@@ -1,9 +1,9 @@
-import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
+import { TemplaterResult } from '../getTemplaterResult.function.js'
 import { updateSupportBy } from '../../render/update/updateSupportBy.function.js'
 import type { Tag } from '../Tag.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { createSupport } from '../createSupport.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
 

@@ -1,6 +1,6 @@
 import { isInlineHtml, renderInlineHtml } from '../../render/renderSupport.function.js'
 import { renderExistingSupport } from '../../render/renderExistingTag.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 
 export function safeRenderSupport(
   newest: AnySupport,

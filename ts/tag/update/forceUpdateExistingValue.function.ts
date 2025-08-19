@@ -1,7 +1,7 @@
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { updateToDiffValue } from './updateToDiffValue.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { TagJsTag } from '../../tagJsVars/tagJsVar.type.js'
 

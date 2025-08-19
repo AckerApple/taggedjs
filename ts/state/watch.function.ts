@@ -1,5 +1,5 @@
 import { Subject, ValueSubject } from'../subject/index.js'
-import { AnySupport } from '../tag/AnySupport.type.js'
+import { AnySupport } from '../tag/index.js'
 import { ContextStateMeta, ContextStateSupport } from '../tag/ContextStateMeta.type.js'
 import { getSupportInCycle } from'../tag/cycles/getSupportInCycle.function.js'
 import { setUseMemory } from'./setUseMemory.object.js'

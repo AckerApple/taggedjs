@@ -1,7 +1,7 @@
 // taggedjs-no-compile
 /** File largely responsible for reacting to element events, such as onclick */
 
-import { AnySupport } from '../../tag/AnySupport.type.js'
+import { AnySupport } from '../../tag/index.js'
 import { SupportTagGlobal } from '../../tag/getTemplaterResult.function.js'
 import { getUpTags } from './getUpTags.function.js'
 import { renderTagUpdateArray } from './renderTagArray.function.js'
@@ -82,29 +82,17 @@ export function runTagCallback(
 
 export function afterTagCallback(
   callbackResult: any,
-  eventHandlerSupport: AnySupport,
-) {
-  const global = eventHandlerSupport.context.global as SupportTagGlobal // tag.subject.global as SupportTagGlobal
-
-  return renderCallbackSupport(
-    eventHandlerSupport as AnySupport,
-    callbackResult,
-    global, // eventHandlersupport.context.global as TagGlobal,
-  )
-}
-
-function renderCallbackSupport(
   last: AnySupport,
-  callbackResult: any,
-  global:SupportTagGlobal, // TagGlobal,
 ) {
+  if(last.context.global.deleted) {
+    return
+  }
+
   const tagsToUpdate = getUpTags(last)
   renderTagUpdateArray(tagsToUpdate)
   return checkToResolvePromise(
     callbackResult,
     last,
-    global,
-    'bind',
     { resolvePromise, resolveValue }
   )
 }

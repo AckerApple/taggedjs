@@ -1,6 +1,6 @@
 import { attachDomElements } from './dom/attachDomElements.function.js'
 import { DomMetaMap } from '../interpolations/optimizers/LikeObjectElement.type.js'
-import { AnySupport } from '../tag/AnySupport.type.js'
+import { AnySupport } from '../tag/index.js'
 import { SupportContextItem } from '../tag/SupportContextItem.type.js'
 import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 import { ContextItem } from '../tag/ContextItem.type.js'

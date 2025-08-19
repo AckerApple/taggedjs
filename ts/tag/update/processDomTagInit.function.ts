@@ -6,7 +6,7 @@ import type { StringTag } from '../StringTag.type.js'
 import type { DomTag } from '../DomTag.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { processNewSubjectTag } from './processNewSubjectTag.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { Tag } from '../Tag.type.js'
 

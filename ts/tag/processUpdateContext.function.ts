@@ -1,6 +1,6 @@
 import { StringTag } from './StringTag.type.js'
 import type { DomTag } from './DomTag.type.js'
-import { AnySupport } from './AnySupport.type.js'
+import { AnySupport } from './index.js'
 import { ContextItem } from '../index.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { removeContextInCycle, setContextInCycle } from './cycles/setContextInCycle.function.js'

@@ -2,7 +2,7 @@
 /** File largely responsible for reacting to element events, such as onclick */
 
 import { isPromise } from '../../isInstance.js'
-import { AnySupport } from '../../tag/AnySupport.type.js'
+import { AnySupport } from '../../tag/index.js'
 import { SupportTagGlobal, TagGlobal } from '../../tag/getTemplaterResult.function.js'
 import { getUpTags } from './getUpTags.function.js'
 import { renderTagUpdateArray } from './renderTagArray.function.js'
@@ -11,8 +11,6 @@ import { syncSupports } from '../../state/syncStates.function.js'
 export function checkToResolvePromise(
   callbackResult: any,
   last: AnySupport,
-  global: TagGlobal,
-  mode: 'bind' | 'onInit',
   {resolvePromise, resolveValue}: {
     resolvePromise: (value: any) => any // promiseNoData
     resolveValue: (value: any) => any // noData

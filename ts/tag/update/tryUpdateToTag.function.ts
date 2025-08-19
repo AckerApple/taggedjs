@@ -1,4 +1,4 @@
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import {SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
 import { BasicTypes } from '../ValueTypes.enum.js'
@@ -78,7 +78,6 @@ function prepareUpdateToComponent(
   contextItem:SupportContextItem,
   ownerSupport: AnySupport,
 ): void {
-  const global = contextItem.global as SupportTagGlobal
   // When last value was not a component
   if(!contextItem.state.newest) {
     ;(templater as TagJsVar).processInit(

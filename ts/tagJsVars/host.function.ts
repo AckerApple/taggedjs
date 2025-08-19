@@ -4,6 +4,8 @@ import { syncWrapCallback } from "../tag/output.function.js"
 import { handleTagTypeChangeFrom } from "../tag/update/checkStillSubscription.function.js"
 import { removeContextInCycle, setContextInCycle } from "../tag/cycles/setContextInCycle.function.js"
 import { MatchesInjection, TagJsVar } from "./tagJsVar.type.js"
+import { initState } from "../state/state.utils.js"
+import { runAfterRender } from "../render/runAfterRender.function.js"
 
 /** On specific host life cycles, a callback can be called. 
  * @state always an object */
@@ -39,8 +41,9 @@ export function host<T extends HostCallback>(
     delete: deleteHost,
     options: { callback, ...options } as AllOptions,
     matchesInjection(inject: any): boolean {
+      const injectCallback = inject?.options?.callback
       // Check if the inject target is a host with the same callback
-      return inject?.options?.callback === callback
+      return injectCallback === callback
     },
   }
 
@@ -98,14 +101,6 @@ function processHostUpdate(
 
   const args = (newHost.options.arguments || oldOptions.arguments || [])
   contextItem.returnValue = newHost.options.callback(...args)
-  /*
-  newHost.options.callback(
-    element,
-    newValue as unknown as HostValue,
-    contextItem as any as AttributeContextItem,
-    (contextItem as HostAttributeContextItem).state,
-  )
-  */
 }
 
 function processHostAttribute(
@@ -129,33 +124,31 @@ function processHost(
   const element = contextItem.element
   const state = (contextItem as HostAttributeContextItem).state = {}
   
-  setContextInCycle(contextItem)
+  initState(contextItem)
 
-  procesHostTagJsVar(
+  processHostTagJsVar(
     element as HTMLInputElement,
     tagJsVar as HostValue,
     contextItem,
     state,
   )
 
-  removeContextInCycle()
+  runAfterRender()
 }
 
-function procesHostTagJsVar(
+function processHostTagJsVar(
   element: HTMLInputElement,
   tagJsVar: HostValue,
   contextItem: ContextItem,
   state: any,
 ) {
-  // tagJsVar.options.callback(element, tagJsVar, contextItem, state)
-  // const oldOptions = (contextItem.tagJsVar as HostValue).options
-  //const args = (tagJsVar.options.arguments || oldOptions?.arguments || [])
   const args = tagJsVar.options.arguments || []
   const returnValue = tagJsVar.options.callback(...args)
   
   // Store the return value for tag.inject to access
   contextItem.returnValue = returnValue
 
+  // DEPRECATED
   const options = tagJsVar.options
   if(options.onInit) {
     // const element = contextItem.element as HTMLInputElement
@@ -170,27 +163,45 @@ function deleteHost(
   const tagJsVar = attrContext.tagJsVar as HostValue
   const options = tagJsVar.options
 
+  if(attrContext.destroy$.subscribers.length) {
+    // TODO: Not sure if this needed
+    setContextInCycle(contextItem)
+
+    syncWrapCallback(
+      [],
+      attrContext.destroy$.next.bind(attrContext.destroy$),
+      contextItem,
+    )
+    
+    // TODO: Not sure if this needed
+    removeContextInCycle()
+  }
+
+  // DEPRECATED
+  // TODO: remove this code and use tag.onDestroy instead
   if(options.onDestroy) {
     const element = attrContext.element as Element
     
     const hostDestroy = function processHostDestroy() {
       setContextInCycle(contextItem)
+      
       const result = options.onDestroy(
         element as HTMLInputElement,
         tagJsVar,
         attrContext,
         (attrContext as HostAttributeContextItem).state,
       )
+      
       removeContextInCycle()
+      
       return result
     }
-
     
     const stateOwner = (contextItem as any).stateOwner as AnySupport
     syncWrapCallback(
       [],
       hostDestroy,
-      stateOwner,
+      stateOwner.context,
     )
   }
 }

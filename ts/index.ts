@@ -15,7 +15,7 @@ export * from './TagJsEvent.type.js'
 export { type Wrapper } from './tag/getTemplaterResult.function.js'
 export { type TagJsEvent } from './TagJsEvent.type.js'
 
-import { renderTagOnly } from './render/renderTagOnly.function.js'
+import { firstTagRender, reRenderTag } from './render/renderTagOnly.function.js'
 import { renderSupport } from './render/renderSupport.function.js'
 import { renderWithSupport } from './render/renderWithSupport.function.js'
 
@@ -25,6 +25,6 @@ export * from './deepFunctions.js'
 
 export const hmr = {
   tagElement, renderWithSupport, renderSupport,
-  renderTagOnly, paint,
+  firstTagRender, reRenderTag, paint,
 }
 

@@ -1,12 +1,13 @@
 // taggedjs-no-compile
 
 import { paintAppend, paintAppends, paintBefore, paintCommands } from '../../render/paint.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { domProcessContextItem } from '../../interpolations/optimizers/domProcessContextItem.function.js'
 import { empty } from '../ValueTypes.enum.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 import { ContextItem } from '../ContextItem.type.js'
+import { Subject } from '../../subject/Subject.class.js'
 
 /** Used by arrays and subcontext creators like subscribe. Must provide insertBefore OR appendTo */
 export function createAndProcessContextItem(
@@ -22,7 +23,7 @@ export function createAndProcessContextItem(
     tagJsVar: valueToTagJsVar(value),
     withinOwnerElement: false,
     placeholder: element,
-    
+    destroy$: new Subject(),
     // TODO: This will need to be passed in
     parentContext: ownerSupport.context,
     

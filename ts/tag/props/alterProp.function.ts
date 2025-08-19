@@ -1,4 +1,4 @@
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { getSupportInCycle } from '../cycles/getSupportInCycle.function.js'
 import { deepCompareDepth } from '../hasSupportChanged.function.js'
 import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
@@ -174,8 +174,7 @@ function afterCheckProp(
 ) {
   // restore object to have original function on destroy
   if(depth > 0) {    
-    const global = newSupport.context.global as SupportTagGlobal
-    newProp[index].subscription = global.destroy$.toCallback(function alterCheckProcessor() {
+    newProp[index].subscription = newSupport.context.destroy$.toCallback(function alterCheckProcessor() {
       newProp[index] = originalValue as unknown as {subscription: Subject<void>}
     })
   }
@@ -221,7 +220,6 @@ export function callbackPropOwner(
   ownerSupport: AnySupport, // <-- WHEN called from alterProp its owner OTHERWISE its previous
 ) {
   const ownerContext = ownerSupport.context
-  const global = ownerContext.global as SupportTagGlobal
   const newest = ownerContext.state?.newest || ownerSupport as AnySupport
   const supportInCycle = getSupportInCycle()
   const noCycle = supportInCycle === undefined

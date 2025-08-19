@@ -15,7 +15,7 @@ export function domProcessContextItem(
   const subject = support.context  
   subject.locked = true
 
-  contextItem.element = appendTo as HTMLElement
+  contextItem.element = contextItem.element || appendTo as HTMLElement
   setContextInCycle(contextItem)
 
   processFirstSubjectValue(

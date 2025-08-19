@@ -5,7 +5,7 @@ import { tryUpdateToTag } from './tryUpdateToTag.function.js'
 import { isArray } from '../../isInstance.js'
 import { processTagArray } from './processTagArray.js'
 import { processNowRegularValue, RegularValue } from './processRegularValue.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { getArrayTagVar } from '../../tagJsVars/getArrayTagJsVar.function.js'
 import { Tag } from '../Tag.type.js'
 

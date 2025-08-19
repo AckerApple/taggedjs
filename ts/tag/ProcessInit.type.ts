@@ -1,5 +1,5 @@
 import { ContextItem } from './ContextItem.type.js'
-import { AnySupport } from './AnySupport.type.js'
+import { AnySupport } from './index.js'
 import { AttributeContextItem } from './AttributeContextItem.type.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 

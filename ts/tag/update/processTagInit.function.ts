@@ -3,7 +3,7 @@ import { TemplaterResult } from '../getTemplaterResult.function.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { processNewSubjectTag } from './processNewSubjectTag.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 
 export function processTagInit(

@@ -2,8 +2,9 @@ import { setUseMemory } from './setUseMemory.object.js'
 import { State, StateConfigItem } from './state.types.js'
 import { getStateValue } from './getStateValue.function.js'
 import { BasicTypes } from '../tag/ValueTypes.enum.js'
-import { UnknownFunction } from '../tag/index.js'
+import { ContextStateSupport, UnknownFunction } from '../tag/index.js'
 import { StateMemory } from './StateMemory.type.js'
+import { getContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
 
 export function runRestate () {
   const config: StateMemory = setUseMemory.stateConfig
@@ -18,6 +19,16 @@ export function runFirstState <T>(
   defaultValue: T | (() => T),
 ) {
   const config: StateMemory = setUseMemory.stateConfig
+  const context = getContextInCycle()
+
+  if( !context || !context.state ) {
+    const msg = 'State requested but TaggedJs is not currently rendering a tag or host'
+    console.error(msg, { config, context })
+    throw new Error(msg)
+  }
+
+  const newer = context.state.newer as ContextStateSupport
+  config.state = newer.state
 
   // State first time run
   let initValue = defaultValue

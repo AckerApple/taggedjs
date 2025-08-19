@@ -1,5 +1,5 @@
 import {SupportTagGlobal } from './getTemplaterResult.function.js'
-import { AnySupport } from './AnySupport.type.js'
+import { AnySupport } from './index.js'
 
 // Life cycle 4 - end of life
 export function runBeforeDestroy(
@@ -18,9 +18,7 @@ export function runBeforeDestroy(
     }
   }
 
-  if(global.destroy$) {
-    global.destroy$.next()
-  }
-
+  // global.deleted = true
+  support.context.destroy$.next()
   support.context.renderCount = 0 // if it comes back, wont be considered an update
 }

@@ -1,5 +1,5 @@
 import { isTagComponent } from '../../isInstance.js'
-import { AnySupport } from '../../tag/AnySupport.type.js'
+import { AnySupport } from '../../tag/index.js'
 
 export function getSupportWithState(support: AnySupport) {
   // get actual component owner not just the html`` support

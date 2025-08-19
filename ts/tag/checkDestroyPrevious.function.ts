@@ -1,35 +1,16 @@
-import { destroyArrayItem } from'./update/compareArrayItems.function.js'
 import { isArray } from'../isInstance.js'
 import { ContextItem } from './ContextItem.type.js'
+import { destroyArrayContext } from './destroyArrayContext.function.js'
 
 export function checkArrayValueChange(
   newValue: unknown,
   subject: ContextItem,
-) {  
+) {
   // no longer an array?
   if (!isArray(newValue)) {
-    destroyArrayContextItem(subject)
-
+    destroyArrayContext(subject)
     return 9 // 'array'
   }
 
   return -1
-}
-
-export function destroyArrayContextItem(
-  subject: ContextItem,
-) {
-  const lastArray = subject.lastArray as unknown[]
-  destroyArray(subject, lastArray)
-}
-
-export function destroyArray(
-  subject: ContextItem,
-  lastArray: any[]
-) {  
-  for (let index=0; index < lastArray.length; ++index) {
-    destroyArrayItem(lastArray[index])
-  }
-  
-  delete subject.lastArray
 }

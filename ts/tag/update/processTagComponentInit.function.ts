@@ -3,7 +3,7 @@ import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.functio
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { ContextItem } from '../ContextItem.type.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 
 export function processTagComponentInit(

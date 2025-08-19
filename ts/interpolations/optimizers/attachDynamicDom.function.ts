@@ -13,7 +13,7 @@ export function attachDynamicDom(
   support: AnySupport, // owner
   parentContext: ContextItem,
   depth: number, // used to indicate if variable lives within an owner's element
-  appendTo?: Element,
+  appendTo?: HTMLElement,
   insertBefore?: Text
 ) {  
   const marker = document.createTextNode(empty)
@@ -26,6 +26,7 @@ export function attachDynamicDom(
   )
 
   contextItem.placeholder = marker
+  contextItem.element = appendTo
 
   if(appendTo) {
     paintAppends.push([paintAppend, [appendTo, marker]])

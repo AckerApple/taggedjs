@@ -1,6 +1,6 @@
 import { EventCallback } from './getDomTag.function.js'
 import { ContextItem } from './ContextItem.type.js'
-import { AnySupport } from './AnySupport.type.js'
+import { AnySupport } from './index.js'
 import { Props } from '../Props.js'
 import { TagWrapper } from './tag.utils.js'
 import { Provider } from '../state/providers.js'
@@ -49,10 +49,7 @@ export type TagGlobal = {
 }
 
 export type SupportTagGlobal = TagGlobal & {
-  destroy$: Subject<void> // not on non-tags
-
   blocked: AnySupport[], // renders that did not occur because an event was processing
-  
   providers?: Provider[]
 }
 

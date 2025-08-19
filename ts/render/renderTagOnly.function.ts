@@ -1,79 +1,44 @@
-import { Wrapper } from '../tag/getTemplaterResult.function.js'
 import { SupportContextItem } from '../tag/SupportContextItem.type.js'
-import { executeWrap } from './executeWrap.function.js'
-import { ValueTypes } from '../tag/ValueTypes.enum.js'
-import { TagWrapper } from '../tag/tag.utils.js'
-import { runAfterRender } from './runAfterRender.function.js'
-import { initState, reState } from '../state/state.utils.js'
-import { createSupport } from '../tag/createSupport.function.js'
-import { AnySupport } from '../tag/AnySupport.type.js'
+import { initState, reStateSupport } from '../state/state.utils.js'
+import { AnySupport } from '../tag/index.js'
+import { ContextStateSupport } from '../tag/ContextStateMeta.type.js'
+import { callTag } from './callTag.function.js'
+import { setSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
 
-/** Used during first renders of a support only */
-export function renderTagOnly(
+export function reRenderTag(
   newSupport: AnySupport,
   prevSupport: AnySupport | undefined, // causes restate
-  subject:SupportContextItem,
+  context: SupportContextItem,
   ownerSupport?: AnySupport,
-): AnySupport {
-  runBeforeRender(newSupport, prevSupport)
-  
-  const templater = newSupport.templater
-  let reSupport: AnySupport
+) {
+  const stateMeta = context.state
+  const prevState = (stateMeta.older as ContextStateSupport).state
 
-  // NEW TAG CREATED HERE
-  if(templater.tagJsType === ValueTypes.stateRender) {
-    const result = templater as any as TagWrapper<any> // .wrapper as any// || {original: templater} as any
+  reStateSupport(
+    newSupport,
+    prevSupport as AnySupport,
+    prevState,
+  )
 
-    reSupport = createSupport(
-      templater,
-      ownerSupport as AnySupport,
-      newSupport.appSupport, // ownerSupport.appSupport as AnySupport,
-      subject,
-    )
-
-    executeWrap(
-      templater,
-      result,
-      reSupport,
-    )
-  } else {
-    // functions wrapped in tag()
-    const wrapper = templater.wrapper as Wrapper
-
-    // calls the function returned from getTagWrap()
-    reSupport = wrapper(
-      newSupport,
-      subject,
-      prevSupport,
-    )
-  }
-
-  runAfterRender(reSupport, ownerSupport)
-
-  reSupport.ownerSupport = newSupport.ownerSupport// || lastOwnerSupport) as AnySupport
-
-  return reSupport
+  return callTag(newSupport, prevSupport, context, ownerSupport)
 }
 
-function runBeforeRender(
+/** Used during first renders of a support */
+export function firstTagRender(
   newSupport: AnySupport,
-  prevSupport?: AnySupport,
-) {
-  // Get state from context.state.older instead of support.state
-  const context = prevSupport?.context as SupportContextItem
-  const stateMeta = context?.state
-  const prevState = stateMeta?.older?.state
-  // const prevState = stateMeta?.newer?.state
+  prevSupport: AnySupport | undefined, // causes restate
+  context: SupportContextItem,
+  ownerSupport?: AnySupport,
+): AnySupport {
+  initState(newSupport.context)
 
-  if(prevState) {
-    reState(
-      newSupport,
-      prevSupport as AnySupport,
-      prevState,
-    )
-    
-    return
-  }
-  
-  initState(newSupport)
+  setSupportInCycle(newSupport)
+
+  return callTag(newSupport, prevSupport, context, ownerSupport)
+}
+
+export function getSupportOlderState(support?: AnySupport) {
+  const context = support?.context as SupportContextItem
+  const stateMeta = context?.state
+  return stateMeta?.older?.state
 }

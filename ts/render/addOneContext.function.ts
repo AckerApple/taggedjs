@@ -1,3 +1,4 @@
+import { Subject } from '../subject/Subject.class.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { valueToTagJsVar } from '../tagJsVars/valueToTagJsVar.function.js'
 
@@ -10,7 +11,7 @@ export function addOneContext(
   const contextItem: ContextItem = {
     value,
     valueIndex: context.length,
-
+    destroy$: new Subject<void>(),
     tagJsVar: valueToTagJsVar(value),
     withinOwnerElement,
     parentContext,

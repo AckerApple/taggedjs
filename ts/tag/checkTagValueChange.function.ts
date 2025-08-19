@@ -1,4 +1,4 @@
-import { AnySupport } from './AnySupport.type.js'
+import { AnySupport } from './index.js'
 import { SupportContextItem } from './SupportContextItem.type.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { destroySupport } from '../render/destroySupport.function.js'

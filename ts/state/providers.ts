@@ -1,5 +1,5 @@
 import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
-import { AnySupport } from '../tag/AnySupport.type.js'
+import { AnySupport } from '../tag/index.js'
 import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 import { setUseMemory } from'./setUseMemory.object.js'
 import { state } from'./state.function.js'

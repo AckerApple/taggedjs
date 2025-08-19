@@ -3,7 +3,7 @@ import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
 import { paintAppend, paintAppends, paintBefore, paintCommands } from '../../render/paint.function.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { newSupportByTemplater } from '../../render/update/processTag.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 
 export function processNewSubjectTag(
   templater: TemplaterResult,

@@ -1,5 +1,5 @@
 import { createHtmlSupport } from '../../tag/createHtmlSupport.function.js'
-import { SupportTagGlobal, TemplaterResult } from '../../tag/getTemplaterResult.function.js'
+import { TemplaterResult } from '../../tag/getTemplaterResult.function.js'
 import { checkTagValueChange } from '../../tag/checkTagValueChange.function.js'
 import { buildBeforeElement } from '../buildBeforeElement.function.js'
 import type { StringTag } from '../../tag/StringTag.type.js'
@@ -7,7 +7,7 @@ import type { DomTag } from '../../tag/DomTag.type.js'
 import { ValueTypes } from '../../tag/ValueTypes.enum.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processTagInit } from '../../tag/update/processTagInit.function.js'
-import { AnySupport } from '../../tag/AnySupport.type.js'
+import { AnySupport } from '../../tag/index.js'
 import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
 
 /** When first time render, adds to owner childTags

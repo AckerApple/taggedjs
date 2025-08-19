@@ -1,4 +1,4 @@
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
 import { SubContext } from './SubContext.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'

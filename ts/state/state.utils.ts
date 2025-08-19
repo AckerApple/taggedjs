@@ -1,13 +1,17 @@
-import { AnySupport } from '../tag/AnySupport.type.js'
+import { AnySupport, ContextItem } from '../tag/index.js'
 import { runFirstState, runRestate } from './stateHandlers.js'
 import { State, StateConfig } from './state.types.js'
 import { firstStatesHandler, reStatesHandler } from './states.utils.js'
 import { setUseMemory } from './setUseMemory.object.js'
 import { setSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
+import { setContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
 
+/** To be called before rendering anything with a state */
 export function initState(
-  support: AnySupport,
+  context: ContextItem,
 ) {
+  setContextInCycle(context)
+  
   const config = setUseMemory.stateConfig
   config.handlers.handler = runFirstState
   config.handlers.statesHandler = firstStatesHandler as <T>(defaultValue: T | (() => T)) => (y: unknown) => T
@@ -17,16 +21,11 @@ export function initState(
   const states = config.states = []
   config.statesIndex = 0
 
-  const context = support.context
   const stateMeta = context.state = context.state || {}
   stateMeta.newer = { state, states }
-
-  setSupportInCycle(support)
 }
 
 export function reState(
-  newSupport: AnySupport,
-  prevSupport: AnySupport,
   prevState: State,
 ) {
   const config = setUseMemory.stateConfig
@@ -40,7 +39,18 @@ export function reState(
   
   config.handlers.handler = runRestate
   config.handlers.statesHandler = reStatesHandler
+
+  return config
+}
+
+export function reStateSupport(
+  newSupport: AnySupport,
+  prevSupport: AnySupport,
+  prevState: State,
+) {  
+  reState(prevState)
   
+  const config = setUseMemory.stateConfig
   config.prevSupport = prevSupport
 
   setSupportInCycle(newSupport)

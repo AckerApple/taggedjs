@@ -1,6 +1,6 @@
 import { attachDomElements } from './attachDomElements.function.js'
 import { ObjectElement } from '../../interpolations/optimizers/ObjectNode.types.js'
-import { AnySupport } from '../../tag/AnySupport.type.js'
+import { AnySupport } from '../../tag/index.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
 import { ValueTypes } from '../../tag/ValueTypes.enum.js'

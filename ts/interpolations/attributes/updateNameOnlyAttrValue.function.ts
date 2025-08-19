@@ -2,7 +2,7 @@
 
 import { HowToSet } from './howToSetInputValue.function.js'
 import { BasicTypes } from '../../tag/ValueTypes.enum.js'
-import { AnySupport } from '../../tag/AnySupport.type.js'
+import { AnySupport } from '../../tag/index.js'
 import { paintContent } from '../../render/paint.function.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processNameOnlyAttrValue } from '../../render/attributes/processAttribute.function.js'

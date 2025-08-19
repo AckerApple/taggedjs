@@ -17,14 +17,11 @@ export function processAttributeUpdate(
   const oldTag = contextItem.tagJsVar // contextItem.tagJsVar as TagJsVar
   const tagValue = value as TagJsVar | undefined
 
-
   const checkResult = oldTag.checkValueChange(
     tagValue,
     contextItem as SupportContextItem, // todo: weird typing should just be ContextItem
     ownerSupport,
   )
-
-  
 
   if (checkResult >= 0) {
     oldTag.delete(contextItem, ownerSupport)

@@ -1,4 +1,4 @@
-import { AnySupport } from './AnySupport.type.js'
+import { AnySupport } from './index.js'
 import { State } from '../state/state.types.js'
 import { Original, Wrapper } from './index.js'
 import { StateMismatchError } from '../errors.js'

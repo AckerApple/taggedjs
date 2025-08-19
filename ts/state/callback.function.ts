@@ -1,7 +1,7 @@
 import callbackStateUpdate from './callbackStateUpdate.function.js'
-import { AnySupport } from '../tag/AnySupport.type.js'
+import { AnySupport } from '../tag/index.js'
 import { setUseMemory } from './setUseMemory.object.js'
-import { Callback, syncError } from './callbackMaker.function.js'
+import { Callback } from './callbackMaker.function.js'
 import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
 import { StateMemory } from './StateMemory.type.js'
 import { state } from './state.function.js'
@@ -27,29 +27,17 @@ export function callback<A,B,C,D,E,F, T>(
   callbackState.callback = callback
 
   return callbackTrigger
-/*
-  if(!support) {
-    throw syncError
-  }
-
-  return createTrigger(
-    support,
-    setUseMemory.stateConfig, // setUseMemory.stateConfig.stateArray
-    callback,
-  )
-  */
 }
 
 type CallbackState = {
   callback: any
 }
 
-export function createTrigger<A,B,C,D,E,F, T>(
+export function createTrigger(
   support: AnySupport,
   oldState: StateMemory,
   callbackState: CallbackState,
 ) {
-  // const oldStates = [...oldState.states]
   const oldStates = oldState.states
 
   return function trigger(...args: any[]) {

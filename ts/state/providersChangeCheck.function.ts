@@ -1,5 +1,5 @@
 import { handleProviderChanges, TagWithProvider } from './handleProviderChanges.function.js'
-import { AnySupport } from '../tag/AnySupport.type.js'
+import { AnySupport } from '../tag/index.js'
 import {SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 
 export function providersChangeCheck(

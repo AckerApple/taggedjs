@@ -1,4 +1,4 @@
-import { AnySupport } from '../tag/AnySupport.type.js'
+import { AnySupport } from '../tag/index.js'
 import { ContextStateSupport, ContextStateMeta } from '../tag/ContextStateMeta.type.js'
 import { State } from './state.types.js'
 import { StatesSetter } from './states.utils.js'

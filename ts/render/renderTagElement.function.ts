@@ -8,11 +8,11 @@ import { paint, painting } from './paint.function.js'
 import { TagMaker } from '../tag/TagMaker.type.js'
 import { AnySupport, BaseTagGlobal, Wrapper } from '../index.js'
 import { createSupport } from '../tag/createSupport.function.js'
-import { runAfterRender } from './runAfterRender.function.js'
+import { runAfterSupportRender } from './runAfterRender.function.js'
 import { executeWrap } from './executeWrap.function.js'
 import { registerTagElement } from './registerNewTagElement.function.js'
 import { loadNewBaseSupport } from '../tag/loadNewBaseSupport.function.js'
-import { reState } from '../state/state.utils.js'
+import { reStateSupport } from '../state/state.utils.js'
 
 export function renderTagElement(
   app: TagMaker,
@@ -107,7 +107,7 @@ export function runWrapper(
 
   if(!isFirstRender) {
     const olderStateContext = subject.state.older as ContextStateSupport
-    reState(
+    reStateSupport(
       newSupport,
       newest,
       olderStateContext.state,
@@ -131,7 +131,7 @@ export function runWrapper(
     subject,
   )
 
-  runAfterRender(newSupport)
+  runAfterSupportRender(newSupport)
 
   return nowSupport
 }
@@ -147,7 +147,7 @@ function executeStateWrap(
 
   if(!isAppFunction) {
     const newSupport = loadNewBaseSupport(templater, subject, appElement)
-    runAfterRender(newSupport)
+    runAfterSupportRender(newSupport)
     return newSupport
   }
 
@@ -157,7 +157,7 @@ function executeStateWrap(
     newSupport,
   )
 
-  runAfterRender(newSupport)
+  runAfterSupportRender(newSupport)
 
   return newSupport
 }

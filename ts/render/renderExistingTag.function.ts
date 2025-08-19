@@ -1,4 +1,4 @@
-import { AnySupport } from '../tag/AnySupport.type.js'
+import { AnySupport } from '../tag/index.js'
 import { SupportContextItem } from '../tag/SupportContextItem.type.js'
 import { renderWithSupport } from'./renderWithSupport.function.js'
 import { processTag } from './update/processTag.function.js'

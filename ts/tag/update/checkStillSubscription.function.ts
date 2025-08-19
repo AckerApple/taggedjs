@@ -1,6 +1,6 @@
 import { SubscribeValue } from '../../tagJsVars/subscribe.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { updateToDiffValue } from './updateToDiffValue.function.js'
 import { SubscriptionContext } from './SubContext.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
@@ -49,7 +49,6 @@ export function handleTagTypeChangeFrom(
   if(isDifferent) {
     const oldTagJsVar = contextItem.tagJsVar as TagJsVar
     oldTagJsVar.delete(contextItem, ownerSupport)
-
 
     updateToDiffValue(
       newValue as TemplateValue,

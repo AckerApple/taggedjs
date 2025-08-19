@@ -1,7 +1,7 @@
 import { SubscribeValue } from '../../tagJsVars/subscribe.function.js'
 import { setupSubscribe } from './setupSubscribe.function.js'
 import { SignalObject } from '../../state/signal.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { SubContext } from './SubContext.type.js'

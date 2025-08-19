@@ -1,4 +1,4 @@
-import { AnySupport } from "../tag/AnySupport.type.js"
+import { AnySupport } from "../tag/index.js"
 import { AttributeContextItem } from "../tag/AttributeContextItem.type.js"
 import { ContextItem } from "../tag/ContextItem.type.js"
 import { State } from "./state.types.js"

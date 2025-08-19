@@ -1,5 +1,5 @@
 import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
-import { destroyArray } from './checkDestroyPrevious.function.js'
+import { destroyArray } from './destroyArrayContext.function.js'
 import { addPaintRemover } from '../render/paint.function.js'
 import { ContextItem } from './ContextItem.type.js'
 import { SupportTagGlobal } from './getTemplaterResult.function.js'
@@ -23,10 +23,11 @@ function smartRemoveByContext(
   allPromises: Promise<any>[],
 ) {
   for (const context of contexts) {
+    /*
     if( context.locked ) {
       continue
     }
-
+*/
     if(context.withinOwnerElement) {
       const tagJsVar = context.tagJsVar as TagJsVar
       if( tagJsVar && tagJsVar.tagJsType === 'host' ) {
@@ -56,9 +57,11 @@ function smartRemoveByContext(
       continue // context
     }
 
+    /*
     if(subGlobal.deleted === true) {
       continue // already deleted
     }
+    */
 
     subGlobal.deleted = true
     const oldest = (context as SupportContextItem).state?.oldest

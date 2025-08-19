@@ -4,9 +4,9 @@ import { PropsConfig } from '../createHtmlSupport.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { getCastedProps } from '../getTagWrap.function.js'
 import { createSupport } from '../createSupport.function.js'
-import { AnySupport } from '../AnySupport.type.js'
+import { AnySupport } from '../index.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
-import { renderTagOnly } from '../../render/renderTagOnly.function.js'
+import { firstTagRender } from '../../render/renderTagOnly.function.js'
 import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
 
 export function processReplacementComponent(
@@ -31,7 +31,7 @@ export function processReplacementComponent(
     newPropsConfig.castProps = castedProps
   }
   
-  const support = renderTagOnly(
+  const support = firstTagRender(
     newSupport,
     subject.state.newest, // existing tag
     subject,
@@ -69,7 +69,7 @@ export function processFirstSubjectComponent(
     newPropsConfig.castProps = castedProps
   }
     
-  const support = renderTagOnly(
+  const support = firstTagRender(
     newSupport,
     subject.state.newest, // existing tag
     subject,

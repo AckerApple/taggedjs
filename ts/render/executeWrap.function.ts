@@ -1,6 +1,6 @@
 import { TemplaterResult } from '../tag/getTemplaterResult.function.js'
 import { TagWrapper } from '../tag/tag.utils.js'
-import { AnySupport } from '../tag/AnySupport.type.js'
+import { AnySupport } from '../tag/index.js'
 import { StringTag } from '../tag/StringTag.type.js'
 import { BasicTypes, ValueTypes } from '../tag/ValueTypes.enum.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'

@@ -1,6 +1,6 @@
 import { TemplaterResult } from './getTemplaterResult.function.js'
 import { getBaseSupport, upgradeBaseToSupport } from './createHtmlSupport.function.js'
-import { AnySupport } from './AnySupport.type.js'
+import { AnySupport } from './index.js'
 import { SupportContextItem } from './SupportContextItem.type.js'
 
 export function loadNewBaseSupport(

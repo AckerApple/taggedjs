@@ -1,5 +1,5 @@
 import { Props } from '../Props.js'
-import { AnySupport } from './AnySupport.type.js'
+import { AnySupport } from './index.js'
 import { PropsConfig } from './createHtmlSupport.function.js'
 import { TemplaterResult } from './getTemplaterResult.function.js'
 import { hasPropChanges } from './hasPropChanges.function.js'
