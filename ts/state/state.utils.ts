@@ -5,6 +5,7 @@ import { firstStatesHandler, reStatesHandler } from './states.utils.js'
 import { setUseMemory } from './setUseMemory.object.js'
 import { setSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
 import { setContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
+import { ContextStateMeta, ContextStateSupport } from '../tag/ContextStateMeta.type.js'
 
 /** To be called before rendering anything with a state */
 export function initState(
@@ -26,6 +27,13 @@ export function initState(
 }
 
 export function reState(
+  context: ContextItem,
+) {
+  const stateMeta = context.state as ContextStateMeta
+  return reStateByPrev( (stateMeta.newer as ContextStateSupport).state )
+}
+
+export function reStateByPrev(
   prevState: State,
 ) {
   const config = setUseMemory.stateConfig
@@ -48,7 +56,7 @@ export function reStateSupport(
   prevSupport: AnySupport,
   prevState: State,
 ) {  
-  reState(prevState)
+  reStateByPrev(prevState)
   
   const config = setUseMemory.stateConfig
   config.prevSupport = prevSupport

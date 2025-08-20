@@ -48,12 +48,12 @@ export type TagGlobal = {
   callbackMaker?: true
 }
 
-export type SupportTagGlobal = TagGlobal & {
+export interface SupportTagGlobal extends TagGlobal {
   blocked: AnySupport[], // renders that did not occur because an event was processing
   providers?: Provider[]
 }
 
-export type BaseTagGlobal =SupportTagGlobal & {
+export type BaseTagGlobal = SupportTagGlobal & {
   // only appears on app
   events?: Events
 }

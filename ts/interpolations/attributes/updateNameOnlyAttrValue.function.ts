@@ -5,7 +5,7 @@ import { BasicTypes } from '../../tag/ValueTypes.enum.js'
 import { AnySupport } from '../../tag/index.js'
 import { paintContent } from '../../render/paint.function.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
-import { processNameOnlyAttrValue } from '../../render/attributes/processAttribute.function.js'
+import { processStandAloneAttribute } from '../../render/attributes/processStandAloneAttribute.function.js'
 import { isNoDisplayValue } from '../../render/attributes/isNoDisplayValue.function.js'
 
 export function updateNameOnlyAttrValue(
@@ -20,7 +20,7 @@ export function updateNameOnlyAttrValue(
 ) {
   // check to remove previous attribute(s)
   if(lastValue) {
-    if( isNoDisplayValue(attrValue) ) {
+    if( isNoDisplayValue(attrValue) || attrValue === '' ) {
       element.removeAttribute(lastValue as string)
       return
     }
@@ -43,7 +43,7 @@ export function updateNameOnlyAttrValue(
     }
   }
 
-  processNameOnlyAttrValue(
+  processStandAloneAttribute(
     values,
     attrValue,
     element as HTMLElement,

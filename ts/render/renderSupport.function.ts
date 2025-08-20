@@ -24,6 +24,7 @@ export function renderSupport<T extends AnySupport>(
   const inlineHtml = isInlineHtml(templater)
 
   if(subject.locked) {
+    console.log('global', {global, subject})
     global.blocked.push(support)
     return support
   }
@@ -34,7 +35,7 @@ export function renderSupport<T extends AnySupport>(
     return result
   }
 
-  subject.locked = true
+  subject.locked = 4
 
   if(global.blocked.length) {
     support = global.blocked.pop() as T

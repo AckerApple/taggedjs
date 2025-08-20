@@ -1,4 +1,4 @@
-import { AnySupport, SupportContextItem } from '../index.js'
+import { AnySupport, SupportContextItem, tag } from '../index.js'
 import { checkToResolvePromise } from '../interpolations/attributes/checkToResolvePromise.function.js'
 import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
 import { getContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
@@ -23,6 +23,8 @@ export function onInit(
       )
     }
   })
+
+  return tag
 }
 
 function resolvePromise(x: any) {

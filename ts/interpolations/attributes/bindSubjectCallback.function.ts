@@ -59,7 +59,7 @@ export function runTagCallback(
   const subject = component.context
   // const global = subject.global as SupportTagGlobal // tag.subject.global as TagGlobal
   
-  subject.locked = true // prevent another render from re-rendering this tag
+  subject.locked = 1 // prevent another render from re-rendering this tag
 
   // sync the new states to the old before the old does any processing
   // syncStatesArray(component.subject.global.newest.states, states)

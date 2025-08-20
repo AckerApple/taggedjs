@@ -1,7 +1,7 @@
-import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
 import { setUseMemory } from './setUseMemory.object.js'
 import { SyncCallbackError } from '../errors.js'
 import { createTrigger } from './callback.function.js'
+import { getContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
 
 export type Callback<A,B,C,D,E,F, T> = (
   a: A, b: B, c: C, d: D, e: E, f: F,
@@ -13,10 +13,11 @@ type innerCallback = <A,B,C,D,E,F, T>(
 ) => (_a?:A, _b?:B, _c?:C, _d?:D, _e?:E, _f?: F) => T
 
 export const callbackMaker = () => {
-  const support = getSupportInCycle()
+  const context = getContextInCycle()
+  // const support = getSupportInCycle()
   // callback as typeof innerCallback
 
-  if(!support) {
+  if(!context) {
     throw syncError
   }
 
@@ -25,7 +26,7 @@ export const callbackMaker = () => {
   return function triggerMaker<A,B,C,D,E,F, T>(
     callback: Callback<A, B, C, D, E, F, T>
   ) {
-    return createTrigger(support, oldState, { callback })
+    return createTrigger(context, oldState, { callback })
   } as innerCallback
 }
 

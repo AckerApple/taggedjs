@@ -20,7 +20,7 @@ export function checkToResolvePromise(
 
   if(isProm) {
     const subject = last.context
-    subject.locked = true
+    subject.locked = 2
     return callbackResult.then(thenResolveBy(last, resolvePromise))
   }
 
@@ -34,13 +34,12 @@ export function thenResolveBy(
   return (x: any) => {
     const global = last.context.global as SupportTagGlobal
     //clearTimeout(timeout)
+    const subject = last.context
+    delete subject.locked
 
     if(global.deleted === true) {
       return resolvePromise(x) // tag was deleted during event processing
     }
-
-    const subject = last.context
-    delete subject.locked
 
     // The promise may have then changed old variables, lets update forward
     syncSupports(last, subject.state.newest as AnySupport)

@@ -1,6 +1,7 @@
 import { BaseTagGlobal, EventCallback } from '../../tag/index.js'
 import { Events } from '../../tag/getTemplaterResult.function.js'
 import { AnySupport } from '../../tag/index.js'
+import { bubbleEvent } from './bubbleEvent.function.js'
 
 export function addSupportEventListener(
   support: AnySupport,
@@ -9,21 +10,17 @@ export function addSupportEventListener(
   callback: EventCallback,
 ) {
   const elm = support.appElement as Element
+  const replaceEventName = getEventReferenceName(eventName)
 
-  // cast events that do not bubble up into ones that do
   if(eventName === 'blur') {
     eventName = 'focusout'
   }
-
-  const replaceEventName = '_' + eventName
-  // const replaceEventName = eventName
 
   const global = support.context.global as BaseTagGlobal
   const eventReg = global.events as Events
   
   if(!eventReg[eventName]) {
     const listener = function eventCallback(event: Event) {
-      (event as any).originalStopPropagation = event.stopPropagation;
       bubbleEvent(event, replaceEventName, event.target as Element)
     }
     eventReg[eventName] = listener
@@ -36,30 +33,11 @@ export function addSupportEventListener(
   ;(element as any)[eventName] = callback
 }
 
-function bubbleEvent(
-  event: Event,
-  replaceEventName: string,
-  target: Element
-) {
-  const callback = (target as any)[replaceEventName]
-
-  if(callback) {
-    let stopped = false
-    event.stopPropagation = function() {
-      stopped = true
-      ;(event as any).originalStopPropagation.call(event)
-    }
-  
-    callback(event)
-
-    if(event.defaultPrevented || stopped) {
-      return
-    }
+export function getEventReferenceName(eventName: string) {
+  // cast events that do not bubble up into ones that do
+  if(eventName === 'blur') {
+    eventName = 'focusout'
   }
 
-
-  const parentNode = target.parentNode
-  if(parentNode) {
-    bubbleEvent(event, replaceEventName, parentNode as Element)
-  }
+  return '_' + eventName
 }

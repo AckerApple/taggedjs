@@ -35,7 +35,7 @@ export interface BaseContextItem extends AppContextItem {
 }
 
 export interface ContextItem extends BaseContextItem {
-  locked?: true
+  locked?: number // true - number is reason locked
   deleted?: true
   
   // used only for strings, numbers, booleans

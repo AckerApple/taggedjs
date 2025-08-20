@@ -2,7 +2,7 @@
 
 import { KeyFunction } from '../tag/getDomTag.function.js'
 import type { StringTag } from '../tag/StringTag.type.js'
-import { setUseMemory } from '../state/index.js'
+import { callback, Callback, setUseMemory, state } from '../state/index.js'
 import { getTemplaterResult, TemplaterResult, Wrapper } from '../tag/getTemplaterResult.function.js'
 import { Original, TagComponent, TagWrapper, tags } from '../tag/tag.utils.js'
 import { getTagWrap } from '../tag/getTagWrap.function.js'
@@ -21,6 +21,21 @@ import { onInit as tagOnInit } from '../state/onInit.function.js'
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js'
 
 let tagCount = 0
+
+const tagElement = {
+  get: getTagElement,
+  onclick: (toBeCalled: (...args: any[]) => any) => {
+    const wrapped = callback(toBeCalled)
+
+    // run one time
+    state(() => {
+      const element = getTagElement()
+      element.addEventListener('click', wrapped)
+    })
+
+    return callback
+  }
+}
 
 /** TODO: This might be a duplicate typing of Wrapper */
 export type TaggedFunction<T extends ToTag> = ((...x:Parameters<T>) => ReturnType<T> & {
@@ -97,7 +112,7 @@ export declare namespace tag {
   let immutableProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
   let watchProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
   
-  let getElement: typeof getTagElement;
+  let element: typeof tagElement;
   let inject: typeof tagInject;
   let onInit: typeof tagOnInit;
   let onDestroy: typeof tagOnDestroy;
@@ -121,7 +136,8 @@ function tagUseFn(): ReturnTag {
   throw new Error('Do not call tag.use as a function but instead set it as: `(props) => tag.use = (use) => html`` `')
 }
 
-;(tag as any).getElement = getTagElement
+// actually placing of items into tag memory
+;(tag as any).element = tagElement
 ;(tag as any).renderOnce = renderOnceFn
 ;(tag as any).use = tagUseFn
 ;(tag as any).deepPropWatch = tag

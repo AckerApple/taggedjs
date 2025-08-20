@@ -24,6 +24,7 @@ import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js'
 import { TemplateValue } from '../../index.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
+import { processStandAloneAttribute } from './processStandAloneAttribute.function.js'
 
 /** MAIN FUNCTION. Sets attribute value, subscribes to value updates  */
 export function processAttribute(
@@ -74,7 +75,7 @@ export function processAttribute(
     tagJsVar.processUpdate = processUpdateAttrContext
 
     // single/stand alone attributes
-    processNameOnlyAttrValue(
+    processStandAloneAttribute(
       values,
       valueInValues as any,
       element,
@@ -172,50 +173,6 @@ function processTagJsVarAttribute(
   contextItem.tagJsVar = tagJsVar
 
   return contextItem
-}
-
-// single/stand alone attributes
-export function processNameOnlyAttrValue(
-  values: unknown[],
-  attrValue: string | boolean | Record<string, any> | HostValue,
-  element: HTMLElement,
-  ownerSupport: AnySupport,
-  howToSet: HowToSet,
-  context: ContextItem[],
-  parentContext: ContextItem,
-) {
-  if(isNoDisplayValue(attrValue)) {
-    return
-  }
-
-  // process an object of attributes ${{class:'something, checked:true}}
-  if(typeof attrValue === BasicTypes.object) {
-    for (const name in (attrValue as any)) {
-      const isSpecial = isSpecialAttr(name) // only object variables are evaluated for is special attr
-      const value = (attrValue as any)[name]
-      const howToSet: HowToSet = howToSetFirstInputValue
-
-      processAttribute(
-        values,
-        name,
-        element,
-        ownerSupport,
-        howToSet,
-        context,
-        parentContext,
-        isSpecial,
-        value,
-      )
-    }
-    return
-  }
-
-  // regular attributes
-  if((attrValue as string).length === 0) {
-    return // ignore, do not set at this time
-  }
-
-  howToSet(element, attrValue as string, empty)
 }
 
 /** Only used during updates */

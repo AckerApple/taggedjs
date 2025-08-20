@@ -231,7 +231,7 @@ export function callbackPropOwner(
     const subject = newest.context
     const global = subject.global as SupportTagGlobal
     
-    if(!global || subject.locked === true) {
+    if(!global || subject.locked) {
       return callbackResult // currently in the middle of rendering
     }
 

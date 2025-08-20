@@ -4,7 +4,7 @@ import { syncWrapCallback } from "../tag/output.function.js"
 import { handleTagTypeChangeFrom } from "../tag/update/checkStillSubscription.function.js"
 import { removeContextInCycle, setContextInCycle } from "../tag/cycles/setContextInCycle.function.js"
 import { MatchesInjection, TagJsVar } from "./tagJsVar.type.js"
-import { initState } from "../state/state.utils.js"
+import { initState, reState } from "../state/state.utils.js"
 import { runAfterRender } from "../render/runAfterRender.function.js"
 
 /** On specific host life cycles, a callback can be called. 
@@ -31,7 +31,7 @@ export function host<T extends HostCallback>(
   callback: T,
   options: Options = {}
 ): HostValueFunction<T> {
-  const hostValue = {
+  const baseHost = {
     tagJsType: ValueTypes.host,
     processInitAttribute: processHostAttribute,
     // TODO: maybe a host value can change?
@@ -46,15 +46,20 @@ export function host<T extends HostCallback>(
       return injectCallback === callback
     },
   }
+  
+  const returnFunction = (...args: any[]) => {
+    const hostValue = {
+      ...returnFunction,
+      options: { arguments: args, ...options, callback } as AllOptions,
+    }
 
-  const returnFunction = function hostWrap(...args: any[]) {
-    ;(returnFunction as unknown as HostValue).options.arguments = args
-    return returnFunction
+    return hostValue
   }
 
-  Object.assign(returnFunction, hostValue)
+  Object.assign(returnFunction, baseHost)
+  // returnFunction.options = { callback }
 
-  return returnFunction as HostValueFunction<T>
+  return returnFunction as any as HostValueFunction<T>
 }
 
 // Declare namespace for TypeScript visibility
@@ -99,8 +104,12 @@ function processHostUpdate(
   // const element = (contextItem as any as AttributeContextItem).element as HTMLInputElement
   const newHost = newValue as unknown as HostValue
 
+  reState(contextItem)
+
   const args = (newHost.options.arguments || oldOptions.arguments || [])
   contextItem.returnValue = newHost.options.callback(...args)
+
+  runAfterRender()
 }
 
 function processHostAttribute(
@@ -135,7 +144,7 @@ function processHost(
 
   runAfterRender()
 }
-
+/** first time run */
 function processHostTagJsVar(
   element: HTMLInputElement,
   tagJsVar: HostValue,

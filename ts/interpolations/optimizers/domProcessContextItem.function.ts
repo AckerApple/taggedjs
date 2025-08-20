@@ -13,7 +13,7 @@ export function domProcessContextItem(
   insertBefore?: Text
 ) {
   const subject = support.context  
-  subject.locked = true
+  subject.locked = 3
 
   contextItem.element = contextItem.element || appendTo as HTMLElement
   setContextInCycle(contextItem)
