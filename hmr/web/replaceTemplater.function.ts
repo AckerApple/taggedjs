@@ -1,4 +1,4 @@
-import { ValueTypes, ContextItem, paint, Tag, Support, TaggedFunction, SupportTagGlobal } from "taggedjs"
+import { ValueTypes, ContextItem, paint, Tag, Support, TaggedFunction, SupportTagGlobal, SupportContextItem } from "taggedjs"
 import { updateSubject } from "./updateSubject.function"
 import { HmrImport } from "./hmr"
 
@@ -57,7 +57,7 @@ export async function replaceTemplater(
       return
     }
 
-    const support = childGlobal.oldest as Support
+    const support = (child as SupportContextItem).state.oldest as Support
 
     if(support) {
       const newCount = await replaceTemplater(
@@ -110,7 +110,7 @@ async function checkToUpdateSubject(
     return count
   }
 
-  const oldest = (contextItem.global as SupportTagGlobal)?.oldest
+  const oldest = (contextItem as SupportContextItem).state?.oldest
   const newOriginal = oldest?.templater.wrapper?.original
   if(oldTag.original.toString() === newOriginal?.toString()) {
     oldTag.original = newOriginal

@@ -19,11 +19,11 @@ export { expect } from './expect-wrapper'
 
 export const beforeEach = isVitest 
   ? (globalThis as any).beforeEach 
-  : (() => { /* no-op in browser */ })
+  : browserRunner.beforeEach
 
 export const afterEach = isVitest 
   ? (globalThis as any).afterEach 
-  : (() => { /* no-op in browser */ })
+  : browserRunner.afterEach
 
 // Re-export all DOM utilities
 export * from './elmSelectors'

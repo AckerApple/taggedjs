@@ -4,8 +4,6 @@ import { Todo, todoReducer } from "./reducer.js";
 import { html, InputElementTargetEvent } from "taggedjs";
 import { useHashRouter } from "./HashRouter.function.js";
 import { Item } from "./components/item.js";
-import { ViewTypes } from "../sectionSelector.tag.js";
-import { autoTestingControls } from "../autoTestingControls.tag.js";
 
 export const todos: Todo[] = []
 const dispatch = todoReducer(todos)
@@ -20,6 +18,10 @@ export const todoApp = () => {
 
     const todoCount = todos.length
 
+    const newMap = visibleTodos.map((todo, index) => {
+      return Item(todo, dispatch, index).key(todo.id)
+    })
+
     return html`
         ${/*autoTestingControls([ViewTypes.Todo], false)*/false}
         ${Header(dispatch)}
@@ -30,7 +32,7 @@ export const todoApp = () => {
                         id="toggle-all"
                         class="toggle-all"
                         type="checkbox"
-                        checked=${activeTodoCount < 1}
+                        checked=${activeTodoCount < 1 ? 1 : 0}
                         onChange=${(e: InputElementTargetEvent) => dispatch.toggleAll(e.target.checked)}
                     />
                     <label class="toggle-all-label" for="toggle-all">
@@ -38,7 +40,7 @@ export const todoApp = () => {
                     </label>
                 </div>
                 <ul class="todo-list show-priority">
-                ${visibleTodos.map((todo, index) => Item(todo, dispatch, index).key(todo.id))}
+                    ${newMap}
                 </ul>
             </main>
             ${Footer(todoCount, dispatch.removeCompleted, route, activeTodoCount)}

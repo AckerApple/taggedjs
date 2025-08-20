@@ -2,6 +2,7 @@ import { html, Subject } from "taggedjs"
 import { runTesting } from "./runTesting.function"
 
 export enum ViewTypes {
+  Basic = 'basic',
   Destroys = 'destroys',
   Todo = 'todo',
   FunInPropsTag = 'funInPropsTag',

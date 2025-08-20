@@ -1,4 +1,4 @@
-import { AnySupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, StringTag, ContextItem, getNewGlobal, getBaseSupport, SupportTagGlobal, SupportContextItem, valueToTagJsVar } from 'taggedjs'
+import { AnySupport, RouteProps, RouteQuery, RouteTag, Support, TemplaterResult, ValueSubject, ValueTypes, oneRenderToSupport, reRenderTag, StringTag, ContextItem, getNewGlobal, getBaseSupport, SupportTagGlobal, SupportContextItem, valueToTagJsVar, Subject } from 'taggedjs'
 import App from './pages/app.js'
 import isolatedApp from './pages/isolatedApp.page.js'
 
@@ -45,7 +45,7 @@ function templaterToSupport(
 ) {
   const context: SupportContextItem = {
     renderCount: 0,
-    
+    destroy$: new Subject(),
     value: templater,
     valueIndex: 0,
 
@@ -54,6 +54,7 @@ function templaterToSupport(
     parentContext,
     withinOwnerElement: false,
     contexts: [],
+    state: {},
   }
   
   getNewGlobal(context) as SupportTagGlobal
@@ -70,10 +71,11 @@ function readySupport(
   subject: SupportContextItem,
 ) {
   const global = subject.global
-  global.newest = support
-  global.oldest = support
+  subject.state.newest = support
+  subject.state.oldest = support
 
-  renderTagOnly(support, support, subject)
+  // renderTagOnly(support, support, subject)
+  reRenderTag(support, support, subject)
   // buildSupportContext(support)
   
   return support
@@ -149,8 +151,7 @@ function processValue(
               global: getNewGlobal(subject as SupportContextItem),
               parentContext: support.context,
               tagJsVar: valueToTagJsVar(value),
-              // checkValueChange: checkSimpleValueChange,
-              // delete: destorySupportByContextItem,
+              destroy$: new Subject(),
               withinOwnerElement: subject?.withinOwnerElement || false,
             }
           )

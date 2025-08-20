@@ -14,12 +14,18 @@ export const Item = tag.immutableProps((
     <li class.completed=${todo.completed} class.editing=${editing}>
       ${!editing ? html`
         <div class="view">
-          <input class="toggle" type="checkbox" ${todo.completed && 'checked'} onchange=${() => dispatch.toggleItem(todo, index)} />
+          <input class="toggle" type="checkbox"
+            ${todo.completed && 'checked'}
+            onchange=${() => dispatch.toggleItem(todo, index)}
+          />
           
           <label data-testid="todo-item-label" ondoubleclick=${() => editing = !editing}
           >${todo.title}</label>
           
-          <button class="destroy" onclick=${() => dispatch.removeItemByIndex(index)}></button>
+          <!-- delete -->
+          <button class="destroy"
+            onclick=${() => dispatch.removeItemByIndex(index)}
+          >🗑️</button>
         </div>
       ` : html`
         <div class="input-container">

@@ -2,6 +2,7 @@ import { renderCountDiv } from "./renderCount.component.js"
 import { dialog } from "./providerDialog.tag.js"
 import { html, tag, providers, state, callbackMaker, Subject, onInit, states, host } from "taggedjs"
 import { fx } from "taggedjs-animate-css"
+import { injectionTag } from "./injectionTesting.tag.js"
 
 export class TagDebugProvider {
   tagDebug = 0
@@ -277,30 +278,31 @@ const testProviderAsProps = tag((
 })
 
 const inCycleParent = host((color = 'red') => {
-  const element = tag.getElement()
+  const element = tag.element.get()
   element.style.border = '2px solid ' + color
   element.style.display = 'flex'
   element.style.gap = '1em'
-
-  return { color, title: 'inCycleParent' }
+  const rtn = { color, title: 'inCycleParent' }
+  console.log('parent return value created', { rtn })
+  return rtn
 })
 
 const inCycleChild = host((color = 'green') => {
   const parent = tag.inject( inCycleParent )
-  const element = tag.getElement()
+  const element = tag.element.get()
   element.style.border = '2px solid ' + color
   element.style.flex = '1'
   element.innerHTML = `wonderful - parent(${parent.color})`
 })
 
 const inCycleChild2 = host((color = 'green') => {
-  const element = tag.getElement()
+  const element = tag.element.get()
   element.style.border = '2px solid ' + color
   element.style.flex = '1'
 })
 
 const inCycleChild3 = host((color = 'green') => {
-  const element = tag.getElement()
+  const element = tag.element.get()
   element.style.color = color
 })
 
@@ -360,7 +362,9 @@ const inCycleContextComms = tag(() => {
           </label>
         </div>
         
-        <div id="drag-drop-wrap">
+        <div id="drag-drop-wrap">    
+          <h3>Drag Selection Testing</h3>
+          ${injectionTag()}
         </div>
         
         <div id="in-cycle-parent" ${inCycleParent(cycleColorParent)}>

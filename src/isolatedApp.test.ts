@@ -32,6 +32,7 @@ export async function runIsolatedTests(
 
   if(views.includes(ViewTypes.ProviderDebug)) {
     await import('./providers.test')
+    await import('./injectionTesting.test')
     ++testCount
   }
 

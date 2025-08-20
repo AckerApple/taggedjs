@@ -7,14 +7,15 @@ interface Test {
   suite: string | null
 }
 
-interface Suite {
-  name: string
-  tests: Test[]
+interface Hooks {
+  beforeEach: Array<() => void | Promise<void>>
+  afterEach: Array<() => void | Promise<void>>
 }
 
 let currentSuite: string | null = null
 let suites: Map<string | null, Test[]> = new Map()
 let testQueue: Test[] = []
+let suiteHooks: Map<string | null, Hooks> = new Map()
 
 // Check if we're in Vitest environment
 const isVitest = typeof (globalThis as any).vitest !== 'undefined'
@@ -38,12 +39,30 @@ export const describe = isVitest
       const previousSuite = currentSuite
       currentSuite = name
       suites.set(name, [])
+      suiteHooks.set(name, { beforeEach: [], afterEach: [] })
       fn() // Execute immediately to collect tests
       currentSuite = previousSuite
     }
 
 // Re-export expect from wrapper
 export { expect }
+
+// Add beforeEach and afterEach support for browser environment
+export const beforeEach = isVitest
+  ? (globalThis as any).beforeEach
+  : (fn: () => void | Promise<void>) => {
+      const hooks = suiteHooks.get(currentSuite) || { beforeEach: [], afterEach: [] }
+      hooks.beforeEach.push(fn)
+      suiteHooks.set(currentSuite, hooks)
+    }
+
+export const afterEach = isVitest
+  ? (globalThis as any).afterEach
+  : (fn: () => void | Promise<void>) => {
+      const hooks = suiteHooks.get(currentSuite) || { beforeEach: [], afterEach: [] }
+      hooks.afterEach.push(fn)
+      suiteHooks.set(currentSuite, hooks)
+    }
 
 // Execute tests in browser environment
 export async function executeBrowserTests() {
@@ -70,15 +89,43 @@ export async function executeBrowserTests() {
     
     for (const test of tests) {
       const indent = suiteName ? '  ' : ''
+      const hooks = suiteHooks.get(test.suite)
+      
       try {
+        // Run beforeEach hooks
+        if (hooks?.beforeEach) {
+          for (const hook of hooks.beforeEach) {
+            await hook()
+          }
+        }
+        
+        // Run the test
         await test.fn()
         passed++
         console.log(`${indent}✅ ${test.name}`)
+        
+        // Run afterEach hooks even on success
+        if (hooks?.afterEach) {
+          for (const hook of hooks.afterEach) {
+            await hook()
+          }
+        }
       } catch (error) {
         failed++
         failures.push({ test: test.name, suite: test.suite, error: error as Error })
         console.error(`${indent}❌ ${test.name}`)
         console.error(error)
+        
+        // Try to run afterEach hooks even on failure
+        if (hooks?.afterEach) {
+          for (const hook of hooks.afterEach) {
+            try {
+              await hook()
+            } catch (afterError) {
+              console.error('Error in afterEach hook:', afterError)
+            }
+          }
+        }
       }
     }
     
@@ -110,6 +157,7 @@ export async function executeBrowserTests() {
   // Clear queues for next run
   testQueue = []
   suites.clear()
+  suiteHooks.clear()
   currentSuite = null
 
   return failed === 0

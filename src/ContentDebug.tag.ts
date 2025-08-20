@@ -423,7 +423,7 @@ const testHost = tag(() => {
       ${hideShow && html`
         <span id="hostedContent"
           ${host(
-            () => tag.getElement().innerHTML = Date.now().toString(),
+            () => tag.element.get().innerHTML = Date.now().toString(),
             {
               onDestroy: () => ++destroyCount,
             }

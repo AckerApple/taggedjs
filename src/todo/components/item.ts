@@ -22,7 +22,7 @@ export const Item = tag.immutableProps((
                     >${todo.title}</label>
                     
                     <button class="destroy" onclick=${() => dispatch.removeItemByIndex(index)}
-                    >destroy</button>
+                    >🗑️ destroy</button>
                 </div>
             ` : html`
                 <div class="input-container">

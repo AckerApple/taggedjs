@@ -1,4 +1,5 @@
 import { beforeAll, afterEach, beforeEach } from 'vitest'
+import { testMap } from './src/testing/testMap'
 
 declare global {
   interface Window {
@@ -63,26 +64,8 @@ beforeEach(async () => {
   // Get the test file path from Vitest context
   const testFile = String((globalThis as any).__vitest_worker__?.current?.file || '')
   
-  // Map test files to their required views
-  const viewMap: Record<string, string> = {
-    'destroys.test': 'destroys',
-    'content.test': 'content',
-    'counters.test': 'counters',
-    'props.test': 'props',
-    'providers.test': 'providerDebug',
-    'tagSwitch.test': 'tagSwitchDebug',
-    'child.test': 'child',
-    'arrays.test': 'arrays',
-    'mirror.test': 'mirroring',
-    'watch.test': 'watchTesting',
-    'funInProps.test': 'funInPropsTag',
-    'attributes.test': 'attributeDebug',
-    'oneRender.test': 'oneRender',
-    'todos.test': 'todo',
-  }
-  
   // Find the matching view
-  for (const [testName, view] of Object.entries(viewMap)) {
+  for (const [testName, view] of Object.entries(testMap)) {
     if (testFile.includes(testName)) {
       // For content test, navigate directly to the content page
       if (testName === 'content.test') {
@@ -117,7 +100,7 @@ beforeEach(async () => {
         }
       } else {
         // For other tests, use the checkbox method
-        window.location.hash = view;
+        window.location.hash = view as string;
         
         // Click the section checkbox to show the view
         const checkbox = document.querySelector(`#section_${view}`) as HTMLInputElement;
@@ -128,8 +111,6 @@ beforeEach(async () => {
         // Wait for view to render
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
-      
-      break;
     }
   }
 })

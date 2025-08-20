@@ -15,6 +15,7 @@ import { tableDebug } from "./tableDebug.component"
 import { content } from "./ContentDebug.tag"
 import { watchTesting } from "./watchTesting.tag"
 import { attributeDebug } from "./attributeDebug.tag"
+import { basic } from "./basic.tag"
 
 type OutputSection = {
   view: ViewTypes
@@ -28,6 +29,8 @@ type OutputSection = {
 }
 
 export const outputSections: (OutputSection & {tag: any})[] = [{
+  view: ViewTypes.Basic, tag: basic, emoji: '🔢'
+},{
   view: ViewTypes.OneRender, tag: oneRender, emoji: '1️⃣'
 },{
   view: ViewTypes.Props, tag: propsDebugMain, emoji:'🧳',
