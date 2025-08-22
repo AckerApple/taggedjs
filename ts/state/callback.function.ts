@@ -1,15 +1,14 @@
 import callbackStateUpdate from './callbackStateUpdate.function.js'
 import { ContextItem, SupportContextItem } from '../tag/index.js'
 import { setUseMemory } from './setUseMemory.object.js'
-import { Callback } from './callbackMaker.function.js'
 import { StateMemory } from './StateMemory.type.js'
 import { state } from './state.function.js'
 import { getContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
 
 /** Wrap a function that will be called back. After the wrapper and function are called, a rendering cycle will update display */
-export function callback<A,B,C,D,E,F, T>(
-  callback: Callback<A, B, C, D, E, F, T>
-): (A?: A, B?: B, C?: C, D?: D, E?: E, F?: F) => T {
+export function callback<T extends (...args: any[]) => any>(
+  callback: T
+): T {
   const context = getContextInCycle() as ContextItem
   
   const callbackState = state({

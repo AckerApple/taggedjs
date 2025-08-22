@@ -13,7 +13,7 @@ export function registerTagElement(
   app: TagMaker,
   placeholder: Text,
 ) {
-  console.debug('🏷️ Building element into tag...', {element, app, support})
+  // console.debug('🏷️ Building element into tag...', {element, app, support})
   const result = buildBeforeElement(
     support,
     element,
@@ -45,7 +45,7 @@ export function registerTagElement(
     putOneDomDown(domItem, newFragment)
   }
 
-  console.debug('🏷️ Element Tag DOM built ✅')
+  // console.debug('🏷️ Element Tag DOM built ✅')
 
   return newFragment
 }

@@ -1,9 +1,9 @@
-import { AnySupport, SupportContextItem } from '../index.js'
+import { SupportContextItem } from '../index.js'
 import { renderSupport } from '../render/renderSupport.function.js'
 import { Callback } from './callbackMaker.function.js'
 import { isPromise } from '../isInstance.js'
 import { StatesSetter } from './states.utils.js'
-import { findStateSupportUpContext, getSupportWithState } from '../interpolations/attributes/getSupportWithState.function.js'
+import { findStateSupportUpContext } from '../interpolations/attributes/getSupportWithState.function.js'
 
 export default function callbackStateUpdate<T>(
   context: SupportContextItem,

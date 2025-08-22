@@ -12,6 +12,7 @@ import { guaranteeInsertBefore } from '../guaranteeInsertBefore.function.js'
 import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { processUpdateSubscribe } from './processUpdateSubscribe.function.js'
+import { removeContextInCycle, setContextInCycle } from '../cycles/setContextInCycle.function.js'
 
 export function setupSubscribe(
   value: SubscribeValue,
@@ -67,6 +68,7 @@ export function setupSubscribe(
       subContext,
     ) => onOutput(value, syncRun, subContext),
     value,
+    contextItem,
   )
 
   subContext.appendMarker = appendMarker
@@ -84,6 +86,7 @@ export function setupSubscribeCallbackProcessor(
   ownerSupport: AnySupport, // ownerSupport ?
   onOutput: OnSubOutput,
   tagJsVar: SubscribeValue,
+  contextItem: ContextItem,
 ): SubContext {
   // const component = getSupportWithState(ownerSupport)
   
@@ -108,14 +111,16 @@ export function setupSubscribeCallbackProcessor(
     newValues: {value: TemplateValue, tagJsVar: TagJsVar}[],
     index: number
   ) {
-    // const newComponent = component.context.global.newest
-    // syncSupports(newComponent, component)
-
     const newestParentTagJsVar = subContext.tagJsVar
     if(newestParentTagJsVar?.callback) {
+      // setContextInCycle(ownerSupport.context)
+      setContextInCycle(contextItem)
+      
       const responseValue = (newestParentTagJsVar.callback as any)( ...newValues.map(x => x.value) )
       onOutput(responseValue, syncRun, subContext)
-      // oldValues[index].value = responseValue
+      
+      removeContextInCycle()
+      
       return
     }
 

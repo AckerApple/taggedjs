@@ -1,7 +1,6 @@
 import { StateMemory } from '../state/StateMemory.type.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
 import { AnySupport, ContextItem } from '../tag/index.js'
-import { checkStateMismatch } from '../tag/checkStateMismatch.function.js'
 import { removeContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
 
 /** Compares states of previous renders

@@ -2,7 +2,7 @@
 
 import { KeyFunction } from '../tag/getDomTag.function.js'
 import type { StringTag } from '../tag/StringTag.type.js'
-import { callback, Callback, setUseMemory, state } from '../state/index.js'
+import { callback, setUseMemory, state } from '../state/index.js'
 import { getTemplaterResult, TemplaterResult, Wrapper } from '../tag/getTemplaterResult.function.js'
 import { Original, TagComponent, TagWrapper, tags } from '../tag/tag.utils.js'
 import { getTagWrap } from '../tag/getTagWrap.function.js'
@@ -22,20 +22,54 @@ import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js'
 
 let tagCount = 0
 
-const tagElement = {
-  get: getTagElement,
-  onclick: (toBeCalled: (...args: any[]) => any) => {
-    const wrapped = callback(toBeCalled)
+const onClick = makeEventListener('click')
+const onMouseDown = makeEventListener('mousedown')
 
+function makeEventListener(type: string) {
+  return function eventListener<T extends (...args: any[]) => any>(
+    toBeCalled: T
+  ): T {
+    const wrapped = callback(toBeCalled)
+  
     // run one time
     state(() => {
       const element = getTagElement()
-      element.addEventListener('click', wrapped)
+      element.addEventListener(type, wrapped)
     })
-
-    return callback
+  
+    return wrapped // this is what you remove
   }
 }
+
+const tagElement = {
+  get: getTagElement,
+
+  onclick: onClick,
+  click: onClick,
+  onClick,
+
+  mousedown: onMouseDown,
+  onmousedown: onMouseDown,
+  onMouseDown: onMouseDown,
+}
+
+defineGetSet('onclick', onClick)
+defineGetSet('click', onClick)
+defineGetSet('onMouseDown', onMouseDown)
+defineGetSet('onmousedown', onMouseDown)
+defineGetSet('mousedown', onMouseDown)
+
+function defineGetSet(name: string, eventFn: any) {
+  Object.defineProperty(tag, name, {
+    get() {
+      return eventFn
+    },
+    set(fn: any) {
+      return eventFn(fn)
+    },
+  })
+}
+
 
 /** TODO: This might be a duplicate typing of Wrapper */
 export type TaggedFunction<T extends ToTag> = ((...x:Parameters<T>) => ReturnType<T> & {

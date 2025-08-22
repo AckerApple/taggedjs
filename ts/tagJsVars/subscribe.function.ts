@@ -2,7 +2,7 @@ import { getSupportWithState } from "../interpolations/attributes/getSupportWith
 import { AnySupport } from "../tag/AnySupport.type.js"
 import { ContextStateMeta, ContextStateSupport } from "../tag/ContextStateMeta.type.js"
 import { getSupportInCycle } from "../tag/cycles/getSupportInCycle.function.js"
-import { ValueTypes } from "../tag/index.js"
+import { ContextItem, ValueTypes } from "../tag/index.js"
 import { StatesSetter } from "../state/states.utils.js"
 import { deleteAndUnsubscribe, setupSubscribe } from "../tag/update/setupSubscribe.function.js"
 import { TagJsVar } from "./tagJsVar.type.js"
@@ -12,6 +12,7 @@ import { processSubscribeAttribute } from "./processSubscribeAttribute.function.
 import { OnSubOutput, SubContext, SubscriptionContext } from "../tag/update/SubContext.type.js"
 import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { checkStillSubscription } from "../tag/update/checkStillSubscription.function.js"
+import { getContextInCycle } from "../tag/cycles/setContextInCycle.function.js"
 
 export type LikeSubscription = {
   unsubscribe: () => any
@@ -74,15 +75,11 @@ export function subscribe<T>(
   Observable: LikeObservable<T>,
   callback?: SubscribeCallback<T>,
 ): SubscribeValue {
-  const support = getSupportInCycle() as AnySupport
-
-  let states: StatesSetter[] = []
-  if (support) {
-    const context = getSupportWithState(support).context
-    const stateMeta = context.state as ContextStateMeta
-    const newer = stateMeta.newer as ContextStateSupport
-    states = newer.states
-  }
+  // const context = getSupportWithState(support).context
+  const context = getContextInCycle() as ContextItem
+  const stateMeta = context.state as ContextStateMeta
+  const newer = stateMeta.newer as ContextStateSupport
+  const states = newer.states
 
   return {
     onOutput: blankHandler, // gets set within setupSubscribe()

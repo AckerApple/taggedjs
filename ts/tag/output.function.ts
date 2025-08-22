@@ -50,14 +50,14 @@ export function syncWrapCallback(
   // now render the owner
   paintAfters.push([() => {
     const newGlobal = newestOwner.context.global
-    if( !newGlobal ) {
-      // paint()
+    const ignore = newGlobal === undefined || newGlobal.deleted === true
+    
+    if( ignore ) {
       return // its not a tag anymore
     }
-    ++painting.locks
 
+    ++painting.locks
     safeRenderSupport(newestOwner)
-    // safeRenderSupport(global.newest)
     --painting.locks
     paint()
   }, []])

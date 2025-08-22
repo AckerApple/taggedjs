@@ -3,6 +3,7 @@ import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { AnySupport } from "../tag/AnySupport.type.js"
 import { ContextStateMeta, ContextStateSupport } from "../tag/ContextStateMeta.type.js"
 import { getSupportInCycle } from "../tag/cycles/getSupportInCycle.function.js"
+import { getContextInCycle } from "../tag/cycles/setContextInCycle.function.js"
 import { ContextItem, ValueTypes } from "../tag/index.js"
 import { processSubscribeWith } from "../tag/update/processSubscribeWith.function.js"
 import { deleteAndUnsubscribe } from "../tag/update/setupSubscribe.function.js"
@@ -14,8 +15,9 @@ export function subscribeWith<SubValue, DEFAULT>(
   withDefault: DEFAULT,
   callback?: SubscribeCallback<SubValue | DEFAULT>,
 ): SubscribeValue {
-  const support = getSupportInCycle() as AnySupport
-  const context = getSupportWithState(support).context
+  // const support = getSupportInCycle() as AnySupport
+  // const context = getSupportWithState(support).context
+  const context = getContextInCycle() as ContextItem
   const stateMeta = context.state as ContextStateMeta
   const newer = stateMeta.newer as ContextStateSupport
   

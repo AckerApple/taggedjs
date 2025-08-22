@@ -15,9 +15,9 @@ export function renderExistingSupport(
     subject,
   )
 
-  // lastSupport !== newSupport && 
   if( result.wasLikeTags ) {
-    updateSupportBy(subject.state.oldest as AnySupport, result.support)
+    const oldest = subject.state.oldest as AnySupport // || result.support
+    updateSupportBy(oldest, result.support)
     return result.support
   }
 

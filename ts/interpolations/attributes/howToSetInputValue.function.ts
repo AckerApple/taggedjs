@@ -50,6 +50,9 @@ export function howToSetFirstInputValue(
   name: string,
   value: string | undefined | boolean | Record<string, any>
 ) {
+  // for checked=true
+  ;(element as any)[name] = value
+
   if(value === undefined || value === false || value === null) {
     element.removeAttribute(name)
     return
@@ -71,6 +74,7 @@ function setPropertyValue(
   ;(element as any)[name].setProperty(key, value)
 }
 
+/** main processor for things like <div style=${{ maxWidth: '100vw' }}> */
 function setObjectValue(
   element: HTMLElement,
   name: string,

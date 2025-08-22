@@ -1,5 +1,5 @@
 import { AppSupportContextItem, SupportContextItem } from '../SupportContextItem.type.js'
-import { SupportTagGlobal, TagGlobal } from '../getTemplaterResult.function.js'
+import { SupportTagGlobal } from '../getTemplaterResult.function.js'
 
 /** Only used in TagSupport */
 export function getNewGlobal(

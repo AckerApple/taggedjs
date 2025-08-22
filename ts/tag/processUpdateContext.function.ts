@@ -32,10 +32,10 @@ export function processUpdateContext(
 function processUpdateOneContext(
   values: unknown[], // the interpolated values
   index: number,
-  context: ContextItem[],
+  contexts: ContextItem[],
   ownerSupport: AnySupport,
 ) {
-  const contextItem = context[index]
+  const contextItem = contexts[index]
 
   if( contextItem.deleted ) {
     return

@@ -1,7 +1,7 @@
 // taggedjs-no-compile
 
 import { HowToSet, howToSetFirstInputValue } from '../../interpolations/attributes/howToSetInputValue.function.js'
-import { BasicTypes, ValueTypes, empty } from '../../tag/ValueTypes.enum.js'
+import { BasicTypes, empty } from '../../tag/ValueTypes.enum.js'
 import { AnySupport } from '../../tag/index.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { isSpecialAttr } from '../../interpolations/attributes/isSpecialAttribute.function.js'

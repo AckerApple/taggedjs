@@ -1,6 +1,5 @@
 import { TemplaterResult } from './getTemplaterResult.function.js'
 import { clonePropsBy } from './props/clonePropsBy.function.js'
-import { Subject } from '../subject/Subject.class.js'
 import { Props } from '../Props.js'
 import { AnySupport } from './index.js'
 import { ContextItem, SupportContextItem } from '../index.js'

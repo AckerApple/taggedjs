@@ -40,7 +40,8 @@ export function processSubscribeAttribute(
     value.Observables,
     ownerSupport,
     onOutput,
-    value
+    value,
+    contextItem,
   );
 
   contextItem.subContext = subContext
