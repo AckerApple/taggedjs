@@ -47,7 +47,7 @@ export const injectionTag = tag(() => {
               style.background = ${selectedTest.includes(x) ? '#4CAF50' : '#2196F3'};
               style.border = ${selectedTest.includes(x) ? '3px solid #333' : '1px solid #999'};
           >
-            <input type="checkbox" ${ selectedTest.includes(x) ? 'checked' : ''} />
+            <input type="checkbox" ${{checked: selectedTest.includes(x) ? true : false}} />
             Item ${x.id}
           </div>
         `)}

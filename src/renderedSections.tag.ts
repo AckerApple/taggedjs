@@ -16,6 +16,7 @@ import { content } from "./ContentDebug.tag"
 import { watchTesting } from "./watchTesting.tag"
 import { attributeDebug } from "./attributeDebug.tag"
 import { basic } from "./basic.tag"
+import { subscriptions } from "./subscriptions.tag"
 
 type OutputSection = {
   view: ViewTypes
@@ -61,6 +62,8 @@ export const outputSections: (OutputSection & {tag: any})[] = [{
   view: ViewTypes.Todo, tag: tag(todoApp),
 },{
   view: ViewTypes.Counters, tag: counters, emoji:'💯',
+},{
+  view: ViewTypes.Subscriptions, tag: subscriptions, emoji:'📡',
 }]
 
 export const renderedSections = tag((

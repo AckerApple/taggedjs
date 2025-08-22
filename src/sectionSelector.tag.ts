@@ -18,6 +18,7 @@ export enum ViewTypes {
   TagSwitchDebug = 'tagSwitchDebug',
   ProviderDebug = 'providerDebug',
   AttributeDebug = 'attributeDebug',
+  Subscriptions = 'subscriptions',
 }
 
 export const storage = getScopedStorage()
@@ -45,7 +46,7 @@ export const sectionSelector = (viewTypes = defaultViewTypes) => {
       <!-- checkbox menu -->
       <div style="display:flex;gap:1em;flex-wrap:wrap;margin:1em;">
         ${sortedViewTypes.map(type => html`
-          <div style="flex:1;white-space:nowrap;">
+          <div style="flex:0 0 auto;min-width:150px;white-space:nowrap;">
             <input type="checkbox"
               id=${'view-type-' + type} name=${'view-type-' + type}
               ${storage.views.includes(type) && 'checked'}

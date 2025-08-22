@@ -4,6 +4,7 @@
 export const testMap: Record<string, string> = {
   'destroys.test': 'destroys',
   'content.test': 'content',
+  'subscriptions.test': 'subscriptions',
   'dumpContent.test': 'content', // dumpContent also uses content view
   'counters.test': 'counters',
   'props.test': 'props',

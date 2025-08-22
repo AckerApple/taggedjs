@@ -20,6 +20,11 @@ export async function runIsolatedTests(
     ++testCount
   }
 
+  if(views.includes(ViewTypes.Subscriptions)) {
+    await import('./subscriptions.test')
+    ++testCount
+  }
+
   if(views.includes(ViewTypes.Counters)) {
     await import('./counters.test')
     ++testCount
@@ -83,6 +88,11 @@ export async function runIsolatedTests(
 
   if(views.includes(ViewTypes.Destroys)) {
     await import('./destroys.test')
+    ++testCount
+  }
+
+  if(views.includes(ViewTypes.Basic)) {
+    await import('./basic.test')
     ++testCount
   }
 
