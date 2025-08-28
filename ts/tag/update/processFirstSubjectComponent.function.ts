@@ -9,7 +9,7 @@ import { SupportContextItem } from '../SupportContextItem.type.js'
 import { firstTagRender } from '../../render/renderTagOnly.function.js'
 import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
 import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
-import { Subject, Tag, TemplateValue } from '../../index.js'
+import { Subject, TemplateValue } from '../../index.js'
 import { ReadOnlyVar, TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { updateToDiffValue } from './updateToDiffValue.function.js'
 
@@ -83,9 +83,9 @@ function convertTagToElementManaged(
     tagJsType: 'tag-conversion',
     processInitAttribute: tagJsVar.processInitAttribute,
     processInit: (
-      value: TemplateValue,
-      contextItem: ContextItem,
-      ownerSupport: AnySupport,
+      _value: TemplateValue,
+      _contextItem: ContextItem,
+      _ownerSupport: AnySupport,
     ) => {
       return tagJsVar.processInit(
         context.returnValue,
@@ -128,8 +128,8 @@ function convertTagToElementManaged(
       newContext.value = convertValue
     },
     checkValueChange: (
-      value: unknown,
-      contextItem: ContextItem,
+      _value: unknown,
+      _contextItem: ContextItem,
     ) => {
       const newValue = context.returnValue
       const checkResult = tagJsVar.checkValueChange(

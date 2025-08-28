@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 
-import { paintAppend, paintAppends, paintBefore, paintCommands } from '../../render/paint.function.js'
+import { paintAppend, paintAppends } from '../../render/paint.function.js'
 import { AnySupport } from '../index.js'
 import { domProcessContextItem } from '../../interpolations/optimizers/domProcessContextItem.function.js'
 import { empty } from '../ValueTypes.enum.js'

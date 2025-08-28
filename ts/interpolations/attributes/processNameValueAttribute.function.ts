@@ -19,7 +19,7 @@ export function processDynamicNameValueAttribute(
   howToSet: HowToSet,
   support: AnySupport,
   isSpecial: SpecialDefinition,
-  contexts: ContextItem[],
+  _contexts: ContextItem[],
 ) {
   contextItem.element = element as HTMLElement
   contextItem.howToSet = howToSet

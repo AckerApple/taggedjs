@@ -1,6 +1,6 @@
 import { AnySupport } from "../index.js"
 import { castTextValue } from '../castTextValue.function.js'
-import { paintBeforeText, paintCommands, addPaintRemover, paint, painting } from "../render/paint.function.js"
+import { paintBeforeText, paintCommands, addPaintRemover } from "../render/paint.function.js"
 import { BasicTypes, ContextItem } from "../index.js"
 import { processUpdateRegularValue, RegularValue } from "../tag/update/processRegularValue.function.js"
 import { TagJsTag } from "./tagJsVar.type.js"

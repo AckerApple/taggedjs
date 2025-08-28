@@ -1,7 +1,7 @@
 import { isSubjectInstance } from '../isInstance.js'
 import { LikeObservable } from '../tagJsVars/subscribe.function.js'
 import { combineLatest } from './combineLatest.function.js'
-import { UnaryFunction as OperatorFunction, SubjectLike, SubjectSubscriber, Subscription, getSubscription, runPipedMethods } from './subject.utils.js'
+import { UnaryFunction as OperatorFunction, SubjectSubscriber, Subscription, getSubscription, runPipedMethods } from './subject.utils.js'
 
 export type OnSubscription<T> = (subscription: Subscription<T>) => unknown
 

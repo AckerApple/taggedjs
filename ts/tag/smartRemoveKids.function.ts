@@ -1,4 +1,4 @@
-import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
+import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { destroyArray } from './destroyArrayContext.function.js'
 import { addPaintRemover } from '../render/paint.function.js'
 import { ContextItem } from './ContextItem.type.js'

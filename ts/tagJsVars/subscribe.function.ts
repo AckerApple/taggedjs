@@ -1,7 +1,5 @@
 import { AnySupport } from "../tag/AnySupport.type.js"
-import { ContextStateMeta, ContextStateSupport } from "../tag/ContextStateMeta.type.js"
-import { ContextItem, ValueTypes } from "../tag/index.js"
-import { StatesSetter } from "../state/states.utils.js"
+import { ValueTypes } from "../tag/index.js"
 import { deleteAndUnsubscribe, setupSubscribe } from "../tag/update/setupSubscribe.function.js"
 import { TagJsVar } from "./tagJsVar.type.js"
 import { AttributeContextItem } from "../tag/AttributeContextItem.type.js"

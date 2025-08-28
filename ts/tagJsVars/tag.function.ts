@@ -19,7 +19,6 @@ import { getContextInCycle, getElement as getTagElement } from '../tag/cycles/se
 import { tagInject } from './tagInject.function.js'
 import { onInit as tagOnInit } from '../state/onInit.function.js'
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js'
-import { ContextItem } from '../tag/ContextItem.type.js'
 import { SupportContextItem } from '../index.js'
 
 let tagCount = 0
