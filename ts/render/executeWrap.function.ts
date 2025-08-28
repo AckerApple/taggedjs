@@ -27,12 +27,13 @@ export function executeWrap(
   } else {
     tag = originalFunction(...castedProps as unknown[]) as StringTag
 
-    // CALL ORIGINAL COMPONENT FUNCTION
-    if(typeof(tag) === BasicTypes.function) {
+    // tag returns another function expected to be called
+    if(typeof(tag) === BasicTypes.function && tag.tagJsType === undefined) {
       tag = (tag as unknown as ReturnStringTag)()
     }
   }
 
+  useSupport.context.returnValue = tag
   tag.templater = templater
   templater.tag = tag
 

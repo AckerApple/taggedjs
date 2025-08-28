@@ -29,14 +29,11 @@ export type Wrapper = ((
   processInit: ProcessInit
   processUpdate: ProcessUpdate
   checkValueChange: CheckValueChange | CheckSupportValueChange
-  delete: ProcessDelete
+  destroy: ProcessDelete
 }
 
 /** NOT shared across variable spots. The Subject/ContextItem is more global than this is */
 export type TagGlobal = {
-  // renderCount: number
-  htmlDomMeta?: DomObjectChildren
-
   deleted?: true
   isApp?: boolean // root element
 
@@ -91,7 +88,7 @@ export function getTemplaterResult(
     processInitAttribute: blankHandler,
     processUpdate: tagValueUpdateHandler,
     checkValueChange: checkTagValueChange,
-    delete: destroySupportByContextItem,
+    destroy: destroySupportByContextItem,
 
     propWatch,
     props,

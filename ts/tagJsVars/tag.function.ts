@@ -15,10 +15,12 @@ import { processTagComponentInit } from '../tag/update/processTagComponentInit.f
 import { checkTagValueChange } from '../tag/checkTagValueChange.function.js'
 import { destroySupportByContextItem } from '../tag/destroySupportByContextItem.function.js'
 import { tagValueUpdateHandler } from '../tag/update/tagValueUpdateHandler.function.js'
-import { getElement as getTagElement } from '../tag/cycles/setContextInCycle.function.js'
+import { getContextInCycle, getElement as getTagElement } from '../tag/cycles/setContextInCycle.function.js'
 import { tagInject } from './tagInject.function.js'
 import { onInit as tagOnInit } from '../state/onInit.function.js'
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js'
+import { ContextItem } from '../tag/ContextItem.type.js'
+import { SupportContextItem } from '../index.js'
 
 let tagCount = 0
 
@@ -72,11 +74,14 @@ function defineGetSet(name: string, eventFn: any) {
 
 
 /** TODO: This might be a duplicate typing of Wrapper */
-export type TaggedFunction<T extends ToTag> = ((...x:Parameters<T>) => ReturnType<T> & {
+export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnType<T> & {
   key: KeyFunction
   original?: Original
   compareTo?: string
-}) & { original: UnknownFunction }
+}) & {
+  original: UnknownFunction
+  inputs: (handler: (updates: Parameters<T>) => any) => true
+}
 
 /** How to handle checking for prop changes aka argument changes */
 export enum PropWatches {
@@ -127,7 +132,15 @@ export function tag<T extends ToTag>(
   tag.tagIndex = tagCount++ // needed for things like HMR
   tags.push(parentWrap as TagWrapper<unknown>)
 
-  return parentWrap as unknown as TaggedFunction<T>
+  const returnWrap = parentWrap as unknown as TaggedFunction<T>
+
+  returnWrap.inputs = (handler: (updates: Parameters<T>) => any) => {
+    const context = getContextInCycle() as SupportContextItem
+    context.inputsHandler = handler
+    return true
+  }
+
+  return returnWrap
 }
 
 // Used to declare all the variable attachments on the "tag" function
@@ -206,9 +219,9 @@ Object.defineProperty(tag, 'renderOnce', {
     oneRenderFunction.tagJsType = ValueTypes.renderOnce
     oneRenderFunction.processInit = processRenderOnceInit
     oneRenderFunction.processUpdate = tagValueUpdateHandler
-    oneRenderFunction.delete = destroySupportByContextItem
+    oneRenderFunction.destroy = destroySupportByContextItem
     oneRenderFunction.checkValueChange = function renderOnceNeverChanges() {
-      return -1
+      return 0
     }
   },
 })
@@ -223,6 +236,6 @@ Object.defineProperty(tag, 'use', {
     renderFunction.processInit = processTagComponentInit
     renderFunction.processUpdate = tagValueUpdateHandler
     renderFunction.checkValueChange = checkTagValueChange
-    renderFunction.delete = destroySupportByContextItem
+    renderFunction.destroy = destroySupportByContextItem
   },
 })

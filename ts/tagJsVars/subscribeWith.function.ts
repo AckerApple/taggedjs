@@ -17,9 +17,12 @@ export function subscribeWith<SubValue, DEFAULT>(
 ): SubscribeValue {
   // const support = getSupportInCycle() as AnySupport
   // const context = getSupportWithState(support).context
+  
+  /*
   const context = getContextInCycle() as ContextItem
   const stateMeta = context.state as ContextStateMeta
   const newer = stateMeta.newer as ContextStateSupport
+  */
   
   return {
     onOutput: blankHandler, // this gets set within setupSubscribe
@@ -31,11 +34,11 @@ export function subscribeWith<SubValue, DEFAULT>(
     // processUpdate: tagValueUpdateHandler,
     processUpdate: blankHandler,
 
-    delete: deleteAndUnsubscribe,
+    destroy: deleteAndUnsubscribe,
 
     callback,
     withDefault,
-    states: newer.states,
+    // states: newer.states,
     
     Observables: [Observable],
   }
@@ -67,5 +70,5 @@ export function checkSubscribeValueChanged(
   }
 
 
-  return -1 // still the same
+  return 0 // still the same
 }

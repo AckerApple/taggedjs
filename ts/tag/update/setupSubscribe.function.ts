@@ -18,8 +18,8 @@ export function setupSubscribe(
   value: SubscribeValue,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  appendTo?: Element,
   insertBeforeOriginal?: Text, // optional but will always be made
+  appendTo?: Element,
 ): SubContext {
   const observables = value.Observables
   const { appendMarker, insertBefore } = guaranteeInsertBefore(appendTo, insertBeforeOriginal)
@@ -113,7 +113,6 @@ export function setupSubscribeCallbackProcessor(
   ) {
     const newestParentTagJsVar = subContext.tagJsVar
     if(newestParentTagJsVar?.callback) {
-      // setContextInCycle(ownerSupport.context)
       setContextInCycle(contextItem)
       
       const responseValue = (newestParentTagJsVar.callback as any)( ...newValues.map(x => x.value) )

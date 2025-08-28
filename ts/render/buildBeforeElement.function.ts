@@ -2,7 +2,6 @@ import { attachDomElements } from './dom/attachDomElements.function.js'
 import { DomMetaMap } from '../interpolations/optimizers/LikeObjectElement.type.js'
 import { AnySupport } from '../tag/index.js'
 import { SupportContextItem } from '../tag/SupportContextItem.type.js'
-import { SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { ParsedHtml } from '../interpolations/index.js'
 import { Tag } from '../tag/index.js'
@@ -19,7 +18,6 @@ export function buildBeforeElement(
   insertBefore?: Text,
 ) {
   const subject = support.context
-  const global = subject.global as SupportTagGlobal
   
   // TODO this is only needed for components and not basic tags
   subject.state = subject.state || {}
@@ -38,7 +36,7 @@ export function buildBeforeElement(
     insertBefore,
   )
     
-  global.htmlDomMeta = result.dom
+  subject.htmlDomMeta = result.dom
   --painting.locks
 
   // return fragment
@@ -63,7 +61,7 @@ function attachHtmlDomMeta(
     values,
     support,
     parentContext,
-    contexts,
+    // contexts,
     0, // depth
     appendTo,
     insertBefore,

@@ -14,8 +14,8 @@ export function processDomTagInit(
   value: TemplateValue | Tag, // StringTag,
   contextItem: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owningSupport
-  appendTo?: Element,
   insertBefore?: Text,
+  appendTo?: Element,
 ): AnySupport | undefined {
   const tag = value as StringTag | DomTag
   let templater = tag.templater

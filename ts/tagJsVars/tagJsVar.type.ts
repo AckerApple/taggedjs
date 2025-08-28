@@ -4,17 +4,18 @@ import { AnySupport } from "../tag/index.js"
 import { ProcessAttribute, ProcessInit } from "../tag/ProcessInit.type.js"
 import { ProcessUpdate } from "../tag/ProcessUpdate.type.js"
 
-export type TagJsVar = {
-  isAttr?: true
+export type ReadOnlyVar = {
   tagJsType: string // typeof ValueTypes.tag | typeof ValueTypes.dom
-
   processInitAttribute: ProcessAttribute
   processInit: ProcessInit
   processUpdate: ProcessUpdate
-  delete: ProcessDelete  
-  
+  checkValueChange: CheckValueChange // | CheckSupportValueChange
+  destroy: ProcessDelete
+}
+
+export type TagJsVar = ReadOnlyVar & {
+  isAttr?: true  
   value?: any
-  checkValueChange: CheckValueChange | CheckSupportValueChange
   
   /** Optional method to check if this TagJsVar matches an injection request */
   matchesInjection?: MatchesInjection
@@ -26,7 +27,7 @@ export type TagJsTag = TagJsVar & {
   tagJsType: string // typeof ValueTypes.tag | typeof ValueTypes.dom
 
   processInit: ProcessInit
-  delete: ProcessDelete
+  destroy: ProcessDelete
   
   value?: any
 }

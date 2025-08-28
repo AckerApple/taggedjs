@@ -4,20 +4,20 @@ import { valueToTagJsVar } from '../tagJsVars/valueToTagJsVar.function.js'
 
 export function addOneContext(
   value: unknown,
-  context: ContextItem[],
+  contexts: ContextItem[],
   withinOwnerElement: boolean,
   parentContext: ContextItem,
 ): ContextItem {
   const contextItem: ContextItem = {
     value,
-    valueIndex: context.length,
+    valueIndex: contexts.length,
     destroy$: new Subject<void>(),
     tagJsVar: valueToTagJsVar(value),
     withinOwnerElement,
     parentContext,
   }
 
-  context.push(contextItem)
+  contexts.push(contextItem)
 
   return contextItem
 }

@@ -10,26 +10,23 @@ export function processTagComponentInit(
   value: TagJsVar,
   contextItem: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owningSupport
+  _insertBefore?: Text,
   appendTo?: Element,
 ): AnySupport | undefined {
   getNewGlobal(contextItem as SupportContextItem) as SupportTagGlobal
 
   if(appendTo) {
-    const processResult = processFirstSubjectComponent(
+    return processFirstSubjectComponent(
       value as TemplaterResult,
       contextItem as SupportContextItem,
       ownerSupport,
       appendTo as Element,
     )
-    
-    return processResult
   }
 
-  const processResult = processReplacementComponent(
+  return processReplacementComponent(
     value as TemplaterResult,
     contextItem as SupportContextItem,
     ownerSupport,
   )
-        
-  return processResult
 }

@@ -9,7 +9,6 @@ export function specialAttribute(
   specialName: SpecialDefinition,
 ) {
   switch (specialName) {
-
     case 'autofocus':
       paintContent.push([autofocus, [element]])
       return
@@ -19,9 +18,8 @@ export function specialAttribute(
       return
 
     case 'style': {
-      const names = name.split('.')      
+      const names = name.split('.')
       paintContent.push([paintStyle, [element, names, value]]) // attribute changes should come first
-      
       return
     }
 

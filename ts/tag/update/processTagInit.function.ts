@@ -10,8 +10,8 @@ export function processTagInit(
   value: TagJsVar,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  appendTo?: Element | undefined,
   insertBefore?: Text,
+  appendTo?: Element | undefined,
 ): AnySupport {
   contextItem.state = {}
   

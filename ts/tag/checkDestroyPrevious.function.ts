@@ -12,5 +12,5 @@ export function checkArrayValueChange(
     return 9 // 'array'
   }
 
-  return -1
+  return 0
 }

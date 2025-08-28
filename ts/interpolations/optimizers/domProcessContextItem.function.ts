@@ -1,6 +1,3 @@
-// taggedjs-no-compile
-
-import { processFirstSubjectValue } from "../../tag/update/processFirstSubjectValue.function.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
 import { ContextItem } from "../../tag/ContextItem.type.js"
 import { removeContextInCycle, setContextInCycle } from "../../tag/cycles/setContextInCycle.function.js"
@@ -18,16 +15,17 @@ export function domProcessContextItem(
   contextItem.element = contextItem.element || appendTo as HTMLElement
   setContextInCycle(contextItem)
 
-  processFirstSubjectValue(
+  contextItem.tagJsVar.processInit(
     value,
     contextItem,
     support,
-    appendTo,
     insertBefore,
+    appendTo,
   )
 
   removeContextInCycle()
 
-  delete subject.locked
   contextItem.value = value
+
+  delete subject.locked
 }

@@ -35,10 +35,10 @@ export function host<T extends HostCallback>(
     tagJsType: ValueTypes.host,
     processInitAttribute: processHostAttribute,
     // TODO: maybe a host value can change?
-    checkValueChange: () => -1,
+    checkValueChange: () => 0,
     processInit: processHost, // This should be a throw error because only attribute is supported
     processUpdate: processHostUpdate,
-    delete: deleteHost,
+    destroy: deleteHost,
     options: { callback, ...options } as AllOptions,
     matchesInjection(inject: any): boolean {
       const injectCallback = inject?.options?.callback

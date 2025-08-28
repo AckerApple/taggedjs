@@ -12,7 +12,7 @@ export type ContextHandler = (
 
 export type LastArrayItem = ContextItem // {context: ContextItem, global: TagGlobal}
 
-/** Return -1 if no change. Any other number tells what changed */
+/** Return 0 if no change. Any other number tells what changed */
 export type CheckValueChange = (
   value: unknown,
   contextItem: ContextItem,

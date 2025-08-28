@@ -16,7 +16,7 @@ export function attachDomElements(
   values: any[],
   support: AnySupport,
   parentContext: ContextItem,
-  contexts: ContextItem[],
+  // contexts: ContextItem[],
   depth: number, // used to know if dynamic variables live within parent owner tag/support
   appendTo?: Element,
   insertBefore?: Text,
@@ -24,6 +24,7 @@ export function attachDomElements(
   contexts: ContextItem[]
   dom: DomObjectChildren // return of children created. Used to attach `ch` for children to a node
 } {
+  const contexts = support.context.contexts
   const dom: DomObjectChildren = []
 
   if(appendTo && insertBefore === undefined) {
@@ -102,7 +103,7 @@ export function attachDomElements(
         values,
         support,
         newParentContext,
-        contexts,
+        // contexts,
         depth + 1,
         domElement,
         insertBefore,

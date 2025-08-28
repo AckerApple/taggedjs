@@ -26,7 +26,7 @@ export function deleteSubContext(
     delete subContext.appendMarker
   }
   
-  // delete (contextItem as any).delete
+  // delete (contextItem as any).destroy
   
   if(!subContext.hasEmitted) {
     return
@@ -34,7 +34,7 @@ export function deleteSubContext(
 
   const subContextItem = subContext.contextItem as ContextItem
   const subTagJsVar = subContextItem.tagJsVar as TagJsVar
-  subTagJsVar.delete(
+  subTagJsVar.destroy(
     subContextItem,
     ownerSupport,
   )

@@ -17,7 +17,7 @@ export function processUpdateSubscribe(
     ownerSupport,
   )
 
-  if(resultNum === -1 && (newValue as SubscribeValue).callback) {    
+  if(resultNum === 0 && (newValue as SubscribeValue).callback) {    
     const subContext = contextItem.subContext as SubContext
     emitSubContext(newValue as SubscribeValue, subContext)
   }

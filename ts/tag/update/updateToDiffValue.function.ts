@@ -49,7 +49,7 @@ export function updateToDiffValue(
     return
   }
   
-  if(ignoreOrDestroyed) {
+  if(ignoreOrDestroyed) { // TODO: is this check really needed?
     processNowRegularValue(
       newValue as RegularValue,
       contextItem,

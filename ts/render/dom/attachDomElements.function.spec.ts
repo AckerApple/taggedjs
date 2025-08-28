@@ -77,8 +77,8 @@ describe('attachDomElements', () => {
         processInitAttribute: jest.fn(),
         processInit: jest.fn(),
         processUpdate: jest.fn(),
-        delete: jest.fn(),
-        checkValueChange: jest.fn(() => -1),
+        destroy: jest.fn(),
+        checkValueChange: jest.fn(() => 0),
       },
       withinOwnerElement: true,
       parentContext: {} as ContextItem,
@@ -105,8 +105,8 @@ describe('attachDomElements', () => {
         processInitAttribute: jest.fn(),
         processInit: jest.fn(),
         processUpdate: jest.fn(),
-        delete: jest.fn(),
-        checkValueChange: jest.fn(() => -1),
+        destroy: jest.fn(),
+        checkValueChange: jest.fn(() => 0),
       },
       withinOwnerElement: true,
       parentContext: {} as ContextItem,
@@ -190,8 +190,8 @@ describe('attachDomElements', () => {
         processInitAttribute: jest.fn(),
         processInit: jest.fn(),
         processUpdate: jest.fn(),
-        delete: jest.fn(),
-        checkValueChange: jest.fn(() => -1),
+        destroy: jest.fn(),
+        checkValueChange: jest.fn(() => 0),
       },
       withinOwnerElement: true,
       parentContext: {} as ContextItem,
@@ -204,8 +204,6 @@ describe('attachDomElements', () => {
       context: mockSupportContext,
       appSupport: {} as any,
       templater: {} as any,
-      state: {} as any,
-      states: [],
     }
 
     const mockParentContext: ContextItem = {
@@ -216,8 +214,8 @@ describe('attachDomElements', () => {
         processInitAttribute: jest.fn(),
         processInit: jest.fn(),
         processUpdate: jest.fn(),
-        delete: jest.fn(),
-        checkValueChange: jest.fn(() => -1),
+        destroy: jest.fn(),
+        checkValueChange: jest.fn(() => 0),
       },
       withinOwnerElement: true,
       parentContext: {} as ContextItem,
@@ -277,22 +275,27 @@ describe('attachDomElements', () => {
         processInitAttribute: jest.fn(),
         processInit: jest.fn(),
         processUpdate: jest.fn(),
-        delete: jest.fn(),
-        checkValueChange: jest.fn(() => -1),
+        destroy: jest.fn(),
+        checkValueChange: jest.fn(() => 0),
       },
       withinOwnerElement: true,
       parentContext: {} as ContextItem,
       contexts: [],
       global: mockGlobal,
       renderCount: 0,
+      
+      state: {
+        newer: {
+          state: [],
+          states: [],
+        }
+      },
     }
 
     const mockSupport: AnySupport = {
       context: mockSupportContext,
       appSupport: {} as any,
       templater: {} as any,
-      state: {} as any,
-      states: [],
     }
 
     const mockParentContext: ContextItem = {
@@ -303,8 +306,8 @@ describe('attachDomElements', () => {
         processInitAttribute: jest.fn(),
         processInit: jest.fn(),
         processUpdate: jest.fn(),
-        delete: jest.fn(),
-        checkValueChange: jest.fn(() => -1),
+        destroy: jest.fn(),
+        checkValueChange: jest.fn(() => 0),
       },
       withinOwnerElement: true,
       parentContext: {} as ContextItem,

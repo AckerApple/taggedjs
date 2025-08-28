@@ -18,7 +18,6 @@ export function processTagArray(
 ) {
   const noLast = contextItem.lastArray === undefined
 
-  
   if( noLast ){
     contextItem.lastArray = []
   }

@@ -1,3 +1,3 @@
-export const blankHandler = function blankHandler() {
+export const blankHandler = function blankHandler(): any {
   return undefined
 }

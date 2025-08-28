@@ -10,9 +10,16 @@ export function tagValueUpdateHandler(
   contextItem: ContextItem | SupportContextItem,
   ownerSupport: AnySupport,
 ): number {
+  if((newValue as any)?.tagJsType === 'element') {
+    contextItem.tagJsVar.processUpdate(
+      newValue, contextItem, ownerSupport, []
+    )
+    return 0
+  }
+
   // Do not continue if the value is just the same
   if(newValue === contextItem.value) {
-    return -1
+    return 0
   }
 
   return forceUpdateExistingValue(

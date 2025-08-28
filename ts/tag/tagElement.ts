@@ -119,7 +119,7 @@ function getNewSubject(
   const tagJsVar: TagJsTag = {
     tagJsType: 'templater',
     checkValueChange: checkTagValueChange,
-    delete: destroySupportByContextItem,
+    destroy: destroySupportByContextItem,
     processInitAttribute: blankHandler,
     processInit: function appDoNothing() {
       console.debug('do nothing app function')

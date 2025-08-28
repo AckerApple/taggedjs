@@ -20,7 +20,7 @@ export function forceUpdateExistingValue(
   )
 
   // ignore
-  if( ignoreOrDestroyed === -1 ) {
+  if( ignoreOrDestroyed === 0 ) {
     return ignoreOrDestroyed // do nothing
   }
 

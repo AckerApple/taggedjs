@@ -58,7 +58,7 @@ export function Signal<T>(initialValue: T): SignalObject<T> {
       }
     },
 
-    delete: deleteAndUnsubscribe,
+    destroy: deleteAndUnsubscribe,
     emit,
 
     subscribe(callback: Subscriber<T>) {

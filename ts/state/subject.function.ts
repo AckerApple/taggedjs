@@ -6,6 +6,7 @@ import { ContextStateMeta, ContextStateSupport } from '../tag/ContextStateMeta.t
 import { setUseMemory } from './setUseMemory.object.js'
 import { state } from './state.function.js'
 import { oldSyncStates } from './syncStates.function.js'
+import { LikeObservable } from '../tagJsVars/index.js'
 
 /** Create a Subject that on updates will sync state values to keep chained functions using latest variables */
 export function subject<T>(
@@ -48,12 +49,12 @@ subject._value = <T>(value: T) => {
   })  
 }
 
-function all<A, B, C, D, E, F>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D, Subject<E> | E, Subject<F> | F]): Subject<[A,B,C,D,E,F]>
-function all<A, B, C, D, E>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D, Subject<E> | E]): Subject<[A,B,C,D,E]>
-function all<A, B, C, D>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D]): Subject<[A,B,C,D]>
-function all<A, B, C>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C]): Subject<[A,B,C]>
-function all<A, B>(args: [Subject<A> | A, Subject<B> | B]): Subject<[A,B]>
-function all<A>(args: [Subject<A> | A]): Subject<[A]>
+function all<A, B, C, D, E, F>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C, LikeObservable<D> | D, LikeObservable<E> | E, LikeObservable<F> | F]): Subject<[A,B,C,D,E,F]>
+function all<A, B, C, D, E>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C, LikeObservable<D> | D, LikeObservable<E> | E]): Subject<[A,B,C,D,E]>
+function all<A, B, C, D>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C, LikeObservable<D> | D]): Subject<[A,B,C,D]>
+function all<A, B, C>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C]): Subject<[A,B,C]>
+function all<A, B>(args: [LikeObservable<A> | A, LikeObservable<B> | B]): Subject<[A,B]>
+function all<A>(args: [LikeObservable<A> | A]): Subject<[A]>
 function all(args: any[]): Subject<any> {
   const oldestState = state(() => ({
     state: setUseMemory.stateConfig.state,
@@ -73,7 +74,7 @@ function all(args: any[]): Subject<any> {
       )
     }
     return x
-  })
+  }) as any
 }
 
 subject.all = all

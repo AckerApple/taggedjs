@@ -25,7 +25,7 @@ export function checkStillSubscription(
   }
 
   if (!subContext || !subContext.hasEmitted) {
-    return -1
+    return 0
   }
 
   subContext.tagJsVar = newValue as SubscribeValue
@@ -34,7 +34,7 @@ export function checkStillSubscription(
     0,
   )
 
-  return -1
+  return 0
 }
 
 /** used to handle when value was subscribe but now is something else */
@@ -48,7 +48,7 @@ export function handleTagTypeChangeFrom(
 
   if(isDifferent) {
     const oldTagJsVar = contextItem.tagJsVar as TagJsVar
-    oldTagJsVar.delete(contextItem, ownerSupport)
+    oldTagJsVar.destroy(contextItem, ownerSupport)
 
     updateToDiffValue(
       newValue as TemplateValue,

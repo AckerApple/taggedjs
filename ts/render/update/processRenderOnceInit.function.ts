@@ -12,8 +12,8 @@ export function processRenderOnceInit(
   value: TemplateValue,
   contextItem: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owningSupport
-  appendTo?: Element,
   insertBefore?: Text,
+  appendTo?: Element,
 ) {
   getNewGlobal(contextItem as SupportContextItem)
 

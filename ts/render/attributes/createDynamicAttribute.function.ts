@@ -94,6 +94,7 @@ export function createDynamicAttribute(
   support: AnySupport,
   isSpecial: SpecialDefinition,
   varIndex: number,
+  contexts: ContextItem[],
 ) {
   const tagJsVar = valueToTagJsVar(value)
   const contextItem: AttributeContextItem = {
@@ -118,6 +119,7 @@ export function createDynamicAttribute(
     howToSet,
     support,
     isSpecial,
+    contexts,
   )
 
   contextItem.value = value

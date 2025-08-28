@@ -58,7 +58,7 @@ function processUpdateOneContext(
   setContextInCycle(contextItem)
   
   tagJsVar.processUpdate(
-    newValue, // valueToTagJsVar(newValue),
+    newValue,
     contextItem,
     ownerSupport,
     values,

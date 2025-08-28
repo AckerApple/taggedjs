@@ -1,7 +1,5 @@
-import { getSupportWithState } from "../interpolations/attributes/getSupportWithState.function.js"
 import { AnySupport } from "../tag/AnySupport.type.js"
 import { ContextStateMeta, ContextStateSupport } from "../tag/ContextStateMeta.type.js"
-import { getSupportInCycle } from "../tag/cycles/getSupportInCycle.function.js"
 import { ContextItem, ValueTypes } from "../tag/index.js"
 import { StatesSetter } from "../state/states.utils.js"
 import { deleteAndUnsubscribe, setupSubscribe } from "../tag/update/setupSubscribe.function.js"
@@ -12,7 +10,7 @@ import { processSubscribeAttribute } from "./processSubscribeAttribute.function.
 import { OnSubOutput, SubContext, SubscriptionContext } from "../tag/update/SubContext.type.js"
 import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { checkStillSubscription } from "../tag/update/checkStillSubscription.function.js"
-import { getContextInCycle } from "../tag/cycles/setContextInCycle.function.js"
+import { Subject } from "../index.js"
 
 export type LikeSubscription = {
   unsubscribe: () => any
@@ -60,8 +58,13 @@ export function emitSubScriptionAsIs(
       throw new Error('blankhandler not converted')
     }
     const observables = value.Observables
-    
+    //const hasEmitted = subContext.hasEmitted
+    // const hasValue = 'value' in observables[0]
+    // let obValue = hasValue ? (observables[0] as any)?.value : value.withDefault
+    // let obValue = hasEmitted ? (observables[0] as any)?.value : value.withDefault
     let obValue = (observables[0] as any)?.value || value.withDefault
+    // subContext.hasEmitted = true
+    // subContext.lastValues[0] = obValue
 
     if( value.callback ) {
       obValue = value.callback(obValue)
@@ -75,12 +78,6 @@ export function subscribe<T>(
   Observable: LikeObservable<T>,
   callback?: SubscribeCallback<T>,
 ): SubscribeValue {
-  // const context = getSupportWithState(support).context
-  const context = getContextInCycle() as ContextItem
-  const stateMeta = context.state as ContextStateMeta
-  const newer = stateMeta.newer as ContextStateSupport
-  const states = newer.states
-
   return {
     onOutput: blankHandler, // gets set within setupSubscribe()
     tagJsType: ValueTypes.subscribe,
@@ -92,21 +89,38 @@ export function subscribe<T>(
     processUpdate: checkStillSubscription,
     // processUpdate: processUpdateSubscribe,
     
-    delete: deleteAndUnsubscribe,
+    destroy: deleteAndUnsubscribe,
     callback,
-    states,
+    // states,
     
     Observables: [Observable],
   }
 }
 
+subscribe.all = subscribeAll
+
 export type SubscribeValue = TagJsVar & {
   tagJsType: typeof ValueTypes.subscribe
 
-  states: StatesSetter[]
+  // states: StatesSetter[]
   withDefault?: any
   callback?: SubscribeCallback<any>
   onOutput: OnSubOutput
   
   Observables: LikeObservable<any>[]
+}
+
+function subscribeAll<A, B, C, D, E, F>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C, LikeObservable<D> | D, LikeObservable<E> | E, LikeObservable<F> | F], callback?: SubscribeCallback<[A,B,C,D,E,F]>): SubscribeValue
+function subscribeAll<A, B, C, D, E>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C, LikeObservable<D> | D, LikeObservable<E> | E], callback?: SubscribeCallback<[A,B,C,D,E]>): SubscribeValue
+function subscribeAll<A, B, C, D>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C, LikeObservable<D> | D], callback?: SubscribeCallback<[A,B,C,D]>): SubscribeValue
+function subscribeAll<A, B, C>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C], callback?: SubscribeCallback<[A,B,C]>): SubscribeValue
+function subscribeAll<A, B>(args: [LikeObservable<A> | A, LikeObservable<B> | B], callback?: SubscribeCallback<[A,B]>): SubscribeValue
+function subscribeAll<A>(args: [LikeObservable<A> | A], callback?: SubscribeCallback<[A]>): SubscribeValue
+function subscribeAll<T>(
+  subjects: LikeObservable<T>[],
+  callback?: SubscribeCallback<T>,
+) {
+  return subscribe(
+    Subject.all(subjects as any) as any, callback
+  )
 }

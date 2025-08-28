@@ -23,8 +23,8 @@ export function processAttributeUpdate(
     ownerSupport,
   )
 
-  if (checkResult >= 0) {
-    oldTag.delete(contextItem, ownerSupport)
+  if (checkResult > 0) {
+    oldTag.destroy(contextItem, ownerSupport)
     element.removeAttribute(name)
 
     const newTagVar = valueToTagJsVar(value)

@@ -1,10 +1,11 @@
 import { isSubjectInstance } from '../isInstance.js'
+import { LikeObservable } from '../tagJsVars/subscribe.function.js'
 import { combineLatest } from './combineLatest.function.js'
 import { UnaryFunction as OperatorFunction, SubjectLike, SubjectSubscriber, Subscription, getSubscription, runPipedMethods } from './subject.utils.js'
 
 export type OnSubscription<T> = (subscription: Subscription<T>) => unknown
 
-export class Subject<T> implements SubjectLike<T> {
+export class Subject<T> implements LikeObservable<T> {
   // private?
   methods: OperatorFunction<any, any, any>[] = []
   isSubject = true
@@ -97,22 +98,22 @@ export class Subject<T> implements SubjectLike<T> {
 
   /* tslint:disable:max-line-length */
   pipe(): Subject<T>;
-  pipe<A, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>): Subject<A>;
-  pipe<A, B, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>, op2: OperatorFunction<A, B, RESOLVE>): Subject<B>;
-  pipe<A, B, C, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>, op2: OperatorFunction<A, B, RESOLVE>, op3: OperatorFunction<B, C, RESOLVE>): Subject<C>;
+  pipe<A, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>): LikeObservable<A>;
+  pipe<A, B, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>, op2: OperatorFunction<A, B, RESOLVE>): LikeObservable<B>;
+  pipe<A, B, C, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>, op2: OperatorFunction<A, B, RESOLVE>, op3: OperatorFunction<B, C, RESOLVE>): LikeObservable<C>;
   pipe<A, B, C, D, RESOLVE>(
     op1: OperatorFunction<T, A, RESOLVE>,
     op2: OperatorFunction<A, B, RESOLVE>,
     op3: OperatorFunction<B, C, RESOLVE>,
     op4: OperatorFunction<C, D, RESOLVE>
-  ): Subject<D>;
+  ): LikeObservable<D>;
   pipe<A, B, C, D, E, RESOLVE>(
     op1: OperatorFunction<T, A, RESOLVE>,
     op2: OperatorFunction<A, B, RESOLVE>,
     op3: OperatorFunction<B, C, RESOLVE>,
     op4: OperatorFunction<C, D, RESOLVE>,
     op5: OperatorFunction<D, E, RESOLVE>
-  ): Subject<E>;
+  ): LikeObservable<E>;
   pipe<A, B, C, D, E, F, RESOLVE>(
     op1: OperatorFunction<T, A, RESOLVE>,
     op2: OperatorFunction<A, B, RESOLVE>,
@@ -120,7 +121,7 @@ export class Subject<T> implements SubjectLike<T> {
     op4: OperatorFunction<C, D, RESOLVE>,
     op5: OperatorFunction<D, E, RESOLVE>,
     op6: OperatorFunction<E, F, RESOLVE>
-  ): Subject<F>;
+  ): LikeObservable<F>;
   pipe<A, B, C, D, E, F, G, RESOLVE>(
     op1: OperatorFunction<T, A, RESOLVE>,
     op2: OperatorFunction<A, B, RESOLVE>,
@@ -176,12 +177,12 @@ export class Subject<T> implements SubjectLike<T> {
   }
 
   /** Wait for all observables to emit before continuing */
-  static all<A, B, C, D, E, F>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D, Subject<E> | E, Subject<F> | F]): Subject<[A,B,C,D,E,F]>
-  static all<A, B, C, D, E>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D, Subject<E> | E]): Subject<[A,B,C,D,E]>
-  static all<A, B, C, D>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D]): Subject<[A,B,C,D]>
-  static all<A, B, C>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C]): Subject<[A,B,C]>
-  static all<A, B>(args: [Subject<A> | A, Subject<B> | B]): Subject<[A,B]>
-  static all<A>(args: [Subject<A> | A]): Subject<[A]>
+  static all<A, B, C, D, E, F>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C, LikeObservable<D> | D, LikeObservable<E> | E, LikeObservable<F> | F]): Subject<[A,B,C,D,E,F]>
+  static all<A, B, C, D, E>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C, LikeObservable<D> | D, LikeObservable<E> | E]): Subject<[A,B,C,D,E]>
+  static all<A, B, C, D>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C, LikeObservable<D> | D]): Subject<[A,B,C,D]>
+  static all<A, B, C>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C]): Subject<[A,B,C]>
+  static all<A, B>(args: [LikeObservable<A> | A, LikeObservable<B> | B]): Subject<[A,B]>
+  static all<A>(args: [LikeObservable<A> | A]): Subject<[A]>
   static all(args: any[]): Subject<any> {
     const switched = args.map(arg => {
       if(isSubjectInstance(arg)) return arg;

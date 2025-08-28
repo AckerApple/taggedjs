@@ -13,10 +13,12 @@ export function pipe<SubValue, DEFAULT>(
   Observables: LikeObservable<SubValue>[],
   callback?: SubscribeCallback<SubValue | DEFAULT>,
 ): SubscribeValue {
+  /*
   const support = getSupportInCycle() as AnySupport
   const context = getSupportWithState(support).context
   const stateMeta = context.state as ContextStateMeta
   const newer = stateMeta.newer as ContextStateSupport
+  */
   return {
     onOutput: blankHandler, // gets set within setupSubscribe()
     tagJsType: ValueTypes.subscribe,
@@ -27,10 +29,10 @@ export function pipe<SubValue, DEFAULT>(
     
     
     processUpdate: blankHandler,
-    delete: deleteAndUnsubscribe,
+    destroy: deleteAndUnsubscribe,
 
     callback,
-    states: newer.states,
+    // states: newer.states,
     
     Observables,
   }
@@ -40,6 +42,7 @@ function processPipe(
   values: LikeObservable<any>[],
   contextItem: ContextItem,
   ownerSupport: AnySupport,
+  _insertBefore?: Text,
   appendTo?: Element,
 ) {
   const subValue: SubscribeValue = {
@@ -52,6 +55,7 @@ function processPipe(
     subValue,
     contextItem,
     ownerSupport,
+    undefined,
     appendTo,
   )
 }

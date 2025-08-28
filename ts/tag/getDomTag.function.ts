@@ -57,7 +57,7 @@ export function getDomTag(
     processInit: processDomTagInit,
     processUpdate: tagValueUpdateHandler,
     checkValueChange: checkTagValueChange,
-    delete: destroySupportByContextItem,
+    destroy: destroySupportByContextItem,
 
     key: function keyFun(arrayValue: unknown) {
       tag.arrayValue = arrayValue

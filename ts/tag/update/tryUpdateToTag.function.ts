@@ -23,14 +23,14 @@ export function tryUpdateToTag(
       getNewGlobal(contextItem as SupportContextItem)
     }
 
+    contextItem.oldTagJsVar = contextItem.tagJsVar
+    contextItem.tagJsVar = newValue
+
     prepareUpdateToComponent(
       newValue,
       contextItem as SupportContextItem,
       ownerSupport,
     )
-
-    contextItem.oldTagJsVar = contextItem.tagJsVar
-    contextItem.tagJsVar = newValue
 
     return true
   }
@@ -63,8 +63,8 @@ export function tryUpdateToTag(
     newValue,
     contextItem,
     ownerSupport,
-    undefined, // appendTo,
     contextItem.placeholder,
+    // undefined, // appendTo,
   )
 
   contextItem.oldTagJsVar = contextItem.tagJsVar
@@ -84,8 +84,8 @@ function prepareUpdateToComponent(
       templater,
       contextItem,
       ownerSupport,
-      undefined, // appendTo,
       contextItem.placeholder,
+      // undefined, // appendTo,
     )
     return
   }

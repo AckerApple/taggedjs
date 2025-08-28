@@ -1,7 +1,11 @@
 import { isObject } from "../../index.js"
 import { paintContent } from "../../render/paint.function.js"
 
-export type HowToSet = (element: HTMLElement, name: string, value: string) => any
+export type HowToSet = (
+  element: HTMLElement,
+  name: string,
+  value: string,
+) => any
 
 // Maybe more performant for updates but seemingly slower for first renders
 export function howToSetInputValue(
@@ -50,16 +54,24 @@ export function howToSetFirstInputValue(
   name: string,
   value: string | undefined | boolean | Record<string, any>
 ) {
+  setNonFunctionInputValue(element, name, value)
+}
+
+export function setNonFunctionInputValue(
+  element: HTMLElement,
+  name: string,
+  value: string | undefined | boolean | Record<string, any>
+) {
+  if (isObject(value)) {
+    return howToSetInputObjectValue(element, name, value as Record<string, any>)
+  }
+  
   // for checked=true
   ;(element as any)[name] = value
 
   if(value === undefined || value === false || value === null) {
     element.removeAttribute(name)
     return
-  }
-
-  if (isObject(value)) {
-    return howToSetInputObjectValue(element, name, value as Record<string, any>)
   }
 
   element.setAttribute(name, value as string)

@@ -7,8 +7,8 @@ export type ProcessInit = (
   value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  appendTo?: Element,      
-  insertBefore?: Text,      
+  insertBefore?: Text,
+  appendTo?: Element,
 ) => any
 
 export type ProcessAttribute = (

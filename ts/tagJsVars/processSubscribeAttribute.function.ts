@@ -18,7 +18,7 @@ export function processSubscribeAttribute(
   ownerSupport: AnySupport
 ) {
   // change how the delete occurs
-  value.delete = unsubscribeContext
+  value.destroy = unsubscribeContext
 
   const isSpecial = isSpecialAttr(name)
   const onOutput = function onSubValue(
@@ -30,7 +30,8 @@ export function processSubscribeAttribute(
       callbackValue as any,
       element,
       howToSetFirstInputValue,
-      isSpecial
+      isSpecial,
+      contextItem,
     )
 
     checkToPaint(syncRun)

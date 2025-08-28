@@ -10,15 +10,15 @@ export function processSubscribeWith(
   value: SubscribeValue,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  appendTo?: Element,
   insertBefore?: Text,
+  appendTo?: Element,
 ) {
   const subContext = setupSubscribe(
     value,
     contextItem,
     ownerSupport,
-    appendTo,
     insertBefore,
+    appendTo,
   )
 
   if(!subContext.hasEmitted) {
@@ -34,6 +34,7 @@ export function emitSubContext(
 ) {
   const observables = value.Observables
   const observable = observables[0]
+  
 
   if(!subContext.hasEmitted) {
     if('withDefault' in value) {
@@ -56,7 +57,6 @@ export function emitSubContext(
     return // nothing to emit
   }
 
-
   const emitValue = subContext.lastValues[0].value  
   subContext.subValueHandler(
     emitValue,
@@ -68,6 +68,7 @@ export function processSignal(
   value: SignalObject<any>,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
+  _insertBefore?: Text,
   appendTo?: Element,
 ) {
   const subValue: SubscribeValue = {
@@ -80,6 +81,7 @@ export function processSignal(
     subValue,
     contextItem,
     ownerSupport,
+    undefined,
     appendTo,
   )
 }

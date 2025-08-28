@@ -9,6 +9,7 @@ import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processTagInit } from '../../tag/update/processTagInit.function.js'
 import { AnySupport } from '../../tag/index.js'
 import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
+import { blankHandler } from '../dom/blankHandler.function.js'
 
 /** When first time render, adds to owner childTags
  * Used for BOTH inserts & updates to values that were something else
@@ -45,8 +46,13 @@ export function tagFakeTemplater(
 export function getFakeTemplater() {
   const fake = {
     tagJsType: ValueTypes.templater,
+    processInitAttribute: blankHandler,
     processInit: processTagInit,
+    processUpdate: blankHandler,
     checkValueChange: checkTagValueChange,
+    destroy: blankHandler,
+    propWatch: 'shallow',
+    key: blankHandler,
   } as TemplaterResult
 
   return fake

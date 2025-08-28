@@ -1,4 +1,5 @@
 import { ContextItem } from '../index.js'
+import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { AppContextItem } from './ContextItem.type.js'
 import { ContextStateMeta } from './ContextStateMeta.type.js'
 import { SupportTagGlobal } from './getTemplaterResult.function.js'
@@ -16,4 +17,6 @@ export interface SupportContextItem extends ContextItem {
   state: ContextStateMeta  // Required for SupportContextItem
   /** Indicator of re-rending. Saves from double rending something already rendered */
   renderCount: number
+  
+  inputsHandler?: (...args: any[]) => any
 }

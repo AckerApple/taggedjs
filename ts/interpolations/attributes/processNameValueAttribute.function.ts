@@ -1,5 +1,5 @@
 import { specialAttribute } from './specialAttribute.js'
-import { HowToSet } from './howToSetInputValue.function.js'
+import { HowToSet, setNonFunctionInputValue } from './howToSetInputValue.function.js'
 import { TagGlobal } from '../../tag/getTemplaterResult.function.js'
 import { processTagCallbackFun } from '../../render/attributes/processAttribute.function.js'
 import { SpecialDefinition } from '../../render/attributes/Special.types.js'
@@ -8,6 +8,8 @@ import { AnySupport } from '../../tag/index.js'
 import { BasicTypes } from '../../tag/ValueTypes.enum.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
+import { blankHandler } from '../../render/dom/blankHandler.function.js'
+import { Subject } from '../../index.js'
 
 export function processDynamicNameValueAttribute(
   attrName: string,
@@ -17,6 +19,7 @@ export function processDynamicNameValueAttribute(
   howToSet: HowToSet,
   support: AnySupport,
   isSpecial: SpecialDefinition,
+  contexts: ContextItem[],
 ) {
   contextItem.element = element as HTMLElement
   contextItem.howToSet = howToSet
@@ -45,6 +48,7 @@ export function processDynamicNameValueAttribute(
     element,
     howToSet,
     isSpecial,
+    contextItem,
   )
 }
 
@@ -67,14 +71,13 @@ export function processTagJsAttribute(
   contextItem.tagJsVar = value
 }
 
-
-
 export function processNonDynamicAttr(
   attrName: string,
   value: string,
   element: Element,
   howToSet: HowToSet,
   isSpecial: SpecialDefinition,
+  context: ContextItem,
 ) {
   if (isSpecial) {
     return specialAttribute(
@@ -83,6 +86,40 @@ export function processNonDynamicAttr(
       element,
       isSpecial,
     )
+  }
+
+  if( typeof value === 'function') {
+    const endValue = (value as any)()    
+    setNonFunctionInputValue(
+      element as HTMLElement,
+      attrName,
+      endValue,
+    )
+
+    const contextItem = {
+      parentContext: context,
+      tagJsVar: {
+        tagJsType: 'dynamic-text',
+        checkValueChange: () => 0,
+        processInit: blankHandler,
+        processInitAttribute: blankHandler,
+        destroy: blankHandler,
+        processUpdate: () => {
+          const endValue = (value as any)()    
+          setNonFunctionInputValue(
+            element as HTMLElement,
+            attrName,
+            endValue,
+          )
+        }
+      },
+
+        // TODO: Not needed
+      valueIndex: -1,
+      withinOwnerElement: true,
+      destroy$: new Subject(),
+    }
+    return contextItem
   }
 
   howToSet(element as HTMLElement, attrName, value)  

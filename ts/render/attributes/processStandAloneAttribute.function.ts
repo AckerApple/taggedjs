@@ -31,15 +31,15 @@ export function processStandAloneAttribute(
       const howToSet: HowToSet = howToSetFirstInputValue
 
       processAttribute(
-        values,
         name,
+        value,
+        values,
         element,
         ownerSupport,
         howToSet,
         context,
         parentContext,
         isSpecial,
-        value,
       )
     }
     return

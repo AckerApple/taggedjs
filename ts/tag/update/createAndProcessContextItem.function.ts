@@ -31,7 +31,8 @@ export function createAndProcessContextItem(
   }
 
   if(!appendTo) {
-    paintCommands.push([paintBefore, [insertBefore, element]])
+    contextItem.placeholder = insertBefore
+    // paintCommands.push([paintBefore, [insertBefore, element]])
   }
 
   domProcessContextItem(

@@ -8,6 +8,7 @@ import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { SupportContextItem, Tag, TemplaterResult, TemplateValue } from '../index.js'
 import { destroyArrayContext } from '../tag/destroyArrayContext.function.js'
 
+/** how to process an array */
 export function getArrayTagVar(
   value: any,
 ): TagJsTag {
@@ -18,7 +19,7 @@ export function getArrayTagVar(
     processInit: processArrayInit,
     processUpdate: processArrayUpdates,
     checkValueChange: checkArrayValueChange,
-    delete: destroyArrayContext,
+    destroy: destroyArrayContext,
   }
 }
 
@@ -33,7 +34,7 @@ function processArrayUpdates(
     ownerSupport,
   )
   
-  if(tagUpdateResponse === -1) {
+  if(tagUpdateResponse === 0) {
     processTagArray(
       contextItem,
       newValue as (TemplaterResult | Tag)[],
@@ -46,6 +47,7 @@ function processArrayInit(
   value: TagJsVar, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
+  _insertBefore?: Text,      
   appendTo?: Element,      
 ) {
   const subValue = value as any

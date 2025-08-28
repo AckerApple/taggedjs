@@ -4,16 +4,20 @@ import { PaintCommand } from '../render/paint.function.js'
 import { LastArrayItem, Subject } from '../index.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { ContextStateMeta } from './ContextStateMeta.type.js'
+import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 
 
 export interface AppContextItem {
+  tagJsVar: TagJsVar  
+
   returnValue?: any // used when value results in a return value
+  
   state?: ContextStateMeta
+  htmlDomMeta?: DomObjectChildren
 
   valueIndex: number
   
   value?: any,
-  tagJsVar: TagJsVar  
   oldTagJsVar?: TagJsVar  
 
   // subscribe() and innerHTML

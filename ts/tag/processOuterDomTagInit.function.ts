@@ -18,8 +18,8 @@ export function processOuterDomTagInit(
   value: Tag,
   contextItem: ContextItem, // could be tag via result.tag
   ownerSupport: AnySupport, // owningSupport
-  appendTo?: Element,
   insertBefore?: Text,
+  appendTo?: Element,
 ) {
   const outerHTML = value.outerHTML as Tag
 
@@ -27,8 +27,8 @@ export function processOuterDomTagInit(
     outerHTML,
     contextItem, // could be tag via result.tag
     ownerSupport, // owningSupport
-    appendTo,
     insertBefore,
+    appendTo,
   ) as AnySupport
 
   // contextItem.handler = function outDomTagHanlder(
@@ -52,7 +52,7 @@ export function processOuterDomTagInit(
 
 function checkOuterTagValueChange(
   newValue: unknown,
-  contextItem: SupportContextItem,
+  contextItem: ContextItem,
 ) {    
   return checkTagValueChange(
     newValue, // (newValue as Tag)?.outerHTML || newValue,
@@ -60,7 +60,7 @@ function checkOuterTagValueChange(
   )
 }
 
-/** When runtime is in browser */
+/** tag(html``) When runtime is in browser */
 export function getStringTag(
   strings: string[],
   values: unknown[],
@@ -74,7 +74,7 @@ export function getStringTag(
     processInit: processDomTagInit,
     processUpdate: tagValueUpdateHandler,
     checkValueChange: checkTagValueChange,
-    delete: destroySupportByContextItem,
+    destroy: destroySupportByContextItem,
 
     strings,
     

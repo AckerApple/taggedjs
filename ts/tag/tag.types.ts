@@ -1,4 +1,5 @@
 import { ValueSubject } from '../subject/index.js'
+import { ReadOnlyVar } from '../tagJsVars/tagJsVar.type.js'
 import { AnyTag } from './AnyTag.type.js'
 
 export class RouteQuery {
@@ -13,7 +14,9 @@ export type RouteProps = {
   query: RouteQuery
 }
 
-export type ToTag = ((...props: any[]) => StateToTag | AnyTag | null) & {
+type TagResponse = ReadOnlyVar | StateToTag | AnyTag | null
+
+export type ToTag = ((...props: any[]) => TagResponse | TagResponse[]) & {
   arrayValue?: unknown
 }
 

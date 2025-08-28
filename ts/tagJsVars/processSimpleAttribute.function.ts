@@ -12,10 +12,11 @@ export function processSimpleAttribute(
   value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   element: HTMLElement,
   tagJsVar: TagJsVar,
-  contextItem: AttributeContextItem) {
+  contextItem: AttributeContextItem,
+) {
   // const tagJsVar = contextItem.tagJsVar
   
-  tagJsVar.delete = deleteSimpleAttribute
+  tagJsVar.destroy = deleteSimpleAttribute
   tagJsVar.checkValueChange = checkSimpleValueChange
   contextItem.tagJsVar = tagJsVar
   contextItem.tagJsVar.processUpdate = (
@@ -32,6 +33,7 @@ export function processSimpleAttribute(
     value,
     element,
     howToSetFirstInputValue,
-    isSpecial
+    isSpecial,
+    contextItem,
   )
 }

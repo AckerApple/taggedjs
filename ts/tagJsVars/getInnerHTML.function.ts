@@ -32,8 +32,8 @@ function processInnerHTML(
   value: InnerHTMLValue,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  appendTo?: Element,
   insertBefore?: Text,
+  appendTo?: Element,
 ) {
   contextItem.subContext = {} as SubContext
   
@@ -82,10 +82,10 @@ export type TagJsVarInnerHTML = TagJsVar & {
 export function getInnerHTML(): TagJsVarInnerHTML {
   return {
     tagJsType: 'innerHTML',
-    checkValueChange: () => -1, // not expected to do anything
+    checkValueChange: () => 0, // not expected to do anything
     processInitAttribute: blankHandler,
     processInit: processInnerHTML,
     processUpdate: handleInnerHTML,
-    delete: deleteContextSubContext,
+    destroy: deleteContextSubContext,
   }
 }

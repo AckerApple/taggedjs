@@ -1,6 +1,6 @@
 import { AnySupport } from "../index.js"
 import { castTextValue } from '../castTextValue.function.js'
-import { paintBeforeText, paintCommands, addPaintRemover } from "../render/paint.function.js"
+import { paintBeforeText, paintCommands, addPaintRemover, paint, painting } from "../render/paint.function.js"
 import { BasicTypes, ContextItem } from "../index.js"
 import { processUpdateRegularValue, RegularValue } from "../tag/update/processRegularValue.function.js"
 import { TagJsTag } from "./tagJsVar.type.js"
@@ -24,7 +24,7 @@ export function getSimpleTagVar(
     value,
     processInitAttribute: processSimpleAttribute,
     processInit: processSimpleValueInit,
-    delete: deleteSimpleValue,
+    destroy: deleteSimpleValue,
     
     // TODO: get down to only one
     checkValueChange: checkUpdateDeleteSimpleValueChange,
@@ -36,8 +36,8 @@ function processSimpleValueInit(
   value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
-  appendTo?: Element,      
   insertBefore?: Text,
+  // appendTo?: Element,      
 ) {
   // value = value.value
   const castedValue = castTextValue(value)
@@ -67,7 +67,7 @@ export function checkSimpleValueChange(
   const isBadValue = newValue === null || newValue === undefined
   const isRegularUpdate = isBadValue || !(typeof(newValue) === BasicTypes.object)
   if(isRegularUpdate) {
-    return -1  // no need to destroy, just update display
+    return 0  // no need to destroy, just update display
   }
   
   return 6 // 'changed-simple-value'
@@ -79,6 +79,7 @@ export function checkUpdateDeleteSimpleValueChange(
 ) {
   const isBadValue = newValue === null || newValue === undefined
   const isRegularUpdate = isBadValue || !(typeof(newValue) === BasicTypes.object)
+
   if(isRegularUpdate) {
     // This will cause all other values to render
     processUpdateRegularValue(
@@ -86,7 +87,7 @@ export function checkUpdateDeleteSimpleValueChange(
       contextItem,
     )
 
-    return -1  // no need to destroy, just update display
+    return 0  // no need to destroy, just update display
   }
 
   deleteSimpleValue(contextItem)

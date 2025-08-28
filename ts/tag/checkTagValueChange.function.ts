@@ -1,4 +1,4 @@
-import { AnySupport } from './index.js'
+import { AnySupport, ContextItem } from './index.js'
 import { SupportContextItem } from './SupportContextItem.type.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { destroySupport } from '../render/destroySupport.function.js'
@@ -7,10 +7,11 @@ import { isStaticTag } from'../isInstance.js'
 import { isLikeTags } from'./isLikeTags.function.js'
 import { tryUpdateToTag } from './update/tryUpdateToTag.function.js'
 import { destroySupportByContextItem } from './destroySupportByContextItem.function.js'
+import { ContextStateMeta } from './ContextStateMeta.type.js'
 
 export function checkTagValueChange(
   newValue: unknown,
-  contextItem: SupportContextItem,
+  contextItem: ContextItem,
 ) {
   const global = contextItem.global as SupportTagGlobal
   const lastSupport = contextItem.state?.newest as AnySupport
@@ -22,7 +23,7 @@ export function checkTagValueChange(
     const likeTags = isLikeTags(newTag, lastSupport)
     if(!likeTags) {
       destroySupport(lastSupport, global)
-      getNewGlobal(contextItem)
+      getNewGlobal(contextItem as SupportContextItem)
       return 7 // 'tag-swap'
     }
 
@@ -33,12 +34,13 @@ export function checkTagValueChange(
       lastSupport as AnySupport,
     )
 
-    return -1
+    return 0
   }
 
   const isTag = (newValue as any)?.tagJsType
   if(isTag) {
-    const support = contextItem.state.newest as AnySupport
+    const state = contextItem.state as ContextStateMeta
+    const support = state.newest as AnySupport
     const ownerSupport = support.ownerSupport as AnySupport
     const result = tryUpdateToTag(
       contextItem,
@@ -49,7 +51,7 @@ export function checkTagValueChange(
     const doNotRedraw = result === true
 
     if(doNotRedraw) {
-      return -1
+      return 0
     }
 
     return 88 // its same tag with new values

@@ -25,15 +25,15 @@ import { processStandAloneAttribute } from './processStandAloneAttribute.functio
 
 /** MAIN FUNCTION. Sets attribute value, subscribes to value updates  */
 export function processAttribute(
-  values: unknown[], // all the variables inside html``
   attrName: string | TagVarIdNum,
+  value: string | null | undefined | TagVarIdNum,
+  values: unknown[], // all the variables inside html``
   element: HTMLElement,
   support: AnySupport,
   howToSet: HowToSet, //  = howToSetInputValue
   contexts: ContextItem[],
   parentContext: ContextItem,
   isSpecial: SpecialDefinition,
-  value: string | null | undefined | TagVarIdNum,
 ) {
   const varIndex = getTagJsVar(attrName)
   const isNameVar = varIndex >= 0
@@ -110,16 +110,18 @@ export function processAttribute(
       support,
       isSpecial,
       valueVar,
+      contexts,
     )
   }
 
   // simple name/value attribute
-  processNonDynamicAttr(
+  return processNonDynamicAttr(
     attrName as string,
     value as string,
     element,
     howToSet,
     isSpecial,
+    parentContext,
   )
 }
 
