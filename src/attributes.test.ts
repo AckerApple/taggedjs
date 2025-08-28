@@ -38,7 +38,7 @@ describe('🏹 special attributes', () => {
     const clearColorBtn = byId('clear-color-btn')
 
     // Initial state - all should be red/pink
-    expect(bgColorChanger.style.backgroundColor).toBe('red')
+    expect(bgColorChanger.style.backgroundColor).toBe('red', 'bgColorChanger should start red')
     expect(subscribeBgColor.style.backgroundColor).toBe('red')
     expect(multipleSubscribeBgColor.style.backgroundColor).toBe('pink')
 
@@ -67,8 +67,8 @@ describe('🏹 special attributes', () => {
     clearColorBtn.click()
     
     // Colors should be empty/empty/pink after clear
-    expect(bgColorChanger.style.backgroundColor).toBe('')
-    expect(subscribeBgColor.style.backgroundColor).toBe('')
+    expect(bgColorChanger.style.backgroundColor).toBe('', 'expected no background in bgColorChanger')
+    expect(subscribeBgColor.style.backgroundColor).toBe('', 'expected no background in subscribeBgColor')
     expect(multipleSubscribeBgColor.style.backgroundColor).toBe('pink')
   })
 

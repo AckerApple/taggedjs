@@ -3,6 +3,11 @@ import { byId, html, htmlById, query } from './testing'
 import { expectHTML, expectMatchedHtml, testCounterElements, testDuelCounterElements } from './testing'
 
 describe('🧳 props', () => {    
+  it('json', () => {
+    const propsTextarea = byId('props-debug-textarea') as HTMLTextAreaElement
+    expect(propsTextarea.value.replace(/\s/g,'')).toBe(`{"test":33,"x":"y"}`)
+  })
+
   it('test duels', () => {
     testDuelCounterElements(
       ['#propsDebug-🥩-0-button', '#propsDebug-🥩-0-display'],

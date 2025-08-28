@@ -283,7 +283,6 @@ const inCycleParent = host((color = 'red') => {
   element.style.display = 'flex'
   element.style.gap = '1em'
   const rtn = { color, title: 'inCycleParent' }
-  console.log('parent return value created', { rtn })
   return rtn
 })
 

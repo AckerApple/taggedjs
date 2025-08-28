@@ -132,7 +132,7 @@ export const content = tag(() => {
     <fieldset>
       <legend>Dump Content</legend>
       ${dumpContent()}
-      ${renderCountDiv({renderCount, name: 'ContentDebug'})}
+      ${renderCountDiv({renderCount, name: 'content'})}
     </fieldset>
 
     <fieldset id="noParentTagFieldset">
@@ -235,11 +235,11 @@ export const content = tag(() => {
         <span id="content-dom-parse-0-1">"${'<div>hello</div>'}"</span>
       </div>
     </div>
-    ${renderCountDiv({renderCount, name: 'ContentDebug'})}
+    ${renderCountDiv({renderCount, name: 'content'})}
   `
 })
 
-export function numberedNoParents() {
+const numberedNoParents = () => {
   return html`
     <hr />
     content1

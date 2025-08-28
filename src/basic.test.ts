@@ -21,7 +21,4 @@ it('toggle test', () => {
   
   // after click now false
   expect(toggleTest.innerText).toBe('toggle test')
-  
-  const propsTextarea = byId('props-debug-textarea') as HTMLTextAreaElement
-  expect(propsTextarea.value.replace(/\s/g,'')).toBe(`{"test":33,"x":"y"}`)
 })

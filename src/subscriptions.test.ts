@@ -79,4 +79,14 @@ describe('📰 subscriptions', () => {
     // still same number
     expect( Number(htmlById('hostDestroyCount')) ).toBe(hostDestroyCount + 1)
   })
+
+  it('basic', () => {
+    expectMatchedHtml('#content-subject-pipe-display0', '#content-subject-pipe-display1')
+    expectMatchedHtml('#content-combineLatest-pipe-display0', '#content-combineLatest-pipe-display1')
+    expect(html('#content-dom-parse-0-0')).toBe(html('#content-dom-parse-0-1'))
+  })
+
+  it('html', () => {
+    expectMatchedHtml('#content-combineLatest-pipeHtml-display0', '#content-combineLatest-pipeHtml-display1')
+  })
 })

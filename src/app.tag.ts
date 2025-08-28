@@ -6,7 +6,7 @@ import { tagDebug } from "./tagJsDebug"
 import { runTests } from "./tests"
 import { menu, useMenuName } from "./menu.tag"
 import { innerCounterContent } from "./countersDebug";
-import { content } from "./ContentDebug.tag"
+import { content } from "./content.tag"
 import { animateWrap } from "taggedjs-animate-css"
 
 const appDate = Date.now()

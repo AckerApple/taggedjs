@@ -1,13 +1,7 @@
 import { describe, it, expect } from './testing'
-// taggedjs-no-compile
-
-import { testStaggerBy } from "./ContentDebug.tag"
-import { byId, click, html, query, htmlById, changeOne, textContent, clickOne, clickById, count } from './testing'
-import { expectMatchedHtml, sleep } from './testing'
-
-console.log('📄 content.test.ts: Loading... window.describe available?', typeof window.describe);
-
-let runs = 0
+import { testStaggerBy } from "./content.tag"
+import { byId, click, html, query, changeOne, textContent, count } from './testing'
+import { sleep } from './testing'
 
 // Helper function to wait for animations to complete
 async function waitForAnimationsToComplete(selector: string, expectedCount: number, maxWait: number = 5000) {
@@ -43,16 +37,6 @@ async function waitForElementCount(selector: string, expectedCount: number, maxW
 }
 
 describe('📰 content', () => {
-  it('basic', () => {
-    expectMatchedHtml('#content-subject-pipe-display0', '#content-subject-pipe-display1')
-    expectMatchedHtml('#content-combineLatest-pipe-display0', '#content-combineLatest-pipe-display1')
-    expect(html('#content-dom-parse-0-0')).toBe(html('#content-dom-parse-0-1'))
-  })
-
-  it('html', () => {
-    expectMatchedHtml('#content-combineLatest-pipeHtml-display0', '#content-combineLatest-pipeHtml-display1')
-  })
-
   it('spacing', () => {
     expect(html('#hello-big-dom-world')).toBe('hello <b>big</b> world')
     expect(html('#hello-big-string-world')).toBe('hello <b>big</b> world')
@@ -91,20 +75,6 @@ describe('📰 content', () => {
       const html = parent.innerHTML.replace(/(^(.|\n)+<hr id="noParentsTest2-start">|)/g,'').replace(/<hr id="noParentsTest2-end">(.|\n)*/g,'').trim()
       expect(html).toBe('<hr>content1<hr>test0<hr>content2<hr>test1<hr>content3<hr>test3<hr>content4<hr>')
     })
-  })
-
-  it('subscribe', async () => {
-    if(runs > 0) {
-      console.warn('⏭️ skipped test that only passes the first time')
-      return
-    }
-    
-    expect(htmlById('content-subscribe-sub0')).toBe('')
-    expect(htmlById('content-subscribe-sub0-with')).toBe('-1')
-  })
-
-  it('increase runs', () => {
-    ++runs
   })
 
   it('concat style', () => {

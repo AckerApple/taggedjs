@@ -97,8 +97,6 @@ const passSubscription = tag(({
 
   states(get => [onOff] = get(onOff))
 
-  console.log('sub0', sub0.value)
-
   return html`
     <span>sub-value:<span id="passed-in-output">${subscribe(sub0)}</span></span>
     

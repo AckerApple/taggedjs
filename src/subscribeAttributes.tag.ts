@@ -18,7 +18,9 @@ export const subscribeAttributes = tag(() => {
           <div style="display:flex;flex-wrap:wrap;gap:1em">
             <fieldset style="flex-grow:1">
               <legend>subscribe special attribute</legend>
-              <span id="subscribe-style-dot-bg-color-changer" style.background-color=${subscribeWith(subColor$, 'red')}>background color changer</span>
+              <span id="subscribe-style-dot-bg-color-changer"
+                style.background-color=${subscribeWith(subColor$, 'red')}
+              >background color changer</span>
             </fieldset>
 
             <fieldset style="flex-grow:1">
@@ -51,7 +53,10 @@ export const subscribeAttributes = tag(() => {
         ${shouldHideAttributes ? 'Show' : 'Hide'} Attributes
       </button>
       
-      <button id="clear-color-btn" type="button" onclick=${() => subColor$.next('')}>
+      <button id="clear-color-btn"
+        type="button"
+        onclick=${() => subColor$.next('')}
+      >
         Clear Color
       </button>
 
