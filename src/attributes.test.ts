@@ -90,7 +90,9 @@ describe('🏹 special attributes', () => {
     
     // Check subscriptions decreased by 2
     const afterHideCount = Number(subscriptionsCount.innerText)
-    expect(afterHideCount).toBe(initialCount - 2)
+    const innerSubCount = 2
+    const toBe = initialCount - innerSubCount
+    expect(afterHideCount).toBe(toBe, `afterHideCount expected(${afterHideCount}) toBe(${toBe})`)
     
     // Click Show Attributes
     toggleAttributesBtn.click()

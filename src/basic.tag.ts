@@ -32,7 +32,7 @@ const boltTag = tag((parentCounter: number) => {
   return div(
     () => `color: ${color}`,
 
-    select.change(e => color = e.target.value)(
+    select.onChange(e => color = e.target.value)(
       option.value('red')('red'),
       option.value('green')('green'),
     ),
@@ -43,7 +43,7 @@ const boltTag = tag((parentCounter: number) => {
     
     div.style(() => 'color:' + color)('hello my div world'),
     
-    button.click(() => ++clickCount)('click me'),
+    button.onClick(() => ++clickCount)('click me'),
 
     div(() => `click counts ${clickCount}`),
     div(() => `parent counter: ${parentCounter}`),
@@ -59,6 +59,6 @@ const arrayBoltTest = tag((parentCounter) => {
     div('hello array bolt 1'),
     div(`innerCounter: `, _=> innerCounter),
     div(() => `parent counter: ${parentCounter}`),
-    button.click(() => ++innerCounter)('inner counter')
+    button.onClick(() => ++innerCounter)('inner counter')
   ]
 })
