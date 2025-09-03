@@ -1,4 +1,4 @@
-import { html, states, tag } from "taggedjs"
+import { div, fieldset, html, legend, states, tag } from "taggedjs"
 import { subscribeAttributes } from "./subscribeAttributes.tag"
 
 export const attributeDebug = tag(() => {
@@ -55,27 +55,24 @@ export const attributeDebug = tag(() => {
       </ol>
     </div>
     
-    <fieldset style="margin-top: 1em">
-      <legend>style object attribute</legend>
-      <div id="style-object-test" style=${{
+    ${fieldset.style("margin-top: 1em")(
+      legend('style object attribute'),
+      
+      div.id("style-object-test").style(() => ({
         backgroundColor: isOrange ? 'orange' : 'lightgray',
         padding: '10px',
         border: '2px solid black',
         borderRadius: isOrange ? '8px' : '4px',
         boxShadow: isOrange ? '2px 2px 4px rgba(0,0,0,0.3)' : 'none'
-      }}>
-        Style object test
-      </div>
+      }))('Style object test'),
       
-      <div id="style-set-property-test" style=${{
+      div.id("style-set-property-test").style(() => ({
         'background-color': isOrange ? 'red' : 'blue',
         color: 'white',
         padding: '5px',
         'margin-top': '10px'
-      }}>
-        style property test
-      </div>
-    </fieldset>
+      }))('style property test')   
+    )}
 			
     <style>
       .background-orange {background-color:orange}
