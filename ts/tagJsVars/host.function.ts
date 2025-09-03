@@ -116,11 +116,11 @@ function processHostAttribute(
   name: string,
   value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   element: HTMLElement,
-  _tagJsVar: TagJsVar, // same as value not needed
+  tagJsVar: TagJsVar, // same as value not needed
   contextItem: AttributeContextItem,
 ) {
   return processHost(
-    value,
+    tagJsVar,
     contextItem as any as AttributeContextItem,
   )
 }
@@ -134,7 +134,6 @@ function processHost(
   const state = (contextItem as HostAttributeContextItem).state = {}
   
   initState(contextItem)
-
   processHostTagJsVar(
     element as HTMLInputElement,
     tagJsVar as HostValue,

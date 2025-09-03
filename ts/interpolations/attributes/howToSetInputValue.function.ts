@@ -31,12 +31,14 @@ function howToSetInputObjectValue(
 
   // Handle object values by setting properties directly
   for (const key in value) {
-    paintContent.push([setObjectValue, [element, name, key, value[key]]])
+    const subValue = value[key]
+    paintContent.push([setObjectValue, [element, name, key, subValue]])
   }
 
   if((element as any)[name].setProperty) {
     for (const key in value) {
-      paintContent.push([setPropertyValue, [element, name, key, value[key]]])
+      const subValue = value[key]
+      paintContent.push([setPropertyValue, [element, name, key, subValue]])
     }
   }
 }

@@ -16,7 +16,6 @@ export function attachDomElements(
   values: any[],
   support: AnySupport,
   parentContext: ContextItem,
-  // contexts: ContextItem[],
   depth: number, // used to know if dynamic variables live within parent owner tag/support
   appendTo?: Element,
   insertBefore?: Text,
@@ -87,7 +86,6 @@ export function attachDomElements(
       node,
       values,
       support,
-      contexts,
       newParentContext,
       appendTo,
       insertBefore,

@@ -54,6 +54,7 @@ export function setupSubscribe(
 
       aContext.tagJsVar.processUpdate(updateValue, aContext, ownerSupport, [updateValue])
       // processUpdateContext(ownerSupport)
+      aContext.value = updateValue
 
       checkToPaint(syncRun)
     }
@@ -112,7 +113,9 @@ export function setupSubscribeCallbackProcessor(
     index: number
   ) {
     const newestParentTagJsVar = subContext.tagJsVar
-    if(newestParentTagJsVar?.callback) {
+    const callback = newestParentTagJsVar?.callback
+
+    if(callback) {
       setContextInCycle(contextItem)
       
       const responseValue = (newestParentTagJsVar.callback as any)( ...newValues.map(x => x.value) )

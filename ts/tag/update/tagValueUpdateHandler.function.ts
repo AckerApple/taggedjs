@@ -11,9 +11,16 @@ export function tagValueUpdateHandler(
   ownerSupport: AnySupport,
 ): number {
   if((newValue as any)?.tagJsType === 'element') {
+    // if(contextItem.locked) {
+    //   return 0
+    // }
+    
     contextItem.tagJsVar.processUpdate(
       newValue, contextItem, ownerSupport, []
     )
+
+    contextItem.value = newValue
+
     return 0
   }
 

@@ -1,7 +1,7 @@
 import { AnySupport, InputElementTargetEvent, Subject, SupportContextItem, valueToTagJsVar } from '../index.js'
 import { DomObjectElement } from '../interpolations/optimizers/ObjectNode.types.js'
 import { processAttributeArray } from '../render/dom/processAttributeArray.function.js'
-import { paint, paintAppend, paintAppends, paintBefore, paintCommands, painting } from '../render/paint.function.js'
+import { paintAppend, paintAppends, paintBefore, paintCommands } from '../render/paint.function.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { destroyContextHtml } from '../tag/smartRemoveKids.function.js'
 import { updateToDiffValue } from '../tag/update/updateToDiffValue.function.js'
@@ -9,12 +9,15 @@ import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { ReadOnlyVar } from '../tagJsVars/tagJsVar.type.js'
 import { addSupportEventListener } from '../interpolations/attributes/addSupportEventListener.function.js'
 import { elementFunctions } from './elementFunctions.js'
+import { getSupportWithState } from '../interpolations/attributes/getSupportWithState.function.js'
+import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArray.function.js'
 
 type ElementVarBase = ReadOnlyVar & {
   tagName: string
   innerHTML: any[],
   attributes: any[],
   listeners: [string, callback: (e: InputElementTargetEvent)=> any][],
+  elementFunctions: typeof elementFunctions,
 }
 
 export type ElementFunction = ((...children: (((_: any) => any) | string | boolean | object)[]) => any) & ElementVarBase
@@ -23,13 +26,14 @@ export type ElementVar = ElementFunction & ReturnType<typeof elementFunctions>
 
 export function designElement(
   tagName: string, // div | button
+  // elementFunctions: T,
 ): ElementVar {
   const element: ElementVarBase = {
     tagJsType: 'element',
 
     processInitAttribute: blankHandler,
     processInit,
-    destroy,
+    destroy: destroyDesignElement,
     processUpdate,
     checkValueChange: checkTagElementValueChange,
 
@@ -37,15 +41,19 @@ export function designElement(
     innerHTML: [],
     attributes: [],
     listeners: [],
+    elementFunctions,
   }
 
   
-  const pushKid = getPushKid(element)
+  const pushKid = getPushKid(element, elementFunctions)
   
   return pushKid as ElementVar
 }
 
-export function getPushKid(element: ElementVarBase): ElementVar {
+export function getPushKid(
+  element: ElementVarBase,
+  elmFunctions: typeof elementFunctions,
+): ElementVar {
   const pushKid = (...args: any[]) => {
     const newElement = {...pushKid as any}
     newElement.attributes = [...pushKid.attributes]
@@ -55,6 +63,7 @@ export function getPushKid(element: ElementVarBase): ElementVar {
   }
 
   Object.assign(pushKid, element)
+  // Object.assign(pushKid, elmFunctions(pushKid))
   Object.assign(pushKid, elementFunctions(pushKid))
   pushKid.attributes = [...element.attributes]
   pushKid.listeners = [...element.listeners]
@@ -77,7 +86,7 @@ function processUpdate(
   const hasChanged = checkTagElementValueChange(value)
   
   if( hasChanged ) {
-    destroy(context)
+    destroyDesignElement(context, ownerSupport)
 
     updateToDiffValue(
       value,
@@ -101,10 +110,15 @@ function processUpdate(
   })
 }
 
-function destroy(
+function destroyDesignElement(
   contextItem: ContextItem,
-  // ownerSupport: AnySupport,
+  ownerSupport: AnySupport,
 ) {
+  const contexts = contextItem.contexts as ContextItem[]
+  contexts.forEach(context => 
+    context.tagJsVar.destroy(context, ownerSupport)
+  )
+
   destroyContextHtml(contextItem)
   delete contextItem.htmlDomMeta
 }
@@ -147,8 +161,7 @@ function processElementVar(
     [], // values,
     element,
     ownerSupport,
-    // contexts,
-    context.parentContext,
+    context, // context.parentContext,
     addedContexts,
   )
 
@@ -167,14 +180,20 @@ function processElementVar(
           return
         }
 
-        addedContexts.push({
+        const subContexts: ContextItem[] = []
+        const subContext: ContextItem = {
           parentContext: context,
+          contexts: subContexts,
           tagJsVar: {
             tagJsType: 'dynamic-text',
             checkValueChange: () => 0,
             processInit: blankHandler,
             processInitAttribute: blankHandler,
-            destroy: blankHandler,
+            destroy: (_c, ownerSupport) => {
+              subContexts.forEach(subSub =>
+                subSub.tagJsVar.destroy(subSub, ownerSupport)
+              )
+            },
             processUpdate: (
               value: any,
               contextItem,
@@ -182,9 +201,11 @@ function processElementVar(
               values: unknown[],
             ) => {
               const newValue = item()
-              return newContext.tagJsVar.processUpdate(
+              const result = newContext.tagJsVar.processUpdate(
                 newValue, newContext, ownerSupport, values,
               )
+              newContext.value = newValue
+              return result
             }
           },
 
@@ -192,9 +213,18 @@ function processElementVar(
           valueIndex: -1,
           withinOwnerElement: true,
           destroy$: new Subject(),
-        })
+        }
+
+        addedContexts.push(subContext)
         
-        const newContext = processNonElement(item(), context, addedContexts, element, ownerSupport)
+        const newContext = processNonElement(
+          item(),
+          context,
+          subContext.contexts as ContextItem[], // addedContexts,
+          element,
+          ownerSupport,
+        )
+
         return newContext
         // const textElement = handleSimpleInnerValue(item(), element)
         // return textElement
@@ -213,30 +243,8 @@ function processElementVar(
   value.listeners.forEach(listener => {
     const wrap = (...args: any[]) => {
       const result = (listener[1] as any)(...args)
-
-      const ownerContext = ownerSupport.context
-      const ownerVar = ownerContext.tagJsVar
-
-      ++painting.locks
-
-      ownerVar.processUpdate(
-        ownerContext.value,
-        ownerContext,
-        ownerSupport.ownerSupport as AnySupport,
-        [],
-      )
-
-      --painting.locks
-
-      paint()
-
-      /*
-      context.tagJsVar.processUpdate(
-        context.value,
-        context,
-        ownerSupport,
-        [],
-      )*/
+      const stateSupport = getSupportWithState(ownerSupport)
+      renderTagUpdateArray([stateSupport])
       return result
     }
 
@@ -269,6 +277,7 @@ function processNonElement(
     withinOwnerElement: true,
     destroy$: new Subject(),
   }
+  
   addedContexts.push(newContext)
   newContext.placeholder = document.createTextNode('')
   paintAppends.push([paintAppend, [element, newContext.placeholder]])

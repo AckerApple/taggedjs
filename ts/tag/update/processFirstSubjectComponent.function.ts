@@ -123,6 +123,7 @@ function convertTagToElementManaged(
         const inputsHandler = context.inputsHandler as any
         inputsHandler(newContext.value.props)
       }
+      
       tagJsVar.processUpdate(convertValue, newContext, support, [])
 
       newContext.value = convertValue

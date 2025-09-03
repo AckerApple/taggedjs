@@ -9,7 +9,6 @@ export function attachDomElement(
   node: DomObjectElement,
   values: any[],
   support: AnySupport,
-  contexts: ContextItem[],
   parentContext: ContextItem,
   appendTo: Element | undefined,
   insertBefore: Text | undefined,

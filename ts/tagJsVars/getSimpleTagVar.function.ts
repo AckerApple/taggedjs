@@ -1,10 +1,9 @@
-import { AnySupport } from "../index.js"
+import { AnySupport, forceUpdateExistingValue, tagValueUpdateHandler, TemplateValue } from "../index.js"
 import { castTextValue } from '../castTextValue.function.js'
 import { paintBeforeText, paintCommands, addPaintRemover } from "../render/paint.function.js"
 import { BasicTypes, ContextItem } from "../index.js"
 import { processUpdateRegularValue, RegularValue } from "../tag/update/processRegularValue.function.js"
 import { TagJsTag } from "./tagJsVar.type.js"
-import { tagValueUpdateHandler } from "../tag/update/tagValueUpdateHandler.function.js"
 import { AttributeContextItem } from "../tag/AttributeContextItem.type.js"
 import { processSimpleAttribute } from "./processSimpleAttribute.function.js"
 
@@ -26,10 +25,27 @@ export function getSimpleTagVar(
     processInit: processSimpleValueInit,
     destroy: deleteSimpleValue,
     
-    // TODO: get down to only one
-    checkValueChange: checkUpdateDeleteSimpleValueChange,
-    processUpdate: tagValueUpdateHandler,
+    // TODO: get to using only checkSimpleValueChange
+    checkValueChange: checkUpdateDeleteSimpleValueChange, // For attributes, this gets switched to checkSimpleValueChange
+    processUpdate: processStringUpdate, // For attributes, this gets switched to processAttributeUpdate
+    // processUpdate: tagValueUpdateHandler, // For attributes, this gets switched to processAttributeUpdate
   }
+}
+
+function processStringUpdate(
+  newValue: TemplateValue, // newValue
+  contextItem: ContextItem,
+  ownerSupport: AnySupport,
+) {
+  if(newValue === contextItem.value) {
+    return 0
+  }
+
+  return forceUpdateExistingValue(
+    contextItem,
+    newValue,
+    ownerSupport,
+  )
 }
 
 function processSimpleValueInit(
@@ -53,19 +69,23 @@ function processSimpleValueInit(
 }
 
 export function deleteSimpleValue(
-  contextItem: ContextItem,
+  context: ContextItem,
 ) {
-  const elm = contextItem.simpleValueElm as Element
-  delete contextItem.simpleValueElm
+  const elm = context.simpleValueElm as Element
+  delete context.simpleValueElm
+  if(!elm) {
+    console.log('jere - 1', {context, elm})
+    throw new Error('no good')
+  }
   addPaintRemover(elm, 'deleteSimpleValue')
 }
 
 export function checkSimpleValueChange(
   newValue: unknown,
-  _contextItem: ContextItem,
+  contextItem: ContextItem,
 ) {
   const isBadValue = newValue === null || newValue === undefined
-  const isRegularUpdate = isBadValue || !(typeof(newValue) === BasicTypes.object)
+  const isRegularUpdate = isBadValue || newValue === contextItem.value // !(typeof(newValue) === BasicTypes.object)
   if(isRegularUpdate) {
     return 0  // no need to destroy, just update display
   }

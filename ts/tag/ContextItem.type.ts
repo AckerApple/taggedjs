@@ -15,6 +15,7 @@ export interface AppContextItem {
   state?: ContextStateMeta
   htmlDomMeta?: DomObjectChildren
 
+  /** only for html`` . When -1 then its a raw bolt value */
   valueIndex: number
   
   value?: any,
@@ -39,7 +40,8 @@ export interface BaseContextItem extends AppContextItem {
 }
 
 export interface ContextItem extends BaseContextItem {
-  locked?: number // true - number is reason locked
+  /** number represent reason for the lock */
+  locked?: number
   deleted?: true
   
   // used only for strings, numbers, booleans

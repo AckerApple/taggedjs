@@ -124,7 +124,6 @@ function paintRemover(
   element: Text | Element,
   _caller: string, // can be used for determining who is failing
 ) {
-
   const parentNode = element.parentNode as ParentNode
   parentNode.removeChild(element as Element)
 }

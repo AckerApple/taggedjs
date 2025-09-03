@@ -10,11 +10,12 @@ export function addOneContext(
 ): ContextItem {
   const contextItem: ContextItem = {
     value,
-    valueIndex: contexts.length,
     destroy$: new Subject<void>(),
     tagJsVar: valueToTagJsVar(value),
     withinOwnerElement,
     parentContext,
+    
+    valueIndex: contexts.length, // when -1 its a raw bolt value
   }
 
   contexts.push(contextItem)

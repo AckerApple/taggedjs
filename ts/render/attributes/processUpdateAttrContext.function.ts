@@ -18,6 +18,7 @@ export function processUpdateAttrContext(
 ) {
   const attrContextItem = contextItem as any as AttributeContextItem    
   const tagValue = value as TagJsVar | undefined
+
   if( tagValue?.tagJsType ) {
     const oldValue = contextItem.value as TagJsVar
     

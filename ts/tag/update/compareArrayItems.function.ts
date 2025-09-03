@@ -73,6 +73,11 @@ function destroyArrayItemByGlobal(
   }
   
   const element = item.simpleValueElm as Element
+  console.log('delete simpleValueElm -')
   delete item.simpleValueElm
+  if(!element) {
+    console.log('jere - 22')
+  }
+
   addPaintRemover(element)
 }

@@ -37,7 +37,12 @@ export function processAttribute(
 ) {
   const varIndex = getTagJsVar(attrName)
   const isNameVar = varIndex >= 0
-  const valueInValues = values[ varIndex ] as TemplateValue
+  let valueInValues = values[ varIndex ] as TemplateValue
+
+  // value from bolt?
+  if ((value as any)?.tagJsType) {
+    valueInValues = value as any
+  }
   
   const tagJsVar = valueInValues as TagJsVar | undefined
   if( tagJsVar?.tagJsType ) {
@@ -138,7 +143,7 @@ function processTagJsVarAttribute(
 ) {
   const contextItem = addOneContext(
     value,
-    contexts,
+    contexts || [],
     true,
     parentContext,
   ) as any as AttributeContextItem
@@ -152,14 +157,11 @@ function processTagJsVarAttribute(
   contextItem.stateOwner = getSupportWithState(support)
   contextItem.supportOwner = support
 
-  // const parentContexts = parentContext.contexts as ContextItem[]
-  // parentContexts.push(contextItem)
-
   setContextInCycle(contextItem)
 
   tagJsVar.processInitAttribute(
     attrName as string,
-    tagJsVar,
+    value, // tagJsVar,
     element,
     tagJsVar,
     contextItem,

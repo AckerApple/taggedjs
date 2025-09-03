@@ -26,5 +26,8 @@ function destroyClone(
       return
     }
 
+    if(!dom) {
+      console.log('jere - 0')
+    }
     addPaintRemover(dom, 'destroyClone')
 }

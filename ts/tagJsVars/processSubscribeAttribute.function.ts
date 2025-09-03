@@ -46,17 +46,16 @@ export function processSubscribeAttribute(
   );
 
   contextItem.subContext = subContext
-
   contextItem.value = value
   contextItem.tagJsVar = value
 
-  contextItem.tagJsVar.processUpdate = function processAttributeUpdateWrap(
+  value.processUpdate = function processAttributeUpdateWrap(
     value: TemplateValue,
     contextItem2: ContextItem,
     ownerSupport: AnySupport
   ) {
-    processAttributeUpdate(value, contextItem, ownerSupport, element, name)
+    return processAttributeUpdate(value, contextItem, ownerSupport, element, name)
   }
 
-  return { subContext, onOutput };
+  return { subContext, onOutput }
 }

@@ -49,6 +49,7 @@ export function createDynamicArrayAttribute(
 
       const pushValue = values[myIndex]
       contextItem.value = pushValue
+
       contexts.push(contextItem)
     }
   })

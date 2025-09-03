@@ -22,6 +22,12 @@ function mapTagUpdate(support: AnySupport) {
   const global = context.global as SupportTagGlobal
   
   if(!global) {
+    context.tagJsVar.processUpdate(
+      context.value,
+      context,
+      support.ownerSupport as AnySupport,
+      [],
+    )
     return // while rendering a parent, a child may have been deleted (pinbowl)
   }
 

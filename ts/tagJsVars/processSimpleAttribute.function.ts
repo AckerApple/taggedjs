@@ -7,6 +7,7 @@ import { checkSimpleValueChange, deleteSimpleAttribute } from "./getSimpleTagVar
 import { processAttributeUpdate } from "./processAttributeUpdate.function.js";
 import { TagJsVar } from "./tagJsVar.type.js";
 
+/** init runner */
 export function processSimpleAttribute(
   name: string,
   value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
@@ -14,17 +15,15 @@ export function processSimpleAttribute(
   tagJsVar: TagJsVar,
   contextItem: AttributeContextItem,
 ) {
-  // const tagJsVar = contextItem.tagJsVar
-  
+  // function swapping
   tagJsVar.destroy = deleteSimpleAttribute
   tagJsVar.checkValueChange = checkSimpleValueChange
-  contextItem.tagJsVar = tagJsVar
-  contextItem.tagJsVar.processUpdate = (
+  tagJsVar.processUpdate = (
     value: TemplateValue,
     contextItem: ContextItem,
     ownerSupport: AnySupport,
   ) => {
-    processAttributeUpdate(value, contextItem, ownerSupport, element, name)
+    return processAttributeUpdate(value, contextItem, ownerSupport, element, name)
   }
 
   const isSpecial = isSpecialAttr(name)
@@ -36,4 +35,6 @@ export function processSimpleAttribute(
     isSpecial,
     contextItem,
   )
+
+  contextItem.tagJsVar = tagJsVar
 }
