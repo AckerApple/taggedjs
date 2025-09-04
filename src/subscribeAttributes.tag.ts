@@ -40,8 +40,7 @@ export const subscribeAttributes = tag(() => {
             legend('sometimes subscribe style attribute'),
             span
               .id("multiple-subscribe-bg-color")
-              .style(() => {
-                const result =
+              .style(
                 (
                   subColor$.value === 'blue' &&
                   subscribe(subColorPurpleOrange$, subColor => {
@@ -57,9 +56,7 @@ export const subscribeAttributes = tag(() => {
                 )
                 ||
                 'background-color:pink;'
-
-                return result
-              }
+              //}
               )('multiple subscribe bg color')
           )
         )
