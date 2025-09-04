@@ -17,7 +17,7 @@ export function howToSetInputValue(
     return howToSetInputObjectValue(element, name, value as Record<string, any>)
   }
   
-  paintContent.push([howToSetFirstInputValue, [element, name, value]])
+  paintContent.push([setNonFunctionInputValue, [element, name, value]])
 }
 
 function howToSetInputObjectValue(
@@ -51,14 +51,6 @@ export function howToSetStandAloneAttr(
   element.setAttribute(name, '')
 }
 
-export function howToSetFirstInputValue(
-  element: HTMLElement,
-  name: string,
-  value: string | undefined | boolean | Record<string, any>
-) {
-  setNonFunctionInputValue(element, name, value)
-}
-
 export function setNonFunctionInputValue(
   element: HTMLElement,
   name: string,
@@ -68,7 +60,19 @@ export function setNonFunctionInputValue(
     return howToSetInputObjectValue(element, name, value as Record<string, any>)
   }
   
-  // for checked=true
+  setSimpleAttribute(
+    element,
+    name,
+    value
+  )
+}
+
+export function setSimpleAttribute(
+  element: HTMLElement,
+  name: string,
+  value: string | undefined | boolean | Record<string, any>
+) {
+    // for checked=true
   ;(element as any)[name] = value
 
   if(value === undefined || value === false || value === null) {
@@ -77,6 +81,7 @@ export function setNonFunctionInputValue(
   }
 
   element.setAttribute(name, value as string)
+
 }
 
 function setPropertyValue(

@@ -1,5 +1,5 @@
 import { AnySupport, ContextItem, TemplateValue } from "../index.js";
-import { howToSetFirstInputValue } from "../interpolations/attributes/howToSetInputValue.function.js";
+import { HowToSet, setNonFunctionInputValue } from "../interpolations/attributes/howToSetInputValue.function.js";
 import { isSpecialAttr } from "../interpolations/attributes/isSpecialAttribute.function.js";
 import { processNonDynamicAttr } from "../interpolations/attributes/processNameValueAttribute.function.js";
 import { AttributeContextItem } from "../tag/AttributeContextItem.type.js";
@@ -14,6 +14,8 @@ export function processSimpleAttribute(
   element: HTMLElement,
   tagJsVar: TagJsVar,
   contextItem: AttributeContextItem,
+  _ownerSupport: AnySupport,
+  howToSet: HowToSet,
 ) {
   // function swapping
   tagJsVar.destroy = deleteSimpleAttribute
@@ -23,7 +25,14 @@ export function processSimpleAttribute(
     contextItem: ContextItem,
     ownerSupport: AnySupport,
   ) => {
-    return processAttributeUpdate(value, contextItem, ownerSupport, element, name)
+    return processAttributeUpdate(
+      value,
+      contextItem,
+      ownerSupport,
+      element,
+      name,
+      howToSet,
+    )
   }
 
   const isSpecial = isSpecialAttr(name)
@@ -31,7 +40,7 @@ export function processSimpleAttribute(
     name,
     value,
     element,
-    howToSetFirstInputValue,
+    howToSet,
     isSpecial,
     contextItem,
   )

@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 
-import { HowToSet, howToSetFirstInputValue } from '../../interpolations/attributes/howToSetInputValue.function.js'
+import { HowToSet, setNonFunctionInputValue } from '../../interpolations/attributes/howToSetInputValue.function.js'
 import { BasicTypes, empty } from '../../tag/ValueTypes.enum.js'
 import { AnySupport } from '../../tag/index.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
@@ -28,7 +28,7 @@ export function processStandAloneAttribute(
     for (const name in (attrValue as any)) {
       const isSpecial = isSpecialAttr(name) // only object variables are evaluated for is special attr
       const value = (attrValue as any)[name]
-      const howToSet: HowToSet = howToSetFirstInputValue
+      const howToSet: HowToSet = setNonFunctionInputValue
 
       processAttribute(
         name,

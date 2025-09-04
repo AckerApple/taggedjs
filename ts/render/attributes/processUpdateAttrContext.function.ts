@@ -1,7 +1,7 @@
 import { AnySupport } from '../../tag/index.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processAttributeEmit } from './processAttribute.function.js'
-import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.function.js'
+import { HowToSet, setNonFunctionInputValue } from '../../interpolations/attributes/howToSetInputValue.function.js'
 import { updateNameOnlyAttrValue } from '../../interpolations/attributes/updateNameOnlyAttrValue.function.js'
 import { TemplateValue } from '../../tag/TemplateValue.type.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
@@ -35,6 +35,7 @@ export function processUpdateAttrContext(
         tagValue,
         attrContextItem,
         ownerSupport,
+        setNonFunctionInputValue,
       )
       
       removeContextInCycle()

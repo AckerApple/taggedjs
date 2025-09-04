@@ -1,4 +1,4 @@
-import { ContextItem, Tag, TemplaterResult, AnySupport, SupportContextItem } from "../index.js";
+import { ContextItem, Tag, TemplaterResult, AnySupport, SupportContextItem, setNonFunctionInputValue, HowToSet } from "../index.js";
 import { Callback } from "../interpolations/attributes/bindSubjectCallback.function.js";
 import { Subject } from "../subject/index.js";
 import { SubscribeValue } from "./subscribe.function.js";
@@ -11,8 +11,8 @@ export function processAttributeUpdate(
   ownerSupport: AnySupport,
   element: Element,
   name: string,
+  howToSet: HowToSet,
 ) {
-  const oldValue = contextItem.value as TagJsVar
   const oldTag = contextItem.tagJsVar // contextItem.tagJsVar as TagJsVar
   const tagValue = value as TagJsVar | undefined
 
@@ -35,9 +35,11 @@ export function processAttributeUpdate(
       element as HTMLElement,
       newTagVar,
       contextItem,
-      ownerSupport
+      ownerSupport,
+      howToSet,
     )
 
     contextItem.tagJsVar = newTagVar
+    return
   }
 }

@@ -2,7 +2,7 @@
 
 import { specialAttribute } from '../../interpolations/attributes/specialAttribute.js'
 import { isFunction } from '../../isInstance.js'
-import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.function.js'
+import { HowToSet, setNonFunctionInputValue } from '../../interpolations/attributes/howToSetInputValue.function.js'
 import { bindSubjectCallback, Callback } from '../../interpolations/attributes/bindSubjectCallback.function.js'
 import { ValueTypes } from '../../tag/ValueTypes.enum.js'
 import { AnySupport } from '../../tag/index.js'
@@ -166,6 +166,7 @@ function processTagJsVarAttribute(
     tagJsVar,
     contextItem,
     support,
+    setNonFunctionInputValue,
   )
 
   removeContextInCycle()

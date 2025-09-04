@@ -1,5 +1,4 @@
-import { AnySupport, TemplateValue, ContextItem } from "../index.js";
-import { howToSetFirstInputValue } from "../interpolations/attributes/howToSetInputValue.function.js";
+import { AnySupport, TemplateValue, ContextItem, setNonFunctionInputValue } from "../index.js";
 import { isSpecialAttr } from "../interpolations/attributes/isSpecialAttribute.function.js";
 import { processNonDynamicAttr } from "../interpolations/attributes/processNameValueAttribute.function.js";
 import { AttributeContextItem } from "../tag/AttributeContextItem.type.js";
@@ -29,7 +28,7 @@ export function processSubscribeAttribute(
       name,
       callbackValue as any,
       element,
-      howToSetFirstInputValue,
+      setNonFunctionInputValue,
       isSpecial,
       contextItem,
     )
@@ -54,7 +53,14 @@ export function processSubscribeAttribute(
     contextItem2: ContextItem,
     ownerSupport: AnySupport
   ) {
-    return processAttributeUpdate(value, contextItem, ownerSupport, element, name)
+    return processAttributeUpdate(
+      value,
+      contextItem,
+      ownerSupport,
+      element,
+      name,
+      setNonFunctionInputValue,
+    )
   }
 
   return { subContext, onOutput }

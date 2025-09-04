@@ -1,3 +1,5 @@
+import { isObject } from '../index.js';
+import { HowToSet, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
 import { getPushKid, ElementFunction } from './designElement.function.js'
 
@@ -10,10 +12,13 @@ export const elementFunctions = (item: any) => {
     };
   }
 
-  function makeAttributeHandler(attrName: string) {
+  function makeAttributeHandler(
+    attrName: string,
+    howToSet: HowToSet,
+  ) {
     return function (value: any) {
-      const clone = getPushKid(item as any, item.elementFunctions);
-      clone.attributes.push([attrName, value]);
+      const clone = getPushKid(item as any, item.elementFunctions)
+      clone.attributes.push([attrName, value, false, howToSet])
       return clone;
     };
   }
@@ -28,12 +33,38 @@ export const elementFunctions = (item: any) => {
       clone.attributes.push([name, value]);
       return clone;
     },
-    style: makeAttributeHandler('style'),
-    id: makeAttributeHandler('id'),
+    style: makeAttributeHandler('style', setNonFunctionInputValue),
+    class: makeAttributeHandler('class', setClassValue),
+    id: makeAttributeHandler('id', setNonFunctionInputValue),
     
-    value: makeAttributeHandler('value'),
-    type: makeAttributeHandler('type'),
+    // only for certain elements
+    placeholder: makeAttributeHandler('placeholder', setNonFunctionInputValue),
+    value: makeAttributeHandler('value', setNonFunctionInputValue),
+    type: makeAttributeHandler('type', setNonFunctionInputValue),
   }
 
   return elmAttachments
-};
+}
+
+function setClassValue(
+  element: HTMLElement,
+  name: string,
+  value: string | undefined | boolean | Record<string, any>
+) {
+  if (isObject(value)) {
+    Object.entries(value as object).forEach(([name, value]) => {
+      if(value) {
+        element.classList.add(name)
+      } else {
+        element.classList.remove(name)
+      }
+    })
+    return// howToSetInputObjectValue(element, name, value as Record<string, any>)
+  }
+  
+  setSimpleAttribute(
+    element,
+    name,
+    value
+  )
+}

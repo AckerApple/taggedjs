@@ -22,12 +22,5 @@ function destroyClone(
     }
 
     const dom = clone.domElement
-    if(!dom) {
-      return
-    }
-
-    if(!dom) {
-      console.log('jere - 0')
-    }
     addPaintRemover(dom, 'destroyClone')
 }

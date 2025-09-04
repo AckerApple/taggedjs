@@ -1,4 +1,4 @@
-import { HowToSet, howToSetFirstInputValue, howToSetStandAloneAttr } from "../../interpolations/attributes/howToSetInputValue.function.js"
+import { HowToSet, howToSetStandAloneAttr, setNonFunctionInputValue } from "../../interpolations/attributes/howToSetInputValue.function.js"
 import { processAttribute } from "../attributes/processAttribute.function.js"
 import { ContextItem } from "../../tag/ContextItem.type.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
@@ -17,7 +17,11 @@ export function processAttributeArray(
     const name = attr[0]
     const value = attr[1]
     const isSpecial = attr[2] || false
-    const howToSet: HowToSet = attr.length > 1 ? howToSetFirstInputValue : howToSetStandAloneAttr
+    let howToSet: HowToSet = attr.length > 1 ? setNonFunctionInputValue : howToSetStandAloneAttr
+
+    if(attr[3]) {
+      howToSet = attr[3]
+    }
 
     const newContext = processAttribute(
       name,

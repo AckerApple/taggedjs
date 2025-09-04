@@ -73,10 +73,6 @@ export function deleteSimpleValue(
 ) {
   const elm = context.simpleValueElm as Element
   delete context.simpleValueElm
-  if(!elm) {
-    console.log('jere - 1', {context, elm})
-    throw new Error('no good')
-  }
   addPaintRemover(elm, 'deleteSimpleValue')
 }
 

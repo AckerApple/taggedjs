@@ -33,9 +33,6 @@ export function processNowRegularValue(
 
   const before = contextItem.placeholder as Text
   const castedValue = castTextValue(value)
-if((value as any)?.slice && (value as string).slice(0, 3) === 'Wed') {
-  console.log('will be setting simple value', {value, contextItem})
-}
 
   const paint = contextItem.paint = [paintBeforeText, [before, castedValue, function cleanRegularValue(x: Text) {
     contextItem.simpleValueElm = x

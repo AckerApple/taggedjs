@@ -2,6 +2,7 @@ import { ContextItem } from './ContextItem.type.js'
 import { AnySupport } from './index.js'
 import { AttributeContextItem } from './AttributeContextItem.type.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { HowToSet } from '../interpolations/attributes/howToSetInputValue.function.js'
 
 export type ProcessInit = (
   value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
@@ -17,5 +18,6 @@ export type ProcessAttribute = (
   element: HTMLElement,
   tagJsVar: TagJsVar,
   contextItem: AttributeContextItem,
-  ownerSupport: AnySupport,
+  ownerSupport: AnySupport, // may not be needed?
+  howToSet: HowToSet,
 ) => any

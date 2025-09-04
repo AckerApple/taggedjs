@@ -1,5 +1,5 @@
 import { specialAttribute } from './specialAttribute.js'
-import { HowToSet } from './howToSetInputValue.function.js'
+import { HowToSet, setNonFunctionInputValue } from './howToSetInputValue.function.js'
 import { TagGlobal } from '../../tag/getTemplaterResult.function.js'
 import { processTagCallbackFun } from '../../render/attributes/processAttribute.function.js'
 import { SpecialDefinition } from '../../render/attributes/Special.types.js'
@@ -38,7 +38,13 @@ export function processDynamicNameValueAttribute(
   contextItem.isSpecial = isSpecial
 
   if( value?.tagJsType ) {
-    processTagJsAttribute(attrName, value, contextItem, support, element)
+    processTagJsAttribute(
+      attrName,
+      value,
+      contextItem,
+      support,
+      element,
+    )
     return
   }
 
@@ -52,7 +58,7 @@ export function processDynamicNameValueAttribute(
   )
 }
 
-export function processTagJsAttribute(
+function processTagJsAttribute(
   name: string,
   value: TagJsVar,
   contextItem: ContextItem,
@@ -66,6 +72,7 @@ export function processTagJsAttribute(
     value,
     contextItem,
     ownerSupport,
+    setNonFunctionInputValue,
   )
 
   contextItem.tagJsVar = value
@@ -94,6 +101,7 @@ export function processNonDynamicAttr(
       context,
       attrName,
       element as HTMLElement,
+      howToSet,
     )
   }
 
@@ -105,6 +113,7 @@ function processFunctionAttr(
   parentContext: ContextItem, // parent context
   attrName: string,
   element: HTMLElement,
+  howToSet: HowToSet,
 ) {
   const innerValue = (value as any)()
   
@@ -183,7 +192,8 @@ function processFunctionAttr(
     element,
     subContext.tagJsVar,
     subContext,
-    {} as AnySupport
+    {} as AnySupport,
+    howToSet,
   )
 
   return contextItem
