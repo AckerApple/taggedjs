@@ -124,7 +124,7 @@ describe('🏹 special attributes', () => {
     toggleBtn.click()
     
     // Check styles changed
-    expect(styleObjectTest.style.backgroundColor).toBe('lightgray')
+    expect(styleObjectTest.style.backgroundColor).toBe('lightgrey')
     expect(styleObjectTest.style.padding).toBe('10px')
     expect(styleObjectTest.style.border).toBe('2px solid black')
     expect(styleObjectTest.style.borderRadius).toBe('4px')

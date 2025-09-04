@@ -42,3 +42,7 @@ input {
 label, a, button {
   cursor: pointer;
 }
+
+.background-orange {background-color:orange}
+.text-black {color:black}
+.text-white {color:white}
