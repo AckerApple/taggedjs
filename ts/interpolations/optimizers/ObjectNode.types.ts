@@ -13,9 +13,10 @@ export type ObjectText = ObjectNode & {
 }
 
 export type Attribute = [
-  string, // name
-  any?, // value
-  SpecialDefinition? // isSpecial
+  attrName: string, // name
+  value?: any, // value
+  isSpecial?: SpecialDefinition, // isSpecial
+  howToSet?: any,
 ] | [any]
 
 export type ObjectElement = ObjectNode & {

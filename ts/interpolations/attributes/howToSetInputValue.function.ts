@@ -67,6 +67,19 @@ export function setNonFunctionInputValue(
   )
 }
 
+/** used for checked, selected, and so on */
+export function setBooleanAttribute(
+  element: HTMLElement,
+  name: string,
+  value: string | undefined | boolean
+) {  
+  if( value ) {
+    (element as HTMLOptionElement)[name as 'selected'] = true
+  } else {
+    (element as HTMLOptionElement)[name as 'selected'] = false
+  }
+}
+
 export function setSimpleAttribute(
   element: HTMLElement,
   name: string,

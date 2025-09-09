@@ -18,7 +18,7 @@ function destroyClone(
 ) {
     const marker = clone.marker
     if(marker) {
-      addPaintRemover(marker)
+      addPaintRemover(marker, 'destroyMarker')
     }
 
     const dom = clone.domElement

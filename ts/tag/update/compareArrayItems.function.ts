@@ -1,6 +1,5 @@
 import { LastArrayItem } from '../Context.types.js'
 import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { addPaintRemover } from '../../render/paint.function.js'
 import { destroySupport } from '../../render/destroySupport.function.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import type { StringTag } from '../StringTag.type.js'
@@ -56,23 +55,21 @@ function runArrayItemDiff(
 }
 
 export function destroyArrayItem(
-  item: ContextItem,
+  context: ContextItem,
 ) {
-  const global = item.global as SupportTagGlobal  
-  destroyArrayItemByGlobal(global, item)
+  const global = context.global as SupportTagGlobal  
+  destroyArrayItemByGlobal(global, context)
 }
 
 function destroyArrayItemByGlobal(
   global: SupportTagGlobal,
-  item: ContextItem,
+  context: ContextItem,
 ) {
-  if(global && item.state?.oldest) {
-    const support = item.state.oldest
+  if(global && context.state?.oldest) {
+    const support = context.state.oldest
     destroySupport(support, global)
     return
   }
   
-  const element = item.simpleValueElm as Element
-  delete item.simpleValueElm
-  addPaintRemover(element)
+  context.tagJsVar.destroy(context, {} as any)
 }

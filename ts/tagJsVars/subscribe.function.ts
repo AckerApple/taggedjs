@@ -82,7 +82,7 @@ export function subscribe<T>(
     
     processInitAttribute: processSubscribeAttribute,
     processInit: setupSubscribe,
-    checkValueChange: checkSubscribeValueChanged,
+    hasValueChanged: checkSubscribeValueChanged,
     
     processUpdate: checkStillSubscription,
     // processUpdate: processUpdateSubscribe,

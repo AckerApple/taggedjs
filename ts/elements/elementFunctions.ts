@@ -1,5 +1,5 @@
 import { isObject } from '../index.js';
-import { HowToSet, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
+import { HowToSet, setBooleanAttribute, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
 import { getPushKid, ElementFunction } from './designElement.function.js'
 
@@ -16,7 +16,7 @@ export const elementFunctions = (item: any) => {
     attrName: string,
     howToSet: HowToSet,
   ) {
-    return function (value: any) {
+    return function (value: unknown) {
       const clone = getPushKid(item as any, item.elementFunctions)
       clone.attributes.push([attrName, value, false, howToSet])
       return clone;
@@ -41,6 +41,12 @@ export const elementFunctions = (item: any) => {
     placeholder: makeAttributeHandler('placeholder', setNonFunctionInputValue),
     value: makeAttributeHandler('value', setNonFunctionInputValue),
     type: makeAttributeHandler('type', setNonFunctionInputValue),
+    
+    /** sets or removes selected attribute by checking for any truthy value */
+    selected: makeAttributeHandler('selected', setBooleanAttribute),
+    
+    /** sets or removes checked attribute by checking for any truthy value */
+    checked: makeAttributeHandler('checked', setBooleanAttribute),
   }
 
   return elmAttachments

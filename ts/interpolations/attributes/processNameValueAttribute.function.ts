@@ -119,13 +119,13 @@ function processFunctionAttr(
   
   const tagJsVarOverride: TagJsVar = {
     tagJsType: 'dynamic-attr',
-    checkValueChange: (
+    hasValueChanged: (
       _value: unknown,
       _contextItem: ContextItem,
       ownerSupport: AnySupport,
     ) => {
       const newValue = (value as any)()
-      return subContext.tagJsVar.checkValueChange(
+      return subContext.tagJsVar.hasValueChanged(
         newValue,
         subContext,
         ownerSupport,

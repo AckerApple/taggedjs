@@ -42,7 +42,7 @@ export function Signal<T>(initialValue: T): SignalObject<T> {
   return {
     tagJsType: ValueTypes.signal,
     
-    checkValueChange: checkSubscribeValueChanged,
+    hasValueChanged: checkSubscribeValueChanged,
     processInitAttribute: blankHandler,
     processInit: processSignal,
     processUpdate: processUpdateSubscribe,

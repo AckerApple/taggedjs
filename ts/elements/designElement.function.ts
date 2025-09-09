@@ -1,5 +1,5 @@
 import { AnySupport, InputElementTargetEvent, Subject, SupportContextItem, valueToTagJsVar } from '../index.js'
-import { DomObjectElement } from '../interpolations/optimizers/ObjectNode.types.js'
+import { Attribute, DomObjectElement } from '../interpolations/optimizers/ObjectNode.types.js'
 import { processAttributeArray } from '../render/dom/processAttributeArray.function.js'
 import { paintAppend, paintAppends, paintBefore, paintCommands } from '../render/paint.function.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
@@ -15,12 +15,14 @@ import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArra
 type ElementVarBase = ReadOnlyVar & {
   tagName: string
   innerHTML: any[],
-  attributes: any[],
+  attributes: Attribute,
   listeners: [string, callback: (e: InputElementTargetEvent)=> any][],
   elementFunctions: typeof elementFunctions,
 }
 
-export type ElementFunction = ((...children: (((_: any) => any) | string | boolean | object)[]) => any) & ElementVarBase
+export type ElementFunction = (
+  (...children: (((_: any) => any) | string | boolean | object)[]) => ElementVar
+) & ElementVarBase
 
 export type ElementVar = ElementFunction & ReturnType<typeof elementFunctions>
 
@@ -35,11 +37,11 @@ export function designElement(
     processInit,
     destroy: destroyDesignElement,
     processUpdate,
-    checkValueChange: checkTagElementValueChange,
+    hasValueChanged: checkTagElementValueChange,
 
     tagName,
     innerHTML: [],
-    attributes: [],
+    attributes: [] as any,
     listeners: [],
     elementFunctions,
   }
@@ -52,7 +54,7 @@ export function designElement(
 
 export function getPushKid(
   element: ElementVarBase,
-  elmFunctions: typeof elementFunctions,
+  _elmFunctions: typeof elementFunctions,
 ): ElementVar {
   const pushKid = (...args: any[]) => {
     const newElement = {...pushKid as any}
@@ -74,8 +76,18 @@ export function getPushKid(
 
 function checkTagElementValueChange(
   value: any,
+  context: ContextItem,
 ) {
-  return !value || value.tagJsType !== 'element' ? 1 : 0
+  const oldValue = context.value
+  if(oldValue === value) {
+    return 0 // has not changed
+  }
+
+  // return 1 // it has changed
+
+  const hasChanged = !value || value.tagJsType !== 'element'
+
+  return hasChanged ? 1 : 0
 }
 
 function processUpdate(
@@ -83,7 +95,7 @@ function processUpdate(
   context: ContextItem,
   ownerSupport: AnySupport,
 ) {
-  const hasChanged = checkTagElementValueChange(value)
+  const hasChanged = checkTagElementValueChange(value, context)
   
   if( hasChanged ) {
     destroyDesignElement(context, ownerSupport)
@@ -186,7 +198,7 @@ function processElementVar(
           contexts: subContexts,
           tagJsVar: {
             tagJsType: 'dynamic-text',
-            checkValueChange: () => 0,
+            hasValueChanged: () => 0,
             processInit: blankHandler,
             processInitAttribute: blankHandler,
             destroy: (_c, ownerSupport) => {
@@ -200,7 +212,7 @@ function processElementVar(
               ownerSupport: AnySupport,
               values: unknown[],
             ) => {
-              const newValue = item()
+              const newValue = item(newContext)
               const result = newContext.tagJsVar.processUpdate(
                 newValue, newContext, ownerSupport, values,
               )

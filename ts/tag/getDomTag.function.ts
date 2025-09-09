@@ -11,7 +11,7 @@ import { StringTag } from './StringTag.type.js'
 import { DomTag } from './DomTag.type.js'
 import { processDomTagInit } from './update/processDomTagInit.function.js'
 import { Tag } from './Tag.type.js'
-import { checkTagValueChange, TagJsVarInnerHTML } from '../index.js'
+import { checkTagValueChangeAndUpdate, TagJsVarInnerHTML } from '../index.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { processOuterDomTagInit } from './processOuterDomTagInit.function.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
@@ -56,7 +56,7 @@ export function getDomTag(
     processInitAttribute: blankHandler,
     processInit: processDomTagInit,
     processUpdate: tagValueUpdateHandler,
-    checkValueChange: checkTagValueChange,
+    hasValueChanged: checkTagValueChangeAndUpdate,
     destroy: destroySupportByContextItem,
 
     key: function keyFun(arrayValue: unknown) {

@@ -18,7 +18,7 @@ export function getArrayTagVar(
     processInitAttribute: blankHandler,
     processInit: processArrayInit,
     processUpdate: processArrayUpdates,
-    checkValueChange: checkArrayValueChange,
+    hasValueChanged: checkArrayValueChange,
     destroy: destroyArrayContext,
   }
 }

@@ -24,7 +24,7 @@ export function subscribeWith<SubValue, DEFAULT>(
     tagJsType: ValueTypes.subscribe,
     processInitAttribute: processSubscribeWithAttribute,
     processInit: processSubscribeWith,
-    checkValueChange: checkSubscribeValueChanged,
+    hasValueChanged: checkSubscribeValueChanged,
     
     // processUpdate: tagValueUpdateHandler,
     processUpdate: blankHandler,

@@ -82,7 +82,7 @@ export type TagJsVarInnerHTML = TagJsVar & {
 export function getInnerHTML(): TagJsVarInnerHTML {
   return {
     tagJsType: 'innerHTML',
-    checkValueChange: () => 0, // not expected to do anything
+    hasValueChanged: () => 0, // not expected to do anything
     processInitAttribute: blankHandler,
     processInit: processInnerHTML,
     processUpdate: handleInnerHTML,

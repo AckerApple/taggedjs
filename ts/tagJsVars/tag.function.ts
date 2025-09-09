@@ -12,7 +12,7 @@ import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { AnyTag } from '../tag/AnyTag.type.js'
 import { processRenderOnceInit } from '../render/update/processRenderOnceInit.function.js'
 import { processTagComponentInit } from '../tag/update/processTagComponentInit.function.js'
-import { checkTagValueChange } from '../tag/checkTagValueChange.function.js'
+import { checkTagValueChangeAndUpdate } from '../tag/checkTagValueChange.function.js'
 import { destroySupportByContextItem } from '../tag/destroySupportByContextItem.function.js'
 import { tagValueUpdateHandler } from '../tag/update/tagValueUpdateHandler.function.js'
 import { getContextInCycle, getElement as getTagElement } from '../tag/cycles/setContextInCycle.function.js'
@@ -108,6 +108,7 @@ export function tag<T extends ToTag>(
     
     templater.tagJsType = ValueTypes.tagComponent
     templater.processInit = processTagComponentInit
+    templater.hasValueChanged = checkTagValueChangeAndUpdate
     
     // attach memory back to original function that contains developer display logic
     const innerTagWrap: Wrapper = getTagWrap(
@@ -219,7 +220,7 @@ Object.defineProperty(tag, 'renderOnce', {
     oneRenderFunction.processInit = processRenderOnceInit
     oneRenderFunction.processUpdate = tagValueUpdateHandler
     oneRenderFunction.destroy = destroySupportByContextItem
-    oneRenderFunction.checkValueChange = function renderOnceNeverChanges() {
+    oneRenderFunction.hasValueChanged = function renderOnceNeverChanges() {
       return 0
     }
   },
@@ -234,7 +235,7 @@ Object.defineProperty(tag, 'use', {
     renderFunction.tagJsType = ValueTypes.stateRender
     renderFunction.processInit = processTagComponentInit
     renderFunction.processUpdate = tagValueUpdateHandler
-    renderFunction.checkValueChange = checkTagValueChange
+    renderFunction.hasValueChanged = checkTagValueChangeAndUpdate
     renderFunction.destroy = destroySupportByContextItem
   },
 })

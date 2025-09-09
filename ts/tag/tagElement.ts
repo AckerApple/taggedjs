@@ -10,7 +10,7 @@ import { isTagComponent } from '../isInstance.js'
 import { Props } from '../Props.js'
 import { TagMaker } from './TagMaker.type.js'
 import { setUseMemory } from '../state/setUseMemory.object.js'
-import { checkTagValueChange } from './checkTagValueChange.function.js'
+import { checkTagValueChangeAndUpdate } from './checkTagValueChange.function.js'
 import { destroySupportByContextItem } from './destroySupportByContextItem.function.js'
 import { AnySupport } from './index.js'
 import { renderTagElement } from '../render/renderTagElement.function.js'
@@ -118,7 +118,7 @@ function getNewSubject(
 ) {
   const tagJsVar: TagJsTag = {
     tagJsType: 'templater',
-    checkValueChange: checkTagValueChange,
+    hasValueChanged: checkTagValueChangeAndUpdate,
     destroy: destroySupportByContextItem,
     processInitAttribute: blankHandler,
     processInit: function appDoNothing() {

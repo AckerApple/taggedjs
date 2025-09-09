@@ -48,7 +48,7 @@ function smartRemoveByContext(
     const elm = context.simpleValueElm as Text
     if(elm) {
       delete context.simpleValueElm
-      addPaintRemover(elm)
+      addPaintRemover(elm, 'smartRemoveByContext')
       continue
     }
 

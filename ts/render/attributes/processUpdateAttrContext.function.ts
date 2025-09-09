@@ -44,7 +44,7 @@ export function processUpdateAttrContext(
       return
     }
 
-    oldValue.checkValueChange(
+    oldValue.hasValueChanged(
       tagValue,
       contextItem as SupportContextItem, // todo: weird typing should just be ContextItem
       ownerSupport,

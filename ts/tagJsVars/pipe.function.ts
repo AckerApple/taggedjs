@@ -21,7 +21,7 @@ export function pipe<SubValue, DEFAULT>(
     tagJsType: ValueTypes.subscribe,
     
     processInitAttribute: blankHandler,
-    checkValueChange: checkSubscribeValueChanged,
+    hasValueChanged: checkSubscribeValueChanged,
     processInit: processPipe,
     
     

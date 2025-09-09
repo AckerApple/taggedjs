@@ -1,4 +1,4 @@
-import { AnySupport, forceUpdateExistingValue, tagValueUpdateHandler, TemplateValue } from "../index.js"
+import { AnySupport, forceUpdateExistingValue, TemplateValue } from "../index.js"
 import { castTextValue } from '../castTextValue.function.js'
 import { paintBeforeText, paintCommands, addPaintRemover } from "../render/paint.function.js"
 import { BasicTypes, ContextItem } from "../index.js"
@@ -26,7 +26,7 @@ export function getSimpleTagVar(
     destroy: deleteSimpleValue,
     
     // TODO: get to using only checkSimpleValueChange
-    checkValueChange: checkUpdateDeleteSimpleValueChange, // For attributes, this gets switched to checkSimpleValueChange
+    hasValueChanged: checkUpdateDeleteSimpleValueChange, // For attributes, this gets switched to checkSimpleValueChange
     processUpdate: processStringUpdate, // For attributes, this gets switched to processAttributeUpdate
     // processUpdate: tagValueUpdateHandler, // For attributes, this gets switched to processAttributeUpdate
   }

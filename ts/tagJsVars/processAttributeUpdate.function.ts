@@ -1,4 +1,4 @@
-import { ContextItem, Tag, TemplaterResult, AnySupport, SupportContextItem, setNonFunctionInputValue, HowToSet } from "../index.js";
+import { ContextItem, Tag, TemplaterResult, AnySupport, SupportContextItem, HowToSet } from "../index.js";
 import { Callback } from "../interpolations/attributes/bindSubjectCallback.function.js";
 import { Subject } from "../subject/index.js";
 import { SubscribeValue } from "./subscribe.function.js";
@@ -16,7 +16,7 @@ export function processAttributeUpdate(
   const oldTag = contextItem.tagJsVar // contextItem.tagJsVar as TagJsVar
   const tagValue = value as TagJsVar | undefined
 
-  const checkResult = oldTag.checkValueChange(
+  const checkResult = oldTag.hasValueChanged(
     tagValue,
     contextItem as SupportContextItem, // todo: weird typing should just be ContextItem
     ownerSupport,

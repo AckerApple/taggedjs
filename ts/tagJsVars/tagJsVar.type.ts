@@ -1,4 +1,4 @@
-import { CheckValueChange } from "../tag/Context.types.js"
+import { HasValueChanged } from "../tag/Context.types.js"
 import { ContextItem } from "../tag/ContextItem.type.js"
 import { AnySupport } from "../tag/index.js"
 import { ProcessAttribute, ProcessInit } from "../tag/ProcessInit.type.js"
@@ -9,7 +9,7 @@ export type ReadOnlyVar = {
   processInitAttribute: ProcessAttribute
   processInit: ProcessInit
   processUpdate: ProcessUpdate
-  checkValueChange: CheckValueChange // | CheckSupportValueChange
+  hasValueChanged: HasValueChanged // | CheckSupportValueChange
   destroy: ProcessDelete
 }
 

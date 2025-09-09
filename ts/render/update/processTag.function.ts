@@ -1,6 +1,6 @@
 import { createHtmlSupport } from '../../tag/createHtmlSupport.function.js'
 import { TemplaterResult } from '../../tag/getTemplaterResult.function.js'
-import { checkTagValueChange } from '../../tag/checkTagValueChange.function.js'
+import { checkTagValueChangeAndUpdate } from '../../tag/checkTagValueChange.function.js'
 import { buildBeforeElement } from '../buildBeforeElement.function.js'
 import type { StringTag } from '../../tag/StringTag.type.js'
 import type { DomTag } from '../../tag/DomTag.type.js'
@@ -49,7 +49,7 @@ export function getFakeTemplater() {
     processInitAttribute: blankHandler,
     processInit: processTagInit,
     processUpdate: blankHandler,
-    checkValueChange: checkTagValueChange,
+    hasValueChanged: checkTagValueChangeAndUpdate,
     destroy: blankHandler,
     propWatch: 'shallow',
     key: blankHandler,

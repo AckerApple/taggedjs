@@ -9,7 +9,7 @@ import { SupportContextItem } from '../SupportContextItem.type.js'
 import { firstTagRender } from '../../render/renderTagOnly.function.js'
 import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
 import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
-import { Subject, TemplateValue } from '../../index.js'
+import { checkTagValueChange, Subject, TemplateValue } from '../../index.js'
 import { ReadOnlyVar, TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { updateToDiffValue } from './updateToDiffValue.function.js'
 
@@ -79,86 +79,6 @@ function convertTagToElementManaged(
   const tagJsVar = valueToTagJsVar(newValue)
   delete (context as ContextItem).global
 
-  const overrideTagVar:ReadOnlyVar = {
-    tagJsType: 'tag-conversion',
-    processInitAttribute: tagJsVar.processInitAttribute,
-    processInit: (
-      _value: TemplateValue,
-      _contextItem: ContextItem,
-      _ownerSupport: AnySupport,
-    ) => {
-      return tagJsVar.processInit(
-        context.returnValue,
-        newContext,
-        support,
-        subject.placeholder,
-      )
-    },
-    processUpdate: (
-      value: TemplateValue,
-      contextItem: ContextItem,
-      ownerSupport: AnySupport,
-    ) => {
-      const convertValue = context.returnValue
-      const hasTypeChanged = (value as TagJsVar)?.tagJsType !== context.value.tagJsType
-      const changed = hasTypeChanged || overrideTagVar.checkValueChange(convertValue, newContext, support)
-
-      
-      if(changed) {
-        overrideTagVar.destroy(context, support)
-        
-        updateToDiffValue(
-          value,
-          context,
-          ownerSupport,
-          789,
-        )
-    
-        return
-      }
-
-      newContext.value.props = (value as any).props     
-      ;(newContext as SupportContextItem).inputsHandler = context.inputsHandler
-      if( context.inputsHandler ) {
-        const inputsHandler = context.inputsHandler as any
-        inputsHandler(newContext.value.props)
-      }
-      
-      tagJsVar.processUpdate(convertValue, newContext, support, [])
-
-      newContext.value = convertValue
-    },
-    checkValueChange: (
-      _value: unknown,
-      _contextItem: ContextItem,
-    ) => {
-      const newValue = context.returnValue
-      const checkResult = tagJsVar.checkValueChange(
-        newValue,
-        newContext,
-        support,
-      )
-      return checkResult
-    },
-    destroy: (
-      contextItem: ContextItem,
-      ownerSupport: AnySupport,
-    ) => {
-      tagJsVar.destroy(newContext, support)
-      
-      delete context.returnValue
-
-      // Things only needed to perform destroy
-      ;(context as SupportContextItem).global = {} as any
-      ;(context as SupportContextItem).contexts = [] as any
-      ;(context as SupportContextItem).htmlDomMeta = [] as any
-
-      context.value.destroy(context, ownerSupport)
-
-      return 
-    }
-  }
-
   const newContext: ContextItem = {
     value: newValue,
     tagJsVar,
@@ -171,7 +91,13 @@ function convertTagToElementManaged(
     parentContext: context,
   }
 
-  // context.tagJsVar = context.returnValue
+  const overrideTagVar:ReadOnlyVar = getOverrideTagVar(
+    context,
+    newContext,
+    support,
+    subject,
+  )
+
   context.tagJsVar = overrideTagVar
 
   // TODO: should we be calling this here?
@@ -184,6 +110,99 @@ function convertTagToElementManaged(
   )
 
   return support
+}
+
+/** Used when a tag() does not return html`` */
+function getOverrideTagVar(
+  context: ContextItem & SupportContextItem,
+  newContext: ContextItem,
+  support: AnySupport,
+  subject: SupportContextItem,
+): ReadOnlyVar {
+  const overrideTagVar: ReadOnlyVar = {
+    tagJsType: 'tag-conversion',
+    processInitAttribute: newContext.tagJsVar.processInitAttribute,
+    processInit: (
+      _value: TemplateValue,
+      _contextItem: ContextItem,
+      _ownerSupport: AnySupport
+    ) => {
+      return newContext.tagJsVar.processInit(
+        context.returnValue,
+        newContext,
+        support,
+        subject.placeholder
+      )
+    },
+    processUpdate: (
+      value: TemplateValue,
+      contextItem: ContextItem,
+      ownerSupport: AnySupport
+    ) => {
+      const convertValue = context.returnValue
+      const oldValue = context.value
+      const oldType = oldValue.tagJsType
+      const newType = (value as TagJsVar)?.tagJsType
+      const hasTypeChanged = newType !== oldType
+      const hasChanged = checkTagValueChange(value, context)
+      const changed = hasChanged || hasTypeChanged || overrideTagVar.hasValueChanged(convertValue, newContext, support)
+
+      if (changed) {
+        overrideTagVar.destroy(context, support)
+
+        updateToDiffValue(
+          value,
+          context,
+          ownerSupport,
+          789
+        )
+
+        return
+      }
+
+      newContext.value.props = (value as any).props
+      
+      ;(newContext as SupportContextItem).inputsHandler = context.inputsHandler
+      if (context.inputsHandler) {
+        const inputsHandler = context.inputsHandler as any
+        inputsHandler(newContext.value.props)
+      }
+
+      newContext.tagJsVar.processUpdate(convertValue, newContext, support, [])
+
+      newContext.value = convertValue
+    },
+    hasValueChanged: (
+      _value: unknown,
+      _contextItem: ContextItem
+    ) => {
+      const newValue = context.returnValue
+      const checkResult = newContext.tagJsVar.hasValueChanged(
+        newValue,
+        newContext,
+        support
+      )
+      return checkResult
+    },
+    destroy: (
+      contextItem: ContextItem,
+      ownerSupport: AnySupport
+    ) => {
+      newContext.tagJsVar.destroy(newContext, support)
+
+      delete context.returnValue;
+      (context as SupportContextItem).global = {} as any;
+      (context as SupportContextItem).contexts = [] as any;
+      (context as SupportContextItem).htmlDomMeta = [] as any
+      delete context.inputsHandler
+
+      context.value.destroy(context, ownerSupport)
+
+      return
+    }
+  }
+
+  return overrideTagVar
 }
 
 export function processFirstSubjectComponent(

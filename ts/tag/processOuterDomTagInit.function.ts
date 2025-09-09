@@ -6,7 +6,7 @@ import { getSupportInCycle } from './cycles/getSupportInCycle.function.js'
 import { StringTag } from './StringTag.type.js'
 import { processDomTagInit } from './update/processDomTagInit.function.js'
 import { Tag } from './Tag.type.js'
-import { AnySupport, ContextItem, TemplateValue, checkTagValueChange, TagJsVarInnerHTML, ArrayItemStringTag } from '../index.js'
+import { AnySupport, ContextItem, TemplateValue, checkTagValueChangeAndUpdate, TagJsVarInnerHTML, ArrayItemStringTag } from '../index.js'
 import { forceUpdateExistingValue } from './update/forceUpdateExistingValue.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
@@ -47,14 +47,14 @@ export function processOuterDomTagInit(
   }
 
   // TODO: Not best idea to swap out the original values changeChecker
-  value.checkValueChange = checkOuterTagValueChange
+  value.hasValueChanged = checkOuterTagValueChange
 }
 
 function checkOuterTagValueChange(
   newValue: unknown,
   contextItem: ContextItem,
 ) {    
-  return checkTagValueChange(
+  return checkTagValueChangeAndUpdate(
     newValue, // (newValue as Tag)?.outerHTML || newValue,
     contextItem, // subContext.contextItem as any,
   )
@@ -73,7 +73,7 @@ export function getStringTag(
     processInitAttribute: blankHandler,
     processInit: processDomTagInit,
     processUpdate: tagValueUpdateHandler,
-    checkValueChange: checkTagValueChange,
+    hasValueChanged: checkTagValueChangeAndUpdate,
     destroy: destroySupportByContextItem,
 
     strings,

@@ -12,9 +12,9 @@ import { ProcessInit } from './ProcessInit.type.js'
 import { processTagInit } from './update/processTagInit.function.js'
 import { Tag } from './Tag.type.js'
 import { ProcessDelete, TagJsTag } from '../tagJsVars/tagJsVar.type.js'
-import { checkTagValueChange } from './checkTagValueChange.function.js'
+import { checkTagValueChangeAndUpdate } from './checkTagValueChange.function.js'
 import { destroySupportByContextItem } from './destroySupportByContextItem.function.js'
-import { CheckSupportValueChange, CheckValueChange } from './Context.types.js'
+import { CheckSupportValueChange, HasValueChanged } from './Context.types.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
 import { ProcessUpdate } from './ProcessUpdate.type.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
@@ -27,7 +27,7 @@ export type Wrapper = ((
   tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater
   processInit: ProcessInit
   processUpdate: ProcessUpdate
-  checkValueChange: CheckValueChange | CheckSupportValueChange
+  hasValueChanged: HasValueChanged | CheckSupportValueChange
   destroy: ProcessDelete
 }
 
@@ -86,7 +86,7 @@ export function getTemplaterResult(
     processInit: processTagInit,
     processInitAttribute: blankHandler,
     processUpdate: tagValueUpdateHandler,
-    checkValueChange: checkTagValueChange,
+    hasValueChanged: checkTagValueChangeAndUpdate,
     destroy: destroySupportByContextItem,
 
     propWatch,

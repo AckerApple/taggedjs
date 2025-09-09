@@ -13,9 +13,9 @@ export type ContextHandler = (
 export type LastArrayItem = ContextItem // {context: ContextItem, global: TagGlobal}
 
 /** Return 0 if no change. Any other number tells what changed */
-export type CheckValueChange = (
+export type HasValueChanged = (
   value: unknown,
-  contextItem: ContextItem,
+  context: ContextItem,
   ownerSupport: AnySupport,
 ) => number
 

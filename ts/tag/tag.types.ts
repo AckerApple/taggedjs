@@ -16,9 +16,10 @@ export type RouteProps = {
 
 type TagResponse = ReadOnlyVar | StateToTag | AnyTag | null
 
-export type ToTag = ((...props: any[]) => TagResponse | TagResponse[]) & {
+export type ToTag = ((...props: any[]) => TagResponse | TagResponse[])/* & {
   arrayValue?: unknown
-}
+  key?: 22
+}*/
 
 export type StateToTag = () => AnyTag | null // Warn: do not data type arguments, let them be inferred
 export type RouteTag = (extraProps?: Record<string, any>) => AnyTag
