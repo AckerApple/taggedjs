@@ -14,7 +14,6 @@ export const subscribeAttributes = tag(() => {
       .style("display:flex;flex-wrap:wrap;gap:1em;font-size:0.8em")
       .id("subscribe-attributes-wrap")
       (
-        () => `shouldHideAttributes: ${shouldHideAttributes}`,
         div.style("display:flex;flex-wrap:wrap;gap:1em")(
           fieldset.style("flex-grow:1")(
             legend('subscribe special attribute'),
@@ -40,8 +39,8 @@ export const subscribeAttributes = tag(() => {
             legend('sometimes subscribe style attribute'),
             span
               .id("multiple-subscribe-bg-color")
-              .style(
-                (
+              .style(() => {
+                return (
                   subColor$.value === 'blue' &&
                   subscribe(subColorPurpleOrange$, subColor => {
                     return 'background-color:' + subColor
@@ -56,7 +55,7 @@ export const subscribeAttributes = tag(() => {
                 )
                 ||
                 'background-color:pink;'
-              //}
+              }
               )('multiple subscribe bg color')
           )
         )

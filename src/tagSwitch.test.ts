@@ -15,18 +15,18 @@ describe('🔀 tagSwitching', () => {
     const dropdown = byId('tag-switch-dropdown') as HTMLSelectElement
     dropdown.value = "1"
 
-    ;(dropdown as any)._change({target:dropdown})
-    expectElmCount('#tagSwitch-1-hello', 5)
+    ;(dropdown as any).onchange({target:dropdown})
     expect(elmCount('#tagSwitch-2-hello')).toBe(0)
     expect(elmCount('#tagSwitch-3-hello')).toBe(0)
     expect(elmCount('#select-tag-above')).toBe(0)
+    expectElmCount('#tagSwitch-1-hello', 5)
   })
 
   it('2', () => {
     const dropdown = byId('tag-switch-dropdown') as HTMLSelectElement
 
     dropdown.value = "2"
-    ;(dropdown as any)._change({target:dropdown})
+    ;(dropdown as any).onchange({target:dropdown})
 
     expectElmCount('#tagSwitch-1-hello', 2)
     expectElmCount('#tagSwitch-2-hello', 4)
@@ -36,11 +36,14 @@ describe('🔀 tagSwitching', () => {
 
   it('3', () => {
     const dropdown = byId('tag-switch-dropdown') as HTMLSelectElement
-    dropdown.value = "3"
-    ;(dropdown as any)._change({target:dropdown})
+    dropdown.value = '3'
+    ;(dropdown as any).onchange({target:dropdown})
+
+    expect(byId('selectTag-display').textContent).toBe('3')
 
     expect(elmCount('#tagSwitch-1-hello')).toBe(0) // Expected no hello 1s
-    expect(elmCount('#tagSwitch-2-hello')).toBe(0) // Expected no #tagSwitch-2-hello elements
+    const twoCount = elmCount('#tagSwitch-2-hello')
+    expect(twoCount).toBe(0, `Expected no #tagSwitch-2-hello but got ${twoCount}`) // Expected no #tagSwitch-2-hello elements
     expectElmCount('#tagSwitch-3-hello', 7)
     expect(elmCount('#select-tag-above')).toBe(0)
   })
@@ -48,7 +51,7 @@ describe('🔀 tagSwitching', () => {
   it('4', () => {  
     const dropdown = byId('tag-switch-dropdown') as HTMLSelectElement
     dropdown.value = ""
-    ;(dropdown as any)._change({target:dropdown})
+    ;(dropdown as any).onchange({target:dropdown})
 
     expectElmCount('#select-tag-above',1)
     expectElmCount('#tag-switch-dropdown',1)

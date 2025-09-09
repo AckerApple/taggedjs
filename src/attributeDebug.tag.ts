@@ -1,11 +1,9 @@
-import { div, fieldset, h3, hr, html, input, legend, li, ol, select, states, tag } from "taggedjs"
+import { div, fieldset, h3, hr, html, input, legend, li, ol, select, tag } from "taggedjs"
 import { subscribeAttributes } from "./subscribeAttributes.tag"
 
 export const attributeDebug = tag(() => {
   let selected: string = 'a'
   let isOrange: boolean = true
-
-  //states(get => [{selected,isOrange}] = get({selected, isOrange}))
 
   return div(
     input
