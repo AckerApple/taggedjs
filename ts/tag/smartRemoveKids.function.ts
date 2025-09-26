@@ -6,6 +6,7 @@ import { SupportTagGlobal } from './getTemplaterResult.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { AnySupport, SupportContextItem } from './index.js'
 import { destroyHtmlDomMeta } from './destroyHtmlDomMeta.function.js'
+import { isPromise } from '../index.js'
 
 /** sets global.deleted on support and all children */
 export function smartRemoveKids(
@@ -32,7 +33,11 @@ function smartRemoveByContext(
       
       if( tagJsVar && tagJsVar.tagJsType === 'host' ) {
         const newest = (context as any).supportOwner as AnySupport
-        tagJsVar.destroy(context, newest)
+        const hostDestroy = tagJsVar.destroy(context, newest)
+
+        if( isPromise(hostDestroy) ) {
+          allPromises.push(hostDestroy)
+        }
       }
 
       continue // i live within my owner variable. I will be deleted with owner

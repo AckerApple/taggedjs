@@ -38,14 +38,13 @@ export function processDynamicNameValueAttribute(
   contextItem.isSpecial = isSpecial
 
   if( value?.tagJsType ) {
-    processTagJsAttribute(
+    return processTagJsAttribute(
       attrName,
       value,
       contextItem,
       support,
       element,
     )
-    return
   }
 
   return processNonDynamicAttr(
@@ -141,10 +140,11 @@ function processFunctionAttr(
     },
     processUpdate: (
       _value: any,
-      _contextItem: ContextItem,
+      contextItem: ContextItem,
       ownerSupport: AnySupport,
       values: unknown[],
     ) => {
+      ++contextItem.updateCount
       const newValue = (value as any)()
       // const oldValue = subContext.value
       // const newTagJsVar = valueToTagJsVar(newValue)
@@ -161,6 +161,7 @@ function processFunctionAttr(
   }
 
   const subContext: BaseContextItem = {
+    updateCount: 0,
     isAttr: true,
     element,
     parentContext,
@@ -174,6 +175,7 @@ function processFunctionAttr(
   }
 
   const contextItem: BaseContextItem = {
+    updateCount: 0,
     isAttr: true,
     contexts: [subContext],
     element,

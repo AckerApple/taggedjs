@@ -228,10 +228,29 @@ export function callbackPropOwner(
   const callbackResult = toCall.apply(owner, callWith)
 
   const run = function propCallbackProcessor() {
-    const subject = newest.context
-    const global = subject.global as SupportTagGlobal
+    const context = newest.context
+    const global = context.global as SupportTagGlobal
+
+    if(context.locked) {
+      return callbackResult // currently in the middle of rendering
+    }
     
-    if(!global || subject.locked) {
+    if(!global) {
+      /*
+      context.tagJsVar.processUpdate(
+        context.value,
+        context,
+        ownerSupport,
+        [],
+      )
+*/
+      ownerContext.tagJsVar.processUpdate(
+        ownerContext.value,
+        ownerContext,
+        ownerSupport,
+        [],
+      )
+      
       return callbackResult // currently in the middle of rendering
     }
 

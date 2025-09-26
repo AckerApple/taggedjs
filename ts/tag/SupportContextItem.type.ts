@@ -1,3 +1,4 @@
+import { ElementVar } from '../elements/designElement.function.js'
 import { ContextItem } from '../index.js'
 import { AppContextItem } from './ContextItem.type.js'
 import { ContextStateMeta } from './ContextStateMeta.type.js'
@@ -17,5 +18,7 @@ export interface SupportContextItem extends ContextItem {
   /** Indicator of re-rending. Saves from double rending something already rendered */
   renderCount: number
   
-  inputsHandler?: (...args: any[]) => any
+  /** Argument aka Prop updates */
+  updatesHandler?: (...args: any[]) => any
+  toRender?: ElementVar[]
 }

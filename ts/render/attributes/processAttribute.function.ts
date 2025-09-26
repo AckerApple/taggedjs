@@ -2,7 +2,7 @@
 
 import { specialAttribute } from '../../interpolations/attributes/specialAttribute.js'
 import { isFunction } from '../../isInstance.js'
-import { HowToSet, setNonFunctionInputValue } from '../../interpolations/attributes/howToSetInputValue.function.js'
+import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.function.js'
 import { bindSubjectCallback, Callback } from '../../interpolations/attributes/bindSubjectCallback.function.js'
 import { ValueTypes } from '../../tag/ValueTypes.enum.js'
 import { AnySupport } from '../../tag/index.js'
@@ -16,12 +16,11 @@ import { createDynamicArrayAttribute, createDynamicAttribute } from './createDyn
 import { getTagJsVar, TagVarIdNum } from './getTagJsVar.function.js'
 import { NoDisplayValue } from './NoDisplayValue.type.js'
 import { SpecialDefinition } from './Special.types.js'
-import { removeContextInCycle, setContextInCycle } from '../../tag/cycles/setContextInCycle.function.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
-import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js'
 import { TemplateValue } from '../../index.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
 import { processStandAloneAttribute } from './processStandAloneAttribute.function.js'
+import { processTagJsVarAttribute } from './processTagJsAttribute.function.js'
 
 /** MAIN FUNCTION. Sets attribute value, subscribes to value updates  */
 export function processAttribute(
@@ -36,14 +35,18 @@ export function processAttribute(
   isSpecial: SpecialDefinition,
 ) {
   const varIndex = getTagJsVar(attrName)
-  const isNameVar = varIndex >= 0
+  let isNameVar = varIndex >= 0 || (value === undefined && typeof(attrName) !== 'string')
   let valueInValues = values[ varIndex ] as TemplateValue
 
-  // value from bolt?
+  // value or name from bolt?
   if ((value as any)?.tagJsType) {
-    valueInValues = value as any
+    valueInValues = value as any // the value is a tagJsVar
+  } else if ((attrName as any)?.tagJsType) {
+    isNameVar = true
+    valueInValues = attrName as any // the name is a tagJsVar
+    value = attrName
   }
-  
+
   const tagJsVar = valueInValues as TagJsVar | undefined
   if( tagJsVar?.tagJsType ) {
     return processTagJsVarAttribute(
@@ -59,7 +62,12 @@ export function processAttribute(
     )
   }
 
-  if( isNameVar ) {    
+  if( isNameVar ) {
+    // old way of setting by html``
+    if(varIndex === -1 && isNameVar) {
+      valueInValues = attrName as TemplateValue // its a name only value attribute
+    }
+
     const contextItem = addOneContext(
       valueInValues,
       contexts,
@@ -130,52 +138,6 @@ export function processAttribute(
   )
 }
 
-function processTagJsVarAttribute(
-  value: string | TagVarIdNum | null | undefined,
-  contexts: ContextItem[],
-  parentContext: ContextItem,
-  tagJsVar: TagJsVar,
-  varIndex: number,
-  support: AnySupport,
-  attrName: string | TagVarIdNum,
-  element: HTMLElement,
-  isNameVar: boolean,
-) {
-  const contextItem = addOneContext(
-    value,
-    contexts || [],
-    true,
-    parentContext,
-  ) as any as AttributeContextItem
-
-  contextItem.element = element
-  contextItem.valueIndex = varIndex
-
-  contextItem.isAttr = true
-  contextItem.isNameOnly = isNameVar
-
-  contextItem.stateOwner = getSupportWithState(support)
-  contextItem.supportOwner = support
-
-  setContextInCycle(contextItem)
-
-  tagJsVar.processInitAttribute(
-    attrName as string,
-    value, // tagJsVar,
-    element,
-    tagJsVar,
-    contextItem,
-    support,
-    setNonFunctionInputValue,
-  )
-
-  removeContextInCycle()
-
-  contextItem.oldTagJsVar = contextItem.tagJsVar
-  contextItem.tagJsVar = tagJsVar
-
-  return contextItem
-}
 
 /** Only used during updates */
 export function processAttributeEmit(

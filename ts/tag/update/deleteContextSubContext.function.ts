@@ -8,6 +8,7 @@ export function deleteContextSubContext(
   contextItem: ContextItem,
   ownerSupport: AnySupport,
 ) {
+  ++contextItem.updateCount
   const subscription = contextItem.subContext as SubContext
   const result = deleteSubContext(subscription, ownerSupport)
   delete contextItem.subContext

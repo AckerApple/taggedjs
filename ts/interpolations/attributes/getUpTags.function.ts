@@ -1,9 +1,10 @@
 import { isTagComponent } from "../../isInstance.js"
 import { providersChangeCheck } from "../../state/providersChangeCheck.function.js"
-import { checkRenderUp, isInlineHtml } from "../../render/renderSupport.function.js"
+import { isInlineHtml } from "../../render/renderSupport.function.js"
 import { Support } from "../../tag/createHtmlSupport.function.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
 import { ValueTypes } from "../../tag/ValueTypes.enum.js"
+import { checkRenderUp } from "../../render/checkRenderUp.function.js"
 
 export function getUpTags(
   support: AnySupport,
@@ -25,7 +26,8 @@ export function getUpTags(
     return getUpTags(ownerSupport, supports)
   }
 
-  if(support.context.global.deleted === true) {
+  const global = support.context.global
+  if(global && global.deleted === true) {
     return supports
   }
 

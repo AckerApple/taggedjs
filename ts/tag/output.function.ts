@@ -35,14 +35,15 @@ export function syncWrapCallback(
   context: ContextItem, // aka stateOwner
 ) {
   const stateMeta = context.state as ContextStateMeta
-  const newestOwner = stateMeta.newest as AnySupport
   const newerStates = (stateMeta.newer as ContextStateSupport).states
-  const olderStates = (stateMeta.older as ContextStateSupport).states
-  
+  const olderStates = stateMeta.older ? (stateMeta.older as ContextStateSupport).states : newerStates
+  const newestOwner = stateMeta.newest as AnySupport
+
   // sync the new states to the old before the old does any processing
   syncStatesArray(newerStates, olderStates)
 
   const c = callback(...args) // call the latest callback
+
 
   // sync the old states to the new
   syncStatesArray(olderStates, newerStates)
@@ -59,6 +60,7 @@ export function syncWrapCallback(
     ++painting.locks
     safeRenderSupport(newestOwner)
     --painting.locks
+
     paint()
   }, []])
 

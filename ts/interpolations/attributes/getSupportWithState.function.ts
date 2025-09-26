@@ -19,6 +19,12 @@ export function getSupportWithState(support: AnySupport) {
     component = component.ownerSupport as AnySupport
   }
 
-  const stateMeta = component.context.state
+  const context = component.context
+  const stateMeta = context.state
+
+  if( !stateMeta ) {
+    return component
+  }
+
   return stateMeta.newest || component
 }

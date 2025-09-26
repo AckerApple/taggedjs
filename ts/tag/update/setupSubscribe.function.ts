@@ -167,6 +167,7 @@ export function deleteAndUnsubscribe(
   contextItem: ContextItem,
   ownerSupport: AnySupport,
 ) {
+  ++contextItem.updateCount
   const subContext = contextItem.subContext as SubContext
   unsubscribeContext(contextItem)
   return deleteSubContext(subContext, ownerSupport)

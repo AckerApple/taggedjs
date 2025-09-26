@@ -4,6 +4,7 @@ export type PaintCommand = [((...args: any[]) => unknown), any[]]
 
 /** Typically used for animations to run before clearing elements */
 export function addPaintRemoveAwait(promise: Promise<any>) {
+  /*
   if(paintRemoveAwaits.length) {
     paintRemoveAwaits[paintRemoveAwaits.length - 1].paintRemoves.push( ...paintRemoves )
     paintRemoves = []
@@ -11,11 +12,13 @@ export function addPaintRemoveAwait(promise: Promise<any>) {
 
   paintRemoveAwaits.push({promise, paintRemoves})
   paintRemoves = []
+  */
 }
 
-let paintRemoveAwaits: {promise: Promise<any>, paintRemoves: PaintCommand[]}[] = []
+// let paintRemoveAwaits: {promise: Promise<any>, paintRemoves: PaintCommand[]}[] = []
 export let paintCommands: PaintCommand[] = []
-export let paintRemoves: PaintCommand[] = []
+// export let paintRemoves: PaintCommand[] = []
+export const paintRemoves: PaintCommand[] = []
 export let paintContent: PaintCommand[] = []
 
 // TODO: This this is duplicate of paintCommands (however timing is currently and issue and cant be removed)
@@ -48,6 +51,7 @@ function runCycles() {
   runAfterCycle()
 }
 
+/** Deletes happen last */
 function runAfterCycle() {
   paintReset()
 
@@ -60,6 +64,7 @@ function runAfterCycle() {
 }
 
 function runPaintRemoves(): any {
+  /*
   if( paintRemoveAwaits.length ) {
     const currentAwaits = paintRemoveAwaits.map(data => data.promise.then(() => {
       const paintRemoves = data.paintRemoves
@@ -78,7 +83,7 @@ function runPaintRemoves(): any {
         content[0](...content[1])
       }
     })
-  }
+  }*/
 
   // element.parentNode.removeChild
   for (const content of paintRemoves) {
@@ -87,8 +92,11 @@ function runPaintRemoves(): any {
 }
 
 function runPaintCycles() {
+  const removes = paintRemoves.length
   runPaintRemoves()
-  paintRemoves = []
+  
+  // paintRemoves = []
+  paintRemoves.splice(0, removes)
 
   // styles/attributes and textElement.textContent
   for(const content of paintContent) {
@@ -136,6 +144,7 @@ function paintRemover(
 export function paintBefore(
   relative: Text | Element,
   element: Text | Element,
+  _caller: string,
 ) {
   const parentNode = relative.parentNode as ParentNode
   parentNode.insertBefore(element, relative as Text)
@@ -161,11 +170,12 @@ function toPlainTextElm(text: string) {
 export function paintBeforeText(
   relative: Text | Element,
   text: string,
-  callback: (created: Text) => any = blankHandler
+  callback: (created: Text) => any = blankHandler,
+  _caller: string,
 ) {
   const textElm = toPlainTextElm(text)
 
-  paintBefore(relative, textElm)
+  paintBefore(relative, textElm, _caller)
   callback(textElm)
 }
 
@@ -188,7 +198,7 @@ export function paintBeforeElementString(
   contentCleaner.innerHTML = text
   const textElm = document.createTextNode(contentCleaner.textContent as string) // toPlainTextElm(text)
 
-  paintBefore(relative, textElm)
+  paintBefore(relative, textElm, 'paintBeforeElementString')
   callback(textElm)
 }
 

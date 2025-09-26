@@ -17,6 +17,8 @@ export function renderWithSupport(
 ): {support: AnySupport, wasLikeTags: boolean} {
   let reSupport: AnySupport
 
+  delete subject.toRender
+
   if( getSupportOlderState(lastSupport) ) {
     reSupport = reRenderTag(
       newSupport,

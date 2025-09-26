@@ -19,6 +19,7 @@ export function createAndProcessContextItem(
 ): ContextItem {
   const element = document.createTextNode(empty)
   const contextItem: ContextItem = {
+    updateCount: 0,
     value,
     tagJsVar: valueToTagJsVar(value),
     withinOwnerElement: false,

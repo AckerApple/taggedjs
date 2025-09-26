@@ -1,7 +1,7 @@
 import { isObject } from '../index.js';
 import { HowToSet, setBooleanAttribute, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
-import { getPushKid, ElementFunction } from './designElement.function.js'
+import { getPushKid, ElementFunction, ElementVar } from './designElement.function.js'
 
 export const elementFunctions = (item: any) => {
   function makeCallback(eventName: string) {
@@ -16,23 +16,30 @@ export const elementFunctions = (item: any) => {
     attrName: string,
     howToSet: HowToSet,
   ) {
-    return function (value: unknown) {
+    return function (
+      value: ((...args: any[]) => any) | string | object
+    ) {
       const clone = getPushKid(item as any, item.elementFunctions)
       clone.attributes.push([attrName, value, false, howToSet])
-      return clone;
+      return clone
     };
   }
 
   const elmAttachments = {
     onClick: makeCallback('click'),    
     onChange: makeCallback('onchange'),
+    onKeyup: makeCallback('onkeyup'),
 
-    // nameValue: function (name: string, value: any): ElementFunction {
-    attr: function (name: string, value: any): ElementFunction {
-      const clone = getPushKid(item as any, item.elementFunctions);
-      clone.attributes.push([name, value]);
-      return clone;
+    /* apply attribute via attr(name: string, value?: any): **/
+    attr: function (
+      ...args: [name: string | unknown, value?: any]
+    ) {
+      const clone = getPushKid(item as any, item.elementFunctions)
+      clone.attributes.push(args)
+      return clone
     },
+
+    /** element.setAttribute('style', x)  */
     style: makeAttributeHandler('style', setNonFunctionInputValue),
     class: makeAttributeHandler('class', setClassValue),
     id: makeAttributeHandler('id', setNonFunctionInputValue),
@@ -47,6 +54,12 @@ export const elementFunctions = (item: any) => {
     
     /** sets or removes checked attribute by checking for any truthy value */
     checked: makeAttributeHandler('checked', setBooleanAttribute),
+    
+    /** Used for setting array index-key value */
+    key: function (arrayValue: any) {
+     ;(this as any).arrayValue = arrayValue
+     return this
+    },
   }
 
   return elmAttachments

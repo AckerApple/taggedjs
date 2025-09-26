@@ -28,6 +28,8 @@ function processArrayUpdates(
   contextItem: ContextItem | SupportContextItem,
   ownerSupport: AnySupport,
 ) {
+  ++contextItem.updateCount
+
   const tagUpdateResponse = tagValueUpdateHandler(
     newValue,
     contextItem,

@@ -30,6 +30,7 @@ export function createDynamicArrayAttribute(
       const myIndex = contexts.length
       const tagJsVar = valueToTagJsVar(value)
       const contextItem: AttributeContextItem = {
+        updateCount: 0,
         isAttr: true,
         element,
         attrName: attrName as string,
@@ -42,8 +43,9 @@ export function createDynamicArrayAttribute(
   
       // contextItem.handler =
       tagJsVar.processUpdate = function arrayItemHandler(
-        value, newSupport, contextItem, newValues
+        value, contextItem, newSupport, newValues
       ) {
+        ++contextItem.updateCount
         setBy(newValues)
       }
 
@@ -99,9 +101,12 @@ export function createDynamicAttribute(
 ) {
   const tagJsVar = valueToTagJsVar(value)
   const contextItem: AttributeContextItem = {
+    updateCount: 0,
     isAttr: true,
     element,
     attrName,
+    howToSet,
+    value,
     withinOwnerElement: true,
     tagJsVar,
     destroy$: new Subject(),

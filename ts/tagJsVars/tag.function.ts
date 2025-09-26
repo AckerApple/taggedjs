@@ -79,7 +79,11 @@ export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnTy
   compareTo?: string
 }) & {
   original: UnknownFunction
+  /** @deprecated - use updates() instead */
   inputs: (handler: (updates: Parameters<T>) => any) => true
+
+  /** Process input/argument updates */
+  updates: (handler: (updates: Parameters<T>) => any) => true
 }
 
 /** How to handle checking for prop changes aka argument changes */
@@ -134,9 +138,10 @@ export function tag<T extends ToTag>(
 
   const returnWrap = parentWrap as unknown as TaggedFunction<T>
 
-  returnWrap.inputs = (handler: (updates: Parameters<T>) => any) => {
+  // used for argument updates
+  returnWrap.updates = returnWrap.inputs = (handler: (updates: Parameters<T>) => any) => {
     const context = getContextInCycle() as SupportContextItem
-    context.inputsHandler = handler
+    context.updatesHandler = handler
     return true
   }
 

@@ -8,8 +8,10 @@ import { SupportTagGlobal } from './getTemplaterResult.function'
 export function destroySupportByContextItem(
   context: ContextItem,
 ) {
+  ++context.updateCount
   const global = context.global as SupportTagGlobal
-  const lastSupport = (context as SupportContextItem).state.newest as AnySupport
+  const state = (context as SupportContextItem).state
+  const lastSupport = state.newest as AnySupport
 
   // destroy old component, value is not a component
   destroySupport(lastSupport, global)
@@ -18,7 +20,8 @@ export function destroySupportByContextItem(
 }
 
 function destroySupportContext(context: SupportContextItem) {
-  delete context.htmlDomMeta
+  // delete context.htmlDomMeta
+  context.htmlDomMeta = []
   delete (context as ContextItem).contexts
   delete (context as ContextItem).state
   delete (context as ContextItem).global

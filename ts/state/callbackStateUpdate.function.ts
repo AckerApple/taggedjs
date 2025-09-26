@@ -20,11 +20,30 @@ export default function callbackStateUpdate<T>(
   const newestSupport = findStateSupportUpContext(context)
   // const newestSupport = context.state.newest as AnySupport
   if(newestSupport) {
-    renderSupport(newestSupport)
-  
+    if(context.global) {
+      renderSupport(newestSupport) // TODO: remove
+    } else {
+      context.tagJsVar.processUpdate(
+        context.value,
+        context,
+        newestSupport, // ownerSupport,
+        [],
+      )
+    }
+
+
     if(isPromise(maybePromise)) {
       (maybePromise as Promise<any>).finally(() => {
-        renderSupport(newestSupport)
+        if(context.global) {
+          renderSupport(newestSupport) // TODO: remove
+        } else {
+          context.tagJsVar.processUpdate(
+            context.value,
+            context,
+            newestSupport, // ownerSupport,
+            [],
+          )
+        }
       })
     }
   }

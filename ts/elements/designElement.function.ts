@@ -1,7 +1,7 @@
-import { AnySupport, InputElementTargetEvent, Subject, SupportContextItem, valueToTagJsVar } from '../index.js'
+import { AnySupport, InputElementTargetEvent, isPromise, Subject, SupportContextItem, valueToTagJsVar } from '../index.js'
 import { Attribute, DomObjectElement } from '../interpolations/optimizers/ObjectNode.types.js'
 import { processAttributeArray } from '../render/dom/processAttributeArray.function.js'
-import { paintAppend, paintAppends, paintBefore, paintCommands } from '../render/paint.function.js'
+import { paint, paintAppend, paintAppends, paintBefore, paintCommands, painting } from '../render/paint.function.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { destroyContextHtml } from '../tag/smartRemoveKids.function.js'
 import { updateToDiffValue } from '../tag/update/updateToDiffValue.function.js'
@@ -11,6 +11,7 @@ import { addSupportEventListener } from '../interpolations/attributes/addSupport
 import { elementFunctions } from './elementFunctions.js'
 import { getSupportWithState } from '../interpolations/attributes/getSupportWithState.function.js'
 import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArray.function.js'
+import { processElementVar } from './processElementVar.function.js'
 
 type ElementVarBase = ReadOnlyVar & {
   tagName: string
@@ -21,7 +22,7 @@ type ElementVarBase = ReadOnlyVar & {
 }
 
 export type ElementFunction = (
-  (...children: (((_: any) => any) | string | boolean | object)[]) => ElementVar
+  (...children: (((_: any) => any) | string | boolean | object | undefined | number | null)[]) => ElementVar
 ) & ElementVarBase
 
 export type ElementVar = ElementFunction & ReturnType<typeof elementFunctions>
@@ -95,6 +96,8 @@ function processUpdate(
   context: ContextItem,
   ownerSupport: AnySupport,
 ) {
+  ++context.updateCount
+
   const hasChanged = checkTagElementValueChange(value, context)
   
   if( hasChanged ) {
@@ -111,9 +114,9 @@ function processUpdate(
   }
 
   // how arguments get updated within function
-  if( (context as SupportContextItem).inputsHandler ) {
-    const inputsHandler = (context as SupportContextItem).inputsHandler as any
-    inputsHandler(value.props)
+  if( (context as SupportContextItem).updatesHandler ) {
+    const updatesHandler = (context as SupportContextItem).updatesHandler as any
+    updatesHandler(value.props)
   }
 
   const contexts = context.contexts as ContextItem[]
@@ -123,16 +126,62 @@ function processUpdate(
 }
 
 function destroyDesignElement(
-  contextItem: ContextItem,
+  context: ContextItem,
   ownerSupport: AnySupport,
 ) {
-  const contexts = contextItem.contexts as ContextItem[]
-  contexts.forEach(context => 
-    context.tagJsVar.destroy(context, ownerSupport)
-  )
+  ++context.updateCount
 
-  destroyContextHtml(contextItem)
-  delete contextItem.htmlDomMeta
+  const contexts = context.contexts as ContextItem[]
+
+  console.log('contexts===>',contexts)
+  const promises: Promise<any>[] = []
+
+  if(contexts.length) {
+    destroyDesignByContexts(contexts, ownerSupport, promises)
+
+    if( promises.length ) {
+      return Promise.all(promises).then(() => {
+        ++painting.locks
+        destroyContextHtml(context)
+        // delete context.htmlDomMeta
+        context.htmlDomMeta = []
+        --painting.locks
+        paint()
+      })
+    }
+  }
+
+  destroyContextHtml(context)
+  // delete context.htmlDomMeta
+  context.htmlDomMeta = []
+}
+
+function destroyDesignByContexts(
+  contexts: ContextItem[],
+  ownerSupport: AnySupport,
+  promises: Promise<any>[],
+) {
+  const context = contexts[0]
+  const result = context.tagJsVar.destroy(context, ownerSupport)
+
+  if( isPromise(result) ) {
+    promises.push(result)
+    return result.then(() => {
+      if(contexts.length > 1) {
+        return destroyDesignByContexts( contexts.slice(1, contexts.length), ownerSupport, promises )
+      }
+    })
+  }
+
+  if(context.htmlDomMeta) {
+    console.log('context -->', { context, htmlDomMeta: context.htmlDomMeta })
+    destroyContextHtml(context)
+    delete context.htmlDomMeta
+  }
+
+  if(contexts.length > 1) {
+    return destroyDesignByContexts( contexts.slice(1, contexts.length), ownerSupport, promises )
+  }
 }
 
 function processInit(
@@ -145,7 +194,7 @@ function processInit(
   context.contexts = []
   const element = processElementVar(value, context, ownerSupport, context.contexts)
   
-  paintCommands.push([paintBefore, [insertBefore, element]])
+  paintCommands.push([paintBefore, [insertBefore, element, 'designElement.processInit']])
 
   const dom: DomObjectElement = {
     nn: value.tagName,
@@ -159,156 +208,3 @@ function processInit(
   return element
 }
 
-function processElementVar(
-  value: ElementVar,
-  context: ContextItem,
-  ownerSupport: AnySupport,
-  addedContexts: ContextItem[],
-) {
-  const element = document.createElement( value.tagName )
-  context.element = element
-
-  processAttributeArray(
-    value.attributes,
-    [], // values,
-    element,
-    ownerSupport,
-    context, // context.parentContext,
-    addedContexts,
-  )
-
-  value.innerHTML.forEach(item => {
-    const type = typeof item
-
-    switch (type) {
-      case 'string':
-      case 'number':
-        return handleSimpleInnerValue(item, element)
-      
-      case 'function': {
-        if(item.tagJsType === 'element') {
-          const newElement = processElementVar(item, context, ownerSupport, addedContexts)
-          paintAppends.push([paintAppend, [element, newElement]])
-          return
-        }
-
-        const subContexts: ContextItem[] = []
-        const subContext: ContextItem = {
-          parentContext: context,
-          contexts: subContexts,
-          tagJsVar: {
-            tagJsType: 'dynamic-text',
-            hasValueChanged: () => 0,
-            processInit: blankHandler,
-            processInitAttribute: blankHandler,
-            destroy: (_c, ownerSupport) => {
-              subContexts.forEach(subSub =>
-                subSub.tagJsVar.destroy(subSub, ownerSupport)
-              )
-            },
-            processUpdate: (
-              value: any,
-              contextItem,
-              ownerSupport: AnySupport,
-              values: unknown[],
-            ) => {
-              const newValue = item(newContext)
-              const result = newContext.tagJsVar.processUpdate(
-                newValue, newContext, ownerSupport, values,
-              )
-              newContext.value = newValue
-              return result
-            }
-          },
-
-           // TODO: Not needed
-          valueIndex: -1,
-          withinOwnerElement: true,
-          destroy$: new Subject(),
-        }
-
-        addedContexts.push(subContext)
-        
-        const newContext = processNonElement(
-          item(),
-          context,
-          subContext.contexts as ContextItem[], // addedContexts,
-          element,
-          ownerSupport,
-        )
-
-        return newContext
-        // const textElement = handleSimpleInnerValue(item(), element)
-        // return textElement
-      }
-    }
-
-    if(item.tagJsType === 'element') {
-      const newElement = processElementVar(item, context, ownerSupport, addedContexts)
-      paintAppends.push([paintAppend, [element, newElement]])
-      return
-    }
-
-    processNonElement(item, context, addedContexts, element, ownerSupport)
-  })
-
-  value.listeners.forEach(listener => {
-    const wrap = (...args: any[]) => {
-      const result = (listener[1] as any)(...args)
-      const stateSupport = getSupportWithState(ownerSupport)
-      renderTagUpdateArray([stateSupport])
-      return result
-    }
-
-    addSupportEventListener(
-      ownerSupport.appSupport,
-      listener[0], // eventName
-      element,
-      wrap,
-    )
-  })
-
-  return element
-}
-
-function processNonElement(
-  item: any,
-  context: ContextItem,
-  addedContexts: ContextItem[],
-  element: HTMLElement,
-  ownerSupport: AnySupport,
-) {
-  const tagJsVar = valueToTagJsVar(item)
-  const newContext: ContextItem = {
-    value: item,
-    parentContext: context,
-    tagJsVar,
-
-    // TODO: Not needed
-    valueIndex: -1,
-    withinOwnerElement: true,
-    destroy$: new Subject(),
-  }
-  
-  addedContexts.push(newContext)
-  newContext.placeholder = document.createTextNode('')
-  paintAppends.push([paintAppend, [element, newContext.placeholder]])
-
-  tagJsVar.processInit(
-    item,
-    newContext, // context, // newContext,
-    ownerSupport,
-    newContext.placeholder
-  )
-
-  return newContext
-}
-
-function handleSimpleInnerValue(
-  value: number | string,
-  element: HTMLElement,
-) {
-  const text = document.createTextNode(value as string)
-  paintAppends.push([paintAppend, [element, text]])
-  return text
-}

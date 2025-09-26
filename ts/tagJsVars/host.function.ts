@@ -1,11 +1,11 @@
 import { AttributeContextItem, HostAttributeContextItem } from "../tag/AttributeContextItem.type.js"
 import { AnySupport, ContextItem, TemplateValue, ValueTypes } from "../tag/index.js"
 import { syncWrapCallback } from "../tag/output.function.js"
-import { handleTagTypeChangeFrom } from "../tag/update/checkStillSubscription.function.js"
 import { removeContextInCycle, setContextInCycle } from "../tag/cycles/setContextInCycle.function.js"
 import { MatchesInjection, TagJsVar } from "./tagJsVar.type.js"
 import { initState, reState } from "../state/state.utils.js"
 import { runAfterRender } from "../render/runAfterRender.function.js"
+import { handleTagTypeChangeFrom } from "../tag/update/handleTagTypeChangeFrom.function.js"
 
 /** On specific host life cycles, a callback can be called. 
  * @state always an object */
@@ -109,7 +109,7 @@ function processHostUpdate(
   const args = (newHost.options.arguments || oldOptions.arguments || [])
   contextItem.returnValue = newHost.options.callback(...args)
 
-  runAfterRender()
+  runAfterRender(contextItem)
 }
 
 function processHostAttribute(
@@ -162,11 +162,14 @@ function processHostTagJsVar(
     // const element = contextItem.element as HTMLInputElement
     options.onInit(element, tagJsVar, contextItem, state)
   }
+
+  return returnValue
 }
 
 function deleteHost(
   contextItem: ContextItem,
 ) {
+  ++contextItem.updateCount
   const attrContext = contextItem as any as AttributeContextItem
   const tagJsVar = attrContext.tagJsVar as HostValue
   const options = tagJsVar.options
@@ -206,7 +209,7 @@ function deleteHost(
     }
     
     const stateOwner = (contextItem as any).stateOwner as AnySupport
-    syncWrapCallback(
+    return syncWrapCallback(
       [],
       hostDestroy,
       stateOwner.context,

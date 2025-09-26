@@ -8,7 +8,8 @@ import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types
 
 
 export interface AppContextItem {
-  tagJsVar: TagJsVar  
+  tagJsVar: TagJsVar
+  updateCount: number
 
   returnValue?: any // used when value results in a return value
   

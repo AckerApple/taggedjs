@@ -10,6 +10,8 @@ export function tagValueUpdateHandler(
   contextItem: ContextItem | SupportContextItem,
   ownerSupport: AnySupport,
 ): number {
+  ++contextItem.updateCount
+  
   if((newValue as any)?.tagJsType === 'element') {
     contextItem.tagJsVar.processUpdate(
       newValue, contextItem, ownerSupport, []

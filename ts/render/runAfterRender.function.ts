@@ -19,8 +19,10 @@ export function runAfterSupportRender(
 }
 
 /** run after rendering anything with state */
-export function runAfterRender() {
-  saveState()
+export function runAfterRender(
+  context?: ContextItem,
+) {
+  saveState(context)
   // TODO: prove this is worth having
   // checkStateMismatch(config, support)
   clearStateConfig()
@@ -28,9 +30,11 @@ export function runAfterRender() {
   // setUseMemory.tagClosed$.next(ownerSupport)
 }
 
-function saveState() {
+function saveState(
+  context?: ContextItem
+) {
   const config: StateMemory = setUseMemory.stateConfig
-  const subject = config.context as ContextItem
+  const subject = context || config.context as ContextItem
   subject.state = subject.state || {}
   subject.state.newer = { ...config }
   

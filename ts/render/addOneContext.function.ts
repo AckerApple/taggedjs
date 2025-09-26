@@ -9,12 +9,13 @@ export function addOneContext(
   parentContext: ContextItem,
 ): ContextItem {
   const contextItem: ContextItem = {
+    updateCount: 0,
     value,
     destroy$: new Subject<void>(),
     tagJsVar: valueToTagJsVar(value),
     withinOwnerElement,
     parentContext,
-    
+
     valueIndex: contexts.length, // when -1 its a raw bolt value
   }
 

@@ -27,9 +27,9 @@ export function addSupportEventListener(
     elm.addEventListener(eventName, listener)
   }
 
-  // attach to element but not as "_click" and "_keyup"
+  // attach to element as "_click" and "_keyup"
   ;(element as any)[replaceEventName] = callback
-  // attach to element but not as "click" and "keyup"
+  // attach to element as "click" and "keyup"
   ;(element as any)[eventName] = callback
 }
 

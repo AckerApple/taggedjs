@@ -2,10 +2,11 @@ import { destroyArrayItem } from'./update/compareArrayItems.function.js'
 import { ContextItem } from './ContextItem.type.js'
 
 export function destroyArrayContext(
-  subject: ContextItem,
+  context: ContextItem,
 ) {
-  const lastArray = subject.lastArray as unknown[]
-  destroyArray(subject, lastArray)
+  ++context.updateCount
+  const lastArray = context.lastArray as unknown[]
+  destroyArray(context, lastArray)
 }
 
 /** Deletes entire array context not just one */

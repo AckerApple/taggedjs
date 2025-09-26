@@ -15,6 +15,7 @@ function handleInnerHTML(
   contextItem: ContextItem,
   newSupport: AnySupport,
 ) {
+  ++contextItem.updateCount
   const owner = (value as any).owner
   const realValue = owner._innerHTML
   realValue.processInit = realValue.oldProcessInit

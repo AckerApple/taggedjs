@@ -68,6 +68,7 @@ export function attachDomElements(
 
     // Create parent context for attributes first
     const newParentContext: ContextItem = {
+      updateCount: 0,
       isAttrs: true,
       element: domElement,
       parentContext,

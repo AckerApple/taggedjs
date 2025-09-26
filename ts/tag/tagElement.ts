@@ -128,6 +128,7 @@ function getNewSubject(
   }
 
   const subject: AppSupportContextItem = {
+    updateCount: 0,
     value: templater,
     valueIndex: 0,
     destroy$: new Subject(),
