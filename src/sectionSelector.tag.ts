@@ -58,7 +58,7 @@ export const sectionSelector = (viewTypes = defaultViewTypes) => {
               ${storage.views.includes(type) && 'checked'}
               onclick=${() => toggleViewType(type)}
             />
-            ${meta?.emoji ? meta.emoji + '&nbsp' : null}
+            ${meta?.emoji ? meta.emoji + ' ' : null}
             <label for=${'view-type-' + type}>&nbsp;${type}</label>
             &nbsp;<a href=${`isolated.html#${type}`} style="font-size:.6em;text-decoration:none;">🔗</a>
             &nbsp;<a href=${`#${type}`} style="font-size:.6em;">↗️</a>
