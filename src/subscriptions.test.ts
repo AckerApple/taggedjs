@@ -40,7 +40,13 @@ describe('📰 subscriptions', () => {
       let subValue = htmlById('passed-in-output')
       expect(hideShowValue.textContent).toBe('true')
       expect(htmlById('passed-in-sub-ex0')).toBe(`0||||0`)
-      expect(htmlById('passed-in-sub-ex1')).toBe(`1||your fun number ${subValue}||1`, 'failed after hide')
+
+      const zeros = '0||||0'
+      const ones = '1||||1'
+
+      const _ex1Html = htmlById('passed-in-sub-ex1')
+      const expectedEx1Html = `1||your fun number ${subValue}||1`
+      expect(_ex1Html).toBe(expectedEx1Html, `failed after hide expected #passed-in-sub-ex1 to be ${expectedEx1Html} but its ${_ex1Html}`)
       expect(htmlById('passed-in-sub-ex2')).toBe(`2||your tag number ${subValue}||2`)
 
       increase.click() // show
@@ -52,8 +58,11 @@ describe('📰 subscriptions', () => {
 
       hideShow.click()
 
-      expect(htmlById('passed-in-sub-ex0')).toBe('0||||0')
-      expect(htmlById('passed-in-sub-ex1')).toBe('1||||1', 'failed closing')
+      const ex0Html = htmlById('passed-in-sub-ex0')
+      expect(ex0Html).toBe(zeros, `Lest click check expected #passed-in-sub-ex0 to be ${zeros} but it is ${ex0Html}`)
+      
+      const ex1Html = htmlById('passed-in-sub-ex1')
+      expect(ex1Html).toBe(ones, `Failed closing expected #passed-in-sub-ex1 ${ex1Html} to be ${ones} but it is ${ex1Html}`)
       expect(htmlById('passed-in-sub-ex2')).toBe('2||||2')
     })
   })
@@ -62,11 +71,11 @@ describe('📰 subscriptions', () => {
     let hostDestroyCount = Number(htmlById('hostDestroyCount'))
 
     // should be a number
-    expect(isNaN(Number(htmlById('hostedContent')))).toBe(false)
+    expect(isNaN(Number(htmlById('hostedContent')))).toBe(false, 'hostedContent html not as expected')
 
     clickById('hostHideShow')
 
-    expect( Number(htmlById('hostDestroyCount')) ).toBe(hostDestroyCount + 1)
+    expect( Number(htmlById('hostDestroyCount')) ).toBe(hostDestroyCount + 1, 'host destroy mismatch')
 
     // should NOT be a number
     expect(htmlById('hostedContent')).toBe('')
@@ -74,10 +83,10 @@ describe('📰 subscriptions', () => {
     clickById('hostHideShow')
 
     // should be a number
-    expect(isNaN(Number(htmlById('hostedContent')))).toBe(false)
+    expect(isNaN(Number(htmlById('hostedContent')))).toBe(false, 'hostedContent check 2 not right')
     
     // still same number
-    expect( Number(htmlById('hostDestroyCount')) ).toBe(hostDestroyCount + 1)
+    expect( Number(htmlById('hostDestroyCount')) ).toBe(hostDestroyCount + 1, 'host destroy mismatch 2')
   })
 
   it('basic', () => {

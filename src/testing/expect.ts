@@ -17,7 +17,10 @@ export function createExpect<T>(actual: T): Matchers<T> {
   const callerLine = stack.split('\n')[3] || '' // Get the line that called expect()
   
   return {
-    toBe(expected: T, message?: string | (() => string)) {
+    toBe(
+      expected: T,
+      message?: string | (() => string)
+    ) {
       if (actual !== expected) {
         const errorMessage = typeof message === 'function' ? message() : message
         const fullMessage = errorMessage 
@@ -38,9 +41,12 @@ export function createExpect<T>(actual: T): Matchers<T> {
         throw new Error(`Expected value to be undefined but got ${JSON.stringify(actual)}`)
       }
     },
-    toBeGreaterThan(expected: number) {
+    toBeGreaterThan(
+      expected: number,
+      message?: string | (() => string)
+    ) {
       if (typeof actual !== 'number' || !(actual > expected)) {
-        throw new Error(`Expected ${actual} to be greater than ${expected}`)
+        throw new Error(`Expected ${actual} to be greater than ${expected}\n\n${message}`)
       }
     },
     toHaveLength(expected: number) {

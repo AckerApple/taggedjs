@@ -21,7 +21,9 @@ function appFun(){
     return html`<!--app.js-->
       <h1 id="h1-app">🏷️ TaggedJs - ${2+2}</h1>
 
-      <button type="button" onclick=${() => showHide = !showHide}>show/hide ${showHide}</button>
+      <button type="button"
+        onclick=${() => showHide = !showHide}
+      >show/hide ${showHide}</button>
       ${showHide && fxTag()}
 
 
@@ -115,7 +117,9 @@ export const homePage = () => tag.use = (
   ++renderCount
 
   return html`
-    <button onclick=${() => fireTesting(true, onTestComplete)}>run tests ${testEmoji}</button>
+    <button
+      onclick=${() => fireTesting(true, onTestComplete)}
+    >run tests ${testEmoji}</button>
 
     <fieldset>
       <legend>direct app tests</legend>        

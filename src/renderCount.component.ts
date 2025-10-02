@@ -13,8 +13,8 @@ export const renderCountDiv = tag((
   return div(
     small(
       `(${name} render count`,
-      _=> 22,
-      span.id(`${name}_render_count`)(_=> renderCount),
+      span.id(`${name}_render_count`)
+        (_=> renderCount),
       `)`
     )
   )

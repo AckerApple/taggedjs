@@ -45,6 +45,7 @@ function templaterToSupport(
 ) {
   const context: SupportContextItem = {
     renderCount: 0,
+    updateCount: 0,
     destroy$: new Subject(),
     value: templater,
     valueIndex: 0,
@@ -146,6 +147,7 @@ function processValue(
             valueIndex,
             support,
             {
+              updateCount: 0,
               value,
               valueIndex,
               global: getNewGlobal(subject as SupportContextItem),

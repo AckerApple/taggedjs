@@ -11,7 +11,7 @@ interface Matchers<T> {
   toBe(expected: T, message?: string | (() => string)): void
   toBeDefined(): void
   toBeUndefined(): void
-  toBeGreaterThan(expected: number): void
+  toBeGreaterThan(expected: number, message?: string | (() => string)): void
   toHaveLength(expected: number): void
   not: {
     toBe(expected: T): void
@@ -134,9 +134,11 @@ export function createUnifiedExpect(): ExpectFunction {
           toBeUndefined() {
             matchers.toBeUndefined()
           },
+          /*
           toBeGreaterThan(expected: number) {
             matchers.toBeGreaterThan(expected)
           },
+          */
           toHaveLength(expected: number) {
             matchers.toHaveLength(expected)
           },

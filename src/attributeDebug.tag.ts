@@ -1,4 +1,4 @@
-import { div, fieldset, h3, hr, html, input, legend, li, ol, select, tag } from "taggedjs"
+import { div, fieldset, h3, hr, html, input, legend, li, ol, option, select, tag } from "taggedjs"
 import { subscribeAttributes } from "./subscribeAttributes.tag"
 
 export const attributeDebug = tag(() => {
@@ -11,11 +11,27 @@ export const attributeDebug = tag(() => {
       .placeholder("a b or c")
       .onChange((event: any) => selected = event.target.value),
         
-    select.id("select-sample-drop-down")(
-      ['a','b','c'].map(item => html`
-        <option value=${item} ${item == selected ? 'selected' : ''}>${item} - ${item == selected ? 'true' : 'false'}</option>
-      `.key(item))
-    ),
+    select
+      .onChange(e => selected = e.target.value)
+      .id("select-sample-drop-down")(
+        ['a','b','c'].map(item => 
+          option
+            .value(item)
+            .selected(() => item == selected)
+            (item, ' - ', _=> item == selected ? 'true' : 'false')
+        )
+      ),
+
+    select
+      .onChange(e => selected = e.target.value)
+      .id("select-sample-drop-down-clone")(
+        ['a','b','c'].map(item => 
+          option
+            .value(item)
+            .selected(() => item == selected)
+            (item, ' - ', item == selected ? 'true' : 'false')
+        )
+      ),
     
     hr,
     
@@ -34,9 +50,8 @@ export const attributeDebug = tag(() => {
     div.style("display: flex;flex-wrap:wrap;gap:1em")(
       ol(
         li(
-          div
-            .id("attr-style-strings")
-            .style(() => ({
+          div.id("attr-style-strings")
+            .style(_=> ({
               backgroundColor: isOrange ? 'orange' : '',
               color: isOrange ? 'black': '',
             }))("style.background-color=${'orange'}")
@@ -87,6 +102,6 @@ export const attributeDebug = tag(() => {
       }))('style property test')   
     ),
 
-    subscribeAttributes(),
+    _=> subscribeAttributes(),
   )
 })

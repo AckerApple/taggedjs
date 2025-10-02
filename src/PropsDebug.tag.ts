@@ -70,10 +70,12 @@ export const propsDebugMain = tag((
   <fieldset>
     <legend>date prop</legend>
     date:${date}
-    <input type="date" value=${timestampToValues(date).date} onchange=${(event: InputElementTargetEvent) => {
-      const newDateString = event.target.value
-      date = new Date(newDateString)
-    }} />
+    <input type="date" value=${timestampToValues(date).date}
+      onchange=${(event: InputElementTargetEvent) => {
+        const newDateString = event.target.value
+        date = new Date(newDateString)
+      }}
+    />
     <hr />
     ${propDateDebug({date})}
   </fieldset>

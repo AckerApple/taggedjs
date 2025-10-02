@@ -1,11 +1,12 @@
-import { describe, it, expect } from './testing'
-import { byId, elmCount } from './testing'
+import { byId, elmCount, click, describe, it, expect } from './testing'
 export const fxTime = 160
 
 describe('⠇ array testing', () => {
   it('signal array count and items', () => {
     const signalArrayCount = byId('signal-array-count')
     const initialCount = Number(signalArrayCount.innerText)
+
+    expect(initialCount).toBe(3)
     
     // Check initial array items match count
     for (let i = 0; i < initialCount; i++) {
@@ -16,10 +17,12 @@ describe('⠇ array testing', () => {
     expect(elmCount(`#signal-array-item-${initialCount}`)).toBe(0)
   })
 
-  it('push signal array button', () => {
+  it('push signal array button', async () => {
     const signalArrayCount = byId('signal-array-count')
     const initialCount = Number(signalArrayCount.innerText)
     const pushBtn = byId('push-signal-array-btn')
+
+    expect(initialCount).toBe(3)
     
     // Click push button
     pushBtn.click()
@@ -37,6 +40,16 @@ describe('⠇ array testing', () => {
     // Check count increased again
     expect(Number(signalArrayCount.innerText)).toBe(initialCount + 2)
     expect(elmCount(`#signal-array-item-${initialCount + 1}`)).toBe(1)
+    
+    expect(Number(byId('signal-array-count').innerText)).toBe(5)
+
+    click(`#signal-array-item-delete-btn-3`)
+    click(`#signal-array-item-delete-btn-4`)
+
+    // Wait for animation to complete
+    await delay(fxTime * 2)
+
+    expect(Number(byId('signal-array-count').innerText)).toBe(3)
   })
 
   it('arrays counter display matches item counter displays', () => {
@@ -62,17 +75,21 @@ describe('⠇ array testing', () => {
     expect(newCounterValue).toBe(counterValue + 1)
     
     for (let i = 0; i < arrayLength; i++) {
-      const itemCounter = byId(`signal-array-item-counter-display-${i}`)
-      expect(Number(itemCounter.innerText)).toBe(newCounterValue)
+      const id = `signal-array-item-counter-display-${i}`
+      const itemCounter = byId(id)
+      const value = Number(itemCounter.innerText)
+      expect(value).toBe(newCounterValue, `Index ${i} ID ${id} has ${value} but need toBe ${newCounterValue} like #signal-array-increase-counter`)
     }
   })
 
   it('signal array item delete button with animation', async () => {
     const signalArrayCount = byId('signal-array-count')
     const initialCount = Number(signalArrayCount.innerText)
+
+    expect(initialCount).toBe(3)
     
-    // Ensure we have at least one item to delete
     if (initialCount === 0) {
+      // Ensure we have at least one item to delete
       byId('push-signal-array-btn').click()
     }
     
@@ -89,11 +106,16 @@ describe('⠇ array testing', () => {
     // Wait for animation to complete
     await delay(fxTime)
 
+    expect(Number(byId('signal-array-count').innerText)).toBe(2)
+
     // Check count decreased
-    expect(Number(signalArrayCount.innerText)).toBe(currentCount - 1)
+    const sigCount = Number(signalArrayCount.innerText)
+    const newCount1 = currentCount - 1
+    expect(sigCount).toBe(newCount1, `#signal-array-count has ${sigCount} but expected ${newCount1}`)
 
     // Check item no longer exists
-    expect(elmCount(`#signal-array-item-${currentCount - 1}`)).toBe(0)
+    const itemCount2 = elmCount(`#signal-array-item-2`) // pos 2 is now 1
+    expect(itemCount2).toBe(0, `Expected signal array item 2 but got ${itemCount2}`)
 
     // If there are remaining items, check they've been re-indexed
     const newCount = Number(signalArrayCount.innerText)
@@ -155,7 +177,7 @@ describe('⠇ array testing', () => {
     await delay(fxTime) // animation
     await result
 
-    expect(elmCount('#player-remove-promise-btn-0')).toBe(0)
+    expect(elmCount('#player-remove-promise-btn-0')).toBe(0, 'Expected element not to exist #player-remove-promise-btn-0')
     expect(elmCount('#player-edit-btn-0')).toBe(0)
   })
 

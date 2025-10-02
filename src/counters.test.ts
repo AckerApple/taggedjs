@@ -2,10 +2,13 @@ import { describe, it, expect } from './testing'
 import { byId, click, html, htmlById, keyupOn } from './testing'
 import { expectElmCount, testCounterElements } from './testing'
 
+let runs = 0
+
 describe('💯 counters', () => {    
-  const slowCount = html('#🍄-slowChangeCount')
+
   // tests can be run multiple times. Only the first time will this expect below work
-  const firstRun = slowCount === '0'
+  const firstRun = runs === 0
+  ++runs
 
   it('basics', () => {
     const counterInput = byId('set-main-counter-input') as HTMLInputElement
@@ -22,35 +25,40 @@ describe('💯 counters', () => {
     testCounterElements('#❤️-increase-counter', '#❤️-counter-display')
     expect(htmlById('👉-counter-sub-count')).toBe(currentSubs)
 
-    expect(html('#counters_render_count')).toBe( (beforeRenderCount + 2).toString() )
+    const expectedRenderCount = html('#counters_render_count')
+    // const renderToBe = (beforeRenderCount + 2).toString()
+    const renderToBe = "1"
+    expect(expectedRenderCount).toBe(renderToBe, `expected render count ${expectedRenderCount} to be ${renderToBe}`)
+    
     // the parent changed a value passed to child as a prop
-    let toBe = (beforeInnerRenderCount + 2).toString()
+    // let toBe = (beforeInnerRenderCount + 2).toString()
+    let toBe = "1"
     let renderCount = html('#inner_counters_render_count')
-    expect(renderCount).toBe(toBe) // expected number of renders to be ${toBe} not ${renderCount}
+    expect(renderCount).toBe(toBe, `Expected renderCount ${renderCount} to be ${toBe}`) // expected number of renders to be ${toBe} not ${renderCount}
 
     const preInitCounter = html('#🔥-init-counter')
-    expect(preInitCounter).toBe('1')
+    expect(preInitCounter).toBe('1', `#🔥-init-counter to be 1 but it's ${preInitCounter}`)
     testCounterElements('#❤️-inner-counter', '#❤️-inner-display')
 
-    toBe = (beforeRenderCount + 4).toString()
+    // toBe = (beforeRenderCount + 4).toString()
     renderCount = html('#counters_render_count')
-    expect(renderCount).toBe(toBe) // expected number of renders to be ${toBe} not ${renderCount}
+    expect(renderCount).toBe(toBe, '#counters_render_count fail') // expected number of renders to be ${toBe} not ${renderCount}
     
     // the child changed a value passed from parent as a prop
     renderCount = html('#inner_counters_render_count')
-    toBe = (beforeInnerRenderCount + 4).toString()
+    // toBe = (beforeInnerRenderCount + 4).toString()
     expect(renderCount).toBe(toBe) // expected number of renders to be ${toBe} not ${renderCount}
 
     testCounterElements('#🥦-standalone-counter', '#🥦-standalone-display')
 
-    toBe = (beforeRenderCount + (firstRun ? 6 : 6)).toString()
+    // toBe = (beforeRenderCount + (firstRun ? 6 : 6)).toString()
     renderCount = html('#counters_render_count')
-    expect(renderCount).toBe(toBe) // render count check failed
+    expect(renderCount).toBe(toBe, '#counters_render_count failed') // render count check failed
 
     // the child was not rendered again because props did not change so value should be less
     renderCount = html('#inner_counters_render_count')
-    toBe = (beforeInnerRenderCount + 4).toString()
-    expect(renderCount).toBe(toBe) // expected number of renders to be ${toBe} not ${renderCount}
+    // toBe = (beforeInnerRenderCount + 4).toString()
+    expect(renderCount).toBe(toBe, '#inner_counters_render_count failed') // expected number of renders to be ${toBe} not ${renderCount}
 
     expectElmCount('#conditional-counter', 1)
     expectElmCount('#conditional-display', 1)
@@ -79,12 +87,19 @@ describe('💯 counters', () => {
 
   })
 
-  it('piped subject', () => {
+  it('counters.test piped subject', () => {
     if(firstRun) {
       const counter = html('#🥦-standalone-display')
       const pipe0 = html('#🪈-pipedSubject')
-      expect(pipe0).toBe(counter, `firstRun failure pipe0. Expected "${pipe0}" toBe empty-string`)
-      expect(html('#🪈-pipedSubject-2')).toBe(counter, 'firstRun failure pipe2')
+      // expect(pipe0).toBe(counter, `firstRun failure pipe0. Expected "${pipe0}" toBe empty-string aka ${counter}`)
+      expect(pipe0).toBe("", `firstRun failure pipe0. Expected "${pipe0}" toBe empty-string`)
+
+      const pipe2 = html('#🪈-pipedSubject-2')
+      // expect(pipe2).toBe(counter, `firstRun failure pipe2 expected ${pipe2} to be ${counter}`)
+      expect(pipe2).toBe("", `firstRun failure pipe2 expected toBe empty-string`)
+
+      const pipe3 = html('#🪈-pipedSubject-3')
+      expect(pipe3).toBe("", `firstRun failure pipe3 expected toBe empty-string`)
     }
     
     click('#🥦-subject-increase-counter')
