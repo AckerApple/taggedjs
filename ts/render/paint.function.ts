@@ -134,7 +134,7 @@ function paintRemover(
 ) {
   /*
   if(!element) {
-    console.log('no element by', _caller)
+    console.info('no element by', _caller)
   }
   */
   const parentNode = element.parentNode as ParentNode

@@ -177,6 +177,7 @@ function getOverrideTagVar(
       )
       
       ;(newContext as SupportContextItem).updatesHandler = context.updatesHandler
+      
       if (context.updatesHandler) {
         const updatesHandler = context.updatesHandler as any
         updatesHandler(newContext.value.props)

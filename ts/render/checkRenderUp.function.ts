@@ -11,8 +11,9 @@ export function checkRenderUp(
   templater: TemplaterResult,
   support: AnySupport,
 ) {
-  if(support.context.global.deleted) {
-    return false
+  const global = support.context.global
+  if (global && global.deleted) {
+    return false;
   }
 
   const selfPropChange = hasPropsToOwnerChanged(

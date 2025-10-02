@@ -1,5 +1,5 @@
 import { isSubjectInstance } from '../isInstance.js'
-import { LikeObservable } from '../tagJsVars/subscribe.function.js'
+import { LikeObservable } from '../tagJsVars/processSubscribeWithAttribute.function.js'
 import { combineLatest } from './combineLatest.function.js'
 import { UnaryFunction as OperatorFunction, SubjectSubscriber, Subscription, getSubscription, runPipedMethods } from './subject.utils.js'
 
@@ -12,13 +12,18 @@ export class Subject<T> implements LikeObservable<T> {
   // private?
   subscribers: Subscription<T>[] = []
   subscribeWith?: (x: SubjectSubscriber<T>) => Subscription<T>
+  
+  public value?: any
 
   constructor(
-    public value?: T,
+    value?: T,
     // private? - only used by extending classes
     public onSubscription?: OnSubscription<T>
   ) {
     // defineValueOn(this)
+    if(arguments.length > 0) {
+      this.value = value
+    }
   }
 
   subscribe(callback: SubjectSubscriber<T>) {
@@ -165,7 +170,13 @@ export class Subject<T> implements LikeObservable<T> {
     ...operations: OperatorFunction<any, any, any>[]
   ): Subject<unknown>;
   pipe(...operations: OperatorFunction<any, any, any>[]): Subject<any> {
-    const subject = new Subject(this.value)
+    const args = []
+    
+    if('value' in this) {
+      args.push(this.value)
+    }
+
+    const subject = new Subject(...args)
     subject.setMethods(operations)
     subject.subscribeWith = (x) => this.subscribe(x)
     subject.next = x => this.next(x)
@@ -206,12 +217,10 @@ export class Subjective<T> extends Subject<T> {
   public _value?: T
 
   constructor(
-    public value?: T,
-    // private?
-    public onSubscription?: OnSubscription<T>
+    ...args: [value?: T, onSubscription?: OnSubscription<T>]
   ) {
-    super(value, onSubscription)
-    this._value = value
+    super(...args)
+    this._value = args[0]
     defineValueOn(this)
   }
 

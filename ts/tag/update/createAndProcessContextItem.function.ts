@@ -33,7 +33,6 @@ export function createAndProcessContextItem(
 
   if(!appendTo) {
     contextItem.placeholder = insertBefore
-    // paintCommands.push([paintBefore, [insertBefore, element]])
   }
 
   domProcessContextItem(

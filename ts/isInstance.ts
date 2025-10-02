@@ -55,6 +55,8 @@ export function isPromise(value: any) {
 
 export function isFunction(value: any) {
   return typeof value === BasicTypes.function
+  // TODO: Start using this instead
+  return value instanceof Function
 }
 
 export function isObject(value: any) {

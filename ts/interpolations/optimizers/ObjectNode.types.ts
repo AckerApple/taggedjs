@@ -33,11 +33,7 @@ export type DomObjectText = ObjectText & {
   marker: Text
 }
 export type DomObjectElement = ObjectElement & {
-  at: [
-    string, // name
-    any, // value
-    boolean, // isSpecial
-  ][] // attributes
+  at: Attribute[] // attributes
   domElement: HTMLElement
   
   ch?: DomObjectChildren // children

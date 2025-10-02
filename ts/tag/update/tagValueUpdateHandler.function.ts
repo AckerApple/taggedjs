@@ -12,7 +12,10 @@ export function tagValueUpdateHandler(
 ): number {
   ++contextItem.updateCount
   
-  if((newValue as any)?.tagJsType === 'element') {
+  // TODO: When a tag-conversion occurs we should swap a different processUpdate that only runs the code below
+  const tagJsType = contextItem.tagJsVar.tagJsType
+  if( tagJsType && ['tag-conversion','element'].includes(tagJsType) ) {
+    // calls processDesignElementUpdate
     contextItem.tagJsVar.processUpdate(
       newValue, contextItem, ownerSupport, []
     )

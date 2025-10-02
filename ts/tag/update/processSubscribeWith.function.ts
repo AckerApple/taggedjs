@@ -63,25 +63,3 @@ export function emitSubContext(
     0
   )
 }
-
-export function processSignal(
-  value: SignalObject<any>,
-  contextItem: ContextItem,
-  ownerSupport: AnySupport,
-  _insertBefore?: Text,
-  appendTo?: Element,
-) {
-  const subValue: SubscribeValue = {
-    tagJsType: ValueTypes.subscribe,
-    states: [],
-    Observables: [value],
-  } as any as SubscribeValue
-
-  setupSubscribe(
-    subValue,
-    contextItem,
-    ownerSupport,
-    undefined,
-    appendTo,
-  )
-}

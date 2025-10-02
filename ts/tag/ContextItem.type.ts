@@ -8,6 +8,10 @@ import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types
 
 
 export interface AppContextItem {
+  /** automatically updated with every update */
+  value?: any,
+
+  /** Not updated automatically. processUpdate has the option to set this value */
   tagJsVar: TagJsVar
   updateCount: number
 
@@ -18,8 +22,8 @@ export interface AppContextItem {
 
   /** only for html`` . When -1 then its a raw bolt value */
   valueIndex: number
-  
-  value?: any,
+
+  /** TODO: is this deprecated? */
   oldTagJsVar?: TagJsVar  
 
   // subscribe() and innerHTML

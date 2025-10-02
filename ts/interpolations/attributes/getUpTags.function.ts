@@ -36,9 +36,12 @@ export function getUpTags(
   const tagJsType = support.templater.tagJsType
   const canContinueUp = ownerSupport && tagJsType !== ValueTypes.stateRender
   const continueUp = canContinueUp && (!isComponent || checkRenderUp(newSupport.templater, newSupport))
+
   
-  const proSupports = providersChangeCheck(newSupport)
-  supports.push(...proSupports)
+  if( newSupport.context.global ) {
+    const proSupports = providersChangeCheck(newSupport)
+    supports.push(...proSupports)
+  }
 
   if(continueUp) {
     getUpTags(ownerSupport, supports)

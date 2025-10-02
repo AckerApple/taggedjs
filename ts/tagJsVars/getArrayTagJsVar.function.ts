@@ -1,5 +1,5 @@
 import { checkArrayValueChange } from '../tag/checkDestroyPrevious.function.js'
-import { processTagArray } from '../tag/update/processTagArray.js'
+import { processTagArray } from '../tag/update/arrays/processTagArray.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { AnySupport } from '../tag/index.js'
 import { TagJsTag, TagJsVar } from './tagJsVar.type.js'

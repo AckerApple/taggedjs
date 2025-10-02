@@ -1,14 +1,14 @@
 import { state } from './index.js'
 import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
-import { processSignal } from '../tag/update/processSubscribeWith.function.js'
+import { processSignal } from '../tag/update/processSignal.function.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { ProcessInit } from '../tag/ProcessInit.type.js'
-import { Subscriber, SubscribeFn } from '../tagJsVars/subscribe.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { deleteAndUnsubscribe } from '../tag/update/setupSubscribe.function.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { checkSubscribeValueChanged } from '../tagJsVars/subscribeWith.function.js'
 import { processUpdateSubscribe } from '../tag/update/processUpdateSubscribe.function.js'
+import { SubscribeFn, Subscriber } from '../tagJsVars/processSubscribeWithAttribute.function.js'
 
 
 /** Checks if rendering cycle in process. Then creates object with "value" key and ability to "subscribe" to value changes */

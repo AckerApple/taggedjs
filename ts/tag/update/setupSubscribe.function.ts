@@ -1,5 +1,5 @@
 import { ContextItem } from '../ContextItem.type.js'
-import { LikeObservable, SubscribeValue } from '../../tagJsVars/subscribe.function.js'
+import { SubscribeValue } from '../../tagJsVars/subscribe.function.js'
 import { paint } from '../../render/paint.function.js'
 import { setUseMemory } from '../../state/setUseMemory.object.js'
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js'
@@ -13,6 +13,7 @@ import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { processUpdateSubscribe } from './processUpdateSubscribe.function.js'
 import { removeContextInCycle, setContextInCycle } from '../cycles/setContextInCycle.function.js'
+import { LikeObservable } from '../../tagJsVars/processSubscribeWithAttribute.function.js'
 
 export function setupSubscribe(
   value: SubscribeValue,
@@ -157,8 +158,11 @@ export function unsubscribeContext(
   contextItem: ContextItem,
 ) {
   const subscription = contextItem.subContext as SubscriptionContext
+  if( !subscription ) {
+    return // TODO: wonder why this happens, maybe subscription never emits?
+  }
+
   const subscriptions = subscription.subscriptions
-  
   subscriptions.forEach(sub => sub.unsubscribe())
   delete contextItem.subContext
 }

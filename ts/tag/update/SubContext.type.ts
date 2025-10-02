@@ -1,5 +1,6 @@
 import { ContextItem, TemplateValue } from "../../index.js"
-import { LikeSubscription, SubscribeValue } from '../../tagJsVars/subscribe.function.js'
+import { LikeSubscription } from "../../tagJsVars/processSubscribeWithAttribute.function.js"
+import { SubscribeValue } from '../../tagJsVars/subscribe.function.js'
 import { TagJsVar } from "../../tagJsVars/tagJsVar.type.js"
 
 export interface SubContext {

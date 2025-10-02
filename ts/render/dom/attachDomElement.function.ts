@@ -29,9 +29,9 @@ export function attachDomElement(
   }
 
   if (appendTo) {
-    paintAppends.push([paintAppend, [appendTo, domElement]])
+    paintAppends.push([paintAppend, [appendTo, domElement, 'appendToAttachDomElement']])
   } else {
-    paintCommands.push([paintBefore, [insertBefore, domElement]])
+    paintCommands.push([paintBefore, [insertBefore, domElement, 'insertBeforeAttachDomElement']])
   }
   
   return attributeContexts

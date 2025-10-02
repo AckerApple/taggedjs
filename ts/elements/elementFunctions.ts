@@ -1,15 +1,24 @@
-import { isObject } from '../index.js';
+import { isFunction, isObject, isPromise } from '../index.js';
 import { HowToSet, setBooleanAttribute, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
+import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
-import { getPushKid, ElementFunction, ElementVar } from './designElement.function.js'
+import { getPushKid, ElementVar } from './designElement.function.js'
 
-export const elementFunctions = (item: any) => {
+export function elementFunctions(item: any) {
+  /** Used for all element callbacks */
   function makeCallback(eventName: string) {
     return function (callback: (e: InputElementTargetEvent) => any) {
       const clone = getPushKid(item as any, item.elementFunctions);
-      clone.listeners.push([eventName, callback]);
-      return clone;
-    };
+      function wrapCallback(e: InputElementTargetEvent) {
+        return wrapCallback.toCallback(e)
+      }
+      wrapCallback.toCallback = callback
+      
+      clone.listeners.push([eventName, wrapCallback])
+      clone.allListeners.push([eventName, wrapCallback])
+      
+      return clone
+    }
   }
 
   function makeAttributeHandler(
@@ -21,11 +30,16 @@ export const elementFunctions = (item: any) => {
     ) {
       const clone = getPushKid(item as any, item.elementFunctions)
       clone.attributes.push([attrName, value, false, howToSet])
+
+      if(isValueForContext(value)) {
+        registerMockAttrContext(value, clone)
+      }
+
       return clone
     };
   }
 
-  const elmAttachments = {
+  return {
     onClick: makeCallback('click'),    
     onChange: makeCallback('onchange'),
     onKeyup: makeCallback('onkeyup'),
@@ -35,7 +49,14 @@ export const elementFunctions = (item: any) => {
       ...args: [name: string | unknown, value?: any]
     ) {
       const clone = getPushKid(item as any, item.elementFunctions)
-      clone.attributes.push(args)
+      clone.attributes.push(args as Attribute)
+
+      if( isValueForContext(args[0]) ) {
+        registerMockAttrContext(args[0], clone) // the attrName is a function or TagJsVar
+      } else if( isValueForContext(args[1]) ) {
+        registerMockAttrContext(args[1], clone) // the attrValue is a function or TagJsVar
+      }
+
       return clone
     },
 
@@ -61,8 +82,6 @@ export const elementFunctions = (item: any) => {
      return this
     },
   }
-
-  return elmAttachments
 }
 
 function setClassValue(
@@ -86,4 +105,32 @@ function setClassValue(
     name,
     value
   )
+}
+
+/** used during updates */
+export function registerMockAttrContext(
+  value: any,
+  mockElm: ElementVar,
+) {
+  if(!mockElm.contexts) {
+    mockElm.contexts = []
+  }
+
+  mockElm.contexts.push(value)
+}
+
+/** used during updates */
+export function registerMockChildContext(
+  value: any,
+  mockElm: ElementVar,
+) {
+  if(!mockElm.contexts) {
+    mockElm.contexts = []
+  }
+
+  mockElm.contexts.push( value )
+}
+
+export function isValueForContext(value: any) {
+  return Array.isArray(value) || isFunction(value) || value?.tagJsType
 }

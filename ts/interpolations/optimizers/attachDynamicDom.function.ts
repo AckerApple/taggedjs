@@ -31,7 +31,9 @@ export function attachDynamicDom(
   if(appendTo) {
     paintAppends.push([paintAppend, [appendTo, marker]])
   } else {
-    paintCommands.push([paintBefore, [insertBefore, marker]])
+    paintCommands.push([
+      paintBefore, [insertBefore, marker, 'attachDynamicDom.attachDynamicDom']
+    ])
   }
 
   domProcessContextItem(

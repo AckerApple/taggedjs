@@ -1,14 +1,14 @@
 // taggedjs-no-compile
 
-import { TemplaterResult } from '../getTemplaterResult.function.js'
-import { tagValueUpdateHandler } from './tagValueUpdateHandler.function.js'
-import { LastArrayItem } from '../Context.types.js'
+import { TemplaterResult } from '../../getTemplaterResult.function.js'
+import { tagValueUpdateHandler } from '../tagValueUpdateHandler.function.js'
+import { LastArrayItem } from '../../Context.types.js'
 import { compareArrayItems } from './compareArrayItems.function.js'
-import { AnySupport } from '../index.js'
-import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
-import { TemplateValue } from '../TemplateValue.type.js'
-import { Tag } from '../Tag.type.js'
-import { ContextItem } from '../ContextItem.type.js'
+import { AnySupport } from '../../index.js'
+import { createAndProcessContextItem } from '../createAndProcessContextItem.function.js'
+import { TemplateValue } from '../../TemplateValue.type.js'
+import { Tag } from '../../Tag.type.js'
+import { ContextItem } from '../../ContextItem.type.js'
 
 export function processTagArray(
   contextItem: ContextItem,

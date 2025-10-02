@@ -89,6 +89,7 @@ export function afterTagCallback(
   }
 
   const tagsToUpdate = getUpTags(last)
+
   renderTagUpdateArray(tagsToUpdate)
   return checkToResolvePromise(
     callbackResult,

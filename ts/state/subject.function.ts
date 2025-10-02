@@ -6,7 +6,7 @@ import { ContextStateMeta, ContextStateSupport } from '../tag/ContextStateMeta.t
 import { setUseMemory } from './setUseMemory.object.js'
 import { state } from './state.function.js'
 import { oldSyncStates } from './syncStates.function.js'
-import { LikeObservable } from '../tagJsVars/index.js'
+import { LikeObservable } from '../tagJsVars/processSubscribeWithAttribute.function.js'
 
 /** Create a Subject that on updates will sync state values to keep chained functions using latest variables */
 export function subject<T>(

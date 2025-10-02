@@ -53,9 +53,8 @@ function processSimpleValueInit(
   contextItem: ContextItem,
   ownerSupport: AnySupport,
   insertBefore?: Text,
-  // appendTo?: Element,      
+  appendTo?: Element,      
 ) {
-  // value = value.value
   const castedValue = castTextValue(value)
 
   insertBefore = contextItem.placeholder as Text
@@ -64,7 +63,7 @@ function processSimpleValueInit(
   const paint = contextItem.paint = [paintBeforeText, [insertBefore, castedValue, function afterSimpleValue(x: Text) {
     contextItem.simpleValueElm = x
     delete contextItem.paint
-  }]]
+  }, 'processSimpleValueInit']]
   paintCommands.push(paint)
 }
 

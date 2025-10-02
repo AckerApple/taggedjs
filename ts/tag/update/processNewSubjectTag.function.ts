@@ -27,15 +27,15 @@ export function processNewSubjectTag(
       if(appendTo) {
         paintAppends.push([paintAppend, [appendTo, dom.marker]])
       } else {
-        paintCommands.push([paintBefore, [insertBefore, dom.marker]])
+        paintCommands.push([paintBefore, [insertBefore, dom.marker, 'subMarker']])
       }
     }
 
     if(dom.domElement) {
       if(appendTo) {
-        paintAppends.push([paintAppend, [appendTo, dom.domElement]])
+        paintAppends.push([paintAppend, [appendTo, dom.domElement, 'subAppendTo']])
       } else {
-        paintCommands.push([paintBefore, [insertBefore, dom.domElement]])
+        paintCommands.push([paintBefore, [insertBefore, dom.domElement, 'subInsertBefore']])
       }
     }
   }

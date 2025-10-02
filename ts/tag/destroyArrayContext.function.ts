@@ -1,4 +1,4 @@
-import { destroyArrayItem } from'./update/compareArrayItems.function.js'
+import { destroyArrayItem } from'./update/arrays/compareArrayItems.function.js'
 import { ContextItem } from './ContextItem.type.js'
 
 export function destroyArrayContext(

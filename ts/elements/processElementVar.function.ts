@@ -1,4 +1,4 @@
-import { AnySupport, Subject, valueToTagJsVar } from '../index.js'
+import { AnySupport, isPromise, Subject, valueToTagJsVar } from '../index.js'
 import { addSupportEventListener } from '../interpolations/attributes/addSupportEventListener.function.js'
 import { getSupportWithState } from '../interpolations/attributes/getSupportWithState.function.js'
 import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArray.function.js'
@@ -58,23 +58,28 @@ export function processElementVar(
     return processNonElement(item, context, addedContexts, element, ownerSupport)
   })
 
-  value.listeners.forEach(listener => {
+  value.listeners.forEach((listener, index) => {
     const wrap = (...args: any[]) => {
-      const toCall = listener[1]
+      const listenScope = value.listeners[index]
+      const toCall = listenScope[1]
       const stateSupport = getSupportWithState(ownerSupport)
       const updateCount = stateSupport.context.updateCount
 
       const result = (toCall as any)(...args)
 
-      console.log('updateCount !== stateSupport.context.updateCount', {
-        updateCount, newUpdateCount: stateSupport.context.updateCount
-      })
-      if( updateCount !== stateSupport.context.updateCount ) {
-        return // the call back resulted in an update render
+      if( updateCount === stateSupport.context.updateCount ) {
+        renderTagUpdateArray([stateSupport])
       }
 
-      renderTagUpdateArray([stateSupport])
-      return result;
+
+      if( isPromise(result) ) {
+        return result.then(() => {
+          renderTagUpdateArray([stateSupport.context.state.newest as AnySupport])
+          return 'promise-no-data-ever'
+        })
+      }
+
+      return 'no-data-ever'
     }
 
     addSupportEventListener(

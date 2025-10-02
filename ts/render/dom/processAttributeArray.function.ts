@@ -5,7 +5,7 @@ import { AnySupport } from "../../tag/AnySupport.type.js"
 import { Attribute } from "../../interpolations/optimizers/ObjectNode.types.js"
 
 export function processAttributeArray(
-  attrs: Attribute[] & [string, any, boolean][],
+  attrs: Attribute[],
   values: any[],
   domElement: HTMLElement,
   support: AnySupport,

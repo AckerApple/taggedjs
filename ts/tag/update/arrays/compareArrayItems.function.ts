@@ -1,10 +1,10 @@
-import { LastArrayItem } from '../Context.types.js'
-import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.function.js'
-import { destroySupport } from '../../render/destroySupport.function.js'
-import { SupportContextItem } from '../SupportContextItem.type.js'
-import type { StringTag } from '../StringTag.type.js'
-import { Tag } from '../Tag.type.js'
-import { ContextItem } from '../ContextItem.type.js'
+import { LastArrayItem } from '../../Context.types.js'
+import { SupportTagGlobal, TemplaterResult } from '../../getTemplaterResult.function.js'
+import { destroySupport } from '../../../render/destroySupport.function.js'
+import { SupportContextItem } from '../../SupportContextItem.type.js'
+import type { StringTag } from '../../StringTag.type.js'
+import { Tag } from '../../Tag.type.js'
+import { ContextItem } from '../../ContextItem.type.js'
 
 export function compareArrayItems(
   value: (TemplaterResult | Tag)[],

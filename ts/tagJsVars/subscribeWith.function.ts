@@ -2,7 +2,8 @@ import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { ContextItem, ValueTypes } from "../tag/index.js"
 import { processSubscribeWith } from "../tag/update/processSubscribeWith.function.js"
 import { deleteAndUnsubscribe } from "../tag/update/setupSubscribe.function.js"
-import { LikeObservable, processSubscribeWithAttribute, SubscribeCallback, SubscribeValue } from "./subscribe.function.js"
+import { SubscribeValue } from "./index.js"
+import { LikeObservable, processSubscribeWithAttribute, SubscribeCallback } from "./processSubscribeWithAttribute.function.js"
 
 /** Have an html tagged value as value of subscribe emissions, with initial default value emission. Automatically unsubscribes for you */
 export function subscribeWith<SubValue, DEFAULT>(

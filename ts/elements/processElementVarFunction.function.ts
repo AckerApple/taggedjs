@@ -1,9 +1,7 @@
 import { AnySupport, Subject } from '../index.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
-import { paintAppends, paintAppend } from '../render/paint.function.js'
 import { ContextItem } from '../tag/index.js'
-import { ElementVar } from './designElement.function.js'
-import { processElementVar, processNonElement } from './processElementVar.function.js'
+import { processNonElement } from './processElementVar.function.js'
 
 export function processElementVarFunction(
   item: any,
@@ -37,8 +35,8 @@ export function processElementVarFunction(
         values: unknown[],
       ) => {
         ++subContext.updateCount
-
-        const newValue = item(aSubContext)
+        
+        const newValue = value(aSubContext)
         const result = aSubContext.tagJsVar.processUpdate(
           newValue,
           aSubContext,

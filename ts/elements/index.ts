@@ -1,4 +1,4 @@
-import { designElement } from './designElement.function.js'
+import { designElement, ElementFunction, ElementVar } from './designElement.function.js'
 
 export const button = designElement('button')
 export const select = designElement('select')
