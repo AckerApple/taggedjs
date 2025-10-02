@@ -1,5 +1,6 @@
 import { html, Subject } from "taggedjs"
 import { runTesting } from "./runTesting.function"
+import { outputSections } from "./renderedSections.tag"
 
 export enum ViewTypes {
   Basic = 'basic',
@@ -38,20 +39,26 @@ const defaultViewTypes = Object.values(ViewTypes)
 
 export const sectionSelector = (viewTypes = defaultViewTypes) => {
   // Sort viewTypes alphabetically
-  const sortedViewTypes = [...viewTypes].sort((a, b) => a.localeCompare(b));
+  const sortedViewTypes = [...viewTypes]
+    .sort((a, b) => a.localeCompare(b))
+    .map(type => ({
+      type,
+      meta: outputSections.find(s => s.view === type),
+    }))
   
   return html`
     <div>
-      <h3>Sections</h3>
+      <h3>᭟ Sections</h3>
       <!-- checkbox menu -->
       <div style="display:flex;gap:1em;flex-wrap:wrap;margin:1em;">
-        ${sortedViewTypes.map(type => html`
+        ${sortedViewTypes.map(({meta, type}) => html`
           <div style="flex:0 0 auto;min-width:150px;white-space:nowrap;">
             <input type="checkbox"
               id=${'view-type-' + type} name=${'view-type-' + type}
               ${storage.views.includes(type) && 'checked'}
               onclick=${() => toggleViewType(type)}
             />
+            ${meta?.emoji ? meta.emoji + '&nbsp' : null}
             <label for=${'view-type-' + type}>&nbsp;${type}</label>
             &nbsp;<a href=${`isolated.html#${type}`} style="font-size:.6em;text-decoration:none;">🔗</a>
             &nbsp;<a href=${`#${type}`} style="font-size:.6em;">↗️</a>

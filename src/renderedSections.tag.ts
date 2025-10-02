@@ -55,11 +55,11 @@ export const outputSections: (OutputSection & {tag: any})[] = [{
 },{
   view: ViewTypes.Destroys, tag: destroys, emoji:'🗑️',
 },{
-  view: ViewTypes.FunInPropsTag, tag: funInPropsTag,
+  view: ViewTypes.FunInPropsTag, tag: funInPropsTag, emoji: '🤡'
 },{
   view: ViewTypes.AttributeDebug, tag: attributeDebug, emoji:'🏹',
 },{
-  view: ViewTypes.Todo, tag: tag(todoApp),
+  view: ViewTypes.Todo, tag: tag(todoApp), emoji: '✏️'
 },{
   view: ViewTypes.Counters, tag: counters, emoji:'💯',
 },{
