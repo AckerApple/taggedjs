@@ -4,7 +4,7 @@ import { paintBefore, paintCommands } from '../render/paint.function.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { ReadOnlyVar, TagJsVar } from '../tagJsVars/tagJsVar.type.js'
-import { elementFunctions, isValueForContext, registerMockChildContext } from './elementFunctions.js'
+import { elementFunctions, isValueForContext, loopObjectAttributes, registerMockChildContext } from './elementFunctions.js'
 import { processElementVar } from './processElementVar.function.js'
 import { destroyDesignElement } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
@@ -31,7 +31,17 @@ type ElementVarBase = ReadOnlyVar & {
 }
 
 export type ElementFunction = (
-  (...children: (((_: any) => any) | string | boolean | object | undefined | number | null)[]) => any
+  (
+    ...children: (
+      ((_: any) => any) | string | boolean | undefined | number | null | object | {
+        onKeyup: (_: InputElementTargetEvent) => any;
+        onClick: (_: InputElementTargetEvent) => any;
+        onChange: (_: InputElementTargetEvent) => any;
+      } & {
+        [attr: string]: string | ((_: ContextItem) => any)
+      }
+    )[]
+  ) => any
 ) & ElementVarBase
 
 export type ElementVar = ElementFunction & ReturnType<typeof elementFunctions>
@@ -60,6 +70,7 @@ export function designElement(
 
   
   const pushKid = getPushKid(element, elementFunctions)
+  pushKid.tagName = tagName
   
   return pushKid as ElementVar
 }
@@ -73,6 +84,17 @@ export function getPushKid(
     newElement.attributes = [...pushKid.attributes] as Attribute[]
     newElement.listeners = [...pushKid.listeners]
     newElement.allListeners = [...pushKid.allListeners]
+
+    if(
+      args.length > 0 &&
+      typeof args[0] === 'object' &&
+      !Array.isArray(args[0]) && 
+      !args[0].tagJsType // TODO: need better attribute detection
+    ) {
+      loopObjectAttributes(newElement, args[0])
+      args.splice(0,1)
+    }
+    
     newElement.innerHTML = args
 
     // review each child for potential to be context

@@ -1,23 +1,73 @@
-import { isFunction, isObject, isPromise } from '../index.js';
+import { ContextItem, isFunction, isObject, isPromise } from '../index.js';
 import { HowToSet, setBooleanAttribute, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
 import { getPushKid, ElementVar } from './designElement.function.js'
 
+function callbackWrapper(
+  item: ElementVar,
+  eventName: string,
+  callback: (e: InputElementTargetEvent) => any
+) {
+  const clone = getPushKid(item as any, item.elementFunctions);
+
+  return callbackWrapper2(clone, eventName, callback)
+}
+
+function callbackWrapper2(
+  item: ElementVar,
+  eventName: string,
+  callback: (e: InputElementTargetEvent) => any
+) {
+  function wrapCallback(e: InputElementTargetEvent) {
+    return wrapCallback.toCallback(e)
+  }
+  wrapCallback.toCallback = callback
+  
+  item.listeners.push([eventName, wrapCallback])
+  item.allListeners.push([eventName, wrapCallback])
+  
+  return item
+}
+
+function attr(
+  item: any,
+  args: [name: string | unknown, value?: any]
+) {
+  const clone = getPushKid(item as any, item.elementFunctions)
+  clone.attributes.push(args as Attribute)
+
+  if( isValueForContext(args[0]) ) {
+    registerMockAttrContext(args[0], clone) // the attrName is a function or TagJsVar
+  } else if( isValueForContext(args[1]) ) {
+    registerMockAttrContext(args[1], clone) // the attrValue is a function or TagJsVar
+  }
+
+  return clone
+}
+
+function attr2(
+  item: ElementVar,
+  args: [name: string | unknown, value?: any]
+) {
+  // const clone = getPushKid(item as any, item.elementFunctions)
+  // clone.attributes.push(args as Attribute)
+  item.attributes.push(args as Attribute)
+
+  if( isValueForContext(args[0]) ) {
+    registerMockAttrContext(args[0], item) // the attrName is a function or TagJsVar
+  } else if( isValueForContext(args[1]) ) {
+    registerMockAttrContext(args[1], item) // the attrValue is a function or TagJsVar
+  }
+
+  return item
+}
+
 export function elementFunctions(item: any) {
   /** Used for all element callbacks */
   function makeCallback(eventName: string) {
     return function (callback: (e: InputElementTargetEvent) => any) {
-      const clone = getPushKid(item as any, item.elementFunctions);
-      function wrapCallback(e: InputElementTargetEvent) {
-        return wrapCallback.toCallback(e)
-      }
-      wrapCallback.toCallback = callback
-      
-      clone.listeners.push([eventName, wrapCallback])
-      clone.allListeners.push([eventName, wrapCallback])
-      
-      return clone
+      return callbackWrapper(item,eventName,callback)
     }
   }
 
@@ -39,49 +89,22 @@ export function elementFunctions(item: any) {
     };
   }
 
-  return {
+  const callables = {
     onClick: makeCallback('click'),    
     onChange: makeCallback('onchange'),
     onKeyup: makeCallback('onkeyup'),
 
     /* apply attribute via attr(name: string, value?: any): **/
-    attr: function (
-      ...args: [name: string | unknown, value?: any]
-    ) {
-      const clone = getPushKid(item as any, item.elementFunctions)
-      clone.attributes.push(args as Attribute)
-
-      if( isValueForContext(args[0]) ) {
-        registerMockAttrContext(args[0], clone) // the attrName is a function or TagJsVar
-      } else if( isValueForContext(args[1]) ) {
-        registerMockAttrContext(args[1], clone) // the attrValue is a function or TagJsVar
-      }
-
-      return clone
-    },
-
-    /** element.setAttribute('style', x)  */
-    style: makeAttributeHandler('style', setNonFunctionInputValue),
-    class: makeAttributeHandler('class', setClassValue),
-    id: makeAttributeHandler('id', setNonFunctionInputValue),
-    
-    // only for certain elements
-    placeholder: makeAttributeHandler('placeholder', setNonFunctionInputValue),
-    value: makeAttributeHandler('value', setNonFunctionInputValue),
-    type: makeAttributeHandler('type', setNonFunctionInputValue),
-    
-    /** sets or removes selected attribute by checking for any truthy value */
-    selected: makeAttributeHandler('selected', setBooleanAttribute),
-    
-    /** sets or removes checked attribute by checking for any truthy value */
-    checked: makeAttributeHandler('checked', setBooleanAttribute),
-    
+    attr: (...args: any[]) => attr(item, args as any),
+        
     /** Used for setting array index-key value */
     key: function (arrayValue: any) {
      ;(this as any).arrayValue = arrayValue
      return this
     },
   }
+
+  return callables
 }
 
 function setClassValue(
@@ -133,4 +156,43 @@ export function registerMockChildContext(
 
 export function isValueForContext(value: any) {
   return Array.isArray(value) || isFunction(value) || value?.tagJsType
+}
+
+function setupAttr(attrName: string, howToSet: HowToSet) {
+  return (item: ElementVar, value: any) => attr2(item, [attrName, value, false, howToSet] as any)
+}
+
+function makeCallback(eventName: string) {
+  return (item: ElementVar, callback: (e: InputElementTargetEvent) => any) => {
+    return callbackWrapper2(item, eventName, callback)
+  }
+}
+
+const callables = {
+  checked: setupAttr('checked', setBooleanAttribute),
+  selected: setupAttr('selected', setBooleanAttribute),
+
+  /** element.setAttribute('style', x)  */
+  class: setupAttr('class', setClassValue),
+
+  onClick: makeCallback('click'),
+  onChange: makeCallback('onchange'),
+  onKeyup: makeCallback('onkeyup'),
+}
+
+export function loopObjectAttributes(
+  item: ElementVar,
+  object: any,
+) {
+  const result = Object.entries(object).reduce((all, [name, value]) => {
+    if(name in callables) {
+      return (callables as any)[name](item, value)
+    }
+
+    // return item[name](value)
+    // return attr2(all, [name, value] as any)
+    return attr2(item, [name, value, false, setNonFunctionInputValue] as any)
+  }, item) as ElementVar
+
+  return result
 }
