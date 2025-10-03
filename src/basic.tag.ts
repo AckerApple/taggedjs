@@ -32,22 +32,22 @@ const boltTag = tag((parentCounter: number) => {
   return div(
     () => `color: ${color}`,
 
-    select.onChange(e => color = e.target.value)(
-      option.value('red')('red'),
-      option.value('green')('green'),
+    select({onChange: e => color = e.target.value},
+      option({value:'red'}, 'red'),
+      option({value:'green'}, 'green'),
     ),
 
     () => arrayBoltTest(parentCounter),
 
-    span.style(() => 'color:' + color)('hello my span world'),
-    
-    div.style(() => 'color:' + color)('hello my div world'),
-    
-    button.onClick(() => ++clickCount)('click me'),
+    span({style: _=> 'color:' + color}, 'hello my span world'),
 
-    div(() => `click counts ${clickCount}`),
-    div(() => `parent counter: ${parentCounter}`),
-    div(() => `combined counters: ${clickCount + parentCounter}`),
+    div({style: _=> 'color:' + color}, 'hello my div world'),
+
+    button({onClick: () => ++clickCount}, 'click me'),
+
+    div(_=> `click counts ${clickCount}`),
+    div(_=> `parent counter: ${parentCounter}`),
+    div(_=> `combined counters: ${clickCount + parentCounter}`),
   )
 })
 
@@ -59,6 +59,6 @@ const arrayBoltTest = tag((parentCounter) => {
     div('hello array bolt 1'),
     div(`innerCounter: `, _=> innerCounter),
     div(() => `parent counter: ${parentCounter}`),
-    button.onClick(() => ++innerCounter)('inner counter')
+    button({onClick: () => ++innerCounter}, 'inner counter')
   ]
 })

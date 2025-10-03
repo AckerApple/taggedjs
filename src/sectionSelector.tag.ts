@@ -1,6 +1,8 @@
-import { html, Subject } from "taggedjs"
+import { Subject, div, h3, input, label, a, fieldset, span, legend } from "taggedjs"
 import { runTesting } from "./runTesting.function"
 import { outputSections } from "./renderedSections.tag"
+
+class b {}
 
 export enum ViewTypes {
   Basic = 'basic',
@@ -45,44 +47,63 @@ export const sectionSelector = (viewTypes = defaultViewTypes) => {
       type,
       meta: outputSections.find(s => s.view === type),
     }))
-  
-  return html`
-    <div>
-      <h3>᭟ Sections</h3>
-      <!-- checkbox menu -->
-      <div style="display:flex;gap:1em;flex-wrap:wrap;margin:1em;">
-        ${sortedViewTypes.map(({meta, type}) => html`
-          <div style="flex:0 0 auto;min-width:150px;white-space:nowrap;">
-            <input type="checkbox"
-              id=${'view-type-' + type} name=${'view-type-' + type}
-              ${storage.views.includes(type) && 'checked'}
-              onclick=${() => toggleViewType(type)}
-            />
-            ${meta?.emoji ? meta.emoji + ' ' : null}
-            <label for=${'view-type-' + type}>&nbsp;${type}</label>
-            &nbsp;<a href=${`isolated.html#${type}`} style="font-size:.6em;text-decoration:none;">🔗</a>
-            &nbsp;<a href=${`#${type}`} style="font-size:.6em;">↗️</a>
-          </div>
-        `.key(type))}
 
-        ${viewTypes.length > 1 && html`
-          <div>
-            <label onclick=${() => viewTypes.forEach(viewType => {
+  return div(
+    h3('᭟ Sections'),
+
+    div({style:"display:flex;gap:1em;flex-wrap:wrap;margin:1em;"},
+      _ => sortedViewTypes.map(({meta, type}) =>
+        div({style:"flex:0 0 auto;min-width:150px;white-space:nowrap;"},
+          input({
+            name: _ => 'view-type-' + type,
+            type: "checkbox",
+            id: _ => 'view-type-' + type,
+            checked: _ => storage.views.includes(type),
+            onClick: () => toggleViewType(type),
+          }),
+
+          _ => meta?.emoji ? meta.emoji + ' ' : null,
+
+          label({for: _ => 'view-type-' + type}, ' ', _ => type),
+
+          ' ',
+
+          a({
+            href: _ => `isolated.html#${type}`,
+            style: "font-size:.6em;text-decoration:none;",
+          },'🔗'),
+
+          ' ',
+
+          a({
+            href: _ => `#${type}`,
+            style: "font-size:.6em;",
+          },'↗️')
+        ).key(type)
+      ),
+
+      _ => viewTypes.length > 1 && [
+        div(
+          label({
+            onClick: () => viewTypes.forEach(viewType => {
               // viewChanged.next({viewType, checkTesting: false})
               activate(viewType, false)
               saveScopedStorage()
-            })}>&nbsp;all</label>
-          </div>
-          <div>
-            <label onclick=${() => viewTypes.forEach(viewType => {
+            })
+          }, ' all')
+        ),
+
+        div(
+          label({
+            onClick: () => viewTypes.forEach(viewType => {
               deactivate(viewType)
               saveScopedStorage()
-            })}>&nbsp;none</label>
-          </div>
-        `}
-      </div>
-    </div>
-  `
+            })
+          }, ' none')
+        )
+      ]
+    )
+  )
 }
 
 sectionSelector.tempNote = 'sections'

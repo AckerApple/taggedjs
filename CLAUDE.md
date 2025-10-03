@@ -66,7 +66,7 @@ export default tag<YourComponentTemplate>("component-name", (tag, { html, state,
 
 ### Key Framework Features
 
-1. **Reactive State**: 
+1. **Reactive State**:
    - Use `state()` for **const** declarations (reactive values that cannot be reassigned)
    - Use `states()` for **let** declarations (reactive values that can be reassigned)
    - Example: `const mySubject = state(() => new Subject())` vs `let counter = 0; states(get => [counter] = get(counter))`
@@ -74,6 +74,52 @@ export default tag<YourComponentTemplate>("component-name", (tag, { html, state,
 3. **Event Handling**: Direct function binding in templates (e.g., `onclick=${handler}`)
 4. **Lifecycle Hooks**: `onInit()` and `onDestroy()` for component lifecycle
 5. **Observables**: `Subject` class and `subscribe()` for reactive streams
+
+### Mock Element Syntax (New as of 2025)
+
+**IMPORTANT**: The framework has migrated to a new attribute syntax for mock elements.
+
+**Old syntax (deprecated)**:
+```typescript
+div.id('my-id').class('my-class')('content')
+button.onClick(handler)('Click me')
+span.style("color: red")('text')
+```
+
+**New syntax (current)**:
+```typescript
+div({id: 'my-id', class: 'my-class'}, 'content')
+button({onClick: handler}, 'Click me')
+span({style: "color: red"}, 'text')
+```
+
+**Key changes**:
+- All attributes are passed as the first argument object
+- Content/children come after the attributes object
+- Attributes like `id`, `class`, `style`, `onClick`, `onKeyup`, etc. are properties of the first argument
+- Special attributes like `attr` for lifecycle hooks are also part of the first argument object
+- When using `.attr()` with chained methods, convert to: `element.attr(value)({...otherAttributes}, children...)`
+
+**Examples**:
+```typescript
+// Simple attributes
+div({style: "display:flex"}, 'content')
+span({id: "counter"}, value)
+
+// Event handlers
+button({onClick: () => count++}, 'Increment')
+input({onKeyup: e => handleInput(e)})
+
+// Multiple attributes
+button({
+  id: "submit-btn",
+  type: "button",
+  onClick: handleClick
+}, 'Submit')
+
+// Special cases with .attr() - keep the chaining if it involves host.onInit
+div.attr(host.onInit(() => initLogic))({style: "..."}, children)
+```
 
 ### Project Structure
 

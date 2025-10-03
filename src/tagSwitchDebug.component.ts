@@ -23,10 +23,10 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
   ++renderCount
 
   return div(
-    div.id("selectTag-wrap")(
+    div({id:"selectTag-wrap"},
       'selectedTag: |',
-      span.id("selectTag-display")(
-        () => 
+      span({id:"selectTag-display"},
+        () =>
           selectedTag === null && 'null' ||
           selectedTag === undefined && 'undefined' ||
           selectedTag === '' && 'empty-string' ||
@@ -35,53 +35,54 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
       '|'
     ),
 
-    select
-      .id("tag-switch-dropdown")
-      .onChange(changeSelectedTag)(
+    select({
+      id: "tag-switch-dropdown",
+      onChange: changeSelectedTag
+    },
         option(),
-        
+
         /* TODO: implement selected attribute */
-        option
-          .value("")
-          .selected(() => typeof(selectedTag) === 'string' && !selectedTag.length ? {selected: true} : {})
-          ('empty-string'),
-        
-        option
-          .value("undefined")
-          .selected(() => selectedTag === undefined ? {selected: true} : {})
-          ('undefined'),
-        
-        option
-          .value("null")
-          .selected(() => selectedTag === null)
-          ('null'),
-        
-        option
-          .value("1")
-          .selected(() => selectedTag === '1')
-          ('tag 1'),
-        
-        option
-          .value("2")
-          .selected(() => selectedTag === '2')
-          ('tag 2'),
-        
-        option
-          .value("3")
-          .selected(() => selectedTag === '3')
-          ('tag 3'),
+        option({
+          value: "",
+          selected: () => typeof(selectedTag) === 'string' && !selectedTag.length ? {selected: true} : {}
+        }, 'empty-string'),
+
+        option({
+          value: "undefined",
+          selected: () => selectedTag === undefined ? {selected: true} : {}
+        }, 'undefined'),
+
+        option({
+          value: "null",
+          selected: () => selectedTag === null
+        }, 'null'),
+
+        option({
+          value: "1",
+          selected: () => selectedTag === '1'
+        }, 'tag 1'),
+
+        option({
+          value: "2",
+          selected: () => selectedTag === '2'
+        }, 'tag 2'),
+
+        option({
+          value: "3",
+          selected: () => selectedTag === '3'
+        }, 'tag 3'),
       ),
 
-      div
-        .id("switch-tests-wrap")
-        .style("display:flex;flex-wrap:wrap;gap:1em;")
-        (
-          div.style("border:1px solid blue;flex-grow:1")(
+      div({
+        id: "switch-tests-wrap",
+        style: "display:flex;flex-wrap:wrap;gap:1em;"
+      },
+          div({style:"border:1px solid blue;flex-grow:1"},
             h3('Test 1 - string | Tag'),
             div(() => {
               switch (selectedTag) {
                 case null: return 'null, select tag below'
-                case "": return div.id("empty-string-1")
+                case "": return div({id:"empty-string-1"})
                 case '1': return tag1({title:'value switch'})
                 case '2': return tag2({title:'value switch'})
                 case '3': return tag3({title:'value switch'})
@@ -89,37 +90,46 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
               return 'select tag below'
             })
           ),
-          
-          div.style("border:1px solid blue;flex-grow:1")(
+
+          div({style:"border:1px solid blue;flex-grow:1"},
             h3('Test 2 - Tag'),
             div(() => {
               switch (selectedTag) {
-                case null: return div.id("select-tag-above")('null, select tag above')
-                case "": return div.id("select-tag-above")('empty-string, select tag above')
+                case null:
+                  return div({id:"select-tag-above"},
+                    'null, select tag above'
+                  )
+                case "":
+                  return div({id:"select-tag-above"},
+                    'empty-string, select tag above'
+                  )
                 case '1': return tag1({title:'tag switch'})
                 case '2': return tag2({title:'tag switch'})
                 case '3': return tag3({title:'tag switch'})
               }
 
-              return div.id("select-tag-above")('select tag above')
+              return div({id:"select-tag-above"}, 'select tag above')
             }),
           ),
-          
-          div.style("border:1px solid blue;flex-grow:1")(
+
+          div({style:"border:1px solid blue;flex-grow:1"},
             h3('Test 3 - ternary (only 1 or 3 shows)'),
             div(
               () => selectedTag === '3' ? tag3({title: 'ternary simple'}) : tag1({title: 'ternary simple'})
             )
           ),
-      
-          div.style("border:1px solid blue;flex-grow:1")(
+
+          div({style:"border:1px solid blue;flex-grow:1"},
             h3('Test 3.2 - ternary via prop (only 1 or 3 shows)'),
             div(() => ternaryPropTest({selectedTag})),
           ),
-      
-          div.id("arraySwitching-test-wrap").style("border:1px solid red;flex-grow:1")(
+
+          div({
+            id: "arraySwitching-test-wrap",
+            style: "border:1px solid red;flex-grow:1"
+          },
             h3('Test 4 - arraySwitching'),
-            div.id("arraySwitching-wrap")(
+            div({id:"arraySwitching-wrap"},
               () => arraySwitching({selectedTag})
             )
           ),
@@ -134,7 +144,7 @@ export const ternaryPropTest = tag((
 ) => {
   ternaryPropTest.inputs(x =>[{selectedTag}] = x)
 
-  return div.id("ternaryPropTest-wrap")(
+  return div({id:"ternaryPropTest-wrap"},
     () => `${selectedTag}:`, (context) => {
       const returnValue = selectedTag === '3' ? tag3({title: 'ternaryPropTest'}) : tag1({title: 'ternaryPropTest'})
       return returnValue
@@ -145,19 +155,22 @@ export const ternaryPropTest = tag((
 export const tag1 = tag(({title}: {title: string}) => {
   let counter = 0
   let renderCount = 0
-  
+
   tag1.inputs(x => [{title}] = x)
 
   ++renderCount
-  return div
-    .id("tag1")
-    .style("border:1px solid orange;")(
-      div.id("tagSwitch-1-hello")(() => `Hello 1 ${title} World`),
-      
-      button
-        .onClick(() => ++counter)
-        (() => `increase ${counter}`),
-      
+  return div({
+    id: "tag1",
+    style: "border:1px solid orange;"
+  },
+      div({id:"tagSwitch-1-hello"},
+        () => `Hello 1 ${title} World`
+      ),
+
+      button({onClick: () => ++counter},
+        () => `increase ${counter}`
+      ),
+
       () => renderCountDiv({renderCount, name:'tag1'})
     )
 })
@@ -165,23 +178,23 @@ export const tag1 = tag(({title}: {title: string}) => {
 export const tag2 = tag(({title}: {title: string}) => {
   let counter = 0
   let renderCount = 0
-  
+
   //tag2.inputs(x => [{title}] = x)
-  
+
   ++renderCount
   //return 22
 
-  return div
-    .id("tag2")
-    .style("border:1px solid orange;")(
-      div
-        .id("tagSwitch-2-hello")
-        (() => `Hello 2 ${title} World`),
+  return div({
+    id: "tag2",
+    style: "border:1px solid orange;"
+  },
+      div({id:"tagSwitch-2-hello"},
+        () => `Hello 2 ${title} World`),
 
-      button
-        .onClick(() => ++counter)
-        (()=> `increase ${counter}`),
-      
+      button({
+        onClick: () => ++counter
+      }, ()=> `increase ${counter}`),
+
       () => renderCountDiv({renderCount, name:'tag1'}),
     )
 })
@@ -189,20 +202,20 @@ export const tag2 = tag(({title}: {title: string}) => {
 export const tag3 = tag(({title}: {title: string}) => {
   let counter = 0
   let renderCount = 0
-  
+
   tag3.inputs(x => [{title}] = x)
 
   ++renderCount
-  return div
-    .id("tag3")
-    .style("border:1px solid orange;")(
-      div
-        .id("tagSwitch-3-hello")
-        (() => `Hello 3 ${title} World`),
+  return div({
+    id: "tag3",
+    style: "border:1px solid orange;"
+  },
+      div({id:"tagSwitch-3-hello"},
+        () => `Hello 3 ${title} World`),
 
-      button
-        .onClick(() => ++counter)
-        (() => `increase ${counter}`),
+      button({
+        onClick: () => ++counter
+      }, () => `increase ${counter}`),
 
       () => renderCountDiv({renderCount, name:'tag1'}),
     )

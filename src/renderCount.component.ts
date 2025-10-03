@@ -6,15 +6,14 @@ export const renderCountDiv = tag((
     name: string
   }
 ) => {
-  renderCountDiv.inputs(x =>
+  renderCountDiv.updates(x =>
     [{renderCount, name}] = x
   )
 
   return div(
     small(
       `(${name} render count`,
-      span.id(`${name}_render_count`)
-        (_=> renderCount),
+        span({id:`${name}_render_count`},_=> renderCount),
       `)`
     )
   )
