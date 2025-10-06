@@ -1,14 +1,17 @@
-import { getInnerHTML, Tag, html, states, tag } from "taggedjs"
+import { getInnerHTML, Tag, html, states, tag, fieldset, legend, div } from "taggedjs"
 import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests.js"
 import { renderCountDiv } from "./renderCount.component.js"
 
-const test22 = tag((a:number, b:number, children: Tag) => html`
-  <fieldset>
-    <legend>xxxxx</legend>  
-    <div>hello other world ${a} - ${b}</div>
-    <div style="border:2px solid red;">***${children}***</div>
-  </fieldset>
-`)
+const test22 = tag((a:number, b:number, children: Tag) => {
+  test22.updates(x => [a, b, children] = x)
+  return fieldset(
+    legend('xxxxx'),
+    div('hello other world', _=> a, ' - ', _=> b),
+    div({style:"border:2px solid red;"},
+      '***', _=> children, '***',
+    ),
+  )
+})
 
 const noTagTest = () => {
   const innerHTML = getInnerHTML()
@@ -90,11 +93,10 @@ export const child = tag((_: string = 'childTests') => (
   </fieldset>
 `)
 
-function childAsPropTest({child}: {child: Tag}) {
-  return html`
-    <fieldset>
-      <legend>child as prop</legend>
-      ${child}
-    </fieldset>
-  `
-}
+const childAsPropTest = tag(({child}: {child: Tag}) => {
+  childAsPropTest.updates(x => [{child}] = x)
+  return fieldset(
+    legend('child as prop'),
+    _=> child
+  )
+})

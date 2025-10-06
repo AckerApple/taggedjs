@@ -75,50 +75,159 @@ export default tag<YourComponentTemplate>("component-name", (tag, { html, state,
 4. **Lifecycle Hooks**: `onInit()` and `onDestroy()` for component lifecycle
 5. **Observables**: `Subject` class and `subscribe()` for reactive streams
 
-### Mock Element Syntax (New as of 2025)
+### Mock Element Syntax (Current Standard)
 
-**IMPORTANT**: The framework has migrated to a new attribute syntax for mock elements.
+**CRITICAL MIGRATION**: The framework is moving AWAY from `html` tagged template literals to mock elements.
 
-**Old syntax (deprecated)**:
+#### Modern Approach (PREFERRED):
+```typescript
+import { div, span, button, hr } from "taggedjs";
+
+// Use mock element functions with attributes-first syntax
+export default tag(() => (
+  // ... state setup ...
+) => div(
+  button({id: "my-button", onclick: handler}, 'Click me'),
+  span({id: "counter"}, count),
+  hr()
+))
+```
+
+#### Legacy Approach (DEPRECATED - Being phased out):
+```typescript
+import { html } from "taggedjs";
+
+// Old template literal approach
+export default tag(() => (
+  // ... state setup ...
+) => html`
+  <button id="my-button" onclick=${handler}>Click me</button>
+  <span id="counter">${count}</span>
+  <hr />
+`)
+```
+
+### Converting from html`` to Mock Elements
+
+When converting files from `html` template literals to mock elements:
+
+**1. Change imports:**
+```typescript
+// OLD
+import { html, states, tag } from "taggedjs";
+
+// NEW
+import { div, span, button, strong, hr, states, tag } from "taggedjs";
+```
+
+**2. Change return structure:**
+```typescript
+// OLD - returns template string
+) => html`...`
+
+// NEW - returns single element or wrapped in parent div
+) => div(...)
+```
+
+**3. Convert HTML elements to function calls:**
+```typescript
+// OLD
+html`
+  <button id="fun-parent-button" onclick=${myFunction}>🤰 ++parent</button>
+  <span id="fun_in_prop_display">${counter}</span>
+`
+
+// NEW
+div(
+  button({id: "fun-parent-button", onclick: myFunction}, '🤰 ++parent'),
+  span({id: "fun_in_prop_display"}, counter)
+)
+```
+
+**4. Handle conditional rendering:**
+```typescript
+// OLD
+${showChild && component()}
+
+// NEW - use arrow function prefix
+_=> showChild && component()
+```
+
+**5. Handle text interpolation:**
+```typescript
+// OLD
+array length: ${array.length}
+
+// NEW - split into multiple arguments
+'array length: ',
+array.length
+```
+
+**6. Self-closing tags:**
+```typescript
+// OLD
+<hr />
+
+// NEW
+hr()
+```
+
+**7. Nested elements:**
+```typescript
+// OLD
+html`
+  <div>
+    <strong>Label:</strong>
+    <span id="value">${data}</span>
+  </div>
+`
+
+// NEW
+div(
+  strong('Label:'),
+  span({id: "value"}, data)
+)
+```
+
+### Mock Element Attribute Syntax
+
+**Old chained syntax (deprecated)**:
 ```typescript
 div.id('my-id').class('my-class')('content')
 button.onClick(handler)('Click me')
-span.style("color: red")('text')
 ```
 
-**New syntax (current)**:
+**New attributes-first syntax (current)**:
 ```typescript
 div({id: 'my-id', class: 'my-class'}, 'content')
-button({onClick: handler}, 'Click me')
-span({style: "color: red"}, 'text')
+button({onclick: handler}, 'Click me')
 ```
 
-**Key changes**:
-- All attributes are passed as the first argument object
-- Content/children come after the attributes object
-- Attributes like `id`, `class`, `style`, `onClick`, `onKeyup`, etc. are properties of the first argument
-- Special attributes like `attr` for lifecycle hooks are also part of the first argument object
-- When using `.attr()` with chained methods, convert to: `element.attr(value)({...otherAttributes}, children...)`
+**Key patterns**:
+- First argument: attributes object `{id: "...", onclick: handler}`
+- Remaining arguments: children (strings, numbers, elements, components)
+- Event handlers: lowercase `onclick`, `onkeyup` (NOT `onClick`, `onKeyup`)
+- Multiple children are passed as separate arguments
+- Arrow function prefix `_=>` for conditional/computed expressions
+- No attributes needed: just call the function with children `hr()` or `div('text')`
 
-**Examples**:
+**Complete conversion example:**
 ```typescript
-// Simple attributes
-div({style: "display:flex"}, 'content')
-span({id: "counter"}, value)
+// OLD
+html`
+  <div>
+    <button onclick=${increment}>Increment</button>
+    <span>${count}</span>
+    ${count > 5 && html`<strong>High!</strong>`}
+  </div>
+`
 
-// Event handlers
-button({onClick: () => count++}, 'Increment')
-input({onKeyup: e => handleInput(e)})
-
-// Multiple attributes
-button({
-  id: "submit-btn",
-  type: "button",
-  onClick: handleClick
-}, 'Submit')
-
-// Special cases with .attr() - keep the chaining if it involves host.onInit
-div.attr(host.onInit(() => initLogic))({style: "..."}, children)
+// NEW
+div(
+  button({onclick: increment}, 'Increment'),
+  span(count),
+  _=> count > 5 && strong('High!')
+)
 ```
 
 ### Project Structure

@@ -1,33 +1,35 @@
-import { div, tag, html, states, button, select, option, span } from "taggedjs"
+import { div, tag, button, select, option, span, h2, p } from "taggedjs"
 
 export const basic = tag(() => {
   let counter = 0
   let renderCount = 0
   let showDiv = true
 
-  states(get =>
-    [counter, renderCount, showDiv] = get(counter, renderCount, showDiv)
-  )
-  
   renderCount++
 
-  return html`
-    <div>
-      <h2>Basic Component</h2>
-      <p>Counter: ${counter}</p>
-      <p>Render Count: ${renderCount}</p>
-      <button onclick=${() => counter++}>Increment Counter</button>
-      <button onclick=${() => showDiv = !showDiv}>Toggle Div (${showDiv ? 'Hide' : 'Show'})</button>
-    </div>
-    ${showDiv && boltTag(counter)}
-  `
+  return div(
+    h2('Basic Component'),
+    
+    p(_=> `Counter: ${counter}`),
+    p(_=> `Render Count: ${renderCount}`),
+    
+    button({
+      onClick: () => counter++
+    }, 'Increment Counter'),
+
+    button({
+      onClick: () => showDiv = !showDiv
+    }, _=> `Toggle Div (${showDiv ? 'Hide' : 'Show'})`),
+
+    _=> showDiv && boltTag(counter),
+  )
 })
 
 const boltTag = tag((parentCounter: number) => {
   let clickCount = 0
   let color = 'red'
 
-  boltTag.inputs(x => [parentCounter] = x)
+  boltTag.updates(x => [parentCounter] = x)
 
   return div(
     () => `color: ${color}`,
@@ -52,7 +54,7 @@ const boltTag = tag((parentCounter: number) => {
 })
 
 const arrayBoltTest = tag((parentCounter) => {
-  arrayBoltTest.inputs(x => [parentCounter] = x)
+  arrayBoltTest.updates(x => [parentCounter] = x)
   let innerCounter = 0
   return [
     div('hello array bolt 0'),

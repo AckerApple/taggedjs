@@ -1,4 +1,4 @@
-import { LikeObjectChildren, html, tag, ValueSubject, state, states, subscribe, Subject, getInnerHTML } from "taggedjs"
+import { LikeObjectChildren, html, tag, ValueSubject, state, states, subscribe, Subject, getInnerHTML, div, input, select, option } from "taggedjs"
 import { dumpContent } from "./dumpContent.tag"
 import { renderCountDiv } from "./renderCount.component"
 import { fx } from "taggedjs-animate-css"
@@ -18,33 +18,45 @@ const outerHtml = (
 }
 
 export const concatStyles = tag((innerHTML: any) => {
+  concatStyles.updates(x => [innerHTML] = x)
   let width = 1
   let borderColor = 'white'
 
-  states(get => [{borderColor, width}] = get({borderColor, width}))
+  return div(
+    div({
+      id: "dynamic-border-element",
+      style: _=> `border-width:${width}px;border-color:${borderColor};border-style:solid;`
+    }, innerHTML),
 
-  return html`
-    <div id="dynamic-border-element"
-      style="border-width:${width}px;border-color:${borderColor};border-style:solid;"
-    >${innerHTML}</div>
-    
-    <div>
-      borderWidth:
-      <input id="dynamic-border-width" type="range" min="0" max="10" step="1"
-        value=${width} onchange=${event => width = Number(event.target.value)}
-      /> - ${width}px
-    </div>
+    div(
+      'borderWidth:',
+      input({
+        id: "dynamic-border-width",
+        type: "range",
+        min: "0",
+        max: "10",
+        step: "1",
+        value: _=> width,
+        onChange: event => width = Number(event.target.value)
+      }),
+      ' - ',
+      _=> width,
+      'px'
+    ),
 
-    <div>
-      borderColor:
-      <select id="dynamic-border-color" onchange=${event => borderColor = event.target.value}>
-        <option ${borderColor === '' ? 'selected' : ''} value=""></option>
-        <option ${borderColor === 'black' ? 'selected' : ''} value="black">black</option>
-        <option ${borderColor === 'blue' ? 'selected' : ''} value="blue">blue</option>
-        <option ${borderColor === 'white' ? 'selected' : ''} value="white">white</option>
-      </select>
-    </div>
-  `
+    div(
+      'borderColor:',
+      select({
+        id: "dynamic-border-color",
+        onChange: event => borderColor = event.target.value
+      },
+        option({value: "", selected: _=> borderColor === ''}),
+        option({value: "black", selected: _=> borderColor === 'black'}, 'black'),
+        option({value: "blue", selected: _=> borderColor === 'blue'}, 'blue'),
+        option({value: "white", selected: _=> borderColor === 'white'}, 'white')
+      )
+    )
+  )
 })
 
 export const content = tag(() => {
