@@ -2,8 +2,9 @@ import { TemplaterResult } from '../tag/getTemplaterResult.function.js'
 import {  TagWrapper } from '../tag/tag.utils.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { TagMaker } from '../tag/TagMaker.type.js'
-import { AnySupport, appElements, BaseTagGlobal, buildBeforeElement, TagAppElement, UseMemory, Wrapper } from '../index.js'
-import { DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
+import { AnySupport, appElements, BaseTagGlobal, buildBeforeElement, ContextItem, SupportContextItem, TagAppElement, UseMemory, Wrapper } from '../index.js'
+import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
+import { convertTagToElementManaged } from '../tag/update/convertTagToElementManaged.function.js'
 
 export function registerTagElement(
   support: AnySupport,
@@ -13,6 +14,21 @@ export function registerTagElement(
   app: TagMaker,
   placeholder: Text,
 ) {
+  const tag = support.templater.tag as any
+  if( !['dom','html'].includes(tag.tagJsType) ) {
+    const context = {
+      placeholder, // where to build off of
+    } as SupportContextItem
+    const conversion = convertTagToElementManaged(support, support, context)
+    const dom = conversion.context.htmlDomMeta as DomObjectChildren
+    const elmSetup = {
+      dom,
+      contexts: conversion.context.contexts
+    }
+    console.log('conversion', {elmSetup})
+    return putDownTagDom(placeholder, elmSetup)
+  }
+
   // console.debug('🏷️ Building element into tag...', {element, app, support})
   const result = buildBeforeElement(
     support,
@@ -38,6 +54,10 @@ export function registerTagElement(
   ;(element as TagAppElement).setUse = setUse; (element as TagAppElement).ValueTypes = ValueTypes
   appElements.push({ element, support })
 
+  return putDownTagDom(placeholder, result)
+}
+
+function putDownTagDom(placeholder: Text, result: { contexts: ContextItem[]; dom: DomObjectChildren }) {
   const newFragment = document.createDocumentFragment()
   newFragment.appendChild(placeholder)
 
@@ -46,7 +66,6 @@ export function registerTagElement(
   }
 
   // console.debug('🏷️ Element Tag DOM built ✅')
-
   return newFragment
 }
 

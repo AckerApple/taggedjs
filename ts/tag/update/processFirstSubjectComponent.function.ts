@@ -8,13 +8,12 @@ import { AnySupport, ContextItem } from '../index.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { firstTagRender } from '../../render/renderTagOnly.function.js'
 import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
-import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
-import { checkTagValueChange, isPromise, paint, Subject, TemplateValue } from '../../index.js'
+import { checkTagValueChange, isPromise, paint, TemplateValue } from '../../index.js'
 import { ReadOnlyVar, TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { updateToDiffValue } from './updateToDiffValue.function.js'
 import { castProps } from '../props/alterProp.function.js'
-import { keyTag } from '../processOuterDomTagInit.function.js'
 import { blankHandler } from '../../render/dom/blankHandler.function.js'
+import { convertTagToElementManaged } from './convertTagToElementManaged.function.js'
 
 function createSupportWithProps(
   templater: TemplaterResult,
@@ -72,60 +71,8 @@ export function processReplacementComponent(
   return support
 }
 
-function convertTagToElementManaged(
-  support: AnySupport,
-  ownerSupport: AnySupport,
-  subject: SupportContextItem,
-) {
-  const context = support.context
-  const newValue = context.toRender || context.returnValue
-
-  // EXAMPLE: ['a','b'].map(x=> tag(() => [div,span]).key(x))
-  /*
-  if(Array.isArray(newValue)) {
-    ;(newValue as any).key = (arrayValue: any) => keyTag(arrayValue, newValue)
-  }
-  */
-
-  const tagJsVar = valueToTagJsVar(newValue)
-  delete (context as ContextItem).global
-
-  const newContext: ContextItem = {
-    updateCount: 0,
-    value: newValue,
-    tagJsVar,
-    destroy$: new Subject<void>(),
-    placeholder: context.placeholder,
-    
-    // not important
-    valueIndex: -1,
-    withinOwnerElement: true,
-    parentContext: context,
-  }
-
-  const overrideTagVar:ReadOnlyVar = getOverrideTagVar(
-    context,
-    newContext,
-    support,
-    subject,
-  )
-
-  context.tagJsVar = overrideTagVar
-
-  // TODO: should we be calling this here?
-  tagJsVar.processInit(
-    newValue,
-    newContext,
-    support,
-    subject.placeholder,
-    // appendTo,
-  )
-
-  return support
-}
-
 /** Used when a tag() does not return html`` */
-function getOverrideTagVar(
+export function getOverrideTagVar(
   context: ContextItem & SupportContextItem,
   newContext: ContextItem,
   support: AnySupport,

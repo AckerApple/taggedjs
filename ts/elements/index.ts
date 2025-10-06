@@ -7,6 +7,16 @@ export const select = designElement('select')
 export const option = designElement('option')
 export const input = designElement('input')
 
+// HEAD & SUPPORT ELEMENTS
+
+export const htmlDoc = designElement('html') // TODO: get this named to html
+export const head = designElement('head')
+export const title = designElement('title')
+export const meta = designElement('meta')
+export const link = designElement('link')
+export const body = designElement('body')
+export const noscript = designElement('noscript')
+
 // BLOCK ELEMENTS
 
 export const hr = designElement('hr')
@@ -24,6 +34,13 @@ export const div = designElement('div')
 
 export const fieldset = designElement('fieldset')
 export const legend = designElement('legend')
+
+// TABLE ELEMENTS
+
+export const table = designElement('table')
+export const tr = designElement('tr')
+export const td = designElement('td')
+export const th = designElement('th')
 
 // INLINE ELEMENTS
 
