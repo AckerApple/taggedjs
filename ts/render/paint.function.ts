@@ -1,6 +1,13 @@
 import { blankHandler } from "./dom/blankHandler.function.js"
 
-export type PaintCommand = [((...args: any[]) => unknown), any[]]
+/** A function expected to paint by commands such as a html painter that renders elements */
+export type painter = (...args: any[]) => unknown
+
+export type PaintCommand = [
+  painter,
+  /** arguments for the painter */
+  any[],
+]
 
 /** Typically used for animations to run before clearing elements */
 export function addPaintRemoveAwait(promise: Promise<any>) {
@@ -64,27 +71,6 @@ function runAfterCycle() {
 }
 
 function runPaintRemoves(): any {
-  /*
-  if( paintRemoveAwaits.length ) {
-    const currentAwaits = paintRemoveAwaits.map(data => data.promise.then(() => {
-      const paintRemoves = data.paintRemoves
-      
-      for (const content of paintRemoves) {
-        // call paintRemover()
-        content[0](...content[1])
-      }
-    }))
-    
-    paintRemoveAwaits = []
-
-    const outerPaintRemoves = paintRemoves
-    return Promise.all(currentAwaits).then(() => {
-      for (const content of outerPaintRemoves) {
-        content[0](...content[1])
-      }
-    })
-  }*/
-
   // element.parentNode.removeChild
   for (const content of paintRemoves) {
     content[0](...content[1])
@@ -132,11 +118,10 @@ function paintRemover(
   element: Text | Element,
   _caller: string, // can be used for determining who is failing
 ) {
-  /*
   if(!element) {
     console.info('no element by', _caller)
   }
-  */
+
   const parentNode = element.parentNode as ParentNode
   parentNode.removeChild(element as Element)
 }

@@ -84,7 +84,8 @@ export function afterTagCallback(
   callbackResult: any,
   last: AnySupport,
 ) {
-  if(last.context.global.deleted) {
+  const global = last.context.global
+  if(global?.deleted) {
     return
   }
 

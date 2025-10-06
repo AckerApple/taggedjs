@@ -1,4 +1,6 @@
 import { designElement } from './designElement.function.js'
+export type { ElementVar } from './designElement.function.js'
+export { noElement } from './noElement.function.js'
 
 export const button = designElement('button')
 export const select = designElement('select')
@@ -25,6 +27,7 @@ export const legend = designElement('legend')
 
 // INLINE ELEMENTS
 
+export const p = designElement('p')
 export const a = designElement('a')
 export const span = designElement('span')
 export const strong = designElement('strong')

@@ -1,12 +1,12 @@
-import { AnySupport, isPromise, Subject, valueToTagJsVar } from '../index.js'
+import { AnySupport, isPromise } from '../index.js'
 import { addSupportEventListener } from '../interpolations/attributes/addSupportEventListener.function.js'
 import { getSupportWithState } from '../interpolations/attributes/getSupportWithState.function.js'
 import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArray.function.js'
 import { processAttributeArray } from '../render/dom/processAttributeArray.function.js'
-import { paintAppends, paintAppend } from '../render/paint.function.js'
+import { paintAppend } from '../render/paint.function.js'
 import { ContextItem } from '../tag/index.js'
 import { ElementVar } from './designElement.function.js'
-import { processElementVarFunction } from './processElementVarFunction.function.js'
+import { processChildren } from './processChildren.function.js'
 
 export function processElementVar(
   value: ElementVar,
@@ -26,37 +26,14 @@ export function processElementVar(
     addedContexts,
   )
 
-  value.innerHTML.forEach(item => {
-    if (item.tagJsType === 'element') {
-      const newElement = processElementVar(
-        item,
-        context,
-        ownerSupport,
-        addedContexts, // addedContexts, // TODO: remove
-      )
-      paintAppends.push([paintAppend, [element, newElement]]);
-      return;
-    }
-    
-    const type = typeof item
-
-    switch (type) {
-      case 'string':
-      case 'number':
-        return handleSimpleInnerValue(item, element)
-
-      case 'function':
-        return processElementVarFunction(
-          item,
-          element,
-          context,
-          ownerSupport,
-          addedContexts,
-        )
-    }
-
-    return processNonElement(item, context, addedContexts, element, ownerSupport)
-  })
+  processChildren(
+    value.innerHTML,
+    context,
+    ownerSupport,
+    addedContexts,
+    element,
+    paintAppend,
+  )
 
   value.listeners.forEach((listener, index) => {
     const wrap = (...args: any[]) => {
@@ -91,47 +68,4 @@ export function processElementVar(
   })
 
   return element
-}
-
-export function processNonElement(
-  item: any,
-  context: ContextItem,
-  addedContexts: ContextItem[],
-  element: HTMLElement,
-  ownerSupport: AnySupport,
-) {
-  const tagJsVar = valueToTagJsVar(item)
-  const newContext: ContextItem = {
-    updateCount: 0,
-    value: item,
-    parentContext: context,
-    tagJsVar,
-
-    // TODO: Not needed
-    valueIndex: -1,
-    withinOwnerElement: true,
-    destroy$: new Subject(),
-  }
-
-  addedContexts.push(newContext)
-  newContext.placeholder = document.createTextNode('')
-  paintAppends.push([paintAppend, [element, newContext.placeholder]])
-
-  tagJsVar.processInit(
-    item,
-    newContext, // context, // newContext,
-    ownerSupport,
-    newContext.placeholder
-  )
-
-  return newContext
-}
-
-export function handleSimpleInnerValue(
-  value: number | string,
-  element: HTMLElement,
-) {
-  const text = document.createTextNode(value as string)
-  paintAppends.push([paintAppend, [element, text]])
-  return text
 }

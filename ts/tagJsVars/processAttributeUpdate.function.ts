@@ -6,7 +6,7 @@ import { TagJsVar } from "./tagJsVar.type.js";
 import { valueToTagJsVar } from "./valueToTagJsVar.function.js";
 
 export function processAttributeUpdate(
-  value: string | number | boolean | Tag | SubscribeValue | TemplaterResult | (Tag | TemplaterResult)[] | Subject<unknown> | Callback | null | undefined,
+  value: string | number | boolean | null | Tag | SubscribeValue | TemplaterResult | (Tag | TemplaterResult)[] | Subject<unknown> | Callback | null | undefined,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
   element: Element,

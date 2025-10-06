@@ -91,8 +91,16 @@ export function elementFunctions(item: any) {
 
   const callables = {
     onClick: makeCallback('click'),    
+    // onclick: makeCallback('click'),
+    // click: makeCallback('click'),
+
     onChange: makeCallback('onchange'),
+    // onchange: makeCallback('onchange'),
+    // change: makeCallback('onchange'),
+    
     onKeyup: makeCallback('onkeyup'),
+    // onkeyup: makeCallback('onkeyup'),
+    // keyup: makeCallback('onkeyup'),
 
     /* apply attribute via attr(name: string, value?: any): **/
     attr: (...args: any[]) => attr(item, args as any),

@@ -13,6 +13,8 @@ import { checkTagValueChange, isPromise, paint, Subject, TemplateValue } from '.
 import { ReadOnlyVar, TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { updateToDiffValue } from './updateToDiffValue.function.js'
 import { castProps } from '../props/alterProp.function.js'
+import { keyTag } from '../processOuterDomTagInit.function.js'
+import { blankHandler } from '../../render/dom/blankHandler.function.js'
 
 function createSupportWithProps(
   templater: TemplaterResult,
@@ -77,6 +79,14 @@ function convertTagToElementManaged(
 ) {
   const context = support.context
   const newValue = context.toRender || context.returnValue
+
+  // EXAMPLE: ['a','b'].map(x=> tag(() => [div,span]).key(x))
+  /*
+  if(Array.isArray(newValue)) {
+    ;(newValue as any).key = (arrayValue: any) => keyTag(arrayValue, newValue)
+  }
+  */
+
   const tagJsVar = valueToTagJsVar(newValue)
   delete (context as ContextItem).global
 
@@ -123,7 +133,10 @@ function getOverrideTagVar(
 ): ReadOnlyVar {
   const overrideTagVar: ReadOnlyVar = {
     tagJsType: 'tag-conversion',
-    processInitAttribute: newContext.tagJsVar.processInitAttribute,
+    
+    // processInitAttribute: newContext.tagJsVar.processInitAttribute,
+    processInitAttribute: blankHandler, // cannot be an attribute ever
+    
     processInit: (
       _value: TemplateValue,
       _contextItem: ContextItem,

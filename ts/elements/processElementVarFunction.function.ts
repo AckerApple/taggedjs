@@ -1,14 +1,16 @@
 import { AnySupport, Subject } from '../index.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
+import { painter } from '../render/paint.function.js'
 import { ContextItem } from '../tag/index.js'
-import { processNonElement } from './processElementVar.function.js'
+import { processNonElement } from './processChildren.function.js'
 
 export function processElementVarFunction(
   item: any,
-  element: HTMLElement,
+  element: HTMLElement | Text,
   context: ContextItem,
   ownerSupport: AnySupport,
   addedContexts: ContextItem[],
+  paintBy: painter,
 ) {
   const subContexts: ContextItem[] = []
   const subContext: ContextItem = {
@@ -63,6 +65,7 @@ export function processElementVarFunction(
     subContext.contexts as ContextItem[],
     element,
     ownerSupport,
+    paintBy,
   )
 
   return aSubContext

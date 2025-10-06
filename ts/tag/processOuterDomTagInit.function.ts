@@ -80,8 +80,7 @@ export function getStringTag(
     
     /** Used within an array.map() that returns html aka array.map(x => html``.key(x)) */
     key<T>(arrayValue: T) {
-      tag.arrayValue = arrayValue
-      return tag as ArrayItemStringTag<T>
+      return keyTag(arrayValue, tag)
     },
 
     /** aka setInnerHTML */
@@ -119,4 +118,13 @@ export function getStringTag(
   })
 
   return tag
+}
+
+export function keyTag<T>(
+  arrayValue: T,
+  tag: any,
+) {
+  keyTag(arrayValue, tag)
+  tag.arrayValue = arrayValue
+  return tag as ArrayItemStringTag<T>
 }

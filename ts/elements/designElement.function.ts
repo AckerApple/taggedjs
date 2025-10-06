@@ -8,6 +8,7 @@ import { elementFunctions, isValueForContext, loopObjectAttributes, registerMock
 import { processElementVar } from './processElementVar.function.js'
 import { destroyDesignElement } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
+import { processChildren } from './processChildren.function.js'
 
 export type MockElmListener = [
   string,
@@ -15,7 +16,7 @@ export type MockElmListener = [
   // realCallback: (e: InputElementTargetEvent)=> any,
 ]
 
-type ElementVarBase = ReadOnlyVar & {
+export type ElementVarBase = ReadOnlyVar & {
   tagName: string
   innerHTML: any[],
   attributes: Attribute[],
@@ -33,7 +34,7 @@ type ElementVarBase = ReadOnlyVar & {
 export type ElementFunction = (
   (
     ...children: (
-      ((_: any) => any) | string | boolean | undefined | number | null | object | {
+      ((_: ContextItem) => any) | string | boolean | undefined | number | null | object | {
         onKeyup: (_: InputElementTargetEvent) => any;
         onClick: (_: InputElementTargetEvent) => any;
         onChange: (_: InputElementTargetEvent) => any;
@@ -67,7 +68,6 @@ export function designElement(
 
     elementFunctions,
   }
-
   
   const pushKid = getPushKid(element, elementFunctions)
   pushKid.tagName = tagName
@@ -138,7 +138,7 @@ function processInit(
   insertBefore?: Text,
   // appendTo?: Element,
 ) {
-  context.contexts = []
+  context.contexts = [] // added contexts
   const element = processElementVar(value, context, ownerSupport, context.contexts)
   
   paintCommands.push([paintBefore, [insertBefore, element, 'designElement.processInit']])
@@ -154,4 +154,3 @@ function processInit(
 
   return element
 }
-

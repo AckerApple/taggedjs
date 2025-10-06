@@ -6,6 +6,7 @@ import { processUpdateRegularValue, RegularValue } from "../tag/update/processRe
 import { TagJsTag } from "./tagJsVar.type.js"
 import { AttributeContextItem } from "../tag/AttributeContextItem.type.js"
 import { processSimpleAttribute } from "./processSimpleAttribute.function.js"
+import { blankHandler } from "../render/dom/blankHandler.function.js"
 
 export function deleteSimpleAttribute(
   contextItem: AttributeContextItem,
@@ -70,6 +71,11 @@ function processSimpleValueInit(
 export function deleteSimpleValue(
   context: ContextItem,
 ) {
+  if(!context.simpleValueElm && context.paint) {
+    context.paint[0] = blankHandler
+    return // I'm being deleted before my first render even occurred
+  }
+
   const elm = context.simpleValueElm as Element
   delete context.simpleValueElm
   addPaintRemover(elm, 'deleteSimpleValue')
