@@ -20,7 +20,8 @@ export default function callbackStateUpdate<T>(
   const newestSupport = findStateSupportUpContext(context)
   // const newestSupport = context.state.newest as AnySupport
   if(newestSupport) {
-    if(context.global) {
+    // context.global && 
+    if(newestSupport.context.global) {
       renderSupport(newestSupport) // TODO: remove
     } else {
       context.tagJsVar.processUpdate(
@@ -30,7 +31,6 @@ export default function callbackStateUpdate<T>(
         [],
       )
     }
-
 
     if(isPromise(maybePromise)) {
       (maybePromise as Promise<any>).finally(() => {

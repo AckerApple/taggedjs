@@ -16,7 +16,9 @@ export function addOneContext(
     withinOwnerElement,
     parentContext,
 
-    valueIndex: contexts.length, // when -1 its a raw bolt value
+    // TODO: remove with html``
+    // valueIndex: contexts?.length || -1, // when -1 its a raw bolt value
+    valueIndex: contexts.length
   }
 
   contexts.push(contextItem)

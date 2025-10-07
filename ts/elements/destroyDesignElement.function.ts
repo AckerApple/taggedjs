@@ -32,7 +32,7 @@ export function destroyDesignElement(
   context.htmlDomMeta = []
 }
 
-function destroyDesignByContexts(
+export function destroyDesignByContexts(
   contexts: ContextItem[],
   ownerSupport: AnySupport,
   promises: Promise<any>[],

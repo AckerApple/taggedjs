@@ -1,4 +1,4 @@
-import { BaseTagGlobal, EventCallback } from '../../tag/index.js'
+import { TagGlobal, EventCallback } from '../../tag/index.js'
 import { Events } from '../../tag/getTemplaterResult.function.js'
 import { AnySupport } from '../../tag/index.js'
 import { bubbleEvent } from './bubbleEvent.function.js'
@@ -16,8 +16,8 @@ export function addSupportEventListener(
     eventName = 'focusout'
   }
 
-  const global = support.context.global as BaseTagGlobal
-  const eventReg = global.events as Events
+  const context = support.context
+  const eventReg = context.events as Events
   
   if(!eventReg[eventName]) {
     const listener = function eventCallback(event: Event) {

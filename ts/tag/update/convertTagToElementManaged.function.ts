@@ -1,8 +1,8 @@
-import { AnySupport, SupportContextItem, Subject } from '../..';
-import { valueToTagJsVar } from '../../tagJsVars';
-import { ReadOnlyVar } from '../../tagJsVars/tagJsVar.type';
-import { ContextItem } from '../ContextItem.type';
-import { getOverrideTagVar } from './processFirstSubjectComponent.function';
+import { AnySupport, SupportContextItem, Subject } from '../../index.js';
+import { valueToTagJsVar } from '../../tagJsVars/index.js';
+import { ReadOnlyVar } from '../../tagJsVars/tagJsVar.type.js';
+import { ContextItem } from '../ContextItem.type.js';
+import { getOverrideTagVar } from './processFirstSubjectComponent.function.js';
 
 export function convertTagToElementManaged(
   support: AnySupport,
@@ -31,7 +31,9 @@ export function convertTagToElementManaged(
     // not important
     valueIndex: -1,
     withinOwnerElement: true,
+    
     parentContext: context,
+    contexts: [],
   };
 
   const overrideTagVar: ReadOnlyVar = getOverrideTagVar(

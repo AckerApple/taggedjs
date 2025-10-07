@@ -48,11 +48,6 @@ export interface SupportTagGlobal extends TagGlobal {
   providers?: Provider[]
 }
 
-export type BaseTagGlobal = SupportTagGlobal & {
-  // only appears on app
-  events?: Events
-}
-
 export type Events = {
   [name: string]: EventCallback
 }

@@ -1,7 +1,7 @@
 import { Clone, TagGlobal } from './getTemplaterResult.function.js'
 import { SubContext } from './update/SubContext.type.js'
 import { PaintCommand } from '../render/paint.function.js'
-import { LastArrayItem, Subject } from '../index.js'
+import { Events, LastArrayItem, Subject } from '../index.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { ContextStateMeta } from './ContextStateMeta.type.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
@@ -33,6 +33,9 @@ export interface AppContextItem {
   withinOwnerElement: boolean  
 
   destroy$: Subject<void> // not on non-tags
+
+  // only appears on app
+  events?: Events
 }
 export interface BaseContextItem extends AppContextItem {  
   element?: HTMLElement

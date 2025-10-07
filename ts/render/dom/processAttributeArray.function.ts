@@ -23,6 +23,7 @@ export function processAttributeArray(
       howToSet = attr[3]
     }
 
+    const contexts = support.context.contexts
     const newContext = processAttribute(
       name,
       value,
@@ -30,7 +31,7 @@ export function processAttributeArray(
       domElement,
       support,
       howToSet,
-      support.context.contexts,
+      contexts,
       parentContext,
       isSpecial
     )

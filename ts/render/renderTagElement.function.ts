@@ -6,7 +6,7 @@ import { empty, ValueTypes } from '../tag/ValueTypes.enum.js'
 import { destroySupport } from './destroySupport.function.js'
 import { paint, painting } from './paint.function.js'
 import { TagMaker } from '../tag/TagMaker.type.js'
-import { AnySupport, BaseTagGlobal, Wrapper } from '../index.js'
+import { AnySupport, SupportTagGlobal, TagGlobal, Wrapper } from '../index.js'
 import { createSupport } from '../tag/createSupport.function.js'
 import { runAfterSupportRender } from './runAfterRender.function.js'
 import { executeWrap } from './executeWrap.function.js'
@@ -16,20 +16,21 @@ import { reStateSupport } from '../state/state.utils.js'
 
 export function renderTagElement(
   app: TagMaker,
-  global: BaseTagGlobal,
+  global: SupportTagGlobal,
   templater: TemplaterResult,
   templater2: TemplaterResult,
   element: Element,
-  subject: SupportContextItem,
+  context: SupportContextItem,
   isAppFunction: boolean,
 ) {
   const placeholder = document.createTextNode(empty)
   tags.push((templater.wrapper || {original: templater}) as unknown as TagWrapper<unknown>)
+  context.placeholder = placeholder
   const support = runWrapper(
     templater,
     placeholder,
     element,
-    subject,
+    context,
     isAppFunction,
   )
   
@@ -45,12 +46,12 @@ export function renderTagElement(
 
   // enables hmr destroy so it can control entire app
   ;(element as TagJsElement).destroy = function() {
-    const events = global.events as Events
+    const events = context.events as Events
     for (const eventName in events) {
       const callback = events[eventName]
       element.removeEventListener(eventName, callback)
     }
-    global.events = {}
+    context.events = {}
     
     ++painting.locks
     const toAwait = destroySupport(support, global) // never return anything here

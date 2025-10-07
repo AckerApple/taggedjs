@@ -1,12 +1,13 @@
 import { AnySupport, ElementVar } from '../index.js'
-import { paintBefore } from '../render/paint.function.js'
+import { paint, paintBefore, painting } from '../render/paint.function.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { elementFunctions } from './elementFunctions.js'
-import { destroyDesignElement } from './destroyDesignElement.function.js'
+import { destroyDesignByContexts, destroyDesignElement } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
 import { processChildren } from './processChildren.function.js'
 import { ElementVarBase, getPushKid } from './designElement.function.js'
+import { destroyContextHtml } from '../tag/smartRemoveKids.function.js'
 
 /** used when you do NOT have a root element returned for your function */
 export const noElement = noElementMaker()
@@ -19,7 +20,7 @@ export function noElementMaker(): ElementVar {
     
     processInit: processNoElmInit,
 
-    destroy: destroyDesignElement,
+    destroy: destroyNoElement,
     processUpdate: processDesignElementUpdate,
     hasValueChanged: checkTagElementValueChange,
 
@@ -56,3 +57,27 @@ function processNoElmInit(
   )
 }
 
+function destroyNoElement(
+  context: ContextItem,
+  ownerSupport: AnySupport,
+) {
+  ++context.updateCount
+
+  const contexts = context.contexts as ContextItem[]
+  const promises: Promise<any>[] = []
+
+  if(contexts.length) {
+    destroyDesignByContexts(contexts, ownerSupport, promises)
+
+    if( promises.length ) {
+      return Promise.all(promises).then(() => {
+        ++painting.locks
+        destroyContextHtml(context)
+        // delete context.htmlDomMeta
+        context.htmlDomMeta = []
+        --painting.locks
+        paint()
+      })
+    }
+  }
+}

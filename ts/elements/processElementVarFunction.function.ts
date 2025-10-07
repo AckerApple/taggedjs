@@ -37,7 +37,6 @@ export function processElementVarFunction(
         values: unknown[],
       ) => {
         ++subContext.updateCount
-        
         const newValue = value(aSubContext)
         const result = aSubContext.tagJsVar.processUpdate(
           newValue,

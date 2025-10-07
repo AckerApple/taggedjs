@@ -78,6 +78,8 @@ export function getOverrideTagVar(
   support: AnySupport,
   subject: SupportContextItem,
 ): ReadOnlyVar {
+  // support.context = subject as SupportContextItem
+
   const overrideTagVar: ReadOnlyVar = {
     tagJsType: 'tag-conversion',
     
@@ -111,9 +113,11 @@ export function getOverrideTagVar(
       const newType = (value as TagJsVar)?.tagJsType
       const hasTypeChanged = newType !== oldType
       const hasChanged = checkTagValueChange(value, context)
+
+      // check to see if the tagConversion itself has changed
       const changed = hasChanged || hasTypeChanged || overrideTagVar.hasValueChanged(
         convertValue,
-        context, // newContext,
+        context, // aka contextItem,
         support,
       )
 

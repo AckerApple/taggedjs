@@ -1,3 +1,4 @@
+import { castTextValue } from '../castTextValue.function.js';
 import { AnySupport, Subject } from '../index.js';
 import { paintAppends, paintAppend, painter, paintCommands } from '../render/paint.function.js';
 import { ContextItem } from '../tag/index.js';
@@ -14,6 +15,19 @@ export function processChildren(
   paintBy: painter, // paintAppend | paintBefore
 ) {
   innerHTML.forEach(item => {
+    const type = typeof item;
+
+    switch (type) {
+      case 'string':
+      case 'boolean':
+      case 'number':
+        return handleSimpleInnerValue(item, element, paintBy)
+    }
+
+    if( item === null || item === undefined ) {
+      return handleSimpleInnerValue(item, element, paintBy)
+    }
+
     if (item.tagJsType === 'element') {
       const newElement = processElementVar(
         item,
@@ -25,22 +39,15 @@ export function processChildren(
       return;
     }
 
-    const type = typeof item;
-
-    switch (type) {
-      case 'string':
-      case 'number':
-        return handleSimpleInnerValue(item, element, paintBy);
-
-      case 'function':
-        return processElementVarFunction(
-          item,
-          element,
-          context,
-          ownerSupport,
-          addedContexts,
-          paintBy,
-        );
+    if(type === 'function') {
+      return processElementVarFunction(
+        item,
+        element,
+        context,
+        ownerSupport,
+        addedContexts,
+        paintBy,
+      )
     }
 
     return processNonElement(
@@ -95,7 +102,8 @@ export function handleSimpleInnerValue(
   element: HTMLElement | Text,
   paintBy: painter,
 ) {
-  const text = document.createTextNode(value as string);
+  const castedValue = castTextValue(value)
+  const text = document.createTextNode(castedValue);
   paintCommands.push([paintBy, [element, text]]);
   return text;
 }

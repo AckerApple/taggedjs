@@ -4,7 +4,7 @@ import { TagWrapper } from './tag.utils.js'
 import { getNewGlobal } from './update/getNewGlobal.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 import { destroySupport } from '../render/destroySupport.function.js'
-import { BaseTagGlobal, DomTag, PropWatches } from './index.js'
+import { DomTag, PropWatches, TagGlobal } from './index.js'
 import { initState } from '../state/state.utils.js'
 import { isTagComponent } from '../isInstance.js'
 import { Props } from '../Props.js'
@@ -76,7 +76,7 @@ export function tagElement(
 
   // create observable the app lives on
   const subject = getNewSubject(templater, element)
-  const global = subject.global as BaseTagGlobal
+  const global = subject.global
   const newest = subject.state.newest as AnySupport
   
   initState(newest.context)
@@ -127,7 +127,7 @@ function getNewSubject(
     processUpdate: tagValueUpdateHandler,
   }
 
-  const subject: AppSupportContextItem = {
+  const context: AppSupportContextItem = {
     updateCount: 0,
     value: templater,
     valueIndex: 0,
@@ -141,17 +141,18 @@ function getNewSubject(
     tagJsVar,
   }
 
-  const global = getNewGlobal(subject) as BaseTagGlobal
+  // sets new global on context
+  getNewGlobal(context) as TagGlobal
   
   // TODO: events are only needed on the base and not every support
   // for click events and such read at a higher level
-  global.events = {}
+  context.events = {}
 
   loadNewBaseSupport(
     templater,
-    subject as SupportContextItem,
+    context as SupportContextItem,
     appElement,
   )
 
-  return subject
+  return context
 }
