@@ -29,11 +29,6 @@ export const oneRender = tag(() => {
       button({type:"button", id:"👍-counter-button",
         onClick: () => {
           ++counter.value
-          counter.next(counter.value)
-          console.log('counter.value',{
-            value: counter.value,
-            counter,
-          })
         }
       }, '++👍')
     ),
