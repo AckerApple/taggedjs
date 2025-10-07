@@ -1,37 +1,54 @@
-import { html, Subject, subject, tag, states, ValueSubjective, signal, subscribe } from "taggedjs"
+import { html, states, Subject, subject, tag, ValueSubjective, signal, subscribe, noElement, div, span, button, hr, fieldset, legend } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component.js"
 
+let outsideCount = 0
+
 /** this tag renders only once */
-export const oneRender = () => tag.renderOnce = (
-  counter = new ValueSubjective(0),
-  renderCount = 0,
-) => {
+export const oneRender = tag(() => {
+  const counter = new ValueSubjective(0)
+  let renderCount = 0
+  
   ++renderCount
+  ++outsideCount
 
   const x = Subject.all([0, 'all', 4])
+
+  if(outsideCount > 1) {
+    throw new Error('issue started!')
+  }
   
-  return html`
-    ${subscribe(x.pipe(x => JSON.stringify(x)))}
-    <div>
-      <span>👍<span id="👍-counter-display">${subscribe(counter)}</span></span>
-      <button type="button" id="👍-counter-button"
-        onclick=${() => {
+  return noElement(
+    subscribe(x.pipe(x => JSON.stringify(x))),
+    
+    div(
+      span('👍',
+        span({id:"👍-counter-display"}, subscribe(counter, x => x)
+        )
+      ),
+      
+      button({type:"button", id:"👍-counter-button",
+        onClick: () => {
           ++counter.value
+          counter.next(counter.value)
           console.log('counter.value',{
             value: counter.value,
             counter,
           })
-        }}
-      >++👍</button>
-    </div>
-    ${renderCountDiv({renderCount, name:'oneRender_tag_ts'})}
-    <hr />
-    <fieldset>
-      <legend>insideMultiRender</legend>
-      ${insideMultiRender()}
-    </fieldset>
-  `
-}
+        }
+      }, '++👍')
+    ),
+
+    _=> renderCountDiv({renderCount, name:'oneRender_tag_ts'}),
+
+    hr,
+
+    fieldset(
+      legend('insideMultiRender'),
+      _=> insideMultiRender(),
+    )
+  )
+
+})
 
 /** this tag renders on every event but should not cause parent to re-render */
 const insideMultiRender = tag(() => (
