@@ -1,4 +1,4 @@
-import { html, tag, onInit, state, Subject, callbackMaker, onDestroy, states, subscribe } from "taggedjs"
+import { html, tag, onInit, state, Subject, callbackMaker, onDestroy, states, subscribe, noElement, button, h1 } from "taggedjs"
 import { renderedSections } from "./renderedSections.tag"
 import { renderCountDiv } from "./renderCount.component"
 import { sectionSelector } from "./sectionSelector.tag"
@@ -18,21 +18,21 @@ function appFun(){
     states(get => [{ showHide }] = get({ showHide }))
 
     console.log('🍒 App rendered', appDate)
-    return html`<!--app.js-->
-      <h1 id="h1-app">🏷️ TaggedJs - ${2+2}</h1>
+    return noElement('<!--app.js-->',
+      h1({id:"h1-app"}, `🏷️ TaggedJs - ${2+2}`),
 
-      <button type="button"
-        onclick=${() => showHide = !showHide}
-      >show/hide ${showHide}</button>
-      ${showHide && fxTag()}
+      button({type:"button",
+        onClick:() => showHide = !showHide,
+      }, 'show/hide ', _=> showHide),
+      
+      _=> showHide && fxTag(),
 
+      menu(),
 
-      ${menu()}
-
-      ${menuName === 'home' && homePage()}
-      ${menuName === 'counters' && innerCounterContent()}
-      ${menuName === 'content' && content()}
-    `
+      _=> menuName === 'home' && homePage(),
+      _=> menuName === 'counters' && innerCounterContent(),
+      _=> menuName === 'content' && content(),
+    )
   }
 }
 appFun.isApp = true
