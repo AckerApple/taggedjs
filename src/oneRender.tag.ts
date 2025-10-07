@@ -15,7 +15,13 @@ export const oneRender = () => tag.renderOnce = (
     <div>
       <span>👍<span id="👍-counter-display">${subscribe(counter)}</span></span>
       <button type="button" id="👍-counter-button"
-        onclick=${() => ++counter.value}
+        onclick=${() => {
+          ++counter.value
+          console.log('counter.value',{
+            value: counter.value,
+            counter,
+          })
+        }}
       >++👍</button>
     </div>
     ${renderCountDiv({renderCount, name:'oneRender_tag_ts'})}

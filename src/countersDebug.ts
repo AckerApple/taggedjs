@@ -405,7 +405,6 @@ export const innerCounterContent = tag(() => (
       div(
         small(
           span({id:"🪈-pipedSubject-3"}, subscribe(pipedSubject3, (a) => {
-            console.log('pipedSubject3', pipedSubject3)
             return 'hello world'
           }))
         )
