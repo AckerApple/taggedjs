@@ -8,8 +8,8 @@ it('no template tags', () => {
 */
 
 it('basic app subject', () => {
-  const current = textContent('#app-counter-subject-value-display')
+  const current = Number(textContent('#app-counter-subject-value-display'))
   click('#app-counter-subject-button')
-  const afterClick = textContent('#app-counter-subject-value-display')
-  expect(Number(current)).toBe(Number(afterClick)-1)
+  const afterClick = Number(textContent('#app-counter-subject-value-display'))
+  expect(current).toBe(afterClick-1, `Expected #app-counter-subject-value-display to be ${afterClick-1} but it is ${current}`)
 })

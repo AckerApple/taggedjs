@@ -1,20 +1,30 @@
-import { tag, html, onInit } from "taggedjs"
+import { tag, html, onInit, noElement, input, button, div } from "taggedjs"
 import { saveScopedStorage, storage, ViewTypes } from "./sectionSelector.tag"
 import { runTesting } from "./runTesting.function"
 
-export const autoTestingControls = (
+export const autoTestingControls = tag((
   tests?: ViewTypes[],
   runStartEndTests?: boolean,
-) => tag.use = (
-  _ = onInit(() => {
-    if(storage.autoTest) {
-      runTesting(false, tests, runStartEndTests)
-    }
-  }),
-) => html`
-  auto testing <input type="checkbox" ${storage.autoTest && 'checked'} onchange=${toggleAutoTesting} />
-  <button type="button" onclick=${() => runTesting(true, tests, runStartEndTests)}>run tests</button>
-`
+) => {
+  if(storage.autoTest) {
+    runTesting(false, tests, runStartEndTests)
+  }
+
+  return div(
+    'auto testing ',
+  
+    input({
+      type: "checkbox",
+      onChange: toggleAutoTesting,
+      checked: _=> storage.autoTest,
+    }),
+    
+    button({
+      type: "button",
+      onClick: () => runTesting(true, tests, runStartEndTests),
+    },'run tests')
+  )
+})
 
 function toggleAutoTesting() {
   storage.autoTest = storage.autoTest = !storage.autoTest

@@ -1,4 +1,4 @@
-import { Subject, div, h3, input, label, a, fieldset, span, legend } from "taggedjs"
+import { Subject, div, h3, input, label, a, fieldset, span, legend, tag } from "taggedjs"
 import { runTesting } from "./runTesting.function"
 import { outputSections } from "./renderedSections.tag"
 
@@ -39,7 +39,7 @@ export function saveScopedStorage() {
 
 const defaultViewTypes = Object.values(ViewTypes)
 
-export const sectionSelector = (viewTypes = defaultViewTypes) => {
+export const sectionSelector = tag((viewTypes = defaultViewTypes) => {
   // Sort viewTypes alphabetically
   const sortedViewTypes = [...viewTypes]
     .sort((a, b) => a.localeCompare(b))
@@ -104,9 +104,7 @@ export const sectionSelector = (viewTypes = defaultViewTypes) => {
       ]
     )
   )
-}
-
-sectionSelector.tempNote = 'sections'
+})
 
 function toggleViewType(
   type: ViewTypes,

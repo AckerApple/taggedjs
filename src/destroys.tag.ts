@@ -7,7 +7,7 @@ export const destroys = tag(() => (
   on = true,
   renderCount = 0,
   __ = ++renderCount,
-) => noElement(
+) => div(
   'destroyCount: ',
   span({id:"destroyCount"}, _=> destroyCount),
   'on/off: ', _=> on,

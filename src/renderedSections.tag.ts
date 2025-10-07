@@ -1,4 +1,4 @@
-import { html, state, Subject, tag } from "taggedjs"
+import { div, state, Subject, tag, a, fieldset, legend, button } from "taggedjs"
 import { oneRender } from "./oneRender.tag"
 import { storage, ViewTypes } from "./sectionSelector.tag"
 import funInPropsTag from "./funInProps.tag"
@@ -70,7 +70,7 @@ export const renderedSections = tag((
   appCounterSubject: Subject<number>,
   viewTypes: ViewTypes[] = storage.views,
 ) => {
-  const visibleSections = state(() => outputSections.filter(section => {
+  const visibleSections = outputSections.filter(section => {
     if(viewTypes.includes(section.view)) {
       return true
     }
@@ -86,36 +86,34 @@ export const renderedSections = tag((
   }).sort((a, b) => {
     // Sort alphabetically by view name
     return a.view.localeCompare(b.view);
-  }))
+  })
 
-  return html`
-    <div style="display:flex;flex-wrap:wrap;gap:1em">
-      ${visibleSections.map((section) => getSection(section).key(section.view))}
-    </div>
-  `
+  return div({style:"display:flex;flex-wrap:wrap;gap:1em"},
+    _=> visibleSections.map((section) => getSection(section).key(section.view))
+  )
 })
 
 const getSection = (section: OutputSection) => {
   const {emoji, view, title, output, debug} = section
-  return html`
-    <div style="flex:2 2 20em">
-      <a id=${view}><!-- ⚓️ --></a>
-      <fieldset>
-        <legend>${emoji} ${title}</legend>
-        <div id="many-section-contents" style.display=${section.contentHide ? 'none' : ''}>
-          ${output}
-        </div>
-        <div style="display:flex;">
-          <button style="flex:1;"
-            id=${'section_' + section.view}
-            onclick=${() => section.contentHide = !section.contentHide}
-            style.background-color=${section.contentHide ? 'grey' : ''}
-          >👁️ hide/show</button>
-        </div>
-      </fieldset>
-      <div style="font-size:0.6em;text-align:right;">
-        <a href="#top">⏫</a>
-      </div>
-    </div>
-  `
+  return div({style: "flex:2 2 20em"},
+    a({id: view}, '<!-- ⚓️ -->'),
+    fieldset(
+      legend(emoji, ' ', title),
+      div({
+        id: "many-section-contents",
+        'style.display': _=> section.contentHide ? 'none' : ''
+      }, output),
+      div({style: "display:flex;"},
+        button({
+          style: "flex:1;",
+          id: 'section_' + section.view,
+          onClick: () => section.contentHide = !section.contentHide,
+          'style.background-color': _=> section.contentHide ? 'grey' : ''
+        }, '👁️ hide/show')
+      )
+    ),
+    div({style: "font-size:0.6em;text-align:right;"},
+      a({href: "#top"}, '⏫')
+    )
+  )
 }
