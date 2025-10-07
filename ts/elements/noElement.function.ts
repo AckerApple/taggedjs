@@ -47,6 +47,8 @@ function processNoElmInit(
   // appendTo?: Element,
 ) {
   context.contexts = [] // added contexts
+  context.htmlDomMeta = []
+  
   processChildren(
     value.innerHTML,
     context,
@@ -71,11 +73,12 @@ function destroyNoElement(
 
     if( promises.length ) {
       return Promise.all(promises).then(() => {
+
         ++painting.locks
         destroyContextHtml(context)
-        // delete context.htmlDomMeta
         context.htmlDomMeta = []
         --painting.locks
+        
         paint()
       })
     }

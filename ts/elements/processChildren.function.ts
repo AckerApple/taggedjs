@@ -1,5 +1,6 @@
 import { castTextValue } from '../castTextValue.function.js';
 import { AnySupport, Subject } from '../index.js';
+import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
 import { paintAppends, paintAppend, painter, paintCommands } from '../render/paint.function.js';
 import { ContextItem } from '../tag/index.js';
 import { valueToTagJsVar } from '../tagJsVars/index.js';
@@ -36,6 +37,13 @@ export function processChildren(
         addedContexts
       );
       paintCommands.push([paintBy, [element, newElement]]);
+      const htmlDomMeta = context.htmlDomMeta as DomObjectChildren
+      htmlDomMeta.push({
+        nn: newElement.tagName,
+        domElement: newElement,
+        // at: newElement.attributes,
+        at: [],
+      })
       return;
     }
 

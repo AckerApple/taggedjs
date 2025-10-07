@@ -8,7 +8,6 @@ import { elementFunctions, isValueForContext, loopObjectAttributes, registerMock
 import { processElementVar } from './processElementVar.function.js'
 import { destroyDesignElement } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
-import { processChildren } from './processChildren.function.js'
 
 export type MockElmListener = [
   string,
@@ -139,6 +138,7 @@ function processInit(
   // appendTo?: Element,
 ) {
   context.contexts = [] // added contexts
+  context.htmlDomMeta = []
   const element = processElementVar(value, context, ownerSupport, context.contexts)
   
   paintCommands.push([paintBefore, [insertBefore, element, 'designElement.processInit']])
@@ -146,8 +146,7 @@ function processInit(
   const dom: DomObjectElement = {
     nn: value.tagName,
     domElement: element,
-    // marker: insertBefore,
-    at: value.attributes,
+    at: value.attributes, // TODO: most likely does nothing
   }
 
   context.htmlDomMeta = [dom]

@@ -41,12 +41,11 @@ export function destroyDesignByContexts(
   const result = context.tagJsVar.destroy(context, ownerSupport)
 
   if( isPromise(result) ) {
-    promises.push(result)
-    return result.then(() => {
+    return promises.push(result.then(() => {
       if(contexts.length > 1) {
         return destroyDesignByContexts( contexts.slice(1, contexts.length), ownerSupport, promises )
       }
-    })
+    }))
   }
 
   if(context.htmlDomMeta) {
