@@ -1,4 +1,4 @@
-import { LikeObjectChildren, html, tag, ValueSubject, state, states, subscribe, Subject, getInnerHTML, div, input, select, option } from "taggedjs"
+import { LikeObjectChildren, html, tag, ValueSubject, state, states, subscribe, Subject, getInnerHTML, div, input, select, option, noElement, button, hr } from "taggedjs"
 import { dumpContent } from "./dumpContent.tag"
 import { renderCountDiv } from "./renderCount.component"
 import { fx } from "taggedjs-animate-css"
@@ -87,12 +87,18 @@ export const content = tag(() => {
   const injectionTest = '<script>alert("i should never run but be seen on page")</script>'
 
   const pipe = subscribe(vs0, () => {
-    return html`
-      <button type="button" onclick=${() => {
-        ++counter
-      }}>increase inside ${counter}</button>
-      <button type="button" onclick=${() => vs0.next( vs0.value + 1 )}>increase vs0</button>
-    `
+    return noElement(
+      button({
+        type:"button",
+        onClick:() => {
+          ++counter
+        }
+      }, 'increase inside ', _=> counter),
+      
+      button({
+        type:"button", onClick:() => vs0.next( vs0.value + 1 )
+      }, 'increase vs0'),
+    )
   })
 
   return html`<!-- content-debug-testing -->
@@ -251,25 +257,25 @@ export const content = tag(() => {
   `
 })
 
-const numberedNoParents = () => {
-  return html`
-    <hr />
-    content1
-    <hr />
-    ${'test0'}
-    <hr />
-    content2
-    <hr />
-    ${'test1'}
-    <hr />
-    content3
-    <hr />
-    ${'test3'}
-    <hr />
-    content4
-    <hr />
-  `  
-}
+const numberedNoParents = tag(() => {
+  return noElement(
+    hr,
+    'content1',
+    hr,
+    'test0',
+    hr,
+    'content2',
+    hr,
+    'test1',
+    hr,
+    'content3',
+    hr,
+    'test3',
+    hr,
+    'content4',
+    hr,
+  )
+})
 
 
 const innerHtmlTag = tag(() => {

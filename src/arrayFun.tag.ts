@@ -1,7 +1,10 @@
-import { html, tag } from "taggedjs";
+import { button, div, tag } from "taggedjs"
 
-export const arrayFunTag = tag((item, deleteItem) => html`
-  <div style="border:1px solid black;">
-    ${item}<button type="button" onclick=${() => deleteItem(item)}>delete</button>
-  </div>
-`)
+export const arrayFunTag = tag((item, deleteItem) => {
+  return div({style:"border:1px solid black;"},
+    _=> item,
+    button({type:"button", onClick:() => deleteItem(item)},
+      'delete'
+    ),
+  )
+})
