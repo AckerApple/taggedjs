@@ -1,4 +1,4 @@
-import { LikeObjectChildren, html, tag, ValueSubject, state, states, subscribe, Subject, getInnerHTML, div, input, select, option, noElement, button, hr } from "taggedjs"
+import { LikeObjectChildren, html, tag, ValueSubject, state, states, subscribe, Subject, getInnerHTML, div, input, select, option, noElement, button, hr, fieldset, legend } from "taggedjs"
 import { dumpContent } from "./dumpContent.tag"
 import { renderCountDiv } from "./renderCount.component"
 import { fx } from "taggedjs-animate-css"
@@ -163,12 +163,14 @@ export const content = tag(() => {
     <hr id="noParentsTest2-end" />
 
     <div style="display:flex;flex-wrap:wrap;gap:1em;">
-      <fieldset>
-        <legend>injection test</legend>        
-        <div id="injection-test">injection test ${injectionTest}</div>
-        <div id="hello-big-dom-world">hello ${html.dom(dom)} world</div>
-        <div id="hello-big-string-world">hello ${html`<b>big</b>`} world</div>
-      </fieldset>
+      ${
+        fieldset(
+          legend('injection test'),
+          div({id:"injection-test"}, 'injection test ', injectionTest),
+          div({id:"hello-big-dom-world"}, 'hello ', html.dom(dom), ' world'),
+          div({id:"hello-big-string-world"}, 'hello ', html`<b>big</b>`, ' world'),
+        )
+      }
 
       <fieldset>
         <legend>tagvar injection</legend>
