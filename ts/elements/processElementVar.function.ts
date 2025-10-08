@@ -1,6 +1,7 @@
 import { AnySupport, isPromise } from '../index.js'
 import { addSupportEventListener } from '../interpolations/attributes/addSupportEventListener.function.js'
 import { getSupportWithState } from '../interpolations/attributes/getSupportWithState.function.js'
+import { isSpecialAttr } from '../interpolations/attributes/isSpecialAttribute.function.js'
 import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArray.function.js'
 import { processAttributeArray } from '../render/dom/processAttributeArray.function.js'
 import { paintAppend } from '../render/paint.function.js'
@@ -16,6 +17,15 @@ export function processElementVar(
 ) {
   const element = document.createElement(value.tagName)
   context.element = element
+
+  value.attributes.forEach(x => {
+    const name = x[0]
+    if(typeof(name) !== 'string') {
+      return
+    }
+
+    x[2] = isSpecialAttr(name)
+  })
 
   processAttributeArray(
     value.attributes,

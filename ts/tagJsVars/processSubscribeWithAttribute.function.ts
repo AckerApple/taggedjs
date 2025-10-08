@@ -3,7 +3,6 @@ import { TagJsVar } from "./tagJsVar.type.js"
 import { AttributeContextItem } from "../tag/AttributeContextItem.type.js"
 import { processSubscribeAttribute } from "./processSubscribeAttribute.function.js"
 import {  SubContext, SubscriptionContext } from "../tag/update/SubContext.type.js"
-import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { SubscribeValue } from "./index.js"
 
 

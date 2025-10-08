@@ -187,7 +187,7 @@ export function getOverrideTagVar(
 
 function afterDestroy(
   context: ContextItem & SupportContextItem,
-  ownerSupport: AnySupport,
+  _ownerSupport: AnySupport,
 ) {
   delete context.returnValue
   delete context.toRender;

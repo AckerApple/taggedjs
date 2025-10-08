@@ -2,7 +2,7 @@ import { TemplaterResult } from '../tag/getTemplaterResult.function.js'
 import {  TagWrapper } from '../tag/tag.utils.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { TagMaker } from '../tag/TagMaker.type.js'
-import { AnySupport, appElements, buildBeforeElement, ContextItem, SupportContextItem, TagAppElement, TagGlobal, UseMemory, Wrapper } from '../index.js'
+import { AnySupport, appElements, buildBeforeElement, ContextItem, TagAppElement, TagGlobal, UseMemory, Wrapper } from '../index.js'
 import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { processReplacementComponent } from '../tag/update/processFirstSubjectComponent.function.js'
 
@@ -29,13 +29,12 @@ export function registerTagElement(
     context.contexts = []
     const newFragment = document.createDocumentFragment()
     newFragment.appendChild(placeholder)
-    const replaceResult = processReplacementComponent(
+    void processReplacementComponent(
       support.templater,
       context,
       support,
     )
-    
-    // return replaceResult as any
+
     return newFragment
   }
 

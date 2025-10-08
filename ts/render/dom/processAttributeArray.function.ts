@@ -3,6 +3,7 @@ import { processAttribute } from "../attributes/processAttribute.function.js"
 import { ContextItem } from "../../tag/ContextItem.type.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
 import { Attribute } from "../../interpolations/optimizers/ObjectNode.types.js"
+import { isSpecialAttr } from "../../interpolations/attributes/isSpecialAttribute.function.js"
 
 export function processAttributeArray(
   attrs: Attribute[],
@@ -16,7 +17,8 @@ export function processAttributeArray(
   for (const attr of attrs) {
     const name = attr[0]
     const value = attr[1]
-    const isSpecial = attr[2] || false
+    // const isSpecial2 = !value?.tagJsVar && (typeof(name) === 'string' && isSpecialAttr(name))
+    const isSpecial = attr[2] || false // isSpecial2
     let howToSet: HowToSet = attr.length > 1 ? setNonFunctionInputValue : howToSetStandAloneAttr
 
     if(attr[3]) {

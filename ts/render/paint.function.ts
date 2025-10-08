@@ -10,7 +10,7 @@ export type PaintCommand = [
 ]
 
 /** Typically used for animations to run before clearing elements */
-export function addPaintRemoveAwait(promise: Promise<any>) {
+export function addPaintRemoveAwait(_promise: Promise<any>) {
   /*
   if(paintRemoveAwaits.length) {
     paintRemoveAwaits[paintRemoveAwaits.length - 1].paintRemoves.push( ...paintRemoves )

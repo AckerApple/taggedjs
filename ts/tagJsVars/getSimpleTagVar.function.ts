@@ -54,7 +54,7 @@ function processSimpleValueInit(
   contextItem: ContextItem,
   ownerSupport: AnySupport,
   insertBefore?: Text,
-  appendTo?: Element,      
+  _appendTo?: Element,
 ) {
   const castedValue = castTextValue(value)
 

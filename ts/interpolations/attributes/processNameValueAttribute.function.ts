@@ -84,15 +84,6 @@ export function processNonDynamicAttr(
   isSpecial: SpecialDefinition,
   context: ContextItem,
 ) {
-  if (isSpecial) {
-    return specialAttribute(
-      attrName,
-      value,
-      element,
-      isSpecial,
-    )
-  }
-
   if( typeof value === 'function') {
     return processFunctionAttr(
       value,
@@ -100,6 +91,15 @@ export function processNonDynamicAttr(
       attrName,
       element as HTMLElement,
       howToSet,
+    )
+  }
+
+  if (isSpecial) {
+    return specialAttribute(
+      attrName,
+      value,
+      element,
+      isSpecial,
     )
   }
 

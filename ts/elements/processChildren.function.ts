@@ -1,7 +1,7 @@
 import { castTextValue } from '../castTextValue.function.js';
 import { AnySupport, Subject } from '../index.js';
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
-import { paintAppends, paintAppend, painter, paintCommands } from '../render/paint.function.js';
+import { painter, paintCommands } from '../render/paint.function.js';
 import { ContextItem } from '../tag/index.js';
 import { valueToTagJsVar } from '../tagJsVars/index.js';
 import { processElementVar } from './processElementVar.function.js';

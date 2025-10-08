@@ -1,4 +1,4 @@
-import { TagGlobal, EventCallback } from '../../tag/index.js'
+import { EventCallback } from '../../tag/index.js'
 import { Events } from '../../tag/getTemplaterResult.function.js'
 import { AnySupport } from '../../tag/index.js'
 import { bubbleEvent } from './bubbleEvent.function.js'

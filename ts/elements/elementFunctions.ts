@@ -1,4 +1,4 @@
-import { ContextItem, isFunction, isObject, isPromise } from '../index.js';
+import { isFunction, isObject } from '../index.js';
 import { HowToSet, setBooleanAttribute, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
@@ -69,24 +69,6 @@ export function elementFunctions(item: any) {
     return function (callback: (e: InputElementTargetEvent) => any) {
       return callbackWrapper(item,eventName,callback)
     }
-  }
-
-  function makeAttributeHandler(
-    attrName: string,
-    howToSet: HowToSet,
-  ) {
-    return function (
-      value: ((...args: any[]) => any) | string | object
-    ) {
-      const clone = getPushKid(item as any, item.elementFunctions)
-      clone.attributes.push([attrName, value, false, howToSet])
-
-      if(isValueForContext(value)) {
-        registerMockAttrContext(value, clone)
-      }
-
-      return clone
-    };
   }
 
   const callables = {
