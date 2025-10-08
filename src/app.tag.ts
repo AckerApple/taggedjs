@@ -11,9 +11,8 @@ function appFun(){
   return function runAppFun(menuName = useMenuName()) {
     let showHide = false
 
-    states(get => [{ showHide }] = get({ showHide }))
-
     console.info('🍒 Main app rendered', appDate)
+
     return noElement('<!--app.js-->',
       h1({id:"h1-app"}, `🏷️ TaggedJs - ${2+2}`),
 

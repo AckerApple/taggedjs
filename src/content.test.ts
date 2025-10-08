@@ -44,7 +44,8 @@ describe('📰 content', () => {
   })
 
   it('style.', () => {
-    expect(query('#style-simple-border-orange')[0].style.border).toBe('3px solid orange')
+    const ssbo = query('#style-simple-border-orange')[0].style.border
+    expect(ssbo).toBe('3px solid orange')
     expect(query('#style-var-border-orange')[0].style.border).toBe('3px solid orange')
     expect(query('#style-toggle-border-orange')[0].style.border).toBe('3px solid orange')
     click('#toggle-border-orange')

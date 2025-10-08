@@ -162,48 +162,52 @@ export const content = tag(() => {
     ${numberedNoParents()}
     <hr id="noParentsTest2-end" />
 
-    <div style="display:flex;flex-wrap:wrap;gap:1em;">
-      ${
-        fieldset(
-          legend('injection test'),
-          div({id:"injection-test"}, 'injection test ', injectionTest),
-          div({id:"hello-big-dom-world"}, 'hello ', html.dom(dom), ' world'),
-          div({id:"hello-big-string-world"}, 'hello ', html`<b>big</b>`, ' world'),
+    ${div({style:"display:flex;flex-wrap:wrap;gap:1em;"},
+      fieldset(
+        legend('injection test'),
+        div({id:"injection-test"}, 'injection test ', injectionTest),
+        div({id:"hello-big-dom-world"}, 'hello ', html.dom(dom), ' world'),
+        div({id:"hello-big-string-world"}, 'hello ', html`<b>big</b>`, ' world'),
+      ),
+
+      fieldset(
+        legend('tagvar injection'),
+        div(
+          div({id:"inject-tagvar-0"}, ':tagvar0:'), '===', div({id:"inject-read-tagvar-0"}, ':tagvar0:'),
+          div({id:"inject-tagvar-1"}, ':tagvarx0x:'), '===', div({id:"inject-read-tagvar-1"}, ':tagvarx0x:'),
+          div({id:"inject-tagvar-2"}, ':tagvar0:'), '===', div({id:"inject-read-tagvar-2"}, ':tagvar0:')
         )
-      }
+      ),
 
-      <fieldset>
-        <legend>tagvar injection</legend>
-        <div>
-          <div id="inject-tagvar-0">&#58;tagvar0&#58;</div>===<div id="inject-read-tagvar-0">:tagvar0:</div>
-          <div id="inject-tagvar-1">&#58;tagvarx0x&#58;</div>===<div id="inject-read-tagvar-1">:tagvarx0x:</div>
-          <div id="inject-tagvar-2">&#58;tagvar0&#58;</div>===<div id="inject-read-tagvar-2">:tagva&#x72;0:</div>
-        </div>        
-      </fieldset>
-      
-      <div id="style-simple-border-orange" style.border="3px solid orange">simple orange border</div>
-      <div id="style-var-border-orange" style.border=${"3px solid orange"}>var orange border</div>
-      
-      <div>
-        <div id="style-toggle-border-orange"
-          style.border=${ orangeToggle ? "3px solid orange" : "3px solid green"}
-        >toggle orange border</div>
-        <button id="toggle-border-orange"
-          onclick=${() => orangeToggle = !orangeToggle}
-        >orange toggle ${orangeToggle}</button>
-      </div>
+      div({id:"style-simple-border-orange", 'style.border':"3px solid orange"}, 'simple orange border'),
+      div({id:"style-var-border-orange", 'style.border': "3px solid orange"}, 'var orange border'),
 
-      <div>
-        <div id="style-toggle-bold"
-          ${ boldToggle ? {style:'font-weight:bold;'} : {}}
-        >toggle orange border</div>
-        <button id="toggle-bold"
-          onclick=${() => boldToggle = !boldToggle}
-        >bold toggle ${boldToggle ? 'true' : 'false'}</button>
-      </div>
+      div(
+        div({
+          id:"style-toggle-border-orange",
+          'style.border': _=> orangeToggle ? "3px solid orange" : "3px solid green",
+        }, 'toggle orange border'),
+
+        button({
+          id:"toggle-border-orange",
+          onClick: () => orangeToggle = !orangeToggle,
+        }, 'orange toggle ', _=> orangeToggle),
+      ),
+
+      div(
+        div({
+          id: "style-toggle-bold",
+          style: _=> boldToggle ? 'font-weight:bold;' : '',
+        }, 'toggle orange border'),
+        
+        button({
+          id: "toggle-bold",
+          onClick: () => boldToggle = !boldToggle,
+        }, 'bold toggle ', boldToggle ? 'true' : 'false'),
+      ),
       
-      <div id="hello-spacing-dom-world">${54} ${'hello'} worlds</div>
-    </div>
+      div({id:"hello-spacing-dom-world"}, 54, ' hello', ' worlds'),
+    )}
 
     <div style="display:flex;flex-wrap:wrap;gap:1em;font-size:0.8em">
       <div style="flex-grow:1">

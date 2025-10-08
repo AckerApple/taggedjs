@@ -96,7 +96,7 @@ export const renderedSections = tag((
 const getSection = (section: OutputSection) => {
   const {emoji, view, title, output, debug} = section
   return div({style: "flex:2 2 20em"},
-    a({id: view}, '<!-- ⚓️ -->'),
+    a({id: view},''),
     fieldset(
       legend(emoji, ' ', title),
       div({
