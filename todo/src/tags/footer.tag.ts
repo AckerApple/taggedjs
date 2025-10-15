@@ -1,26 +1,39 @@
-import { tag, html } from 'taggedjs'
+/* TODO: Not sure this file is even in use */
+import { tag, footer, p, div, span, ul, li, a, button } from 'taggedjs'
 
 // Performance boost to not render if props non-mutating props did not change
-export const Footer = tag.immutableProps((
+export const Footer = tag((
   todosCount: number,
   removeCompleted: Function,
   route: string,
   activeTodoCount: number,
-) => html`
-  <footer class="footer" data-testid="footer">
-    <p>Double-click to edit a todo</p>
-    <div>
-      <span class="todo-count">${activeTodoCount} item${activeTodoCount > 1 && "s"} left!</span>
-      <ul class="filters">
-        <li><a class.selected=${route === "/" } href="#/">All</a></li>
-        <li><a class.selected=${route === "/active" } href="#/active">Active</a></li>
-        <li><a class.selected=${route === "/completed" } href="#/completed">Completed</a></li>
-      </ul>
-      ${(todosCount - activeTodoCount) > 0 && html`
-        <button class="clear-completed" onclick=${() => removeCompleted()}>
-          Clear completed
-        </button>
-      `}
-    </div>
-  </footer>
-`)
+) => footer({class: "footer", 'data-testid': "footer"},
+  p('Double-click to edit a todo'),
+  div(
+    span({class: "todo-count"},
+      _=> activeTodoCount,
+      ' item',
+      _=> activeTodoCount > 1 && "s",
+      ' left!'
+    ),
+    ul({class: "filters"},
+      li(
+        a({class: route === "/" ? "selected" : "", href: "#/"},
+          'All'
+        )),
+      li(
+        a({class: route === "/active" ? "selected" : "", href: "#/active"},
+          'Active'
+        )),
+      li(
+        a({class: route === "/completed" ? "selected" : "", href: "#/completed"},
+          'Completed'
+        ))
+    ),
+    _=> (todosCount - activeTodoCount) > 0 &&
+      button({
+        class: "clear-completed",
+        onClick: () => removeCompleted()
+      }, 'Clear completed')
+  )
+))

@@ -99,6 +99,7 @@ describe('📰 content', () => {
   })
 
   it('tagvar injections', () => {
+    expect(html('#content-dom-parse-0-0')).toBe(html('#content-dom-parse-0-1'))
     expect(byId('inject-tagvar-0').innerText).toBe(byId('inject-read-tagvar-0').innerText)
     expect(byId('inject-tagvar-1').innerText).toBe(byId('inject-read-tagvar-1').innerText)
     expect(byId('inject-tagvar-2').innerText).toBe(byId('inject-read-tagvar-2').innerText)

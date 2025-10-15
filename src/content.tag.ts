@@ -1,4 +1,4 @@
-import { LikeObjectChildren, html, tag, ValueSubject, state, states, subscribe, Subject, getInnerHTML, div, input, select, option, noElement, button, hr, fieldset, legend } from "taggedjs"
+import { LikeObjectChildren, html, tag, ValueSubject, state, states, subscribe, Subject, getInnerHTML, div, input, select, option, noElement, button, hr, fieldset, legend, span } from "taggedjs"
 import { dumpContent } from "./dumpContent.tag"
 import { renderCountDiv } from "./renderCount.component"
 import { fx } from "taggedjs-animate-css"
@@ -60,7 +60,7 @@ export const concatStyles = tag((innerHTML: any) => {
 })
 
 export const content = tag(() => {
-  const vs0 = state(() => new ValueSubject(0))
+  const vs0 = new ValueSubject(0)
 
   let renderCount: number = 0
   let orangeToggle = true
@@ -68,13 +68,7 @@ export const content = tag(() => {
   let counter = 0
   let staggerBy = testStaggerBy
   let showHideFx = false
-  const counts = state(() => new Subject({ added: 0, removed: 0})) as ValueSubject<{added: number, removed: number}>
-
-  states(get => [{
-    renderCount, orangeToggle, boldToggle, counter, showHideFx, staggerBy,
-  }] = get({
-    renderCount, orangeToggle, boldToggle, counter, showHideFx, staggerBy,
-  }))
+  const counts = new Subject({ added: 0, removed: 0})// as ValueSubject<{added: number, removed: number}>
 
   ++renderCount
 
@@ -101,68 +95,94 @@ export const content = tag(() => {
     )
   })
 
-  return html`<!-- content-debug-testing -->
-    <fieldset style="flex-grow:1">
-      <legend>
-        piped subject click <span id="pipe-counter-click-display">${counter}</span>
-      </legend>
-      ${pipe}
-      <button type="button" onclick=${() => ++counter}>increase outside ${counter}</button>
-    </fieldset>
-
-    <fieldset style="flex-grow:1">
-      <legend>
-        hide show
-      </legend>
+  return noElement(
+    fieldset({style: "flex-grow:1"},
+      legend(
+        'piped subject click ',
+        span({id: "pipe-counter-click-display"},
+          _=> counter
+        )
+      ),
       
-      <button id="content-toggle-fx" type="button"
-        onclick=${() => showHideFx = !showHideFx}
-      >toggle hideshow fx</button>
-
-      ${showHideFx && (html`
-        <div name="test-the-tester" ${fx({duration:'10ms'})}>test the tester - 0</div>
-      `)}
-      ${showHideFx && (html`
-        <div name="test-the-tester" ${fx({duration:'10ms', stagger: staggerBy})}>test the tester - 1</div>
-      `)}
-      ${showHideFx && (html`
-        <div name="test-the-tester" ${fx({duration:'10ms', stagger: staggerBy * 2})}>test the tester - 2</div>
-      `)}
-      ${showHideFx && (outerHtml(staggerBy).innerHTML = innerHtmlTag())}
-
-      <div>
-        <div>
-          added: <span id="content-fx-added">${subscribe(counts, counts => counts.added)}</span>&nbsp;
-          removed: <span id="content-fx-removed">${subscribe(counts, counts => counts.removed)}</span>
-        </div>
-        <div>
-          staggerBy:<input type="range" min="10" max="300" step="1" onchange=${event => staggerBy = Number(event.target.value)} />
-        </div>
-      </div>
-
-      <hr />
+      pipe,
       
-      ${concatStyles(html`
+      button({type: "button", onClick: () => ++counter},
+        'increase outside ', _=> counter
+      )
+    ),
+
+    fieldset({style: "flex-grow:1"},
+      legend('hide show'),
+
+      button({
+        id: "content-toggle-fx",
+        type: "button",
+        onClick: () => showHideFx = !showHideFx
+      }, 'toggle hideshow fx'),
+
+      _=> showHideFx && div({
+        name:"test-the-tester", attr: fx({duration:'10ms'}),
+      }, 'test the tester - 0'),
+
+      _=> showHideFx && div({
+        name:"test-the-tester",
+        attr: fx({duration:'10ms', stagger: staggerBy}),
+      }, 'test the tester - 1'),
+
+      _=> showHideFx && div({
+        name:"test-the-tester",
+        attr: fx({duration:'10ms', stagger: staggerBy * 2}),
+      }, 'test the tester - 2'),
+
+      _=> showHideFx && (outerHtml(staggerBy).innerHTML = innerHtmlTag()),
+
+      div(
+        div(
+          'added: ',
+          span({id: "content-fx-added"},
+            subscribe(counts, counts => counts.added)
+          ),
+          ' ',
+          'removed: ',
+          span({id: "content-fx-removed"},
+            subscribe(counts, counts => counts.removed)
+          )
+        ),
+        div(
+          'staggerBy:',
+          input({
+            type: "range", min: "10",
+            max: "300", step: "1",
+            onChange: event => staggerBy = Number(event.target.value)
+          })
+        )
+      ),
+
+      hr,
+
+      concatStyles(html`
         test the tester2
-      `)}
-    </fieldset>
+      `)
+    ),
 
-    <fieldset>
-      <legend>Dump Content</legend>
-      ${dumpContent()}
-      ${renderCountDiv({renderCount, name: 'content'})}
-    </fieldset>
+    fieldset(
+      legend('Dump Content'),
+      dumpContent(),
+      renderCountDiv({renderCount, name: 'content'})
+    ),
 
-    <fieldset id="noParentTagFieldset">
-      <legend>No Parent Test</legend>
-      ${numberedNoParents()}
-    </fieldset>
+    fieldset({id: "noParentTagFieldset"},
+      legend('No Parent Test'),
+      numberedNoParents()
+    ),
 
-    <hr id="noParentsTest2-start" />
-    ${numberedNoParents()}
-    <hr id="noParentsTest2-end" />
+    hr({id: "noParentsTest2-start"}),
+    
+    numberedNoParents(),
+    
+    hr({id: "noParentsTest2-end"}),
 
-    ${div({style:"display:flex;flex-wrap:wrap;gap:1em;"},
+    div({style:"display:flex;flex-wrap:wrap;gap:1em;"},
       fieldset(
         legend('injection test'),
         div({id:"injection-test"}, 'injection test ', injectionTest),
@@ -199,68 +219,78 @@ export const content = tag(() => {
           id: "style-toggle-bold",
           style: _=> boldToggle ? 'font-weight:bold;' : '',
         }, 'toggle orange border'),
-        
+
         button({
           id: "toggle-bold",
           onClick: () => boldToggle = !boldToggle,
         }, 'bold toggle ', boldToggle ? 'true' : 'false'),
       ),
-      
-      div({id:"hello-spacing-dom-world"}, 54, ' hello', ' worlds'),
-    )}
 
-    <div style="display:flex;flex-wrap:wrap;gap:1em;font-size:0.8em">
-      <div style="flex-grow:1">
-        <fieldset>
-          <legend>zero test</legend>
-          P.0 You should see "0" here => "${0}"
-        </fieldset>
-      </div>
-      <!--proof you cannot see false values -->
-      <div style="flex-grow:1">
-        <fieldset>
-          <legend>false test</legend>
-          P.1 You should see "" here => "${false}"
-        </fieldset>
-      </div>
-      <div style="flex-grow:1">
-        <fieldset>
-          <legend>null test</legend>
-          P.2 You should see "" here => "${null}"
-        </fieldset>
-      </div>
-      <div style="flex-grow:1">
-        <fieldset>
-          <legend>undefined test</legend>
-          P.3 You should see "" here => "${undefined}"
-        </fieldset>
-      </div>
-      <!--proof you can see true booleans -->
-      <div style="flex-grow:1">
-        <fieldset>
-          <legend>true test</legend>
-          P.4 You should see "true" here => "${true}"
-        </fieldset>
-      </div>
-      <!--proof you can try to use the tagVar syntax -->
-      <fieldset>
-        <div style="flex-grow:1">
-          P.5 You should see "{22}" here => "${'{'}22${'}'}"</div>
-      </fieldset>
-      <fieldset>
-        <div style="flex-grow:1">
-          P.6 You should see "${'{'}__tagVar0${'}'}" here => "{__tagVar0}"
-        </div>
-      </fieldset>
-      <div style="flex-grow:1">
-        should be a safe string no html&nbsp;
-        <span id="content-dom-parse-0-0">"&lt;div&gt;hello&lt;/div&gt;"</span>&nbsp;
-        here =>&nbsp;
-        <span id="content-dom-parse-0-1">"${'<div>hello</div>'}"</span>
-      </div>
-    </div>
-    ${renderCountDiv({renderCount, name: 'content'})}
-  `
+      div({id:"hello-spacing-dom-world"}, 54, ' hello', ' worlds'),
+    ),
+
+    div({style:"display:flex;flex-wrap:wrap;gap:1em;font-size:0.8em"},
+      div({style:"flex-grow:1"},
+        fieldset(
+          legend('zero test'),
+          'P.0 You should see "0" here => "', `${0}`, '"'
+        )
+      ),
+      /* proof you cannot see false values */
+      div({style:"flex-grow:1"},
+        fieldset(
+          legend('false test'),
+          'P.1 You should see "" here => "', `${false}`, '"',
+        )
+      ),
+
+      div({style:"flex-grow:1"},
+        fieldset(
+          legend('null test'),
+          'P.2 You should see "" here => "', `${null}`, '"',
+        )
+      ),
+
+      div({style:"flex-grow:1"},
+        fieldset(
+          legend('undefined test'),
+          'P.3 You should see "" here => "', `${undefined}`, '"',
+        )
+      ),
+
+      /* proof you can see true booleans */
+      div({style:"flex-grow:1"},
+        fieldset(
+          legend('true test'),
+          'P.4 You should see "true" here => "', `${true}`, '"',
+        )
+      ),
+
+      /* proof you can try to use the tagVar syntax */
+      fieldset(
+        div({style:"flex-grow:1"},
+          'P.5 You should see "{22}" here => "' , `${'{'}`, '22', `${'}'}`, '"',
+        )
+      ),
+
+      // TODO: useless
+      fieldset(
+        div({style:"flex-grow:1"},
+          'P.6 You should see "{__tagVar0}" here => "{__tagVar0}"',
+        )
+      ),
+
+      /* TODO: Move me to subscriptions.tag.ts */
+      div({style:"flex-grow:1"},
+        'should be a safe string no html ',
+        span({id:"content-dom-parse-0-0"}, '"<div>hello</div>"'),
+        ' here => ',
+        span({id:"content-dom-parse-0-1"}, `"${'<div>hello</div>'}"`)
+      )
+    ),
+
+    renderCountDiv({renderCount, name: 'content'})
+  )
 })
 
 const numberedNoParents = tag(() => {

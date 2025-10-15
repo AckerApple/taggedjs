@@ -4,7 +4,7 @@ import { Dispatch } from '../reducer'
 
 export const Header = (dispatch: Dispatch) => tag.renderOnce = () => html`
     <header class="header" data-testid="header">
-        <h1>todos</h1>
+        <h1>src todos</h1>
         <input autoFocus class="new-todo"
             placeholder="What needs to be done?"
             onKeyDown=${e => {

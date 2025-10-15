@@ -1,4 +1,4 @@
-import { states, html, tag, noElement, button, h1, hr, div } from "taggedjs"
+import { tag, noElement, button, h1, hr, div } from "taggedjs"
 import { menu, useMenuName } from "./menu.tag"
 import { innerCounterContent } from "./countersDebug";
 import { content } from "./content.tag"
@@ -13,7 +13,7 @@ function appFun(){
 
     console.info('🍒 Main app rendered', appDate)
 
-    return noElement('<!--app.js-->',
+    return noElement(
       h1({id:"h1-app"}, `🏷️ TaggedJs - ${2+2}`),
 
       button({type:"button",

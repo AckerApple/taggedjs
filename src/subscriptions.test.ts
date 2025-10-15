@@ -4,7 +4,7 @@ import { describe, it, expect } from './testing'
 import { byId, click, html, htmlById, expectMatchedHtml, clickById } from './testing'
 
 describe('📰 subscriptions', () => {
-  it('basic', () => {
+  it('sub basic', () => {
     expectMatchedHtml('#content-subject-pipe-display0', '#content-subject-pipe-display1')
     expectMatchedHtml('#content-combineLatest-pipe-display0', '#content-combineLatest-pipe-display1')
   })
@@ -67,7 +67,7 @@ describe('📰 subscriptions', () => {
     })
   })
 
-  it('host', () => {
+  it('subscriptions host', () => {
     let hostDestroyCount = Number(htmlById('hostDestroyCount'))
 
     // should be a number
@@ -75,7 +75,8 @@ describe('📰 subscriptions', () => {
 
     clickById('hostHideShow')
 
-    expect( Number(htmlById('hostDestroyCount')) ).toBe(hostDestroyCount + 1, 'host destroy mismatch')
+    const dCount = Number(htmlById('hostDestroyCount'))
+    expect( dCount ).toBe(hostDestroyCount + 1, `host destroy count expected ${dCount} to be ${hostDestroyCount + 1}`)
 
     // should NOT be a number
     expect(htmlById('hostedContent')).toBe('')
@@ -89,10 +90,9 @@ describe('📰 subscriptions', () => {
     expect( Number(htmlById('hostDestroyCount')) ).toBe(hostDestroyCount + 1, 'host destroy mismatch 2')
   })
 
-  it('basic', () => {
+  it('subscribe basic', () => {
     expectMatchedHtml('#content-subject-pipe-display0', '#content-subject-pipe-display1')
     expectMatchedHtml('#content-combineLatest-pipe-display0', '#content-combineLatest-pipe-display1')
-    expect(html('#content-dom-parse-0-0')).toBe(html('#content-dom-parse-0-1'))
   })
 
   it('html', () => {

@@ -156,7 +156,9 @@ const testHost = tag(() => {
           ${host(
             () => tag.element.get().innerHTML = Date.now().toString(),
             {
-              onDestroy: () => ++destroyCount,
+              onDestroy: () => {
+                ++destroyCount
+              },
             }
           )}
         ></span>

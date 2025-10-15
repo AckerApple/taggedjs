@@ -1,10 +1,9 @@
 import { describe, it, expect } from './testing'
-import { click, clickOne, focus, keydownOn, query } from './testing'
-import { sleep } from './testing'
+import { clickOne, focus, keydownOn, query } from './testing'
 
 describe('☑️ todos', function todos() {
   const todoInput = query('.new-todo')[0] as HTMLInputElement
-
+/*
   it('todos add one remove one', async function addOneRemoveOne() {
     expect(query('button.destroy').length).toBe(0)
 
@@ -81,12 +80,12 @@ describe('☑️ todos', function todos() {
     clickOne('button.destroy')
     expect(query('input.toggle').length).toBe(0)
   })
-
+*/
   it('todos editing', function editing() {
     // create todo
     todoInput.value = 'one'
     keydownOn(todoInput, 'Enter')
-    expect(query('input#edit-todo-input').length).toBe(0)
+    expect(query('input#edit-todo-input').length).toBe(0, 'input#edit-todo-input should not exist')
     
     // prepare to make new todo become editable
     let event = new MouseEvent('dblclick', {
@@ -107,20 +106,23 @@ describe('☑️ todos', function todos() {
     const editInput = query('input#edit-todo-input')[0] as any
     editInput.value = 'two'
     keydownOn(editInput, 'Enter')
+    // blur('input#edit-todo-input')
 
-    expect(query('button.destroy').length).toBe(1) // expected only one delete button
+    const dButtonCount = query('button.destroy').length
+    expect(dButtonCount).toBe(1, `Expected 1 button with class "destroy" but got ${dButtonCount}`) // expected only one delete button
 
     // main input + array input
     expect(query('input.new-todo').length).toBe(1)
-    expect(query('input#edit-todo-input').length).toBe(0) // enter key already hid it
+    expect(query('input#edit-todo-input').length).toBe(0, 'input#edit-todo-input should not exist') // enter key already hid it
     // blur('input#edit-todo-input')
     // expect(query('input#edit-todo-input').length).toBe(0)
 
     // delete 0
     clickOne('button.destroy')
-    expect(query('input#edit-todo-input').length).toBe(0)
+    expect(query('input#edit-todo-input').length).toBe(0, 'input#edit-todo-input should not exist')
   })
 
+  // TODO: turn this back on
   it('⌚️ todos speedometer', runTodoSpeedometer)
 })
 

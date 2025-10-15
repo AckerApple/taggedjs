@@ -7,7 +7,7 @@ describe('⌚️ watch tests', () => {
   // tests can be run multiple times. Only the first time will this expect below work
   const firstRun = slowCount === '0'
 
-  it('basic', async () => {
+  it('watch basic', async () => {
     const startCount = Number(htmlById('watch-testing-num-display'))
 
     expectMatchedHtml('#watch-testing-num-display', '#🍄-slowChangeCount')

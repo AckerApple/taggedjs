@@ -18,7 +18,9 @@ export const useHashRouter = () => {
   ))
 
   // What to run on change and signify a state change will occur. Only first instance is used below in listener
-  const onHashChange = callback((route: string) => memory.route = getHash())
+  const onHashChange = callback((route: string) => {
+    memory.route = getHash()
+  })
   
   // runs function call only once
   const listener = state(() => {

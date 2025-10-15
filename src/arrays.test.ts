@@ -160,7 +160,7 @@ describe('⠇ array testing', () => {
     expect(indexValue).toBe((Number(outsideDisplay.innerText) - 2).toString())
   })
 
-  it('🗑️ deletes', async () => {
+  it('🗑️ array deletes', async () => {
     expect(elmCount('#player-remove-promise-btn-0')).toBe(0)
     expect(elmCount('#player-edit-btn-0')).toBe(1)
 
@@ -181,7 +181,7 @@ describe('⠇ array testing', () => {
     expect(elmCount('#player-edit-btn-0')).toBe(0)
   })
 
-  it('add then deletes', async () => {        
+  it('array add then deletes', async () => {        
     // add player 1
     byId('array-test-push-item').click()
     expect(elmCount('#score-data-0-1-inside-button')).toBe(1)
