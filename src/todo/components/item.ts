@@ -18,8 +18,8 @@ export const Item = tag((
         editing && 'editing'
       ].filter(Boolean).join(' ')
     },
-    _=> !editing ?
-      () => div({class: "view"},
+    _=> !editing ? () =>
+      div({class: "view"},
         _=> todo.completed && '✅',
 
         // toggle completed
@@ -45,25 +45,27 @@ export const Item = tag((
           class: "destroy",
           onClick: () => onUpdated(dispatch.removeItemByIndex(index))
         },'🗑️ destroy')
-    ) : () => div({class: "input-container"},
-      input({
-        id: "edit-todo-input",
-        type: "text",
-        autofocus: true,
-        class: "edit",
-        value: todo.title,
-        onBlur: () => editing = false,
-        onKeydown: (e: InputElementTargetEvent) => handleKey(e, title => {
-          handleUpdate(title, todo, index, dispatch)
-          onUpdated(index)
-          editing = false
-        })
-      }),
-      label({
-        class: "visually-hidden",
-        for: "todo-input"
-      }, 'Edit Todo Input')
-    )
+      )
+    : () =>
+      div({class: "input-container"},
+        input({
+          id: "edit-todo-input",
+          type: "text",
+          autofocus: true,
+          class: "edit",
+          value: todo.title,
+          onBlur: () => editing = false,
+          onKeydown: (e: InputElementTargetEvent) => handleKey(e, title => {
+            handleUpdate(title, todo, index, dispatch)
+            onUpdated(index)
+            editing = false
+          })
+        }),
+        label({
+          class: "visually-hidden",
+          for: "todo-input"
+        }, 'Edit Todo Input')
+      )
   )
 })
 

@@ -40,10 +40,10 @@ export const Footer = (
     )
   ),
 
-  _=> (todosCount - activeTodoCount) > 0 &&
+  _=> (todosCount - activeTodoCount) > 0 && (() =>
     button({
       class: "clear-completed",
       onClick: () => removeCompleted(),
-    }, 'Clear completed')
+    }, 'Clear completed'))
   )
 }
