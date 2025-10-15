@@ -3,7 +3,6 @@ import { processAttribute } from "../attributes/processAttribute.function.js"
 import { ContextItem } from "../../tag/ContextItem.type.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
 import { Attribute } from "../../interpolations/optimizers/ObjectNode.types.js"
-import { isSpecialAttr } from "../../interpolations/attributes/isSpecialAttribute.function.js"
 
 export function processAttributeArray(
   attrs: Attribute[],

@@ -1,6 +1,7 @@
 import { castTextValue } from '../castTextValue.function.js';
 import { AnySupport, Subject } from '../index.js';
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
+import { getNewContext } from '../render/addOneContext.function.js';
 import { painter, paintCommands } from '../render/paint.function.js';
 import { ContextItem } from '../tag/index.js';
 import { valueToTagJsVar } from '../tagJsVars/index.js';
@@ -77,25 +78,19 @@ export function processNonElement(
   ownerSupport: AnySupport,
   paintBy: painter,
 ) {
-  const tagJsVar = valueToTagJsVar(item);
-  const newContext: ContextItem = {
-    updateCount: 0,
-    value: item,
-    parentContext: context,
-    tagJsVar,
-
-    // TODO: Not needed
-    valueIndex: -1,
-    withinOwnerElement: true,
-    destroy$: new Subject(),
-  };
+  const newContext: ContextItem = getNewContext(
+    item,
+    addedContexts,
+    true,
+    context,
+  )
 
   addedContexts.push(newContext);
   newContext.placeholder = document.createTextNode('');
   
   paintCommands.push([paintBy, [element, newContext.placeholder]]);
 
-  tagJsVar.processInit(
+  newContext.tagJsVar.processInit(
     item,
     newContext, // context, // newContext,
     ownerSupport,

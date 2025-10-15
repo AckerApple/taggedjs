@@ -29,9 +29,14 @@ export const h5 = designElement('h5')
 export const h6 = designElement('h6')
 
 export const ol = designElement('ol')
+export const ul = designElement('ul')
 export const li = designElement('li')
 export const div = designElement('div')
 
+export const main = designElement('main')
+export const section = designElement('section')
+export const header = designElement('header')
+export const footer = designElement('footer')
 export const fieldset = designElement('fieldset')
 export const legend = designElement('legend')
 

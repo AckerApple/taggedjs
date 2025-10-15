@@ -6,6 +6,7 @@ import type { StringTag } from '../../StringTag.type.js'
 import { Tag } from '../../Tag.type.js'
 import { ContextItem } from '../../ContextItem.type.js'
 
+/** 1 = destroyed, 2 = value changes, 0 = no change */
 export function compareArrayItems(
   value: (TemplaterResult | Tag)[],
   index: number,

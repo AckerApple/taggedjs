@@ -30,17 +30,20 @@ export type ElementVarBase = ReadOnlyVar & {
   allListeners: MockElmListener[]
 }
 
+type Child = ((_: ContextItem) => any) | string | boolean | undefined | number | null | object | any[]
+
+type Attributes = {
+  onKeyup: (_: InputElementTargetEvent) => any;
+  onClick: (_: InputElementTargetEvent) => any;
+  onChange: (_: InputElementTargetEvent) => any;
+} & {
+  [attr: string]: string | ((_: ContextItem) => any)
+}
+
 export type ElementFunction = (
   (
-    ...children: (
-      ((_: ContextItem) => any) | string | boolean | undefined | number | null | object | {
-        onKeyup: (_: InputElementTargetEvent) => any;
-        onClick: (_: InputElementTargetEvent) => any;
-        onChange: (_: InputElementTargetEvent) => any;
-      } & {
-        [attr: string]: string | ((_: ContextItem) => any)
-      }
-    )[]
+    attributesOrFirstChild?: Child | Attributes,
+    ...children: Child[]
   ) => any
 ) & ElementVarBase
 
@@ -139,7 +142,12 @@ function processInit(
 ) {
   context.contexts = [] // added contexts
   context.htmlDomMeta = []
-  const element = processElementVar(value, context, ownerSupport, context.contexts)
+  const element = processElementVar(
+    value,
+    context,
+    ownerSupport,
+    context.contexts,
+  )
   
   paintCommands.push([paintBefore, [insertBefore, element, 'designElement.processInit']])
 

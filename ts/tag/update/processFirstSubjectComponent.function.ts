@@ -8,12 +8,13 @@ import { AnySupport, ContextItem } from '../index.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { firstTagRender } from '../../render/renderTagOnly.function.js'
 import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
-import { checkTagValueChange, isPromise, paint, TemplateValue } from '../../index.js'
+import { checkTagValueChange, isPromise, paint, Subject, SubscribeValue, Tag, TemplateValue } from '../../index.js'
 import { ReadOnlyVar, TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { updateToDiffValue } from './updateToDiffValue.function.js'
 import { castProps } from '../props/alterProp.function.js'
 import { blankHandler } from '../../render/dom/blankHandler.function.js'
 import { convertTagToElementManaged } from './convertTagToElementManaged.function.js'
+import { Callback } from '../../interpolations/attributes/bindSubjectCallback.function.js'
 
 function createSupportWithProps(
   templater: TemplaterResult,
@@ -101,13 +102,16 @@ export function getOverrideTagVar(
     },
     processUpdate: (
       value: TemplateValue,
-      contextItem: ContextItem,
+      context: ContextItem,
       ownerSupport: AnySupport
     ) => {
-      ++context.updateCount
-      ++contextItem.updateCount
+      if(context.locked) {
+        return
+      }
 
-      const convertValue = context.toRender || context.returnValue
+      ++context.updateCount
+
+      const convertValue = (context as SupportContextItem).toRender || context.returnValue
       const oldValue = context.value
       const oldType = oldValue.tagJsType
       const newType = (value as TagJsVar)?.tagJsType
@@ -134,22 +138,14 @@ export function getOverrideTagVar(
         return
       }
 
-      newContext.value.props = castProps(
-        (value as any).props,
+      makeRealUpdate(
+        newContext,
+        value,
         ownerSupport,
-        1, // depth of arguments to dig
+        context as SupportContextItem,
+        convertValue,
+        support,
       )
-      
-      ;(newContext as SupportContextItem).updatesHandler = context.updatesHandler
-      
-      if (context.updatesHandler) {
-        const updatesHandler = context.updatesHandler as any
-        updatesHandler(newContext.value.props)
-      }
-
-      newContext.tagJsVar.processUpdate(convertValue, newContext, support, [])
-
-      newContext.value = convertValue
     },
     hasValueChanged: (
       _value: unknown,
@@ -183,6 +179,29 @@ export function getOverrideTagVar(
   }
 
   return overrideTagVar
+}
+
+function makeRealUpdate(
+  newContext: ContextItem,
+  value: string | number | boolean | Tag | SubscribeValue | TemplaterResult | (Tag | TemplaterResult)[] | Subject<unknown> | Callback | null | undefined,
+  ownerSupport: AnySupport,
+  context: SupportContextItem,
+  convertValue: any, support: AnySupport,
+) {
+  newContext.value.props = castProps(
+    (value as any).props,
+    ownerSupport,
+    1
+  ); (newContext as SupportContextItem).updatesHandler = context.updatesHandler
+
+  if (context.updatesHandler) {
+    const updatesHandler = context.updatesHandler as any
+    updatesHandler(newContext.value.props)
+  }
+
+  newContext.tagJsVar.processUpdate(convertValue, newContext, support, [])
+
+  newContext.value = convertValue
 }
 
 function afterDestroy(

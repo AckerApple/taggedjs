@@ -21,6 +21,7 @@ export function destroyDesignElement(
         destroyContextHtml(context)
         // delete context.htmlDomMeta
         context.htmlDomMeta = []
+        // context.deleted = true
         --painting.locks
         paint()
       })
@@ -28,8 +29,10 @@ export function destroyDesignElement(
   }
 
   destroyContextHtml(context)
+
   // delete context.htmlDomMeta
   context.htmlDomMeta = []
+  // context.deleted = true
 }
 
 export function destroyDesignByContexts(

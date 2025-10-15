@@ -1,9 +1,10 @@
 import callbackStateUpdate from './callbackStateUpdate.function.js'
-import { ContextItem, SupportContextItem } from '../tag/index.js'
+import { ContextItem, paint, SupportContextItem } from '../tag/index.js'
 import { setUseMemory } from './setUseMemory.object.js'
 import { StateMemory } from './StateMemory.type.js'
 import { state } from './state.function.js'
 import { getContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
+import { painting } from '../render/paint.function.js'
 
 /** Wrap a function that will be called back. After the wrapper and function are called, a rendering cycle will update display */
 export function callback<T extends (...args: any[]) => any>(
@@ -40,11 +41,19 @@ export function createTrigger(
   const oldStates = oldState.states
 
   return function trigger(...args: any[]) {
-    return callbackStateUpdate(
+    // ++painting.locks
+
+    const result = callbackStateUpdate(
       context as SupportContextItem,
       oldStates,
       callbackState.callback,
       ...args
     )
+
+    // --painting.locks
+
+    paint()
+
+    return result
   }
 }

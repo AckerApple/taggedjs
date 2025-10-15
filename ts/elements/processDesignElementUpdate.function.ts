@@ -1,4 +1,5 @@
-import { AnySupport, SupportContextItem } from '../index.js'
+import { AnySupport, SupportContextItem, valueToTagJsVar } from '../index.js'
+import { addOneContext, getNewContext } from '../render/addOneContext.function.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { updateToDiffValue } from '../tag/update/updateToDiffValue.function.js'
 import { ElementVar, MockElmListener } from './designElement.function.js'
@@ -9,15 +10,24 @@ export function processDesignElementUpdate(
   context: ContextItem,
   ownerSupport: AnySupport,
 ) {
+  //  || context.deleted === true
+  if(context.locked) {
+    return // something else is running an event
+  }
+
   ++context.updateCount
 
   const hasChanged = checkTagElementValueChange(value, context)
   if( hasChanged ) {
     destroyDesignElement(context, ownerSupport)
 
+    // delete context.deleted // The next value needs to know its not been deleted
+    // delete context.htmlDomMeta // The next value needs to know its not been deleted
+    context.htmlDomMeta = [] // The next value needs to know its not been deleted
+
     updateToDiffValue(
       value,
-      context,
+      context, // newContext,
       ownerSupport,
       789,
     )
@@ -25,8 +35,10 @@ export function processDesignElementUpdate(
     return
   }
 
+  const hasUpdater = (context as SupportContextItem).updatesHandler
+
   // how arguments get updated within function
-  if( (context as SupportContextItem).updatesHandler ) {
+  if( hasUpdater ) {
     const updatesHandler = (context as SupportContextItem).updatesHandler as any
     updatesHandler(value.props)
   }
@@ -62,7 +74,13 @@ export function checkTagElementValueChange(
 
   // return 1 // it has changed
 
-  const hasChanged = !value || value.tagJsType !== 'element'
+  const notElement = !value || value.tagJsType !== 'element'
+  if( notElement ) {
+    return 1
+  }
 
+  const newKidLength = (value as ElementVar).innerHTML.length
+  const oldKidLength = context.value.innerHTML.length
+  const hasChanged = newKidLength !== oldKidLength
   return hasChanged ? 1 : 0
 }

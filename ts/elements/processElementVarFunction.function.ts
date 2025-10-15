@@ -1,4 +1,4 @@
-import { AnySupport, Subject } from '../index.js'
+import { AnySupport, isFunction, Subject } from '../index.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { painter } from '../render/paint.function.js'
 import { ContextItem } from '../tag/index.js'
@@ -37,7 +37,24 @@ export function processElementVarFunction(
         values: unknown[],
       ) => {
         ++subContext.updateCount
-        const newValue = value(aSubContext)
+        /*
+        if(typeof(value) !== 'function') {
+          console.debug('value', {contextItem, value})
+          throw new Error('issue of no function')
+        }*/
+
+        let newValue = value(aSubContext)
+        const underFunction = (subContext as any).underFunction
+        delete (subContext as any).underFunction
+        if(newValue instanceof Function && !newValue.tagJsType) {
+          if(underFunction && newValue.toString() === underFunction.toString()) {
+            newValue = aSubContext.value
+          } else {
+            (subContext as any).underFunction = newValue
+            newValue = newValue()
+          }
+        }
+
         const result = aSubContext.tagJsVar.processUpdate(
           newValue,
           aSubContext,
@@ -58,8 +75,14 @@ export function processElementVarFunction(
 
   addedContexts.push(subContext)
 
+  let trueValue = item()
+  if(isFunction(trueValue) && !trueValue.tagJsType) {
+    ;(subContext as any).underFunction = trueValue
+    trueValue = trueValue() // function returns function
+  }
+
   const aSubContext = processNonElement(
-    item(),
+    trueValue,
     context,
     subContext.contexts as ContextItem[],
     element,

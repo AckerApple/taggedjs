@@ -16,7 +16,7 @@ export function updateSupportBy(
   ++painting.locks
   processUpdateContext(olderSupport, contexts as unknown as ContextItem[])
   --painting.locks
-
+  
   paint()
 }
 

@@ -161,6 +161,8 @@ export declare namespace tag {
   let route: typeof routeFn;
   let app: (_routeTag: RouteTag) => StateToTag;
   let deepPropWatch: typeof tag;
+
+  /** monitors root and 1 level argument for exact changes */
   let immutableProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
   let watchProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
   

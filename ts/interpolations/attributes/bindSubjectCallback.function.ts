@@ -7,6 +7,7 @@ import { getUpTags } from './getUpTags.function.js'
 import { renderTagUpdateArray } from './renderTagArray.function.js'
 import { getSupportWithState } from './getSupportWithState.function.js'
 import { checkToResolvePromise } from './checkToResolvePromise.function.js'
+import { painting } from '../../render/paint.function.js'
 
 export type Callback = (...args: any[]) => any
 
@@ -60,6 +61,7 @@ export function runTagCallback(
   // const global = subject.global as SupportTagGlobal // tag.subject.global as TagGlobal
   
   subject.locked = 1 // prevent another render from re-rendering this tag
+  // ++painting.locks
 
   // sync the new states to the old before the old does any processing
   // syncStatesArray(component.subject.global.newest.states, states)
@@ -71,6 +73,7 @@ export function runTagCallback(
   // syncStatesArray(states, component.subject.global.newest.states)
 
   delete subject.locked
+  // --painting.locks
 
   const result = afterTagCallback(
     callbackResult,

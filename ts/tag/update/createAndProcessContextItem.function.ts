@@ -8,6 +8,7 @@ import { TemplateValue } from '../TemplateValue.type.js'
 import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { Subject } from '../../subject/Subject.class.js'
+import { getNewContext } from '../../render/addOneContext.function.js'
 
 /** Used by arrays and subcontext creators like subscribe. Must provide insertBefore OR appendTo */
 export function createAndProcessContextItem(
@@ -18,18 +19,16 @@ export function createAndProcessContextItem(
   appendTo?: Element, // used during initial entire array rendering
 ): ContextItem {
   const element = document.createTextNode(empty)
-  const contextItem: ContextItem = {
-    updateCount: 0,
+
+  const contextItem = getNewContext(
     value,
-    tagJsVar: valueToTagJsVar(value),
-    withinOwnerElement: false,
-    placeholder: element,
-    destroy$: new Subject(),
-    // TODO: This will need to be passed in
-    parentContext: ownerSupport.context,
-    
-    valueIndex: contexts.length,
-  }
+    contexts,
+    true,
+    ownerSupport.context,
+  )
+
+  contextItem.withinOwnerElement = false
+  contextItem.placeholder = element
 
   if(!appendTo) {
     contextItem.placeholder = insertBefore

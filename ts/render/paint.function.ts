@@ -45,16 +45,21 @@ export function setContent(
   textNode.textContent = text
 }
 
+/** you must lock before calling this function */
 export function paint(): any {
   if(painting.locks > 0) {
+    // throw new Error('double paint')
     return
   }
 
-  return runCycles()
+  runCycles()
 }
 
 function runCycles() {
+  ++painting.locks
   runPaintCycles()
+  --painting.locks
+
   runAfterCycle()
 }
 
@@ -118,11 +123,15 @@ function paintRemover(
   element: Text | Element,
   _caller: string, // can be used for determining who is failing
 ) {
-  if(!element) {
-    console.info('no element by', _caller)
-  }
-
   const parentNode = element.parentNode as ParentNode
+  /*
+  if(!element) {
+    console.debug('no element by', _caller)
+  }
+  if(!parentNode) {
+    console.debug('no parentNode by', _caller)
+  }
+  */
   parentNode.removeChild(element as Element)
 }
 

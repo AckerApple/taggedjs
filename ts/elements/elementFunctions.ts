@@ -10,7 +10,6 @@ function callbackWrapper(
   callback: (e: InputElementTargetEvent) => any
 ) {
   const clone = getPushKid(item as any, item.elementFunctions);
-
   return callbackWrapper2(clone, eventName, callback)
 }
 
@@ -71,14 +70,20 @@ export function elementFunctions(item: any) {
     }
   }
 
-  const callables = {
+  // TODO: This maybe the old way of doing things
+  const callables_other = {
+    // TODO: Change to ...callables
+    onDoubleClick: makeCallback('ondblclick'),
     onClick: makeCallback('click'),    
     // onclick: makeCallback('click'),
     // click: makeCallback('click'),
 
+    onBlur: makeCallback('onblur'),
     onChange: makeCallback('onchange'),
     // onchange: makeCallback('onchange'),
     // change: makeCallback('onchange'),
+    
+    onKeydown: makeCallback('onkeydown'),
     
     onKeyup: makeCallback('onkeyup'),
     // onkeyup: makeCallback('onkeyup'),
@@ -94,7 +99,7 @@ export function elementFunctions(item: any) {
     },
   }
 
-  return callables
+  return callables_other
 }
 
 function setClassValue(
@@ -166,8 +171,13 @@ const callables = {
   class: setupAttr('class', setClassValue),
 
   onClick: makeCallback('click'),
+  onDoubleClick: makeCallback('ondblclick'),
+
+  onBlur: makeCallback('onblur'),
   onChange: makeCallback('onchange'),
+  
   onKeyup: makeCallback('onkeyup'),
+  onKeydown: makeCallback('onkeydown'),
 }
 
 export function loopObjectAttributes(
@@ -179,8 +189,6 @@ export function loopObjectAttributes(
       return (callables as any)[name](item, value)
     }
 
-    // return item[name](value)
-    // return attr2(all, [name, value] as any)
     return attr2(item, [name, value, false, setNonFunctionInputValue] as any)
   }, item) as ElementVar
 

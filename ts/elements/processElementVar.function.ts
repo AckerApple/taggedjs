@@ -4,7 +4,7 @@ import { getSupportWithState } from '../interpolations/attributes/getSupportWith
 import { isSpecialAttr } from '../interpolations/attributes/isSpecialAttribute.function.js'
 import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArray.function.js'
 import { processAttributeArray } from '../render/dom/processAttributeArray.function.js'
-import { paintAppend } from '../render/paint.function.js'
+import { paint, paintAppend, painting } from '../render/paint.function.js'
 import { ContextItem } from '../tag/index.js'
 import { ElementVar } from './designElement.function.js'
 import { processChildren } from './processChildren.function.js'
@@ -52,12 +52,21 @@ export function processElementVar(
       const stateSupport = getSupportWithState(ownerSupport)
       const updateCount = stateSupport.context.updateCount
 
+      stateSupport.context.locked = 1
+      ++painting.locks
+
       const result = (toCall as any)(...args)
 
-      if( updateCount === stateSupport.context.updateCount ) {
-        renderTagUpdateArray([stateSupport])
-      }
+      --painting.locks
+      delete stateSupport.context.locked
 
+      const needsRender = updateCount === stateSupport.context.updateCount
+
+      if( needsRender ) {
+        renderTagUpdateArray([stateSupport])
+      } else {
+        paint()
+      }
 
       if( isPromise(result) ) {
         return result.then(() => {
