@@ -54,19 +54,20 @@ function attachHtmlDomMeta(
   const values = thisTag.values
   const contexts: SupportContextItem[] = []
 
-  support.context.contexts = contexts
+  const context = support.context
+  parentContext = context
+  context.contexts = contexts
 
   const result = attachDomElements(
     domMeta,
     values,
     support,
-    parentContext,
-    // contexts,
+    parentContext as SupportContextItem,
     0, // depth
     appendTo,
     insertBefore,
   )
-      
+  
   return result
 }
 

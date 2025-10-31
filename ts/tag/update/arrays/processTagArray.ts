@@ -73,6 +73,7 @@ export function processTagArray(
   }
 }
 
+/** new and old array items processed here */
 function reviewArrayItem(
   array: unknown[],
   index: number,
@@ -123,6 +124,8 @@ function reviewPreviousArrayItem(
     )
     return itemSubject
   }
+
+  // NEW REPLACEMENT
 
   const contextItem = createAndProcessContextItem(
     value as TemplateValue,

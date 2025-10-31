@@ -28,6 +28,7 @@ export function destroySupport(
   delete (context as ContextItem).state
   delete (context as ContextItem).contexts
   delete context.returnValue
+  delete context.providers
 
   return promises
 }

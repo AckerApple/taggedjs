@@ -1,5 +1,6 @@
 export { getNewGlobal } from './update/getNewGlobal.function.js'
 export * from './tag.types.js'
+export * from './cycles/index.js'
 export { getDomMeta } from './domMetaCollector.js'
 export * from './update/index.js'
 export * from '../tagJsVars/tag.function.js'

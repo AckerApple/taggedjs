@@ -14,13 +14,13 @@ export function runAfterSupportRender(
   const subject = support.context
   ++subject.renderCount
 
-  runAfterRender()
+  runAfterRender(support.context)
   setUseMemory.tagClosed$.next(ownerSupport)
 }
 
 /** run after rendering anything with state */
 export function runAfterRender(
-  context?: ContextItem,
+  context: ContextItem,
 ) {
   saveState(context)
   // TODO: prove this is worth having
@@ -31,10 +31,11 @@ export function runAfterRender(
 }
 
 function saveState(
-  context?: ContextItem
+  context: ContextItem
 ) {
   const config: StateMemory = setUseMemory.stateConfig
   const subject = context || config.context as ContextItem
+
   subject.state = subject.state || {}
   subject.state.newer = { ...config }
   

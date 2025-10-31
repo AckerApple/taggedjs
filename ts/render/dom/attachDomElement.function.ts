@@ -12,9 +12,7 @@ export function attachDomElement(
   parentContext: ContextItem,
   appendTo: Element | undefined,
   insertBefore: Text | undefined,
-): ContextItem[] {
-  const attributeContexts: ContextItem[] = []
-  
+) {
   // attributes that may effect style, come first for performance
   if (node.at) {
     processAttributeArray(
@@ -24,7 +22,7 @@ export function attachDomElement(
       support,
       // contexts,
       parentContext,
-      attributeContexts,
+      // parentContext.contexts as ContextItem[],
     )
   }
 
@@ -33,6 +31,4 @@ export function attachDomElement(
   } else {
     paintCommands.push([paintBefore, [insertBefore, domElement, 'insertBeforeAttachDomElement']])
   }
-  
-  return attributeContexts
 }

@@ -3,7 +3,6 @@ import { ContextItem } from './ContextItem.type.js'
 import { AnySupport } from './index.js'
 import { Props } from '../Props.js'
 import { TagWrapper } from './tag.utils.js'
-import { Provider } from '../state/providers.js'
 import { OnDestroyCallback } from '../state/onDestroy.function.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { ValueTypes } from './ValueTypes.enum.js'
@@ -45,7 +44,6 @@ export type TagGlobal = {
 
 export interface SupportTagGlobal extends TagGlobal {
   blocked: AnySupport[], // renders that did not occur because an event was processing
-  providers?: Provider[]
 }
 
 export type Events = {
@@ -90,9 +88,14 @@ export function getTemplaterResult(
       (templater as TemplaterResultArrayItem<T>).arrayValue = arrayValue
       return templater
     },
-    matchesInjection(inject: any): boolean {
-      // For templaters, check if the wrapper matches
-      return templater.wrapper === inject || templater.wrapper?.original === inject?.original
+    matchesInjection(inject: any, context: ContextItem) {
+      if(templater.wrapper === inject) {
+        return context
+      }
+      
+      if(templater.wrapper?.original === inject?.original) {
+        return context
+      }
     }
   }
   

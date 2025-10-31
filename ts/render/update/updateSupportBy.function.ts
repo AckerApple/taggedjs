@@ -14,19 +14,23 @@ export function updateSupportBy(
   updateSupportValuesBy(olderSupport, newerSupport)
 
   ++painting.locks
-  processUpdateContext(olderSupport, contexts as unknown as ContextItem[])
+  processUpdateContext(
+    olderSupport,
+    contexts as unknown as ContextItem[],
+  )
   --painting.locks
   
   paint()
 }
 
-export function updateSupportValuesBy(
+function updateSupportValuesBy(
   olderSupport: AnySupport,
   newerSupport: AnySupport,
 ) {
   const newTemplate = newerSupport.templater as unknown as Tag
   const tempTag = newerSupport.templater.tag as Tag
   const values = newTemplate.values || tempTag.values
+  
   const tag = olderSupport.templater.tag as DomTag
   tag.values = values
 }

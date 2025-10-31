@@ -1,5 +1,5 @@
 import { Subject, ValueSubject } from'../subject/index.js'
-import { AnySupport } from '../tag/index.js'
+import { AnySupport, tag } from '../tag/index.js'
 import { ContextStateMeta, ContextStateSupport } from '../tag/ContextStateMeta.type.js'
 import { getSupportInCycle } from'../tag/cycles/getSupportInCycle.function.js'
 import { setUseMemory } from'./setUseMemory.object.js'
@@ -7,7 +7,7 @@ import { state } from'./state.function.js'
 import { oldSyncStates } from'./syncStates.function.js'
 
 export type WatchCallback<T> = (
-  currentValues: any[],
+  currentValues: any[], // | (() => any[]),
   previousValues: any[] | undefined // first run this is undefined
 ) => T | ((currentValues: any[]) => T) | (() => T)
 
@@ -16,19 +16,19 @@ type WatchOperators<T> = {
 
   /** When an item in watch array changes, callback function will be triggered. Does not trigger on initial watch setup. */
   noInit: (<T>(
-    currentValues: any[],
+    currentValues: any[] | (() => any[]),
     callback: WatchCallback<T>
   ) => T | undefined) & MasterWatch<T>
   
   /** When an item in watch array changes, callback function will be triggered */
   asSubject: (<T>(
-    currentValues: any[],
+    currentValues: any[] | (() => any[]),
     callback: WatchCallback<T>
   ) => Subject<T>) & MasterWatch<T>
   
   /** When an item in watch array changes and all values are truthy then callback function will be triggered */
   truthy: (<T>(
-    currentValues: any[],
+    currentValues: any[] | (() => any[]),
     callback: WatchCallback<T>
   ) => T | undefined) & MasterWatch<T>
 }
@@ -51,12 +51,12 @@ type MasterWatch<T> = ((
  * @returns T[]
  */
 export const watch = (<T>(
-  currentValues: unknown[],
+  currentValues: unknown[] | (() => unknown[]),
   callback: WatchCallback<T>
 ): T => {
-  return setupWatch(currentValues, callback) as any
+  return setupWatch(currentValues, callback).pastResult
 }) as (<T>(
-  currentValues: unknown[],
+  currentValues: unknown[] | (() => any[]),
   callback: WatchCallback<T>
 ) => T) & WatchOperators<any>
 
@@ -77,7 +77,7 @@ function newWatch<T, R>(
     currentValues: any[],
     callback: WatchCallback<T>  
   ) => {
-    return setupWatch(currentValues, callback, setup)
+    return setupWatch(currentValues, callback, setup).pastResult
   }
 
   method.setup = setup
@@ -85,6 +85,11 @@ function newWatch<T, R>(
   defineOnMethod(() => method as any, method)
   
   return method as any
+}
+
+type PreviousWatchMeta<T> = {
+  pastResult: T
+  values: any[]
 }
 
 /**
@@ -95,53 +100,74 @@ function newWatch<T, R>(
  * @returns 
  */
 const setupWatch = <T, R>(
-  currentValues: any[],
+  currentValues: any[] | (() => any[]),
   callback: WatchCallback<T>,
   {
     init,
     before,
     final = defaultFinally,  
   }: WatchSetup<R> = {}
-): T => {
+): PreviousWatchMeta<T> => {
   const previous = state({
     pastResult: undefined as T,
     values: undefined as unknown as any[],
   })
 
-  const previousValues = previous.values
-
-  // First time running watch?
-  if(previousValues === undefined) {
-    if(before && !before(currentValues)) {
-      previous.values = currentValues
-      return previous.pastResult // do not continue
-    }
+  const isFun = typeof(currentValues) === 'function'
+  const realValues = isFun ? currentValues() : currentValues
+  const isFirstRender = previous.values === undefined
+  let renderCount = 0
   
-    const castedInit = init || callback
-    const result = castedInit(currentValues, previousValues)
+  if(isFirstRender) {
+    if(typeof(currentValues) === 'function') {
+      tag.onRender(() => {
+        ++renderCount
+        if(renderCount === 1) {
+          return // first run is already performed
+        }
+        const realValues = currentValues()
+        processRealValues(realValues)
+      })
+    }
+  }
+
+  function processRealValues(realValues: any[]) {
+    // First time running watch?
+    if(previous.values === undefined) {
+      if(before && !before(realValues)) {
+        previous.values = realValues
+        return previous // do not continue
+      }
+    
+      const castedInit = init || callback
+      const result = castedInit(realValues, previous.values)
+      previous.pastResult = final(result)
+      previous.values = realValues
+      return previous
+    }
+
+    const allExact = realValues.every((item, index) =>
+      item === previous.values[index]
+    )
+    
+    if(allExact) {
+      return previous
+    }
+
+    if(before && !before(realValues)) {
+      previous.values = realValues
+      return previous // do not continue
+    }
+
+    const result = callback(realValues, previous.values) as T
     previous.pastResult = final(result)
-    previous.values = currentValues
-    return previous.pastResult
+    previous.values.length = 0
+    previous.values.push(...realValues)
+
+    return previous
   }
 
-  const allExact = currentValues.every((item, index) =>
-    item === previousValues[index]
-  )
-  if(allExact) {
-    return previous.pastResult
-  }
-
-  if(before && !before(currentValues)) {
-    previous.values = currentValues
-    return previous.pastResult // do not continue
-  }
-
-  const result = callback(currentValues, previousValues) as T
-  previous.pastResult = final(result)
-  previousValues.length = 0
-  previousValues.push(...currentValues)
-
-  return previous.pastResult
+  return processRealValues(realValues)
 }
 
 function defineOnMethod<R>(
@@ -160,27 +186,32 @@ function defineOnMethod<R>(
     get() {
       const oldWatch = getWatch()
       const firstSupport = state(() => (getSupportInCycle() as AnySupport))
-      const subject = state(() => new ValueSubject<any>(undefined))
+      const subject = state(() => {
+        return new ValueSubject<any>(undefined)
+      })
       const oldState = state(() => ({
         state: setUseMemory.stateConfig.state,
         states: setUseMemory.stateConfig.states,
       }))
       
       const method = <T>(
-        currentValues: any[],
+        currentValues: any[] | (() => any[]),
         callback: WatchCallback<T>  
       ) => {
-        setupWatch(
-          currentValues,
-          (currentValues, previousValues) => {
-            const nowSupport = getSupportInCycle() as AnySupport
-            const setTo = callback(currentValues, previousValues)
+        const handler = (
+          realValues: any[],
+          previousValues: any[] | undefined
+        ) => {
+          const nowSupport = getSupportInCycle() as AnySupport
+          const setTo = callback(realValues, previousValues)
 
-            if(nowSupport !== firstSupport) {
-              const newestState = oldState.state
-              const context = firstSupport.context
-              const stateMeta = context.state as ContextStateMeta
-              const oldestStateSupport = stateMeta.older as ContextStateSupport
+          if(nowSupport !== firstSupport) {
+            const newestState = oldState.state
+            const context = firstSupport.context
+            const stateMeta = context.state as ContextStateMeta
+            const oldestStateSupport = stateMeta.older as ContextStateSupport
+
+            if(oldestStateSupport) {
               const oldestState = oldestStateSupport.state
               
               const newStates = oldState.states
@@ -193,9 +224,14 @@ function defineOnMethod<R>(
                 oldStates,
               )
             }
+          }
 
-            subject.next(setTo)
-          },
+          subject.next(setTo)
+        }
+
+        setupWatch(
+          currentValues,
+          handler,
           oldWatch.setup
         )
 

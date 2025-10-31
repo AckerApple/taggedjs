@@ -3,13 +3,14 @@
 import { setNonFunctionInputValue } from '../../interpolations/attributes/howToSetInputValue.function.js'
 import { AnySupport } from '../../tag/index.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
-import { addOneContext } from '../addOneContext.function.js'
+import { addOneContext, getNewContext } from '../addOneContext.function.js'
 import { TagVarIdNum } from './getTagJsVar.function.js'
 import { removeContextInCycle, setContextInCycle } from '../../tag/cycles/setContextInCycle.function.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
 import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
 
+/** adds onto parent.contexts */
 export function processTagJsVarAttribute(
   value: string | TagVarIdNum | null | undefined,
   contexts: ContextItem[],
@@ -21,7 +22,8 @@ export function processTagJsVarAttribute(
   element: HTMLElement,
   isNameVar: boolean,
 ) {
-  const contextItem = addOneContext(
+  // getOneContext
+  const contextItem = getNewContext(
     value,
     contexts || [],
     true,

@@ -71,7 +71,7 @@ export function newSupportByTemplater(
     subject,
   )
 
-  subject.contexts = []
+  subject.contexts = subject.contexts || []
 
   return support
 }

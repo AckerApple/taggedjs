@@ -43,7 +43,7 @@ export function updateNameOnlyAttrValue(
     }
   }
 
-  processStandAloneAttribute(
+  const standAloneResult = processStandAloneAttribute(
     values,
     attrValue,
     element as HTMLElement,
@@ -52,6 +52,10 @@ export function updateNameOnlyAttrValue(
     contexts,
     parentContext,
   )
+
+  if(standAloneResult) {
+    contexts.push( ...standAloneResult )
+  }
 }
 
 function removeAttribute(

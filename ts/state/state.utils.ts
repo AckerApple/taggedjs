@@ -1,11 +1,9 @@
-import { AnySupport, ContextItem } from '../tag/index.js'
-import { runFirstState, runRestate } from './stateHandlers.js'
-import { State, StateConfig } from './state.types.js'
-import { firstStatesHandler, reStatesHandler } from './states.utils.js'
+import { ContextItem } from '../tag/index.js'
+import { runFirstState } from './stateHandlers.js'
+import { StateConfig } from './state.types.js'
+import { firstStatesHandler } from './states.utils.js'
 import { setUseMemory } from './setUseMemory.object.js'
-import { setSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
 import { setContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
-import { ContextStateMeta, ContextStateSupport } from '../tag/ContextStateMeta.type.js'
 
 /** To be called before rendering anything with a state */
 export function initState(
@@ -24,44 +22,6 @@ export function initState(
 
   const stateMeta = context.state = context.state || {}
   stateMeta.newer = { state, states }
-}
-
-export function reState(
-  context: ContextItem,
-) {
-  const stateMeta = context.state as ContextStateMeta
-  return reStateByPrev( (stateMeta.newer as ContextStateSupport).state )
-}
-
-export function reStateByPrev(
-  prevState: State,
-) {
-  const config = setUseMemory.stateConfig
-
-  // set previous state memory
-  config.rearray = prevState
-
-  config.state = []
-  config.states = []
-  config.statesIndex = 0
-  
-  config.handlers.handler = runRestate
-  config.handlers.statesHandler = reStatesHandler
-
-  return config
-}
-
-export function reStateSupport(
-  newSupport: AnySupport,
-  prevSupport: AnySupport,
-  prevState: State,
-) {  
-  reStateByPrev(prevState)
-  
-  const config = setUseMemory.stateConfig
-  config.prevSupport = prevSupport
-
-  setSupportInCycle(newSupport)
 }
 
 export class StateEchoBack {}

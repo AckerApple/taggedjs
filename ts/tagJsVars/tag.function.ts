@@ -19,6 +19,7 @@ import { getContextInCycle, getElement as getTagElement } from '../tag/cycles/se
 import { tagInject } from './tagInject.function.js'
 import { onInit as tagOnInit } from '../state/onInit.function.js'
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js'
+import { onRender as tagOnRender } from '../state/onRender.function.js'
 import { SupportContextItem } from '../index.js'
 
 let tagCount = 0
@@ -30,7 +31,7 @@ function makeEventListener(type: string) {
   return function eventListener<T extends (...args: any[]) => any>(
     toBeCalled: T
   ): T {
-    const wrapped = callback(toBeCalled)
+    const wrapped = callback(toBeCalled) // should cause render to occur
   
     // run one time
     state(() => {
@@ -170,6 +171,7 @@ export declare namespace tag {
   let inject: typeof tagInject;
   let onInit: typeof tagOnInit;
   let onDestroy: typeof tagOnDestroy;
+  let onRender: typeof tagOnRender;
 }
 
 type ReturnTag = AnyTag | StateToTag | null | undefined
@@ -199,6 +201,7 @@ function tagUseFn(): ReturnTag {
 ;(tag as any).inject = tagInject
 ;(tag as any).onInit = tagOnInit
 ;(tag as any).onDestroy = tagOnDestroy
+;(tag as any).onRender = tagOnRender
 
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``

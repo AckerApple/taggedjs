@@ -18,6 +18,15 @@ export function processFunctionAttr(
 
   const tagJsVarOverride: TagJsVar = {
     tagJsType: 'dynamic-attr',
+
+    matchesInjection: (inject: any) => {
+      const tagJsVar = subContext.tagJsVar
+      if( tagJsVar.matchesInjection ) {
+        const rtn = tagJsVar.matchesInjection(inject, subContext)
+        return rtn
+      }
+    },
+
     hasValueChanged: (
       _value: unknown,
       _contextItem: ContextItem,
@@ -73,6 +82,7 @@ export function processFunctionAttr(
     valueIndex: -1,
     withinOwnerElement: true,
     destroy$: new Subject(),
+    render$: new Subject(),
   }
 
   const contextItem: BaseContextItem = {
@@ -88,6 +98,7 @@ export function processFunctionAttr(
     valueIndex: -1,
     withinOwnerElement: true,
     destroy$: new Subject(),
+    render$: new Subject(),
   }
 
   subContext.tagJsVar.processInitAttribute(

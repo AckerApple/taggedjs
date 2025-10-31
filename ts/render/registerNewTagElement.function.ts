@@ -26,7 +26,7 @@ export function registerTagElement(
 
   const tag = support.templater.tag as any
   if( !['dom','html'].includes(tag.tagJsType) ) {
-    context.contexts = []
+    context.contexts = context.contexts || []
     const newFragment = document.createDocumentFragment()
     newFragment.appendChild(placeholder)
     void processReplacementComponent(
@@ -44,7 +44,6 @@ export function registerTagElement(
     element,
     undefined,
   )
-
 
   let setUse = (templater as unknown as TagAppElement).setUse
 

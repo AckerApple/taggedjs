@@ -1,22 +1,23 @@
 import { AnySupport, isFunction, Subject } from '../index.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { painter } from '../render/paint.function.js'
+import { removeContextInCycle, setContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
 import { ContextItem } from '../tag/index.js'
 import { processNonElement } from './processChildren.function.js'
 
 export function processElementVarFunction(
   item: any,
   element: HTMLElement | Text,
-  context: ContextItem,
+  parentContext: ContextItem,
   ownerSupport: AnySupport,
-  addedContexts: ContextItem[],
   paintBy: painter,
 ) {
   const subContexts: ContextItem[] = []
   const subContext: ContextItem = {
     updateCount: 0,
-    parentContext: context,
+    parentContext,
     contexts: subContexts,
+    element: element as HTMLElement,
     value: item,
     htmlDomMeta: [],
     tagJsVar: {
@@ -42,6 +43,7 @@ export function processElementVarFunction(
           console.debug('value', {contextItem, value})
           throw new Error('issue of no function')
         }*/
+        setContextInCycle(aSubContext)
 
         let newValue = value(aSubContext)
         const underFunction = (subContext as any).underFunction
@@ -63,6 +65,9 @@ export function processElementVarFunction(
         )
         aSubContext.value = newValue
         contextItem.value = value
+        
+        removeContextInCycle()
+
         return result
       }
     },
@@ -71,24 +76,31 @@ export function processElementVarFunction(
     valueIndex: -1,
     withinOwnerElement: true,
     destroy$: new Subject(),
+    render$: new Subject(),
   }
 
-  addedContexts.push(subContext)
+  // addedContexts.push(subContext)
+  setContextInCycle(subContext)
 
   let trueValue = item()
-  if(isFunction(trueValue) && !trueValue.tagJsType) {
+  const isAgainFunc = isFunction(trueValue) && !trueValue.tagJsType
+  if(isAgainFunc) {
     ;(subContext as any).underFunction = trueValue
     trueValue = trueValue() // function returns function
   }
 
   const aSubContext = processNonElement(
     trueValue,
-    context,
-    subContext.contexts as ContextItem[],
+    subContext, // parentContext,
     element,
     ownerSupport,
     paintBy,
   )
+
+  const contexts = parentContext.contexts as ContextItem[]
+  contexts.push(subContext)
+
+  removeContextInCycle()
 
   return aSubContext
 }

@@ -8,6 +8,7 @@ import { renderTagUpdateArray } from './renderTagArray.function.js'
 import { getSupportWithState } from './getSupportWithState.function.js'
 import { checkToResolvePromise } from './checkToResolvePromise.function.js'
 import { painting } from '../../render/paint.function.js'
+import { syncStatesArray } from '../../state/syncStates.function.js'
 
 export type Callback = (...args: any[]) => any
 
@@ -64,7 +65,7 @@ export function runTagCallback(
   // ++painting.locks
 
   // sync the new states to the old before the old does any processing
-  // syncStatesArray(component.subject.global.newest.states, states)
+  // syncStatesArray(component.context.state.newest.states, states)
 
   // ACTUAL CALLBACK TO ORIGINAL FUNCTION
   const callbackResult = value.apply(bindTo, args)

@@ -11,18 +11,14 @@ export function processUpdateContext(
 ) {
   const thisTag = support.templater.tag as StringTag | DomTag
   const values = thisTag.values
-  let index = 0
-  const len = values.length
-
-  while (index < len) {
+  
+  for (const context of contexts) {
+    // const context = contexts[index]
     processUpdateOneContext(
       values,
-      index,
-      contexts,
+      context,
       support,
     )
-    
-    ++index
   }
 
   return contexts
@@ -31,12 +27,9 @@ export function processUpdateContext(
 /** returns boolean of did render */
 function processUpdateOneContext(
   values: unknown[], // the interpolated values
-  index: number,
-  contexts: ContextItem[],
+  contextItem: ContextItem,
   ownerSupport: AnySupport,
 ) {
-  const contextItem = contexts[index]
-
   if( contextItem.deleted ) {
     return
   }

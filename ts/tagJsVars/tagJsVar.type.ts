@@ -21,7 +21,7 @@ export type TagJsVar = ReadOnlyVar & {
   matchesInjection?: MatchesInjection
 }
 
-export type MatchesInjection = (inject: any) => boolean
+export type MatchesInjection = (inject: any, context: ContextItem) => ContextItem | void
 
 export type TagJsTag = TagJsVar & {
   tagJsType: string // typeof ValueTypes.tag | typeof ValueTypes.dom

@@ -127,7 +127,8 @@ export function setupSubscribeCallbackProcessor(
       return
     }
 
-    onOutput(newValues[index].value, syncRun, subContext)
+    const newValue = newValues[index].value
+    onOutput(newValue, syncRun, subContext)
   }
 
   let syncRun = true

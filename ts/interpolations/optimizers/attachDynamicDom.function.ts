@@ -15,7 +15,7 @@ export function attachDynamicDom(
   depth: number, // used to indicate if variable lives within an owner's element
   appendTo?: HTMLElement,
   insertBefore?: Text
-) {  
+) {
   const marker = document.createTextNode(empty)
   const isWithinOwnerElement = depth > 0
   const contextItem = addOneContext(

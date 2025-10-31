@@ -18,21 +18,9 @@ export function processDynamicNameValueAttribute(
   howToSet: HowToSet,
   support: AnySupport,
   isSpecial: SpecialDefinition,
-  _contexts: ContextItem[],
 ) {
   contextItem.element = element as HTMLElement
   contextItem.howToSet = howToSet
-
-  if(typeof(value) === BasicTypes.function ) {
-    return processTagCallbackFun(
-      contextItem,
-      value,
-      support,
-      attrName,
-      element,
-    )
-  }
-
   contextItem.attrName = attrName
   contextItem.isSpecial = isSpecial
 
@@ -83,7 +71,7 @@ export function processNonDynamicAttr(
   howToSet: HowToSet,
   isSpecial: SpecialDefinition,
   context: ContextItem,
-) {
+): ContextItem | void {
   if( typeof value === 'function') {
     return processFunctionAttr(
       value,

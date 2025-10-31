@@ -1,13 +1,12 @@
-import { AnySupport, InputElementTargetEvent } from '../index.js'
-import { Attribute, DomObjectElement } from '../interpolations/optimizers/ObjectNode.types.js'
-import { paintBefore, paintCommands } from '../render/paint.function.js'
+import { InputElementTargetEvent } from '../index.js'
+import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { ReadOnlyVar, TagJsVar } from '../tagJsVars/tagJsVar.type.js'
-import { elementFunctions, isValueForContext, loopObjectAttributes, registerMockChildContext } from './elementFunctions.js'
-import { processElementVar } from './processElementVar.function.js'
+import { elementFunctions, isValueForContext, loopObjectAttributes } from './elementFunctions.js'
 import { destroyDesignElement } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
+import { processDesignElementInit } from './processDesignElementInit.function.js'
 
 export type MockElmListener = [
   string,
@@ -57,7 +56,7 @@ export function designElement(
     tagJsType: 'element',
 
     processInitAttribute: blankHandler,
-    processInit,
+    processInit: processDesignElementInit,
     destroy: destroyDesignElement,
     processUpdate: processDesignElementUpdate,
     hasValueChanged: checkTagElementValueChange,
@@ -101,23 +100,26 @@ export function getPushKid(
 
     // review each child for potential to be context
     args.forEach(arg => {
-      if( isValueForContext(arg) ) {
-        if(arg.tagJsType === 'element') {
-          newElement.allListeners.push(...arg.allListeners)
-
-          if(arg.contexts) {
-            // the argument is an element so push up its contexts into mine
-            if(!newElement.contexts) {
-              newElement.contexts = arg.contexts
-            } else {
-              newElement.contexts.push( ...arg.contexts )
-            }
-          }
-          return
-        }
-
-        registerMockChildContext(arg, newElement)
+      if( !isValueForContext(arg) ) {
+        return
       }
+      
+      if(arg.tagJsType === 'element') {
+        newElement.allListeners.push(...arg.allListeners)
+
+        if(arg.contexts) {
+          // the argument is an element so push up its contexts into mine
+          if(!newElement.contexts) {
+            // newElement.contexts = [...arg.contexts]
+            newElement.contexts = arg.contexts
+          } else {
+            newElement.contexts.push( ...arg.contexts )
+          }
+        }
+        return
+      }
+
+      registerMockChildContext(arg, newElement)
     })
 
     return newElement
@@ -133,31 +135,14 @@ export function getPushKid(
 }
 
 
-function processInit(
-  value: ElementVar,
-  context: ContextItem,
-  ownerSupport: AnySupport,
-  insertBefore?: Text,
-  // appendTo?: Element,
+/** used during updates */
+function registerMockChildContext(
+  value: any,
+  mockElm: ElementVar,
 ) {
-  context.contexts = [] // added contexts
-  context.htmlDomMeta = []
-  const element = processElementVar(
-    value,
-    context,
-    ownerSupport,
-    context.contexts,
-  )
-  
-  paintCommands.push([paintBefore, [insertBefore, element, 'designElement.processInit']])
-
-  const dom: DomObjectElement = {
-    nn: value.tagName,
-    domElement: element,
-    at: value.attributes, // TODO: most likely does nothing
+  if(!mockElm.contexts) {
+    mockElm.contexts = []
   }
 
-  context.htmlDomMeta = [dom]
-
-  return element
+  mockElm.contexts.push( value )
 }

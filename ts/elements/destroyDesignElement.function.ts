@@ -1,6 +1,8 @@
 import { AnySupport, isPromise } from '../index.js'
+import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { paint, painting } from '../render/paint.function.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
+import { destroyHtmlDomMeta } from '../tag/destroyHtmlDomMeta.function.js'
 import { destroyContextHtml } from '../tag/smartRemoveKids.function.js'
 
 export function destroyDesignElement(
@@ -14,11 +16,15 @@ export function destroyDesignElement(
 
   if(contexts.length) {
     destroyDesignByContexts(contexts, ownerSupport, promises)
+    contexts.length = 0
 
     if( promises.length ) {
+      const htmlDomMeta = context.htmlDomMeta as DomObjectChildren
+      context.deleted = true
       return Promise.all(promises).then(() => {
         ++painting.locks
-        destroyContextHtml(context)
+        // destroyContextHtml(context)
+        destroyHtmlDomMeta( htmlDomMeta )
         // delete context.htmlDomMeta
         context.htmlDomMeta = []
         // context.deleted = true
@@ -33,6 +39,8 @@ export function destroyDesignElement(
   // delete context.htmlDomMeta
   context.htmlDomMeta = []
   // context.deleted = true
+  delete context.contexts
+  context.deleted = true
 }
 
 export function destroyDesignByContexts(
@@ -42,11 +50,16 @@ export function destroyDesignByContexts(
 ) {
   const context = contexts[0]
   const result = context.tagJsVar.destroy(context, ownerSupport)
+  context.deleted = true
 
   if( isPromise(result) ) {
     return promises.push(result.then(() => {
       if(contexts.length > 1) {
-        return destroyDesignByContexts( contexts.slice(1, contexts.length), ownerSupport, promises )
+        return destroyDesignByContexts(
+          contexts.slice(1, contexts.length),
+          ownerSupport,
+          promises,
+        )
       }
     }))
   }
@@ -57,6 +70,10 @@ export function destroyDesignByContexts(
   }
 
   if(contexts.length > 1) {
-    return destroyDesignByContexts( contexts.slice(1, contexts.length), ownerSupport, promises )
+    return destroyDesignByContexts(
+      contexts.slice(1, contexts.length),
+      ownerSupport,
+      promises,
+    )
   }
 }

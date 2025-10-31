@@ -1,4 +1,4 @@
-import { SupportContextItem } from '../index.js'
+import { AnySupport, SupportContextItem } from '../index.js'
 import { renderSupport } from '../render/renderSupport.function.js'
 import { Callback } from './callbackMaker.function.js'
 import { isPromise } from '../isInstance.js'
@@ -18,34 +18,38 @@ export default function callbackStateUpdate<T>(
   const maybePromise = callback(...args as [any,any,any,any,any,any])
 
   const newestSupport = findStateSupportUpContext(context)
-  // const newestSupport = context.state.newest as AnySupport
-  if(newestSupport) {
-    // context.global && 
-    if(newestSupport.context.global) {
-      renderSupport(newestSupport) // TODO: remove
-    } else {
-      context.tagJsVar.processUpdate(
-        context.value,
-        context,
-        newestSupport, // ownerSupport,
-        [],
-      )
-    }
+  // TODO: This if may not be ever doing anything
+  if(!newestSupport) {
+    return maybePromise
+  }
 
-    if(isPromise(maybePromise)) {
-      (maybePromise as Promise<any>).finally(() => {
-        if(context.global) {
-          renderSupport(newestSupport) // TODO: remove
-        } else {
-          context.tagJsVar.processUpdate(
-            context.value,
-            context,
-            newestSupport, // ownerSupport,
-            [],
-          )
-        }
-      })
-    }
+  // context.global && 
+  if(newestSupport.context.global) {
+    renderSupport(newestSupport) // TODO: remove with html``
+  } else {
+    const supContext = newestSupport.context
+    supContext.tagJsVar.processUpdate(
+      supContext.value,
+      supContext,
+      newestSupport.ownerSupport as AnySupport, // ownerSupport,
+      [],
+    )
+  }
+
+  if(isPromise(maybePromise)) {
+    (maybePromise as Promise<any>).finally(() => {
+      if(context.global) {
+        renderSupport(newestSupport) // TODO: remove
+      } else {
+        const supContext = newestSupport.context
+        supContext.tagJsVar.processUpdate(
+          supContext.value,
+          supContext,
+          newestSupport.ownerSupport as AnySupport, // ownerSupport,
+          [],
+        )
+      }
+    })
   }
 
   return maybePromise

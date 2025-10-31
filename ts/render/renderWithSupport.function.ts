@@ -13,23 +13,25 @@ import { Tag } from '../tag/Tag.type.js'
 export function renderWithSupport(
   newSupport: AnySupport,
   lastSupport: AnySupport| undefined, // previous (global.newest)
-  subject: SupportContextItem, // events & memory
+  context: SupportContextItem, // events & memory
 ): {support: AnySupport, wasLikeTags: boolean} {
   let reSupport: AnySupport
 
-  delete subject.toRender
+  delete context.toRender
+  const olderState = getSupportOlderState(lastSupport)
+  // const olderState = getSupportNewerState(lastSupport)
 
-  if( getSupportOlderState(lastSupport) ) {
+  if( olderState ) {
     reSupport = reRenderTag(
       newSupport,
       lastSupport,
-      subject,
+      context,
     )
   } else {
     reSupport = firstTagRender(
       newSupport,
       lastSupport,
-      subject,
+      context,
     )
   }
 
@@ -37,19 +39,22 @@ export function renderWithSupport(
   if(!isLikeTag) {
     moveProviders(lastSupport as AnySupport, reSupport)
     softDestroySupport(lastSupport)
-    const subject = reSupport.context
+    const context = reSupport.context
 
-    subject.state.oldest = reSupport
-    subject.state.newest = reSupport
-    subject.state.older = subject.state.newer
+    context.state.oldest = reSupport
+    context.state.newest = reSupport
+    // context.state.older = context.state.newer
   } else if(lastSupport) {
     const tag = lastSupport.templater.tag
-    if(tag && subject.renderCount > 0) {
+    if(tag && context.renderCount > 0) {
       const lastTemplater = lastSupport?.templater
       const lastTag = lastTemplater?.tag
 
       checkTagSoftDestroy(tag, lastSupport, lastTag)
     }
+    
+    // context.state.older = context.state.newer
+    // context.state.newer = context.state.older
   }
 
   reSupport.ownerSupport = newSupport.ownerSupport// || lastOwnerSupport) as AnySupport

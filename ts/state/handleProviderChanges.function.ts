@@ -6,7 +6,6 @@ export function handleProviderChanges(
   provider: Provider,
 ): TagWithProvider[] {
   const tagsWithProvider = getTagsWithProvider(appSupport, provider)
-
   return tagsWithProvider
 }
 

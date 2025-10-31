@@ -8,20 +8,21 @@ import { setUseMemory } from '../../state/index.js'
 import { Tag } from '../Tag.type.js'
 import { Props } from '../../Props.js'
 import { UnknownFunction } from '../index.js'
-import { Subject } from '../../subject/Subject.class.js'
 import { safeRenderSupport } from './safeRenderSupport.function.js'
+import { Subscription } from '../../index.js'
 
 export function castProps(
   props: Props,
   newSupport: AnySupport,
-  depth: number,
+  currentDepth: number,
 ) {
-  return props.map(function eachCastProp(prop) {
+  return props.map(function eachCastProp(prop, pos) {
     return alterProp(
       prop,
       newSupport.ownerSupport as AnySupport,
       newSupport,
-      depth,
+      currentDepth,
+      pos,
     )
   })
 }
@@ -32,6 +33,7 @@ function alterProp(
   ownerSupport: AnySupport,
   newSupport: AnySupport,
   depth: number,
+  pos: number // arguments position
 ) {
   if(isStaticTag(prop) || !prop) {
     return prop
@@ -41,7 +43,13 @@ function alterProp(
     return prop // no one above me
   }
 
-  return checkProp(prop, ownerSupport, newSupport, depth)
+  return checkProp(
+    prop,
+    ownerSupport,
+    newSupport,
+    depth,
+    pos,
+  )
 }
 
 export function checkProp(
@@ -49,6 +57,7 @@ export function checkProp(
   ownerSupport: AnySupport,
   newSupport: AnySupport,
   depth: number,
+  pos: number,
   owner?: any,
 ) {
   if(!value) {
@@ -77,10 +86,22 @@ export function checkProp(
   }
 
   if(isArray(value)) {
-    return checkArrayProp(value as unknown[], newSupport, ownerSupport, depth)
+    return checkArrayProp(
+      value as unknown[],
+      newSupport,
+      ownerSupport,
+      depth,
+      pos,
+    )
   }
 
-  return checkObjectProp(value as Record<string, unknown>, newSupport, ownerSupport, depth)
+  return checkObjectProp(
+    value as Record<string, unknown>,
+    newSupport,
+    ownerSupport,
+    depth,
+    pos,
+  )
 }
 
 function checkArrayProp(
@@ -88,6 +109,7 @@ function checkArrayProp(
   newSupport: AnySupport,
   ownerSupport: AnySupport,
   depth: number,
+  pos: number, // argument position
 ) {
   for (let index = value.length - 1; index >= 0; --index) {
     const subValue = value[index] as WrapRunner
@@ -97,6 +119,7 @@ function checkArrayProp(
       ownerSupport,
       newSupport,
       depth + 1,
+      pos,
       value
     )
 
@@ -106,9 +129,12 @@ function checkArrayProp(
       }
 
       afterCheckProp(
-        depth + 1, index, subValue,
+        depth + 1,
+        index,
+        subValue,
         value as unknown as SubableProp,
         newSupport,
+        pos,
       )
     }
   }
@@ -121,6 +147,7 @@ function checkObjectProp(
   newSupport: AnySupport,
   ownerSupport: AnySupport,
   depth: number,
+  pos: number // argument position
 ) {
   const keys = Object.keys(value)
   for(const name of keys){
@@ -130,6 +157,7 @@ function checkObjectProp(
       ownerSupport,
       newSupport,
       depth + 1,
+      pos,
       value,
     )
 
@@ -156,6 +184,7 @@ function checkObjectProp(
         subValue,
         value as SubableProp,
         newSupport,
+        pos,
       )
     }
   }
@@ -163,21 +192,40 @@ function checkObjectProp(
   return value
 }
 
-type SubableProp = {[name:string]: {subscription: Subject<void>}}
+type SubablePropMeta = {subscription: Subscription<any>, restore: () => any}
+type SubableProp = {[name:string]: SubablePropMeta}
 
 function afterCheckProp(
   depth: number,
   index: string | number,
   originalValue: unknown,
   newProp: SubableProp,
-  newSupport: AnySupport
+  newSupport: AnySupport,
+  pos: number,
 ) {
   // restore object to have original function on destroy
-  if(depth > 0) {    
-    newProp[index].subscription = newSupport.context.destroy$.toCallback(function alterCheckProcessor() {
-      newProp[index] = originalValue as unknown as {subscription: Subject<void>}
-    })
+  if(depth <= 0) {
+    return
   }
+
+  const context = newSupport.context
+  const castedProps = context.value?.props
+  
+  if(castedProps) {
+    // check for old prop subscription
+    const prop = castedProps[pos][index]
+    if( prop?.subscription ) {
+      prop.subscription() // unsubscribe to prevent this old argument/prop from being called on destroy
+      prop.restore() // put original value back
+    }
+  }
+
+  const altPropRestore = () => {
+    newProp[index] = originalValue as any
+  }
+
+  newProp[index].subscription = newSupport.context.destroy$.toCallback(altPropRestore)
+  newProp[index].restore = altPropRestore
 }
 
 export type WrapRunner = (() => unknown) & {

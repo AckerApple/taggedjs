@@ -26,9 +26,10 @@ export function tagInject<T extends (...args: any[]) => any>(
       for (const attrContext of contexts) {
         if (attrContext.isAttr && attrContext.tagJsVar?.matchesInjection) {
           // Use the matchesInjection method if available
-          if (attrContext.tagJsVar.matchesInjection(targetItem)) {
+          const inContext = attrContext.tagJsVar.matchesInjection(targetItem, attrContext)
+          if (inContext !== undefined) {
             // For host values, return the returnValue from the context
-            return attrContext.returnValue
+            return inContext.returnValue
           }
         }
       }
@@ -36,7 +37,7 @@ export function tagInject<T extends (...args: any[]) => any>(
     
     // Check if this context has a tagJsVar with matchesInjection
     if (currentContext.tagJsVar?.matchesInjection) {
-      if (currentContext.tagJsVar.matchesInjection(targetItem)) {
+      if (currentContext.tagJsVar.matchesInjection(targetItem, currentContext)) {
         // For tag components, return the tag instance
         return currentContext.returnValue
       }

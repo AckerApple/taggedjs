@@ -6,7 +6,8 @@ export function runBeforeDestroy(
   support: AnySupport,
   global: SupportTagGlobal,
 ) {
-  const providers = global.providers
+  const providers = support.context.providers
+  
   if(providers) {
     for(const provider of providers) {
       for (let index = provider.children.length - 1; index >= 0; --index) {

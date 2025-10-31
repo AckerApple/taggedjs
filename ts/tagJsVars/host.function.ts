@@ -3,7 +3,8 @@ import { AnySupport, ContextItem, TemplateValue, ValueTypes } from "../tag/index
 import { syncWrapCallback } from "../tag/output.function.js"
 import { removeContextInCycle, setContextInCycle } from "../tag/cycles/setContextInCycle.function.js"
 import { MatchesInjection, TagJsVar } from "./tagJsVar.type.js"
-import { initState, reState } from "../state/state.utils.js"
+import { initState } from "../state/state.utils.js"
+import { reState } from '../state/reState.function.js'
 import { runAfterRender } from "../render/runAfterRender.function.js"
 import { handleTagTypeChangeFrom } from "../tag/update/handleTagTypeChangeFrom.function.js"
 
@@ -40,10 +41,12 @@ export function host<T extends HostCallback>(
     processUpdate: processHostUpdate,
     destroy: deleteHost,
     options: { callback, ...options } as AllOptions,
-    matchesInjection(inject: any): boolean {
+    matchesInjection(inject: any, context: ContextItem) {
       const injectCallback = inject?.options?.callback
       // Check if the inject target is a host with the same callback
-      return injectCallback === callback
+      if(injectCallback === callback) {
+        return context
+      }
     },
   }
   
@@ -86,6 +89,10 @@ function processHostUpdate(
   contextItem: ContextItem,
   ownerSupport: AnySupport,
 ) {
+  if(typeof(newValue) === 'function' && !(newValue as any)?.tagJsType) {
+    throw new Error('issue on its way')
+  }
+
   const hasChanged = handleTagTypeChangeFrom(
     ValueTypes.host,
     newValue,
@@ -141,7 +148,7 @@ function processHost(
     state,
   )
 
-  runAfterRender()
+  runAfterRender(contextItem)
 }
 /** first time run */
 function processHostTagJsVar(

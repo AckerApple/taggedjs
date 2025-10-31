@@ -6,6 +6,7 @@ export const button = designElement('button')
 export const select = designElement('select')
 export const option = designElement('option')
 export const input = designElement('input')
+export const textarea = designElement('textarea')
 
 // HEAD & SUPPORT ELEMENTS
 
@@ -14,6 +15,7 @@ export const head = designElement('head')
 export const title = designElement('title')
 export const meta = designElement('meta')
 export const link = designElement('link')
+export const style = designElement('style')
 export const body = designElement('body')
 export const noscript = designElement('noscript')
 
@@ -39,6 +41,8 @@ export const header = designElement('header')
 export const footer = designElement('footer')
 export const fieldset = designElement('fieldset')
 export const legend = designElement('legend')
+export const dialog = designElement('dialog')
+export const pre = designElement('pre')
 
 // TABLE ELEMENTS
 
@@ -49,10 +53,11 @@ export const th = designElement('th')
 
 // INLINE ELEMENTS
 
-export const p = designElement('p')
 export const a = designElement('a')
+export const br = designElement('br')
+export const label = designElement('label')
+export const p = designElement('p')
+export const small = designElement('small')
 export const span = designElement('span')
 export const strong = designElement('strong')
-export const small = designElement('small')
-export const label = designElement('label')
 export const sup = designElement('sup')

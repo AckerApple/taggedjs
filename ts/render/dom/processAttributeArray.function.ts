@@ -3,6 +3,7 @@ import { processAttribute } from "../attributes/processAttribute.function.js"
 import { ContextItem } from "../../tag/ContextItem.type.js"
 import { AnySupport } from "../../tag/AnySupport.type.js"
 import { Attribute } from "../../interpolations/optimizers/ObjectNode.types.js"
+import { SupportContextItem } from "../../index.js"
 
 export function processAttributeArray(
   attrs: Attribute[],
@@ -11,7 +12,6 @@ export function processAttributeArray(
   support: AnySupport,
   // contexts: ContextItem[],
   parentContext: ContextItem,
-  attributeContexts: ContextItem[],
 ) {
   for (const attr of attrs) {
     const name = attr[0]
@@ -24,7 +24,8 @@ export function processAttributeArray(
       howToSet = attr[3]
     }
 
-    const contexts = support.context.contexts
+    // const contexts = support.context.contexts
+    const contexts = parentContext.contexts as ContextItem[]
     const newContext = processAttribute(
       name,
       value,
@@ -35,10 +36,11 @@ export function processAttributeArray(
       contexts,
       parentContext,
       isSpecial
-    )
+    ) as ContextItem || undefined
 
     if (typeof newContext === 'object') {
-      attributeContexts.push(newContext as ContextItem)
+      contexts.push(newContext as ContextItem)
+      ++(parentContext as SupportContextItem).varCounter
     }
   }
 }

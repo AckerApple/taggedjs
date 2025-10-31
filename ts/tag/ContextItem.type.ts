@@ -32,7 +32,8 @@ export interface AppContextItem {
   // todo this is most likely only used by an ContextItem only
   withinOwnerElement: boolean  
 
-  destroy$: Subject<void> // not on non-tags
+  destroy$: Subject<void> // not present on non-tags
+  render$: Subject<void> // not present on non-tags
 
   // only appears on app
   events?: Events

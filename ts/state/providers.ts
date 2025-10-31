@@ -59,8 +59,9 @@ export const providers = {
       }
 
       stateDiffMemory.provider = provider
-      const global = support.context.global as SupportTagGlobal
-      const providers = global.providers = global.providers || []
+      const context = support.context
+      // const global = context.global as SupportTagGlobal
+      const providers = context.providers = context.providers || []
       providers.push(provider)
       stateDiffMemory.stateDiff = stateDiff
 
@@ -96,8 +97,9 @@ function providerInject<T>(constructor: ProviderConstructor<T>): T {
     } as AnySupport
   
     while(owner.ownerSupport) {
-      const ownGlobal = owner.ownerSupport.context.global as SupportTagGlobal
-      const ownerProviders = ownGlobal.providers
+      const context = owner.ownerSupport.context
+      // const ownGlobal = context.global as SupportTagGlobal
+      const ownerProviders = context.providers
 
       if(!ownerProviders) {
         owner = owner.ownerSupport as AnySupport // cause reloop checking next parent
@@ -114,8 +116,8 @@ function providerInject<T>(constructor: ProviderConstructor<T>): T {
       })
 
       if(provider) {
-        const global = support.context.global as SupportTagGlobal
-        const providers = global.providers = global.providers || []
+        const context = support.context
+        const providers = context.providers = context.providers || []
         providers.push(provider)
         provider.children.push(support)
         return provider.instance

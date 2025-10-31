@@ -35,4 +35,5 @@ function softDestroyOne(
 ) {
   context.global.deleted = true // the children are truly destroyed but the main support will be swapped
   smartRemoveKids(context, [])
+  delete (context as any).contexts
 }

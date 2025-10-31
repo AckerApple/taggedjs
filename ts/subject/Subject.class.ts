@@ -86,7 +86,9 @@ export class Subject<T> implements LikeObservable<T> {
     })
   }
 
-  /** like toPromise but faster. Only get called once. No subscription to manage */
+  /** like toPromise but faster.
+   * Once called, unsubscribe occurs.
+   * No subscription to manage UNLESS the callback will never occur THEN subscription needs to be closed with result.unsubscribe() */
   toCallback(callback: (x: T) => any) {
     const subscription = this.subscribe((x, runtimeSub) => {
       const tagJsUnsub = runtimeSub?.unsubscribe
@@ -98,7 +100,8 @@ export class Subject<T> implements LikeObservable<T> {
 
       callback(x)
     })
-    return this
+    // return this 10-2025 remove
+    return subscription
   }
 
   /* tslint:disable:max-line-length */

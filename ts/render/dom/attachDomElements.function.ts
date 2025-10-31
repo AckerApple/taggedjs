@@ -10,12 +10,13 @@ import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicD
 import { TagJsVar } from "../../tagJsVars/tagJsVar.type.js"
 import { attachDomElement } from "./attachDomElement.function.js"
 import { Subject } from "../../subject/Subject.class.js"
+import { SupportContextItem } from "../../index.js"
 
 export function attachDomElements(
   nodes: ObjectChildren,
   values: any[],
   support: AnySupport,
-  parentContext: ContextItem,
+  parentContext: SupportContextItem,
   depth: number, // used to know if dynamic variables live within parent owner tag/support
   appendTo?: Element,
   insertBefore?: Text,
@@ -23,7 +24,10 @@ export function attachDomElements(
   contexts: ContextItem[]
   dom: DomObjectChildren // return of children created. Used to attach `ch` for children to a node
 } {
-  const contexts = support.context.contexts
+  const context = support.context as SupportContextItem
+  const contexts = context.contexts
+  parentContext = context
+  // const contexts = parentContext.contexts
   const dom: DomObjectChildren = []
 
   if(appendTo && insertBefore === undefined) {
@@ -36,15 +40,24 @@ export function attachDomElements(
   for (let index=0; index < nodes.length; ++index) {
     const node = (nodes as DomObjectElement[])[index]
     
-    const value = node.v as ContextItem
-    const isNum = !isNaN(value as unknown as number)
-    
-    if(isNum) {
-      const valueIndex = contexts.length
-      const value = values[ valueIndex ]
+    const v = node.v as ContextItem
+    const isNum = !isNaN(v as unknown as number)
 
-      attachDynamicDom(
-        value,
+    if(isNum) {
+      // const valueIndex = context.varCounter // contexts.length
+      // const valueIndex = (parentContext as SupportContextItem).varCounter // contexts.length
+      const valueIndex = Number(v) // (parentContext as SupportContextItem).varCounter // contexts.length
+      const realValue = values[ valueIndex ]
+      const isSkipFun = typeof(realValue) === 'function' && realValue.tagJsType === undefined
+
+      if(isSkipFun) {
+        ++parentContext.varCounter
+        // TODO: I dont think we ever get in here?
+        continue
+      }
+
+      const contextItem = attachDynamicDom(
+        realValue,
         contexts,
         support,
         parentContext,
@@ -52,6 +65,8 @@ export function attachDomElements(
         appendTo as HTMLElement,
         insertBefore,
       )
+
+      contextItem.valueIndex = valueIndex
 
       continue
     }
@@ -74,6 +89,7 @@ export function attachDomElements(
       parentContext,
       contexts: [],
       destroy$: new Subject(),
+      render$: new Subject(),
       tagJsVar: {
         tagJsType: 'new-parent-context'
       } as TagJsVar,
@@ -81,8 +97,10 @@ export function attachDomElements(
       withinOwnerElement: true,
     }
 
+    ;(newParentContext as SupportContextItem).varCounter = 0
+
     // one single html element. This is where attribute processing takes place
-    const attributeContexts = attachDomElement(
+    attachDomElement(
       domElement,
       node,
       values,
@@ -94,14 +112,13 @@ export function attachDomElements(
 
     // Update parent context with element and attribute contexts
     newParentContext.element = domElement
-    newParentContext.contexts = attributeContexts
 
     if (node.ch) {
       newNode.ch = attachDomElements(
         node.ch,
         values,
         support,
-        newParentContext,
+        newParentContext as SupportContextItem,
         // contexts,
         depth + 1,
         domElement,

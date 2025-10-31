@@ -20,12 +20,14 @@ export function convertTagToElementManaged(
   */
   const tagJsVar = valueToTagJsVar(newValue);
   delete (context as ContextItem).global;
+  context.contexts = []
 
   const newContext: ContextItem = {
     updateCount: 0,
     value: newValue,
     tagJsVar,
     destroy$: new Subject<void>(),
+    render$: new Subject<void>(),
     placeholder: context.placeholder,
 
     // not important
@@ -33,8 +35,11 @@ export function convertTagToElementManaged(
     withinOwnerElement: true,
     
     parentContext: context,
-    contexts: [],
+    contexts: context.contexts, // share contexts especially so providers properly crawl my available contexts
+    // contexts: subject.contexts, // share contexts especially so providers properly crawl my available contexts
   };
+
+  // context.contexts = [ newContext ] as ContextItem[] & SupportContextItem[]
 
   const overrideTagVar: ReadOnlyVar = getOverrideTagVar(
     context,

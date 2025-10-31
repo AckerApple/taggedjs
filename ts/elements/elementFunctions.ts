@@ -70,11 +70,12 @@ export function elementFunctions(item: any) {
     }
   }
 
-  // TODO: This maybe the old way of doing things
+  // TODO: This maybe the old way of doing things (see callables)
   const callables_other = {
-    // TODO: Change to ...callables
+    // ...eventCallables,
+    onClose: makeCallback('onclose'),
     onDoubleClick: makeCallback('ondblclick'),
-    onClick: makeCallback('click'),    
+    onClick: makeCallback('click'),
     // onclick: makeCallback('click'),
     // click: makeCallback('click'),
 
@@ -83,12 +84,15 @@ export function elementFunctions(item: any) {
     // onchange: makeCallback('onchange'),
     // change: makeCallback('onchange'),
     
+    onMousedown: makeCallback('onmousedown'),
+    onMouseup: makeCallback('onmouseup'),
+    
     onKeydown: makeCallback('onkeydown'),
     
     onKeyup: makeCallback('onkeyup'),
     // onkeyup: makeCallback('onkeyup'),
     // keyup: makeCallback('onkeyup'),
-
+   
     /* apply attribute via attr(name: string, value?: any): **/
     attr: (...args: any[]) => attr(item, args as any),
         
@@ -137,18 +141,6 @@ export function registerMockAttrContext(
   mockElm.contexts.push(value)
 }
 
-/** used during updates */
-export function registerMockChildContext(
-  value: any,
-  mockElm: ElementVar,
-) {
-  if(!mockElm.contexts) {
-    mockElm.contexts = []
-  }
-
-  mockElm.contexts.push( value )
-}
-
 export function isValueForContext(value: any) {
   return Array.isArray(value) || isFunction(value) || value?.tagJsType
 }
@@ -163,6 +155,21 @@ function makeCallback(eventName: string) {
   }
 }
 
+const eventCallables = {
+  onClose: makeCallback('onclose'),
+  onClick: makeCallback('click'),
+  onDoubleClick: makeCallback('ondblclick'),
+
+  onBlur: makeCallback('onblur'),
+  onChange: makeCallback('onchange'),
+  
+  onMousedown: makeCallback('onmousedown'),
+  onMouseup: makeCallback('onmouseup'),
+
+  onKeyup: makeCallback('onkeyup'),
+  onKeydown: makeCallback('onkeydown'),
+}
+
 const callables = {
   checked: setupAttr('checked', setBooleanAttribute),
   selected: setupAttr('selected', setBooleanAttribute),
@@ -170,14 +177,7 @@ const callables = {
   /** element.setAttribute('style', x)  */
   class: setupAttr('class', setClassValue),
 
-  onClick: makeCallback('click'),
-  onDoubleClick: makeCallback('ondblclick'),
-
-  onBlur: makeCallback('onblur'),
-  onChange: makeCallback('onchange'),
-  
-  onKeyup: makeCallback('onkeyup'),
-  onKeydown: makeCallback('onkeydown'),
+  ...eventCallables
 }
 
 export function loopObjectAttributes(

@@ -137,15 +137,19 @@ export function getOverrideTagVar(
 
         return
       }
+      
+      context.locked = 467
+      context.render$.next() // cause tag.onRender to fire
 
       makeRealUpdate(
         newContext,
         value,
-        ownerSupport,
         context as SupportContextItem,
         convertValue,
         support,
       )
+
+      delete context.locked
     },
     hasValueChanged: (
       _value: unknown,
@@ -184,19 +188,24 @@ export function getOverrideTagVar(
 function makeRealUpdate(
   newContext: ContextItem,
   value: string | number | boolean | Tag | SubscribeValue | TemplaterResult | (Tag | TemplaterResult)[] | Subject<unknown> | Callback | null | undefined,
-  ownerSupport: AnySupport,
   context: SupportContextItem,
-  convertValue: any, support: AnySupport,
+  convertValue: any,
+  support: AnySupport,
 ) {
-  newContext.value.props = castProps(
+  const castedProps = castProps(
     (value as any).props,
-    ownerSupport,
-    1
-  ); (newContext as SupportContextItem).updatesHandler = context.updatesHandler
+    support, // ownerSupport,
+    0
+  )
 
+  newContext.value.props = castedProps
+  const propsConfig = support.propsConfig as PropsConfig
+  propsConfig.castProps = castedProps
+  
+  ;(newContext as SupportContextItem).updatesHandler = context.updatesHandler
   if (context.updatesHandler) {
     const updatesHandler = context.updatesHandler as any
-    updatesHandler(newContext.value.props)
+    updatesHandler( castedProps )
   }
 
   newContext.tagJsVar.processUpdate(convertValue, newContext, support, [])

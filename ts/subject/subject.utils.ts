@@ -119,7 +119,7 @@ function unsubscribe(
   Subject.globalSubCount$.next(
     valSub.value - 1
   )
-  
+
   // any double unsubscribes will be ignored
   subscription.unsubscribe = () => subscription
 

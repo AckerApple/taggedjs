@@ -8,6 +8,8 @@ import { processDesignElementUpdate, checkTagElementValueChange } from './proces
 import { processChildren } from './processChildren.function.js'
 import { ElementVarBase, getPushKid } from './designElement.function.js'
 import { destroyContextHtml } from '../tag/smartRemoveKids.function.js'
+import { destroyHtmlDomMeta } from '../tag/destroyHtmlDomMeta.function.js'
+import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 
 /** used when you do NOT have a root element returned for your function */
 export const noElement = noElementMaker()
@@ -46,14 +48,13 @@ function processNoElmInit(
   insertBefore?: Text,
   // appendTo?: Element,
 ) {
-  context.contexts = [] // added contexts
+  context.contexts = context.contexts || [] // added contexts
   context.htmlDomMeta = []
   
   processChildren(
     value.innerHTML,
     context,
     ownerSupport,
-    context.contexts,
     insertBefore as unknown as HTMLElement,
     paintBefore,
   )
@@ -70,13 +71,14 @@ function destroyNoElement(
 
   if(contexts.length) {
     destroyDesignByContexts(contexts, ownerSupport, promises)
+    contexts.length = 0
 
     if( promises.length ) {
+      const htmlDomMeta = context.htmlDomMeta as DomObjectChildren
       return Promise.all(promises).then(() => {
 
         ++painting.locks
-        destroyContextHtml(context)
-        context.htmlDomMeta = []
+        destroyHtmlDomMeta( htmlDomMeta )
         --painting.locks
         
         paint()

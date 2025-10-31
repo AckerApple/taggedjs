@@ -1,6 +1,6 @@
 import { tag } from './tag.function.js'
 import { host } from './host.function.js'
-import { html } from '../tag/index.js'
+import { ContextItem, html } from '../tag/index.js'
 import { setContextInCycle, removeContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 
@@ -60,8 +60,10 @@ describe('tag.inject', () => {
     const mockTemplater: any = {
       tagJsType: ValueTypes.templater,
       wrapper: mockWrapper,
-      matchesInjection: (inject: any) => {
-        return mockTemplater.wrapper === inject || mockTemplater.wrapper?.original === inject?.original
+      matchesInjection: (inject: any, context: ContextItem) => {
+        if(mockTemplater.wrapper === inject || mockTemplater.wrapper?.original === inject?.original) {
+          return context
+        }
       }
     }
 
@@ -131,11 +133,11 @@ describe('tag.inject', () => {
     const host2 = host(callback)
 
     // Both hosts created with same callback should match
-    expect(host1.matchesInjection!(host2)).toBe(true)
+    expect(host1.matchesInjection!(host2, true as any as ContextItem)).toBe(true)
 
     // Different callback should not match
     const differentCallback = (color: string) => ({ color })
     const host3 = host(differentCallback)
-    expect(host1.matchesInjection!(host3)).toBe(false)
+    expect(host1.matchesInjection!(host3, true as any as ContextItem)).toBe(false)
   })
 })

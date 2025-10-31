@@ -1,7 +1,7 @@
 // taggedjs-no-compile
 
 import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.function.js'
-import { AnySupport } from '../../tag/index.js'
+import { AnySupport, BasicTypes, SupportContextItem } from '../../tag/index.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processDynamicNameValueAttribute } from '../../interpolations/attributes/processNameValueAttribute.function.js'
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
@@ -10,6 +10,7 @@ import { getTagVarIndex } from './getTagVarIndex.function.js'
 import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
 import { Subject } from '../../subject/Subject.class.js'
+import { processTagCallbackFun } from './processAttribute.function.js'
 
 /** Support string attributes with dynamics Ex: <div style="color:black;font-size::${fontSize};"></div> */
 export function createDynamicArrayAttribute(
@@ -20,8 +21,9 @@ export function createDynamicArrayAttribute(
   howToSet: HowToSet, //  = howToSetInputValue
   values: unknown[],
   parentContext: ContextItem,
-) {
+): ContextItem[] {
   const startIndex = contexts.length
+  const createdContexts: ContextItem[] = []
 
   // loop all to attach context and processors
   array.forEach((value) => {
@@ -36,9 +38,10 @@ export function createDynamicArrayAttribute(
         attrName: attrName as string,
         withinOwnerElement: true,
         tagJsVar,
-        valueIndex: contexts.length,
+        valueIndex: (parentContext as SupportContextItem).varCounter, // contexts.length,
         parentContext,
         destroy$: new Subject(),
+        render$: new Subject(),
       }
   
       // contextItem.handler =
@@ -51,8 +54,8 @@ export function createDynamicArrayAttribute(
 
       const pushValue = values[myIndex]
       contextItem.value = pushValue
-
-      contexts.push(contextItem)
+      createdContexts.push(contextItem)
+      ++(parentContext as SupportContextItem).varCounter
     }
   })
 
@@ -63,7 +66,7 @@ export function createDynamicArrayAttribute(
 
   setBy(values)
 
-  return contexts
+  return createdContexts
 }
 
 function buildNewValueFromArray(
@@ -97,8 +100,18 @@ export function createDynamicAttribute(
   support: AnySupport,
   isSpecial: SpecialDefinition,
   varIndex: number,
-  contexts: ContextItem[],
 ) {
+  if(typeof(value) === BasicTypes.function ) {
+    ++(parentContext as SupportContextItem).varCounter
+    return processTagCallbackFun(
+      // contextItem,
+      value,
+      support,
+      attrName,
+      element,
+    )
+  }
+
   const tagJsVar = valueToTagJsVar(value)
   const contextItem: AttributeContextItem = {
     updateCount: 0,
@@ -110,6 +123,7 @@ export function createDynamicAttribute(
     withinOwnerElement: true,
     tagJsVar,
     destroy$: new Subject(),
+    render$: new Subject(),
     valueIndex: varIndex,
     parentContext,
   }
@@ -125,7 +139,6 @@ export function createDynamicAttribute(
     howToSet,
     support,
     isSpecial,
-    contexts,
   )
 
   contextItem.value = value

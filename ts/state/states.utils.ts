@@ -35,8 +35,11 @@ export function reStatesHandler(
   const prevSupport = getSupportWithState(config.prevSupport as AnySupport)
   const prevContext = prevSupport.context
   const stateMeta = prevContext.state as ContextStateMeta
-  // const prevStateMeta = stateMeta.older as ContextStateSupport
-  const prevStateMeta = stateMeta.newer as ContextStateSupport
+  
+  const prevStateMeta = stateMeta.older as ContextStateSupport
+  // const prevStateMeta = stateMeta.newer as ContextStateSupport
+  // const prevStateMeta = stateMeta.older || stateMeta.newer as ContextStateSupport
+
   const prevStates = prevStateMeta.states
   // const prevStates = config.states
   
@@ -45,6 +48,7 @@ export function reStatesHandler(
 
   oldStates(function regetter(...args) {
     lastValues = args
+    ;(oldStates as any).lastValues = lastValues
     return args
   })
 

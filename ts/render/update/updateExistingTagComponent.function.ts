@@ -142,9 +142,10 @@ export function moveProviders(
   oldSupport: AnySupport,
   newSupport: AnySupport,
 ) {
-  const global = oldSupport.context.global as SupportTagGlobal
+  const context = oldSupport.context
+  const global = context.global as SupportTagGlobal
   let pIndex = -1
-  const providers = global.providers = global.providers || []
+  const providers = context.providers = context.providers || []
 
   const pLen = providers.length - 1
   while (pIndex++ < pLen) {

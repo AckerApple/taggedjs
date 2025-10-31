@@ -5,10 +5,9 @@ import {SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 export function providersChangeCheck(
   support: AnySupport
 ): AnySupport[] {
-  const global = support.context.global as SupportTagGlobal
-  const providers = global.providers
-
-  if(!providers) {
+  const context = support.context
+  const providers = context.providers
+  if( !providers ) {
     return []
   }
 

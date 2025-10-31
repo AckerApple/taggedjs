@@ -20,6 +20,7 @@ import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.j
 import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { setSupportInCycle } from './cycles/getSupportInCycle.function.js'
 import { Subject } from '../subject/Subject.class.js'
+import { removeContextInCycle } from './cycles/setContextInCycle.function.js'
 
 if( typeof(document) === 'object' ) {
   if( (document as any).taggedJs ) {
@@ -101,7 +102,7 @@ export function tagElement(
     }
   }
 
-  return renderTagElement(
+  const result = renderTagElement(
     app,
     global,
     templater,
@@ -110,6 +111,10 @@ export function tagElement(
     subject as SupportContextItem,
     isAppFunction,
   )
+
+  removeContextInCycle()
+
+  return result
 }
 
 function getNewSubject(
@@ -131,7 +136,9 @@ function getNewSubject(
     updateCount: 0,
     value: templater,
     valueIndex: 0,
+    varCounter: 0,
     destroy$: new Subject(),
+    render$: new Subject(),
     withinOwnerElement: false, // i am the highest owner
     renderCount: 0,
 
@@ -142,7 +149,7 @@ function getNewSubject(
   }
 
   // sets new global on context
-  getNewGlobal(context) as TagGlobal
+  getNewGlobal(context as SupportContextItem) as TagGlobal
   
   // TODO: events are only needed on the base and not every support
   // for click events and such read at a higher level

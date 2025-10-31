@@ -1,18 +1,17 @@
 import { castTextValue } from '../castTextValue.function.js';
-import { AnySupport, Subject } from '../index.js';
+import { AnySupport } from '../index.js';
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
 import { getNewContext } from '../render/addOneContext.function.js';
 import { painter, paintCommands } from '../render/paint.function.js';
+import { removeContextInCycle, setContextInCycle } from '../tag/cycles/setContextInCycle.function.js';
 import { ContextItem } from '../tag/index.js';
-import { valueToTagJsVar } from '../tagJsVars/index.js';
 import { processElementVar } from './processElementVar.function.js';
 import { processElementVarFunction } from './processElementVarFunction.function.js';
 
 export function processChildren(
   innerHTML: any[],
-  context: ContextItem,
+  parentContext: ContextItem,
   ownerSupport: AnySupport,
-  addedContexts: ContextItem[],
   element: HTMLElement | Text, // appendTo
   paintBy: painter, // paintAppend | paintBefore
 ) {
@@ -33,71 +32,83 @@ export function processChildren(
     if (item.tagJsType === 'element') {
       const newElement = processElementVar(
         item,
-        context,
+        parentContext,
         ownerSupport,
-        addedContexts
+        parentContext.contexts as ContextItem[],// addedContexts
       );
+      
       paintCommands.push([paintBy, [element, newElement]]);
-      const htmlDomMeta = context.htmlDomMeta as DomObjectChildren
+      
+      const htmlDomMeta = parentContext.htmlDomMeta as DomObjectChildren
       htmlDomMeta.push({
         nn: newElement.tagName,
         domElement: newElement,
         // at: newElement.attributes,
         at: [],
       })
+
       return;
     }
 
     if(type === 'function') {
-      return processElementVarFunction(
+      const beforeCount = parentContext.contexts?.length
+      
+      const result = processElementVarFunction(
         item,
         element,
-        context,
+        parentContext,
         ownerSupport,
-        addedContexts,
         paintBy,
       )
+
+      return result
     }
 
     return processNonElement(
       item,
-      context,
-      addedContexts,
+      parentContext,
       element,
       ownerSupport,
       paintBy,
-    );
-  });
+    )
+  })
 }
 
+/** used when a child is not another element and requires init processing */
 export function processNonElement(
   item: any,
-  context: ContextItem,
-  addedContexts: ContextItem[],
+  parentContext: ContextItem,
   element: HTMLElement | Text,
   ownerSupport: AnySupport,
   paintBy: painter,
 ) {
   const newContext: ContextItem = getNewContext(
     item,
-    addedContexts,
+    [], // addedContexts
     true,
-    context,
+    parentContext,
   )
 
-  addedContexts.push(newContext);
+  const contexts = parentContext.contexts as ContextItem[]
+  contexts.push(newContext)
+
+  newContext.element = element as HTMLElement
   newContext.placeholder = document.createTextNode('');
   
   paintCommands.push([paintBy, [element, newContext.placeholder]]);
+
+  setContextInCycle(newContext)
 
   newContext.tagJsVar.processInit(
     item,
     newContext, // context, // newContext,
     ownerSupport,
     newContext.placeholder
-  );
+  )
 
-  return newContext;
+  removeContextInCycle()
+
+  return newContext
 }
 
 export function handleSimpleInnerValue(

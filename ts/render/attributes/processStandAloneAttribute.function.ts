@@ -16,12 +16,14 @@ export function processStandAloneAttribute(
   element: HTMLElement,
   ownerSupport: AnySupport,
   howToSet: HowToSet,
-  context: ContextItem[],
+  contexts: ContextItem[],
   parentContext: ContextItem,
-) {
+): ContextItem[] | void {
   if(isNoDisplayValue(attrValue)) {
     return
   }
+
+  const newContexts: ContextItem[] = []
 
   // process an object of attributes ${{class:'something, checked:true}}
   if(typeof attrValue === BasicTypes.object) {
@@ -30,19 +32,28 @@ export function processStandAloneAttribute(
       const value = (attrValue as any)[name]
       const howToSet: HowToSet = setNonFunctionInputValue
 
-      processAttribute(
+      const subContext = processAttribute(
         name,
         value,
         values,
         element,
         ownerSupport,
         howToSet,
-        context,
+        contexts,
         parentContext,
         isSpecial,
       )
+      
+      
+      if(subContext !== undefined) {
+        if(Array.isArray(subContext)) {
+          newContexts.push( ...subContext )
+        } else {
+          newContexts.push( subContext )
+        }
+      }
     }
-    return
+    return newContexts
   }
 
   // regular attributes

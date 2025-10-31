@@ -1,5 +1,4 @@
-import { AnySupport, SupportContextItem, valueToTagJsVar } from '../index.js'
-import { addOneContext, getNewContext } from '../render/addOneContext.function.js'
+import { AnySupport, SupportContextItem } from '../index.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { updateToDiffValue } from '../tag/update/updateToDiffValue.function.js'
 import { ElementVar, MockElmListener } from './designElement.function.js'
@@ -10,8 +9,8 @@ export function processDesignElementUpdate(
   context: ContextItem,
   ownerSupport: AnySupport,
 ) {
-  //  || context.deleted === true
-  if(context.locked) {
+  const skip = context.locked || context.deleted === true
+  if(skip) {
     return // something else is running an event
   }
 
@@ -21,9 +20,10 @@ export function processDesignElementUpdate(
   if( hasChanged ) {
     destroyDesignElement(context, ownerSupport)
 
-    // delete context.deleted // The next value needs to know its not been deleted
     // delete context.htmlDomMeta // The next value needs to know its not been deleted
     context.htmlDomMeta = [] // The next value needs to know its not been deleted
+    // context.deleted = true // its not deleted but changed
+    delete context.deleted // its not deleted but changed
 
     updateToDiffValue(
       value,
@@ -33,14 +33,6 @@ export function processDesignElementUpdate(
     )
 
     return
-  }
-
-  const hasUpdater = (context as SupportContextItem).updatesHandler
-
-  // how arguments get updated within function
-  if( hasUpdater ) {
-    const updatesHandler = (context as SupportContextItem).updatesHandler as any
-    updatesHandler(value.props)
   }
 
   const contexts = context.contexts as ContextItem[]
@@ -54,13 +46,28 @@ export function processDesignElementUpdate(
     wrapCallback.toCallback = newListener[1].toCallback
   })
 
- contexts.forEach((context, index) => {
+  if(contexts.length !== vContexts.length) {
+    console.info('context mismatch', {
+      value,
+      context,
+      conValues: contexts.map(x => x.value),
+      vContexts,
+      deleted: context.deleted
+    })
+    throw new Error('super issue discovered')
+  }
+
+  context.locked = 79
+  
+  contexts.forEach((context, index) => {
     (context.tagJsVar as any).processUpdate(
       vContexts[index], // context.value,
       context,
       ownerSupport,
     )
   })
+
+  delete context.locked
 }
 
 export function checkTagElementValueChange(
@@ -81,6 +88,17 @@ export function checkTagElementValueChange(
 
   const newKidLength = (value as ElementVar).innerHTML.length
   const oldKidLength = context.value.innerHTML.length
-  const hasChanged = newKidLength !== oldKidLength
-  return hasChanged ? 1 : 0
+  const kidLengthChanged = newKidLength !== oldKidLength
+  if(kidLengthChanged) {
+    return 1
+  }
+
+  const newAttrLength = (value as ElementVar).attributes.length
+  const oldAttrLength = context.value.attributes.length
+  const kidAttrChanged = newAttrLength !== oldAttrLength
+  if(kidAttrChanged) {
+    return 1
+  }
+  
+  return 0
 }

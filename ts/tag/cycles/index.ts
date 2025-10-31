@@ -1,0 +1,1 @@
+export { getContextInCycle } from './setContextInCycle.function.js'

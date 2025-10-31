@@ -12,7 +12,7 @@ import { runAfterSupportRender } from './runAfterRender.function.js'
 import { executeWrap } from './executeWrap.function.js'
 import { registerTagElement } from './registerNewTagElement.function.js'
 import { loadNewBaseSupport } from '../tag/loadNewBaseSupport.function.js'
-import { reStateSupport } from '../state/state.utils.js'
+import { reStateSupport } from '../state/reState.function.js'
 
 export function renderTagElement(
   app: TagMaker,
@@ -116,13 +116,17 @@ export function runWrapper(
   }
 
   if(templater.tagJsType === ValueTypes.stateRender) {
-    return executeStateWrap(
+    const result = executeStateWrap(
       templater,
       isAppFunction,
       newSupport,
       subject,
-      appElement,    
+      appElement,
     )
+
+    // removeContextInCycle()
+
+    return result
   }
   
   // Call the apps function for our tag templater
@@ -132,6 +136,7 @@ export function runWrapper(
     subject,
   )
 
+  // this will call removeContextInCycle()
   runAfterSupportRender(newSupport)
 
   return nowSupport

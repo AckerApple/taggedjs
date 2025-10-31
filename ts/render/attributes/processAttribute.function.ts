@@ -9,7 +9,7 @@ import { AnySupport } from '../../tag/index.js'
 import { paintContent } from '../paint.function.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processNonDynamicAttr } from '../../interpolations/attributes/processNameValueAttribute.function.js'
-import { addOneContext } from '../addOneContext.function.js'
+import { addOneContext, getNewContext } from '../addOneContext.function.js'
 import { processAttributeFunction } from '../../interpolations/attributes/processAttributeCallback.function.js'
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
 import { createDynamicArrayAttribute, createDynamicAttribute } from './createDynamicAttribute.function.js'
@@ -33,7 +33,7 @@ export function processAttribute(
   contexts: ContextItem[],
   parentContext: ContextItem,
   isSpecial: SpecialDefinition,
-) {
+): ContextItem | ContextItem[] | void {
   const varIndex = getTagJsVar(attrName)
   let isNameVar = varIndex >= 0 || (value === undefined && typeof(attrName) !== 'string')
   let valueInValues = values[ varIndex ] as TemplateValue
@@ -51,7 +51,7 @@ export function processAttribute(
   if( tagJsVar?.tagJsType ) {
     return processTagJsVarAttribute(
       value,
-      contexts,
+      [], // contexts,
       parentContext,
       tagJsVar,
       varIndex,
@@ -68,9 +68,9 @@ export function processAttribute(
       valueInValues = attrName as TemplateValue // its a name only value attribute
     }
 
-    const contextItem = addOneContext(
+    const contextItem = getNewContext(
       valueInValues,
-      contexts,
+      [], // contexts,
       true,
       parentContext,
     ) as any as AttributeContextItem
@@ -85,7 +85,7 @@ export function processAttribute(
     tagJsVar.processUpdate = processUpdateAttrContext
 
     // single/stand alone attributes
-    processStandAloneAttribute(
+    const aloneResult = processStandAloneAttribute(
       values,
       valueInValues as any,
       element,
@@ -95,6 +95,10 @@ export function processAttribute(
       parentContext,
     )
 
+    if(aloneResult) {
+      contexts.push( ...aloneResult )
+    }
+
     return contextItem
   }
 
@@ -103,7 +107,7 @@ export function processAttribute(
       attrName as string,
       value,
       element,
-      contexts,
+      [], // contexts,
       howToSet,
       values,
       support.context,
@@ -117,13 +121,12 @@ export function processAttribute(
       attrName as string,
       value,
       element,
-      contexts,
+      [], // contexts,
       parentContext,
       howToSet,
       support,
       isSpecial,
       valueVar,
-      contexts,
     )
   }
 
@@ -225,7 +228,7 @@ function callbackFun(
   
   if(!oneRender) {
     return processTagCallbackFun(
-      subject,
+      // subject,
       newAttrValue,
       support,
       attrName,
@@ -244,7 +247,7 @@ function callbackFun(
 }
 
 export function processTagCallbackFun(
-  subject: AttributeContextItem,
+  // subject: AttributeContextItem,
   newAttrValue: any,
   support: AnySupport,
   attrName: string,
@@ -253,8 +256,8 @@ export function processTagCallbackFun(
   // tag has state and will need all functions wrapped to cause re-renders
   newAttrValue = bindSubjectCallback(newAttrValue, support)
 
-  const tagJsVar = subject.tagJsVar // = valueToTagJsVar(newAttrValue)
-  tagJsVar.processUpdate = processUpdateAttrContext
+  // const tagJsVar = subject.tagJsVar // = valueToTagJsVar(newAttrValue)
+  // tagJsVar.processUpdate = processUpdateAttrContext
 
   return processAttributeFunction(element, newAttrValue, support, attrName)
 }
