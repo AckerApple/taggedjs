@@ -102,7 +102,7 @@ export const homePage = tag(() => {
       _=> renderCountDiv({name:'app', renderCount}),
       div(
         small(
-          '(subscription count: ',
+          '(subscriptionCount$: ',
           subscribe(Subject.globalSubCount$),
           ')'
         )

@@ -89,7 +89,7 @@ export default tag(() => (
 ) => div(
   button({id: "my-button", onclick: handler}, 'Click me'),
   span({id: "counter"}, count),
-  hr()
+  hr
 ))
 ```
 
@@ -167,9 +167,11 @@ array.length
 ```typescript
 // OLD
 <hr />
+<br />
 
-// NEW
-hr()
+// NEW - NOTE: br and hr do NOT require function calls
+hr,
+br,
 ```
 
 **7. Nested elements:**
@@ -209,7 +211,8 @@ button({onclick: handler}, 'Click me')
 - Event handlers: lowercase `onclick`, `onkeyup` (NOT `onClick`, `onKeyup`)
 - Multiple children are passed as separate arguments
 - Arrow function prefix `_=>` for conditional/computed expressions
-- No attributes needed: just call the function with children `hr()` or `div('text')`
+- No attributes needed: just call the function with children `div('text')`
+- **IMPORTANT**: `br` and `hr` do NOT require function calls - use `br,` and `hr,` (not `br()` or `hr()`)
 
 **Complete conversion example:**
 ```typescript

@@ -1,4 +1,4 @@
-import { subscribeWith, html, tag, ValueSubject, state, combineLatest, willPromise, subscribe, Subject, host, states } from "taggedjs"
+import { subscribeWith, html, tag, ValueSubject, state, combineLatest, willPromise, subscribe, Subject, host, states, fieldset, legend, span, button, div, noElement, strong } from "taggedjs"
 import { Subject as RxSubject, startWith } from "rxjs"
 
 export const subscriptions = tag(() => {
@@ -92,41 +92,93 @@ const passSubscription = tag(({
   sub1: Subject<number>
 }) => {
   let onOff = false
-  // const ob = state(() => new Observable()) as any
-  const ob = state(() => new RxSubject()) as any
+  const ob = new RxSubject() as any
 
   states(get => [onOff] = get(onOff))
 
-  return html`
-    <span>sub-value:<span id="passed-in-output">${subscribe(sub0)}</span></span>
-    
-    <button id="passed-in-sub-increase"
-      onclick=${() => sub0.next((sub0.value || 0) + 1)}
-    >sub0 increase</button>
-    
-    <button id="passed-in-sub-next"
-      onclick=${() => ob.next(sub0.value = (sub0.value || 0) + 1)}
-    >ob increase</button>
-    
-    <button id="passed-in-sub-hide-show" onclick=${() => onOff = !onOff}
-    >hide/show on/off = ${onOff ? 'show' : 'hide'}</button>
-    <span>onOffValue:<span id="passed-in-sub-hideShow-value">${onOff}</span></span>
-    
-    <div>
-      <strong>test 0</strong>
-      <div id="passed-in-sub-ex0">0||${onOff && subscribe(sub0)}||0</div>
-    </div>
-    <div>
-      <strong>test 1</strong>
-      <div id="passed-in-sub-ex1">1||${onOff && subscribe(sub0, numberFun)}||1</div>
-    </div>
-    <div id="passed-in-sub-ex2">2||${onOff && subscribe(sub0, numberTag)}||2</div>
-    <div id="passed-in-sub-ex3">3||${subscribe(sub1, numberTag)}||3</div>
-    <div id="passed-in-sub-ex4">4||${subscribe(ob, numberTag)}||4</div>
-    <div id="passed-in-sub-ex4">5||${subscribe(ob.pipe( startWith(33) ), numberTag)}||5</div>
-    <div id="passed-in-sub-ex4">6||${subscribe(ob.pipe( startWith(undefined) ), (x: number) => numberTag(x))}||6</div>
-    <div id="passed-in-sub-ex4">7||${subscribe(ob, (x: number) => numberTag(x))}||7</div>
-  `
+  return noElement(
+    span(
+      'sub-value:',
+      span({id: "passed-in-output"}, subscribe(sub0))
+    ),
+
+    button({
+      id: "passed-in-sub-increase",
+      onClick: () => sub0.next((sub0.value || 0) + 1)
+    }, 'sub0 increase'),
+
+    button({
+      id: "passed-in-sub-next",
+      onClick: () => ob.next(sub0.value = (sub0.value || 0) + 1)
+    }, 'ob increase'),
+
+    button({
+      id: "passed-in-sub-hide-show",
+      onClick: () => onOff = !onOff
+    }, 'hide/show on/off = ', _=> onOff ? 'show' : 'hide'),
+
+    span(
+      'onOffValue:',
+      span({id: "passed-in-sub-hideShow-value"}, _=> onOff)
+    ),
+
+    div(
+      strong('test 0'),
+      div({id: "passed-in-sub-ex0"},
+        '0||',
+        _=> onOff && subscribe(sub0),
+        '||0'
+      )
+    ),
+
+    div(
+      strong('test 1'),
+      div({id: "passed-in-sub-ex1"},
+        '1||',
+        _=> onOff && subscribe(sub0, numberFun),
+        '||1'
+      )
+    ),
+
+    div({id: "passed-in-sub-ex2"},
+      '2||',
+      _=> onOff && subscribe(sub0, numberTag),
+      '||2'
+    ),
+
+    div({id: "passed-in-sub-ex3"},
+      '3||',
+      subscribe(sub1, numberTag),
+      '||3'
+    ),
+
+    div({id: "passed-in-sub-ex4"},
+      '4||',
+      subscribe(ob, numberTag),
+      '||4'
+    ),
+
+    div({id: "passed-in-sub-ex4"},
+      '5||',
+      subscribe(ob.pipe( startWith(33) ), numberTag),
+      '||5'
+    ),
+
+    div({id: "passed-in-sub-ex4"},
+      '6||',
+      subscribe(
+        ob.pipe( startWith(undefined) ),
+        (x: number) => numberTag(x)
+      ),
+      '||6'
+    ),
+
+    div({id: "passed-in-sub-ex4"},
+      '7||',
+      subscribe(ob, (x: number) => numberTag(x)),
+      '||7'
+    )
+  )
 })
 
 const numberFun = (x: number) => {
@@ -142,34 +194,32 @@ const testHost = tag(() => {
   let destroyCount = 0
   let clickCounter = 0
 
-  states(get => [{
-    hideShow, destroyCount, clickCounter,
-  }] = get({
-    hideShow, destroyCount, clickCounter,
-  }))
-
-  return html`
-    <fieldset style="flex-grow:1">
-      <legend>host</legend>
-      ${hideShow && html`
-        <span id="hostedContent"
-          ${host(
-            () => tag.element.get().innerHTML = Date.now().toString(),
-            {
-              onDestroy: () => {
-                ++destroyCount
-              },
-            }
-          )}
-        ></span>
-        <button type="button" onclick=${() => ++clickCounter}>
-          clickCounter:${clickCounter}
-        </button>
-      `}
-      <button id="hostHideShow"
-        onclick=${() => hideShow = !hideShow}
-      >hide/show</button>
-      <div>destroyCount: <span id="hostDestroyCount">${destroyCount}</span></div>
-    </fieldset>
-  `
+  return fieldset({style: "flex-grow:1"},
+    legend('host'),
+    _=> hideShow && noElement(
+      span({
+        id: "hostedContent",
+        attr: host(
+          () => tag.element.get().innerHTML = Date.now().toString(),
+          {
+            onDestroy: () => {
+              ++destroyCount
+            },
+          }
+        )
+      }),
+      button({
+        type: "button",
+        onClick: () => ++clickCounter
+      }, 'clickCounter:', _=> clickCounter)
+    ),
+    button({
+      id: "hostHideShow",
+      onClick: () => hideShow = !hideShow
+    }, 'hide/show'),
+    div(
+      'destroyCount: ',
+      span({id: "hostDestroyCount"}, _=> destroyCount)
+    )
+  )
 })

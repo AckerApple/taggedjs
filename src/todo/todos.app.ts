@@ -9,6 +9,7 @@ export const todos: Todo[] = []
 const dispatch = todoReducer(todos)
 
 export const todoApp = tag(() => {
+  console.log('todos.app.ts')
   const router = useHashRouter()
   
   const activeTodoCount = () => {
@@ -26,6 +27,7 @@ export const todoApp = tag(() => {
   return noElement(
     Header(dispatch),
     'route: ', _=> router.route,
+    
     _=> todos.length > 0 && (() => noElement(
       main({class: "main"},
         div({class: "toggle-all-container"},
@@ -42,6 +44,7 @@ export const todoApp = tag(() => {
         ),
         
         ul({class: "todo-list show-priority"},
+          // 👉 loop todos
           _=> getVisibleTodos().map((todo, index) => {
             return Item(todo, dispatch, index).key(todo.id)
           })

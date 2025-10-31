@@ -23,7 +23,8 @@ describe('💯 counters', () => {
 
     const currentSubs = htmlById('👉-counter-sub-count')
     testCounterElements('#❤️-increase-counter', '#❤️-counter-display')
-    expect(htmlById('👉-counter-sub-count')).toBe(currentSubs)
+    const htmlSubCount = htmlById('👉-counter-sub-count')
+    expect(htmlSubCount).toBe(currentSubs, `Different subscription counts? Expected ${htmlSubCount} to be ${currentSubs}`)
 
     const expectedRenderCount = html('#counters_render_count')
     // const renderToBe = (beforeRenderCount + 2).toString()

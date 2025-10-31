@@ -23,13 +23,6 @@ describe('🧳 props', () => {
   })
 
   it('basics', () => {
-    // the number of times the watch counted a change happens to match that increase counter
-    const funUpdateValue = html('#propsOneLevelFunUpdate-🥩-display')
-    const changed = html('#propsDebug-🥩-change-count-display')
-
-    // test that watch runs onInit
-    expect(changed).toBe( (Number(funUpdateValue) + 1).toString() )
-
     const ownerHTML = byId('propsDebug-🥩-0-display').innerHTML
     const parentHTML = byId('propsDebug-🥩-1-display').innerHTML
     const childHTML = byId('propsOneLevelFunUpdate-🥩-display').innerHTML
@@ -47,17 +40,32 @@ describe('🧳 props', () => {
     expectMatchedHtml('#propsDebug-🥩-0-display', '#propsDebug-🥩-let-prop-display')
     const propCounter = Number(html('#propsDebug-🥩-0-display'))
     
-    const result = (query('#propsDebug-🥩-2-button')[0] as any)._click()
+    // click let button
+    const result = (query('#propsDebugLet-🥩-2-button')[0] as any)._click()
     expect(result).toBe('no-data-ever')
 
     // outer should not have changed
-    expect(html('#propsDebug-🥩-0-display')).toBe( propCounter.toString() )
-    expect(html('#propsDebug-🥩-let-prop-display')).toBe(
-      (propCounter + 1).toString()
+    const displayAfterClick = html('#propsDebug-🥩-0-display')
+    expect(displayAfterClick).toBe( propCounter.toString(), `Expected ${displayAfterClick} to be ${propCounter.toString()} ... propCounter and display mismatched`)
+    
+    const letPropDisplay = html('#propsDebug-🥩-let-prop-display')
+    expect(letPropDisplay).toBe(
+      (propCounter).toString()
     )
 
     // end of test put all in sync
     byId('propsDebug-🥩-1-button').click()
+  })
+
+  it('change count', () => {
+    // the number of times the watch counted a change happens to match that increase counter
+    const funUpdateValue = html('#propsOneLevelFunUpdate-🥩-display')
+    const oldValue = Number(html('#propsDebug-🥩-change-count-display'))
+
+    byId('propsDebug-🥩-0-button').click()
+
+    const newValue = Number(html('#propsDebug-🥩-change-count-display'))
+    expect(newValue).toBe( oldValue + 1 )
   })
 
   it('props as functions', () => {
@@ -67,9 +75,14 @@ describe('🧳 props', () => {
 
     byId('sync-prop-child-button').click()
 
-    expectHTML('#sync-prop-number-display', (syncCounter + 2).toString())
+    expectHTML('#sync-prop-number-display', (syncCounter + 1).toString())
     testCounterElements('#nothing-prop-counter-button', '#nothing-prop-counter-display')
+    
+    byId('sync-prop-child-button').click()
+    
     expectHTML('#sync-prop-number-display', (syncCounter + 2).toString())
     expectMatchedHtml('#sync-prop-counter-display', '#nothing-prop-counter-display')
+    
+    expectHTML('#sync-prop-number-display', (syncCounter + 2).toString())
   })
 })

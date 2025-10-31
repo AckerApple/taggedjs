@@ -1,110 +1,138 @@
-import { watch, html, tag, states, subscribe, callback } from "taggedjs"
+import { watch, tag, subscribe, div, span, button, fieldset, legend, small, getContextInCycle } from "taggedjs"
 
-export const watchTesting = tag.deepPropWatch(() => (
-  stateNum = 0,
-  stateNumChangeCount = 0,
-  slowChangeCount = 0,
-  subjectChangeCount = 0,
-  truthChange = false,
-  truthChangeCount = 0,
-  truthSubChangeCount = 0,
-
-  _states = states(get => [{
-    stateNum, stateNumChangeCount, slowChangeCount, subjectChangeCount,
-    truthChange, truthChangeCount,
-    truthSubChangeCount,
-  }] = get({
-    stateNum, stateNumChangeCount, slowChangeCount, subjectChangeCount,
-    truthChange, truthChangeCount,
-    truthSubChangeCount,
-  })),
-
-  _ = watch([stateNum], () => ++stateNumChangeCount),
-  watchPropNumSlow = watch.noInit([stateNum], callback(() => ++slowChangeCount)),
+export const watchTesting = tag(() => {
+  let stateNum = 0
+  let stateNumChangeCount = 0
+  let nothing = 0
+  let slowChangeCount = 0
+  let subjectChangeCount = 0
+  let truthChange = false
+  let truthChangeCount = 0
+  let truthSubChangeCount = 0
+  let watchPropNumSlow: number | undefined
+  let watchTruth: number | undefined
   
-  watchPropNumSubject = watch.asSubject([stateNum], callback(() => {
+  watch(() => [stateNum], () => {
+    ++stateNumChangeCount
+  })
+  watch.noInit(() => [stateNum], () => watchPropNumSlow = ++slowChangeCount)
+  watch.truthy(() => [truthChange], () => {
+    watchTruth = ++truthChangeCount
+    return truthChangeCount
+  })
+
+
+
+  const watchPropNumSubject = watch.asSubject(() => [stateNum], () => {
     return ++subjectChangeCount
-  })),
+  })
 
-  watchTruth = watch.truthy([truthChange], callback(() => ++truthChangeCount)),
-  watchTruthAsSub = watch.truthy.asSubject([truthChange], callback((truthChange) => {
+  const watchTruthAsSub = watch.truthy.asSubject(() => [truthChange], (truthChange) => {
     ++truthSubChangeCount
-    
+
     return truthSubChangeCount
+  })
 
-  })),
-) => html`<!-- watchTesting.tag.ts -->
-  stateNum:<span id="watch-testing-num-display">${stateNum}</span>
-  <button id="watch-testing-num-button" type="button"
-    onclick=${() => ++stateNum}
-  >++ stateNum</button>
-  <div>
-    <small>stateNumChangeCount:<span id="stateNumChangeCount">${stateNumChangeCount}</span></small>
-  </div>
-  <fieldset>
-    <legend>🍄 slowChangeCount</legend> 
-    <div>
-      <small>
-        <span id="🍄-slowChangeCount">${slowChangeCount}</span>
-      </small>
-    </div>
-    <div>
-      <small>
-        watchPropNumSlow:<span id="🍄-watchPropNumSlow">${watchPropNumSlow}</span>
-      </small>
-    </div>
-  </fieldset>
-
-  <fieldset>
-    <legend>🍄‍🟫 subjectChangeCount</legend>    
-    <div>
-      <small>
-        <span id="🍄‍🟫-subjectChangeCount">${subjectChangeCount}</span>
-      </small>
-    </div>
-    <div>
-      <small>
-        (watchPropNumSubject:<span id="🍄‍🟫-watchPropNumSubject">${subscribe(watchPropNumSubject)}</span>)
-      </small>
-    </div>
-  </fieldset>
-
-  <fieldset>
-    <legend>🦷 truthChange</legend>
-    <div>
-      <small>
-        <span id="🦷-truthChange">${truthChange ? 'true' : 'false'}</span>
-      </small>
-    </div>
-    <fieldset>
-      <legend>simple truth</legend>      
-      <div>
-        <small>
-          watchTruth:<span id="🦷-watchTruth">${watchTruth || 'false'}</span>
-        </small>
-      </div>
-      <div>
-        <small>
-          (truthChangeCount:<span id="🦷-truthChangeCount">${truthChangeCount}</span>)
-        </small>
-      </div>
-    </fieldset>
-    <fieldset>
-      <legend>truth subject</legend>      
-      <div>
-        <small>
-        watchTruthAsSub:<span id="🦷-watchTruthAsSub">${subscribe(watchTruthAsSub)}</span>
-        </small>
-      </div>
-      <div>
-        <small>
-          (truthSubChangeCount:<span id="🦷-truthSubChangeCount">${truthSubChangeCount}</span>)
-        </small>
-      </div>
-    </fieldset>
-
-    <button id="🦷-truthChange-button" type="button"
-      onclick=${() => truthChange = !truthChange}
-    >🦷 toggle to ${truthChange ? 'true' : 'false'}</button>
-  </fieldset>`
-)
+  return div(
+    'stateNum:',
+    span({id: "watch-testing-num-display"}, _=> stateNum),
+    button({
+      id: "watch-testing-num-button",
+      type: "button",
+      onClick: () => ++stateNum
+    }, '++stateNum'),
+    button({
+      id: "watch-testing-nothing-button",
+      type: "button",
+      onClick: () => ++nothing
+    }, '++nothing'),
+    div(
+      small(
+        'stateNumChangeCount:',
+        span({id: "stateNumChangeCount"}, _=> stateNumChangeCount)
+      )
+    ),
+    fieldset(
+      legend('🍄 slowChangeCount'),
+      div(
+        small(
+          span({id: "🍄-slowChangeCount"}, _=> slowChangeCount)
+        )
+      ),
+      div(
+        small(
+          'watchPropNumSlow:',
+          span({id: "🍄-watchPropNumSlow"}, _=> watchPropNumSlow)
+        )
+      )
+    ),
+    fieldset(
+      legend('🍄‍🟫 subjectChangeCount'),
+      div(
+        small(
+          span({id: "🍄‍🟫-subjectChangeCount"}, _=> subjectChangeCount)
+        )
+      ),
+      div(
+        small(
+          '(watchPropNumSubject$:',
+          span({id: "🍄‍🟫-watchPropNumSubject"},
+            subscribe(watchPropNumSubject, x => {
+              return x
+            })
+          ),
+          ')'
+        )
+      )
+    ),
+    fieldset(
+      legend('🦷 truthChange'),
+      div(
+        small(
+          span({id: "🦷-truthChange"}, _=> truthChange ? 'true' : 'false')
+        )
+      ),
+      fieldset(
+        legend('simple truth'),
+        div(
+          small(
+            'watchTruth:',
+            span({id: "🦷-watchTruth"}, _=> watchTruth || 'false')
+          )
+        ),
+        div(
+          small(
+            '(truthChangeCount:',
+            span({id: "🦷-truthChangeCount"}, _=> truthChangeCount),
+            ')'
+          )
+        )
+      ),
+      fieldset(
+        legend('truth subject'),
+        div(
+          small(
+            'watchTruthAsSub$:',
+            span({id: "🦷-watchTruthAsSub"}, subscribe(watchTruthAsSub, x => {
+              return x
+            }))
+          )
+        ),
+        div(
+          small(
+            '(truthSubChangeCount:',
+            span({id: "🦷-truthSubChangeCount"}, _=> truthSubChangeCount),
+            ')'
+          )
+        )
+      ),
+      button({
+        id: "🦷-truthChange-button",
+        type: "button",
+        onClick: () => {
+          truthChange = !truthChange
+        }
+      }, _=> `🦷 toggle to ${truthChange ? 'true' : 'false'}`)
+    )
+  )
+})

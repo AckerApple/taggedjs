@@ -1,8 +1,8 @@
 import { renderCountDiv } from "./renderCount.component.js"
-import { dialog } from "./providerDialog.tag.js"
-import { html, tag, providers, state, callbackMaker, Subject, onInit, states, host } from "taggedjs"
+import { providerDialog } from "./providerDialog.tag.js"
+import { html, tag, providers, callbackMaker, Subject, host, div, strong, button, span, hr, h3, textarea } from "taggedjs"
 import { fx } from "taggedjs-animate-css"
-import { injectionTag } from "./injectionTesting.tag.js"
+import { inCycleContextComms, inCycleParent } from "./inCycleContextComms.tag.js"
 
 export class TagDebugProvider {
   tagDebug = 0
@@ -21,7 +21,7 @@ export function tagDebugProvider() {
 }
 
 export function upperTagDebugProvider() {
-  state('ensure states in providers are stable')
+  // state('ensure states in providers are stable')
   return {
     name: 'upperTagDebugProvider',
     test: 0
@@ -38,129 +38,128 @@ export const providerDebug = tag((_x = 'providerDebugBase') => {
   let propCounter = 0
   let renderCount = 0
 
-  states(get => [{
-    propCounter, renderCount,
-  }] = get({
-    propCounter, renderCount,
-  }))
-
-  if(providerClass.showDialog) {
-    (document.getElementById('provider_debug_dialog') as any).showModal()
+  const toggleDialog = () => {
+    const modal = document.getElementById('provider_debug_dialog') as HTMLDialogElement
+    modal.showModal()
+    providerClass.showDialog = !providerClass.showDialog
+    console.log('show modal', providerClass.showDialog)
   }
 
   ++renderCount
 
-  return html`<!--providerDebug.js-->
-    <div>
-      <strong>provider.test sugar-daddy-77</strong>:${provider.test}
-    </div>
-    <div>
-      <strong>provider.upper?.test</strong>:${provider.upper?.test || '?'}
-    </div>
-    <div>
-      <strong>providerClass.tagDebug</strong>:${providerClass.tagDebug || '?'}
-    </div>
+  return div(
+    div(
+      strong('provider.test sugar-daddy-77'),
+      ':',
+      _=> provider.test
+    ),
 
-    <div style="display:flex;flex-wrap:wrap;gap:1em">
-      <div>
-        <button id="increase-provider-🍌-0-button"
-          onclick=${() => ++provider.test}
-        >🍌 increase provider.test ${provider.test}</button>
-        <span>
-          🍌 <span id="increase-provider-🍌-0-display">${provider.test}</span>
-        </span>
-      </div>
-      
-      <div>
-        <button id="increase-provider-upper-🌹-0-button" onclick=${() => ++provider.upper.test}
-        >🌹 increase upper.provider.test ${provider.upper.test}</button>
-        <span>
-          🌹 <span id="increase-provider-upper-🌹-0-display">${provider.upper.test}</span>
-        </span>
-      </div>
-      
-      <div>
-        <button id="increase-provider-🍀-0-button" onclick=${() => ++providerClass.tagDebug}
-        >🍀 increase provider class ${providerClass.tagDebug}</button>
-        <span>
-          🍀 <span id="increase-provider-🍀-0-display">${providerClass.tagDebug}</span>
-        </span>
-      </div>
+    div(
+      strong('provider.upper?.test'),
+      ':',
+      _=> provider.upper?.test || '?'
+    ),
 
-      <div>
-        <button id="increase-prop-🐷-0-button" onclick=${() => ++propCounter}
-        >🐷 ++propCounter in parent ${propCounter}</button>
-        <span>
-          🐷 <span id="increase-prop-🐷-0-display">${propCounter}</span>
-        </span>
-      </div>
+    div(
+      strong('providerClass.tagDebug'),
+      ':',
+      _=> providerClass.tagDebug || '?'/*2*/
+    ),
 
-      <button onclick=${() => providerClass.showDialog = true}
-      >💬 toggle dialog ${providerClass.showDialog}</button>
-    </div>
+    div({style: "display:flex;flex-wrap:wrap;gap:1em"},
+      div(
+        button({id: "increase-provider-🍌-0-button",
+          onClick: () => ++provider.test
+        },
+          '🍌 increase provider.test ',
+          _=> provider.test/*4*/
+        ),
+        span(
+          '🍌 ',
+          span({id: "increase-provider-🍌-0-display"},
+            _=> provider.test
+          )
+        )
+      ),
 
-    <hr />
+      div(
+        button({id: "increase-provider-upper-🌹-0-button",
+          onClick: () => ++provider.upper.test
+        },
+          '🌹 increase upper.provider.test ',
+          _=> provider.upper.test/*7*/
+        ),
+        span(
+          '🌹 ',
+          span({id: "increase-provider-upper-🌹-0-display"},
+            _=> provider.upper.test
+          )
+        )
+      ),
 
-    <div style="display:flex;flex-wrap:wrap;gap:1em">
-      ${providerChildDebug({
-        propCounter,
-        propCounterChange: x => {
-          propCounter = x
-        }
-      })}
-    </div>
+      div(
+        button({id: "increase-provider-🍀-0-button",
+          onClick: () => ++providerClass.tagDebug
+        },
+          '🍀 increase provider class ',
+          _=> providerClass.tagDebug/*10*/
+        ),
+        span(
+          '🍀 ',
+          span({id: "increase-provider-🍀-0-display"},
+            _=> providerClass.tagDebug
+          )
+        )
+      ),
 
-    <hr />
-    renderCount outer:<span name="render_count_outer">${renderCount}</span>
-    ${renderCountDiv({renderCount, name:'providerDebugBase'})}
+      div(
+        button({id: "increase-prop-🐷-0-button",
+          onClick: () => {
+            ++propCounter
+          }
+        },
+          '⬇️ 🐷 ++propCounter in parent ',
+          _=> propCounter/*13*/
+        ),
+        span(
+          '⬇️ 🐷 ',
+          span({id: "increase-prop-🐷-0-display"},
+            _=> propCounter
+          )
+        )
+      ),
 
-    ${dialog(providerClass)}
+      button({ onClick: toggleDialog },
+        '💬 toggle dialog in parent ',
+        _=> providerClass.showDialog/*16*/
+      )
+    ),
 
-    ${inCycleContextComms()}
-  `
+    hr,
+
+    div({style: "display:flex;flex-wrap:wrap;gap:1em"},
+      _=> {
+        return providerChildDebug({
+          propCounter,
+          propCounterChange: x => {
+            propCounter = x
+          }
+        })
+      }
+    ),
+
+    hr,
+
+    'renderCount outer:',
+    span({name: "render_count_outer"}, _=> renderCount),
+
+    _=> renderCountDiv({renderCount, name:'providerDebugBase'}),
+
+    providerDialog(providerClass),
+
+    inCycleContextComms()/*20*/
+  )
 })
-/*
-const tagSwitchingWithProvider = tag(() => (
-  upperProvider = providers.inject( upperTagDebugProvider )
-) => html`
-  <div>
-    <button id="increase-provider-switch-🌹-0-button" onclick=${() => ++upperProvider.test}
-    >🌹 increase switch.provider.test ${upperProvider.test}</button>
-    <span>
-      🌹<span id="increase-provider-switch-🌹-0-display">${upperProvider.test}</span>
-    </span>
-  </div>
-  <hr />
-  <div>statue:${upperProvider.test % 2 == 0 ? 'off' : 'on'}</div>
-  ${tagSwitchingProChild1()}
-  <hr />
-  ${upperProvider.test % 2 == 0 ? null : tagSwitchingProChild2()}
-`)
-*/
-/*
-const tagSwitchingProChild1 = tag(() => (
-  upperProvider = providers.inject( upperTagDebugProvider ),
-) => upperProvider.test % 2 == 0 ? null : html`
-  <div>
-    <button id="increase-provider-switch-🌹-1-button" onclick=${() => ++upperProvider.test}
-    >🌹 increase switch.provider.test ${upperProvider.test}</button>
-    <span>
-      🌹<span id="increase-provider-switch-🌹-1-display">${upperProvider.test}</span>
-    </span>
-  </div>
-`)
-
-const tagSwitchingProChild2 = tag(() => (
-  upperProvider = providers.inject( upperTagDebugProvider )
-) => html`
-  <div>
-    <button id="increase-provider-switch-🌹-2-button" onclick=${() => ++upperProvider.test}
-    >🌹 increase switch.provider.test ${upperProvider.test}</button>
-    <span>
-      🌹<span id="increase-provider-switch-🌹-2-display">${upperProvider.test}</span>
-    </span>
-  </div>
-`)*/
 
 /* child of main provider testing */
 const providerChildDebug = tag(({
@@ -172,7 +171,10 @@ const providerChildDebug = tag(({
   propCounterChange: (x: number) => unknown,
   _?: string
 }) => {
-  const funcProvider = providers.inject(ProviderFunc) // test that an arrow function can be a provider
+  providerChildDebug.updates(x => {
+    [{ propCounter, propCounterChange }] = x
+  })
+  const funcProvider = providers.inject( ProviderFunc ) // test that an arrow function can be a provider
   const provider = providers.inject( tagDebugProvider )
   const providerClass = providers.inject( TagDebugProvider )
   const upperProvider = providers.inject( upperTagDebugProvider )
@@ -180,113 +182,160 @@ const providerChildDebug = tag(({
   let showProProps: boolean = false
   let renderCount: number = 0
 
-  states(get => [{showProProps,renderCount}] = get({showProProps,renderCount}))
-
   const callbacks = callbackMaker()
-  const callbackTestSub = state(() => new Subject())
+  const callbackTestSub = new Subject()
+  console.info('providerDebug.ts: 👉 👉 i should only ever run once')
 
-  onInit(() => {
-    console.info('providerDebug.ts: 👉 👉 i should only ever run once')
+  const sub = callbackTestSub.subscribe(x => {
+    callbacks((y) => {
+      provider.test = x as number
+    })()
+  })
 
-    callbackTestSub.subscribe(x => {
-      callbacks((y) => {
-        provider.test = x as number
-      })()
-    })
+  tag.onDestroy(() => {
+    sub.unsubscribe()
   })
 
   ++renderCount
 
-  return html`<!--providerDebug.js@child-->
-    <div>
-      <button id="increase-provider-🍌-1-button" onclick=${() => ++provider.test}
-      >🍌 increase provider.test ${provider.test}</button>
-      <span>
-        🍌 <span id="increase-provider-🍌-1-display">${provider.test}</span>
-      </span>
-    </div>
-    
-    <div>
-      <button id="increase-provider-upper-🌹-1-button" onclick=${() => ++upperProvider.test}
-      >🌹 increase upper.provider.test ${upperProvider.test}</button>
-      <span>
-        🌹<span id="increase-provider-upper-🌹-1-display">${upperProvider.test}</span>
-      </span>
-    </div>
+  return div(
+    div(
+      button({id: "increase-provider-🍌-1-button",
+        onClick: () => ++provider.test
+      },
+        '🍌 increase provider.test ',
+        _=> provider.test
+      ),
+      span(
+        '🍌 ',
+        span({id: "increase-provider-🍌-1-display"},
+          _=> provider.test
+        )
+      )
+    ),
 
-    <div>
-      <button id="increase-arrow-provider-⚡️-1-button" onclick=${() => ++funcProvider.counter}
-      >⚡️ increase upper.provider.test ${funcProvider.counter}</button>
-      <span>
-      ⚡️<span id="increase-arrow-provider-⚡️-1-display">${funcProvider.counter}</span>
-      </span>
-    </div>
+    div(
+      button({id: "increase-provider-upper-🌹-1-button",
+        onClick: () => ++upperProvider.test
+      },
+        '🌹 increase upper.provider.test ',
+        _=> upperProvider.test
+      ),
+      span(
+        '🌹',
+        span({id: "increase-provider-upper-🌹-1-display"},
+          _=> upperProvider.test
+        )
+      )
+    ),
 
-    <div>
-      <button id="subject-increase-counter"
-        onclick=${() => callbackTestSub.next(provider.test + 1)}
-      >🍌 subject increase:</button>
-      <span>
-        🍌 <span id="subject-counter-display">${provider.test}</span>
-      </span>
-    </div>
-    
-    <div>
-      <button id="increase-provider-🍀-1-button" onclick=${() => ++providerClass.tagDebug}
-      >🍀 increase provider class ${providerClass.tagDebug}</button>
-      <span>
-        🍀 <span id="increase-provider-🍀-1-display">${providerClass.tagDebug}</span>
-      </span>
-    </div>
+    div(
+      button({id: "increase-arrow-provider-⚡️-1-button",
+        onClick: () => ++funcProvider.counter
+      },
+        '⚡️ increase upper.provider.test ',
+        _=> funcProvider.counter
+      ),
+      span(
+        '⚡️',
+        span({id: "increase-arrow-provider-⚡️-1-display"},
+          _=> funcProvider.counter
+        )
+      )
+    ),
 
-    <div>
-      <button id="increase-prop-🐷-1-button" onclick=${() => propCounterChange(++propCounter)}
-      >🐷 ++propCounter in child ${propCounter}</button>
-      <span>
-        🐷 <span id="increase-prop-🐷-1-display">${propCounter}</span>
-      </span>
-    </div>
+    div(
+      button({id: "subject-increase-counter",
+        onClick: () => callbackTestSub.next(provider.test + 1)
+      },
+        '🍌 subject increase:'
+      ),
+      span(
+        '🍌 ',
+        span({id: "subject-counter-display"},
+          _=> provider.test
+        )
+      )
+    ),
 
-    <button onclick=${() => providerClass.showDialog = true}
-      >💬 toggle dialog ${providerClass.showDialog}</button>
+    div(
+      button({id: "increase-provider-🍀-1-button",
+        onClick: () => ++providerClass.tagDebug
+      },
+        '🍀 increase provider class ',
+        _=> providerClass.tagDebug
+      ),
+      span(
+        '🍀 ',
+        span({id: "increase-provider-🍀-1-display"},
+          _=> providerClass.tagDebug
+        )
+      )
+    ),
 
-    <button onclick=${() => showProProps = !showProProps}
-    >${showProProps ? 'hide' : 'show'} provider as props</button>
-    
-    ${showProProps && html`
-      <div ${fx()}>
-        <hr />
-        <h3>Provider as Props</h3>
-        ${testProviderAsProps(providerClass)}
-      </div>
-    `}
+    div(
+      button({id: "increase-prop-🐷-1-button",
+        onClick: () => {
+          propCounterChange(++propCounter)
+        }
+      },
+        '⬆️ 🐷 ++propCounter in child ',
+        _=> propCounter
+      ),
+      span(
+        '⬆️ 🐷 ',
+        span({id: "increase-prop-🐷-1-display"},
+          _=> propCounter
+        )
+      )
+    ),
 
-    <div>
-      renderCount inner:${renderCount}
-      ${renderCountDiv({renderCount, name:'providerDebugInner'})}
-    </div>
-  `
+    button({
+      onClick: () => {
+        providerClass.showDialog = !providerClass.showDialog
+
+        if(providerClass.showDialog === true) {
+          const modal = document.getElementById('provider_debug_dialog') as HTMLDialogElement
+          modal.showModal()
+        }
+
+        console.log('providerClass.showDialog', providerClass.showDialog)
+      }
+    },
+      '💬 toggle dialog in child ',
+      _=> providerClass.showDialog
+    ),
+
+    button({onClick: () => showProProps = !showProProps},
+      _=> showProProps ? 'hide' : 'show',
+      ' provider as props'
+    ),
+
+    _=> showProProps &&
+      div({attr:fx()},
+        hr,
+        h3('Provider as Props'),
+        _=> testProviderAsProps(providerClass)
+      ),
+
+    div(
+      'renderCount inner:',
+      _=> renderCount,
+      _=> renderCountDiv({renderCount, name:'providerDebugInner'})
+    )
+  )
 })
 
 
 const testProviderAsProps = tag((
   providerClass: TagDebugProvider
 ) => {
-  return html`<!--providerDebug.js@TestProviderAsProps-->
-    <textarea wrap="off" rows="20" style="width:100%;font-size:0.6em">${JSON.stringify(providerClass, null, 2)}</textarea>
-  `
+  return textarea({wrap:"off", rows:"20", style:"width:100%;font-size:0.6em"},
+    _=> JSON.stringify(providerClass, null, 2)
+  )
 })
 
-const inCycleParent = host((color = 'red') => {
-  const element = tag.element.get()
-  element.style.border = '2px solid ' + color
-  element.style.display = 'flex'
-  element.style.gap = '1em'
-  const rtn = { color, title: 'inCycleParent' }
-  return rtn
-})
-
-const inCycleChild = host((color = 'green') => {
+export const inCycleChild = host((color = 'green') => {
   const parent = tag.inject( inCycleParent )
   const element = tag.element.get()
   element.style.border = '2px solid ' + color
@@ -294,87 +343,16 @@ const inCycleChild = host((color = 'green') => {
   element.innerHTML = `wonderful - parent(${parent.color})`
 })
 
-const inCycleChild2 = host((color = 'green') => {
+export const inCycleChild2 = host((color = 'green') => {
   const element = tag.element.get()
   element.style.border = '2px solid ' + color
   element.style.flex = '1'
 })
 
-const inCycleChild3 = host((color = 'green') => {
+export const inCycleChild3 = host((color = 'green') => {
   const element = tag.element.get()
   element.style.color = color
 })
 
-const colorOptions = ['red', 'blue', 'green', 'purple', 'orange']
+export const colorOptions = ['red', 'blue', 'green', 'purple', 'orange']
 
-const inCycleContextComms = tag(() => {
-  let cycleColorParent = 'red'
-  let cycleColorChild = 'green'
-  let cycleColorChild2 = 'green'
-  let hideShowCycles = false
-
-  states(get => [{
-    cycleColorParent, cycleColorChild, cycleColorChild2, hideShowCycles,
-  }] = get({
-    cycleColorParent, cycleColorChild, cycleColorChild2, hideShowCycles,
-  }))
-
-  return html`
-    <fieldset id="in-cycle-context-comms">
-      <legend>
-        <label>
-          <input type="checkbox" checked=${!hideShowCycles} onchange=${e => hideShowCycles = !hideShowCycles} />
-          In-Cycle Context Communication
-        </label>
-      </legend>
-      ${!hideShowCycles && html`
-        <div id="fieldset-body-wrap" style="margin-bottom: 1em">
-          <label>
-            Parent Color: 
-            <select id="parent-color-select" onchange=${e => cycleColorParent = e.target.value}>
-              ${colorOptions.map(color => html`
-                <option value=${color} selected=${cycleColorParent === color}>
-                  ${color}
-                </option>
-              `.key(color))}
-            </select>
-          </label>
-          <label style="margin-left: 1em">
-            Child Color: 
-            <select id="child-color-select" onchange=${e => cycleColorChild = e.target.value}>
-              ${colorOptions.map(color => html`
-                <option value=${color} selected=${cycleColorChild === color}>
-                  ${color}
-                </option>
-              `.key(color))}
-            </select>
-          </label>
-          <label style="margin-left: 1em">
-            Child Color2: 
-            <select id="child-color-select-2" onchange=${e => cycleColorChild2 = e.target.value}>
-              ${colorOptions.map(color => html`
-                <option value=${color} selected=${cycleColorChild2 === color}>
-                  ${color}
-                </option>
-              `.key(color))}
-            </select>
-          </label>
-        </div>
-        
-        <div id="drag-drop-wrap">    
-          <h3>Drag Selection Testing</h3>
-          ${injectionTag()}
-        </div>
-        
-        <div id="in-cycle-parent" ${inCycleParent(cycleColorParent)}>
-          <div id="in-cycle-child" ${inCycleChild(cycleColorChild)}></div>
-          <div id="in-cycle-child-2">
-            wonderful too
-            ${inCycleChild2(cycleColorChild2)}
-            <span>part 2${inCycleChild3(cycleColorChild2)}</span>
-          </div>
-        </div>
-      `}
-    </fieldset>
-  `
-})

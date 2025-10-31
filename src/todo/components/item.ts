@@ -10,6 +10,7 @@ export const Item = tag((
   Item.updates(x => {
     [todo, dispatch, index] = x
   })
+  
   let editing = false
   return li(
     {
@@ -18,14 +19,16 @@ export const Item = tag((
         editing && 'editing'
       ].filter(Boolean).join(' ')
     },
-    _=> !editing ? () =>
-      div({class: "view"},
+    _=> !editing ? () => {
+      return div({class: "view"},
         _=> todo.completed && '✅',
 
         // toggle completed
         input({
           type: "button",
-          onClick: (e: InputElementTargetEvent) => onUpdated(dispatch.toggleItem(todo, index)),
+          onClick: (e: InputElementTargetEvent) => {
+            return onUpdated(dispatch.toggleItem(todo, index))
+          },
           value: "toggle"
         }),
       
@@ -46,8 +49,9 @@ export const Item = tag((
           onClick: () => onUpdated(dispatch.removeItemByIndex(index))
         },'🗑️ destroy')
       )
-    : () =>
-      div({class: "input-container"},
+    }
+    : () => {
+      return div({class: "input-container"},
         input({
           id: "edit-todo-input",
           type: "text",
@@ -57,8 +61,8 @@ export const Item = tag((
           onBlur: () => editing = false,
           onKeydown: (e: InputElementTargetEvent) => handleKey(e, title => {
             handleUpdate(title, todo, index, dispatch)
-            onUpdated(index)
             editing = false
+            onUpdated(index)
           })
         }),
         label({
@@ -66,6 +70,7 @@ export const Item = tag((
           for: "todo-input"
         }, 'Edit Todo Input')
       )
+    }
   )
 })
 

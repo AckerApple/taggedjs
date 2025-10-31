@@ -26,7 +26,7 @@ _ = 'countersDebug'
     test(),
     div({style:"display:flex;flex-wrap:wrap;gap:1em"},
       div(
-        '👉 Subscription count:',
+        '👉 SubscriptionCount$:',
         span({id:"👉-counter-sub-count"},
           subscribe((Subject as any).globalSubCount$)
         )
@@ -55,18 +55,19 @@ _ = 'countersDebug'
   )
 })
 
-const innerCounters = tag.deepPropWatch(({
+const innerCounters = tag(({
   propCounter,
   increasePropCounter,
 }: {
   propCounter: number,
   increasePropCounter: () => void
-}) => (
-  otherCounter = 0,
-  renderCount = 0,
-  elmInitCount = 0,
-  __ = ++renderCount, // for debugging
-) => {
+}) => {
+  let otherCounter = 0
+  let renderCount = 0
+  let elmInitCount = 0
+  
+  ++renderCount // for debugging
+
   innerCounters.updates(x => {
     ;[{propCounter, increasePropCounter}] = x
   })
@@ -226,55 +227,60 @@ const noWatchPropCounters = tag(({
   `
 })
 
-export const innerCounterContent = tag(() => (
-  statesRenderCount = 0,
-  statesRenderCount2 = 0,  
-  counter = 0,  
-  counter2 = 0,  
-  renderCount = 0,
-  propCounter = 0,  
-  initCounter = 0,
+export const innerCounterContent = tag(() => {
+  let statesRenderCount = 0
+  let statesRenderCount2 = 0  
+  let counter = 0  
+  let counter2 = 0  
+  let renderCount = 0
+  let propCounter = 0  
+  let initCounter = 0
 
-  callbacks = callbackMaker(),
-  callbackTo = callback(z => {
+  let callbacks = callbackMaker()
+  let callbackTo = callback(z => {
     counter2 = z as number
-  }),
+  })
 
 
-  increasePropCounter = () => {
+  let increasePropCounter = () => {
     ++propCounter
-  },
+  }
 
-  immutableProps = {propCounter, increasePropCounter},
+  let immutableProps = {propCounter, increasePropCounter}
 
-  callbackTestSub = new Subject(counter),
-  callbackTestSub2 = new Subject(0),
-  callbackTestSub3 = new Subject(),
-  pipedSubject0 = new ValueSubject('222'),
+  let callbackTestSub = new Subject(counter)
+  let callbackTestSub2 = new Subject(0)
+  let callbackTestSub3 = new Subject()
+  let pipedSubject0 = new ValueSubject('222')
 
   // State as a callback only needed so pipedSubject1 has the latest value
-  increaseCounter = () => {
+  let increaseCounter = () => {
     ++counter
     pipedSubject0.next('333-' + counter)
-  },
+  }
 
-  pipedSubject1 = Subject.all([pipedSubject0, callbackTestSub]),
-  pipedSubject2 = subject.all([pipedSubject0, callbackTestSub]),
-  pipedSubject3 = subject.all([pipedSubject0, callbackTestSub, callbackTestSub3]),
-  memory = {counter: 0},
+  let pipedSubject1 = Subject.all([pipedSubject0, callbackTestSub])
+  let pipedSubject2 = subject.all([pipedSubject0, callbackTestSub])
+  let pipedSubject3 = subject.all([pipedSubject0, callbackTestSub, callbackTestSub3])
+  let memory = {counter: 0}
   // create an object that remains the same
-  readStartTime = Date.now(),
-) => {
+  let readStartTime = Date.now()
+
   ++initCounter
   console.info('countersDebug.ts: 👉 i should only ever run once')
 
-  callbackTestSub.subscribe(
+  const sub0 = callbackTestSub.subscribe(
     callbacks(y => {
       counter = y
     })
   )
 
-  callbackTestSub.subscribe(callbackTo)
+  const sub1 = callbackTestSub.subscribe(callbackTo)
+
+  tag.onDestroy(() => {
+    sub0.unsubscribe()
+    sub1.unsubscribe()
+  })
 
   if(immutableProps.propCounter !== propCounter) {
     immutableProps = {propCounter, increasePropCounter}

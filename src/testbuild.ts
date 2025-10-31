@@ -46,9 +46,12 @@ function templaterToSupport(
   const context: SupportContextItem = {
     renderCount: 0,
     updateCount: 0,
-    destroy$: new Subject(),
-    value: templater,
+    varCounter: 0,
     valueIndex: 0,
+
+    destroy$: new Subject(),
+    render$: new Subject(),
+    value: templater,
 
     tagJsVar: valueToTagJsVar(templater),
     global: undefined as any, // populated below in getNewGlobal
@@ -154,6 +157,7 @@ function processValue(
               parentContext: support.context,
               tagJsVar: valueToTagJsVar(value),
               destroy$: new Subject(),
+              render$: new Subject(),
               withinOwnerElement: subject?.withinOwnerElement || false,
             }
           )

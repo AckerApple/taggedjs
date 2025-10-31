@@ -20,7 +20,8 @@ describe('taggedjs-dump', () => {
     triggerChangeElm(elm)
 
     const resultElms2 = query('#taggedjs-dump-user-result .taggedjs-simple-label')
-    expect(resultElms2.length).toBe(2)
+    const elmCount = resultElms2.length
+    expect(elmCount).toBe(2, `Expected 2 elements to match '#taggedjs-dump-user-result .taggedjs-simple-label' but only got ${elmCount}`)
     expect(resultElms2[0].innerText).toBe('test')
     expect(resultElms2[1].innerText).toBe('testb')
 

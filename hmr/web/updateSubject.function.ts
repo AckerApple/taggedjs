@@ -76,19 +76,20 @@ export async function updateSubject(
   }
 
   await swapSupport(
-    contextSubject, hmr,
+    contextSubject as SupportContextItem,
+    hmr,
   )
 }
 
 async function swapSupport(
-  contextSubject: ContextItem,
+  contextSubject: SupportContextItem,
   hmr: HmrImport,
 ) {
   const global = contextSubject.global as SupportTagGlobal  
   const oldest = (contextSubject as SupportContextItem).state.oldest as Support
   const newest = (contextSubject as SupportContextItem).state.newest as Support
 
-  const pros = global.providers
+  const pros = contextSubject.providers
   const prevConstructors = pros ? pros.map(provider => provider.constructMethod) : []
   const placeholder = contextSubject.placeholder
 
@@ -108,8 +109,8 @@ async function swapSupport(
 
   const appSupport = oldest.appSupport
   const ownerSupport = oldest.ownerSupport as AnySupport
-  const ownGlobal = ownerSupport.context.global as SupportTagGlobal
-  const providers = global.providers
+  // const ownGlobal = ownerSupport.context.global as SupportTagGlobal
+  const providers = contextSubject.providers
   const owner = ownerSupport.context.state.oldest as Support
 
   // connect child to owner

@@ -16,6 +16,8 @@ export const arrays = tag(() => {/* ArrayTests */
   const signalArray = array(['d','e','f'])
   const simpleArray = ['a','b','c']
   const arrayFx = fxGroup({ stagger:10, duration: '.1s' })
+  const fxValue = fx({duration: '.1s'})
+  ;(fxValue as any).acker = 43
 
   const getNewPlayer = () => ({
     name: 'Person '+players.length,
@@ -200,9 +202,9 @@ export const arrays = tag(() => {/* ArrayTests */
 
       _=> players.length > 0 &&
           button({
-            attr: fx({duration: '.1s'}),
+            attr: fxValue,
             onClick: () => players.length = 0
-          }, 'remove all'),
+          }, `remove all ${players.length} players`),
     ),
 
     _=> renderCountDiv({renderCount, name: 'arrayTests.ts'})

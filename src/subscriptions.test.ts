@@ -38,7 +38,7 @@ describe('📰 subscriptions', () => {
       hideShow.click() // hide
       
       let subValue = htmlById('passed-in-output')
-      expect(hideShowValue.textContent).toBe('true')
+      expect(hideShowValue.textContent).toBe('true', `Expected #passed-in-output to be 'true' but it is ${hideShowValue.textContent}`)
       expect(htmlById('passed-in-sub-ex0')).toBe(`0||||0`)
 
       const zeros = '0||||0'
@@ -76,7 +76,10 @@ describe('📰 subscriptions', () => {
     clickById('hostHideShow')
 
     const dCount = Number(htmlById('hostDestroyCount'))
-    expect( dCount ).toBe(hostDestroyCount + 1, `host destroy count expected ${dCount} to be ${hostDestroyCount + 1}`)
+    expect( dCount ).toBe(
+      hostDestroyCount + 1,
+      `host destroy count expected ${dCount} to be ${hostDestroyCount + 1}`
+    )
 
     // should NOT be a number
     expect(htmlById('hostedContent')).toBe('')

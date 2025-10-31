@@ -1,17 +1,30 @@
-import { Tag, html, states, state, tag } from "taggedjs";
+import { noElement, button, tag } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
 
-export const statePropDebug = (propCounter: number, child: Tag) => tag.use = (
-  _ = state('statePropDebug.tag.ts'), // something to be seen in console
-  edit = false,
-  renderCount = 0,
-  ___ = states(get => [{edit, renderCount}] = get({edit, renderCount})),
-  __ = ++renderCount,
-) => html`
-  propCounter:${propCounter}
-  <button type="button" onclick=${() => edit = !edit}>edit ${edit}</button>
-  child: ${child}
-  ${renderCountDiv({renderCount, name: 'statePropDebug-tag'})}
-`
+export const statePropDebug = tag((
+  propCounter: number,
+  child: any,
+) => {
+  statePropDebug.updates(x => [propCounter, child] = x)
+
+  let edit = false
+  let renderCount = 0
+
+  ++renderCount
+
+  return noElement(
+    'propCounter:', _=> propCounter,
+    button(
+      {
+        type:"button",
+        onClick: () => edit = !edit
+      },
+      'edit: ', _=> edit,
+    ),
+    'child: ', _=> child,
+    _=> renderCountDiv({renderCount, name: 'statePropDebug-tag'}),
+
+  )
+})
 
 export default statePropDebug

@@ -6,6 +6,8 @@ export const renderCountDiv = tag((
     name: string
   }
 ) => {
+  let partialRenderCount = 0
+  
   renderCountDiv.updates(x =>
     [{renderCount, name}] = x
   )
@@ -14,6 +16,9 @@ export const renderCountDiv = tag((
     small(
       `(${name} render count`,
         span({id:`${name}_render_count`},_=> renderCount),
+      `)`,
+      `(${name} partial render count`,
+        span(_=> ++partialRenderCount),
       `)`
     )
   )

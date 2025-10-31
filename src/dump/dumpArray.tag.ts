@@ -1,5 +1,5 @@
 import { arraysDisplay } from "./arraysDisplay.component"
-import { html, letProp, state, states, tag, watch } from "taggedjs"
+import { button, dialog, div, html, letProp, noElement, state, states, tag, watch } from "taggedjs"
 import { FormatChange } from "./index.js"
 import { EverySimpleValue } from "./dump.props"
 
@@ -26,16 +26,38 @@ export const dumpArray = tag(({// dumpArray
   allowMaximize?: boolean
   everySimpleValue?: EverySimpleValue
 }) => {
+  dumpArray.updates(x => {
+    if(x[0].show != show) {
+      showLower = show
+    }
+    if(x[0].showAll != showAll) {
+      showLower = showAll
+    }
+
+    [{// dumpArray
+      key,
+      value,
+      show,
+      showAll,
+      showKids,
+      // arrayView,
+      showLevels,
+      formatChange,
+      allowMaximize,
+      everySimpleValue,
+    }] = x
+  })
+
   let showLower = undefined as boolean | undefined
   let arrayView = undefined as undefined | 'table'
   let maximize = false
   
-  states(get => [{showLower, arrayView, maximize}] = get({showLower, arrayView, maximize}))
-  letProp(get => [showKids] = get(showKids))
-  letProp(get => [showAll] = get(showAll))
+  // states(get => [{showLower, arrayView, maximize}] = get({showLower, arrayView, maximize}))
+  // letProp(get => [showKids] = get(showKids))
+  // letProp(get => [showAll] = get(showAll))
   
-  watch.noInit([show], ([show])=> showLower = show)
-  watch.noInit([showAll], ([showAll])=> showLower = showAll)
+  // watch.noInit([show], ([show])=> showLower = show)
+  // watch.noInit([showAll], ([showAll])=> showLower = showAll)
 
   const maximizeId = state(() => 'maximize-dump-' + performance.now())
   const toggleMaximize = () => {
@@ -80,39 +102,54 @@ export const dumpArray = tag(({// dumpArray
     everySimpleValue,
   }
 
-  const getBody = () => html`
-    <!-- array displays wrap -->
-    <div class="taggedjs-array-body">
-      ${arraysDisplay(displayOptions)}
-    </div>
-  `
+  /* array displays wrap */
+  const getBody = () => div({class:"taggedjs-array-body"},
+    _=> arraysDisplay(displayOptions)
+  )
 
-  return html`<!-- array -->
-    <div class="taggedjs-array-wrap">
-      ${getHeader(allowMaximize)}
-      ${dumpBody && getBody()}
-    </div>
+  return noElement(
+    div(
+      {class:"taggedjs-array-wrap"},
+      _=> getHeader(allowMaximize),
+      _=> dumpBody && getBody(),
+    ),
 
-    <!-- maximize -->
-    <dialog id=${maximizeId} class="dump-dialog" style="padding:0"
-      onmousedown="var r = this.getBoundingClientRect();(r.top<=event.clientY&&event.clientY<=r.top+r.height&&r.left<=event.clientX&&event.clientX<=r.left+r.width) || this.close()"
-      ondragstart="const {e,dt,t} = {t:this,e:event,dt:event.dataTransfer};const d=t.drag=t.drag||{x:0,y:0};d.initX=d.x;d.startX=event.clientX-t.offsetLeft;d.startY=event.clientY-t.offsetTop;t.ondragover=e.target.ondragover=(e)=>e.preventDefault();dt.effectAllowed='move';dt.dropEffect='move'"
-      ondrag="const {t,e,dt,d}={e:event,dt:event.dataTransfer,d:this.drag}; if(e.clientX===0) return;d.x = d.x + e.offsetX - d.startX; d.y = d.y + e.offsetY - d.startY; this.style.left = d.x + 'px'; this.style.top = d.y+'px';"
-      ondragend="const {t,e,d}={t:this,e:event,d:this.drag};if (d.initX === d.x) {d.x=d.x+e.offsetX-(d.startX-d.x);d.y=d.y+e.offsetY-(d.startY-d.y);this.style.transform=translate3d(d.x+'px', d.y+'px', 0)};this.draggable=false"
-    >
-      <div style="padding:.25em" onmousedown="this.parentNode.draggable=true">
-        ${maximize && getHeader(false)}
-      </div>
+    /* maximize */
+    dialog(
+      {
+        id: maximizeId,
+        class:"dump-dialog",
+        style:"padding:0",
+        onmousedown:"var r = this.getBoundingClientRect();(r.top<=event.clientY&&event.clientY<=r.top+r.height&&r.left<=event.clientX&&event.clientX<=r.left+r.width) || this.close()",
+        ondragstart:"const {e,dt,t} = {t:this,e:event,dt:event.dataTransfer};const d=t.drag=t.drag||{x:0,y:0};d.initX=d.x;d.startX=event.clientX-t.offsetLeft;d.startY=event.clientY-t.offsetTop;t.ondragover=e.target.ondragover=(e)=>e.preventDefault();dt.effectAllowed='move';dt.dropEffect='move'",
+        ondrag:"const {t,e,dt,d}={e:event,dt:event.dataTransfer,d:this.drag}; if(e.clientX===0) return;d.x = d.x + e.offsetX - d.startX; d.y = d.y + e.offsetY - d.startY; this.style.left = d.x + 'px'; this.style.top = d.y+'px';",
+        ondragend:"const {t,e,d}={t:this,e:event,d:this.drag};if (d.initX === d.x) {d.x=d.x+e.offsetX-(d.startX-d.x);d.y=d.y+e.offsetY-(d.startY-d.y);this.style.transform=translate3d(d.x+'px', d.y+'px', 0)};this.draggable=false",
+      },
+
+      div(
+        {
+          style:"padding:.25em",
+          onmousedown:"this.parentNode.draggable=true"
+        },
+        _=> maximize && getHeader(false)
+      ),
       
-      ${maximize && html`
-        <div style="text-align:left;display:flex;flex-wrap:wrap;margin:0.2em;gap:0.2em">
-          ${arraysDisplay({...displayOptions, allowMaximize: false})}
-        </div>
-      `}
-
-      <div style="padding:.25em">
-        <button type="button" onclick=${minimize} style="width:100%">🅧 close array</button>
-      </div>
-    </dialog>
-  `
+      _=> maximize &&
+        div(
+          {style:"text-align:left;display:flex;flex-wrap:wrap;margin:0.2em;gap:0.2em"},
+          arraysDisplay({...displayOptions, allowMaximize: false})
+        ),
+      
+      div({style:"padding:.25em"},
+        button(
+          {
+            type:"button",
+            onClick: minimize,
+            style:"width:100%"
+          },
+          '🅧 close array',
+        )
+      )
+    )
+  )
 })

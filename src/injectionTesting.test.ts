@@ -72,17 +72,17 @@ describe('Injection Test', () => {
     
     // Click first item
     items[0].click()
-    expect(checkboxes[0].checked).toBe(true)
+    expect(checkboxes[0].checked).toBe(true, 'first checkbox should be checked')
     expect(getCheckedCount()).toBe(1)
     
     // Click third item
     items[2].click()
-    expect(checkboxes[2].checked).toBe(true)
+    expect(checkboxes[2].checked).toBe(true, 'third checkbox expected checked')
     expect(getCheckedCount()).toBe(2)
     
     // Click fifth item
     items[4].click()
-    expect(checkboxes[4].checked).toBe(true)
+    expect(checkboxes[4].checked).toBe(true, 'fifth checkbox expected checked')
     expect(getCheckedCount()).toBe(3)
   })
 

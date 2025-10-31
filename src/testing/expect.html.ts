@@ -21,25 +21,31 @@ export function expectElmCount(
 }
 
 export function expectMatchedHtml(...queries: string[]) {
-  const elements = queries.reduce((all, query) => {
+  let firstElmString: string
+  const elements = queries.reduce((all, query, queryIndex) => {
     const elements = document.querySelectorAll(query)
     all.push(...elements)
+
+    elements.forEach((elm, index) => {
+      firstElmString = firstElmString = elm.innerHTML
+      expect(elm.innerHTML).toBe(firstElmString, `Expected ${query}[${index}] expected to have html: ${firstElmString} but it is ${elm.innerHTML}`)
+    })
+
     return all
   }, [] as Element[])
 
   if (elements.length === 0) {
     throw new Error(`Expected elements to be present in expectMatchedHtml() query but found none`)
   }
-
-  const lastElm = elements.pop() as Element
-  const lastHtml = lastElm.innerHTML
-  elements.forEach(elm => 
-    expect(elm.innerHTML).toBe(lastHtml)
-  )
 }
 
-export function expectHTML(selector: string, expectedHtml: string) {
-  expect(html(selector)).toBe(expectedHtml)
+export function expectHTML(
+  selector: string,
+  expectedHtml: string,
+  message?: string,
+) {
+  const expectValue = html(selector)
+  expect(expectValue).toBe(expectedHtml, message || `Expected ${selector} html to be "${expectedHtml}" but instead it is "${expectValue}"`)
 }
 
 
@@ -53,8 +59,8 @@ function testCounterSelectedElements(
   counterDisplaySelect: string,
   testQuantifier: number = 0
 ) {
-  expect(counterButtons.length).toBe(elementCountExpected, () => `Expected ${counterButtonSelect} to be ${elementCountExpected} elements but is instead ${counterButtons.length}`)
-  expect(counterDisplays.length).toBe(elementCountExpected, ()=> `Expected ${counterDisplaySelect} to be ${elementCountExpected} elements but is instead ${counterDisplays.length}`)
+  expect(counterButtons.length).toBe(elementCountExpected, `Expected ${counterButtonSelect} to be ${elementCountExpected} elements but is instead ${counterButtons.length}`)
+  expect(counterDisplays.length).toBe(elementCountExpected, `Expected ${counterDisplaySelect} to be ${elementCountExpected} elements but is instead ${counterDisplays.length}`)
 
   counterButtons.forEach((increaseCounter, index: number) => {
     const counterDisplay = document.querySelectorAll(counterDisplaySelect)[index] as HTMLElement // counterDisplays[index]
@@ -73,14 +79,14 @@ function testCounterSelectedElements(
     let newCounterValue = counterValue + 1
     counterValue = Number(counterDisplay.innerText)
     expect(document.body.contains(counterDisplay)).toBe(true)
-    expect(newCounterValue).toBe(counterValue, () => `After click ${counterButtonSelect}, counter test ${testQuantifier + 1} of ${testQuantifier + 2} expected ${counterDisplaySelect} to be value ${newCounterValue} but it is ${counterValue}`)
+    expect(newCounterValue).toBe(counterValue, `After click ${counterButtonSelect}, counter test ${testQuantifier + 1} of ${testQuantifier + 2} expected ${counterDisplaySelect} to be value ${newCounterValue} but it is ${counterValue}`)
 
     // will increase by one
     increaseCounter.click()
 
     counterValue = Number(counterDisplay?.innerText)
     ++newCounterValue
-    expect(newCounterValue).toBe(counterValue, () => `Counter test ${testQuantifier + 2} of ${testQuantifier + 2} expected ${counterDisplaySelect} to increase value to ${newCounterValue} but it is ${counterValue}`)
+    expect(newCounterValue).toBe(counterValue, `Counter test ${testQuantifier + 2} of ${testQuantifier + 2} expected ${counterDisplaySelect} to increase value to ${newCounterValue} but it is ${counterValue}`)
   })
 }
 

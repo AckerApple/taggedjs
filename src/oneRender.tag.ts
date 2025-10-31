@@ -1,4 +1,4 @@
-import { html, states, Subject, subject, tag, ValueSubjective, signal, subscribe, noElement, div, span, button, hr, fieldset, legend } from "taggedjs"
+import { html, states, Subject, subject, tag, ValueSubjective, signal, subscribe, noElement, div, span, button, hr, fieldset, legend, br } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component.js"
 
 let outsideCount = 0
@@ -22,7 +22,9 @@ export const oneRender = tag(() => {
     
     div(
       span('👍',
-        span({id:"👍-counter-display"}, subscribe(counter, x => x)
+        span(
+          {id:"👍-counter-display"},
+          subscribe(counter, x => x)
         )
       ),
       
@@ -46,28 +48,43 @@ export const oneRender = tag(() => {
 })
 
 /** this tag renders on every event but should not cause parent to re-render */
-const insideMultiRender = tag(() => (
-  counter$ = subject(0),
-  counterSignal$ = signal(0),
+const insideMultiRender = tag(() => {
+  const counter$ = subject(0)
+  const counterSignal$ = signal(0)
   
-  counter = 0,
-  renderCount = 0, // state can be used but it never updates
-  _ = states(get => [{renderCount, counter}] = get({renderCount, counter})),
-) => {
+  let counter = 0
+  let renderCount = 0 // state can be used but it never updates
+  
   ++renderCount
-  return html`
-  <div>👍🔨 sub counter-subject-display:<span id="👍🔨-counter-subject-display">${subscribe(counter$)}</span></div>
-  <div>👍📡 signal counter:<span id="📡-signal-counter-display">${counterSignal$}</span></div>
-  <br />
-  <span>👍🔨 sub counter<span id="👍🔨-counter-display">${counter}</span></span>
-  <br />
-  <button type="button" id="👍🔨-counter-button"
-    onclick=${() => {
-      ++counter
-      counter$.next(counter)
-      counterSignal$.value = counter
-    }}
-  >++👍👍</button>
-  ${renderCountDiv({renderCount, name:'insideMultiRender'})}
-`
+  
+  return noElement(
+    div(
+      '👍🔨 sub counter-subject-display:',
+      span({id: "👍🔨-counter-subject-display"}, subscribe(counter$))
+    ),
+    div(
+      '👍📡 signal counter:',
+      span({id: "📡-signal-counter-display"}, counterSignal$)
+    ),
+    
+    br,
+    
+    span(
+      '👍🔨 sub counter: ',
+      span({id: "👍🔨-counter-display"}, _=> counter)
+    ),
+    
+    br,
+    
+    button({
+      type: "button",
+      id: "👍🔨-counter-button",
+      onClick: () => {
+        ++counter
+        counter$.next(counter)
+        counterSignal$.value = counter
+      }
+    }, '++👍👍'),
+    _=> renderCountDiv({renderCount, name:'insideMultiRender'})
+  )
 })

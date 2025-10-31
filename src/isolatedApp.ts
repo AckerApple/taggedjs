@@ -37,13 +37,16 @@ export default tag(() => {
 
   ++renderCount
 
+  const v3 = () => appCounterSubject.value
+  v3.testing = 44
+
   return div(
     '<!--isolatedApp.js-->',
     h1({id: "app"}, '🏷️ TaggedJs - isolated'),
     div({style: "opacity:.6"}, '(no HMR)'),
-    div({style: "opacity:.6"}, 'route: ', route),
+    div({style: "opacity:.6"}, 'route: ', route), // v0
 
-    menu(),
+    menu(), // puts a subscribe down inline - v1
 
     div(
       fieldset(
@@ -64,13 +67,13 @@ export default tag(() => {
         
         span(
           '🍒 ',
-          span({id: "app-counter-display"}, appCounter)
+          span({id: "app-counter-display"}, _=> appCounter)
         ),
         
         span(
           '🍒$<',
           span({id: "app-counter-subject-display"},
-            subscribe(appCounterSubject)
+            subscribe(appCounterSubject) // v2
           ),
           '>'
         ),
@@ -78,7 +81,7 @@ export default tag(() => {
         span(
           '🍒$.value<',
           span({id: "app-counter-subject-value-display"},
-            _=> appCounterSubject.value
+            v3 // v3
           ),
           '>'
         ),
@@ -86,7 +89,6 @@ export default tag(() => {
         button({id: "toggle-test", onClick: toggle},
           'toggle test ',
           _=> toggleValue,
-          'true'
         )
       ),
 
@@ -97,7 +99,7 @@ export default tag(() => {
       renderCountDiv({name:'app', renderCount}),
       div(
         small(
-          '(subscription count: ',
+          '(subscriptionCount$: ',
           subscribe(Subject.globalSubCount$),
           ')'
         )

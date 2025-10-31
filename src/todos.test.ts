@@ -1,3 +1,4 @@
+/** tests src/todo/todos.app.ts */
 import { describe, it, expect } from './testing'
 import { clickOne, focus, keydownOn, query } from './testing'
 
@@ -94,7 +95,7 @@ describe('☑️ todos', function todos() {
       view: window         // Default view (window)
     });
 
-    // Dispatch the event on the specified element
+    // Edit first item => Dispatch the event on the specified element
     query('label[data-testid="todo-item-label"]')[0].dispatchEvent(event)
     
     // should have two inputs, the main and the edit

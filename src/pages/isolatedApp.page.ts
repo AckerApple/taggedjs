@@ -39,7 +39,7 @@ export default tag.route = tag(() => () => {
 
   ++renderCount
 
-  return html`<!--isolatedApp.js-->
+  return html`<!--isolatedApp.page.js-->
     <h1 id="app">🏷️ TaggedJs - isolated</h1>
 
     <div>
