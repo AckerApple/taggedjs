@@ -1,4 +1,4 @@
-import { getInnerHTML, Tag, html, states, tag, fieldset, legend, div } from "taggedjs"
+import { Tag, tag, fieldset, legend, div, noElement, b, hr, button, span } from "taggedjs"
 import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests.js"
 import { renderCountDiv } from "./renderCount.component.js"
 
@@ -13,85 +13,112 @@ const test22 = tag((a:number, b:number, children: Tag) => {
   )
 })
 
-const noTagTest = () => {
-  const innerHTML = getInnerHTML()
-  
-  return html`
-    <fieldset>
-      <legend>noTagTest</legend>
-      ${11}---${innerHTML}+++${22}
-    </fieldset>
-  `.acceptInnerHTML(innerHTML)
+const noTagTest = (innerHTML: any) => {  
+  // noTagTest.updates(x => [innerHTML] = x)
+  return fieldset(
+    legend('noTagTest'),
+    '11---', _=> innerHTML, '+++22',
+  )
 }
 
-export const child = tag((_: string = 'childTests') => (
-  renderCount = 0,
-  counter = 0,
+export const child = tag((_: string = 'childTests') => {
+  let renderCount = 0
+  let counter = 0
 
-  _ = states(get => [{renderCount, counter}] = get({renderCount, counter})),
-  __ = ++renderCount,
-) => html`
-  <fieldset id="children-test" style="flex:2 2 20em">
-    <legend>childTests</legend>
+  ++renderCount
 
-    <hr />
-    <hr />
-    <hr />
-    ${test22(1,2,html`
-      <div><hr />abc-123-${Date.now()}<hr /></div>
-    `)}
-    <hr />
-    <hr />
-    <hr />
-    
-    ${innerHtmlTest({}, 2, html`
-      <b>Field set body A</b>
-      <hr />
-      <button id="innerHtmlTest-childTests-button"
-        onclick=${() => ++counter}
-      >🐮 (A) increase childTests inside ${counter}:${renderCount}</button>
-      <span id="innerHtmlTest-childTests-display">${counter}</span>
-      ${renderCountDiv({renderCount, name: 'childTests-innerHtmlTest'})}
-    `)}
-    
-    ${noTagTest().innerHTML = html`
-      <b>Field set body C</b>
-      <hr />
-      <button id="innerHtmlTest-childTests-button-c"
-        onclick=${() => ++counter}
-      >🐮 (C) increase childTests inside ${counter}:${renderCount}</button>
-      <span id="innerHtmlTest-childTests-display-c">${counter}</span>
-      ${renderCountDiv({renderCount, name: 'childTests-innerHtmlTest-c'})}
-    `}
+  return fieldset({id: "children-test", style: "flex:2 2 20em"},
+    legend('childTests'),
 
-    ${innerHtmlPropsTest(22, html`
-      <b>Field set body B</b>
-      <hr />
-      <button id="innerHtmlPropsTest-childTests-button"
-        onclick=${() => ++counter}
-      >🐮 (B) increase childTests inside ${counter}</button>
-      <span id="innerHtmlPropsTest-childTests-display">${counter}</span>
-      ${renderCountDiv({renderCount, name: 'innerHtmlPropsTest child'})}
-    `)}
+    hr,
+    hr,
+    hr,
+    test22(1, 2, div(
+      hr,
+      'abc-123-',
+      _=> Date.now(),
+      hr
+    )),
+    hr,
+    hr,
+    hr,
 
-    ${childAsPropTest({child: html`
-      hello child as prop test
-      <button id="child-as-prop-test-button"
-        onclick=${() => ++counter}
-      >🐮 child as prop ${counter}</button>
-      <span id="child-as-prop-test-display">${counter}</span>
-    `})}
-    
-    <hr />
-    
-    <button id="childTests-button"
-      onclick=${() => ++counter}
-    >🐮 increase childTests outside ${counter} - ${renderCount}</button>
-    <span id="childTests-display">${counter}</span>
+    innerHtmlTest({}, 2, noElement(
+      b('Field set body A'),
+      hr,
+      button({
+          id: "innerHtmlTest-childTests-button",
+          onClick: () => ++counter
+        },
+        '🐮 (A) increase childTests inside ',
+        _=> counter,
+        ':',
+        _=> renderCount
+      ),
+      span({id: "innerHtmlTest-childTests-display"}, _=> counter),
+      _=> renderCountDiv({renderCount, name: 'childTests-innerHtmlTest'})
+    )),
 
-    ${renderCountDiv({renderCount, name:'childTests'})}
-  </fieldset>
-`)
+    noTagTest(
+      noElement(
+        b('Field set body C'),
+
+        hr,
+
+        button({
+          id:"innerHtmlTest-childTests-button-c",
+          onClick:() => ++counter
+        }, _=> `🐮🐮 (C) increase childTests inside ${counter}:${renderCount}`),
+
+        span({id:"innerHtmlTest-childTests-display-c"}, _=> counter),
+
+        _=> renderCountDiv({renderCount, name: 'childTests-innerHtmlTest-c'})
+      )
+    ),
+
+    _=> innerHtmlPropsTest(22, noElement(
+      b('Field set body B'),
+      hr,
+      button({
+          id: "innerHtmlPropsTest-childTests-button",
+          onClick: () => ++counter
+        },
+        '🐮🐮🐮 (B) increase childTests inside ',
+        _=> counter
+      ),
+      span(
+        {id: "innerHtmlPropsTest-childTests-display"},
+        _=> counter
+      ),
+      _=> renderCountDiv({renderCount, name: 'innerHtmlPropsTest child'})
+    )),
+
+    _=> childAsPropTest({child: noElement(
+      'hello child as prop test',
+      button({
+        id: "child-as-prop-test-button",
+        onClick: () => ++counter
+      }, '🐮🐮🐮🐄 child as prop ', _=> counter),
+      span({id: "child-as-prop-test-display"}, _=> counter)
+    )}),
+
+    hr,
+
+    button(
+      {
+        id: "childTests-button",
+        onClick: () => ++counter
+      },
+      '🐮🐮🐄🐄 increase childTests outside ',
+      _=> counter,
+      ' - ',
+      _=> renderCount
+    ),
+    span({id: "childTests-display"}, _=> counter),
+
+    _=> renderCountDiv({renderCount, name:'childTests'})
+  )
+})
 
 const childAsPropTest = tag(({child}: {child: Tag}) => {
   childAsPropTest.updates(x => [{child}] = x)

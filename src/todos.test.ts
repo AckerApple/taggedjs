@@ -131,7 +131,7 @@ function runTodoSpeedometer() {
   const numberOfItemsToAdd = 500
   console.time('☀️-speedometer-all')
 
-  console.time('🆕 speedometer-adding')
+  console.time(`🆕 speedometer-adding ${numberOfItemsToAdd}`)
   const newTodo = document.querySelector(".new-todo") as any
   for (let i = 0; i < numberOfItemsToAdd; i++) {
       newTodo.value = 'aaa - ' + i;
@@ -139,7 +139,7 @@ function runTodoSpeedometer() {
       // Dispatch the event on the child element
       keydownOn(newTodo, 'Enter')
   }
-  console.timeEnd('🆕 speedometer-adding')
+  console.timeEnd(`🆕 speedometer-adding ${numberOfItemsToAdd}`)
 
   console.time('✏️ speedometer-editing')
   const checkboxes = document.querySelectorAll(".toggle") as any

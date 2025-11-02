@@ -1,4 +1,4 @@
-import { html, states, tag, isSubjectInstance, Tag, fieldset, div, legend, span, button } from "taggedjs"
+import { tag, isSubjectInstance, Tag, fieldset, div, legend, span, button } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
 
 export const innerHtmlTest = tag((
@@ -31,18 +31,25 @@ export const innerHtmlTest = tag((
 
 export const innerHtmlPropsTest = tag((
   x: number, children: Tag,
-) => (
-  counter = 0,
-  renderCount = 0,
-  _ = states(get => [{counter, renderCount}] = get({counter, renderCount})),
-  __ = ++renderCount,
-) => html`<!--innerHtmlTests.js-->
-  <fieldset id="innerHtmlTests-2">
-    <legend>innerHTML Props: ${x}</legend>
-    ${children}
-    <button id="innerHtmlPropsTest-button" onclick=${() => ++counter}
-    >increase innerHtmlPropsTest ${counter}</button>
-    <span id="innerHtmlPropsTest-display">${counter}</span>
-    ${/*renderCountDiv(renderCount)*/ false}
-  </fieldset>
-`)
+) => {
+  innerHtmlPropsTest.updates(xx => [x, children] = xx)
+  let counter = 0
+  let renderCount = 0
+
+  ++renderCount
+
+  return fieldset(
+    {id: "innerHtmlTests-2"},
+    legend('innerHTML Props: ', _=> x),
+    _=> children,
+    button(
+      {
+        id: "innerHtmlPropsTest-button",
+        onClick: () => ++counter
+      },
+      '🍉 increase innerHtmlPropsTest ',
+      _=> counter
+    ),
+    span({id: "innerHtmlPropsTest-display"}, _=> counter)
+  )
+})
