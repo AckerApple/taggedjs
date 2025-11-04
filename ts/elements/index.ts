@@ -50,6 +50,9 @@ export const table = designElement('table')
 export const tr = designElement('tr')
 export const td = designElement('td')
 export const th = designElement('th')
+export const thead = designElement('thead')
+export const tbody = designElement('tbody')
+export const tfoot = designElement('tfoot')
 
 // INLINE ELEMENTS
 
@@ -60,4 +63,5 @@ export const p = designElement('p')
 export const small = designElement('small')
 export const span = designElement('span')
 export const strong = designElement('strong')
+export const b = designElement('b')
 export const sup = designElement('sup')

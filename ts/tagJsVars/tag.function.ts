@@ -20,7 +20,7 @@ import { tagInject } from './tagInject.function.js'
 import { onInit as tagOnInit } from '../state/onInit.function.js'
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js'
 import { onRender as tagOnRender } from '../state/onRender.function.js'
-import { SupportContextItem } from '../index.js'
+import { getInnerHTML as tagGetInnerHTML, SupportContextItem } from '../index.js'
 
 let tagCount = 0
 
@@ -85,6 +85,9 @@ export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnTy
 
   /** Process input/argument updates */
   updates: (handler: (updates: Parameters<T>) => any) => true
+
+  /** Process input/argument updates */
+  getInnerHTML: () => true
 }
 
 /** How to handle checking for prop changes aka argument changes */
@@ -140,11 +143,13 @@ export function tag<T extends ToTag>(
   const returnWrap = parentWrap as unknown as TaggedFunction<T>
 
   // used for argument updates
-  returnWrap.updates = returnWrap.inputs = (handler: (updates: Parameters<T>) => any) => {
+  returnWrap.updates = (handler: (updates: Parameters<T>) => any) => {
     const context = getContextInCycle() as SupportContextItem
     context.updatesHandler = handler
     return true
   }
+
+  returnWrap.getInnerHTML = tagGetInnerHTML as any
 
   return returnWrap
 }
@@ -172,6 +177,7 @@ export declare namespace tag {
   let onInit: typeof tagOnInit;
   let onDestroy: typeof tagOnDestroy;
   let onRender: typeof tagOnRender;
+  let getInnerHTML: typeof tagGetInnerHTML;
 }
 
 type ReturnTag = AnyTag | StateToTag | null | undefined
@@ -202,6 +208,7 @@ function tagUseFn(): ReturnTag {
 ;(tag as any).onInit = tagOnInit
 ;(tag as any).onDestroy = tagOnDestroy
 ;(tag as any).onRender = tagOnRender
+;(tag as any).getInnerHTML = tagGetInnerHTML
 
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
