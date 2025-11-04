@@ -1,6 +1,5 @@
-import { states, html, tag, InputElementTargetEvent, Tag, div, select, option, h3, button, span } from "taggedjs"
+import { tag, InputElementTargetEvent, div, select, option, h3, button, span } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component.js"
-import { ElementVar } from "taggedjs/js/elements/designElement.function.js"
 
 type SelectedTag = null | string | undefined
 
@@ -142,7 +141,7 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
 export const ternaryPropTest = tag((
   {selectedTag}: {selectedTag: string | undefined | null}
 ) => {
-  ternaryPropTest.inputs(x =>[{selectedTag}] = x)
+  ternaryPropTest.updates(x =>[{selectedTag}] = x)
 
   return div({id:"ternaryPropTest-wrap"},
     () => `${selectedTag}:`, (context) => {
@@ -156,7 +155,7 @@ export const tag1 = tag(({title}: {title: string}) => {
   let counter = 0
   let renderCount = 0
 
-  tag1.inputs(x => [{title}] = x)
+  tag1.updates(x => [{title}] = x)
 
   ++renderCount
   return div({
@@ -179,31 +178,31 @@ export const tag2 = tag(({title}: {title: string}) => {
   let counter = 0
   let renderCount = 0
 
-  //tag2.inputs(x => [{title}] = x)
+  //tag2.updates(x => [{title}] = x)
 
   ++renderCount
   //return 22
 
   return div({
-    id: "tag2",
-    style: "border:1px solid orange;"
-  },
-      div({id:"tagSwitch-2-hello"},
-        () => `Hello 2 ${title} World`),
+      id: "tag2",
+      style: "border:1px solid orange;"
+    },
+    div({id:"tagSwitch-2-hello"},
+      () => `Hello 2 ${title} World`),
 
-      button({
-        onClick: () => ++counter
-      }, ()=> `increase ${counter}`),
+    button({
+      onClick: () => ++counter
+    }, ()=> `increase ${counter}`),
 
-      () => renderCountDiv({renderCount, name:'tag1'}),
-    )
+    () => renderCountDiv({renderCount, name:'tag1'}),
+  )
 })
 
 export const tag3 = tag(({title}: {title: string}) => {
   let counter = 0
   let renderCount = 0
 
-  tag3.inputs(x => [{title}] = x)
+  tag3.updates(x => [{title}] = x)
 
   ++renderCount
   return div({

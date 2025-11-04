@@ -79,6 +79,8 @@ export default tag<YourComponentTemplate>("component-name", (tag, { html, state,
 
 **CRITICAL MIGRATION**: The framework is moving AWAY from `html` tagged template literals to mock elements.
 
+**For detailed conversion instructions, see [HTML_TO_MOCK_ELEMENTS_CONVERSION.md](./HTML_TO_MOCK_ELEMENTS_CONVERSION.md)**
+
 #### Modern Approach (PREFERRED):
 ```typescript
 import { div, span, button, hr } from "taggedjs";
@@ -87,7 +89,7 @@ import { div, span, button, hr } from "taggedjs";
 export default tag(() => (
   // ... state setup ...
 ) => div(
-  button({id: "my-button", onclick: handler}, 'Click me'),
+  button({id: "my-button", onClick: handler}, 'Click me'),
   span({id: "counter"}, count),
   hr
 ))
@@ -139,7 +141,7 @@ html`
 
 // NEW
 div(
-  button({id: "fun-parent-button", onclick: myFunction}, '🤰 ++parent'),
+  button({id: "fun-parent-button", onClick: myFunction}, '🤰 ++parent'),
   span({id: "fun_in_prop_display"}, counter)
 )
 ```
@@ -202,13 +204,13 @@ button.onClick(handler)('Click me')
 **New attributes-first syntax (current)**:
 ```typescript
 div({id: 'my-id', class: 'my-class'}, 'content')
-button({onclick: handler}, 'Click me')
+button({onClick: handler}, 'Click me')
 ```
 
 **Key patterns**:
-- First argument: attributes object `{id: "...", onclick: handler}`
+- First argument: attributes object `{id: "...", onClick: handler}`
 - Remaining arguments: children (strings, numbers, elements, components)
-- Event handlers: lowercase `onclick`, `onkeyup` (NOT `onClick`, `onKeyup`)
+- **Event handlers: camelCase** `onClick`, `onKeyup`, `onMouseover` (NOT lowercase!)
 - Multiple children are passed as separate arguments
 - Arrow function prefix `_=>` for conditional/computed expressions
 - No attributes needed: just call the function with children `div('text')`
@@ -227,7 +229,7 @@ html`
 
 // NEW
 div(
-  button({onclick: increment}, 'Increment'),
+  button({onClick: increment}, 'Increment'),
   span(count),
   _=> count > 5 && strong('High!')
 )

@@ -1,7 +1,7 @@
 import { innerCounters } from "./innerCounters.js"
 import { mouseOverTag } from "./mouseover.tag.js"
 import { renderCountDiv } from "./renderCount.component.js"
-import { states, html, tag, Subject, callbackMaker, state, ValueSubject, callback, subject, subscribe, host, div, button, span, input, fieldset, legend, small } from "taggedjs"
+import { tag, Subject, callbackMaker, state, ValueSubject, callback, subject, subscribe, host, div, button, span, input, fieldset, legend, small } from "taggedjs"
 import { shallowPropCounters } from "./shallowPropCounters.js"
 
 const loadStartTime = Date.now()
@@ -51,41 +51,54 @@ _ = 'countersDebug'
   )
 })
 
-const immutablePropCounters = tag.immutableProps(({
+const immutablePropCounters = tag(({
   propCounter,
   increasePropCounter,
 }: {
   propCounter: number,
   increasePropCounter: () => void
 }) => {
+  immutablePropCounters.updates(x => [{ propCounter, increasePropCounter }] = x)
+
   let otherCounter = 0
   let renderCount = 0
-  states(get => [{otherCounter, renderCount}] = get({otherCounter, renderCount}))
 
   ++renderCount // for debugging
 
-  return html`
-    <div style="display:flex;flex-wrap:wrap;gap:1em;">
-      <div style="border:1px dashed black;padding:1em;">
-        <button id="❤️🪨-immutable-counter" onclick=${increasePropCounter}
-        >❤️🪨 propCounter:${propCounter}</button>
-        <span>
-          ❤️🪨 <span id="❤️🪨-immutable-display">${propCounter}</span>
-        </span>
-      </div>
+  return div(
+    div({style: "display:flex;flex-wrap:wrap;gap:1em;"},
+      div({style: "border:1px dashed black;padding:1em;"},
+        button({
+            id: "❤️🪨-immutable-counter",
+            onClick: increasePropCounter,
+          },
+          '❤️🪨 propCounter:',
+          _=> propCounter
+        ),
+        span(
+          '❤️🪨 ',
+          span({id: "❤️🪨-immutable-display"}, _=> propCounter)
+        )
+      ),
 
-      <div style="border:1px dashed black;padding:1em;">
-        <button id="🪨-immutable-counter" onclick=${() => ++otherCounter}
-        >🪨 otherCounter:${otherCounter}</button>
-        <span>
-        🪨 <span id="🪨-immutable-display">${otherCounter}</span>
-        </span>
-      </div>
-    </div>
-    
-    <div>renderCount:${renderCount}</div>
-    ${renderCountDiv({renderCount, name: 'immutable_counters'})}
-  `
+      div({style: "border:1px dashed black;padding:1em;"},
+        button({
+            id: "🪨-immutable-counter",
+            onClick: () => ++otherCounter,
+          },
+          '🪨 otherCounter:',
+          _=> otherCounter,
+        ),
+        span(
+          '🪨 ',
+          span({id: "🪨-immutable-display"}, _=> otherCounter)
+        )
+      )
+    ),
+
+    div('renderCount:', _=> renderCount),
+    _=> renderCountDiv({renderCount, name: 'immutable_counters'})
+  )
 })
 
 const noWatchPropCounters = tag(({
@@ -95,36 +108,48 @@ const noWatchPropCounters = tag(({
   propCounter: number,
   increasePropCounter: () => void
 }) => {
+  noWatchPropCounters.updates(x => [{propCounter, increasePropCounter}] = x)
+
   let otherCounter = 0
   let renderCount = 0
-  let noWatchPropCounters = 'noWatchPropCounters' // just a name to pickup
-
-  states(get => [{otherCounter, renderCount, noWatchPropCounters}] = get({otherCounter, renderCount, noWatchPropCounters}))
+  // let noWatchPropCounters = 'noWatchPropCounters' // just a name to pickup
 
   ++renderCount // for debugging
 
-  return html`
-    <div style="display:flex;flex-wrap:wrap;gap:1em;">
-      <div style="border:1px dashed black;padding:1em;">
-        <button id="❤️🚫-nowatch-counter" onclick=${increasePropCounter}
-        >❤️🚫 propCounter:${propCounter}</button>
-        <span>
-          ❤️🚫 <span id="❤️🚫-nowatch-display">${propCounter}</span>
-        </span>
-      </div>
+  return div(
+    div({style: "display:flex;flex-wrap:wrap;gap:1em;"},
+      div({style: "border:1px dashed black;padding:1em;"},
+        button({
+            id: "❤️🚫-nowatch-counter",
+            onClick: increasePropCounter,
+          },
+          '❤️🚫 propCounter:',
+          _=> propCounter,
+        ),
+        span(
+          '❤️🚫 ',
+          span({id: "❤️🚫-nowatch-display"}, _=> propCounter)
+        )
+      ),
 
-      <div style="border:1px dashed black;padding:1em;">
-        <button id="🚫-nowatch-counter" onclick=${() => ++otherCounter}
-        >🚫 otherCounter:${otherCounter}</button>
-        <span>
-        🚫 <span id="🚫-nowatch-display">${otherCounter}</span>
-        </span>
-      </div>
-    </div>
-    
-    <div>renderCount:${renderCount}</div>
-    ${renderCountDiv({renderCount, name: 'nowatch_counters'})}
-  `
+      div({style: "border:1px dashed black;padding:1em;"},
+        button({
+            id: "🚫-nowatch-counter",
+            onClick: () => ++otherCounter,
+          },
+          '🚫 otherCounter:',
+          _=> otherCounter
+        ),
+        span(
+          '🚫 ',
+          span({id: "🚫-nowatch-display"}, _=> otherCounter)
+        )
+      )
+    ),
+
+    div('renderCount:', _=> renderCount),
+    _=> renderCountDiv({renderCount, name: 'nowatch_counters'})
+  )
 })
 
 export const innerCounterContent = tag(() => {

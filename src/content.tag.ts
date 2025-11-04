@@ -1,21 +1,22 @@
-import { LikeObjectChildren, html, tag, ValueSubject, state, states, subscribe, Subject, getInnerHTML, div, input, select, option, noElement, button, hr, fieldset, legend, span } from "taggedjs"
+import { LikeObjectChildren, html, tag, ValueSubject, state, states, subscribe, Subject, getInnerHTML, div, input, select, option, noElement, button, hr, fieldset, legend, span, b } from "taggedjs"
 import { dumpContent } from "./dumpContent.tag"
 import { renderCountDiv } from "./renderCount.component"
 import { fx } from "taggedjs-animate-css"
 
 export const testStaggerBy = 20
 
-const outerHtml = (
+const outerHtml = tag((
   staggerBy = 10,
 ) => {
-  const innerHTML = getInnerHTML()
+  const xx = tag.getInnerHTML()
   
-  return html`
-    <div id="outer-html-fx-test" ${fx({stagger: staggerBy, duration: '.1s'})}
-      style.border="1px solid orange"
-    >${innerHTML}</div>
-  `.acceptInnerHTML(innerHTML)
-}
+  return div({
+    id:"outer-html-fx-test",
+    attr: fx({stagger: staggerBy, duration: '.1s'}),
+    'style.border': "1px solid orange",
+    
+  }, xx)
+})
 
 export const concatStyles = tag((innerHTML: any) => {
   concatStyles.updates(x => [innerHTML] = x)
@@ -160,9 +161,7 @@ export const content = tag(() => {
 
       hr,
 
-      concatStyles(html`
-        test the tester2
-      `)
+      concatStyles('test the tester2')
     ),
 
     fieldset(
@@ -187,7 +186,7 @@ export const content = tag(() => {
         legend('injection test'),
         div({id:"injection-test"}, 'injection test ', injectionTest),
         div({id:"hello-big-dom-world"}, 'hello ', html.dom(dom), ' world'),
-        div({id:"hello-big-string-world"}, 'hello ', html`<b>big</b>`, ' world'),
+        div({id:"hello-big-string-world"}, 'hello ', b('big'), ' world'),
       ),
 
       fieldset(
@@ -314,6 +313,6 @@ const numberedNoParents = tag(() => {
 })
 
 
-const innerHtmlTag = tag(() => {
-  return html`inner html tag`
-})
+const innerHtmlTag = () => {
+  return noElement('inner html tag')
+}

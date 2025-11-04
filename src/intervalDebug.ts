@@ -1,4 +1,4 @@
-import { html, tag, onInit, callbackMaker, onDestroy, states } from "taggedjs"
+import { div, button, input, tag, onInit, callbackMaker, onDestroy, states } from "taggedjs"
 
 const test0interval = 3000
 const test1interval = 6000
@@ -9,12 +9,6 @@ export const intervalTester0 = tag(() => {
   let intervalId2: any = undefined
   let renderCounter: number = 0
   let currentTime: number = 0
-
-  states(get => [{
-    intervalCount,intervalId,intervalId2,renderCounter,currentTime,
-  }] = get({
-    intervalCount,intervalId,intervalId2,renderCounter,currentTime,
-  }))
   
   const callback = callbackMaker()
   const increase = () => ++intervalCount
@@ -63,24 +57,50 @@ export const intervalTester0 = tag(() => {
     currentTime = currentTime + 200
   }), 1000);
 
-  onInit(startInterval)
+  startInterval()
   onDestroy(stopInterval)
 
   ++renderCounter
 
-  return html`<!--intervalDebug.js-->
-    <div>interval type 1 at ${test0interval}ms</div>
-    intervalId: ${intervalId}
-    <button type="button" onclick=${increase}>${intervalCount}:${renderCounter}</button>
-    <input type="range" min="0" max=${test0interval} step="1" value=${currentTime} />
-    <div>
-      --${currentTime}--
-    </div>
-    <button type="button" onclick=${toggle}
-      style.background-color=${intervalId || intervalId2 ? 'red' : 'green'}
-    >start/stop</button>
-    <button type="button" onclick=${delayIncrease}>delay increase currentTime</button>
-  `
+  return div(
+    div(
+      'interval type 1 at ',
+      _=> test0interval, 'ms'
+    ),
+    'intervalId: ',
+    _=> intervalId,
+    button({
+        type: "button",
+        onClick: increase
+      },
+      _=> intervalCount,
+      ':',
+      _=> renderCounter
+    ),
+    input({
+      type: "range",
+      min: "0",
+      max: _=> test0interval,
+      step: "1",
+      value: _=> currentTime,
+    }),
+    div(
+      '--',
+      _=> currentTime,
+      '--'
+    ),
+    button({
+      type: "button",
+      onClick: toggle,
+      'style.background-color': intervalId || intervalId2 ? 'red' : 'green'
+    }, 'start/stop'),
+    button({
+        type: "button",
+        onClick: delayIncrease
+      },
+      'delay increase currentTime'
+    )
+  )
 })
 
 export const intervalTester1 = tag(() => {  
@@ -90,12 +110,6 @@ export const intervalTester1 = tag(() => {
   let renderCounter: number = 0
   let currentTime: number = 0
 
-  states(get => [{
-    intervalCount,intervalId,intervalId2,renderCounter,currentTime
-  }] = get({
-    intervalCount,intervalId,intervalId2,renderCounter,currentTime
-  }))
-  
   const callback = callbackMaker()
   const increase = () => ++intervalCount
 
@@ -132,21 +146,43 @@ export const intervalTester1 = tag(() => {
     }),test1interval)
   }
 
-  onInit(toggleInterval)
+  toggleInterval()
   onDestroy(destroy)
 
   ++renderCounter
 
-  return html`
-    <div>interval type 2 with ${test1interval}ms</div>
-    intervalId: ${intervalId}
-    <button type="button" onclick=${increase}>${intervalCount}:${renderCounter}</button>
-    <input type="range" min="0" max=${test1interval} step="1" value=${currentTime} />
-    <div>
-      --${currentTime}--
-    </div>
-    <button type="button" onclick=${toggleInterval}
-      style.background-color=${intervalId ? 'red' : 'green'}
-    >start/stop</button>
-  `
+  return div(
+    div('interval type 2 with ', _=> test1interval, 'ms'),
+    'intervalId: ',
+    _=> intervalId,
+    button({
+        type: "button",
+        onClick: increase
+      },
+      _=> intervalCount,
+      ':',
+      _=> renderCounter
+    ),
+    input({
+      type: "range",
+      min: "0",
+      max: _=> test1interval,
+      step: "1",
+      value: _=> currentTime
+    }),
+    
+    div(
+      '--',
+      _=> currentTime,
+      '--'
+    ),
+    
+    button({
+        type: "button",
+        onClick: toggleInterval,
+        'style.background-color': _=> intervalId ? 'red' : 'green'
+      },
+      'start/stop'
+    )
+  )
 })

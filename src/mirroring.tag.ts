@@ -1,27 +1,34 @@
-import { html, tag, states } from "taggedjs"
+import { html, tag, states, fieldset, noElement, legend, span, button } from "taggedjs"
 
 export const mirroring = tag(() => {
   const tag = tagCounter()
 
-  return html`
-    <fieldset>
-      <legend>counter0</legend>
-      ${tag}
-    </fieldset>
-    <fieldset>
-      <legend>counter1</legend>
-      ${tag}
-    </fieldset>
-  `
+  return noElement(
+    fieldset(
+      legend('counter0'),
+      _=> tag
+    ),
+    fieldset(
+      legend('counter1'),
+      _=> tag
+    )
+  )
 })
 
 
 const tagCounter = () => {
   let counter = 0
-  states(get => [counter] = get(counter))
 
-  return html`
-    counter:<span>🪞<span id="mirror-counter-display">${counter}</span></span>
-    <button id="mirror-counter-button" onclick=${() => ++counter}>${counter}</button>
-  `
+  return noElement(
+    'counter:',
+    span('🪞',
+      span({id:"mirror-counter-display"}, _=> counter)
+    ),
+    button({
+        id:"mirror-counter-button",
+        onClick: () => ++counter,
+      },
+      _=> counter
+    )
+  )
 }

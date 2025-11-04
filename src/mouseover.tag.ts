@@ -1,4 +1,4 @@
-import {html, states, tag} from 'taggedjs'
+import {div, button, a, tag} from 'taggedjs'
 
 export const mouseOverTag = tag(({
   label, memory,
@@ -8,21 +8,26 @@ export const mouseOverTag = tag(({
     counter: number
   }
 }) => {
+  mouseOverTag.updates(x => [{label, memory}] = x)
+  
   let mouseOverEditShow = false
   let edit = false
 
-  states(get => [{mouseOverEditShow,edit}] = get({mouseOverEditShow,edit}))
-
-  return html`<!-- mouseOverTag -->
-    <div style="background-color:purple;padding:.2em;flex:1"
-      onmouseover=${() => mouseOverEditShow = true}
-      onmouseout=${() => mouseOverEditShow = false}
-    >
-      mouseover - ${label}:${memory.counter}:${mouseOverEditShow || 'false'}
-      <button onclick=${() => ++memory.counter}>++counter</button>
-      <a style.visibility=${(edit || mouseOverEditShow) ? 'visible' : 'hidden'}
-        onclick=${() => edit = !edit}
-      >⚙️&nbsp;</a>
-    </div>
-  `
+  return div({
+      style: "background-color:purple;padding:.2em;flex:1",
+      onMouseover: () => mouseOverEditShow = true,
+      onMouseout: () => mouseOverEditShow = false
+    },
+    'mouseover - ',
+    _=> label,
+    ':',
+    _=> memory.counter,
+    ':',
+    _=> mouseOverEditShow || 'false',
+    button({onClick: () => ++memory.counter}, '++counter'),
+    a({
+      'style.visibility': (edit || mouseOverEditShow) ? 'visible' : 'hidden',
+      onClick: () => edit = !edit
+    }, '⚙️\u00A0')
+  )
 })

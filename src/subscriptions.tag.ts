@@ -1,88 +1,103 @@
-import { subscribeWith, html, tag, ValueSubject, state, combineLatest, willPromise, subscribe, Subject, host, states, fieldset, legend, span, button, div, noElement, strong } from "taggedjs"
+import { subscribeWith, tag, ValueSubject, state, combineLatest, willPromise, subscribe, Subject, host, states, fieldset, legend, span, button, div, noElement, strong, select, option, b } from "taggedjs"
 import { Subject as RxSubject, startWith } from "rxjs"
 
 export const subscriptions = tag(() => {
-  const sub0 = state(() => new Subject<number>())
-  const sub1 = state(() => new ValueSubject<number>(3))
-  const subArray = state(() => new ValueSubject<string[]>(['a','b','c']))
-  const vs0 = state(() => new ValueSubject(0))
-  const vs1 = state(() => new ValueSubject(1))
+  const sub0 = new Subject<number>()
+  const sub1 = new ValueSubject<number>(3)
+  const subArray = new ValueSubject<string[]>(['a','b','c'])
+  const vs0 = new ValueSubject(0)
+  const vs1 = new ValueSubject(1)
 
-  return html`
-    <fieldset>
-      <legend>Subscribe()</legend>
-      
-      <div style="display:flex;flex-wrap:wrap;gap:1em;font-size:0.8em">
-        <div style="display:flex;flex-wrap:wrap;gap:1em">
-          <fieldset style="flex-grow:1">
-            <legend>subscribe</legend>
-            0 === <span id="content-subscribe-sub0">${subscribe(sub0)}</span>
-          </fieldset>
-  
-          <fieldset style="flex-grow:1">
-            <legend>subscribe map</legend>
-            0 === <span id="content-subscribe-sub-map">${subscribe(subArray, array => {
-              return array.map(x => html`👉<strong>${x}</strong>👈`.key(x))
-            })}</span>
-          </fieldset>
-  
-          <fieldset style="flex-grow:1">
-            <legend>subscribe select</legend>
-            <select>
-              <option value="">select option</option>
-              ${subscribe(subArray, array => {
-                return array.map(x => html`<option value=${x}>${x}</option>`.key(x))
-              })}
-            </select>
-        
-          </fieldset>
-  
-          <fieldset style="flex-grow:1">
-            <legend>subscribe with default</legend>
-            0 === <span id="content-subscribe-sub0-with">${subscribeWith(sub0, -1)}</span>
-          </fieldset>
+  return div(
+    fieldset(
+      legend('Subscribe()'),
 
-          <fieldset style="flex-grow:1">
-            <legend>value subject</legend>
-            0 === ${subscribe(vs0)}
-          </fieldset>
-          
-          <fieldset style="flex-grow:1">
-            <legend>piped subject</legend>        
-            <span id="content-subject-pipe-display0">55</span>&nbsp;===&nbsp;
-            <span id="content-subject-pipe-display1">
-              ${subscribe(vs0, () => 55)}
-            </span>
-          </fieldset>
-          
-          ${testHost()}
-  
-          <fieldset style="flex-grow:1">
-            <legend>combineLatest</legend>
-            <span id="content-combineLatest-pipe-display0">1</span>&nbsp;===&nbsp;
-            <span id="content-combineLatest-pipe-display1">${subscribe(combineLatest([vs0, vs1]).pipe(x => x[1]))}</span>
-          </fieldset>
-  
-          <fieldset style="flex-grow:1">
-            <legend>combineLatest piped html</legend>
-            <span id="content-combineLatest-pipeHtml-display0"><b>bold 77</b></span>&nbsp;===&nbsp;
-            <span id="content-combineLatest-pipeHtml-display1">${
+      div({style: "display:flex;flex-wrap:wrap;gap:1em;font-size:0.8em"},
+        div({style: "display:flex;flex-wrap:wrap;gap:1em"},
+          fieldset({style: "flex-grow:1"},
+            legend('subscribe'),
+            '0 === ',
+            span({id: "content-subscribe-sub0"}, subscribe(sub0))
+          ),
+
+          fieldset({style: "flex-grow:1"},
+            legend('subscribe map'),
+            '0 === ',
+            span(
+              {id: "content-subscribe-sub-map"},
+              subscribe(subArray, array =>
+                array.map(x => noElement('👉', strong(x), '👈').key(x))
+              )
+            )
+          ),
+
+          fieldset({style: "flex-grow:1"},
+            legend('subscribe select'),
+            select(
+              option({value: ""}, 'select option'),
+              subscribe(subArray, array => {
+                return array.map(x => option({value: x}, x).key(x))
+              })
+            )
+          ),
+
+          fieldset({style: "flex-grow:1"},
+            legend('subscribe with default'),
+            '0 === ',
+            span({id: "content-subscribe-sub0-with"}, subscribeWith(sub0, -1))
+          ),
+
+          fieldset({style: "flex-grow:1"},
+            legend('value subject'),
+            '0 === ',
+            subscribe(vs0)
+          ),
+
+          fieldset({style: "flex-grow:1"},
+            legend('piped subject'),
+            span({id: "content-subject-pipe-display0"}, '55'),
+            '\u00A0===\u00A0',
+            span({id: "content-subject-pipe-display1"},
+              subscribe(vs0, () => 55)
+            )
+          ),
+
+          testHost(),
+
+          fieldset({style: "flex-grow:1"},
+            legend('combineLatest'),
+            span({id: "content-combineLatest-pipe-display0"}, '1'),
+            '\u00A0===\u00A0',
+            span(
+              {id: "content-combineLatest-pipe-display1"},
+              subscribe(combineLatest([vs0, vs1]).pipe(x => x[1]))
+            )
+          ),
+
+          fieldset({style: "flex-grow:1"},
+            legend('combineLatest piped html'),
+            span(
+              {id: "content-combineLatest-pipeHtml-display0"},
+              b('bold 77')
+            ),
+            '\u00A0===\u00A0',
+            span({id: "content-combineLatest-pipeHtml-display1"},
               subscribe(
                 combineLatest([vs0, vs1]).pipe(
-                  willPromise(x => Promise.resolve(html`<b>bold 77</b>`))
+                  willPromise(x => Promise.resolve(b('bold 77')))
                 )
               )
-            }</span>
-          </fieldset>
-        </div>
-      </div>
-    </fieldset>
-    
-    <fieldset id="noParentTagFieldset">
-      <legend>Pass subscription</legend>
-      ${passSubscription({sub0, sub1})}
-    </fieldset>
-  `
+            )
+          )
+        )
+      )
+    ),
+
+    fieldset({id: "noParentTagFieldset"},
+      legend('Pass subscription'),
+      passSubscription({sub0, sub1})
+    )
+  )
 })
 
 const passSubscription = tag(({
@@ -91,10 +106,10 @@ const passSubscription = tag(({
   sub0: Subject<number>
   sub1: Subject<number>
 }) => {
+  passSubscription.updates(x => [{sub0, sub1}] = x)
+
   let onOff = false
   const ob = new RxSubject() as any
-
-  states(get => [onOff] = get(onOff))
 
   return noElement(
     span(
@@ -182,11 +197,12 @@ const passSubscription = tag(({
 })
 
 const numberFun = (x: number) => {
-  return html`your fun number ${x}`
+  return `your fun number ${x}`
 }
 
 const numberTag = tag((x: number) => {
-  return html`your tag number ${x}`
+  numberTag.updates(y => [x] = y)
+  return noElement(_=>`your tag number ${x}`)
 })
 
 const testHost = tag(() => {
