@@ -19,10 +19,12 @@ export function isSpecialAttr(
 }
 
 export function isSpecialAction(attrName: string) {
-  switch (attrName.toLowerCase()) {
+  switch (attrName) {
     case 'autoselect':
+    case 'autoSelect':
       return 'autoselect'
     case 'autofocus':
+    case 'autoFocus':
       return 'autofocus'
   }
   return false
