@@ -1,4 +1,4 @@
-import { Subject, callbackMaker, html, onInit, tag, state, states } from "taggedjs"
+import { Subject, callbackMaker, h1, div, button, span, fieldset, legend, onInit, tag, state, states } from "taggedjs"
 import { child } from "../childTests.tag.js"
 import { arrays } from "../arrays.tag.js"
 import { tagSwitchDebug } from "../tagSwitchDebug.component.js"
@@ -14,7 +14,7 @@ import { renderCountDiv } from "../renderCount.component.js"
 
 type viewTypes = 'oneRender' | 'watchTesting' | 'mirroring' | 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
 
-export default tag.route = tag(() => () => {
+export default tag.route = tag(() => {
   const views: viewTypes[] = [
     'content',
     'oneRender',
@@ -23,37 +23,36 @@ export default tag.route = tag(() => () => {
   let renderCount = 0
   let appCounter = 0
 
-  states(get => [{renderCount, appCounter}] = get({renderCount, appCounter}))
-
   const appCounterSubject = state(() => new Subject(appCounter))
   const callback = callbackMaker()
-  onInit(() => {
-    console.info('1️⃣ app init should only run once')    
 
-    appCounterSubject.subscribe(
-      callback(x => {
-        appCounter = x
-      })
-    )
-  })
+  console.info('1️⃣ app init should only run once')    
+
+  appCounterSubject.subscribe(
+    callback(x => {
+      appCounter = x
+    })
+  )
 
   ++renderCount
 
-  return html`<!--isolatedApp.page.js-->
-    <h1 id="app">🏷️ TaggedJs - isolated</h1>
+  return div(
+    h1({id: "app"}, '🏷️ TaggedJs - isolated'),
 
-    <div>
-      <button id="app-counter-subject-button"
-        onclick=${() => appCounterSubject.next(appCounter + 1)}
-      >🍒 ++app subject</button>
-      <span>
-        🍒 <span id="app-counter-subject-display">${appCounter}</span>
-      </span>
-    </div>
+    div(
+      button({
+        id: "app-counter-subject-button",
+        onClick: () => appCounterSubject.next(appCounter + 1)
+      }, '🍒 ++app subject'),
+      span(
+        '🍒 ',
+        span({id: "app-counter-subject-display"}, _=> appCounter)
+      )
+    ),
 
-    <div id="tagDebug-fx-wrap">
-      <div style="display:flex;flex-wrap:wrap;gap:1em">
-        ${[
+    div({id: "tagDebug-fx-wrap"},
+      div({style: "display:flex;flex-wrap:wrap;gap:1em"},
+        _=> [
           {view:'oneRender', label:'oneRender', tag: oneRender},
           {view:'props', label:'propsDebugMain', tag: propsDebugMain},
           {view:'watchTesting', label:'watchTesting', tag: watchTesting},
@@ -64,29 +63,19 @@ export default tag.route = tag(() => () => {
           {view:'arrays', label:'arrays', tag: arrays},
           {view:'content', label:'content', tag: content},
           {view:'child', label:'child', tag: child},
-        ].map(({view, label, tag}) => 
-          views.includes(view as viewTypes) && html`
-            <fieldset style="flex:2 2 20em">
-              <legend>${label}</legend>
-              ${tag()}
-            </fieldset>
-          `.key(view)
-        )}
+        ].map(({view, label, tag}) =>
+          views.includes(view as viewTypes) && fieldset({style: "flex:2 2 20em"},
+            legend(_=> label),
+            _=> tag()
+          ).key(view)
+        ),
 
-        ${views.includes('counters') && html`
-          <fieldset style="flex:2 2 20em">
-            <legend>counters</legend>
-            ${counters({appCounterSubject})}
-          </fieldset>
-        `}
-
-        ${/*
-          <textarea style="font-size:0.6em;min-width:50vw;height:400px">${ template.string }</textarea>
-          <textarea style="font-size:0.6em;min-width:50vw;height:400px">${ JSON.stringify(template, null, 2) }</textarea>
-          */ false
-        }
-      </div>
-      ${renderCountDiv({renderCount, name:'isolatedApp'})}
-    </div>
-  `
+        _=> views.includes('counters') && fieldset({style: "flex:2 2 20em"},
+          legend('counters'),
+          _=> counters({appCounterSubject})
+        ),
+      ),
+      renderCountDiv({renderCount, name:'isolatedApp'})
+    )
+  )
 })

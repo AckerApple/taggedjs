@@ -170,8 +170,9 @@ body {
 
 .todo-list li.editing .edit {
   display: block;
-  margin: 0 0 0 43px;
-  padding: 12px 16px;
+  /*margin: 0 0 0 43px;*/
+  padding: 16px 16px 16px 60px;
+  /*padding: 12px 16px;*/
   width: calc(100% - 43px)
 }
 

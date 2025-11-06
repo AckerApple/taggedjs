@@ -49,9 +49,9 @@ export default tag(() => (
     'array length: ',
     array.length,
 
-    button({onClick: addArrayItem}, 'reset add'),
+    button({onClick: () => addArrayItem()}, 'reset add'),
 
-    hr(),
+    hr,
 
     _=> showChild && funInPropsChild({
       myFunction, array, addArrayItem, deleteItem,

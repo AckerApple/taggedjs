@@ -113,9 +113,12 @@ export const watchTesting = tag(() => {
         div(
           small(
             'watchTruthAsSub$:',
-            span({id: "🦷-watchTruthAsSub"}, subscribe(watchTruthAsSub, x => {
-              return x
-            }))
+            span(
+              {id: "🦷-watchTruthAsSub"},
+              subscribe(watchTruthAsSub, x => {
+                return x
+              })
+            )
           )
         ),
         div(

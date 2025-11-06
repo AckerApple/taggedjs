@@ -29,4 +29,6 @@ export const injectionTarget = host((
       wrapHost.selected.push(value)
     }
   })
+
+  // return 'true'
 })

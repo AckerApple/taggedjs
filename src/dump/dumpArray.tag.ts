@@ -1,5 +1,5 @@
 import { arraysDisplay } from "./arraysDisplay.component"
-import { button, dialog, div, html, letProp, noElement, state, states, tag, watch } from "taggedjs"
+import { button, dialog, div, noElement, state, tag, a, strong, sup, span } from "taggedjs"
 import { FormatChange } from "./index.js"
 import { EverySimpleValue } from "./dump.props"
 
@@ -70,28 +70,43 @@ export const dumpArray = tag(({// dumpArray
   const minimize = () => (document.getElementById(maximizeId) as any).close()
   const dumpBody = (showAll || showLower || showKids || (showLower==undefined && showLevels > 0))
 
-  const getHeader = (allowMaximize?: boolean) => html`
-    <div class="taggedjs-array-label">
-      <a style="flex-grow:1" onclick=${() => {
-        if(showLower === undefined) {
-          return showAll = showKids = showLower = !dumpBody
-        }
+  const getHeader = (allowMaximize?: boolean) =>
+    div({class: "taggedjs-array-label"},
+      a({
+          style: "flex-grow:1",
+          onClick: () => {
+            if(showLower === undefined) {
+              return showAll = showKids = showLower = !dumpBody
+            }
 
-        showAll = showKids = showLower = !showLower
-      }}>
-        <strong>${key}</strong>
-      </a>
-      <sup style="opacity:80%;font-size:75%;padding-left:0.4em">
-        <a style="text-decoration:underline;" style.font-weight=${arrayView === 'table' ? 'bold' : ''}
-          onclick=${() => arrayView = arrayView === 'table' ? undefined : 'table'
-        }>${arrayView === 'table' ? 'flex' : 'table'}</a>
-      </sup>
-      <sup style="opacity:80%;font-size:75%;padding-left:0.4em">[${value.length}]</sup>
-      ${allowMaximize && html`
-        &nbsp;<a onclick=${toggleMaximize}><span style="width:10px;height:10px;border:1px solid white;border-top-width:3px;display:inline-block;"></span></a>
-      `}
-    </div>
-  `
+            showAll = showKids = showLower = !showLower
+          }
+        },
+        strong(key)
+      ),
+      
+      sup({style: "opacity:80%;font-size:75%;padding-left:0.4em"},
+        a({
+            style: "text-decoration:underline;",
+            'style.font-weight': _=> arrayView === 'table' ? 'bold' : '',
+            onClick: () => arrayView = arrayView === 'table' ? undefined : 'table',
+          },
+          _=> arrayView === 'table' ? 'flex' : 'table'
+        )
+      ),
+      
+      sup(
+        {style: "opacity:80%;font-size:75%;padding-left:0.4em"},
+        '[', _=> value.length, ']'
+      ),
+
+      _=> allowMaximize && noElement(
+        ' ',
+        a({onClick: toggleMaximize},
+          span({style: "width:10px;height:10px;border:1px solid white;border-top-width:3px;display:inline-block;"})
+        )
+      )
+  )
 
   const displayOptions = {
     showLevels, showAll, showKids,

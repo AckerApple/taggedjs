@@ -27,7 +27,7 @@ export const dumpSimple = tag(({
     {style: "font-size:75%;flex:1 1 10em;color:#111111"},
     _=> key && div({
       class: "taggedjs-simple-label",
-      style: _=> {cursor: onHeaderClick ? "pointer" : ""},
+      style: _=> ({cursor: onHeaderClick ? "pointer" : ""}),
       onClick: onHeaderClick
     }, key),
     _=> displayValue

@@ -38,7 +38,7 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
       id: "tag-switch-dropdown",
       onChange: changeSelectedTag
     },
-        option(),
+        option,
 
         /* TODO: implement selected attribute */
         option({

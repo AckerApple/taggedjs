@@ -27,9 +27,13 @@ export const destroys = tag(() => (
 const toDestroy = tag(() => (
   _ = onDestroy(() => ++destroyCount.value),
 ) =>
-  div.attr(host.onDestroy(() => {
-    ++destroyCount.value
-  }))({
-    id:"destroyable-content", style:"border:1px solid orange;"
-  },'will be destroyed')
+  div({
+      attr: host.onDestroy(() => {
+        ++destroyCount.value
+      }),
+      id:"destroyable-content",
+      style:"border:1px solid orange;"
+    },
+    'will be destroyed'
+  )
 )

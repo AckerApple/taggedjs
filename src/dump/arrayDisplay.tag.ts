@@ -21,13 +21,22 @@ export const arrayDisplay = tag(({
   allowMaximize?: boolean,
   everySimpleValue?: EverySimpleValue,
 }) => {
-  return html`
-    ${array.map((
+  arrayDisplay.updates(x => [{
+    array, showLevels,
+    showAll, showKids,
+    columnNames,
+    formatChange,
+    toggleColumnDialog,
+    allowMaximize,
+    everySimpleValue,
+  }] = x)
+
+  return array.map((
       item: any,
       index: number
     ) => {
       const value = paramValueKeys(item, columnNames)
-      return html`${dump({
+      return dump({
         value,
         showLevels,
         showAll,
@@ -37,10 +46,10 @@ export const arrayDisplay = tag(({
         onHeaderClick: toggleColumnDialog,
         allowMaximize,
         everySimpleValue,
-      })}`.key(index)
-    })}
-  `
-})
+      }).key(index)
+    })
+  }
+)
 
 function paramValueKeys(
   inputObject: Record<string, any> | string,

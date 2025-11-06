@@ -18,10 +18,12 @@ export const innerCounters = tag(({
   });
 
   return div(
-    div.attr(host.onInit(() => {
-      return ++elmInitCount;
-    }))(
-      { style: "display:flex;flex-wrap:wrap;gap:1em;" },
+    div({
+        attr: host.onInit(() => {
+          return ++elmInitCount;
+        }),
+        style: "display:flex;flex-wrap:wrap;gap:1em;"
+      },
       div({ style: "border:1px dashed black;padding:1em;" },
         '🔥 elmInitCount:',
         span({ id: "🔥-init-counter" }, _ => {

@@ -18,7 +18,7 @@ export const Footer = (
       li(
         a({
           id: "todo-view-all-link",
-          class: route === "/" ? "selected" : "",
+          class: _=> route === "/" ? "selected" : "",
           href: "#/"
         }, 'All')
       ),
@@ -26,7 +26,7 @@ export const Footer = (
       li(
         a({
           id: "todo-view-active-link",
-          class: route === "/active" ? "selected" : "",
+          class: _=> route === "/active" ? "selected" : "",
           href: "#/active"
         }, 'Active')
       ),
@@ -34,7 +34,7 @@ export const Footer = (
     li(
       a({
         id: "todo-view-completed-link",
-        class: route === "/completed" ? "selected" : "",
+        class: _=> route === "/completed" ? "selected" : "",
         href: "#/completed",
       }, 'Completed')
     )

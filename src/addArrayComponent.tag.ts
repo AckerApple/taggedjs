@@ -6,7 +6,7 @@ export const addArrayComponent = tag((
 ) => (
   renderCount = 0,
   __ = ++renderCount,
-  handleKeyUp = (e: InputElementTargetEvent & KeyboardEvent) => {
+  handleKeyUp = (e: InputElementTargetEvent) => {
     if (e.key === "Enter") {
         const value = e.target.value.trim();
         addArrayItem(value)

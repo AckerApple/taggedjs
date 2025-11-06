@@ -1,49 +1,59 @@
 import { Dispatch, Todo } from '../reducer'
-import { html, states, tag } from 'taggedjs'
+import { li, div, input, label, button, tag } from 'taggedjs'
 
 // Performance boost to not render if props non-mutating props did not change
-export const Item = tag.immutableProps((
+export const Item = tag((
   todo: Todo,
   dispatch: Dispatch,
   index: number,
-) => (
-  editing = false,
-  _ = states(get => [{ editing }] = get({editing})),
 ) => {
-  return html`
-    <li class.completed=${todo.completed} class.editing=${editing}>
-      ${!editing ? html`
-        <div class="view">
-          <input class="toggle" type="checkbox"
-            ${todo.completed && 'checked'}
-            onchange=${() => dispatch.toggleItem(todo, index)}
-          />
-          
-          <label data-testid="todo-item-label" ondoubleclick=${() => editing = !editing}
-          >${todo.title}</label>
-          
-          <!-- delete -->
-          <button class="destroy"
-            onclick=${() => dispatch.removeItemByIndex(index)}
-          >🗑️</button>
-        </div>
-      ` : html`
-        <div class="input-container">
-          <input id="edit-todo-input" type="text" autofocus class="edit"
-            value=${todo.title}
-            onblur=${() => editing = false}
-            onKeyDown=${e => handleKey(e, title => {
-              handleUpdate(title, todo, index, dispatch)
-              editing = false
-            })}
-          />
-          <label class="visually-hidden" htmlFor="todo-input">
-            Edit Todo Input
-          </label>
-        </div>
-      `}
-    </li>
-  `
+  Item.updates(x => [todo,dispatch,index] = x)
+
+  let editing = false
+  return li({
+      'class.completed': _=> todo.completed,
+      'class.editing': _=> editing
+    },
+    _=> !editing ?
+      div({class: "view"},
+        input({
+          class: "toggle",
+          type: "checkbox",
+          checked: _=> todo.completed,
+          onChange: () => dispatch.toggleItem(todo, index)
+        }),
+
+        label({
+          'data-testid': "todo-item-label",
+          onDblClick: () => {
+            editing = !editing
+          }
+        }, _=> todo.title),
+
+        button({
+          class: "destroy",
+          onClick: () => dispatch.removeItemByIndex(index)
+        })
+      )
+      :
+      div({class: "input-container"},
+        input({
+          id: "edit-todo-input",
+          type: "text",
+          autoFocus: true,
+          class: "edit",
+          value: _=> todo.title,
+          onBlur: () => editing = false,
+          onKeyDown: e => handleKey(e, title => {
+            handleUpdate(title, todo, index, dispatch)
+            editing = false
+          })
+        }),
+        label({class: "visually-hidden", htmlFor: "todo-input"},
+          'Edit Todo Input'
+        )
+      )
+  )
 })
 
 function handleUpdate(

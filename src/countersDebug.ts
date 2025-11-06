@@ -377,16 +377,19 @@ export const innerCounterContent = tag(() => {
 
     div({style:"font-size:0.8em;opacity:0.8"},
       '⌚️ page load to display in\u00A0',
-      span.attr(
-        host.onInit((element) => element.innerText = (Date.now()-loadStartTime).toString())
-      )('-'),
+      span({
+          attr: host.onInit((element) => element.innerText = (Date.now()-loadStartTime).toString())
+        },'-'
+      ),
       'ms'
     ),
     div({style:"font-size:0.8em;opacity:0.8"},
       '⌚️ read in\u00A0',
-      span.attr(
-        host.onInit((element) => element.innerText = (Date.now()-readStartTime).toString())
-      )('-'),
+      span({
+          attr: host.onInit((element) => element.innerText = (Date.now()-readStartTime).toString()),
+        },
+        '-'
+      ),
       'ms'
     ),
 

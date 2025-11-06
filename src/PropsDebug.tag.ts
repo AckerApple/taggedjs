@@ -283,7 +283,7 @@ const propFnUpdateTest = tag(({
   propNumber, // passed as myPropNumber
   callback,
 }: {
-  propNumber: number, callback: Function
+  propNumber: number, callback: () => any
 }) => {
   propFnUpdateTest.updates(x => [{propNumber, callback}] = x)
   

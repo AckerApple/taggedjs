@@ -86,26 +86,43 @@ button({id: "my-btn", onClick: handler}, 'Click me')
 - Remaining arguments: children (strings, numbers, elements, components)
 - If no attributes: just pass children directly `div('text', span('more'))`
 
-### 4. Event Handlers: Use camelCase
+### 4. Event Handlers: Function vs String
 
-**CRITICAL**: Event handlers must use camelCase, NOT lowercase!
+**CRITICAL**: Event handler casing depends on whether you're passing a **function** or a **string**.
 
+**Function Handlers (use camelCase):**
 ```typescript
-// CORRECT
+// CORRECT - function handlers use camelCase
 button({onClick: handler}, 'Click')
-input({onKeyup: handler})
-div({onMouseover: handler, onMouseout: handler})
+input({onKeyup: (e) => console.log(e)})
+div({onMouseover: showMenu, onMouseout: hideMenu})
 
-// WRONG - do not use lowercase
+// WRONG - don't use lowercase with functions
 button({onclick: handler}, 'Click')  // ❌
-input({onkeyup: handler})            // ❌
 ```
 
-Common event handlers:
+**String Handlers (use lowercase):**
+```typescript
+// CORRECT - string handlers use lowercase (HTML attributes)
+dialog({
+  onmousedown: "this.close()",
+  ondragstart: "event.dataTransfer.effectAllowed='move'"
+})
+
+// These are inline JavaScript executed by the browser
+// They use lowercase because they become actual HTML attributes
+```
+
+**The Rule:**
+- **Function reference** → camelCase: `onClick`, `onKeyup`, `onMouseover`
+- **String (inline JS)** → lowercase: `onclick`, `onkeyup`, `onmouseover`
+
+Common event handlers (function form):
 - `onClick` (not `onclick`)
 - `onKeyup`, `onKeydown` (not `onkeyup`, `onkeydown`)
 - `onMouseover`, `onMouseout` (not `onmouseover`, `onmouseout`)
 - `onChange`, `onInput`, `onFocus`, `onBlur`
+- `onDragstart`, `onDrag`, `onDragend`
 
 ### 5. Text Interpolation: Split into Arguments
 
@@ -181,6 +198,38 @@ items.map(item => noElement(
   '👈'
 ).key(item.id))
 ```
+
+**IMPORTANT: Dynamic Arrays**
+
+When an array is **dynamic** (can be modified with push, splice, etc.), wrap the `.map()` call in `_=>`:
+
+```typescript
+// Dynamic array that can change
+const items = [] as Item[]
+
+// WRONG - map won't re-run when array changes
+div(
+  items.map(item => div(item.name).key(item))
+)
+
+// CORRECT - map re-runs when array changes
+div(
+  _=> items.map(item => div(item.name).key(item))
+)
+
+// Also use _=> for reactive values within the map
+div(
+  _=> items.map(item => div(
+    strong(_=> item.title),  // If item properties can change
+    span(_=> item.value)
+  ).key(item))
+)
+```
+
+**When to use `_=>` with `.map()`:**
+- ✅ Use `_=>` when the array can be modified (push, splice, pop, etc.)
+- ✅ Use `_=>` when the array reference might change
+- ❌ Skip `_=>` when the array is static/constant (like props that don't change)
 
 ### 9. Conditional Rendering
 
@@ -499,14 +548,36 @@ items.map(item => html`<div>${item}</div>`.key(item))  // Don't mix syntaxes
 items.map(item => div(item).key(item))  // Do this
 ```
 
+### ❌ Wrong: Dynamic array map without arrow prefix
+```typescript
+const items = [] as Item[]
+
+// Won't re-render when items array changes
+div(
+  items.map(item => div(item.name).key(item))
+)
+```
+
+### ✅ Correct: Dynamic array map with arrow prefix
+```typescript
+const items = [] as Item[]
+
+// Re-renders when items array changes (push, splice, etc.)
+div(
+  _=> items.map(item => div(_=> item.name).key(item))
+)
+```
+
 ## Checklist for Conversion
 
 - [ ] Remove `html` from imports
 - [ ] Add all necessary element imports (`div`, `span`, `button`, etc.)
 - [ ] Convert `html`...`` to element function calls
-- [ ] Change all event handlers to camelCase (`onClick`, `onKeyup`, etc.)
+- [ ] Change **function** event handlers to camelCase (`onClick`, `onKeyup`, etc.)
+- [ ] Keep **string** event handlers lowercase (`onclick: "..."`, `onmousedown: "..."`)
 - [ ] Split text interpolation into separate arguments
 - [ ] Add `_=>` prefix to reactive/conditional values
+- [ ] Add `_=>` prefix to dynamic array `.map()` calls
 - [ ] Convert `<hr />` and `<br />` to `hr,` and `br,` (no function calls)
 - [ ] Convert nested `html`...`` templates to mock elements
 - [ ] Replace HTML entities with Unicode (`&nbsp;` → `\u00A0`)
