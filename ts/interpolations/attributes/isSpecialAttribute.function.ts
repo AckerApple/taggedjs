@@ -19,7 +19,7 @@ export function isSpecialAttr(
 }
 
 export function isSpecialAction(attrName: string) {
-  switch (attrName) {
+  switch (attrName.toLowerCase()) {
     case 'autoselect':
       return 'autoselect'
     case 'autofocus':

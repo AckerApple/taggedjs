@@ -105,7 +105,7 @@ export function getOverrideTagVar(
       context: ContextItem,
       ownerSupport: AnySupport
     ) => {
-      if(context.locked) {
+      if(context.locked || context.deleted) {
         return
       }
 
@@ -200,7 +200,9 @@ function makeRealUpdate(
 
   newContext.value.props = castedProps
   const propsConfig = support.propsConfig as PropsConfig
-  propsConfig.castProps = castedProps
+  if(propsConfig) {
+    propsConfig.castProps = castedProps
+  }
   
   ;(newContext as SupportContextItem).updatesHandler = context.updatesHandler
   if (context.updatesHandler) {

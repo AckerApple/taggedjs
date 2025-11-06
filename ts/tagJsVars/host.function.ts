@@ -42,11 +42,18 @@ export function host<T extends HostCallback>(
     destroy: deleteHost,
     options: { callback, ...options } as AllOptions,
     matchesInjection(inject: any, context: ContextItem) {
-      const injectCallback = inject?.options?.callback
+      const options = inject?.options
+      if(!options) {
+        return false
+      }
+
+      const injectCallback = options?.callback
       // Check if the inject target is a host with the same callback
       if(injectCallback === callback) {
         return context
       }
+
+      return false
     },
   }
   

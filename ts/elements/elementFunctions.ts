@@ -158,16 +158,23 @@ function makeCallback(eventName: string) {
 const eventCallables = {
   onClose: makeCallback('onclose'),
   onClick: makeCallback('click'),
+  
   onDoubleClick: makeCallback('ondblclick'),
+  onDblClick: makeCallback('ondblclick'),
 
   onBlur: makeCallback('onblur'),
   onChange: makeCallback('onchange'),
   
   onMousedown: makeCallback('onmousedown'),
+  onMouseDown: makeCallback('onmousedown'),
   onMouseup: makeCallback('onmouseup'),
+  onMouseUp: makeCallback('onmouseup'),
 
   onKeyup: makeCallback('onkeyup'),
+  onKeyUp: makeCallback('onkeyup'),
+  
   onKeydown: makeCallback('onkeydown'),
+  onKeyDown: makeCallback('onkeydown'),
 }
 
 const callables = {

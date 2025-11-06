@@ -1,4 +1,4 @@
-import { paintContent } from "../../render/paint.function.js"
+import { paintAfters, paintContent } from "../../render/paint.function.js"
 import { SpecialDefinition } from "../../render/attributes/Special.types.js";
 
 /** handles autofocus, autoselect, style., class. */
@@ -10,11 +10,12 @@ export function specialAttribute(
 ) {
   switch (specialName) {
     case 'autofocus':
-      paintContent.push([autofocus, [element]])
+      paintAfters.push([autofocus, [element]])
+      // element.setAttribute("autofocus", 'true')
       return
 
     case 'autoselect':
-      paintContent.push([autoselect, [element]])
+      paintAfters.push([autoselect, [element]])
       return
 
     case 'style': {

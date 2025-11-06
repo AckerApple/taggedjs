@@ -16,20 +16,25 @@ describe('tag.inject', () => {
       return { color, title: 'parentHost' }
     })
 
+    const tagJsVar = {
+      tagJsType: ValueTypes.host,
+      options: {
+        callback: parentHost.options.callback
+      },
+      matchesInjection: parentHost.matchesInjection
+    } as any
+
+    const aContext = {
+      isAttr: true,
+      tagJsVar: tagJsVar,
+      returnValue: { color: 'red', title: 'parentHost' }
+    } as any
+
     // Simulate a parent context with the host
-    const parentContext: any = {
+    const parentContext = {
       isAttrs: true,
-      contexts: [{
-        tagJsVar: {
-          tagJsType: ValueTypes.host,
-          options: {
-            callback: parentHost.options.callback
-          },
-          matchesInjection: parentHost.matchesInjection
-        },
-        returnValue: { color: 'red', title: 'parentHost' }
-      }]
-    }
+      contexts: [aContext]
+    } as any as ContextItem
 
     // Simulate a child context
     const childContext: any = {
@@ -138,6 +143,7 @@ describe('tag.inject', () => {
     // Different callback should not match
     const differentCallback = (color: string) => ({ color })
     const host3 = host(differentCallback)
-    expect(host1.matchesInjection!(host3, true as any as ContextItem)).toBe(false)
+    const injected = host1.matchesInjection!(host3, true as any as ContextItem)
+    expect(injected).toBe(false)
   })
 })

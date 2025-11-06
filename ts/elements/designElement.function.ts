@@ -1,4 +1,4 @@
-import { InputElementTargetEvent } from '../index.js'
+import { HostValue, InputElementTargetEvent } from '../index.js'
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
@@ -7,6 +7,8 @@ import { elementFunctions, isValueForContext, loopObjectAttributes } from './ele
 import { destroyDesignElement } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
 import { processDesignElementInit } from './processDesignElementInit.function.js'
+
+export type TruthyVar = number | string | boolean | ((_: InputElementTargetEvent) => string | boolean | number)
 
 export type MockElmListener = [
   string,
@@ -29,24 +31,40 @@ export type ElementVarBase = ReadOnlyVar & {
   allListeners: MockElmListener[]
 }
 
-type Child = ((_: ContextItem) => any) | string | boolean | undefined | number | null | object | any[]
+type Child = ((_: InputElementTargetEvent) => any) | string | boolean | TagJsVar | number | null | undefined | any[] // object
 
-type Attributes = {
-  onKeyup: (_: InputElementTargetEvent) => any;
-  onClick: (_: InputElementTargetEvent) => any;
-  onChange: (_: InputElementTargetEvent) => any;
+export type Attributes = {
+  onKeyup?: (_: InputElementTargetEvent) => any;
+  onKeydown?: (_: InputElementTargetEvent) => any;
+  onClick?: (_: InputElementTargetEvent) => any;
+  onChange?: (_: InputElementTargetEvent) => any;
+  onBlur?: (_: InputElementTargetEvent) => any;
+  
+  /** You may want to instead use "onClick" because "onclick" is a string function that runs in browser */
+  onclick?: string
+
+  /** You may want to instead use "onChange" because "onchange" is a string function that runs in browser */
+  onchange?: string
+
+  /** You may want to instead use "onBlur" because "onblur" is a string function that runs in browser */
+  onblur?: string
+  
+  checked?: TruthyVar
+  autofocus?: TruthyVar
+  style?: string | object | ((_: InputElementTargetEvent) => string | object)
+  attr?: string | object | TagJsVar | void | undefined | ((_: InputElementTargetEvent) => any)
 } & {
-  [attr: string]: string | ((_: ContextItem) => any)
+  [attrName: string]: object | string | boolean | number | TagJsVar | undefined | void | ((_: InputElementTargetEvent) => any)
 }
 
 export type ElementFunction = (
   (
-    attributesOrFirstChild?: Child | Attributes,
+    attributesOrFirstChild: Child | Attributes,
     ...children: Child[]
   ) => any
 ) & ElementVarBase
 
-export type ElementVar = ElementFunction & ReturnType<typeof elementFunctions>
+export type ElementVar = ElementFunction // & ReturnType<typeof elementFunctions>
 
 export function designElement(
   tagName: string, // div | button
