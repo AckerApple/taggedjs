@@ -21,6 +21,27 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
 
   ++renderCount
 
+  const testTag2 = div({style:"border:1px solid blue;flex-grow:1"},
+    h3('Test 2 - Tag'),
+    div(_ => {
+      switch (selectedTag) {
+        case null:
+          return div({id:"select-tag-above"},
+            'null, select tag above'
+          )
+        case "":
+          return div({id:"select-tag-above"},
+            'empty-string, select tag above'
+          )
+        case '1': return tag1({title:'tag switch'})
+        case '2': return tag2({title:'tag switch'})
+        case '3': return tag3({title:'tag switch'})
+      }
+
+      return div({id:"select-tag-above"}, 'select tag above')
+    }),
+  )
+
   return div(
     div({id:"selectTag-wrap"},
       'selectedTag: |',
@@ -31,7 +52,8 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
           selectedTag === '' && 'empty-string' ||
           selectedTag
       ),
-      '|'
+      '|',
+      button({onClick: () => ++renderCount}, '++renderCount ', _=> renderCount),
     ),
 
     select({
@@ -76,65 +98,46 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
         id: "switch-tests-wrap",
         style: "display:flex;flex-wrap:wrap;gap:1em;"
       },
-          div({style:"border:1px solid blue;flex-grow:1"},
-            h3('Test 1 - string | Tag'),
-            div(() => {
-              switch (selectedTag) {
-                case null: return 'null, select tag below'
-                case "": return div({id:"empty-string-1"})
-                case '1': return tag1({title:'value switch'})
-                case '2': return tag2({title:'value switch'})
-                case '3': return tag3({title:'value switch'})
-              }
-              return 'select tag below'
-            })
-          ),
-
-          div({style:"border:1px solid blue;flex-grow:1"},
-            h3('Test 2 - Tag'),
-            div(() => {
-              switch (selectedTag) {
-                case null:
-                  return div({id:"select-tag-above"},
-                    'null, select tag above'
-                  )
-                case "":
-                  return div({id:"select-tag-above"},
-                    'empty-string, select tag above'
-                  )
-                case '1': return tag1({title:'tag switch'})
-                case '2': return tag2({title:'tag switch'})
-                case '3': return tag3({title:'tag switch'})
-              }
-
-              return div({id:"select-tag-above"}, 'select tag above')
-            }),
-          ),
-
-          div({style:"border:1px solid blue;flex-grow:1"},
-            h3('Test 3 - ternary (only 1 or 3 shows)'),
-            div(
-              () => selectedTag === '3' ? tag3({title: 'ternary simple'}) : tag1({title: 'ternary simple'})
-            )
-          ),
-
-          div({style:"border:1px solid blue;flex-grow:1"},
-            h3('Test 3.2 - ternary via prop (only 1 or 3 shows)'),
-            div(() => ternaryPropTest({selectedTag})),
-          ),
-
-          div({
-            id: "arraySwitching-test-wrap",
-            style: "border:1px solid red;flex-grow:1"
-          },
-            h3('Test 4 - arraySwitching'),
-            div({id:"arraySwitching-wrap"},
-              () => arraySwitching({selectedTag})
-            )
-          ),
+        div({style:"border:1px solid blue;flex-grow:1"},
+          h3('Test 1 - string | Tag'),
+          div(_ => {
+            switch (selectedTag) {
+              case null: return 'null, select tag below'
+              case "": return div({id:"empty-string-1"})
+              case '1': return tag1({title:'value switch'})
+              case '2': return tag2({title:'value switch'})
+              case '3': return tag3({title:'value switch'})
+            }
+            return 'select tag below'
+          })
         ),
-      
-      () => renderCountDiv({renderCount, name:'tagSwitchDebug'}),
+
+        testTag2,
+
+        div({style:"border:1px solid blue;flex-grow:1"},
+          h3('Test 3 - ternary (only 1 or 3 shows)'),
+          div(
+            () => selectedTag === '3' ? tag3({title: 'ternary simple'}) : tag1({title: 'ternary simple'})
+          )
+        ),
+
+        div({style:"border:1px solid blue;flex-grow:1"},
+          h3('Test 3.2 - ternary via prop (only 1 or 3 shows)'),
+          div(() => ternaryPropTest({selectedTag})),
+        ),
+
+        div({
+          id: "arraySwitching-test-wrap",
+          style: "border:1px solid red;flex-grow:1"
+        },
+          h3('Test 4 - arraySwitching'),
+          div({id:"arraySwitching-wrap"},
+            () => arraySwitching({selectedTag})
+          )
+        ),
+      ),
+    
+    // () => renderCountDiv({renderCount, name:'tagSwitchDebug'}),
   )
 })
 
@@ -144,7 +147,7 @@ export const ternaryPropTest = tag((
   ternaryPropTest.updates(x =>[{selectedTag}] = x)
 
   return div({id:"ternaryPropTest-wrap"},
-    () => `${selectedTag}:`, (context) => {
+    () => `${selectedTag}:`, () => {
       const returnValue = selectedTag === '3' ? tag3({title: 'ternaryPropTest'}) : tag1({title: 'ternaryPropTest'})
       return returnValue
     }
@@ -194,7 +197,7 @@ export const tag2 = tag(({title}: {title: string}) => {
       onClick: () => ++counter
     }, ()=> `increase ${counter}`),
 
-    () => renderCountDiv({renderCount, name:'tag1'}),
+    () => renderCountDiv({renderCount, name:'tag2'}),
   )
 })
 
@@ -216,7 +219,7 @@ export const tag3 = tag(({title}: {title: string}) => {
         onClick: () => ++counter
       }, () => `increase ${counter}`),
 
-      () => renderCountDiv({renderCount, name:'tag1'}),
+      () => renderCountDiv({renderCount, name:'tag3'}),
     )
 })
 

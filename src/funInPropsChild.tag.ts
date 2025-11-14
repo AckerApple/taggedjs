@@ -14,30 +14,38 @@ export const funInPropsChild = tag((
   mainProp: typeof main,
   myFunction3: () => any
 ) => {
-  funInPropsChild.updates(x => [arg0, mainProp, myFunction3] = x)
+  funInPropsChild.updates(x => {
+    [arg0, mainProp, myFunction3] = x
+    
+    myFunction3 = output(myFunction3)
+    myFunction = output(arg0.myFunction)
+  })
 
-  let other = 'other'
+  myFunction3 = output(myFunction3)
+
+  // let other = 'other'
   let counter = 0
   let renderCount = 0
 
   ++renderCount
 
-  const {addArrayItem, myFunction, deleteItem, child, array} = arg0
+  let {addArrayItem, myFunction, deleteItem, child, array} = arg0
+  myFunction = output(myFunction)
 
   return div(
     div(
       strong('mainFunction:'),
-      _=> (mainProp.function as any).original ? 'taggjedjs-wrapped' : 'nowrap',
+      _=> (mainProp.function as any).wrapped ? 'taggjedjs-wrapped' : 'nowrap',
       ':',
       span(_=> mainProp.count)
     ),
     div(
       strong('childFunction:'),
-      _=> (child.myChildFunction as any).original ? 'taggjedjs-wrapped' : 'nowrap'
+      _=> (child.myChildFunction as any).wrapped ? 'taggjedjs-wrapped' : 'nowrap'
     ),
     div(
       strong('myFunction:'),
-      (myFunction as any).original ? 'taggjedjs-wrapped' : 'nowrap'
+      (myFunction as any).wrapped ? 'taggjedjs-wrapped' : 'nowrap'
     ),
 
     button({

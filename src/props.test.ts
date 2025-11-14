@@ -32,7 +32,8 @@ describe('🧳 props', () => {
     const childNum = Number(childHTML)
 
     expect(parentNum).toBe(childNum)
-    expect(ownerNum + 2).toBe(parentNum) // testing of setProp() doesn't change owner
+    expect(ownerNum).toBe(parentNum, `Expected ${ownerNum} to be ${parentNum}`) // testing of setProp() doesn't change owner
+    // expect(ownerNum + 2).toBe(parentNum, `Parent should be 2 less than ${ownerNum + 2} but it is ${parentNum}`) // testing of setProp() doesn't change owner
   })
 
   it('letProp', () => {
@@ -46,11 +47,12 @@ describe('🧳 props', () => {
 
     // outer should not have changed
     const displayAfterClick = html('#propsDebug-🥩-0-display')
-    expect(displayAfterClick).toBe( propCounter.toString(), `Expected ${displayAfterClick} to be ${propCounter.toString()} ... propCounter and display mismatched`)
+    expect(displayAfterClick).toBe( propCounter.toString(), `Expected ${displayAfterClick} to still be ${propCounter.toString()} ... propCounter and display mismatched`)
     
     const letPropDisplay = html('#propsDebug-🥩-let-prop-display')
+    const newString = (propCounter + 1).toString()
     expect(letPropDisplay).toBe(
-      (propCounter).toString()
+      newString, `Expected #propsDebug-🥩-let-prop-display to be ${newString}`
     )
 
     // end of test put all in sync
@@ -59,7 +61,7 @@ describe('🧳 props', () => {
 
   it('change count', () => {
     // the number of times the watch counted a change happens to match that increase counter
-    const funUpdateValue = html('#propsOneLevelFunUpdate-🥩-display')
+    // const funUpdateValue = html('#propsOneLevelFunUpdate-🥩-display')
     const oldValue = Number(html('#propsDebug-🥩-change-count-display'))
 
     byId('propsDebug-🥩-0-button').click()

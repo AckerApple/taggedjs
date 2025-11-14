@@ -1,4 +1,4 @@
-import { tag, InputElementTargetEvent, noElement, button, span, small, div, textarea, pre, fieldset, legend, hr, input, h3, getContextInCycle } from "taggedjs"
+import { tag, InputElementTargetEvent, noElement, button, span, small, div, textarea, pre, fieldset, legend, hr, input, h3, getContextInCycle, output } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component.js"
 import statePropDebugTag from "./statePropDebug.tag.js"
 
@@ -108,15 +108,22 @@ const syncPropDebug = tag((
     parentTest,
   }: {
     syncPropNumber: number
-    propNumberChange: (x: number) => any
-    parentTest: <T>(x: T) => T
+    propNumberChange: (x: number) => any // output
+    parentTest: <T>(x: T) => T // NOT output. Get value only
   }
 ) => {
-  syncPropDebug.updates(x => [{
-    syncPropNumber,
-    propNumberChange,
-    parentTest,
-  }] = x)
+  propNumberChange = output(propNumberChange)
+  // parentTest = output(parentTest)
+  syncPropDebug.updates(x => {
+    [{
+      syncPropNumber,
+      propNumberChange,
+      parentTest,
+    }] = x
+    
+    propNumberChange = output(propNumberChange)
+    // parentTest = output(parentTest)
+  })
 
   let counter = 0
   let renderCount = 0
@@ -170,41 +177,29 @@ const propsDebug = tag((
     propsJson: any
   }
 ) => {
+  propNumberChange = output(propNumberChange)
+  
   propsDebug.updates(x => {
-    /*
-    if(counting===2) {
-      throw new Error('eh')
-    }
-    ++counting
-    */
     const newProp = x[0].propNumber
-    if( newProp !== propNumber) {
-      myPropNumber = newProp
+    const parentChanged = newProp !== controlPropNumber
+    if( parentChanged ) {
+      controlPropNumber = newProp
       ++propNumberChangeCount
     }
     
-    propNumber = newProp === undefined ? propNumber : newProp
+    const prePropnumber = propNumber
+    propNumber = parentChanged ? newProp : propNumber
 
     ;[{
       propsJson,
       propNumberChange,
     }] = x
 
-    // myPropNumber = propNumber
+    propNumberChange = output(propNumberChange)
   })
 
-  let renderCount = 0
   let propNumberChangeCount = 0
-
-  // simple way to locally only update an argument
-  // let ___ = letProp(get => [propNumber] = get(propNumber))
-
-  // poor way to update an argument
-  let myPropNumber = propNumber
-
-  // watch([propNumber], () => myPropNumber = propNumber)
-
-  //const watchResults = watch([myPropNumber], () => ++propNumberChangeCount)
+  let controlPropNumber = propNumber
 
   return noElement(
     h3('Props Json'),
@@ -233,9 +228,9 @@ const propsDebug = tag((
     div(
       button({
         id: "propsDebug-🥩-1-button",
-        onClick: () => propNumberChange(++myPropNumber)
-      }, '🐄 🥩 my propNumber ', _=> myPropNumber),
-      span({id:"propsDebug-🥩-1-display"}, _=> myPropNumber)
+        onClick: () => propNumberChange(++propNumber)
+      }, '🐄 🥩 my propNumber ', _=> controlPropNumber),
+      span({id:"propsDebug-🥩-1-display"}, _=> controlPropNumber)
     ),
   
     div(
@@ -247,16 +242,6 @@ const propsDebug = tag((
       }, '🐄 🥩 local letProp propNumber ', _=> propNumber),
       span({id:"propsDebug-🥩-let-prop-display"}, _=> propNumber)
     ),
-  
-    button({
-      title: "test of increasing render count and nothing else",
-      onClick: () => ++renderCount,
-    }, 'renderCount ++renderCount'),
-    
-    button({
-      onClick: () => ++myPropNumber,
-      title: "only changes number locally but if change by parent than that is the number"
-    }, '🐄 🥩 local set myPropNumber ', _=> myPropNumber),
     
     div(
       small(
@@ -271,9 +256,9 @@ const propsDebug = tag((
     h3('Fn update test'),
 
     _=> propFnUpdateTest({
-      propNumber: myPropNumber,
+      propNumber,
       callback: () => {
-        ++myPropNumber
+       propNumberChange(++propNumber)
       }
     })
   )
@@ -283,9 +268,14 @@ const propFnUpdateTest = tag(({
   propNumber, // passed as myPropNumber
   callback,
 }: {
-  propNumber: number, callback: () => any
+  propNumber: number,
+  callback: () => any,
 }) => {
-  propFnUpdateTest.updates(x => [{propNumber, callback}] = x)
+  callback = output(callback)
+  propFnUpdateTest.updates(x => {
+    [{propNumber, callback}] = x
+    callback = output(callback)
+  })
   
   let renderCount = 0
 

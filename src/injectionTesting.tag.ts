@@ -17,8 +17,6 @@ export const injectionTag = tag(() => {
 
   ;(wrapHost as any).TEST = '👈👈👈👈'
 
-  console.log('wrapHost', wrapHost)
-
   return div({style: "padding: 20px;"},
     h2('Injection Test'),
     'selected: ', _=> {

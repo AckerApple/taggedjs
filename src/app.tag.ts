@@ -13,28 +13,28 @@ function appFun(){
 
     console.info('🍒 Main app rendered', appDate)
 
-    return noElement(
+    return [
       h1({id:"h1-app"}, `🏷️ TaggedJs - ${2+2}`),
 
       button({type:"button",
         onClick:() => showHide = !showHide,
       }, 'show/hide ', _=> showHide),
       
-      _=> showHide && fxTag(),
+      () => showHide && fxTag(),
 
       menu(),
 
-      _=> menuName === 'home' && homePage(),
-      _=> menuName === 'counters' && innerCounterContent(),
-      _=> menuName === 'content' && content(),
-    )
+      () => menuName === 'home' && homePage(),
+      () => menuName === 'counters' && innerCounterContent(),
+      () => menuName === 'content' && content(),
+    ]
   }
 }
 appFun.isApp = true
 
 export const App = tag(appFun)
 
-const fxTag = tag(() => noElement(
+const fxTag = tag(() => [
   hr,
   
   div({attr: fx({duration: '.1s'})},
@@ -42,4 +42,4 @@ const fxTag = tag(() => noElement(
   ),
   
   hr,
-))
+])

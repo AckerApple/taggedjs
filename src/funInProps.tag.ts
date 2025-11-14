@@ -13,7 +13,7 @@ export default tag(() => (
   counter = 0,
   renderCount = 0,
   showChild = true,
-  somethingElse = 'a',
+  // somethingElse = 'a',
   myFunction = () => ++counter,
 
   _ = ++renderCount,
@@ -33,10 +33,6 @@ export default tag(() => (
 
     div(
       strong('🆎 main:'),
-      span({id: "main_wrap_state"},
-        _=> (main.function as any).original ? 'taggjedjs-wrapped' : 'nowrap'
-      ),
-      ':',
       _=> main.count
     ),
 

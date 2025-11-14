@@ -1,4 +1,4 @@
-import { tag, div, button, span } from "taggedjs";
+import { tag, div, button, span, output } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
 
 export const shallowPropCounters = tag(({
@@ -11,6 +11,7 @@ export const shallowPropCounters = tag(({
   let renderCount = 0
   
   shallowPropCounters.updates(x => [{propCounter, increasePropCounter}] = x)
+  increasePropCounter = output(increasePropCounter)
 
   ++renderCount; // for debugging
 

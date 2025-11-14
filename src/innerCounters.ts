@@ -1,4 +1,4 @@
-import { tag, div, host, span, button } from "taggedjs";
+import { tag, div, host, span, button, output } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
 
 export const innerCounters = tag(({
@@ -15,7 +15,10 @@ export const innerCounters = tag(({
 
   innerCounters.updates(x => {
     ;[{ propCounter, increasePropCounter }] = x;
+    increasePropCounter = output(increasePropCounter)
   });
+
+  increasePropCounter = output(increasePropCounter)
 
   return div(
     div({

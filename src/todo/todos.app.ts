@@ -1,12 +1,12 @@
-import { Header } from "./components/header.js";
-import { Footer } from "./components/footer.js";
-import { Todo, todoReducer } from "./reducer.js";
-import { InputElementTargetEvent, noElement, div, main, input, label, ul, tag } from "taggedjs";
-import { hashRouterSubject, useHashRouter } from "./HashRouter.function.js";
-import { Item } from "./components/item.js";
+import { Header } from "./components/header.js"
+import { Footer } from "./components/footer.js"
+import { Todo, todoReducer } from "./reducer.js"
+import { tag } from "taggedjs"
+import { useHashRouter } from "./HashRouter.function.js"
+import { Main } from "./main.js"
 
 export const todos: Todo[] = []
-const dispatch = todoReducer(todos)
+export const dispatch = todoReducer(todos)
 
 export const todoApp = tag(() => {
   console.log('todos.app.ts')
@@ -24,40 +24,21 @@ export const todoApp = tag(() => {
     isCompletedRoute() && todos.filter(todo => todo.completed) || todos
   }
 
-  return noElement(
+  return [
     Header(dispatch),
-    'route: ', _=> router.route,
+    'route: ', () => router.route,
     
-    _=> todos.length > 0 && (() => noElement(
-      main({class: "main"},
-        div({class: "toggle-all-container"},
-          input({
-            id: "toggle-all",
-            class: "toggle-all",
-            type: "checkbox",
-            checked: _=> activeTodoCount() < 1 ? 1 : 0,
-            onChange: (e: InputElementTargetEvent) => dispatch.toggleAll(e.target.checked)
-          }),
-          label({class: "toggle-all-label", for: "toggle-all"},
-            'Toggle All Input'
-          )
-        ),
-        
-        ul({class: "todo-list show-priority"},
-          // 👉 loop todos
-          _=> getVisibleTodos().map((todo, index) => {
-            return Item(todo, dispatch, index).key(todo.id)
-          })
-        )
-      ),
+    ()=> todos.length > 0 && [
+      () => Main(activeTodoCount(), getVisibleTodos()),
       
-      _=> {
+      () => {
         return Footer(
         todos.length,
         dispatch.removeCompleted,
         router.route,
         activeTodoCount(),
       )}
-    ))
-  )
+    ]
+  ]
 })
+
