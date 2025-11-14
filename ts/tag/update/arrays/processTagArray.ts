@@ -4,11 +4,12 @@ import { TemplaterResult } from '../../getTemplaterResult.function.js'
 import { tagValueUpdateHandler } from '../tagValueUpdateHandler.function.js'
 import { LastArrayItem } from '../../Context.types.js'
 import { compareArrayItems } from './compareArrayItems.function.js'
-import { AnySupport } from '../../index.js'
+import { AnySupport, empty } from '../../index.js'
 import { createAndProcessContextItem } from '../createAndProcessContextItem.function.js'
 import { TemplateValue } from '../../TemplateValue.type.js'
 import { Tag } from '../../Tag.type.js'
 import { ContextItem } from '../../ContextItem.type.js'
+import { TagJsVar } from '../../../tagJsVars/tagJsVar.type.js'
 
 export function processTagArray(
   contextItem: ContextItem,
@@ -82,12 +83,14 @@ function reviewArrayItem(
   runtimeInsertBefore: Text | undefined, // used during updates
   appendTo?: Element, // used during initial rendering of entire array
 ) {
-  const item = array[index]
-  const previous = lastArray[index]
+  const item = castArrayItem(array[index])
+  const previousContext = lastArray[index]
 
-  if(previous) {
+  if( previousContext ) {
     return reviewPreviousArrayItem(
-      item, previous, lastArray, ownerSupport, index,
+      item,
+      previousContext,
+      lastArray, ownerSupport, index,
       runtimeInsertBefore, appendTo,
     )
   }
@@ -108,7 +111,7 @@ function reviewArrayItem(
 
 function reviewPreviousArrayItem(
   value: unknown,
-  itemSubject: ContextItem,
+  context: ContextItem,
   lastArray: LastArrayItem[],
   ownerSupport: AnySupport,
   index: number,
@@ -117,16 +120,25 @@ function reviewPreviousArrayItem(
 ) {
   const couldBeSame = lastArray.length > index
   if (couldBeSame) {
+    if(Array.isArray(value)) {
+      context.tagJsVar.processUpdate(
+        value, context, ownerSupport, []
+      )
+
+      context.value = value
+
+      return context
+    }
+
     tagValueUpdateHandler(
       value as TemplateValue,
-      itemSubject,
+      context,
       ownerSupport,
     )
-    return itemSubject
+    return context
   }
 
   // NEW REPLACEMENT
-
   const contextItem = createAndProcessContextItem(
     value as TemplateValue,
     ownerSupport,
@@ -139,4 +151,14 @@ function reviewPreviousArrayItem(
   lastArray.push(contextItem)
 
   return contextItem
+}
+
+export function castArrayItem(item: any) {
+  const isBasicFun = typeof item === 'function' && (item as any as TagJsVar).tagJsType === undefined
+  if( isBasicFun ) {
+    const fun = (item as any)
+    item = fun()
+  }
+
+  return item
 }

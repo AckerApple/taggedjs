@@ -1,7 +1,9 @@
 import { isTagComponent } from '../../isInstance.js'
 import { AnySupport, ContextItem } from '../../tag/index.js'
 
-export function findStateSupportUpContext(context: ContextItem) {
+export function findStateSupportUpContext(
+  context: ContextItem
+): AnySupport | undefined {
   const stateMeta = context.state
   if(stateMeta && stateMeta.newest && stateMeta.newest) {
     return stateMeta.newest

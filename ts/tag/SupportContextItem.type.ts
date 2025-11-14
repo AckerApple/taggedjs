@@ -25,5 +25,4 @@ export interface SupportContextItem extends ContextItem {
   
   /** Argument aka Prop updates */
   updatesHandler?: (...args: any[]) => any
-  toRender?: ElementVar[]
 }

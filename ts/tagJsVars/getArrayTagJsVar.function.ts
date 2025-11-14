@@ -30,16 +30,24 @@ function processArrayUpdates(
 ) {
   ++contextItem.updateCount
 
+  if(Array.isArray(newValue)) {
+    processTagArray(
+      contextItem,
+      newValue as (TemplaterResult | Tag)[],
+      ownerSupport,
+    )
+    return
+  }
+
   const tagUpdateResponse = tagValueUpdateHandler(
     newValue,
     contextItem,
     ownerSupport,
   )
-  
   if(tagUpdateResponse === 0) {
     processTagArray(
       contextItem,
-      newValue as (TemplaterResult | Tag)[],
+      newValue as any,
       ownerSupport,
     )
   }

@@ -11,12 +11,14 @@ import { Tag } from '../Tag.type.js'
 
 export function updateToDiffValue(
   newValue: TemplateValue,
-  contextItem: ContextItem | SupportContextItem,
+  context: ContextItem | SupportContextItem,
   ownerSupport: AnySupport,
   ignoreOrDestroyed: number | boolean,
 ) {
   // is new value a tag?
   const tagJsType = newValue && (newValue as TemplaterResult).tagJsType as ValueType
+  
+  delete context.deleted
 
   if(tagJsType) {
     if(tagJsType === ValueTypes.renderOnce) {
@@ -24,7 +26,7 @@ export function updateToDiffValue(
     }
 
     tryUpdateToTag(
-      contextItem,
+      context,
       newValue as TemplaterResult,
       ownerSupport,
     )
@@ -34,25 +36,25 @@ export function updateToDiffValue(
 
   if( isArray(newValue) ) {
     processTagArray(
-      contextItem,
+      context,
       newValue as (TemplaterResult | Tag)[],
       ownerSupport,
     )
-    contextItem.oldTagJsVar = contextItem.tagJsVar
-    contextItem.tagJsVar = getArrayTagVar(newValue as (TemplaterResult | Tag)[])
+    context.oldTagJsVar = context.tagJsVar
+    context.tagJsVar = getArrayTagVar(newValue as (TemplaterResult | Tag)[])
   
     return
   }
 
   if(typeof(newValue) === BasicTypes.function) {
-    contextItem.value = newValue // do not render functions that are not explicity defined as tag html processing
+    context.value = newValue // do not render functions that are not explicity defined as tag html processing
     return
   }
   
   if(ignoreOrDestroyed) { // TODO: is this check really needed?
     processNowRegularValue(
       newValue as RegularValue,
-      contextItem,
+      context,
     )
   }
 }

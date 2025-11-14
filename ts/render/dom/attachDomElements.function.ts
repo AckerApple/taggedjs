@@ -10,7 +10,7 @@ import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicD
 import { TagJsVar } from "../../tagJsVars/tagJsVar.type.js"
 import { attachDomElement } from "./attachDomElement.function.js"
 import { Subject } from "../../subject/Subject.class.js"
-import { SupportContextItem } from "../../index.js"
+import { isFunction, SupportContextItem } from "../../index.js"
 
 export function attachDomElements(
   nodes: ObjectChildren,
@@ -48,7 +48,7 @@ export function attachDomElements(
       // const valueIndex = (parentContext as SupportContextItem).varCounter // contexts.length
       const valueIndex = Number(v) // (parentContext as SupportContextItem).varCounter // contexts.length
       const realValue = values[ valueIndex ]
-      const isSkipFun = typeof(realValue) === 'function' && realValue.tagJsType === undefined
+      const isSkipFun = isFunction(realValue) && realValue.tagJsType === undefined
 
       if(isSkipFun) {
         ++parentContext.varCounter

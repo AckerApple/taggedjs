@@ -5,6 +5,7 @@ import { SupportContextItem } from '../../SupportContextItem.type.js'
 import type { StringTag } from '../../StringTag.type.js'
 import { Tag } from '../../Tag.type.js'
 import { ContextItem } from '../../ContextItem.type.js'
+import { castArrayItem } from './processTagArray.js'
 
 /** 1 = destroyed, 2 = value changes, 0 = no change */
 export function compareArrayItems(
@@ -24,7 +25,7 @@ export function compareArrayItems(
   }
 
   const oldKey = prevContext.value.arrayValue
-  const newValueTag = value[index]
+  const newValueTag = castArrayItem(value[index])
 
   const result = runArrayItemDiff(
     oldKey,

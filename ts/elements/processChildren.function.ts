@@ -1,5 +1,5 @@
 import { castTextValue } from '../castTextValue.function.js';
-import { AnySupport } from '../index.js';
+import { AnySupport, isFunction } from '../index.js';
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
 import { getNewContext } from '../render/addOneContext.function.js';
 import { painter, paintCommands } from '../render/paint.function.js';
@@ -23,12 +23,28 @@ export function processChildren(
       case 'boolean':
       case 'number':
         return handleSimpleInnerValue(item, element, paintBy)
+
+      case 'function': {
+        if (item.tagJsType === 'element') {
+          break // skip
+        }
+
+        const result = processElementVarFunction(
+          item,
+          element,
+          parentContext,
+          ownerSupport,
+          paintBy,
+        )
+
+        return result
+      }
     }
 
     if( item === null || item === undefined ) {
       return handleSimpleInnerValue(item, element, paintBy)
     }
-
+    
     if (item.tagJsType === 'element') {
       const newElement = processElementVar(
         item,
@@ -48,20 +64,6 @@ export function processChildren(
       })
 
       return;
-    }
-
-    if(type === 'function') {
-      const beforeCount = parentContext.contexts?.length
-      
-      const result = processElementVarFunction(
-        item,
-        element,
-        parentContext,
-        ownerSupport,
-        paintBy,
-      )
-
-      return result
     }
 
     return processNonElement(

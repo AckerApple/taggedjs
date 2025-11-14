@@ -3,6 +3,8 @@ import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js
 import { AnySupport } from '../index.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { ContextItem } from '../ContextItem.type.js'
+import { processTagArray } from './arrays/processTagArray.js'
+import { getArrayTagVar } from '../../tagJsVars/getArrayTagJsVar.function.js'
 
 /** Checks if value has changed before updating. Used for all tag value updates. Determines if value changed since last render */
 export function tagValueUpdateHandler(
@@ -10,11 +12,9 @@ export function tagValueUpdateHandler(
   contextItem: ContextItem | SupportContextItem,
   ownerSupport: AnySupport,
 ): number {
-  // ++contextItem.updateCount
-
-  // TODO: When a tag-conversion occurs we should swap a different processUpdate that only runs the code below
   const tagJsType = contextItem.tagJsVar.tagJsType
-  if( tagJsType && ['tag-conversion','element'].includes(tagJsType) ) {
+  const processUpdate = tagJsType && ['tag-conversion','element'].includes(tagJsType)
+  if( processUpdate ) {
     // calls processDesignElementUpdate
     contextItem.tagJsVar.processUpdate(
       newValue, contextItem, ownerSupport, []

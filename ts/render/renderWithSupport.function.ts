@@ -16,8 +16,6 @@ export function renderWithSupport(
   context: SupportContextItem, // events & memory
 ): {support: AnySupport, wasLikeTags: boolean} {
   let reSupport: AnySupport
-
-  delete context.toRender
   const olderState = getSupportOlderState(lastSupport)
   // const olderState = getSupportNewerState(lastSupport)
 

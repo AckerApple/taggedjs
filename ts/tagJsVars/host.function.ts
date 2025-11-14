@@ -7,6 +7,7 @@ import { initState } from "../state/state.utils.js"
 import { reState } from '../state/reState.function.js'
 import { runAfterRender } from "../render/runAfterRender.function.js"
 import { handleTagTypeChangeFrom } from "../tag/update/handleTagTypeChangeFrom.function.js"
+import { isFunction } from "../index.js"
 
 /** On specific host life cycles, a callback can be called. 
  * @state always an object */
@@ -96,7 +97,7 @@ function processHostUpdate(
   contextItem: ContextItem,
   ownerSupport: AnySupport,
 ) {
-  if(typeof(newValue) === 'function' && !(newValue as any)?.tagJsType) {
+  if(isFunction(newValue) && !(newValue as any)?.tagJsType) {
     throw new Error('issue on its way')
   }
 

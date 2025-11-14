@@ -87,7 +87,7 @@ export function tagElement(
   const isAppFunction = typeof templater2 == BasicTypes.function
 
   if(!isAppFunction) {
-    if(!isTagComponent(templater2)) {
+    if( !isTagComponent(templater2) ) {
       templater.tag = templater2 as unknown as DomTag
       templater2 = app as unknown as TemplaterResult
     } else {

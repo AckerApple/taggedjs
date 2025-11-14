@@ -135,6 +135,7 @@ function paintRemover(
   parentNode.removeChild(element as Element)
 }
 
+/** insertBefore. For parent.appendChild() see paintAppend */
 export function paintBefore(
   relative: Text | Element,
   element: Text | Element,
@@ -144,6 +145,7 @@ export function paintBefore(
   parentNode.insertBefore(element, relative as Text)
 }
 
+/** parent.appendChild(). For insertBefore see paintBefore */
 export function paintAppend(
   relative: Text | Element,
   element: Text | Element,

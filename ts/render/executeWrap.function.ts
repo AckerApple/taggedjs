@@ -35,6 +35,7 @@ export function executeWrap(
   }
 
   useSupport.context.returnValue = tag
+  useSupport.returnValue = tag
   tag.templater = templater
   templater.tag = tag
 

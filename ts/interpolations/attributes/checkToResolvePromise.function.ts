@@ -31,12 +31,11 @@ export function thenResolveBy(
   resolvePromise: (value: any) => any, // promiseNoData
 ) {
   return (x: any) => {
-    const global = last.context.global as SupportTagGlobal
-    //clearTimeout(timeout)
     const subject = last.context
+    const global = subject.global as SupportTagGlobal
     delete subject.locked
 
-    if(global.deleted === true) {
+    if(subject.deleted === true || global.deleted === true) {
       return resolvePromise(x) // tag was deleted during event processing
     }
 

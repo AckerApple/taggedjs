@@ -16,6 +16,7 @@ export type HtmlSupport = {
   propsConfig?: PropsConfig
   
   templater: TemplaterResult,
+  returnValue?: any
 
   // only on support
   context: ContextItem

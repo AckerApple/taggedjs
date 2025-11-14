@@ -23,6 +23,7 @@ export function isSpecialAction(attrName: string) {
     case 'autoselect':
     case 'autoSelect':
       return 'autoselect'
+    
     case 'autofocus':
     case 'autoFocus':
       return 'autofocus'

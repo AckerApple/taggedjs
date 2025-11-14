@@ -16,7 +16,7 @@ export type RouteProps = {
   query: RouteQuery
 }
 
-type TagResponse = ReadOnlyVar | StateToTag | AnyTag | null | number | ElementVar | (() => any)
+type TagResponse = ReadOnlyVar | StateToTag | AnyTag | null | number | string | ElementVar | (() => any)
 
 export type SimpleToTag = ((...props: any[]) => TagResponse | (TagResponse | ((_contextItem: ContextItem) => any))[])
 export type ToTag = SimpleToTag | (() => SimpleToTag)

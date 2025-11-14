@@ -29,7 +29,7 @@ export function registerTagElement(
     context.contexts = context.contexts || []
     const newFragment = document.createDocumentFragment()
     newFragment.appendChild(placeholder)
-    void processReplacementComponent(
+    processReplacementComponent(
       support.templater,
       context,
       support,

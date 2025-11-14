@@ -16,6 +16,7 @@ export function castProps(
   newSupport: AnySupport,
   currentDepth: number,
 ) {
+  return props
   return props.map(function eachCastProp(prop, pos) {
     return alterProp(
       prop,

@@ -72,7 +72,7 @@ export function processNonDynamicAttr(
   isSpecial: SpecialDefinition,
   context: ContextItem,
 ): ContextItem | void {
-  if( typeof value === 'function') {
+  if( typeof value === 'function' ) {
     return processFunctionAttr(
       value,
       context,

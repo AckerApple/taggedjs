@@ -9,6 +9,7 @@ import { tryUpdateToTag } from './update/tryUpdateToTag.function.js'
 import { destroySupportByContextItem } from './destroySupportByContextItem.function.js'
 import { ContextStateMeta } from './ContextStateMeta.type.js'
 
+/** When return > 0 then its the same tag */
 export function checkTagValueChange(
   newValue: unknown,
   contextItem: ContextItem,

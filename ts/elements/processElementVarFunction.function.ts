@@ -38,11 +38,6 @@ export function processElementVarFunction(
         values: unknown[],
       ) => {
         ++subContext.updateCount
-        /*
-        if(typeof(value) !== 'function') {
-          console.debug('value', {contextItem, value})
-          throw new Error('issue of no function')
-        }*/
         setContextInCycle(aSubContext)
 
         let newValue = value(aSubContext)

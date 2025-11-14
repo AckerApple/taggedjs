@@ -2,15 +2,15 @@ import { AnySupport, SupportContextItem, Subject } from '../../index.js';
 import { valueToTagJsVar } from '../../tagJsVars/index.js';
 import { ReadOnlyVar } from '../../tagJsVars/tagJsVar.type.js';
 import { ContextItem } from '../ContextItem.type.js';
-import { getOverrideTagVar } from './processFirstSubjectComponent.function.js';
+import { getOverrideTagVar } from './getOverrideTagVar.js';
 
 export function convertTagToElementManaged(
   support: AnySupport,
   ownerSupport: AnySupport,
   subject: SupportContextItem
 ) {
-  const context = support.context;
-  const newValue = context.toRender || context.returnValue;
+  const context = support.context
+  const newValue = support.returnValue // context.returnValue
 
   // EXAMPLE: ['a','b'].map(x=> tag(() => [div,span]).key(x))
   /*
@@ -18,8 +18,8 @@ export function convertTagToElementManaged(
     ;(newValue as any).key = (arrayValue: any) => keyTag(arrayValue, newValue)
   }
   */
-  const tagJsVar = valueToTagJsVar(newValue);
-  delete (context as ContextItem).global;
+  const tagJsVar = valueToTagJsVar(newValue)
+  delete (context as ContextItem).global
   context.contexts = []
 
   const newContext: ContextItem = {
