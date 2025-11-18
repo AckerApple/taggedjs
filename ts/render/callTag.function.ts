@@ -19,9 +19,9 @@ export function callTag(
 
     reSupport = createSupport(
       templater,
+      context,
       ownerSupport as AnySupport,
       newSupport.appSupport, // ownerSupport.appSupport as AnySupport,
-      context
     );
 
     executeWrap(

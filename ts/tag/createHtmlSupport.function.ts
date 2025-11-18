@@ -61,11 +61,11 @@ export type Support = AnySupport & {
 /** Sets support states to empty array and clones props */
 export function upgradeBaseToSupport(
   templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
-  support: AnySupport,
-  appSupport: AnySupport,
+  support: AnySupport, // when appSupport not defined then this support becomes appSupport
+  appSupport?: AnySupport,
   castedProps?: Props,
 ): AnySupport {
-  support.appSupport = appSupport
+  support.appSupport = appSupport || support
   
   const props = templater.props  // natural props
   if(props) {

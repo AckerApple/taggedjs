@@ -34,9 +34,9 @@ export function getTagWrap(
     const ownerSupport = newSupport.ownerSupport as AnySupport
     const useSupport = createSupport(
       templater,
+      subject,
       ownerSupport,
       newSupport.appSupport, // ownerSupport.appSupport as AnySupport,
-      subject,
       castedProps,
     )
 

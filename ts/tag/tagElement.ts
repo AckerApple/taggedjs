@@ -49,7 +49,7 @@ export const appElements: {
  */
 export function tagElement(
   app: TagMaker,
-  element: HTMLElement | Element,
+  element: HTMLElement | Element, // aka appElement
   props?: unknown,
 ): {
   support: AnySupport

@@ -1,7 +1,7 @@
 import { handleProviderChanges, TagWithProvider } from './handleProviderChanges.function.js'
 import { AnySupport } from '../tag/index.js'
-import {SupportTagGlobal } from '../tag/getTemplaterResult.function.js'
 
+/** Called when one tag changes and we need to find other tags that will need to be rendered */
 export function providersChangeCheck(
   support: AnySupport
 ): AnySupport[] {

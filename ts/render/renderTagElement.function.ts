@@ -6,26 +6,28 @@ import { empty, ValueTypes } from '../tag/ValueTypes.enum.js'
 import { destroySupport } from './destroySupport.function.js'
 import { paint, painting } from './paint.function.js'
 import { TagMaker } from '../tag/TagMaker.type.js'
-import { AnySupport, SupportTagGlobal, Wrapper } from '../index.js'
+import { AnySupport, appElements, SupportTagGlobal, Wrapper } from '../index.js'
 import { createSupport } from '../tag/createSupport.function.js'
 import { runAfterSupportRender } from './runAfterRender.function.js'
 import { executeWrap } from './executeWrap.function.js'
 import { registerTagElement } from './registerNewTagElement.function.js'
 import { loadNewBaseSupport } from '../tag/loadNewBaseSupport.function.js'
 import { reStateSupport } from '../state/reState.function.js'
+import { processReplacementComponent } from '../tag/update/processFirstSubjectComponent.function.js'
 
 export function renderTagElement(
   app: TagMaker,
   global: SupportTagGlobal,
   templater: TemplaterResult,
   templater2: TemplaterResult,
-  element: Element,
+  element: Element, // appElement
   context: SupportContextItem,
   isAppFunction: boolean,
 ) {
   const placeholder = document.createTextNode(empty)
   tags.push((templater.wrapper || {original: templater}) as unknown as TagWrapper<unknown>)
   context.placeholder = placeholder
+  /*
   const support = runWrapper(
     templater,
     placeholder,
@@ -33,12 +35,9 @@ export function renderTagElement(
     context,
     isAppFunction,
   )
+  */
   
   global.isApp = true
-  
-  if(isAppFunction) {
-    templater2.tag = support.templater.tag
-  }
 
   if(!element) {
     throw new Error(`Cannot tagElement, element received is type ${typeof element} and not type Element`)
@@ -64,6 +63,29 @@ export function renderTagElement(
   
   ++painting.locks
 
+  const newFragment = document.createDocumentFragment()
+  newFragment.appendChild(placeholder)
+  const ownerSupport = {
+    appSupport: {
+      appElement: element,
+      context,
+    },
+    appElement: element
+  } as any as AnySupport
+  const support = processReplacementComponent(
+    templater,
+    context,
+    ownerSupport,
+  )
+
+  support.appElement = element
+  // support.appSupport = support
+
+  if(isAppFunction) {
+    templater2.tag = support.templater.tag
+  }
+
+  /*
   const newFragment = registerTagElement(
     support,
     element,
@@ -72,7 +94,7 @@ export function renderTagElement(
     app,
     placeholder,
   )
-
+  */
   --painting.locks
 
   paint()
@@ -85,24 +107,22 @@ export function renderTagElement(
   }
 }
 
-export function runWrapper(
+function runWrapper(
   templater: TemplaterResult,
   placeholder: Text,
   appElement: Element,
   subject:SupportContextItem,
   isAppFunction: boolean,
 ) {
-  subject.placeholder = placeholder
-  
   const oldest = subject.state.oldest as AnySupport
   const newest = subject.state.newest as AnySupport
   const isFirstRender = newest === oldest
 
   const newSupport = createSupport(
     templater,
+    subject,
     newest,
     newest.appSupport, // ownerSupport.appSupport as AnySupport,
-    subject,
     // castedProps,
   )
 

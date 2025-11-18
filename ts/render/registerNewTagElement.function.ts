@@ -6,6 +6,7 @@ import { AnySupport, appElements, buildBeforeElement, ContextItem, TagAppElement
 import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
 import { processReplacementComponent } from '../tag/update/processFirstSubjectComponent.function.js'
 
+/** Only called by renderTagElement */
 export function registerTagElement(
   support: AnySupport,
   element: Element | HTMLElement,

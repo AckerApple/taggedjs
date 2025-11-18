@@ -27,9 +27,9 @@ export function handleStillTag(
 
   const valueSupport = createSupport(
     templater as TemplaterResult,
+    subject,
     ownerSupport,
     ownerSupport.appSupport,
-    subject,
   )
 
   const lastSubject = oldSupport.context as SupportContextItem

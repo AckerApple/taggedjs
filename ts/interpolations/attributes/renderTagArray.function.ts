@@ -19,7 +19,7 @@ export function renderTagUpdateArray(
 function mapTagUpdate(support: AnySupport) {
   const context = support.context
   const global = context.global as SupportTagGlobal
-  
+
   if(!global) {
     context.tagJsVar.processUpdate(
       context.value,

@@ -92,9 +92,9 @@ function prepareUpdateToComponent(
 
   const support = createSupport(
     templater,
+    contextItem,
     ownerSupport,
     ownerSupport.appSupport,
-    contextItem,
   )
 
   updateExistingTagComponent(

@@ -35,7 +35,7 @@ export function thenResolveBy(
     const global = subject.global as SupportTagGlobal
     delete subject.locked
 
-    if(subject.deleted === true || global.deleted === true) {
+    if(subject.deleted === true || global?.deleted === true) {
       return resolvePromise(x) // tag was deleted during event processing
     }
 

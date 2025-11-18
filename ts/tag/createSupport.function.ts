@@ -7,9 +7,9 @@ import { SupportContextItem } from './SupportContextItem.type.js'
 
 export function createSupport(
   templater: TemplaterResult, // at runtime rendering of a tag, it needs to be married to a new Support()
-  ownerSupport: AnySupport,
-  appSupport: AnySupport,
   subject: ContextItem,
+  ownerSupport?: AnySupport, // when not
+  appSupport?: AnySupport,
   castedProps?: Props,
 ): AnySupport {
   const support = getBaseSupport(
@@ -18,7 +18,8 @@ export function createSupport(
     castedProps
   ) as AnySupport
 
-  support.ownerSupport = ownerSupport
+  support.ownerSupport = ownerSupport || support
+  support.ownerSupport.appSupport = appSupport || support.ownerSupport
 
   return upgradeBaseToSupport(templater, support, appSupport, castedProps)
 }

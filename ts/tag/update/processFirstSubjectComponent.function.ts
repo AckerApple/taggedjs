@@ -17,13 +17,13 @@ import { removeContextInCycle, setContextInCycle } from '../cycles/setContextInC
 function createSupportWithProps(
   templater: TemplaterResult,
   subject: SupportContextItem,
-  ownerSupport: AnySupport,
+  ownerSupport?: AnySupport,
 ): AnySupport {
   const newSupport = createSupport(
     templater,
-    ownerSupport,
-    ownerSupport.appSupport,
     subject,
+    ownerSupport,
+    ownerSupport?.appSupport,
   )
   
   const newPropsConfig = newSupport.propsConfig as PropsConfig
@@ -35,7 +35,7 @@ function createSupportWithProps(
   
     newPropsConfig.castProps = castedProps
   }
-    
+  
   const support = firstTagRender(
     newSupport,
     subject.state.newest, // existing tag
@@ -47,24 +47,28 @@ function createSupportWithProps(
 
 export function processReplacementComponent(
   templater: TemplaterResult,
-  subject:SupportContextItem,
-  ownerSupport: AnySupport,
+  context:SupportContextItem,
+  ownerSupport?: AnySupport,
 ): AnySupport {
   const support = createSupportWithProps(
     templater,
-    subject,
+    context,
     ownerSupport,
   )
 
   const tag = support.templater.tag as any
   if( !['dom','html'].includes(tag.tagJsType) ) {
-    return convertTagToElementManaged(support, ownerSupport, subject)
+    return convertTagToElementManaged(
+      support,
+      support.ownerSupport as AnySupport,
+      context,
+    )
   }
 
   buildBeforeElement(
     support,
     undefined, // element for append child
-    subject.placeholder as Text, // placeholder
+    context.placeholder as Text, // placeholder
   )
 
   return support
