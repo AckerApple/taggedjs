@@ -1,4 +1,4 @@
-import { ElementVar } from '../elements/designElement.function.js';
+import { ElementVar } from '../elements/htmlTag.function.js';
 import { ValueSubject } from '../subject/index.js';
 import { ReadOnlyVar } from '../tagJsVars/tagJsVar.type.js';
 import { AnyTag } from './AnyTag.type.js';

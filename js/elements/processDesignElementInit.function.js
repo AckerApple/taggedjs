@@ -7,7 +7,7 @@ export function processDesignElementInit(value, context, ownerSupport, insertBef
     context.locked = 34;
     const element = processElementVar(value, context, ownerSupport, context.contexts);
     delete context.locked;
-    paintCommands.push([paintBefore, [insertBefore, element, 'designElement.processInit']]);
+    paintCommands.push([paintBefore, [insertBefore, element, 'htmlTag.processInit']]);
     const dom = {
         nn: value.tagName,
         domElement: element,

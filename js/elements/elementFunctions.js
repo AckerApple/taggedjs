@@ -1,6 +1,6 @@
 import { isFunction, isObject } from '../index.js';
 import { setBooleanAttribute, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
-import { getPushKid } from './designElement.function.js';
+import { getPushKid } from './htmlTag.function.js';
 function callbackWrapper(item, eventName, callback) {
     const clone = getPushKid(item, item.elementFunctions);
     return callbackWrapper2(clone, eventName, callback);
