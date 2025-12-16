@@ -1,7 +1,7 @@
 import { AnySupport } from '../index.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { updateToDiffValue } from '../tag/update/updateToDiffValue.function.js'
-import { ElementVar, MockElmListener } from './designElement.function.js'
+import { ElementVar, MockElmListener } from './htmlTag.function.js'
 import { destroyDesignElement } from './destroyDesignElement.function.js'
 
 export function processDesignElementUpdate(

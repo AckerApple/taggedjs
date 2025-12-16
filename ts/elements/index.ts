@@ -1,67 +1,68 @@
-import { designElement } from './designElement.function.js'
-export type { ElementVar } from './designElement.function.js'
+import { htmlTag } from './htmlTag.function.js'
+export type { ElementVar } from './htmlTag.function.js'
+export { htmlTag }
 export { noElement } from './noElement.function.js'
 
-export const button = designElement('button')
-export const select = designElement('select')
-export const option = designElement('option')
-export const input = designElement('input')
-export const textarea = designElement('textarea')
+export const button = htmlTag('button')
+export const select = htmlTag('select')
+export const option = htmlTag('option')
+export const input = htmlTag('input')
+export const textarea = htmlTag('textarea')
 
 // HEAD & SUPPORT ELEMENTS
 
-export const htmlDoc = designElement('html') // TODO: get this named to html
-export const head = designElement('head')
-export const title = designElement('title')
-export const meta = designElement('meta')
-export const link = designElement('link')
-export const style = designElement('style')
-export const body = designElement('body')
-export const noscript = designElement('noscript')
+export const htmlDoc = htmlTag('html') // TODO: get this named to html
+export const head = htmlTag('head')
+export const title = htmlTag('title')
+export const meta = htmlTag('meta')
+export const link = htmlTag('link')
+export const style = htmlTag('style')
+export const body = htmlTag('body')
+export const noscript = htmlTag('noscript')
 
 // BLOCK ELEMENTS
 
-export const hr = designElement('hr')
+export const hr = htmlTag('hr')
 
-export const h1 = designElement('h1')
-export const h2 = designElement('h2')
-export const h3 = designElement('h3')
-export const h4 = designElement('h4')
-export const h5 = designElement('h5')
-export const h6 = designElement('h6')
+export const h1 = htmlTag('h1')
+export const h2 = htmlTag('h2')
+export const h3 = htmlTag('h3')
+export const h4 = htmlTag('h4')
+export const h5 = htmlTag('h5')
+export const h6 = htmlTag('h6')
 
-export const ol = designElement('ol')
-export const ul = designElement('ul')
-export const li = designElement('li')
-export const div = designElement('div')
+export const ol = htmlTag('ol')
+export const ul = htmlTag('ul')
+export const li = htmlTag('li')
+export const div = htmlTag('div')
 
-export const main = designElement('main')
-export const section = designElement('section')
-export const header = designElement('header')
-export const footer = designElement('footer')
-export const fieldset = designElement('fieldset')
-export const legend = designElement('legend')
-export const dialog = designElement('dialog')
-export const pre = designElement('pre')
+export const main = htmlTag('main')
+export const section = htmlTag('section')
+export const header = htmlTag('header')
+export const footer = htmlTag('footer')
+export const fieldset = htmlTag('fieldset')
+export const legend = htmlTag('legend')
+export const dialog = htmlTag('dialog')
+export const pre = htmlTag('pre')
 
 // TABLE ELEMENTS
 
-export const table = designElement('table')
-export const tr = designElement('tr')
-export const td = designElement('td')
-export const th = designElement('th')
-export const thead = designElement('thead')
-export const tbody = designElement('tbody')
-export const tfoot = designElement('tfoot')
+export const table = htmlTag('table')
+export const tr = htmlTag('tr')
+export const td = htmlTag('td')
+export const th = htmlTag('th')
+export const thead = htmlTag('thead')
+export const tbody = htmlTag('tbody')
+export const tfoot = htmlTag('tfoot')
 
 // INLINE ELEMENTS
 
-export const a = designElement('a')
-export const br = designElement('br')
-export const label = designElement('label')
-export const p = designElement('p')
-export const small = designElement('small')
-export const span = designElement('span')
-export const strong = designElement('strong')
-export const b = designElement('b')
-export const sup = designElement('sup')
+export const a = htmlTag('a')
+export const br = htmlTag('br')
+export const label = htmlTag('label')
+export const p = htmlTag('p')
+export const small = htmlTag('small')
+export const span = htmlTag('span')
+export const strong = htmlTag('strong')
+export const b = htmlTag('b')
+export const sup = htmlTag('sup')

@@ -2,7 +2,7 @@ import { isFunction, isObject } from '../index.js';
 import { HowToSet, setBooleanAttribute, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
-import { getPushKid, ElementVar } from './designElement.function.js'
+import { getPushKid, ElementVar } from './htmlTag.function.js'
 
 function callbackWrapper(
   item: ElementVar,

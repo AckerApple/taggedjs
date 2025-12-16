@@ -6,7 +6,7 @@ import { elementFunctions } from './elementFunctions.js'
 import { destroyDesignByContexts } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
 import { processChildren } from './processChildren.function.js'
-import { ElementVarBase, getPushKid } from './designElement.function.js'
+import { ElementVarBase, getPushKid } from './htmlTag.function.js'
 import { destroyHtmlDomMeta } from '../tag/destroyHtmlDomMeta.function.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 

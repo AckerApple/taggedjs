@@ -24,7 +24,7 @@ export function processDesignElementInit(
   )
   
   delete context.locked
-  paintCommands.push([paintBefore, [insertBefore, element, 'designElement.processInit']])
+  paintCommands.push([paintBefore, [insertBefore, element, 'htmlTag.processInit']])
 
   const dom: DomObjectElement = {
     nn: value.tagName,

@@ -65,7 +65,7 @@ export type ElementFunction = (
 
 export type ElementVar = ElementFunction // & ReturnType<typeof elementFunctions>
 
-export function designElement(
+export function htmlTag(
   tagName: string, // div | button
   // elementFunctions: T,
 ): ElementVar {
