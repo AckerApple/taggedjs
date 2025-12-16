@@ -2,8 +2,9 @@ import { TemplaterResult } from '../tag/getTemplaterResult.function.js';
 import { SupportContextItem } from '../tag/SupportContextItem.type.js';
 import { TagWrapper } from '../tag/tag.utils.js';
 import { TagMaker } from '../tag/TagMaker.type.js';
-import { AnySupport, BaseTagGlobal } from '../index.js';
-export declare function renderTagElement(app: TagMaker, global: BaseTagGlobal, templater: TemplaterResult, templater2: TemplaterResult, element: Element, subject: SupportContextItem, isAppFunction: boolean): {
+import { AnySupport, SupportTagGlobal } from '../index.js';
+export declare function renderTagElement(app: TagMaker, global: SupportTagGlobal, templater: TemplaterResult, templater2: TemplaterResult, element: Element, // appElement
+context: SupportContextItem, isAppFunction: boolean): {
     support: AnySupport;
     tags: TagWrapper<unknown>[];
     ValueTypes: {
@@ -20,4 +21,3 @@ export declare function renderTagElement(app: TagMaker, global: BaseTagGlobal, t
         host: string;
     };
 };
-export declare function runWrapper(templater: TemplaterResult, placeholder: Text, appElement: Element, subject: SupportContextItem, isAppFunction: boolean): AnySupport;

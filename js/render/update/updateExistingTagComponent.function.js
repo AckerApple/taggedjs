@@ -10,7 +10,7 @@ import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.fu
 export function updateExistingTagComponent(ownerSupport, newSupport, // lastest
 subject) {
     const global = subject.global;
-    const oldSupport = global.newest;
+    const oldSupport = subject.state.newest;
     const oldWrapper = oldSupport.templater.wrapper;
     let newWrapper = newSupport.templater.wrapper;
     let isSameTag = false;
@@ -55,14 +55,14 @@ export function syncFunctionProps(newSupport, oldSupport, ownerSupport, newProps
 maxDepth, depth = -1) {
     const subject = oldSupport.context;
     const global = subject.global;
-    if (!global || !global.newest) {
+    if (!global || !subject.state.newest) {
         const castedProps = castProps(newPropsArray, newSupport, depth);
         newPropsArray.push(...castedProps);
         const propsConfig = newSupport.propsConfig;
         propsConfig.castProps = castedProps;
         return newPropsArray;
     }
-    const newest = global.newest;
+    const newest = subject.state.newest;
     oldSupport = newest || oldSupport;
     const priorPropConfig = oldSupport.propsConfig;
     const priorPropsArray = priorPropConfig.castProps;
@@ -78,9 +78,10 @@ maxDepth, depth = -1) {
     return newArray;
 }
 export function moveProviders(oldSupport, newSupport) {
-    const global = oldSupport.context.global;
+    const context = oldSupport.context;
+    const global = context.global;
     let pIndex = -1;
-    const providers = global.providers = global.providers || [];
+    const providers = context.providers = context.providers || [];
     const pLen = providers.length - 1;
     while (pIndex++ < pLen) {
         const provider = providers[pIndex];
@@ -114,10 +115,9 @@ function syncSupports(templater, support, oldSupport, ownerSupport, maxDepth) {
 function swapTags(contextItem, templater, // new tag
 ownerSupport) {
     const global = contextItem.global;
-    const oldestSupport = global.oldest;
+    const oldestSupport = contextItem.state.oldest;
     destroySupport(oldestSupport, global);
     getNewGlobal(contextItem);
-    templater.processInit(templater, contextItem, ownerSupport, { added: 0, removed: 0 }, undefined, // appendTo,
-    contextItem.placeholder);
+    templater.processInit(templater, contextItem, ownerSupport, contextItem.placeholder);
 }
 //# sourceMappingURL=updateExistingTagComponent.function.js.map

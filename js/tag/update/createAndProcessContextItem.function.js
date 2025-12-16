@@ -1,24 +1,19 @@
 // taggedjs-no-compile
-import { paintAppend, paintAppends, paintBefore, paintCommands } from '../../render/paint.function.js';
+import { paintAppend, paintAppends } from '../../render/paint.function.js';
 import { domProcessContextItem } from '../../interpolations/optimizers/domProcessContextItem.function.js';
 import { empty } from '../ValueTypes.enum.js';
-import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js';
-/** Must provide insertBefore OR appendTo */
-export function createAndProcessContextItem(value, ownerSupport, counts, contexts, insertBefore, // used during updates
+import { getNewContext } from '../../render/addOneContext.function.js';
+/** Used by arrays and subcontext creators like subscribe. Must provide insertBefore OR appendTo */
+export function createAndProcessContextItem(value, ownerSupport, contexts, insertBefore, // used during updates
 appendTo) {
     const element = document.createTextNode(empty);
-    const contextItem = {
-        value,
-        tagJsVar: valueToTagJsVar(value),
-        withinOwnerElement: false,
-        placeholder: element,
-        valueIndex: contexts.length,
-        valueIndexSetBy: 'createAndProcessContextItem',
-    };
+    const contextItem = getNewContext(value, contexts, true, ownerSupport.context);
+    contextItem.withinOwnerElement = false;
+    contextItem.placeholder = element;
     if (!appendTo) {
-        paintCommands.push([paintBefore, [insertBefore, element]]);
+        contextItem.placeholder = insertBefore;
     }
-    domProcessContextItem(value, ownerSupport, contextItem, counts, appendTo, insertBefore);
+    domProcessContextItem(value, ownerSupport, contextItem, appendTo, insertBefore);
     if (appendTo) {
         paintAppends.push([paintAppend, [appendTo, element]]);
     }

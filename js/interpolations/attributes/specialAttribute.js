@@ -1,12 +1,13 @@
-import { paintContent } from "../../render/paint.function.js";
+import { paintAfters, paintContent } from "../../render/paint.function.js";
 /** handles autofocus, autoselect, style., class. */
 export function specialAttribute(name, value, element, specialName) {
     switch (specialName) {
         case 'autofocus':
-            paintContent.push([autofocus, [element]]);
+            paintAfters.push([autofocus, [element]]);
+            // element.setAttribute("autofocus", 'true')
             return;
         case 'autoselect':
-            paintContent.push([autoselect, [element]]);
+            paintAfters.push([autoselect, [element]]);
             return;
         case 'style': {
             const names = name.split('.');
@@ -21,8 +22,8 @@ export function specialAttribute(name, value, element, specialName) {
 }
 function paintStyle(element, names, value) {
     const smallName = names[1];
-    element.style[smallName] = value;
-    element.style.setProperty(smallName, value);
+    element.style[smallName] = value; // style.backgroundGround
+    element.style.setProperty(smallName, value); // style.background-ground
 }
 function processSpecialClass(name, value, element) {
     const names = name.split('.');

@@ -2,10 +2,8 @@ import { DomObjectChildren } from "../../interpolations/optimizers/ObjectNode.ty
 import { AnySupport } from "../../tag/AnySupport.type.js";
 import { ContextItem } from "../../tag/ContextItem.type.js";
 import { ObjectChildren } from "../../interpolations/optimizers/LikeObjectElement.type.js";
-import { TagCounts } from "../../tag/TagCounts.type.js";
-export declare const blankHandler: () => undefined;
-export declare function attachDomElements(nodes: ObjectChildren, values: any[], support: AnySupport, counts: TagCounts, // used for animation stagger computing
-contexts: ContextItem[], depth: number, // used to know if dynamic variables live within parent owner tag/support
+import { SupportContextItem } from "../../index.js";
+export declare function attachDomElements(nodes: ObjectChildren, values: any[], support: AnySupport, parentContext: SupportContextItem, depth: number, // used to know if dynamic variables live within parent owner tag/support
 appendTo?: Element, insertBefore?: Text): {
     contexts: ContextItem[];
     dom: DomObjectChildren;

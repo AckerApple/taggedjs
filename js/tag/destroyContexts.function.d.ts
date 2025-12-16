@@ -1,0 +1,9 @@
+import { Subscription } from '../subject/subject.utils.js';
+import { AnySupport } from './index.js';
+import { ContextItem } from '../index.js';
+export declare function destroyContexts(childTags: ContextItem[], ownerSupport: AnySupport): void;
+export declare function getChildTagsToSoftDestroy(childTags: ContextItem[], tags?: AnySupport[], subs?: Subscription<any>[]): {
+    subs: Subscription<any>[];
+    tags: AnySupport[];
+};
+export declare function unsubscribeFrom(from: any): void;

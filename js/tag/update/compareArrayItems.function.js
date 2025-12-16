@@ -1,4 +1,3 @@
-import { addPaintRemover } from '../../render/paint.function.js';
 import { destroySupport } from '../../render/destroySupport.function.js';
 export function compareArrayItems(value, index, lastArray, removed) {
     const newLength = value.length - 1;
@@ -23,18 +22,16 @@ function runArrayItemDiff(oldKey, newValueTag, prevContext, lastArray, index) {
     }
     return 0;
 }
-export function destroyArrayItem(item) {
-    const global = item.global;
-    destroyArrayItemByGlobal(global, item);
+export function destroyArrayItem(context) {
+    const global = context.global;
+    destroyArrayItemByGlobal(global, context);
 }
-function destroyArrayItemByGlobal(global, item) {
-    if (global) {
-        const support = global.oldest;
+function destroyArrayItemByGlobal(global, context) {
+    if (global && context.state?.oldest) {
+        const support = context.state.oldest;
         destroySupport(support, global);
         return;
     }
-    const element = item.simpleValueElm;
-    delete item.simpleValueElm;
-    addPaintRemover(element);
+    context.tagJsVar.destroy(context, {});
 }
 //# sourceMappingURL=compareArrayItems.function.js.map

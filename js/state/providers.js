@@ -1,4 +1,4 @@
-import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
+import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js';
 import { setUseMemory } from './setUseMemory.object.js';
 import { state } from './state.function.js';
 function getBlankDiffMemory() {
@@ -18,11 +18,11 @@ export const providers = {
         }
         const result = state(() => {
             const stateConfig = setUseMemory.stateConfig;
-            const oldStateCount = stateConfig.stateArray.length;
+            const oldStateCount = stateConfig.state.length;
             // Providers with provider requirements just need to use providers.create() and providers.inject()
             const instance = constructMethod.prototype ? new constructMethod() : constructMethod();
             const support = stateConfig.support;
-            const stateDiff = stateConfig.stateArray.length - oldStateCount;
+            const stateDiff = stateConfig.state.length - oldStateCount;
             const provider = {
                 constructMethod,
                 instance,
@@ -31,8 +31,9 @@ export const providers = {
                 children: [],
             };
             stateDiffMemory.provider = provider;
-            const global = support.context.global;
-            const providers = global.providers = global.providers || [];
+            const context = support.context;
+            // const global = context.global as SupportTagGlobal
+            const providers = context.providers = context.providers || [];
             providers.push(provider);
             stateDiffMemory.stateDiff = stateDiff;
             return instance;
@@ -61,8 +62,9 @@ function providerInject(constructor) {
             ownerSupport: support.ownerSupport
         };
         while (owner.ownerSupport) {
-            const ownGlobal = owner.ownerSupport.context.global;
-            const ownerProviders = ownGlobal.providers;
+            const context = owner.ownerSupport.context;
+            // const ownGlobal = context.global as SupportTagGlobal
+            const ownerProviders = context.providers;
             if (!ownerProviders) {
                 owner = owner.ownerSupport; // cause reloop checking next parent
                 continue;
@@ -75,8 +77,8 @@ function providerInject(constructor) {
                 }
             });
             if (provider) {
-                const global = support.context.global;
-                const providers = global.providers = global.providers || [];
+                const context = support.context;
+                const providers = context.providers = context.providers || [];
                 providers.push(provider);
                 provider.children.push(support);
                 return provider.instance;

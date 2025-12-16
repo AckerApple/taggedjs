@@ -1,17 +1,23 @@
 import { setupSubscribe } from './setupSubscribe.function.js';
-export function processSubscribe(value, contextItem, ownerSupport, counts, appendTo, insertBefore) {
-    return setupSubscribe(value.Observables, contextItem, ownerSupport, counts, value.callback, appendTo, insertBefore);
-}
+import { ValueTypes } from '../ValueTypes.enum.js';
 export function processSubscribeWith(value, contextItem, ownerSupport, counts, appendTo, insertBefore) {
-    const observables = value.Observables;
-    const subscription = setupSubscribe(observables, contextItem, ownerSupport, counts, value.callback, appendTo, insertBefore);
-    if (!subscription.hasEmitted) {
-        const obValue = observables[0]?.value;
-        subscription.valueHandler((obValue || value.withDefault), 0);
+    const subContext = setupSubscribe(value, contextItem, ownerSupport, counts, appendTo, insertBefore);
+    if (!subContext.hasEmitted) {
+        emitSubContext(value, subContext);
     }
-    return subscription;
+    return subContext;
+}
+export function emitSubContext(value, subContext) {
+    const observables = value.Observables;
+    const obValue = observables[0]?.value;
+    subContext.valueHandler((obValue || value.withDefault), 0);
 }
 export function processSignal(value, contextItem, ownerSupport, counts, appendTo) {
-    setupSubscribe([value], contextItem, ownerSupport, counts, undefined, appendTo);
+    const subValue = {
+        tagJsType: ValueTypes.subscribe,
+        states: [],
+        Observables: [value],
+    };
+    setupSubscribe(subValue, contextItem, ownerSupport, counts, appendTo);
 }
 //# sourceMappingURL=processSubscribe.function.js.map

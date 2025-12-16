@@ -1,7 +1,5 @@
-import { State } from '../state/index.js';
-import { StatesSetter } from '../state/states.utils.js';
-import { BaseSupport } from './BaseSupport.type.js';
-export type AnySupport = (BaseSupport & {
-    state: State;
-    states: StatesSetter[];
-});
+import { HtmlSupport } from './createHtmlSupport.function.js';
+import { SupportContextItem } from './SupportContextItem.type.js';
+export type AnySupport = HtmlSupport & {
+    context: SupportContextItem;
+};

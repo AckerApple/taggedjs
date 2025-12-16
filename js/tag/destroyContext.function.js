@@ -13,13 +13,14 @@ export function destroyContext(childTags, ownerSupport) {
         const childValue = child.value;
         if (childValue?.tagJsType === ValueTypes.subscribe) {
             childValue.delete(child, ownerSupport);
+            child.deleted = true;
             continue;
         }
         const global = child.global;
         if (!global) {
             continue; // not a support contextItem
         }
-        const support = global.newest;
+        const support = child.state.newest;
         const iSubs = global.subscriptions;
         if (iSubs) {
             iSubs.forEach(unsubscribeFrom);
@@ -27,7 +28,7 @@ export function destroyContext(childTags, ownerSupport) {
         if (isTagComponent(support.templater)) {
             runBeforeDestroy(support, global);
         }
-        const subTags = global.contexts;
+        const subTags = child.contexts;
         // recurse
         destroyContext(subTags, support);
     }
@@ -38,7 +39,7 @@ export function getChildTagsToSoftDestroy(childTags, tags = [], subs = []) {
         if (!global) {
             continue;
         }
-        const support = global.newest;
+        const support = child.state.newest;
         if (support) {
             tags.push(support);
             const iSubs = global.subscriptions;
@@ -46,7 +47,7 @@ export function getChildTagsToSoftDestroy(childTags, tags = [], subs = []) {
                 subs.push(...iSubs);
             }
         }
-        const subTags = global.contexts;
+        const subTags = child.contexts;
         if (subTags) {
             getChildTagsToSoftDestroy(subTags, tags, subs);
         }

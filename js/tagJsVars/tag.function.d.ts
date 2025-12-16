@@ -3,6 +3,21 @@ import { Original } from '../tag/tag.utils.js';
 import { RouteProps, RouteTag, StateToTag, ToTag } from '../tag/tag.types.js';
 import { UnknownFunction } from '../tag/update/oneRenderToSupport.function.js';
 import { AnyTag } from '../tag/AnyTag.type.js';
+import { getElement as getTagElement } from '../tag/cycles/setContextInCycle.function.js';
+import { tagInject } from './tagInject.function.js';
+import { onInit as tagOnInit } from '../state/onInit.function.js';
+import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js';
+import { onRender as tagOnRender } from '../state/onRender.function.js';
+import { getInnerHTML as tagGetInnerHTML } from '../index.js';
+declare const tagElement: {
+    get: typeof getTagElement;
+    onclick: <T extends (...args: any[]) => any>(toBeCalled: T) => T;
+    click: <T extends (...args: any[]) => any>(toBeCalled: T) => T;
+    onClick: <T extends (...args: any[]) => any>(toBeCalled: T) => T;
+    mousedown: <T extends (...args: any[]) => any>(toBeCalled: T) => T;
+    onmousedown: <T extends (...args: any[]) => any>(toBeCalled: T) => T;
+    onMouseDown: <T extends (...args: any[]) => any>(toBeCalled: T) => T;
+};
 /** TODO: This might be a duplicate typing of Wrapper */
 export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnType<T> & {
     key: KeyFunction;
@@ -10,6 +25,12 @@ export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnTy
     compareTo?: string;
 }) & {
     original: UnknownFunction;
+    /** @deprecated - use updates() instead */
+    inputs: (handler: (updates: Parameters<T>) => any) => true;
+    /** Process input/argument updates */
+    updates: (handler: (updates: Parameters<T>) => any) => true;
+    /** Process input/argument updates */
+    getInnerHTML: () => true;
 };
 /** How to handle checking for prop changes aka argument changes */
 export declare enum PropWatches {
@@ -33,8 +54,15 @@ export declare namespace tag {
     let route: typeof routeFn;
     let app: (_routeTag: RouteTag) => StateToTag;
     let deepPropWatch: typeof tag;
+    /** monitors root and 1 level argument for exact changes */
     let immutableProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
     let watchProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
+    let element: typeof tagElement;
+    let inject: typeof tagInject;
+    let onInit: typeof tagOnInit;
+    let onDestroy: typeof tagOnDestroy;
+    let onRender: typeof tagOnRender;
+    let getInnerHTML: typeof tagGetInnerHTML;
 }
 type ReturnTag = AnyTag | StateToTag | null | undefined;
 /** Use to structure and define a browser tag route handler

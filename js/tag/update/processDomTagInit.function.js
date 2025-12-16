@@ -4,17 +4,18 @@ import { processNewSubjectTag } from './processNewSubjectTag.function.js';
 export function processDomTagInit(value, // StringTag,
 contextItem, // could be tag via result.tag
 ownerSupport, // owningSupport
-counts, appendTo, insertBefore) {
+insertBefore, appendTo) {
     const tag = value;
     let templater = tag.templater;
     if (!templater) {
         templater = tagFakeTemplater(tag);
     }
-    const global = getNewGlobal(contextItem);
+    getNewGlobal(contextItem);
     if (appendTo) {
-        return processNewSubjectTag(templater, contextItem, ownerSupport, counts, appendTo, insertBefore);
+        return processNewSubjectTag(templater, contextItem, ownerSupport, appendTo, insertBefore);
     }
-    global.newest = newSupportByTemplater(templater, ownerSupport, contextItem);
-    return processTag(ownerSupport, contextItem, counts);
+    const stateMeta = contextItem.state = contextItem.state || {};
+    stateMeta.newest = newSupportByTemplater(templater, ownerSupport, contextItem);
+    return processTag(ownerSupport, contextItem);
 }
 //# sourceMappingURL=processDomTagInit.function.js.map

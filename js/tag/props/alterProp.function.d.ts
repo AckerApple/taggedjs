@@ -1,14 +1,16 @@
-import { AnySupport } from '../AnySupport.type.js';
+import { AnySupport } from '../index.js';
 import { TemplaterResult } from '../getTemplaterResult.function.js';
 import { Props } from '../../Props.js';
 import { UnknownFunction } from '../index.js';
-import { Subject } from '../../subject/Subject.class.js';
-export declare function castProps(props: Props, newSupport: AnySupport, depth: number): unknown[];
-export declare function checkProp(value: unknown | TemplaterResult | SubableProp | unknown[] | Record<string, unknown>, ownerSupport: AnySupport, newSupport: AnySupport, depth: number, owner?: any): unknown;
+import { Subscription } from '../../index.js';
+export declare function castProps(props: Props, newSupport: AnySupport, currentDepth: number): Props;
+export declare function checkProp(value: unknown | TemplaterResult | SubableProp | unknown[] | Record<string, unknown>, ownerSupport: AnySupport, newSupport: AnySupport, depth: number, pos: number, owner?: any): unknown;
+type SubablePropMeta = {
+    subscription: Subscription<any>;
+    restore: () => any;
+};
 type SubableProp = {
-    [name: string]: {
-        subscription: Subject<void>;
-    };
+    [name: string]: SubablePropMeta;
 };
 export type WrapRunner = (() => unknown) & {
     original: unknown;

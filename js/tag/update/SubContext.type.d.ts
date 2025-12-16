@@ -1,18 +1,28 @@
-import { AdvancedContextItem, TemplateValue } from "../../index.js";
-import { SubscribeCallback } from "../../tagJsVars/subscribe.function.js";
-import { LikeSubscription } from '../../tagJsVars/subscribe.function.js';
+import { ContextItem, TemplateValue } from "../../index.js";
+import { LikeSubscription } from "../../tagJsVars/processSubscribeWithAttribute.function.js";
+import { SubscribeValue } from '../../tagJsVars/subscribe.function.js';
+import { TagJsVar } from "../../tagJsVars/tagJsVar.type.js";
 export interface SubContext {
+    tagJsVar?: TagJsVar;
     hasEmitted?: true;
     deleted?: true;
     /** Handles each emission separately */
-    valueHandler: (value: TemplateValue, index: number) => void;
+    subValueHandler: (value: TemplateValue, index: number) => void;
     /** Handles all emissions collectively */
-    valuesHandler: (values: TemplateValue[]) => void;
-    lastValues: any[];
+    valuesHandler: (values: {
+        value: TemplateValue;
+        tagJsVar: TagJsVar;
+    }[], index: number) => void;
+    lastValues: {
+        value: TemplateValue;
+        tagJsVar: TagJsVar;
+        oldTagJsVar?: TagJsVar;
+    }[];
     appendMarker?: Text;
-    contextItem?: AdvancedContextItem;
+    contextItem?: ContextItem;
 }
+export type OnSubOutput = (value: TemplateValue, syncRun: boolean, subContext: SubscriptionContext) => any;
 export interface SubscriptionContext extends SubContext {
-    callback?: SubscribeCallback<any>;
+    tagJsVar: SubscribeValue;
     subscriptions: LikeSubscription[];
 }

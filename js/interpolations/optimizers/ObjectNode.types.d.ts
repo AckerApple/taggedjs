@@ -10,9 +10,10 @@ export type ObjectText = ObjectNode & {
     domElement?: Text;
 };
 export type Attribute = [
-    string,
-    any?,
-    SpecialDefinition?
+    attrName: string,
+    value?: any,
+    isSpecial?: SpecialDefinition,
+    howToSet?: any
 ] | [any];
 export type ObjectElement = ObjectNode & {
     at?: Attribute[];
@@ -25,11 +26,7 @@ export type DomObjectText = ObjectText & {
     marker: Text;
 };
 export type DomObjectElement = ObjectElement & {
-    at: [
-        string,
-        any,
-        boolean
-    ][];
+    at: Attribute[];
     domElement: HTMLElement;
     ch?: DomObjectChildren;
     marker?: Text;

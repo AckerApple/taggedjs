@@ -2,14 +2,14 @@
 import { tagValueUpdateHandler } from './tagValueUpdateHandler.function.js';
 import { compareArrayItems } from './compareArrayItems.function.js';
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js';
-export function processTagArray(subject, value, // arry of Tag classes
-ownerSupport, counts, appendTo) {
-    const noLast = subject.lastArray === undefined;
+export function processTagArray(contextItem, value, // arry of Tag classes
+ownerSupport, appendTo) {
+    const noLast = contextItem.lastArray === undefined;
     if (noLast) {
-        subject.lastArray = [];
+        contextItem.lastArray = [];
     }
-    const lastArray = subject.lastArray;
-    let runtimeInsertBefore = subject.placeholder;
+    const lastArray = contextItem.lastArray;
+    let runtimeInsertBefore = contextItem.placeholder;
     let removed = 0;
     /** 🗑️ remove previous items first */
     const filteredLast = [];
@@ -31,34 +31,34 @@ ownerSupport, counts, appendTo) {
             }
             removed = removed + newRemoved;
         }
-        subject.lastArray = filteredLast;
+        contextItem.lastArray = filteredLast;
     }
     const length = value.length;
     for (let index = 0; index < length; ++index) {
-        const newSubject = reviewArrayItem(value, index, subject.lastArray, ownerSupport, runtimeInsertBefore, counts, appendTo);
+        const newSubject = reviewArrayItem(value, index, contextItem.lastArray, ownerSupport, runtimeInsertBefore, appendTo);
         runtimeInsertBefore = newSubject.placeholder;
     }
 }
 function reviewArrayItem(array, index, lastArray, ownerSupport, runtimeInsertBefore, // used during updates
-counts, appendTo) {
+appendTo) {
     const item = array[index];
     const previous = lastArray[index];
     if (previous) {
-        return reviewPreviousArrayItem(item, previous, lastArray, ownerSupport, index, runtimeInsertBefore, counts, appendTo);
+        return reviewPreviousArrayItem(item, previous, lastArray, ownerSupport, index, runtimeInsertBefore, appendTo);
     }
-    const contextItem = createAndProcessContextItem(item, ownerSupport, counts, lastArray, runtimeInsertBefore, appendTo);
+    const contextItem = createAndProcessContextItem(item, ownerSupport, lastArray, runtimeInsertBefore, appendTo);
     // Added to previous array
     lastArray.push(contextItem);
     return contextItem;
 }
 function reviewPreviousArrayItem(value, itemSubject, lastArray, ownerSupport, index, runtimeInsertBefore, // used during updates
-counts, appendTo) {
+appendTo) {
     const couldBeSame = lastArray.length > index;
     if (couldBeSame) {
-        tagValueUpdateHandler(value, ownerSupport, itemSubject, counts);
+        tagValueUpdateHandler(value, itemSubject, ownerSupport);
         return itemSubject;
     }
-    const contextItem = createAndProcessContextItem(value, ownerSupport, counts, lastArray, runtimeInsertBefore, appendTo);
+    const contextItem = createAndProcessContextItem(value, ownerSupport, lastArray, runtimeInsertBefore, appendTo);
     // Added to previous array
     lastArray.push(contextItem);
     return contextItem;

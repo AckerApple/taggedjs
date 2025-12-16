@@ -1,0 +1,19 @@
+import { addPaintRemover } from '../render/paint.function.js';
+/** Destroy dom elements and dom space markers */
+export function destroyHtmlDomMeta(htmlDomMeta) {
+    // check subjects that may have clones attached to them
+    for (let index = htmlDomMeta.length - 1; index >= 0; --index) {
+        const clone = htmlDomMeta[index];
+        destroyClone(clone);
+        htmlDomMeta.splice(index, 1);
+    }
+}
+function destroyClone(clone) {
+    const marker = clone.marker;
+    if (marker) {
+        addPaintRemover(marker, 'destroyMarker');
+    }
+    const dom = clone.domElement;
+    addPaintRemover(dom, 'destroyClone');
+}
+//# sourceMappingURL=destroyHtmlDomMeta.function.js.map

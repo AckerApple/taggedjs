@@ -1,5 +1,5 @@
 import { InterpolateSubject } from '../tag/update/processFirstSubject.utils.js';
-import { AnySupport } from '../tag/AnySupport.type.js';
+import { AnySupport } from '../tag/index.js';
 export type Template = Element & {
     content: any;
 };

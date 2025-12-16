@@ -1,14 +1,58 @@
 // taggedjs-no-compile
-import { setUseMemory } from '../state/index.js';
+import { callback, setUseMemory, state } from '../state/index.js';
 import { getTemplaterResult } from '../tag/getTemplaterResult.function.js';
 import { tags } from '../tag/tag.utils.js';
 import { getTagWrap } from '../tag/getTagWrap.function.js';
 import { ValueTypes } from '../tag/ValueTypes.enum.js';
 import { processRenderOnceInit } from '../render/update/processRenderOnceInit.function.js';
 import { processTagComponentInit } from '../tag/update/processTagComponentInit.function.js';
-import { checkTagValueChange, destroySupportByContextItem } from '../tag/checkTagValueChange.function.js';
+import { checkTagValueChangeAndUpdate } from '../tag/checkTagValueChange.function.js';
+import { destroySupportByContextItem } from '../tag/destroySupportByContextItem.function.js';
 import { tagValueUpdateHandler } from '../tag/update/tagValueUpdateHandler.function.js';
+import { getContextInCycle, getElement as getTagElement } from '../tag/cycles/setContextInCycle.function.js';
+import { tagInject } from './tagInject.function.js';
+import { onInit as tagOnInit } from '../state/onInit.function.js';
+import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js';
+import { onRender as tagOnRender } from '../state/onRender.function.js';
+import { getInnerHTML as tagGetInnerHTML } from '../index.js';
 let tagCount = 0;
+const onClick = makeEventListener('click');
+const onMouseDown = makeEventListener('mousedown');
+function makeEventListener(type) {
+    return function eventListener(toBeCalled) {
+        const wrapped = callback(toBeCalled); // should cause render to occur
+        // run one time
+        state(() => {
+            const element = getTagElement();
+            element.addEventListener(type, wrapped);
+        });
+        return wrapped; // this is what you remove
+    };
+}
+const tagElement = {
+    get: getTagElement,
+    onclick: onClick,
+    click: onClick,
+    onClick,
+    mousedown: onMouseDown,
+    onmousedown: onMouseDown,
+    onMouseDown: onMouseDown,
+};
+defineGetSet('onclick', onClick);
+defineGetSet('click', onClick);
+defineGetSet('onMouseDown', onMouseDown);
+defineGetSet('onmousedown', onMouseDown);
+defineGetSet('mousedown', onMouseDown);
+function defineGetSet(name, eventFn) {
+    Object.defineProperty(tag, name, {
+        get() {
+            return eventFn;
+        },
+        set(fn) {
+            return eventFn(fn);
+        },
+    });
+}
 /** How to handle checking for prop changes aka argument changes */
 export var PropWatches;
 (function (PropWatches) {
@@ -27,6 +71,7 @@ export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
         const templater = getTemplaterResult(propWatch, props);
         templater.tagJsType = ValueTypes.tagComponent;
         templater.processInit = processTagComponentInit;
+        templater.hasValueChanged = checkTagValueChangeAndUpdate;
         // attach memory back to original function that contains developer display logic
         const innerTagWrap = getTagWrap(templater, parentWrap);
         innerTagWrap.original = tagComponent;
@@ -41,7 +86,15 @@ export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
     tag.ValueTypes = ValueTypes;
     tag.tagIndex = tagCount++; // needed for things like HMR
     tags.push(parentWrap);
-    return parentWrap;
+    const returnWrap = parentWrap;
+    // used for argument updates
+    returnWrap.updates = (handler) => {
+        const context = getContextInCycle();
+        context.updatesHandler = handler;
+        return true;
+    };
+    returnWrap.getInnerHTML = tagGetInnerHTML;
+    return returnWrap;
 }
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
@@ -56,11 +109,18 @@ function renderOnceFn() {
 function tagUseFn() {
     throw new Error('Do not call tag.use as a function but instead set it as: `(props) => tag.use = (use) => html`` `');
 }
+// actually placing of items into tag memory
 ;
+tag.element = tagElement;
 tag.renderOnce = renderOnceFn;
 tag.use = tagUseFn;
 tag.deepPropWatch = tag;
 tag.route = routeFn;
+tag.inject = tagInject;
+tag.onInit = tagOnInit;
+tag.onDestroy = tagOnDestroy;
+tag.onRender = tagOnRender;
+tag.getInnerHTML = tagGetInnerHTML;
 tag.app = function (_routeTag) {
     throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `');
 };
@@ -76,9 +136,9 @@ Object.defineProperty(tag, 'renderOnce', {
         oneRenderFunction.tagJsType = ValueTypes.renderOnce;
         oneRenderFunction.processInit = processRenderOnceInit;
         oneRenderFunction.processUpdate = tagValueUpdateHandler;
-        oneRenderFunction.delete = destroySupportByContextItem;
-        oneRenderFunction.checkValueChange = function renderOnceNeverChanges() {
-            return -1;
+        oneRenderFunction.destroy = destroySupportByContextItem;
+        oneRenderFunction.hasValueChanged = function renderOnceNeverChanges() {
+            return 0;
         };
     },
 });
@@ -91,8 +151,8 @@ Object.defineProperty(tag, 'use', {
         renderFunction.tagJsType = ValueTypes.stateRender;
         renderFunction.processInit = processTagComponentInit;
         renderFunction.processUpdate = tagValueUpdateHandler;
-        renderFunction.checkValueChange = checkTagValueChange;
-        renderFunction.delete = destroySupportByContextItem;
+        renderFunction.hasValueChanged = checkTagValueChangeAndUpdate;
+        renderFunction.destroy = destroySupportByContextItem;
     },
 });
 //# sourceMappingURL=tag.function.js.map

@@ -14,13 +14,14 @@ export function processUpdateRegularValue(value, contextItem) {
 /** Used during updates that were another value/tag first but now simple string */
 export function processNowRegularValue(value, contextItem) {
     contextItem.value = value;
+    contextItem.oldTagJsVar = contextItem.tagJsVar;
     contextItem.tagJsVar = getSimpleTagVar(value);
     const before = contextItem.placeholder;
     const castedValue = castTextValue(value);
     const paint = contextItem.paint = [paintBeforeText, [before, castedValue, function cleanRegularValue(x) {
                 contextItem.simpleValueElm = x;
                 delete contextItem.paint;
-            }]];
+            }, 'processNowRegularValue']];
     paintCommands.push(paint);
 }
 //# sourceMappingURL=processRegularValue.function.js.map

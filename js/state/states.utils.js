@@ -14,12 +14,18 @@ export function reStatesHandler(setter) {
     const config = setUseMemory.stateConfig;
     const statesIndex = config.statesIndex;
     const prevSupport = getSupportWithState(config.prevSupport);
-    const prevStates = prevSupport.states;
+    const prevContext = prevSupport.context;
+    const stateMeta = prevContext.state;
+    const prevStateMeta = stateMeta.older;
+    // const prevStateMeta = stateMeta.newer as ContextStateSupport
+    // const prevStateMeta = stateMeta.older || stateMeta.newer as ContextStateSupport
+    const prevStates = prevStateMeta.states;
     // const prevStates = config.states
     const oldStates = prevStates[statesIndex];
     let lastValues = [];
     oldStates(function regetter(...args) {
         lastValues = args;
+        oldStates.lastValues = lastValues;
         return args;
     });
     const resetter = function stateResetter(..._args) {

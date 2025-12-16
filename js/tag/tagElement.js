@@ -4,10 +4,15 @@ import { destroySupport } from '../render/destroySupport.function.js';
 import { PropWatches } from './index.js';
 import { initState } from '../state/state.utils.js';
 import { isTagComponent } from '../isInstance.js';
-import { checkTagValueChange, destroySupportByContextItem } from './checkTagValueChange.function.js';
+import { checkTagValueChangeAndUpdate } from './checkTagValueChange.function.js';
+import { destroySupportByContextItem } from './destroySupportByContextItem.function.js';
 import { renderTagElement } from '../render/renderTagElement.function.js';
 import { loadNewBaseSupport } from './loadNewBaseSupport.function.js';
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js';
+import { blankHandler } from '../render/dom/blankHandler.function.js';
+import { setSupportInCycle } from './cycles/getSupportInCycle.function.js';
+import { Subject } from '../subject/Subject.class.js';
+import { removeContextInCycle } from './cycles/setContextInCycle.function.js';
 if (typeof (document) === 'object') {
     if (document.taggedJs) {
         console.warn('🏷️🏷️ Multiple versions of taggedjs are loaded. May cause issues.');
@@ -22,7 +27,8 @@ export const appElements = [];
  * @param props object
  * @returns
  */
-export function tagElement(app, element, props) {
+export function tagElement(app, element, // aka appElement
+props) {
     const appElmIndex = appElements.findIndex(appElm => appElm.element === element);
     if (appElmIndex >= 0) {
         const support = appElements[appElmIndex].support;
@@ -42,7 +48,9 @@ export function tagElement(app, element, props) {
     // create observable the app lives on
     const subject = getNewSubject(templater, element);
     const global = subject.global;
-    initState(global.newest);
+    const newest = subject.state.newest;
+    initState(newest.context);
+    setSupportInCycle(newest);
     let templater2 = app(props);
     const isAppFunction = typeof templater2 == BasicTypes.function;
     if (!isAppFunction) {
@@ -51,7 +59,7 @@ export function tagElement(app, element, props) {
             templater2 = app;
         }
         else {
-            global.newest.propsConfig = {
+            subject.state.newest.propsConfig = {
                 latest: [props],
                 castProps: [props],
             };
@@ -61,32 +69,41 @@ export function tagElement(app, element, props) {
             templater = templater2;
         }
     }
-    return renderTagElement(app, global, templater, templater2, element, subject, isAppFunction);
+    const result = renderTagElement(app, global, templater, templater2, element, subject, isAppFunction);
+    removeContextInCycle();
+    return result;
 }
 function getNewSubject(templater, appElement) {
     const tagJsVar = {
         tagJsType: 'templater',
-        checkValueChange: checkTagValueChange,
-        delete: destroySupportByContextItem,
+        hasValueChanged: checkTagValueChangeAndUpdate,
+        destroy: destroySupportByContextItem,
+        processInitAttribute: blankHandler,
         processInit: function appDoNothing() {
             console.debug('do nothing app function');
         },
         processUpdate: tagValueUpdateHandler,
     };
-    const subject = {
+    const context = {
+        updateCount: 0,
         value: templater,
         valueIndex: 0,
-        valueIndexSetBy: 'getNewSubject',
+        varCounter: 0,
+        destroy$: new Subject(),
+        render$: new Subject(),
         withinOwnerElement: false, // i am the highest owner
         renderCount: 0,
         global: undefined, // gets set below in getNewGlobal()
+        state: {},
+        // parentContext: undefined as any,
         tagJsVar,
     };
-    const global = getNewGlobal(subject);
+    // sets new global on context
+    getNewGlobal(context);
     // TODO: events are only needed on the base and not every support
     // for click events and such read at a higher level
-    global.events = {};
-    loadNewBaseSupport(templater, subject, appElement);
-    return subject;
+    context.events = {};
+    loadNewBaseSupport(templater, context, appElement);
+    return context;
 }
 //# sourceMappingURL=tagElement.js.map

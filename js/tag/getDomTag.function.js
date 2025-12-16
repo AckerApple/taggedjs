@@ -1,10 +1,12 @@
 // taggedjs-no-compile
 import { ValueTypes } from './ValueTypes.enum.js';
-import { getSupportInCycle } from './getSupportInCycle.function.js';
+import { getSupportInCycle } from './cycles/getSupportInCycle.function.js';
 import { processDomTagInit } from './update/processDomTagInit.function.js';
-import { checkTagValueChange, destroySupportByContextItem } from '../index.js';
+import { checkTagValueChangeAndUpdate } from '../index.js';
 import { processOuterDomTagInit } from './processOuterDomTagInit.function.js';
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js';
+import { blankHandler } from '../render/dom/blankHandler.function.js';
+import { destroySupportByContextItem } from './destroySupportByContextItem.function.js';
 /** When compiled to then run in browser */
 export function getDomTag(dom, values) {
     const tag = {
@@ -12,10 +14,11 @@ export function getDomTag(dom, values) {
         ownerSupport: getSupportInCycle(),
         dom,
         tagJsType: ValueTypes.dom,
+        processInitAttribute: blankHandler,
         processInit: processDomTagInit,
         processUpdate: tagValueUpdateHandler,
-        checkValueChange: checkTagValueChange,
-        delete: destroySupportByContextItem,
+        hasValueChanged: checkTagValueChangeAndUpdate,
+        destroy: destroySupportByContextItem,
         key: function keyFun(arrayValue) {
             tag.arrayValue = arrayValue;
             return tag;

@@ -1,2 +1,2 @@
-import { AnySupport } from '../AnySupport.type.js';
+import { AnySupport } from '../index.js';
 export declare function safeRenderSupport(newest: AnySupport): AnySupport;

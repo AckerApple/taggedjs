@@ -1,5 +1,5 @@
 import { checkToResolvePromise } from '../interpolations/attributes/checkToResolvePromise.function.js';
-import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
+import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js';
 import { state } from './state.function.js';
 /** runs a callback function one time and never again. Same as calling state(() => ...) */
 export function onInit(callback) {

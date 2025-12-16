@@ -2,13 +2,11 @@ import { processFirstSubjectComponent, processReplacementComponent } from './pro
 import { getNewGlobal } from './getNewGlobal.function.js';
 export function processTagComponentInit(value, contextItem, // could be tag via result.tag
 ownerSupport, // owningSupport
-counts, appendTo) {
+_insertBefore, appendTo) {
     getNewGlobal(contextItem);
     if (appendTo) {
-        const processResult = processFirstSubjectComponent(value, contextItem, ownerSupport, counts, appendTo);
-        return processResult;
+        return processFirstSubjectComponent(value, contextItem, ownerSupport, appendTo);
     }
-    const processResult = processReplacementComponent(value, contextItem, ownerSupport, counts);
-    return processResult;
+    return processReplacementComponent(value, contextItem, ownerSupport);
 }
 //# sourceMappingURL=processTagComponentInit.function.js.map

@@ -5,13 +5,10 @@ export function deleteSubContext(contextItem, ownerSupport) {
     delete contextItem.subContext;
     const appendMarker = subscription.appendMarker;
     if (appendMarker) {
-        addPaintRemover(appendMarker);
+        addPaintRemover(appendMarker, 'deleteSubContext');
         delete subscription.appendMarker;
     }
     delete contextItem.delete;
-    // contextItem.handler = tagValueUpdateHandler
-    // const tagJsVar = contextItem.tagJsVar as TagJsVar
-    //tagJsVar.processUpdate = tagValueUpdateHandler
     if (!subscription.hasEmitted) {
         return;
     }

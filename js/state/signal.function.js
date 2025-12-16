@@ -1,9 +1,11 @@
 import { state } from './index.js';
-import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
-import { processSignal } from '../tag/update/processSubscribe.function.js';
+import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js';
+import { processSignal } from '../tag/update/processSignal.function.js';
 import { ValueTypes } from '../tag/ValueTypes.enum.js';
 import { deleteAndUnsubscribe } from '../tag/update/setupSubscribe.function.js';
-import { handleTagTypeChangeFrom } from '../tag/update/checkSubContext.function.js';
+import { blankHandler } from '../render/dom/blankHandler.function.js';
+import { checkSubscribeValueChanged } from '../tagJsVars/subscribeWith.function.js';
+import { processUpdateSubscribe } from '../tag/update/processUpdateSubscribe.function.js';
 /** Checks if rendering cycle in process. Then creates object with "value" key and ability to "subscribe" to value changes */
 export function signal(initialValue) {
     const support = getSupportInCycle();
@@ -22,8 +24,10 @@ export function Signal(initialValue) {
     };
     return {
         tagJsType: ValueTypes.signal,
+        hasValueChanged: checkSubscribeValueChanged,
+        processInitAttribute: blankHandler,
         processInit: processSignal,
-        processUpdate: (newValue, ownerSupport, contextItem, counts) => handleTagTypeChangeFrom(ValueTypes.signal, newValue, ownerSupport, contextItem, counts),
+        processUpdate: processUpdateSubscribe,
         get value() {
             return value;
         },
@@ -33,7 +37,7 @@ export function Signal(initialValue) {
                 emit(newValue);
             }
         },
-        delete: deleteAndUnsubscribe,
+        destroy: deleteAndUnsubscribe,
         emit,
         subscribe(callback) {
             callback(value); // emit initial value

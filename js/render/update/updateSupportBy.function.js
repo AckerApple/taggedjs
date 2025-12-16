@@ -1,15 +1,14 @@
 import { paint, painting } from '../paint.function.js';
 import { processUpdateContext } from '../../tag/processUpdateContext.function.js';
 export function updateSupportBy(olderSupport, newerSupport) {
-    const global = olderSupport.context.global;
-    const context = global.contexts;
+    const contexts = olderSupport.context.contexts;
     updateSupportValuesBy(olderSupport, newerSupport);
     ++painting.locks;
-    processUpdateContext(olderSupport, context);
+    processUpdateContext(olderSupport, contexts);
     --painting.locks;
     paint();
 }
-export function updateSupportValuesBy(olderSupport, newerSupport) {
+function updateSupportValuesBy(olderSupport, newerSupport) {
     const newTemplate = newerSupport.templater;
     const tempTag = newerSupport.templater.tag;
     const values = newTemplate.values || tempTag.values;

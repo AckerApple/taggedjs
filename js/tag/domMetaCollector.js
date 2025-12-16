@@ -4,7 +4,7 @@ import { replacePlaceholders } from '../interpolations/optimizers/replacePlaceho
 import { isLastRunMatched } from './isLastRunMatched.function.js';
 import { getStringsId } from './getStringsId.function.js';
 const lastRuns = {};
-/** Converts strings & values into dom meta */
+/** Merges strings & values with dom meta into a html array tree */
 export function getDomMeta(strings, values) {
     const stringId = getStringsId(strings);
     const lastRun = lastRuns[stringId];

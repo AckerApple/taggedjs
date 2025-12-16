@@ -15,8 +15,10 @@ export function isSpecialAttr(attrName) {
 export function isSpecialAction(attrName) {
     switch (attrName) {
         case 'autoselect':
+        case 'autoSelect':
             return 'autoselect';
         case 'autofocus':
+        case 'autoFocus':
             return 'autofocus';
     }
     return false;

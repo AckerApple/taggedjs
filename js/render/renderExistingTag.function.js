@@ -5,12 +5,11 @@ export function renderExistingSupport(lastSupport, // should be global.newest
 newSupport, // new to be rendered
 subject) {
     const result = renderWithSupport(newSupport, lastSupport, subject);
-    const global = subject.global;
-    // lastSupport !== newSupport && 
     if (result.wasLikeTags) {
-        updateSupportBy(global.oldest, result.support);
+        const oldest = subject.state.oldest; // || result.support
+        updateSupportBy(oldest, result.support);
         return result.support;
     }
-    return processTag(newSupport, subject, { added: 0, removed: 0 });
+    return processTag(newSupport, subject);
 }
 //# sourceMappingURL=renderExistingTag.function.js.map

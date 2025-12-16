@@ -1,70 +1,51 @@
-import { destroyArray } from './checkDestroyPrevious.function.js';
+import { destroyArray } from './destroyArrayContext.function.js';
 import { addPaintRemover } from '../render/paint.function.js';
+import { destroyHtmlDomMeta } from './destroyHtmlDomMeta.function.js';
+import { isPromise } from '../index.js';
 /** sets global.deleted on support and all children */
-export function smartRemoveKids(global, allPromises) {
-    const context = global.contexts;
-    smartRemoveByContext(context, allPromises);
-    destroyClones(global);
+export function smartRemoveKids(context, allPromises) {
+    const subContexts = context.contexts;
+    smartRemoveByContext(subContexts, allPromises);
+    destroyContextHtml(context);
 }
-function smartRemoveByContext(context, allPromises) {
-    for (const subject of context) {
-        if (subject.locked) {
-            continue;
-        }
-        if (subject.withinOwnerElement) {
-            const tagJsVar = subject.tagJsVar;
+export function destroyContextHtml(context) {
+    destroyHtmlDomMeta(context.htmlDomMeta);
+}
+function smartRemoveByContext(contexts, allPromises) {
+    for (const context of contexts) {
+        if (context.withinOwnerElement) {
+            const tagJsVar = context.tagJsVar;
             if (tagJsVar && tagJsVar.tagJsType === 'host') {
-                const newest = subject.supportOwner;
-                tagJsVar.delete(subject, newest);
+                const newest = context.supportOwner;
+                const hostDestroy = tagJsVar.destroy(context, newest);
+                if (isPromise(hostDestroy)) {
+                    allPromises.push(hostDestroy);
+                }
             }
             continue; // i live within my owner variable. I will be deleted with owner
         }
-        const lastArray = subject.lastArray;
+        const lastArray = context.lastArray;
         if (lastArray) {
-            destroyArray(subject, lastArray);
+            destroyArray(context, lastArray);
             continue;
         }
         // regular values, no placeholders
-        const elm = subject.simpleValueElm;
+        const elm = context.simpleValueElm;
         if (elm) {
-            delete subject.simpleValueElm;
-            addPaintRemover(elm);
+            delete context.simpleValueElm;
+            addPaintRemover(elm, 'smartRemoveByContext');
             continue;
         }
-        const subGlobal = subject.global;
+        const subGlobal = context.global;
         if (subGlobal === undefined) {
-            continue; // subject
-        }
-        if (subGlobal.deleted === true) {
-            continue; // already deleted
+            continue; // context
         }
         subGlobal.deleted = true;
-        const oldest = subGlobal.oldest;
+        const oldest = context.state?.oldest;
         if (oldest) {
-            smartRemoveKids(subGlobal, allPromises);
+            smartRemoveKids(context, allPromises);
             continue;
         }
     }
-}
-/** Destroy dom elements and dom space markers */
-function destroyClones(global) {
-    const htmlDomMeta = global.htmlDomMeta;
-    // check subjects that may have clones attached to them
-    for (let index = htmlDomMeta.length - 1; index >= 0; --index) {
-        const clone = htmlDomMeta[index];
-        destroyClone(clone);
-        htmlDomMeta.splice(index, 1);
-    }
-}
-function destroyClone(clone) {
-    const marker = clone.marker;
-    if (marker) {
-        addPaintRemover(marker);
-    }
-    const dom = clone.domElement;
-    if (!dom) {
-        return;
-    }
-    addPaintRemover(dom);
 }
 //# sourceMappingURL=smartRemoveKids.function.js.map

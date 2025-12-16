@@ -1,48 +1,35 @@
 import { EventCallback } from './getDomTag.function.js';
 import { ContextItem } from './ContextItem.type.js';
-import { AnySupport } from './AnySupport.type.js';
-import { SupportContextItem } from './SupportContextItem.type.js';
+import { AnySupport } from './index.js';
 import { Props } from '../Props.js';
 import { TagWrapper } from './tag.utils.js';
-import { Provider } from '../state/providers.js';
-import { OnDestroyCallback } from '../state/onDestroy.js';
+import { OnDestroyCallback } from '../state/onDestroy.function.js';
 import { Subscription } from '../subject/subject.utils.js';
-import { Subject } from '../subject/index.js';
 import { ValueTypes } from './ValueTypes.enum.js';
-import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
 import { PropWatches } from '../tagJsVars/tag.function.js';
 import { ProcessInit } from './ProcessInit.type.js';
 import { Tag } from './Tag.type.js';
 import { ProcessDelete, TagJsTag } from '../tagJsVars/tagJsVar.type.js';
-import { CheckSupportValueChange, CheckValueChange } from './Context.types.js';
+import { CheckSupportValueChange, HasValueChanged } from './Context.types.js';
 import { ProcessUpdate } from './ProcessUpdate.type.js';
 export type Wrapper = ((newSupport: AnySupport, subject: ContextItem, prevSupport?: AnySupport) => AnySupport) & TagWrapper<unknown> & {
     tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater;
     processInit: ProcessInit;
     processUpdate: ProcessUpdate;
-    checkValueChange: CheckValueChange | CheckSupportValueChange;
-    delete: ProcessDelete;
+    hasValueChanged: HasValueChanged | CheckSupportValueChange;
+    destroy: ProcessDelete;
 };
 /** NOT shared across variable spots. The Subject/ContextItem is more global than this is */
 export type TagGlobal = {
-    htmlDomMeta?: DomObjectChildren;
     deleted?: true;
     isApp?: boolean;
     subscriptions?: Subscription<unknown>[];
     destroyCallback?: OnDestroyCallback;
     callbackMaker?: true;
 };
-export type SupportTagGlobal = TagGlobal & {
-    destroy$: Subject<void>;
+export interface SupportTagGlobal extends TagGlobal {
     blocked: AnySupport[];
-    oldest: AnySupport;
-    newest: AnySupport;
-    contexts: SupportContextItem[];
-    providers?: Provider[];
-};
-export type BaseTagGlobal = SupportTagGlobal & {
-    events?: Events;
-};
+}
 export type Events = {
     [name: string]: EventCallback;
 };

@@ -1,28 +1,33 @@
+import { removeContextInCycle, setContextInCycle } from './cycles/setContextInCycle.function.js';
 export function processUpdateContext(support, contexts) {
     const thisTag = support.templater.tag;
     const values = thisTag.values;
-    let index = 0;
-    const len = values.length;
-    const counts = { added: 0, removed: 0 };
-    while (index < len) {
-        processUpdateOneContext(values, index, contexts, support, counts);
-        ++index;
+    for (const context of contexts) {
+        // const context = contexts[index]
+        processUpdateOneContext(values, context, support);
     }
     return contexts;
 }
 /** returns boolean of did render */
 function processUpdateOneContext(values, // the interpolated values
-index, context, ownerSupport, counts) {
-    const contextItem = context[index];
+contextItem, ownerSupport) {
+    if (contextItem.deleted) {
+        return;
+    }
     // some values, like style, get rearranged and there value appearance may not match context appearance
     const valueIndex = contextItem.valueIndex;
     const newValue = values[valueIndex];
+    // Removed, let the tagJsVars do the checking
     // Do not continue if the value is just the same
-    if (newValue === contextItem.value) {
-        return;
+    /*
+    if(newValue === contextItem.value) {
+      return
     }
+    */
     const tagJsVar = contextItem.tagJsVar;
-    tagJsVar.processUpdate(newValue, ownerSupport, contextItem, counts, values);
+    setContextInCycle(contextItem);
+    tagJsVar.processUpdate(newValue, contextItem, ownerSupport, values);
+    removeContextInCycle();
     contextItem.value = newValue;
 }
 //# sourceMappingURL=processUpdateContext.function.js.map

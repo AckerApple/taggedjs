@@ -7,10 +7,13 @@ export function renderTagUpdateArray(supports) {
     paint();
 }
 function mapTagUpdate(support) {
-    const global = support.context.global;
+    const context = support.context;
+    const global = context.global;
     if (!global) {
+        context.tagJsVar.processUpdate(context.value, context, support.ownerSupport, []);
         return; // while rendering a parent, a child may have been deleted (pinbowl)
     }
-    renderSupport(global.newest);
+    const stateMeta = context.state;
+    renderSupport(stateMeta.newest);
 }
 //# sourceMappingURL=renderTagArray.function.js.map

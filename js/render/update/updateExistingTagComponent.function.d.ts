@@ -1,5 +1,5 @@
 import { Props } from '../../Props.js';
-import { AnySupport } from '../../tag/AnySupport.type.js';
+import { AnySupport } from '../../tag/index.js';
 import { SupportContextItem } from '../../tag/SupportContextItem.type.js';
 export declare function updateExistingTagComponent(ownerSupport: AnySupport, newSupport: AnySupport, // lastest
 subject: SupportContextItem): void;

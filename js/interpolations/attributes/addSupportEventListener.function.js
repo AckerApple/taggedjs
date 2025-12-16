@@ -1,42 +1,29 @@
+import { bubbleEvent } from './bubbleEvent.function.js';
 export function addSupportEventListener(support, eventName, element, callback) {
     const elm = support.appElement;
-    // cast events that do not bubble up into ones that do
+    const replaceEventName = getEventReferenceName(eventName);
     if (eventName === 'blur') {
         eventName = 'focusout';
     }
-    const replaceEventName = '_' + eventName;
-    // const replaceEventName = eventName
-    const global = support.context.global;
-    const eventReg = global.events;
+    const context = support.context;
+    const eventReg = context.events;
     if (!eventReg[eventName]) {
         const listener = function eventCallback(event) {
-            event.originalStopPropagation = event.stopPropagation;
             bubbleEvent(event, replaceEventName, event.target);
         };
         eventReg[eventName] = listener;
         elm.addEventListener(eventName, listener);
     }
-    // attach to element but not as "_click" and "_keyup"
+    // attach to element as "_click" and "_keyup"
     ;
     element[replaceEventName] = callback;
     element[eventName] = callback;
 }
-function bubbleEvent(event, replaceEventName, target) {
-    const callback = target[replaceEventName];
-    if (callback) {
-        let stopped = false;
-        event.stopPropagation = function () {
-            stopped = true;
-            event.originalStopPropagation.call(event);
-        };
-        callback(event);
-        if (event.defaultPrevented || stopped) {
-            return;
-        }
+export function getEventReferenceName(eventName) {
+    // cast events that do not bubble up into ones that do
+    if (eventName === 'blur') {
+        eventName = 'focusout';
     }
-    const parentNode = target.parentNode;
-    if (parentNode) {
-        bubbleEvent(event, replaceEventName, parentNode);
-    }
+    return '_' + eventName;
 }
 //# sourceMappingURL=addSupportEventListener.function.js.map

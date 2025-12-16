@@ -11,10 +11,9 @@ export function handleStillTag(oldSupport, subject, value, ownerSupport) {
             templater = value.outerHTML || value._innerHTML.outerHTML;
         }
     }
-    const valueSupport = createSupport(templater, ownerSupport, ownerSupport.appSupport, subject);
+    const valueSupport = createSupport(templater, subject, ownerSupport, ownerSupport.appSupport);
     const lastSubject = oldSupport.context;
-    const newGlobal = lastSubject.global;
-    const oldest = newGlobal.oldest;
+    const oldest = lastSubject.state.oldest;
     updateSupportBy(oldest, valueSupport);
 }
 //# sourceMappingURL=handleStillTag.function.js.map

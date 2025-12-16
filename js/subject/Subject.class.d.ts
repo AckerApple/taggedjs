@@ -1,20 +1,23 @@
-import { UnaryFunction as OperatorFunction, SubjectLike, SubjectSubscriber, Subscription } from './subject.utils.js';
+import { LikeObservable } from '../tagJsVars/processSubscribeWithAttribute.function.js';
+import { UnaryFunction as OperatorFunction, SubjectSubscriber, Subscription } from './subject.utils.js';
 export type OnSubscription<T> = (subscription: Subscription<T>) => unknown;
-export declare class Subject<T> implements SubjectLike<T> {
-    value?: T | undefined;
+export declare class Subject<T> implements LikeObservable<T> {
     onSubscription?: OnSubscription<T> | undefined;
     methods: OperatorFunction<any, any, any>[];
     isSubject: boolean;
     subscribers: Subscription<T>[];
     subscribeWith?: (x: SubjectSubscriber<T>) => Subscription<T>;
-    constructor(value?: T | undefined, onSubscription?: OnSubscription<T> | undefined);
-    subscribe(callback: SubjectSubscriber<T>): Subscription<any> | Subscription<T>;
+    value?: any;
+    constructor(value?: T, onSubscription?: OnSubscription<T> | undefined);
+    subscribe(callback: SubjectSubscriber<T>): Subscription<T> | Subscription<any>;
     next(value?: T): void;
     set: (value?: T) => void;
     emit(): void;
     toPromise(): Promise<T>;
-    /** like toPromise but faster. Only get called once. No subscription to manage */
-    toCallback(callback: (x: T) => any): this;
+    /** like toPromise but faster.
+     * Once called, unsubscribe occurs.
+     * No subscription to manage UNLESS the callback will never occur THEN subscription needs to be closed with result.unsubscribe() */
+    toCallback(callback: (x: T) => any): Subscription<T> | Subscription<any>;
     pipe(): Subject<T>;
     pipe<A, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>): Subject<A>;
     pipe<A, B, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>, op2: OperatorFunction<A, B, RESOLVE>): Subject<B>;
@@ -28,19 +31,17 @@ export declare class Subject<T> implements SubjectLike<T> {
     pipe<A, B, C, D, E, F, G, H, I, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>, op2: OperatorFunction<A, B, RESOLVE>, op3: OperatorFunction<B, C, RESOLVE>, op4: OperatorFunction<C, D, RESOLVE>, op5: OperatorFunction<D, E, RESOLVE>, op6: OperatorFunction<E, F, RESOLVE>, op7: OperatorFunction<F, G, RESOLVE>, op8: OperatorFunction<G, H, RESOLVE>, op9: OperatorFunction<H, I, RESOLVE>, ...operations: OperatorFunction<any, any, any>[]): Subject<unknown>;
     setMethods(operations: OperatorFunction<any, any, any>[]): void;
     /** Wait for all observables to emit before continuing */
-    static all<A, B, C, D, E, F>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D, Subject<E> | E, Subject<F> | F]): Subject<[A, B, C, D, E, F]>;
-    static all<A, B, C, D, E>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D, Subject<E> | E]): Subject<[A, B, C, D, E]>;
-    static all<A, B, C, D>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C, Subject<D> | D]): Subject<[A, B, C, D]>;
-    static all<A, B, C>(args: [Subject<A> | A, Subject<B> | B, Subject<C> | C]): Subject<[A, B, C]>;
-    static all<A, B>(args: [Subject<A> | A, Subject<B> | B]): Subject<[A, B]>;
-    static all<A>(args: [Subject<A> | A]): Subject<[A]>;
+    static all<A, B, C, D, E, F>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C, LikeObservable<D> | D, LikeObservable<E> | E, LikeObservable<F> | F]): Subject<[A, B, C, D, E, F]>;
+    static all<A, B, C, D, E>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C, LikeObservable<D> | D, LikeObservable<E> | E]): Subject<[A, B, C, D, E]>;
+    static all<A, B, C, D>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C, LikeObservable<D> | D]): Subject<[A, B, C, D]>;
+    static all<A, B, C>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeObservable<C> | C]): Subject<[A, B, C]>;
+    static all<A, B>(args: [LikeObservable<A> | A, LikeObservable<B> | B]): Subject<[A, B]>;
+    static all<A>(args: [LikeObservable<A> | A]): Subject<[A]>;
     static globalSubCount$: Subject<number>;
 }
 export declare class Subjective<T> extends Subject<T> {
-    value?: T | undefined;
-    onSubscription?: OnSubscription<T> | undefined;
     _value?: T;
-    constructor(value?: T | undefined, onSubscription?: OnSubscription<T> | undefined);
+    constructor(...args: [value?: T, onSubscription?: OnSubscription<T>]);
     next(value?: any): void;
     emit(): void;
 }

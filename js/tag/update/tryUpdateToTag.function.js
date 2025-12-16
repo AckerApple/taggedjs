@@ -6,21 +6,24 @@ import { updateExistingTagComponent } from '../../render/update/updateExistingTa
 import { createSupport } from '../createSupport.function.js';
 /** result is an indication to ignore further processing but that does not seem in use anymore */
 export function tryUpdateToTag(contextItem, newValue, // newValue
-ownerSupport, counts) {
+ownerSupport) {
     const isComp = isTagComponent(newValue);
-    contextItem.tagJsVar = newValue;
     if (isComp) {
         if (contextItem.global === undefined) {
             getNewGlobal(contextItem);
         }
-        prepareUpdateToComponent(newValue, contextItem, ownerSupport, counts);
+        contextItem.oldTagJsVar = contextItem.tagJsVar;
+        contextItem.tagJsVar = newValue;
+        prepareUpdateToComponent(newValue, contextItem, ownerSupport);
         return true;
     }
     // detect if previous value was a tag
     const global = contextItem.global;
     if (global) {
+        contextItem.oldTagJsVar = contextItem.tagJsVar;
+        contextItem.tagJsVar = newValue;
         // its html/dom based tag
-        const support = global.newest;
+        const support = contextItem.state.newest;
         if (support) {
             if (typeof (newValue) === BasicTypes.function) {
                 return true;
@@ -30,20 +33,19 @@ ownerSupport, counts) {
         }
     }
     ;
-    newValue.processInit(newValue, contextItem, ownerSupport, counts, undefined, // appendTo,
-    contextItem.placeholder);
+    newValue.processInit(newValue, contextItem, ownerSupport, contextItem.placeholder);
+    contextItem.oldTagJsVar = contextItem.tagJsVar;
+    contextItem.tagJsVar = newValue;
     return true;
 }
-function prepareUpdateToComponent(templater, contextItem, ownerSupport, counts) {
-    const global = contextItem.global;
+function prepareUpdateToComponent(templater, contextItem, ownerSupport) {
     // When last value was not a component
-    if (!global.newest) {
+    if (!contextItem.state.newest) {
         ;
-        templater.processInit(templater, contextItem, ownerSupport, counts, undefined, // appendTo,
-        contextItem.placeholder);
+        templater.processInit(templater, contextItem, ownerSupport, contextItem.placeholder);
         return;
     }
-    const support = createSupport(templater, ownerSupport, ownerSupport.appSupport, contextItem);
+    const support = createSupport(templater, contextItem, ownerSupport, ownerSupport.appSupport);
     updateExistingTagComponent(ownerSupport, support, // latest value
     contextItem);
 }

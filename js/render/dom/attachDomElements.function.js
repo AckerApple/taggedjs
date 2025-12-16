@@ -1,29 +1,40 @@
 // taggedjs-no-compile
-import { howToSetFirstInputValue, howToSetStandAloneAttr } from "../../interpolations/attributes/howToSetInputValue.function.js";
-import { paintAppend, paintAppendElementString, paintAppends, paintBefore, paintBeforeElementString, paintCommands } from "../paint.function.js";
-import { processAttribute } from "../attributes/processAttribute.function.js";
+import { paintAppend, paintAppendElementString, paintAppends, paintBeforeElementString, paintCommands } from "../paint.function.js";
 import { empty } from "../../tag/ValueTypes.enum.js";
 import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicDom.function.js";
-export const blankHandler = function blankHandler() {
-    return undefined;
-};
-export function attachDomElements(nodes, values, support, counts, // used for animation stagger computing
-contexts, depth, // used to know if dynamic variables live within parent owner tag/support
+import { attachDomElement } from "./attachDomElement.function.js";
+import { Subject } from "../../subject/Subject.class.js";
+import { isFunction } from "../../index.js";
+export function attachDomElements(nodes, values, support, parentContext, depth, // used to know if dynamic variables live within parent owner tag/support
 appendTo, insertBefore) {
+    const context = support.context;
+    const contexts = context.contexts;
+    parentContext = context;
+    // const contexts = parentContext.contexts
     const dom = [];
     if (appendTo && insertBefore === undefined) {
         insertBefore = document.createTextNode(empty);
         paintAppends.push([paintAppend, [appendTo, insertBefore]]);
         appendTo = undefined;
     }
+    // loop map of elements that need to be put down on document
     for (let index = 0; index < nodes.length; ++index) {
         const node = nodes[index];
-        const value = node.v;
-        const isNum = !isNaN(value);
+        const v = node.v;
+        const isNum = !isNaN(v);
         if (isNum) {
-            const index = contexts.length;
-            const value = values[index];
-            attachDynamicDom(value, contexts, support, counts, depth, appendTo, insertBefore);
+            // const valueIndex = context.varCounter // contexts.length
+            // const valueIndex = (parentContext as SupportContextItem).varCounter // contexts.length
+            const valueIndex = Number(v); // (parentContext as SupportContextItem).varCounter // contexts.length
+            const realValue = values[valueIndex];
+            const isSkipFun = isFunction(realValue) && realValue.tagJsType === undefined;
+            if (isSkipFun) {
+                ++parentContext.varCounter;
+                // TODO: I dont think we ever get in here?
+                continue;
+            }
+            const contextItem = attachDynamicDom(realValue, contexts, support, parentContext, depth, appendTo, insertBefore);
+            contextItem.valueIndex = valueIndex;
             continue;
         }
         const newNode = {}; // DomObjectText
@@ -32,33 +43,34 @@ appendTo, insertBefore) {
             attachDomText(newNode, node, appendTo, insertBefore);
             continue;
         }
-        // one single html element
-        const domElement = attachDomElement(newNode, node, values, support, contexts, counts, appendTo, insertBefore);
+        const domElement = newNode.domElement = document.createElement(node.nn);
+        // Create parent context for attributes first
+        const newParentContext = {
+            updateCount: 0,
+            isAttrs: true,
+            element: domElement,
+            parentContext,
+            contexts: [],
+            destroy$: new Subject(),
+            render$: new Subject(),
+            tagJsVar: {
+                tagJsType: 'new-parent-context'
+            },
+            valueIndex: -1,
+            withinOwnerElement: true,
+        };
+        newParentContext.varCounter = 0;
+        // one single html element. This is where attribute processing takes place
+        attachDomElement(domElement, node, values, support, newParentContext, appendTo, insertBefore);
+        // Update parent context with element and attribute contexts
+        newParentContext.element = domElement;
         if (node.ch) {
-            newNode.ch = attachDomElements(node.ch, values, support, counts, contexts, depth + 1, domElement, insertBefore).dom;
+            newNode.ch = attachDomElements(node.ch, values, support, newParentContext, 
+            // contexts,
+            depth + 1, domElement, insertBefore).dom;
         }
     }
     return { dom, contexts };
-}
-function attachDomElement(newNode, node, values, support, contexts, counts, appendTo, insertBefore) {
-    const domElement = newNode.domElement = document.createElement(node.nn);
-    // attributes that may effect style, come first for performance
-    if (node.at) {
-        for (const attr of node.at) {
-            const name = attr[0];
-            const value = attr[1];
-            const isSpecial = attr[2] || false;
-            const howToSet = attr.length > 1 ? howToSetFirstInputValue : howToSetStandAloneAttr;
-            processAttribute(values, name, domElement, support, howToSet, contexts, isSpecial, counts, value);
-        }
-    }
-    if (appendTo) {
-        paintAppends.push([paintAppend, [appendTo, domElement]]);
-    }
-    else {
-        paintCommands.push([paintBefore, [insertBefore, domElement]]);
-    }
-    return domElement;
 }
 function attachDomText(newNode, node, owner, insertBefore) {
     const textNode = newNode;

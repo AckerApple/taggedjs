@@ -1,4 +1,4 @@
-import { getSupportInCycle } from "../tag/getSupportInCycle.function.js";
+import { getSupportInCycle } from "../tag/cycles/getSupportInCycle.function.js";
 import { state } from "./state.function.js";
 export function onDestroy(callback) {
     state(function stateDestroy() {

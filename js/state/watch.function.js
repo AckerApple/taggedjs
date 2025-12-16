@@ -1,5 +1,6 @@
 import { ValueSubject } from '../subject/index.js';
-import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
+import { tag } from '../tag/index.js';
+import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js';
 import { setUseMemory } from './setUseMemory.object.js';
 import { state } from './state.function.js';
 import { oldSyncStates } from './syncStates.function.js';
@@ -11,12 +12,12 @@ import { oldSyncStates } from './syncStates.function.js';
  * @returns T[]
  */
 export const watch = ((currentValues, callback) => {
-    return setupWatch(currentValues, callback);
+    return setupWatch(currentValues, callback).pastResult;
 });
 const defaultFinally = (x) => x;
 function newWatch(setup) {
     const method = (currentValues, callback) => {
-        return setupWatch(currentValues, callback, setup);
+        return setupWatch(currentValues, callback, setup).pastResult;
     };
     method.setup = setup;
     defineOnMethod(() => method, method);
@@ -34,32 +35,50 @@ const setupWatch = (currentValues, callback, { init, before, final = defaultFina
         pastResult: undefined,
         values: undefined,
     });
-    const previousValues = previous.values;
-    // First time running watch?
-    if (previousValues === undefined) {
-        if (before && !before(currentValues)) {
-            previous.values = currentValues;
-            return previous.pastResult; // do not continue
+    const isFun = typeof (currentValues) === 'function';
+    const realValues = isFun ? currentValues() : currentValues;
+    const isFirstRender = previous.values === undefined;
+    let renderCount = 0;
+    if (isFirstRender) {
+        if (typeof (currentValues) === 'function') {
+            tag.onRender(() => {
+                ++renderCount;
+                if (renderCount === 1) {
+                    return; // first run is already performed
+                }
+                const realValues = currentValues();
+                processRealValues(realValues);
+            });
         }
-        const castedInit = init || callback;
-        const result = castedInit(currentValues, previousValues);
+    }
+    function processRealValues(realValues) {
+        // First time running watch?
+        if (previous.values === undefined) {
+            if (before && !before(realValues)) {
+                previous.values = realValues;
+                return previous; // do not continue
+            }
+            const castedInit = init || callback;
+            const result = castedInit(realValues, previous.values);
+            previous.pastResult = final(result);
+            previous.values = realValues;
+            return previous;
+        }
+        const allExact = realValues.every((item, index) => item === previous.values[index]);
+        if (allExact) {
+            return previous;
+        }
+        if (before && !before(realValues)) {
+            previous.values = realValues;
+            return previous; // do not continue
+        }
+        const result = callback(realValues, previous.values);
         previous.pastResult = final(result);
-        previous.values = currentValues;
-        return previous.pastResult;
+        previous.values.length = 0;
+        previous.values.push(...realValues);
+        return previous;
     }
-    const allExact = currentValues.every((item, index) => item === previousValues[index]);
-    if (allExact) {
-        return previous.pastResult;
-    }
-    if (before && !before(currentValues)) {
-        previous.values = currentValues;
-        return previous.pastResult; // do not continue
-    }
-    const result = callback(currentValues, previousValues);
-    previous.pastResult = final(result);
-    previousValues.length = 0;
-    previousValues.push(...currentValues);
-    return previous.pastResult;
+    return processRealValues(realValues);
 };
 function defineOnMethod(getWatch, attachTo) {
     Object.defineProperty(attachTo, 'noInit', {
@@ -73,26 +92,32 @@ function defineOnMethod(getWatch, attachTo) {
         get() {
             const oldWatch = getWatch();
             const firstSupport = state(() => getSupportInCycle());
-            const subject = state(() => new ValueSubject(undefined));
+            const subject = state(() => {
+                return new ValueSubject(undefined);
+            });
             const oldState = state(() => ({
-                stateArray: setUseMemory.stateConfig.stateArray,
+                state: setUseMemory.stateConfig.state,
                 states: setUseMemory.stateConfig.states,
             }));
             const method = (currentValues, callback) => {
-                setupWatch(currentValues, (currentValues, previousValues) => {
+                const handler = (realValues, previousValues) => {
                     const nowSupport = getSupportInCycle();
-                    const setTo = callback(currentValues, previousValues);
+                    const setTo = callback(realValues, previousValues);
                     if (nowSupport !== firstSupport) {
-                        const newestState = oldState.stateArray;
-                        const global = firstSupport.context.global;
-                        const oldest = global.oldest;
-                        const oldestState = oldest.state;
-                        const newStates = oldState.states;
-                        const oldStates = oldest.states;
-                        oldSyncStates(newestState, oldestState, newStates, oldStates);
+                        const newestState = oldState.state;
+                        const context = firstSupport.context;
+                        const stateMeta = context.state;
+                        const oldestStateSupport = stateMeta.older;
+                        if (oldestStateSupport) {
+                            const oldestState = oldestStateSupport.state;
+                            const newStates = oldState.states;
+                            const oldStates = oldestStateSupport.states;
+                            oldSyncStates(newestState, oldestState, newStates, oldStates);
+                        }
                     }
                     subject.next(setTo);
-                }, oldWatch.setup);
+                };
+                setupWatch(currentValues, handler, oldWatch.setup);
                 return subject;
             };
             method.setup = oldWatch.setup;

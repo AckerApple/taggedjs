@@ -1,8 +1,6 @@
-import type { TagCounts } from '../../tag/TagCounts.type.js';
 import { ContextItem } from '../ContextItem.type.js';
-import { AnySupport } from '../AnySupport.type.js';
-import { TemplateValue } from '../TemplateValue.type.js';
-import { Tag } from '../Tag.type.js';
-export declare function processFirstSubjectValue(value: TemplateValue | Tag, contextItem: ContextItem, // could be tag via result.tag
+import { AnySupport } from '../index.js';
+import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js';
+export declare function processFirstSubjectValue(value: TagJsVar, tagJsVar: TagJsVar, contextItem: ContextItem, // could be tag via result.tag
 ownerSupport: AnySupport, // owningSupport
-counts: TagCounts, appendTo?: Element, insertBefore?: Text): AnySupport | undefined;
+insertBefore?: Text, appendTo?: Element): AnySupport | undefined;

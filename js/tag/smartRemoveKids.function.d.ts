@@ -1,3 +1,5 @@
-import { SupportTagGlobal } from './getTemplaterResult.function.js';
+import { ContextItem } from './ContextItem.type.js';
+import { SupportContextItem } from './index.js';
 /** sets global.deleted on support and all children */
-export declare function smartRemoveKids(global: SupportTagGlobal, allPromises: Promise<any>[]): void;
+export declare function smartRemoveKids(context: SupportContextItem, allPromises: Promise<any>[]): void;
+export declare function destroyContextHtml(context: ContextItem): void;

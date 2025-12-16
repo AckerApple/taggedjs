@@ -1,16 +1,22 @@
-import { ContextItem, ValueTypes } from "../tag/index.js";
-import { TagJsVar } from "./tagJsVar.type.js";
-export type HostCallback = (element: HTMLInputElement, newHostValue: HostValue, context: ContextItem) => any;
+import { ValueTypes } from "../tag/index.js";
+import { MatchesInjection, TagJsVar } from "./tagJsVar.type.js";
+/** On specific host life cycles, a callback can be called.
+ * @state always an object */
+export type HostCallback = (...args: any[]) => any;
 type Options = {
     onDestroy?: HostCallback;
     onInit?: HostCallback;
 };
 type AllOptions = Options & {
+    arguments?: any[];
     onDestroy: HostCallback;
     callback: HostCallback;
 };
-/** Use to gain access to element */
-export declare function host(callback: HostCallback, options?: Options): HostValue;
+export type HostValueFunction<T extends ((args: any[]) => any)> = HostValue & T;
+/** Use to gain access to element
+ * @callback called every render
+ */
+export declare function host<T extends HostCallback>(callback: T, options?: Options): HostValueFunction<T>;
 export declare namespace host {
     /** Attach a host to an element that only runs during initialization */
     const onInit: (callback: HostCallback) => HostValue;
@@ -20,5 +26,6 @@ export declare namespace host {
 export type HostValue = TagJsVar & {
     tagJsType: typeof ValueTypes.host;
     options: AllOptions;
+    matchesInjection: MatchesInjection;
 };
 export {};

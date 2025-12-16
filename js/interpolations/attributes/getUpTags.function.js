@@ -1,7 +1,8 @@
 import { isTagComponent } from "../../isInstance.js";
 import { providersChangeCheck } from "../../state/providersChangeCheck.function.js";
-import { checkRenderUp, isInlineHtml } from "../../render/renderSupport.function.js";
+import { isInlineHtml } from "../../render/renderSupport.function.js";
 import { ValueTypes } from "../../tag/ValueTypes.enum.js";
+import { checkRenderUp } from "../../render/checkRenderUp.function.js";
 export function getUpTags(support, supports = []) {
     const subject = support.context;
     // const global = support.context.global as SupportTagGlobal
@@ -16,13 +17,20 @@ export function getUpTags(support, supports = []) {
     if (inlineHtml) {
         return getUpTags(ownerSupport, supports);
     }
+    const global = support.context.global;
+    if (global && global.deleted === true) {
+        return supports;
+    }
     const newSupport = support; // global.newest as AnySupport
     const isComponent = isTagComponent(newSupport.templater);
     const tagJsType = support.templater.tagJsType;
     const canContinueUp = ownerSupport && tagJsType !== ValueTypes.stateRender;
     const continueUp = canContinueUp && (!isComponent || checkRenderUp(newSupport.templater, newSupport));
-    const proSupports = providersChangeCheck(newSupport);
-    supports.push(...proSupports);
+    const providers = newSupport.context.providers;
+    if (providers) {
+        const proSupports = providersChangeCheck(newSupport);
+        supports.push(...proSupports);
+    }
     if (continueUp) {
         getUpTags(ownerSupport, supports);
         if (isComponent) {

@@ -1,5 +1,5 @@
 import { Subject, ValueSubject } from '../subject/index.js';
-import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
+import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js';
 import { setUseMemory } from './setUseMemory.object.js';
 import { state } from './state.function.js';
 import { oldSyncStates } from './syncStates.function.js';
@@ -14,14 +14,17 @@ export function subject(initialValue) {
 subject._value = (value) => {
     const oldestState = state(function subjectValue() {
         return {
-            stateArray: setUseMemory.stateConfig.stateArray,
+            state: setUseMemory.stateConfig.state,
             states: setUseMemory.stateConfig.states,
         };
     });
     const nowSupport = getSupportInCycle();
     return state(function subjectValue() {
         const subject = new ValueSubject(value).pipe(x => {
-            oldSyncStates(nowSupport.state, oldestState.stateArray, nowSupport.states, oldestState.states);
+            const context = nowSupport.context;
+            const stateMeta = context.state;
+            const newer = stateMeta.newer;
+            oldSyncStates(newer.state, oldestState.state, newer.states, oldestState.states);
             return x;
         });
         return subject;
@@ -29,12 +32,17 @@ subject._value = (value) => {
 };
 function all(args) {
     const oldestState = state(() => ({
-        stateArray: setUseMemory.stateConfig.stateArray,
+        state: setUseMemory.stateConfig.state,
         states: setUseMemory.stateConfig.states,
     }));
     const nowSupport = getSupportInCycle();
     return Subject.all(args).pipe(x => {
-        oldSyncStates(nowSupport.state, oldestState.stateArray, nowSupport.states, oldestState.states);
+        const context = nowSupport.context;
+        const stateMeta = context.state;
+        const newer = stateMeta.newer;
+        if (newer) {
+            oldSyncStates(newer.state, oldestState.state, newer.states, oldestState.states);
+        }
         return x;
     });
 }

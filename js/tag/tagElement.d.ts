@@ -1,9 +1,8 @@
 import { TagWrapper } from './tag.utils.js';
 import { ValueTypes } from './ValueTypes.enum.js';
 import { TagMaker } from './TagMaker.type.js';
-import { BaseSupport } from './BaseSupport.type.js';
 import { setUseMemory } from '../state/setUseMemory.object.js';
-import { AnySupport } from './AnySupport.type.js';
+import { AnySupport } from './index.js';
 export type TagAppElement = Element & {
     ValueTypes: typeof ValueTypes;
     setUse: typeof setUseMemory;
@@ -19,8 +18,9 @@ export declare const appElements: {
  * @param props object
  * @returns
  */
-export declare function tagElement(app: TagMaker, element: HTMLElement | Element, props?: unknown): {
-    support: BaseSupport;
+export declare function tagElement(app: TagMaker, element: HTMLElement | Element, // aka appElement
+props?: unknown): {
+    support: AnySupport;
     tags: TagWrapper<unknown>[];
     ValueTypes: typeof ValueTypes;
 };

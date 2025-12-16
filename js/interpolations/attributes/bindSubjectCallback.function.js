@@ -32,25 +32,27 @@ bindTo, args) {
     const component = getSupportWithState(support);
     const subject = component.context;
     // const global = subject.global as SupportTagGlobal // tag.subject.global as TagGlobal
-    subject.locked = true; // prevent another render from re-rendering this tag
+    subject.locked = 1; // prevent another render from re-rendering this tag
+    // ++painting.locks
     // sync the new states to the old before the old does any processing
-    // syncStatesArray(component.subject.global.newest.states, states)
+    // syncStatesArray(component.context.state.newest.states, states)
     // ACTUAL CALLBACK TO ORIGINAL FUNCTION
     const callbackResult = value.apply(bindTo, args);
     // sync the old states to the new
     // syncStatesArray(states, component.subject.global.newest.states)
     delete subject.locked;
+    // --painting.locks
     const result = afterTagCallback(callbackResult, component);
     return result;
 }
-export function afterTagCallback(callbackResult, eventHandlerSupport) {
-    const global = eventHandlerSupport.context.global; // tag.subject.global as SupportTagGlobal
-    return renderCallbackSupport(eventHandlerSupport, callbackResult, global);
-}
-function renderCallbackSupport(last, callbackResult, global) {
+export function afterTagCallback(callbackResult, last) {
+    const global = last.context.global;
+    if (global?.deleted) {
+        return;
+    }
     const tagsToUpdate = getUpTags(last);
     renderTagUpdateArray(tagsToUpdate);
-    return checkToResolvePromise(callbackResult, last, global, 'bind', { resolvePromise, resolveValue });
+    return checkToResolvePromise(callbackResult, last, { resolvePromise, resolveValue });
 }
 const noData = 'no-data-ever';
 const promiseNoData = 'promise-no-data-ever';

@@ -1,5 +1,4 @@
 import { clonePropsBy } from './props/clonePropsBy.function.js';
-import { Subject } from '../subject/Subject.class.js';
 /** used only for apps, otherwise use Support */
 export function getBaseSupport(templater, context, castedProps) {
     const baseSupport = {
@@ -8,20 +7,24 @@ export function getBaseSupport(templater, context, castedProps) {
         castedProps,
         appSupport: undefined,
     };
-    // const global = context.global || getNewGlobal(context)
     const global = context.global;
     global.blocked = [];
-    global.destroy$ = new Subject();
-    // global.oldest = global.oldest || baseSupport as AnySupport
-    // global.oldest = baseSupport as AnySupport
+    // context.state.newer = context.state.newer || { ...setUseMemory.stateConfig }
+    if (!context.state) {
+        context.state = {
+            newer: {
+                state: [],
+                states: [],
+            }
+        };
+    }
     return baseSupport;
 }
 /** Sets support states to empty array and clones props */
 export function upgradeBaseToSupport(templater, // at runtime rendering of a tag, it needs to be married to a new Support()
-support, appSupport, castedProps) {
-    // ;(support as AnySupport).state = []
-    // ;(support as AnySupport).states = []
-    support.appSupport = appSupport;
+support, // when appSupport not defined then this support becomes appSupport
+appSupport, castedProps) {
+    support.appSupport = appSupport || support;
     const props = templater.props; // natural props
     if (props) {
         support.propsConfig = clonePropsBy(support, props, castedProps);

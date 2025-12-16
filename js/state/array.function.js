@@ -1,5 +1,5 @@
 import { state } from '../index.js';
-import { getSupportInCycle } from '../tag/getSupportInCycle.function.js';
+import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js';
 import { Signal } from './signal.function.js';
 /** returns a signal that contains an array and mocks acting like an array to support root array functionality */
 export function array(initialValue = []) {

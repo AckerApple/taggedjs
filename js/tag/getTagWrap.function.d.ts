@@ -1,7 +1,7 @@
 import { TemplaterResult, Wrapper } from './getTemplaterResult.function.js';
 import { TagWrapper } from './tag.utils.js';
 import { Props } from '../Props.js';
-import { AnySupport } from './AnySupport.type.js';
+import { AnySupport } from './index.js';
 /** creates/returns a function that when called then calls the original component function
  * Gets used as templater.wrapper()
  */

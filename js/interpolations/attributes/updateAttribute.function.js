@@ -3,7 +3,7 @@ import { BasicTypes } from '../../tag/ValueTypes.enum.js';
 import { paintContent } from '../../render/paint.function.js';
 import { processNameOnlyAttrValue } from '../../render/attributes/processAttribute.function.js';
 import { isNoDisplayValue } from '../../render/attributes/isNoDisplayValue.function.js';
-export function updateNameOnlyAttrValue(values, attrValue, lastValue, element, ownerSupport, howToSet, context, counts) {
+export function updateNameOnlyAttrValue(values, attrValue, lastValue, element, ownerSupport, howToSet, context) {
     // check to remove previous attribute(s)
     if (lastValue) {
         if (isNoDisplayValue(attrValue)) {
@@ -28,7 +28,7 @@ export function updateNameOnlyAttrValue(values, attrValue, lastValue, element, o
             }
         }
     }
-    processNameOnlyAttrValue(values, attrValue, element, ownerSupport, howToSet, context, counts);
+    processNameOnlyAttrValue(values, attrValue, element, ownerSupport, howToSet, context);
 }
 function removeAttribute(element, name) {
     element.removeAttribute(name);

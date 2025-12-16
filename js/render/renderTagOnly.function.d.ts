@@ -1,4 +1,8 @@
 import { SupportContextItem } from '../tag/SupportContextItem.type.js';
-import { AnySupport } from '../tag/AnySupport.type.js';
-export declare function renderTagOnly(newSupport: AnySupport, prevSupport: AnySupport | undefined, // causes restate
-subject: SupportContextItem, ownerSupport?: AnySupport): AnySupport;
+import { AnySupport } from '../tag/index.js';
+export declare function reRenderTag(newSupport: AnySupport, prevSupport: AnySupport | undefined, // causes restate
+context: SupportContextItem, ownerSupport?: AnySupport): AnySupport;
+/** Used during first renders of a support */
+export declare function firstTagRender(newSupport: AnySupport, prevSupport: AnySupport | undefined, // causes restate
+context: SupportContextItem, ownerSupport?: AnySupport): AnySupport;
+export declare function getSupportOlderState(support?: AnySupport): import("../index.js").State | undefined;

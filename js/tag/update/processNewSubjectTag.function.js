@@ -3,25 +3,25 @@ import { paintAppend, paintAppends, paintBefore, paintCommands } from '../../ren
 import { newSupportByTemplater } from '../../render/update/processTag.function.js';
 export function processNewSubjectTag(templater, subject, // could be tag via result.tag
 ownerSupport, // owner
-counts, appendTo, insertBefore) {
+appendTo, insertBefore) {
     const support = newSupportByTemplater(templater, ownerSupport, subject);
     support.ownerSupport = ownerSupport;
-    const result = buildBeforeElement(support, counts, appendTo, appendTo ? undefined : insertBefore);
+    const result = buildBeforeElement(support, appendTo, appendTo ? undefined : insertBefore);
     for (const dom of result.dom) {
         if (dom.marker) {
             if (appendTo) {
                 paintAppends.push([paintAppend, [appendTo, dom.marker]]);
             }
             else {
-                paintCommands.push([paintBefore, [insertBefore, dom.marker]]);
+                paintCommands.push([paintBefore, [insertBefore, dom.marker, 'subMarker']]);
             }
         }
         if (dom.domElement) {
             if (appendTo) {
-                paintAppends.push([paintAppend, [appendTo, dom.domElement]]);
+                paintAppends.push([paintAppend, [appendTo, dom.domElement, 'subAppendTo']]);
             }
             else {
-                paintCommands.push([paintBefore, [insertBefore, dom.domElement]]);
+                paintCommands.push([paintBefore, [insertBefore, dom.domElement, 'subInsertBefore']]);
             }
         }
     }

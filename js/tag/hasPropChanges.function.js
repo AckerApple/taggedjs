@@ -1,8 +1,9 @@
 import { deepEqual } from '../deepFunctions.js';
-import { deepCompareDepth, immutablePropMatch, shallowPropMatch } from './hasSupportChanged.function.js';
-import { hasPropLengthsChanged } from '../render/renderSupport.function.js';
+import { deepCompareDepth, immutablePropMatch } from './hasSupportChanged.function.js';
+import { shallowPropMatch } from './shallowPropMatch.function.js';
 import { PropWatches } from '../tagJsVars/tag.function.js';
 import { BasicTypes } from './ValueTypes.enum.js';
+import { hasPropLengthsChanged } from '../render/checkRenderUp.function.js';
 /**
  *
  * @param props

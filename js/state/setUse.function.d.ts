@@ -1,4 +1,4 @@
-import { AnySupport } from '../tag/AnySupport.type.js';
+import { AnySupport } from '../tag/index.js';
 import { StateMemory } from './StateMemory.type.js';
 import { tagClosed$ } from './tagClosed$.subject.js';
 export type UseOptions = {

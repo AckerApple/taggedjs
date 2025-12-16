@@ -1,27 +1,38 @@
 import { moveProviders } from './update/updateExistingTagComponent.function.js';
 import { softDestroySupport } from './softDestroySupport.function.js';
-import { renderTagOnly } from './renderTagOnly.function.js';
+import { firstTagRender, getSupportOlderState, reRenderTag } from './renderTagOnly.function.js';
 import { isLikeTags } from '../tag/isLikeTags.function.js';
 import { ValueTypes } from '../tag/ValueTypes.enum.js';
 /** TODO: This seems to support both new and updates and should be separated? */
 export function renderWithSupport(newSupport, lastSupport, // previous (global.newest)
-subject) {
-    const reSupport = renderTagOnly(newSupport, lastSupport, subject);
+context) {
+    let reSupport;
+    const olderState = getSupportOlderState(lastSupport);
+    // const olderState = getSupportNewerState(lastSupport)
+    if (olderState) {
+        reSupport = reRenderTag(newSupport, lastSupport, context);
+    }
+    else {
+        reSupport = firstTagRender(newSupport, lastSupport, context);
+    }
     const isLikeTag = !lastSupport || isLikeTags(lastSupport, reSupport);
     if (!isLikeTag) {
         moveProviders(lastSupport, reSupport);
         softDestroySupport(lastSupport);
-        const global = reSupport.context.global;
-        global.oldest = reSupport;
-        global.newest = reSupport;
+        const context = reSupport.context;
+        context.state.oldest = reSupport;
+        context.state.newest = reSupport;
+        // context.state.older = context.state.newer
     }
     else if (lastSupport) {
         const tag = lastSupport.templater.tag;
-        if (tag && subject.renderCount > 0) {
+        if (tag && context.renderCount > 0) {
             const lastTemplater = lastSupport?.templater;
             const lastTag = lastTemplater?.tag;
             checkTagSoftDestroy(tag, lastSupport, lastTag);
         }
+        // context.state.older = context.state.newer
+        // context.state.newer = context.state.older
     }
     reSupport.ownerSupport = newSupport.ownerSupport; // || lastOwnerSupport) as AnySupport
     return {

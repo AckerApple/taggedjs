@@ -1,7 +1,8 @@
 import { handleProviderChanges } from './handleProviderChanges.function.js';
+/** Called when one tag changes and we need to find other tags that will need to be rendered */
 export function providersChangeCheck(support) {
-    const global = support.context.global;
-    const providers = global.providers;
+    const context = support.context;
+    const providers = context.providers;
     if (!providers) {
         return [];
     }

@@ -6,7 +6,11 @@
  */
 export function syncSupports(support, // from
 newestSupport) {
-    return syncStatesArray(support.states, newestSupport.states);
+    const stateMeta = support.context.state;
+    const newestStateMeta = newestSupport.context.state;
+    const fromStates = stateMeta.newer.states;
+    const toStates = newestStateMeta.newer.states;
+    return syncStatesArray(fromStates, toStates);
 }
 export function syncStatesArray(from, onto) {
     for (let index = 0; index < from.length; ++index) {

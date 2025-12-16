@@ -1,13 +1,13 @@
 import { StateMismatchError } from '../errors.js';
 export function checkStateMismatch(config, support) {
     const rearray = config.rearray;
-    if (rearray.length && rearray.length !== config.stateArray.length) {
+    if (rearray.length && rearray.length !== config.state.length) {
         throwStateMismatch(rearray, support, config);
     }
 }
 const hint = 'State tracking requires same number of state calls on every render. This error typically occurs when a state call is only reachable behind a condition. Also, wrapping tags that have state, with tag(), often helps when tag is only reachable by a condition.';
 function throwStateMismatch(rearray, support, config) {
-    const message = `Saved states between renders are inconsistent. Expected ${rearray.length} states got ${config.stateArray.length}.`;
+    const message = `Saved states between renders are inconsistent. Expected ${rearray.length} states got ${config.state.length}.`;
     const wrapper = support.templater?.wrapper;
     let tagFunction = wrapper;
     if (wrapper?.original) {
@@ -17,7 +17,7 @@ function throwStateMismatch(rearray, support, config) {
         tagFunction = wrapper.original;
     }
     const details = {
-        oldStates: config.stateArray,
+        oldStates: config.state,
         newStates: config.rearray,
         tagFunction,
         templater: support.templater,

@@ -1,5 +1,5 @@
 import { TemplaterResult } from './getTemplaterResult.function.js';
-import { AnySupport } from './AnySupport.type.js';
+import { AnySupport } from './index.js';
 import { TagJsTag, TagJsVar } from '../tagJsVars/tagJsVar.type.js';
 export type Tag = TagJsTag & {
     values: unknown[];

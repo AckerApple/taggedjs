@@ -3,7 +3,7 @@ import { runFirstState } from './stateHandlers.js';
 import { tagClosed$ } from './tagClosed$.subject.js';
 export const setUseMemory = {
     stateConfig: {
-        stateArray: [], // state memory on the first render
+        state: [], // state memory on the first render
         version: Date.now(),
         handlers: {
             handler: runFirstState,

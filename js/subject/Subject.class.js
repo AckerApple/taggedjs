@@ -2,7 +2,6 @@ import { isSubjectInstance } from '../isInstance.js';
 import { combineLatest } from './combineLatest.function.js';
 import { getSubscription, runPipedMethods } from './subject.utils.js';
 export class Subject {
-    value;
     onSubscription;
     // private?
     methods = [];
@@ -10,12 +9,15 @@ export class Subject {
     // private?
     subscribers = [];
     subscribeWith;
+    value;
     constructor(value, 
     // private? - only used by extending classes
     onSubscription) {
-        this.value = value;
         this.onSubscription = onSubscription;
         // defineValueOn(this)
+        if (arguments.length > 0) {
+            this.value = value;
+        }
     }
     subscribe(callback) {
         const subscription = getSubscription(this, callback, this.subscribers);
@@ -60,7 +62,9 @@ export class Subject {
             });
         });
     }
-    /** like toPromise but faster. Only get called once. No subscription to manage */
+    /** like toPromise but faster.
+     * Once called, unsubscribe occurs.
+     * No subscription to manage UNLESS the callback will never occur THEN subscription needs to be closed with result.unsubscribe() */
     toCallback(callback) {
         const subscription = this.subscribe((x, runtimeSub) => {
             const tagJsUnsub = runtimeSub?.unsubscribe;
@@ -72,10 +76,15 @@ export class Subject {
             }
             callback(x);
         });
-        return this;
+        // return this 10-2025 remove
+        return subscription;
     }
     pipe(...operations) {
-        const subject = new Subject(this.value);
+        const args = [];
+        if ('value' in this) {
+            args.push(this.value);
+        }
+        const subject = new Subject(...args);
         subject.setMethods(operations);
         subject.subscribeWith = (x) => this.subscribe(x);
         subject.next = x => this.next(x);
@@ -100,16 +109,10 @@ export class Subject {
     static globalSubCount$ = new Subject(0); // for ease of debugging}
 }
 export class Subjective extends Subject {
-    value;
-    onSubscription;
     _value;
-    constructor(value, 
-    // private?
-    onSubscription) {
-        super(value, onSubscription);
-        this.value = value;
-        this.onSubscription = onSubscription;
-        this._value = value;
+    constructor(...args) {
+        super(...args);
+        this._value = args[0];
         defineValueOn(this);
     }
     next(value) {

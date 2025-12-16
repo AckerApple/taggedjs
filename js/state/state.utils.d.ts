@@ -1,7 +1,7 @@
-import { AnySupport } from '../tag/AnySupport.type.js';
-import { State, StateConfig } from './state.types.js';
-export declare function initState(support: AnySupport): void;
-export declare function reState(newSupport: AnySupport, prevSupport: AnySupport, prevState: State): void;
+import { ContextItem } from '../tag/index.js';
+import { StateConfig } from './state.types.js';
+/** To be called before rendering anything with a state */
+export declare function initState(context: ContextItem): void;
 export declare class StateEchoBack {
 }
 /** sends a fake value and then sets back to received value */

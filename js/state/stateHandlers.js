@@ -1,15 +1,24 @@
 import { setUseMemory } from './setUseMemory.object.js';
 import { getStateValue } from './getStateValue.function.js';
 import { BasicTypes } from '../tag/ValueTypes.enum.js';
+import { getContextInCycle } from '../tag/cycles/setContextInCycle.function.js';
 export function runRestate() {
     const config = setUseMemory.stateConfig;
     const rearray = config.rearray;
-    const restate = rearray[config.stateArray.length];
-    config.stateArray.push(restate);
+    const restate = rearray[config.state.length];
+    config.state.push(restate);
     return restate.defaultValue;
 }
 export function runFirstState(defaultValue) {
     const config = setUseMemory.stateConfig;
+    const context = getContextInCycle();
+    if (!context || !context.state) {
+        const msg = 'State requested but TaggedJs is not currently rendering a tag or host';
+        console.error(msg, { config, context });
+        throw new Error(msg);
+    }
+    const newer = context.state.newer;
+    config.state = newer.state;
     // State first time run
     let initValue = defaultValue;
     if (typeof (defaultValue) === BasicTypes.function) {
@@ -30,7 +39,7 @@ export function runFirstState(defaultValue) {
         },
         defaultValue: initValue,
     };
-    config.stateArray.push(push);
+    config.state.push(push);
     return initValue;
 }
 //# sourceMappingURL=stateHandlers.js.map

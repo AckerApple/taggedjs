@@ -1,36 +1,34 @@
-import { executeWrap } from './executeWrap.function.js';
-import { ValueTypes } from '../tag/ValueTypes.enum.js';
-import { runAfterRender } from './afterRender.function.js';
-import { initState, reState } from '../state/state.utils.js';
-import { createSupport } from '../tag/createSupport.function.js';
-export function renderTagOnly(newSupport, prevSupport, // causes restate
-subject, ownerSupport) {
-    runBeforeRender(newSupport, prevSupport);
-    const templater = newSupport.templater;
-    let reSupport;
-    // NEW TAG CREATED HERE
-    if (templater.tagJsType === ValueTypes.stateRender) {
-        const result = templater; // .wrapper as any// || {original: templater} as any
-        reSupport = createSupport(templater, ownerSupport, newSupport.appSupport, // ownerSupport.appSupport as AnySupport,
-        subject);
-        executeWrap(templater, result, reSupport);
-    }
-    else {
-        // functions wrapped in tag()
-        const wrapper = templater.wrapper;
-        // calls the function returned from getTagWrap()
-        reSupport = wrapper(newSupport, subject, prevSupport);
-    }
-    runAfterRender(reSupport, ownerSupport);
-    reSupport.ownerSupport = newSupport.ownerSupport; // || lastOwnerSupport) as AnySupport
-    return reSupport;
+import { initState } from '../state/state.utils.js';
+import { callTag } from './callTag.function.js';
+import { setSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js';
+import { removeContextInCycle } from '../tag/cycles/setContextInCycle.function.js';
+import { reStateSupport } from '../state/reState.function.js';
+export function reRenderTag(newSupport, prevSupport, // causes restate
+context, ownerSupport) {
+    const stateMeta = context.state;
+    const prevState = stateMeta.older.state;
+    reStateSupport(newSupport, prevSupport, prevState);
+    return callTag(newSupport, prevSupport, context, ownerSupport);
 }
-function runBeforeRender(newSupport, prevSupport) {
-    const prevState = prevSupport?.state;
-    if (prevState) {
-        reState(newSupport, prevSupport, prevState);
-        return;
-    }
-    initState(newSupport);
+/** Used during first renders of a support */
+export function firstTagRender(newSupport, prevSupport, // causes restate
+context, ownerSupport) {
+    initState(newSupport.context);
+    setSupportInCycle(newSupport);
+    const result = callTag(newSupport, prevSupport, context, ownerSupport);
+    removeContextInCycle();
+    return result;
 }
+export function getSupportOlderState(support) {
+    const context = support?.context;
+    const stateMeta = context?.state;
+    return stateMeta?.older?.state;
+}
+/*
+export function getSupportNewerState(support?: AnySupport) {
+  const context = support?.context as SupportContextItem
+  const stateMeta = context?.state
+  return stateMeta?.newer?.state
+}
+*/ 
 //# sourceMappingURL=renderTagOnly.function.js.map

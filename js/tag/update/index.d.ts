@@ -1,5 +1,5 @@
-export { deleteSubContext } from './deleteSubContext.function.js';
-export { checkSubContext } from './checkSubContext.function.js';
+export { deleteContextSubContext } from './deleteContextSubContext.function.js';
+export { checkStillSubscription } from './checkStillSubscription.function.js';
 export { onFirstSubContext } from './onFirstSubContext.function.js';
 export { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js';
 export type { SubContext } from './SubContext.type.js';
