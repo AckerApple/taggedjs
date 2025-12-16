@@ -1,4 +1,3 @@
-import { ElementVar } from '../elements/designElement.function.js'
 import { ContextItem } from '../index.js'
 import { Provider } from '../state/providers.js'
 import { AppContextItem } from './ContextItem.type.js'

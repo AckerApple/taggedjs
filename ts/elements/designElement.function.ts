@@ -1,6 +1,5 @@
-import { HostValue, InputElementTargetEvent } from '../index.js'
+import { InputElementTargetEvent } from '../index.js'
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js'
-import { ContextItem } from '../tag/ContextItem.type.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { ReadOnlyVar, TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { elementFunctions, isValueForContext, loopObjectAttributes } from './elementFunctions.js'

@@ -9,7 +9,7 @@ import { AnySupport } from '../../tag/index.js'
 import { paintContent } from '../paint.function.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { processNonDynamicAttr } from '../../interpolations/attributes/processNameValueAttribute.function.js'
-import { addOneContext, getNewContext } from '../addOneContext.function.js'
+import { getNewContext } from '../addOneContext.function.js'
 import { processAttributeFunction } from '../../interpolations/attributes/processAttributeCallback.function.js'
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
 import { createDynamicArrayAttribute, createDynamicAttribute } from './createDynamicAttribute.function.js'
@@ -220,7 +220,7 @@ function callbackFun(
   attrName: string,
   isSpecial: SpecialDefinition,
   howToSet: HowToSet,
-  subject: AttributeContextItem,
+  _subject: AttributeContextItem,
 ) {
   const wrapper = support.templater.wrapper
   const tagJsType = wrapper?.tagJsType || (wrapper?.original as any)?.tagJsType

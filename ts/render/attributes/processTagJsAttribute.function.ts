@@ -3,7 +3,7 @@
 import { setNonFunctionInputValue } from '../../interpolations/attributes/howToSetInputValue.function.js'
 import { AnySupport } from '../../tag/index.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
-import { addOneContext, getNewContext } from '../addOneContext.function.js'
+import { getNewContext } from '../addOneContext.function.js'
 import { TagVarIdNum } from './getTagJsVar.function.js'
 import { removeContextInCycle, setContextInCycle } from '../../tag/cycles/setContextInCycle.function.js'
 import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'

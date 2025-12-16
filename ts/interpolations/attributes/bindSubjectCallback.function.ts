@@ -7,8 +7,6 @@ import { getUpTags } from './getUpTags.function.js'
 import { renderTagUpdateArray } from './renderTagArray.function.js'
 import { getSupportWithState } from './getSupportWithState.function.js'
 import { checkToResolvePromise } from './checkToResolvePromise.function.js'
-import { painting } from '../../render/paint.function.js'
-import { syncStatesArray } from '../../state/syncStates.function.js'
 
 export type Callback = (...args: any[]) => any
 

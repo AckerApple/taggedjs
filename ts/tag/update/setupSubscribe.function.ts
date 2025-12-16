@@ -1,6 +1,6 @@
 import { ContextItem } from '../ContextItem.type.js'
 import { SubscribeValue } from '../../tagJsVars/subscribe.function.js'
-import { paint, painting } from '../../render/paint.function.js'
+import { paint } from '../../render/paint.function.js'
 import { setUseMemory } from '../../state/setUseMemory.object.js'
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js'
 import { AnySupport } from '../index.js'

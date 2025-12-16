@@ -127,7 +127,7 @@ describe('tag.inject', () => {
     }
 
     setContextInCycle(childContext)
-
+    jest.spyOn(console, 'error').mockReturnValue(undefined)
     // Should throw when parent not found
     expect(() => tag.inject(testHost)).toThrow('Could not find parent context for tag.inject')
   })

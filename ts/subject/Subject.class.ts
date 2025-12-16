@@ -106,22 +106,22 @@ export class Subject<T> implements LikeObservable<T> {
 
   /* tslint:disable:max-line-length */
   pipe(): Subject<T>;
-  pipe<A, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>): LikeObservable<A>;
-  pipe<A, B, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>, op2: OperatorFunction<A, B, RESOLVE>): LikeObservable<B>;
-  pipe<A, B, C, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>, op2: OperatorFunction<A, B, RESOLVE>, op3: OperatorFunction<B, C, RESOLVE>): LikeObservable<C>;
+  pipe<A, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>): Subject<A>;
+  pipe<A, B, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>, op2: OperatorFunction<A, B, RESOLVE>): Subject<B>;
+  pipe<A, B, C, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>, op2: OperatorFunction<A, B, RESOLVE>, op3: OperatorFunction<B, C, RESOLVE>): Subject<C>;
   pipe<A, B, C, D, RESOLVE>(
     op1: OperatorFunction<T, A, RESOLVE>,
     op2: OperatorFunction<A, B, RESOLVE>,
     op3: OperatorFunction<B, C, RESOLVE>,
     op4: OperatorFunction<C, D, RESOLVE>
-  ): LikeObservable<D>;
+  ): Subject<D>;
   pipe<A, B, C, D, E, RESOLVE>(
     op1: OperatorFunction<T, A, RESOLVE>,
     op2: OperatorFunction<A, B, RESOLVE>,
     op3: OperatorFunction<B, C, RESOLVE>,
     op4: OperatorFunction<C, D, RESOLVE>,
     op5: OperatorFunction<D, E, RESOLVE>
-  ): LikeObservable<E>;
+  ): Subject<E>;
   pipe<A, B, C, D, E, F, RESOLVE>(
     op1: OperatorFunction<T, A, RESOLVE>,
     op2: OperatorFunction<A, B, RESOLVE>,
@@ -129,7 +129,7 @@ export class Subject<T> implements LikeObservable<T> {
     op4: OperatorFunction<C, D, RESOLVE>,
     op5: OperatorFunction<D, E, RESOLVE>,
     op6: OperatorFunction<E, F, RESOLVE>
-  ): LikeObservable<F>;
+  ): Subject<F>;
   pipe<A, B, C, D, E, F, G, RESOLVE>(
     op1: OperatorFunction<T, A, RESOLVE>,
     op2: OperatorFunction<A, B, RESOLVE>,

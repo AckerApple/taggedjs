@@ -1,5 +1,5 @@
 import { castTextValue } from '../castTextValue.function.js';
-import { AnySupport, isFunction } from '../index.js';
+import { AnySupport } from '../index.js';
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js';
 import { getNewContext } from '../render/addOneContext.function.js';
 import { painter, paintCommands } from '../render/paint.function.js';

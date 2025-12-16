@@ -15,7 +15,7 @@ export function processElementVar(
   value: ElementVar,
   context: ContextItem,
   ownerSupport: AnySupport,
-  addedContexts: ContextItem[],
+  _addedContexts: ContextItem[],
 ) {
   const element = document.createElement(value.tagName)
   context.element = element
