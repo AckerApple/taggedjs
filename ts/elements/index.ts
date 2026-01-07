@@ -66,3 +66,8 @@ export const span = htmlTag('span')
 export const strong = htmlTag('strong')
 export const b = htmlTag('b')
 export const sup = htmlTag('sup')
+
+export const nav = htmlTag("nav")
+export const figure = htmlTag("figure")
+export const figcaption = htmlTag("figcaption")
+export const code = htmlTag("code")

@@ -1,8 +1,9 @@
-import { isFunction, isObject } from '../index.js';
+import { ContextItem, isFunction, isObject } from '../index.js';
 import { HowToSet, setBooleanAttribute, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
 import { getPushKid, ElementVar } from './htmlTag.function.js'
+import { makeAttrCallable, AttributeCallable } from './attributeCallables.js'
 
 function callbackWrapper(
   item: ElementVar,
@@ -44,6 +45,9 @@ function attr(
 
   return clone
 }
+
+const styleCallable = makeAttrCallable('style', attr)
+const idCallable = makeAttrCallable('id', attr)
 
 function attr2(
   item: ElementVar,
@@ -101,6 +105,16 @@ export function elementFunctions(item: any) {
      ;(this as any).arrayValue = arrayValue
      return this
     },
+
+    /** Use as div.style`border:${border}` or div.style(() => `border:${border}`) */
+    style: ((stringsOrValue: any | ((_?: ContextItem) => string), ...values: any[]) => {
+      return styleCallable(item, stringsOrValue, values)
+    }) as AttributeCallable,
+
+    /** Use as div.id`main` or div.id(() => `main-${1}`) */
+    id: ((stringsOrValue: any, ...values: any[]) => {
+      return idCallable(item, stringsOrValue, values)
+    }) as AttributeCallable,
   }
 
   return callables_other

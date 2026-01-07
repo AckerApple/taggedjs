@@ -6,6 +6,7 @@ import { elementFunctions, isValueForContext, loopObjectAttributes } from './ele
 import { destroyDesignElement } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
 import { processDesignElementInit } from './processDesignElementInit.function.js'
+import type { AttributeCallable } from './attributeCallables.js'
 
 export type TruthyVar = number | string | boolean | ((_: InputElementTargetEvent) => string | boolean | number)
 
@@ -61,7 +62,10 @@ export type ElementFunction = (
     attributesOrFirstChild: Child | Attributes,
     ...children: Child[]
   ) => any
-) & ElementVarBase
+) & ElementVarBase & {
+  style: AttributeCallable
+  id: AttributeCallable
+}
 
 export type ElementVar = ElementFunction // & ReturnType<typeof elementFunctions>
 
