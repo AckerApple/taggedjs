@@ -1,5 +1,6 @@
 import { InputElementTargetEvent } from '../TagJsEvent.type.js';
 import { ElementVar } from './htmlTag.function.js';
+import { AttributeCallable } from './attributeCallables.js';
 export declare function elementFunctions(item: any): {
     onClose: (callback: (e: InputElementTargetEvent) => any) => import("./htmlTag.function.js").ElementFunction;
     onDoubleClick: (callback: (e: InputElementTargetEvent) => any) => import("./htmlTag.function.js").ElementFunction;
@@ -13,6 +14,10 @@ export declare function elementFunctions(item: any): {
     attr: (...args: any[]) => import("./htmlTag.function.js").ElementFunction;
     /** Used for setting array index-key value */
     key: (arrayValue: any) => /*elided*/ any;
+    /** Use as div.style`border:${border}` or div.style(() => `border:${border}`) */
+    style: AttributeCallable;
+    /** Use as div.id`main` or div.id(() => `main-${1}`) */
+    id: AttributeCallable;
 };
 /** used during updates */
 export declare function registerMockAttrContext(value: any, mockElm: ElementVar): void;

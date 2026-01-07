@@ -2,6 +2,7 @@ import { InputElementTargetEvent } from '../index.js';
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js';
 import { ReadOnlyVar, TagJsVar } from '../tagJsVars/tagJsVar.type.js';
 import { elementFunctions } from './elementFunctions.js';
+import type { AttributeCallable } from './attributeCallables.js';
 export type TruthyVar = number | string | boolean | ((_: InputElementTargetEvent) => string | boolean | number);
 export type MockElmListener = [
     string,
@@ -41,7 +42,10 @@ export type Attributes = {
 } & {
     [attrName: string]: object | string | boolean | number | TagJsVar | undefined | void | ((_: InputElementTargetEvent) => any);
 };
-export type ElementFunction = ((attributesOrFirstChild: Child | Attributes, ...children: Child[]) => any) & ElementVarBase;
+export type ElementFunction = ((attributesOrFirstChild: Child | Attributes, ...children: Child[]) => any) & ElementVarBase & {
+    style: AttributeCallable;
+    id: AttributeCallable;
+};
 export type ElementVar = ElementFunction;
 export declare function htmlTag(tagName: string): ElementVar;
 export declare function getPushKid(element: ElementVarBase, _elmFunctions: typeof elementFunctions): ElementVar;

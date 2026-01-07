@@ -50,3 +50,7 @@ export declare const span: import("./htmlTag.function.js").ElementFunction;
 export declare const strong: import("./htmlTag.function.js").ElementFunction;
 export declare const b: import("./htmlTag.function.js").ElementFunction;
 export declare const sup: import("./htmlTag.function.js").ElementFunction;
+export declare const nav: import("./htmlTag.function.js").ElementFunction;
+export declare const figure: import("./htmlTag.function.js").ElementFunction;
+export declare const figcaption: import("./htmlTag.function.js").ElementFunction;
+export declare const code: import("./htmlTag.function.js").ElementFunction;

@@ -1,6 +1,7 @@
 import { isFunction, isObject } from '../index.js';
 import { setBooleanAttribute, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
 import { getPushKid } from './htmlTag.function.js';
+import { makeAttrCallable } from './attributeCallables.js';
 function callbackWrapper(item, eventName, callback) {
     const clone = getPushKid(item, item.elementFunctions);
     return callbackWrapper2(clone, eventName, callback);
@@ -25,6 +26,8 @@ function attr(item, args) {
     }
     return clone;
 }
+const styleCallable = makeAttrCallable('style', attr);
+const idCallable = makeAttrCallable('id', attr);
 function attr2(item, args) {
     // const clone = getPushKid(item as any, item.elementFunctions)
     // clone.attributes.push(args as Attribute)
@@ -70,6 +73,14 @@ export function elementFunctions(item) {
             this.arrayValue = arrayValue;
             return this;
         },
+        /** Use as div.style`border:${border}` or div.style(() => `border:${border}`) */
+        style: ((stringsOrValue, ...values) => {
+            return styleCallable(item, stringsOrValue, values);
+        }),
+        /** Use as div.id`main` or div.id(() => `main-${1}`) */
+        id: ((stringsOrValue, ...values) => {
+            return idCallable(item, stringsOrValue, values);
+        }),
     };
     return callables_other;
 }
