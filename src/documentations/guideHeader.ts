@@ -1,4 +1,4 @@
-import { htmlTag, div, header, h1, p, a } from "../node_modules/taggedjs/js/index.js"
+import { htmlTag, div, header, h1, p, a } from "taggedjs"
 
 const nav = htmlTag("nav")
 

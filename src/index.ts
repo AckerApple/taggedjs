@@ -12,3 +12,5 @@ export { todoApp }
 
 import { run } from './run.function'
 export { run }
+
+export { runDocs } from "./documentations/guide"

@@ -1,4 +1,4 @@
-import { section, h2, p, ul, li, a } from "../node_modules/taggedjs/js/index.js"
+import { section, h2, ul, li, a } from "taggedjs"
 
 const tocItems = [
   { id: "project-layout", label: "Project Layout" },

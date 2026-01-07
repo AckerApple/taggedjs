@@ -1,4 +1,4 @@
-import { htmlTag, section, h2, p, a } from "../node_modules/taggedjs/js/index.js"
+import { htmlTag, section, h2, p, a } from "taggedjs"
 
 const code = htmlTag("code")
 const h3 = htmlTag("h3")

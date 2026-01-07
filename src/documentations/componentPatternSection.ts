@@ -1,24 +1,21 @@
-import { htmlTag, section, h2, p, pre, a } from "../node_modules/taggedjs/js/index.js"
+import { htmlTag, section, h2, p, pre, a } from "taggedjs"
 
 const figure = htmlTag("figure")
 const figcaption = htmlTag("figcaption")
 const code = htmlTag("code")
 
-const componentPatternCode = `
-import { tag, h2, p, button } from 'taggedjs'
-
-export const basic = tag(() => {
+const componentPatternCode = `export const basic = tag(() => {
   let counter = 0
   let renderCount = 0
   let showDiv = true
+
+  renderCount++
 
   return div(
     h2('Basic Component'),
     
     p(_=> \`Counter: \${counter}\`),
-    
-    // Below, display updates will cause renderCount increase
-    p(_=> \`Render Count: \${_=> ++renderCount}\`),
+    p(_=> \`Render Count: \${renderCount}\`),
     
     button({
       onClick: () => counter++

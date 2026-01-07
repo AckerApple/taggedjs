@@ -1,4 +1,4 @@
-import { htmlTag, section, h2, p, pre, a } from "../node_modules/taggedjs/js/index.js"
+import { htmlTag, section, h2, p, pre, a } from "taggedjs"
 
 const figure = htmlTag("figure")
 const figcaption = htmlTag("figcaption")
