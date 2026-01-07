@@ -24,6 +24,16 @@ export const concatStyles = tag((innerHTML: any) => {
   let borderColor = 'white'
 
   return div(
+    div
+      .id`static-style-border`
+      .style`border-width:${width}px;border-color:green;border-style:solid;`
+      ('static-style-border'),
+
+    div
+      .id`dynamic-style-border`
+      .style(_=> `border-width:${width}px;border-color:${borderColor};border-style:solid;`)
+      ('dynamic-style-border'),
+
     div({
       id: "dynamic-border-element",
       style: _=> `border-width:${width}px;border-color:${borderColor};border-style:solid;`

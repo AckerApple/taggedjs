@@ -87,6 +87,8 @@ describe('📰 content', () => {
     
     expect(byId('dynamic-border-element').style.borderColor).toBe('white')
     expect(byId('dynamic-border-element').style.borderWidth).toBe('2px')
+    expect(byId('dynamic-style-border').style.borderColor).toBe('white')
+    expect(byId('dynamic-style-border').style.borderWidth).toBe('2px')
 
     byId('dynamic-border-width').value = 1
     byId('dynamic-border-color').value = 'blue'
@@ -96,6 +98,8 @@ describe('📰 content', () => {
     
     expect(byId('dynamic-border-element').style.borderColor).toBe('blue')
     expect(byId('dynamic-border-element').style.borderWidth).toBe('1px')
+    expect(byId('dynamic-style-border').style.borderColor).toBe('blue')
+    expect(byId('dynamic-style-border').style.borderWidth).toBe('1px')
   })
 
   it('tagvar injections', () => {

@@ -1,8 +1,8 @@
-import { tag, noElement, button, h1, hr, div } from "taggedjs"
+import { tag, button, h1, hr, div } from "taggedjs"
 import { menu, useMenuName } from "./menu.tag"
 import { innerCounterContent } from "./countersDebug";
 import { content } from "./content.tag"
-import { animateWrap, fx } from "taggedjs-animate-css"
+import { fx } from "taggedjs-animate-css"
 import { homePage } from "./homePage.tag"
 
 const appDate = Date.now()

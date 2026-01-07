@@ -1,33 +1,10 @@
-import { tag, subscribe, div, a, button } from "taggedjs"
-import { hashRouterSubject, useHashRouter } from "./todo/HashRouter.function"
+import { htmlTag, section, h2, p, pre, a } from "../node_modules/taggedjs/js/index.js"
 
-export function getMenuNameByItem(router: {route:string, location: any}) {
+const figure = htmlTag("figure")
+const figcaption = htmlTag("figcaption")
+const code = htmlTag("code")
 
-  const route = router.route
-  const pathname = router.location.pathname
-
-  if(pathname && route === 'counters/') {
-    return 'counters'
-  }
-
-  if(pathname && route === 'content/') {
-    return 'content'
-  }
-
-  const isIsolated = pathname.endsWith('isolated.html')
-  if(isIsolated) {
-    return 'isolated'
-  }
-
-  const isTodo = pathname.includes('todo/www')
-  if(isTodo) {
-    return 'todo'
-  }
-
-  return 'home'
-}
-
-export const menu = () => {
+const menuRoutingCode = `export const menu = () => {
   const router = hashRouterSubject()
 
   return subscribe(router, item => {
@@ -37,10 +14,6 @@ export const menu = () => {
         'style.opacity': _=> menuName === 'home' ? '.5' : '1',
         href: _=> menuName === 'home' ? undefined : '#/'
       }, 'home'),
-      
-      ' - ',
-
-      a({href: './documentation'}, '📕 documentation'),
       
       ' - ',
       
@@ -83,31 +56,19 @@ export const menu = () => {
     )
   })
 }
+`
 
-
-/** @deprecated */
-export function useMenuName() {
-  const router = useHashRouter()
-  const route = router.route
-  const pathname = router.location.pathname
-  
-  if(pathname && route === 'counters/') {
-    return 'counters'
-  }
-
-  if(pathname && route === 'content/') {
-    return 'content'
-  }
-  
-  const isIsolated = pathname.endsWith('isolated.html')
-  if(isIsolated) {
-    return 'isolated'
-  }
-
-  const isTodo = pathname.includes('todo/www')
-  if(isTodo) {
-    return 'todo'
-  }
-
-  return 'home'
+export function menuRoutingSection() {
+  return section({class: "section-card", id: "menu-routing"},
+    h2("Menu And Routing"),
+    p(
+      "The menu is a live view of the current hash route. It subscribes to the ",
+      "router subject, decides which view is active, and renders anchor links."
+    ),
+    figure(
+      pre(code({class: "language-ts"}, menuRoutingCode)),
+      figcaption("Source: ", code("src/menu.tag.ts"))
+    ),
+    p(a({class: "inline-link", href: "#top"}, "Back to top"))
+  )
 }
