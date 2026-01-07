@@ -5,7 +5,7 @@ const h3 = htmlTag("h3")
 
 export function reactiveUpdatesSection() {
   return section({class: "section-card", id: "reactive-updates"},
-    h2("Reactive Updates"),
+    h2("🔁 Reactive Updates"),
     p(
       "Reactive updates are driven by closures and tracked by the TaggedJS runtime. ",
       "When a function uses values in an arrow callback (for example, ",

@@ -30,7 +30,7 @@ const entryPointCode = `<!DOCTYPE html>
 
 export function entryPointSection() {
   return section({class: "section-card", id: "entry-point"},
-    h2("Entry Point"),
+    h2("🚪 Entry Point"),
     p(
       "To start a TaggedJS app, place a custom element in your HTML and mount the ",
       "component with ",

@@ -4,7 +4,7 @@ const code = htmlTag("code")
 
 export function projectLayoutSection() {
   return section({class: "section-card", id: "project-layout"},
-    h2("Project Layout"),
+    h2("🗂️ Project Layout"),
     p(
       "The gh-pages branch is a full app. Source code lives in ",
       code("src/"),

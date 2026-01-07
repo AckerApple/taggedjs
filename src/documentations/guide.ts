@@ -8,6 +8,7 @@ import { elementImportsSection } from "./elementImportsSection"
 import { attributesSection } from "./attributesSection"
 import { reactiveUpdatesSection } from "./reactiveUpdatesSection"
 import { dynamicContentSection } from "./dynamicContentSection"
+import { mapLoopsSection } from "./mapLoopsSection"
 import { eventHandlersSection } from "./eventHandlersSection"
 import { menuRoutingSection } from "./menuRoutingSection"
 
@@ -26,6 +27,7 @@ const GuideApp = tag(() => [
         attributesSection(),
         reactiveUpdatesSection(),
         dynamicContentSection(),
+        mapLoopsSection(),
         eventHandlersSection(),
         menuRoutingSection()
       )

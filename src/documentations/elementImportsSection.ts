@@ -16,7 +16,7 @@ export const example = tag(() =>
 
 export function elementImportsSection() {
   return section({class: "section-card", id: "element-imports"},
-    h2("Element Imports"),
+    h2("📦 Element Imports"),
     p(
       "TaggedJS exposes HTML elements as functions you can import directly. ",
       "This keeps your render output explicit, avoids string-based templates, ",

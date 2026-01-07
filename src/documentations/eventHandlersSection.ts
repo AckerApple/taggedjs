@@ -11,7 +11,7 @@ const eventHandlersCode = `button({
 
 export function eventHandlersSection() {
   return section({class: "section-card", id: "event-handlers"},
-    h2("Event Handlers"),
+    h2("🖱️ Event Handlers"),
     p(
       "Event handlers use camelCase attributes like ",
       code("onClick"),

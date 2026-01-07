@@ -60,7 +60,7 @@ const menuRoutingCode = `export const menu = () => {
 
 export function menuRoutingSection() {
   return section({class: "section-card", id: "menu-routing"},
-    h2("Menu And Routing"),
+    h2("🧭 Menu And Routing"),
     p(
       "The menu is a live view of the current hash route. It subscribes to the ",
       "router subject, decides which view is active, and renders anchor links."

@@ -15,7 +15,7 @@ button({
 
 export function dynamicContentSection() {
   return section({class: "section-card", id: "dynamic-content"},
-    h2("Dynamic Contect _=>"),
+    h2("✨ Dynamic Contect _=>"),
     p(
       "The ",
       code("_=>"),

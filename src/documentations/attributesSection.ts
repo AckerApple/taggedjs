@@ -19,7 +19,7 @@ div
 
 export function attributesSection() {
   return section({class: "section-card", id: "attributes"},
-    h2("attributes``"),
+    h2("🏷️ attributes``"),
     p(
       "TaggedJS supports a shorthand attribute syntax using tagged template calls. ",
       "You can set attributes with concise chains like ",

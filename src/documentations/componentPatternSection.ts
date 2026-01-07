@@ -32,7 +32,7 @@ const componentPatternCode = `export const basic = tag(() => {
 
 export function componentPatternSection() {
   return section({class: "section-card", id: "component-pattern"},
-    h2("Component Pattern"),
+    h2("🧩 Component Pattern"),
     p(
       "Components are created by calling ",
       code("tag"),
