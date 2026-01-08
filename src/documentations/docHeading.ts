@@ -3,7 +3,6 @@ import { htmlTag, a } from "taggedjs"
 const h2 = htmlTag("h2")
 const h3 = htmlTag("h3")
 const span = htmlTag("span")
-const cursorIcon = "🖱️"
 
 function copyHashToClipboard(id: string) {
   if (typeof window === "undefined" || typeof navigator === "undefined") {
@@ -21,16 +20,11 @@ function copyHashToClipboard(id: string) {
 }
 
 function titleLink(id: string, label: string) {
-  return a(
-    {
-      class: "doc-title-link",
-      href: `#${id}`,
-      onClick: () => copyHashToClipboard(id)
-    },
-    label,
-    " ",
-    span({class: "doc-title-cursor", "aria-hidden": "true"}, cursorIcon)
-  )
+  return a
+    .class`doc-title-link`
+    .href`#${id}`
+    .onClick(() => copyHashToClipboard(id))
+    (label)
 }
 
 export function docH2(id: string, label: string) {

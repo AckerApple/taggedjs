@@ -45,6 +45,25 @@ const componentCallCode = `return div(
   _=> boltTag(counter)
 )`
 
+const componentOutputCode = `import { output, tag, button } from "taggedjs"
+
+export const child = tag((onSave: () => void) => {
+  onSave = output(onSave)
+  return button({
+    onClick: () => onSave()
+  }, "Save")
+})
+
+export const parent = tag(() => {
+  let saved = 0
+
+  return div(
+    _=> child(() => saved++),
+    div(_=> \`saved: \${saved}\`)
+  )
+})
+`
+
 export function componentPatternSection() {
   return section({class: "section-card", id: "component-pattern"},
     docH2("component-pattern", "🧩 Component Pattern"),
@@ -87,7 +106,7 @@ export function componentPatternSection() {
         a({href: `${repoBaseUrl}/src/basic.tag.ts`, target: "_blank"}, code("src/basic.tag.ts"))
       )
     ),
-    docH3("tag-component-outputs", "🧠 Tag Component Outputs"),
+    docH3("tag-component-display", "🧠 Tag Component Display"),
     p(
       "When you pass arguments to a tag component, render it inside a ",
       code("_=>"),
@@ -101,6 +120,27 @@ export function componentPatternSection() {
     figure(
       pre(code({class: "language-ts"}, componentCallCode)),
       figcaption("Render tag components inside a dynamic output")
+    ),
+    docH3("tag-component-callbacks", "🪝 Component Callbacks/Output"),
+    p(
+      "TaggedJS treats function arguments as outputs: when the child calls the ",
+      "function, the parent can update state and re-render the dependent ",
+      code("_=>"),
+      " segments."
+    ),
+    p(
+      "This mirrors Angular-style outputs and keeps data flowing up without ",
+      "recreating the child component."
+    ),
+    p(
+      "Calling ",
+      code("output"),
+      " with the callback binds the caller to the currently running tag, so when ",
+      "the child triggers it, TaggedJS knows which parent output to re-evaluate."
+    ),
+    figure(
+      pre(code({class: "language-ts"}, componentOutputCode)),
+      figcaption("Child callback triggers parent updates")
     ),
     p(a({class: "inline-link", href: "#top"}, "Back to top"))
   )
