@@ -1,17 +1,22 @@
-import { htmlTag, section, h2, p, pre, a } from "taggedjs"
+import { htmlTag, section, p, pre, a } from "taggedjs"
+import { docH2 } from "./docHeading"
 
 const figure = htmlTag("figure")
 const figcaption = htmlTag("figcaption")
 const code = htmlTag("code")
 
-const eventHandlersCode = `button({
-  onClick: () => counter++
-}, 'Increment Counter')
+const eventHandlersCode = `export const clicker = tag(() => {
+  let counter = 0
+
+  return button({
+    onClick: () => counter++
+  }, _=> \`Increment Counter: \${counter}\`)
+})
 `
 
 export function eventHandlersSection() {
   return section({class: "section-card", id: "event-handlers"},
-    h2("🖱️ Event Handlers"),
+    docH2("event-handlers", "🖱️ Event Handlers"),
     p(
       "Event handlers use camelCase attributes like ",
       code("onClick"),

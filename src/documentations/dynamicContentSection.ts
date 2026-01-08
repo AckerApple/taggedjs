@@ -1,4 +1,5 @@
-import { htmlTag, section, h2, p, pre, a } from "taggedjs"
+import { htmlTag, section, p, pre, a } from "taggedjs"
+import { docH2 } from "./docHeading"
 
 const figure = htmlTag("figure")
 const figcaption = htmlTag("figcaption")
@@ -15,7 +16,7 @@ button({
 
 export function dynamicContentSection() {
   return section({class: "section-card", id: "dynamic-content"},
-    h2("✨ Dynamic Contect _=>"),
+    docH2("dynamic-content", "✨ Dynamic Contect _=>"),
     p(
       "The ",
       code("_=>"),

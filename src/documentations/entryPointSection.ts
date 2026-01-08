@@ -1,4 +1,5 @@
-import { htmlTag, section, h2, p, pre, a } from "taggedjs"
+import { htmlTag, section, p, pre, a } from "taggedjs"
+import { docH2 } from "./docHeading"
 
 const figure = htmlTag("figure")
 const figcaption = htmlTag("figcaption")
@@ -30,7 +31,7 @@ const entryPointCode = `<!DOCTYPE html>
 
 export function entryPointSection() {
   return section({class: "section-card", id: "entry-point"},
-    h2("🚪 Entry Point"),
+    docH2("entry-point", "🚪 Entry Point"),
     p(
       "To start a TaggedJS app, place a custom element in your HTML and mount the ",
       "component with ",

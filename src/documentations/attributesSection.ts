@@ -1,4 +1,5 @@
-import { htmlTag, section, h2, p, pre, a } from "taggedjs"
+import { htmlTag, section, p, pre, a } from "taggedjs"
+import { docH2 } from "./docHeading"
 
 const figure = htmlTag("figure")
 const figcaption = htmlTag("figcaption")
@@ -19,7 +20,7 @@ div
 
 export function attributesSection() {
   return section({class: "section-card", id: "attributes"},
-    h2("🏷️ attributes``"),
+    docH2("attributes", "🏷️ attributes``"),
     p(
       "TaggedJS supports a shorthand attribute syntax using tagged template calls. ",
       "You can set attributes with concise chains like ",

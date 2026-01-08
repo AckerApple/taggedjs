@@ -1,11 +1,11 @@
-import { htmlTag, section, h2, p, a } from "taggedjs"
+import { htmlTag, section, p, a } from "taggedjs"
+import { docH2, docH3 } from "./docHeading"
 
 const code = htmlTag("code")
-const h3 = htmlTag("h3")
 
 export function reactiveUpdatesSection() {
   return section({class: "section-card", id: "reactive-updates"},
-    h2("🔁 Reactive Updates"),
+    docH2("reactive-updates", "🔁 Reactive Updates"),
     p(
       "Reactive updates are driven by closures and tracked by the TaggedJS runtime. ",
       "When a function uses values in an arrow callback (for example, ",
@@ -19,7 +19,7 @@ export function reactiveUpdatesSection() {
       code("_=> showDiv && boltTag(counter)"),
       " are reactive segments."
     ),
-    h3("React vs TaggedJS"),
+    docH3("react-vs-taggedjs", "⚖️ React vs TaggedJS"),
     p(
       "React typically re-runs the component function to produce the next render ",
       "output, then reconciles the result. TaggedJS keeps the main tag function ",

@@ -1,10 +1,11 @@
-import { htmlTag, section, h2, p, a } from "taggedjs"
+import { htmlTag, section, p, a } from "taggedjs"
+import { docH2 } from "./docHeading"
 
 const code = htmlTag("code")
 
 export function projectLayoutSection() {
   return section({class: "section-card", id: "project-layout"},
-    h2("🗂️ Project Layout"),
+    docH2("project-layout", "🗂️ Project Layout"),
     p(
       "The gh-pages branch is a full app. Source code lives in ",
       code("src/"),

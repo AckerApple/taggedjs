@@ -1,4 +1,5 @@
-import { htmlTag, section, h2, p, pre, a } from "taggedjs"
+import { htmlTag, section, p, pre, a } from "taggedjs"
+import { docH2 } from "./docHeading"
 
 const figure = htmlTag("figure")
 const figcaption = htmlTag("figcaption")
@@ -60,7 +61,7 @@ const menuRoutingCode = `export const menu = () => {
 
 export function menuRoutingSection() {
   return section({class: "section-card", id: "menu-routing"},
-    h2("🧭 Menu And Routing"),
+    docH2("menu-routing", "🧭 Menu And Routing"),
     p(
       "The menu is a live view of the current hash route. It subscribes to the ",
       "router subject, decides which view is active, and renders anchor links."
