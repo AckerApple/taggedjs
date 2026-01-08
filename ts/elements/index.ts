@@ -1,5 +1,5 @@
 import { htmlTag } from './htmlTag.function.js'
-export type { ElementVar } from './htmlTag.function.js'
+export type { ElementVar } from './ElementFunction.type.js'
 export { htmlTag }
 export { noElement } from './noElement.function.js'
 

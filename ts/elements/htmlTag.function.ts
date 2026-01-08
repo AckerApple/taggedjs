@@ -6,7 +6,7 @@ import { elementFunctions, isValueForContext, loopObjectAttributes } from './ele
 import { destroyDesignElement } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
 import { processDesignElementInit } from './processDesignElementInit.function.js'
-import type { AttributeCallable } from './attributeCallables.js'
+import { ElementVar } from './ElementFunction.type.js'
 
 export type TruthyVar = number | string | boolean | ((_: InputElementTargetEvent) => string | boolean | number)
 
@@ -31,8 +31,6 @@ export type ElementVarBase = ReadOnlyVar & {
   allListeners: MockElmListener[]
 }
 
-type Child = ((_: InputElementTargetEvent) => any) | string | boolean | TagJsVar | number | null | undefined | any[] // object
-
 export type Attributes = {
   onKeyup?: (_: InputElementTargetEvent) => any;
   onKeydown?: (_: InputElementTargetEvent) => any;
@@ -56,21 +54,6 @@ export type Attributes = {
 } & {
   [attrName: string]: object | string | boolean | number | TagJsVar | undefined | void | ((_: InputElementTargetEvent) => any)
 }
-
-export type ElementFunction = (
-  (
-    attributesOrFirstChild: Child | Attributes,
-    ...children: Child[]
-  ) => any
-) & ElementVarBase & {
-  // Hint: add new attribute callables in `ts/elements/elementFunctions.ts` and mirror them here.
-  style: AttributeCallable
-  id: AttributeCallable
-  class: AttributeCallable
-  href: AttributeCallable
-}
-
-export type ElementVar = ElementFunction // & ReturnType<typeof elementFunctions>
 
 export function htmlTag(
   tagName: string, // div | button

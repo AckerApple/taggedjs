@@ -2,8 +2,9 @@ import { ContextItem, isFunction, isObject } from '../index.js';
 import { HowToSet, setBooleanAttribute, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
-import { getPushKid, ElementVar } from './htmlTag.function.js'
+import { getPushKid } from './htmlTag.function.js'
 import { makeAttrCallable, AttributeCallable } from './attributeCallables.js'
+import { ElementVar } from './ElementFunction.type.js';
 
 function callbackWrapper(
   item: ElementVar,

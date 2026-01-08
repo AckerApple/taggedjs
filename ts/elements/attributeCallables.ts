@@ -1,5 +1,5 @@
 import { ContextItem } from '../tag/index.js'
-import { ElementFunction } from './htmlTag.function.js'
+import { ElementFunction } from './ElementFunction.type.js'
 
 type AttrFn = (item: any, args: [name: string | unknown, value?: any]) => any
 

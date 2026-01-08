@@ -1,4 +1,4 @@
-import { AnySupport, isPromise } from '../index.js'
+import { AnySupport, ElementVar, isPromise } from '../index.js'
 import { addSupportEventListener } from '../interpolations/attributes/addSupportEventListener.function.js'
 import { afterTagCallback } from '../interpolations/attributes/bindSubjectCallback.function.js'
 import { getSupportWithState } from '../interpolations/attributes/getSupportWithState.function.js'
@@ -7,7 +7,7 @@ import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArra
 import { processAttributeArray } from '../render/dom/processAttributeArray.function.js'
 import { paint, paintAppend, painting } from '../render/paint.function.js'
 import { ContextItem } from '../tag/index.js'
-import { ElementVar, MockElmListener } from './htmlTag.function.js'
+import { MockElmListener } from './htmlTag.function.js'
 import { processChildren } from './processChildren.function.js'
 
 /** The first and recursive processor for elements */
