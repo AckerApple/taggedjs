@@ -63,8 +63,11 @@ export type ElementFunction = (
     ...children: Child[]
   ) => any
 ) & ElementVarBase & {
+  // Hint: add new attribute callables in `ts/elements/elementFunctions.ts` and mirror them here.
   style: AttributeCallable
   id: AttributeCallable
+  class: AttributeCallable
+  href: AttributeCallable
 }
 
 export type ElementVar = ElementFunction // & ReturnType<typeof elementFunctions>

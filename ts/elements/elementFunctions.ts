@@ -48,6 +48,8 @@ function attr(
 
 const styleCallable = makeAttrCallable('style', attr)
 const idCallable = makeAttrCallable('id', attr)
+const classCallable = makeAttrCallable('class', attr)
+const hrefCallable = makeAttrCallable('href', attr)
 
 function attr2(
   item: ElementVar,
@@ -114,6 +116,16 @@ export function elementFunctions(item: any) {
     /** Use as div.id`main` or div.id(() => `main-${1}`) */
     id: ((stringsOrValue: any, ...values: any[]) => {
       return idCallable(item, stringsOrValue, values)
+    }) as AttributeCallable,
+
+    /** Use as div.class`primary` or div.class(() => `primary`) */
+    class: ((stringsOrValue: any, ...values: any[]) => {
+      return classCallable(item, stringsOrValue, values)
+    }) as AttributeCallable,
+
+    /** Use as a.href`/path` or a.href(() => `/path`) */
+    href: ((stringsOrValue: any, ...values: any[]) => {
+      return hrefCallable(item, stringsOrValue, values)
     }) as AttributeCallable,
   }
 
