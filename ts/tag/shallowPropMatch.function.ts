@@ -25,6 +25,11 @@ export function shallowPropMatch(
     }
   
     if(typeof(prop) === BasicTypes.object) {
+      // cover null and undefined
+      if(!prop && !pastProp) {
+        continue
+      }
+
       if(typeof(pastCloneProps) === BasicTypes.object) {
         const obEntries = Object.entries(prop)
         for (const subItem of obEntries) {
