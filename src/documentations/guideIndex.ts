@@ -6,6 +6,7 @@ const tocItems = [
   { id: "entry-point", label: "🚪 Entry Point" },
   { id: "component-pattern", label: "🧩 Component Pattern" },
   { id: "tag-component-arguments", label: "🧵 Tag Component Arguments", level: "sub" },
+  { id: "tag-component-outputs", label: "🧠 Tag Component Outputs", level: "sub" },
   { id: "element-imports", label: "📦 Element Imports" },
   { id: "attributes", label: "🏷️ attributes``" },
   { id: "reactive-updates", label: "🔁 Reactive Updates" },

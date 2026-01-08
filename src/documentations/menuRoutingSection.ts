@@ -4,6 +4,7 @@ import { docH2 } from "./docHeading"
 const figure = htmlTag("figure")
 const figcaption = htmlTag("figcaption")
 const code = htmlTag("code")
+const repoBaseUrl = "https://github.com/AckerApple/taggedjs/blob/gh-pages"
 
 const menuRoutingCode = `export const menu = () => {
   const router = hashRouterSubject()
@@ -68,7 +69,10 @@ export function menuRoutingSection() {
     ),
     figure(
       pre(code({class: "language-ts"}, menuRoutingCode)),
-      figcaption("Source: ", code("src/menu.tag.ts"))
+      figcaption(
+        "Source: ",
+        a({href: `${repoBaseUrl}/src/menu.tag.ts`, target: "_blank"}, code("src/menu.tag.ts"))
+      )
     ),
     p(a({class: "inline-link", href: "#top"}, "Back to top"))
   )
