@@ -28,6 +28,8 @@ function attr(item, args) {
 }
 const styleCallable = makeAttrCallable('style', attr);
 const idCallable = makeAttrCallable('id', attr);
+const classCallable = makeAttrCallable('class', attr);
+const hrefCallable = makeAttrCallable('href', attr);
 function attr2(item, args) {
     // const clone = getPushKid(item as any, item.elementFunctions)
     // clone.attributes.push(args as Attribute)
@@ -80,6 +82,14 @@ export function elementFunctions(item) {
         /** Use as div.id`main` or div.id(() => `main-${1}`) */
         id: ((stringsOrValue, ...values) => {
             return idCallable(item, stringsOrValue, values);
+        }),
+        /** Use as div.class`primary` or div.class(() => `primary`) */
+        class: ((stringsOrValue, ...values) => {
+            return classCallable(item, stringsOrValue, values);
+        }),
+        /** Use as a.href`/path` or a.href(() => `/path`) */
+        href: ((stringsOrValue, ...values) => {
+            return hrefCallable(item, stringsOrValue, values);
         }),
     };
     return callables_other;

@@ -45,6 +45,8 @@ export type Attributes = {
 export type ElementFunction = ((attributesOrFirstChild: Child | Attributes, ...children: Child[]) => any) & ElementVarBase & {
     style: AttributeCallable;
     id: AttributeCallable;
+    class: AttributeCallable;
+    href: AttributeCallable;
 };
 export type ElementVar = ElementFunction;
 export declare function htmlTag(tagName: string): ElementVar;

@@ -18,6 +18,10 @@ export declare function elementFunctions(item: any): {
     style: AttributeCallable;
     /** Use as div.id`main` or div.id(() => `main-${1}`) */
     id: AttributeCallable;
+    /** Use as div.class`primary` or div.class(() => `primary`) */
+    class: AttributeCallable;
+    /** Use as a.href`/path` or a.href(() => `/path`) */
+    href: AttributeCallable;
 };
 /** used during updates */
 export declare function registerMockAttrContext(value: any, mockElm: ElementVar): void;
