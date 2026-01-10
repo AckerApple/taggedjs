@@ -30,7 +30,7 @@ export function getFakeTemplater() {
         processUpdate: blankHandler,
         hasValueChanged: checkTagValueChangeAndUpdate,
         destroy: blankHandler,
-        propWatch: 'shallow',
+        propWatch: 'shallow', // deprecate
         key: blankHandler,
     };
     return fake;

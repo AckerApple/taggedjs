@@ -57,6 +57,7 @@ export function getOverrideTagVar(context, newContext, support, subject) {
                     return result;
                 });
             }
+            context.destroy$.next();
             return afterDestroy(context, ownerSupport);
         }
     };
