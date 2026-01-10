@@ -117,6 +117,8 @@ export function getOverrideTagVar(
         })
       }
 
+      context.destroy$.next()
+
       return afterDestroy(context, ownerSupport)
     }
   }
