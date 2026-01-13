@@ -12,7 +12,7 @@ export function domProcessContextItem(
   const subject = support.context  
   subject.locked = 3
 
-  contextItem.element = contextItem.element || appendTo as HTMLElement
+  contextItem.target = contextItem.target || appendTo as HTMLElement
   setContextInCycle(contextItem)
 
   contextItem.tagJsVar.processInit(

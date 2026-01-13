@@ -26,7 +26,7 @@ export function attachDynamicDom(
   )
 
   contextItem.placeholder = marker
-  contextItem.element = appendTo
+  contextItem.target = appendTo
 
   if(appendTo) {
     paintAppends.push([paintAppend, [appendTo, marker]])

@@ -30,7 +30,7 @@ export function processTagJsVarAttribute(
     parentContext,
   ) as any as AttributeContextItem
 
-  contextItem.element = element
+  contextItem.target = element
   contextItem.valueIndex = varIndex
 
   contextItem.isAttr = true

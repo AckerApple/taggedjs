@@ -9,7 +9,7 @@ export function getContextInCycle(): AttributeContextItem | ContextItem | undefi
 /** Gets the current element associated with taggedjs document processing */
 export function getElement(): HTMLElement {
   const context = getContextInCycle() as AttributeContextItem
-  return context.element as HTMLElement
+  return context.target as HTMLElement
 }
 
 // const contextCycles: ContextItem[] = []

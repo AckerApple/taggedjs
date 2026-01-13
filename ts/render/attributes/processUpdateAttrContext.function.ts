@@ -31,7 +31,7 @@ export function processUpdateAttrContext(
       tagValue.processInitAttribute(
         attrContextItem.attrName as string,
         value,
-        attrContextItem.element as HTMLElement,
+        attrContextItem.target as HTMLElement,
         tagValue,
         attrContextItem,
         ownerSupport,
@@ -58,7 +58,7 @@ export function processUpdateAttrContext(
       values,
       value as string,
       attrContextItem.value,
-      attrContextItem.element as Element,// global.element as Element,
+      attrContextItem.target as Element,// global.element as Element,
       ownerSupport,
       attrContextItem.howToSet as HowToSet,
       [], // Context, but we dont want to alter current
@@ -70,7 +70,7 @@ export function processUpdateAttrContext(
     return
   }
 
-  const element = attrContextItem.element as Element
+  const element = attrContextItem.target as Element
 
   processAttributeEmit(
     value,

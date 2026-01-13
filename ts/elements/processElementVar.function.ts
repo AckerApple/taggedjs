@@ -18,7 +18,7 @@ export function processElementVar(
   _addedContexts: ContextItem[],
 ) {
   const element = document.createElement(value.tagName)
-  context.element = element
+  context.target = element
 
   // mark special attributes
   value.attributes.forEach(x => {

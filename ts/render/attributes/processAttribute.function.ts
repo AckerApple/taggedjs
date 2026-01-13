@@ -77,7 +77,7 @@ export function processAttribute(
 
     contextItem.valueIndex = varIndex
     contextItem.isAttr = true
-    contextItem.element = element
+    contextItem.target = element
     contextItem.isNameOnly = true
     contextItem.howToSet = howToSet
 

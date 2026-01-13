@@ -17,7 +17,7 @@ export function processElementVarFunction(
     updateCount: 0,
     parentContext,
     contexts: subContexts,
-    element: element as HTMLElement,
+    target: element as HTMLElement,
     value: item,
     htmlDomMeta: [],
     tagJsVar: {

@@ -94,7 +94,7 @@ export function processNonElement(
   const contexts = parentContext.contexts as ContextItem[]
   contexts.push(newContext)
 
-  newContext.element = element as HTMLElement
+  newContext.target = element as HTMLElement
   newContext.placeholder = document.createTextNode('');
   
   paintCommands.push([paintBy, [element, newContext.placeholder]]);

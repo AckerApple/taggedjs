@@ -85,7 +85,7 @@ export function attachDomElements(
     const newParentContext: ContextItem = {
       updateCount: 0,
       isAttrs: true,
-      element: domElement,
+      target: domElement,
       parentContext,
       contexts: [],
       destroy$: new Subject(),
@@ -111,7 +111,7 @@ export function attachDomElements(
     )
 
     // Update parent context with element and attribute contexts
-    newParentContext.element = domElement
+    newParentContext.target = domElement
 
     if (node.ch) {
       newNode.ch = attachDomElements(

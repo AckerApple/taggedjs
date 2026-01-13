@@ -34,7 +34,7 @@ export function createDynamicArrayAttribute(
       const contextItem: AttributeContextItem = {
         updateCount: 0,
         isAttr: true,
-        element,
+        target: element,
         attrName: attrName as string,
         withinOwnerElement: true,
         tagJsVar,
@@ -116,7 +116,7 @@ export function createDynamicAttribute(
   const contextItem: AttributeContextItem = {
     updateCount: 0,
     isAttr: true,
-    element,
+    target: element,
     attrName,
     howToSet,
     value,

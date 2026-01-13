@@ -11,7 +11,7 @@ import { blankHandler } from "../render/dom/blankHandler.function.js"
 export function deleteSimpleAttribute(
   contextItem: AttributeContextItem,
 ) {
-  const element = contextItem.element as Element
+  const element = contextItem.target as Element
   const name = contextItem.attrName as string
   element.removeAttribute(name)
 }

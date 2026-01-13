@@ -17,7 +17,7 @@ export function processDynamicNameValueAttribute(
   support: AnySupport,
   isSpecial: SpecialDefinition,
 ) {
-  contextItem.element = element as HTMLElement
+  contextItem.target = element as HTMLElement
   contextItem.howToSet = howToSet
   contextItem.attrName = attrName
   contextItem.isSpecial = isSpecial
@@ -91,4 +91,3 @@ export function processNonDynamicAttr(
 
   howToSet(element as HTMLElement, attrName, value)
 }
-

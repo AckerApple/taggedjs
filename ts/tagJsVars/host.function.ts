@@ -116,7 +116,7 @@ function processHostUpdate(
   const oldTagJsVar = contextItem.tagJsVar as HostValue
   const oldOptions = oldTagJsVar.options
 
-  // const element = (contextItem as any as AttributeContextItem).element as HTMLInputElement
+  // const element = (contextItem as any as AttributeContextItem).target as HTMLInputElement
   const newHost = newValue as unknown as HostValue
 
   reState(contextItem)
@@ -145,7 +145,7 @@ function processHost(
   tagJsVar: TagJsVar,
   contextItem: ContextItem,
 ) {
-  const element = contextItem.element
+  const element = contextItem.target
   const state = (contextItem as HostAttributeContextItem).state = {}
   
   initState(contextItem)
@@ -174,7 +174,7 @@ function processHostTagJsVar(
   // DEPRECATED
   const options = tagJsVar.options
   if(options.onInit) {
-    // const element = contextItem.element as HTMLInputElement
+    // const element = contextItem.target as HTMLInputElement
     options.onInit(element, tagJsVar, contextItem, state)
   }
 
@@ -206,7 +206,7 @@ function deleteHost(
   // DEPRECATED
   // TODO: remove this code and use tag.onDestroy instead
   if(options.onDestroy) {
-    const element = attrContext.element as Element
+    const element = attrContext.target as Element
     
     const hostDestroy = function processHostDestroy() {
       setContextInCycle(contextItem)

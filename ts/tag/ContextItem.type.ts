@@ -39,7 +39,7 @@ export interface AppContextItem {
   events?: Events
 }
 export interface BaseContextItem extends AppContextItem {  
-  element?: HTMLElement
+  target?: HTMLElement
   parentContext: BaseContextItem
   
   isAttr?: true // when a context is just one attribute definition

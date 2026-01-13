@@ -73,7 +73,7 @@ export function processFunctionAttr(
   const subContext: BaseContextItem = {
     updateCount: 0,
     isAttr: true,
-    element,
+    target: element,
     parentContext,
     value: innerValue, // used for new value comparing
     tagJsVar: valueToTagJsVar(innerValue),
@@ -89,7 +89,7 @@ export function processFunctionAttr(
     updateCount: 0,
     isAttr: true,
     contexts: [subContext],
-    element,
+    target: element,
     parentContext,
     value,
     tagJsVar: tagJsVarOverride,

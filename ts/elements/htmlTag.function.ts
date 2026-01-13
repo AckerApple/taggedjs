@@ -49,6 +49,8 @@ export type Attributes = {
   
   checked?: TruthyVar
   autofocus?: TruthyVar
+  // These maybe duplicate attribute typings
+  class?: string | object | ((_: InputElementTargetEvent) => string | object)
   style?: string | object | ((_: InputElementTargetEvent) => string | object)
   attr?: string | object | TagJsVar | void | undefined | ((_: InputElementTargetEvent) => any)
 } & {

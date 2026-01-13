@@ -4,7 +4,7 @@ import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
 import { getPushKid } from './htmlTag.function.js'
 import { makeAttrCallable, AttributeCallable } from './attributeCallables.js'
-import { ElementVar } from './ElementFunction.type.js';
+import { AttrValue, ElementVar } from './ElementFunction.type.js';
 
 function callbackWrapper(
   item: ElementVar,
@@ -47,10 +47,34 @@ function attr(
   return clone
 }
 
+export type Attrs = { [name:string]: AttrValue }
+
+/** attrs({names: values}) */
+function attrs(
+  item: any,
+  args: Attrs,
+) {
+  const clone = getPushKid(item as any, item.elementFunctions)
+
+  Object.entries(args).map(args => {
+    clone.attributes.push(args as unknown as Attribute)
+  
+    if( isValueForContext(args[0]) ) {
+      registerMockAttrContext(args[0], clone) // the attrName is a function or TagJsVar
+    } else if( isValueForContext(args[1]) ) {
+      registerMockAttrContext(args[1], clone) // the attrValue is a function or TagJsVar
+    }
+  })
+
+  return clone
+}
+
 const styleCallable = makeAttrCallable('style', attr)
 const idCallable = makeAttrCallable('id', attr)
 const classCallable = makeAttrCallable('class', attr)
 const hrefCallable = makeAttrCallable('href', attr)
+const valueCallable = makeAttrCallable('value', attr)
+const placeholderCallable = makeAttrCallable('placeholder', attr)
 
 function attr2(
   item: ElementVar,
@@ -93,6 +117,8 @@ export function elementFunctions(item: any) {
     
     onMousedown: makeCallback('onmousedown'),
     onMouseup: makeCallback('onmouseup'),
+    onMouseover: makeCallback('onmouseover'),
+    onMouseout: makeCallback('onmouseout'),
     
     onKeydown: makeCallback('onkeydown'),
     
@@ -102,6 +128,7 @@ export function elementFunctions(item: any) {
    
     /* apply attribute via attr(name: string, value?: any): **/
     attr: (...args: any[]) => attr(item, args as any),
+    attrs: (attributes: Attrs) => attrs(item, attributes),
         
     /** Used for setting array index-key value */
     key: function (arrayValue: any) {
@@ -127,6 +154,16 @@ export function elementFunctions(item: any) {
     /** Use as a.href`/path` or a.href(() => `/path`) */
     href: ((stringsOrValue: any, ...values: any[]) => {
       return hrefCallable(item, stringsOrValue, values)
+    }) as AttributeCallable,
+
+    /** Use as input.value`text` or input.value(() => `${value}`) */
+    value: ((stringsOrValue: any, ...values: any[]) => {
+      return valueCallable(item, stringsOrValue, values)
+    }) as AttributeCallable,
+
+    /** Use as input.placeholder`text` or input.placeholder(() => `${value}`) */
+    placeholder: ((stringsOrValue: any, ...values: any[]) => {
+      return placeholderCallable(item, stringsOrValue, values)
     }) as AttributeCallable,
   }
 
@@ -196,6 +233,10 @@ const eventCallables = {
   onMouseDown: makeCallback('onmousedown'),
   onMouseup: makeCallback('onmouseup'),
   onMouseUp: makeCallback('onmouseup'),
+  onMouseover: makeCallback('onmouseover'),
+  onMouseOver: makeCallback('onmouseup'),
+  onMouseout: makeCallback('onmouseout'),
+  onMouseOut: makeCallback('onmouseout'),
 
   onKeyup: makeCallback('onkeyup'),
   onKeyUp: makeCallback('onkeyup'),
