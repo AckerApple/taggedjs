@@ -1,7 +1,7 @@
 import { describe, it, expect } from './testing'
 // taggedjs-no-compile
 
-import { byId, triggerChangeElm, click, html, query } from './testing'
+import { byId, triggerChangeElm, query } from './testing'
 describe('taggedjs-dump', () => {
   it('starts with nothing THEN becomes object THEN object with array', () => {
     const elm = byId('taggedjs-dump-user-textarea') as HTMLTextAreaElement

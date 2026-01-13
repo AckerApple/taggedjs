@@ -1,4 +1,4 @@
-import { html, tag } from "taggedjs"
+import { tag } from "taggedjs"
 import { FormatChange, dump } from "./index"
 import { EverySimpleValue } from "./dump.props"
 

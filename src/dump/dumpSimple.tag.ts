@@ -1,4 +1,4 @@
-import { Tag, html, states, tag, div, a, noElement } from "taggedjs"
+import { Tag, tag, div, a } from "taggedjs"
 import { OnHeaderClick } from "./index"
 import { copyText } from "./copyText.function"
 import { EverySimpleValue, SimpleValue } from "./dump.props"

@@ -1,6 +1,5 @@
 import { describe, it, expect } from './testing'
-import { testStaggerBy } from "./content.tag"
-import { byId, click, html, query, changeOne, textContent, count } from './testing'
+import { byId, click, html, query, changeOne, count } from './testing'
 import { sleep } from './testing'
 
 // Helper function to wait for animations to complete

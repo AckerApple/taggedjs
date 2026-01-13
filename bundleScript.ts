@@ -21,6 +21,10 @@ export const run = (compiler: webpack.Compiler) => {
         console.error('🌎📦 🔴 compilation bundle error',
           error.message,
           errors,
+          {module: {
+            request: (error.module as any)?.request,
+            rawRequest: (error.module as any)?.rawRequest,
+          }}
         )
         return rej({}/*error*/)
       }

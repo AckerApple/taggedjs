@@ -1,6 +1,6 @@
 import { renderCountDiv } from "./renderCount.component.js"
 import { providerDialog } from "./providerDialog.tag.js"
-import { html, tag, providers, callbackMaker, Subject, host, div, strong, button, span, hr, h3, textarea } from "taggedjs"
+import { tag, providers, callbackMaker, Subject, host, div, strong, button, span, hr, h3, textarea } from "taggedjs"
 import { fx } from "taggedjs-animate-css"
 import { inCycleContextComms, inCycleParent } from "./inCycleContextComms.tag.js"
 

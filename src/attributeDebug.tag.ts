@@ -1,4 +1,4 @@
-import { div, fieldset, h3, hr, html, input, legend, li, ol, option, select, tag } from "taggedjs"
+import { div, fieldset, h3, hr, input, legend, li, ol, option, select, tag } from "taggedjs"
 import { subscribeAttributes } from "./subscribeAttributes.tag"
 
 export const attributeDebug = tag(() => {

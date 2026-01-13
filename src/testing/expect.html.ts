@@ -1,5 +1,5 @@
 import { expect } from './index'
-import { click, elmCount, query, html, lastById, byId, clickEach, clickOne, htmlById } from "./elmSelectors"
+import { html } from "./elmSelectors"
 
 export function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))

@@ -1,4 +1,4 @@
-import { LikeObjectChildren, html, tag, ValueSubject, subscribe, Subject, div, input, select, option, noElement, button, hr, fieldset, legend, span, b } from 'taggedjs'
+import { LikeObjectChildren, tag, ValueSubject, subscribe, Subject, div, input, select, option, button, hr, fieldset, legend, span, b } from 'taggedjs'
 import { dumpContent } from "./dumpContent.tag"
 import { renderCountDiv } from "./renderCount.component"
 import { fx } from "taggedjs-animate-css"
@@ -83,12 +83,6 @@ export const content = tag(() => {
 
   ++renderCount
 
-  const dom: LikeObjectChildren = [{
-    nn: 'b', ch:[{
-      nn: 'text',
-      tc: 'big',
-    }]
-  }]
   const injectionTest = '<script>alert("i should never run but be seen on page")</script>'
 
   const pipe = subscribe(vs0, () => {
@@ -196,7 +190,6 @@ export const content = tag(() => {
       fieldset(
         legend('injection test'),
         div({id:"injection-test"}, 'injection test ', injectionTest),
-        div({id:"hello-big-dom-world"}, 'hello ', html.dom(dom), ' world'),
         '--- repeat content ---',
         div({id:"hello-big-string-world"}, 'hello ', b('big'), ' world'),
       ),

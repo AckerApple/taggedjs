@@ -1,4 +1,4 @@
-import { tag, html, onInit, noElement, input, button, div } from "taggedjs"
+import { tag, input, button, div } from "taggedjs"
 import { saveScopedStorage, storage, ViewTypes } from "./sectionSelector.tag"
 import { runTesting } from "./runTesting.function"
 

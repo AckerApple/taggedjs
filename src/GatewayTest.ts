@@ -1,5 +1,5 @@
 import { renderCountDiv } from "./renderCount.component.js"
-import { states, tag, html, noElement } from "taggedjs"
+import { tag, noElement } from "taggedjs"
 
 export const GatewayTest = tag((
   props: any, // : {test:number}

@@ -1,4 +1,4 @@
-import { html, tag, states, fieldset, noElement, legend, span, button } from "taggedjs"
+import { tag, fieldset, noElement, legend, span, button } from "taggedjs"
 
 export const mirroring = tag(() => {
   const tag = tagCounter()

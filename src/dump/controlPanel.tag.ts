@@ -1,4 +1,4 @@
-import { html, tag, div, style, a, noElement } from "taggedjs"
+import { tag, div, style, a, noElement } from "taggedjs"
 import { FormatChange } from "./index"
 import { copyText } from "./copyText.function"
 

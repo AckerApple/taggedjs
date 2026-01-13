@@ -18,7 +18,7 @@ export const run = (compiler: webpack.Compiler) => {
       if(compilation.errors.length) {
         const error = compilation.errors[0]
         const errors = (error.module as any)?._errors || (error.module?.getErrors?.())
-        console.error('🌎📦 🔴 compilation bundle error',
+        console.error('🌎📦 🔴 todo compilation bundle error',
           error.message,
           errors,
         )

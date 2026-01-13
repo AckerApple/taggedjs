@@ -1,7 +1,7 @@
 import { describe, it, expect } from './testing'
 // taggedjs-no-compile
 
-import { byId, click, html, htmlById, expectMatchedHtml, clickById } from './testing'
+import { byId, htmlById, expectMatchedHtml, clickById } from './testing'
 
 describe('📰 subscriptions', () => {
   it('sub basic', () => {

@@ -92,6 +92,7 @@ async function discoverTags(): Promise<DiscoveredTag[]> {
     const url = element.getAttribute('url')
     const tagName = element.getAttribute('name') as string
 
+    console.log('111', url)
     const newApp = await import(`${url}?${Date.now()}`)
 
     if(!newApp[tagName]) {

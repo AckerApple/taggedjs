@@ -37,13 +37,13 @@ export default {
         test: /\.(ts|js)x?$/,
         use: 'ts-loader',
         exclude: /node_modules/,
-      },
+      }/*,
       {
         test: /\.(js|ts)$/,  // Adjust the regex to match the files you're interested in
         exclude: /node_modules\/stacktrace-js/, // Exclude stacktrace-js from this loader
         // use: [path.resolve(__dirname, 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.ts')] // Use the path to your loader
         use: [path.resolve(__dirname, 'node_modules', 'taggedjs-cli', 'bin', 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.js')] // Use the path to your loader
-      },
+      },*/
     ],
   },
   optimization: {
