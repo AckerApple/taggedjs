@@ -7,7 +7,7 @@ import { getSupportWithState } from '../../interpolations/attributes/getSupportW
 export function processTagJsVarAttribute(value, contexts, parentContext, tagJsVar, varIndex, support, attrName, element, isNameVar) {
     // getOneContext
     const contextItem = getNewContext(value, contexts || [], true, parentContext);
-    contextItem.element = element;
+    contextItem.target = element;
     contextItem.valueIndex = varIndex;
     contextItem.isAttr = true;
     contextItem.isNameOnly = isNameVar;

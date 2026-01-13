@@ -18,6 +18,7 @@ import { tagElement } from './tag/tagElement.js';
 import { paint } from './render/paint.function.js';
 export * from './deepFunctions.js';
 export * from './elements/index.js';
+export { version } from './version.js';
 export declare const hmr: {
     tagElement: typeof tagElement;
     renderWithSupport: typeof renderWithSupport;

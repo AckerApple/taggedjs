@@ -45,7 +45,7 @@ export function processNonElement(item, parentContext, element, ownerSupport, pa
     true, parentContext);
     const contexts = parentContext.contexts;
     contexts.push(newContext);
-    newContext.element = element;
+    newContext.target = element;
     newContext.placeholder = document.createTextNode('');
     paintCommands.push([paintBy, [element, newContext.placeholder]]);
     setContextInCycle(newContext);

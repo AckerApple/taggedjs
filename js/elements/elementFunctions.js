@@ -26,10 +26,26 @@ function attr(item, args) {
     }
     return clone;
 }
+/** attrs({names: values}) */
+function attrs(item, args) {
+    const clone = getPushKid(item, item.elementFunctions);
+    Object.entries(args).map(args => {
+        clone.attributes.push(args);
+        if (isValueForContext(args[0])) {
+            registerMockAttrContext(args[0], clone); // the attrName is a function or TagJsVar
+        }
+        else if (isValueForContext(args[1])) {
+            registerMockAttrContext(args[1], clone); // the attrValue is a function or TagJsVar
+        }
+    });
+    return clone;
+}
 const styleCallable = makeAttrCallable('style', attr);
 const idCallable = makeAttrCallable('id', attr);
 const classCallable = makeAttrCallable('class', attr);
 const hrefCallable = makeAttrCallable('href', attr);
+const valueCallable = makeAttrCallable('value', attr);
+const placeholderCallable = makeAttrCallable('placeholder', attr);
 function attr2(item, args) {
     // const clone = getPushKid(item as any, item.elementFunctions)
     // clone.attributes.push(args as Attribute)
@@ -63,12 +79,15 @@ export function elementFunctions(item) {
         // change: makeCallback('onchange'),
         onMousedown: makeCallback('onmousedown'),
         onMouseup: makeCallback('onmouseup'),
+        onMouseover: makeCallback('onmouseover'),
+        onMouseout: makeCallback('onmouseout'),
         onKeydown: makeCallback('onkeydown'),
         onKeyup: makeCallback('onkeyup'),
         // onkeyup: makeCallback('onkeyup'),
         // keyup: makeCallback('onkeyup'),
         /* apply attribute via attr(name: string, value?: any): **/
         attr: (...args) => attr(item, args),
+        attrs: (attributes) => attrs(item, attributes),
         /** Used for setting array index-key value */
         key: function (arrayValue) {
             ;
@@ -90,6 +109,14 @@ export function elementFunctions(item) {
         /** Use as a.href`/path` or a.href(() => `/path`) */
         href: ((stringsOrValue, ...values) => {
             return hrefCallable(item, stringsOrValue, values);
+        }),
+        /** Use as input.value`text` or input.value(() => `${value}`) */
+        value: ((stringsOrValue, ...values) => {
+            return valueCallable(item, stringsOrValue, values);
+        }),
+        /** Use as input.placeholder`text` or input.placeholder(() => `${value}`) */
+        placeholder: ((stringsOrValue, ...values) => {
+            return placeholderCallable(item, stringsOrValue, values);
         }),
     };
     return callables_other;
@@ -137,6 +164,10 @@ const eventCallables = {
     onMouseDown: makeCallback('onmousedown'),
     onMouseup: makeCallback('onmouseup'),
     onMouseUp: makeCallback('onmouseup'),
+    onMouseover: makeCallback('onmouseover'),
+    onMouseOver: makeCallback('onmouseup'),
+    onMouseout: makeCallback('onmouseout'),
+    onMouseOut: makeCallback('onmouseout'),
     onKeyup: makeCallback('onkeyup'),
     onKeyUp: makeCallback('onkeyup'),
     onKeydown: makeCallback('onkeydown'),

@@ -2,7 +2,7 @@ import { removeContextInCycle, setContextInCycle } from "../../tag/cycles/setCon
 export function domProcessContextItem(value, support, contextItem, appendTo, insertBefore) {
     const subject = support.context;
     subject.locked = 3;
-    contextItem.element = contextItem.element || appendTo;
+    contextItem.target = contextItem.target || appendTo;
     setContextInCycle(contextItem);
     contextItem.tagJsVar.processInit(value, contextItem, support, insertBefore, appendTo);
     removeContextInCycle();

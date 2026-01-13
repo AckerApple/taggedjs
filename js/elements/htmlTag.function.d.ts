@@ -36,6 +36,7 @@ export type Attributes = {
     onblur?: string;
     checked?: TruthyVar;
     autofocus?: TruthyVar;
+    class?: string | object | ((_: InputElementTargetEvent) => string | object);
     style?: string | object | ((_: InputElementTargetEvent) => string | object);
     attr?: string | object | TagJsVar | void | undefined | ((_: InputElementTargetEvent) => any);
 } & {

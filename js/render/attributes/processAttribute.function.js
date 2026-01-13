@@ -42,7 +42,7 @@ contexts, parentContext, isSpecial) {
         true, parentContext);
         contextItem.valueIndex = varIndex;
         contextItem.isAttr = true;
-        contextItem.element = element;
+        contextItem.target = element;
         contextItem.isNameOnly = true;
         contextItem.howToSet = howToSet;
         const tagJsVar = contextItem.tagJsVar;

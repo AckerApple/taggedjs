@@ -5,7 +5,7 @@ export function getContextInCycle() {
 /** Gets the current element associated with taggedjs document processing */
 export function getElement() {
     const context = getContextInCycle();
-    return context.element;
+    return context.target;
 }
 // const contextCycles: ContextItem[] = []
 export function setContextInCycle(context) {

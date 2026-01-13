@@ -8,7 +8,7 @@ export function processElementVarFunction(item, element, parentContext, ownerSup
         updateCount: 0,
         parentContext,
         contexts: subContexts,
-        element: element,
+        target: element,
         value: item,
         htmlDomMeta: [],
         tagJsVar: {

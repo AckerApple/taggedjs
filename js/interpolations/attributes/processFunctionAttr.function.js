@@ -35,7 +35,7 @@ attrName, element, howToSet) {
     const subContext = {
         updateCount: 0,
         isAttr: true,
-        element,
+        target: element,
         parentContext,
         value: innerValue, // used for new value comparing
         tagJsVar: valueToTagJsVar(innerValue),
@@ -49,7 +49,7 @@ attrName, element, howToSet) {
         updateCount: 0,
         isAttr: true,
         contexts: [subContext],
-        element,
+        target: element,
         parentContext,
         value,
         tagJsVar: tagJsVarOverride,

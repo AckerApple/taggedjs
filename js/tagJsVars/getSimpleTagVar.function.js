@@ -6,7 +6,7 @@ import { processUpdateRegularValue } from "../tag/update/processRegularValue.fun
 import { processSimpleAttribute } from "./processSimpleAttribute.function.js";
 import { blankHandler } from "../render/dom/blankHandler.function.js";
 export function deleteSimpleAttribute(contextItem) {
-    const element = contextItem.element;
+    const element = contextItem.target;
     const name = contextItem.attrName;
     element.removeAttribute(name);
 }

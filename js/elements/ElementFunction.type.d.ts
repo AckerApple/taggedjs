@@ -1,14 +1,27 @@
+import { ContextItem } from '../tag/ContextItem.type.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js';
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js';
 import type { AttributeCallable } from './attributeCallables.js';
 import { Attributes, ElementVarBase } from './htmlTag.function';
 type Child = ((_: InputElementTargetEvent) => any) | string | boolean | TagJsVar | number | null | undefined | any[];
+export type AttrValue = string | number | boolean | undefined | ((context: ContextItem) => any);
 export type ElementFunction = ((attributesOrFirstChild: Child | Attributes, ...children: Child[]) => any) & ElementVarBase & {
     style: AttributeCallable;
     id: AttributeCallable;
     class: AttributeCallable;
     href: AttributeCallable;
+    value: AttributeCallable;
+    placeholder: AttributeCallable;
+    type: AttributeCallable;
+    attr: (nameOrValue: AttrValue, value?: AttrValue) => ElementFunction;
+    attrs: (nameValuePairs: {
+        [name: string]: AttrValue;
+    }) => ElementFunction;
     onClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onChange: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onKeydown: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onMouseover: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onMouseout: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
 };
 export type ElementVar = ElementFunction;
 export {};

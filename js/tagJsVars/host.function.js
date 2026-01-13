@@ -63,7 +63,7 @@ function processHostUpdate(newValue, contextItem, ownerSupport) {
     }
     const oldTagJsVar = contextItem.tagJsVar;
     const oldOptions = oldTagJsVar.options;
-    // const element = (contextItem as any as AttributeContextItem).element as HTMLInputElement
+    // const element = (contextItem as any as AttributeContextItem).target as HTMLInputElement
     const newHost = newValue;
     reState(contextItem);
     const args = (newHost.options.arguments || oldOptions.arguments || []);
@@ -77,7 +77,7 @@ contextItem) {
 }
 /* Only runs on host() init */
 function processHost(tagJsVar, contextItem) {
-    const element = contextItem.element;
+    const element = contextItem.target;
     const state = contextItem.state = {};
     initState(contextItem);
     processHostTagJsVar(element, tagJsVar, contextItem, state);
@@ -92,7 +92,7 @@ function processHostTagJsVar(element, tagJsVar, contextItem, state) {
     // DEPRECATED
     const options = tagJsVar.options;
     if (options.onInit) {
-        // const element = contextItem.element as HTMLInputElement
+        // const element = contextItem.target as HTMLInputElement
         options.onInit(element, tagJsVar, contextItem, state);
     }
     return returnValue;
@@ -112,7 +112,7 @@ function deleteHost(contextItem) {
     // DEPRECATED
     // TODO: remove this code and use tag.onDestroy instead
     if (options.onDestroy) {
-        const element = attrContext.element;
+        const element = attrContext.target;
         const hostDestroy = function processHostDestroy() {
             setContextInCycle(contextItem);
             const result = options.onDestroy(element, tagJsVar, attrContext, attrContext.state);

@@ -25,7 +25,7 @@ export interface AppContextItem {
     events?: Events;
 }
 export interface BaseContextItem extends AppContextItem {
-    element?: HTMLElement;
+    target?: HTMLElement;
     parentContext: BaseContextItem;
     isAttr?: true;
     isAttrs?: true;

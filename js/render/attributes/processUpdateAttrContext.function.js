@@ -12,7 +12,7 @@ export function processUpdateAttrContext(value, contextItem, ownerSupport, value
         if (!oldValue?.tagJsType) {
             tagValue.isAttr = true;
             setContextInCycle(contextItem);
-            tagValue.processInitAttribute(attrContextItem.attrName, value, attrContextItem.element, tagValue, attrContextItem, ownerSupport, setNonFunctionInputValue);
+            tagValue.processInitAttribute(attrContextItem.attrName, value, attrContextItem.target, tagValue, attrContextItem, ownerSupport, setNonFunctionInputValue);
             removeContextInCycle();
             attrContextItem.tagJsVar = tagValue;
             return;
@@ -22,13 +22,13 @@ export function processUpdateAttrContext(value, contextItem, ownerSupport, value
         return;
     }
     if (attrContextItem.isNameOnly) {
-        updateNameOnlyAttrValue(values, value, attrContextItem.value, attrContextItem.element, // global.element as Element,
+        updateNameOnlyAttrValue(values, value, attrContextItem.value, attrContextItem.target, // global.element as Element,
         ownerSupport, attrContextItem.howToSet, [], // Context, but we dont want to alter current
         attrContextItem.parentContext);
         attrContextItem.value = value;
         return;
     }
-    const element = attrContextItem.element;
+    const element = attrContextItem.target;
     processAttributeEmit(value, attrContextItem.attrName, attrContextItem, element, ownerSupport, attrContextItem.howToSet, attrContextItem.isSpecial);
     contextItem.value = value;
     return;

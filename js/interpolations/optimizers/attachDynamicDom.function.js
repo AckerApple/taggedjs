@@ -10,7 +10,7 @@ appendTo, insertBefore) {
     const isWithinOwnerElement = depth > 0;
     const contextItem = addOneContext(value, contexts, isWithinOwnerElement, parentContext);
     contextItem.placeholder = marker;
-    contextItem.element = appendTo;
+    contextItem.target = appendTo;
     if (appendTo) {
         paintAppends.push([paintAppend, [appendTo, marker]]);
     }

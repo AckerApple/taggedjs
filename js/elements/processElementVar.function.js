@@ -10,7 +10,7 @@ import { processChildren } from './processChildren.function.js';
 /** The first and recursive processor for elements */
 export function processElementVar(value, context, ownerSupport, _addedContexts) {
     const element = document.createElement(value.tagName);
-    context.element = element;
+    context.target = element;
     // mark special attributes
     value.attributes.forEach(x => {
         const name = x[0];

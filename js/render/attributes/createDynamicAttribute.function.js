@@ -20,7 +20,7 @@ values, parentContext) {
             const contextItem = {
                 updateCount: 0,
                 isAttr: true,
-                element,
+                target: element,
                 attrName: attrName,
                 withinOwnerElement: true,
                 tagJsVar,
@@ -72,7 +72,7 @@ support, isSpecial, varIndex) {
     const contextItem = {
         updateCount: 0,
         isAttr: true,
-        element,
+        target: element,
         attrName,
         howToSet,
         value,

@@ -2,7 +2,7 @@ import { specialAttribute } from './specialAttribute.js';
 import { setNonFunctionInputValue } from './howToSetInputValue.function.js';
 import { processFunctionAttr } from './processFunctionAttr.function.js';
 export function processDynamicNameValueAttribute(attrName, value, contextItem, element, howToSet, support, isSpecial) {
-    contextItem.element = element;
+    contextItem.target = element;
     contextItem.howToSet = howToSet;
     contextItem.attrName = attrName;
     contextItem.isSpecial = isSpecial;

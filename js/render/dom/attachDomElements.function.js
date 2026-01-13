@@ -48,7 +48,7 @@ appendTo, insertBefore) {
         const newParentContext = {
             updateCount: 0,
             isAttrs: true,
-            element: domElement,
+            target: domElement,
             parentContext,
             contexts: [],
             destroy$: new Subject(),
@@ -63,7 +63,7 @@ appendTo, insertBefore) {
         // one single html element. This is where attribute processing takes place
         attachDomElement(domElement, node, values, support, newParentContext, appendTo, insertBefore);
         // Update parent context with element and attribute contexts
-        newParentContext.element = domElement;
+        newParentContext.target = domElement;
         if (node.ch) {
             newNode.ch = attachDomElements(node.ch, values, support, newParentContext, 
             // contexts,
