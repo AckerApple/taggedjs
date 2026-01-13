@@ -10,7 +10,7 @@ import { reactiveUpdatesSection } from "./reactiveUpdatesSection"
 import { dynamicContentSection } from "./dynamicContentSection"
 import { mapLoopsSection } from "./mapLoopsSection"
 import { eventHandlersSection } from "./eventHandlersSection"
-import { menuRoutingSection } from "./menuRoutingSection"
+import { onDestroySection } from "./onDestroySection"
 
 const GuideApp = tag(() => [
   guideHeader(),
@@ -29,7 +29,7 @@ const GuideApp = tag(() => [
         dynamicContentSection(),
         mapLoopsSection(),
         eventHandlersSection(),
-        menuRoutingSection()
+        onDestroySection()
       )
     )
   )

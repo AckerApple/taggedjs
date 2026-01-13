@@ -1,10 +1,9 @@
 import { Header } from './tags/header.tag'
 import { Footer } from './tags/footer.tag'
 import { Todo, todoReducer } from './reducer'
-import { a, div, html, input, label, main, noElement, section, tag, ul } from 'taggedjs'
+import { a, div, input, label, main, noElement, section, tag, ul } from 'taggedjs'
 import { useHashRouter } from './HashRouter.function'
 import { Item } from './tags/item.tag'
-import { Attributes } from 'taggedjs/js/elements/designElement.function'
 
 export const todos: Todo[] = []
 const dispatch = todoReducer(todos)
@@ -62,7 +61,7 @@ const todosTag = tag((route: string) => {
             type:"checkbox",
             checked: _=> activeTodoCount < 1,
             onChange: e => dispatch.toggleAll(e.target.checked),
-          } as Attributes),
+          }),
           
           label({class:"toggle-all-label", for:"toggle-all"},
             'Toggle All Input'

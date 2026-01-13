@@ -59,8 +59,8 @@ export const controlPanel = tag(({
       }
     `),
 
-    div({style: "width: 100%;line-height: 90%;"},
-      div({style: "position:relative;"},
+    div.style`width: 100%;line-height: 90%;`(
+      div.style`position:relative`(
         div({style: "display:flex;font-size:50%;position:absolute;top:-18px;right:-6px"},
           _=> (!format || format==='flex') && a({
             style: _=> "margin:1px;border-radius:5px;color:white;align-items:center;display:flex;padding-left:0.2em;padding-right:0.2em;" +

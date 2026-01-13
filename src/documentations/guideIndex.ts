@@ -15,7 +15,7 @@ const tocItems = [
   { id: "dynamic-content", label: "✨ Dynamic Contect _=>" },
   { id: "map-loops", label: "🔂 Map Loops" },
   { id: "event-handlers", label: "🖱️ Event Handlers" },
-  { id: "menu-routing", label: "🧭 Menu And Routing" }
+  { id: "on-destroy", label: "🧹 onDestroy Cleanup" },
 ]
 
 export function guideIndex() {

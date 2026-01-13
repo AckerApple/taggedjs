@@ -2,17 +2,28 @@ import { onDestroy, signal, tag, host, span, button, div, noElement } from "tagg
 import { renderCountDiv } from "./renderCount.component.js"
 
 let destroyCount = signal(0) // lets use Signals
+let destroyTagCount = signal(0) // lets use Signals
 
 export const destroys = tag(() => (
   on = true,
+  tagOn = true,
   renderCount = 0,
-  __ = ++renderCount,
 ) => div(
   'destroyCount: ',
-  span({id:"destroyCount"}, _=> destroyCount),
+  span.id`destroyCount`(_=> destroyCount),
   'on/off: ', _=> on,
-
-  _=> on && toDestroy(),
+  
+  div(
+    'HostDestroy:',
+    _=> on && toDestroyHost(),
+  ),
+  
+  div(
+    'TagDestroy:',
+    span.id`destroyTagCount`(_=> destroyTagCount),
+    ':',
+    _=> tagOn && toDestroyTag(),
+  ),
 
   button({
     id:"toggle-destroys", type:"button",
@@ -20,13 +31,18 @@ export const destroys = tag(() => (
       on = !on
     },
   }, _=> on ? 'destroy' : 'restore'),
+
+  button({
+    id:"toggle-tag-destroys", type:"button",
+    onClick: () => {
+      tagOn = !tagOn
+    },
+  }, _=> on ? 'destroy tag' : 'restore tag'),
   
-  () => renderCountDiv({renderCount, name: 'destroys'}),
+  () => renderCountDiv({renderCount: ++renderCount, name: 'destroys'}),
 ))
 
-const toDestroy = tag(() => (
-  _ = onDestroy(() => ++destroyCount.value),
-) =>
+const toDestroyHost = tag(() =>
   div({
       attr: host.onDestroy(() => {
         ++destroyCount.value
@@ -37,3 +53,17 @@ const toDestroy = tag(() => (
     'will be destroyed'
   )
 )
+
+const toDestroyTag = tag(() => {
+  onDestroy(() => {
+    ++destroyTagCount.value
+    console.log('xxx')
+  })
+  
+  return div({
+      id:"destroyable-tag-content",
+      style:"border:1px solid orange;"
+    },
+    'tag will be destroyed'
+  )
+})

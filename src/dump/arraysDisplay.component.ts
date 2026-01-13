@@ -1,5 +1,5 @@
 import { columnEditor } from "./columnEditor.component"
-import { html, state, states, tag, watch, div, dialog, button, noElement } from "taggedjs"
+import { state, tag, watch, div, dialog, button, noElement } from "taggedjs"
 import { FormatChange } from "./index"
 import { arrayTable } from "./arrayTable.component"
 import { arrayDisplay } from "./arrayDisplay.tag"
@@ -88,44 +88,42 @@ export const arraysDisplay = tag(({
   return noElement(
     arrayTag,
 
-    dialog({
-      id: uniqueId,
-      class: "dump-dialog",
-      style: "padding:0",
-      onmousedown: "var r = this.getBoundingClientRect();(r.top<=event.clientY&&event.clientY<=r.top+r.height&&r.left<=event.clientX&&event.clientX<=r.left+r.width) || this.close()",
-      ondragstart: "const {e,dt,t} = {t:this,e:event,dt:event.dataTransfer};const d=t.drag=t.drag||{x:0,y:0};d.initX=d.x;d.startX=event.clientX-t.offsetLeft;d.startY=event.clientY-t.offsetTop;t.ondragover=e.target.ondragover=(e)=>e.preventDefault();dt.effectAllowed='move';dt.dropEffect='move'",
-      ondrag: "const {t,e,dt,d}={e:event,dt:event.dataTransfer,d:this.drag}; if(e.clientX===0) return;d.x = d.x + e.offsetX - d.startX; d.y = d.y + e.offsetY - d.startY; this.style.left = d.x + 'px'; this.style.top = d.y+'px';",
-      ondragend: "const {t,e,d}={t:this,e:event,d:this.drag};if (d.initX === d.x) {d.x=d.x+e.offsetX-(d.startX-d.x);d.y=d.y+e.offsetY-(d.startY-d.y);this.style.transform=translate3d(d.x+'px', d.y+'px', 0)};this.draggable=false"
-    },
-      div({
-        style: "padding:.25em;background-color:#666;color:white;",
-        onmousedown: "this.parentNode.draggable=true"
-      }, 'Column Modifier'),
+    dialog
+      .id(uniqueId)
+      .class`dump-dialog`
+      .style`padding:0`
+      .attr('onmousedown', "var r = this.getBoundingClientRect();(r.top<=event.clientY&&event.clientY<=r.top+r.height&&r.left<=event.clientX&&event.clientX<=r.left+r.width) || this.close()")
+      .attr('ondragstart', "const {e,dt,t} = {t:this,e:event,dt:event.dataTransfer};const d=t.drag=t.drag||{x:0,y:0};d.initX=d.x;d.startX=event.clientX-t.offsetLeft;d.startY=event.clientY-t.offsetTop;t.ondragover=e.target.ondragover=(e)=>e.preventDefault();dt.effectAllowed='move';dt.dropEffect='move'")
+      .attr('ondrag', "const {t,e,dt,d}={e:event,dt:event.dataTransfer,d:this.drag}; if(e.clientX===0) return;d.x = d.x + e.offsetX - d.startX; d.y = d.y + e.offsetY - d.startY; this.style.left = d.x + 'px'; this.style.top = d.y+'px';")
+      .attr('ondragend', "const {t,e,d}={t:this,e:event,d:this.drag};if (d.initX === d.x) {d.x=d.x+e.offsetX-(d.startX-d.x);d.y=d.y+e.offsetY-(d.startY-d.y);this.style.transform=translate3d(d.x+'px', d.y+'px', 0)};this.draggable=false")(
+        div
+          .style`padding:.25em;background-color:#666;color:white;`
+          .attr('onmousedown', "this.parentNode.draggable=true")
+          ('Column Modifier'),
 
-      div({style: "padding:.25em"},
-        _=> allColumnNames.map(name => {
-          const included = columnNames === undefined || columnNames.includes(name)
-          return div({
-            style: "display:flex;justify-content: space-between;flex-wrap:wrap",
-            class: "hover-bg-warning"
-          },
-            _=> columnEditor({
-              name,
-              array,
-              included,
-              columnNames: columnNames || defaultColumnNames,
-              allColumnNames,
-            })
-          ).key(name)
-        }),
+        div
+          .style`padding:.25em`(
+            _=> allColumnNames.map(name => {
+              const included = columnNames === undefined || columnNames.includes(name)
+              return div
+                .style`display:flex;justify-content: space-between;flex-wrap:wrap`
+                .class`hover-bg-warning`(
+                  _=> columnEditor({
+                    name,
+                    array,
+                    included,
+                    columnNames: columnNames || defaultColumnNames,
+                    allColumnNames,
+                  })
+                ).key(name)
+            }),
 
-        button({
-          style: "width:100%",
-          type: "button",
-          onClick: toggleColumnDialog
-        }, '🅧 close')
+            button
+              .style`width:100%`
+              .attr('type', "button")
+              .onClick(toggleColumnDialog)('🅧 close')
+          )
       )
-    )
   )
 })
 

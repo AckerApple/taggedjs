@@ -36,11 +36,11 @@ export default tag(() => (
       _=> main.count
     ),
 
-    button({
-      id: "toggle-fun-in-child",
-      type: "button",
-      onClick: () => showChild = !showChild
-    }, 'toggle child'),
+    button
+      .id`toggle-fun-in-child`
+      .type`button`
+      .onClick(() => showChild = !showChild)
+      ('toggle child'),
     
     'array length: ',
     array.length,

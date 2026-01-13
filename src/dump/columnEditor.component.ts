@@ -73,59 +73,76 @@ export const columnEditor = tag(({
     formula.value = sandboxRunEval(newFormula, {array})
   }
 
-  return noElement(
-    a({onClick: toggle, style: "cursor:pointer;"},
-      input({type: "checkbox", checked: included}),
+  const nameCheckbox = a
+    .style`cursor:pointer`
+    .onClick(toggle)(
+      input
+        .attr('type', "checkbox")
+        .attr('checked', included),
       ' ',
       _=> name
-    ),
+    )
 
-    div({
-      onMouseover: () => mouseOverEditShow = true,
-      onMouseout: () => mouseOverEditShow = false
-    },
-      a({
-        'style.visibility': _=> (edit || mouseOverEditShow) ? 'visible' : 'hidden',
-        onClick: () => edit = !edit
-      }, '⚙️\u00A0'),
+  return noElement(
+    nameCheckbox,
 
-      _=> included && columnNames.length !== allColumnNames.length ?
-        a({style: "color:blue;", onClick: goAll}, small('all'))
-        :
-        a({style: "color:blue;", onClick: goOnly}, small('only'))
-    ),
+    div
+      .onMouseover(() => mouseOverEditShow = true)
+      .onMouseout(() => mouseOverEditShow = false)(
+        a
+          .attr(
+            'style.visibility',
+            _=> (edit || mouseOverEditShow) ? 'visible' : 'hidden'
+          )
+          .onClick(() => edit = !edit)('⚙️\u00A0'),
+
+        _=> included && columnNames.length !== allColumnNames.length ?
+          a
+            .style`color:blue;`
+            .onClick(goAll)(small('all'))
+          :
+          a
+            .style`color:blue;`
+            .onClick(goOnly)(small('only'))
+      ),
 
     _=> edit &&
-      div({style: "width:100%;padding:0.3em;"},
-        div({style: "font-size:0.7em;text-align:center;"},
-          strong('Column Settings')
-        ),
-        div(
-          _=> editFormula && noElement(
-            div({style: "padding:0.3em;"},
-              strong('edit formula')
+      div
+        .style`width:100%;padding:0.3em;`(
+          div
+            .style`font-size:0.7em;text-align:center;`(
+              strong('Column Settings')
             ),
-            textarea({
-                wrap: "off",
-                onChange: (evt: any) => updateFormula(editFormula as Formula, evt.target.value)
-              },
-              _=> editFormula?.value
-            )
-          ),
-          div({style: "display:flex;flex-wrap:wrap;gap:1em"},
-            _=> formulas.map(formula =>
-              div(
-                div(
-                  strong(_=> formula.title),
-                  a({onClick: () => editFormula = formula}, '✏️')
+          div(
+            _=> editFormula && noElement(
+              div
+                .style`padding:0.3em;`(
+                  strong('edit formula')
                 ),
-                div(_=> formula.value)
-              ).key(formula)
-            )
-          ),
-          button({type: "button", onClick: addSumFormula}, 'sum')
+              textarea
+                .attr('wrap', "off")
+                .onChange((evt: any) => updateFormula(editFormula as Formula, evt.target.value))(
+                  _=> editFormula?.value
+                )
+            ),
+            div
+              .style`display:flex;flex-wrap:wrap;gap:1em`(
+                _=> formulas.map(formula =>
+                  div(
+                    div(
+                      strong(_=> formula.title),
+                      a
+                        .onClick(() => editFormula = formula)('✏️')
+                    ),
+                    div(_=> formula.value)
+                  ).key(formula)
+                )
+              ),
+            button
+              .attr('type', "button")
+              .onClick(addSumFormula)('sum')
+          )
         )
-      )
   )
 })
 
