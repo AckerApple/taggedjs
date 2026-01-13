@@ -41,6 +41,6 @@
   },
   "dependencies": {
     "taggedjs": "file:../main/dist",
-    "taggedjs-animate-css": "^0.0.16"
+    "taggedjs-animate-css": "^0.0.24"
   }
 }

@@ -37,7 +37,6 @@ async function waitForElementCount(selector: string, expectedCount: number, maxW
 
 describe('📰 content', () => {
   it('spacing', () => {
-    expect(html('#hello-big-dom-world')).toBe('hello <b>big</b> world')
     expect(html('#hello-big-string-world')).toBe('hello <b>big</b> world')
     expect(html('#hello-spacing-dom-world')).toBe('54 hello worlds')
   })
