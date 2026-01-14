@@ -1,5 +1,5 @@
-import { htmlTag, section, p, pre, a } from "taggedjs"
-import { docH2 } from "./docHeading"
+import { htmlTag, p, pre, a } from "taggedjs"
+import { docH3 } from "./docHeading"
 
 const figure = htmlTag("figure")
 const figcaption = htmlTag("figcaption")
@@ -14,8 +14,8 @@ const eventHandlersCode = `export const clicker = tag(() => {
 `
 
 export function eventHandlersSection() {
-  return section({class: "section-card", id: "event-handlers"},
-    docH2("event-handlers", "🖱️ Event Handlers"),
+  return [
+    docH3("event-handlers", "🖱️ Event Handlers"),
     p(
       "Event handlers use method chaining like ",
       code("button.onClick(...)"),
@@ -30,6 +30,5 @@ export function eventHandlersSection() {
         a({href: `${repoBaseUrl}/src/basic.tag.ts`, target: "_blank"}, code("src/basic.tag.ts"))
       )
     ),
-    p(a({class: "inline-link", href: "#top"}, "Back to top"))
-  )
+  ]
 }

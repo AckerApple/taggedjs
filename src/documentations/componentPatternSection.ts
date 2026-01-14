@@ -1,4 +1,4 @@
-import { htmlTag, section, p, pre, a } from "taggedjs"
+import { htmlTag, section, p, pre, a, br } from "taggedjs"
 import { docH2, docH3 } from "./docHeading"
 
 const figure = htmlTag("figure")
@@ -6,28 +6,24 @@ const figcaption = htmlTag("figcaption")
 const code = htmlTag("code")
 const repoBaseUrl = "https://github.com/AckerApple/taggedjs/blob/gh-pages"
 
-const componentPatternCode = `export const basic = tag(() => {
-  let counter = 0
-  let renderCount = 0
-  let showDiv = true
+const basicCounterCode = `import { tag, p, button } from 'taggedjs'
 
-  renderCount++
+export const basicCounter = tag(() => (counter = 0) => [
+  p('Counter: ', _=> counter}),
+  button.onClick(() => counter++)('Increment Counter')
+])
+`
 
-  return div(
-    h2('Basic Component'),
-    
-    p(_=> \`Counter: \${counter}\`),
-    p(_=> \`Render Count: \${renderCount}\`),
-    
-    button.onClick(() => counter++)('Increment Counter'),
+const basicShowHideCode = `import { tag, div, button } from 'taggedjs'
 
+export const basicShowHide = tag(() => (showDiv = true) =>
+  div(
     button.onClick(() => showDiv = !showDiv)(
       _=> \`Toggle Div (\${showDiv ? 'Hide' : 'Show'})\`
     ),
-
-    _=> showDiv && boltTag(counter),
+    _=> showDiv && div('Now you see me')
   )
-})
+)
 `
 
 const componentArgsCode = `const boltTag = tag((parentCounter: number) => {
@@ -115,17 +111,37 @@ export function componentPatternSection() {
       code("button"),
       ", and ",
       code("p"),
-      ". A minimal component example already lives in ",
-      code("src/basic.tag.ts"),
-      "."
+      ". Below are some simple examples. You may see syntax used in ways you have not seen before BUT all code is native vanilla JavaScript that is supported everywhere."
     ),
-    figure(
-      pre(code({class: "language-ts"}, componentPatternCode)),
-      figcaption(
-        "Source: ",
-        a({href: `${repoBaseUrl}/src/basic.tag.ts`, target: "_blank"}, code("src/basic.tag.ts"))
-      )
+    p.class`code-title`("Basic Counter Component"),
+    figure({class: "code-block"},
+      pre(code({class: "language-ts"}, basicCounterCode))
     ),
+    p('☝️ ABOVE Explanation: The function "basicCounter" becomes a tag component when wrapped in a tag() call. The tag requires no inputs/props/arguments. The new tag/component is designed to create a local variable counter that is set to 0 and increments when a button is clicked.'),
+    br,
+    br,
+    p.class`code-title`("Basic show/hide Component"),
+    figure({class: "code-block"},
+      pre(code({class: "language-ts"}, basicShowHideCode))
+    ),
+    p('☝️ ABOVE Explanation: The function "basicShowHide" becomes a tag component when wrapped in a tag() call. The tag requires no inputs/props/arguments. The new tag/component is designed to create a local variable "showDiv" that is toggled true/false when a button is clicked.'),
+    br,br,
+    p(
+      "The ",
+      code("tag(() => (counter = 0) => div(_=> counter))"),
+      " form is shorthand for declaring local variables and returning markup. It ",
+      "is the same as ",
+      code("tag(() => { let counter = 0; return div(_=> counter) })"),
+      ", just more compact."
+    ),
+    p(
+      "Returning an array lets you emit multiple root elements without a wrapper. ",
+      code("() => [div('hello'), div('world')]"),
+      " is the no-wrapper alternative to ",
+      code("() => div('hello world')"),
+      " when you want separate siblings."
+    ),
+    br,
     docH3("tag-component-display", "🧠 Component Display"),
     p(
       "When you pass arguments to a tag component, render it inside a ",

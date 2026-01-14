@@ -5,12 +5,7 @@ import { projectLayoutSection } from "./projectLayoutSection"
 import { entryPointSection } from "./entryPointSection"
 import { componentPatternSection } from "./componentPatternSection"
 import { displaySection } from "./displaySection"
-import { elementImportsSection } from "./elementImportsSection"
-import { attributesSection } from "./attributesSection"
 import { reactiveUpdatesSection } from "./reactiveUpdatesSection"
-import { dynamicContentSection } from "./dynamicContentSection"
-import { mapLoopsSection } from "./mapLoopsSection"
-import { eventHandlersSection } from "./eventHandlersSection"
 
 const GuideApp = tag(() => [
   guideHeader(),
@@ -24,11 +19,6 @@ const GuideApp = tag(() => [
         entryPointSection(),
         componentPatternSection(),
         displaySection(),
-        elementImportsSection(),
-        attributesSection(),
-        dynamicContentSection(),
-        mapLoopsSection(),
-        eventHandlersSection(),
         reactiveUpdatesSection(),
       )
     )

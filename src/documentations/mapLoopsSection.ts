@@ -1,5 +1,5 @@
-import { htmlTag, section, p, pre, a } from "taggedjs"
-import { docH2 } from "./docHeading"
+import { htmlTag, p, pre } from "taggedjs"
+import { docH3 } from "./docHeading"
 
 const figure = htmlTag("figure")
 const figcaption = htmlTag("figcaption")
@@ -17,8 +17,8 @@ _=> items.map((item, index) =>
 `
 
 export function mapLoopsSection() {
-  return section({class: "section-card", id: "map-loops"},
-    docH2("map-loops", "🔂 Map Loops"),
+  return [
+    docH3("map-loops", "🔂 Map Loops"),
     p(
       "TaggedJS uses normal JavaScript array mapping for list rendering. ",
       "Put the ",
@@ -36,6 +36,5 @@ export function mapLoopsSection() {
       pre(code({class: "language-ts"}, mapLoopsCode)),
       figcaption("Map each item and key the result")
     ),
-    p(a({class: "inline-link", href: "#top"}, "Back to top"))
-  )
+  ]
 }

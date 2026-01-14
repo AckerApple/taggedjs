@@ -31,7 +31,7 @@ body {
 }
 
 main {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 2.5rem 2rem 4rem;
 }
@@ -43,7 +43,7 @@ header {
 }
 
 header .wrap {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 2.5rem 2rem 2rem;
 }
@@ -169,6 +169,15 @@ figure {
   margin: 0;
 }
 
+.code-title {
+  font-weight: 600;
+  margin: 0 0 0.6rem 0;
+}
+
+.code-block {
+  margin: 0 0 1.5rem 0;
+}
+
 figcaption {
   font-size: 0.85rem;
   color: var(--muted);
@@ -188,7 +197,7 @@ a.inline-link {
 }
 
 footer {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   color: var(--muted);
@@ -218,6 +227,7 @@ footer a {
 
   .guide-content {
     min-width: 0;
+    max-width: 900px;
   }
 
   .guide-content .section-card:first-child {

@@ -1,5 +1,5 @@
-import { htmlTag, section, p, pre, a } from "taggedjs"
-import { docH2 } from "./docHeading"
+import { htmlTag, p, pre } from "taggedjs"
+import { docH3 } from "./docHeading"
 
 const figure = htmlTag("figure")
 const figcaption = htmlTag("figcaption")
@@ -12,8 +12,8 @@ const dynamicCueCode = `const counter = tag(() => [
 `
 
 export function dynamicContentSection() {
-  return section({class: "section-card", id: "dynamic-content"},
-    docH2("dynamic-content", "✨ Dynamic Content _=>"),
+  return [
+    docH3("dynamic-content", "✨ Dynamic Content _=>"),
     p(
       "The ",
       code("_=>"),
@@ -28,6 +28,5 @@ export function dynamicContentSection() {
       pre(code({class: "language-ts"}, dynamicCueCode)),
       figcaption("Dynamic content cue vs event handler")
     ),
-    p(a({class: "inline-link", href: "#top"}, "Back to top"))
-  )
+  ]
 }

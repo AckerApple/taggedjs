@@ -1,5 +1,5 @@
-import { htmlTag, section, p, pre, a } from "taggedjs"
-import { docH2 } from "./docHeading"
+import { htmlTag, p, pre } from "taggedjs"
+import { docH3 } from "./docHeading"
 
 const figure = htmlTag("figure")
 const figcaption = htmlTag("figcaption")
@@ -16,8 +16,8 @@ export const example = tag(() =>
 `
 
 export function elementImportsSection() {
-  return section({class: "section-card", id: "element-imports"},
-    docH2("element-imports", "📦 Element Imports"),
+  return [
+    docH3("element-imports", "📦 Element Imports"),
     p(
       "TaggedJS exposes HTML elements as functions you can import directly. ",
       "This keeps your render output explicit, avoids string-based templates, ",
@@ -31,6 +31,5 @@ export function elementImportsSection() {
       pre(code({class: "language-ts"}, importsCode)),
       figcaption("Import only the elements you use")
     ),
-    p(a({class: "inline-link", href: "#top"}, "Back to top"))
-  )
+  ]
 }
