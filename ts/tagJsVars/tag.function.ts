@@ -2,7 +2,7 @@
 
 import { KeyFunction } from '../tag/getDomTag.function.js'
 import type { StringTag } from '../tag/StringTag.type.js'
-import { callback, setUseMemory, state } from '../state/index.js'
+import { callback, promise, setUseMemory, state } from '../state/index.js'
 import { getTemplaterResult, TemplaterResult, Wrapper } from '../tag/getTemplaterResult.function.js'
 import { Original, TagComponent, TagWrapper, tags } from '../tag/tag.utils.js'
 import { getTagWrap } from '../tag/getTagWrap.function.js'
@@ -178,6 +178,7 @@ export declare namespace tag {
   let onDestroy: typeof tagOnDestroy;
   let onRender: typeof tagOnRender;
   let getInnerHTML: typeof tagGetInnerHTML;
+  let promise: Promise<unknown>;
 }
 
 type ReturnTag = AnyTag | StateToTag | null | undefined
@@ -254,5 +255,11 @@ Object.defineProperty(tag, 'use', {
     renderFunction.processUpdate = tagValueUpdateHandler
     renderFunction.hasValueChanged = checkTagValueChangeAndUpdate
     renderFunction.destroy = destroySupportByContextItem
+  },
+})
+
+Object.defineProperty(tag, 'promise', {
+  set(target: Promise<unknown>) {
+    promise(target)
   },
 })
