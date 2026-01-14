@@ -69,13 +69,17 @@ function attrs(
   return clone
 }
 
-const styleCallable = makeAttrCallable('style', attr)
+const style = makeAttrCallable('style', attr)
 const idCallable = makeAttrCallable('id', attr)
 const classCallable = makeAttrCallable('class', attr)
-const hrefCallable = makeAttrCallable('href', attr)
-const valueCallable = makeAttrCallable('value', attr)
-const placeholderCallable = makeAttrCallable('placeholder', attr)
-const typeCallable = makeAttrCallable('type', attr)
+const href = makeAttrCallable('href', attr)
+const value = makeAttrCallable('value', attr)
+const placeholder = makeAttrCallable('placeholder', attr)
+const title = makeAttrCallable('title', attr)
+const type = makeAttrCallable('type', attr)
+const checked = makeAttrCallable('checked', attr)
+const disabled = makeAttrCallable('disabled', attr)
+const selected = makeAttrCallable('selected', attr)
 
 function attr2(
   item: ElementVar,
@@ -141,7 +145,7 @@ export function elementFunctions(item: any) {
 
     /** Use as div.style`border:${border}` or div.style(() => `border:${border}`) */
     style: ((stringsOrValue: any | ((_?: ContextItem) => string), ...values: any[]) => {
-      return styleCallable(item, stringsOrValue, values)
+      return style(item, stringsOrValue, values)
     }) as AttributeCallable,
 
     /** Use as div.id`main` or div.id(() => `main-${1}`) */
@@ -156,22 +160,42 @@ export function elementFunctions(item: any) {
 
     /** Use as a.href`/path` or a.href(() => `/path`) */
     href: ((stringsOrValue: any, ...values: any[]) => {
-      return hrefCallable(item, stringsOrValue, values)
+      return href(item, stringsOrValue, values)
     }) as AttributeCallable,
 
     /** Use as input.value`text` or input.value(() => `${value}`) */
     value: ((stringsOrValue: any, ...values: any[]) => {
-      return valueCallable(item, stringsOrValue, values)
+      return value(item, stringsOrValue, values)
     }) as AttributeCallable,
 
     /** Use as input.placeholder`text` or input.placeholder(() => `${value}`) */
     placeholder: ((stringsOrValue: any, ...values: any[]) => {
-      return placeholderCallable(item, stringsOrValue, values)
+      return placeholder(item, stringsOrValue, values)
     }) as AttributeCallable,
 
     /** Use as input.type`text` or input.type(() => `${value}`) */
     type: ((stringsOrValue: any, ...values: any[]) => {
-      return typeCallable(item, stringsOrValue, values)
+      return type(item, stringsOrValue, values)
+    }) as AttributeCallable,
+
+    /** Use as input.type`text` or input.type(() => `${value}`) */
+    title: ((stringsOrValue: any, ...values: any[]) => {
+      return title(item, stringsOrValue, values)
+    }) as AttributeCallable,
+    
+    /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
+    checked: ((stringsOrValue: any, ...values: any[]) => {
+      return checked(item, stringsOrValue, values)
+    }) as AttributeCallable,
+    
+    /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
+    disabled: ((stringsOrValue: any, ...values: any[]) => {
+      return disabled(item, stringsOrValue, values)
+    }) as AttributeCallable,
+    
+    /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
+    selected: ((stringsOrValue: any, ...values: any[]) => {
+      return selected(item, stringsOrValue, values)
     }) as AttributeCallable,
   }
 
@@ -256,6 +280,7 @@ const eventCallables = {
 
 const callables = {
   checked: setupAttr('checked', setBooleanAttribute),
+  disabled: setupAttr('disabled', setBooleanAttribute),
   selected: setupAttr('selected', setBooleanAttribute),
 
   /** element.setAttribute('style', x)  */

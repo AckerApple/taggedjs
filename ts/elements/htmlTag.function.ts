@@ -48,6 +48,7 @@ export type Attributes = {
   onblur?: string
   
   checked?: TruthyVar
+  disabled?: TruthyVar
   autofocus?: TruthyVar
   // These maybe duplicate attribute typings
   class?: string | object | ((_: InputElementTargetEvent) => string | object)

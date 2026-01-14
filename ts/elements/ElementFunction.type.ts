@@ -20,6 +20,10 @@ export type ElementFunction = (
   value: AttributeCallable
   placeholder: AttributeCallable
   type: AttributeCallable
+  title: AttributeCallable
+  disabled: AttributeCallable
+  checked: AttributeCallable
+  selected: AttributeCallable
   
   // any other attribute
   attr: (
