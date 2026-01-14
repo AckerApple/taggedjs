@@ -57,7 +57,6 @@ const toDestroyHost = tag(() =>
 const toDestroyTag = tag(() => {
   onDestroy(() => {
     ++destroyTagCount.value
-    console.log('xxx')
   })
   
   return div({

@@ -17,6 +17,7 @@ import { watchTesting } from "./watchTesting.tag"
 import { attributeDebug } from "./attributeDebug.tag"
 import { basic } from "./basic.tag"
 import { subscriptions } from "./subscriptions.tag"
+import { asyncSection } from "./async.tag"
 
 type OutputSection = {
   view: ViewTypes
@@ -30,6 +31,8 @@ type OutputSection = {
 }
 
 export const outputSections: (OutputSection & {tag: any})[] = [{
+  view: ViewTypes.Async, tag: asyncSection, emoji: '⏳'
+},{
   view: ViewTypes.Basic, tag: basic, emoji: '🔢'
 },{
   view: ViewTypes.OneRender, tag: oneRender, emoji: '1️⃣'

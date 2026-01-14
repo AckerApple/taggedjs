@@ -18,6 +18,12 @@ export async function runTests() {
     console.log('⏭️ Skipping content tests (unchecked)')
   }
 
+  if (storage.views.includes(ViewTypes.Async)) {
+    await import('./async.test')
+  } else {
+    console.log('⏭️ Skipping async tests (unchecked)')
+  }
+
   if (storage.views.includes(ViewTypes.Subscriptions)) {
     await import('./subscriptions.test')
   } else {

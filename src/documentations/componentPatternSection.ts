@@ -64,6 +64,30 @@ export const parent = tag(() => {
 })
 `
 
+const componentAsyncCallbackCode = `import { callback } from "taggedjs"
+
+const getHash = () => window.location.hash.substring(1) || '/'
+
+const HashRouter = () => {
+  const memory = {route: getHash()}
+  const onHashChange = callback(() => memory.route = getHash())
+  window.addEventListener('hashchange', onHashChange)
+  return {memory, onHashChange}
+}
+`
+
+const componentPromiseCode = `const promiseTag = tag(() => {
+  let x = 0
+  tag.promise = new Promise((resolve) => {
+    setTimeout(() => {
+      ++x
+      resolve(x)
+    }, 250)
+  })
+  return div.id\`tag-promise-test\`(_=> \`count \${x}\`)
+})
+`
+
 export function componentPatternSection() {
   return section({class: "section-card", id: "component-pattern"},
     docH2("component-pattern", "🧩 Component Pattern"),
@@ -87,6 +111,29 @@ export function componentPatternSection() {
         a({href: `${repoBaseUrl}/src/basic.tag.ts`, target: "_blank"}, code("src/basic.tag.ts"))
       )
     ),
+    docH3("tag-component-display", "🧠 Tag Component Display"),
+    p(
+      "When you pass arguments to a tag component, render it inside a ",
+      code("_=>"),
+      " block so TaggedJS treats argument changes as updates."
+    ),
+    p(
+      "This keeps the tag mounted and lets ",
+      code(".updates(...)"),
+      " receive new arguments without recreating the component."
+    ),
+    p(
+      "Using ",
+      code("_=>"),
+      " also helps it stand out as dynamic display, while something like ",
+      code("div.onClick(() => {})"),
+      " reads more like an event handler. It's optional, but recommended for ",
+      "clearer intent."
+    ),
+    figure(
+      pre(code({class: "language-ts"}, componentCallCode)),
+      figcaption("Render tag components inside a dynamic output")
+    ),
     docH3("tag-component-arguments", "🧵 Tag Component Arguments"),
     p(
       "Tag components receive arguments like normal functions, but you must opt in ",
@@ -106,22 +153,7 @@ export function componentPatternSection() {
         a({href: `${repoBaseUrl}/src/basic.tag.ts`, target: "_blank"}, code("src/basic.tag.ts"))
       )
     ),
-    docH3("tag-component-display", "🧠 Tag Component Display"),
-    p(
-      "When you pass arguments to a tag component, render it inside a ",
-      code("_=>"),
-      " block so TaggedJS treats argument changes as updates."
-    ),
-    p(
-      "This keeps the tag mounted and lets ",
-      code(".updates(...)"),
-      " receive new arguments without recreating the component."
-    ),
-    figure(
-      pre(code({class: "language-ts"}, componentCallCode)),
-      figcaption("Render tag components inside a dynamic output")
-    ),
-    docH3("tag-component-callbacks", "🪝 Component Callbacks/Output"),
+    docH3("tag-component-callbacks", "🪝 Functions for Output"),
     p(
       "TaggedJS treats function arguments as outputs: when the child calls the ",
       "function, the parent can update state and re-render the dependent ",
@@ -141,6 +173,48 @@ export function componentPatternSection() {
     figure(
       pre(code({class: "language-ts"}, componentOutputCode)),
       figcaption("Child callback triggers parent updates")
+    ),
+    docH3("tag-component-async-callbacks", "⏱️ Async Callback Wrapper"),
+    p(
+      "TaggedJS exports ",
+      code("callback"),
+      " to wrap async handlers (events, timers, promises) so the current tag ",
+      "can re-evaluate dependent ",
+      code("_=>"),
+      " outputs when the async work completes."
+    ),
+    p(
+      "Call ",
+      code("callback"),
+      " inline and assign it to a new variable so it can be registered and ",
+      "cleaned up with the async API."
+    ),
+    figure(
+      pre(code({class: "language-ts"}, componentAsyncCallbackCode)),
+      figcaption(
+        "Source: ",
+        a({href: `${repoBaseUrl}/todo/src/HashRouter.function.ts`, target: "_blank"}, code("todo/src/HashRouter.function.ts"))
+      )
+    ),
+    docH3("tag-component-promise", "⏳ tag.promise"),
+    p(
+      "Set ",
+      code("tag.promise"),
+      " to a Promise to tell TaggedJS that a new render cycle should run when ",
+      "that async work completes."
+    ),
+    p(
+      "Do not use ",
+      code("await tag.promise"),
+      " or await the promise inline; the promise is only a signal for re-render, ",
+      "not a value to block on."
+    ),
+    figure(
+      pre(code({class: "language-ts"}, componentPromiseCode)),
+      figcaption(
+        "Source: ",
+        a({href: `${repoBaseUrl}/src/async.tag.ts`, target: "_blank"}, code("src/async.tag.ts"))
+      )
     ),
     p(a({class: "inline-link", href: "#top"}, "Back to top"))
   )

@@ -20,6 +20,11 @@ export async function runIsolatedTests(
     ++testCount
   }
 
+  if(views.includes(ViewTypes.Async)) {
+    await import('./async.test')
+    ++testCount
+  }
+
   if(views.includes(ViewTypes.Subscriptions)) {
     await import('./subscriptions.test')
     ++testCount

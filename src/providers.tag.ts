@@ -184,7 +184,7 @@ const providerChildDebug = tag(({
 
   const callbacks = callbackMaker()
   const callbackTestSub = new Subject()
-  console.info('providerDebug.ts: 👉 👉 i should only ever run once')
+  console.info('providerDebug.ts: 👉 👉 providers should only ever run once')
 
   const sub = callbackTestSub.subscribe(x => {
     callbacks((y) => {
@@ -355,4 +355,3 @@ export const inCycleChild3 = host((color = 'green') => {
 })
 
 export const colorOptions = ['red', 'blue', 'green', 'purple', 'orange']
-

@@ -5,6 +5,7 @@ import { outputSections } from "./renderedSections.tag"
 class b {}
 
 export enum ViewTypes {
+  Async = 'async',
   Basic = 'basic',
   Destroys = 'destroys',
   Todo = 'todo',
