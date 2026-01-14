@@ -40,6 +40,8 @@ export const appElements: {
   element: Element
 }[] = []
 
+const TAG_ELEMENT_MARKER = '__taggedjs_tag_element__'
+
 /**
  * 
  * @param app taggedjs tag
@@ -56,14 +58,18 @@ export function tagElement(
   tags: TagWrapper<unknown>[] // TagComponent[]
   ValueTypes: typeof ValueTypes
 } {
+  const wasTagged = (element as any)[TAG_ELEMENT_MARKER]
   const appElmIndex = appElements.findIndex(appElm => appElm.element === element)
-  if(appElmIndex >= 0) {
+  if(wasTagged || appElmIndex >= 0) {
+    console.warn('tagElement called multiple times for the same element', { element })
+  }
+
+  if (appElmIndex >= 0) {
     const support = appElements[appElmIndex].support
     destroySupport(support, support.context.global)
     appElements.splice(appElmIndex, 1)
-    // an element already had an app on it
-    console.warn('Found and destroyed app element already rendered to element', {element})
   }
+  ;(element as any)[TAG_ELEMENT_MARKER] = true
 
   // Create the app which returns [props, runOneTimeFunction]
   

@@ -103,6 +103,7 @@ export function elementFunctions(item: any) {
   }
 
   // TODO: This maybe the old way of doing things (see callables)
+  // This seems to be for supporting div.onClick()
   const callables_other = {
     // ...eventCallables,
     onClose: makeCallback('onclose'),
