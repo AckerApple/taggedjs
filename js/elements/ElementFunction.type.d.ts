@@ -19,6 +19,7 @@ export type ElementFunction = ((attributesOrFirstChild: Child | Attributes, ...c
     }) => ElementFunction;
     onClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onChange: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onInput: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onKeydown: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onMouseover: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onMouseout: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;

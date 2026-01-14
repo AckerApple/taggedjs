@@ -10,6 +10,7 @@ export declare function elementFunctions(item: any): {
     onClick: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
     onBlur: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
     onChange: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
+    onInput: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
     onMousedown: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
     onMouseup: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
     onMouseover: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
@@ -32,6 +33,8 @@ export declare function elementFunctions(item: any): {
     value: AttributeCallable;
     /** Use as input.placeholder`text` or input.placeholder(() => `${value}`) */
     placeholder: AttributeCallable;
+    /** Use as input.type`text` or input.type(() => `${value}`) */
+    type: AttributeCallable;
 };
 /** used during updates */
 export declare function registerMockAttrContext(value: any, mockElm: ElementVar): void;

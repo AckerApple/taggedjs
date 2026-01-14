@@ -46,6 +46,7 @@ const classCallable = makeAttrCallable('class', attr);
 const hrefCallable = makeAttrCallable('href', attr);
 const valueCallable = makeAttrCallable('value', attr);
 const placeholderCallable = makeAttrCallable('placeholder', attr);
+const typeCallable = makeAttrCallable('type', attr);
 function attr2(item, args) {
     // const clone = getPushKid(item as any, item.elementFunctions)
     // clone.attributes.push(args as Attribute)
@@ -75,6 +76,7 @@ export function elementFunctions(item) {
         // click: makeCallback('click'),
         onBlur: makeCallback('onblur'),
         onChange: makeCallback('onchange'),
+        onInput: makeCallback('oninput'),
         // onchange: makeCallback('onchange'),
         // change: makeCallback('onchange'),
         onMousedown: makeCallback('onmousedown'),
@@ -118,6 +120,10 @@ export function elementFunctions(item) {
         placeholder: ((stringsOrValue, ...values) => {
             return placeholderCallable(item, stringsOrValue, values);
         }),
+        /** Use as input.type`text` or input.type(() => `${value}`) */
+        type: ((stringsOrValue, ...values) => {
+            return typeCallable(item, stringsOrValue, values);
+        }),
     };
     return callables_other;
 }
@@ -160,6 +166,7 @@ const eventCallables = {
     onDblClick: makeCallback('ondblclick'),
     onBlur: makeCallback('onblur'),
     onChange: makeCallback('onchange'),
+    onInput: makeCallback('oninput'),
     onMousedown: makeCallback('onmousedown'),
     onMouseDown: makeCallback('onmousedown'),
     onMouseup: makeCallback('onmouseup'),
