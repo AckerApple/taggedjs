@@ -1,6 +1,6 @@
 import { tag } from './tag.function.js'
 import { host } from './host.function.js'
-import { ContextItem, html } from '../tag/index.js'
+import { ContextItem } from '../tag/index.js'
 import { setContextInCycle, removeContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 
@@ -49,48 +49,6 @@ describe('tag.inject', () => {
 
     // Verify the injected value matches the parent's return value
     expect(injectedValue).toEqual({ color: 'red', title: 'parentHost' })
-  })
-
-  it('should inject tag component into child context', () => {
-    // Create a tag component
-    const parentTag = tag(() => html`<div>Parent</div>`)
-
-    // Create a wrapper mock
-    const mockWrapper: any = {
-      original: parentTag.original,
-      tagJsType: ValueTypes.tagComponent
-    }
-
-    // Create a templater mock with matchesInjection
-    const mockTemplater: any = {
-      tagJsType: ValueTypes.templater,
-      wrapper: mockWrapper,
-      matchesInjection: (inject: any, context: ContextItem) => {
-        if(mockTemplater.wrapper === inject || mockTemplater.wrapper?.original === inject?.original) {
-          return context
-        }
-      }
-    }
-
-    // Simulate a parent context with the tag component
-    const parentContext: any = {
-      tagJsVar: mockTemplater,
-      returnValue: parentTag
-    }
-
-    // Simulate a child context
-    const childContext: any = {
-      parentContext
-    }
-
-    // Set the child context as current
-    setContextInCycle(childContext)
-
-    // Call tag.inject from the child
-    const injectedValue = tag.inject(parentTag)
-
-    // Verify the injected value is the parent tag
-    expect(injectedValue).toBe(parentTag)
   })
 
   it('should throw error when no context is available', () => {

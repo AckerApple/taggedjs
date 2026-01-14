@@ -75,6 +75,7 @@ const classCallable = makeAttrCallable('class', attr)
 const hrefCallable = makeAttrCallable('href', attr)
 const valueCallable = makeAttrCallable('value', attr)
 const placeholderCallable = makeAttrCallable('placeholder', attr)
+const typeCallable = makeAttrCallable('type', attr)
 
 function attr2(
   item: ElementVar,
@@ -112,6 +113,7 @@ export function elementFunctions(item: any) {
 
     onBlur: makeCallback('onblur'),
     onChange: makeCallback('onchange'),
+    onInput: makeCallback('oninput'),
     // onchange: makeCallback('onchange'),
     // change: makeCallback('onchange'),
     
@@ -164,6 +166,11 @@ export function elementFunctions(item: any) {
     /** Use as input.placeholder`text` or input.placeholder(() => `${value}`) */
     placeholder: ((stringsOrValue: any, ...values: any[]) => {
       return placeholderCallable(item, stringsOrValue, values)
+    }) as AttributeCallable,
+
+    /** Use as input.type`text` or input.type(() => `${value}`) */
+    type: ((stringsOrValue: any, ...values: any[]) => {
+      return typeCallable(item, stringsOrValue, values)
     }) as AttributeCallable,
   }
 
@@ -228,6 +235,7 @@ const eventCallables = {
 
   onBlur: makeCallback('onblur'),
   onChange: makeCallback('onchange'),
+  onInput: makeCallback('oninput'),
   
   onMousedown: makeCallback('onmousedown'),
   onMouseDown: makeCallback('onmousedown'),

@@ -12,21 +12,3 @@ export type InputCallback = ((e: InputElementTargetEvent) => unknown)
 export type TagValue = (InputCallback | RegularValue | object | void) & unknown
 export type TagValues = TagValue[]
 
-/** Used as html`<div></div>` */
-export function html(
-  strings: string[] | TemplateStringsArray,
-  ...values: TagValues
-): Tag {
-  const stringTag = getStringTag(strings as string[], values)
-  const templater = getTemplaterResult(PropWatches.NONE)
-  templater.tag = stringTag
-  stringTag.templater = templater
-  return stringTag
-}
-
-html.dom = function(
-  dom: LikeObjectChildren,
-  ...values: TagValues
-) {
-  return getDomTag(dom, values)
-}

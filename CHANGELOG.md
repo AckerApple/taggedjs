@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+### v3.1.0 - 1-2026
+- removed html``
+
 ### v2.11.0 - 7-2025
 - BREAKING: Removed element `oninit`/`ondestroy` attribute support
   - BEFORE: html`<div oninit=${fx} ondestroy=${fx}>...</div>`
