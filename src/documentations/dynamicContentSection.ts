@@ -13,7 +13,7 @@ const dynamicCueCode = `const counter = tag(() => [
 
 export function dynamicContentSection() {
   return section({class: "section-card", id: "dynamic-content"},
-    docH2("dynamic-content", "✨ Dynamic Contect _=>"),
+    docH2("dynamic-content", "✨ Dynamic Content _=>"),
     p(
       "The ",
       code("_=>"),
