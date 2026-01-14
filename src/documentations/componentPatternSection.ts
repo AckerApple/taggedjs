@@ -19,13 +19,11 @@ const componentPatternCode = `export const basic = tag(() => {
     p(_=> \`Counter: \${counter}\`),
     p(_=> \`Render Count: \${renderCount}\`),
     
-    button({
-      onClick: () => counter++
-    }, 'Increment Counter'),
+    button.onClick(() => counter++)('Increment Counter'),
 
-    button({
-      onClick: () => showDiv = !showDiv
-    }, _=> \`Toggle Div (\${showDiv ? 'Hide' : 'Show'})\`),
+    button.onClick(() => showDiv = !showDiv)(
+      _=> \`Toggle Div (\${showDiv ? 'Hide' : 'Show'})\`
+    ),
 
     _=> showDiv && boltTag(counter),
   )
@@ -49,9 +47,7 @@ const componentOutputCode = `import { output, tag, button } from "taggedjs"
 
 export const child = tag((onSave: () => void) => {
   onSave = output(onSave)
-  return button({
-    onClick: () => onSave()
-  }, "Save")
+  return button.onClick(() => onSave())("Save")
 })
 
 export const parent = tag(() => {
@@ -88,6 +84,25 @@ const componentPromiseCode = `const promiseTag = tag(() => {
 })
 `
 
+const onDestroyCode = `import { tag, div, button, onDestroy, host, signal } from "taggedjs"
+
+const contentTag = tag(() => {
+  onDestroy(() => {
+    // closing logic here
+  })
+
+  return div("this tag will be destroyed")
+})
+
+const destroys = tag(() => (showContent: boolean) =>
+div(
+  "Content:", _=> showContent && contentTag(),
+  button
+    .onClick(() => { showContent = !showContent } )
+    (_=> showContent ? "destroy" : "restore")
+))
+`
+
 export function componentPatternSection() {
   return section({class: "section-card", id: "component-pattern"},
     docH2("component-pattern", "🧩 Component Pattern"),
@@ -111,7 +126,7 @@ export function componentPatternSection() {
         a({href: `${repoBaseUrl}/src/basic.tag.ts`, target: "_blank"}, code("src/basic.tag.ts"))
       )
     ),
-    docH3("tag-component-display", "🧠 Tag Component Display"),
+    docH3("tag-component-display", "🧠 Component Display"),
     p(
       "When you pass arguments to a tag component, render it inside a ",
       code("_=>"),
@@ -134,7 +149,7 @@ export function componentPatternSection() {
       pre(code({class: "language-ts"}, componentCallCode)),
       figcaption("Render tag components inside a dynamic output")
     ),
-    docH3("tag-component-arguments", "🧵 Tag Component Arguments"),
+    docH3("tag-component-arguments", "🧵 Component Arguments"),
     p(
       "Tag components receive arguments like normal functions, but you must opt in ",
       "to argument updates when those values change. Call ",
@@ -215,6 +230,25 @@ export function componentPatternSection() {
         "Source: ",
         a({href: `${repoBaseUrl}/src/async.tag.ts`, target: "_blank"}, code("src/async.tag.ts"))
       )
+    ),
+    docH3("on-destroy", "🧹 onDestroy Cleanup"),
+    p(
+      "Use ",
+      code("onDestroy"),
+      " to run cleanup logic when a tag component is removed. For host elements, ",
+      code("host.onDestroy"),
+      " lets you attach cleanup at the element level."
+    ),
+    figure(
+      pre(code({class: "language-ts"}, onDestroyCode)),
+      figcaption(
+        "Source: ",
+        a({href: `${repoBaseUrl}/src/destroys.tag.ts`, target: "_blank"}, code("src/destroys.tag.ts"))
+      )
+    ),
+    p(
+      "Common uses include removing event listeners, stopping intervals, or ",
+      "disposing subscriptions tied to the component lifecycle."
     ),
     p(a({class: "inline-link", href: "#top"}, "Back to top"))
   )

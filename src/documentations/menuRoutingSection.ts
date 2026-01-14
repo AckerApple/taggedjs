@@ -45,10 +45,9 @@ const menuRoutingCode = `export const menu = () => {
 
       ' - ',
       
-      button({
-        type: "button",
-        onClick: () => window.location.href = 'documentation/index.html'
-      }, 'documentation'),
+      button.type\`button\`
+        .onClick(() => window.location.href = 'documentation/index.html')
+        ('documentation'),
       
       ' - ',
       

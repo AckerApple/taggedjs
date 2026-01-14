@@ -9,9 +9,7 @@ const repoBaseUrl = "https://github.com/AckerApple/taggedjs/blob/gh-pages"
 const eventHandlersCode = `export const clicker = tag(() => {
   let counter = 0
 
-  return button({
-    onClick: () => counter++
-  }, _=> \`Increment Counter: \${counter}\`)
+  return button.onClick(() => counter++)(_=> \`Increment Counter: \${counter}\`)
 })
 `
 
@@ -19,8 +17,8 @@ export function eventHandlersSection() {
   return section({class: "section-card", id: "event-handlers"},
     docH2("event-handlers", "🖱️ Event Handlers"),
     p(
-      "Event handlers use camelCase attributes like ",
-      code("onClick"),
+      "Event handlers use method chaining like ",
+      code("button.onClick(...)"),
       ". The code in ",
       code("src/basic.tag.ts"),
       " shows the standard pattern."

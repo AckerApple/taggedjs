@@ -13,8 +13,7 @@ export function guideHeader() {
       ),
       nav({class: "primary"},
         a({href: "index.html"}, "Docs Home"),
-        a({href: "../index.html"}, "Live App"),
-        a({href: "#toc"}, "Guide Index")
+        a({href: "../index.html"}, "Live App")
       )
     )
   )

@@ -4,13 +4,13 @@ import { guideIndex } from "./guideIndex"
 import { projectLayoutSection } from "./projectLayoutSection"
 import { entryPointSection } from "./entryPointSection"
 import { componentPatternSection } from "./componentPatternSection"
+import { displaySection } from "./displaySection"
 import { elementImportsSection } from "./elementImportsSection"
 import { attributesSection } from "./attributesSection"
 import { reactiveUpdatesSection } from "./reactiveUpdatesSection"
 import { dynamicContentSection } from "./dynamicContentSection"
 import { mapLoopsSection } from "./mapLoopsSection"
 import { eventHandlersSection } from "./eventHandlersSection"
-import { onDestroySection } from "./onDestroySection"
 
 const GuideApp = tag(() => [
   guideHeader(),
@@ -23,13 +23,13 @@ const GuideApp = tag(() => [
         projectLayoutSection(),
         entryPointSection(),
         componentPatternSection(),
+        displaySection(),
         elementImportsSection(),
         attributesSection(),
-        reactiveUpdatesSection(),
         dynamicContentSection(),
         mapLoopsSection(),
         eventHandlersSection(),
-        onDestroySection()
+        reactiveUpdatesSection(),
       )
     )
   )

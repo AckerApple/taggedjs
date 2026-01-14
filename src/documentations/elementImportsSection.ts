@@ -10,7 +10,7 @@ const importsCode = `import { div, span, button } from "taggedjs"
 export const example = tag(() =>
   div(
     span("Hello"),
-    button({onClick: () => alert("Hi")}, "Click")
+    button.onClick(() => alert("Hi"))("Click")
   )
 )
 `

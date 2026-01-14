@@ -11,9 +11,7 @@ _=> items.map((item, index) =>
   div(
     'item:', _=> item,
     ' index:', _=> index,
-    button({
-      onClick: () => items.splice(index, 1)
-    }, 'remove')
+    button.onClick(() => items.splice(index, 1))('remove')
   ).key(item)
 )
 `

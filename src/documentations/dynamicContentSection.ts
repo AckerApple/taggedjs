@@ -5,13 +5,10 @@ const figure = htmlTag("figure")
 const figcaption = htmlTag("figcaption")
 const code = htmlTag("code")
 
-const dynamicCueCode = `p(_=> \
-  count \
-)
-
-button({
-  onClick: () => count++
-}, 'increment')
+const dynamicCueCode = `const counter = tag(() => [
+  p(_=> \ count ),
+  button.onClick(() => count++), 'increment')
+])
 `
 
 export function dynamicContentSection() {
