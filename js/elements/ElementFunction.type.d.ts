@@ -13,6 +13,10 @@ export type ElementFunction = ((attributesOrFirstChild: Child | Attributes, ...c
     value: AttributeCallable;
     placeholder: AttributeCallable;
     type: AttributeCallable;
+    title: AttributeCallable;
+    disabled: AttributeCallable;
+    checked: AttributeCallable;
+    selected: AttributeCallable;
     attr: (nameOrValue: AttrValue, value?: AttrValue) => ElementFunction;
     attrs: (nameValuePairs: {
         [name: string]: AttrValue;

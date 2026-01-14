@@ -40,13 +40,17 @@ function attrs(item, args) {
     });
     return clone;
 }
-const styleCallable = makeAttrCallable('style', attr);
+const style = makeAttrCallable('style', attr);
 const idCallable = makeAttrCallable('id', attr);
 const classCallable = makeAttrCallable('class', attr);
-const hrefCallable = makeAttrCallable('href', attr);
-const valueCallable = makeAttrCallable('value', attr);
-const placeholderCallable = makeAttrCallable('placeholder', attr);
-const typeCallable = makeAttrCallable('type', attr);
+const href = makeAttrCallable('href', attr);
+const value = makeAttrCallable('value', attr);
+const placeholder = makeAttrCallable('placeholder', attr);
+const title = makeAttrCallable('title', attr);
+const type = makeAttrCallable('type', attr);
+const checked = makeAttrCallable('checked', attr);
+const disabled = makeAttrCallable('disabled', attr);
+const selected = makeAttrCallable('selected', attr);
 function attr2(item, args) {
     // const clone = getPushKid(item as any, item.elementFunctions)
     // clone.attributes.push(args as Attribute)
@@ -99,7 +103,7 @@ export function elementFunctions(item) {
         },
         /** Use as div.style`border:${border}` or div.style(() => `border:${border}`) */
         style: ((stringsOrValue, ...values) => {
-            return styleCallable(item, stringsOrValue, values);
+            return style(item, stringsOrValue, values);
         }),
         /** Use as div.id`main` or div.id(() => `main-${1}`) */
         id: ((stringsOrValue, ...values) => {
@@ -111,19 +115,35 @@ export function elementFunctions(item) {
         }),
         /** Use as a.href`/path` or a.href(() => `/path`) */
         href: ((stringsOrValue, ...values) => {
-            return hrefCallable(item, stringsOrValue, values);
+            return href(item, stringsOrValue, values);
         }),
         /** Use as input.value`text` or input.value(() => `${value}`) */
         value: ((stringsOrValue, ...values) => {
-            return valueCallable(item, stringsOrValue, values);
+            return value(item, stringsOrValue, values);
         }),
         /** Use as input.placeholder`text` or input.placeholder(() => `${value}`) */
         placeholder: ((stringsOrValue, ...values) => {
-            return placeholderCallable(item, stringsOrValue, values);
+            return placeholder(item, stringsOrValue, values);
         }),
         /** Use as input.type`text` or input.type(() => `${value}`) */
         type: ((stringsOrValue, ...values) => {
-            return typeCallable(item, stringsOrValue, values);
+            return type(item, stringsOrValue, values);
+        }),
+        /** Use as input.type`text` or input.type(() => `${value}`) */
+        title: ((stringsOrValue, ...values) => {
+            return title(item, stringsOrValue, values);
+        }),
+        /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
+        checked: ((stringsOrValue, ...values) => {
+            return checked(item, stringsOrValue, values);
+        }),
+        /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
+        disabled: ((stringsOrValue, ...values) => {
+            return disabled(item, stringsOrValue, values);
+        }),
+        /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
+        selected: ((stringsOrValue, ...values) => {
+            return selected(item, stringsOrValue, values);
         }),
     };
     return callables_other;
@@ -183,6 +203,7 @@ const eventCallables = {
 };
 const callables = {
     checked: setupAttr('checked', setBooleanAttribute),
+    disabled: setupAttr('disabled', setBooleanAttribute),
     selected: setupAttr('selected', setBooleanAttribute),
     /** element.setAttribute('style', x)  */
     class: setupAttr('class', setClassValue),

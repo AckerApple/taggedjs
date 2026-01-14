@@ -31,6 +31,7 @@ export declare const main: import("./ElementFunction.type.js").ElementFunction;
 export declare const section: import("./ElementFunction.type.js").ElementFunction;
 export declare const header: import("./ElementFunction.type.js").ElementFunction;
 export declare const footer: import("./ElementFunction.type.js").ElementFunction;
+export declare const form: import("./ElementFunction.type.js").ElementFunction;
 export declare const fieldset: import("./ElementFunction.type.js").ElementFunction;
 export declare const legend: import("./ElementFunction.type.js").ElementFunction;
 export declare const dialog: import("./ElementFunction.type.js").ElementFunction;

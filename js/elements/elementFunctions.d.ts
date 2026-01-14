@@ -35,6 +35,14 @@ export declare function elementFunctions(item: any): {
     placeholder: AttributeCallable;
     /** Use as input.type`text` or input.type(() => `${value}`) */
     type: AttributeCallable;
+    /** Use as input.type`text` or input.type(() => `${value}`) */
+    title: AttributeCallable;
+    /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
+    checked: AttributeCallable;
+    /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
+    disabled: AttributeCallable;
+    /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
+    selected: AttributeCallable;
 };
 /** used during updates */
 export declare function registerMockAttrContext(value: any, mockElm: ElementVar): void;

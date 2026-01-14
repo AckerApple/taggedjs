@@ -35,6 +35,7 @@ export type Attributes = {
     /** You may want to instead use "onBlur" because "onblur" is a string function that runs in browser */
     onblur?: string;
     checked?: TruthyVar;
+    disabled?: TruthyVar;
     autofocus?: TruthyVar;
     class?: string | object | ((_: InputElementTargetEvent) => string | object);
     style?: string | object | ((_: InputElementTargetEvent) => string | object);
