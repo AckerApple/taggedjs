@@ -63,6 +63,7 @@ export declare namespace tag {
     let onDestroy: typeof tagOnDestroy;
     let onRender: typeof tagOnRender;
     let getInnerHTML: typeof tagGetInnerHTML;
+    let promise: Promise<unknown>;
 }
 type ReturnTag = AnyTag | StateToTag | null | undefined;
 /** Use to structure and define a browser tag route handler

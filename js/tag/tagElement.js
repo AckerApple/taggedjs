@@ -20,6 +20,7 @@ if (typeof (document) === 'object') {
     document.taggedJs = true;
 }
 export const appElements = [];
+const TAG_ELEMENT_MARKER = '__taggedjs_tag_element__';
 /**
  *
  * @param app taggedjs tag
@@ -29,14 +30,18 @@ export const appElements = [];
  */
 export function tagElement(app, element, // aka appElement
 props) {
+    const wasTagged = element[TAG_ELEMENT_MARKER];
     const appElmIndex = appElements.findIndex(appElm => appElm.element === element);
+    if (wasTagged || appElmIndex >= 0) {
+        console.warn('tagElement called multiple times for the same element', { element });
+    }
     if (appElmIndex >= 0) {
         const support = appElements[appElmIndex].support;
         destroySupport(support, support.context.global);
         appElements.splice(appElmIndex, 1);
-        // an element already had an app on it
-        console.warn('Found and destroyed app element already rendered to element', { element });
     }
+    ;
+    element[TAG_ELEMENT_MARKER] = true;
     // Create the app which returns [props, runOneTimeFunction]
     let templater = (() => templater2(props));
     templater.propWatch = PropWatches.NONE;

@@ -7,6 +7,7 @@ export * from './state.types.js';
 export { providers } from './providers.js';
 export * from './callbackMaker.function.js';
 export * from './callback.function.js';
+export * from './promise.function.js';
 export * from './onInit.function.js';
 export * from './onDestroy.function.js';
 export * from './state.function.js';

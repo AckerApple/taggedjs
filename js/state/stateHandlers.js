@@ -14,7 +14,11 @@ export function runFirstState(defaultValue) {
     const context = getContextInCycle();
     if (!context || !context.state) {
         const msg = 'State requested but TaggedJs is not currently rendering a tag or host';
-        console.error(msg, { config, context });
+        console.error(msg, {
+            config,
+            context,
+            function: config.support?.templater.wrapper?.original
+        });
         throw new Error(msg);
     }
     const newer = context.state.newer;

@@ -1,5 +1,5 @@
 // taggedjs-no-compile
-import { callback, setUseMemory, state } from '../state/index.js';
+import { callback, promise, setUseMemory, state } from '../state/index.js';
 import { getTemplaterResult } from '../tag/getTemplaterResult.function.js';
 import { tags } from '../tag/tag.utils.js';
 import { getTagWrap } from '../tag/getTagWrap.function.js';
@@ -153,6 +153,11 @@ Object.defineProperty(tag, 'use', {
         renderFunction.processUpdate = tagValueUpdateHandler;
         renderFunction.hasValueChanged = checkTagValueChangeAndUpdate;
         renderFunction.destroy = destroySupportByContextItem;
+    },
+});
+Object.defineProperty(tag, 'promise', {
+    set(target) {
+        promise(target);
     },
 });
 //# sourceMappingURL=tag.function.js.map
