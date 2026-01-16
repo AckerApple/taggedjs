@@ -135,7 +135,6 @@ export function elementFunctions(item: any) {
     onMouseout: makeCallback('onmouseout'),
     
     onKeydown: makeCallback('onkeydown'),
-    
     onKeyup: makeCallback('onkeyup'),
     // onkeyup: makeCallback('onkeyup'),
     // keyup: makeCallback('onkeyup'),
