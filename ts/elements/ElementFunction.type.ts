@@ -19,11 +19,16 @@ export type ElementFunction = (
   href: AttributeCallable
   value: AttributeCallable
   placeholder: AttributeCallable
+  src: AttributeCallable
   type: AttributeCallable
   title: AttributeCallable
   disabled: AttributeCallable
   checked: AttributeCallable
   selected: AttributeCallable
+  
+  cellPadding: AttributeCallable
+  cellSpacing: AttributeCallable
+  border: AttributeCallable
   
   // any other attribute
   attr: (

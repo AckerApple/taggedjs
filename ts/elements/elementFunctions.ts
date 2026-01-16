@@ -75,11 +75,16 @@ const classCallable = makeAttrCallable('class', attr)
 const href = makeAttrCallable('href', attr)
 const value = makeAttrCallable('value', attr)
 const placeholder = makeAttrCallable('placeholder', attr)
+const src = makeAttrCallable('src', attr)
 const title = makeAttrCallable('title', attr)
 const type = makeAttrCallable('type', attr)
 const checked = makeAttrCallable('checked', attr)
 const disabled = makeAttrCallable('disabled', attr)
 const selected = makeAttrCallable('selected', attr)
+
+const cellPadding = makeAttrCallable('cellpadding', attr)
+const cellSpacing = makeAttrCallable('cellspacing', attr)
+const border = makeAttrCallable('border', attr)
 
 function attr2(
   item: ElementVar,
@@ -173,6 +178,11 @@ export function elementFunctions(item: any) {
       return placeholder(item, stringsOrValue, values)
     }) as AttributeCallable,
 
+    /** Use as input.src`text` or input.src(() => `${value}`) */
+    src: ((stringsOrValue: any, ...values: any[]) => {
+      return src(item, stringsOrValue, values)
+    }) as AttributeCallable,
+
     /** Use as input.type`text` or input.type(() => `${value}`) */
     type: ((stringsOrValue: any, ...values: any[]) => {
       return type(item, stringsOrValue, values)
@@ -196,6 +206,18 @@ export function elementFunctions(item: any) {
     /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
     selected: ((stringsOrValue: any, ...values: any[]) => {
       return selected(item, stringsOrValue, values)
+    }) as AttributeCallable,
+
+    cellSpacing: ((stringsOrValue: any, ...values: any[]) => {
+      return cellSpacing(item, stringsOrValue, values)
+    }) as AttributeCallable,
+
+    cellPadding: ((stringsOrValue: any, ...values: any[]) => {
+      return cellPadding(item, stringsOrValue, values)
+    }) as AttributeCallable,
+
+    border: ((stringsOrValue: any, ...values: any[]) => {
+      return border(item, stringsOrValue, values)
     }) as AttributeCallable,
   }
 
