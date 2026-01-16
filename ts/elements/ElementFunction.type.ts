@@ -42,6 +42,7 @@ export type ElementFunction = (
     [name: string]: AttrValue
   }) => ElementFunction,
 
+  contextMenu: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   onClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   onChange: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   onInput: (callback: (e: InputElementTargetEvent) => any) => ElementFunction

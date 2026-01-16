@@ -129,6 +129,7 @@ export function elementFunctions(item: any) {
     // onchange: makeCallback('onchange'),
     // change: makeCallback('onchange'),
     
+    contextMenu: makeCallback('contextmenu'),
     onMousedown: makeCallback('onmousedown'),
     onMouseup: makeCallback('onmouseup'),
     onMouseover: makeCallback('onmouseover'),
@@ -150,71 +151,46 @@ export function elementFunctions(item: any) {
     },
 
     /** Use as div.style`border:${border}` or div.style(() => `border:${border}`) */
-    style: ((stringsOrValue: any | ((_?: ContextItem) => string), ...values: any[]) => {
-      return style(item, stringsOrValue, values)
-    }) as AttributeCallable,
+    style: makeAttr(style, item),
 
     /** Use as div.id`main` or div.id(() => `main-${1}`) */
-    id: ((stringsOrValue: any, ...values: any[]) => {
-      return idCallable(item, stringsOrValue, values)
-    }) as AttributeCallable,
+    id: makeAttr(idCallable, item),
 
     /** Use as div.class`primary` or div.class(() => `primary`) */
-    class: ((stringsOrValue: any, ...values: any[]) => {
-      return classCallable(item, stringsOrValue, values)
-    }) as AttributeCallable,
+    class: makeAttr(classCallable, item),
 
     /** Use as a.href`/path` or a.href(() => `/path`) */
-    href: ((stringsOrValue: any, ...values: any[]) => {
-      return href(item, stringsOrValue, values)
-    }) as AttributeCallable,
+    href: makeAttr(href, item),
 
     /** Use as input.value`text` or input.value(() => `${value}`) */
-    value: ((stringsOrValue: any, ...values: any[]) => {
-      return value(item, stringsOrValue, values)
-    }) as AttributeCallable,
+    value: makeAttr(value, item),
 
     /** Use as input.placeholder`text` or input.placeholder(() => `${value}`) */
-    placeholder: ((stringsOrValue: any, ...values: any[]) => {
-      return placeholder(item, stringsOrValue, values)
-    }) as AttributeCallable,
+    placeholder: makeAttr(placeholder, item),
 
     /** Use as input.src`text` or input.src(() => `${value}`) */
-    src: ((stringsOrValue: any, ...values: any[]) => {
-      return src(item, stringsOrValue, values)
-    }) as AttributeCallable,
+    src: makeAttr(src, item),
 
     /** Use as input.type`text` or input.type(() => `${value}`) */
-    type: ((stringsOrValue: any, ...values: any[]) => {
-      return type(item, stringsOrValue, values)
-    }) as AttributeCallable,
+    type: makeAttr(type, item),
 
     /** Use as input.type`text` or input.type(() => `${value}`) */
-    title: ((stringsOrValue: any, ...values: any[]) => {
-      return title(item, stringsOrValue, values)
-    }) as AttributeCallable,
+    title: makeAttr(title, item),
     
     /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
-    checked: ((stringsOrValue: any, ...values: any[]) => {
-      return checked(item, stringsOrValue, values)
-    }) as AttributeCallable,
+    checked: makeAttr(checked, item),
     
     /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
-    disabled: ((stringsOrValue: any, ...values: any[]) => {
-      return disabled(item, stringsOrValue, values)
-    }) as AttributeCallable,
+    disabled: makeAttr(disabled, item),
     
     /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
-    selected: ((stringsOrValue: any, ...values: any[]) => {
-      return selected(item, stringsOrValue, values)
-    }) as AttributeCallable,
+    selected: makeAttr(selected, item),
 
-    cellSpacing: ((stringsOrValue: any, ...values: any[]) => {
-      return cellSpacing(item, stringsOrValue, values)
-    }) as AttributeCallable,
-
+    cellSpacing: makeAttr(cellSpacing, item),
     cellPadding: makeAttr(cellPadding, item),
     border: makeAttr(border, item),
+    minLength: makeAttr(minLength, item),
+    maxLength: makeAttr(maxLength, item),
   }
 
   return callables_other
