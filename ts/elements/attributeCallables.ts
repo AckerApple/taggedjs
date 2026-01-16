@@ -16,7 +16,7 @@ function isTemplateStringsArray(value: any): value is TemplateStringsArray {
   )
 }
 
-type AttrCallableInternal = (
+export type AttrCallableInternal = (
   item: any,
   stringsOrValue: TemplateStringsArray | string | object | ((context: ContextItem) => any),
   values: any[],

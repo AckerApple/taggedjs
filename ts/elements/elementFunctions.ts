@@ -3,7 +3,7 @@ import { HowToSet, setBooleanAttribute, setNonFunctionInputValue, setSimpleAttri
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
 import { getPushKid } from './htmlTag.function.js'
-import { makeAttrCallable, AttributeCallable } from './attributeCallables.js'
+import { makeAttrCallable, AttributeCallable, AttrCallableInternal } from './attributeCallables.js'
 import { AttrValue, ElementVar } from './ElementFunction.type.js';
 
 function callbackWrapper(
@@ -81,6 +81,8 @@ const type = makeAttrCallable('type', attr)
 const checked = makeAttrCallable('checked', attr)
 const disabled = makeAttrCallable('disabled', attr)
 const selected = makeAttrCallable('selected', attr)
+const minLength = makeAttrCallable('minLength', attr)
+const maxLength = makeAttrCallable('maxLength', attr)
 
 const cellPadding = makeAttrCallable('cellpadding', attr)
 const cellSpacing = makeAttrCallable('cellspacing', attr)
@@ -212,16 +214,20 @@ export function elementFunctions(item: any) {
       return cellSpacing(item, stringsOrValue, values)
     }) as AttributeCallable,
 
-    cellPadding: ((stringsOrValue: any, ...values: any[]) => {
-      return cellPadding(item, stringsOrValue, values)
-    }) as AttributeCallable,
-
-    border: ((stringsOrValue: any, ...values: any[]) => {
-      return border(item, stringsOrValue, values)
-    }) as AttributeCallable,
+    cellPadding: makeAttr(cellPadding, item),
+    border: makeAttr(border, item),
   }
 
   return callables_other
+}
+
+function makeAttr(
+  handler: AttrCallableInternal,
+  item: any,
+) {
+  return ((stringsOrValue: any, ...values: any[]) => {
+    return handler(item, stringsOrValue, values)
+  }) as AttributeCallable
 }
 
 function setClassValue(
