@@ -46,11 +46,15 @@ const classCallable = makeAttrCallable('class', attr);
 const href = makeAttrCallable('href', attr);
 const value = makeAttrCallable('value', attr);
 const placeholder = makeAttrCallable('placeholder', attr);
+const src = makeAttrCallable('src', attr);
 const title = makeAttrCallable('title', attr);
 const type = makeAttrCallable('type', attr);
 const checked = makeAttrCallable('checked', attr);
 const disabled = makeAttrCallable('disabled', attr);
 const selected = makeAttrCallable('selected', attr);
+const cellPadding = makeAttrCallable('cellpadding', attr);
+const cellSpacing = makeAttrCallable('cellspacing', attr);
+const border = makeAttrCallable('border', attr);
 function attr2(item, args) {
     // const clone = getPushKid(item as any, item.elementFunctions)
     // clone.attributes.push(args as Attribute)
@@ -125,6 +129,10 @@ export function elementFunctions(item) {
         placeholder: ((stringsOrValue, ...values) => {
             return placeholder(item, stringsOrValue, values);
         }),
+        /** Use as input.src`text` or input.src(() => `${value}`) */
+        src: ((stringsOrValue, ...values) => {
+            return src(item, stringsOrValue, values);
+        }),
         /** Use as input.type`text` or input.type(() => `${value}`) */
         type: ((stringsOrValue, ...values) => {
             return type(item, stringsOrValue, values);
@@ -144,6 +152,15 @@ export function elementFunctions(item) {
         /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
         selected: ((stringsOrValue, ...values) => {
             return selected(item, stringsOrValue, values);
+        }),
+        cellSpacing: ((stringsOrValue, ...values) => {
+            return cellSpacing(item, stringsOrValue, values);
+        }),
+        cellPadding: ((stringsOrValue, ...values) => {
+            return cellPadding(item, stringsOrValue, values);
+        }),
+        border: ((stringsOrValue, ...values) => {
+            return border(item, stringsOrValue, values);
         }),
     };
     return callables_other;

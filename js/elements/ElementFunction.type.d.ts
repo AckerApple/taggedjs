@@ -12,11 +12,15 @@ export type ElementFunction = ((attributesOrFirstChild: Child | Attributes, ...c
     href: AttributeCallable;
     value: AttributeCallable;
     placeholder: AttributeCallable;
+    src: AttributeCallable;
     type: AttributeCallable;
     title: AttributeCallable;
     disabled: AttributeCallable;
     checked: AttributeCallable;
     selected: AttributeCallable;
+    cellPadding: AttributeCallable;
+    cellSpacing: AttributeCallable;
+    border: AttributeCallable;
     attr: (nameOrValue: AttrValue, value?: AttrValue) => ElementFunction;
     attrs: (nameValuePairs: {
         [name: string]: AttrValue;

@@ -33,6 +33,8 @@ export declare function elementFunctions(item: any): {
     value: AttributeCallable;
     /** Use as input.placeholder`text` or input.placeholder(() => `${value}`) */
     placeholder: AttributeCallable;
+    /** Use as input.src`text` or input.src(() => `${value}`) */
+    src: AttributeCallable;
     /** Use as input.type`text` or input.type(() => `${value}`) */
     type: AttributeCallable;
     /** Use as input.type`text` or input.type(() => `${value}`) */
@@ -43,6 +45,9 @@ export declare function elementFunctions(item: any): {
     disabled: AttributeCallable;
     /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
     selected: AttributeCallable;
+    cellSpacing: AttributeCallable;
+    cellPadding: AttributeCallable;
+    border: AttributeCallable;
 };
 /** used during updates */
 export declare function registerMockAttrContext(value: any, mockElm: ElementVar): void;

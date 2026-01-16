@@ -46,6 +46,7 @@ export const tbody = htmlTag('tbody');
 export const tfoot = htmlTag('tfoot');
 // INLINE ELEMENTS
 export const a = htmlTag('a');
+export const img = htmlTag('img');
 export const br = htmlTag('br');
 export const label = htmlTag('label');
 export const p = htmlTag('p');
@@ -58,4 +59,10 @@ export const nav = htmlTag("nav");
 export const figure = htmlTag("figure");
 export const figcaption = htmlTag("figcaption");
 export const code = htmlTag("code");
+// OTHER
+export const canvas = htmlTag('canvas');
+export const svg = htmlTag('svg');
+export const path = htmlTag('path');
+export const polygon = htmlTag('polygon');
+export const rect = htmlTag('rect');
 //# sourceMappingURL=index.js.map
