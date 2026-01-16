@@ -52,6 +52,8 @@ const type = makeAttrCallable('type', attr);
 const checked = makeAttrCallable('checked', attr);
 const disabled = makeAttrCallable('disabled', attr);
 const selected = makeAttrCallable('selected', attr);
+const minLength = makeAttrCallable('minLength', attr);
+const maxLength = makeAttrCallable('maxLength', attr);
 const cellPadding = makeAttrCallable('cellpadding', attr);
 const cellSpacing = makeAttrCallable('cellspacing', attr);
 const border = makeAttrCallable('border', attr);
@@ -156,14 +158,15 @@ export function elementFunctions(item) {
         cellSpacing: ((stringsOrValue, ...values) => {
             return cellSpacing(item, stringsOrValue, values);
         }),
-        cellPadding: ((stringsOrValue, ...values) => {
-            return cellPadding(item, stringsOrValue, values);
-        }),
-        border: ((stringsOrValue, ...values) => {
-            return border(item, stringsOrValue, values);
-        }),
+        cellPadding: makeAttr(cellPadding, item),
+        border: makeAttr(border, item),
     };
     return callables_other;
+}
+function makeAttr(handler, item) {
+    return ((stringsOrValue, ...values) => {
+        return handler(item, stringsOrValue, values);
+    });
 }
 function setClassValue(element, name, value) {
     if (isObject(value)) {

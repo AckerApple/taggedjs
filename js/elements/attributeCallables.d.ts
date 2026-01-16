@@ -6,6 +6,6 @@ export type AttributeCallable = {
     (value: string): ElementFunction;
     (value: (context: ContextItem) => any): ElementFunction;
 };
-type AttrCallableInternal = (item: any, stringsOrValue: TemplateStringsArray | string | object | ((context: ContextItem) => any), values: any[]) => ElementFunction;
+export type AttrCallableInternal = (item: any, stringsOrValue: TemplateStringsArray | string | object | ((context: ContextItem) => any), values: any[]) => ElementFunction;
 export declare function makeAttrCallable(attrName: string, attr: AttrFn): AttrCallableInternal;
 export {};

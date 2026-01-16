@@ -12,6 +12,8 @@ export type ElementFunction = ((attributesOrFirstChild: Child | Attributes, ...c
     href: AttributeCallable;
     value: AttributeCallable;
     placeholder: AttributeCallable;
+    minLength: AttributeCallable;
+    maxLength: AttributeCallable;
     src: AttributeCallable;
     type: AttributeCallable;
     title: AttributeCallable;
