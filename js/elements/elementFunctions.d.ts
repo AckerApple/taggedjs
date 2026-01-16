@@ -11,6 +11,7 @@ export declare function elementFunctions(item: any): {
     onBlur: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
     onChange: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
     onInput: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
+    contextMenu: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
     onMousedown: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
     onMouseup: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
     onMouseover: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
@@ -48,6 +49,8 @@ export declare function elementFunctions(item: any): {
     cellSpacing: AttributeCallable;
     cellPadding: AttributeCallable;
     border: AttributeCallable;
+    minLength: AttributeCallable;
+    maxLength: AttributeCallable;
 };
 /** used during updates */
 export declare function registerMockAttrContext(value: any, mockElm: ElementVar): void;
