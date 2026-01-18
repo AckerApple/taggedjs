@@ -450,11 +450,11 @@ export const form = tag(() => {
   let value = '';
 
   return div(
-    input({
-      type: "text",
-      placeholder: "Enter text",
-      onKeyup: (e) => value = e.target.value
-    }),
+    input
+      .type`text`
+      .placeholder`Enter text`
+      .onKeyup((e) => value = e.target.value)
+,
     div('You typed: ', _=> value)
   );
 });
