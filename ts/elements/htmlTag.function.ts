@@ -1,35 +1,15 @@
 import { InputElementTargetEvent } from '../index.js'
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
-import { ReadOnlyVar, TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { elementFunctions, isValueForContext, loopObjectAttributes } from './elementFunctions.js'
 import { destroyDesignElement } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
 import { processDesignElementInit } from './processDesignElementInit.function.js'
 import { ElementVar } from './ElementFunction.type.js'
+import { ElementVarBase } from './ElementVarBase.type.js'
 
 export type TruthyVar = number | string | boolean | ((_: InputElementTargetEvent) => string | boolean | number)
-
-export type MockElmListener = [
-  string,
-  callback: ((e: InputElementTargetEvent)=> any) & {toCallback: any},
-  // realCallback: (e: InputElementTargetEvent)=> any,
-]
-
-export type ElementVarBase = ReadOnlyVar & {
-  tagName: string
-  innerHTML: any[],
-  attributes: Attribute[],
-  elementFunctions: typeof elementFunctions,
-  
-  /** Children and self contexts all together */
-  contexts?: TagJsVar[]
-  
-  /** Just this element listeners */
-  listeners: MockElmListener[]
-  /** Parent and Child elements listeners */
-  allListeners: MockElmListener[]
-}
 
 export type Attributes = {
   onKeyup?: (_: InputElementTargetEvent) => any;

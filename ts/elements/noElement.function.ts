@@ -6,9 +6,10 @@ import { elementFunctions } from './elementFunctions.js'
 import { destroyDesignByContexts } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
 import { processChildren } from './processChildren.function.js'
-import { ElementVarBase, getPushKid } from './htmlTag.function.js'
+import { getPushKid } from './htmlTag.function.js'
 import { destroyHtmlDomMeta } from '../tag/destroyHtmlDomMeta.function.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
+import { ElementVarBase } from './ElementVarBase.type.js'
 
 /** used when you do NOT have a root element returned for your function */
 export const noElement = noElementMaker()

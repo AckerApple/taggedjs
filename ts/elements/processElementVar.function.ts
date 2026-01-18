@@ -7,7 +7,7 @@ import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArra
 import { processAttributeArray } from '../render/dom/processAttributeArray.function.js'
 import { paint, paintAppend, painting } from '../render/paint.function.js'
 import { ContextItem } from '../tag/index.js'
-import { MockElmListener } from './htmlTag.function.js'
+import { MockElmListener } from './ElementVarBase.type.js'
 import { processChildren } from './processChildren.function.js'
 
 /** The first and recursive processor for elements */

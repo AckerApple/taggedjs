@@ -12,7 +12,7 @@ export const textarea = htmlTag('textarea')
 
 // HEAD & SUPPORT ELEMENTS
 
-export const htmlDoc = htmlTag('html') // TODO: get this named to html
+export const html = htmlTag('html') // TODO: get this named to html
 export const head = htmlTag('head')
 export const title = htmlTag('title')
 export const meta = htmlTag('meta')

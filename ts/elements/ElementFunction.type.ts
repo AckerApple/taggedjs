@@ -2,7 +2,8 @@ import { ContextItem } from '../tag/ContextItem.type.js'
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import type { AttributeCallable } from './attributeCallables.js'
-import { Attributes, ElementVarBase } from './htmlTag.function'
+import { ElementVarBase } from './ElementVarBase.type.js'
+import { Attributes } from './htmlTag.function'
 
 type Child = ((_: InputElementTargetEvent) => any) | string | boolean | TagJsVar | number | null | undefined | any[] // object
 export type AttrValue = string | number | boolean | undefined | ((context: ContextItem) => any)
