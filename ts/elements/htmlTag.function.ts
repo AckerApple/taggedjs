@@ -3,6 +3,7 @@ import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
 import { elementFunctions, isValueForContext, loopObjectAttributes } from './elementFunctions.js'
+import { elementVarToHtmlString } from './elementVarToHtmlString.function.js'
 import { destroyDesignElement } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
 import { processDesignElementInit } from './processDesignElementInit.function.js'
@@ -120,6 +121,9 @@ export function getPushKid(
   pushKid.attributes = [...element.attributes] as Attribute[]
   pushKid.listeners = [...element.listeners]
   pushKid.allListeners = [...element.allListeners]
+  pushKid.toString = function () {
+    return elementVarToHtmlString(this as any)
+  }
 
   return pushKid as ElementVar
 }

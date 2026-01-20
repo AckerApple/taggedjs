@@ -3,6 +3,7 @@ export type { Attributes } from './htmlTag.function.js'
 export type { ElementVar } from './ElementFunction.type.js'
 export { htmlTag }
 export { noElement } from './noElement.function.js'
+export { elementVarToHtmlString } from './elementVarToHtmlString.function.js'
 
 export const button = htmlTag('button')
 export const select = htmlTag('select')
@@ -19,6 +20,7 @@ export const meta = htmlTag('meta')
 export const link = htmlTag('link')
 export const style = htmlTag('style')
 export const body = htmlTag('body')
+export const script = htmlTag('script')
 export const noscript = htmlTag('noscript')
 
 // BLOCK ELEMENTS
