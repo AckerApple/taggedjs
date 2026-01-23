@@ -29,6 +29,7 @@ export function noElementMaker(): ElementVar {
     tagName: 'no-element',
     innerHTML: [],
     attributes: [] as any,
+    contentId: 0,
     listeners: [],
     allListeners: [],
 

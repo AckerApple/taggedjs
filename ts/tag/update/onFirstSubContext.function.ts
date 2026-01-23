@@ -1,5 +1,5 @@
 import { AnySupport } from '../index.js'
-import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
+import { createAndProcessContextItem } from './arrays/createAndProcessContextItem.function.js'
 import { SubContext } from './SubContext.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { ContextItem } from '../ContextItem.type.js'

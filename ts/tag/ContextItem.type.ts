@@ -59,6 +59,7 @@ export interface ContextItem extends BaseContextItem {
 
   // array only
   lastArray?: LastArrayItem[]
+  arrayValue?: any
   
   // TAG SUPPORT ONLY BELOW
   global?: TagGlobal

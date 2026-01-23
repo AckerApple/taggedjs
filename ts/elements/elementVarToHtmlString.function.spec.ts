@@ -33,8 +33,8 @@ describe('elementVarToHtmlString', () => {
   it('no events', () => {
     const element = div
       .class`test`
-      .onChange(() => console.log(44))
-      .onClick(() => console.log(44))(
+      .onChange(() => undefined)
+      .onClick(() => undefined)(
         span('hello world')
       )
     const html = elementVarToHtmlString(element)
@@ -45,8 +45,8 @@ describe('elementVarToHtmlString', () => {
   it('self to string', () => {
     const element = div
       .class`test`
-      .onChange(() => console.log(44))
-      .onClick(() => console.log(44))(
+      .onChange(() => undefined)
+      .onClick(() => undefined)(
         span('hello world')
       )
     const html = element.toString()

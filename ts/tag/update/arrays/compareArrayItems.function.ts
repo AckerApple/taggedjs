@@ -24,7 +24,12 @@ export function compareArrayItems(
     return 1
   }
 
-  const oldKey = prevContext.value.arrayValue
+  if( prevContext.arrayValue === undefined ) {
+    prevContext.arrayValue = index
+  }
+
+  // const oldKey = prevArrayValue.arrayValue === undefined ? index : prevArrayValue.arrayValue
+  const oldKey = prevContext.arrayValue // || prevContext.value.arrayValue
   const newValueTag = castArrayItem(value[index])
 
   const result = runArrayItemDiff(
@@ -45,7 +50,8 @@ function runArrayItemDiff(
   lastArray: LastArrayItem[],
   index: number
 ) {
-  const isDiff = newValueTag && oldKey !== newValueTag.arrayValue
+  const newKey = newValueTag.arrayValue || index
+  const isDiff = newValueTag && oldKey !== newKey
 
   if( isDiff ) {
     destroyArrayItem(prevContext)

@@ -86,19 +86,25 @@ export function checkTagElementValueChange(
     return 1
   }
 
+  const newContentId = (value as ElementVar).contentId
+  const oldContentId = (context.value as ElementVar).contentId
+  if(newContentId !== oldContentId) {
+    return 1
+  }
+
   const newKidLength = (value as ElementVar).innerHTML.length
   const oldKidLength = context.value.innerHTML.length
   const kidLengthChanged = newKidLength !== oldKidLength
   if(kidLengthChanged) {
     return 1
   }
-
+/*
   const newAttrLength = (value as ElementVar).attributes.length
   const oldAttrLength = context.value.attributes.length
   const kidAttrChanged = newAttrLength !== oldAttrLength
   if(kidAttrChanged) {
     return 1
   }
-  
+*/
   return 0
 }

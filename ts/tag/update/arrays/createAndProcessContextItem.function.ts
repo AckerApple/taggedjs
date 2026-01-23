@@ -1,12 +1,12 @@
 // taggedjs-no-compile
 
-import { paintAppend, paintAppends } from '../../render/paint.function.js'
-import { AnySupport } from '../index.js'
-import { domProcessContextItem } from '../../interpolations/optimizers/domProcessContextItem.function.js'
-import { empty } from '../ValueTypes.enum.js'
-import { TemplateValue } from '../TemplateValue.type.js'
-import { ContextItem } from '../ContextItem.type.js'
-import { getNewContext } from '../../render/addOneContext.function.js'
+import { paintAppend, paintAppends } from '../../../render/paint.function.js'
+import { AnySupport } from '../../index.js'
+import { domProcessContextItem } from '../../../interpolations/optimizers/domProcessContextItem.function.js'
+import { empty } from '../../ValueTypes.enum.js'
+import { TemplateValue } from '../../TemplateValue.type.js'
+import { ContextItem } from '../../ContextItem.type.js'
+import { getNewContext } from '../../../render/addOneContext.function.js'
 
 /** Used by arrays and subcontext creators like subscribe. Must provide insertBefore OR appendTo */
 export function createAndProcessContextItem(

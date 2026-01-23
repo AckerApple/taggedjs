@@ -55,6 +55,7 @@ export function htmlTag(
     tagName,
     innerHTML: [],
     attributes: [] as any,
+    contentId: 0,
     listeners: [],
     allListeners: [],
 

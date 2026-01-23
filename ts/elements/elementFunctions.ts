@@ -37,6 +37,7 @@ function attr(
 ) {
   const clone = getPushKid(item as any, item.elementFunctions)
   clone.attributes.push(args as Attribute)
+  bumpContentId(clone, args[1])
 
   if( isValueForContext(args[0]) ) {
     registerMockAttrContext(args[0], clone) // the attrName is a function or TagJsVar
@@ -58,6 +59,7 @@ function attrs(
 
   Object.entries(args).map(args => {
     clone.attributes.push(args as unknown as Attribute)
+    bumpContentId(clone, args[1])
   
     if( isValueForContext(args[0]) ) {
       registerMockAttrContext(args[0], clone) // the attrName is a function or TagJsVar
@@ -95,6 +97,7 @@ function attr2(
   // const clone = getPushKid(item as any, item.elementFunctions)
   // clone.attributes.push(args as Attribute)
   item.attributes.push(args as Attribute)
+  bumpContentId(item, args[1])
 
   if( isValueForContext(args[0]) ) {
     registerMockAttrContext(args[0], item) // the attrName is a function or TagJsVar
@@ -194,6 +197,18 @@ export function elementFunctions(item: any) {
   }
 
   return callables_other
+}
+
+function bumpContentId(
+  item: ElementVar,
+  attrValue: any,
+) {
+  let bump = 1
+  if(attrValue != null && typeof attrValue !== 'function' && typeof attrValue.length === 'number') {
+    bump += attrValue.length
+  }
+
+  item.contentId += bump
 }
 
 function makeAttr(

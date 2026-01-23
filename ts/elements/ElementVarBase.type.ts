@@ -7,6 +7,7 @@ export type ElementVarBase = ReadOnlyVar & {
   tagName: string
   innerHTML: any[],
   attributes: Attribute[],
+  contentId: number,
   elementFunctions: typeof elementFunctions,
   
   /** Children and self contexts all together */

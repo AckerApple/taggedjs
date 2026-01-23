@@ -5,7 +5,7 @@ import { tagValueUpdateHandler } from '../tagValueUpdateHandler.function.js'
 import { LastArrayItem } from '../../Context.types.js'
 import { compareArrayItems } from './compareArrayItems.function.js'
 import { AnySupport } from '../../index.js'
-import { createAndProcessContextItem } from '../createAndProcessContextItem.function.js'
+import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
 import { TemplateValue } from '../../TemplateValue.type.js'
 import { Tag } from '../../Tag.type.js'
 import { ContextItem } from '../../ContextItem.type.js'
@@ -36,6 +36,12 @@ export function processTagArray(
     // on each loop check the new length
     for (let index=0; index < lastArray.length; ++index) {
       const item = lastArray[index]
+
+      // .key() was not used
+      if(item.value === null) {
+        filteredLast.push(item)
+        continue
+      }
 
       // 👁️ COMPARE & REMOVE
       const newRemoved = compareArrayItems(
@@ -98,13 +104,16 @@ function reviewArrayItem(
   const contextItem = createAndProcessContextItem(
     item as TemplateValue,
     ownerSupport,
-    lastArray,
+    lastArray, // acts as contexts aka Context[]
     runtimeInsertBefore as Text,
     appendTo,
   )
 
   // Added to previous array
   lastArray.push(contextItem)
+  if(item) {
+    contextItem.arrayValue = item?.arrayValue || contextItem.arrayValue || index
+  }
 
   return contextItem
 }
