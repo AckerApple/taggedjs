@@ -15,7 +15,147 @@
 </head>
 <body>
   <noscript style="color:red">Javascript is required but is turned off on your device</noscript>
-  <app id="docs-app"></app>
+  <app id="docs-app">
+        <!-- taggedjs:ssr-start -->
+        <header><div class="wrap"><h1>Work With The TaggedJS Code</h1><p>This guide is grounded in the real TaggedJS source. Each section points to current files and uses live excerpts so you can follow the actual patterns used in this repo.</p><nav class="primary"><a href="index.html">Docs Home</a><a href="../index.html">Live App</a></nav></div></header><main><a id="top"></a><div class="guide-layout"><section class="toc guide-index" id="toc"><h2 class="doc-title"><a class="doc-title-link" href="#toc">Guide Index</a></h2><ul><li class=""><a href="#project-layout">🗂️ Project Layout</a></li><li class=""><a href="#entry-point">🚪 Entry Point</a></li><li class=""><a href="#component-pattern">🧩 Component Pattern</a></li><li class="toc-sub"><a href="#tag-component-display">🧠 Component Display</a></li><li class="toc-sub"><a href="#tag-component-arguments">🧵 Component Arguments</a></li><li class="toc-sub"><a href="#tag-component-callbacks">🪝 Functions for Output</a></li><li class="toc-sub"><a href="#tag-component-async-callbacks">⏱️ Async Callback Wrapper</a></li><li class="toc-sub"><a href="#tag-component-promise">⏳ tag.promise</a></li><li class="toc-sub"><a href="#on-destroy">🧹 onDestroy Cleanup</a></li><li class=""><a href="#display">🖼️ Display</a></li><li class="toc-sub"><a href="#element-imports">📦 Element Imports</a></li><li class="toc-sub"><a href="#attributes">🏷️ attributes``</a></li><li class="toc-sub"><a href="#dynamic-content">✨ Dynamic Content _=&gt;</a></li><li class="toc-sub"><a href="#map-loops">🔂 Map Loops</a></li><li class="toc-sub"><a href="#event-handlers">🖱️ Event Handlers</a></li><li class=""><a href="#reactive-updates">🔁 Reactive Updates</a></li><li class="toc-sub"><a href="#react-vs-taggedjs">⚖️ React vs TaggedJS</a></li></ul></section><div class="guide-content"><section class="section-card" id="project-layout"><h2 class="doc-title"><a class="doc-title-link" href="#project-layout">🗂️ Project Layout</a></h2><p>The gh-pages branch is a full app. Source code lives in <code>src/</code>, the runtime entry is in <code>src/index.ts</code>, and the main view assembly lives in <code>src/app.tag.ts</code> plus the menu in <code>src/menu.tag.ts</code>.</p><p>Use the <code>documentation/</code> folder for doc pages, styles, and future guides. Keep documentation separate from app runtime code so it remains focused and easy to host.</p><p><a class="inline-link" href="#top">Back to top</a></p></section><section class="section-card" id="entry-point"><h2 class="doc-title"><a class="doc-title-link" href="#entry-point">🚪 Entry Point</a></h2><p>To start a TaggedJS app, place a custom element in your HTML and mount the component with <code>tagElement</code>. The mount call connects your component to that element and triggers the first render.</p><p>This is the minimal setup: an HTML document, a root element, and a module script that defines a <code>tag</code> component and mounts it.</p><figure><pre><code class="language-html">&lt;!DOCTYPE html&gt;
+        &lt;html lang="en"&gt;
+          &lt;head&gt;
+            &lt;meta charset="UTF-8" /&gt;
+            &lt;title&gt;TaggedJS App&lt;/title&gt;
+          &lt;/head&gt;
+          &lt;body&gt;
+            &lt;app id="app-root"&gt;&lt;/app&gt;
+
+            &lt;script type="module"&gt;
+              import { tag, tagElement, div, h1 } from "taggedjs"
+
+              const App = tag(() =&gt;
+                div(
+                  h1("Hello TaggedJS")
+                )
+              )
+
+              tagElement(App, document.getElementById("app-root"))
+            &lt;/script&gt;
+          &lt;/body&gt;
+        &lt;/html&gt;
+        </code></pre><figcaption>Minimal TaggedJS app bootstrap</figcaption></figure><p><a class="inline-link" href="#top">Back to top</a></p></section><section class="section-card" id="component-pattern"><h2 class="doc-title"><a class="doc-title-link" href="#component-pattern">🧩 Component Pattern</a></h2><p>Components are created by calling <code>tag</code> and returning mock element functions like <code>div</code>, <code>button</code>, and <code>p</code>. Below are some simple examples. You may see syntax used in ways you have not seen before BUT all code is native vanilla JavaScript that is supported everywhere.</p><p class="code-title">Basic Counter Component</p><figure class="code-block"><pre><code class="language-ts">import { tag, p, button } from 'taggedjs'
+
+        export const basicCounter = tag(() =&gt; (counter = 0) =&gt; [
+          p('Counter: ', _=&gt; counter}),
+          button.onClick(() =&gt; counter++)('Increment Counter')
+        ])
+        </code></pre></figure><p>☝️ ABOVE Explanation: The function "basicCounter" becomes a tag component when wrapped in a tag() call. The tag requires no inputs/props/arguments. The new tag/component is designed to create a local variable counter that is set to 0 and increments when a button is clicked.</p><br><br><p class="code-title">Basic show/hide Component</p><figure class="code-block"><pre><code class="language-ts">import { tag, div, button } from 'taggedjs'
+
+        export const basicShowHide = tag(() =&gt; (showDiv = true) =&gt;
+          div(
+            button.onClick(() =&gt; showDiv = !showDiv)(
+              _=&gt; `Toggle Div (${showDiv ? 'Hide' : 'Show'})`
+            ),
+            _=&gt; showDiv &amp;&amp; div('Now you see me')
+          )
+        )
+        </code></pre></figure><p>☝️ ABOVE Explanation: The function "basicShowHide" becomes a tag component when wrapped in a tag() call. The tag requires no inputs/props/arguments. The new tag/component is designed to create a local variable "showDiv" that is toggled true/false when a button is clicked.</p><br><br><p>The <code>tag(() =&gt; (counter = 0) =&gt; div(_=&gt; counter))</code> form is shorthand for declaring local variables and returning markup. It is the same as <code>tag(() =&gt; { let counter = 0; return div(_=&gt; counter) })</code>, just more compact.</p><p>Returning an array lets you emit multiple root elements without a wrapper. <code>() =&gt; [div('hello'), div('world')]</code> is the no-wrapper alternative to <code>() =&gt; div('hello world')</code> when you want separate siblings.</p><br><h3 class="doc-subtitle" id="tag-component-display"><a class="doc-title-link" href="#tag-component-display">🧠 Component Display</a></h3><p>When you pass arguments to a tag component, render it inside a <code>_=&gt;</code> block so TaggedJS treats argument changes as updates.</p><p>This keeps the tag mounted and lets <code>.updates(...)</code> receive new arguments without recreating the component.</p><p>Using <code>_=&gt;</code> also helps it stand out as dynamic display, while something like <code>div.onClick(() =&gt; {})</code> reads more like an event handler. It's optional, but recommended for clearer intent.</p><figure><pre><code class="language-ts">return div(
+          _=&gt; boltTag(counter)
+        )</code></pre><figcaption>Render tag components inside a dynamic output</figcaption></figure><h3 class="doc-subtitle" id="tag-component-arguments"><a class="doc-title-link" href="#tag-component-arguments">🧵 Component Arguments</a></h3><p>Tag components receive arguments like normal functions, but you must opt in to argument updates when those values change. Call <code>.updates(...)</code> inside the tag to re-assign the latest arguments in the same order they were passed.</p><p>This keeps local variables in sync with the parent without re-running the entire tag function.</p><figure><pre><code class="language-ts">const boltTag = tag((parentCounter: number) =&gt; {
+          boltTag.updates(args =&gt; [parentCounter] = args)
+
+          return div(
+            div(_=&gt; `parent counter: ${parentCounter}`)
+          )
+        })
+        </code></pre><figcaption>Source: <a href="https://github.com/AckerApple/taggedjs/blob/gh-pages/src/basic.tag.ts" target="_blank"><code>src/basic.tag.ts</code></a></figcaption></figure><h3 class="doc-subtitle" id="tag-component-callbacks"><a class="doc-title-link" href="#tag-component-callbacks">🪝 Functions for Output</a></h3><p>TaggedJS treats function arguments as outputs: when the child calls the function, the parent can update state and re-render the dependent <code>_=&gt;</code> segments.</p><p>This mirrors Angular-style outputs and keeps data flowing up without recreating the child component.</p><p>Calling <code>output</code> with the callback binds the caller to the currently running tag, so when the child triggers it, TaggedJS knows which parent output to re-evaluate.</p><figure><pre><code class="language-ts">import { output, tag, button } from "taggedjs"
+
+        export const child = tag((onSave: () =&gt; void) =&gt; {
+          onSave = output(onSave)
+          return button.onClick(() =&gt; onSave())("Save")
+        })
+
+        export const parent = tag(() =&gt; {
+          let saved = 0
+
+          return div(
+            _=&gt; child(() =&gt; saved++),
+            div(_=&gt; `saved: ${saved}`)
+          )
+        })
+        </code></pre><figcaption>Child callback triggers parent updates</figcaption></figure><h3 class="doc-subtitle" id="tag-component-async-callbacks"><a class="doc-title-link" href="#tag-component-async-callbacks">⏱️ Async Callback Wrapper</a></h3><p>TaggedJS exports <code>callback</code> to wrap async handlers (events, timers, promises) so the current tag can re-evaluate dependent <code>_=&gt;</code> outputs when the async work completes.</p><p>Call <code>callback</code> inline and assign it to a new variable so it can be registered and cleaned up with the async API.</p><figure><pre><code class="language-ts">import { callback } from "taggedjs"
+
+        const getHash = () =&gt; window.location.hash.substring(1) || '/'
+
+        const HashRouter = () =&gt; {
+          const memory = {route: getHash()}
+          const onHashChange = callback(() =&gt; memory.route = getHash())
+          window.addEventListener('hashchange', onHashChange)
+          return {memory, onHashChange}
+        }
+        </code></pre><figcaption>Source: <a href="https://github.com/AckerApple/taggedjs/blob/gh-pages/todo/src/HashRouter.function.ts" target="_blank"><code>todo/src/HashRouter.function.ts</code></a></figcaption></figure><h3 class="doc-subtitle" id="tag-component-promise"><a class="doc-title-link" href="#tag-component-promise">⏳ tag.promise</a></h3><p>Set <code>tag.promise</code> to a Promise to tell TaggedJS that a new render cycle should run when that async work completes.</p><p>Do not use <code>await tag.promise</code> or await the promise inline; the promise is only a signal for re-render, not a value to block on.</p><figure><pre><code class="language-ts">const promiseTag = tag(() =&gt; {
+          let x = 0
+          tag.promise = new Promise((resolve) =&gt; {
+            setTimeout(() =&gt; {
+              ++x
+              resolve(x)
+            }, 250)
+          })
+          return div.id`tag-promise-test`(_=&gt; `count ${x}`)
+        })
+        </code></pre><figcaption>Source: <a href="https://github.com/AckerApple/taggedjs/blob/gh-pages/src/async.tag.ts" target="_blank"><code>src/async.tag.ts</code></a></figcaption></figure><h3 class="doc-subtitle" id="on-destroy"><a class="doc-title-link" href="#on-destroy">🧹 onDestroy Cleanup</a></h3><p>Use <code>onDestroy</code> to run cleanup logic when a tag component is removed. For host elements, <code>host.onDestroy</code> lets you attach cleanup at the element level.</p><figure><pre><code class="language-ts">import { tag, div, button, onDestroy, host, signal } from "taggedjs"
+
+        const contentTag = tag(() =&gt; {
+          onDestroy(() =&gt; {
+            // closing logic here
+          })
+
+          return div("this tag will be destroyed")
+        })
+
+        const destroys = tag(() =&gt; (showContent: boolean) =&gt;
+        div(
+          "Content:", _=&gt; showContent &amp;&amp; contentTag(),
+          button
+            .onClick(() =&gt; { showContent = !showContent } )
+            (_=&gt; showContent ? "destroy" : "restore")
+        ))
+        </code></pre><figcaption>Source: <a href="https://github.com/AckerApple/taggedjs/blob/gh-pages/src/destroys.tag.ts" target="_blank"><code>src/destroys.tag.ts</code></a></figcaption></figure><p>Common uses include removing event listeners, stopping intervals, or disposing subscriptions tied to the component lifecycle.</p><p><a class="inline-link" href="#top">Back to top</a></p></section><section class="section-card" id="display"><h2 class="doc-title"><a class="doc-title-link" href="#display">🖼️ Display</a></h2><p>These sections cover the rendering building blocks: importing elements, applying <code>attributes``</code>, mapping lists, and wiring event handlers.</p><h3 class="doc-subtitle" id="element-imports"><a class="doc-title-link" href="#element-imports">📦 Element Imports</a></h3><p>TaggedJS exposes HTML elements as functions you can import directly. This keeps your render output explicit, avoids string-based templates, and makes composition feel like regular JavaScript.</p><p>Benefits include clear dependency lists, easy refactors, and better editor autocomplete because each element is a real import instead of a string tag.</p><figure><pre><code class="language-ts">import { div, span, button } from "taggedjs"
+
+        export const example = tag(() =&gt;
+          div(
+            span("Hello"),
+            button.onClick(() =&gt; alert("Hi"))("Click")
+          )
+        )
+        </code></pre><figcaption>Import only the elements you use</figcaption></figure><h3 class="doc-subtitle" id="attributes"><a class="doc-title-link" href="#attributes">🏷️ attributes``</a></h3><p>TaggedJS supports a shorthand attribute syntax using tagged template calls. You can set attributes with concise chains like <code>div.id`identifier`.style`border:1px solid black;`</code> to keep the markup compact.</p><p>For dynamic values, switch to a function call. The <code>.style(_=&gt; border)</code> form keeps the same chain, but marks the style as reactive so it updates when the value changes.</p><figure><pre><code class="language-ts">div
+          .id`identifier`
+          .style`border:1px solid black;`
+          ("attributes shorthand")
+
+        const border = "border:2px solid blue;"
+
+        div
+          .id`identifier`
+          .style(_=&gt; border)
+          ("dynamic style")
+        </code></pre><figcaption>Shorthand attributes with static and dynamic styles</figcaption></figure><h3 class="doc-subtitle" id="dynamic-content"><a class="doc-title-link" href="#dynamic-content">✨ Dynamic Content _=&gt;</a></h3><p>The <code>_=&gt;</code> prefix is a visual cue that the content is dynamic and will re-evaluate when values change. It is meant to stand out from <code>() =&gt;</code>, which you will usually see in event handlers like <code>onClick</code>.</p><figure><pre><code class="language-ts">const counter = tag(() =&gt; [
+          p(_=&gt;  count ),
+          button.onClick(() =&gt; count++), 'increment')
+        ])
+        </code></pre><figcaption>Dynamic content cue vs event handler</figcaption></figure><h3 class="doc-subtitle" id="map-loops"><a class="doc-title-link" href="#map-loops">🔂 Map Loops</a></h3><p>TaggedJS uses normal JavaScript array mapping for list rendering. Put the <code>array.map</code> inside a <code>_=&gt;</code> block so the list is reactive.</p><p>Return a tag for each item and add <code>.key(...)</code> when the list can be reordered or removed so TaggedJS can keep elements stable.</p><figure><pre><code class="language-ts">const items = ['a', 'b', 'c']
+
+        _=&gt; items.map((item, index) =&gt;
+          div(
+            'item:', _=&gt; item,
+            ' index:', _=&gt; index,
+            button.onClick(() =&gt; items.splice(index, 1))('remove')
+          ).key(item)
+        )
+        </code></pre><figcaption>Map each item and key the result</figcaption></figure><h3 class="doc-subtitle" id="event-handlers"><a class="doc-title-link" href="#event-handlers">🖱️ Event Handlers</a></h3><p>Event handlers use method chaining like <code>button.onClick(...)</code>. The code in <code>src/basic.tag.ts</code> shows the standard pattern.</p><figure><pre><code class="language-ts">export const clicker = tag(() =&gt; {
+          let counter = 0
+
+          return button.onClick(() =&gt; counter++)(_=&gt; `Increment Counter: ${counter}`)
+        })
+        </code></pre><figcaption>Source: <a href="https://github.com/AckerApple/taggedjs/blob/gh-pages/src/basic.tag.ts" target="_blank"><code>src/basic.tag.ts</code></a></figcaption></figure><p><a class="inline-link" href="#top">Back to top</a></p></section><section class="section-card" id="reactive-updates"><h2 class="doc-title"><a class="doc-title-link" href="#reactive-updates">🔁 Reactive Updates</a></h2><p>Reactive updates are driven by closures and tracked by the TaggedJS runtime. When a function uses values in an arrow callback (for example, <code>_=&gt;</code>), the runtime re-evaluates that part of the view when the values change.</p><p>In the example above, the <code>p</code> tags and the final conditional <code>_=&gt; showDiv &amp;&amp; boltTag(counter)</code> are reactive segments.</p><h3 class="doc-subtitle" id="react-vs-taggedjs"><a class="doc-title-link" href="#react-vs-taggedjs">⚖️ React vs TaggedJS</a></h3><p>React typically re-runs the component function to produce the next render output, then reconciles the result. TaggedJS keeps the main tag function stable and re-evaluates only the dynamic segments marked with <code>_=&gt;</code>, which helps focus updates on the specific parts that changed.</p><p><a class="inline-link" href="#top">Back to top</a></p></section></div></div></main>
+        <!-- taggedjs:ssr-end -->
+  </app>
   <script type="module">
     import { runDocs } from "../assets/dist/bundle.js"
     runDocs()

@@ -7,7 +7,7 @@ import { componentPatternSection } from "./componentPatternSection"
 import { displaySection } from "./displaySection"
 import { reactiveUpdatesSection } from "./reactiveUpdatesSection"
 
-const GuideApp = tag(() => [
+export const GuideApp = tag(() => [
   guideHeader(),
 
   main(
@@ -31,5 +31,6 @@ export function runDocs() {
     return
   }
 
+  mount.innerHTML = ""
   tagElement(GuideApp, mount)
 }

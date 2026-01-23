@@ -292,9 +292,9 @@ html`
 `
 
 // NEW
-import { htmlDoc, head, title, meta, body } from "taggedjs";
+import { html, head, title, meta, body } from "taggedjs";
 
-htmlDoc({lang: "en"},
+html({lang: "en"},
   head(
     title('App'),
     meta({charset: "UTF-8"})
@@ -303,7 +303,7 @@ htmlDoc({lang: "en"},
 )
 ```
 
-Note: The `<!DOCTYPE html>` is automatically added by `htmlDoc()`.
+Note: The `<!DOCTYPE html>` is automatically added by `html()`.
 
 ## Complete Examples
 

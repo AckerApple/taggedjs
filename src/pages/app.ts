@@ -1,7 +1,7 @@
-import { head, title, meta, link, body, noscript, table, tr, td, tag, htmlDoc } from "taggedjs"
+import { head, title, meta, link, body, noscript, table, tr, td, tag, html } from "taggedjs"
 
 export default tag.app = tag(routeTag =>
-  htmlDoc({lang: "en"},
+  html({lang: "en"},
     head(
       title('TaggedJs'),
       meta({charset:"UTF-8"}),
