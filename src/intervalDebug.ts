@@ -1,4 +1,4 @@
-import { div, button, input, tag, onInit, callbackMaker, onDestroy, states } from "taggedjs"
+import { div, button, input, tag, callbackMaker, onDestroy } from "taggedjs"
 
 const test0interval = 3000
 const test1interval = 6000

@@ -1,10 +1,10 @@
-import { Subject, callbackMaker, onInit, tag, state, states, subscribe, h1, div, button, span, fieldset, legend, small } from "taggedjs"
+import { Subject, tag, subscribe, h1, div, button, span, fieldset, legend, small } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
 import { activate, sectionSelector, viewChanged, ViewTypes } from "./sectionSelector.tag"
 import { renderedSections } from "./renderedSections.tag"
 import { autoTestingControls } from "./autoTestingControls.tag"
 import { menu } from "./menu.tag"
-import { hashRouterSubject, useHashRouter } from "./todo/HashRouter.function"
+import { hashRouterSubject } from "./todo/HashRouter.function"
 
 export default tag(() => {
   const _ = 'isolated app state'

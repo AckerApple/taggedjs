@@ -1,4 +1,4 @@
-import { LikeObjectChildren, tag, ValueSubject, subscribe, Subject, div, input, select, option, button, hr, fieldset, legend, span, b } from 'taggedjs'
+import { LikeObjectChildren, tag, ValueSubject, subscribe, Subject, div, input, select, option, button, hr, fieldset, legend, span, b, output } from 'taggedjs'
 import { dumpContent } from "./dumpContent.tag"
 import { renderCountDiv } from "./renderCount.component"
 import { fx } from "taggedjs-animate-css"
@@ -79,6 +79,10 @@ export const content = tag(() => {
   let counter = 0
   let staggerBy = testStaggerBy
   let showHideFx = false
+  let updatesArgA = 0
+  let updatesArgB = 0
+  let inputsArgA = 0
+  let inputsArgB = () => `inputs-${inputsArgA}`
   const counts = new Subject({ added: 0, removed: 0})// as ValueSubject<{added: number, removed: number}>
 
   ++renderCount
@@ -172,6 +176,30 @@ export const content = tag(() => {
       legend('Dump Content'),
       dumpContent(),
       renderCountDiv({renderCount, name: 'content'})
+    ),
+
+    fieldset({id: "inputs-updates-fieldset"},
+      legend('inputs vs updates'),
+      div(
+        button({
+          id: "updates-count-bump",
+          onClick: () => {
+            ++updatesArgA
+            ++updatesArgB
+          }
+        }, 'update updates args'),
+        span({id: "updates-count-display"}, _=> updatesCountTag(updatesArgA, updatesArgB))
+      ),
+      div(
+        button({
+          id: "inputs-count-bump",
+          onClick: () => {
+            ++inputsArgA
+            inputsArgB = () => `inputs-${inputsArgA}`
+          }
+        }, 'update inputs args'),
+        span({id: "inputs-count-display"}, _=> inputsCountTag(inputsArgA, inputsArgB))
+      )
     ),
 
     fieldset({id: "noParentTagFieldset"},
@@ -295,6 +323,25 @@ export const content = tag(() => {
 
     renderCountDiv({renderCount, name: 'content'})
   ]
+})
+
+const updatesCountTag = tag((a: number, b: number) => {
+  let calls = 0
+  updatesCountTag.updates(x => {
+    ++calls
+    ;[a, b] = x
+  })
+  return div({id: "updates-count"}, _=> calls)
+})
+
+const inputsCountTag = tag((a: number, b: () => string) => {
+  let calls = 0
+  inputsCountTag.inputs(x => {
+    ++calls
+    ;[a, b] = x
+    b = output(b)
+  })
+  return div({id: "inputs-count"}, _=> calls)
 })
 
 const numberedNoParents = tag(() => {

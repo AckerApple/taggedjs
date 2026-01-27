@@ -5,14 +5,15 @@ import { getContextInCycle } from "taggedjs"
 export const injectionTarget = host((
   value: any
 ) => {
-  const context = getContextInCycle()
+  // const context = getContextInCycle()
   const wrapHost = tag.inject(injectionWrap)
+
+  // should only run once
+  // wrapHost.targets.push(value)
   
-  tag
-  .onInit(() => {
+  tag.onInit(() => {
     wrapHost.targets.push(value)
-  })
-  .onDestroy(() => {
+  }).onDestroy(() => {
     const index = wrapHost.targets.findIndex((x: any) => x === value)
     if (index !== -1) {
       wrapHost.targets.splice(index, 1)

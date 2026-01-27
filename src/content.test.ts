@@ -1,5 +1,5 @@
 import { describe, it, expect } from './testing'
-import { byId, click, html, query, changeOne, count } from './testing'
+import { byId, click, html, query, changeOne, count, textContent } from './testing'
 import { sleep } from './testing'
 
 // Helper function to wait for animations to complete
@@ -106,59 +106,16 @@ describe('📰 content', () => {
     expect(byId('inject-tagvar-1').innerText).toBe(byId('inject-read-tagvar-1').innerText)
     expect(byId('inject-tagvar-2').innerText).toBe(byId('inject-read-tagvar-2').innerText)
   })
-/*
-  it('animates', async () => {
-    // Skip if running in an environment where content view isn't properly loaded
-    const toggleButton = document.querySelector('#content-toggle-fx');
-    if (!toggleButton) {
-      console.warn('⚠️ Skipping animation test - Content view not loaded properly in test environment');
-      return;
-    }
-    
-    expect(count('[name=test-the-tester]'), 'Initial state: should have 0 test elements').toBe(0)
-    
-    //show
-    click('#content-toggle-fx')
 
-    // Wait for elements to appear
-    await waitForElementCount('[name=test-the-tester]', 3);
-    expect(count('[name=test-the-tester]')).toBe(3, 'After show click: should have 3 test elements')
-    
-    // Check if any elements are animating initially (could be 1, 2, or 3 depending on timing)
-    const animatingCount = count('.animate__animated[name=test-the-tester]');
-    expect(animatingCount).toBeGreaterThan(0, 'After show click: should have at least 1 animating element')
-        
-    // Wait a bit to ensure we're still mid-animation
-    await sleep(testStaggerBy / 2);
-    
-    // almost shown - there might be more animating elements due to stagger
-    expect(count('[name=test-the-tester]'), 'During animation: should still have 3 test elements').toBe(3)
-    // Don't check exact animation count here as it depends on stagger timing
-    expect(textContent('#outer-html-fx-test'), 'During animation: inner html should be rendered').toBe('inner html tag')
-
-    // Wait for all animations to complete
-    await waitForAnimationsToComplete('[name=test-the-tester]', 0);
-   
-    // completed showing
-    expect(count('[name=test-the-tester]'), 'After animation complete: should have 3 test elements').toBe(3)
-    expect(count('.animate__animated[name=test-the-tester]'), 'After animation complete: should have 0 animating elements').toBe(0)
-    
-    // hide
-    click('#content-toggle-fx')
-
-    // Check if any elements are animating (could be 1, 2, or 3 depending on timing)
-    const hideAnimatingCount = count('.animate__animated[name=test-the-tester]');
-    expect(hideAnimatingCount).toBeGreaterThan(0, 'After hide click: should have at least 1 animating element')
-    
-    // no changes to remove yet
-    expect(count('[name=test-the-tester]')).toBe(3, 'After hide click: should still have 3 test elements')
-    
-    // Wait for all elements to disappear
-    await waitForElementCount('[name=test-the-tester]', 0);
-    
-    // should be done disappearing
-    expect(count('[name=test-the-tester]')).toBe(0, 'After hide animation: should have 0 test elements')
-    expect(count('.animate__animated[name=test-the-tester]')).toBe(0, 'After hide animation: should have 0 animating elements')
+  it('updates hook runs only on updates', () => {
+    const start = textContent('#updates-count')
+    click('#updates-count-bump')
+    expect(textContent('#updates-count')).toBe( (Number(start) + 1).toString() )
   })
-*/
+
+  it('inputs hook runs on init and updates', () => {
+    const start = textContent('#inputs-count')
+    click('#inputs-count-bump')
+    expect(textContent('#inputs-count')).toBe( (Number(start) + 1).toString() )
+  })
 })
