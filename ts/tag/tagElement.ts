@@ -70,6 +70,7 @@ export function tagElement(
     appElements.splice(appElmIndex, 1)
   }
   ;(element as any)[TAG_ELEMENT_MARKER] = true
+  ;(element as HTMLElement).innerHTML = ''
 
   // Create the app which returns [props, runOneTimeFunction]
   

@@ -15,6 +15,12 @@ export function processTagInit(
 ): AnySupport {
   contextItem.state = {}
   
+  if(contextItem.inputsHandler) {
+    const props = ownerSupport.propsConfig
+    console.log('init tag props', {props})
+    contextItem.inputsHandler( props )
+  }
+  
   if(appendTo) {
     return processNewSubjectTag(
       value as TemplaterResult,

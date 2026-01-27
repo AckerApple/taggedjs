@@ -14,6 +14,7 @@ export type HtmlSupport = {
   ownerSupport?: AnySupport
   appElement?: Element // only seen on this.getAppSupport().appElement
   propsConfig?: PropsConfig
+  isRoot?: true
   
   templater: TemplaterResult,
   returnValue?: any

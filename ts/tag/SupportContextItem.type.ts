@@ -21,7 +21,4 @@ export interface SupportContextItem extends ContextItem {
   state: ContextStateMeta  // Required for SupportContextItem
   /** Indicator of re-rending. Saves from double rending something already rendered */
   renderCount: number
-  
-  /** Argument aka Prop updates */
-  updatesHandler?: (...args: any[]) => any
 }

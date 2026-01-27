@@ -12,10 +12,12 @@ export function destroySupportByContextItem(
   const global = context.global as SupportTagGlobal
   const state = (context as SupportContextItem).state
   const lastSupport = state.newest as AnySupport
+  
+  delete context.inputsHandler
+  delete context.updatesHandler
 
   // destroy old component, value is not a component
   destroySupport(lastSupport, global)
-  
   destroySupportContext(context as SupportContextItem)
 }
 

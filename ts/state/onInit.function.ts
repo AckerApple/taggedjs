@@ -1,36 +1,33 @@
-import { AnySupport, SupportContextItem, tag } from '../index.js'
 import { checkToResolvePromise } from '../interpolations/attributes/checkToResolvePromise.function.js'
 import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
-import { getContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
+import { tag } from '../tagJsVars/tag.function.js'
 import { state } from './state.function.js'
 
 export type OnInitCallback = () => unknown
 
-/** runs a callback function one time and never again. Same as calling state(() => ...) */
-export function onInit(
-  callback: OnInitCallback
-) {
+/** Used for knowing when html elements have arrived on page */
+export function onInit(callback: OnInitCallback) {
   state(() => {
     const result = callback()
-    const context = getContextInCycle() as SupportContextItem
-    
-    if( context.global ) {
-      const nowSupport = getSupportInCycle() as AnySupport
-      return checkToResolvePromise(
-        result,
-        nowSupport,
-        { resolvePromise, resolveValue },
-      )
+    const nowSupport = getSupportInCycle()
+
+    if (!nowSupport?.context?.global) {
+      return result
     }
+
+    return checkToResolvePromise(result, nowSupport, {
+      resolvePromise,
+      resolveValue,
+    })
   })
 
   return tag
 }
 
-function resolvePromise(x: any) {
-  return x
+function resolvePromise<T>(value: T) {
+  return value
 }
 
-function resolveValue(x: any) {
-  return x
+function resolveValue<T>(value: T) {
+  return value
 }

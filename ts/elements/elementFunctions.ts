@@ -85,6 +85,7 @@ const disabled = makeAttrCallable('disabled', attr)
 const selected = makeAttrCallable('selected', attr)
 const minLength = makeAttrCallable('minLength', attr)
 const maxLength = makeAttrCallable('maxLength', attr)
+const open = makeAttrCallable('open', attr) // dialog element
 
 const cellPadding = makeAttrCallable('cellpadding', attr)
 const cellSpacing = makeAttrCallable('cellspacing', attr)
@@ -121,6 +122,7 @@ export function elementFunctions(item: any) {
   const callables_other = {
     // ...eventCallables,
     onClose: makeCallback('onclose'),
+    onCancel: makeCallback('oncancel'),
     onDoubleClick: makeCallback('ondblclick'),
     onClick: makeCallback('click'),
     // onclick: makeCallback('click'),
@@ -194,6 +196,7 @@ export function elementFunctions(item: any) {
     border: makeAttr(border, item),
     minLength: makeAttr(minLength, item),
     maxLength: makeAttr(maxLength, item),
+    open: makeAttr(open, item), // html dialog
   }
 
   return callables_other
@@ -270,7 +273,6 @@ function makeCallback(eventName: string) {
 }
 
 const eventCallables = {
-  onClose: makeCallback('onclose'),
   onClick: makeCallback('click'),
   
   onDoubleClick: makeCallback('ondblclick'),
@@ -278,6 +280,8 @@ const eventCallables = {
 
   onBlur: makeCallback('onblur'),
   onChange: makeCallback('onchange'),
+  onCancel: makeCallback('oncancel'),
+  onClose: makeCallback('onclose'), // dialog
   onInput: makeCallback('oninput'),
   
   onMousedown: makeCallback('onmousedown'),

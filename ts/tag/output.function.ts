@@ -1,4 +1,4 @@
-import { AnySupport, ContextItem, getContextInCycle, paint } from "../index.js"
+import { AnySupport, ContextItem, getContextInCycle, paint, SupportContextItem, TagGlobal } from "../index.js"
 import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { paintAfters, painting } from "../render/paint.function.js"
 import { syncStatesArray } from "../state/syncStates.function.js"
@@ -52,6 +52,8 @@ export function syncWrapCallback(
   callback: any,
   context: ContextItem, // aka stateOwner
 ) {
+  const newestOwner = undefined as any
+  /*
   const stateMeta = context.state as ContextStateMeta
   const newerStates = (stateMeta.newer as ContextStateSupport).states
   const olderStates = stateMeta.older ? (stateMeta.older as ContextStateSupport).states : newerStates
@@ -59,22 +61,25 @@ export function syncWrapCallback(
 
   // sync the new states to the old before the old does any processing
   syncStatesArray(newerStates, olderStates)
+  */
 
   const c = callback(...args) // call the latest callback
 
   // sync the old states to the new
-  syncStatesArray(olderStates, newerStates)
+  // syncStatesArray(olderStates, newerStates)
 
   // now render the owner
   paintAfters.push([() => {
-    const newGlobal = newestOwner.context.global
+    const newGlobal = context.global as TagGlobal
+    // const newGlobal = newestOwner.context.global
     const ignore = newGlobal === undefined || newGlobal.deleted === true
     
     if( ignore ) {
       ++painting.locks
-      newestOwner.context.tagJsVar.processUpdate(
-        newestOwner.context.value,
-        newestOwner.context,
+      const targetContext = context // newestOwner.context
+      targetContext.tagJsVar.processUpdate(
+        targetContext.value,
+        targetContext,
         newestOwner,
         [],
       )

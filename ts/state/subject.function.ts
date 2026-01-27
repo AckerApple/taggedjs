@@ -5,7 +5,6 @@ import { SupportContextItem } from '../tag/SupportContextItem.type.js'
 import { ContextStateMeta, ContextStateSupport } from '../tag/ContextStateMeta.type.js'
 import { setUseMemory } from './setUseMemory.object.js'
 import { state } from './state.function.js'
-import { oldSyncStates } from './syncStates.function.js'
 import { LikeObservable } from '../tagJsVars/processSubscribeWithAttribute.function.js'
 
 /** Create a Subject that on updates will sync state values to keep chained functions using latest variables */
@@ -29,9 +28,10 @@ subject._value = <T>(value: T) => {
     }
   })
 
-  const nowSupport = getSupportInCycle() as AnySupport
+  //const nowSupport = getSupportInCycle() as AnySupport
   return state(function subjectValue() {
     const subject = new ValueSubject(value).pipe(x => {
+      /*
       const context = nowSupport.context as SupportContextItem
       const stateMeta = context.state as ContextStateMeta
       const newer = stateMeta.newer as ContextStateSupport
@@ -42,7 +42,7 @@ subject._value = <T>(value: T) => {
         newer.states,
         oldestState.states,
       )
-
+      */
       return x
     })
     return subject
@@ -62,6 +62,7 @@ function all(args: any[]): Subject<any> {
   }))
   const nowSupport = getSupportInCycle() as AnySupport
   return Subject.all(args as any).pipe(x => {
+    /*
     const context = nowSupport.context as SupportContextItem
     const stateMeta = context.state as ContextStateMeta
     const newer = stateMeta.newer
@@ -73,6 +74,7 @@ function all(args: any[]): Subject<any> {
         oldestState.states,
       )
     }
+      */
     return x
   }) as any
 }

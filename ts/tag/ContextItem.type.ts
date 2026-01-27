@@ -46,6 +46,13 @@ export interface BaseContextItem extends AppContextItem {
   isAttrs?: true // when a context is created just to house multiple attributes for one element
 
   contexts?: ContextItem[]
+
+    
+  /** Argument aka Prop updates */
+  inputsHandler?: (...args: any[]) => any
+
+  /** Argument aka Prop updates */
+  updatesHandler?: (...args: any[]) => any
 }
 
 export interface ContextItem extends BaseContextItem {

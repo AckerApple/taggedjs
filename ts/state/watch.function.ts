@@ -4,7 +4,6 @@ import { ContextStateMeta, ContextStateSupport } from '../tag/ContextStateMeta.t
 import { getSupportInCycle } from'../tag/cycles/getSupportInCycle.function.js'
 import { setUseMemory } from'./setUseMemory.object.js'
 import { state } from'./state.function.js'
-import { oldSyncStates } from'./syncStates.function.js'
 
 export type WatchCallback<T> = (
   currentValues: any[], // | (() => any[]),
@@ -43,7 +42,7 @@ type MasterWatch<T> = ((
   callback: WatchCallback<T>
 ) => T) & WatchOperators<T>
 
-/**
+/** @deprecated - 
  * When an item in watch array changes, callback function will be triggered.
  * Triggers on initial watch setup. TIP: try watch.noInit()
  * @param currentValues T[]
@@ -212,6 +211,7 @@ function defineOnMethod<R>(
             const oldestStateSupport = stateMeta.older as ContextStateSupport
 
             if(oldestStateSupport) {
+              /*
               const oldestState = oldestStateSupport.state
               
               const newStates = oldState.states
@@ -223,6 +223,7 @@ function defineOnMethod<R>(
                 newStates,
                 oldStates,
               )
+              */
             }
           }
 

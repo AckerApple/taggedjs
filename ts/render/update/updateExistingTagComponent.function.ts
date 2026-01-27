@@ -63,15 +63,6 @@ export function updateExistingTagComponent(
 
   // everyhing has matched, no display needs updating.
   if(!hasChanged) {
-    const maxDepth = templater.propWatch === PropWatches.DEEP ? deepCompareDepth : shallowCompareDepth
-    syncSupports(
-      templater,
-      newSupport,
-      oldSupport,
-      ownerSupport,
-      maxDepth,
-    )
-
     return
   }
 
@@ -164,36 +155,6 @@ export function moveProviders(
   }
 }
 
-/** Exchanges entire propsConfigs */
-function syncSupports<T extends AnySupport>(
-  templater: TemplaterResult,
-  support: AnySupport,
-  oldSupport: T,
-  ownerSupport: AnySupport,
-  maxDepth: number,
-) {
-  // update function refs to use latest references
-  const newProps = templater.props as Props
-  const castedProps = syncFunctionProps(
-    support,
-    oldSupport as AnySupport,
-    ownerSupport,
-    newProps,
-    maxDepth,
-  )
-
-  const propsConfig = support.propsConfig as PropsConfig
-
-  // When new support actually makes call to real function, use these pre casted props
-  propsConfig.castProps = castedProps
-  
-  const lastPropsConfig = oldSupport.propsConfig as PropsConfig
-  // update support to think it has different cloned props
-  lastPropsConfig.latest = propsConfig.latest
-  
-  return oldSupport // its the same tag component  
-}
-
 /** Was tag, will be tag */
 function swapTags(
   contextItem: SupportContextItem,
@@ -205,7 +166,9 @@ function swapTags(
   destroySupport(oldestSupport, global)
   getNewGlobal(contextItem)
 
-  ;(templater as TagJsVar).processInit(
+  const t = templater as TagJsVar
+
+  t.processInit(
     templater,
     contextItem,
     ownerSupport,

@@ -72,8 +72,10 @@ export function renderTagElement(
       appElement: element,
       context,
     },
-    appElement: element
-  } as any as AnySupport
+    appElement: element,
+    context,
+    isRoot: true,
+  } as AnySupport
   const support = processReplacementComponent(
     templater,
     context,

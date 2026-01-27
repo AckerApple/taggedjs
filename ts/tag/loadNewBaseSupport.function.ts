@@ -16,6 +16,7 @@ export function loadNewBaseSupport(
   upgradeBaseToSupport(templater, newSupport, newSupport)
   
   newSupport.appElement = appElement
+  newSupport.context = subject
   
   // Initialize older/newer with empty state if first render
   if (!subject.state.oldest) {

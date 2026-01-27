@@ -20,7 +20,7 @@ import { tagInject } from './tagInject.function.js'
 import { onInit as tagOnInit } from '../state/onInit.function.js'
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js'
 import { onRender as tagOnRender } from '../state/onRender.function.js'
-import { getInnerHTML as tagGetInnerHTML, SupportContextItem } from '../index.js'
+import { getInnerHTML as tagGetInnerHTML, SupportContextItem, output as outputAlias } from '../index.js'
 
 let tagCount = 0
 
@@ -80,11 +80,11 @@ export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnTy
   compareTo?: string
 }) & {
   original: UnknownFunction
-  /** @deprecated - use updates() instead */
-  inputs: (handler: (updates: Parameters<T>) => any) => true
+  /** Process input/argument updates. Fires at start and on updates */
+  inputs: (handler: (parameters: Parameters<T>) => any) => true
 
-  /** Process input/argument updates */
-  updates: (handler: (updates: Parameters<T>) => any) => true
+  /** Process input/argument only on update cycles (not init) */
+  updates: (handler: (parameters: Parameters<T>) => any) => true
 
   /** Process input/argument updates */
   getInnerHTML: () => true
@@ -142,8 +142,15 @@ export function tag<T extends ToTag>(
 
   const returnWrap = parentWrap as unknown as TaggedFunction<T>
 
+  /* Used for setting arguments as inputs and outputs. Runs every init and update of tag */
+  returnWrap.inputs = (handler: (parameters: Parameters<T>) => any) => {
+    const context = getContextInCycle() as SupportContextItem
+    context.inputsHandler = handler
+    return true
+  }
+
   // used for argument updates
-  returnWrap.updates = (handler: (updates: Parameters<T>) => any) => {
+  returnWrap.updates = (handler: (parameters: Parameters<T>) => any) => {
     const context = getContextInCycle() as SupportContextItem
     context.updatesHandler = handler
     return true
@@ -174,6 +181,7 @@ export declare namespace tag {
   
   let element: typeof tagElement;
   let inject: typeof tagInject;
+  let output: typeof outputAlias;
   let onInit: typeof tagOnInit;
   let onDestroy: typeof tagOnDestroy;
   let onRender: typeof tagOnRender;
@@ -206,6 +214,7 @@ function tagUseFn(): ReturnTag {
 ;(tag as any).deepPropWatch = tag
 ;(tag as any).route = routeFn
 ;(tag as any).inject = tagInject
+;(tag as any).output = outputAlias
 ;(tag as any).onInit = tagOnInit
 ;(tag as any).onDestroy = tagOnDestroy
 ;(tag as any).onRender = tagOnRender
