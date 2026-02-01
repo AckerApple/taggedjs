@@ -1,12 +1,19 @@
-import { Tag, tag, fieldset, legend, div, noElement, b, hr, button, span } from "taggedjs"
+import { TagJsComponent, tag, fieldset, legend, div, noElement, b, hr, button, span, ElementFunction } from "taggedjs"
 import { innerHtmlPropsTest, innerHtmlTest } from "./innerHtmlTests.js"
 import { renderCountDiv } from "./renderCount.component.js"
 
-const test22 = tag((a:number, b:number, children: Tag) => {
+const test22 = tag((
+  a:number,
+  b:number,
+  children: ElementFunction
+) => {
   test22.updates(x => [a, b, children] = x)
+  
+  const xx = div('hello other world', _=> a, ' - ', _=> b)
+
   return fieldset(
     legend('xxxxx'),
-    div('hello other world', _=> a, ' - ', _=> b),
+    xx,
     div({style:"border:2px solid red;"},
       '***', _=> children, '***',
     ),
@@ -33,7 +40,7 @@ export const child = tag((_: string = 'childTests') => {
     hr,
     hr,
     hr,
-    test22(1, 2, div(
+    _=> test22(1, 2, div(
       hr,
       'abc-123-',
       _=> Date.now(),
@@ -43,7 +50,7 @@ export const child = tag((_: string = 'childTests') => {
     hr,
     hr,
 
-    innerHtmlTest({}, 2, noElement(
+    _=> innerHtmlTest({}, 2, noElement(
       b('Field set body A'),
       hr,
       button({
@@ -120,7 +127,7 @@ export const child = tag((_: string = 'childTests') => {
   )
 })
 
-const childAsPropTest = tag(({child}: {child: Tag}) => {
+const childAsPropTest = tag(({child}: {child: ElementFunction}) => {
   childAsPropTest.updates(x => [{child}] = x)
   return fieldset(
     legend('child as prop'),

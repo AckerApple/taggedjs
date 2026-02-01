@@ -152,7 +152,7 @@ export const dumpArray = tag(({// dumpArray
       _=> maximize &&
         div(
           {style:"text-align:left;display:flex;flex-wrap:wrap;margin:0.2em;gap:0.2em"},
-          arraysDisplay({...displayOptions, allowMaximize: false})
+          _=> arraysDisplay({...displayOptions, allowMaximize: false})
         ),
       
       div({style:"padding:.25em"},

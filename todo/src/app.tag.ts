@@ -8,22 +8,24 @@ import { Item } from './tags/item.tag'
 export const todos: Todo[] = []
 const dispatch = todoReducer(todos)
 
-export const app = () => {
+export const app = tag(() => {
   const router = useHashRouter()
+  const x = todosTag( router.route )
   return noElement(
-    _=> router.route === '/info' ? infoTag() : todosTag( router.route ),
+    _=> router.route === '/info' ? infoTag : x,
+
     div({style:'text-align:center;'},
       a({href:"#/info"}, 'info'),
       '   ',
       a({href:"#/"}, 'todo app')
     )
   )
-}
+})
 
-const infoTag = () =>
-div({style:"margin:2rem;padding:2rem;background-color:white;"},
-  '🚧 A work in progress to demonstrate the capabilities of TaggedJs'
-)
+const infoTag =
+  div({style:"margin:2rem;padding:2rem;background-color:white;"},
+    '🚧 A work in progress to demonstrate the capabilities of TaggedJs'
+  )
 
 
 const todosTag = tag((route: string) => {
@@ -49,7 +51,7 @@ const todosTag = tag((route: string) => {
   let activeTodoCount = getActiveTodoCount()
   let visibleTodos = getVisibleTodos()
 
-  return section({class:"todoapp"},
+  return section.class`todoapp`(
     Header(dispatch),
     // div('todoCount:', _=> todos.length),
     main({class:"main"},

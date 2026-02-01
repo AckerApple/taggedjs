@@ -19,8 +19,7 @@ export const Item = tag((
         editing && 'editing'
       ].filter(Boolean).join(' ')
     },
-    _=> !editing ? () => {
-      return div({class: "view"},
+    (_=> !editing ? div({class: "view"},
         _=> todo.completed && '✅',
 
         // toggle completed
@@ -49,9 +48,7 @@ export const Item = tag((
           onClick: () => onUpdated(dispatch.removeItemByIndex(index))
         },'🗑️ destroy')
       )
-    }
-    : () => {
-      return div({class: "input-container"},
+    : div({class: "input-container"},
         input({
           id: "edit-todo-input",
           type: "text",
@@ -70,7 +67,7 @@ export const Item = tag((
           for: "todo-input"
         }, 'Edit Todo Input')
       )
-    }
+)
   )
 })
 

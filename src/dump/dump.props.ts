@@ -1,4 +1,4 @@
-import { Tag } from "taggedjs"
+import { TagJsComponent } from "taggedjs"
 
 type ShowChange = (show: boolean) => any
 export type OnHeaderClick = () => any
@@ -26,4 +26,4 @@ export type DumpProps<T> = {
   everySimpleValue?: EverySimpleValue
 }
 
-export type EverySimpleValue = (value: SimpleValue, key?: string) => SimpleValue | Tag
+export type EverySimpleValue = (value: SimpleValue, key?: string) => SimpleValue | TagJsComponent<any>

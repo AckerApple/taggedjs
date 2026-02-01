@@ -62,7 +62,7 @@ export const subscriptions = tag(() => {
             )
           ),
 
-          testHost(),
+          testHost,
 
           fieldset({style: "flex-grow:1"},
             legend('combineLatest'),
@@ -95,7 +95,7 @@ export const subscriptions = tag(() => {
 
     fieldset({id: "noParentTagFieldset"},
       legend('Pass subscription'),
-      passSubscription({sub0, sub1})
+      _=> passSubscription({sub0, sub1})
     )
   )
 })

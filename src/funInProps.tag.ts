@@ -8,22 +8,24 @@ export const main = {
   count: 0,
 }
 
-export default tag(() => (
-  array = [] as string[],
-  counter = 0,
-  renderCount = 0,
-  showChild = true,
+export default tag(() => {
+  let array = [] as string[]
+  let counter = 0
+  let renderCount = 0
+  let showChild = true
   // somethingElse = 'a',
-  myFunction = () => ++counter,
+  const myFunction = () => ++counter
 
-  _ = ++renderCount,
-  addArrayItem = (x?: string) => {
+  ++renderCount
+  
+  const addArrayItem = (x?: string) => {
     array = array.map(x => x)
     array.push(typeof(x) === 'string' ? x : 'push'+array.length)
-  },
-  deleteItem = (item: string) => array = array.filter(x => x !== item),
-) =>
-  div(
+  }
+
+  const deleteItem = (item: string) => array = array.filter(x => x !== item)
+
+  return div(
     button({id: "fun-parent-button", onClick: myFunction},
       '🤰 ++parent'
     ),
@@ -56,4 +58,4 @@ export default tag(() => (
 
     _=> addArrayComponent(addArrayItem)
   )
-)
+})

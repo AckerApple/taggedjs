@@ -1,20 +1,21 @@
-import { InputElementTargetEvent, input, tag, ElementVar, button } from "taggedjs";
+import { InputElementTargetEvent, input, tag, button, TagChildContent } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
 
 export const addArrayComponent = tag((
   addArrayItem: (x: any) => any,
-) => (
-  renderCount = 0,
-  __ = ++renderCount,
-  handleKeyUp = (e: InputElementTargetEvent) => {
+) => {
+  let renderCount = 0
+  ++renderCount
+  
+  const handleKeyUp = (e: InputElementTargetEvent) => {
     if (e.key === "Enter") {
         const value = e.target.value.trim();
         addArrayItem(value)
         e.target.value = "";
     }
-  },
-) => {
-  const x: ElementVar[] = [ 
+  }
+
+  const x: TagChildContent[] = [ 
     input({
       type: "text",
       onKeyup: handleKeyUp,
@@ -22,10 +23,10 @@ export const addArrayComponent = tag((
     }),
 
     button({type: "button", onClick:addArrayItem},
-      'add by outside'
+      'add by outside', _=> 33,
     ),
     
-    _=> renderCountDiv({renderCount, name:'addArrayComponent'})
+    _=> renderCountDiv({renderCount, name:'addArrayComponent'}),
   ]
 
   return x

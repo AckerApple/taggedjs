@@ -1,10 +1,10 @@
-import { tag, isSubjectInstance, Tag, fieldset, div, legend, span, button } from "taggedjs"
+import { tag, isSubjectInstance, TagJsComponent, fieldset, div, legend, span, button, ElementFunction } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component"
 
 export const innerHtmlTest = tag((
   _props: unknown,
   b:number, // TODO: remove, not in use
-  children: Tag,
+  children: ElementFunction, // TagJsComponent<any>,
 ) => {
   let counter = 0
   let renderCount = 0
@@ -30,7 +30,8 @@ export const innerHtmlTest = tag((
 })
 
 export const innerHtmlPropsTest = tag((
-  x: number, children: Tag,
+  x: number,
+  children: ElementFunction, // TagJsComponent<any>,
 ) => {
   innerHtmlPropsTest.updates(xx => [x, children] = xx)
   let counter = 0

@@ -1,4 +1,4 @@
-import { Tag, tag, div, a } from "taggedjs"
+import { tag, div, a, CombinedElementFunctions, TagJsComponent } from "taggedjs"
 import { OnHeaderClick } from "./index"
 import { copyText } from "./copyText.function"
 import { EverySimpleValue, SimpleValue } from "./dump.props"
@@ -15,7 +15,7 @@ export const dumpSimple = tag(({
   const isLinkValue = value.search && (value.slice(0,8)==='https://' || value.slice(0,7)==='http://')
 
   // const result = everySimpleValue && everySimpleValue(value, key)
-  let displayValue: SimpleValue | Tag
+  let displayValue: CombinedElementFunctions | TagJsComponent<any>
 
   if(everySimpleValue) {
     displayValue = simpleValue({value, everySimpleValue})

@@ -7,7 +7,7 @@ import { homePage } from "./homePage.tag"
 
 const appDate = Date.now()
 
-function appFun(){
+const appFun = tag(() => {
   return function runAppFun(menuName = useMenuName()) {
     let showHide = false
 
@@ -29,8 +29,8 @@ function appFun(){
       () => menuName === 'content' && content(),
     ]
   }
-}
-appFun.isApp = true
+})
+// appFun.isApp = true
 
 export const App = tag(appFun)
 

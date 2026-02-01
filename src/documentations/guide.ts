@@ -6,6 +6,7 @@ import { entryPointSection } from "./entryPointSection"
 import { componentPatternSection } from "./componentPatternSection"
 import { displaySection } from "./displaySection"
 import { reactiveUpdatesSection } from "./reactiveUpdatesSection"
+import { subscriptionsSection } from "./subscriptionsSection"
 
 export const GuideApp = tag(() => [
   guideHeader(),
@@ -20,6 +21,7 @@ export const GuideApp = tag(() => [
         componentPatternSection(),
         displaySection(),
         reactiveUpdatesSection(),
+        subscriptionsSection(),
       )
     )
   )

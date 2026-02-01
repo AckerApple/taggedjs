@@ -1,4 +1,4 @@
-import { tag, Tag, textarea, div, noElement } from "taggedjs"
+import { tag, textarea, div, noElement } from "taggedjs"
 import { dumpArray } from "./dumpArray.tag"
 import { dumpSimple } from "./dumpSimple.tag"
 import { dumpObject } from "./dumpObject.tag"
@@ -117,7 +117,7 @@ const getObjectTemplate = tag(<T>({
   showAllChange: any
   showKids: boolean
   showLevels: number
-}): Tag => {
+}): any => {
   getObjectTemplate.updates(x => {
     [{
       value,
@@ -136,19 +136,6 @@ const getObjectTemplate = tag(<T>({
     }] = x as any
   })
   
-  if(value === null) {
-    if(!showKids) {
-      return 'no kids' as any as Tag
-    }
-
-    return dumpSimple({
-      key: key as string,
-      value: 'null',
-      onHeaderClick,
-      everySimpleValue,
-    })
-  }
-
   const isArray = Array.isArray(value) // (!format || format==='flex') && ((value as any).push && (value as any).pop)
 
   const getArrayDump = () => {
@@ -188,15 +175,30 @@ const getObjectTemplate = tag(<T>({
     style:"width:100%;height:25vh;min-height:400px;color:white;background-color:black;",
   }, _=> JSON.stringify(value, null, 2))
 
-  return div(
-    {id:`taggedjs-dump-${++dumpCount}`, class:"taggedjs-dump"},
-    _=> isRootDump && controlPanel({
-      value,
-      format,
-      showAll,
-      showAllChange,
-      formatChange,
-    }),
-    _=> (format==='json' && getJsonDump()) || (isArray ? getArrayDump() : getObjectDump()),
-  )
+  return noElement(_=> {
+    if(value === null) {
+      if(!showKids) {
+        return 'no kids' as any
+      }
+
+      return dumpSimple({
+        key: key as string,
+        value: 'null',
+        onHeaderClick,
+        everySimpleValue,
+      })
+    }
+
+    return div(
+      {id:`taggedjs-dump-${++dumpCount}`, class:"taggedjs-dump"},
+      _=> isRootDump && controlPanel({
+        value,
+        format,
+        showAll,
+        showAllChange,
+        formatChange,
+      }),
+      _=> (format==='json' && getJsonDump()) || (isArray ? getArrayDump() : getObjectDump()),
+    )
+  })
 })

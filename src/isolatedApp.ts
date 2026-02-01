@@ -92,11 +92,11 @@ export default tag(() => {
         )
       ),
 
-      autoTestingControls(viewTypes)
+      _=> autoTestingControls(viewTypes)
     ),
 
     div({style: "display:flex;flex-wrap:nowrap;gap:1em;justify-content: center;"},
-      renderCountDiv({name:'app', renderCount}),
+      _=> renderCountDiv({name:'app', renderCount}),
       div(
         small(
           '(subscriptionCount$: ',
@@ -106,11 +106,11 @@ export default tag(() => {
       )
     ),
 
-    sectionSelector(viewTypes),
+    _=> sectionSelector(viewTypes),
 
     div({id: "tagDebug-fx-wrap"},
-      renderedSections(appCounterSubject, viewTypes),
-      renderCountDiv({renderCount, name:'isolatedApp'})
+      _=> renderedSections(appCounterSubject, viewTypes),
+      _=> renderCountDiv({renderCount, name:'isolatedApp'})
     )
   )
 })

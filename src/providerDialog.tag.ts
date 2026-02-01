@@ -15,10 +15,6 @@ export const providerDialog = (
     
     onClose: () => {
       providerClass.showDialog = false
-      console.log('close call made?', {
-        providerClass,
-        showDialog: providerClass.showDialog,
-      })
       return true
     }
   },

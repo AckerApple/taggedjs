@@ -42,7 +42,6 @@ export const providerDebug = tag((_x = 'providerDebugBase') => {
     const modal = document.getElementById('provider_debug_dialog') as HTMLDialogElement
     modal.showModal()
     providerClass.showDialog = !providerClass.showDialog
-    console.log('show modal', providerClass.showDialog)
   }
 
   ++renderCount
@@ -157,7 +156,7 @@ export const providerDebug = tag((_x = 'providerDebugBase') => {
 
     providerDialog(providerClass),
 
-    inCycleContextComms()/*20*/
+    inCycleContextComms, /*20*/
   )
 })
 
@@ -298,8 +297,6 @@ const providerChildDebug = tag(({
           const modal = document.getElementById('provider_debug_dialog') as HTMLDialogElement
           modal.showModal()
         }
-
-        console.log('providerClass.showDialog', providerClass.showDialog)
       }
     },
       '💬 toggle dialog in child ',

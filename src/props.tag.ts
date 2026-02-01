@@ -130,39 +130,37 @@ const syncPropDebug = tag((
 
   ++renderCount
   
-  return () => {
-    if(syncPropNumber % 2 === 1) {
-      propNumberChange(syncPropNumber = syncPropNumber + 1)
-    }
-
-    return div(
-      div(
-        '🥡 child syncPropNumber:',
-        span({id: "sync-prop-child-display"}, _=> syncPropNumber),
-        button({
-          id: "sync-prop-child-button",
-          onClick: () => propNumberChange(++syncPropNumber)
-        }, '🥡 ++')
-      ),
-      div(
-        div(
-          'counter:',
-          span({id: "sync-prop-counter-display"}, _=> counter)
-        ),
-        'parentTest',
-        span({id: "nothing-prop-counter-display"}, _=> {
-          return parentTest(counter)
-        }),
-        button({
-          id: "nothing-prop-counter-button",
-          onClick: () => {
-            parentTest(++counter)
-          }
-        }, '++')
-      ),
-      _=> renderCountDiv({renderCount, name: 'child_sync_props_callback'})
-    )
+  if(syncPropNumber % 2 === 1) {
+    propNumberChange(syncPropNumber = syncPropNumber + 1)
   }
+
+  return div(
+    div(
+      '🥡 child syncPropNumber:',
+      span({id: "sync-prop-child-display"}, _=> syncPropNumber),
+      button({
+        id: "sync-prop-child-button",
+        onClick: () => propNumberChange(++syncPropNumber)
+      }, '🥡 ++')
+    ),
+    div(
+      div(
+        'counter:',
+        span({id: "sync-prop-counter-display"}, _=> counter)
+      ),
+      'parentTest',
+      span({id: "nothing-prop-counter-display"}, _=> {
+        return parentTest(counter)
+      }),
+      button({
+        id: "nothing-prop-counter-button",
+        onClick: () => {
+          parentTest(++counter)
+        }
+      }, '++')
+    ),
+    _=> renderCountDiv({renderCount, name: 'child_sync_props_callback'})
+  )
 })
 
 /** child */

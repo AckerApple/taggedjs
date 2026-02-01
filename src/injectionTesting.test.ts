@@ -1,8 +1,6 @@
 import { it, expect, describe, afterEach, beforeEach } from './testing'
 import { byId } from './testing'
 
-console.log('INCLUDED!!!')
-
 describe('Injection Test', () => {
   // Helper function to get all items
   const getItems = () => {

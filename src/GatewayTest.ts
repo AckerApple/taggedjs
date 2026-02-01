@@ -15,6 +15,6 @@ export const GatewayTest = tag((
     typeof props,
     ':',
     _=> JSON.stringify(props),
-    renderCountDiv({renderCount, name: 'GatewayTest.ts'})
+    _=> renderCountDiv({renderCount, name: 'GatewayTest.ts'})
   )
 })

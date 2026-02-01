@@ -75,7 +75,7 @@ export const inCycleContextComms = tag(() => {
         
         div({ id: "drag-drop-wrap" },
           h3('Drag Selection Testing'),
-          injectionTag()
+          injectionTag,
         ),
       )
   )

@@ -111,7 +111,7 @@ export const homePage = tag(() => {
 
     a({name: "top", id: "top"}),
 
-    sectionSelector(),
+    _=> sectionSelector(),
 
     div({id: "tagDebug-fx-wrap"},
       button({
@@ -120,7 +120,7 @@ export const homePage = tag(() => {
 
       _=> showSections && renderedSections(appCounterSubject),
 
-      tagDebug(),
+      _=> tagDebug(),
     )
   )
 })

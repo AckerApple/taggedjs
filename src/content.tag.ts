@@ -104,7 +104,15 @@ export const content = tag(() => {
     ]
   })
 
+  const xx = contentTest('earth')
+
   return [
+    div(
+      'a:', contentTest,
+      'b:', _=> xx,
+      // 'c:', xx,
+    ),
+
     fieldset({style: "flex-grow:1"},
       legend(
         'piped subject click ',
@@ -169,13 +177,13 @@ export const content = tag(() => {
 
       hr,
 
-      concatStyles('test the tester2')
+      _=> concatStyles('test the tester2')
     ),
 
     fieldset(
       legend('Dump Content'),
-      dumpContent(),
-      renderCountDiv({renderCount, name: 'content'})
+      dumpContent,
+      _=> renderCountDiv({renderCount, name: 'content'})
     ),
 
     fieldset({id: "inputs-updates-fieldset"},
@@ -204,7 +212,7 @@ export const content = tag(() => {
 
     fieldset({id: "noParentTagFieldset"},
       legend('No Parent Test'),
-      numberedNoParents()
+      numberedNoParents,
     ),
     
     '--- REPEAT CONTENT---',
@@ -373,3 +381,7 @@ const numberedNoParents = tag(() => {
 const innerHtmlTag = () => {
   return 'inner html tag'
 }
+
+const contentTest = tag((a?: any) => () => {
+  return div(`hello ${a || 'world'}`)
+})

@@ -19,7 +19,7 @@ _ = 'countersDebug'
 ) => {
   return div(
     '<!--counters-->',
-    test(),
+    _=> test(),
     div({style:"display:flex;flex-wrap:wrap;gap:1em"},
       div(
         '👉 SubscriptionCount$:',
@@ -47,7 +47,7 @@ _ = 'countersDebug'
       )
     ),
     
-    innerCounterContent()
+    innerCounterContent,
   )
 })
 

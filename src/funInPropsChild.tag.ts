@@ -80,6 +80,6 @@ export const funInPropsChild = tag((
       'counter:',
       span(_=> counter)
     ),
-    renderCountDiv({renderCount, name:'funInProps_tag_child'})
+    _=> renderCountDiv({renderCount, name:'funInProps_tag_child'})
   )
 })

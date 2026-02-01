@@ -1,4 +1,4 @@
-import { tag, InputElementTargetEvent, div, select, option, h3, button, span } from "taggedjs"
+import { tag, InputElementTargetEvent, div, select, option, h3, button, span, noElement } from "taggedjs"
 import { renderCountDiv } from "./renderCount.component.js"
 
 type SelectedTag = null | string | undefined
@@ -131,8 +131,8 @@ export const tagSwitchDebug = tag((_t='tagSwitchDebug') => {
           style: "border:1px solid red;flex-grow:1"
         },
           h3('Test 4 - arraySwitching'),
-          div({id:"arraySwitching-wrap"},
-            () => arraySwitching({selectedTag})
+          div.id`arraySwitching-wrap`(
+            _=> arraySwitching({selectedTag})
           )
         ),
       ),
@@ -223,33 +223,37 @@ export const tag3 = tag(({title}: {title: string}) => {
     )
 })
 
-export const arraySwitching = (
+export const arraySwitching = tag((
   {selectedTag}: {selectedTag: SelectedTag},
-) => {  
-  switch (selectedTag) {
-    case undefined:
-      return `its an undefined value`
+) => {
+  arraySwitching.inputs(x => [{selectedTag}] = x)
 
-    case null:
-      return `its a null value`
+  return noElement(_=> {
+    switch (selectedTag) {
+      case undefined:
+        return `its an undefined value`
+  
+      case null:
+        return `its a null value`
+  
+      case '':
+        // TODO: ??? should be empty string
+        return `space` // tests how .previousSibling works
 
-    case '':
-      // TODO: ??? should be empty string
-      return `space` // tests how .previousSibling works
+      case '1':
+        return tag1({title: `tag ${selectedTag}`})
+  
+      case '2':
+        return ['b','c'].map(x => 
+          tag2({title: `array ${selectedTag} ${x}`}).key(x)
+        )
 
-    case '1':
-      return tag1({title: `tag ${selectedTag}`})
-
-    case '2':
-      return ['b','c'].map(x => 
-        tag2({title: `array ${selectedTag} ${x}`}).key(x)
-      )
-
-    case '3':
-      return ['d','e','f'].map(x => 
-        tag3({title: `array ${selectedTag} ${x}`}).key(x)
-      )
-  }
-
-  return `nothing to show for in arrays`
-}
+      case '3':
+        return ['d','e','f'].map(x => 
+          tag3({title: `array ${selectedTag} ${x}`}).key(x)
+        )
+    }
+    
+    return `nothing to show for in arrays`
+  })
+})

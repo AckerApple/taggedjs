@@ -14,7 +14,7 @@ import { renderCountDiv } from "../renderCount.component.js"
 
 type viewTypes = 'oneRender' | 'watchTesting' | 'mirroring' | 'content' | 'arrays' | 'counters' | 'tableDebug' | 'props' | 'child' | 'tagSwitchDebug' | 'providerDebug'
 
-export default tag.route = tag(() => {
+export default tag(() => {
   const views: viewTypes[] = [
     'content',
     'oneRender',
@@ -64,7 +64,8 @@ export default tag.route = tag(() => {
           {view:'content', label:'content', tag: content},
           {view:'child', label:'child', tag: child},
         ].map(({view, label, tag}) =>
-          views.includes(view as viewTypes) && fieldset({style: "flex:2 2 20em"},
+          views.includes(view as viewTypes) &&
+          fieldset.style`flex:2 2 20em`(
             legend(_=> label),
             _=> tag()
           ).key(view)
@@ -75,7 +76,7 @@ export default tag.route = tag(() => {
           _=> counters({appCounterSubject})
         ),
       ),
-      renderCountDiv({renderCount, name:'isolatedApp'})
+      _=> renderCountDiv({renderCount, name:'isolatedApp'})
     )
   )
 })
