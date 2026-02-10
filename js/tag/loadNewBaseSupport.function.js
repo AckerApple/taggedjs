@@ -3,6 +3,7 @@ export function loadNewBaseSupport(templater, subject, appElement) {
     const newSupport = getBaseSupport(templater, subject);
     upgradeBaseToSupport(templater, newSupport, newSupport);
     newSupport.appElement = appElement;
+    newSupport.context = subject;
     // Initialize older/newer with empty state if first render
     if (!subject.state.oldest) {
         subject.state.oldest = newSupport;

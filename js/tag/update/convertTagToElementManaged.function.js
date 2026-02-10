@@ -1,5 +1,5 @@
 import { Subject } from '../../index.js';
-import { valueToTagJsVar } from '../../tagJsVars/index.js';
+import { valueToTagJsVar } from '../../TagJsTags/index.js';
 import { getOverrideTagVar } from './getOverrideTagVar.js';
 export function convertTagToElementManaged(support, ownerSupport, subject) {
     const context = support.context;
@@ -19,6 +19,7 @@ export function convertTagToElementManaged(support, ownerSupport, subject) {
         tagJsVar,
         destroy$: new Subject(),
         render$: new Subject(),
+        // paintCommands: [],
         placeholder: context.placeholder,
         // not important
         valueIndex: -1,

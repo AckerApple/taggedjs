@@ -11,7 +11,7 @@ type WatchOperators<T> = {
     truthy: (<T>(currentValues: any[] | (() => any[]), callback: WatchCallback<T>) => T | undefined) & MasterWatch<T>;
 };
 type MasterWatch<T> = ((currentValues: any[], callback: WatchCallback<T>) => T) & WatchOperators<T>;
-/**
+/** @deprecated -
  * When an item in watch array changes, callback function will be triggered.
  * Triggers on initial watch setup. TIP: try watch.noInit()
  * @param currentValues T[]

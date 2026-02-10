@@ -4,12 +4,13 @@ import { Subject, valueToTagJsVar } from '../../index.js';
 export function processFunctionAttr(value, parentContext, // parent context
 attrName, element, howToSet) {
     const innerValue = value();
-    const tagJsVarOverride = {
+    const TagJsTagOverride = {
+        component: false,
         tagJsType: 'dynamic-attr',
         matchesInjection: (inject) => {
-            const tagJsVar = subContext.tagJsVar;
-            if (tagJsVar.matchesInjection) {
-                const rtn = tagJsVar.matchesInjection(inject, subContext);
+            const TagJsTag = subContext.tagJsVar;
+            if (TagJsTag.matchesInjection) {
+                const rtn = TagJsTag.matchesInjection(inject, subContext);
                 return rtn;
             }
         },
@@ -26,8 +27,8 @@ attrName, element, howToSet) {
             ++contextItem.updateCount;
             const newValue = value();
             // const oldValue = subContext.value
-            // const newTagJsVar = valueToTagJsVar(newValue)
-            subContext.tagJsVar.processUpdate(newValue, // newTagJsVar as any,
+            // const newTagJsTag = valueToTagJsVar(newValue)
+            subContext.tagJsVar.processUpdate(newValue, // newTagJsTag as any,
             subContext, ownerSupport, values);
             subContext.value = newValue;
         }
@@ -44,6 +45,7 @@ attrName, element, howToSet) {
         withinOwnerElement: true,
         destroy$: new Subject(),
         render$: new Subject(),
+        // paintCommands: [],
     };
     const contextItem = {
         updateCount: 0,
@@ -52,12 +54,13 @@ attrName, element, howToSet) {
         target: element,
         parentContext,
         value,
-        tagJsVar: tagJsVarOverride,
+        tagJsVar: TagJsTagOverride,
         // TODO: Not needed
         valueIndex: -1,
         withinOwnerElement: true,
         destroy$: new Subject(),
         render$: new Subject(),
+        // paintCommands: [],
     };
     subContext.tagJsVar.processInitAttribute(attrName, innerValue, element, subContext.tagJsVar, subContext, {}, howToSet);
     return contextItem;

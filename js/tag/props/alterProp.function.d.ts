@@ -25,5 +25,5 @@ export declare function getPropWrap(value: {
 /** Function shared by alterProps() and updateExistingTagComponent... TODO: May want to have to functions to reduce cycle checking?  */
 export declare function callbackPropOwner(toCall: UnknownFunction, // original function
 owner: any, callWith: unknown[], ownerSupport: AnySupport): unknown;
-export declare function isSkipPropValue(value: unknown): string | true;
+export declare function isSkipPropValue(value: unknown): true | "component";
 export {};

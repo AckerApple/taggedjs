@@ -12,6 +12,7 @@ export function processElementVarFunction(item, element, parentContext, ownerSup
         value: item,
         htmlDomMeta: [],
         tagJsVar: {
+            component: false,
             tagJsType: 'dynamic-text',
             hasValueChanged: () => 0,
             processInit: blankHandler,
@@ -47,6 +48,7 @@ export function processElementVarFunction(item, element, parentContext, ownerSup
         withinOwnerElement: true,
         destroy$: new Subject(),
         render$: new Subject(),
+        // paintCommands: [],
     };
     // addedContexts.push(subContext)
     setContextInCycle(subContext);

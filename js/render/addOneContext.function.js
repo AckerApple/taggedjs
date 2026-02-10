@@ -1,11 +1,12 @@
 import { Subject } from '../subject/Subject.class.js';
-import { valueToTagJsVar } from '../tagJsVars/valueToTagJsVar.function.js';
+import { valueToTagJsVar } from '../TagJsTags/valueToTagJsVar.function.js';
 export function getNewContext(value, contexts, withinOwnerElement, parentContext) {
     const contextItem = {
         updateCount: 0,
         value,
         destroy$: new Subject(),
         render$: new Subject(),
+        // paintCommands: [],
         tagJsVar: valueToTagJsVar(value),
         withinOwnerElement,
         parentContext,

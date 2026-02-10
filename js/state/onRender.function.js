@@ -1,5 +1,5 @@
 import { getContextInCycle, removeContextInCycle, setContextInCycle } from "../tag/cycles/setContextInCycle.function.js";
-import { tag } from "../tagJsVars/tag.function.js";
+import { tag } from "../TagJsTags/tag.function.js";
 export function onRender(callback) {
     const context = getContextInCycle();
     const callbackWrap = (_isFirst) => {
@@ -14,7 +14,9 @@ export function onRender(callback) {
         setContextInCycle(lastContext);
         return result;
     };
-    const subscription = context.render$.subscribe(() => callbackWrap());
+    const subscription = context.render$.subscribe(() => {
+        callbackWrap();
+    });
     const result = callbackWrap();
     tag.onDestroy(() => subscription.unsubscribe());
     return result;

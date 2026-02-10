@@ -49,6 +49,10 @@ export function processNonElement(item, parentContext, element, ownerSupport, pa
     newContext.placeholder = document.createTextNode('');
     paintCommands.push([paintBy, [element, newContext.placeholder]]);
     setContextInCycle(newContext);
+    if (newContext.inputsHandler) {
+        const props = ownerSupport.propsConfig;
+        newContext.inputsHandler(props);
+    }
     newContext.tagJsVar.processInit(item, newContext, // context, // newContext,
     ownerSupport, newContext.placeholder);
     removeContextInCycle();

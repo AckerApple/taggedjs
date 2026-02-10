@@ -1,7 +1,7 @@
 import { ValueTypes } from '../ValueTypes.enum.js';
 import { cloneTagJsValue } from '../cloneValueArray.function.js';
 import { deepCompareDepth, shallowCompareDepth } from '../hasSupportChanged.function.js';
-import { PropWatches } from '../../tagJsVars/tag.function.js';
+import { PropWatches } from '../../TagJsTags/tag.function.js';
 export function clonePropsBy(support, props, castProps) {
     const templater = support.templater;
     if (templater.tagJsType === ValueTypes.stateRender) {

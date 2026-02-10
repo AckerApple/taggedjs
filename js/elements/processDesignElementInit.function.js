@@ -1,4 +1,4 @@
-import { paintBefore, paintCommands } from '../render/paint.function.js';
+import { paintAfters, paintBefore, paintCommands } from '../render/paint.function.js';
 import { processElementVar } from './processElementVar.function.js';
 export function processDesignElementInit(value, context, ownerSupport, insertBefore) {
     context.contexts = context.contexts || []; // added contexts
@@ -7,7 +7,14 @@ export function processDesignElementInit(value, context, ownerSupport, insertBef
     context.locked = 34;
     const element = processElementVar(value, context, ownerSupport, context.contexts);
     delete context.locked;
-    paintCommands.push([paintBefore, [insertBefore, element, 'htmlTag.processInit']]);
+    const paintCommand = [
+        paintBefore, [insertBefore, element, 'htmlTag.processInit']
+    ];
+    paintCommands.push(paintCommand);
+    context.paintCommands = [paintCommand];
+    paintAfters.push([() => {
+            delete context.paintCommands;
+        }, []]);
     const dom = {
         nn: value.tagName,
         domElement: element,

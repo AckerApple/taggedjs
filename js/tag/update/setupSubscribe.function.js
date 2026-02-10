@@ -4,7 +4,7 @@ import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js
 import { deleteSubContext } from './deleteContextSubContext.function.js';
 import { onFirstSubContext } from './onFirstSubContext.function.js';
 import { guaranteeInsertBefore } from '../guaranteeInsertBefore.function.js';
-import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js';
+import { valueToTagJsVar } from '../../TagJsTags/valueToTagJsVar.function.js';
 import { processUpdateSubscribe } from './processUpdateSubscribe.function.js';
 import { removeContextInCycle, setContextInCycle } from '../cycles/setContextInCycle.function.js';
 export function setupSubscribe(value, contextItem, ownerSupport, insertBeforeOriginal, // optional but will always be made

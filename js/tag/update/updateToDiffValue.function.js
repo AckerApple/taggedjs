@@ -3,7 +3,7 @@ import { tryUpdateToTag } from './tryUpdateToTag.function.js';
 import { isArray } from '../../isInstance.js';
 import { processTagArray } from './arrays/processTagArray.js';
 import { processNowRegularValue } from './processRegularValue.function.js';
-import { getArrayTagVar } from '../../tagJsVars/getArrayTagJsVar.function.js';
+import { getArrayTagVar } from '../../TagJsTags/getArrayTagJsTag.function.js';
 export function updateToDiffValue(newValue, context, ownerSupport, ignoreOrDestroyed) {
     // is new value a tag?
     const tagJsType = newValue && newValue.tagJsType;

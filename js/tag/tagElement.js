@@ -42,6 +42,7 @@ props) {
     }
     ;
     element[TAG_ELEMENT_MARKER] = true;
+    element.innerHTML = '';
     // Create the app which returns [props, runOneTimeFunction]
     let templater = (() => templater2(props));
     templater.propWatch = PropWatches.NONE;
@@ -80,6 +81,7 @@ props) {
 }
 function getNewSubject(templater, appElement) {
     const tagJsVar = {
+        component: false,
         tagJsType: 'templater',
         hasValueChanged: checkTagValueChangeAndUpdate,
         destroy: destroySupportByContextItem,
@@ -96,6 +98,7 @@ function getNewSubject(templater, appElement) {
         varCounter: 0,
         destroy$: new Subject(),
         render$: new Subject(),
+        // paintCommands: [],
         withinOwnerElement: false, // i am the highest owner
         renderCount: 0,
         global: undefined, // gets set below in getNewGlobal()

@@ -1,5 +1,4 @@
-import { KeyFunction } from '../tag/getDomTag.function.js';
-import { Original } from '../tag/tag.utils.js';
+import { TemplaterResult } from '../tag/getTemplaterResult.function.js';
 import { RouteProps, RouteTag, StateToTag, ToTag } from '../tag/tag.types.js';
 import { UnknownFunction } from '../tag/update/oneRenderToSupport.function.js';
 import { AnyTag } from '../tag/AnyTag.type.js';
@@ -8,7 +7,8 @@ import { tagInject } from './tagInject.function.js';
 import { onInit as tagOnInit } from '../state/onInit.function.js';
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js';
 import { onRender as tagOnRender } from '../state/onRender.function.js';
-import { getInnerHTML as tagGetInnerHTML } from '../index.js';
+import { getInnerHTML as tagGetInnerHTML, output as outputAlias, ProcessInit, AnySupport } from '../index.js';
+import { ProcessDelete, TagJsTag, TagJsVar } from './tagJsVar.type.js';
 declare const tagElement: {
     get: typeof getTagElement;
     onclick: <T extends (...args: any[]) => any>(toBeCalled: T) => T;
@@ -18,20 +18,33 @@ declare const tagElement: {
     onmousedown: <T extends (...args: any[]) => any>(toBeCalled: T) => T;
     onMouseDown: <T extends (...args: any[]) => any>(toBeCalled: T) => T;
 };
-/** TODO: This might be a duplicate typing of Wrapper */
-export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnType<T> & {
-    key: KeyFunction;
-    original?: Original;
-    compareTo?: string;
-}) & {
+export type TagJsComponent<T extends ToTag> = TagJsTag & {
+    tagJsType: 'component';
+    values: unknown[];
+    /** The true saved innerHTML variable */
+    innerHTML?: any;
+    _innerHTML?: TaggedFunction<any>;
     original: UnknownFunction;
-    /** @deprecated - use updates() instead */
-    inputs: (handler: (updates: Parameters<T>) => any) => true;
-    /** Process input/argument updates */
-    updates: (handler: (updates: Parameters<T>) => any) => true;
+    /** Process input/argument updates. Fires at start and on updates */
+    inputs: (handler: (parameters: Parameters<T>) => any) => true;
+    /** Process input/argument only on update cycles (not init) */
+    updates: (handler: (parameters: Parameters<T>) => any) => true;
     /** Process input/argument updates */
     getInnerHTML: () => true;
+    processInit: ProcessInit;
+    destroy: ProcessDelete;
+    templater?: TemplaterResult;
+    ownerSupport?: AnySupport;
+    debug?: boolean;
+    /** used in array.map() */
+    key: (arrayValue: unknown) => TagJsComponent<any>;
+    arrayValue?: any;
+    /** Used INSIDE a tag/function to signify that innerHTML is expected */
+    acceptInnerHTML: (useTagVar: TagJsVar) => TagJsComponent<any>;
+    /** Same as innerHTML = x */
+    setHTML: (innerHTML: any) => TagJsComponent<any>;
 };
+export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnType<T>) & TagJsComponent<T>;
 /** How to handle checking for prop changes aka argument changes */
 export declare enum PropWatches {
     DEEP = "deep",
@@ -59,6 +72,7 @@ export declare namespace tag {
     let watchProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
     let element: typeof tagElement;
     let inject: typeof tagInject;
+    let output: typeof outputAlias;
     let onInit: typeof tagOnInit;
     let onDestroy: typeof tagOnDestroy;
     let onRender: typeof tagOnRender;

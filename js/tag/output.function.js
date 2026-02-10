@@ -1,9 +1,9 @@
 import { getContextInCycle, paint } from "../index.js";
 import { blankHandler } from "../render/dom/blankHandler.function.js";
 import { paintAfters, painting } from "../render/paint.function.js";
-import { syncStatesArray } from "../state/syncStates.function.js";
 import { safeRenderSupport } from "./props/safeRenderSupport.function.js";
 import { findStateSupportUpContext } from "../interpolations/attributes/getSupportWithState.function.js";
+import { removeContextInCycle, setContextInCycle } from "./cycles/setContextInCycle.function.js";
 /** Used to call a function that belongs to a calling tag but is not with root arguments */
 export function output(callback) {
     if (!callback) {
@@ -25,28 +25,37 @@ export function output(callback) {
     }
     const newCallback = (...args) => {
         const ownerSupport = support.ownerSupport;
-        return syncWrapCallback(args, callback, ownerSupport.context);
+        const result = syncWrapCallback(args, callback, ownerSupport.context);
+        return result;
     };
     newCallback.wrapped = true;
     return newCallback;
 }
 export function syncWrapCallback(args, callback, context) {
-    const stateMeta = context.state;
-    const newerStates = stateMeta.newer.states;
-    const olderStates = stateMeta.older ? stateMeta.older.states : newerStates;
-    const newestOwner = stateMeta.newest;
+    const newestOwner = undefined;
+    /*
+    const stateMeta = context.state as ContextStateMeta
+    const newerStates = (stateMeta.newer as ContextStateSupport).states
+    const olderStates = stateMeta.older ? (stateMeta.older as ContextStateSupport).states : newerStates
+    const newestOwner = stateMeta.newest as AnySupport
+  
     // sync the new states to the old before the old does any processing
-    syncStatesArray(newerStates, olderStates);
+    syncStatesArray(newerStates, olderStates)
+    */
+    setContextInCycle(context);
     const c = callback(...args); // call the latest callback
+    removeContextInCycle();
     // sync the old states to the new
-    syncStatesArray(olderStates, newerStates);
+    // syncStatesArray(olderStates, newerStates)
     // now render the owner
     paintAfters.push([() => {
-            const newGlobal = newestOwner.context.global;
+            const newGlobal = context.global;
+            // const newGlobal = newestOwner.context.global
             const ignore = newGlobal === undefined || newGlobal.deleted === true;
             if (ignore) {
                 ++painting.locks;
-                newestOwner.context.tagJsVar.processUpdate(newestOwner.context.value, newestOwner.context, newestOwner, []);
+                const targetContext = context; // newestOwner.context
+                targetContext.tagJsVar.processUpdate(targetContext.value, targetContext, newestOwner, []);
                 --painting.locks;
                 paint();
                 return; // its not a tag anymore

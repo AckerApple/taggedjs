@@ -1,19 +1,21 @@
 import { htmlTag } from './htmlTag.function.js';
 export { htmlTag };
 export { noElement } from './noElement.function.js';
+export { elementVarToHtmlString } from './elementVarToHtmlString.function.js';
 export const button = htmlTag('button');
 export const select = htmlTag('select');
 export const option = htmlTag('option');
 export const input = htmlTag('input');
 export const textarea = htmlTag('textarea');
 // HEAD & SUPPORT ELEMENTS
-export const htmlDoc = htmlTag('html'); // TODO: get this named to html
+export const html = htmlTag('html'); // TODO: get this named to html
 export const head = htmlTag('head');
 export const title = htmlTag('title');
 export const meta = htmlTag('meta');
 export const link = htmlTag('link');
 export const style = htmlTag('style');
 export const body = htmlTag('body');
+export const script = htmlTag('script');
 export const noscript = htmlTag('noscript');
 // BLOCK ELEMENTS
 export const hr = htmlTag('hr');
@@ -44,8 +46,10 @@ export const th = htmlTag('th');
 export const thead = htmlTag('thead');
 export const tbody = htmlTag('tbody');
 export const tfoot = htmlTag('tfoot');
+export const iframe = htmlTag('iframe');
 // INLINE ELEMENTS
 export const a = htmlTag('a');
+export const u = htmlTag('u');
 export const img = htmlTag('img');
 export const br = htmlTag('br');
 export const label = htmlTag('label');
@@ -65,4 +69,6 @@ export const svg = htmlTag('svg');
 export const path = htmlTag('path');
 export const polygon = htmlTag('polygon');
 export const rect = htmlTag('rect');
+export const details = htmlTag('details');
+export const summary = htmlTag('summary');
 //# sourceMappingURL=index.js.map

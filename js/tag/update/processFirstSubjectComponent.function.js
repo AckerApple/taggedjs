@@ -29,6 +29,7 @@ export function processReplacementComponent(templater, context, ownerSupport) {
     return support;
 }
 export function makeRealUpdate(newContext, value, context, convertValue, support) {
+    // We need to deprecate this completely (castProps)
     const castedProps = castProps(value.props, support, // ownerSupport,
     0);
     newContext.value.props = castedProps;
@@ -36,16 +37,27 @@ export function makeRealUpdate(newContext, value, context, convertValue, support
     if (propsConfig) {
         propsConfig.castProps = castedProps;
     }
-    ;
-    newContext.updatesHandler = context.updatesHandler;
-    if (context.updatesHandler) {
-        setContextInCycle(context);
-        const updatesHandler = context.updatesHandler;
-        updatesHandler(castedProps); // updates()
-        removeContextInCycle();
+    // TODO this outer condition may not be needed at all
+    if (value?.tagJsType === 'tagComponent') {
+        newContext.inputsHandler = context.inputsHandler;
+        newContext.updatesHandler = context.updatesHandler;
+        context.value = value;
+        if (context.inputsHandler) {
+            setContextInCycle(context);
+            const inputsHandler = context.inputsHandler;
+            inputsHandler(castedProps); // .inputs()
+            removeContextInCycle();
+        }
+        if (context.updatesHandler) {
+            setContextInCycle(context);
+            const updatesHandler = context.updatesHandler;
+            updatesHandler(castedProps); // .updates()
+            removeContextInCycle();
+        }
     }
     newContext.tagJsVar.processUpdate(convertValue, newContext, support, []);
     newContext.value = convertValue;
+    // paint()
 }
 export function afterDestroy(context, _ownerSupport) {
     delete context.returnValue;
@@ -54,6 +66,7 @@ export function afterDestroy(context, _ownerSupport) {
     context.contexts = [];
     ;
     context.htmlDomMeta = [];
+    delete context.inputsHandler;
     delete context.updatesHandler;
     // context.value.destroy(context, ownerSupport)
 }

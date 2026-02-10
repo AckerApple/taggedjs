@@ -1,11 +1,10 @@
-import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from '../../tag/hasSupportChanged.function.js';
+import { hasSupportChanged } from '../../tag/hasSupportChanged.function.js';
 import { castProps } from '../../tag/props/alterProp.function.js';
 import { renderSupport } from '../renderSupport.function.js';
 import { ValueTypes } from '../../tag/ValueTypes.enum.js';
 import { destroySupport } from '../destroySupport.function.js';
 import { getNewGlobal } from '../../tag/update/getNewGlobal.function.js';
 import { isLikeTags } from '../../tag/isLikeTags.function.js';
-import { PropWatches } from '../../tagJsVars/tag.function.js';
 import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.function.js';
 export function updateExistingTagComponent(ownerSupport, newSupport, // lastest
 subject) {
@@ -39,8 +38,6 @@ subject) {
     const hasChanged = skipComparing || hasSupportChanged(oldSupport, templater);
     // everyhing has matched, no display needs updating.
     if (!hasChanged) {
-        const maxDepth = templater.propWatch === PropWatches.DEEP ? deepCompareDepth : shallowCompareDepth;
-        syncSupports(templater, newSupport, oldSupport, ownerSupport, maxDepth);
         return;
     }
     if (subject.locked) {
@@ -98,19 +95,6 @@ export function moveProviders(oldSupport, newSupport) {
         }
     }
 }
-/** Exchanges entire propsConfigs */
-function syncSupports(templater, support, oldSupport, ownerSupport, maxDepth) {
-    // update function refs to use latest references
-    const newProps = templater.props;
-    const castedProps = syncFunctionProps(support, oldSupport, ownerSupport, newProps, maxDepth);
-    const propsConfig = support.propsConfig;
-    // When new support actually makes call to real function, use these pre casted props
-    propsConfig.castProps = castedProps;
-    const lastPropsConfig = oldSupport.propsConfig;
-    // update support to think it has different cloned props
-    lastPropsConfig.latest = propsConfig.latest;
-    return oldSupport; // its the same tag component  
-}
 /** Was tag, will be tag */
 function swapTags(contextItem, templater, // new tag
 ownerSupport) {
@@ -118,6 +102,7 @@ ownerSupport) {
     const oldestSupport = contextItem.state.oldest;
     destroySupport(oldestSupport, global);
     getNewGlobal(contextItem);
-    templater.processInit(templater, contextItem, ownerSupport, contextItem.placeholder);
+    const t = templater;
+    t.processInit(templater, contextItem, ownerSupport, contextItem.placeholder);
 }
 //# sourceMappingURL=updateExistingTagComponent.function.js.map

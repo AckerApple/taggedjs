@@ -1,4 +1,4 @@
 import { TemplateValue } from '../tag/TemplateValue.type.js';
 import { TagJsVar } from './tagJsVar.type.js';
-import { Tag } from '../tag/Tag.type.js';
-export declare function valueToTagJsVar(value: TemplateValue | Tag | TagJsVar | unknown): TagJsVar;
+import { TagJsComponent } from './index.js';
+export declare function valueToTagJsVar(value: TemplateValue | TagJsComponent<any> | TagJsVar | unknown): TagJsVar;

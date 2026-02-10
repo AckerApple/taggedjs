@@ -10,6 +10,7 @@ import { destroyHtmlDomMeta } from '../tag/destroyHtmlDomMeta.function.js';
 export const noElement = noElementMaker();
 export function noElementMaker() {
     const element = {
+        component: false,
         tagJsType: 'element',
         processInitAttribute: blankHandler, // its never an attribute
         processInit: processNoElmInit,
@@ -19,6 +20,7 @@ export function noElementMaker() {
         tagName: 'no-element',
         innerHTML: [],
         attributes: [],
+        contentId: 0,
         listeners: [],
         allListeners: [],
         elementFunctions,

@@ -18,11 +18,12 @@ function callbackWrapper2(item, eventName, callback) {
 function attr(item, args) {
     const clone = getPushKid(item, item.elementFunctions);
     clone.attributes.push(args);
+    bumpContentId(clone, args[1]);
     if (isValueForContext(args[0])) {
-        registerMockAttrContext(args[0], clone); // the attrName is a function or TagJsVar
+        registerMockAttrContext(args[0], clone); // the attrName is a function or TagJsTag
     }
     else if (isValueForContext(args[1])) {
-        registerMockAttrContext(args[1], clone); // the attrValue is a function or TagJsVar
+        registerMockAttrContext(args[1], clone); // the attrValue is a function or TagJsTag
     }
     return clone;
 }
@@ -31,11 +32,12 @@ function attrs(item, args) {
     const clone = getPushKid(item, item.elementFunctions);
     Object.entries(args).map(args => {
         clone.attributes.push(args);
+        bumpContentId(clone, args[1]);
         if (isValueForContext(args[0])) {
-            registerMockAttrContext(args[0], clone); // the attrName is a function or TagJsVar
+            registerMockAttrContext(args[0], clone); // the attrName is a function or TagJsTag
         }
         else if (isValueForContext(args[1])) {
-            registerMockAttrContext(args[1], clone); // the attrValue is a function or TagJsVar
+            registerMockAttrContext(args[1], clone); // the attrValue is a function or TagJsTag
         }
     });
     return clone;
@@ -54,6 +56,7 @@ const disabled = makeAttrCallable('disabled', attr);
 const selected = makeAttrCallable('selected', attr);
 const minLength = makeAttrCallable('minLength', attr);
 const maxLength = makeAttrCallable('maxLength', attr);
+const open = makeAttrCallable('open', attr); // dialog element
 const cellPadding = makeAttrCallable('cellpadding', attr);
 const cellSpacing = makeAttrCallable('cellspacing', attr);
 const border = makeAttrCallable('border', attr);
@@ -61,11 +64,12 @@ function attr2(item, args) {
     // const clone = getPushKid(item as any, item.elementFunctions)
     // clone.attributes.push(args as Attribute)
     item.attributes.push(args);
+    bumpContentId(item, args[1]);
     if (isValueForContext(args[0])) {
-        registerMockAttrContext(args[0], item); // the attrName is a function or TagJsVar
+        registerMockAttrContext(args[0], item); // the attrName is a function or TagJsTag
     }
     else if (isValueForContext(args[1])) {
-        registerMockAttrContext(args[1], item); // the attrValue is a function or TagJsVar
+        registerMockAttrContext(args[1], item); // the attrValue is a function or TagJsTag
     }
     return item;
 }
@@ -81,6 +85,7 @@ export function elementFunctions(item) {
     const callables_other = {
         // ...eventCallables,
         onClose: makeCallback('onclose'),
+        onCancel: makeCallback('oncancel'),
         onDoubleClick: makeCallback('ondblclick'),
         onClick: makeCallback('click'),
         // onclick: makeCallback('click'),
@@ -137,8 +142,16 @@ export function elementFunctions(item) {
         border: makeAttr(border, item),
         minLength: makeAttr(minLength, item),
         maxLength: makeAttr(maxLength, item),
+        open: makeAttr(open, item), // html dialog
     };
     return callables_other;
+}
+function bumpContentId(item, attrValue) {
+    let bump = 1;
+    if (attrValue != null && typeof attrValue !== 'function' && typeof attrValue.length === 'number') {
+        bump += attrValue.length;
+    }
+    item.contentId += bump;
 }
 function makeAttr(handler, item) {
     return ((stringsOrValue, ...values) => {
@@ -165,6 +178,7 @@ export function registerMockAttrContext(value, mockElm) {
         mockElm.contexts = [];
     }
     mockElm.contexts.push(value);
+    ++mockElm.contentId;
 }
 export function isValueForContext(value) {
     return Array.isArray(value) || isFunction(value) || value?.tagJsType;
@@ -178,12 +192,13 @@ function makeCallback(eventName) {
     };
 }
 const eventCallables = {
-    onClose: makeCallback('onclose'),
     onClick: makeCallback('click'),
     onDoubleClick: makeCallback('ondblclick'),
     onDblClick: makeCallback('ondblclick'),
     onBlur: makeCallback('onblur'),
     onChange: makeCallback('onchange'),
+    onCancel: makeCallback('oncancel'),
+    onClose: makeCallback('onclose'), // dialog
     onInput: makeCallback('oninput'),
     onMousedown: makeCallback('onmousedown'),
     onMouseDown: makeCallback('onmousedown'),

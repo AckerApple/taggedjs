@@ -10,13 +10,18 @@ export function compareArrayItems(value, index, lastArray, removed) {
         destroyArrayItem(prevContext);
         return 1;
     }
-    const oldKey = prevContext.value.arrayValue;
+    if (prevContext.arrayValue === undefined) {
+        prevContext.arrayValue = index;
+    }
+    // const oldKey = prevArrayValue.arrayValue === undefined ? index : prevArrayValue.arrayValue
+    const oldKey = prevContext.arrayValue; // || prevContext.value.arrayValue
     const newValueTag = castArrayItem(value[index]);
     const result = runArrayItemDiff(oldKey, newValueTag, prevContext, lastArray, index);
     return result;
 }
 function runArrayItemDiff(oldKey, newValueTag, prevContext, lastArray, index) {
-    const isDiff = newValueTag && oldKey !== newValueTag.arrayValue;
+    const newKey = newValueTag.arrayValue || index;
+    const isDiff = oldKey !== newKey;
     if (isDiff) {
         destroyArrayItem(prevContext);
         lastArray.splice(index, 1);

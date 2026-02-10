@@ -1,5 +1,5 @@
 import { Subject } from '../subject/index.js';
-import { LikeObservable } from '../tagJsVars/processSubscribeWithAttribute.function.js';
+import { LikeObservable } from '../TagJsTags/processSubscribeWithAttribute.function.js';
 /** Create a Subject that on updates will sync state values to keep chained functions using latest variables */
 export declare function subject<T>(initialValue: T): Subject<T>;
 export declare namespace subject {

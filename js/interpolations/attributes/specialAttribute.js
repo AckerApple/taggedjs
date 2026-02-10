@@ -1,4 +1,5 @@
 import { paintAfters, paintContent } from "../../render/paint.function.js";
+import { setNonFunctionInputValue } from "./howToSetInputValue.function.js";
 /** handles autofocus, autoselect, style., class. */
 export function specialAttribute(name, value, element, specialName) {
     switch (specialName) {
@@ -16,6 +17,12 @@ export function specialAttribute(name, value, element, specialName) {
         }
         case 'class':
             processSpecialClass(name, value, element);
+            return;
+        case 'value':
+            setNonFunctionInputValue(element, name, value);
+            paintAfters.push([(element) => {
+                    element.value = value;
+                }, [element]]);
             return;
     }
     throw new Error(`Invalid special attribute of ${specialName}. ${name}`);

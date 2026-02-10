@@ -4,7 +4,7 @@ import { processSignal } from '../tag/update/processSignal.function.js';
 import { ValueTypes } from '../tag/ValueTypes.enum.js';
 import { deleteAndUnsubscribe } from '../tag/update/setupSubscribe.function.js';
 import { blankHandler } from '../render/dom/blankHandler.function.js';
-import { checkSubscribeValueChanged } from '../tagJsVars/subscribeWith.function.js';
+import { checkSubscribeValueChanged } from '../TagJsTags/subscribeWith.function.js';
 import { processUpdateSubscribe } from '../tag/update/processUpdateSubscribe.function.js';
 /** Checks if rendering cycle in process. Then creates object with "value" key and ability to "subscribe" to value changes */
 export function signal(initialValue) {
@@ -23,6 +23,7 @@ export function Signal(initialValue) {
         subscribers.forEach(callback => callback(newValue));
     };
     return {
+        component: false,
         tagJsType: ValueTypes.signal,
         hasValueChanged: checkSubscribeValueChanged,
         processInitAttribute: blankHandler,

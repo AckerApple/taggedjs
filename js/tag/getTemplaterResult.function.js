@@ -6,6 +6,7 @@ import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.j
 import { blankHandler } from '../render/dom/blankHandler.function.js';
 export function getTemplaterResult(propWatch, props) {
     const templater = {
+        component: false,
         tagJsType: ValueTypes.templater,
         processInit: processTagInit,
         processInitAttribute: blankHandler,

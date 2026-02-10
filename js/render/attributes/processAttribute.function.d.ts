@@ -1,7 +1,7 @@
 import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.function.js';
 import { AnySupport } from '../../tag/index.js';
 import { ContextItem } from '../../tag/ContextItem.type.js';
-import { TagVarIdNum } from './getTagJsVar.function.js';
+import { TagVarIdNum } from './getTagJsTag.function.js';
 import { NoDisplayValue } from './NoDisplayValue.type.js';
 import { SpecialDefinition } from './Special.types.js';
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js';

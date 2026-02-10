@@ -1,11 +1,13 @@
+import { KeyFunction, TagJsComponent } from '../index.js';
 import { ContextItem } from '../tag/ContextItem.type.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js';
-import { TagJsVar } from '../tagJsVars/tagJsVar.type.js';
+import { TagJsTag } from '../TagJsTags/TagJsTag.type.js';
 import type { AttributeCallable } from './attributeCallables.js';
-import { Attributes, ElementVarBase } from './htmlTag.function';
-type Child = ((_: InputElementTargetEvent) => any) | string | boolean | TagJsVar | number | null | undefined | any[];
-export type AttrValue = string | number | boolean | undefined | ((context: ContextItem) => any);
-export type ElementFunction = ((attributesOrFirstChild: Child | Attributes, ...children: Child[]) => any) & ElementVarBase & {
+import { ElementVarBase } from './ElementVarBase.type.js';
+import { Attributes } from './htmlTag.function';
+export type CombinedElementFunctions = ElementVarBase & {
+    /** array value metadata */
+    key: KeyFunction;
     style: AttributeCallable;
     id: AttributeCallable;
     class: AttributeCallable;
@@ -36,5 +38,12 @@ export type ElementFunction = ((attributesOrFirstChild: Child | Attributes, ...c
     onMouseover: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onMouseout: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
 };
-export type ElementVar = ElementFunction;
+type HtmlBasic = void | Date | string | boolean | TagJsTag | number | null | undefined;
+export type ToHtmlItem = ((_: InputElementTargetEvent) => (HtmlItem | HtmlItem[] | TagJsComponent<any> | TagJsComponent<any>[]));
+export type HtmlItem = /*(
+  (_: InputElementTargetEvent) => Tag | HtmlBasic | (Tag | HtmlBasic)[]
+) | */ HtmlBasic | any[];
+export type AttrValue = string | number | boolean | undefined | ((context: ContextItem) => any);
+export type TagChildContent = HtmlItem[] | HtmlItem | ToHtmlItem | ((_: InputElementTargetEvent) => HtmlBasic | TagJsComponent<any>);
+export type ElementFunction = ((attributesOrFirstChild: TagChildContent | Attributes, ...children: TagChildContent[]) => ElementFunction & CombinedElementFunctions) & CombinedElementFunctions;
 export {};

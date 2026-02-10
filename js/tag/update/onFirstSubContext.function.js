@@ -1,4 +1,4 @@
-import { createAndProcessContextItem } from './createAndProcessContextItem.function.js';
+import { createAndProcessContextItem } from './arrays/createAndProcessContextItem.function.js';
 export function onFirstSubContext(value, subContext, ownerSupport, // ownerSupport ?
 insertBefore) {
     subContext.hasEmitted = true;

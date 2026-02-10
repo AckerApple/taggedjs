@@ -4,6 +4,8 @@ export function destroySupportByContextItem(context) {
     const global = context.global;
     const state = context.state;
     const lastSupport = state.newest;
+    delete context.inputsHandler;
+    delete context.updatesHandler;
     // destroy old component, value is not a component
     destroySupport(lastSupport, global);
     destroySupportContext(context);

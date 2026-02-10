@@ -1,7 +1,7 @@
 // taggedjs-no-compile
 import { tagValueUpdateHandler } from '../tagValueUpdateHandler.function.js';
 import { compareArrayItems } from './compareArrayItems.function.js';
-import { createAndProcessContextItem } from '../createAndProcessContextItem.function.js';
+import { createAndProcessContextItem } from './createAndProcessContextItem.function.js';
 export function processTagArray(contextItem, value, // arry of Tag classes
 ownerSupport, appendTo) {
     const noLast = contextItem.lastArray === undefined;
@@ -18,6 +18,11 @@ ownerSupport, appendTo) {
         // on each loop check the new length
         for (let index = 0; index < lastArray.length; ++index) {
             const item = lastArray[index];
+            // .key() was not used
+            if (item.value === null) {
+                filteredLast.push(item);
+                continue;
+            }
             // 👁️ COMPARE & REMOVE
             const newRemoved = compareArrayItems(value, index, lastArray, removed);
             if (newRemoved === 0) {
@@ -47,9 +52,13 @@ appendTo) {
     if (previousContext) {
         return reviewPreviousArrayItem(item, previousContext, lastArray, ownerSupport, index, runtimeInsertBefore, appendTo);
     }
-    const contextItem = createAndProcessContextItem(item, ownerSupport, lastArray, runtimeInsertBefore, appendTo);
+    const contextItem = createAndProcessContextItem(item, ownerSupport, lastArray, // acts as contexts aka Context[]
+    runtimeInsertBefore, appendTo);
     // Added to previous array
     lastArray.push(contextItem);
+    if (item) {
+        contextItem.arrayValue = item?.arrayValue || contextItem.arrayValue || index;
+    }
     return contextItem;
 }
 function reviewPreviousArrayItem(value, context, lastArray, ownerSupport, index, runtimeInsertBefore, // used during updates

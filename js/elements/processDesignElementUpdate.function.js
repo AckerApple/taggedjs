@@ -53,16 +53,15 @@ export function checkTagElementValueChange(value, context) {
     if (notElement) {
         return 1;
     }
+    const newContentId = value.contentId;
+    const oldContentId = context.value.contentId;
+    if (newContentId !== oldContentId) {
+        return 1;
+    }
     const newKidLength = value.innerHTML.length;
     const oldKidLength = context.value.innerHTML.length;
     const kidLengthChanged = newKidLength !== oldKidLength;
     if (kidLengthChanged) {
-        return 1;
-    }
-    const newAttrLength = value.attributes.length;
-    const oldAttrLength = context.value.attributes.length;
-    const kidAttrChanged = newAttrLength !== oldAttrLength;
-    if (kidAttrChanged) {
         return 1;
     }
     return 0;

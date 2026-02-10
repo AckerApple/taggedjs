@@ -14,7 +14,7 @@ import { tagInject } from './tagInject.function.js';
 import { onInit as tagOnInit } from '../state/onInit.function.js';
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js';
 import { onRender as tagOnRender } from '../state/onRender.function.js';
-import { getInnerHTML as tagGetInnerHTML } from '../index.js';
+import { getInnerHTML as tagGetInnerHTML, output as outputAlias } from '../index.js';
 let tagCount = 0;
 const onClick = makeEventListener('click');
 const onMouseDown = makeEventListener('mousedown');
@@ -87,6 +87,12 @@ export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
     tag.tagIndex = tagCount++; // needed for things like HMR
     tags.push(parentWrap);
     const returnWrap = parentWrap;
+    /* Used for setting arguments as inputs and outputs. Runs every init and update of tag */
+    returnWrap.inputs = (handler) => {
+        const context = getContextInCycle();
+        context.inputsHandler = handler;
+        return true;
+    };
     // used for argument updates
     returnWrap.updates = (handler) => {
         const context = getContextInCycle();
@@ -94,6 +100,7 @@ export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
         return true;
     };
     returnWrap.getInnerHTML = tagGetInnerHTML;
+    // returnWrap.tagJsType = 'component'
     return returnWrap;
 }
 /** Use to structure and define a browser tag route handler
@@ -117,6 +124,7 @@ tag.use = tagUseFn;
 tag.deepPropWatch = tag;
 tag.route = routeFn;
 tag.inject = tagInject;
+tag.output = outputAlias;
 tag.onInit = tagOnInit;
 tag.onDestroy = tagOnDestroy;
 tag.onRender = tagOnRender;

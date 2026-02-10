@@ -11,12 +11,13 @@ export type ReadOnlyVar = {
     hasValueChanged: HasValueChanged;
     destroy: ProcessDelete;
 };
-export type TagJsVar = ReadOnlyVar & {
+type TagJsVarBasics = {
     isAttr?: true;
     value?: any;
     /** Optional method to check if this TagJsVar matches an injection request */
     matchesInjection?: MatchesInjection;
 };
+export type TagJsVar = ReadOnlyVar & TagJsVarBasics;
 export type MatchesInjection = (inject: any, context: ContextItem) => ContextItem | void;
 export type TagJsTag = TagJsVar & {
     tagJsType: string;
@@ -25,3 +26,4 @@ export type TagJsTag = TagJsVar & {
     value?: any;
 };
 export type ProcessDelete = (contextItem: ContextItem, ownerSupport: AnySupport) => any;
+export {};

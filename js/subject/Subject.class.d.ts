@@ -1,4 +1,4 @@
-import { LikeObservable } from '../tagJsVars/processSubscribeWithAttribute.function.js';
+import { LikeObservable } from '../TagJsTags/processSubscribeWithAttribute.function.js';
 import { UnaryFunction as OperatorFunction, SubjectSubscriber, Subscription } from './subject.utils.js';
 export type OnSubscription<T> = (subscription: Subscription<T>) => unknown;
 export declare class Subject<T> implements LikeObservable<T> {
@@ -9,7 +9,7 @@ export declare class Subject<T> implements LikeObservable<T> {
     subscribeWith?: (x: SubjectSubscriber<T>) => Subscription<T>;
     value?: any;
     constructor(value?: T, onSubscription?: OnSubscription<T> | undefined);
-    subscribe(callback: SubjectSubscriber<T>): Subscription<T> | Subscription<any>;
+    subscribe(callback: SubjectSubscriber<T>): Subscription<any> | Subscription<T>;
     next(value?: T): void;
     set: (value?: T) => void;
     emit(): void;
@@ -17,7 +17,7 @@ export declare class Subject<T> implements LikeObservable<T> {
     /** like toPromise but faster.
      * Once called, unsubscribe occurs.
      * No subscription to manage UNLESS the callback will never occur THEN subscription needs to be closed with result.unsubscribe() */
-    toCallback(callback: (x: T) => any): Subscription<T> | Subscription<any>;
+    toCallback(callback: (x: T) => any): Subscription<any> | Subscription<T>;
     pipe(): Subject<T>;
     pipe<A, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>): Subject<A>;
     pipe<A, B, RESOLVE>(op1: OperatorFunction<T, A, RESOLVE>, op2: OperatorFunction<A, B, RESOLVE>): Subject<B>;

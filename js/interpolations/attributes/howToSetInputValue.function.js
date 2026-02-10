@@ -23,6 +23,7 @@ function howToSetInputObjectValue(element, name, value) {
         }
     }
 }
+/* used for <input checked /> */
 export function howToSetStandAloneAttr(element, name, _value) {
     element.setAttribute(name, '');
 }
@@ -50,6 +51,11 @@ export function setSimpleAttribute(element, name, value) {
         return;
     }
     element.setAttribute(name, value);
+    /*
+    paintAfters.push([(element: HTMLInputElement) => {
+      element.value = value as string
+    }, [element]])
+    */
 }
 function setPropertyValue(element, name, key, value) {
     ;

@@ -1,25 +1,26 @@
 import { InputElementTargetEvent } from '../TagJsEvent.type.js';
 import { AttributeCallable } from './attributeCallables.js';
-import { AttrValue, ElementVar } from './ElementFunction.type.js';
+import { AttrValue, ElementFunction } from './ElementFunction.type.js';
 export type Attrs = {
     [name: string]: AttrValue;
 };
 export declare function elementFunctions(item: any): {
-    onClose: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
-    onDoubleClick: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
-    onClick: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
-    onBlur: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
-    onChange: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
-    onInput: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
-    contextMenu: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
-    onMousedown: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
-    onMouseup: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
-    onMouseover: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
-    onMouseout: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
-    onKeydown: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
-    onKeyup: (callback: (e: InputElementTargetEvent) => any) => import("./ElementFunction.type.js").ElementFunction;
-    attr: (...args: any[]) => import("./ElementFunction.type.js").ElementFunction;
-    attrs: (attributes: Attrs) => import("./ElementFunction.type.js").ElementFunction;
+    onClose: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onCancel: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onDoubleClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onBlur: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onChange: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onInput: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    contextMenu: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onMousedown: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onMouseup: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onMouseover: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onMouseout: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onKeydown: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onKeyup: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    attr: (...args: any[]) => ElementFunction;
+    attrs: (attributes: Attrs) => ElementFunction;
     /** Used for setting array index-key value */
     key: (arrayValue: any) => /*elided*/ any;
     /** Use as div.style`border:${border}` or div.style(() => `border:${border}`) */
@@ -51,8 +52,9 @@ export declare function elementFunctions(item: any): {
     border: AttributeCallable;
     minLength: AttributeCallable;
     maxLength: AttributeCallable;
+    open: AttributeCallable;
 };
 /** used during updates */
-export declare function registerMockAttrContext(value: any, mockElm: ElementVar): void;
+export declare function registerMockAttrContext(value: any, mockElm: ElementFunction): void;
 export declare function isValueForContext(value: any): any;
-export declare function loopObjectAttributes(item: ElementVar, object: any): import("./ElementFunction.type.js").ElementFunction;
+export declare function loopObjectAttributes(item: ElementFunction, object: any): ElementFunction;

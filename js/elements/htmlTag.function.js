@@ -1,10 +1,12 @@
 import { blankHandler } from '../render/dom/blankHandler.function.js';
 import { elementFunctions, isValueForContext, loopObjectAttributes } from './elementFunctions.js';
+import { elementVarToHtmlString } from './elementVarToHtmlString.function.js';
 import { destroyDesignElement } from './destroyDesignElement.function.js';
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js';
 import { processDesignElementInit } from './processDesignElementInit.function.js';
 export function htmlTag(tagName) {
     const element = {
+        component: false,
         tagJsType: 'element',
         processInitAttribute: blankHandler,
         processInit: processDesignElementInit,
@@ -14,6 +16,7 @@ export function htmlTag(tagName) {
         tagName,
         innerHTML: [],
         attributes: [],
+        contentId: 0,
         listeners: [],
         allListeners: [],
         elementFunctions,
@@ -30,6 +33,7 @@ export function getPushKid(element, _elmFunctions) {
         newElement.allListeners = [...pushKid.allListeners];
         if (args.length > 0 &&
             typeof args[0] === 'object' &&
+            args[0] !== null &&
             !Array.isArray(args[0]) &&
             !args[0].tagJsType // TODO: need better attribute detection
         ) {
@@ -49,9 +53,11 @@ export function getPushKid(element, _elmFunctions) {
                     if (!newElement.contexts) {
                         // newElement.contexts = [...arg.contexts]
                         newElement.contexts = arg.contexts;
+                        ++newElement.contentId;
                     }
                     else {
                         newElement.contexts.push(...arg.contexts);
+                        ++newElement.contentId;
                     }
                 }
                 return;
@@ -65,6 +71,9 @@ export function getPushKid(element, _elmFunctions) {
     pushKid.attributes = [...element.attributes];
     pushKid.listeners = [...element.listeners];
     pushKid.allListeners = [...element.allListeners];
+    pushKid.toString = function () {
+        return elementVarToHtmlString(this);
+    };
     return pushKid;
 }
 /** used during updates */

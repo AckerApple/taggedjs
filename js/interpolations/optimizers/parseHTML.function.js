@@ -137,6 +137,7 @@ function splitByTagVar(inputString) {
 function notEmptyStringMapper(part) {
     return part !== '';
 }
+/** @deprecated - this seems no longer needed? */
 function parseAttrString(attrMatch, valueIndex, valuePositions, attributes) {
     const attrName = attrMatch[1] || attrMatch[3] || attrMatch[5];
     const attrChoice = attrMatch[2] || attrMatch[4] || attrMatch[6];
@@ -190,7 +191,8 @@ function parseAttrString(attrMatch, valueIndex, valuePositions, attributes) {
         });
     }
     const attrSet = [fixedName, attrValue];
-    const isSpecial = isSpecialAttr(lowerName); // check original name for "oninit" or "autofocus"
+    console.debug('EVER GET HERE??????');
+    const isSpecial = isSpecialAttr(lowerName, 'DIV'); // check original name for "oninit" or "autofocus"
     if (isSpecial) {
         attrSet.push(isSpecial);
     }

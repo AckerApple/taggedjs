@@ -18,8 +18,8 @@ export function deleteSubContext(subContext, ownerSupport) {
         return;
     }
     const subContextItem = subContext.contextItem;
-    const subTagJsVar = subContextItem.tagJsVar;
-    subTagJsVar.destroy(subContextItem, ownerSupport);
+    const subTagJsTag = subContextItem.tagJsVar;
+    subTagJsTag.destroy(subContextItem, ownerSupport);
     return 76;
 }
 //# sourceMappingURL=deleteContextSubContext.function.js.map

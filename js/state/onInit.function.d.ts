@@ -1,4 +1,4 @@
-import { tag } from '../index.js';
+import { tag } from '../TagJsTags/tag.function.js';
 export type OnInitCallback = () => unknown;
-/** runs a callback function one time and never again. Same as calling state(() => ...) */
+/** Used for knowing when html elements have arrived on page */
 export declare function onInit(callback: OnInitCallback): typeof tag;

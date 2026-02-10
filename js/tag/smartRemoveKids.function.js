@@ -6,18 +6,15 @@ import { isPromise } from '../index.js';
 export function smartRemoveKids(context, allPromises) {
     const subContexts = context.contexts;
     smartRemoveByContext(subContexts, allPromises);
-    destroyContextHtml(context);
-}
-export function destroyContextHtml(context) {
     destroyHtmlDomMeta(context.htmlDomMeta);
 }
 function smartRemoveByContext(contexts, allPromises) {
     for (const context of contexts) {
         if (context.withinOwnerElement) {
-            const tagJsVar = context.tagJsVar;
-            if (tagJsVar && tagJsVar.tagJsType === 'host') {
+            const TagJsTag = context.tagJsVar;
+            if (TagJsTag && TagJsTag.tagJsType === 'host') {
                 const newest = context.supportOwner;
-                const hostDestroy = tagJsVar.destroy(context, newest);
+                const hostDestroy = TagJsTag.destroy(context, newest);
                 if (isPromise(hostDestroy)) {
                     allPromises.push(hostDestroy);
                 }

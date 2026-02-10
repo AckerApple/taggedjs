@@ -11,6 +11,7 @@ export type HtmlSupport = {
     ownerSupport?: AnySupport;
     appElement?: Element;
     propsConfig?: PropsConfig;
+    isRoot?: true;
     templater: TemplaterResult;
     returnValue?: any;
     context: ContextItem;

@@ -3,7 +3,7 @@ import { BasicTypes } from '../../tag/index.js';
 import { processDynamicNameValueAttribute } from '../../interpolations/attributes/processNameValueAttribute.function.js';
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js';
 import { getTagVarIndex } from './getTagVarIndex.function.js';
-import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js';
+import { valueToTagJsVar } from '../../TagJsTags/valueToTagJsVar.function.js';
 import { Subject } from '../../subject/Subject.class.js';
 import { processTagCallbackFun } from './processAttribute.function.js';
 /** Support string attributes with dynamics Ex: <div style="color:black;font-size::${fontSize};"></div> */
@@ -28,6 +28,7 @@ values, parentContext) {
                 parentContext,
                 destroy$: new Subject(),
                 render$: new Subject(),
+                // paintCommands: [],
             };
             // contextItem.handler =
             tagJsVar.processUpdate = function arrayItemHandler(value, contextItem, newSupport, newValues) {
@@ -80,6 +81,7 @@ support, isSpecial, varIndex) {
         tagJsVar,
         destroy$: new Subject(),
         render$: new Subject(),
+        // paintCommands: [],
         valueIndex: varIndex,
         parentContext,
     };

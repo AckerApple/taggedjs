@@ -8,7 +8,7 @@ export function handleStillTag(oldSupport, subject, value, ownerSupport) {
         const innerHTML = oldTtag._innerHTML;
         if (innerHTML) {
             // Value has innerHTML that is either tag() or html``
-            templater = value.outerHTML || value._innerHTML.outerHTML;
+            templater = value._innerHTML;
         }
     }
     const valueSupport = createSupport(templater, subject, ownerSupport, ownerSupport.appSupport);

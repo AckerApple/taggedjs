@@ -1,6 +1,6 @@
 import { state } from "./state.function.js";
 import { getContextInCycle } from "../tag/cycles/setContextInCycle.function.js";
-import { tag } from "../tagJsVars/tag.function.js";
+import { tag } from "../TagJsTags/tag.function.js";
 export function onDestroy(callback) {
     state(function stateDestroy() {
         const context = getContextInCycle();

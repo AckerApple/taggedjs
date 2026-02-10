@@ -84,14 +84,14 @@ export function addPaintRemover(element, caller) {
 /** must be used with paintRemoves */
 function paintRemover(element, _caller) {
     const parentNode = element.parentNode;
-    /*
-    if(!element) {
-      console.debug('no element by', _caller)
+    if (!element) {
+        console.debug('no element by', {
+            _caller, element
+        });
     }
-    if(!parentNode) {
-      console.debug('no parentNode by', _caller)
+    if (!parentNode) {
+        console.debug('no parentNode by', { _caller, element });
     }
-    */
     parentNode.removeChild(element);
 }
 /** insertBefore. For parent.appendChild() see paintAppend */

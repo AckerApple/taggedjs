@@ -53,6 +53,7 @@ appendTo, insertBefore) {
             contexts: [],
             destroy$: new Subject(),
             render$: new Subject(),
+            // paintCommands: [],
             tagJsVar: {
                 tagJsType: 'new-parent-context'
             },

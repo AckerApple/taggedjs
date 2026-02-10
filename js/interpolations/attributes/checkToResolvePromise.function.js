@@ -2,12 +2,9 @@
 import { isPromise } from '../../isInstance.js';
 import { getUpTags } from './getUpTags.function.js';
 import { renderTagUpdateArray } from './renderTagArray.function.js';
-import { syncSupports } from '../../state/syncStates.function.js';
 export function checkToResolvePromise(callbackResult, last, { resolvePromise, resolveValue }) {
     const isProm = isPromise(callbackResult);
     if (isProm) {
-        const subject = last.context;
-        subject.locked = 2;
         return callbackResult.then(thenResolveBy(last, resolvePromise));
     }
     return resolveValue(callbackResult);
@@ -16,12 +13,12 @@ export function thenResolveBy(last, resolvePromise) {
     return (x) => {
         const subject = last.context;
         const global = subject.global;
-        delete subject.locked;
-        if (subject.deleted === true || global?.deleted === true) {
+        // delete subject.locked
+        if (subject.deleted === true ||
+            global?.deleted === true // this maybe deprecated
+        ) {
             return resolvePromise(x); // tag was deleted during event processing
         }
-        // The promise may have then changed old variables, lets update forward
-        syncSupports(last, subject.state.newest);
         const tagsToUpdate = getUpTags(last);
         renderTagUpdateArray(tagsToUpdate);
         return resolvePromise(x);

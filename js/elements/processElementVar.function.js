@@ -6,6 +6,7 @@ import { isSpecialAttr } from '../interpolations/attributes/isSpecialAttribute.f
 import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArray.function.js';
 import { processAttributeArray } from '../render/dom/processAttributeArray.function.js';
 import { paint, paintAppend, painting } from '../render/paint.function.js';
+import { removeContextInCycle, setContextInCycle } from '../tag/cycles/setContextInCycle.function.js';
 import { processChildren } from './processChildren.function.js';
 /** The first and recursive processor for elements */
 export function processElementVar(value, context, ownerSupport, _addedContexts) {
@@ -17,14 +18,11 @@ export function processElementVar(value, context, ownerSupport, _addedContexts) 
         if (typeof (name) !== 'string') {
             return;
         }
-        x[2] = isSpecialAttr(name);
+        x[2] = isSpecialAttr(name, element.tagName);
     });
     processAttributeArray(value.attributes, [], // values,
     element, ownerSupport, context);
-    /*
-    value.listeners.forEach((listener, index) =>
-      registerListener(value, index, ownerSupport, listener, element)
-    )*/
+    /* process children BEFORE attributes for  `<select value="1">` to work */
     processChildren(value.innerHTML, context, // parentContext
     ownerSupport, element, paintAppend);
     value.listeners.forEach((listener, index) => registerListener(value, index, ownerSupport, listener, element));
@@ -38,9 +36,11 @@ function registerListener(value, index, ownerSupport, listener, element) {
         const updateCount = stateSupport.context.updateCount;
         stateSupport.context.locked = 1;
         ++painting.locks;
+        setContextInCycle(stateSupport.context);
         const result = toCall(...args);
         --painting.locks;
         delete stateSupport.context.locked;
+        removeContextInCycle();
         const needsRender = updateCount === stateSupport.context.updateCount;
         if (needsRender) {
             return afterTagCallback(result, stateSupport);

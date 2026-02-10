@@ -1,2 +1,2 @@
 export type SpecialAction = 'init' | 'destroy';
-export type SpecialDefinition = boolean | SpecialAction | 'class' | 'style' | 'autofocus' | 'autoselect';
+export type SpecialDefinition = boolean | SpecialAction | 'class' | 'style' | 'autofocus' | 'autoselect' | 'value';

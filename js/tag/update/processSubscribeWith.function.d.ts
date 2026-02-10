@@ -1,4 +1,4 @@
-import { SubscribeValue } from '../../tagJsVars/subscribe.function.js';
+import { SubscribeValue } from '../../TagJsTags/subscribe.function.js';
 import { AnySupport } from '../index.js';
 import { ContextItem } from '../ContextItem.type.js';
 import { SubContext } from './SubContext.type.js';

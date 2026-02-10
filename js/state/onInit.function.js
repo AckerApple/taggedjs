@@ -1,24 +1,26 @@
-import { tag } from '../index.js';
 import { checkToResolvePromise } from '../interpolations/attributes/checkToResolvePromise.function.js';
 import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js';
-import { getContextInCycle } from '../tag/cycles/setContextInCycle.function.js';
+import { tag } from '../TagJsTags/tag.function.js';
 import { state } from './state.function.js';
-/** runs a callback function one time and never again. Same as calling state(() => ...) */
+/** Used for knowing when html elements have arrived on page */
 export function onInit(callback) {
     state(() => {
         const result = callback();
-        const context = getContextInCycle();
-        if (context.global) {
-            const nowSupport = getSupportInCycle();
-            return checkToResolvePromise(result, nowSupport, { resolvePromise, resolveValue });
+        const nowSupport = getSupportInCycle();
+        if (!nowSupport?.context?.global) {
+            return result;
         }
+        return checkToResolvePromise(result, nowSupport, {
+            resolvePromise,
+            resolveValue,
+        });
     });
     return tag;
 }
-function resolvePromise(x) {
-    return x;
+function resolvePromise(value) {
+    return value;
 }
-function resolveValue(x) {
-    return x;
+function resolveValue(value) {
+    return value;
 }
 //# sourceMappingURL=onInit.function.js.map

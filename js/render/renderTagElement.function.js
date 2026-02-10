@@ -52,7 +52,9 @@ context, isAppFunction) {
             appElement: element,
             context,
         },
-        appElement: element
+        appElement: element,
+        context,
+        isRoot: true,
     };
     const support = processReplacementComponent(templater, context, ownerSupport);
     support.appElement = element;

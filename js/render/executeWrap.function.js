@@ -18,11 +18,15 @@ export function executeWrap(templater, result, useSupport, castedProps) {
             tag = tag();
         }
     }
-    useSupport.context.returnValue = tag;
+    const context = useSupport.context;
+    context.returnValue = tag;
     useSupport.returnValue = tag;
     tag.templater = templater;
     templater.tag = tag;
-    useSupport.context.state.newer = { ...config };
+    context.state.newer = { ...config };
+    if (context.inputsHandler) {
+        context.inputsHandler(castedProps);
+    }
     removeContextInCycle();
     return useSupport;
 }

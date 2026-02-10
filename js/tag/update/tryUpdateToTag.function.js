@@ -32,6 +32,10 @@ ownerSupport) {
             return true;
         }
     }
+    if (contextItem.inputsHandler) {
+        const props = ownerSupport.propsConfig;
+        contextItem.inputsHandler(props);
+    }
     ;
     newValue.processInit(newValue, contextItem, ownerSupport, contextItem.placeholder);
     contextItem.oldTagJsVar = contextItem.tagJsVar;
@@ -41,6 +45,10 @@ ownerSupport) {
 function prepareUpdateToComponent(templater, contextItem, ownerSupport) {
     // When last value was not a component
     if (!contextItem.state.newest) {
+        if (contextItem.inputsHandler) {
+            const props = ownerSupport.propsConfig;
+            contextItem.inputsHandler(props);
+        }
         ;
         templater.processInit(templater, contextItem, ownerSupport, contextItem.placeholder);
         return;

@@ -1,6 +1,6 @@
 import { castTextValue } from '../../castTextValue.function.js';
 import { paintBeforeText, paintCommands, paintContent, setContent } from '../../render/paint.function.js';
-import { getSimpleTagVar } from '../../tagJsVars/getSimpleTagVar.function.js';
+import { getSimpleTagVar } from '../../TagJsTags/getSimpleTagVar.function.js';
 export function processUpdateRegularValue(value, contextItem) {
     const castedValue = castTextValue(value);
     if (contextItem.paint) {

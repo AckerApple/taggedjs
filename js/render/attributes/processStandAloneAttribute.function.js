@@ -13,7 +13,7 @@ export function processStandAloneAttribute(values, attrValue, element, ownerSupp
     // process an object of attributes ${{class:'something, checked:true}}
     if (typeof attrValue === BasicTypes.object) {
         for (const name in attrValue) {
-            const isSpecial = isSpecialAttr(name); // only object variables are evaluated for is special attr
+            const isSpecial = isSpecialAttr(name, element.tagName); // only object variables are evaluated for is special attr
             const value = attrValue[name];
             const howToSet = setNonFunctionInputValue;
             const subContext = processAttribute(name, value, values, element, ownerSupport, howToSet, contexts, parentContext, isSpecial);

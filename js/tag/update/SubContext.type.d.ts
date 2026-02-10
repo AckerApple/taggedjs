@@ -1,9 +1,9 @@
 import { ContextItem, TemplateValue } from "../../index.js";
-import { LikeSubscription } from "../../tagJsVars/processSubscribeWithAttribute.function.js";
-import { SubscribeValue } from '../../tagJsVars/subscribe.function.js';
-import { TagJsVar } from "../../tagJsVars/tagJsVar.type.js";
+import { LikeSubscription } from "../../TagJsTags/processSubscribeWithAttribute.function.js";
+import { SubscribeValue } from '../../TagJsTags/subscribe.function.js';
+import { TagJsTag } from "../../TagJsTags/TagJsTag.type.js";
 export interface SubContext {
-    tagJsVar?: TagJsVar;
+    tagJsVar?: TagJsTag;
     hasEmitted?: true;
     deleted?: true;
     /** Handles each emission separately */
@@ -11,12 +11,12 @@ export interface SubContext {
     /** Handles all emissions collectively */
     valuesHandler: (values: {
         value: TemplateValue;
-        tagJsVar: TagJsVar;
+        tagJsVar: TagJsTag;
     }[], index: number) => void;
     lastValues: {
         value: TemplateValue;
-        tagJsVar: TagJsVar;
-        oldTagJsVar?: TagJsVar;
+        tagJsVar: TagJsTag;
+        oldTagJsVar?: TagJsTag;
     }[];
     appendMarker?: Text;
     contextItem?: ContextItem;

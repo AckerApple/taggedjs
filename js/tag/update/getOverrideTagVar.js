@@ -8,10 +8,23 @@ import { updateToDiffValue } from './updateToDiffValue.function.js';
 export function getOverrideTagVar(context, newContext, support, subject) {
     // support.context = subject as SupportContextItem
     const overrideTagVar = {
+        component: false,
         tagJsType: 'tag-conversion',
         // processInitAttribute: newContext.tagJsVar.processInitAttribute,
         processInitAttribute: blankHandler, // cannot be an attribute ever
         processInit: (_value, _contextItem, _ownerSupport) => {
+            if (context.inputsHandler) {
+                const props = support.propsConfig;
+                context.inputsHandler(props);
+            }
+            if (newContext.inputsHandler) {
+                const props = support.propsConfig;
+                newContext.inputsHandler(props);
+            }
+            if (_contextItem.inputsHandler) {
+                const props = support.propsConfig;
+                _contextItem.inputsHandler(props);
+            }
             const renderContent = context.returnValue;
             return newContext.tagJsVar.processInit(renderContent, newContext, support, subject.placeholder);
         },

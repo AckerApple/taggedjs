@@ -6,10 +6,9 @@ import { TagWrapper } from './tag.utils.js';
 import { OnDestroyCallback } from '../state/onDestroy.function.js';
 import { Subscription } from '../subject/subject.utils.js';
 import { ValueTypes } from './ValueTypes.enum.js';
-import { PropWatches } from '../tagJsVars/tag.function.js';
+import { PropWatches, TagJsComponent } from '../TagJsTags/tag.function.js';
 import { ProcessInit } from './ProcessInit.type.js';
-import { Tag } from './Tag.type.js';
-import { ProcessDelete, TagJsTag } from '../tagJsVars/tagJsVar.type.js';
+import { ProcessDelete, TagJsTag } from '../TagJsTags/TagJsTag.type.js';
 import { CheckSupportValueChange, HasValueChanged } from './Context.types.js';
 import { ProcessUpdate } from './ProcessUpdate.type.js';
 export type Wrapper = ((newSupport: AnySupport, subject: ContextItem, prevSupport?: AnySupport) => AnySupport) & TagWrapper<unknown> & {
@@ -39,7 +38,7 @@ export type TemplaterResult = TagJsTag & {
     processInit: ProcessInit;
     propWatch: PropWatches;
     wrapper?: Wrapper;
-    tag?: Tag;
+    tag?: TagJsComponent<any>;
     props?: Props;
     /** Used inside of an array.map() function */
     key: <T>(arrayValue: T) => TemplaterResultArrayItem<T>;

@@ -1,4 +1,4 @@
-import { ElementVar } from '../index.js';
+import { ElementFunction } from '../index.js';
 /** used when you do NOT have a root element returned for your function */
-export declare const noElement: import("./ElementFunction.type.js").ElementFunction;
-export declare function noElementMaker(): ElementVar;
+export declare const noElement: ElementFunction;
+export declare function noElementMaker(): ElementFunction;

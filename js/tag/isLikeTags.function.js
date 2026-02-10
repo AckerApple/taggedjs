@@ -10,6 +10,7 @@ oldSupport) {
     }
     return isLike;
 }
+/** @deprecated */
 function isLikeBaseTags(newSupport, // new
 oldSupport) {
     const templater0 = newSupport.templater;
