@@ -2,7 +2,7 @@ import { AttributeContextItem, HostAttributeContextItem } from "../tag/Attribute
 import { AnySupport, ContextItem, TemplateValue, ValueTypes } from "../tag/index.js"
 import { syncWrapCallback } from "../tag/output.function.js"
 import { removeContextInCycle, setContextInCycle } from "../tag/cycles/setContextInCycle.function.js"
-import { MatchesInjection, TagJsVar } from "./tagJsVar.type.js"
+import { MatchesInjection, TagJsTag } from "./TagJsTag.type.js"
 import { initState } from "../state/state.utils.js"
 import { reState } from '../state/reState.function.js'
 import { runAfterRender } from "../render/runAfterRender.function.js"
@@ -104,7 +104,7 @@ function processHostUpdate(
   const hasChanged = handleTagTypeChangeFrom(
     ValueTypes.host,
     newValue,
-    // tagJsVar,
+    // TagJsTag,
     ownerSupport,
     contextItem,
   )
@@ -113,8 +113,8 @@ function processHostUpdate(
     return hasChanged
   }
 
-  const oldTagJsVar = contextItem.tagJsVar as HostValue
-  const oldOptions = oldTagJsVar.options
+  const oldTagJsTag = contextItem.tagJsVar as HostValue
+  const oldOptions = oldTagJsTag.options
 
   // const element = (contextItem as any as AttributeContextItem).target as HTMLInputElement
   const newHost = newValue as unknown as HostValue
@@ -131,7 +131,7 @@ function processHostAttribute(
   name: string,
   value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   element: HTMLElement,
-  tagJsVar: TagJsVar, // same as value not needed
+  tagJsVar: TagJsTag, // same as value not needed
   contextItem: AttributeContextItem,
 ) {
   return processHost(
@@ -142,14 +142,14 @@ function processHostAttribute(
 
 /* Only runs on host() init */
 function processHost(
-  tagJsVar: TagJsVar,
+  tagJsVar: TagJsTag,
   contextItem: ContextItem,
 ) {
   const element = contextItem.target
   const state = (contextItem as HostAttributeContextItem).state = {}
   
   initState(contextItem)
-  processHostTagJsVar(
+  processHostTagJsTag(
     element as HTMLInputElement,
     tagJsVar as HostValue,
     contextItem,
@@ -159,7 +159,7 @@ function processHost(
   runAfterRender(contextItem)
 }
 /** first time run */
-function processHostTagJsVar(
+function processHostTagJsTag(
   element: HTMLInputElement,
   tagJsVar: HostValue,
   contextItem: ContextItem,
@@ -186,8 +186,8 @@ function deleteHost(
 ) {
   ++contextItem.updateCount
   const attrContext = contextItem as any as AttributeContextItem
-  const tagJsVar = attrContext.tagJsVar as HostValue
-  const options = tagJsVar.options
+  const TagJsTag = attrContext.tagJsVar as HostValue
+  const options = TagJsTag.options
 
   if(attrContext.destroy$.subscribers.length) {
     // TODO: Not sure if this needed
@@ -213,7 +213,7 @@ function deleteHost(
       
       const result = options.onDestroy(
         element as HTMLInputElement,
-        tagJsVar,
+        TagJsTag,
         attrContext,
         (attrContext as HostAttributeContextItem).state,
       )
@@ -232,7 +232,7 @@ function deleteHost(
   }
 }
 
-export type HostValue = TagJsVar & {
+export type HostValue = TagJsTag & {
   tagJsType: typeof ValueTypes.host
   options: AllOptions
   matchesInjection: MatchesInjection

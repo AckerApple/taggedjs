@@ -7,7 +7,7 @@ import { processDynamicNameValueAttribute } from '../../interpolations/attribute
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
 import { SpecialDefinition } from './Special.types.js'
 import { getTagVarIndex } from './getTagVarIndex.function.js'
-import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
+import { valueToTagJsVar } from '../../TagJsTags/valueToTagJsVar.function.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
 import { Subject } from '../../subject/Subject.class.js'
 import { processTagCallbackFun } from './processAttribute.function.js'
@@ -42,6 +42,7 @@ export function createDynamicArrayAttribute(
         parentContext,
         destroy$: new Subject(),
         render$: new Subject(),
+        // paintCommands: [],
       }
   
       // contextItem.handler =
@@ -124,6 +125,7 @@ export function createDynamicAttribute(
     tagJsVar,
     destroy$: new Subject(),
     render$: new Subject(),
+    // paintCommands: [],
     valueIndex: varIndex,
     parentContext,
   }

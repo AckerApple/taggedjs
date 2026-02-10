@@ -21,6 +21,7 @@ export function subscribeWith<SubValue, DEFAULT>(
   */
   
   return {
+    component: false,
     onOutput: blankHandler, // this gets set within setupSubscribe
     tagJsType: ValueTypes.subscribe,
     processInitAttribute: processSubscribeWithAttribute,

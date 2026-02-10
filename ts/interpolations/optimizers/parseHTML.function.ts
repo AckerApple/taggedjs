@@ -182,6 +182,7 @@ function notEmptyStringMapper(part: string) {
   return part !== ''
 }
 
+/** @deprecated - this seems no longer needed? */
 function parseAttrString(
   attrMatch: any[],
   valueIndex: number,
@@ -248,7 +249,8 @@ function parseAttrString(
   }
 
   const attrSet: Attribute = [fixedName, attrValue]
-  const isSpecial = isSpecialAttr(lowerName) // check original name for "oninit" or "autofocus"
+  console.debug('EVER GET HERE??????')
+  const isSpecial = isSpecialAttr(lowerName, 'DIV') // check original name for "oninit" or "autofocus"
   if(isSpecial) {
     attrSet.push(isSpecial)
   }

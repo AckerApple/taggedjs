@@ -1,12 +1,12 @@
-import { AnySupport, ElementVar } from '../index.js'
+import { AnySupport, ElementFunction } from '../index.js'
 import { DomObjectElement } from '../interpolations/optimizers/ObjectNode.types.js'
-import { paintBefore, paintCommands } from '../render/paint.function.js'
-import { ContextItem } from '../tag/ContextItem.type.js'
+import { paintAfters, paintBefore, PaintCommand, paintCommands } from '../render/paint.function.js'
+import { ElementContext } from '../tag/ContextItem.type.js'
 import { processElementVar } from './processElementVar.function.js'
 
 export function processDesignElementInit(
-  value: ElementVar,
-  context: ContextItem,
+  value: ElementFunction,
+  context: ElementContext,
   ownerSupport: AnySupport,
   insertBefore?: Text,
   // appendTo?: Element,
@@ -24,7 +24,15 @@ export function processDesignElementInit(
   )
   
   delete context.locked
-  paintCommands.push([paintBefore, [insertBefore, element, 'htmlTag.processInit']])
+  const paintCommand: PaintCommand = [
+    paintBefore, [insertBefore, element, 'htmlTag.processInit']
+  ]
+  paintCommands.push(paintCommand)
+  context.paintCommands = [paintCommand]
+  paintAfters.push([() => {
+    delete context.paintCommands
+  }, []])
+
 
   const dom: DomObjectElement = {
     nn: value.tagName,

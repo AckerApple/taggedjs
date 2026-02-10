@@ -52,7 +52,7 @@ taggedjs is a reactive HTML templating framework that provides a lightweight alt
   - `/render` - DOM rendering and update logic
   - `/subject` - Observable/reactive programming patterns
   - `/interpolations` - Template interpolation and attribute handling
-  - `/tagJsVars` - Special variables and functions for templates
+  - `/TagJsTags` - Special variables and functions for templates
 
 - `/js` - Compiled JavaScript output
 - `/dist` - Distribution files (separate git branch)

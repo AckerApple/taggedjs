@@ -1,10 +1,9 @@
 import { attachDomElements } from './dom/attachDomElements.function.js'
 import { DomMetaMap } from '../interpolations/optimizers/LikeObjectElement.type.js'
-import { AnySupport } from '../tag/index.js'
+import { AnySupport, TagJsComponent } from '../tag/index.js'
 import { SupportContextItem } from '../tag/SupportContextItem.type.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { ParsedHtml } from '../interpolations/index.js'
-import { Tag } from '../tag/index.js'
 import { getDomMeta } from '../tag/domMetaCollector.js'
 import type { DomTag } from '../tag/DomTag.type.js'
 import type { StringTag } from '../tag/StringTag.type.js'
@@ -74,7 +73,7 @@ function attachHtmlDomMeta(
 /** Extracts variables from support in order to merge strings & values with dom meta into a html array tree */
 function loadDomMeta(support: AnySupport): ParsedHtml {
   const templater = support.templater
-  const thisTag = templater.tag as Tag
+  const thisTag = templater.tag as TagJsComponent<any>
 
   if(thisTag.tagJsType === ValueTypes.dom) {
     return (thisTag as DomTag).dom as DomMetaMap

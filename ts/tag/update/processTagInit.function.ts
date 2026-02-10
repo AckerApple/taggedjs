@@ -4,10 +4,10 @@ import { SupportContextItem } from '../SupportContextItem.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { processNewSubjectTag } from './processNewSubjectTag.function.js'
 import { AnySupport } from '../index.js'
-import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 
 export function processTagInit(
-  value: TagJsVar,
+  value: TagJsTag,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
   insertBefore?: Text,
@@ -17,7 +17,6 @@ export function processTagInit(
   
   if(contextItem.inputsHandler) {
     const props = ownerSupport.propsConfig
-    console.log('init tag props', {props})
     contextItem.inputsHandler( props )
   }
   

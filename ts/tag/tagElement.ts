@@ -15,7 +15,7 @@ import { destroySupportByContextItem } from './destroySupportByContextItem.funct
 import { AnySupport } from './index.js'
 import { renderTagElement } from '../render/renderTagElement.function.js'
 import { loadNewBaseSupport } from './loadNewBaseSupport.function.js'
-import { TagJsTag } from '../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { setSupportInCycle } from './cycles/getSupportInCycle.function.js'
@@ -129,6 +129,7 @@ function getNewSubject(
   appElement: Element,
 ) {
   const tagJsVar: TagJsTag = {
+    component: false,
     tagJsType: 'templater',
     hasValueChanged: checkTagValueChangeAndUpdate,
     destroy: destroySupportByContextItem,
@@ -146,6 +147,7 @@ function getNewSubject(
     varCounter: 0,
     destroy$: new Subject(),
     render$: new Subject(),
+    // paintCommands: [],
     withinOwnerElement: false, // i am the highest owner
     renderCount: 0,
 

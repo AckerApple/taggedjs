@@ -8,7 +8,7 @@ import { AnySupport, ContextItem } from '../index.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { firstTagRender } from '../../render/renderTagOnly.function.js'
 import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
-import { paint, Subject, SubscribeValue, Tag } from '../../index.js'
+import { paint, Subject, SubscribeValue, TagJsComponent } from '../../index.js'
 import { castProps } from '../props/alterProp.function.js'
 import { convertTagToElementManaged } from './convertTagToElementManaged.function.js'
 import { Callback } from '../../interpolations/attributes/bindSubjectCallback.function.js'
@@ -76,7 +76,7 @@ export function processReplacementComponent(
 
 export function makeRealUpdate(
   newContext: ContextItem,
-  value: string | number | boolean | Tag | SubscribeValue | TemplaterResult | (Tag | TemplaterResult)[] | Subject<unknown> | Callback | null | undefined,
+  value: string | number | boolean | TagJsComponent<any> | SubscribeValue | TemplaterResult | (TagJsComponent<any> | TemplaterResult)[] | Subject<unknown> | Callback | null | undefined,
   context: SupportContextItem,
   convertValue: any,
   support: AnySupport,
@@ -98,6 +98,7 @@ export function makeRealUpdate(
   if((value as any)?.tagJsType === 'tagComponent') {
     newContext.inputsHandler = context.inputsHandler
     newContext.updatesHandler = context.updatesHandler
+    context.value = value
 
     if (context.inputsHandler) {
       setContextInCycle(context)

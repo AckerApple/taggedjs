@@ -3,7 +3,7 @@ import { castTextValue } from '../castTextValue.function.js'
 import { paintBeforeText, paintCommands, addPaintRemover } from "../render/paint.function.js"
 import { BasicTypes, ContextItem } from "../index.js"
 import { processUpdateRegularValue, RegularValue } from "../tag/update/processRegularValue.function.js"
-import { TagJsTag } from "./tagJsVar.type.js"
+import { TagJsTag } from "./TagJsTag.type.js"
 import { AttributeContextItem } from "../tag/AttributeContextItem.type.js"
 import { processSimpleAttribute } from "./processSimpleAttribute.function.js"
 import { blankHandler } from "../render/dom/blankHandler.function.js"
@@ -20,6 +20,7 @@ export function getSimpleTagVar(
   value: any,
 ): TagJsTag {
   return {
+    component: false,
     tagJsType: 'simple',
     value,
     processInitAttribute: processSimpleAttribute,
@@ -99,7 +100,7 @@ export function checkUpdateDeleteSimpleValueChange(
   contextItem: ContextItem,
 ) {
   const isBadValue = newValue === null || newValue === undefined
-  const isRegularUpdate = isBadValue || !(typeof(newValue) === BasicTypes.object)
+  const isRegularUpdate = isBadValue || !([BasicTypes.object, BasicTypes.function].includes(typeof(newValue) as any))
 
   if(isRegularUpdate) {
     // This will cause all other values to render

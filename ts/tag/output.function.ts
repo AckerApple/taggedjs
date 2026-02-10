@@ -5,6 +5,7 @@ import { syncStatesArray } from "../state/syncStates.function.js"
 import { safeRenderSupport } from "./props/safeRenderSupport.function.js"
 import { ContextStateMeta, ContextStateSupport } from "./ContextStateMeta.type.js"
 import { findStateSupportUpContext } from "../interpolations/attributes/getSupportWithState.function.js"
+import { removeContextInCycle, setContextInCycle } from "./cycles/setContextInCycle.function.js"
 
 
 /** Used to call a function that belongs to a calling tag but is not with root arguments */
@@ -36,10 +37,12 @@ export function output<CallbackReturn, ReceivedArguments extends any[]>(
   const newCallback = (...args: any[]) => {
     const ownerSupport = support.ownerSupport as AnySupport
 
-    return syncWrapCallback(
+    const result = syncWrapCallback(
       args, callback,
       ownerSupport.context, // support.context, // parentContext,
     )
+
+    return result
   }
 
   newCallback.wrapped = true
@@ -62,8 +65,11 @@ export function syncWrapCallback(
   // sync the new states to the old before the old does any processing
   syncStatesArray(newerStates, olderStates)
   */
+  setContextInCycle(context)
 
   const c = callback(...args) // call the latest callback
+
+  removeContextInCycle()
 
   // sync the old states to the new
   // syncStatesArray(olderStates, newerStates)

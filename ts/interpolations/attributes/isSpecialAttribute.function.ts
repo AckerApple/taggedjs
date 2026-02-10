@@ -1,9 +1,16 @@
-/** Looking for (class | style) followed by a period */
+/** @deprecated - this needs to be replaced with the source attribute defining itself so select.value`1` just sets itself properly
+ * Looking for (class | style) followed by a period
+*/
 export function isSpecialAttr(
-  attrName: string
+  attrName: string,
+  tagName: string // INPUT, DIV
 ) {
   if(attrName.startsWith('class.')) {
     return 'class'
+  }
+
+  if(attrName.startsWith('style.')) {
+    return 'style'
   }
 
   const specialAction = isSpecialAction(attrName)
@@ -11,8 +18,8 @@ export function isSpecialAttr(
     return specialAction
   }
 
-  if(attrName.startsWith('style.')) {
-    return 'style'
+  if(attrName === 'value' && tagName === 'SELECT') {
+    return 'value' // requires being set after put down
   }
 
   return false

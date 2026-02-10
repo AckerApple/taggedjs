@@ -18,6 +18,7 @@ export function pipe<SubValue, DEFAULT>(
   const newer = stateMeta.newer as ContextStateSupport
   */
   return {
+    component: false,
     onOutput: blankHandler, // gets set within setupSubscribe()
     tagJsType: ValueTypes.subscribe,
     

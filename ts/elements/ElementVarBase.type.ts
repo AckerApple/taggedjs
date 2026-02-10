@@ -1,6 +1,6 @@
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js'
 import { InputElementTargetEvent } from '../TagJsEvent.type'
-import { ReadOnlyVar, TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { ReadOnlyVar, TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 import { elementFunctions } from './elementFunctions.js'
 
 export type ElementVarBase = ReadOnlyVar & {
@@ -11,7 +11,7 @@ export type ElementVarBase = ReadOnlyVar & {
   elementFunctions: typeof elementFunctions,
   
   /** Children and self contexts all together */
-  contexts?: TagJsVar[]
+  contexts?: TagJsTag[]
   
   /** Just this element listeners */
   listeners: MockElmListener[]

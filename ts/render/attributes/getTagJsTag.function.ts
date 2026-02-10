@@ -3,10 +3,10 @@
 import { isObject } from '../../isInstance.js'
 
 export type TagVarIdNum = {tagJsVar: number}
-export function getTagJsVar(
+export function getTagJsTag(
   attrPart: string | TagVarIdNum | null | undefined
 ) {
-  if(isObject(attrPart) && 'tagJsVar' in (attrPart as TagVarIdNum))
+  if(isObject(attrPart) && 'TagJsTag' in (attrPart as TagVarIdNum))
     return (attrPart as TagVarIdNum).tagJsVar
   
   return -1

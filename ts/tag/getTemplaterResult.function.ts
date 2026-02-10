@@ -6,11 +6,10 @@ import { TagWrapper } from './tag.utils.js'
 import { OnDestroyCallback } from '../state/onDestroy.function.js'
 import { Subscription } from '../subject/subject.utils.js'
 import { ValueTypes } from './ValueTypes.enum.js'
-import { PropWatches } from '../tagJsVars/tag.function.js'
+import { PropWatches, TagJsComponent } from '../TagJsTags/tag.function.js'
 import { ProcessInit } from './ProcessInit.type.js'
 import { processTagInit } from './update/processTagInit.function.js'
-import { Tag } from './Tag.type.js'
-import { ProcessDelete, TagJsTag } from '../tagJsVars/tagJsVar.type.js'
+import { ProcessDelete, TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 import { checkTagValueChangeAndUpdate } from './checkTagValueChange.function.js'
 import { destroySupportByContextItem } from './destroySupportByContextItem.function.js'
 import { CheckSupportValueChange, HasValueChanged } from './Context.types.js'
@@ -58,7 +57,7 @@ export type TemplaterResult = TagJsTag & {
 
   propWatch: PropWatches
   wrapper?: Wrapper
-  tag?: Tag // StringTag | DomTag
+  tag?: TagJsComponent<any> // StringTag | DomTag
   props?: Props
 
   /** Used inside of an array.map() function */
@@ -75,6 +74,7 @@ export function getTemplaterResult(
   props?: Props,
 ) {
   const templater: TemplaterResult = {
+    component: false,
     tagJsType: ValueTypes.templater,
     processInit: processTagInit,
     processInitAttribute: blankHandler,

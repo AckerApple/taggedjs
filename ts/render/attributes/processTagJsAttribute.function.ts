@@ -4,18 +4,18 @@ import { setNonFunctionInputValue } from '../../interpolations/attributes/howToS
 import { AnySupport } from '../../tag/index.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { getNewContext } from '../addOneContext.function.js'
-import { TagVarIdNum } from './getTagJsVar.function.js'
+import { TagVarIdNum } from './getTagJsTag.function.js'
 import { removeContextInCycle, setContextInCycle } from '../../tag/cycles/setContextInCycle.function.js'
-import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 import { getSupportWithState } from '../../interpolations/attributes/getSupportWithState.function.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
 
 /** adds onto parent.contexts */
-export function processTagJsVarAttribute(
+export function processTagJsTagAttribute(
   value: string | TagVarIdNum | null | undefined,
   contexts: ContextItem[],
   parentContext: ContextItem,
-  tagJsVar: TagJsVar,
+  tagJsVar: TagJsTag,
   varIndex: number,
   support: AnySupport,
   attrName: string | TagVarIdNum,
@@ -43,7 +43,7 @@ export function processTagJsVarAttribute(
 
   tagJsVar.processInitAttribute(
     attrName as string,
-    value, // tagJsVar,
+    value, // TagJsTag,
     element,
     tagJsVar,
     contextItem,

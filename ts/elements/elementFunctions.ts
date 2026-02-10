@@ -1,13 +1,13 @@
-import { ContextItem, isFunction, isObject } from '../index.js';
+import { isFunction, isObject } from '../index.js';
 import { HowToSet, setBooleanAttribute, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js';
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
 import { getPushKid } from './htmlTag.function.js'
 import { makeAttrCallable, AttributeCallable, AttrCallableInternal } from './attributeCallables.js'
-import { AttrValue, ElementVar } from './ElementFunction.type.js';
+import { AttrValue, ElementFunction } from './ElementFunction.type.js';
 
 function callbackWrapper(
-  item: ElementVar,
+  item: ElementFunction,
   eventName: string,
   callback: (e: InputElementTargetEvent) => any
 ) {
@@ -16,7 +16,7 @@ function callbackWrapper(
 }
 
 function callbackWrapper2(
-  item: ElementVar,
+  item: ElementFunction,
   eventName: string,
   callback: (e: InputElementTargetEvent) => any
 ) {
@@ -40,9 +40,9 @@ function attr(
   bumpContentId(clone, args[1])
 
   if( isValueForContext(args[0]) ) {
-    registerMockAttrContext(args[0], clone) // the attrName is a function or TagJsVar
+    registerMockAttrContext(args[0], clone) // the attrName is a function or TagJsTag
   } else if( isValueForContext(args[1]) ) {
-    registerMockAttrContext(args[1], clone) // the attrValue is a function or TagJsVar
+    registerMockAttrContext(args[1], clone) // the attrValue is a function or TagJsTag
   }
 
   return clone
@@ -62,9 +62,9 @@ function attrs(
     bumpContentId(clone, args[1])
   
     if( isValueForContext(args[0]) ) {
-      registerMockAttrContext(args[0], clone) // the attrName is a function or TagJsVar
+      registerMockAttrContext(args[0], clone) // the attrName is a function or TagJsTag
     } else if( isValueForContext(args[1]) ) {
-      registerMockAttrContext(args[1], clone) // the attrValue is a function or TagJsVar
+      registerMockAttrContext(args[1], clone) // the attrValue is a function or TagJsTag
     }
   })
 
@@ -92,7 +92,7 @@ const cellSpacing = makeAttrCallable('cellspacing', attr)
 const border = makeAttrCallable('border', attr)
 
 function attr2(
-  item: ElementVar,
+  item: ElementFunction,
   args: [name: string | unknown, value?: any]
 ) {
   // const clone = getPushKid(item as any, item.elementFunctions)
@@ -101,9 +101,9 @@ function attr2(
   bumpContentId(item, args[1])
 
   if( isValueForContext(args[0]) ) {
-    registerMockAttrContext(args[0], item) // the attrName is a function or TagJsVar
+    registerMockAttrContext(args[0], item) // the attrName is a function or TagJsTag
   } else if( isValueForContext(args[1]) ) {
-    registerMockAttrContext(args[1], item) // the attrValue is a function or TagJsVar
+    registerMockAttrContext(args[1], item) // the attrValue is a function or TagJsTag
   }
 
   return item
@@ -203,7 +203,7 @@ export function elementFunctions(item: any) {
 }
 
 function bumpContentId(
-  item: ElementVar,
+  item: ElementFunction,
   attrValue: any,
 ) {
   let bump = 1
@@ -249,13 +249,14 @@ function setClassValue(
 /** used during updates */
 export function registerMockAttrContext(
   value: any,
-  mockElm: ElementVar,
+  mockElm: ElementFunction,
 ) {
   if(!mockElm.contexts) {
     mockElm.contexts = []
   }
 
   mockElm.contexts.push(value)
+  ++mockElm.contentId
 }
 
 export function isValueForContext(value: any) {
@@ -263,11 +264,11 @@ export function isValueForContext(value: any) {
 }
 
 function setupAttr(attrName: string, howToSet: HowToSet) {
-  return (item: ElementVar, value: any) => attr2(item, [attrName, value, false, howToSet] as any)
+  return (item: ElementFunction, value: any) => attr2(item, [attrName, value, false, howToSet] as any)
 }
 
 function makeCallback(eventName: string) {
-  return (item: ElementVar, callback: (e: InputElementTargetEvent) => any) => {
+  return (item: ElementFunction, callback: (e: InputElementTargetEvent) => any) => {
     return callbackWrapper2(item, eventName, callback)
   }
 }
@@ -312,7 +313,7 @@ const callables = {
 }
 
 export function loopObjectAttributes(
-  item: ElementVar,
+  item: ElementFunction,
   object: any,
 ) {
   const result = Object.entries(object).reduce((all, [name, value]) => {
@@ -321,7 +322,7 @@ export function loopObjectAttributes(
     }
 
     return attr2(item, [name, value, false, setNonFunctionInputValue] as any)
-  }, item) as ElementVar
+  }, item) as ElementFunction
 
   return result
 }

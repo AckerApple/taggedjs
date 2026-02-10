@@ -15,6 +15,11 @@ export function domProcessContextItem(
   contextItem.target = contextItem.target || appendTo as HTMLElement
   setContextInCycle(contextItem)
 
+  if(contextItem.inputsHandler) {
+    const props = support.propsConfig
+    contextItem.inputsHandler( props )
+  }
+
   contextItem.tagJsVar.processInit(
     value,
     contextItem,

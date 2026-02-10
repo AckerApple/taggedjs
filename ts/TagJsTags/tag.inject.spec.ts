@@ -16,7 +16,7 @@ describe('tag.inject', () => {
       return { color, title: 'parentHost' }
     })
 
-    const tagJsVar = {
+    const TagJsTag = {
       tagJsType: ValueTypes.host,
       options: {
         callback: parentHost.options.callback
@@ -26,7 +26,7 @@ describe('tag.inject', () => {
 
     const aContext = {
       isAttr: true,
-      tagJsVar: tagJsVar,
+      tagJsVar: TagJsTag,
       returnValue: { color: 'red', title: 'parentHost' }
     } as any
 

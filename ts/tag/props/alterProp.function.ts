@@ -5,11 +5,10 @@ import { SupportTagGlobal, TemplaterResult } from '../getTemplaterResult.functio
 import { isArray, isStaticTag } from '../../isInstance.js'
 import { BasicTypes } from '../ValueTypes.enum.js'
 import { setUseMemory } from '../../state/index.js'
-import { Tag } from '../Tag.type.js'
 import { Props } from '../../Props.js'
 import { UnknownFunction } from '../index.js'
 import { safeRenderSupport } from './safeRenderSupport.function.js'
-import { Subscription } from '../../index.js'
+import { Subscription, TagJsComponent } from '../../index.js'
 
 export function castProps(
   props: Props,
@@ -318,5 +317,5 @@ export function callbackPropOwner(
 }
 
 export function isSkipPropValue(value: unknown) {
-  return typeof(value)!== BasicTypes.object || !value || (value as Tag).tagJsType
+  return typeof(value)!== BasicTypes.object || !value || (value as TagJsComponent<any>).tagJsType
 }

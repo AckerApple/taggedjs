@@ -35,7 +35,7 @@ export function tagInject<T extends (...args: any[]) => any>(
       }
     }
     
-    // Check if this context has a tagJsVar with matchesInjection
+    // Check if this context has a TagJsTag with matchesInjection
     if (currentContext.tagJsVar?.matchesInjection) {
       if (currentContext.tagJsVar.matchesInjection(targetItem, currentContext)) {
         // For tag components, return the tag instance

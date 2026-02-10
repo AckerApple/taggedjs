@@ -20,7 +20,10 @@ import { tagInject } from './tagInject.function.js'
 import { onInit as tagOnInit } from '../state/onInit.function.js'
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js'
 import { onRender as tagOnRender } from '../state/onRender.function.js'
-import { getInnerHTML as tagGetInnerHTML, SupportContextItem, output as outputAlias } from '../index.js'
+import { getInnerHTML as tagGetInnerHTML, SupportContextItem, output as outputAlias, ProcessInit, AnySupport, HasValueChanged } from '../index.js'
+import { ProcessDelete, TagJsTag, TagJsTagBasics } from './TagJsTag.type.js'
+import { ProcessUpdate } from '../tag/ProcessUpdate.type.js'
+import { ProcessAttribute } from '../tag/ProcessInit.type.js'
 
 let tagCount = 0
 
@@ -72,13 +75,26 @@ function defineGetSet(name: string, eventFn: any) {
   })
 }
 
-
-/** TODO: This might be a duplicate typing of Wrapper */
-export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnType<T> & {
+type ShortTag = {
   key: KeyFunction
+  arrayValue?: any
   original?: Original
   compareTo?: string
-}) & {
+}
+
+export type TagJsComponent<T extends ToTag> = TagJsTagBasics & {
+  component: true
+  tagJsType: 'component'
+  // templater?: TemplaterResult
+  values: unknown[]
+  
+  value?: any
+
+  
+  /** The true saved innerHTML variable */
+  innerHTML?: any // Tag
+  _innerHTML?: TaggedFunction<any> // Tag // TaggedFunction<any>
+
   original: UnknownFunction
   /** Process input/argument updates. Fires at start and on updates */
   inputs: (handler: (parameters: Parameters<T>) => any) => true
@@ -88,7 +104,33 @@ export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnTy
 
   /** Process input/argument updates */
   getInnerHTML: () => true
+
+  
+
+
+  processInitAttribute: ProcessAttribute
+  processUpdate: ProcessUpdate
+  hasValueChanged: HasValueChanged
+  processInit: ProcessInit
+  destroy: ProcessDelete
+  templater?: TemplaterResult
+  ownerSupport?: AnySupport
+  debug?: boolean // Attach as () => {const h=html``;h.debug=true;return true}
+
+  /** used in array.map() */
+  key: (arrayValue: unknown) => TagJsComponent<any>
+  arrayValue?: any
+  
+  /** Used INSIDE a tag/function to signify that innerHTML is expected */
+  acceptInnerHTML: (useTagVar: TagJsTag) => TagJsComponent<any>
+  
+  /** Same as innerHTML = x */
+  setHTML: (innerHTML: any) => TagJsComponent<any>
 }
+
+// export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnType<T> & ShortTag) & TagJsComponent<T>
+// export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnType<T>) & TagJsComponent<T>
+export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => TagJsComponent<T>) & TagJsComponent<T>
 
 /** How to handle checking for prop changes aka argument changes */
 export enum PropWatches {
@@ -108,6 +150,7 @@ export function tag<T extends ToTag>(
   tagComponent: T,
   propWatch: PropWatches = PropWatches.SHALLOW, // PropWatches.DEEP,
 ): TaggedFunction<T> {
+// ): TagJsComponent<any> {
   /** function developer triggers */
   const parentWrap = function tagWrapper(
     ...props: (T | StringTag | StringTag[])[]
@@ -157,6 +200,7 @@ export function tag<T extends ToTag>(
   }
 
   returnWrap.getInnerHTML = tagGetInnerHTML as any
+  // returnWrap.tagJsType = 'component'
 
   return returnWrap
 }

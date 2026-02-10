@@ -2,7 +2,7 @@ import { StringTag } from './StringTag.type.js'
 import type { DomTag } from './DomTag.type.js'
 import { AnySupport } from './index.js'
 import { ContextItem } from '../index.js'
-import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 import { removeContextInCycle, setContextInCycle } from './cycles/setContextInCycle.function.js'
 
 export function processUpdateContext(
@@ -38,7 +38,7 @@ function processUpdateOneContext(
   const valueIndex = contextItem.valueIndex
   const newValue = values[ valueIndex ] as any
 
-  // Removed, let the tagJsVars do the checking
+  // Removed, let the TagJsTags do the checking
   // Do not continue if the value is just the same
   /*
   if(newValue === contextItem.value) {
@@ -46,11 +46,11 @@ function processUpdateOneContext(
   }
   */
 
-  const tagJsVar = contextItem.tagJsVar as TagJsVar
+  const TagJsTag = contextItem.tagJsVar as TagJsTag
   
   setContextInCycle(contextItem)
   
-  tagJsVar.processUpdate(
+  TagJsTag.processUpdate(
     newValue,
     contextItem,
     ownerSupport,

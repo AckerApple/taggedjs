@@ -101,6 +101,11 @@ export function processNonElement(
 
   setContextInCycle(newContext)
 
+  if(newContext.inputsHandler) {
+    const props = ownerSupport.propsConfig
+    newContext.inputsHandler( props )
+  }
+
   newContext.tagJsVar.processInit(
     item,
     newContext, // context, // newContext,

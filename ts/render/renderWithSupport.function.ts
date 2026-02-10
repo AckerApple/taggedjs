@@ -1,4 +1,4 @@
-import { AnySupport } from '../tag/index.js'
+import { AnySupport, TagJsComponent } from '../tag/index.js'
 import { SupportContextItem } from '../tag/SupportContextItem.type.js'
 import { moveProviders } from './update/updateExistingTagComponent.function.js'
 import { softDestroySupport } from './softDestroySupport.function.js'
@@ -7,7 +7,6 @@ import { isLikeTags } from'../tag/isLikeTags.function.js'
 import { StringTag } from '../tag/StringTag.type.js'
 import { DomTag } from '../tag/DomTag.type.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
-import { Tag } from '../tag/Tag.type.js'
 
 /** TODO: This seems to support both new and updates and should be separated? */
 export function renderWithSupport(
@@ -63,9 +62,9 @@ export function renderWithSupport(
 }
 
 function checkTagSoftDestroy(
-  tag: Tag,
+  tag: TagJsComponent<any>,
   lastSupport: AnySupport,
-  lastTag?: Tag,
+  lastTag?: TagJsComponent<any>,
 ) {
   if(tag.tagJsType === ValueTypes.dom) {
     const lastDom = (lastTag as DomTag)?.dom

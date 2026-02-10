@@ -1,6 +1,6 @@
 import { ValueTypes } from "../tag/index.js"
 import { deleteAndUnsubscribe, setupSubscribe } from "../tag/update/setupSubscribe.function.js"
-import { TagJsVar } from "./tagJsVar.type.js"
+import { TagJsTag } from "./TagJsTag.type.js"
 import { checkSubscribeValueChanged } from "./subscribeWith.function.js"
 import { processSubscribeAttribute } from "./processSubscribeAttribute.function.js"
 import { OnSubOutput } from "../tag/update/SubContext.type.js"
@@ -15,6 +15,7 @@ export function subscribe<T>(
   callback?: SubscribeCallback<T>,
 ): SubscribeValue {
   return {
+    component: false,
     onOutput: blankHandler, // gets set within setupSubscribe()
     tagJsType: ValueTypes.subscribe,
     
@@ -35,7 +36,7 @@ export function subscribe<T>(
 
 subscribe.all = subscribeAll
 
-export type SubscribeValue = TagJsVar & {
+export type SubscribeValue = TagJsTag & {
   tagJsType: typeof ValueTypes.subscribe
 
   // states: StatesSetter[]

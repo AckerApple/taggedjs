@@ -1,7 +1,8 @@
 import { htmlTag } from './htmlTag.function.js'
 export type { Attributes } from './htmlTag.function.js'
-export type { ElementVar } from './ElementFunction.type.js'
+export type { TagChildContent, HtmlItem, ToHtmlItem, ElementFunction } from './ElementFunction.type.js'
 export { htmlTag }
+export type { CombinedElementFunctions } from './ElementFunction.type.js'
 export { noElement } from './noElement.function.js'
 export { elementVarToHtmlString } from './elementVarToHtmlString.function.js'
 
@@ -58,10 +59,12 @@ export const th = htmlTag('th')
 export const thead = htmlTag('thead')
 export const tbody = htmlTag('tbody')
 export const tfoot = htmlTag('tfoot')
+export const iframe = htmlTag('iframe')
 
 // INLINE ELEMENTS
 
 export const a = htmlTag('a')
+export const u = htmlTag('u')
 export const img = htmlTag('img')
 export const br = htmlTag('br')
 export const label = htmlTag('label')
@@ -84,3 +87,6 @@ export const svg = htmlTag('svg')
 export const path = htmlTag('path')
 export const polygon = htmlTag('polygon')
 export const rect = htmlTag('rect')
+
+export const details = htmlTag('details')
+export const summary = htmlTag('summary')

@@ -6,7 +6,7 @@ import { AnySupport } from '../../tag/index.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { isSpecialAttr } from '../../interpolations/attributes/isSpecialAttribute.function.js'
 import { isNoDisplayValue } from './isNoDisplayValue.function.js'
-import { HostValue } from '../../tagJsVars/host.function.js'
+import { HostValue } from '../../TagJsTags/host.function.js'
 import { processAttribute } from './processAttribute.function.js'
 
 // single/stand alone attributes
@@ -28,7 +28,7 @@ export function processStandAloneAttribute(
   // process an object of attributes ${{class:'something, checked:true}}
   if(typeof attrValue === BasicTypes.object) {
     for (const name in (attrValue as any)) {
-      const isSpecial = isSpecialAttr(name) // only object variables are evaluated for is special attr
+      const isSpecial = isSpecialAttr(name, element.tagName) // only object variables are evaluated for is special attr
       const value = (attrValue as any)[name]
       const howToSet: HowToSet = setNonFunctionInputValue
 

@@ -3,7 +3,7 @@ import { ContextItem } from '../ContextItem.type.js'
 import { updateToDiffValue } from './updateToDiffValue.function.js'
 import { AnySupport } from '../index.js'
 import { TemplateValue } from '../TemplateValue.type.js'
-import { TagJsTag } from '../../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 
 /** Used for all tag value updates. Determines if value changed since last render */
 export function forceUpdateExistingValue(
@@ -12,8 +12,8 @@ export function forceUpdateExistingValue(
   ownerSupport: AnySupport,
 ): number {
   // Have the context check itself (avoid having to detect old value)
-  const tagJsVar = contextItem.tagJsVar as TagJsTag
-  const ignoreOrDestroyed = tagJsVar.hasValueChanged(
+  const TagJsTag = contextItem.tagJsVar as TagJsTag
+  const ignoreOrDestroyed = TagJsTag.hasValueChanged(
     newValue,
     contextItem as unknown as SupportContextItem,
     ownerSupport,

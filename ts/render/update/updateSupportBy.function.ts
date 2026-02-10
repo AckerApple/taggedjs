@@ -1,9 +1,8 @@
 import { paint, painting } from '../paint.function.js'
 import { processUpdateContext } from '../../tag/processUpdateContext.function.js'
 import type { DomTag } from '../../tag/DomTag.type.js'
-import type { Tag } from '../../tag/Tag.type.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
-import { AnySupport } from '../../tag/index.js'
+import { AnySupport, TagJsComponent } from '../../tag/index.js'
 
 export function updateSupportBy(
   olderSupport: AnySupport,
@@ -27,8 +26,8 @@ function updateSupportValuesBy(
   olderSupport: AnySupport,
   newerSupport: AnySupport,
 ) {
-  const newTemplate = newerSupport.templater as unknown as Tag
-  const tempTag = newerSupport.templater.tag as Tag
+  const newTemplate = newerSupport.templater as unknown as TagJsComponent<any>
+  const tempTag = newerSupport.templater.tag as TagJsComponent<any>
   const values = newTemplate.values || tempTag.values
   
   const tag = olderSupport.templater.tag as DomTag

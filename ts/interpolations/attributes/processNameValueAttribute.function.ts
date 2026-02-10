@@ -4,7 +4,7 @@ import { TagGlobal } from '../../tag/getTemplaterResult.function.js'
 import { SpecialDefinition } from '../../render/attributes/Special.types.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { AnySupport } from '../../tag/index.js'
-import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
 import { processFunctionAttr } from './processFunctionAttr.function.js'
 
@@ -44,7 +44,7 @@ export function processDynamicNameValueAttribute(
 
 function processTagJsAttribute(
   name: string,
-  value: TagJsVar,
+  value: TagJsTag,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
   element: Element,
@@ -84,7 +84,7 @@ export function processNonDynamicAttr(
     return specialAttribute(
       attrName,
       value,
-      element,
+      element as HTMLElement,
       isSpecial,
     )
   }

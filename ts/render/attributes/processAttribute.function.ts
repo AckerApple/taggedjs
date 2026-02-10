@@ -13,14 +13,14 @@ import { getNewContext } from '../addOneContext.function.js'
 import { processAttributeFunction } from '../../interpolations/attributes/processAttributeCallback.function.js'
 import { processUpdateAttrContext } from './processUpdateAttrContext.function.js'
 import { createDynamicArrayAttribute, createDynamicAttribute } from './createDynamicAttribute.function.js'
-import { getTagJsVar, TagVarIdNum } from './getTagJsVar.function.js'
+import { getTagJsTag, TagVarIdNum } from './getTagJsTag.function.js'
 import { NoDisplayValue } from './NoDisplayValue.type.js'
 import { SpecialDefinition } from './Special.types.js'
-import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 import { TemplateValue } from '../../index.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
 import { processStandAloneAttribute } from './processStandAloneAttribute.function.js'
-import { processTagJsVarAttribute } from './processTagJsAttribute.function.js'
+import { processTagJsTagAttribute } from './processTagJsAttribute.function.js'
 
 /** MAIN FUNCTION. Sets attribute value, subscribes to value updates  */
 export function processAttribute(
@@ -34,22 +34,22 @@ export function processAttribute(
   parentContext: ContextItem,
   isSpecial: SpecialDefinition,
 ): ContextItem | ContextItem[] | void {
-  const varIndex = getTagJsVar(attrName)
+  const varIndex = getTagJsTag(attrName)
   let isNameVar = varIndex >= 0 || (value === undefined && typeof(attrName) !== 'string')
   let valueInValues = values[ varIndex ] as TemplateValue
 
   // value or name from bolt?
   if ((value as any)?.tagJsType) {
-    valueInValues = value as any // the value is a tagJsVar
+    valueInValues = value as any // the value is a TagJsTag
   } else if ((attrName as any)?.tagJsType) {
     isNameVar = true
-    valueInValues = attrName as any // the name is a tagJsVar
+    valueInValues = attrName as any // the name is a TagJsTag
     value = attrName
   }
 
-  const tagJsVar = valueInValues as TagJsVar | undefined
+  const tagJsVar = valueInValues as TagJsTag | undefined
   if( tagJsVar?.tagJsType ) {
-    return processTagJsVarAttribute(
+    return processTagJsTagAttribute(
       value,
       [], // contexts,
       parentContext,
@@ -81,8 +81,8 @@ export function processAttribute(
     contextItem.isNameOnly = true
     contextItem.howToSet = howToSet
 
-    const tagJsVar = contextItem.tagJsVar
-    tagJsVar.processUpdate = processUpdateAttrContext
+    const TagJsTag = contextItem.tagJsVar
+    TagJsTag.processUpdate = processUpdateAttrContext
 
     // single/stand alone attributes
     const aloneResult = processStandAloneAttribute(
@@ -114,7 +114,7 @@ export function processAttribute(
     )
   }
 
-  const valueVar = getTagJsVar(value)
+  const valueVar = getTagJsTag(value)
   if(valueVar >= 0) {
     const value = values[valueVar]
     return createDynamicAttribute(
@@ -256,8 +256,8 @@ export function processTagCallbackFun(
   // tag has state and will need all functions wrapped to cause re-renders
   newAttrValue = bindSubjectCallback(newAttrValue, support)
 
-  // const tagJsVar = subject.tagJsVar // = valueToTagJsVar(newAttrValue)
-  // tagJsVar.processUpdate = processUpdateAttrContext
+  // const TagJsTag = subject.tagJsVar // = valueToTagJsVar(newAttrValue)
+  // TagJsTag.processUpdate = processUpdateAttrContext
 
   return processAttributeFunction(element, newAttrValue, support, attrName)
 }

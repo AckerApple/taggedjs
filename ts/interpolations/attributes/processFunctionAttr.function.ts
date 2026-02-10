@@ -2,7 +2,7 @@ import { HowToSet } from './howToSetInputValue.function.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { BaseContextItem } from '../../tag/ContextItem.type.js'
 import { AnySupport } from '../../tag/index.js'
-import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 import { blankHandler } from '../../render/dom/blankHandler.function.js'
 import { Subject, valueToTagJsVar } from '../../index.js'
 
@@ -16,13 +16,14 @@ export function processFunctionAttr(
 ) {
   const innerValue = (value as any)()
 
-  const tagJsVarOverride: TagJsVar = {
+  const TagJsTagOverride: TagJsTag = {
+    component: false,
     tagJsType: 'dynamic-attr',
 
     matchesInjection: (inject: any) => {
-      const tagJsVar = subContext.tagJsVar
-      if( tagJsVar.matchesInjection ) {
-        const rtn = tagJsVar.matchesInjection(inject, subContext)
+      const TagJsTag = subContext.tagJsVar
+      if( TagJsTag.matchesInjection ) {
+        const rtn = TagJsTag.matchesInjection(inject, subContext)
         return rtn
       }
     },
@@ -57,10 +58,10 @@ export function processFunctionAttr(
 
       const newValue = (value as any)()
       // const oldValue = subContext.value
-      // const newTagJsVar = valueToTagJsVar(newValue)
+      // const newTagJsTag = valueToTagJsVar(newValue)
 
       subContext.tagJsVar.processUpdate(
-        newValue, // newTagJsVar as any,
+        newValue, // newTagJsTag as any,
         subContext,
         ownerSupport,
         values
@@ -83,6 +84,7 @@ export function processFunctionAttr(
     withinOwnerElement: true,
     destroy$: new Subject(),
     render$: new Subject(),
+    // paintCommands: [],
   }
 
   const contextItem: BaseContextItem = {
@@ -92,13 +94,14 @@ export function processFunctionAttr(
     target: element,
     parentContext,
     value,
-    tagJsVar: tagJsVarOverride,
+    tagJsVar: TagJsTagOverride,
 
     // TODO: Not needed
     valueIndex: -1,
     withinOwnerElement: true,
     destroy$: new Subject(),
     render$: new Subject(),
+    // paintCommands: [],
   }
 
   subContext.tagJsVar.processInitAttribute(

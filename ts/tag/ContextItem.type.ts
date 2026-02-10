@@ -2,7 +2,7 @@ import { Clone, TagGlobal } from './getTemplaterResult.function.js'
 import { SubContext } from './update/SubContext.type.js'
 import { PaintCommand } from '../render/paint.function.js'
 import { Events, LastArrayItem, Subject } from '../index.js'
-import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 import { ContextStateMeta } from './ContextStateMeta.type.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 
@@ -12,7 +12,7 @@ export interface AppContextItem {
   value?: any,
 
   /** Not updated automatically. processUpdate has the option to set this value */
-  tagJsVar: TagJsVar
+  tagJsVar: TagJsTag
   updateCount: number
 
   returnValue?: any // used when value results in a return value
@@ -24,7 +24,7 @@ export interface AppContextItem {
   valueIndex: number
 
   /** TODO: is this deprecated? */
-  oldTagJsVar?: TagJsVar  
+  oldTagJsVar?: TagJsTag  
 
   // subscribe() and innerHTML
   subContext?: SubContext 
@@ -33,6 +33,7 @@ export interface AppContextItem {
   withinOwnerElement: boolean  
 
   destroy$: Subject<void> // not present on non-tags
+  /** emits during update cycle (before paint() flush) so tag.onRender/watch hooks can run */
   render$: Subject<void> // not present on non-tags
 
   // only appears on app
@@ -62,6 +63,7 @@ export interface ContextItem extends BaseContextItem {
   
   // used only for strings, numbers, booleans
   simpleValueElm?: Clone
+  /** pending paint command for simple/regular values before the DOM node is committed */
   paint?: PaintCommand
 
   // array only
@@ -73,4 +75,9 @@ export interface ContextItem extends BaseContextItem {
 
   // ELEMENTS
   placeholder?: Text // when insertBefore is taken up, the last element becomes or understanding of where to redraw to
+}
+
+export type ElementContext = ContextItem & {
+  /** paint commands queued for this context's element work */
+  paintCommands?: PaintCommand[]
 }

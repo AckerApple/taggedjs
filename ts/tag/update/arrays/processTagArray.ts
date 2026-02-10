@@ -4,16 +4,15 @@ import { TemplaterResult } from '../../getTemplaterResult.function.js'
 import { tagValueUpdateHandler } from '../tagValueUpdateHandler.function.js'
 import { LastArrayItem } from '../../Context.types.js'
 import { compareArrayItems } from './compareArrayItems.function.js'
-import { AnySupport } from '../../index.js'
+import { AnySupport, TagJsComponent } from '../../index.js'
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
 import { TemplateValue } from '../../TemplateValue.type.js'
-import { Tag } from '../../Tag.type.js'
 import { ContextItem } from '../../ContextItem.type.js'
-import { TagJsVar } from '../../../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../../../TagJsTags/TagJsTag.type.js'
 
 export function processTagArray(
   contextItem: ContextItem,
-  value: (TemplaterResult | Tag)[], // arry of Tag classes
+  value: (TemplaterResult | TagJsComponent<any>)[], // arry of Tag classes
   ownerSupport: AnySupport,
   appendTo?: Element,
 ) {
@@ -163,7 +162,7 @@ function reviewPreviousArrayItem(
 }
 
 export function castArrayItem(item: any) {
-  const isBasicFun = typeof item === 'function' && (item as any as TagJsVar).tagJsType === undefined
+  const isBasicFun = typeof item === 'function' && (item as any as TagJsTag).tagJsType === undefined
   if( isBasicFun ) {
     const fun = (item as any)
     item = fun()

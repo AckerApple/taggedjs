@@ -1,11 +1,12 @@
 import { paintAfters, paintContent } from "../../render/paint.function.js"
 import { SpecialDefinition } from "../../render/attributes/Special.types.js";
+import { setNonFunctionInputValue } from "./howToSetInputValue.function.js";
 
 /** handles autofocus, autoselect, style., class. */
 export function specialAttribute(
   name: string,
   value: any,
-  element: Element,
+  element: HTMLElement,
   specialName: SpecialDefinition,
 ) {
   switch (specialName) {
@@ -26,6 +27,14 @@ export function specialAttribute(
 
     case 'class':
       processSpecialClass(name, value, element)
+      return
+
+    case 'value':
+      setNonFunctionInputValue(element, name, value)
+      paintAfters.push([(element: HTMLInputElement) => {
+        element.value = value as string
+      }, [element]])
+
       return
   }
 

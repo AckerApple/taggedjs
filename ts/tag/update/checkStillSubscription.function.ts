@@ -1,4 +1,4 @@
-import { SubscribeValue } from '../../tagJsVars/subscribe.function.js'
+import { SubscribeValue } from '../../TagJsTags/subscribe.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { AnySupport } from '../index.js'
 import { SubscriptionContext } from './SubContext.type.js'

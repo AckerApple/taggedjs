@@ -1,5 +1,5 @@
 import { isSubjectInstance } from '../isInstance.js'
-import { LikeObservable } from '../tagJsVars/processSubscribeWithAttribute.function.js'
+import { LikeObservable } from '../TagJsTags/processSubscribeWithAttribute.function.js'
 import { combineLatest } from './combineLatest.function.js'
 import { UnaryFunction as OperatorFunction, SubjectSubscriber, Subscription, getSubscription, runPipedMethods } from './subject.utils.js'
 

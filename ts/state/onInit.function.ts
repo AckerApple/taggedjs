@@ -1,6 +1,6 @@
 import { checkToResolvePromise } from '../interpolations/attributes/checkToResolvePromise.function.js'
 import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
-import { tag } from '../tagJsVars/tag.function.js'
+import { tag } from '../TagJsTags/tag.function.js'
 import { state } from './state.function.js'
 
 export type OnInitCallback = () => unknown

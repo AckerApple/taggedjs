@@ -1,4 +1,4 @@
-import { SubscribeValue } from '../../tagJsVars/subscribe.function.js'
+import { SubscribeValue } from '../../TagJsTags/subscribe.function.js'
 import { setupSubscribe } from './setupSubscribe.function.js'
 import { SignalObject } from '../../state/signal.function.js'
 import { AnySupport } from '../index.js'

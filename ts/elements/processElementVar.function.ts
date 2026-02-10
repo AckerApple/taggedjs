@@ -1,4 +1,4 @@
-import { AnySupport, ElementVar, isPromise } from '../index.js'
+import { AnySupport, isPromise } from '../index.js'
 import { addSupportEventListener } from '../interpolations/attributes/addSupportEventListener.function.js'
 import { afterTagCallback } from '../interpolations/attributes/bindSubjectCallback.function.js'
 import { getSupportWithState } from '../interpolations/attributes/getSupportWithState.function.js'
@@ -6,13 +6,15 @@ import { isSpecialAttr } from '../interpolations/attributes/isSpecialAttribute.f
 import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArray.function.js'
 import { processAttributeArray } from '../render/dom/processAttributeArray.function.js'
 import { paint, paintAppend, painting } from '../render/paint.function.js'
+import { removeContextInCycle, setContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
 import { ContextItem } from '../tag/index.js'
+import { ElementFunction } from './ElementFunction.type.js'
 import { MockElmListener } from './ElementVarBase.type.js'
 import { processChildren } from './processChildren.function.js'
 
 /** The first and recursive processor for elements */
 export function processElementVar(
-  value: ElementVar,
+  value: ElementFunction,
   context: ContextItem,
   ownerSupport: AnySupport,
   _addedContexts: ContextItem[],
@@ -27,7 +29,7 @@ export function processElementVar(
       return
     }
 
-    x[2] = isSpecialAttr(name)
+    x[2] = isSpecialAttr(name, element.tagName)
   })
 
   processAttributeArray(
@@ -39,11 +41,7 @@ export function processElementVar(
     // context.contexts as ContextItem[], // addedContexts,
   )
 
-  /*
-  value.listeners.forEach((listener, index) => 
-    registerListener(value, index, ownerSupport, listener, element)
-  )*/
-
+  /* process children BEFORE attributes for  `<select value="1">` to work */
   processChildren(
     value.innerHTML,
     context, // parentContext
@@ -60,7 +58,7 @@ export function processElementVar(
 }
 
 function registerListener(
-  value: ElementVar,
+  value: ElementFunction,
   index: number,
   ownerSupport: AnySupport,
   listener: MockElmListener,
@@ -74,11 +72,13 @@ function registerListener(
 
     stateSupport.context.locked = 1
     ++painting.locks
+    setContextInCycle(stateSupport.context)
 
     const result = (toCall as any)(...args)
 
     --painting.locks
     delete stateSupport.context.locked
+    removeContextInCycle()
 
     const needsRender = updateCount === stateSupport.context.updateCount
 

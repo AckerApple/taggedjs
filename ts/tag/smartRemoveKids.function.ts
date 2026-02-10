@@ -3,7 +3,7 @@ import { destroyArray } from './destroyArrayContext.function.js'
 import { addPaintRemover } from '../render/paint.function.js'
 import { ContextItem } from './ContextItem.type.js'
 import { SupportTagGlobal } from './getTemplaterResult.function.js'
-import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 import { AnySupport, SupportContextItem } from './index.js'
 import { destroyHtmlDomMeta } from './destroyHtmlDomMeta.function.js'
 import { isPromise } from '../index.js'
@@ -16,10 +16,6 @@ export function smartRemoveKids(
   const subContexts = context.contexts
 
   smartRemoveByContext(subContexts, allPromises)
-  destroyContextHtml(context)
-}
-
-export function destroyContextHtml(context: ContextItem) {
   destroyHtmlDomMeta(context.htmlDomMeta as DomObjectChildren)
 }
 
@@ -29,11 +25,11 @@ function smartRemoveByContext(
 ) {
   for (const context of contexts) {
     if(context.withinOwnerElement) {
-      const tagJsVar = context.tagJsVar as TagJsVar
+      const TagJsTag = context.tagJsVar as TagJsTag
       
-      if( tagJsVar && tagJsVar.tagJsType === 'host' ) {
+      if( TagJsTag && TagJsTag.tagJsType === 'host' ) {
         const newest = (context as any).supportOwner as AnySupport
-        const hostDestroy = tagJsVar.destroy(context, newest)
+        const hostDestroy = TagJsTag.destroy(context, newest)
 
         if( isPromise(hostDestroy) ) {
           allPromises.push(hostDestroy)

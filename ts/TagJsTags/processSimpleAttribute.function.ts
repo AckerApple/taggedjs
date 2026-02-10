@@ -5,14 +5,14 @@ import { processNonDynamicAttr } from "../interpolations/attributes/processNameV
 import { AttributeContextItem } from "../tag/AttributeContextItem.type.js";
 import { checkSimpleValueChange, deleteSimpleAttribute } from "./getSimpleTagVar.function.js";
 import { processAttributeUpdate } from "./processAttributeUpdate.function.js";
-import { TagJsVar } from "./tagJsVar.type.js";
+import { TagJsTag } from "./TagJsTag.type.js";
 
 /** init runner */
 export function processSimpleAttribute(
   name: string,
   value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   element: HTMLElement,
-  tagJsVar: TagJsVar,
+  tagJsVar: TagJsTag,
   contextItem: AttributeContextItem,
   _ownerSupport: AnySupport,
   howToSet: HowToSet,
@@ -35,7 +35,7 @@ export function processSimpleAttribute(
     )
   }
 
-  const isSpecial = isSpecialAttr(name)
+  const isSpecial = isSpecialAttr(name, element.tagName)
   processNonDynamicAttr(
     name,
     value,

@@ -1,4 +1,4 @@
-import { AnySupport, ElementVar } from '../index.js'
+import { AnySupport, ElementFunction } from '../index.js'
 import { paint, paintBefore, painting } from '../render/paint.function.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
@@ -14,8 +14,9 @@ import { ElementVarBase } from './ElementVarBase.type.js'
 /** used when you do NOT have a root element returned for your function */
 export const noElement = noElementMaker()
 
-export function noElementMaker(): ElementVar {
+export function noElementMaker(): ElementFunction {
   const element: ElementVarBase = {
+    component: false,
     tagJsType: 'element',
 
     processInitAttribute: blankHandler, // its never an attribute
@@ -39,11 +40,11 @@ export function noElementMaker(): ElementVar {
   const pushKid = getPushKid(element, elementFunctions)
   pushKid.tagName = 'no-element'
   
-  return pushKid as ElementVar
+  return pushKid as ElementFunction
 }
 
 function processNoElmInit(
-  value: ElementVar,
+  value: ElementFunction,
   context: ContextItem,
   ownerSupport: AnySupport,
   insertBefore?: Text,

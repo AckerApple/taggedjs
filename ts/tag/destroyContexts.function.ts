@@ -5,7 +5,7 @@ import { runBeforeDestroy } from './tagRunner.js'
 import { AnySupport } from './index.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { ContextItem, SupportContextItem } from '../index.js'
-import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 
 export function destroyContexts(
   childTags: ContextItem[],
@@ -20,7 +20,7 @@ export function destroyContexts(
       continue
     }
 
-    const childValue = child.value as TagJsVar | undefined
+    const childValue = child.value as TagJsTag | undefined
     if(childValue?.tagJsType === ValueTypes.subscribe) {
       childValue.destroy(child, ownerSupport)
       child.deleted = true

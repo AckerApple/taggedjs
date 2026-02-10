@@ -1,5 +1,5 @@
 import { AnySupport } from "../tag/AnySupport.type.js"
-import { TagJsVar } from "./tagJsVar.type.js"
+import { TagJsTag } from "./TagJsTag.type.js"
 import { AttributeContextItem } from "../tag/AttributeContextItem.type.js"
 import { processSubscribeAttribute } from "./processSubscribeAttribute.function.js"
 import {  SubContext, SubscriptionContext } from "../tag/update/SubContext.type.js"
@@ -23,7 +23,7 @@ export function processSubscribeWithAttribute(
   name: string,
   value: SubscribeValue, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   element: HTMLElement,
-  _tagJsVar: TagJsVar, // its the same as the value
+  _tagJsVar: TagJsTag, // its the same as the value
   contextItem: AttributeContextItem,
   ownerSupport: AnySupport,
 ) {
@@ -45,8 +45,8 @@ export function emitSubScriptionAsIs(
   value: SubscribeValue,
   subContext: SubContext,
 ) {
-    const tagJsVar = subContext.tagJsVar as SubscribeValue
-    const onOutput = tagJsVar.onOutput // value.onOutput
+    const TagJsTag = subContext.tagJsVar as SubscribeValue
+    const onOutput = TagJsTag.onOutput // value.onOutput
     const observables = value.Observables
     let obValue = (observables[0] as any)?.value || value.withDefault
     // subContext.hasEmitted = true

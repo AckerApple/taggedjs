@@ -45,6 +45,7 @@ export function tagFakeTemplater(
 
 export function getFakeTemplater() {
   const fake = {
+    component: false,
     tagJsType: ValueTypes.templater,
     processInitAttribute: blankHandler,
     processInit: processTagInit,

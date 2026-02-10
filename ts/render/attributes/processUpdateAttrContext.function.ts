@@ -4,7 +4,7 @@ import { processAttributeEmit } from './processAttribute.function.js'
 import { HowToSet, setNonFunctionInputValue } from '../../interpolations/attributes/howToSetInputValue.function.js'
 import { updateNameOnlyAttrValue } from '../../interpolations/attributes/updateNameOnlyAttrValue.function.js'
 import { TemplateValue } from '../../tag/TemplateValue.type.js'
-import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
 import { SupportContextItem } from '../../index.js'
 import { removeContextInCycle, setContextInCycle } from '../../tag/cycles/setContextInCycle.function.js'
@@ -17,10 +17,10 @@ export function processUpdateAttrContext(
   values: unknown[],
 ) {
   const attrContextItem = contextItem as any as AttributeContextItem    
-  const tagValue = value as TagJsVar | undefined
+  const tagValue = value as TagJsTag | undefined
 
   if( tagValue?.tagJsType ) {
-    const oldValue = contextItem.value as TagJsVar
+    const oldValue = contextItem.value as TagJsTag
     
     // its now a tagVar value but before was not
     if(!oldValue?.tagJsType) {

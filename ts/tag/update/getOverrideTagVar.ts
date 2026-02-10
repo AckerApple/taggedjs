@@ -1,12 +1,13 @@
 import { SupportContextItem, AnySupport, isPromise } from '../../index.js';
 import { paint } from '../../render/index.js';
 import { blankHandler } from '../../render/dom/blankHandler.function.js';
-import { ReadOnlyVar, TagJsVar } from '../../tagJsVars/tagJsVar.type.js';
+import { ReadOnlyVar, TagJsTag } from '../../TagJsTags/TagJsTag.type.js';
 import { checkTagValueChange } from '../checkTagValueChange.function.js';
-import { ContextItem } from '../ContextItem.type.js';
+import { ContextItem, ElementContext } from '../ContextItem.type.js';
 import { TemplateValue } from '../TemplateValue.type.js';
 import { makeRealUpdate, afterDestroy } from './processFirstSubjectComponent.function.js';
 import { updateToDiffValue } from './updateToDiffValue.function.js';
+import { paintAfters } from '../../render/paint.function.js';
 
 /** Used when a tag() does not return html`` */
 
@@ -18,6 +19,7 @@ export function getOverrideTagVar(
 ): ReadOnlyVar {
   // support.context = subject as SupportContextItem
   const overrideTagVar: ReadOnlyVar = {
+    component: false,
     tagJsType: 'tag-conversion',
 
     // processInitAttribute: newContext.tagJsVar.processInitAttribute,
@@ -28,6 +30,19 @@ export function getOverrideTagVar(
       _contextItem: ContextItem,
       _ownerSupport: AnySupport
     ) => {
+      if(context.inputsHandler) {
+        const props = support.propsConfig
+        context.inputsHandler( props )
+      }
+      if(newContext.inputsHandler) {
+        const props = support.propsConfig
+        newContext.inputsHandler( props )
+      }
+      if(_contextItem.inputsHandler) {
+        const props = support.propsConfig
+        _contextItem.inputsHandler( props )
+      }
+
       const renderContent = context.returnValue
       return newContext.tagJsVar.processInit(
         renderContent,
@@ -38,7 +53,7 @@ export function getOverrideTagVar(
     },
     processUpdate: (
       value: TemplateValue,
-      context: ContextItem,
+      context: ElementContext,
       ownerSupport: AnySupport
     ) => {
       if (context.locked || context.deleted) {
@@ -49,7 +64,7 @@ export function getOverrideTagVar(
 
       const oldValue = context.value;
       const oldType = oldValue.tagJsType;
-      const newType = (value as TagJsVar)?.tagJsType;
+      const newType = (value as TagJsTag)?.tagJsType;
       const hasTypeChanged = newType !== oldType;
       const hasChanged = checkTagValueChange(value, context);
 

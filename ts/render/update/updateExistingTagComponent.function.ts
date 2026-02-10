@@ -7,12 +7,12 @@ import { ValueTypes } from '../../tag/ValueTypes.enum.js'
 import { destroySupport } from '../destroySupport.function.js'
 import { getNewGlobal } from '../../tag/update/getNewGlobal.function.js'
 import { isLikeTags } from'../../tag/isLikeTags.function.js'
-import { PropWatches } from '../../tagJsVars/tag.function.js'
+import { PropWatches } from '../../TagJsTags/tag.function.js'
 import { Props } from '../../Props.js'
 import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.function.js'
 import { AnySupport } from '../../tag/index.js'
 import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
-import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 
 export function updateExistingTagComponent(
   ownerSupport: AnySupport,
@@ -166,7 +166,7 @@ function swapTags(
   destroySupport(oldestSupport, global)
   getNewGlobal(contextItem)
 
-  const t = templater as TagJsVar
+  const t = templater as TagJsTag
 
   t.processInit(
     templater,

@@ -5,21 +5,21 @@ import { AttributeContextItem } from "../tag/AttributeContextItem.type.js";
 import { unsubscribeContext, checkToPaint, setupSubscribeCallbackProcessor } from "../tag/update/setupSubscribe.function.js";
 import { processAttributeUpdate } from "./processAttributeUpdate.function.js";
 import { SubscribeValue } from "./subscribe.function.js";
-import { TagJsVar } from "./tagJsVar.type.js";
+import { TagJsTag } from "./TagJsTag.type.js";
 
 
 export function processSubscribeAttribute(
   name: string,
   value: SubscribeValue, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   element: Element,
-  _tagJsVar: TagJsVar, // same as value
+  _tagJsVar: TagJsTag, // same as value
   contextItem: AttributeContextItem,
   ownerSupport: AnySupport
 ) {
   // change how the delete occurs
   value.destroy = unsubscribeContext
 
-  const isSpecial = isSpecialAttr(name)
+  const isSpecial = isSpecialAttr(name, element.tagName)
   const onOutput = function onSubValue(
     callbackValue: TemplateValue,
     syncRun: boolean

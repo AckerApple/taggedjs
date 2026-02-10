@@ -1,5 +1,5 @@
 import { isObject } from "../../index.js"
-import { paintContent } from "../../render/paint.function.js"
+import { paintAfters, paintContent } from "../../render/paint.function.js"
 
 export type HowToSet = (
   element: HTMLElement,
@@ -43,6 +43,7 @@ function howToSetInputObjectValue(
   }
 }
 
+/* used for <input checked /> */
 export function howToSetStandAloneAttr(
   element: HTMLElement,
   name: string,
@@ -94,7 +95,11 @@ export function setSimpleAttribute(
   }
 
   element.setAttribute(name, value as string)
-
+  /*
+  paintAfters.push([(element: HTMLInputElement) => {
+    element.value = value as string
+  }, [element]])
+  */
 }
 
 function setPropertyValue(

@@ -18,6 +18,7 @@ export default function callbackStateUpdate<T>(
   const maybePromise = callback(...args as [any,any,any,any,any,any])
 
   const newestSupport = findStateSupportUpContext(context)
+  
   // TODO: This if may not be ever doing anything
   if(!newestSupport) {
     return maybePromise

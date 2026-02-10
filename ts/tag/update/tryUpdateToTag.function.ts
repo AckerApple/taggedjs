@@ -6,7 +6,7 @@ import { isTagComponent } from '../../isInstance.js'
 import { getNewGlobal } from './getNewGlobal.function.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { handleStillTag } from './handleStillTag.function.js'
-import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 import { updateExistingTagComponent } from '../../render/update/updateExistingTagComponent.function.js'
 import { createSupport } from '../createSupport.function.js'
 
@@ -59,7 +59,12 @@ export function tryUpdateToTag(
     }
   }
 
-  ;(newValue as TagJsVar).processInit(
+  if(contextItem.inputsHandler) {
+    const props = ownerSupport.propsConfig
+    contextItem.inputsHandler( props )
+  }
+
+  ;(newValue as TagJsTag).processInit(
     newValue,
     contextItem,
     ownerSupport,
@@ -80,7 +85,12 @@ function prepareUpdateToComponent(
 ): void {
   // When last value was not a component
   if(!contextItem.state.newest) {
-    ;(templater as TagJsVar).processInit(
+    if(contextItem.inputsHandler) {
+      const props = ownerSupport.propsConfig
+      contextItem.inputsHandler( props )
+    }
+
+    ;(templater as TagJsTag).processInit(
       templater,
       contextItem,
       ownerSupport,

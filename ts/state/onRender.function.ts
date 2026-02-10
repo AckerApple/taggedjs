@@ -1,6 +1,6 @@
 import { getContextInCycle, removeContextInCycle, setContextInCycle } from "../tag/cycles/setContextInCycle.function.js"
 import { ContextItem } from "../tag/ContextItem.type.js"
-import { tag } from "../tagJsVars/tag.function.js"
+import { tag } from "../TagJsTags/tag.function.js"
 
 export function onRender<T>(
   callback: () => T
@@ -23,7 +23,9 @@ export function onRender<T>(
     
     return result
   }
-  const subscription = context.render$.subscribe(() => callbackWrap())
+  const subscription = context.render$.subscribe(() => {
+    callbackWrap()
+  })
 
   const result = callbackWrap()
 

@@ -1,13 +1,13 @@
 import { InputElementTargetEvent } from '../index.js'
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
-import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 import { elementFunctions, isValueForContext, loopObjectAttributes } from './elementFunctions.js'
 import { elementVarToHtmlString } from './elementVarToHtmlString.function.js'
 import { destroyDesignElement } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
 import { processDesignElementInit } from './processDesignElementInit.function.js'
-import { ElementVar } from './ElementFunction.type.js'
+import { ElementFunction } from './ElementFunction.type.js'
 import { ElementVarBase } from './ElementVarBase.type.js'
 
 export type TruthyVar = number | string | boolean | ((_: InputElementTargetEvent) => string | boolean | number)
@@ -34,16 +34,17 @@ export type Attributes = {
   // These maybe duplicate attribute typings
   class?: string | object | ((_: InputElementTargetEvent) => string | object)
   style?: string | object | ((_: InputElementTargetEvent) => string | object)
-  attr?: string | object | TagJsVar | void | undefined | ((_: InputElementTargetEvent) => any)
+  attr?: string | object | TagJsTag | void | undefined | ((_: InputElementTargetEvent) => any)
 } & {
-  [attrName: string]: object | string | boolean | number | TagJsVar | undefined | void | ((_: InputElementTargetEvent) => any)
+  [attrName: string]: object | string | boolean | number | TagJsTag | undefined | void | ((_: InputElementTargetEvent) => any)
 }
 
 export function htmlTag(
   tagName: string, // div | button
   // elementFunctions: T,
-): ElementVar {
+): ElementFunction {
   const element: ElementVarBase = {
+    component: false,
     tagJsType: 'element',
 
     processInitAttribute: blankHandler,
@@ -65,15 +66,15 @@ export function htmlTag(
   const pushKid = getPushKid(element, elementFunctions)
   pushKid.tagName = tagName
   
-  return pushKid as ElementVar
+  return pushKid
 }
 
 export function getPushKid(
   element: ElementVarBase,
   _elmFunctions: typeof elementFunctions,
-): ElementVar {
+): ElementFunction {
   const pushKid = (...args: any[]) => {
-    const newElement: ElementVar = {...pushKid as any}
+    const newElement: ElementFunction = {...pushKid as any}
     newElement.attributes = [...pushKid.attributes] as Attribute[]
     newElement.listeners = [...pushKid.listeners]
     newElement.allListeners = [...pushKid.allListeners]
@@ -81,6 +82,7 @@ export function getPushKid(
     if(
       args.length > 0 &&
       typeof args[0] === 'object' &&
+      args[0] !== null &&
       !Array.isArray(args[0]) && 
       !args[0].tagJsType // TODO: need better attribute detection
     ) {
@@ -104,8 +106,10 @@ export function getPushKid(
           if(!newElement.contexts) {
             // newElement.contexts = [...arg.contexts]
             newElement.contexts = arg.contexts
+            ++newElement.contentId
           } else {
             newElement.contexts.push( ...arg.contexts )
+            ++newElement.contentId
           }
         }
         return
@@ -126,14 +130,14 @@ export function getPushKid(
     return elementVarToHtmlString(this as any)
   }
 
-  return pushKid as ElementVar
+  return pushKid as any as ElementFunction
 }
 
 
 /** used during updates */
 function registerMockChildContext(
   value: any,
-  mockElm: ElementVar,
+  mockElm: ElementFunction,
 ) {
   if(!mockElm.contexts) {
     mockElm.contexts = []

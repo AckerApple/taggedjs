@@ -1,5 +1,5 @@
 import { ContextItem } from '../ContextItem.type.js'
-import { SubscribeValue } from '../../tagJsVars/subscribe.function.js'
+import { SubscribeValue } from '../../TagJsTags/subscribe.function.js'
 import { paint } from '../../render/paint.function.js'
 import { setUseMemory } from '../../state/setUseMemory.object.js'
 import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js'
@@ -9,11 +9,11 @@ import { onFirstSubContext } from './onFirstSubContext.function.js'
 import { OnSubOutput, SubContext, SubscriptionContext } from './SubContext.type.js'
 import { TemplateValue } from '../TemplateValue.type.js'
 import { guaranteeInsertBefore } from '../guaranteeInsertBefore.function.js'
-import { valueToTagJsVar } from '../../tagJsVars/valueToTagJsVar.function.js'
-import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { valueToTagJsVar } from '../../TagJsTags/valueToTagJsVar.function.js'
+import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 import { processUpdateSubscribe } from './processUpdateSubscribe.function.js'
 import { removeContextInCycle, setContextInCycle } from '../cycles/setContextInCycle.function.js'
-import { LikeObservable } from '../../tagJsVars/processSubscribeWithAttribute.function.js'
+import { LikeObservable } from '../../TagJsTags/processSubscribeWithAttribute.function.js'
 
 export function setupSubscribe(
   value: SubscribeValue,
@@ -110,7 +110,7 @@ export function setupSubscribeCallbackProcessor(
   }
 
   function valuesHandler(
-    newValues: {value: TemplateValue, tagJsVar: TagJsVar}[],
+    newValues: {value: TemplateValue, tagJsVar: TagJsTag}[],
     index: number
   ) {
     const newestParentTagJsVar = subContext.tagJsVar
@@ -179,7 +179,7 @@ export function deleteAndUnsubscribe(
 }
 
 export function checkToPaint(
-  syncRun: boolean
+  syncRun: boolean,
 ) {
   if(syncRun) {
     return

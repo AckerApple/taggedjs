@@ -1,18 +1,15 @@
+import { KeyFunction, TagJsComponent } from '../index.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
-import { TagJsVar } from '../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 import type { AttributeCallable } from './attributeCallables.js'
 import { ElementVarBase } from './ElementVarBase.type.js'
 import { Attributes } from './htmlTag.function'
 
-type Child = ((_: InputElementTargetEvent) => any) | string | boolean | TagJsVar | number | null | undefined | any[] // object
-export type AttrValue = string | number | boolean | undefined | ((context: ContextItem) => any)
-export type ElementFunction = (
-  (
-    attributesOrFirstChild: Child | Attributes,
-    ...children: Child[]
-  ) => any
-) & ElementVarBase & {
+export type CombinedElementFunctions = ElementVarBase & {
+  /** array value metadata */
+  key: KeyFunction
+
   // Hint: add new attribute callables in `ts/elements/elementFunctions.ts` and mirror them here.
   style: AttributeCallable
   id: AttributeCallable
@@ -53,4 +50,23 @@ export type ElementFunction = (
   onMouseout: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
 }
 
-export type ElementVar = ElementFunction // & ReturnType<typeof elementFunctions>
+// type HtmlBasic = (() => TagJsComponent<any>) | void | Date | string | boolean | TagJsTag | number | null | undefined
+type HtmlBasic = void | Date | string | boolean | TagJsTag | number | null | undefined
+
+export type ToHtmlItem = ((_: InputElementTargetEvent) => (HtmlItem | HtmlItem[] | TagJsComponent<any> | TagJsComponent<any>[]))
+export type HtmlItem = /*(
+  (_: InputElementTargetEvent) => Tag | HtmlBasic | (Tag | HtmlBasic)[]
+) | */HtmlBasic | any[] // object
+
+export type AttrValue = string | number | boolean | undefined | ((context: ContextItem) => any)
+
+export type TagChildContent =  HtmlItem[] | HtmlItem | ToHtmlItem | ((_: InputElementTargetEvent) => HtmlBasic | TagJsComponent<any>)
+
+export type ElementFunction = (
+  (
+    attributesOrFirstChild: TagChildContent | Attributes,
+    ...children: TagChildContent[]
+  // ) => TagJsComponent<any> // | any[] //| ElementFunction // TagJsTag // CombinedElementFunctions
+  ) => ElementFunction & CombinedElementFunctions
+  // ) => TagJsTag
+) & CombinedElementFunctions

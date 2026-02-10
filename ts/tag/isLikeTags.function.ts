@@ -1,7 +1,6 @@
 import type { StringTag } from './StringTag.type.js'
-import type { Tag } from './Tag.type.js'
 import type { DomTag } from './DomTag.type.js'
-import { AnySupport } from './index.js'
+import { AnySupport, TagJsComponent } from './index.js'
 import { TemplaterResult } from './getTemplaterResult.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 
@@ -21,6 +20,7 @@ export function isLikeTags(
   return isLike
 }
 
+/** @deprecated */
 function isLikeBaseTags(
     newSupport: AnySupport | StringTag, // new
     oldSupport: AnySupport, // previous
@@ -76,7 +76,7 @@ export function isLikeDomTags(
 function isLikeStringTags(
   newTag: StringTag,
   oldTag: StringTag,
-  newSupport: AnySupport | Tag, // new
+  newSupport: AnySupport | TagJsComponent<any>, // new
   oldSupport: AnySupport, // previous
 ) {
   const strings0 = newTag.strings
@@ -85,7 +85,7 @@ function isLikeStringTags(
     return false
   }
 
-  const everyStringMatched = strings0.every((string,index) =>
+  const everyStringMatched = strings0.every((string: string, index: number) =>
     strings1[index].length === string.length // performance, just compare length of strings // TODO: Document this
   )
   if(!everyStringMatched) {

@@ -2,18 +2,18 @@ import { TemplaterResult } from '../tag/getTemplaterResult.function.js'
 import { isArray } from '../isInstance.js'
 import { ValueType } from '../tag/ValueTypes.enum.js'
 import { TemplateValue } from '../tag/TemplateValue.type.js'
-import { TagJsVar } from './tagJsVar.type.js'
-import { Tag } from '../tag/Tag.type.js'
+import { TagJsTag } from './TagJsTag.type.js'
 import { getSimpleTagVar } from './getSimpleTagVar.function.js'
-import { getArrayTagVar } from './getArrayTagJsVar.function.js'
+import { getArrayTagVar } from './getArrayTagJsTag.function.js'
+import { TagJsComponent } from './index.js'
 
 export function valueToTagJsVar(
-  value: TemplateValue | Tag | TagJsVar | unknown,
-): TagJsVar {
+  value: TemplateValue | TagJsComponent<any> | TagJsTag | unknown,
+): TagJsTag {
   const tagJsType = (value as TemplaterResult)?.tagJsType as ValueType
   
   if(tagJsType) {
-    return value as TagJsVar
+    return value as TagJsTag
   }
 
   return getBasicTagVar( value )
@@ -21,7 +21,7 @@ export function valueToTagJsVar(
 
 function getBasicTagVar(
   value: any,
-): TagJsVar {
+): TagJsTag {
   if(isArray(value)) {
     return getArrayTagVar(value)
   }

@@ -1,11 +1,11 @@
-import { AnySupport, ContextItem, deleteContextSubContext, guaranteeInsertBefore, onFirstSubContext, SubContext, Tag } from "../index.js"
+import { AnySupport, ContextItem, deleteContextSubContext, guaranteeInsertBefore, onFirstSubContext, SubContext, TagJsComponent } from "../index.js"
 import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { ProcessInit } from "../tag/ProcessInit.type.js"
 import { TemplateValue } from "../tag/TemplateValue.type.js"
 import { forceUpdateExistingValue } from "../tag/update/index.js"
-import { TagJsVar } from "./tagJsVar.type.js"
+import { TagJsTag } from "./TagJsTag.type.js"
 
-type InnerHTMLValue = TagJsVar & {
+type InnerHTMLValue = TagJsTag & {
   tagJsType: 'innerHTML'
   processInit: ProcessInit
 }
@@ -76,12 +76,13 @@ function checkInnerHTML(
   )
 }
 
-export type TagJsVarInnerHTML = TagJsVar & {
-  owner?: Tag
+export type TagJsTagInnerHTML = TagJsTag & {
+  owner?: TagJsComponent<any>
 }
 
-export function getInnerHTML(): TagJsVarInnerHTML {
+export function getInnerHTML(): TagJsTagInnerHTML {
   return {
+    component: false,
     tagJsType: 'innerHTML',
     hasValueChanged: () => 0, // not expected to do anything
     processInitAttribute: blankHandler,

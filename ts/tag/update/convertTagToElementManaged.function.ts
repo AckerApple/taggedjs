@@ -1,6 +1,6 @@
 import { AnySupport, SupportContextItem, Subject } from '../../index.js';
-import { valueToTagJsVar } from '../../tagJsVars/index.js';
-import { ReadOnlyVar } from '../../tagJsVars/tagJsVar.type.js';
+import { valueToTagJsVar } from '../../TagJsTags/index.js';
+import { ReadOnlyVar } from '../../TagJsTags/TagJsTag.type.js';
 import { ContextItem } from '../ContextItem.type.js';
 import { getOverrideTagVar } from './getOverrideTagVar.js';
 
@@ -28,6 +28,7 @@ export function convertTagToElementManaged(
     tagJsVar,
     destroy$: new Subject<void>(),
     render$: new Subject<void>(),
+    // paintCommands: [],
     placeholder: context.placeholder,
 
     // not important

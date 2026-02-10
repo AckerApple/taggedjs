@@ -1,5 +1,5 @@
 import type { StringTag } from './StringTag.type.js'
 import type { DomTag } from './DomTag.type.js'
-import { Tag } from './Tag.type.js'
+import { TagJsComponent } from '../TagJsTags/index.js'
 
-export type AnyTag = StringTag | DomTag | Tag
+export type AnyTag = StringTag | DomTag | TagJsComponent<any>

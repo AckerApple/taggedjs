@@ -3,13 +3,13 @@ import { SupportTagGlobal, TemplaterResult } from '../../getTemplaterResult.func
 import { destroySupport } from '../../../render/destroySupport.function.js'
 import { SupportContextItem } from '../../SupportContextItem.type.js'
 import type { StringTag } from '../../StringTag.type.js'
-import { Tag } from '../../Tag.type.js'
 import { ContextItem } from '../../ContextItem.type.js'
 import { castArrayItem } from './processTagArray.js'
+import { TagJsComponent } from '../../../TagJsTags/index.js'
 
 /** 1 = destroyed, 2 = value changes, 0 = no change */
 export function compareArrayItems(
-  value: (TemplaterResult | Tag)[],
+  value: (TemplaterResult | TagJsComponent<any>)[],
   index: number,
   lastArray: LastArrayItem[],
   removed: number,
@@ -50,8 +50,8 @@ function runArrayItemDiff(
   lastArray: LastArrayItem[],
   index: number
 ) {
-  const newKey = newValueTag.arrayValue || index
-  const isDiff = newValueTag && oldKey !== newKey
+  const newKey = (newValueTag as any).arrayValue || index
+  const isDiff = oldKey !== newKey
 
   if( isDiff ) {
     destroyArrayItem(prevContext)

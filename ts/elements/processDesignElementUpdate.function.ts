@@ -1,7 +1,8 @@
-import { AnySupport, ElementVar } from '../index.js'
+import { AnySupport } from '../index.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
 import { updateToDiffValue } from '../tag/update/updateToDiffValue.function.js'
 import { destroyDesignElement } from './destroyDesignElement.function.js'
+import { ElementFunction } from './ElementFunction.type.js'
 import { MockElmListener } from './ElementVarBase.type.js'
 
 export function processDesignElementUpdate(
@@ -38,8 +39,8 @@ export function processDesignElementUpdate(
   const contexts = context.contexts as ContextItem[]
   const vContexts = value.contexts || []
   
-  const ogListeners = (context.tagJsVar as ElementVar).allListeners as MockElmListener[]
-  const allListeners = (value as ElementVar).allListeners
+  const ogListeners = (context.tagJsVar as ElementFunction).allListeners as MockElmListener[]
+  const allListeners = (value as ElementFunction).allListeners
   allListeners.forEach((newListener, index) => {
     // ensure the latest callback is always called. Needed for functions within array maps
     const wrapCallback = ogListeners[index][1]
@@ -86,25 +87,18 @@ export function checkTagElementValueChange(
     return 1
   }
 
-  const newContentId = (value as ElementVar).contentId
-  const oldContentId = (context.value as ElementVar).contentId
+  const newContentId = (value as ElementFunction).contentId
+  const oldContentId = (context.value as ElementFunction).contentId
   if(newContentId !== oldContentId) {
     return 1
   }
 
-  const newKidLength = (value as ElementVar).innerHTML.length
+  const newKidLength = (value as ElementFunction).innerHTML.length
   const oldKidLength = context.value.innerHTML.length
   const kidLengthChanged = newKidLength !== oldKidLength
   if(kidLengthChanged) {
     return 1
   }
-/*
-  const newAttrLength = (value as ElementVar).attributes.length
-  const oldAttrLength = context.value.attributes.length
-  const kidAttrChanged = newAttrLength !== oldAttrLength
-  if(kidAttrChanged) {
-    return 1
-  }
-*/
+
   return 0
 }

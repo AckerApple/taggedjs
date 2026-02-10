@@ -5,7 +5,7 @@ import { StringTag } from '../StringTag.type.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { Original } from '../tag.utils.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
-import { PropWatches } from '../../tagJsVars/tag.function.js'
+import { PropWatches } from '../../TagJsTags/tag.function.js'
 
 export function oneRenderToSupport(
   wrapper: Wrapper,

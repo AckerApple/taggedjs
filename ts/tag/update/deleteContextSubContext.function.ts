@@ -2,7 +2,7 @@ import { ContextItem } from '../ContextItem.type.js'
 import { addPaintRemover } from '../../render/paint.function.js'
 import { AnySupport } from '../index.js'
 import { SubContext } from './SubContext.type.js'
-import { TagJsVar } from '../../tagJsVars/tagJsVar.type.js'
+import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 
 export function deleteContextSubContext(
   contextItem: ContextItem,
@@ -34,9 +34,9 @@ export function deleteSubContext(
   }
 
   const subContextItem = subContext.contextItem as ContextItem
-  const subTagJsVar = subContextItem.tagJsVar as TagJsVar
+  const subTagJsTag = subContextItem.tagJsVar as TagJsTag
   
-  subTagJsVar.destroy(
+  subTagJsTag.destroy(
     subContextItem,
     ownerSupport,
   )

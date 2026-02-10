@@ -7,7 +7,7 @@ import { ContextItem } from "../../tag/ContextItem.type.js"
 import { ObjectChildren } from "../../interpolations/optimizers/LikeObjectElement.type.js"
 import { empty } from "../../tag/ValueTypes.enum.js"
 import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicDom.function.js"
-import { TagJsVar } from "../../tagJsVars/tagJsVar.type.js"
+import { TagJsTag } from "../../TagJsTags/TagJsTag.type.js"
 import { attachDomElement } from "./attachDomElement.function.js"
 import { Subject } from "../../subject/Subject.class.js"
 import { isFunction, SupportContextItem } from "../../index.js"
@@ -90,9 +90,10 @@ export function attachDomElements(
       contexts: [],
       destroy$: new Subject(),
       render$: new Subject(),
+      // paintCommands: [],
       tagJsVar: {
         tagJsType: 'new-parent-context'
-      } as TagJsVar,
+      } as TagJsTag,
       valueIndex: -1,
       withinOwnerElement: true,
     }
