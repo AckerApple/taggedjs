@@ -5,19 +5,22 @@ import { smartRemoveKids } from '../tag/smartRemoveKids.function.js';
 export function softDestroySupport(lastSupport) {
     const context = lastSupport.context;
     const global = context.global;
-    const { subs, tags } = getChildTagsToSoftDestroy(context.contexts);
-    softDestroyOne(context);
-    for (const child of tags) {
-        const cGlobal = child.context.global;
-        if (cGlobal.deleted === true) {
-            return;
+    const contexts = context.contexts;
+    if (contexts) {
+        const { subs, tags } = getChildTagsToSoftDestroy(contexts);
+        for (const child of tags) {
+            const cGlobal = child.context.global;
+            if (cGlobal.deleted === true) {
+                return;
+            }
+            softDestroyOne(child.context);
         }
-        softDestroyOne(child.context);
+        const mySubs = global.subscriptions;
+        if (mySubs) {
+            subs.forEach(unsubscribeFrom);
+        }
     }
-    const mySubs = global.subscriptions;
-    if (mySubs) {
-        subs.forEach(unsubscribeFrom);
-    }
+    softDestroyOne(context);
     getNewGlobal(context);
 }
 function softDestroyOne(context) {

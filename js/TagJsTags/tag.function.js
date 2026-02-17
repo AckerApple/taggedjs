@@ -13,6 +13,7 @@ import { getContextInCycle, getElement as getTagElement } from '../tag/cycles/se
 import { tagInject } from './tagInject.function.js';
 import { onInit as tagOnInit } from '../state/onInit.function.js';
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js';
+import { callback as tagCallback } from '../state/callback.function.js';
 import { onRender as tagOnRender } from '../state/onRender.function.js';
 import { getInnerHTML as tagGetInnerHTML, output as outputAlias } from '../index.js';
 let tagCount = 0;
@@ -128,6 +129,7 @@ tag.inject = tagInject;
 tag.output = outputAlias;
 tag.onInit = tagOnInit;
 tag.onDestroy = tagOnDestroy;
+tag.callback = tagCallback;
 tag.onRender = tagOnRender;
 tag.getInnerHTML = tagGetInnerHTML;
 tag.app = function (_routeTag) {

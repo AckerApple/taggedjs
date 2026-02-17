@@ -91,7 +91,8 @@ function afterCheckProp(depth, index, originalValue, newProp, newSupport, pos) {
         return;
     }
     const context = newSupport.context;
-    const castedProps = context.value?.props;
+    const value = context.value;
+    const castedProps = value?.props;
     if (castedProps) {
         // check for old prop subscription
         const prop = castedProps[pos][index];

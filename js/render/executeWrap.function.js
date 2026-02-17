@@ -18,10 +18,13 @@ export function executeWrap(templater, result, useSupport, castedProps) {
             tag = tag();
         }
     }
+    if (!tag) {
+        throw new Error(`A tag cannot return a value of type ${tag === null ? 'null' : typeof (tag)}`);
+    }
     const context = useSupport.context;
     context.returnValue = tag;
     useSupport.returnValue = tag;
-    tag.templater = templater;
+    // tag.templater = templater
     templater.tag = tag;
     context.state.newer = { ...config };
     if (context.inputsHandler) {

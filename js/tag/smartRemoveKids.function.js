@@ -4,9 +4,12 @@ import { destroyHtmlDomMeta } from './destroyHtmlDomMeta.function.js';
 import { isPromise } from '../index.js';
 /** sets global.deleted on support and all children */
 export function smartRemoveKids(context, allPromises) {
-    const subContexts = context.contexts;
-    smartRemoveByContext(subContexts, allPromises);
-    destroyHtmlDomMeta(context.htmlDomMeta);
+    if (context.contexts) {
+        smartRemoveByContext(context.contexts, allPromises);
+    }
+    if (context.htmlDomMeta) {
+        destroyHtmlDomMeta(context.htmlDomMeta);
+    }
 }
 function smartRemoveByContext(contexts, allPromises) {
     for (const context of contexts) {

@@ -9,7 +9,7 @@ export type ElementVarBase = ReadOnlyVar & {
     contentId: number;
     elementFunctions: typeof elementFunctions;
     /** Children and self contexts all together */
-    contexts?: TagJsTag[];
+    contexts?: TagJsTag<any>[];
     /** Just this element listeners */
     listeners: MockElmListener[];
     /** Parent and Child elements listeners */

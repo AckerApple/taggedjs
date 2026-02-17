@@ -34,7 +34,7 @@ export function getOverrideTagVar(context, newContext, support, subject) {
             }
             ++context.updateCount;
             const oldValue = context.value;
-            const oldType = oldValue.tagJsType;
+            const oldType = oldValue?.tagJsType;
             const newType = value?.tagJsType;
             const hasTypeChanged = newType !== oldType;
             const hasChanged = checkTagValueChange(value, context);

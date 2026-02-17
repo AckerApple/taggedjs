@@ -19,11 +19,11 @@ export type TagJsTagBasics = {
     matchesInjection?: MatchesInjection;
 };
 export type MatchesInjection = (inject: any, context: ContextItem) => ContextItem | void;
-export type TagJsTag = ReadOnlyVar & TagJsTagBasics & {
+export type TagJsTag<T> = ReadOnlyVar & TagJsTagBasics & {
     component: false;
     tagJsType: string;
     processInit: ProcessInit;
     destroy: ProcessDelete;
-    value?: any;
+    value?: T;
 };
 export type ProcessDelete = (contextItem: ContextItem, ownerSupport: AnySupport) => any;

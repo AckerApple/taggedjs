@@ -33,7 +33,7 @@ export type Events = {
     [name: string]: EventCallback;
 };
 export type Clone = (Element | Text | ChildNode);
-export type TemplaterResult = TagJsTag & {
+export type TemplaterResult = TagJsTag<any> & {
     tagJsType: string;
     processInit: ProcessInit;
     propWatch: PropWatches;

@@ -38,7 +38,7 @@ export type CombinedElementFunctions = ElementVarBase & {
     onMouseover: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onMouseout: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
 };
-type HtmlBasic = void | Date | string | boolean | TagJsTag | number | null | undefined;
+type HtmlBasic = void | Date | string | boolean | TagJsTag<any> | number | null | undefined;
 export type ToHtmlItem = ((_: InputElementTargetEvent) => (HtmlItem | HtmlItem[] | TagJsComponent<any> | TagJsComponent<any>[]));
 export type HtmlItem = /*(
   (_: InputElementTargetEvent) => Tag | HtmlBasic | (Tag | HtmlBasic)[]

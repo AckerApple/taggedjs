@@ -1,7 +1,11 @@
 import { paint, painting } from '../paint.function.js';
 import { processUpdateContext } from '../../tag/processUpdateContext.function.js';
 export function updateSupportBy(olderSupport, newerSupport) {
-    const contexts = olderSupport.context.contexts;
+    if (!olderSupport) {
+        return;
+    }
+    const context = olderSupport.context;
+    const contexts = context.contexts;
     updateSupportValuesBy(olderSupport, newerSupport);
     ++painting.locks;
     processUpdateContext(olderSupport, contexts);

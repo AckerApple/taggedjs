@@ -23,7 +23,7 @@ export declare namespace host {
     /** Attach a host to an element that only runs during element destruction */
     const onDestroy: (callback: HostCallback) => HostValue;
 }
-export type HostValue = TagJsTag & {
+export type HostValue = TagJsTag<any> & {
     tagJsType: typeof ValueTypes.host;
     options: AllOptions;
     matchesInjection: MatchesInjection;

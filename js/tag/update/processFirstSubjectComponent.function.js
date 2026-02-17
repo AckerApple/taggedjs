@@ -21,6 +21,9 @@ function createSupportWithProps(templater, subject, ownerSupport) {
 export function processReplacementComponent(templater, context, ownerSupport) {
     const support = createSupportWithProps(templater, context, ownerSupport);
     const tag = support.templater.tag;
+    if (!tag) {
+        return support;
+    }
     if (!['dom', 'html'].includes(tag.tagJsType)) {
         return convertTagToElementManaged(support, support.ownerSupport, context);
     }
@@ -32,7 +35,8 @@ export function makeRealUpdate(newContext, value, context, convertValue, support
     // We need to deprecate this completely (castProps)
     const castedProps = castProps(value.props, support, // ownerSupport,
     0);
-    newContext.value.props = castedProps;
+    const newValue = newContext.value;
+    newValue.props = castedProps;
     const propsConfig = support.propsConfig;
     if (propsConfig) {
         propsConfig.castProps = castedProps;

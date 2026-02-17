@@ -20,42 +20,14 @@ oldSupport) {
     if (templater0?.tagJsType === ValueTypes.stateRender) {
         return templater0.dom === templater1.dom;
     }
-    switch (newTag.tagJsType) {
-        case ValueTypes.dom: {
-            if (oldTag?.tagJsType !== ValueTypes.dom) {
-                return false; // newTag is not even same type
-            }
-            return isLikeDomTags(newTag, oldTag);
-        }
-        case ValueTypes.tag: {
-            const like = isLikeStringTags(newTag, oldTag, newSupport, oldSupport);
-            return like;
-        }
+    if (!oldTag &&
+        !newTag.returnValue) {
+        return true;
+    }
+    if (!newTag.returnValue) {
+        return false;
     }
     throw new Error(`unknown tagJsType of ${newTag.tagJsType}`);
-}
-// used when compiler was used
-export function isLikeDomTags(newTag, oldTag) {
-    const domMeta0 = newTag.dom;
-    const domMeta1 = oldTag.dom;
-    return domMeta0 === domMeta1;
-}
-// used for no compiling
-function isLikeStringTags(newTag, oldTag, newSupport, // new
-oldSupport) {
-    const strings0 = newTag.strings;
-    const strings1 = oldTag.strings;
-    if (strings0.length !== strings1.length) {
-        return false;
-    }
-    const everyStringMatched = strings0.every((string, index) => strings1[index].length === string.length // performance, just compare length of strings // TODO: Document this
-    );
-    if (!everyStringMatched) {
-        return false;
-    }
-    const values0 = newSupport.templater.values || newTag.values;
-    const values1 = oldSupport.templater.values || oldTag.values;
-    return isLikeValueSets(values0, values1);
 }
 export function isLikeValueSets(values0, values1) {
     const valuesLengthsMatch = values0.length === values1.length;

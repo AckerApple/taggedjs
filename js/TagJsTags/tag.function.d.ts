@@ -6,6 +6,7 @@ import { getElement as getTagElement } from '../tag/cycles/setContextInCycle.fun
 import { tagInject } from './tagInject.function.js';
 import { onInit as tagOnInit } from '../state/onInit.function.js';
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js';
+import { callback as tagCallback } from '../state/callback.function.js';
 import { onRender as tagOnRender } from '../state/onRender.function.js';
 import { getInnerHTML as tagGetInnerHTML, output as outputAlias, ProcessInit, AnySupport, HasValueChanged } from '../index.js';
 import { ProcessDelete, TagJsTag, TagJsTagBasics } from './TagJsTag.type.js';
@@ -47,7 +48,7 @@ export type TagJsComponent<T extends ToTag> = TagJsTagBasics & {
     key: (arrayValue: unknown) => TagJsComponent<any>;
     arrayValue?: any;
     /** Used INSIDE a tag/function to signify that innerHTML is expected */
-    acceptInnerHTML: (useTagVar: TagJsTag) => TagJsComponent<any>;
+    acceptInnerHTML: (useTagVar: TagJsTag<any>) => TagJsComponent<any>;
     /** Same as innerHTML = x */
     setHTML: (innerHTML: any) => TagJsComponent<any>;
 };
@@ -82,6 +83,7 @@ export declare namespace tag {
     let output: typeof outputAlias;
     let onInit: typeof tagOnInit;
     let onDestroy: typeof tagOnDestroy;
+    let callback: typeof tagCallback;
     let onRender: typeof tagOnRender;
     let getInnerHTML: typeof tagGetInnerHTML;
     let promise: Promise<unknown>;

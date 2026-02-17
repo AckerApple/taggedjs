@@ -13,6 +13,9 @@ contextItem) {
     const support = contextItem.state.newest;
     const ph = contextItem.placeholder;
     support.ownerSupport = ownerSupport;
+    if (!contextItem.value.tag) {
+        return support;
+    }
     buildBeforeElement(support, undefined, ph);
     return support;
 }

@@ -3,7 +3,7 @@ import { LikeSubscription } from "../../TagJsTags/processSubscribeWithAttribute.
 import { SubscribeValue } from '../../TagJsTags/subscribe.function.js';
 import { TagJsTag } from "../../TagJsTags/TagJsTag.type.js";
 export interface SubContext {
-    tagJsVar?: TagJsTag;
+    tagJsVar?: TagJsTag<any>;
     hasEmitted?: true;
     deleted?: true;
     /** Handles each emission separately */
@@ -11,12 +11,12 @@ export interface SubContext {
     /** Handles all emissions collectively */
     valuesHandler: (values: {
         value: TemplateValue;
-        tagJsVar: TagJsTag;
+        tagJsVar: TagJsTag<any>;
     }[], index: number) => void;
     lastValues: {
         value: TemplateValue;
-        tagJsVar: TagJsTag;
-        oldTagJsVar?: TagJsTag;
+        tagJsVar: TagJsTag<any>;
+        oldTagJsVar?: TagJsTag<any>;
     }[];
     appendMarker?: Text;
     contextItem?: ContextItem;

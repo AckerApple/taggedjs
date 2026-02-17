@@ -13,6 +13,6 @@ export type LikeObservable<T> = {
 };
 export type SubscribeCallback<T> = (data: T) => any;
 export declare function processSubscribeWithAttribute(name: string, value: SubscribeValue, // TemplateValue | StringTag | SubscribeValue | SignalObject,
-element: HTMLElement, _tagJsVar: TagJsTag, // its the same as the value
+element: HTMLElement, _tagJsVar: TagJsTag<any>, // its the same as the value
 contextItem: AttributeContextItem, ownerSupport: AnySupport): void;
 export declare function emitSubScriptionAsIs(value: SubscribeValue, subContext: SubContext): void;

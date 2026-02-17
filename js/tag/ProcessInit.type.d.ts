@@ -6,5 +6,5 @@ import { HowToSet } from '../interpolations/attributes/howToSetInputValue.functi
 export type ProcessInit = (value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
 contextItem: ContextItem, ownerSupport: AnySupport, insertBefore?: Text, appendTo?: Element) => any;
 export type ProcessAttribute = (name: string, value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
-element: HTMLElement, tagJsVar: TagJsTag, contextItem: AttributeContextItem, ownerSupport: AnySupport, // may not be needed?
+element: HTMLElement, tagJsVar: TagJsTag<any>, contextItem: AttributeContextItem, ownerSupport: AnySupport, // may not be needed?
 howToSet: HowToSet) => any;

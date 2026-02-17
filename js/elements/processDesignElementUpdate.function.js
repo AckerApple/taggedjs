@@ -44,6 +44,9 @@ export function processDesignElementUpdate(value, context, ownerSupport) {
     delete context.locked;
 }
 export function checkTagElementValueChange(value, context) {
+    if (!value) {
+        return 1;
+    }
     const oldValue = context.value;
     if (oldValue === value) {
         return 0; // has not changed

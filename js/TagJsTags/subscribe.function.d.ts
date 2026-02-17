@@ -7,7 +7,7 @@ export declare function subscribe<T>(Observable: LikeObservable<T>, callback?: S
 export declare namespace subscribe {
     var all: typeof subscribeAll;
 }
-export type SubscribeValue = TagJsTag & {
+export type SubscribeValue = TagJsTag<any> & {
     tagJsType: typeof ValueTypes.subscribe;
     withDefault?: any;
     callback?: SubscribeCallback<any>;
