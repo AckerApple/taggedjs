@@ -1,6 +1,6 @@
 import type { StringTag } from './StringTag.type.js'
 import type { DomTag } from './DomTag.type.js'
-import { AnySupport, TagJsComponent } from './index.js'
+import { AnySupport, SupportContextItem, TagJsComponent } from './index.js'
 import { TemplaterResult } from './getTemplaterResult.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 
@@ -35,67 +35,18 @@ function isLikeBaseTags(
     return (templater0 as any).dom === (templater1 as any).dom
   }
 
-  switch (newTag.tagJsType) {
-    case ValueTypes.dom: {
-      if(oldTag?.tagJsType !== ValueTypes.dom) {
-        return false // newTag is not even same type
-      }
-  
-      return isLikeDomTags(
-        newTag as DomTag,
-        oldTag as DomTag,
-      )
-    }
+  if(
+    !oldTag &&
+    !(newTag as any as SupportContextItem).returnValue
+  ) {
+    return true
+  }
 
-    case ValueTypes.tag: {
-      const like = isLikeStringTags(
-        newTag as StringTag,
-        oldTag as StringTag,
-        newSupport,
-        oldSupport
-      )
-      
-      return like
-    }
+  if(!(newTag as any as SupportContextItem).returnValue) {
+    return false
   }
 
   throw new Error(`unknown tagJsType of ${newTag.tagJsType}`)
-}
-
-// used when compiler was used
-export function isLikeDomTags(
-  newTag: DomTag,
-  oldTag: DomTag,
-) {
-  const domMeta0 = newTag.dom
-  const domMeta1 = oldTag.dom
-  return domMeta0 === domMeta1
-}
-
-// used for no compiling
-function isLikeStringTags(
-  newTag: StringTag,
-  oldTag: StringTag,
-  newSupport: AnySupport | TagJsComponent<any>, // new
-  oldSupport: AnySupport, // previous
-) {
-  const strings0 = newTag.strings
-  const strings1 = oldTag.strings
-  if(strings0.length !== strings1.length) {
-    return false
-  }
-
-  const everyStringMatched = strings0.every((string: string, index: number) =>
-    strings1[index].length === string.length // performance, just compare length of strings // TODO: Document this
-  )
-  if(!everyStringMatched) {
-    return false
-  }
-
-  const values0 = (newSupport.templater as any).values || newTag.values
-  const values1 = (oldSupport.templater as any).values || oldTag.values
-  return isLikeValueSets(values0, values1)
-
 }
 
 export function isLikeValueSets(values0:any[], values1:any[]) {

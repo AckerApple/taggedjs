@@ -17,10 +17,10 @@ export function processUpdateAttrContext(
   values: unknown[],
 ) {
   const attrContextItem = contextItem as any as AttributeContextItem    
-  const tagValue = value as TagJsTag | undefined
+  const tagValue = value as TagJsTag<any> | undefined
 
   if( tagValue?.tagJsType ) {
-    const oldValue = contextItem.value as TagJsTag
+    const oldValue = contextItem.value as TagJsTag<any>
     
     // its now a tagVar value but before was not
     if(!oldValue?.tagJsType) {
@@ -57,7 +57,7 @@ export function processUpdateAttrContext(
     updateNameOnlyAttrValue(
       values,
       value as string,
-      attrContextItem.value,
+      attrContextItem.value as string,
       attrContextItem.target as Element,// global.element as Element,
       ownerSupport,
       attrContextItem.howToSet as HowToSet,

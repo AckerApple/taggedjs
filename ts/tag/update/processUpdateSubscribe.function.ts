@@ -14,7 +14,7 @@ export function processUpdateSubscribe(
   )
 
   if((contextItem as any as SubContext).hasEmitted !== true) {
-    const Observables = contextItem.value.Observables
+    const Observables = (contextItem.value as any).Observables
     if(!Observables) {
       return
     }

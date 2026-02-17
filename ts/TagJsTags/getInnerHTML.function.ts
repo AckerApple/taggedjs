@@ -5,7 +5,7 @@ import { TemplateValue } from "../tag/TemplateValue.type.js"
 import { forceUpdateExistingValue } from "../tag/update/index.js"
 import { TagJsTag } from "./TagJsTag.type.js"
 
-type InnerHTMLValue = TagJsTag & {
+type InnerHTMLValue = TagJsTag<any> & {
   tagJsType: 'innerHTML'
   processInit: ProcessInit
 }
@@ -76,7 +76,7 @@ function checkInnerHTML(
   )
 }
 
-export type TagJsTagInnerHTML = TagJsTag & {
+export type TagJsTagInnerHTML = TagJsTag<any> & {
   owner?: TagJsComponent<any>
 }
 

@@ -162,7 +162,7 @@ function reviewPreviousArrayItem(
 }
 
 export function castArrayItem(item: any) {
-  const isBasicFun = typeof item === 'function' && (item as any as TagJsTag).tagJsType === undefined
+  const isBasicFun = typeof item === 'function' && (item as any as TagJsTag<any>).tagJsType === undefined
   if( isBasicFun ) {
     const fun = (item as any)
     item = fun()

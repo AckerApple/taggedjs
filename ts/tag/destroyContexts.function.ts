@@ -20,7 +20,7 @@ export function destroyContexts(
       continue
     }
 
-    const childValue = child.value as TagJsTag | undefined
+    const childValue = child.value as TagJsTag<any> | undefined
     if(childValue?.tagJsType === ValueTypes.subscribe) {
       childValue.destroy(child, ownerSupport)
       child.deleted = true

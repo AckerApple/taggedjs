@@ -51,7 +51,7 @@ export type CombinedElementFunctions = ElementVarBase & {
 }
 
 // type HtmlBasic = (() => TagJsComponent<any>) | void | Date | string | boolean | TagJsTag | number | null | undefined
-type HtmlBasic = void | Date | string | boolean | TagJsTag | number | null | undefined
+type HtmlBasic = void | Date | string | boolean | TagJsTag<any> | number | null | undefined
 
 export type ToHtmlItem = ((_: InputElementTargetEvent) => (HtmlItem | HtmlItem[] | TagJsComponent<any> | TagJsComponent<any>[]))
 export type HtmlItem = /*(

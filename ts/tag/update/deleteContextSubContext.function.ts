@@ -34,7 +34,7 @@ export function deleteSubContext(
   }
 
   const subContextItem = subContext.contextItem as ContextItem
-  const subTagJsTag = subContextItem.tagJsVar as TagJsTag
+  const subTagJsTag = subContextItem.tagJsVar as TagJsTag<any>
   
   subTagJsTag.destroy(
     subContextItem,

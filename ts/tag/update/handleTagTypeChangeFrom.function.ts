@@ -14,7 +14,7 @@ export function handleTagTypeChangeFrom(
   const isDifferent = !newValue || !(newValue as any).tagJsType || (newValue as any).tagJsType !== originalType
 
   if(isDifferent) {
-    const oldTagJsTag = contextItem.tagJsVar as TagJsTag
+    const oldTagJsTag = contextItem.tagJsVar as TagJsTag<any>
     oldTagJsTag.destroy(contextItem, ownerSupport)
 
     updateToDiffValue(

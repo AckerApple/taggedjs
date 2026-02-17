@@ -64,7 +64,7 @@ export function tryUpdateToTag(
     contextItem.inputsHandler( props )
   }
 
-  ;(newValue as TagJsTag).processInit(
+  ;(newValue as TagJsTag<any>).processInit(
     newValue,
     contextItem,
     ownerSupport,
@@ -90,7 +90,7 @@ function prepareUpdateToComponent(
       contextItem.inputsHandler( props )
     }
 
-    ;(templater as TagJsTag).processInit(
+    ;(templater as TagJsTag<any>).processInit(
       templater,
       contextItem,
       ownerSupport,

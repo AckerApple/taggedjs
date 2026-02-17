@@ -16,7 +16,7 @@ export function processFunctionAttr(
 ) {
   const innerValue = (value as any)()
 
-  const TagJsTagOverride: TagJsTag = {
+  const TagJsTagOverride: TagJsTag<any> = {
     component: false,
     tagJsType: 'dynamic-attr',
 

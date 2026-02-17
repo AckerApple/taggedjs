@@ -1,5 +1,5 @@
 
-import { AnySupport } from '../../tag/index.js'
+import { AnySupport, TemplateValue } from '../../tag/index.js'
 import {SupportTagGlobal } from '../../tag/getTemplaterResult.function.js'
 import { paint, painting } from '../../render/paint.function.js'
 import { renderSupport } from'../../render/renderSupport.function.js'
@@ -22,7 +22,7 @@ function mapTagUpdate(support: AnySupport) {
 
   if(!global) {
     context.tagJsVar.processUpdate(
-      context.value,
+      context.value as TemplateValue,
       context,
       support.ownerSupport as AnySupport,
       [],

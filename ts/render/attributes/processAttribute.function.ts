@@ -47,7 +47,7 @@ export function processAttribute(
     value = attrName
   }
 
-  const tagJsVar = valueInValues as TagJsTag | undefined
+  const tagJsVar = valueInValues as TagJsTag<any> | undefined
   if( tagJsVar?.tagJsType ) {
     return processTagJsTagAttribute(
       value,

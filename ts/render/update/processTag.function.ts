@@ -24,6 +24,10 @@ export function processTag(
   
   support.ownerSupport = ownerSupport  
   
+  if(!(contextItem.value as any).tag) {
+    return support
+  }
+  
   buildBeforeElement(
     support,
     undefined,

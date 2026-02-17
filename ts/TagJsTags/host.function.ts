@@ -131,7 +131,7 @@ function processHostAttribute(
   name: string,
   value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   element: HTMLElement,
-  tagJsVar: TagJsTag, // same as value not needed
+  tagJsVar: TagJsTag<any>, // same as value not needed
   contextItem: AttributeContextItem,
 ) {
   return processHost(
@@ -142,7 +142,7 @@ function processHostAttribute(
 
 /* Only runs on host() init */
 function processHost(
-  tagJsVar: TagJsTag,
+  tagJsVar: TagJsTag<any>,
   contextItem: ContextItem,
 ) {
   const element = contextItem.target
@@ -232,7 +232,7 @@ function deleteHost(
   }
 }
 
-export type HostValue = TagJsTag & {
+export type HostValue = TagJsTag<any> & {
   tagJsType: typeof ValueTypes.host
   options: AllOptions
   matchesInjection: MatchesInjection

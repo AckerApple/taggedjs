@@ -12,7 +12,7 @@ export function forceUpdateExistingValue(
   ownerSupport: AnySupport,
 ): number {
   // Have the context check itself (avoid having to detect old value)
-  const TagJsTag = contextItem.tagJsVar as TagJsTag
+  const TagJsTag = contextItem.tagJsVar as TagJsTag<any>
   const ignoreOrDestroyed = TagJsTag.hasValueChanged(
     newValue,
     contextItem as unknown as SupportContextItem,

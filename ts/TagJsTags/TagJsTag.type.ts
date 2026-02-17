@@ -26,14 +26,14 @@ export type TagJsTagBasics = {
 
 export type MatchesInjection = (inject: any, context: ContextItem) => ContextItem | void
 
-export type TagJsTag = ReadOnlyVar & TagJsTagBasics & {
+export type TagJsTag<T> = ReadOnlyVar & TagJsTagBasics & {
   component: false
   tagJsType: string // typeof ValueTypes.tag | typeof ValueTypes.dom
 
   processInit: ProcessInit
   destroy: ProcessDelete
   
-  value?: any
+  value?: T
 }
 
 export type ProcessDelete = (

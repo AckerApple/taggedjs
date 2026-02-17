@@ -12,7 +12,7 @@ export function processSubscribeAttribute(
   name: string,
   value: SubscribeValue, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   element: Element,
-  _tagJsVar: TagJsTag, // same as value
+  _tagJsVar: TagJsTag<any>, // same as value
   contextItem: AttributeContextItem,
   ownerSupport: AnySupport
 ) {

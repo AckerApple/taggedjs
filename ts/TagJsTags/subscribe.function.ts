@@ -36,7 +36,7 @@ export function subscribe<T>(
 
 subscribe.all = subscribeAll
 
-export type SubscribeValue = TagJsTag & {
+export type SubscribeValue = TagJsTag<any> & {
   tagJsType: typeof ValueTypes.subscribe
 
   // states: StatesSetter[]

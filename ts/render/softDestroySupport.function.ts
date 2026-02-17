@@ -11,22 +11,25 @@ export function softDestroySupport(
 ) {
   const context = lastSupport.context
   const global = context.global as SupportTagGlobal
-  const {subs, tags} = getChildTagsToSoftDestroy(context.contexts)
+  const contexts = context.contexts
+
+  if(contexts) {
+    const {subs, tags} = getChildTagsToSoftDestroy(contexts)
+    for (const child of tags) {
+      const cGlobal = child.context.global
+      if(cGlobal.deleted === true) {
+        return
+      }
+      softDestroyOne( child.context )
+    }
+  
+    const mySubs = global.subscriptions
+    if(mySubs) {
+      subs.forEach(unsubscribeFrom)
+    }
+  }
 
   softDestroyOne(context)
-  for (const child of tags) {
-    const cGlobal = child.context.global
-    if(cGlobal.deleted === true) {
-      return
-    }
-    softDestroyOne( child.context )
-  }
-  
-  const mySubs = global.subscriptions
-  if(mySubs) {
-    subs.forEach(unsubscribeFrom)
-  }
-
   getNewGlobal(context)
 }
 

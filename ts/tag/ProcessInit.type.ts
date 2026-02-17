@@ -16,7 +16,7 @@ export type ProcessAttribute = (
   name: string,
   value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   element: HTMLElement,
-  tagJsVar: TagJsTag,
+  tagJsVar: TagJsTag<any>,
   contextItem: AttributeContextItem,
   ownerSupport: AnySupport, // may not be needed?
   howToSet: HowToSet,

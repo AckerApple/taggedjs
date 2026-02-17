@@ -9,10 +9,10 @@ import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types
 
 export interface AppContextItem {
   /** automatically updated with every update */
-  value?: any,
+  value?: unknown,
 
   /** Not updated automatically. processUpdate has the option to set this value */
-  tagJsVar: TagJsTag
+  tagJsVar: TagJsTag<any>
   updateCount: number
 
   returnValue?: any // used when value results in a return value
@@ -24,7 +24,7 @@ export interface AppContextItem {
   valueIndex: number
 
   /** TODO: is this deprecated? */
-  oldTagJsVar?: TagJsTag  
+  oldTagJsVar?: TagJsTag<any>
 
   // subscribe() and innerHTML
   subContext?: SubContext 

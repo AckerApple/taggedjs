@@ -57,6 +57,10 @@ export function processReplacementComponent(
   )
 
   const tag = support.templater.tag as any
+  if(!tag) {
+    return support
+  }
+
   if( !['dom','html'].includes(tag.tagJsType) ) {
     return convertTagToElementManaged(
       support,
@@ -88,7 +92,8 @@ export function makeRealUpdate(
     0
   )
 
-  newContext.value.props = castedProps
+  const newValue = newContext.value as any
+  newValue.props = castedProps
   const propsConfig = support.propsConfig as PropsConfig
   if(propsConfig) {
     propsConfig.castProps = castedProps

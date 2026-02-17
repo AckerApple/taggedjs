@@ -51,7 +51,7 @@ export type Events = {
 
 export type Clone = (Element | Text | ChildNode)
 
-export type TemplaterResult = TagJsTag & {
+export type TemplaterResult = TagJsTag<any> & {
   tagJsType: string // ValueType
   processInit: ProcessInit
 

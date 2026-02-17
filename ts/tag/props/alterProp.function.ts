@@ -8,7 +8,7 @@ import { setUseMemory } from '../../state/index.js'
 import { Props } from '../../Props.js'
 import { UnknownFunction } from '../index.js'
 import { safeRenderSupport } from './safeRenderSupport.function.js'
-import { Subscription, TagJsComponent } from '../../index.js'
+import { Subscription, TagJsComponent, TemplateValue } from '../../index.js'
 
 export function castProps(
   props: Props,
@@ -209,7 +209,8 @@ function afterCheckProp(
   }
 
   const context = newSupport.context
-  const castedProps = context.value?.props
+  const value = context.value as any
+  const castedProps = value?.props
   
   if(castedProps) {
     // check for old prop subscription
@@ -293,7 +294,7 @@ export function callbackPropOwner(
       )
 */
       ownerContext.tagJsVar.processUpdate(
-        ownerContext.value,
+        ownerContext.value as TemplateValue,
         ownerContext,
         ownerSupport,
         [],

@@ -4,7 +4,7 @@ import { SubscribeValue } from '../../TagJsTags/subscribe.function.js'
 import { TagJsTag } from "../../TagJsTags/TagJsTag.type.js"
 
 export interface SubContext {
-  tagJsVar?: TagJsTag // may not be available at start
+  tagJsVar?: TagJsTag<any> // may not be available at start
   hasEmitted?: true
   deleted?: true
   
@@ -16,14 +16,14 @@ export interface SubContext {
 
   /** Handles all emissions collectively */
   valuesHandler: (
-    values: {value: TemplateValue, tagJsVar: TagJsTag}[],
+    values: {value: TemplateValue, tagJsVar: TagJsTag<any>}[],
     index: number,
   ) => void
   
   lastValues: {
     value: TemplateValue,
-    tagJsVar: TagJsTag,
-    oldTagJsVar?: TagJsTag,
+    tagJsVar: TagJsTag<any>,
+    oldTagJsVar?: TagJsTag<any>,
   }[]
   
   appendMarker?: Text  

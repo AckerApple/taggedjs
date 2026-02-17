@@ -14,7 +14,7 @@ export function processAttributeUpdate(
   howToSet: HowToSet,
 ) {
   const oldTag = contextItem.tagJsVar // contextItem.tagJsVar as TagJsTag
-  const tagValue = value as TagJsTag | undefined
+  const tagValue = value as TagJsTag<any> | undefined
 
   const checkResult = oldTag.hasValueChanged(
     tagValue,

@@ -166,7 +166,7 @@ function swapTags(
   destroySupport(oldestSupport, global)
   getNewGlobal(contextItem)
 
-  const t = templater as TagJsTag
+  const t = templater as TagJsTag<any>
 
   t.processInit(
     templater,

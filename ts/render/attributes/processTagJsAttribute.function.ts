@@ -15,7 +15,7 @@ export function processTagJsTagAttribute(
   value: string | TagVarIdNum | null | undefined,
   contexts: ContextItem[],
   parentContext: ContextItem,
-  tagJsVar: TagJsTag,
+  tagJsVar: TagJsTag<any>,
   varIndex: number,
   support: AnySupport,
   attrName: string | TagVarIdNum,

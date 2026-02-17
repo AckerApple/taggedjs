@@ -12,7 +12,7 @@ import { TagJsComponent } from './tag.function.js'
 /** how to process an array */
 export function getArrayTagVar(
   value: any,
-): TagJsTag {
+): TagJsTag<any> {
   return {
     component: false,
     tagJsType: 'array',
@@ -56,7 +56,7 @@ function processArrayUpdates(
 }
 
 function processArrayInit(
-  value: TagJsTag, // TemplateValue | StringTag | SubscribeValue | SignalObject,
+  value: TagJsTag<any>, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
   _insertBefore?: Text,      

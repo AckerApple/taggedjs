@@ -34,9 +34,9 @@ export type Attributes = {
   // These maybe duplicate attribute typings
   class?: string | object | ((_: InputElementTargetEvent) => string | object)
   style?: string | object | ((_: InputElementTargetEvent) => string | object)
-  attr?: string | object | TagJsTag | void | undefined | ((_: InputElementTargetEvent) => any)
+  attr?: string | object | TagJsTag<any> | void | undefined | ((_: InputElementTargetEvent) => any)
 } & {
-  [attrName: string]: object | string | boolean | number | TagJsTag | undefined | void | ((_: InputElementTargetEvent) => any)
+  [attrName: string]: object | string | boolean | number | TagJsTag<any> | undefined | void | ((_: InputElementTargetEvent) => any)
 }
 
 export function htmlTag(

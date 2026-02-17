@@ -13,10 +13,13 @@ export function smartRemoveKids(
   context: SupportContextItem,
   allPromises: Promise<any>[]
 ) {
-  const subContexts = context.contexts
+  if(context.contexts) {
+    smartRemoveByContext(context.contexts, allPromises)
+  }
 
-  smartRemoveByContext(subContexts, allPromises)
-  destroyHtmlDomMeta(context.htmlDomMeta as DomObjectChildren)
+  if(context.htmlDomMeta) {
+    destroyHtmlDomMeta(context.htmlDomMeta as DomObjectChildren)
+  }
 }
 
 function smartRemoveByContext(
@@ -25,7 +28,7 @@ function smartRemoveByContext(
 ) {
   for (const context of contexts) {
     if(context.withinOwnerElement) {
-      const TagJsTag = context.tagJsVar as TagJsTag
+      const TagJsTag = context.tagJsVar as TagJsTag<any>
       
       if( TagJsTag && TagJsTag.tagJsType === 'host' ) {
         const newest = (context as any).supportOwner as AnySupport

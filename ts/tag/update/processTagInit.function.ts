@@ -7,7 +7,7 @@ import { AnySupport } from '../index.js'
 import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 
 export function processTagInit(
-  value: TagJsTag,
+  value: TagJsTag<any>,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
   insertBefore?: Text,

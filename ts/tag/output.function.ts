@@ -1,4 +1,4 @@
-import { AnySupport, ContextItem, getContextInCycle, paint, SupportContextItem, TagGlobal } from "../index.js"
+import { AnySupport, ContextItem, getContextInCycle, paint, SupportContextItem, TagGlobal, TemplateValue } from "../index.js"
 import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { paintAfters, painting } from "../render/paint.function.js"
 import { syncStatesArray } from "../state/syncStates.function.js"
@@ -84,7 +84,7 @@ export function syncWrapCallback(
       ++painting.locks
       const targetContext = context // newestOwner.context
       targetContext.tagJsVar.processUpdate(
-        targetContext.value,
+        targetContext.value as TemplateValue,
         targetContext,
         newestOwner,
         [],

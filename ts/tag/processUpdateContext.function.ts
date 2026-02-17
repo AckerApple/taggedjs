@@ -46,7 +46,7 @@ function processUpdateOneContext(
   }
   */
 
-  const TagJsTag = contextItem.tagJsVar as TagJsTag
+  const TagJsTag = contextItem.tagJsVar as TagJsTag<any>
   
   setContextInCycle(contextItem)
   

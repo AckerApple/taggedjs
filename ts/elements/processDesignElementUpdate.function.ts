@@ -75,6 +75,10 @@ export function checkTagElementValueChange(
   value: any,
   context: ContextItem,
 ) {
+  if(!value) {
+    return 1
+  }
+
   const oldValue = context.value
   if(oldValue === value) {
     return 0 // has not changed
@@ -94,7 +98,7 @@ export function checkTagElementValueChange(
   }
 
   const newKidLength = (value as ElementFunction).innerHTML.length
-  const oldKidLength = context.value.innerHTML.length
+  const oldKidLength = (context.value as any).innerHTML.length
   const kidLengthChanged = newKidLength !== oldKidLength
   if(kidLengthChanged) {
     return 1

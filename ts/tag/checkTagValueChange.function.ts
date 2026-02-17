@@ -30,7 +30,16 @@ export function checkTagValueChange(
 
   const isTag = (newValue as any)?.tagJsType
   if(isTag) {
-    if((newValue as any).wrapper?.original === contextItem.value.wrapper?.original) {
+    const value = contextItem.value as any
+
+    if(!value && newValue) {
+      return 88
+    }
+
+    const wrapper = value.wrapper
+    const newWrapper = (newValue as any).wrapper
+
+    if(newWrapper?.original === wrapper?.original) {
       return 0
     }
 

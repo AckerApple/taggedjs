@@ -93,7 +93,7 @@ export function attachDomElements(
       // paintCommands: [],
       tagJsVar: {
         tagJsType: 'new-parent-context'
-      } as TagJsTag,
+      } as TagJsTag<any>,
       valueIndex: -1,
       withinOwnerElement: true,
     }

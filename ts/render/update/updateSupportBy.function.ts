@@ -8,7 +8,12 @@ export function updateSupportBy(
   olderSupport: AnySupport,
   newerSupport: AnySupport,
 ) {
-  const contexts = olderSupport.context.contexts
+  if(!olderSupport) {
+    return
+  }
+
+  const context = olderSupport.context
+  const contexts = context.contexts
 
   updateSupportValuesBy(olderSupport, newerSupport)
 

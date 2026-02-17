@@ -12,7 +12,7 @@ export function processSimpleAttribute(
   name: string,
   value: any, // TemplateValue | StringTag | SubscribeValue | SignalObject,
   element: HTMLElement,
-  tagJsVar: TagJsTag,
+  tagJsVar: TagJsTag<any>,
   contextItem: AttributeContextItem,
   _ownerSupport: AnySupport,
   howToSet: HowToSet,

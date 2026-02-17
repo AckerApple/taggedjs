@@ -110,7 +110,7 @@ export function setupSubscribeCallbackProcessor(
   }
 
   function valuesHandler(
-    newValues: {value: TemplateValue, tagJsVar: TagJsTag}[],
+    newValues: {value: TemplateValue, tagJsVar: TagJsTag<any>}[],
     index: number
   ) {
     const newestParentTagJsVar = subContext.tagJsVar

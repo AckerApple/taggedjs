@@ -1,4 +1,4 @@
-import { AnySupport, SupportContextItem } from '../index.js'
+import { AnySupport, SupportContextItem, TemplateValue } from '../index.js'
 import { renderSupport } from '../render/renderSupport.function.js'
 import { Callback } from './callbackMaker.function.js'
 import { isPromise } from '../isInstance.js'
@@ -30,7 +30,7 @@ export default function callbackStateUpdate<T>(
   } else {
     const supContext = newestSupport.context
     supContext.tagJsVar.processUpdate(
-      supContext.value,
+      supContext.value as TemplateValue,
       supContext,
       newestSupport.ownerSupport as AnySupport, // ownerSupport,
       [],
@@ -44,7 +44,7 @@ export default function callbackStateUpdate<T>(
       } else {
         const supContext = newestSupport.context
         supContext.tagJsVar.processUpdate(
-          supContext.value,
+          supContext.value as TemplateValue,
           supContext,
           newestSupport.ownerSupport as AnySupport, // ownerSupport,
           [],

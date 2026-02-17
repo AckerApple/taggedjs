@@ -128,7 +128,7 @@ function getNewSubject(
   templater: TemplaterResult,
   appElement: Element,
 ) {
-  const tagJsVar: TagJsTag = {
+  const tagJsVar: TagJsTag<any> = {
     component: false,
     tagJsType: 'templater',
     hasValueChanged: checkTagValueChangeAndUpdate,

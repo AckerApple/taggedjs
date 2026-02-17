@@ -8,12 +8,12 @@ import { getArrayTagVar } from './getArrayTagJsTag.function.js'
 import { TagJsComponent } from './index.js'
 
 export function valueToTagJsVar(
-  value: TemplateValue | TagJsComponent<any> | TagJsTag | unknown,
-): TagJsTag {
+  value: TemplateValue | TagJsComponent<any> | TagJsTag<any> | unknown,
+): TagJsTag<any> {
   const tagJsType = (value as TemplaterResult)?.tagJsType as ValueType
   
   if(tagJsType) {
-    return value as TagJsTag
+    return value as TagJsTag<any>
   }
 
   return getBasicTagVar( value )
@@ -21,7 +21,7 @@ export function valueToTagJsVar(
 
 function getBasicTagVar(
   value: any,
-): TagJsTag {
+): TagJsTag<any> {
   if(isArray(value)) {
     return getArrayTagVar(value)
   }

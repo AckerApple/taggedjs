@@ -18,7 +18,7 @@ export function deleteSimpleAttribute(
 
 export function getSimpleTagVar(
   value: any,
-): TagJsTag {
+): TagJsTag<any> {
   return {
     component: false,
     tagJsType: 'simple',

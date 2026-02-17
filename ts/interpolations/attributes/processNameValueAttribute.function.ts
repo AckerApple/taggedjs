@@ -44,7 +44,7 @@ export function processDynamicNameValueAttribute(
 
 function processTagJsAttribute(
   name: string,
-  value: TagJsTag,
+  value: TagJsTag<any>,
   contextItem: ContextItem,
   ownerSupport: AnySupport,
   element: Element,

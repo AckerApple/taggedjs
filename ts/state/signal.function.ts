@@ -22,9 +22,9 @@ export function signal<T>(initialValue: T) {
   return Signal(initialValue)
 }
 
-export type SignalObject<T> = TagJsTag & {
+export type SignalObject<T> = TagJsTag<T> & {
   tagJsType: typeof ValueTypes.signal
-  value: any
+  value: T
   subscribe: SubscribeFn<T>
   processInit: ProcessInit
   emit: (value: any) => any
