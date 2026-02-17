@@ -1,4 +1,4 @@
-import { htmlTag, p, pre } from "taggedjs"
+import { htmlTag, p, pre, span } from "taggedjs"
 import { docH3 } from "./docHeading"
 
 const figure = htmlTag("figure")
@@ -13,6 +13,19 @@ _=> items.map((item, index) =>
     ' index:', _=> index,
     button.onClick(() => items.splice(index, 1))('remove')
   ).key(item)
+)
+`
+
+const mapLoopsUserIdCode = `const users = [
+  { id: 101, name: 'Ada' },
+  { id: 102, name: 'Grace' },
+  { id: 103, name: 'Linus' }
+]
+
+_=> users.map(user =>
+  div(
+    span('name: ', _=> user.name)
+  ).key(user.id)
 )
 `
 
@@ -35,6 +48,10 @@ export function mapLoopsSection() {
     figure(
       pre(code({class: "language-ts"}, mapLoopsCode)),
       figcaption("Map each item and key the result")
+    ),
+    figure(
+      pre(code({class: "language-ts"}, mapLoopsUserIdCode)),
+      figcaption("Use a stable id as the loop key")
     ),
   ]
 }
