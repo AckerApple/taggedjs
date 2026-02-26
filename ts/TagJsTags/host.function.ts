@@ -45,7 +45,7 @@ export function host<T extends HostCallback>(
     matchesInjection(inject: any, context: ContextItem) {
       const options = inject?.options
       if(!options) {
-        return false
+        return
       }
 
       const injectCallback = options?.callback
@@ -54,7 +54,7 @@ export function host<T extends HostCallback>(
         return context
       }
 
-      return false
+      return
     },
   }
   
@@ -89,7 +89,10 @@ export declare namespace host {
 }
 
 ;(host as any).onDestroy = (callback: HostCallback): HostValue => {
-  return host(() => {}, { onDestroy: callback })
+  return host(
+    () => {},
+    { onDestroy: callback }
+  )
 }
 
 function processHostUpdate(
@@ -98,6 +101,7 @@ function processHostUpdate(
   ownerSupport: AnySupport,
 ) {
   if(isFunction(newValue) && !(newValue as any)?.tagJsType) {
+    console.log('issue on its way', { newValue })
     throw new Error('issue on its way')
   }
 
@@ -143,20 +147,19 @@ function processHostAttribute(
 /* Only runs on host() init */
 function processHost(
   tagJsVar: TagJsTag<any>,
-  contextItem: ContextItem,
+  context: ContextItem,
 ) {
-  const element = contextItem.target
-  const state = (contextItem as HostAttributeContextItem).state = {}
-  
-  initState(contextItem)
+  const element = context.target
+  const state = (context as HostAttributeContextItem).state = {}
+  initState(context)
   processHostTagJsTag(
     element as HTMLInputElement,
     tagJsVar as HostValue,
-    contextItem,
+    context,
     state,
   )
 
-  runAfterRender(contextItem)
+  runAfterRender(context)
 }
 /** first time run */
 function processHostTagJsTag(

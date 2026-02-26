@@ -32,13 +32,23 @@ function callbackWrapper2(
 }
 
 function attr(
-  item: any,
+  item: ElementFunction,
   args: [name: string | unknown, value?: any]
-) {
-  const clone = getPushKid(item as any, item.elementFunctions)
-  clone.attributes.push(args as Attribute)
-  bumpContentId(clone, args[1])
+): ElementFunction {
+  // return processSetAttribute(args[0], args[1], item)
 
+
+  // processSetAttribute(args[0], args[1], item)
+  const clone = getPushKid(item as any, item.elementFunctions)
+  processSetAttribute(args[0], args[1], clone)
+  return clone
+
+  
+  //const clone = getPushKid(item as any, item.elementFunctions)
+  // clone.attributes.push(args as Attribute)
+  // bumpContentId(clone, args[1])
+
+/*
   if( isValueForContext(args[0]) ) {
     registerMockAttrContext(args[0], clone) // the attrName is a function or TagJsTag
   } else if( isValueForContext(args[1]) ) {
@@ -46,6 +56,7 @@ function attr(
   }
 
   return clone
+  */
 }
 
 export type Attrs = { [name:string]: AttrValue }
@@ -71,32 +82,73 @@ function attrs(
   return clone
 }
 
-const style = makeAttrCallable('style', attr)
-const idCallable = makeAttrCallable('id', attr)
-const classCallable = makeAttrCallable('class', attr)
-const href = makeAttrCallable('href', attr)
-const value = makeAttrCallable('value', attr)
-const placeholder = makeAttrCallable('placeholder', attr)
-const src = makeAttrCallable('src', attr)
-const title = makeAttrCallable('title', attr)
-const type = makeAttrCallable('type', attr)
-const checked = makeAttrCallable('checked', attr)
-const disabled = makeAttrCallable('disabled', attr)
-const selected = makeAttrCallable('selected', attr)
-const minLength = makeAttrCallable('minLength', attr)
-const maxLength = makeAttrCallable('maxLength', attr)
-const open = makeAttrCallable('open', attr) // dialog element
+const ATTRIBUTE_CALLABLE_DEFS: Array<[apiName: string, attrName: string]> = [
+  ['alt', 'alt'],
+  ['autoFocus', 'autoFocus'],
+  ['border', 'border'],
+  ['id', 'id'],
+  ['for', 'for'],
+  ['fill', 'fill'],
+  ['content', 'content'],
+  ['charset', 'charset'],
+  ['cellPadding', 'cellpadding'],
+  ['cellSpacing', 'cellspacing'],
+  ['class', 'class'],
+  ['href', 'href'],
+  ['lang', 'lang'],
+  ['value', 'value'],
+  ['placeholder', 'placeholder'],
+  ['src', 'src'],
+  ['title', 'title'],
+  ['width', 'width'],
+  ['height', 'height'],
+  ['type', 'type'],
+  ['min', 'min'],
+  ['max', 'max'],
+  ['step', 'step'],
+  ['name', 'name'],
+  ['wrap', 'wrap'],
+  ['checked', 'checked'],
+  ['disabled', 'disabled'],
+  ['selected', 'selected'],
+  ['minLength', 'minLength'],
+  ['maxLength', 'maxLength'],
+  ['open', 'open'],
+  ['rel', 'rel'],
+  ['rows', 'rows'],
+  ['style', 'style'],
+  ['target', 'target'],
+  ['viewBox', 'viewBox'],
+  ['valign', 'valign'],
+]
 
-const cellPadding = makeAttrCallable('cellpadding', attr)
-const cellSpacing = makeAttrCallable('cellspacing', attr)
-const border = makeAttrCallable('border', attr)
+const attributeCallableHandlers = Object.fromEntries(
+  ATTRIBUTE_CALLABLE_DEFS.map(([apiName, attrName]) => [apiName, makeAttrCallable(attrName, attr)])
+) as Record<string, AttrCallableInternal>
+
+const ELEMENT_EVENT_DEFS: Array<[apiName: string, eventName: string]> = [
+  ['onClose', 'onclose'],
+  ['onCancel', 'oncancel'],
+  ['onDoubleClick', 'ondblclick'],
+  ['onClick', 'click'],
+  ['onBlur', 'onblur'],
+  ['onChange', 'onchange'],
+  ['onInput', 'oninput'],
+  ['contextMenu', 'contextmenu'],
+  
+  ['onMouseDown', 'onmousedown'],
+  ['onMouseUp', 'onmouseup'],
+  ['onMouseOver', 'onmouseover'],
+  ['onMouseOut', 'onmouseout'],
+  
+  ['onKeyDown', 'onkeydown'],
+  ['onKeyUp', 'onkeyUp'],
+]
 
 function attr2(
   item: ElementFunction,
   args: [name: string | unknown, value?: any]
 ) {
-  // const clone = getPushKid(item as any, item.elementFunctions)
-  // clone.attributes.push(args as Attribute)
   item.attributes.push(args as Attribute)
   bumpContentId(item, args[1])
 
@@ -110,38 +162,25 @@ function attr2(
 }
 
 export function elementFunctions(item: any) {
-  /** Used for all element callbacks */
-  function makeCallback(eventName: string) {
-    return function (callback: (e: InputElementTargetEvent) => any) {
-      return callbackWrapper(item,eventName,callback)
-    }
-  }
+  const eventCallables = Object.fromEntries(
+    ELEMENT_EVENT_DEFS.map(([apiName, eventName]) => [
+      apiName,
+      (callback: (e: InputElementTargetEvent) => any) => callbackWrapper(item, eventName, callback),
+    ])
+  )
+
+  const attributeCallables = Object.fromEntries(
+    Object.entries(attributeCallableHandlers).map(([apiName, handler]) => [apiName, makeAttr(handler, item)])
+  )
 
   // TODO: This maybe the old way of doing things (see callables)
   // This seems to be for supporting div.onClick()
   const callables_other = {
-    // ...eventCallables,
-    onClose: makeCallback('onclose'),
-    onCancel: makeCallback('oncancel'),
-    onDoubleClick: makeCallback('ondblclick'),
-    onClick: makeCallback('click'),
+    ...eventCallables,
     // onclick: makeCallback('click'),
     // click: makeCallback('click'),
-
-    onBlur: makeCallback('onblur'),
-    onChange: makeCallback('onchange'),
-    onInput: makeCallback('oninput'),
     // onchange: makeCallback('onchange'),
     // change: makeCallback('onchange'),
-    
-    contextMenu: makeCallback('contextmenu'),
-    onMousedown: makeCallback('onmousedown'),
-    onMouseup: makeCallback('onmouseup'),
-    onMouseover: makeCallback('onmouseover'),
-    onMouseout: makeCallback('onmouseout'),
-    
-    onKeydown: makeCallback('onkeydown'),
-    onKeyup: makeCallback('onkeyup'),
     // onkeyup: makeCallback('onkeyup'),
     // keyup: makeCallback('onkeyup'),
    
@@ -154,49 +193,7 @@ export function elementFunctions(item: any) {
      ;(this as any).arrayValue = arrayValue
      return this
     },
-
-    /** Use as div.style`border:${border}` or div.style(() => `border:${border}`) */
-    style: makeAttr(style, item),
-
-    /** Use as div.id`main` or div.id(() => `main-${1}`) */
-    id: makeAttr(idCallable, item),
-
-    /** Use as div.class`primary` or div.class(() => `primary`) */
-    class: makeAttr(classCallable, item),
-
-    /** Use as a.href`/path` or a.href(() => `/path`) */
-    href: makeAttr(href, item),
-
-    /** Use as input.value`text` or input.value(() => `${value}`) */
-    value: makeAttr(value, item),
-
-    /** Use as input.placeholder`text` or input.placeholder(() => `${value}`) */
-    placeholder: makeAttr(placeholder, item),
-
-    /** Use as input.src`text` or input.src(() => `${value}`) */
-    src: makeAttr(src, item),
-
-    /** Use as input.type`text` or input.type(() => `${value}`) */
-    type: makeAttr(type, item),
-
-    /** Use as input.type`text` or input.type(() => `${value}`) */
-    title: makeAttr(title, item),
-    
-    /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
-    checked: makeAttr(checked, item),
-    
-    /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
-    disabled: makeAttr(disabled, item),
-    
-    /** Use as input.checked`boolean` or input.checked(() => `${boolean}`) */
-    selected: makeAttr(selected, item),
-
-    cellSpacing: makeAttr(cellSpacing, item),
-    cellPadding: makeAttr(cellPadding, item),
-    border: makeAttr(border, item),
-    minLength: makeAttr(minLength, item),
-    maxLength: makeAttr(maxLength, item),
-    open: makeAttr(open, item), // html dialog
+    ...attributeCallables,
   }
 
   return callables_other
@@ -273,56 +270,60 @@ function makeCallback(eventName: string) {
   }
 }
 
-const eventCallables = {
-  onClick: makeCallback('click'),
-  
-  onDoubleClick: makeCallback('ondblclick'),
-  onDblClick: makeCallback('ondblclick'),
+const objectAttrEventCallables = Object.fromEntries([
+  ['onClick', makeCallback('click')],
+  ['onDoubleClick', makeCallback('ondblclick')],
+  ['onDblClick', makeCallback('ondblclick')],
+  ['onDblClick', makeCallback('ondblclick')],
+  ['onBlur', makeCallback('onblur')],
+  ['onChange', makeCallback('onchange')],
+  ['onCancel', makeCallback('oncancel')],
+  ['onClose', makeCallback('onclose')],
+  ['onInput', makeCallback('oninput')],
+  ['onMousedown', makeCallback('onmousedown')],
+  ['onMouseDown', makeCallback('onmousedown')],
+  ['onMouseup', makeCallback('onmouseup')],
+  ['onMouseUp', makeCallback('onmouseup')],
+  ['onMouseover', makeCallback('onmouseover')],
+  ['onMouseOver', makeCallback('onmouseup')],
+  ['onMouseout', makeCallback('onmouseout')],
+  ['onMouseOut', makeCallback('onmouseout')],
+  ['onKeyup', makeCallback('onkeyup')],
+  ['onKeyUp', makeCallback('onkeyup')],
+  ['onKeydown', makeCallback('onkeydown')],
+  ['onKeyDown', makeCallback('onkeydown')],
+]) as Record<string, (item: ElementFunction, value: any) => ElementFunction>
 
-  onBlur: makeCallback('onblur'),
-  onChange: makeCallback('onchange'),
-  onCancel: makeCallback('oncancel'),
-  onClose: makeCallback('onclose'), // dialog
-  onInput: makeCallback('oninput'),
-  
-  onMousedown: makeCallback('onmousedown'),
-  onMouseDown: makeCallback('onmousedown'),
-  onMouseup: makeCallback('onmouseup'),
-  onMouseUp: makeCallback('onmouseup'),
-  onMouseover: makeCallback('onmouseover'),
-  onMouseOver: makeCallback('onmouseup'),
-  onMouseout: makeCallback('onmouseout'),
-  onMouseOut: makeCallback('onmouseout'),
-
-  onKeyup: makeCallback('onkeyup'),
-  onKeyUp: makeCallback('onkeyup'),
-  
-  onKeydown: makeCallback('onkeydown'),
-  onKeyDown: makeCallback('onkeydown'),
-}
-
-const callables = {
-  checked: setupAttr('checked', setBooleanAttribute),
-  disabled: setupAttr('disabled', setBooleanAttribute),
-  selected: setupAttr('selected', setBooleanAttribute),
-
-  /** element.setAttribute('style', x)  */
-  class: setupAttr('class', setClassValue),
-
-  ...eventCallables
-}
+const callables = Object.assign(
+  Object.fromEntries(
+    ['checked', 'disabled', 'selected'].map(attrName => [attrName, setupAttr(attrName, setBooleanAttribute)])
+  ) as Record<string, (item: ElementFunction, value: any) => ElementFunction>,
+  {
+    /** element.setAttribute('style', x)  */
+    class: setupAttr('class', setClassValue),
+  },
+  objectAttrEventCallables,
+)
 
 export function loopObjectAttributes(
   item: ElementFunction,
   object: any,
 ) {
   const result = Object.entries(object).reduce((all, [name, value]) => {
-    if(name in callables) {
-      return (callables as any)[name](item, value)
-    }
-
-    return attr2(item, [name, value, false, setNonFunctionInputValue] as any)
+    return processSetAttribute(name, value, item)
   }, item) as ElementFunction
 
   return result
+}
+
+function processSetAttribute(
+  name: any,
+  value: any,
+  item: ElementFunction,
+): ElementFunction {
+  if(name in callables) {
+    return (callables as any)[name](item, value)
+  }
+
+  return attr2(item, [name, value, false, setNonFunctionInputValue] as any)
 }

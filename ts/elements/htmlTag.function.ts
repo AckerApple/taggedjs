@@ -2,7 +2,7 @@ import { InputElementTargetEvent } from '../index.js'
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { TagJsTag } from '../TagJsTags/TagJsTag.type.js'
-import { elementFunctions, isValueForContext, loopObjectAttributes } from './elementFunctions.js'
+import { elementFunctions, isValueForContext } from './elementFunctions.js'
 import { elementVarToHtmlString } from './elementVarToHtmlString.function.js'
 import { destroyDesignElement } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
@@ -78,18 +78,14 @@ export function getPushKid(
     newElement.attributes = [...pushKid.attributes] as Attribute[]
     newElement.listeners = [...pushKid.listeners]
     newElement.allListeners = [...pushKid.allListeners]
+    const contexts = newElement.contexts = newElement.contexts || [] as any[]
 
-    if(
-      args.length > 0 &&
-      typeof args[0] === 'object' &&
-      args[0] !== null &&
-      !Array.isArray(args[0]) && 
-      !args[0].tagJsType // TODO: need better attribute detection
-    ) {
-      loopObjectAttributes(newElement, args[0])
-      args.splice(0,1)
+    /*
+    if((pushKid as ElementFunction).contexts) {
+      newElement.contexts.push(...(pushKid as any).contexts)
     }
-    
+    */
+
     newElement.innerHTML = args
 
     // review each child for potential to be context
@@ -103,14 +99,8 @@ export function getPushKid(
 
         if(arg.contexts) {
           // the argument is an element so push up its contexts into mine
-          if(!newElement.contexts) {
-            // newElement.contexts = [...arg.contexts]
-            newElement.contexts = arg.contexts
-            ++newElement.contentId
-          } else {
-            newElement.contexts.push( ...arg.contexts )
-            ++newElement.contentId
-          }
+          contexts.push( ...arg.contexts as any )
+          ++newElement.contentId
         }
         return
       }
@@ -122,7 +112,7 @@ export function getPushKid(
   }
 
   Object.assign(pushKid, element)
-  Object.assign(pushKid, elementFunctions(pushKid))
+  assignFunctionMembers(pushKid as any, elementFunctions(pushKid))
   pushKid.attributes = [...element.attributes] as Attribute[]
   pushKid.listeners = [...element.listeners]
   pushKid.allListeners = [...element.allListeners]
@@ -144,4 +134,22 @@ function registerMockChildContext(
   }
 
   mockElm.contexts.push( value )
+}
+
+function assignFunctionMembers(
+  target: Record<string, any>,
+  source: Record<string, any>,
+) {
+  Object.entries(source).forEach(([key, value]) => {
+    try {
+      target[key] = value
+    } catch {
+      Object.defineProperty(target, key, {
+        value,
+        writable: true,
+        configurable: true,
+        enumerable: false,
+      })
+    }
+  })
 }

@@ -7,7 +7,6 @@ import { ContextItem, ElementContext } from '../ContextItem.type.js';
 import { TemplateValue } from '../TemplateValue.type.js';
 import { makeRealUpdate, afterDestroy } from './processFirstSubjectComponent.function.js';
 import { updateToDiffValue } from './updateToDiffValue.function.js';
-import { paintAfters } from '../../render/paint.function.js';
 
 /** Used when a tag() does not return html`` */
 

@@ -72,6 +72,7 @@ export function processFunctionAttr(
   }
 
   const subContext: BaseContextItem = {
+    description: 'sub-context',
     updateCount: 0,
     isAttr: true,
     target: element,
@@ -88,6 +89,7 @@ export function processFunctionAttr(
   }
 
   const contextItem: BaseContextItem = {
+    description: 'override-context',
     updateCount: 0,
     isAttr: true,
     contexts: [subContext],

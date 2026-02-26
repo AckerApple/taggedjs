@@ -33,7 +33,6 @@ export function firstTagRender(
   ownerSupport?: AnySupport,
 ): AnySupport {
   initState(newSupport.context)
-
   setSupportInCycle(newSupport)
 
   const result = callTag(newSupport, prevSupport, context, ownerSupport)

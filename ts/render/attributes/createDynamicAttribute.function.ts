@@ -32,6 +32,7 @@ export function createDynamicArrayAttribute(
       const myIndex = contexts.length
       const tagJsVar = valueToTagJsVar(value)
       const contextItem: AttributeContextItem = {
+        description: 'attribute-array-item',
         updateCount: 0,
         isAttr: true,
         target: element,
@@ -115,6 +116,7 @@ export function createDynamicAttribute(
 
   const tagJsVar = valueToTagJsVar(value)
   const contextItem: AttributeContextItem = {
+    description: 'dynamic-attribute',
     updateCount: 0,
     isAttr: true,
     target: element,

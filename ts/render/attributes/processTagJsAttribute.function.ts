@@ -25,17 +25,16 @@ export function processTagJsTagAttribute(
   // getOneContext
   const contextItem = getNewContext(
     value,
-    contexts || [],
+    [], // contexts || [],
     true,
     parentContext,
   ) as any as AttributeContextItem
 
+  contextItem.description = 'tagJsVar-attr'
   contextItem.target = element
   contextItem.valueIndex = varIndex
-
   contextItem.isAttr = true
   contextItem.isNameOnly = isNameVar
-
   contextItem.stateOwner = getSupportWithState(support)
   contextItem.supportOwner = support
 
@@ -55,6 +54,7 @@ export function processTagJsTagAttribute(
 
   contextItem.oldTagJsVar = contextItem.tagJsVar
   contextItem.tagJsVar = tagJsVar
+  // contexts.push( contextItem )
 
   return contextItem
 }

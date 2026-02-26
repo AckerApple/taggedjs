@@ -63,6 +63,7 @@ export function processUpdateAttrContext(
       attrContextItem.howToSet as HowToSet,
       [], // Context, but we dont want to alter current
       attrContextItem.parentContext,
+      attrContextItem,
     )
 
     attrContextItem.value = value

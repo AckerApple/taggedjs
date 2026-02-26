@@ -1,6 +1,7 @@
 import { SupportContextItem } from '../index.js'
 import { Subject } from '../subject/Subject.class.js'
 import { ContextItem } from '../tag/ContextItem.type.js'
+import { TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 import { valueToTagJsVar } from '../TagJsTags/valueToTagJsVar.function.js'
 
 export function getNewContext(
@@ -8,14 +9,16 @@ export function getNewContext(
   contexts: ContextItem[],
   withinOwnerElement: boolean,
   parentContext: ContextItem,
+  tagJsVar?: TagJsTag<any>,
 ) {
   const contextItem: ContextItem = {
+    description: 'getNewContext',
     updateCount: 0,
     value,
     destroy$: new Subject<void>(),
     render$: new Subject<void>(),
     // paintCommands: [],
-    tagJsVar: valueToTagJsVar(value),
+    tagJsVar: tagJsVar || valueToTagJsVar(value),
     withinOwnerElement,
     
     parentContext,

@@ -1,5 +1,5 @@
 import { isObject } from "../../index.js"
-import { paintAfters, paintContent } from "../../render/paint.function.js"
+import { paintContent } from "../../render/paint.function.js"
 
 export type HowToSet = (
   element: HTMLElement,
@@ -86,7 +86,7 @@ export function setSimpleAttribute(
   name: string,
   value: string | undefined | boolean | Record<string, any>
 ) {
-    // for checked=true
+  // for checked=true
   ;(element as any)[name] = value
 
   if(value === undefined || value === false || value === null) {

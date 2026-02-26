@@ -53,9 +53,10 @@ export function processDesignElementUpdate(
       context,
       conValues: contexts.map(x => x.value),
       vContexts,
-      deleted: context.deleted
+      deleted: context.deleted,
+      contexts
     })
-    throw new Error('super issue discovered')
+    throw new Error(`Expected ${contexts.length} contexts but got ${vContexts.length}`)
   }
 
   context.locked = 79

@@ -97,6 +97,8 @@ export function processElementVarFunction(
   const contexts = parentContext.contexts as ContextItem[]
   contexts.push(subContext)
 
+  subContext.subContext = aSubContext as any
+
   removeContextInCycle()
 
   return aSubContext

@@ -4,7 +4,6 @@ import { InputElementTargetEvent } from '../TagJsEvent.type.js'
 import { TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 import type { AttributeCallable } from './attributeCallables.js'
 import { ElementVarBase } from './ElementVarBase.type.js'
-import { Attributes } from './htmlTag.function'
 
 export type CombinedElementFunctions = ElementVarBase & {
   /** array value metadata */
@@ -14,21 +13,44 @@ export type CombinedElementFunctions = ElementVarBase & {
   style: AttributeCallable
   id: AttributeCallable
   class: AttributeCallable
+  
+  lang: AttributeCallable
+  content: AttributeCallable
+  charset: AttributeCallable
+  rel: AttributeCallable
+  valign: AttributeCallable
+  
   href: AttributeCallable
   value: AttributeCallable
   placeholder: AttributeCallable
   minLength: AttributeCallable
   maxLength: AttributeCallable
+  min: AttributeCallable
+  max: AttributeCallable
+  step: AttributeCallable
+  name: AttributeCallable
+  wrap: AttributeCallable
+  target: AttributeCallable
   src: AttributeCallable
+  rows: AttributeCallable
   type: AttributeCallable
   title: AttributeCallable
+  alt: AttributeCallable
+  width: AttributeCallable
+  height: AttributeCallable
+  for: AttributeCallable
   disabled: AttributeCallable
   checked: AttributeCallable
   selected: AttributeCallable
   
   cellPadding: AttributeCallable
   cellSpacing: AttributeCallable
+  autoFocus: AttributeCallable
   border: AttributeCallable
+  
+  //svg
+  viewBox: AttributeCallable
+  fill: AttributeCallable
   
   // any other attribute
   attr: (
@@ -42,12 +64,20 @@ export type CombinedElementFunctions = ElementVarBase & {
 
   contextMenu: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   onClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
+  onDoubleClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
+  onDblClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
+  onBlur: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   onChange: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   onInput: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
-  onKeyup: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
-  onKeydown: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
-  onMouseover: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
-  onMouseout: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
+  
+  onKeyUp: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
+  onKeyDown: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
+  
+  onMouseOver: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
+  onMouseOut: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
+  onMouseUp: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
+  onMouseDown: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
+  onClose: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
 }
 
 // type HtmlBasic = (() => TagJsComponent<any>) | void | Date | string | boolean | TagJsTag | number | null | undefined
@@ -64,9 +94,7 @@ export type TagChildContent =  HtmlItem[] | HtmlItem | ToHtmlItem | ((_: InputEl
 
 export type ElementFunction = (
   (
-    attributesOrFirstChild: TagChildContent | Attributes,
     ...children: TagChildContent[]
-  // ) => TagJsComponent<any> // | any[] //| ElementFunction // TagJsTag // CombinedElementFunctions
   ) => ElementFunction & CombinedElementFunctions
   // ) => TagJsTag
 ) & CombinedElementFunctions

@@ -12,13 +12,13 @@ export function getElement(): HTMLElement {
   return context.target as HTMLElement
 }
 
-// const contextCycles: ContextItem[] = []
-export function setContextInCycle(context: ContextItem | undefined) {
-  // contextCycles.push(context)
+const contextCycles: ContextItem[] = []
+export function setContextInCycle(context: ContextItem) {
+  contextCycles.push(context)
   return setUseMemory.stateConfig.context = context
 }
 
 export function removeContextInCycle() {
-  // contextCycles.pop()
-  delete setUseMemory.stateConfig.context
+  contextCycles.pop()
+  setUseMemory.stateConfig.context = contextCycles[contextCycles.length - 1]
 }

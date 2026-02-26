@@ -11,7 +11,8 @@ export function handleTagTypeChangeFrom(
   ownerSupport: AnySupport,
   contextItem: ContextItem, // NOT the subContext
 ) {
-  const isDifferent = !newValue || !(newValue as any).tagJsType || (newValue as any).tagJsType !== originalType
+  const newTagJsType = (newValue as any).tagJsType
+  const isDifferent = !newValue || !newTagJsType || newTagJsType !== originalType
 
   if(isDifferent) {
     const oldTagJsTag = contextItem.tagJsVar as TagJsTag<any>

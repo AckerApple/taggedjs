@@ -18,7 +18,6 @@ export function tagInject<T extends (...args: any[]) => any>(
   let currentContext: ContextItem | undefined = context.parentContext
   
   while (currentContext) {
-    
     // Check if this is an attributes context with child contexts
     const contexts = currentContext.contexts as ContextItem[]
     if (contexts) {
@@ -27,6 +26,7 @@ export function tagInject<T extends (...args: any[]) => any>(
         if (attrContext.isAttr && attrContext.tagJsVar?.matchesInjection) {
           // Use the matchesInjection method if available
           const inContext = attrContext.tagJsVar.matchesInjection(targetItem, attrContext)
+
           if (inContext !== undefined) {
             // For host values, return the returnValue from the context
             return inContext.returnValue

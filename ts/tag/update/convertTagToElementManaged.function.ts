@@ -49,6 +49,7 @@ export function convertTagToElementManaged(
     subject
   );
 
+  context.subContext = newContext as any
   context.tagJsVar = overrideTagVar;
 
   // TODO: should we be calling this here?

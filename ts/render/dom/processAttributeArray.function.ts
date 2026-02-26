@@ -25,6 +25,7 @@ export function processAttributeArray(
 
     // const contexts = support.context.contexts
     const contexts = parentContext.contexts as ContextItem[]
+
     const newContext = processAttribute(
       name,
       value,

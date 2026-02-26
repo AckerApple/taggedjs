@@ -40,6 +40,8 @@ export interface AppContextItem {
   events?: Events
 }
 export interface BaseContextItem extends AppContextItem {  
+  description?: string // debug use only
+
   target?: HTMLElement
   parentContext: BaseContextItem
   

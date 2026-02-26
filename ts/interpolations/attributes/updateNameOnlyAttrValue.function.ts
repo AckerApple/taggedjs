@@ -17,6 +17,7 @@ export function updateNameOnlyAttrValue(
   howToSet: HowToSet,
   contexts: ContextItem[],
   parentContext: ContextItem,
+  context: ContextItem,
 ) {
   // check to remove previous attribute(s)
   if(lastValue) {
@@ -51,6 +52,7 @@ export function updateNameOnlyAttrValue(
     howToSet,
     contexts,
     parentContext,
+    context,
   )
 
   if(standAloneResult) {

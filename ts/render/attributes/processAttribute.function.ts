@@ -17,7 +17,7 @@ import { getTagJsTag, TagVarIdNum } from './getTagJsTag.function.js'
 import { NoDisplayValue } from './NoDisplayValue.type.js'
 import { SpecialDefinition } from './Special.types.js'
 import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
-import { TemplateValue } from '../../index.js'
+import { TemplateValue, valueToTagJsVar } from '../../index.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
 import { processStandAloneAttribute } from './processStandAloneAttribute.function.js'
 import { processTagJsTagAttribute } from './processTagJsAttribute.function.js'
@@ -34,6 +34,7 @@ export function processAttribute(
   parentContext: ContextItem,
   isSpecial: SpecialDefinition,
 ): ContextItem | ContextItem[] | void {
+  // TODO: Next 3 lines might be obsolete
   const varIndex = getTagJsTag(attrName)
   let isNameVar = varIndex >= 0 || (value === undefined && typeof(attrName) !== 'string')
   let valueInValues = values[ varIndex ] as TemplateValue
@@ -45,13 +46,20 @@ export function processAttribute(
     isNameVar = true
     valueInValues = attrName as any // the name is a TagJsTag
     value = attrName
+  } else if (typeof attrName === 'function') {
+    isNameVar = true
+    valueInValues = attrName as any // the name is a TagJsTag
+    value = attrName
   }
 
   const tagJsVar = valueInValues as TagJsTag<any> | undefined
   if( tagJsVar?.tagJsType ) {
     return processTagJsTagAttribute(
       value,
-      [], // contexts,
+      
+      // [], // contexts,
+      contexts,
+
       parentContext,
       tagJsVar,
       varIndex,
@@ -75,17 +83,15 @@ export function processAttribute(
       parentContext,
     ) as any as AttributeContextItem
 
+    contextItem.description = 'processAttribute'
     contextItem.valueIndex = varIndex
     contextItem.isAttr = true
     contextItem.target = element
     contextItem.isNameOnly = true
     contextItem.howToSet = howToSet
 
-    const TagJsTag = contextItem.tagJsVar
-    TagJsTag.processUpdate = processUpdateAttrContext
-
     // single/stand alone attributes
-    const aloneResult = processStandAloneAttribute(
+    processStandAloneAttribute(
       values,
       valueInValues as any,
       element,
@@ -93,11 +99,8 @@ export function processAttribute(
       howToSet as HowToSet,
       contexts,
       parentContext,
+      contextItem,
     )
-
-    if(aloneResult) {
-      contexts.push( ...aloneResult )
-    }
 
     return contextItem
   }

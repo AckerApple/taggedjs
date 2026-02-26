@@ -14,6 +14,14 @@ describe('contentId', () => {
     expect(element.contentId).toBe(5)
   })
 
+  it('does not treat first plain object argument as attributes', () => {
+    const payload = { class: 'a' }
+    const element = div(payload as any)
+
+    expect(element.attributes).toEqual([])
+    expect(element.innerHTML[0]).toBe(payload)
+  })
+
   it('triggers change detection when contentId differs', () => {
     const oldElement = div.class`a`('x')
     const newElement = div.class`ab`('x')
