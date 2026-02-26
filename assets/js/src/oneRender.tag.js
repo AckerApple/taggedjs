@@ -1,43 +1,31 @@
-import { html, Subject, subject, tag, states, ValueSubjective, signal, subscribe } from "taggedjs";
+import { Subject, subject, tag, ValueSubjective, signal, subscribe, noElement, div, span, button, hr, fieldset, legend, br } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component.js";
+let outsideCount = 0;
 /** this tag renders only once */
-export const oneRender = () => tag.renderOnce = (counter = new ValueSubjective(0), renderCount = 0) => {
+export const oneRender = tag(() => {
+    const counter = new ValueSubjective(0);
+    let renderCount = 0;
     ++renderCount;
+    ++outsideCount;
     const x = Subject.all([0, 'all', 4]);
-    return html `
-    ${subscribe(x.pipe(x => JSON.stringify(x)))}
-    <div>
-      <span>👍<span id="👍-counter-display">${subscribe(counter)}</span></span>
-      <button type="button" id="👍-counter-button"
-        onclick=${() => ++counter.value}
-      >++👍</button>
-    </div>
-    ${renderCountDiv({ renderCount, name: 'oneRender_tag_ts' })}
-    <hr />
-    <fieldset>
-      <legend>insideMultiRender</legend>
-      ${insideMultiRender()}
-    </fieldset>
-  `;
-};
+    if (outsideCount > 1) {
+        throw new Error('issue started!');
+    }
+    return noElement(subscribe(x.pipe(x => JSON.stringify(x))), div(span('👍', span.id `👍-counter-display`(subscribe(counter, x => x))), button.type `button`.id `👍-counter-button`.onClick(() => {
+        ++counter.value;
+    })('++👍')), _ => renderCountDiv({ renderCount, name: 'oneRender_tag_ts' }), hr, fieldset(legend('insideMultiRender'), _ => insideMultiRender()));
+});
 /** this tag renders on every event but should not cause parent to re-render */
-const insideMultiRender = tag(() => (counter$ = subject(0), counterSignal$ = signal(0), counter = 0, renderCount = 0, // state can be used but it never updates
-_ = states(get => [{ renderCount, counter }] = get({ renderCount, counter }))) => {
+const insideMultiRender = tag(() => {
+    const counter$ = subject(0);
+    const counterSignal$ = signal(0);
+    let counter = 0;
+    let renderCount = 0; // state can be used but it never updates
     ++renderCount;
-    return html `
-  <div>👍🔨 sub counter-subject-display:<span id="👍🔨-counter-subject-display">${subscribe(counter$)}</span></div>
-  <div>👍📡 signal counter:<span id="📡-signal-counter-display">${counterSignal$}</span></div>
-  <br />
-  <span>👍🔨 sub counter<span id="👍🔨-counter-display">${counter}</span></span>
-  <br />
-  <button type="button" id="👍🔨-counter-button"
-    onclick=${() => {
+    return noElement(div('👍🔨 sub counter-subject-display:', span.id `👍🔨-counter-subject-display`(subscribe(counter$))), div('👍📡 signal counter:', span.id `📡-signal-counter-display`(counterSignal$)), br, span('👍🔨 sub counter: ', span.id `👍🔨-counter-display`(_ => counter)), br, button.type `button`.id `👍🔨-counter-button`.onClick(() => {
         ++counter;
         counter$.next(counter);
         counterSignal$.value = counter;
-    }}
-  >++👍👍</button>
-  ${renderCountDiv({ renderCount, name: 'insideMultiRender' })}
-`;
+    })('++👍👍'), _ => renderCountDiv({ renderCount, name: 'insideMultiRender' }));
 });
 //# sourceMappingURL=oneRender.tag.js.map

@@ -1,10 +1,18 @@
-import { html, tag } from "taggedjs";
+import { tag } from "taggedjs";
 import { dump } from "./index";
 export const arrayDisplay = tag(({ array, showLevels, showAll, showKids, columnNames, formatChange, toggleColumnDialog, allowMaximize, everySimpleValue, }) => {
-    return html `
-    ${array.map((item, index) => {
+    arrayDisplay.updates(x => [{
+            array, showLevels,
+            showAll, showKids,
+            columnNames,
+            formatChange,
+            toggleColumnDialog,
+            allowMaximize,
+            everySimpleValue,
+        }] = x);
+    return array.map((item, index) => {
         const value = paramValueKeys(item, columnNames);
-        return html `${dump({
+        return dump({
             value,
             showLevels,
             showAll,
@@ -14,9 +22,8 @@ export const arrayDisplay = tag(({ array, showLevels, showAll, showKids, columnN
             onHeaderClick: toggleColumnDialog,
             allowMaximize,
             everySimpleValue,
-        })}`.key(index);
-    })}
-  `;
+        }).key(index);
+    });
 });
 function paramValueKeys(inputObject, keysArray) {
     if (['string', 'number', 'boolean'].includes(typeof (inputObject))) {

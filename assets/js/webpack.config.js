@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 const out = path.resolve(__dirname, 'assets', 'dist');
 export default {
     mode: 'production', // development
-    devtool: 'source-map',
+    devtool: 'inline-source-map', // Better for debugging in browser
     entry: './src/index.ts', // Entry point of your TypeScript application
     output: {
         filename: 'bundle.js',
@@ -19,7 +19,7 @@ export default {
     experiments: {
         outputModule: true,
     },
-    target: 'node',
+    target: 'web',
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
         alias: {
@@ -32,12 +32,13 @@ export default {
                 test: /\.(ts|js)x?$/,
                 use: 'ts-loader',
                 exclude: /node_modules/,
-            },
+            } /*,
             {
-                test: /\.(js|ts)$/, // Adjust the regex to match the files you're interested in
-                // use: [path.resolve(__dirname, 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.ts')] // Use the path to your loader
-                use: [path.resolve(__dirname, 'node_modules', 'taggedjs-cli', 'bin', 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.js')] // Use the path to your loader
-            },
+              test: /\.(js|ts)$/,  // Adjust the regex to match the files you're interested in
+              exclude: /node_modules\/stacktrace-js/, // Exclude stacktrace-js from this loader
+              // use: [path.resolve(__dirname, 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.ts')] // Use the path to your loader
+              use: [path.resolve(__dirname, 'node_modules', 'taggedjs-cli', 'bin', 'stringCastHtmlTaggedLoader', 'domCastHtmlTaggedLoader.js')] // Use the path to your loader
+            },*/
         ],
     },
     optimization: {

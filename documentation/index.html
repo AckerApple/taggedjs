@@ -188,9 +188,9 @@
         const color$ = new ValueSubject("tomato")
 
         export const swatch = tag(() =&gt; (
-          div({
-            style: subscribeWith(color$, "tomato", color =&gt; ({ backgroundColor: color }))
-          }, "color swatch")
+          div
+            .style( subscribeWith(color$, "tomato", color =&gt; ({ backgroundColor: color })) )
+            ("color swatch")
         ))
         </code></pre><figcaption>Source: <a href="https://github.com/AckerApple/taggedjs/blob/gh-pages/src/subscribeAttributes.tag.ts" target="_blank"><code>src/subscribeAttributes.tag.ts</code></a></figcaption></figure><h3 class="doc-subtitle" id="subscription-lifecycle"><a class="doc-title-link" href="#subscription-lifecycle">♻️ Subscription Lifecycle</a></h3><p>When a <code>subscribe</code> output is rendered, TaggedJS creates an internal subscription context that stores the latest values and the list of active subscriptions.</p><ul><li>Subscribes to each observable on first render and stores the returned subscriptions in <code>contextItem.subContext.subscriptions</code>.</li><li>When the output is removed (conditional turns false, array diff removes it, or component is destroyed), <code>deleteAndUnsubscribe</code> calls <code>unsubscribe()</code> on each stored subscription and clears the sub-context.</li><li>If a value changes from a subscription to something else, TaggedJS destroys the old subscription and then updates the DOM with the new value.</li></ul><p>For debugging, <code>Subject.globalSubCount$</code> tracks active subscriptions and is incremented on <code>subscribe</code> and decremented on <code>unsubscribe</code>.</p><h3 class="doc-subtitle" id="manual-unsubscribe"><a class="doc-title-link" href="#manual-unsubscribe">🧹 Manual Unsubscribe</a></h3><p>If you subscribe manually via <code>Subject.subscribe</code> (outside of <code>subscribe(...)</code>), you are responsible for calling <code>subscription.unsubscribe()</code>. <code>onDestroy</code> is the usual place to do that.</p><figure><pre><code class="language-ts">import { tag, Subject, onDestroy } from "taggedjs"
 

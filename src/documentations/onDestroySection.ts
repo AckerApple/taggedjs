@@ -26,26 +26,20 @@ div(
 `
 
 export function onDestroySection() {
-  return section({class: "section-card", id: "on-destroy"},
-    docH2("on-destroy", "🧹 onDestroy Cleanup"),
-    p(
+  return section.class`section-card`.id`on-destroy`(docH2("on-destroy", "🧹 onDestroy Cleanup"), p(
       "Use ",
       code("onDestroy"),
       " to run cleanup logic when a tag component is removed. For host elements, ",
       code("host.onDestroy"),
       " lets you attach cleanup at the element level."
-    ),
-    figure(
-      pre(code({class: "language-ts"}, onDestroyCode)),
+    ), figure(
+      pre(code.class`language-ts`(onDestroyCode)),
       figcaption(
         "Source: ",
-        a({href: `${repoBaseUrl}/src/destroys.tag.ts`, target: "_blank"}, code("src/destroys.tag.ts"))
+        a.href(`${repoBaseUrl}/src/destroys.tag.ts`).target`_blank`(code("src/destroys.tag.ts"))
       )
-    ),
-    p(
+    ), p(
       "Common uses include removing event listeners, stopping intervals, or ",
       "disposing subscriptions tied to the component lifecycle."
-    ),
-    p(a({class: "inline-link", href: "#top"}, "Back to top"))
-  )
+    ), p(a.class`inline-link`.href`#top`("Back to top")))
 }

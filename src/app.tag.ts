@@ -14,11 +14,9 @@ const appFun = tag(() => {
     console.info('🍒 Main app rendered', appDate)
 
     return [
-      h1({id:"h1-app"}, `🏷️ TaggedJs - ${2+2}`),
+      h1.id`h1-app`(`🏷️ TaggedJs - ${2+2}`),
 
-      button({type:"button",
-        onClick:() => showHide = !showHide,
-      }, 'show/hide ', _=> showHide),
+      button.type`button`.onClick(() => showHide = !showHide)('show/hide ', _=> showHide),
       
       () => showHide && fxTag(),
 
@@ -37,9 +35,7 @@ export const App = tag(appFun)
 const fxTag = tag(() => [
   hr,
   
-  div({attr: fx({duration: '.1s'})},
-    'Hello animated world'
-  ),
+  div.attr(fx({duration: '.1s'}) as any)('Hello animated world'),
   
   hr,
 ])

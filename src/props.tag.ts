@@ -16,18 +16,8 @@ export const propsDebugMain = tag((
   let statePropDisplay = true
 
   return div(
-    div(
-      {
-        style: "display:flex;flex-wrap:wrap",
-        id: "textareawrap"
-      },
-      textarea(
-        {
-          id: "props-debug-textarea",
-          wrap: "off",
-          onChange: (event: InputElementTargetEvent) => propsJson = JSON.parse(event.target.value),
-          style: "height:200px;font-size:0.6em;width:100%;max-width:400px"
-        }, _=> json),
+    div.style`display:flex;flex-wrap:wrap`.id`textareawrap`(
+      textarea.id`props-debug-textarea`.wrap`off`.onChange((event: InputElementTargetEvent) => propsJson = JSON.parse(event.target.value)).style`height:200px;font-size:0.6em;width:100%;max-width:400px`(_=> json),
       pre(json)
     ),
 
@@ -36,13 +26,10 @@ export const propsDebugMain = tag((
     ),
 
     div(
-      button({
-        id: "propsDebug-🥩-0-button",
-        onClick: () => {
+      button.id`propsDebug-🥩-0-button`.onClick(() => {
           ++propNumber
-        }
-      }, '🥩 propNumber ', _=> propNumber),
-      span({id: "propsDebug-🥩-0-display"}, _=> propNumber)
+        })('🥩 propNumber ', _=> propNumber),
+      span.id`propsDebug-🥩-0-display`(_=> propNumber)
     ),
 
     fieldset(
@@ -59,8 +46,8 @@ export const propsDebugMain = tag((
     fieldset(
       legend('sync props callback'),
       '🥡 syncPropNumber: ',
-      span({id: "sync-prop-number-display"}, _=> syncPropNumber),
-      button({onClick: () => ++syncPropNumber}, '🥡 ++'),
+      span.id`sync-prop-number-display`(_=> syncPropNumber),
+      button.onClick(() => ++syncPropNumber)('🥡 ++'),
       _=> renderCountDiv({renderCount, name: 'sync_props_callback'}),
       
       hr,
@@ -78,20 +65,16 @@ export const propsDebugMain = tag((
       legend('state prop'),
       _=> statePropDisplay && statePropDebugTag(propNumber, 'child innerHtml 👶'),
       hr,
-      button({onClick: () => statePropDisplay = !statePropDisplay}, 'hide/show')
+      button.onClick(() => statePropDisplay = !statePropDisplay)('hide/show')
     ),
 
     fieldset(
       legend('date prop'),
       'date:', _=> date,
-      input({
-        type: "date",
-        value: _=> timestampToValues(date).date,
-        onChange: (event: InputElementTargetEvent) => {
+      input.type`date`.value(_=> timestampToValues(date).date).onChange((event: InputElementTargetEvent) => {
           const newDateString = event.target.value
           date = new Date(newDateString)
-        }
-      }),
+        })(),
       hr,
       _=> propDateDebug({date})
     )
@@ -137,27 +120,21 @@ const syncPropDebug = tag((
   return div(
     div(
       '🥡 child syncPropNumber:',
-      span({id: "sync-prop-child-display"}, _=> syncPropNumber),
-      button({
-        id: "sync-prop-child-button",
-        onClick: () => propNumberChange(++syncPropNumber)
-      }, '🥡 ++')
+      span.id`sync-prop-child-display`(_=> syncPropNumber),
+      button.id`sync-prop-child-button`.onClick(() => propNumberChange(++syncPropNumber))('🥡 ++')
     ),
     div(
       div(
         'counter:',
-        span({id: "sync-prop-counter-display"}, _=> counter)
+        span.id`sync-prop-counter-display`(_=> counter)
       ),
       'parentTest',
-      span({id: "nothing-prop-counter-display"}, _=> {
+      span.id`nothing-prop-counter-display`(_=> {
         return parentTest(counter)
       }),
-      button({
-        id: "nothing-prop-counter-button",
-        onClick: () => {
+      button.id`nothing-prop-counter-button`.onClick(() => {
           parentTest(++counter)
-        }
-      }, '++')
+        })('++')
     ),
     _=> renderCountDiv({renderCount, name: 'child_sync_props_callback'})
   )
@@ -202,14 +179,10 @@ const propsDebug = tag((
   return noElement(
     h3('Props Json'),
     
-    textarea({
-      style: "font-size:0.6em;height:200px;width:100%;;max-width:400px",
-      wrap: "off",
-      onChange: (event: InputElementTargetEvent)=> {
+    textarea.style`font-size:0.6em;height:200px;width:100%;;max-width:400px`.wrap`off`.onChange((event: InputElementTargetEvent)=> {
         const value = JSON.parse(event.target.value)
         Object.assign(propsJson, value)
-      },
-    }, _=> JSON.stringify(propsJson, null, 2)),
+      })(_=> JSON.stringify(propsJson, null, 2)),
 
     pre(_=> JSON.stringify(propsJson, null, 2) ),
 
@@ -217,34 +190,29 @@ const propsDebug = tag((
     
     h3('Props Number'),
 
-    textarea({
-      style:"font-size:0.6em;height:200px;width:100%;color:white;",
-      wrap:"off",
-      attr:'disabled'
-    }, _=> JSON.stringify(propNumberChangeCount, null, 2)),
+    textarea
+      .style`font-size:0.6em;height:200px;width:100%;color:white;`
+      .wrap`off`
+      .disabled`true`(
+        _=> JSON.stringify(propNumberChangeCount, null, 2)
+      ),
     
     div(
-      button({
-        id: "propsDebug-🥩-1-button",
-        onClick: () => propNumberChange(++propNumber)
-      }, '🐄 🥩 my propNumber ', _=> controlPropNumber),
-      span({id:"propsDebug-🥩-1-display"}, _=> controlPropNumber)
+      button.id`propsDebug-🥩-1-button`.onClick(() => propNumberChange(++propNumber))('🐄 🥩 my propNumber ', _=> controlPropNumber),
+      span.id`propsDebug-🥩-1-display`(_=> controlPropNumber)
     ),
   
     div(
-      button({
-        id:"propsDebugLet-🥩-2-button",
-        onClick: () => {
+      button.id`propsDebugLet-🥩-2-button`.onClick(() => {
           ++propNumber
-        },
-      }, '🐄 🥩 local letProp propNumber ', _=> propNumber),
-      span({id:"propsDebug-🥩-let-prop-display"}, _=> propNumber)
+        })('🐄 🥩 local letProp propNumber ', _=> propNumber),
+      span.id`propsDebug-🥩-let-prop-display`(_=> propNumber)
     ),
     
     div(
       small(
         '(propNumberChangeCount:',
-        span({id:"propsDebug-🥩-change-count-display"}, _=> propNumberChangeCount),
+        span.id`propsDebug-🥩-change-count-display`(_=> propNumberChangeCount),
         ')',
       )
     ),
@@ -280,16 +248,13 @@ const propFnUpdateTest = tag(({
   ++renderCount
 
   return noElement(
-    button({
-      id:"propsOneLevelFunUpdate-🥩-button",
-      onClick: callback,
-    },'🐄 🥩 local & 1-parent increase', _=> propNumber),
+    button.id`propsOneLevelFunUpdate-🥩-button`.onClick(callback)('🐄 🥩 local & 1-parent increase', _=> propNumber),
     
-    span({id:"propsOneLevelFunUpdate-🥩-display"}, _=> propNumber),
+    span.id`propsOneLevelFunUpdate-🥩-display`(_=> propNumber),
     
     _=> renderCountDiv({renderCount, name: 'propFnUpdateTest'}),
     
-    small({style:"opacity:.5"}, 'the count here and within parent increases but not in parent parent')
+    small.style`opacity:.5`('the count here and within parent increases but not in parent parent')
   )
 })
 

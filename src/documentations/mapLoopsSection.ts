@@ -46,11 +46,11 @@ export function mapLoopsSection() {
       " when the list can be reordered or removed so TaggedJS can keep elements stable."
     ),
     figure(
-      pre(code({class: "language-ts"}, mapLoopsCode)),
+      pre(code.class`language-ts`(mapLoopsCode)),
       figcaption("Map each item and key the result")
     ),
     figure(
-      pre(code({class: "language-ts"}, mapLoopsUserIdCode)),
+      pre(code.class`language-ts`(mapLoopsUserIdCode)),
       figcaption("Use a stable id as the loop key")
     ),
   ]

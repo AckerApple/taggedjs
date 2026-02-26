@@ -62,43 +62,35 @@ export const homePage = tag(() => {
   ++renderCount
 
   return div(
-    button({
-      onClick: () => fireTesting(true, onTestComplete)
-    }, 'run tests ', testEmoji),
+    button.onClick(() => fireTesting(true, onTestComplete))('run tests ', testEmoji),
 
     fieldset(
       legend('direct app tests'),
-      button({
-        id: "app-counter-subject-button",
-        onClick: () => {
+      button.id`app-counter-subject-button`.onClick(() => {
           appCounterSubject.next(appCounter + 1)
-        }
-      }, '🍒 ++app subject'),
-      button({
-        id: "app-counter-button",
-        onClick: () => ++appCounter
-      }, '🍒 ++app'),
+        })('🍒 ++app subject'),
+      button.id`app-counter-button`.onClick(() => ++appCounter)('🍒 ++app'),
       span(
         '🍒 ',
-        span({id: "app-counter-display"}, _=> appCounter)
+        span.id`app-counter-display`(_=> appCounter)
       ),
       span(
         '🍒$<',
-        span({id: "app-counter-subject-display"}, _=> subscribe(appCounterSubject)),
+        span.id`app-counter-subject-display`(_=> subscribe(appCounterSubject)),
         '>'
       ),
-      span(
+      span.style`border:2px solid orange;`(
         '🍒$.value<',
-        span({id: "app-counter-subject-value-display"}, _=> appCounterSubject.value),
+        span
+          .id`app-counter-subject-value-display`(
+            _=> appCounterSubject.value
+          ),
         '>'
       ),
-      button({
-        id: "toggle-test",
-        onClick: () => toggle()
-      }, 'toggle test ', _=> toggleValue)
+      button.id`toggle-test`.onClick(() => toggle())('toggle test ', _=> toggleValue)
     ),
 
-    div({style: "display:flex;flex-wrap:nowrap;gap:1em;justify-content: center;"},
+    div.style`display:flex;flex-wrap:nowrap;gap:1em;justify-content: center;`(
       _=> renderCountDiv({name:'app', renderCount}),
       div(
         small(
@@ -109,14 +101,12 @@ export const homePage = tag(() => {
       )
     ),
 
-    a({name: "top", id: "top"}),
+    a.name`top`.id`top`(),
 
     _=> sectionSelector(),
 
-    div({id: "tagDebug-fx-wrap"},
-      button({
-        onClick: () => showSections = !showSections
-      }, 'toggle sections'),
+    div.id`tagDebug-fx-wrap`(
+      button.onClick(() => showSections = !showSections)('toggle sections'),
 
       _=> showSections && renderedSections(appCounterSubject),
 

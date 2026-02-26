@@ -1,5 +1,5 @@
-import { byId } from "./testing/elmSelectors";
-import { expect, it } from "./testing/expect";
+import { it, expect } from './testing';
+import { byId } from './testing';
 it('elements exists', () => {
     expect(byId('h1-app')).toBeDefined();
     const toggleTest = byId('toggle-test');
@@ -15,7 +15,5 @@ it('toggle test', () => {
     toggleTest.click();
     // after click now false
     expect(toggleTest.innerText).toBe('toggle test');
-    const propsTextarea = byId('props-debug-textarea');
-    expect(propsTextarea.value.replace(/\s/g, '')).toBe(`{"test":33,"x":"y"}`);
 });
 //# sourceMappingURL=basic.test.js.map

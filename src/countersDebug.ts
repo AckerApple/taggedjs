@@ -20,32 +20,20 @@ _ = 'countersDebug'
   return div(
     '<!--counters-->',
     _=> test(),
-    div({style:"display:flex;flex-wrap:wrap;gap:1em"},
-      div(
+    div.style`display:flex;flex-wrap:wrap;gap:1em`(div(
         '👉 SubscriptionCount$:',
-        span({id:"👉-counter-sub-count"},
-          subscribe((Subject as any).globalSubCount$)
-        )
-      ),
-      button({
-        onClick: () => console.info('subs', (Subject as any).globalSubs)
-      }, 'log subs'),
-
-      div(
-        button({
-          id: "counters-app-counter-subject-button",
-          onClick: () => appCounterSubject.next((appCounterSubject.value || 0) + 1)
-        }, '🍒 ++app subject'),
+        span.id`👉-counter-sub-count`(subscribe((Subject as any).globalSubCount$))
+      ), button.onClick(() => console.info('subs', (Subject as any).globalSubs))('log subs'), div(
+        button.id`counters-app-counter-subject-button`.onClick(() => appCounterSubject.next((appCounterSubject.value || 0) + 1))('🍒 ++app subject'),
         span(
           '🍒 ',
-          span({id:"app-counters-display"}, subscribe(appCounterSubject))
+          span.id`app-counters-display`(subscribe(appCounterSubject))
         ),
         span(
           '🍒 ',
-          span({id:"app-counters-subject-display"}, appCounterSubject.value)
+          span.id`app-counters-subject-display`(appCounterSubject.value)
         )
-      )
-    ),
+      )),
     
     innerCounterContent,
   )
@@ -66,35 +54,13 @@ const immutablePropCounters = tag(({
   ++renderCount // for debugging
 
   return div(
-    div({style: "display:flex;flex-wrap:wrap;gap:1em;"},
-      div({style: "border:1px dashed black;padding:1em;"},
-        button({
-            id: "❤️🪨-immutable-counter",
-            onClick: increasePropCounter,
-          },
-          '❤️🪨 propCounter:',
-          _=> propCounter
-        ),
-        span(
+    div.style`display:flex;flex-wrap:wrap;gap:1em;`(div.style`border:1px dashed black;padding:1em;`(button.id`❤️🪨-immutable-counter`.onClick(increasePropCounter)('❤️🪨 propCounter:', _=> propCounter), span(
           '❤️🪨 ',
-          span({id: "❤️🪨-immutable-display"}, _=> propCounter)
-        )
-      ),
-
-      div({style: "border:1px dashed black;padding:1em;"},
-        button({
-            id: "🪨-immutable-counter",
-            onClick: () => ++otherCounter,
-          },
-          '🪨 otherCounter:',
-          _=> otherCounter,
-        ),
-        span(
+          span.id`❤️🪨-immutable-display`(_=> propCounter)
+        )), div.style`border:1px dashed black;padding:1em;`(button.id`🪨-immutable-counter`.onClick(() => ++otherCounter)('🪨 otherCounter:', _=> otherCounter), span(
           '🪨 ',
-          span({id: "🪨-immutable-display"}, _=> otherCounter)
-        )
-      )
-    ),
+          span.id`🪨-immutable-display`(_=> otherCounter)
+        ))),
 
     div('renderCount:', _=> renderCount),
     _=> renderCountDiv({renderCount, name: 'immutable_counters'})
@@ -117,35 +83,13 @@ const noWatchPropCounters = tag(({
   ++renderCount // for debugging
 
   return div(
-    div({style: "display:flex;flex-wrap:wrap;gap:1em;"},
-      div({style: "border:1px dashed black;padding:1em;"},
-        button({
-            id: "❤️🚫-nowatch-counter",
-            onClick: increasePropCounter,
-          },
-          '❤️🚫 propCounter:',
-          _=> propCounter,
-        ),
-        span(
+    div.style`display:flex;flex-wrap:wrap;gap:1em;`(div.style`border:1px dashed black;padding:1em;`(button.id`❤️🚫-nowatch-counter`.onClick(increasePropCounter)('❤️🚫 propCounter:', _=> propCounter), span(
           '❤️🚫 ',
-          span({id: "❤️🚫-nowatch-display"}, _=> propCounter)
-        )
-      ),
-
-      div({style: "border:1px dashed black;padding:1em;"},
-        button({
-            id: "🚫-nowatch-counter",
-            onClick: () => ++otherCounter,
-          },
-          '🚫 otherCounter:',
-          _=> otherCounter
-        ),
-        span(
+          span.id`❤️🚫-nowatch-display`(_=> propCounter)
+        )), div.style`border:1px dashed black;padding:1em;`(button.id`🚫-nowatch-counter`.onClick(() => ++otherCounter)('🚫 otherCounter:', _=> otherCounter), span(
           '🚫 ',
-          span({id: "🚫-nowatch-display"}, _=> otherCounter)
-        )
-      )
-    ),
+          span.id`🚫-nowatch-display`(_=> otherCounter)
+        ))),
 
     div('renderCount:', _=> renderCount),
     _=> renderCountDiv({renderCount, name: 'nowatch_counters'})
@@ -218,93 +162,70 @@ export const innerCounterContent = tag(() => {
     
     div(
       '😱 statesRenderCount:', _=> statesRenderCount,
-      button({
-        type: "button",
-        onClick: () => {
+      button.type`button`.onClick(() => {
           ++statesRenderCount
-        }
-      }, '😱 ++statesRenderCount')
+        })('😱 ++statesRenderCount')
     ),
 
     div(
       '😱😱 statesRenderCount2:', _=> statesRenderCount2,
-      button({
-        type: "button",
-        onClick: () => {
+      button.type`button`.onClick(() => {
           ++statesRenderCount2
-        },
-      }, '😱😱 ++statesRenderCount2')
+        })('😱😱 ++statesRenderCount2')
     ),
 
-    div({style:"display:flex;flex-wrap:wrap;gap:1em"},
-      input({
-        id: "set-main-counter-input",
-        placeholder: "input counter value",
-        onKeyup: e => (counter = Number(e.target.value) || 0)
-      }),
-
+    div.style`display:flex;flex-wrap:wrap;gap:1em`(
+      input
+        .id`set-main-counter-input`
+        .placeholder`input counter value`
+        .onKeyUp(e => (counter = Number(e.target.value) || 0)),
+      
       div(
-        button({
-          id: "❤️-increase-counter",
-          onClick: increasePropCounter
-        }, '❤️ propCounter:', _=> propCounter),
-        span(
-          '❤️ ',
-          span({id:"❤️-counter-display"}, _=> propCounter)
-        )
-      ),
-    
-      div(
-        button({
-          id: "🥦-standalone-counter",
-          onClick: increaseCounter,
-        },'🥦 stand alone counters'),
-        span(
-          '🥦 ',
-          span({id:"🥦-standalone-display"}, _=> counter)
-        )
-      ),
-    
-      _=> counter > 1 && div(
-        button({
-          id: "conditional-counter",
-          onClick: increaseCounter,
-        }, 'conditional counter:', _=> counter)),
+        button
+          .id`❤️-increase-counter`
+          .onClick(increasePropCounter)(
+            '❤️ propCounter:', _=> propCounter
+          ),
         
         span(
-          '🥦 ',
-          span({id:"conditional-display"}, _=> counter),
+          '❤️ ',
+          span.id`❤️-counter-display`(_=> propCounter)
         )
-    ),
+      ),
+      div(
+        button
+          .id`🥦-standalone-counter`
+          .onClick(increaseCounter)(
+            '🥦 stand alone counters'
+          ),
+        span(
+          '🥦 ',
+          span.id`🥦-standalone-display`(_=> counter)
+        )
+      ), _=> counter > 1 && div(
+        button.id`conditional-counter`.onClick(increaseCounter)('conditional counter:', _=> counter)), span(
+          '🥦 ',
+          span.id`conditional-display`(_=> counter),
+        )),
     
     div(
-      button({
-        id: "🥦-subject-increase-counter",
-        onClick: () => callbackTestSub.next(counter + 1)
-      }, '++subject<>'),
+      button.id`🥦-subject-increase-counter`.onClick(() => callbackTestSub.next(counter + 1))('++subject<>'),
       span(
         '🥦<',
-        span({id:"subject-counter-subject-display"},
-          subscribe(callbackTestSub)
-        ),
+        span.id`subject-counter-subject-display`(subscribe(callbackTestSub)),
         '>'
       )
     ),
 
     div(
-      button({
-        id: "🥦-subject-increase-async-counter",
-        onClick: () => {
+      button.id`🥦-subject-increase-async-counter`.onClick(() => {
           setTimeout(() => {
             callbackTestSub2.next(callbackTestSub2.value as number + 1)
           }, 10)
-        }
-      }, '🔀 🥦 ++subject<>'),
+        })('🔀 🥦 ++subject<>'),
       span(
         '🔀 🥦<',
-        span({id:"subject-async-counter-subject-display"},
-          subscribe(callbackTestSub2)
-        ),
+        span.id`subject-async-counter-subject-display`(subscribe(callbackTestSub2)),
         '>'
       )
     ),
@@ -313,9 +234,7 @@ export const innerCounterContent = tag(() => {
       legend('🪈 pipedSubject 1'),
       div(
         small(
-          span({id:"🪈-pipedSubject"},
-            subscribe(pipedSubject1, () => counter)
-          )
+          span.id`🪈-pipedSubject`(subscribe(pipedSubject1, () => counter))
         )
       )
     ),
@@ -324,9 +243,7 @@ export const innerCounterContent = tag(() => {
       legend('🪈 pipedSubject 2'),
       div(
         small(
-          span({id:"🪈-pipedSubject-2"},
-            subscribe(pipedSubject2, () => counter)
-          )
+          span.id`🪈-pipedSubject-2`(subscribe(pipedSubject2, () => counter))
         )
       )
     ),
@@ -335,7 +252,7 @@ export const innerCounterContent = tag(() => {
       legend('🪈 pipedSubject 3'),
       div(
         small(
-          span({id:"🪈-pipedSubject-3"}, subscribe(pipedSubject3, (a) => {
+          span.id`🪈-pipedSubject-3`(subscribe(pipedSubject3, (a) => {
             return 'hello world'
           }))
         )
@@ -344,15 +261,14 @@ export const innerCounterContent = tag(() => {
 
     fieldset(
       legend('shared memory'),
-      div({
-          class: { bold: true, 'text-blue': true },
-          style: "display:flex;flex-wrap:wrap;gap:.5em"
-        },
-        _=> mouseOverTag({label: 'a-a-😻', memory}),
-        _=> mouseOverTag({label: 'b-b-😻', memory})
-      ),
+      div
+        .class({ bold: true, 'text-blue': true } as any)
+        .style`display:flex;flex-wrap:wrap;gap:.5em`(
+          _=> mouseOverTag({label: 'a-a-😻', memory}),
+          _=> mouseOverTag({label: 'b-b-😻', memory})
+        ),
       'memory.counter:😻', _=> memory.counter,
-      button({onClick: () => ++memory.counter}, 'increase 😻')
+      button.onClick(() => ++memory.counter)('increase 😻')
     ),
     
     fieldset(
@@ -375,22 +291,18 @@ export const innerCounterContent = tag(() => {
       _=> noWatchPropCounters({propCounter, increasePropCounter})
     ),
 
-    div({style:"font-size:0.8em;opacity:0.8"},
+    div.style`font-size:0.8em;opacity:0.8`(
       '⌚️ page load to display in\u00A0',
-      span({
-          attr: host.onInit((element) => element.innerText = (Date.now()-loadStartTime).toString())
-        },'-'
-      ),
-      'ms'
-    ),
-    div({style:"font-size:0.8em;opacity:0.8"},
+      span.attr(
+        host.onInit((element) => element.innerText = (Date.now()-loadStartTime).toString()) as any
+      )('-'), 'ms'),
+    div.style`font-size:0.8em;opacity:0.8`(
       '⌚️ read in\u00A0',
-      span({
-          attr: host.onInit((element) => element.innerText = (Date.now()-readStartTime).toString()),
-        },
-        '-'
-      ),
-      'ms'
+      span.attr(
+        host.onInit(
+          (element) => element.innerText = (Date.now()-readStartTime).toString()
+        ) as any
+      )('-'), 'ms'
     ),
 
     _=> renderCountDiv({renderCount, name: 'counters'}),

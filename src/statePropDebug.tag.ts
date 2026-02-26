@@ -14,13 +14,7 @@ export const statePropDebug = tag((
 
   return noElement(
     'propCounter:', _=> propCounter,
-    button(
-      {
-        type:"button",
-        onClick: () => edit = !edit
-      },
-      'edit: ', _=> edit,
-    ),
+    button.type`button`.onClick(() => edit = !edit)('edit: ', _=> edit),
     'child: ', _=> child,
     _=> renderCountDiv({renderCount, name: 'statePropDebug-tag'}),
 

@@ -14,7 +14,10 @@ export const run = (compiler) => {
             if (compilation.errors.length) {
                 const error = compilation.errors[0];
                 const errors = error.module?._errors || (error.module?.getErrors?.());
-                console.error('🌎📦 🔴 compilation bundle error', error.message, errors);
+                console.error('🌎📦 🔴 compilation bundle error', error.message, errors, { module: {
+                        request: error.module?.request,
+                        rawRequest: error.module?.rawRequest,
+                    } });
                 return rej({} /*error*/);
             }
             res(stats);

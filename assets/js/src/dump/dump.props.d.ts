@@ -1,4 +1,4 @@
-import { Tag } from "taggedjs";
+import { TagJsComponent } from "taggedjs";
 type ShowChange = (show: boolean) => any;
 export type OnHeaderClick = () => any;
 export type FormatChange = (format: 'json' | 'flex') => unknown;
@@ -18,5 +18,5 @@ export type DumpProps<T> = {
     allowMaximize?: boolean;
     everySimpleValue?: EverySimpleValue;
 };
-export type EverySimpleValue = (value: SimpleValue, key?: string) => SimpleValue | Tag;
+export type EverySimpleValue = (value: SimpleValue, key?: string) => SimpleValue | TagJsComponent<any>;
 export {};

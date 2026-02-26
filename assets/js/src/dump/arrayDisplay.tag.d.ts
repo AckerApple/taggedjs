@@ -10,4 +10,4 @@ export declare const arrayDisplay: import("taggedjs").TaggedFunction<({ array, s
     toggleColumnDialog: () => any;
     allowMaximize?: boolean;
     everySimpleValue?: EverySimpleValue;
-}) => import("taggedjs").Tag>;
+}) => import("taggedjs").TagJsComponent<any>[]>;

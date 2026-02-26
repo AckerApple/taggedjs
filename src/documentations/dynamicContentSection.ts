@@ -25,7 +25,7 @@ export function dynamicContentSection() {
       "."
     ),
     figure(
-      pre(code({class: "language-ts"}, dynamicCueCode)),
+      pre(code.class`language-ts`(dynamicCueCode)),
       figcaption("Dynamic content cue vs event handler")
     ),
   ]

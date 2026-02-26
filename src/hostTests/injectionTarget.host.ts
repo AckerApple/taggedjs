@@ -1,6 +1,5 @@
 import { host, tag } from "taggedjs"
 import { injectionWrap } from "./injectionWrap.host.js"
-import { getContextInCycle } from "taggedjs"
 
 export const injectionTarget = host((
   value: any

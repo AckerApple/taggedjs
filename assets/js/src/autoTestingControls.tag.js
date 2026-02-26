@@ -1,14 +1,12 @@
-import { tag, html, onInit } from "taggedjs";
+import { tag, input, button, div } from "taggedjs";
 import { saveScopedStorage, storage } from "./sectionSelector.tag";
 import { runTesting } from "./runTesting.function";
-export const autoTestingControls = (tests, runStartEndTests) => tag.use = (_ = onInit(() => {
+export const autoTestingControls = tag((tests, runStartEndTests) => {
     if (storage.autoTest) {
         runTesting(false, tests, runStartEndTests);
     }
-})) => html `
-  auto testing <input type="checkbox" ${storage.autoTest && 'checked'} onchange=${toggleAutoTesting} />
-  <button type="button" onclick=${() => runTesting(true, tests, runStartEndTests)}>run tests</button>
-`;
+    return div('auto testing ', input.type `checkbox`.onChange(toggleAutoTesting).checked(_ => storage.autoTest)(), button.type `button`.onClick(() => runTesting(true, tests, runStartEndTests))('run tests'));
+});
 function toggleAutoTesting() {
     storage.autoTest = storage.autoTest = !storage.autoTest;
     saveScopedStorage();

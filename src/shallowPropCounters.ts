@@ -16,31 +16,13 @@ export const shallowPropCounters = tag(({
   ++renderCount; // for debugging
 
   return div(
-    div({style: "display:flex;flex-wrap:wrap;gap:1em;"},
-      div({style: "border:1px dashed black;padding:1em;"},
-        button(
-          {id: "❤️💧-shallow-counter", onClick: increasePropCounter},
-          '❤️💧 propCounter:',
-          _=> propCounter
-        ),
-        span(
+    div.style`display:flex;flex-wrap:wrap;gap:1em;`(div.style`border:1px dashed black;padding:1em;`(button.id`❤️💧-shallow-counter`.onClick(increasePropCounter)('❤️💧 propCounter:', _=> propCounter), span(
           '❤️💧 ',
-          span({id: "❤️💧-shallow-display"}, _=> propCounter)
-        )
-      ),
-
-      div({style: "border:1px dashed black;padding:1em;"},
-        button(
-          {id: "💧-shallow-counter", onClick: () => ++otherCounter},
-          '💧 otherCounter:',
-          _=> otherCounter
-        ),
-        span(
+          span.id`❤️💧-shallow-display`(_=> propCounter)
+        )), div.style`border:1px dashed black;padding:1em;`(button.id`💧-shallow-counter`.onClick(() => ++otherCounter)('💧 otherCounter:', _=> otherCounter), span(
           '💧 ',
-          span({id: "💧-shallow-display"}, _=> otherCounter)
-        )
-      )
-    ),
+          span.id`💧-shallow-display`(_=> otherCounter)
+        ))),
 
     div('renderCount:', _=> renderCount),
     _=> renderCountDiv({ renderCount, name: 'shallow_counters' })

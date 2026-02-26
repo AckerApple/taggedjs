@@ -37,22 +37,17 @@ export default tag(() => {
   ++renderCount
 
   return div(
-    h1({id: "app"}, '🏷️ TaggedJs - isolated'),
+    h1.id`app`('🏷️ TaggedJs - isolated'),
 
     div(
-      button({
-        id: "app-counter-subject-button",
-        onClick: () => appCounterSubject.next(appCounter + 1)
-      }, '🍒 ++app subject'),
+      button.id`app-counter-subject-button`.onClick(() => appCounterSubject.next(appCounter + 1))('🍒 ++app subject'),
       span(
         '🍒 ',
-        span({id: "app-counter-subject-display"}, _=> appCounter)
+        span.id`app-counter-subject-display`(_=> appCounter)
       )
     ),
 
-    div({id: "tagDebug-fx-wrap"},
-      div({style: "display:flex;flex-wrap:wrap;gap:1em"},
-        _=> [
+    div.id`tagDebug-fx-wrap`(div.style`display:flex;flex-wrap:wrap;gap:1em`(_=> [
           {view:'oneRender', label:'oneRender', tag: oneRender},
           {view:'props', label:'propsDebugMain', tag: propsDebugMain},
           {view:'watchTesting', label:'watchTesting', tag: watchTesting},
@@ -69,14 +64,6 @@ export default tag(() => {
             legend(_=> label),
             _=> tag()
           ).key(view)
-        ),
-
-        _=> views.includes('counters') && fieldset({style: "flex:2 2 20em"},
-          legend('counters'),
-          _=> counters({appCounterSubject})
-        ),
-      ),
-      _=> renderCountDiv({renderCount, name:'isolatedApp'})
-    )
+        ), _=> views.includes('counters') && fieldset.style`flex:2 2 20em`(legend('counters'), _=> counters({appCounterSubject}))), _=> renderCountDiv({renderCount, name:'isolatedApp'}))
   )
 })

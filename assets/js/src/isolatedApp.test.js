@@ -1,6 +1,7 @@
-import { execute } from "./testing/mocha-expect";
 import { ViewTypes } from "./sectionSelector.tag";
+import { executeBrowserTests } from "./testing/testRunner";
 export async function runIsolatedTests(views, runStartEndTests = true) {
+    console.log('🏃 runIsolatedTests: Loading tests for views:', views);
     let testCount = 0;
     if (runStartEndTests) {
         await import('./start.test.js');
@@ -9,6 +10,14 @@ export async function runIsolatedTests(views, runStartEndTests = true) {
     if (views.includes(ViewTypes.Content)) {
         await import('./content.test');
         await import('./dumpContent.test');
+        ++testCount;
+    }
+    if (views.includes(ViewTypes.Async)) {
+        await import('./async.test');
+        ++testCount;
+    }
+    if (views.includes(ViewTypes.Subscriptions)) {
+        await import('./subscriptions.test');
         ++testCount;
     }
     if (views.includes(ViewTypes.Counters)) {
@@ -21,6 +30,7 @@ export async function runIsolatedTests(views, runStartEndTests = true) {
     }
     if (views.includes(ViewTypes.ProviderDebug)) {
         await import('./providers.test');
+        await import('./injectionTesting.test');
         ++testCount;
     }
     if (views.includes(ViewTypes.TagSwitchDebug)) {
@@ -32,7 +42,7 @@ export async function runIsolatedTests(views, runStartEndTests = true) {
         ++testCount;
     }
     if (views.includes(ViewTypes.Arrays)) {
-        await import('./array.test');
+        await import('./arrays.test');
         ++testCount;
     }
     if (views.includes(ViewTypes.Mirroring)) {
@@ -63,16 +73,20 @@ export async function runIsolatedTests(views, runStartEndTests = true) {
         await import('./destroys.test');
         ++testCount;
     }
+    if (views.includes(ViewTypes.Basic)) {
+        await import('./basic.test');
+        ++testCount;
+    }
     console.debug(`🏃 Running ${testCount} test suites...`);
     try {
-        const start = Date.now(); //performance.now()
-        await execute();
-        const time = Date.now() - start; // performance.now() - start
-        console.info(`✅ tests passed in ${time}ms`);
-        return true;
+        const start = Date.now();
+        const result = await executeBrowserTests();
+        const time = Date.now() - start;
+        console.info(`✅ tests completed in ${time}ms`);
+        return result;
     }
     catch (error) {
-        console.error('❌ tests failed: ' + error.message, error);
+        console.error('❌ tests failed:', error);
         return false;
     }
 }

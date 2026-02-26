@@ -26,10 +26,8 @@ export default tag(() => {
   const deleteItem = (item: string) => array = array.filter(x => x !== item)
 
   return div(
-    button({id: "fun-parent-button", onClick: myFunction},
-      '🤰 ++parent'
-    ),
-    span({id: "fun_in_prop_display"}, _=> counter),
+    button.id`fun-parent-button`.onClick(myFunction)('🤰 ++parent'),
+    span.id`fun_in_prop_display`(_=> counter),
     
     _=> renderCountDiv({renderCount, name:'funInProps_tag_parent'}),
 
@@ -47,7 +45,7 @@ export default tag(() => {
     'array length: ',
     array.length,
 
-    button({onClick: () => addArrayItem()}, 'reset add'),
+    button.onClick(() => addArrayItem())('reset add'),
 
     hr,
 

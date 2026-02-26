@@ -1,61 +1,55 @@
-import { html, states, tag } from "taggedjs";
+import { div, input, li, ol, option, select, tag } from "taggedjs";
 export const attributeDebug = tag(() => {
     let selected = 'a';
     let isOrange = true;
-    states(get => [{ selected, isOrange }] = get({ selected, isOrange }));
-    return html `
-    <input
-      id="attr-input-abc"
-      placeholder="a b or c"
-      onchange=${(event) => selected = event.target.value}
-    />
-    <select id="select-sample-drop-down">
-      ${['a', 'b', 'c'].map(item => html `
-        <option value=${item} ${item == selected ? 'selected' : ''}>${item} - ${item == selected ? 'true' : 'false'}</option>
-      `.key(item))}
-    </select>
-    <hr />
-    <h3>Special Attributes</h3>
-    <div>
-      <input type="checkbox" id="toggle-backgrounds"
-        onchange=${(event) => isOrange = event.target.checked} ${isOrange && 'checked'}
-      /> - ${isOrange ? 'true' : 'false'}
-    </div>
-    <div style="display: flex;flex-wrap:wrap;gap:1em">      
-      <ol>
-        <li>
-          <div id="attr-style-strings"
-            style.background-color=${isOrange ? 'orange' : ''}
-            style.color=${isOrange ? 'black' : ''}
-          >style.background-color=&dollar;{'orange'}</div>
-        </li>
-        
-        <li>
-          <div id="attr-class-booleans"
-            class.background-orange=${isOrange ? true : false}
-            class.text-black=${isOrange ? true : false}
-          >class.background-orange=&dollar;{true}</div>
-        </li>
-        
-        <li>        
-          <div id="attr-inline-class"
-            class=${isOrange ? 'background-orange text-black' : ''}
-          >class=&dollar;{'background-orange text-black'}</div>
-        </li>
-        
-        <li>
-          <div id="attr-dynamic-inline-class"
-            ${{ class: 'text-white' + (isOrange ? ' background-orange' : '') }}
-          >class=&dollar;{'background-orange'} but always white</div>
-        </li>
-      </ol>
-    </div>
-			
-    <style>
-      .background-orange {background-color:orange}
-      .text-black {color:black}
-      .text-white {color:white}
-    </style>
-  `;
+    return div(input.id `attr-input-abc`.placeholder `a b or c`.onChange((event) => selected = event.target.value)(), select.onChange(e => selected = e.target.value).id `select-sample-drop-down`(['a', 'b', 'c'].map(item => option({
+        value: item,
+        selected: () => item == selected
+    }, item, ' - ', _ => item == selected ? 'true' : 'false'))), ed = e.target.value).id `select-sample-drop-down-clone`(['a', 'b', 'c'].map(item => option({
+        value: item,
+        selected: () => item == selected
+    }, item, ' - ', item == selected ? 'true' : 'false')));
+    l;
+    Attributes;
+    '),;
+    div(input.type `checkbox`.id `toggle-backgrounds`.checked(() => isOrange && 'checked').onChange((event) => isOrange = event.target.checked)(), () => ` - toggle backgrounds:${isOrange ? 'true' : 'false'}`),
+        div.style `display: flex;flex-wrap:wrap;gap:1em`(ol(li(div({
+            id: "attr-style-strings",
+            style: _ => ({
+                backgroundColor: isOrange ? 'orange' : '',
+                color: isOrange ? 'black' : '',
+            })
+        }, "style.background-color=${'orange'}")), li(div({
+            id: "attr-class-booleans",
+            class: () => ({
+                'background-orange': isOrange ? true : false,
+                'text-black': isOrange ? true : false,
+            })
+        }, () => `class.background-orange=${isOrange}`)), li(div({
+            id: "attr-inline-class",
+            class: () => isOrange ? 'background-orange text-black' : ''
+        }, "class=${'background-orange text-black'}")), li(div({
+            id: "attr-dynamic-inline-class",
+            class: () => 'text-white' + (isOrange ? ' background-orange' : '')
+        }, "class=${'background-orange'} but always white"))));
+    e ? 'orange' : 'lightgrey',
+        padding;
+    '10px',
+        border;
+    '2px solid black',
+        borderRadius;
+    isOrange ? '8px' : '4px',
+        boxShadow;
+    isOrange ? '2px 2px 4px rgba(0,0,0,0.3)' : 'none';
 });
+'Style object test';
+div({
+    id: "style-set-property-test",
+    style: _ => ({
+        'background-color': isOrange ? 'red' : 'blue',
+        color: 'white',
+        padding: '5px',
+        'margin-top': '10px'
+    })
+}, 'style property test');
 //# sourceMappingURL=attributeDebug.tag.js.map

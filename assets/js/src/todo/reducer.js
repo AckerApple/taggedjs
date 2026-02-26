@@ -10,17 +10,19 @@ export function todoReducer(todos) {
         return todos;
     }
     function removeItem(id) {
-        return todos.filter((t) => t.id !== id);
+        const index = todos.findIndex((t) => t.id !== id);
+        return removeItemByIndex(index);
     }
     function removeItemByIndex(index) {
         todos.splice(index, 1);
-        return todos;
+        return index;
     }
     function toggleItem(todo, index) {
         return updateToByIndex(todo, { completed: !todo.completed }, index);
     }
     function removeAll() {
-        todos = [];
+        // todos = []
+        todos.length = 0;
         return todos;
     }
     function toggleAll(completed) {
@@ -41,8 +43,9 @@ export function todoReducer(todos) {
         return todos;
     }
     function updateToByIndex(todo, partial, index) {
-        todos[index] = { ...todo, ...partial };
-        return todos;
+        const newTodo = { ...todo, ...partial };
+        todos[index] = newTodo;
+        return index;
     }
     return {
         addItem,

@@ -23,13 +23,10 @@ export const dumpSimple = tag(({
     displayValue = isLinkValue ? linkValue(value) : simpleValue({value})
   }
   
-  return div(
-    {style: "font-size:75%;flex:1 1 10em;color:#111111"},
-    _=> key && div({
-      class: "taggedjs-simple-label",
-      style: _=> ({cursor: onHeaderClick ? "pointer" : ""}),
-      onClick: onHeaderClick
-    }, key),
+  return div.style`font-size:75%;flex:1 1 10em;color:#111111`(
+    _=> key && div.class`taggedjs-simple-label`
+    .style(_=> ({cursor: onHeaderClick ? "pointer" : ""}))
+    .onClick(onHeaderClick as any)(key),
     _=> displayValue
   )
 })
@@ -68,19 +65,17 @@ const simpleValue = tag(({value, everySimpleValue}: {
 
   displayValue = displayValue === null && 'null' || displayValue === false && 'false' || displayValue === undefined && 'undefined' || displayValue
 
-  return div({
-    class: "hover-bg-warning active-bg-energized",
-    onMousedown: startMouseDown,
-    onMouseup: markMouseUp,
-    style: _=> ({
+  return div.class`hover-bg-warning active-bg-energized`
+    .onMouseDown(startMouseDown)
+    .onMouseUp(markMouseUp)
+    .style(_=> ({
       cursor: "pointer",
       "background-color": isLikeNull ? 'rgba(0,0,0,.5)' : '',
       color: (value === true && '#28a54c') ||
         (value === false && '#e42112') ||
         isLikeNull && 'white' || ''
-    }),
-    title
-  }, _=> displayValue)
+    })).title(title)
+    (_=> displayValue)
 })
 
 function getLargeNumberTitle(number: number) {
@@ -92,11 +87,11 @@ function getLargeNumberTitle(number: number) {
 const linkValue = tag((value: string) => {
   linkValue.updates(x => [value] = x)
   
-  return a({
-    onClick: () => copyText(value),
-    href: _=> value,
-    target: "_blank",
-    class: "hover-bg-warning active-bg-energized",
-    title: "tap to copy"
-  }, _=> value)
+  return a.onClick(() => copyText(value))
+    .href(_=> value)
+    .target`_blank`
+    .class`hover-bg-warning active-bg-energized`
+    .title`tap to copy`(
+      _=> value
+    )
 })

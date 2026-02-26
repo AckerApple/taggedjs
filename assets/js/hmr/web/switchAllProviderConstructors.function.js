@@ -13,7 +13,7 @@ export function switchAllProviderConstructors(tagSupport, provider) {
     if (global === undefined) {
         return;
     }
-    const providers = tagSupport.global.providers;
+    const providers = tagSupport.context.providers;
     if (providers) {
         providers.forEach((iPro) => {
             if (proString === iPro.constructMethod.compareTo) {

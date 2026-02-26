@@ -16,15 +16,9 @@ export const addArrayComponent = tag((
   }
 
   const x: TagChildContent[] = [ 
-    input({
-      type: "text",
-      onKeyup: handleKeyUp,
-      onChange: (e: InputElementTargetEvent) => {addArrayItem(e.target.value);e.target.value=''},
-    }),
+    input.type`text`.onKeyUp(handleKeyUp).onChange((e: InputElementTargetEvent) => {addArrayItem(e.target.value);e.target.value=''})(),
 
-    button({type: "button", onClick:addArrayItem},
-      'add by outside', _=> 33,
-    ),
+    button.type`button`.onClick(addArrayItem)('add by outside', _=> 33),
     
     _=> renderCountDiv({renderCount, name:'addArrayComponent'}),
   ]

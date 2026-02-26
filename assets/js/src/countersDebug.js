@@ -1,304 +1,119 @@
+import { innerCounters } from "./innerCounters.js";
 import { mouseOverTag } from "./mouseover.tag.js";
-import { renderCountDiv } from "./renderCount.component.js";
-import { states, html, tag, Subject, onInit, callbackMaker, state, ValueSubject, callback, subject, subscribe, host } from "taggedjs";
+import { tag, Subject, subscribe, host, div, button, span, fieldset, legend, small } from "taggedjs";
+import { shallowPropCounters } from "./shallowPropCounters.js";
 const loadStartTime = Date.now();
+const test = tag(() => {
+    return div('hello complex world');
+});
 export const counters = tag.immutableProps(({ appCounterSubject }, _ = 'countersDebug') => {
-    state('countersDebug state');
-    return html `<!--counters-->
-    <div style="display:flex;flex-wrap:wrap;gap:1em">
-      <div>👉 Subscription count:<span id="👉-counter-sub-count">
-        ${subscribe(Subject.globalSubCount$)}</span>
-      </div>
-      <button
-        onclick=${() => console.info('subs', Subject.globalSubs)}
-      >log subs</button>
-  
-      <div>
-        <button id="counters-app-counter-subject-button"
-          onclick=${() => appCounterSubject.next((appCounterSubject.value || 0) + 1)}
-        >🍒 ++app subject</button>
-        <span>
-          🍒 <span id="app-counters-display">${subscribe(appCounterSubject)}</span>
-        </span>
-        <span>
-          🍒 <span id="app-counters-subject-display">${appCounterSubject.value}</span>
-        </span>
-      </div>
-    </div>
-    
-    ${innerCounterContent()}
-  `;
+    return div('<!--counters-->', _ => test(), div.style `display:flex;flex-wrap:wrap;gap:1em`(div('👉 SubscriptionCount$:', span({ id: "👉-counter-sub-count" }, subscribe(Subject.globalSubCount$))), button({
+        onClick: () => console.info('subs', Subject.globalSubs)
+    }, 'log subs'), div(button({
+        id: "counters-app-counter-subject-button",
+        onClick: () => appCounterSubject.next((appCounterSubject.value || 0) + 1)
+    }, '🍒 ++app subject'), span('🍒 ', span({ id: "app-counters-display" }, subscribe(appCounterSubject))), span('🍒 ', span({ id: "app-counters-subject-display" }, appCounterSubject.value)))), nter, increasePropCounter);
+}, {
+    propCounter: number,
+    increasePropCounter: () => void 
 });
-const innerCounters = tag.deepPropWatch(({ propCounter, increasePropCounter, }) => (otherCounter = 0, renderCount = 0, elmInitCount = 0, _ = states(get => [{ elmInitCount, otherCounter, renderCount }] = get({ elmInitCount, otherCounter, renderCount })), __ = ++renderCount) => html `
-  <div style="display:flex;flex-wrap:wrap;gap:1em;" ${host.onInit(() => ++elmInitCount)}>
-    <div style="border:1px dashed black;padding:1em;">
-      🔥 elmInitCount:<span id="🔥-init-counter">${elmInitCount}</span>
-    </div>
-
-    <div style="border:1px dashed black;padding:1em;">
-      <button id="❤️-inner-counter" onclick=${increasePropCounter}
-      >❤️-inner-counter propCounter:${propCounter}</button>
-      <span>
-        ❤️ <span id="❤️-inner-display">${propCounter}</span>
-      </span>
-    </div>
-
-    <div style="border:1px dashed black;padding:1em;">
-      <button id="🤿-deep-counter" onclick=${() => ++otherCounter}
-      >🤿 otherCounter:${otherCounter}</button>
-      <span>
-      🤿 <span id="🤿-deep-display">${otherCounter}</span>
-      </span>
-    </div>
-  </div>
-
-  <div>renderCount:${renderCount}</div>
-  ${renderCountDiv({ renderCount, name: 'inner_counters' })}
-`);
-const shallowPropCounters = tag.watchProps(({ propCounter, increasePropCounter, }) => {
+{
+    immutablePropCounters.updates(x => [{ propCounter, increasePropCounter }] = x);
     let otherCounter = 0;
     let renderCount = 0;
-    states(get => [{ otherCounter, renderCount }] = get({ otherCounter, renderCount }));
     ++renderCount; // for debugging
-    return html `
-    <div style="display:flex;flex-wrap:wrap;gap:1em;">
-      <div style="border:1px dashed black;padding:1em;">
-        <button id="❤️💧-shallow-counter" onclick=${increasePropCounter}
-        >❤️💧 propCounter:${propCounter}</button>
-        <span>
-          ❤️💧 <span id="❤️💧-shallow-display">${propCounter}</span>
-        </span>
-      </div>
-
-      <div style="border:1px dashed black;padding:1em;">
-        <button id="💧-shallow-counter" onclick=${() => ++otherCounter}
-        >💧 otherCounter:${otherCounter}</button>
-        <span>
-          💧 <span id="💧-shallow-display">${otherCounter}</span>
-        </span>
-      </div>
-    </div>
-    
-    <div>renderCount:${renderCount}</div>
-    ${renderCountDiv({ renderCount, name: 'shallow_counters' })}
-  `;
-});
-const immutablePropCounters = tag.immutableProps(({ propCounter, increasePropCounter, }) => {
+    return div(div.style `display:flex;flex-wrap:wrap;gap:1em;`(div({ style: "border:1px dashed black;padding:1em;" }, button({
+        id: "❤️🪨-immutable-counter",
+        onClick: increasePropCounter,
+    }, '❤️🪨 propCounter:', _ => propCounter), span('❤️🪨 ', span({ id: "❤️🪨-immutable-display" }, _ => propCounter))), div({ style: "border:1px dashed black;padding:1em;" }, button({
+        id: "🪨-immutable-counter",
+        onClick: () => ++otherCounter,
+    }, '🪨 otherCounter:', _ => otherCounter), span('🪨 ', span({ id: "🪨-immutable-display" }, _ => otherCounter)))), number, increasePropCounter, () => void );
+}
+{
+    noWatchPropCounters.updates(x => [{ propCounter, increasePropCounter }] = x);
     let otherCounter = 0;
     let renderCount = 0;
-    states(get => [{ otherCounter, renderCount }] = get({ otherCounter, renderCount }));
+    // let noWatchPropCounters = 'noWatchPropCounters' // just a name to pickup
     ++renderCount; // for debugging
-    return html `
-    <div style="display:flex;flex-wrap:wrap;gap:1em;">
-      <div style="border:1px dashed black;padding:1em;">
-        <button id="❤️🪨-immutable-counter" onclick=${increasePropCounter}
-        >❤️🪨 propCounter:${propCounter}</button>
-        <span>
-          ❤️🪨 <span id="❤️🪨-immutable-display">${propCounter}</span>
-        </span>
-      </div>
-
-      <div style="border:1px dashed black;padding:1em;">
-        <button id="🪨-immutable-counter" onclick=${() => ++otherCounter}
-        >🪨 otherCounter:${otherCounter}</button>
-        <span>
-        🪨 <span id="🪨-immutable-display">${otherCounter}</span>
-        </span>
-      </div>
-    </div>
-    
-    <div>renderCount:${renderCount}</div>
-    ${renderCountDiv({ renderCount, name: 'immutable_counters' })}
-  `;
-});
-const noWatchPropCounters = ({ propCounter, increasePropCounter, }) => {
-    let otherCounter = 0;
-    let renderCount = 0;
-    let noWatchPropCounters = 'noWatchPropCounters'; // just a name to pickup
-    states(get => [{ otherCounter, renderCount, noWatchPropCounters }] = get({ otherCounter, renderCount, noWatchPropCounters }));
-    ++renderCount; // for debugging
-    return html `
-    <div style="display:flex;flex-wrap:wrap;gap:1em;">
-      <div style="border:1px dashed black;padding:1em;">
-        <button id="❤️🚫-nowatch-counter" onclick=${increasePropCounter}
-        >❤️🚫 propCounter:${propCounter}</button>
-        <span>
-          ❤️🚫 <span id="❤️🚫-nowatch-display">${propCounter}</span>
-        </span>
-      </div>
-
-      <div style="border:1px dashed black;padding:1em;">
-        <button id="🚫-nowatch-counter" onclick=${() => ++otherCounter}
-        >🚫 otherCounter:${otherCounter}</button>
-        <span>
-        🚫 <span id="🚫-nowatch-display">${otherCounter}</span>
-        </span>
-      </div>
-    </div>
-    
-    <div>renderCount:${renderCount}</div>
-    ${renderCountDiv({ renderCount, name: 'nowatch_counters' })}
-  `;
-};
-export const innerCounterContent = () => tag.use = (statesRenderCount = 0, statesRenderCount2 = 0, counter = 0, counter2 = 0, renderCount = 0, propCounter = 0, initCounter = 0, callbacks = callbackMaker(), callbackTo = callback(z => {
-    counter2 = z;
-}), increasePropCounter = () => {
-    ++propCounter;
-}, immutableProps = state(() => ({ propCounter, increasePropCounter })), _ = states(get => [{
-        counter, renderCount, propCounter, initCounter, immutableProps,
-        statesRenderCount, statesRenderCount2,
-    }] = get({
-    counter, renderCount, propCounter, initCounter, immutableProps,
-    statesRenderCount, statesRenderCount2,
-})), callbackTestSub = state(() => new Subject(counter)), callbackTestSub2 = state(() => new Subject(0)), pipedSubject0 = state(() => new ValueSubject('222')), 
-// State as a callback only needed so pipedSubject1 has the latest value
-increaseCounter = () => {
-    ++counter;
-    pipedSubject0.next('333-' + counter);
-}, pipedSubject1 = Subject.all([pipedSubject0, callbackTestSub]), pipedSubject2 = subject.all([pipedSubject0, callbackTestSub]), memory = state(() => ({ counter: 0 })), 
-// create an object that remains the same
-readStartTime = state(() => Date.now()), __ = onInit(() => {
-    ++initCounter;
-    console.info('countersDebug.ts: 👉 i should only ever run once');
-    callbackTestSub.subscribe(callbacks(y => {
+    return div(div.style `display:flex;flex-wrap:wrap;gap:1em;`(div({ style: "border:1px dashed black;padding:1em;" }, button({
+        id: "❤️🚫-nowatch-counter",
+        onClick: increasePropCounter,
+    }, '❤️🚫 propCounter:', _ => propCounter), span('❤️🚫 ', span({ id: "❤️🚫-nowatch-display" }, _ => propCounter))), div({ style: "border:1px dashed black;padding:1em;" }, button({
+        id: "🚫-nowatch-counter",
+        onClick: () => ++otherCounter,
+    }, '🚫 otherCounter:', _ => otherCounter), span('🚫 ', span({ id: "🚫-nowatch-display" }, _ => otherCounter)))), ount2 = 0, let, counter = 0, let, counter2 = 0, let, renderCount = 0, let, propCounter = 0, let, initCounter = 0, let, callbacks = callbackMaker(), let, callbackTo = callback(z => {
+        counter2 = z;
+    }), let, increasePropCounter = () => {
+        ++propCounter;
+    }, let, immutableProps = { propCounter, increasePropCounter }, let, callbackTestSub = new Subject(counter), let, callbackTestSub2 = new Subject(0), let, callbackTestSub3 = new Subject(), let, pipedSubject0 = new ValueSubject('222')
+    // State as a callback only needed so pipedSubject1 has the latest value
+    , 
+    // State as a callback only needed so pipedSubject1 has the latest value
+    let, increaseCounter = () => {
+        ++counter;
+        pipedSubject0.next('333-' + counter);
+    }, let, pipedSubject1 = Subject.all([pipedSubject0, callbackTestSub]), let, pipedSubject2 = subject.all([pipedSubject0, callbackTestSub]), let, pipedSubject3 = subject.all([pipedSubject0, callbackTestSub, callbackTestSub3]), let, memory = { counter: 0 }
+    // create an object that remains the same
+    , 
+    // create an object that remains the same
+    let, readStartTime = Date.now(), ++initCounter, console.info('countersDebug.ts: 👉 i should only ever run once'));
+    const sub0 = callbackTestSub.subscribe(callbacks(y => {
         counter = y;
     }));
-    callbackTestSub.subscribe(callbackTo);
-})) => {
+    const sub1 = callbackTestSub.subscribe(callbackTo);
+    tag.onDestroy(() => {
+        sub0.unsubscribe();
+        sub1.unsubscribe();
+    });
     if (immutableProps.propCounter !== propCounter) {
         immutableProps = { propCounter, increasePropCounter };
     }
     ++renderCount; // for debugging
-    return html `
-  <div>initCounter:${initCounter}</div>
-  
-  <div>
-    😱 statesRenderCount:${statesRenderCount}
-    <button type="button" onclick=${() => {
+    return div(div('initCounter:', _ => initCounter), div('😱 statesRenderCount:', _ => statesRenderCount, button.type `button`.onClick(() => {
         ++statesRenderCount;
-    }}>😱 ++statesRenderCount</button>
-  </div>
-
-  <div>
-    😱😱 statesRenderCount2:${statesRenderCount2}
-    <button type="button" onclick=${() => {
+    })('😱 ++statesRenderCount')), div('😱😱 statesRenderCount2:', _ => statesRenderCount2, button.type `button`.onClick(() => {
         ++statesRenderCount2;
-    }}>😱😱 ++statesRenderCount2</button>
-  </div>
-
-  <div style="display:flex;flex-wrap:wrap;gap:1em">
-    <input id="set-main-counter-input" placeholder="input counter value"
-      onkeyup=${(e) => (counter = Number(e.target.value) || 0)}
-    />
-  
-    <div>
-      <button id="❤️-increase-counter"
-        onclick=${increasePropCounter}
-      >❤️ propCounter:${propCounter}</button>
-      <span>
-        ❤️ <span id="❤️-counter-display">${propCounter}</span>
-        </span>
-    </div>
-  
-    <div>
-      <button id="🥦-standalone-counter"
-        onclick=${increaseCounter}
-      >🥦 stand alone counters</button>
-      <span>
-        🥦 <span id="🥦-standalone-display">${counter}</span>
-      </span>
-    </div>
-  
-    ${counter > 1 && html `
-      <div>
-        <button id="conditional-counter"
-          onclick=${increaseCounter}
-        >conditional counter:${counter}</button>
-        <span>
-          🥦 <span id="conditional-display">${counter}</span>
-        </span>
-      </div>
-    `}
-  
-    <div>
-      <button id="🥦-subject-increase-counter"
-        onclick=${() => callbackTestSub.next(counter + 1)}
-      >++subject&lt;&gt;</button>
-      <span>
-        🥦&lt;<span id="subject-counter-subject-display">${subscribe(callbackTestSub)}</span>&gt;
-      </span>
-    </div>
-
-    <div>
-      <button id="🥦-subject-increase-async-counter"
-        onclick=${() => {
+    })('😱😱 ++statesRenderCount2')), div.style `display:flex;flex-wrap:wrap;gap:1em`(input({
+        id: "set-main-counter-input",
+        placeholder: "input counter value",
+        onKeyup: e => (counter = Number(e.target.value) || 0)
+    }), div(button({
+        id: "❤️-increase-counter",
+        onClick: increasePropCounter
+    }, '❤️ propCounter:', _ => propCounter), span('❤️ ', span({ id: "❤️-counter-display" }, _ => propCounter))), div(button({
+        id: "🥦-standalone-counter",
+        onClick: increaseCounter,
+    }, '🥦 stand alone counters'), span('🥦 ', span({ id: "🥦-standalone-display" }, _ => counter))), _ => counter > 1 && div(button({
+        id: "conditional-counter",
+        onClick: increaseCounter,
+    }, 'conditional counter:', _ => counter)), span('🥦 ', span({ id: "conditional-display" }, _ => counter))), span.id `subject-counter-subject-display`(subscribe(callbackTestSub)), '>');
+    div(button.id `🥦-subject-increase-async-counter`.onClick(() => {
         setTimeout(() => {
             callbackTestSub2.next(callbackTestSub2.value + 1);
         }, 10);
-    }}
-      >🔀 🥦 ++subject&lt;&gt;</button>
-      <span>
-        🔀 🥦&lt;<span id="subject-async-counter-subject-display">${subscribe(callbackTestSub2)}</span>&gt;
-      </span>
-    </div>
-  </div>
-
-  <fieldset>
-    <legend>🪈 pipedSubject 1</legend>
-    <div>
-      <small>
-        <span id="🪈-pipedSubject">${subscribe(pipedSubject1, () => counter)}</span>
-      </small>
-    </div>
-  </fieldset>
-
-  <fieldset>
-    <legend>🪈 pipedSubject 2</legend>
-    <div>
-      <small>
-        <span id="🪈-pipedSubject-2">${subscribe(pipedSubject2, () => counter)}</span>
-      </small>
-    </div>
-  </fieldset>
-
-  <fieldset>
-    <legend>shared memory</legend>
-    <div class.bold.text-blue=${true} style="display:flex;flex-wrap:wrap;gap:.5em">
-      ${mouseOverTag({ label: 'a-a-😻', memory })}
-      ${mouseOverTag({ label: 'b-b-😻', memory })}
-    </div>
-    memory.counter:😻${memory.counter}
-    <button onclick=${() => ++memory.counter}>increase 😻</button>
-  </fieldset>
-  
-  <fieldset>
-    <legend>inner counter</legend>
-    ${innerCounters({ propCounter, increasePropCounter })}
-  </fieldset>
-
-  <fieldset>
-    <legend>shallow props</legend>
-    ${shallowPropCounters({ propCounter, increasePropCounter })}
-  </fieldset>
-
-  <fieldset>
-    <legend>immutable props</legend>
-    ${immutablePropCounters(immutableProps)}
-  </fieldset>
-
-  <fieldset>
-    <legend>nowatch props</legend>
-    ${noWatchPropCounters({ propCounter, increasePropCounter })}
-  </fieldset>
-
-  <div style="font-size:0.8em;opacity:0.8">
-    ⌚️ page load to display in&nbsp;<span ${host.onInit((element) => element.innerText = (Date.now() - loadStartTime).toString())}>-</span>ms
-  </div>
-  <div style="font-size:0.8em;opacity:0.8">
-    ⌚️ read in&nbsp;<span ${host.onInit((element) => element.innerText = (Date.now() - readStartTime).toString())}>-</span>ms
-  </div>
-
-  ${renderCountDiv({ renderCount, name: 'counters' })}
-`;
-};
+    })('🔀 🥦 ++subject<>'), span('🔀 🥦<', span.id `subject-async-counter-subject-display`(subscribe(callbackTestSub2)), '>')),
+        fieldset(legend('🪈 pipedSubject 1'), div(small(span.id `🪈-pipedSubject`(subscribe(pipedSubject1, () => counter))))),
+        fieldset(legend('🪈 pipedSubject 2'), div(small(span.id `🪈-pipedSubject-2`(subscribe(pipedSubject2, () => counter))))),
+        fieldset(legend('🪈 pipedSubject 3'), div(small(span.id `🪈-pipedSubject-3`(subscribe(pipedSubject3, (a) => {
+            return 'hello world';
+        }))))),
+        fieldset(legend('shared memory'), div.class({ bold: true, 'text-blue': true }).style `display:flex;flex-wrap:wrap;gap:.5em`(_ => mouseOverTag({ label: 'a-a-😻', memory }), _ => mouseOverTag({ label: 'b-b-😻', memory })), 'memory.counter:😻', _ => memory.counter, button.onClick(() => ++memory.counter)('increase 😻')),
+        fieldset(legend('inner counter'), _ => innerCounters({ propCounter, increasePropCounter })),
+        fieldset(legend('shallow props'), _ => shallowPropCounters({ propCounter, increasePropCounter })),
+        fieldset(legend('immutable props'), _ => immutablePropCounters(immutableProps)),
+        fieldset(legend('nowatch props'), _ => noWatchPropCounters({ propCounter, increasePropCounter })),
+        div.style `font-size:0.8em;opacity:0.8`('⌚️ page load to display in\u00A0', span({
+            attr: host.onInit((element) => element.innerText = (Date.now() - loadStartTime).toString())
+        }, '-'), 'ms');
+    em;
+    opacity: 0.8 `('⌚️ read in\u00A0', span({
+          attr: host.onInit((element) => element.innerText = (Date.now()-readStartTime).toString()),
+        },
+        '-'
+      ), 'ms') name: 'counters'}),
+  )
+})
+    ;
+}
 //# sourceMappingURL=countersDebug.js.map

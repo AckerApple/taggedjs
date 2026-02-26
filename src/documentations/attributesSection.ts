@@ -34,7 +34,7 @@ export function attributesSection() {
       "when the value changes."
     ),
     figure(
-      pre(code({class: "language-ts"}, attributesCode)),
+      pre(code.class`language-ts`(attributesCode)),
       figcaption("Shorthand attributes with static and dynamic styles")
     ),
   ]

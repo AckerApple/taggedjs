@@ -52,55 +52,39 @@ export const sectionSelector = tag((viewTypes = defaultViewTypes) => {
   return div(
     h3('᭟ Sections'),
 
-    div({style:"display:flex;gap:1em;flex-wrap:wrap;margin:1em;"},
+    div.style`display:flex;gap:1em;flex-wrap:wrap;margin:1em;`(
       _ => sortedViewTypes.map(({meta, type}) =>
-        div({style:"flex:0 0 auto;min-width:150px;white-space:nowrap;"},
-          input({
-            name: _ => 'view-type-' + type,
-            type: "checkbox",
-            id: _ => 'view-type-' + type,
-            checked: _ => storage.views.includes(type),
-            onClick: () => toggleViewType(type),
-          }),
+        div.style`flex:0 0 auto;min-width:150px;white-space:nowrap;`(
+          input.name(_ => 'view-type-' + type).type`checkbox`.id(_ => 'view-type-' + type).checked(_ => storage.views.includes(type)).onClick(() => toggleViewType(type))(),
 
           _ => meta?.emoji ? meta.emoji + ' ' : null,
 
-          label({for: _ => 'view-type-' + type}, ' ', _ => type),
+          label.for(_ => 'view-type-' + type)(' ', _ => type),
 
           ' ',
 
-          a({
-            href: _ => `isolated.html#${type}`,
-            style: "font-size:.6em;text-decoration:none;",
-          },'🔗'),
+          a.href(_ => `isolated.html#${type}`).style`font-size:.6em;text-decoration:none;`('🔗'),
 
           ' ',
 
-          a({
-            href: _ => `#${type}`,
-            style: "font-size:.6em;",
-          },'↗️')
+          a.href(_ => `#${type}`).style`font-size:.6em;`('↗️')
         ).key(type)
       ),
 
       _ => viewTypes.length > 1 && [
         div(
-          label({
-            onClick: () => viewTypes.forEach(viewType => {
+          label.onClick(() => viewTypes.forEach(viewType => {
               // viewChanged.next({viewType, checkTesting: false})
               activate(viewType, false)
               saveScopedStorage()
-            })
-          }, ' all')
+            }))(' all')
         ),
 
         div(
-          label({
-            onClick: () => viewTypes.forEach(viewType => {
+          label.onClick(() => viewTypes.forEach(viewType => {
               deactivate(viewType)
               saveScopedStorage()
-            })
-          }, ' none')
+            }))(' none')
         )
       ]
     )

@@ -25,33 +25,21 @@ export const destroys = tag(() => (
     _=> tagOn && toDestroyTag(),
   ),
 
-  button({
-    id:"toggle-destroys", type:"button",
-    onClick: () => {
+  button.id`toggle-destroys`.type`button`.onClick(() => {
       on = !on
-    },
-  }, _=> on ? 'destroy' : 'restore'),
+    })(_=> on ? 'destroy' : 'restore'),
 
-  button({
-    id:"toggle-tag-destroys", type:"button",
-    onClick: () => {
+  button.id`toggle-tag-destroys`.type`button`.onClick(() => {
       tagOn = !tagOn
-    },
-  }, _=> on ? 'destroy tag' : 'restore tag'),
+    })(_=> on ? 'destroy tag' : 'restore tag'),
   
   () => renderCountDiv({renderCount: ++renderCount, name: 'destroys'}),
 ))
 
 const toDestroyHost = tag(() =>
-  div({
-      attr: host.onDestroy(() => {
+  div.attr(host.onDestroy(() => {
         ++destroyCount.value
-      }),
-      id:"destroyable-content",
-      style:"border:1px solid orange;"
-    },
-    'will be destroyed'
-  )
+      }) as any).id`destroyable-content`.style`border:1px solid orange;`('will be destroyed')
 )
 
 const toDestroyTag = tag(() => {
@@ -59,10 +47,5 @@ const toDestroyTag = tag(() => {
     ++destroyTagCount.value
   })
   
-  return div({
-      id:"destroyable-tag-content",
-      style:"border:1px solid orange;"
-    },
-    'tag will be destroyed'
-  )
+  return div.id`destroyable-tag-content`.style`border:1px solid orange;`('tag will be destroyed')
 })

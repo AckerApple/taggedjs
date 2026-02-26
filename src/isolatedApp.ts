@@ -42,76 +42,57 @@ export default tag(() => {
 
   return div(
     '<!--isolatedApp.js-->',
-    h1({id: "app"}, '🏷️ TaggedJs - isolated'),
-    div({style: "opacity:.6"}, '(no HMR)'),
-    div({style: "opacity:.6"}, 'route: ', route), // v0
+    h1.id`app`('🏷️ TaggedJs - isolated'),
+    div.style`opacity:.6`('(no HMR)'),
+    div.style`opacity:.6`('route: ', route), // v0
 
     menu(), // puts a subscribe down inline - v1
 
     div(
       fieldset(
         legend('direct app tests'),
-        button({
-          id: "app-counter-subject-button",
-          onClick: () => {
+        button.id`app-counter-subject-button`.onClick(() => {
             appCounterSubject.next(appCounter + 1)
-          }
-        }, '🍒 ++app subject'),
+          })('🍒 ++app subject'),
         
-        button({
-          id: "app-counter-button",
-          onClick: () => {
+        button.id`app-counter-button`.onClick(() => {
             ++appCounter
-          }
-        }, '🍒 ++app'),
+          })('🍒 ++app'),
         
         span(
           '🍒 ',
-          span({id: "app-counter-display"}, _=> appCounter)
+          span.id`app-counter-display`(_=> appCounter)
         ),
         
         span(
           '🍒$<',
-          span({id: "app-counter-subject-display"},
-            subscribe(appCounterSubject) // v2
-          ),
+          span.id`app-counter-subject-display`(subscribe(appCounterSubject)),
           '>'
         ),
-        
-        span(
-          '🍒$.value<',
-          span({id: "app-counter-subject-value-display"},
-            v3 // v3
-          ),
+        ' ',
+        span.style`border:2px solid pink;`(
+          '🍒🍒$$.value<',
+          span.id`app-counter-subject-value-display`(v3),
           '>'
         ),
 
-        button({id: "toggle-test", onClick: toggle},
-          'toggle test ',
-          _=> toggleValue,
-        )
+        button.id`toggle-test`.onClick(toggle)('toggle test ', _=> toggleValue)
       ),
 
       _=> autoTestingControls(viewTypes)
     ),
 
-    div({style: "display:flex;flex-wrap:nowrap;gap:1em;justify-content: center;"},
-      _=> renderCountDiv({name:'app', renderCount}),
-      div(
+    div.style`display:flex;flex-wrap:nowrap;gap:1em;justify-content: center;`(_=> renderCountDiv({name:'app', renderCount}), div(
         small(
           '(subscriptionCount$: ',
           subscribe(Subject.globalSubCount$),
           ')'
         )
-      )
-    ),
+      )),
 
     _=> sectionSelector(viewTypes),
 
-    div({id: "tagDebug-fx-wrap"},
-      _=> renderedSections(appCounterSubject, viewTypes),
-      _=> renderCountDiv({renderCount, name:'isolatedApp'})
-    )
+    div.id`tagDebug-fx-wrap`(_=> renderedSections(appCounterSubject, viewTypes), _=> renderCountDiv({renderCount, name:'isolatedApp'}))
   )
 })
 

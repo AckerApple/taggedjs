@@ -1,51 +1,47 @@
-import { states, html, tag } from 'taggedjs';
-export const Item = tag.immutableProps((todo, dispatch, index) => (editing = false, _ = states(get => [editing] = get(editing))) => {
-    return html `
-        <li class.completed=${todo.completed} class.editing=${editing}>
-            ${!editing ? html `
-                <div class="view">
-                    ${todo.completed && '✅'}
-                    <input type="button" onclick=${(e) => dispatch.toggleItem(todo, index)} value="toggle" />
-                    
-                    <input class="toggle" type="checkbox" ${todo.completed && 'checked'} onchange=${() => dispatch.toggleItem(todo, index)} />
-                    
-                    <label data-testid="todo-item-label" ondoubleclick=${() => editing = !editing}
-                    >${todo.title}</label>
-                    
-                    <button class="destroy" onclick=${() => dispatch.removeItemByIndex(index)}
-                    >destroy</button>
-                </div>
-            ` : html `
-                <div class="input-container">
-                    <input id="edit-todo-input" type="text" autofocus class="edit"
-                        value=${todo.title}
-                        onblur=${() => editing = false}
-                        onKeyDown=${(e) => handleKey(e, title => {
-        handleUpdate(title, todo, index, dispatch);
-        editing = false;
-    })}
-                    />
-                    <label class="visually-hidden" htmlFor="todo-input">
-                        Edit Todo Input
-                    </label>
-                </div>
-            `}
-        </li>
-    `;
+import { tag, li, div, input, label, button } from 'taggedjs';
+export const Item = tag((todo, dispatch, index, onUpdated = (index) => index) => {
+    Item.updates(x => {
+        [todo, dispatch, index] = x;
+    });
+    let editing = false;
+    return li.class(_ => [
+        todo.completed && 'completed',
+        editing && 'editing'
+    ].filter(Boolean).join(' '))((_ => !editing ? div({ class: "view" }, _ => todo.completed && '✅', 
+    // toggle completed
+    input({
+        type: "button",
+        onClick: (e) => {
+            return onUpdated(dispatch.toggleItem(todo, index));
+        },
+        value: "toggle"
+    }), input({
+        class: "toggle",
+        type: "checkbox",
+        checked: _ => todo.completed,
+        onChange: () => onUpdated(dispatch.toggleItem(todo, index))
+    }), label({
+        'data-testid': "todo-item-label",
+        onDoubleClick: () => editing = !editing
+    }, _ => todo.title), button({
+        class: "destroy",
+        onClick: () => onUpdated(dispatch.removeItemByIndex(index))
+    }, '🗑️ destroy'))
+        : div({ class: "input-container" }, input({
+            id: "edit-todo-input",
+            type: "text",
+            autofocus: true,
+            class: "edit",
+            value: todo.title,
+            onBlur: () => editing = false,
+            onKeydown: (e) => handleKey(e, title => {
+                handleUpdate(title, todo, index, dispatch);
+                editing = false;
+                onUpdated(index);
+            })
+        }), label({
+            class: "visually-hidden",
+            for: "todo-input"
+        }, 'Edit Todo Input'))));
 });
-function handleUpdate(title, todo, index, dispatch) {
-    if (title.length === 0) {
-        dispatch.removeItem(todo.id);
-        return;
-    }
-    dispatch.updateToByIndex(todo, { title }, index);
-}
-export function handleKey(e, onValid) {
-    if (e.key === "Enter") {
-        const value = e.target.value.trim();
-        onValid(value);
-        return true;
-    }
-}
-;
 //# sourceMappingURL=item.js.map

@@ -48,32 +48,17 @@ export const funInPropsChild = tag((
       (myFunction as any).wrapped ? 'taggjedjs-wrapped' : 'nowrap'
     ),
 
-    button({
-        id: "fun_in_prop1",
-        onClick: myFunction
-      },
-      '🤰 ++object argument'
-    ),
-    button({
-        id: "fun_in_prop2", 
-        onClick: output(child.myChildFunction)
-      },
-      '🤰 ++child.myChildFunction'
-    ),
-    button({
-        id: "fun_in_prop3",
-        onClick: myFunction3
-      },
-      '+🤰 +argument'
-    ),
-    button({onClick: main.function}, '🆎 ++main'),
-    button({onClick: () => ++counter}, '++me'),
+    button.id`fun_in_prop1`.onClick(myFunction)('🤰 ++object argument'),
+    button.id`fun_in_prop2`.onClick(output(child.myChildFunction))('🤰 ++child.myChildFunction'),
+    button.id`fun_in_prop3`.onClick(myFunction3)('+🤰 +argument'),
+    button.onClick(main.function)('🆎 ++main'),
+    button.onClick(() => ++counter)('++me'),
 
     div(
       'child array length: ',
       _=> array.length,
       _=> array.map(item => arrayFunTag(item, deleteItem).key(item)),
-      button({onClick: addArrayItem}, 'addArrayItem')
+      button.onClick(addArrayItem)('addArrayItem')
     ),
 
     div(

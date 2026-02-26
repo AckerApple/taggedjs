@@ -1,12 +1,9 @@
 import { renderCountDiv } from "./renderCount.component.js";
-import { states, tag, html } from "taggedjs";
+import { tag, noElement } from "taggedjs";
 export const GatewayTest = tag((props) => {
+    GatewayTest.updates(x => [props] = x);
     let renderCount = 0;
-    states(get => [renderCount] = get(renderCount));
     ++renderCount;
-    return html `
-    I was loaded by a gateway - props:${typeof props}:${JSON.stringify(props)}
-    ${renderCountDiv({ renderCount, name: 'GatewayTest.ts' })}
-  `;
+    return noElement('I was loaded by a gateway - props:', typeof props, ':', _ => JSON.stringify(props), _ => renderCountDiv({ renderCount, name: 'GatewayTest.ts' }));
 });
 //# sourceMappingURL=GatewayTest.js.map

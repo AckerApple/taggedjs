@@ -91,32 +91,14 @@ export const renderedSections = tag((
     return a.view.localeCompare(b.view);
   })
 
-  return div({style:"display:flex;flex-wrap:wrap;gap:1em"},
-    _=> visibleSections.map((section) => getSection(section).key(section.view))
-  )
+  return div.style`display:flex;flex-wrap:wrap;gap:1em`(_=> visibleSections.map((section) => getSection(section).key(section.view)))
 })
 
 const getSection = (section: OutputSection) => {
   const {emoji, view, title, output, debug} = section
-  return div({style: "flex:2 2 20em"},
-    a({id: view},''),
-    fieldset(
+  return div.style`flex:2 2 20em`(a.id(view)(''), fieldset(
       legend(emoji, ' ', title),
-      div({
-        id: "many-section-contents",
-        'style.display': _=> section.contentHide ? 'none' : ''
-      }, output),
-      div({style: "display:flex;"},
-        button({
-          style: "flex:1;",
-          id: 'section_' + section.view,
-          onClick: () => section.contentHide = !section.contentHide,
-          'style.background-color': _=> section.contentHide ? 'grey' : ''
-        }, '👁️ hide/show')
-      )
-    ),
-    div({style: "font-size:0.6em;text-align:right;"},
-      a({href: "#top"}, '⏫')
-    )
-  )
+      div.id`many-section-contents`.attr("style.display", _=> section.contentHide ? 'none' : '')(output),
+      div.style`display:flex;`(button.style`flex:1;`.id('section_' + section.view).onClick(() => section.contentHide = !section.contentHide).attr("style.background-color", _=> section.contentHide ? 'grey' : '')('👁️ hide/show'))
+    ), div.style`font-size:0.6em;text-align:right;`(a.href`#top`('⏫')))
 }

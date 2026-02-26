@@ -1,15 +1,12 @@
-import { html, Subject } from "taggedjs";
+import { div, h3, input, label, a, tag } from "taggedjs";
 import { runTesting } from "./runTesting.function";
-export const storage = getScopedStorage();
-function getScopedStorage() {
-    const string = localStorage.taggedjs || JSON.stringify({ autoTest: true, views: [] });
-    return JSON.parse(string);
-}
-export function saveScopedStorage() {
-    localStorage.taggedjs = JSON.stringify(storage);
+import { outputSections } from "./renderedSections.tag";
+class b {
 }
 export var ViewTypes;
 (function (ViewTypes) {
+    ViewTypes["Async"] = "async";
+    ViewTypes["Basic"] = "basic";
     ViewTypes["Destroys"] = "destroys";
     ViewTypes["Todo"] = "todo";
     ViewTypes["FunInPropsTag"] = "funInPropsTag";
@@ -25,60 +22,53 @@ export var ViewTypes;
     ViewTypes["TagSwitchDebug"] = "tagSwitchDebug";
     ViewTypes["ProviderDebug"] = "providerDebug";
     ViewTypes["AttributeDebug"] = "attributeDebug";
+    ViewTypes["Subscriptions"] = "subscriptions";
 })(ViewTypes || (ViewTypes = {}));
+export const storage = getScopedStorage();
+function getScopedStorage() {
+    const string = localStorage.taggedjs || JSON.stringify({ autoTest: true, views: Object.values(ViewTypes) });
+    return JSON.parse(string);
+}
+export function saveScopedStorage() {
+    localStorage.taggedjs = JSON.stringify(storage);
+}
 const defaultViewTypes = Object.values(ViewTypes);
-export const sectionSelector = (viewTypes = defaultViewTypes) => {
-    return html `
-    <div>
-      <h3>Sections</h3>
-      <!-- checkbox menu -->
-      <div style="display:flex;gap:1em;flex-wrap:wrap;margin:1em;">
-        ${viewTypes.map(type => html `
-          <div>
-            <input type="checkbox"
-              id=${'view-type-' + type} name=${'view-type-' + type}
-              ${storage.views.includes(type) && 'checked'}
-              onclick=${() => toggleViewType(type)}
-            />
-            <label for=${'view-type-' + type}>&nbsp;${type}</label>
-            &nbsp;<a href=${`isolated.html#${type}`} style="font-size:.6em;text-decoration:none;">🔗</a>
-            &nbsp;<a href=${`#${type}`} style="font-size:.6em;">↗️</a>
-          </div>
-        `.key(type))}
-
-        ${viewTypes.length > 1 && html `
-          <div>
-            <label onclick=${() => viewTypes.forEach(viewType => {
-        // viewChanged.next({viewType, checkTesting: false})
-        activate(viewType, false);
-        saveScopedStorage();
-    })}>&nbsp;all</label>
-          </div>
-          <div>
-            <label onclick=${() => viewTypes.forEach(viewType => {
-        deactivate(viewType);
-        saveScopedStorage();
-    })}>&nbsp;none</label>
-          </div>
-        `}
-      </div>
-    </div>
-  `;
-};
-sectionSelector.tempNote = 'sections';
-function toggleViewType(type, checkTesting = true) {
-    if (storage.views.includes(type)) {
-        deactivate(type);
-    }
-    else {
-        viewChanged.next({ type, checkTesting });
-    }
-    saveScopedStorage();
-}
-export const viewChanged = new Subject();
-function deactivate(type) {
-    (storage.views = storage.views.filter(x => x !== type));
-}
+export const sectionSelector = tag((viewTypes = defaultViewTypes) => {
+    // Sort viewTypes alphabetically
+    const sortedViewTypes = [...viewTypes]
+        .sort((a, b) => a.localeCompare(b))
+        .map(type => ({
+        type,
+        meta: outputSections.find(s => s.view === type),
+    }));
+    return div(h3('᭟ Sections'), div.style `display:flex;gap:1em;flex-wrap:wrap;margin:1em;`(_ => sortedViewTypes.map(({ meta, type }) => div({ style: "flex:0 0 auto;min-width:150px;white-space:nowrap;" }, input({
+        name: _ => 'view-type-' + type,
+        type: "checkbox",
+        id: _ => 'view-type-' + type,
+        checked: _ => storage.views.includes(type),
+        onClick: () => toggleViewType(type),
+    }), _ => meta?.emoji ? meta.emoji + ' ' : null, label({ for: _ => 'view-type-' + type }, ' ', _ => type), ' ', a({
+        href: _ => `isolated.html#${type}`,
+        style: "font-size:.6em;text-decoration:none;",
+    }, '🔗'), ' ', a({
+        href: _ => `#${type}`,
+        style: "font-size:.6em;",
+    }, '↗️')).key(type)), _ => viewTypes.length > 1 && [
+        div(label({
+            onClick: () => viewTypes.forEach(viewType => {
+                // viewChanged.next({viewType, checkTesting: false})
+                activate(viewType, false);
+                saveScopedStorage();
+            })
+        }, ' all')),
+        div(label({
+            onClick: () => viewTypes.forEach(viewType => {
+                deactivate(viewType);
+                saveScopedStorage();
+            })
+        }, ' none'))
+    ]), tion, deactivate(type, ViewTypes), {}(storage.views = storage.views.filter(x => x !== type)));
+});
 export function activate(type, checkTesting = true) {
     storage.views.push(type);
     if (checkTesting && storage.autoTest) {

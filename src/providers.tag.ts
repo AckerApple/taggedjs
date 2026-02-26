@@ -1,6 +1,6 @@
 import { renderCountDiv } from "./renderCount.component.js"
 import { providerDialog } from "./providerDialog.tag.js"
-import { tag, providers, callbackMaker, Subject, host, div, strong, button, span, hr, h3, textarea } from "taggedjs"
+import { tag, providers, Subject, host, div, strong, button, span, hr, h3, textarea, callback, getContextInCycle } from "taggedjs"
 import { fx } from "taggedjs-animate-css"
 import { inCycleContextComms, inCycleParent } from "./inCycleContextComms.tag.js"
 
@@ -65,92 +65,60 @@ export const providerDebug = tag((_x = 'providerDebugBase') => {
       _=> providerClass.tagDebug || '?'/*2*/
     ),
 
-    div({style: "display:flex;flex-wrap:wrap;gap:1em"},
-      div(
-        button({id: "increase-provider-🍌-0-button",
-          onClick: () => ++provider.test
-        },
-          '🍌 increase provider.test ',
-          _=> provider.test/*4*/
-        ),
+    div.style`display:flex;flex-wrap:wrap;gap:1em`(div(
+        button
+          .id`increase-provider-🍌-0-button`
+          .onClick(() => ++provider.test)(
+            '🍌 increase provider.test ',
+            _=> provider.test
+          ),
         span(
           '🍌 ',
-          span({id: "increase-provider-🍌-0-display"},
-            _=> provider.test
-          )
+          span.id`increase-provider-🍌-0-display`(_=> provider.test)
         )
-      ),
-
-      div(
-        button({id: "increase-provider-upper-🌹-0-button",
-          onClick: () => ++provider.upper.test
-        },
-          '🌹 increase upper.provider.test ',
-          _=> provider.upper.test/*7*/
-        ),
+      ), div(
+        button
+          .id`increase-provider-upper-🌹-0-button`
+          .onClick(() => ++provider.upper.test)(
+            '🌹 increase upper.provider.test ',
+            _=> provider.upper.test
+          ),
         span(
           '🌹 ',
-          span({id: "increase-provider-upper-🌹-0-display"},
-            _=> provider.upper.test
-          )
+          span.id`increase-provider-upper-🌹-0-display`(_=> provider.upper.test)
         )
-      ),
-
-      div(
-        button({id: "increase-provider-🍀-0-button",
-          onClick: () => ++providerClass.tagDebug
-        },
-          '🍀 increase provider class ',
-          _=> providerClass.tagDebug/*10*/
-        ),
+      ), div(
+        button.id`increase-provider-🍀-0-button`.onClick(() => ++providerClass.tagDebug)('🍀 increase provider class ', _=> providerClass.tagDebug),
         span(
           '🍀 ',
-          span({id: "increase-provider-🍀-0-display"},
-            _=> providerClass.tagDebug
-          )
+          span.id`increase-provider-🍀-0-display`(_=> providerClass.tagDebug)
         )
-      ),
-
-      div(
-        button({id: "increase-prop-🐷-0-button",
-          onClick: () => {
+      ), div(
+        button.id`increase-prop-🐷-0-button`.onClick(() => {
             ++propCounter
-          }
-        },
-          '⬇️ 🐷 ++propCounter in parent ',
-          _=> propCounter/*13*/
-        ),
+          })('⬇️ 🐷 ++propCounter in parent ', _=> propCounter),
         span(
           '⬇️ 🐷 ',
-          span({id: "increase-prop-🐷-0-display"},
-            _=> propCounter
-          )
+          span.id`increase-prop-🐷-0-display`(_=> propCounter)
         )
-      ),
-
-      button({ onClick: toggleDialog },
-        '💬 toggle dialog in parent ',
-        _=> providerClass.showDialog/*16*/
-      )
-    ),
+      ), button.onClick(toggleDialog)('💬 toggle dialog in parent ', _=> providerClass.showDialog)),
 
     hr,
 
-    div({style: "display:flex;flex-wrap:wrap;gap:1em"},
-      _=> {
-        return providerChildDebug({
-          propCounter,
-          propCounterChange: x => {
-            propCounter = x
-          }
-        })
-      }
-    ),
+    div.style`display:flex;flex-wrap:wrap;gap:1em`(_=> {
+      const x = providerChildDebug({
+        propCounter,
+        propCounterChange: x => {
+          propCounter = x
+        }
+      })
+      return x
+    }),
 
     hr,
 
     'renderCount outer:',
-    span({name: "render_count_outer"}, _=> renderCount),
+    span.name`render_count_outer`(_=> renderCount),
 
     _=> renderCountDiv({renderCount, name:'providerDebugBase'}),
 
@@ -173,6 +141,7 @@ const providerChildDebug = tag(({
   providerChildDebug.updates(x => {
     [{ propCounter, propCounterChange }] = x
   })
+
   const funcProvider = providers.inject( ProviderFunc ) // test that an arrow function can be a provider
   const provider = providers.inject( tagDebugProvider )
   const providerClass = providers.inject( TagDebugProvider )
@@ -181,14 +150,14 @@ const providerChildDebug = tag(({
   let showProProps: boolean = false
   let renderCount: number = 0
 
-  const callbacks = callbackMaker()
+  const onSub = callback(x => {
+    provider.test = x as number
+  })
   const callbackTestSub = new Subject()
   console.info('providerDebug.ts: 👉 👉 providers should only ever run once')
 
   const sub = callbackTestSub.subscribe(x => {
-    callbacks((y) => {
-      provider.test = x as number
-    })()
+    onSub(x)
   })
 
   tag.onDestroy(() => {
@@ -199,121 +168,101 @@ const providerChildDebug = tag(({
 
   return div(
     div(
-      button({id: "increase-provider-🍌-1-button",
-        onClick: () => ++provider.test
-      },
-        '🍌 increase provider.test ',
-        _=> provider.test
-      ),
+      button
+        .id`increase-provider-🍌-1-button`
+        .onClick(() => ++provider.test)(
+          '🍌 increase provider.test ', _=> provider.test
+        ),
       span(
         '🍌 ',
-        span({id: "increase-provider-🍌-1-display"},
-          _=> provider.test
-        )
+        span.id`increase-provider-🍌-1-display`(_=> provider.test)
       )
     ),
 
     div(
-      button({id: "increase-provider-upper-🌹-1-button",
-        onClick: () => ++upperProvider.test
-      },
-        '🌹 increase upper.provider.test ',
-        _=> upperProvider.test
-      ),
+      button
+        .id`increase-provider-upper-🌹-1-button`
+        .onClick(() => ++upperProvider.test)(
+          '🌹 increase upper.provider.test ', _=> upperProvider.test
+        ),
       span(
         '🌹',
-        span({id: "increase-provider-upper-🌹-1-display"},
-          _=> upperProvider.test
-        )
+        span
+          .id`increase-provider-upper-🌹-1-display`(
+            _=> upperProvider.test
+          )
       )
     ),
 
     div(
-      button({id: "increase-arrow-provider-⚡️-1-button",
-        onClick: () => ++funcProvider.counter
-      },
-        '⚡️ increase upper.provider.test ',
-        _=> funcProvider.counter
-      ),
+      button.id`increase-arrow-provider-⚡️-1-button`
+        .onClick(() => ++funcProvider.counter)(
+          '⚡️ increase upper.provider.test ', _=> funcProvider.counter
+        ),
       span(
         '⚡️',
-        span({id: "increase-arrow-provider-⚡️-1-display"},
-          _=> funcProvider.counter
-        )
+        span.id`increase-arrow-provider-⚡️-1-display`(_=> funcProvider.counter)
       )
     ),
 
     div(
-      button({id: "subject-increase-counter",
-        onClick: () => callbackTestSub.next(provider.test + 1)
-      },
-        '🍌 subject increase:'
-      ),
+      button
+        .id`subject-increase-counter`
+        .onClick(() => callbackTestSub.next(provider.test + 1))(
+          '🍌 subject increase:'
+        ),
       span(
         '🍌 ',
-        span({id: "subject-counter-display"},
-          _=> provider.test
-        )
+        span.id`subject-counter-display`(_=> provider.test)
       )
     ),
 
     div(
-      button({id: "increase-provider-🍀-1-button",
-        onClick: () => ++providerClass.tagDebug
-      },
-        '🍀 increase provider class ',
-        _=> providerClass.tagDebug
-      ),
+      button
+        .id`increase-provider-🍀-1-button`
+        .onClick(() => ++providerClass.tagDebug)(
+          '🍀 increase provider class ', _=> providerClass.tagDebug
+        ),
       span(
         '🍀 ',
-        span({id: "increase-provider-🍀-1-display"},
-          _=> providerClass.tagDebug
-        )
+        span.id`increase-provider-🍀-1-display`(_=> providerClass.tagDebug)
       )
     ),
 
     div(
-      button({id: "increase-prop-🐷-1-button",
-        onClick: () => {
+      button
+        .id`increase-prop-🐷-1-button`
+        .onClick(() => {
           propCounterChange(++propCounter)
-        }
-      },
-        '⬆️ 🐷 ++propCounter in child ',
-        _=> propCounter
-      ),
+        })('⬆️ 🐷 ++propCounter in child ', _=> propCounter),
       span(
         '⬆️ 🐷 ',
-        span({id: "increase-prop-🐷-1-display"},
-          _=> propCounter
-        )
+        span.id`increase-prop-🐷-1-display`(_=> propCounter)
       )
     ),
 
-    button({
-      onClick: () => {
+    button.onClick(() => {
         providerClass.showDialog = !providerClass.showDialog
 
         if(providerClass.showDialog === true) {
           const modal = document.getElementById('provider_debug_dialog') as HTMLDialogElement
           modal.showModal()
         }
-      }
-    },
-      '💬 toggle dialog in child ',
-      _=> providerClass.showDialog
-    ),
+      })('💬 toggle dialog in child ', _=> providerClass.showDialog),
 
-    button({onClick: () => showProProps = !showProProps},
-      _=> showProProps ? 'hide' : 'show',
-      ' provider as props'
-    ),
+    button
+      .onClick(() => showProProps = !showProProps)(
+        _=> showProProps ? 'hide' : 'show', ' provider as props'
+      ),
 
     _=> showProProps &&
-      div({attr:fx()},
-        hr,
-        h3('Provider as Props'),
-        _=> testProviderAsProps(providerClass)
-      ),
+      div
+        // .attr(fx() as any)
+        (
+          hr,
+          h3('Provider as Props'),
+          _=> testProviderAsProps(providerClass),
+        ),
 
     div(
       'renderCount inner:',
@@ -327,13 +276,16 @@ const providerChildDebug = tag(({
 const testProviderAsProps = tag((
   providerClass: TagDebugProvider
 ) => {
-  return textarea({wrap:"off", rows:"20", style:"width:100%;font-size:0.6em"},
-    _=> JSON.stringify(providerClass, null, 2)
-  )
+  return textarea
+    .wrap`off`
+    .rows`20`
+    .style`width:100%;font-size:0.6em`(
+      _=> JSON.stringify(providerClass, null, 2)
+    )
 })
 
 export const inCycleChild = host((color = 'green') => {
-  const parent = tag.inject( inCycleParent )
+  const parent = tag.inject( inCycleParent )  
   const element = tag.element.get()
   element.style.border = '2px solid ' + color
   element.style.flex = '1'

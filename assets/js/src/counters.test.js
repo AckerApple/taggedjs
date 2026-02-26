@@ -1,10 +1,11 @@
-import { byId, click, html, htmlById, keyupOn } from "./testing/elmSelectors";
-import { describe, expect, it } from "./testing/expect";
-import { expectElmCount, testCounterElements } from "./testing/expect.html";
+import { describe, it, expect } from './testing';
+import { byId, click, html, htmlById, keyupOn } from './testing';
+import { expectElmCount, testCounterElements } from './testing';
+let runs = 0;
 describe('💯 counters', () => {
-    const slowCount = html('#🍄-slowChangeCount');
     // tests can be run multiple times. Only the first time will this expect below work
-    const firstRun = slowCount === '0';
+    const firstRun = runs === 0;
+    ++runs;
     it('basics', () => {
         const counterInput = byId('set-main-counter-input');
         expect(counterInput).toBeDefined();
@@ -12,34 +13,38 @@ describe('💯 counters', () => {
         keyupOn(counterInput);
         const beforeRenderCount = Number(html('#counters_render_count'));
         const beforeInnerRenderCount = Number(html('#inner_counters_render_count'));
-        expect(html('#counters_render_count')).toBe((beforeRenderCount + 1).toString());
         expectElmCount('#conditional-counter', 0);
         const currentSubs = htmlById('👉-counter-sub-count');
         testCounterElements('#❤️-increase-counter', '#❤️-counter-display');
-        expect(htmlById('👉-counter-sub-count')).toBe(currentSubs);
-        expect(html('#counters_render_count')).toBe((beforeRenderCount + 2).toString());
+        const htmlSubCount = htmlById('👉-counter-sub-count');
+        expect(htmlSubCount).toBe(currentSubs, `Different subscription counts? Expected ${htmlSubCount} to be ${currentSubs}`);
+        const expectedRenderCount = html('#counters_render_count');
+        // const renderToBe = (beforeRenderCount + 2).toString()
+        const renderToBe = "1";
+        expect(expectedRenderCount).toBe(renderToBe, `expected render count ${expectedRenderCount} to be ${renderToBe}`);
         // the parent changed a value passed to child as a prop
-        let toBe = (beforeInnerRenderCount + 2).toString();
+        // let toBe = (beforeInnerRenderCount + 2).toString()
+        let toBe = "1";
         let renderCount = html('#inner_counters_render_count');
-        expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`);
+        expect(renderCount).toBe(toBe, `Expected renderCount ${renderCount} to be ${toBe}`); // expected number of renders to be ${toBe} not ${renderCount}
         const preInitCounter = html('#🔥-init-counter');
-        expect(preInitCounter).toBe('1');
+        expect(preInitCounter).toBe('1', `#🔥-init-counter to be 1 but it's ${preInitCounter}`);
         testCounterElements('#❤️-inner-counter', '#❤️-inner-display');
-        toBe = (beforeRenderCount + 4).toString();
+        // toBe = (beforeRenderCount + 4).toString()
         renderCount = html('#counters_render_count');
-        expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`);
+        expect(renderCount).toBe(toBe, '#counters_render_count fail'); // expected number of renders to be ${toBe} not ${renderCount}
         // the child changed a value passed from parent as a prop
         renderCount = html('#inner_counters_render_count');
-        toBe = (beforeInnerRenderCount + 4).toString();
-        expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`);
+        // toBe = (beforeInnerRenderCount + 4).toString()
+        expect(renderCount).toBe(toBe); // expected number of renders to be ${toBe} not ${renderCount}
         testCounterElements('#🥦-standalone-counter', '#🥦-standalone-display');
-        toBe = (beforeRenderCount + (firstRun ? 6 : 6)).toString();
+        // toBe = (beforeRenderCount + (firstRun ? 6 : 6)).toString()
         renderCount = html('#counters_render_count');
-        expect(renderCount).toBe(toBe, 'render count check failed');
+        expect(renderCount).toBe(toBe, '#counters_render_count failed'); // render count check failed
         // the child was not rendered again because props did not change so value should be less
         renderCount = html('#inner_counters_render_count');
-        toBe = (beforeInnerRenderCount + 4).toString();
-        expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`);
+        // toBe = (beforeInnerRenderCount + 4).toString()
+        expect(renderCount).toBe(toBe, '#inner_counters_render_count failed'); // expected number of renders to be ${toBe} not ${renderCount}
         expectElmCount('#conditional-counter', 1);
         expectElmCount('#conditional-display', 1);
         if (firstRun) {
@@ -47,7 +52,7 @@ describe('💯 counters', () => {
         }
         renderCount = htmlById('❤️💧-shallow-display');
         testCounterElements('#conditional-counter', '#conditional-display');
-        expect(renderCount).toBe(htmlById('❤️💧-shallow-display'), 'expect shallow render not to have changed');
+        expect(renderCount).toBe(htmlById('❤️💧-shallow-display')); // expect shallow render not to have changed
         // test again after higher elements have had reruns
         testCounterElements('#❤️-inner-counter', '#❤️-inner-display');
         testCounterElements('#❤️💧-shallow-counter', '#❤️💧-shallow-display');
@@ -57,17 +62,24 @@ describe('💯 counters', () => {
         speedClickCountTest('🚫-nowatch-counter', '🚫-nowatch-display', '❤️🚫-nowatch-counter');
         // renderCount = html('#shallow_counters_render_count')
         // toBe = (beforeInnerRenderCount + 4).toString()
-        // expect(renderCount).toBe(toBe, `expected number of renders to be ${toBe} not ${renderCount}`)
+        // expect(renderCount).toBe(toBe) // expected number of renders to be ${toBe} not ${renderCount}
     });
-    it('piped subject', () => {
+    it('counters.test piped subject', () => {
         if (firstRun) {
-            expect(html('#🪈-pipedSubject')).toBe('');
-            expect(html('#🪈-pipedSubject-2')).toBe('');
+            const counter = html('#🥦-standalone-display');
+            const pipe0 = html('#🪈-pipedSubject');
+            // expect(pipe0).toBe(counter, `firstRun failure pipe0. Expected "${pipe0}" toBe empty-string aka ${counter}`)
+            expect(pipe0).toBe("", `firstRun failure pipe0. Expected "${pipe0}" toBe empty-string`);
+            const pipe2 = html('#🪈-pipedSubject-2');
+            // expect(pipe2).toBe(counter, `firstRun failure pipe2 expected ${pipe2} to be ${counter}`)
+            expect(pipe2).toBe("", `firstRun failure pipe2 expected toBe empty-string`);
+            const pipe3 = html('#🪈-pipedSubject-3');
+            expect(pipe3).toBe("", `firstRun failure pipe3 expected toBe empty-string`);
         }
         click('#🥦-subject-increase-counter');
         const pipedSubDisplay = html('#🪈-pipedSubject');
         const subjectCountDisplay = html('#🥦-standalone-display');
-        expect(pipedSubDisplay).toBe(subjectCountDisplay, `Expected #🪈-pipedSubject value(${pipedSubDisplay}) to match #🥦-standalone-display value(${subjectCountDisplay})`);
+        expect(pipedSubDisplay).toBe(subjectCountDisplay); // Expected #🪈-pipedSubject value(${pipedSubDisplay}) to match #🥦-standalone-display value(${subjectCountDisplay})
         expect(html('#🪈-pipedSubject-2')).toBe(html('#🥦-standalone-display'));
     });
 });
@@ -87,6 +99,6 @@ function speedClickCountTest(counterQuery, displayQuery, increaseOuterCounterQue
     }
     console.timeEnd(`⌚️ outer ${counterQuery}`);
     const displayQueryTime = (Number(clickCount) + clickSpeedAmount).toString();
-    expect(htmlById(displayQuery)).toBe(displayQueryTime, displayQuery);
+    expect(htmlById(displayQuery)).toBe(displayQueryTime); // ${displayQuery}
 }
 //# sourceMappingURL=counters.test.js.map

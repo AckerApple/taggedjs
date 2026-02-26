@@ -22,17 +22,12 @@ export const oneRender = tag(() => {
     
     div(
       span('👍',
-        span(
-          {id:"👍-counter-display"},
-          subscribe(counter, x => x)
-        )
+        span.id`👍-counter-display`(subscribe(counter, x => x))
       ),
       
-      button({type:"button", id:"👍-counter-button",
-        onClick: () => {
+      button.type`button`.id`👍-counter-button`.onClick(() => {
           ++counter.value
-        }
-      }, '++👍')
+        })('++👍')
     ),
 
     _=> renderCountDiv({renderCount, name:'oneRender_tag_ts'}),
@@ -60,31 +55,27 @@ const insideMultiRender = tag(() => {
   return noElement(
     div(
       '👍🔨 sub counter-subject-display:',
-      span({id: "👍🔨-counter-subject-display"}, subscribe(counter$))
+      span.id`👍🔨-counter-subject-display`(subscribe(counter$))
     ),
     div(
       '👍📡 signal counter:',
-      span({id: "📡-signal-counter-display"}, counterSignal$)
+      span.id`📡-signal-counter-display`(counterSignal$)
     ),
     
     br,
     
     span(
       '👍🔨 sub counter: ',
-      span({id: "👍🔨-counter-display"}, _=> counter)
+      span.id`👍🔨-counter-display`(_=> counter)
     ),
     
     br,
     
-    button({
-      type: "button",
-      id: "👍🔨-counter-button",
-      onClick: () => {
+    button.type`button`.id`👍🔨-counter-button`.onClick(() => {
         ++counter
         counter$.next(counter)
         counterSignal$.value = counter
-      }
-    }, '++👍👍'),
+      })('++👍👍'),
     _=> renderCountDiv({renderCount, name:'insideMultiRender'})
   )
 })

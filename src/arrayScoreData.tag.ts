@@ -17,20 +17,9 @@ export const arrayScoreData = tag((
     'frame:',
     _=> score.frame,
     ':',
-    button({
-      id: _=> `score-data-${playerIndex}-${score.frame}-inside-button`,
-      onClick: () => ++score.score
-    },
-      'inner score button ++',
-      _=> score.score
-    ),
-    span({
-      id: _=> `score-data-${playerIndex}-${score.frame}-inside-display`
-    }, _=> score.score),
-    button({
-      onClick: () => ++renderCount},
-      'increase renderCount'
-    ),
+    button.id(_=> `score-data-${playerIndex}-${score.frame}-inside-button`).onClick(() => ++score.score)('inner score button ++', _=> score.score),
+    span.id(_=> `score-data-${playerIndex}-${score.frame}-inside-display`)(_=> score.score),
+    button.onClick(() => ++renderCount)('increase renderCount'),
     _=> renderCountDiv({renderCount, name: 'scoreData' + score.frame})
   )
 })

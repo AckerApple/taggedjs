@@ -18,8 +18,7 @@ export async function replaceTemplater(ownerSupport, { oldTag, newTag }, hmr, is
     const values = tag.values;
     // loop all values looking for original functions that match oldTag to replace newTag with
     const promises = values.map(async (value, index) => {
-        const matchGlobal = ownerSupport.context.global;
-        const matchContext = matchGlobal.contexts;
+        const matchContext = ownerSupport.context.contexts;
         const contextItem = matchContext[index];
         count = await checkToUpdateSubject(value, contextItem, oldTag, newTag, hmr, count, isApp);
     });
@@ -27,14 +26,13 @@ export async function replaceTemplater(ownerSupport, { oldTag, newTag }, hmr, is
     paint();
     hmr.paint();
     // loop children to process the context they have
-    const global = ownerSupport.context.global;
-    const context = global.contexts;
+    const context = ownerSupport.context.contexts;
     const subPromises = context.map(async (child) => {
         const childGlobal = child.global;
         if (!childGlobal) {
             return;
         }
-        const support = childGlobal.oldest;
+        const support = child.state.oldest;
         if (support) {
             const newCount = await replaceTemplater(support, { oldTag, newTag }, hmr, isApp);
             if (newCount > 0) {
@@ -67,7 +65,7 @@ async function checkToUpdateSubject(value, contextItem, oldTag, newTag, hmr, cou
     if (!isTemplater) {
         return count;
     }
-    const oldest = contextItem.global?.oldest;
+    const oldest = contextItem.state?.oldest;
     const newOriginal = oldest?.templater.wrapper?.original;
     if (oldTag.original.toString() === newOriginal?.toString()) {
         oldTag.original = newOriginal;

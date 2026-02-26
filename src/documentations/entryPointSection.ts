@@ -30,25 +30,19 @@ const entryPointCode = `<!DOCTYPE html>
 `
 
 export function entryPointSection() {
-  return section({class: "section-card", id: "entry-point"},
-    docH2("entry-point", "🚪 Entry Point"),
-    p(
+  return section.class`section-card`.id`entry-point`(docH2("entry-point", "🚪 Entry Point"), p(
       "To start a TaggedJS app, place a custom element in your HTML and mount the ",
       "component with ",
       code("tagElement"),
       ". The mount call connects your component to that element and triggers the ",
       "first render."
-    ),
-    p(
+    ), p(
       "This is the minimal setup: an HTML document, a root element, and a module ",
       "script that defines a ",
       code("tag"),
       " component and mounts it."
-    ),
-    figure(
-      pre(code({class: "language-html"}, entryPointCode)),
+    ), figure(
+      pre(code.class`language-html`(entryPointCode)),
       figcaption("Minimal TaggedJS app bootstrap")
-    ),
-    p(a({class: "inline-link", href: "#top"}, "Back to top"))
-  )
+    ), p(a.class`inline-link`.href`#top`("Back to top")))
 }

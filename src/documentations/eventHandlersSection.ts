@@ -24,10 +24,10 @@ export function eventHandlersSection() {
       " shows the standard pattern."
     ),
     figure(
-      pre(code({class: "language-ts"}, eventHandlersCode)),
+      pre(code.class`language-ts`(eventHandlersCode)),
       figcaption(
         "Source: ",
-        a({href: `${repoBaseUrl}/src/basic.tag.ts`, target: "_blank"}, code("src/basic.tag.ts"))
+        a.href(`${repoBaseUrl}/src/basic.tag.ts`).target`_blank`(code("src/basic.tag.ts"))
       )
     ),
   ]

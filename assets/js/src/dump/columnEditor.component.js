@@ -1,14 +1,16 @@
-import { html, state, states, tag } from "taggedjs";
+import { tag, div, a, input, small, strong, textarea, button, noElement } from "taggedjs";
 export const columnEditor = tag(({ name, array, included, columnNames, allColumnNames }) => {
+    columnEditor.updates(x => [{
+            name,
+            array,
+            included,
+            columnNames,
+            allColumnNames
+        }] = x);
     let mouseOverEditShow = false;
     let edit = false;
     let editFormula = undefined;
-    const formulas = state([]);
-    states(get => [{
-            mouseOverEditShow, edit, editFormula
-        }] = get({
-        mouseOverEditShow, edit, editFormula
-    }));
+    const formulas = [];
     const goAll = () => {
         columnNames.length = 0;
         columnNames.push(...allColumnNames);
@@ -42,56 +44,33 @@ export const columnEditor = tag(({ name, array, included, columnNames, allColumn
         formula.stringFormula = newFormula;
         formula.value = sandboxRunEval(newFormula, { array });
     };
-    return html `
-    <a onclick=${toggle} style="cursor:pointer;">
-      <input type="checkbox" ${included && 'checked'} />&nbsp;${name}
-    </a>
-
-    <div
-      onmouseover=${() => mouseOverEditShow = true}
-      onmouseout=${() => mouseOverEditShow = false}
-    >
-      <a style.visibility=${(edit || mouseOverEditShow) ? 'visible' : 'hidden'}
-        onclick=${() => edit = !edit}
-      >⚙️&nbsp;</a>
-      
-      ${included && columnNames.length !== allColumnNames.length ? html `
-        <a style="color:blue;" onclick=${goAll}><small>all</small></a>
-      ` : html `
-        <a style="color:blue;" onclick=${goOnly}><small>only</small></a>
-      `}
-    </div>
-
-    ${edit && html `
-      <div style="width:100%;padding:0.3em;">
-        <div style="font-size:0.7em;text-align:center;">
-          <strong>Column Settings</strong>
-        </div>
-        <div>
-          ${editFormula && html `
-            <div style="padding:0.3em;">
-              <strong>edit formula</strong>
-            </div>
-            <textarea wrap="off"
-              onchange=${(evt) => updateFormula(editFormula, evt.target.value)}
-            >${editFormula.value}</textarea>
-          `}
-          <div style="display:flex;flex-wrap:wrap;gap:1em">
-            ${formulas.map(formula => html `
-                <div>
-                  <div>
-                    <strong>${formula.title}</strong>
-                    <a onclick=${() => editFormula = formula}>✏️</a>
-                  </div>
-                  <div>${formula.value}</div>
-                </div>
-              `.key(formula))}
-          </div>
-          <button type="button" onclick=${addSumFormula}>sum</button>
-        </div>
-      </div>
-    `}
-  `;
+    const nameCheckbox = a
+        .style `cursor:pointer`
+        .onClick(toggle)(input
+        .attr('type', "checkbox")
+        .attr('checked', included), ' ', _ => name);
+    return noElement(nameCheckbox, div
+        .onMouseover(() => mouseOverEditShow = true)
+        .onMouseout(() => mouseOverEditShow = false)(a
+        .attr('style.visibility', _ => (edit || mouseOverEditShow) ? 'visible' : 'hidden')
+        .onClick(() => edit = !edit)('⚙️\u00A0'), _ => included && columnNames.length !== allColumnNames.length ?
+        a
+            .style `color:blue;`
+            .onClick(goAll)(small('all'))
+        :
+            a
+                .style `color:blue;`
+                .onClick(goOnly)(small('only'))), _ => edit &&
+        div
+            .style `width:100%;padding:0.3em;`(div
+            .style `font-size:0.7em;text-align:center;`(strong('Column Settings')), div(_ => editFormula && noElement(div
+            .style `padding:0.3em;`(strong('edit formula')), textarea
+            .attr('wrap', "off")
+            .onChange((evt) => updateFormula(editFormula, evt.target.value))(_ => editFormula?.value)), div
+            .style `display:flex;flex-wrap:wrap;gap:1em`(_ => formulas.map(formula => div(div(strong(_ => formula.title), a
+            .onClick(() => editFormula = formula)('✏️')), div(_ => formula.value)).key(formula))), button
+            .attr('type', "button")
+            .onClick(addSumFormula)('sum'))));
 });
 function sandboxRunEval(stringFormula, context = {}) {
     return sandboxEval(stringFormula, { isNaN, Math, Number, Date, ...context });

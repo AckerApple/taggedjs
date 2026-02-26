@@ -9,19 +9,10 @@ import { eventHandlersSection } from "./eventHandlersSection"
 const code = htmlTag("code")
 
 export function displaySection() {
-  return section({class: "section-card", id: "display"},
-    docH2("display", "🖼️ Display"),
-    p(
+  return section.class`section-card`.id`display`(docH2("display", "🖼️ Display"), p(
       "These sections cover the rendering building blocks: importing elements, ",
       "applying ",
       code("attributes``"),
       ", mapping lists, and wiring event handlers."
-    ),
-    ...elementImportsSection(),
-    ...attributesSection(),
-    ...dynamicContentSection(),
-    ...mapLoopsSection(),
-    ...eventHandlersSection(),
-    p(a({class: "inline-link", href: "#top"}, "Back to top"))
-  )
+    ), ...elementImportsSection(), ...attributesSection(), ...dynamicContentSection(), ...mapLoopsSection(), ...eventHandlersSection(), p(a.class`inline-link`.href`#top`("Back to top")))
 }

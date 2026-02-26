@@ -14,11 +14,11 @@ const promiseTag = tag(() => {
 export const asyncSection = tag(() => {
   let showPromiseTest = false
 
-  return div({id: "async-display-wrapper"},
-    button({
-      id: "toggle-promise-test",
-      onClick: () => showPromiseTest = !showPromiseTest
-    }, _=> showPromiseTest ? 'hide' : 'show', ' promise tag'),
+  return div.id`async-display-wrapper`(
+    button.id`toggle-promise-test`.onClick(() => showPromiseTest = !showPromiseTest)(
+      _=> showPromiseTest ? 'hide' : 'show',
+      ' promise tag'
+    ),
     _=> showPromiseTest && promiseTag()
   )
 })

@@ -13,13 +13,9 @@ export const basic = tag(() => {
     p(_=> `Counter: ${counter}`),
     p(_=> `Render Count: ${renderCount}`),
     
-    button({
-      onClick: () => counter++
-    }, 'Increment Counter'),
+    button.onClick(() => counter++)('Increment Counter'),
 
-    button({
-      onClick: () => showDiv = !showDiv
-    }, _=> `Toggle Div (${showDiv ? 'Hide' : 'Show'})`),
+    button.onClick(() => showDiv = !showDiv)(_=> `Toggle Div (${showDiv ? 'Hide' : 'Show'})`),
 
     _=> showDiv && boltTag(counter),
   )
@@ -34,18 +30,18 @@ const boltTag = tag((parentCounter: number) => {
   return div(
     () => `color: ${color}`,
 
-    select({onChange: e => color = e.target.value},
-      option({value:'red'}, 'red'),
-      option({value:'green'}, 'green'),
+    select.onChange(e => color = e.target.value)(
+      option.value`red`('red'),
+      option.value`green`('green')
     ),
 
     () => arrayBoltTest(parentCounter),
 
-    span({style: _=> 'color:' + color}, 'hello my span world'),
+    span.style(_=> 'color:' + color)('hello my span world'),
 
-    div({style: _=> 'color:' + color}, 'hello my div world'),
+    div.style(_=> 'color:' + color)('hello my div world'),
 
-    button({onClick: () => ++clickCount}, 'click me'),
+    button.onClick(() => ++clickCount)('click me'),
 
     div(_=> `click counts ${clickCount}`),
     div(_=> `parent counter: ${parentCounter}`),
@@ -61,6 +57,6 @@ const arrayBoltTest = tag((parentCounter) => {
     div('hello array bolt 1'),
     div(`innerCounter: `, _=> innerCounter),
     div(() => `parent counter: ${parentCounter}`),
-    button({onClick: () => ++innerCounter}, 'inner counter')
+    button.onClick(() => ++innerCounter)('inner counter')
   ]
 })

@@ -1,11 +1,11 @@
 import { storage } from "./sectionSelector.tag";
 import { runIsolatedTests } from "./isolatedApp.test";
-import { enableMocha } from "./testing/expect";
+// import { enableMocha } from "./testing/expect" // No longer needed with dual test system
 let testTimeout = null;
 // Alternative test runner that uses Mocha/Chai
 export function runTestingWithMocha(manual = true, tests, runStartEndTests) {
-    // Enable Mocha/Chai integration
-    enableMocha();
+    // Mocha/Chai integration no longer needed with dual test system
+    // enableMocha();
     if (testTimeout !== null) {
         clearTimeout(testTimeout);
         console.debug(`🏃 Cleared previous testing to start again...`);

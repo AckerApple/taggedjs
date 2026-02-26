@@ -69,37 +69,15 @@ export const intervalTester0 = tag(() => {
     ),
     'intervalId: ',
     _=> intervalId,
-    button({
-        type: "button",
-        onClick: increase
-      },
-      _=> intervalCount,
-      ':',
-      _=> renderCounter
-    ),
-    input({
-      type: "range",
-      min: "0",
-      max: _=> test0interval,
-      step: "1",
-      value: _=> currentTime,
-    }),
+    button.type`button`.onClick(increase)(_=> intervalCount, ':', _=> renderCounter),
+    input.type`range`.min`0`.max(_=> test0interval).step`1`.value(_=> currentTime)(),
     div(
       '--',
       _=> currentTime,
       '--'
     ),
-    button({
-      type: "button",
-      onClick: toggle,
-      'style.background-color': intervalId || intervalId2 ? 'red' : 'green'
-    }, 'start/stop'),
-    button({
-        type: "button",
-        onClick: delayIncrease
-      },
-      'delay increase currentTime'
-    )
+    button.type`button`.onClick(toggle).attr('style.background-color', intervalId || intervalId2 ? 'red' : 'green')('start/stop'),
+    button.type`button`.onClick(delayIncrease)('delay increase currentTime')
   )
 })
 
@@ -155,21 +133,8 @@ export const intervalTester1 = tag(() => {
     div('interval type 2 with ', _=> test1interval, 'ms'),
     'intervalId: ',
     _=> intervalId,
-    button({
-        type: "button",
-        onClick: increase
-      },
-      _=> intervalCount,
-      ':',
-      _=> renderCounter
-    ),
-    input({
-      type: "range",
-      min: "0",
-      max: _=> test1interval,
-      step: "1",
-      value: _=> currentTime
-    }),
+    button.type`button`.onClick(increase)(_=> intervalCount, ':', _=> renderCounter),
+    input.type`range`.min`0`.max(_=> test1interval).step`1`.value(_=> currentTime)(),
     
     div(
       '--',
@@ -177,12 +142,6 @@ export const intervalTester1 = tag(() => {
       '--'
     ),
     
-    button({
-        type: "button",
-        onClick: toggleInterval,
-        'style.background-color': _=> intervalId ? 'red' : 'green'
-      },
-      'start/stop'
-    )
+    button.type`button`.onClick(toggleInterval).attr('style.background-color', _=> intervalId ? 'red' : 'green')('start/stop')
   )
 })

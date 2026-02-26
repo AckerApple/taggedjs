@@ -1,17 +1,20 @@
-import { tag, html } from "taggedjs";
-export const Footer = tag.immutableProps((todosCount, removeCompleted, route, activeTodoCount) => html `
-    <footer class="footer" data-testid="footer">
-        <span class="todo-count">${activeTodoCount} item${activeTodoCount > 1 && "s"} left!</span>
-        <ul class="filters">
-            <li><a id="todo-view-all-link" class.selected=${route === "/"} href="#/">All</a></li>
-            <li><a id="todo-view-active-link" class.selected=${route === "/active"} href="#/active">Active</a></li>
-            <li><a id="todo-view-completed-link" class.selected=${route === "/completed"} href="#/completed">Completed</a></li>
-        </ul>
-        ${(todosCount - activeTodoCount) > 0 && html `
-            <button class="clear-completed" onclick=${() => removeCompleted()}>
-                Clear completed
-            </button>
-        `}
-    </footer>
-`);
+import { footer, span, ul, li, a, button } from "taggedjs";
+export const Footer = (todosCount, removeCompleted, route, activeTodoCount) => {
+    return footer.class `footer`["data-testid"] `footer`(span({ class: "todo-count" }, _ => activeTodoCount, ' item', _ => activeTodoCount > 1 && "s", ' left!'), ul({ class: "filters" }, li(a({
+        id: "todo-view-all-link",
+        class: _ => route === "/" ? "selected" : "",
+        href: "#/"
+    }, 'All')), li(a({
+        id: "todo-view-active-link",
+        class: _ => route === "/active" ? "selected" : "",
+        href: "#/active"
+    }, 'Active')), li(a({
+        id: "todo-view-completed-link",
+        class: _ => route === "/completed" ? "selected" : "",
+        href: "#/completed",
+    }, 'Completed'))), _ => (todosCount - activeTodoCount) > 0 && (button({
+        class: "clear-completed",
+        onClick: () => removeCompleted(),
+    }, 'Clear completed')));
+};
 //# sourceMappingURL=footer.js.map

@@ -35,34 +35,26 @@ export const watchTesting = tag(() => {
 
   return div(
     'stateNum:',
-    span({id: "watch-testing-num-display"}, _=> stateNum),
-    button({
-      id: "watch-testing-num-button",
-      type: "button",
-      onClick: () => ++stateNum
-    }, '++stateNum'),
-    button({
-      id: "watch-testing-nothing-button",
-      type: "button",
-      onClick: () => ++nothing
-    }, '++nothing'),
+    span.id`watch-testing-num-display`(_=> stateNum),
+    button.id`watch-testing-num-button`.type`button`.onClick(() => ++stateNum)('++stateNum'),
+    button.id`watch-testing-nothing-button`.type`button`.onClick(() => ++nothing)('++nothing'),
     div(
       small(
         'stateNumChangeCount:',
-        span({id: "stateNumChangeCount"}, _=> stateNumChangeCount)
+        span.id`stateNumChangeCount`(_=> stateNumChangeCount)
       )
     ),
     fieldset(
       legend('🍄 slowChangeCount'),
       div(
         small(
-          span({id: "🍄-slowChangeCount"}, _=> slowChangeCount)
+          span.id`🍄-slowChangeCount`(_=> slowChangeCount)
         )
       ),
       div(
         small(
           'watchPropNumSlow:',
-          span({id: "🍄-watchPropNumSlow"}, _=> watchPropNumSlow)
+          span.id`🍄-watchPropNumSlow`(_=> watchPropNumSlow)
         )
       )
     ),
@@ -70,17 +62,15 @@ export const watchTesting = tag(() => {
       legend('🍄‍🟫 subjectChangeCount'),
       div(
         small(
-          span({id: "🍄‍🟫-subjectChangeCount"}, _=> subjectChangeCount)
+          span.id`🍄‍🟫-subjectChangeCount`(_=> subjectChangeCount)
         )
       ),
       div(
         small(
           '(watchPropNumSubject$:',
-          span({id: "🍄‍🟫-watchPropNumSubject"},
-            subscribe(watchPropNumSubject, x => {
+          span.id`🍄‍🟫-watchPropNumSubject`(subscribe(watchPropNumSubject, x => {
               return x
-            })
-          ),
+            })),
           ')'
         )
       )
@@ -89,7 +79,7 @@ export const watchTesting = tag(() => {
       legend('🦷 truthChange'),
       div(
         small(
-          span({id: "🦷-truthChange"}, _=> truthChange ? 'true' : 'false')
+          span.id`🦷-truthChange`(_=> truthChange ? 'true' : 'false')
         )
       ),
       fieldset(
@@ -97,13 +87,13 @@ export const watchTesting = tag(() => {
         div(
           small(
             'watchTruth:',
-            span({id: "🦷-watchTruth"}, _=> watchTruth || 'false')
+            span.id`🦷-watchTruth`(_=> watchTruth || 'false')
           )
         ),
         div(
           small(
             '(truthChangeCount:',
-            span({id: "🦷-truthChangeCount"}, _=> truthChangeCount),
+            span.id`🦷-truthChangeCount`(_=> truthChangeCount),
             ')'
           )
         )
@@ -113,29 +103,22 @@ export const watchTesting = tag(() => {
         div(
           small(
             'watchTruthAsSub$:',
-            span(
-              {id: "🦷-watchTruthAsSub"},
-              subscribe(watchTruthAsSub, x => {
+            span.id`🦷-watchTruthAsSub`(subscribe(watchTruthAsSub, x => {
                 return x
-              })
-            )
+              }))
           )
         ),
         div(
           small(
             '(truthSubChangeCount:',
-            span({id: "🦷-truthSubChangeCount"}, _=> truthSubChangeCount),
+            span.id`🦷-truthSubChangeCount`(_=> truthSubChangeCount),
             ')'
           )
         )
       ),
-      button({
-        id: "🦷-truthChange-button",
-        type: "button",
-        onClick: () => {
+      button.id`🦷-truthChange-button`.type`button`.onClick(() => {
           truthChange = !truthChange
-        }
-      }, _=> `🦷 toggle to ${truthChange ? 'true' : 'false'}`)
+        })(_=> `🦷 toggle to ${truthChange ? 'true' : 'false'}`)
     )
   )
 })

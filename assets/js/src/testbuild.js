@@ -1,4 +1,4 @@
-import { RouteQuery, ValueSubject, ValueTypes, oneRenderToSupport, renderTagOnly, getNewGlobal, getBaseSupport, valueToTagJsVar } from 'taggedjs';
+import { RouteQuery, ValueSubject, ValueTypes, oneRenderToSupport, reRenderTag, getNewGlobal, getBaseSupport, valueToTagJsVar, Subject } from 'taggedjs';
 import App from './pages/app.js';
 import isolatedApp from './pages/isolatedApp.page.js';
 import * as fs from 'fs';
@@ -21,20 +21,26 @@ const run = () => {
     return App(routeTag);
 };
 const templater = run();
-const html = templaterToHtml(templater);
+const html = templaterToHtml(templater, undefined);
 const fileSavePath = './pages/isolatedApp.page.html';
 const fullFileSavePath = path.join(__dirname, fileSavePath);
 fs.writeFileSync(fullFileSavePath, html);
 console.debug(`💾 wrote ${fileSavePath}`);
-function templaterToSupport(templater) {
+function templaterToSupport(templater, parentContext) {
     const context = {
         renderCount: 0,
+        updateCount: 0,
+        varCounter: 0,
+        valueIndex: 0,
+        destroy$: new Subject(),
+        render$: new Subject(),
         value: templater,
         tagJsVar: valueToTagJsVar(templater),
         global: undefined, // populated below in getNewGlobal
-        // checkValueChange: checkSimpleValueChange,
-        // delete: deleteSimpleValue,
+        parentContext,
         withinOwnerElement: false,
+        contexts: [],
+        state: {},
     };
     getNewGlobal(context);
     templater.props = templater.props || [];
@@ -44,16 +50,16 @@ function templaterToSupport(templater) {
 }
 function readySupport(support, subject) {
     const global = subject.global;
-    global.newest = support;
-    global.oldest = support;
-    renderTagOnly(support, support, subject);
+    subject.state.newest = support;
+    subject.state.oldest = support;
+    // renderTagOnly(support, support, subject)
+    reRenderTag(support, support, subject);
     // buildSupportContext(support)
     return support;
 }
-function templaterToHtml(templater) {
-    const support = templaterToSupport(templater);
-    const global = support.context.global;
-    const context = global.contexts;
+function templaterToHtml(templater, parentContext) {
+    const support = templaterToSupport(templater, parentContext);
+    const context = support.context.contexts;
     const tag = support.templater.tag; // TODO: most likely do not want strings below
     const template = tag.strings; // support.getTemplate()
     const strings = new Array(...template); // clone
@@ -67,13 +73,13 @@ function processValue(value, strings, index, support, subject) {
     if (value instanceof Object && value.tagJsType) {
         switch (value.tagJsType) {
             case ValueTypes.tagComponent:
-                const tagString = templaterToHtml(value);
+                const tagString = templaterToHtml(value, support.context);
                 strings.splice(index + 1, 0, tagString);
                 break;
             case ValueTypes.renderOnce:
                 const tSupport = oneRenderToSupport(value, subject, support);
                 readySupport(tSupport, subject);
-                const fnString = templaterToHtml(tSupport.templater);
+                const fnString = templaterToHtml(tSupport.templater, support.context);
                 strings.splice(index + 1, 0, fnString);
                 break;
             case ValueTypes.templater:
@@ -82,12 +88,16 @@ function processValue(value, strings, index, support, subject) {
                 const subStrings = new Array(...tag.strings); // .reverse()
                 const string = subStrings.map((x, index) => {
                     const value = tag.values[index];
-                    x + processValue(value, [], tag.strings.length - 1 - index, support, {
+                    const valueIndex = tag.strings.length - 1 - index;
+                    x + processValue(value, [], valueIndex, support, {
+                        updateCount: 0,
                         value,
+                        valueIndex,
                         global: getNewGlobal(subject),
+                        parentContext: support.context,
                         tagJsVar: valueToTagJsVar(value),
-                        // checkValueChange: checkSimpleValueChange,
-                        // delete: destorySupportByContextItem,
+                        destroy$: new Subject(),
+                        render$: new Subject(),
                         withinOwnerElement: subject?.withinOwnerElement || false,
                     });
                 }).join('');

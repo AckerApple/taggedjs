@@ -61,35 +61,10 @@ export const controlPanel = tag(({
 
     div.style`width: 100%;line-height: 90%;`(
       div.style`position:relative`(
-        div({style: "display:flex;font-size:50%;position:absolute;top:-18px;right:-6px"},
-          _=> (!format || format==='flex') && a({
-            style: _=> "margin:1px;border-radius:5px;color:white;align-items:center;display:flex;padding-left:0.2em;padding-right:0.2em;" +
-              (showAll ? 'background-color:#33cd5f;' : 'background-color:#444444'),
-            class: "hover-bg-balanced",
-            onClick: () => showAllChange(showAll = !showAll),
-            title: "hide/show all sub objects"
-          }, '👁'),
-
-          a({
-            style: _=> "margin:1px;border-radius:5px;color:white;align-items:center;display:flex;padding-left:0.2em;padding-right:0.2em;" +
-              (!format || format==='flex' ? 'background-color:#33cd5f;' : 'background-color:#444444'),
-            class: "hover-bg-balanced",
-            onClick: () => formatChange(format='flex')
-          }, 'flex'),
-
-          a({
-            style: _=> "margin:1px;border-radius:5px;color:white;align-items:center;display:flex;padding-left:0.2em;padding-right:0.2em;" +
-              (format==='json' ? 'background-color:#33cd5f;' : 'background-color:#444444'),
-            class: "hover-bg-balanced",
-            onClick: () => formatChange(format='json')
-          }, 'json'),
-
-          a({
-            style: "margin:1px;border-radius:5px;color:white;align-items:center;display:flex;padding-left:0.2em;padding-right:0.2em;",
-            class: "bg-dark hover-bg-balanced active-bg-energized",
-            onClick: () => copyAsJsonText(value)
-          }, 'copy')
-        )
+        div.style`display:flex;font-size:50%;position:absolute;top:-18px;right:-6px`(_=> (!format || format==='flex') && a.style(_=> "margin:1px;border-radius:5px;color:white;align-items:center;display:flex;padding-left:0.2em;padding-right:0.2em;" +
+              (showAll ? 'background-color:#33cd5f;' : 'background-color:#444444')).class`hover-bg-balanced`.onClick(() => showAllChange(showAll = !showAll)).title`hide/show all sub objects`('👁'), a.style(_=> "margin:1px;border-radius:5px;color:white;align-items:center;display:flex;padding-left:0.2em;padding-right:0.2em;" +
+              (!format || format==='flex' ? 'background-color:#33cd5f;' : 'background-color:#444444')).class`hover-bg-balanced`.onClick(() => formatChange(format='flex'))('flex'), a.style(_=> "margin:1px;border-radius:5px;color:white;align-items:center;display:flex;padding-left:0.2em;padding-right:0.2em;" +
+              (format==='json' ? 'background-color:#33cd5f;' : 'background-color:#444444')).class`hover-bg-balanced`.onClick(() => formatChange(format='json'))('json'), a.style`margin:1px;border-radius:5px;color:white;align-items:center;display:flex;padding-left:0.2em;padding-right:0.2em;`.class`bg-dark hover-bg-balanced active-bg-energized`.onClick(() => copyAsJsonText(value))('copy'))
       )
     )
   )

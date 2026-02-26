@@ -28,7 +28,7 @@ export function elementImportsSection() {
       "autocomplete because each element is a real import instead of a string tag."
     ),
     figure(
-      pre(code({class: "language-ts"}, importsCode)),
+      pre(code.class`language-ts`(importsCode)),
       figcaption("Import only the elements you use")
     ),
   ]

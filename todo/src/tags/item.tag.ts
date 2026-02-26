@@ -10,50 +10,46 @@ export const Item = tag((
   Item.updates(x => [todo,dispatch,index] = x)
 
   let editing = false
-  return li({
-      'class.completed': _=> todo.completed,
-      'class.editing': _=> editing
-    },
-    _=> !editing ?
-      div({class: "view"},
-        input({
-          class: "toggle",
-          type: "checkbox",
-          checked: _=> todo.completed,
-          onChange: () => dispatch.toggleItem(todo, index)
-        }),
-
-        label({
-          'data-testid': "todo-item-label",
-          onDblClick: () => {
+  return li.attr("class.completed", _=> todo.completed).attr("class.editing", _=> editing)(_=> !editing ?
+      div.class`view`(
+        input
+          .class`toggle`
+          .type`checkbox`
+          .checked(_=> todo.completed)
+          .onChange(() => dispatch.toggleItem(todo, index)),
+      
+        label
+          .attr("data-testid", "todo-item-label")
+          .onDblClick(() => {
             editing = !editing
-          }
-        }, _=> todo.title),
-
-        button({
-          class: "destroy",
-          onClick: () => dispatch.removeItemByIndex(index)
-        })
+          })(_=> todo.title),
+        
+        button
+          .class`destroy`
+          .onClick(() => dispatch.removeItemByIndex(index))
       )
       :
-      div({class: "input-container"},
-        input({
-          id: "edit-todo-input",
-          type: "text",
-          autoFocus: true,
-          class: "edit",
-          value: _=> todo.title,
-          onBlur: () => editing = false,
-          onKeyDown: e => handleKey(e, title => {
-            handleUpdate(title, todo, index, dispatch)
-            editing = false
-          })
-        }),
-        label({class: "visually-hidden", htmlFor: "todo-input"},
-          'Edit Todo Input'
+      div
+        .class`input-container`(
+          input
+            .id`edit-todo-input`
+            .type`text`
+            .autoFocus`true`
+            .class`edit`
+            .value(_=> todo.title)
+            .onBlur(() => editing = false)
+            .onKeyDown(e => handleKey(e, title => {
+              handleUpdate(title, todo, index, dispatch)
+              editing = false
+            })),
+          
+          label
+            .class`visually-hidden`
+            .for`todo-input`(
+              'Edit Todo Input'
+            )
         )
       )
-  )
 })
 
 function handleUpdate(

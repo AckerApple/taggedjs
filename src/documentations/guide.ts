@@ -12,10 +12,10 @@ export const GuideApp = tag(() => [
   guideHeader(),
 
   main(
-    a({id: "top"}),
-    div({class: "guide-layout"},
+    a.id`top`,
+    div.class`guide-layout`(
       guideIndex(),
-      div({class: "guide-content"},
+      div.class`guide-content`(
         projectLayoutSection(),
         entryPointSection(),
         componentPatternSection(),

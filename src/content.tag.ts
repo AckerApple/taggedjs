@@ -10,12 +10,10 @@ const outerHtml = tag((
 ) => {
   const xx = tag.getInnerHTML()
   
-  return div({
-    id:"outer-html-fx-test",
-    attr: fx({stagger: staggerBy, duration: '.1s'}),
-    'style.border': "1px solid orange",
-    
-  }, xx)
+  return div.id`outer-html-fx-test`
+    .attr(fx({stagger: staggerBy, duration: '.1s'}) as any)
+    .attr("style.border", `1px solid orange`)
+    (xx)
 })
 
 export const concatStyles = tag((innerHTML: any) => {
@@ -34,22 +32,11 @@ export const concatStyles = tag((innerHTML: any) => {
       .style(_=> `border-width:${width}px;border-color:${borderColor};border-style:solid;`)
       ('dynamic-style-border'),
 
-    div({
-      id: "dynamic-border-element",
-      style: _=> `border-width:${width}px;border-color:${borderColor};border-style:solid;`
-    }, innerHTML),
+    div.id`dynamic-border-element`.style(_=> `border-width:${width}px;border-color:${borderColor};border-style:solid;`)(innerHTML),
 
     div(
       'borderWidth:',
-      input({
-        id: "dynamic-border-width",
-        type: "range",
-        min: "0",
-        max: "10",
-        step: "1",
-        value: _=> width,
-        onChange: event => width = Number(event.target.value)
-      }),
+      input.id`dynamic-border-width`.type`range`.min`0`.max`10`.step`1`.value(_=> width).onChange(event => width = Number(event.target.value))(),
       ' - ',
       _=> width,
       'px'
@@ -57,15 +44,7 @@ export const concatStyles = tag((innerHTML: any) => {
 
     div(
       'borderColor:',
-      select({
-        id: "dynamic-border-color",
-        onChange: event => borderColor = event.target.value
-      },
-        option({value: "", selected: _=> borderColor === ''}),
-        option({value: "black", selected: _=> borderColor === 'black'}, 'black'),
-        option({value: "blue", selected: _=> borderColor === 'blue'}, 'blue'),
-        option({value: "white", selected: _=> borderColor === 'white'}, 'white')
-      )
+      select.id`dynamic-border-color`.onChange(event => borderColor = event.target.value)(option.value``.selected(_=> borderColor === '')(), option.value`black`.selected(_=> borderColor === 'black')('black'), option.value`blue`.selected(_=> borderColor === 'blue')('blue'), option.value`white`.selected(_=> borderColor === 'white')('white'))
     )
   )
 })
@@ -91,16 +70,11 @@ export const content = tag(() => {
 
   const pipe = subscribe(vs0, () => {
     return [
-      button({
-        type:"button",
-        onClick:() => {
+      button.type`button`.onClick(() => {
           ++counter
-        }
-      }, 'increase inside ', _ => counter),
+        })('increase inside ', _ => counter),
       
-      button({
-        type:"button", onClick:() => vs0.next( vs0.value + 1 )
-      }, 'increase vs0'),
+      button.type`button`.onClick(() => vs0.next( vs0.value + 1 ))('increase vs0'),
     ]
   })
 
@@ -113,72 +87,46 @@ export const content = tag(() => {
       // 'c:', xx,
     ),
 
-    fieldset({style: "flex-grow:1"},
-      legend(
+    fieldset.style`flex-grow:1`(legend(
         'piped subject click ',
-        span({id: "pipe-counter-click-display"},
-          _=> counter
-        )
-      ),
-      
-      pipe,
-      
-      button({type: "button", onClick: () => ++counter},
-        'increase outside ', _=> counter
-      )
-    ),
+        span.id`pipe-counter-click-display`(_=> counter)
+      ), pipe, button.type`button`.onClick(() => ++counter)('increase outside ', _=> counter)),
 
-    fieldset({style: "flex-grow:1"},
+    fieldset.style`flex-grow:1`(
       legend('hide show'),
-
-      button({
-        id: "content-toggle-fx",
-        type: "button",
-        onClick: () => showHideFx = !showHideFx
-      }, 'toggle hideshow fx'),
-
-      _=> showHideFx && div({
-        name:"test-the-tester", attr: fx({duration:'10ms'}),
-      }, 'test the tester - 0'),
-
-      _=> showHideFx && div({
-        name:"test-the-tester",
-        attr: fx({duration:'10ms', stagger: staggerBy}),
-      }, 'test the tester - 1'),
-
-      _=> showHideFx && div({
-        name:"test-the-tester",
-        attr: fx({duration:'10ms', stagger: staggerBy * 2}),
-      }, 'test the tester - 2'),
-
-      _=> showHideFx && (outerHtml(staggerBy).innerHTML = innerHtmlTag()),
-
-      div(
+      button
+        .id`content-toggle-fx`
+        .type`button`
+        .onClick(() => showHideFx = !showHideFx
+      )('toggle hideshow fx'),
+      _=> showHideFx && div.name`test-the-tester`
+        .attr(fx({duration:'10ms'}) as any)(
+          'test the tester - 0'
+        ),
+        _=> showHideFx && div
+          .name`test-the-tester`
+          .attr(fx({duration:'10ms', stagger: staggerBy}) as any)(
+            'test the tester - 1'
+          ),
+        _=> showHideFx && div
+          .name`test-the-tester`
+          .attr(fx({duration:'10ms', stagger: staggerBy * 2}) as any)(
+            'test the tester - 2'
+          ),
+        _=> showHideFx && (outerHtml(staggerBy).innerHTML = innerHtmlTag()),
+        div(
         div(
           'added: ',
-          span({id: "content-fx-added"},
-            subscribe(counts, counts => counts.added)
-          ),
+          span.id`content-fx-added`(subscribe(counts, counts => counts.added)),
           ' ',
           'removed: ',
-          span({id: "content-fx-removed"},
-            subscribe(counts, counts => counts.removed)
-          )
+          span.id`content-fx-removed`(subscribe(counts, counts => counts.removed))
         ),
         div(
           'staggerBy:',
-          input({
-            type: "range", min: "10",
-            max: "300", step: "1",
-            onChange: event => staggerBy = Number(event.target.value)
-          })
+          input.type`range`.min`10`.max`300`.step`1`.onChange(event => staggerBy = Number(event.target.value))()
         )
-      ),
-
-      hr,
-
-      _=> concatStyles('test the tester2')
-    ),
+      ), hr, _=> concatStyles('test the tester2')),
 
     fieldset(
       legend('Dump Content'),
@@ -186,148 +134,89 @@ export const content = tag(() => {
       _=> renderCountDiv({renderCount, name: 'content'})
     ),
 
-    fieldset({id: "inputs-updates-fieldset"},
-      legend('inputs vs updates'),
-      div(
-        button({
-          id: "updates-count-bump",
-          onClick: () => {
+    fieldset.id`inputs-updates-fieldset`(legend('inputs vs updates'), div(
+        button.id`updates-count-bump`.onClick(() => {
             ++updatesArgA
             ++updatesArgB
-          }
-        }, 'update updates args'),
-        span({id: "updates-count-display"}, _=> updatesCountTag(updatesArgA, updatesArgB))
-      ),
-      div(
-        button({
-          id: "inputs-count-bump",
-          onClick: () => {
+          })('update updates args'),
+        span.id`updates-count-display`(_=> updatesCountTag(updatesArgA, updatesArgB))
+      ), div(
+        button.id`inputs-count-bump`.onClick(() => {
             ++inputsArgA
             inputsArgB = () => `inputs-${inputsArgA}`
-          }
-        }, 'update inputs args'),
-        span({id: "inputs-count-display"}, _=> inputsCountTag(inputsArgA, inputsArgB))
-      )
-    ),
+          })('update inputs args'),
+        span.id`inputs-count-display`(_=> inputsCountTag(inputsArgA, inputsArgB))
+      )),
 
-    fieldset({id: "noParentTagFieldset"},
-      legend('No Parent Test'),
-      numberedNoParents,
-    ),
+    fieldset.id`noParentTagFieldset`(legend('No Parent Test'), numberedNoParents),
     
     '--- REPEAT CONTENT---',
-    hr({id: "noParentsTest2-start"}),
+    hr.id`noParentsTest2-start`(),
     
     numberedNoParents(),
     
-    hr({id: "noParentsTest2-end"}),
+    hr.id`noParentsTest2-end`(),
 
-    div({style:"display:flex;flex-wrap:wrap;gap:1em;"},
+    div.style`display:flex;flex-wrap:wrap;gap:1em;`(
       fieldset(
         legend('injection test'),
-        div({id:"injection-test"}, 'injection test ', injectionTest),
+        div.id`injection-test`('injection test ', injectionTest),
         '--- repeat content ---',
-        div({id:"hello-big-string-world"}, 'hello ', b('big'), ' world'),
-      ),
-
-      fieldset(
+        div.id`hello-big-string-world`('hello ', b('big'), ' world'),
+      ), fieldset(
         legend('tagvar injection'),
         div(
-          div({id:"inject-tagvar-0"}, ':tagvar0:'), '===', div({id:"inject-read-tagvar-0"}, ':tagvar0:'),
-          div({id:"inject-tagvar-1"}, ':tagvarx0x:'), '===', div({id:"inject-read-tagvar-1"}, ':tagvarx0x:'),
-          div({id:"inject-tagvar-2"}, ':tagvar0:'), '===', div({id:"inject-read-tagvar-2"}, ':tagvar0:')
+          div.id`inject-tagvar-0`(':tagvar0:'), '===', div.id`inject-read-tagvar-0`(':tagvar0:'),
+          div.id`inject-tagvar-1`(':tagvarx0x:'), '===', div.id`inject-read-tagvar-1`(':tagvarx0x:'),
+          div.id`inject-tagvar-2`(':tagvar0:'), '===', div.id`inject-read-tagvar-2`(':tagvar0:')
         )
       ),
-
-      div({id:"style-simple-border-orange", 'style.border':"3px solid orange"}, 'simple orange border'),
-      div({id:"style-var-border-orange", 'style.border': "3px solid orange"}, 'var orange border'),
-
-      div(
-        div({
-          id:"style-toggle-border-orange",
-          'style.border': _=> orangeToggle ? "3px solid orange" : "3px solid green",
-        }, 'toggle orange border'),
-
-        button({
-          id:"toggle-border-orange",
-          onClick: () => orangeToggle = !orangeToggle,
-        }, 'orange toggle ', _=> orangeToggle),
+      div.id`style-simple-border-orange`.attr("style.border", `3px solid orange`)(
+        'simple orange border'
       ),
-
-      div(
-        div({
-          id: "style-toggle-bold",
-          style: _=> boldToggle ? 'font-weight:bold;' : '',
-        }, 'toggle orange border'),
-
-        button({
-          id: "toggle-bold",
-          onClick: () => boldToggle = !boldToggle,
-        }, 'bold toggle ', boldToggle ? 'true' : 'false'),
+      div.id`style-var-border-orange`.attr("style.border", `3px solid orange`)(
+        'var orange border'
       ),
+      div(
+        div.id`style-toggle-border-orange`.attr("style.border", _=> orangeToggle ? "3px solid orange" : "3px solid green")(
+          'toggle orange border'
+        ),
 
-      div({id:"hello-spacing-dom-world"}, 54, ' hello', ' worlds'),
-    ),
+        button.id`toggle-border-orange`.onClick(() => orangeToggle = !orangeToggle)('orange toggle ', _=> orangeToggle),
+      ), div(
+        div.id`style-toggle-bold`.style(_=> boldToggle ? 'font-weight:bold;' : '')('toggle orange border'),
 
-    div({style:"display:flex;flex-wrap:wrap;gap:1em;font-size:0.8em"},
-      div({style:"flex-grow:1"},
-        fieldset(
+        button.id`toggle-bold`.onClick(() => boldToggle = !boldToggle)('bold toggle ', boldToggle ? 'true' : 'false'),
+      ), div.id`hello-spacing-dom-world`(54, ' hello', ' worlds')),
+
+    div.style`display:flex;flex-wrap:wrap;gap:1em;font-size:0.8em`(div.style`flex-grow:1`(
+      fieldset(
           legend('zero test'),
           'P.0 You should see "0" here => "', `${0}`, '"'
         )
       ),
-      /* proof you cannot see false values */
-      div({style:"flex-grow:1"},
+      div.style`flex-grow:1`(
         fieldset(
           legend('false test'),
           'P.1 You should see "" here => "', `${false}`, '"',
         )
-      ),
-
-      div({style:"flex-grow:1"},
-        fieldset(
+      ), div.style`flex-grow:1`(
+          fieldset(
           legend('null test'),
           'P.2 You should see "" here => "', `${null}`, '"',
-        )
-      ),
-
-      div({style:"flex-grow:1"},
-        fieldset(
+        )), div.style`flex-grow:1`(
+          fieldset(
           legend('undefined test'),
           'P.3 You should see "" here => "', `${undefined}`, '"',
-        )
-      ),
-
-      /* proof you can see true booleans */
-      div({style:"flex-grow:1"},
-        fieldset(
+        )), div.style`flex-grow:1`(
+          fieldset(
           legend('true test'),
           'P.4 You should see "true" here => "', `${true}`, '"',
-        )
-      ),
-
-      /* proof you can try to use the tagVar syntax */
-      fieldset(
-        div({style:"flex-grow:1"},
-          'P.5 You should see "{22}" here => "' , `${'{'}`, '22', `${'}'}`, '"',
-        )
-      ),
-
-      // TODO: useless
-      fieldset(
-        div({style:"flex-grow:1"},
-          'P.6 You should see "{__tagVar0}" here => "{__tagVar0}"',
-        )
-      ),
-
-      /* TODO: Move me to subscriptions.tag.ts */
-      div({style:"flex-grow:1"},
-        'should be a safe string no html ',
-        span({id:"content-dom-parse-0-0"}, '"<div>hello</div>"'),
-        ' here => ',
-        span({id:"content-dom-parse-0-1"}, `"${'<div>hello</div>'}"`)
-      )
-    ),
+        )), fieldset(
+        div.style`flex-grow:1`('P.5 You should see "{22}" here => "', `${'{'}`, '22', `${'}'}`, '"')
+      ), fieldset(
+        div.style`flex-grow:1`('P.6 You should see "{__tagVar0}" here => "{__tagVar0}"')
+      ), div.style`flex-grow:1`('should be a safe string no html ', span.id`content-dom-parse-0-0`('"<div>hello</div>"'), ' here => ', span.id`content-dom-parse-0-1`(`"${'<div>hello</div>'}"`))),
 
     renderCountDiv({renderCount, name: 'content'})
   ]
@@ -339,7 +228,7 @@ const updatesCountTag = tag((a: number, b: number) => {
     ++calls
     ;[a, b] = x
   })
-  return div({id: "updates-count"}, _=> calls)
+  return div.id`updates-count`(_=> calls)
 })
 
 const inputsCountTag = tag((a: number, b: () => string) => {
@@ -349,7 +238,7 @@ const inputsCountTag = tag((a: number, b: () => string) => {
     ;[a, b] = x
     b = output(b)
   })
-  return div({id: "inputs-count"}, _=> calls)
+  return div.id`inputs-count`(_=> calls)
 })
 
 const numberedNoParents = tag(() => {

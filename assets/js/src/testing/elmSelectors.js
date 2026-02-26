@@ -36,13 +36,20 @@ export function keyupOn(input, key) {
     });
     input.dispatchEvent(keyEvent);
 }
+/** dispatch the change event on an element */
+export function changed(q) {
+    changeEach([...query(q)]);
+}
+export function changeEach(items) {
+    items.forEach(changeElm);
+}
 export function changeOne(q, index = 0) {
     const target = query(q)[index];
     changeElm(target);
 }
 export function changeElm(target) {
-    ;
-    target.change({ target });
+    // ;(target as any).change({ target })
+    target.dispatchEvent(new Event('change', { bubbles: true }));
 }
 export function html(q) {
     let html = '';

@@ -31,15 +31,9 @@ const tocItems = [
 ]
 
 export function guideIndex() {
-  return section({class: "toc guide-index", id: "toc"},
-    docH2("toc", "Guide Index"),
-    ul(
+  return section.class`toc guide-index`.id`toc`(docH2("toc", "Guide Index"), ul(
       _=> tocItems.map(item =>
-        li(
-          {class: item.level === "sub" ? "toc-sub" : ""},
-          a({href: `#${item.id}`}, item.label)
-        ).key(item.id)
+        li.class(item.level === "sub" ? "toc-sub" : "")(a.href(`#${item.id}`)(item.label)).key(item.id)
       )
-    )
-  )
+    ))
 }

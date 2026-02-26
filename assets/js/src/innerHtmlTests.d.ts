@@ -1,3 +1,42 @@
-import { Tag } from "taggedjs";
-export declare const innerHtmlTest: import("taggedjs").TaggedFunction<(_props: unknown, b: number, children: Tag) => Tag>;
-export declare const innerHtmlPropsTest: import("taggedjs").TaggedFunction<(x: number, children: Tag) => (counter?: number, renderCount?: number, _?: void, __?: number) => Tag>;
+import { ElementFunction } from "taggedjs";
+export declare const innerHtmlTest: import("taggedjs").TaggedFunction<(_props: unknown, b: number, children: ElementFunction) => ((...children: import("taggedjs").TagChildContent[]) => ElementFunction & import("taggedjs").CombinedElementFunctions) & import("taggedjs/js/TagJsTags/TagJsTag.type").ReadOnlyVar & {
+    tagName: string;
+    innerHTML: any[];
+    attributes: import("taggedjs/js/interpolations/optimizers/ObjectNode.types").Attribute[];
+    contentId: number;
+    elementFunctions: typeof import("taggedjs/js/elements/elementFunctions").elementFunctions;
+    contexts?: import("taggedjs/js/TagJsTags/TagJsTag.type").TagJsTag<any>[];
+    listeners: import("taggedjs/js/elements/ElementVarBase.type").MockElmListener[];
+    allListeners: import("taggedjs/js/elements/ElementVarBase.type").MockElmListener[];
+} & {
+    key: import("taggedjs").KeyFunction;
+    style: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    id: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    class: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    href: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    value: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    placeholder: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    minLength: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    maxLength: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    src: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    type: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    title: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    disabled: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    checked: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    selected: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    cellPadding: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    cellSpacing: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    border: import("taggedjs/js/elements/attributeCallables").AttributeCallable;
+    attr: (nameOrValue: import("taggedjs/js/elements/ElementFunction.type").AttrValue, value?: import("taggedjs/js/elements/ElementFunction.type").AttrValue) => ElementFunction;
+    attrs: (nameValuePairs: {
+        [name: string]: import("taggedjs/js/elements/ElementFunction.type").AttrValue;
+    }) => ElementFunction;
+    contextMenu: (callback: (e: import("taggedjs").InputElementTargetEvent) => any) => ElementFunction;
+    onClick: (callback: (e: import("taggedjs").InputElementTargetEvent) => any) => ElementFunction;
+    onChange: (callback: (e: import("taggedjs").InputElementTargetEvent) => any) => ElementFunction;
+    onInput: (callback: (e: import("taggedjs").InputElementTargetEvent) => any) => ElementFunction;
+    onKeyup: (callback: (e: import("taggedjs").InputElementTargetEvent) => any) => ElementFunction;
+    onKeydown: (callback: (e: import("taggedjs").InputElementTargetEvent) => any) => ElementFunction;
+    onMouseover: (callback: (e: import("taggedjs").InputElementTargetEvent) => any) => ElementFunction;
+    onMouseout: (callback: (e: import("taggedjs").InputElementTargetEvent) => any) => ElementFunction;
+}>;

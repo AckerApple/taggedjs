@@ -169,11 +169,7 @@ const getObjectTemplate = tag(<T>({
     })
   }
 
-  const getJsonDump = () => textarea({
-    attr:'disabled',
-    wrap:"off",
-    style:"width:100%;height:25vh;min-height:400px;color:white;background-color:black;",
-  }, _=> JSON.stringify(value, null, 2))
+  const getJsonDump = () => textarea.disabled`true`.wrap`off`.style`width:100%;height:25vh;min-height:400px;color:white;background-color:black;`(_=> JSON.stringify(value, null, 2))
 
   return noElement(_=> {
     if(value === null) {
@@ -189,16 +185,12 @@ const getObjectTemplate = tag(<T>({
       })
     }
 
-    return div(
-      {id:`taggedjs-dump-${++dumpCount}`, class:"taggedjs-dump"},
-      _=> isRootDump && controlPanel({
+    return div.id(`taggedjs-dump-${++dumpCount}`).class`taggedjs-dump`(_=> isRootDump && controlPanel({
         value,
         format,
         showAll,
         showAllChange,
         formatChange,
-      }),
-      _=> (format==='json' && getJsonDump()) || (isArray ? getArrayDump() : getObjectDump()),
-    )
+      }), _=> (format==='json' && getJsonDump()) || (isArray ? getArrayDump() : getObjectDump()))
   })
 })

@@ -28,9 +28,9 @@ function titleLink(id: string, label: string) {
 }
 
 export function docH2(id: string, label: string) {
-  return h2({class: "doc-title"}, titleLink(id, label))
+  return h2.class`doc-title`(titleLink(id, label))
 }
 
 export function docH3(id: string, label: string) {
-  return h3({class: "doc-subtitle", id}, titleLink(id, label))
+  return h3.class`doc-subtitle`.id(id)(titleLink(id, label))
 }

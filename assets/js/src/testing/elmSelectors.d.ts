@@ -9,6 +9,9 @@ export declare function clickById(id: string): void;
 export declare function clickOne(q: string, index?: number): void;
 export declare function keydownOn(input: Element, key: string): void;
 export declare function keyupOn(input: Element, key?: string): void;
+/** dispatch the change event on an element */
+export declare function changed(q: string): void;
+export declare function changeEach(items: HTMLElement[]): void;
 export declare function changeOne(q: string, index?: number): void;
 export declare function changeElm(target: HTMLElement): void;
 export declare function html(q: string): string;

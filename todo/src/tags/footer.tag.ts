@@ -8,34 +8,13 @@ export const Footer = (
   route: string,
   activeTodoCount: number,
 ) => {
-  return footer({class: "footer", 'data-testid': "footer"},
-    p('Double-click to edit a todo'),
-    div(
-      span({class: "todo-count"},
-        _=> activeTodoCount,
-        ' item',
-        _=> activeTodoCount > 1 && "s",
-        ' left!'
-      ),
-      ul({class: "filters"},
-        li(
-          a({class: _=> route === "/" ? "selected" : "", href: "#/"},
-            'All'
-          )),
-        li(
-          a({class: _=> route === "/active" ? "selected" : "", href: "#/active"},
-            'Active'
-          )),
-        li(
-          a({class: _=> route === "/completed" ? "selected" : "", href: "#/completed"},
-            'Completed'
-          ))
-      ),
+  return footer.class`footer`.attr("data-testid", "footer")(p('Double-click to edit a todo'), div(
+      span.class`todo-count`(_=> activeTodoCount, ' item', _=> activeTodoCount > 1 && "s", ' left!'),
+      ul.class`filters`(li(
+          a.class(_=> route === "/" ? "selected" : "").href`#/`('All')), li(
+          a.class(_=> route === "/active" ? "selected" : "").href`#/active`('Active')), li(
+          a.class(_=> route === "/completed" ? "selected" : "").href`#/completed`('Completed'))),
       _=> (todosCount - activeTodoCount) > 0 &&
-        button({
-          class: "clear-completed",
-          onClick: () => removeCompleted()
-        }, 'Clear completed')
-    )
-  )
+        button.class`clear-completed`.onClick(() => removeCompleted())('Clear completed')
+    ))
 }

@@ -17,16 +17,15 @@ export const injectionTag = tag(() => {
 
   ;(wrapHost as any).TEST = '👈👈👈👈'
 
-  return div({style: "padding: 20px;"},
+  return div.style`padding: 20px;`(
     h2('Injection Test'),
     'selected: ', _=> {
       return selectedTest.length
     },
     
-    div({
-      id: "injection-testing-wrap-host",
-      attr: wrapHost,
-      style: `
+    div.id`injection-testing-wrap-host`
+      .attr(wrapHost as any)
+      .style`
         border: 2px solid #666;
         gap:1em;
         background: #f0f0f0;
@@ -35,12 +34,10 @@ export const injectionTag = tag(() => {
         position: relative;
         user-select: none;
         display:flex;flex-wrap:wrap;
-      `
-      },
+      `(
       _=> items.map((x, index) =>
-        div({
-          id: _=> `injection-test-item-${x.id}`,
-          style: `
+        div.id(_=> `injection-test-item-${x.id}`)
+          .style`
             display: inline-block;
             color: black;
             display: flex;
@@ -49,30 +46,24 @@ export const injectionTag = tag(() => {
             font-weight: bold;
             cursor: pointer;
             transition: background 0.3s;
-          `,
-          'style.background': _=> selectedTest.includes(x) ? '#4CAF50' : '#2196F3',
-          'style.border': _=> selectedTest.includes(x) ? '3px solid #333' : '1px solid #999',
-          attr: injectionTarget(x),
-        },
-          input({
-            type: "checkbox",
-            checked: _=> {
+          `
+          .attr('style.background', _=> selectedTest.includes(x) ? '#4CAF50' : '#2196F3')
+          .attr('style.border', _=> selectedTest.includes(x) ? '3px solid #333' : '1px solid #999')
+          .attr(injectionTarget(x) as any)(
+          input.type`checkbox`.checked(_=> {
               const included = selectedTest.includes(x)
               return included
-            }
-          }),
+            })(),
           'Item ', x.id,
         )
       )
     ),
 
-    div({
-      style: `
+    div.style`
         margin-top: 20px;
         padding: 10px;
         background: #333; color: white;
-      `
-    },
+      `(
       h3('Selected Items:'),
       p(
         _=> selectedTest.length > 0
@@ -81,7 +72,7 @@ export const injectionTag = tag(() => {
       )
     ),
 
-    div({style: "margin-top: 10px; color: #666;"},
+    div.style`margin-top: 10px; color: #666;`(
       small(
         strong('Instructions:'),
         br,

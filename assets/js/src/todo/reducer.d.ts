@@ -4,15 +4,15 @@ export type Todo = {
     title: string;
     completed: boolean;
 };
-export declare function todoReducer(todos: any): {
-    addItem: (title: string) => any;
-    removeItem: (id: string) => any;
-    toggleItem: (todo: Todo, index: number) => any;
-    removeAll: () => any;
-    toggleAll: (completed: boolean) => any;
-    removeCompleted: () => any;
-    removeItemByIndex: (index: number) => any;
-    completeItem: (todo: Todo, index: number) => any;
-    updateItemByIndex: (todo: Todo, index: number) => any;
-    updateToByIndex: (todo: Todo, partial: Partial<Todo>, index: number) => any;
+export declare function todoReducer(todos: any[]): {
+    addItem: (title: string) => any[];
+    removeItem: (id: string) => number;
+    toggleItem: (todo: Todo, index: number) => number;
+    removeAll: () => any[];
+    toggleAll: (completed: boolean) => any[];
+    removeCompleted: () => any[];
+    removeItemByIndex: (index: number) => number;
+    completeItem: (todo: Todo, index: number) => number;
+    updateItemByIndex: (todo: Todo, index: number) => any[];
+    updateToByIndex: (todo: Todo, partial: Partial<Todo>, index: number) => number;
 };

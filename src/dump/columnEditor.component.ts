@@ -87,8 +87,8 @@ export const columnEditor = tag(({
     nameCheckbox,
 
     div
-      .onMouseover(() => mouseOverEditShow = true)
-      .onMouseout(() => mouseOverEditShow = false)(
+      .onMouseOver(() => mouseOverEditShow = true)
+      .onMouseOut(() => mouseOverEditShow = false)(
         a
           .attr(
             'style.visibility',

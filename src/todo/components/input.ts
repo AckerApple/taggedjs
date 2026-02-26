@@ -22,18 +22,21 @@ export function Input({ onSubmit, placeholder, label, defaultValue, onBlur }: an
         }
     };
 
-    return div({class:"input-container"},
-        input({
-            class         : "new-todo",
-            id            : "todo-input",
-            type          : "text",
-            'data-testid' : "text-input",
-            placeholder   : placeholder,
-            value         : defaultValue,
-            onBlur        : handleBlur,
-            onKeyUp       : handleKeyChange,
-            style         : "width:100%"
-        }),
-        labelElm({htmlFor:"todo-input", style:"visibility:hidden"}, _=> label),'*'
-    )
+    return div
+        .class`input-container`(
+            input
+                .class`new-todo`
+                .id`todo-input`
+                .type`text`
+                .attr("data-testid", "text-input")
+                .placeholder(placeholder)
+                .value(defaultValue)
+                .onBlur(handleBlur)
+                .onKeyUp(handleKeyChange)
+                .style`width:100%`,
+                labelElm
+                    .for`todo-input`
+                    .style`visibility:hidden`(_=> label),
+                '*'
+            )
 }

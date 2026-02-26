@@ -210,7 +210,7 @@ button({onClick: handler}, 'Click me')
 **Key patterns**:
 - First argument: attributes object `{id: "...", onClick: handler}`
 - Remaining arguments: children (strings, numbers, elements, components)
-- **Event handlers: camelCase** `onClick`, `onKeyup`, `onMouseover` (NOT lowercase!)
+- **Event handlers: camelCase** `onClick`, `onKeyUp`, `onMouseOver` (NOT lowercase!)
 - Multiple children are passed as separate arguments
 - Arrow function prefix `_=>` for conditional/computed expressions
 - No attributes needed: just call the function with children `div('text')`

@@ -11,7 +11,7 @@ export const Header = (dispatch: Dispatch) =>
         .class`new-todo`
         .attr('autoFocus', true)
         .placeholder`What needs to be done?`
-        .onKeydown(e => {
+        .onKeyDown(e => {
           const enter = handleKey(e, title => dispatch.addItem(title))
           if(enter) {
             e.target.value = ""

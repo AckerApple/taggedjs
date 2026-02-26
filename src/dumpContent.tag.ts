@@ -48,30 +48,24 @@ export const dumpContent = tag(() => {
   }
 
   return noElement(
-    div({
-      style: "display:flex;flex-wrap:wrap;align-item:center;justify-content: center;gap:.5em;padding:.5em;"
-    },
-      textarea({
-        id: "taggedjs-dump-user-textarea",
-        wrap: "off",
-        placeholder: "paste json here",
-        onChange: change,
-        style: "min-width:300px;min-height:400px;flex:1"
-      },
+    div.style`display:flex;flex-wrap:wrap;align-item:center;justify-content: center;gap:.5em;padding:.5em;`(
+      textarea
+        .id`taggedjs-dump-user-textarea`
+        .wrap`off`
+        .placeholder`paste json here`
+        .onChange(change).
+        style`min-width:300px;min-height:400px;flex:1`(
         _=> userJson === "" ? "" : userJsonString
       ),
 
-      _=> userJson === "" ? "" : div({
-        id: "taggedjs-dump-user-result",
-        style: "flex:1;min-width:110px;width:100%;max-width:900px;background-color:rgba(255,255,255,.5);min-width:300px"
-      },
+      _=> userJson === "" ? "" : div.id`taggedjs-dump-user-result`.style`flex:1;min-width:110px;width:100%;max-width:900px;background-color:rgba(255,255,255,.5);min-width:300px`(
         _=> dump({
           value: userJson
         })
       )
     ),
 
-    div({style: "max-width:900px"},
+    div.style`max-width:900px`(
       // dump(sampleDump)
     ),
 

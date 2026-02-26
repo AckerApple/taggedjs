@@ -1,21 +1,28 @@
-import { html, state, tag } from "taggedjs";
+import { div, tag, a, fieldset, legend, button } from "taggedjs";
 import { oneRender } from "./oneRender.tag";
 import { storage, ViewTypes } from "./sectionSelector.tag";
 import funInPropsTag from "./funInProps.tag";
 import { todoApp } from "./todo/todos.app";
 import { child } from "./childTests.tag";
 import { destroys } from "./destroys.tag";
-import { arrays } from "./arrayTests";
+import { arrays } from "./arrays.tag";
 import { tagSwitchDebug } from "./tagSwitchDebug.component";
 import { mirroring } from "./mirroring.tag";
-import { propsDebugMain } from "./PropsDebug.tag";
-import { providerDebug } from "./providerDebug";
+import { propsDebugMain } from "./props.tag";
+import { providerDebug } from "./providers.tag";
 import { counters } from "./countersDebug";
 import { tableDebug } from "./tableDebug.component";
-import { content } from "./ContentDebug.tag";
+import { content } from "./content.tag";
 import { watchTesting } from "./watchTesting.tag";
 import { attributeDebug } from "./attributeDebug.tag";
+import { basic } from "./basic.tag";
+import { subscriptions } from "./subscriptions.tag";
+import { asyncSection } from "./async.tag";
 export const outputSections = [{
+        view: ViewTypes.Async, tag: asyncSection, emoji: '⏳'
+    }, {
+        view: ViewTypes.Basic, tag: basic, emoji: '🔢'
+    }, {
         view: ViewTypes.OneRender, tag: oneRender, emoji: '1️⃣'
     }, {
         view: ViewTypes.Props, tag: propsDebugMain, emoji: '🧳',
@@ -39,16 +46,18 @@ export const outputSections = [{
     }, {
         view: ViewTypes.Destroys, tag: destroys, emoji: '🗑️',
     }, {
-        view: ViewTypes.FunInPropsTag, tag: funInPropsTag,
+        view: ViewTypes.FunInPropsTag, tag: funInPropsTag, emoji: '🤡'
     }, {
         view: ViewTypes.AttributeDebug, tag: attributeDebug, emoji: '🏹',
     }, {
-        view: ViewTypes.Todo, tag: tag(todoApp),
+        view: ViewTypes.Todo, tag: todoApp, emoji: '✏️'
     }, {
         view: ViewTypes.Counters, tag: counters, emoji: '💯',
+    }, {
+        view: ViewTypes.Subscriptions, tag: subscriptions, emoji: '📡',
     }];
 export const renderedSections = tag((appCounterSubject, viewTypes = storage.views) => {
-    const visibleSections = state(() => outputSections.filter(section => {
+    const visibleSections = outputSections.filter(section => {
         if (viewTypes.includes(section.view)) {
             return true;
         }
@@ -60,35 +69,22 @@ export const renderedSections = tag((appCounterSubject, viewTypes = storage.view
             emoji,
             ...extra,
         };
-    }));
-    return html `
-    <div style="display:flex;flex-wrap:wrap;gap:1em">
-      ${visibleSections.map((section) => getSection(section).key(section.view))}
-    </div>
-  `;
+    }).sort((a, b) => {
+        // Sort alphabetically by view name
+        return a.view.localeCompare(b.view);
+    });
+    return div.style `display:flex;flex-wrap:wrap;gap:1em`(_ => visibleSections.map((section) => getSection(section).key(section.view)));
 });
 const getSection = (section) => {
     const { emoji, view, title, output, debug } = section;
-    return html `
-    <div style="flex:2 2 20em">
-      <a id=${view}><!-- ⚓️ --></a>
-      <fieldset>
-        <legend>${emoji} ${title}</legend>
-        <div style.display=${section.contentHide ? 'none' : ''}>
-          ${output}
-        </div>
-        <div style="display:flex;">
-          <button style="flex:1;"
-            id=${'section_' + section.view}
-            onclick=${() => section.contentHide = !section.contentHide}
-            style.background-color=${section.contentHide ? 'grey' : ''}
-          >👁️ hide/show</button>
-        </div>
-      </fieldset>
-      <div style="font-size:0.6em;text-align:right;">
-        <a href="#top">⏫</a>
-      </div>
-    </div>
-  `;
+    return div.style `flex:2 2 20em`(a({ id: view }, ''), fieldset(legend(emoji, ' ', title), div({
+        id: "many-section-contents",
+        'style.display': _ => section.contentHide ? 'none' : ''
+    }, output), div({ style: "display:flex;" }, button({
+        style: "flex:1;",
+        id: 'section_' + section.view,
+        onClick: () => section.contentHide = !section.contentHide,
+        'style.background-color': _ => section.contentHide ? 'grey' : ''
+    }, '👁️ hide/show'))), div({ style: "font-size:0.6em;text-align:right;" }, a({ href: "#top" }, '⏫')));
 };
 //# sourceMappingURL=renderedSections.tag.js.map

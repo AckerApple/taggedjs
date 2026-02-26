@@ -35,18 +35,10 @@ export const arrayTable = tag(({
     everySimpleValue,
   }] = x)
 
-  return div({style: "max-height: 800px;max-width:100vw;overflow: scroll;"},
-    table({cellPadding: "2", cellSpacing: "2", border: "0"},
-      _=> array.length &&
-        thead({style: "position: sticky;top: 0;font-size: 0.8em;"},
-        tr(
-          _=> columnNames.map(key => th({
-            'style.cursor': _=> toggleColumnDialog && 'pointer',
-            onClick: toggleColumnDialog
-          }, _=> key).key(key))
-        )
-      ),
-      tbody(
+  return div.style`max-height: 800px;max-width:100vw;overflow: scroll;`(table.cellPadding`2`.cellSpacing`2`.border`0`(_=> array.length &&
+        thead.style`position: sticky;top: 0;font-size: 0.8em;`(tr(
+          _=> columnNames.map(key => th.attr("style.cursor", _=> toggleColumnDialog && 'pointer').onClick(toggleColumnDialog)(_=> key).key(key))
+        )), tbody(
         _=> array.map(row => tr(
           columnNames.map(name =>
             td(
@@ -62,7 +54,5 @@ export const arrayTable = tag(({
             ).key(row[name])
           )
         ).key(row))
-      )
-    )
-  )
+      )))
 })

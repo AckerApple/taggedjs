@@ -33,53 +33,33 @@ export const menu = () => {
   return subscribe(router, item => {
     const menuName = getMenuNameByItem(item)
     return div(
-      a({
-        'style.opacity': _=> menuName === 'home' ? '.5' : '1',
-        href: _=> menuName === 'home' ? undefined : '#/'
-      }, 'home'),
+      a.attr('style.opacity', _=> menuName === 'home' ? '.5' : '1').href(_=> menuName === 'home' ? undefined : '#/')('home'),
       
       ' - ',
 
-      a({href: './documentation'}, '📕 documentation'),
+      a.href`./documentation`('📕 documentation'),
       
       ' - ',
       
-      a({
-        'style.opacity': _=> menuName === 'isolated' ? '.5' : '1',
-        href: _=> menuName === 'isolated' ? undefined : 'isolated.html'
-      }, 'isolated'),
+      a.attr('style.opacity', _=> menuName === 'isolated' ? '.5' : '1').href(_=> menuName === 'isolated' ? undefined : 'isolated.html')('isolated'),
       
       ' - ',
       
-      a({
-        'style.opacity': _=> menuName === 'counters' ? '.5' : '1',
-        href: _=> menuName === 'counters' ? undefined : '#counters/'
-      }, 'counters'),
+      a.attr('style.opacity', _=> menuName === 'counters' ? '.5' : '1').href(_=> menuName === 'counters' ? undefined : '#counters/')('counters'),
       ' - ',
-      a({
-        'style.opacity': _=> menuName === 'content' ? '.5' : '1',
-        href: _=> menuName === 'content' ? undefined : '#content/'
-      }, 'content'),
+      a.attr('style.opacity', _=> menuName === 'content' ? '.5' : '1').href(_=> menuName === 'content' ? undefined : '#content/')('content'),
       
       ' - ',
       
-      a({
-        'style.opacity': _=> menuName === 'todo' ? '.5' : '1',
-        href: _=> menuName === 'todo' ? undefined : 'todo/www/'
-      }, 'todo app'),
+      a.attr('style.opacity', _=> menuName === 'todo' ? '.5' : '1').href(_=> menuName === 'todo' ? undefined : 'todo/www/')('todo app'),
 
       ' - ',
       
-      button({
-        type: "button",
-        onClick: () => window.location.href = 'documentation/index.html'
-      }, 'documentation'),
+      button.type`button`.onClick(() => window.location.href = 'documentation/index.html')('documentation'),
       
       ' - ',
       
-      a({href: "https://github.com/AckerApple/taggedjs", target: "_blank"},
-        'repo'
-      )
+      a.href`https://github.com/AckerApple/taggedjs`.target`_blank`('repo')
     )
   })
 }

@@ -48,6 +48,7 @@ async function discoverTags() {
     const promises = array.map(async (element) => {
         const url = element.getAttribute('url');
         const tagName = element.getAttribute('name');
+        console.log('111', url);
         const newApp = await import(`${url}?${Date.now()}`);
         if (!newApp[tagName]) {
             throw new Error(`Cannot find export ${tagName} from ${url}`);

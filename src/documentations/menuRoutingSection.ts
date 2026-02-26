@@ -60,19 +60,14 @@ const menuRoutingCode = `export const menu = () => {
 `
 
 export function menuRoutingSection() {
-  return section({class: "section-card", id: "menu-routing"},
-    docH2("menu-routing", "🧭 Menu And Routing"),
-    p(
+  return section.class`section-card`.id`menu-routing`(docH2("menu-routing", "🧭 Menu And Routing"), p(
       "The menu is a live view of the current hash route. It subscribes to the ",
       "router subject, decides which view is active, and renders anchor links."
-    ),
-    figure(
-      pre(code({class: "language-ts"}, menuRoutingCode)),
+    ), figure(
+      pre(code.class`language-ts`(menuRoutingCode)),
       figcaption(
         "Source: ",
-        a({href: `${repoBaseUrl}/src/menu.tag.ts`, target: "_blank"}, code("src/menu.tag.ts"))
+        a.href(`${repoBaseUrl}/src/menu.tag.ts`).target`_blank`(code("src/menu.tag.ts"))
       )
-    ),
-    p(a({class: "inline-link", href: "#top"}, "Back to top"))
-  )
+    ), p(a.class`inline-link`.href`#top`("Back to top")))
 }

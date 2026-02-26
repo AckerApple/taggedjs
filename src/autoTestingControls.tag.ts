@@ -13,16 +13,9 @@ export const autoTestingControls = tag((
   return div(
     'auto testing ',
   
-    input({
-      type: "checkbox",
-      onChange: toggleAutoTesting,
-      checked: _=> storage.autoTest,
-    }),
+    input.type`checkbox`.onChange(toggleAutoTesting).checked(_=> storage.autoTest)(),
     
-    button({
-      type: "button",
-      onClick: () => runTesting(true, tests, runStartEndTests),
-    },'run tests')
+    button.type`button`.onClick(() => runTesting(true, tests, runStartEndTests))('run tests')
   )
 })
 

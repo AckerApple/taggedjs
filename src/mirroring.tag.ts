@@ -22,13 +22,8 @@ const tagCounter = () => {
   return noElement(
     'counter:',
     span('🪞',
-      span({id:"mirror-counter-display"}, _=> counter)
+      span.id`mirror-counter-display`(_=> counter)
     ),
-    button({
-        id:"mirror-counter-button",
-        onClick: () => ++counter,
-      },
-      _=> counter
-    )
+    button.id`mirror-counter-button`.onClick(() => ++counter)(_=> counter)
   )
 }

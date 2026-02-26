@@ -1,2 +1,2 @@
-import { TagDebugProvider } from './providerDebug';
-export declare const dialog: import("taggedjs").TaggedFunction<(providerClass: TagDebugProvider) => import("taggedjs").Tag>;
+import { TagDebugProvider } from './providers.tag';
+export declare const providerDialog: (providerClass: TagDebugProvider) => any;

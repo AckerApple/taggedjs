@@ -1,74 +1,43 @@
-import { Subject, callbackMaker, html, onInit, tag, state, states, subscribe } from "taggedjs";
+import { Subject, tag, subscribe, h1, div, button, span, fieldset, legend, small } from "taggedjs";
 import { renderCountDiv } from "./renderCount.component";
 import { activate, sectionSelector, viewChanged } from "./sectionSelector.tag";
 import { renderedSections } from "./renderedSections.tag";
 import { autoTestingControls } from "./autoTestingControls.tag";
 import { menu } from "./menu.tag";
-import { useHashRouter } from "./todo/HashRouter.function";
-export default () => tag.use = (_ = state('isolated app state'), renderCount = 0, appCounter = 0, appCounterSubject = state(() => new Subject(appCounter)), toggleValue = false, __ = states(get => [{ renderCount, appCounter, toggleValue }] = get({ renderCount, appCounter, toggleValue })), toggle = () => toggleValue = !toggleValue, callback = callbackMaker()) => {
-    const route = useHashRouter().route.split('/')
+import { hashRouterSubject } from "./todo/HashRouter.function";
+export default tag(() => {
+    const _ = 'isolated app state';
+    let renderCount = 0;
+    let appCounter = 0;
+    const appCounterSubject = new Subject(appCounter);
+    let toggleValue = false;
+    const toggle = () => toggleValue = !toggleValue;
+    // callback = callbackMaker(),
+    const route = hashRouterSubject().value.route.split('/')
+        // const route = useHashRouter().route.split('/')
         .map(x => x.trim())
         .filter(hasLength => hasLength.length);
     let viewTypes = undefined;
     if (route.length) {
         viewTypes = route;
     }
-    onInit(() => {
-        console.info('1️⃣ app init should only run once');
-        appCounterSubject.subscribe(callback(x => {
-            appCounter = x;
-        }) // a let variable is expected to maintain new value over render cycles forward
-        );
-    });
+    console.info('1️⃣ app init should only run once');
+    appCounterSubject.subscribe(x => appCounter = x
+    // callback(x => {
+    //appCounter = x
+    // }) // a let variable is expected to maintain new value over render cycles forward
+    );
     ++renderCount;
-    return html `<!--isolatedApp.js-->
-    <h1 id="app">🏷️ TaggedJs - isolated</h1>
-    <div style="opacity:.6">(no HMR)</div>
-    <div style="opacity:.6">route: ${route}</div>
-
-    ${menu()}
-
-    <div>
-      <fieldset>
-        <legend>direct app tests</legend>        
-        <button id="app-counter-subject-button"
-          onclick=${() => {
+    const v3 = () => appCounterSubject.value;
+    v3.testing = 44;
+    return div('<!--isolatedApp.js-->', h1.id `app`('🏷️ TaggedJs - isolated'), div.style `opacity:.6`('(no HMR)'), div.style `opacity:.6`('route: ', route), // v0
+    menu(), // puts a subscribe down inline - v1
+    div(fieldset(legend('direct app tests'), button.id `app-counter-subject-button`.onClick(() => {
         appCounterSubject.next(appCounter + 1);
-    }}
-        >🍒 ++app subject</button>
-        <button id="app-counter-button" onclick=${() => {
+    })('🍒 ++app subject'), button.id `app-counter-button`.onClick(() => {
         ++appCounter;
-    }}>🍒 ++app</button>
-        <span>
-          🍒 <span id="app-counter-display">${appCounter}</span>
-        </span>
-        <span>
-          🍒$&lt;<span id="app-counter-subject-display">${subscribe(appCounterSubject)}</span>&gt;
-        </span>
-        <span>
-          🍒$.value&lt;<span id="app-counter-subject-value-display">${appCounterSubject.value}</span>&gt;
-        </span>
-        <button id="toggle-test" onclick=${toggle}>toggle test ${toggleValue}</button>
-      </fieldset>  
-
-      ${autoTestingControls(viewTypes)}
-    </div>
-
-    <div style="display:flex;flex-wrap:nowrap;gap:1em;justify-content: center;">
-      ${renderCountDiv({ name: 'app', renderCount })}
-      <div>
-        <small>(subscription count: ${subscribe(Subject.globalSubCount$)})</small>
-      </div>
-    </div>
-
-    ${sectionSelector(viewTypes)}
-
-    <div id="tagDebug-fx-wrap">
-      ${renderedSections(appCounterSubject, viewTypes)}
-      ${renderCountDiv({ renderCount, name: 'isolatedApp' })}
-    </div>
-  `;
-};
+    })('🍒 ++app'), span('🍒 ', span.id `app-counter-display`(_ => appCounter)), span('🍒$<', span.id `app-counter-subject-display`(subscribe(appCounterSubject)), '>'), span('🍒$.value<', span.id `app-counter-subject-value-display`(v3), '>'), button.id `toggle-test`.onClick(toggle)('toggle test ', _ => toggleValue)), _ => autoTestingControls(viewTypes)), div.style `display:flex;flex-wrap:nowrap;gap:1em;justify-content: center;`(_ => renderCountDiv({ name: 'app', renderCount }), div(small('(subscriptionCount$: ', subscribe(Subject.globalSubCount$), ')'))), _ => sectionSelector(viewTypes), div.id `tagDebug-fx-wrap`(_ => renderedSections(appCounterSubject, viewTypes), _ => renderCountDiv({ renderCount, name: 'isolatedApp' })));
+});
 viewChanged.subscribe(({ type, checkTesting }) => {
     activate(type, checkTesting);
 });

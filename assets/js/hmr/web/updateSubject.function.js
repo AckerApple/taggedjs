@@ -19,8 +19,8 @@ import { buildBeforeElement, destroySupport, paint } from "taggedjs";
  */
 export async function updateSubject(contextSubject, newTag, oldTag, hmr) {
     const global = contextSubject.global;
-    const oldest = global.oldest;
-    const newest = global.newest;
+    const oldest = contextSubject.state.oldest;
+    const newest = contextSubject.state.newest;
     const oldTemplater = oldest.templater;
     const oldWrapper = oldTemplater.wrapper;
     if (oldWrapper) {
@@ -39,17 +39,19 @@ export async function updateSubject(contextSubject, newTag, oldTag, hmr) {
             contextWrapper.original = newTag.original;
             const newWrapper = newest.templater.wrapper;
             newWrapper.original = newTag.original;
-            const strings = global.oldest.templater.tag.strings;
-            const dom = global.oldest.templater.tag.dom;
+            const oldest = contextSubject.state.oldest;
+            const strings = oldest.templater.tag.strings;
+            const dom = oldest.templater.tag.dom;
             if (original.toString().includes('sections') || strings?.includes('sections')) {
                 console.log('we are swapping sections......');
             }
             if (dom && findText('sections', dom)) {
                 console.log('we found it!!!!');
             }
+            const older = oldest.context.state.older;
             console.log('swapping supports-----', {
                 oldest,
-                state: oldest?.state
+                state: older.state
             });
         }
     }
@@ -57,21 +59,22 @@ export async function updateSubject(contextSubject, newTag, oldTag, hmr) {
 }
 async function swapSupport(contextSubject, hmr) {
     const global = contextSubject.global;
-    const oldest = global.oldest;
-    const newest = global.newest;
-    const pros = global.providers;
+    const oldest = contextSubject.state.oldest;
+    const newest = contextSubject.state.newest;
+    const pros = contextSubject.providers;
     const prevConstructors = pros ? pros.map(provider => provider.constructMethod) : [];
     const placeholder = contextSubject.placeholder;
     await destroySupport(oldest, global);
     const reGlobal = contextSubject.global;
     delete reGlobal.deleted;
     // TODO: ISSUE I believe is here using the other context. Need to ensure handler and processors are NOT arrow functions
-    const reSupport = hmr.renderTagOnly(newest, newest, contextSubject, newest.ownerSupport);
+    // const reSupport = hmr.reRenderTag(
+    const reSupport = hmr.firstTagRender(newest, newest, contextSubject, newest.ownerSupport);
     const appSupport = oldest.appSupport;
     const ownerSupport = oldest.ownerSupport;
-    const ownGlobal = ownerSupport.context.global;
-    const providers = global.providers;
-    const owner = ownGlobal.oldest;
+    // const ownGlobal = ownerSupport.context.global as SupportTagGlobal
+    const providers = contextSubject.providers;
+    const owner = ownerSupport.context.state.oldest;
     // connect child to owner
     reSupport.ownerSupport = owner;
     if (providers) {
@@ -81,11 +84,11 @@ async function swapSupport(contextSubject, hmr) {
             switchAllProviderConstructors(appSupport, provider);
         });
     }
-    buildBeforeElement(reSupport, { added: 0, removed: 0 }, undefined, placeholder);
-    recurseContext(global.contexts, reSupport);
+    buildBeforeElement(reSupport, undefined, placeholder);
+    recurseContext(contextSubject.contexts, reSupport);
     paint();
-    reGlobal.newest = reSupport;
-    reGlobal.oldest = reSupport;
+    contextSubject.state.newest = reSupport;
+    contextSubject.state.oldest = reSupport;
 }
 function recurseContext(context, reSupport) {
     /*
@@ -123,9 +126,9 @@ function recurseContext(context, reSupport) {
         */
         const nextGlobal = contextItem.global;
         if (contextItem.global) {
-            const nextContext = nextGlobal?.contexts;
+            const nextContext = contextItem.contexts;
             if (nextContext) {
-                const nextSupport = nextGlobal.newest;
+                const nextSupport = contextItem.state.newest;
                 recurseContext(nextContext, nextSupport);
             }
         }

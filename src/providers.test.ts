@@ -48,7 +48,8 @@ describe('🫴 providers', () => {
         // Check for red in RGB format (browsers typically return rgb/rgba)
         const hasRed = styles.borderColor.includes('rgb(255, 0, 0)') || 
                       styles.borderColor.includes('red')
-        expect(hasRed).toBe(true)
+        
+        expect(hasRed).toBe(true, `Expected red within ${styles.borderColor}`)
         expect(styles.borderWidth).toBe('2px')
         expect(styles.borderStyle).toBe('solid')
       }
@@ -70,12 +71,9 @@ describe('🫴 providers', () => {
     })
 
     it('child has correct innerHTML', () => {
-      const childElement = document.getElementById('in-cycle-child')
+      const childElement = document.getElementById('in-cycle-child') as HTMLElement
       expect(childElement).toBeDefined()
-      
-      if (childElement) {
-        expect(childElement.innerHTML.trim()).toBe('wonderful - parent(red)')
-      }
+      expect(childElement.innerHTML.trim()).toBe('wonderful - parent(red)')
     })
 
     it('parent contains child element', () => {

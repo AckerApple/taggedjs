@@ -13,21 +13,17 @@ export const mouseOverTag = tag(({
   let mouseOverEditShow = false
   let edit = false
 
-  return div({
-      style: "background-color:purple;padding:.2em;flex:1",
-      onMouseover: () => mouseOverEditShow = true,
-      onMouseout: () => mouseOverEditShow = false
-    },
+  return div
+    .style`background-color:purple;padding:.2em;flex:1`
+    .onMouseOver(() => mouseOverEditShow = true)
+    .onMouseOut(() => mouseOverEditShow = false)(
     'mouseover - ',
     _=> label,
     ':',
     _=> memory.counter,
     ':',
     _=> mouseOverEditShow || 'false',
-    button({onClick: () => ++memory.counter}, '++counter'),
-    a({
-      'style.visibility': (edit || mouseOverEditShow) ? 'visible' : 'hidden',
-      onClick: () => edit = !edit
-    }, '⚙️\u00A0')
+    button.onClick(() => ++memory.counter)('++counter'),
+    a.attr('style.visibility', (edit || mouseOverEditShow) ? 'visible' : 'hidden').onClick(() => edit = !edit)('⚙️\u00A0')
   )
 })
