@@ -34,6 +34,7 @@ attrName, element, howToSet) {
         }
     };
     const subContext = {
+        description: 'sub-context',
         updateCount: 0,
         isAttr: true,
         target: element,
@@ -48,6 +49,7 @@ attrName, element, howToSet) {
         // paintCommands: [],
     };
     const contextItem = {
+        description: 'override-context',
         updateCount: 0,
         isAttr: true,
         contexts: [subContext],

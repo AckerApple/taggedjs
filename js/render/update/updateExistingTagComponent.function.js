@@ -1,53 +1,7 @@
-import { hasSupportChanged } from '../../tag/hasSupportChanged.function.js';
 import { castProps } from '../../tag/props/alterProp.function.js';
-import { renderSupport } from '../renderSupport.function.js';
-import { ValueTypes } from '../../tag/ValueTypes.enum.js';
 import { destroySupport } from '../destroySupport.function.js';
 import { getNewGlobal } from '../../tag/update/getNewGlobal.function.js';
-import { isLikeTags } from '../../tag/isLikeTags.function.js';
 import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.function.js';
-export function updateExistingTagComponent(ownerSupport, newSupport, // lastest
-subject) {
-    const global = subject.global;
-    const oldSupport = subject.state.newest;
-    const oldWrapper = oldSupport.templater.wrapper;
-    let newWrapper = newSupport.templater.wrapper;
-    let isSameTag = false;
-    const tagJsType = newSupport.templater.tagJsType;
-    const skipComparing = ValueTypes.stateRender === tagJsType || ValueTypes.renderOnce === tagJsType;
-    if (skipComparing) {
-        isSameTag = newSupport.templater.tagJsType === ValueTypes.renderOnce || isLikeTags(oldSupport, newSupport);
-    }
-    else if (oldWrapper && newWrapper) {
-        // is this perhaps an outerHTML compare?
-        const innerHTML = oldSupport.templater.tag?._innerHTML;
-        if (innerHTML) {
-            // newWrapper = innerHTML.outerHTML as any as Wrapper
-            newWrapper = newSupport.outerHTML;
-        }
-        const oldFunction = oldWrapper.original;
-        const newFunction = newWrapper.original;
-        // string compare both functions
-        isSameTag = oldFunction === newFunction;
-    }
-    const templater = newSupport.templater;
-    if (!isSameTag) {
-        swapTags(subject, templater, ownerSupport);
-        return;
-    }
-    const hasChanged = skipComparing || hasSupportChanged(oldSupport, templater);
-    // everyhing has matched, no display needs updating.
-    if (!hasChanged) {
-        return;
-    }
-    if (subject.locked) {
-        global.blocked.push(newSupport);
-        return;
-    }
-    renderSupport(newSupport);
-    ++subject.renderCount;
-    return;
-}
 export function syncFunctionProps(newSupport, oldSupport, ownerSupport, newPropsArray, // templater.props
 maxDepth, depth = -1) {
     const subject = oldSupport.context;

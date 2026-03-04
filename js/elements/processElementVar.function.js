@@ -34,7 +34,7 @@ function registerListener(value, index, ownerSupport, listener, element) {
         const toCall = listenScope[1];
         const stateSupport = getSupportWithState(ownerSupport);
         const updateCount = stateSupport.context.updateCount;
-        stateSupport.context.locked = 1;
+        stateSupport.context.locked = 1; // 1 means reactive event lock
         ++painting.locks;
         setContextInCycle(stateSupport.context);
         const result = toCall(...args);

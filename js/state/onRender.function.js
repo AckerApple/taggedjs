@@ -5,13 +5,13 @@ export function onRender(callback) {
     const callbackWrap = (_isFirst) => {
         // remember current context (old)
         // const oldIndex = setUseMemory.stateConfig.statesIndex
-        const lastContext = getContextInCycle();
+        // const lastContext = getContextInCycle()
         // set to inner context cycle with previous state position
         setContextInCycle(context);
         const result = callback();
         // restore previous cycle
         removeContextInCycle();
-        setContextInCycle(lastContext);
+        // setContextInCycle(lastContext)
         return result;
     };
     const subscription = context.render$.subscribe(() => {

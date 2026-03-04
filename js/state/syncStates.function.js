@@ -1,10 +1,3 @@
-export function syncStatesArray(from, onto) {
-    for (let index = 0; index < from.length; ++index) {
-        const getter = from[index];
-        const setter = onto[index];
-        syncStates(getter, setter);
-    }
-}
 let got;
 function syncFromState(...x) {
     got = x;

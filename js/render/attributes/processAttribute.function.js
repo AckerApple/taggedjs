@@ -7,7 +7,6 @@ import { paintContent } from '../paint.function.js';
 import { processNonDynamicAttr } from '../../interpolations/attributes/processNameValueAttribute.function.js';
 import { getNewContext } from '../addOneContext.function.js';
 import { processAttributeFunction } from '../../interpolations/attributes/processAttributeCallback.function.js';
-import { processUpdateAttrContext } from './processUpdateAttrContext.function.js';
 import { createDynamicArrayAttribute, createDynamicAttribute } from './createDynamicAttribute.function.js';
 import { getTagJsTag } from './getTagJsTag.function.js';
 import { processStandAloneAttribute } from './processStandAloneAttribute.function.js';
@@ -16,6 +15,7 @@ import { processTagJsTagAttribute } from './processTagJsAttribute.function.js';
 export function processAttribute(attrName, value, values, // all the variables inside html``
 element, support, howToSet, //  = howToSetInputValue
 contexts, parentContext, isSpecial) {
+    // TODO: Next 3 lines might be obsolete
     const varIndex = getTagJsTag(attrName);
     let isNameVar = varIndex >= 0 || (value === undefined && typeof (attrName) !== 'string');
     let valueInValues = values[varIndex];
@@ -28,10 +28,16 @@ contexts, parentContext, isSpecial) {
         valueInValues = attrName; // the name is a TagJsTag
         value = attrName;
     }
+    else if (typeof attrName === 'function') {
+        isNameVar = true;
+        valueInValues = attrName; // the name is a TagJsTag
+        value = attrName;
+    }
     const tagJsVar = valueInValues;
     if (tagJsVar?.tagJsType) {
-        return processTagJsTagAttribute(value, [], // contexts,
-        parentContext, tagJsVar, varIndex, support, attrName, element, isNameVar);
+        return processTagJsTagAttribute(value, 
+        // [], // contexts,
+        contexts, parentContext, tagJsVar, varIndex, support, attrName, element, isNameVar);
     }
     if (isNameVar) {
         // old way of setting by html``
@@ -40,18 +46,14 @@ contexts, parentContext, isSpecial) {
         }
         const contextItem = getNewContext(valueInValues, [], // contexts,
         true, parentContext);
+        contextItem.description = 'processAttribute';
         contextItem.valueIndex = varIndex;
         contextItem.isAttr = true;
         contextItem.target = element;
         contextItem.isNameOnly = true;
         contextItem.howToSet = howToSet;
-        const TagJsTag = contextItem.tagJsVar;
-        TagJsTag.processUpdate = processUpdateAttrContext;
         // single/stand alone attributes
-        const aloneResult = processStandAloneAttribute(values, valueInValues, element, support, howToSet, contexts, parentContext);
-        if (aloneResult) {
-            contexts.push(...aloneResult);
-        }
+        processStandAloneAttribute(values, valueInValues, element, support, howToSet, contexts, parentContext, contextItem);
         return contextItem;
     }
     if (Array.isArray(value)) {

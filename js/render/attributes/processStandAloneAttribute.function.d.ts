@@ -2,4 +2,4 @@ import { HowToSet } from '../../interpolations/attributes/howToSetInputValue.fun
 import { AnySupport } from '../../tag/index.js';
 import { ContextItem } from '../../tag/ContextItem.type.js';
 import { HostValue } from '../../TagJsTags/host.function.js';
-export declare function processStandAloneAttribute(values: unknown[], attrValue: string | boolean | Record<string, any> | HostValue, element: HTMLElement, ownerSupport: AnySupport, howToSet: HowToSet, contexts: ContextItem[], parentContext: ContextItem): ContextItem[] | void;
+export declare function processStandAloneAttribute(values: unknown[], attrValue: string | boolean | Record<string, any> | HostValue, element: HTMLElement, ownerSupport: AnySupport, howToSet: HowToSet, contexts: ContextItem[], parentContext: ContextItem, contextItem: ContextItem): ContextItem[] | void;

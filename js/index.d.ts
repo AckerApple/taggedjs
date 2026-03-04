@@ -12,7 +12,6 @@ export * from './interpolations/attributes/howToSetInputValue.function.js';
 export * from './TagJsEvent.type.js';
 export { type Wrapper } from './tag/getTemplaterResult.function.js';
 import { firstTagRender, reRenderTag } from './render/renderTagOnly.function.js';
-import { renderSupport } from './render/renderSupport.function.js';
 import { renderWithSupport } from './render/renderWithSupport.function.js';
 import { tagElement } from './tag/tagElement.js';
 import { paint } from './render/paint.function.js';
@@ -22,7 +21,6 @@ export { version } from './version.js';
 export declare const hmr: {
     tagElement: typeof tagElement;
     renderWithSupport: typeof renderWithSupport;
-    renderSupport: typeof renderSupport;
     firstTagRender: typeof firstTagRender;
     reRenderTag: typeof reRenderTag;
     paint: typeof paint;

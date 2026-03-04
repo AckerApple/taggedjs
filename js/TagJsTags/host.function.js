@@ -5,7 +5,6 @@ import { initState } from "../state/state.utils.js";
 import { reState } from '../state/reState.function.js';
 import { runAfterRender } from "../render/runAfterRender.function.js";
 import { handleTagTypeChangeFrom } from "../tag/update/handleTagTypeChangeFrom.function.js";
-import { isFunction } from "../index.js";
 /** Use to gain access to element
  * @callback called every render
  */
@@ -22,14 +21,14 @@ export function host(callback, options = {}) {
         matchesInjection(inject, context) {
             const options = inject?.options;
             if (!options) {
-                return false;
+                return;
             }
             const injectCallback = options?.callback;
             // Check if the inject target is a host with the same callback
             if (injectCallback === callback) {
                 return context;
             }
-            return false;
+            return;
         },
     };
     const returnFunction = (...args) => {
@@ -52,9 +51,6 @@ host.onDestroy = (callback) => {
     return host(() => { }, { onDestroy: callback });
 };
 function processHostUpdate(newValue, contextItem, ownerSupport) {
-    if (isFunction(newValue) && !newValue?.tagJsType) {
-        throw new Error('issue on its way');
-    }
     const hasChanged = handleTagTypeChangeFrom(ValueTypes.host, newValue, 
     // TagJsTag,
     ownerSupport, contextItem);
@@ -76,12 +72,12 @@ contextItem) {
     return processHost(tagJsVar, contextItem);
 }
 /* Only runs on host() init */
-function processHost(tagJsVar, contextItem) {
-    const element = contextItem.target;
-    const state = contextItem.state = {};
-    initState(contextItem);
-    processHostTagJsTag(element, tagJsVar, contextItem, state);
-    runAfterRender(contextItem);
+function processHost(tagJsVar, context) {
+    const element = context.target;
+    const state = context.state = {};
+    initState(context);
+    processHostTagJsTag(element, tagJsVar, context, state);
+    runAfterRender(context);
 }
 /** first time run */
 function processHostTagJsTag(element, tagJsVar, contextItem, state) {

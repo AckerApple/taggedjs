@@ -56,4 +56,4 @@ function firstSignal(sig) {
     });
     return resignal;
 }
-//# sourceMappingURL=array.function.js.map
+//# sourceMappingURL=watchArray.function.js.map

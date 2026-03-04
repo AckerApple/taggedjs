@@ -72,7 +72,9 @@ export class Subject {
                 tagJsUnsub(); // its from taggedjs
             }
             else {
-                setTimeout(() => subscription.unsubscribe(), 0);
+                setTimeout(() => {
+                    subscription.unsubscribe();
+                }, 0);
             }
             callback(x);
         });

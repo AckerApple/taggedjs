@@ -30,6 +30,7 @@ export function convertTagToElementManaged(support, ownerSupport, subject) {
     };
     // context.contexts = [ newContext ] as ContextItem[] & SupportContextItem[]
     const overrideTagVar = getOverrideTagVar(context, newContext, support, subject);
+    context.subContext = newContext;
     context.tagJsVar = overrideTagVar;
     // TODO: should we be calling this here?
     tagJsVar.processInit(newValue, newContext, support, subject.placeholder);

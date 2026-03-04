@@ -2,8 +2,6 @@ import { BasicTypes } from '../ValueTypes.enum.js';
 import { isTagComponent } from '../../isInstance.js';
 import { getNewGlobal } from './getNewGlobal.function.js';
 import { handleStillTag } from './handleStillTag.function.js';
-import { updateExistingTagComponent } from '../../render/update/updateExistingTagComponent.function.js';
-import { createSupport } from '../createSupport.function.js';
 /** result is an indication to ignore further processing but that does not seem in use anymore */
 export function tryUpdateToTag(contextItem, newValue, // newValue
 ownerSupport) {
@@ -53,8 +51,5 @@ function prepareUpdateToComponent(templater, contextItem, ownerSupport) {
         templater.processInit(templater, contextItem, ownerSupport, contextItem.placeholder);
         return;
     }
-    const support = createSupport(templater, contextItem, ownerSupport, ownerSupport.appSupport);
-    updateExistingTagComponent(ownerSupport, support, // latest value
-    contextItem);
 }
 //# sourceMappingURL=tryUpdateToTag.function.js.map

@@ -6,7 +6,9 @@ import { getSupportWithState } from '../../interpolations/attributes/getSupportW
 /** adds onto parent.contexts */
 export function processTagJsTagAttribute(value, contexts, parentContext, tagJsVar, varIndex, support, attrName, element, isNameVar) {
     // getOneContext
-    const contextItem = getNewContext(value, contexts || [], true, parentContext);
+    const contextItem = getNewContext(value, [], // contexts || [],
+    true, parentContext);
+    contextItem.description = 'tagJsVar-attr';
     contextItem.target = element;
     contextItem.valueIndex = varIndex;
     contextItem.isAttr = true;
@@ -19,6 +21,7 @@ export function processTagJsTagAttribute(value, contexts, parentContext, tagJsVa
     removeContextInCycle();
     contextItem.oldTagJsVar = contextItem.tagJsVar;
     contextItem.tagJsVar = tagJsVar;
+    // contexts.push( contextItem )
     return contextItem;
 }
 //# sourceMappingURL=processTagJsAttribute.function.js.map

@@ -7,13 +7,13 @@ export function getElement() {
     const context = getContextInCycle();
     return context.target;
 }
-// const contextCycles: ContextItem[] = []
+const contextCycles = [];
 export function setContextInCycle(context) {
-    // contextCycles.push(context)
+    contextCycles.push(context);
     return setUseMemory.stateConfig.context = context;
 }
 export function removeContextInCycle() {
-    // contextCycles.pop()
-    delete setUseMemory.stateConfig.context;
+    contextCycles.pop();
+    setUseMemory.stateConfig.context = contextCycles[contextCycles.length - 1];
 }
 //# sourceMappingURL=setContextInCycle.function.js.map

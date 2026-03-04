@@ -18,6 +18,7 @@ values, parentContext) {
             const myIndex = contexts.length;
             const tagJsVar = valueToTagJsVar(value);
             const contextItem = {
+                description: 'attribute-array-item',
                 updateCount: 0,
                 isAttr: true,
                 target: element,
@@ -71,6 +72,7 @@ support, isSpecial, varIndex) {
     }
     const tagJsVar = valueToTagJsVar(value);
     const contextItem = {
+        description: 'dynamic-attribute',
         updateCount: 0,
         isAttr: true,
         target: element,

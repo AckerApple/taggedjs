@@ -33,24 +33,12 @@ export function output(callback) {
 }
 export function syncWrapCallback(args, callback, context) {
     const newestOwner = undefined;
-    /*
-    const stateMeta = context.state as ContextStateMeta
-    const newerStates = (stateMeta.newer as ContextStateSupport).states
-    const olderStates = stateMeta.older ? (stateMeta.older as ContextStateSupport).states : newerStates
-    const newestOwner = stateMeta.newest as AnySupport
-  
-    // sync the new states to the old before the old does any processing
-    syncStatesArray(newerStates, olderStates)
-    */
     setContextInCycle(context);
     const c = callback(...args); // call the latest callback
     removeContextInCycle();
-    // sync the old states to the new
-    // syncStatesArray(olderStates, newerStates)
     // now render the owner
     paintAfters.push([() => {
             const newGlobal = context.global;
-            // const newGlobal = newestOwner.context.global
             const ignore = newGlobal === undefined || newGlobal.deleted === true;
             if (ignore) {
                 ++painting.locks;

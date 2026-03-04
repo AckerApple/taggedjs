@@ -1,5 +1,5 @@
 import { paint, painting } from '../../render/paint.function.js';
-import { renderSupport } from '../../render/renderSupport.function.js';
+// import { renderSupport } from'../../render/renderSupport.function.js'
 export function renderTagUpdateArray(supports) {
     ++painting.locks;
     supports.forEach(mapTagUpdate);
@@ -8,12 +8,6 @@ export function renderTagUpdateArray(supports) {
 }
 function mapTagUpdate(support) {
     const context = support.context;
-    const global = context.global;
-    if (!global) {
-        context.tagJsVar.processUpdate(context.value, context, support.ownerSupport, []);
-        return; // while rendering a parent, a child may have been deleted (pinbowl)
-    }
-    const stateMeta = context.state;
-    renderSupport(stateMeta.newest);
+    context.tagJsVar.processUpdate(context.value, context, support.ownerSupport, []);
 }
 //# sourceMappingURL=renderTagArray.function.js.map

@@ -5,13 +5,12 @@ export type PaintCommand = [
     /** arguments for the painter */
     any[]
 ];
-/** Typically used for animations to run before clearing elements */
-export declare function addPaintRemoveAwait(_promise: Promise<any>): void;
 export declare let paintCommands: PaintCommand[];
 export declare const paintRemoves: PaintCommand[];
 export declare let paintContent: PaintCommand[];
 export declare let paintAppends: PaintCommand[];
 export declare let paintAfters: PaintCommand[];
+export declare const batchAfters: PaintCommand[];
 export declare const painting: {
     locks: number;
     removeLocks: number;

@@ -1,7 +1,8 @@
 import { updateToDiffValue } from './updateToDiffValue.function.js';
 /** used to handle when value was subscribe but now is something else */
 export function handleTagTypeChangeFrom(originalType, newValue, ownerSupport, contextItem) {
-    const isDifferent = !newValue || !newValue.tagJsType || newValue.tagJsType !== originalType;
+    const newTagJsType = newValue.tagJsType;
+    const isDifferent = !newValue || !newTagJsType || newTagJsType !== originalType;
     if (isDifferent) {
         const oldTagJsTag = contextItem.tagJsVar;
         oldTagJsTag.destroy(contextItem, ownerSupport);

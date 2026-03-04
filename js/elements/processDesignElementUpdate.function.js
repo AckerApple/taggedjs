@@ -1,7 +1,7 @@
 import { updateToDiffValue } from '../tag/update/updateToDiffValue.function.js';
 import { destroyDesignElement } from './destroyDesignElement.function.js';
 export function processDesignElementUpdate(value, context, ownerSupport) {
-    const skip = context.locked || context.deleted === true;
+    const skip = context.deleted === true;
     if (skip) {
         return; // something else is running an event
     }
@@ -32,9 +32,10 @@ export function processDesignElementUpdate(value, context, ownerSupport) {
             context,
             conValues: contexts.map(x => x.value),
             vContexts,
-            deleted: context.deleted
+            deleted: context.deleted,
+            contexts
         });
-        throw new Error('super issue discovered');
+        throw new Error(`Expected ${contexts.length} contexts but got ${vContexts.length}`);
     }
     context.locked = 79;
     contexts.forEach((context, index) => {

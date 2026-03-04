@@ -24,7 +24,7 @@ export function processUpdateAttrContext(value, contextItem, ownerSupport, value
     if (attrContextItem.isNameOnly) {
         updateNameOnlyAttrValue(values, value, attrContextItem.value, attrContextItem.target, // global.element as Element,
         ownerSupport, attrContextItem.howToSet, [], // Context, but we dont want to alter current
-        attrContextItem.parentContext);
+        attrContextItem.parentContext, attrContextItem);
         attrContextItem.value = value;
         return;
     }

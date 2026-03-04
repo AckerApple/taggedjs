@@ -13,18 +13,21 @@ export function getOverrideTagVar(context, newContext, support, subject) {
         // processInitAttribute: newContext.tagJsVar.processInitAttribute,
         processInitAttribute: blankHandler, // cannot be an attribute ever
         processInit: (_value, _contextItem, _ownerSupport) => {
-            if (context.inputsHandler) {
-                const props = support.propsConfig;
-                context.inputsHandler(props);
+            /*
+            if(context.inputsHandler) {
+              const props = support.propsConfig
+              context.inputsHandler( props )
             }
-            if (newContext.inputsHandler) {
-                const props = support.propsConfig;
-                newContext.inputsHandler(props);
+      
+            if(newContext.inputsHandler) {
+              const props = support.propsConfig
+              newContext.inputsHandler( props )
             }
-            if (_contextItem.inputsHandler) {
-                const props = support.propsConfig;
-                _contextItem.inputsHandler(props);
+            if(_contextItem.inputsHandler) {
+              const props = support.propsConfig
+              _contextItem.inputsHandler( props )
             }
+            */
             const renderContent = context.returnValue;
             return newContext.tagJsVar.processInit(renderContent, newContext, support, subject.placeholder);
         },

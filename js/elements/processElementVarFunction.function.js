@@ -63,6 +63,7 @@ export function processElementVarFunction(item, element, parentContext, ownerSup
     element, ownerSupport, paintBy);
     const contexts = parentContext.contexts;
     contexts.push(subContext);
+    subContext.subContext = aSubContext;
     removeContextInCycle();
     return aSubContext;
 }

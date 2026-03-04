@@ -1,4 +1,5 @@
-// taggedjs-no-compile
+import { output } from '../tag/output.function.js';
+import { getInnerHTML } from '../TagJsTags/getInnerHTML.function.js';
 import { callback, promise, setUseMemory, state } from '../state/index.js';
 import { getTemplaterResult } from '../tag/getTemplaterResult.function.js';
 import { tags } from '../tag/tag.utils.js';
@@ -15,7 +16,6 @@ import { onInit as tagOnInit } from '../state/onInit.function.js';
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js';
 import { callback as tagCallback } from '../state/callback.function.js';
 import { onRender as tagOnRender } from '../state/onRender.function.js';
-import { getInnerHTML as tagGetInnerHTML, output as outputAlias } from '../index.js';
 let tagCount = 0;
 const onClick = makeEventListener('click');
 const onMouseDown = makeEventListener('mousedown');
@@ -93,6 +93,10 @@ export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
     returnWrap.inputs = (handler) => {
         const context = getContextInCycle();
         context.inputsHandler = handler;
+        const tagJsVar = context.tagJsVar;
+        // const value = context.value as any
+        // handler(value.props)
+        handler(tagJsVar.props);
         return true;
     };
     // used for argument updates
@@ -101,7 +105,7 @@ export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
         context.updatesHandler = handler;
         return true;
     };
-    returnWrap.getInnerHTML = tagGetInnerHTML;
+    returnWrap.getInnerHTML = getInnerHTML;
     // returnWrap.tagJsType = 'component'
     return returnWrap;
 }
@@ -126,12 +130,12 @@ tag.use = tagUseFn;
 tag.deepPropWatch = tag;
 tag.route = routeFn;
 tag.inject = tagInject;
-tag.output = outputAlias;
+tag.output = output;
 tag.onInit = tagOnInit;
 tag.onDestroy = tagOnDestroy;
 tag.callback = tagCallback;
 tag.onRender = tagOnRender;
-tag.getInnerHTML = tagGetInnerHTML;
+tag.getInnerHTML = getInnerHTML;
 tag.app = function (_routeTag) {
     throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `');
 };

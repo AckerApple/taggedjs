@@ -1,3 +1,5 @@
+import { output } from '../tag/output.function.js';
+import { getInnerHTML } from '../TagJsTags/getInnerHTML.function.js';
 import { TemplaterResult } from '../tag/getTemplaterResult.function.js';
 import { RouteProps, RouteTag, StateToTag, ToTag } from '../tag/tag.types.js';
 import { UnknownFunction } from '../tag/update/oneRenderToSupport.function.js';
@@ -8,7 +10,7 @@ import { onInit as tagOnInit } from '../state/onInit.function.js';
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js';
 import { callback as tagCallback } from '../state/callback.function.js';
 import { onRender as tagOnRender } from '../state/onRender.function.js';
-import { getInnerHTML as tagGetInnerHTML, output as outputAlias, ProcessInit, AnySupport, HasValueChanged } from '../index.js';
+import { ProcessInit, AnySupport, HasValueChanged } from '../index.js';
 import { ProcessDelete, TagJsTag, TagJsTagBasics } from './TagJsTag.type.js';
 import { ProcessUpdate } from '../tag/ProcessUpdate.type.js';
 import { ProcessAttribute } from '../tag/ProcessInit.type.js';
@@ -65,6 +67,8 @@ export declare enum PropWatches {
  * For single rendering, no event cycles, use: tag.renderOnce = (props) => html``
  */
 export declare function tag<T extends ToTag>(tagComponent: T, propWatch?: PropWatches): TaggedFunction<T>;
+type outputAlias = typeof output;
+type getInnerHTMLAlias = typeof getInnerHTML;
 export declare namespace tag {
     /** Used to declare a function has state in the form of a function, that when called, returns content for rendering
      * Example () => tag.use = (counter = 0)
@@ -80,12 +84,12 @@ export declare namespace tag {
     let watchProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
     let element: typeof tagElement;
     let inject: typeof tagInject;
-    let output: typeof outputAlias;
+    let output: outputAlias;
     let onInit: typeof tagOnInit;
     let onDestroy: typeof tagOnDestroy;
     let callback: typeof tagCallback;
     let onRender: typeof tagOnRender;
-    let getInnerHTML: typeof tagGetInnerHTML;
+    let getInnerHTML: getInnerHTMLAlias;
     let promise: Promise<unknown>;
 }
 type ReturnTag = AnyTag | StateToTag | null | undefined;
