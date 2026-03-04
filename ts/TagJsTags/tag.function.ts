@@ -1,5 +1,5 @@
-// taggedjs-no-compile
-
+import { output } from '../tag/output.function.js'
+import { getInnerHTML } from '../TagJsTags/getInnerHTML.function.js'
 import { KeyFunction } from '../tag/getDomTag.function.js'
 import type { StringTag } from '../tag/StringTag.type.js'
 import { callback, promise, setUseMemory, state } from '../state/index.js'
@@ -21,7 +21,12 @@ import { onInit as tagOnInit } from '../state/onInit.function.js'
 import { onDestroy as tagOnDestroy } from '../state/onDestroy.function.js'
 import { callback as tagCallback } from '../state/callback.function.js'
 import { onRender as tagOnRender } from '../state/onRender.function.js'
-import { getInnerHTML as tagGetInnerHTML, SupportContextItem, output as outputAlias, ProcessInit, AnySupport, HasValueChanged } from '../index.js'
+import {
+  SupportContextItem,
+  ProcessInit,
+  AnySupport,
+  HasValueChanged,
+} from '../index.js'
 import { ProcessDelete, TagJsTag, TagJsTagBasics } from './TagJsTag.type.js'
 import { ProcessUpdate } from '../tag/ProcessUpdate.type.js'
 import { ProcessAttribute } from '../tag/ProcessInit.type.js'
@@ -190,6 +195,13 @@ export function tag<T extends ToTag>(
   returnWrap.inputs = (handler: (parameters: Parameters<T>) => any) => {
     const context = getContextInCycle() as SupportContextItem
     context.inputsHandler = handler
+
+    const tagJsVar = context.tagJsVar
+    
+    // const value = context.value as any
+    // handler(value.props)
+    handler( (tagJsVar as any).props )
+
     return true
   }
 
@@ -200,11 +212,14 @@ export function tag<T extends ToTag>(
     return true
   }
 
-  returnWrap.getInnerHTML = tagGetInnerHTML as any
+  returnWrap.getInnerHTML = getInnerHTML as any
   // returnWrap.tagJsType = 'component'
 
   return returnWrap
 }
+
+type outputAlias = typeof output
+type getInnerHTMLAlias = typeof getInnerHTML
 
 // Used to declare all the variable attachments on the "tag" function
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -226,12 +241,12 @@ export declare namespace tag {
   
   let element: typeof tagElement;
   let inject: typeof tagInject;
-  let output: typeof outputAlias;
+  let output: outputAlias;
   let onInit: typeof tagOnInit;
   let onDestroy: typeof tagOnDestroy;
   let callback: typeof tagCallback;
   let onRender: typeof tagOnRender;
-  let getInnerHTML: typeof tagGetInnerHTML;
+  let getInnerHTML: getInnerHTMLAlias;
   let promise: Promise<unknown>;
 }
 
@@ -260,12 +275,12 @@ function tagUseFn(): ReturnTag {
 ;(tag as any).deepPropWatch = tag
 ;(tag as any).route = routeFn
 ;(tag as any).inject = tagInject
-;(tag as any).output = outputAlias
+;(tag as any).output = output
 ;(tag as any).onInit = tagOnInit
 ;(tag as any).onDestroy = tagOnDestroy
 ;(tag as any).callback = tagCallback
 ;(tag as any).onRender = tagOnRender
-;(tag as any).getInnerHTML = tagGetInnerHTML
+;(tag as any).getInnerHTML = getInnerHTML
 
 /** Use to structure and define a browser tag route handler
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``

@@ -9,19 +9,6 @@ export type PaintCommand = [
   any[],
 ]
 
-/** Typically used for animations to run before clearing elements */
-export function addPaintRemoveAwait(_promise: Promise<any>) {
-  /*
-  if(paintRemoveAwaits.length) {
-    paintRemoveAwaits[paintRemoveAwaits.length - 1].paintRemoves.push( ...paintRemoves )
-    paintRemoves = []
-  }
-
-  paintRemoveAwaits.push({promise, paintRemoves})
-  paintRemoves = []
-  */
-}
-
 // let paintRemoveAwaits: {promise: Promise<any>, paintRemoves: PaintCommand[]}[] = []
 export let paintCommands: PaintCommand[] = []
 // export let paintRemoves: PaintCommand[] = []
@@ -30,8 +17,10 @@ export let paintContent: PaintCommand[] = []
 
 // TODO: This this is duplicate of paintCommands (however timing is currently and issue and cant be removed)
 export let paintAppends: PaintCommand[] = []
-
 export let paintAfters: PaintCommand[] = [] // callbacks after all painted
+
+let batchCycleOpen = false
+export const batchAfters: PaintCommand[] = [] // callbacks after all painted with a paint cycle after all
 
 export const painting = {
   locks: 0,
@@ -61,6 +50,8 @@ function runCycles() {
   --painting.locks
 
   runAfterCycle()
+  
+  runBatchAfterCycle()
 }
 
 /** Deletes happen last */
@@ -73,6 +64,27 @@ function runAfterCycle() {
   for(const content of nowPaintAfters) {
     content[0](...content[1])
   }
+}
+
+/* After paint  full cycle, these paint batches will all run together and then paint all together */
+function runBatchAfterCycle() {
+  if(batchCycleOpen || !batchAfters.length) {
+    return
+  }
+
+  batchCycleOpen = true
+  // queueMicrotask(() => {
+  requestAnimationFrame(() => {
+    ++painting.locks
+    while( batchAfters.length ) {
+      const content = batchAfters.shift() as PaintCommand
+      content[0](...content[1])
+    }
+    runPaintCycles() // actual paint with no after cycles
+    runAfterCycle()
+    --painting.locks
+    batchCycleOpen = false
+  })
 }
 
 function runPaintRemoves(): any {

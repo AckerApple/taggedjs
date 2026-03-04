@@ -14,12 +14,12 @@ export function processTagInit(
   appendTo?: Element | undefined,
 ): AnySupport {
   contextItem.state = {}
-  
+  /*
   if(contextItem.inputsHandler) {
     const props = ownerSupport.propsConfig
     contextItem.inputsHandler( props )
   }
-  
+  */
   if(appendTo) {
     return processNewSubjectTag(
       value as TemplaterResult,

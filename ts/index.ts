@@ -15,7 +15,7 @@ export * from './TagJsEvent.type.js'
 export { type Wrapper } from './tag/getTemplaterResult.function.js'
 
 import { firstTagRender, reRenderTag } from './render/renderTagOnly.function.js'
-import { renderSupport } from './render/renderSupport.function.js'
+// import { renderSupport } from './render/renderSupport.function.js'
 import { renderWithSupport } from './render/renderWithSupport.function.js'
 
 import { tagElement } from './tag/tagElement.js'
@@ -25,6 +25,7 @@ export * from './elements/index.js'
 export { version } from './version.js'
 
 export const hmr = {
-  tagElement, renderWithSupport, renderSupport,
+  tagElement, renderWithSupport,
+  // renderSupport,
   firstTagRender, reRenderTag, paint,
 }

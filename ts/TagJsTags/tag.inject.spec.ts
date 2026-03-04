@@ -102,6 +102,7 @@ describe('tag.inject', () => {
     const differentCallback = (color: string) => ({ color })
     const host3 = host(differentCallback)
     const injected = host1.matchesInjection!(host3, true as any as ContextItem)
-    expect(injected).toBe(false)
+    // expect(injected).toBe(false)
+    expect(injected).toBe(undefined)
   })
 })

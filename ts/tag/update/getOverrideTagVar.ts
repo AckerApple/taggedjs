@@ -29,10 +29,12 @@ export function getOverrideTagVar(
       _contextItem: ContextItem,
       _ownerSupport: AnySupport
     ) => {
+      /*
       if(context.inputsHandler) {
         const props = support.propsConfig
         context.inputsHandler( props )
       }
+
       if(newContext.inputsHandler) {
         const props = support.propsConfig
         newContext.inputsHandler( props )
@@ -41,7 +43,7 @@ export function getOverrideTagVar(
         const props = support.propsConfig
         _contextItem.inputsHandler( props )
       }
-
+      */
       const renderContent = context.returnValue
       return newContext.tagJsVar.processInit(
         renderContent,

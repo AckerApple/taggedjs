@@ -7,8 +7,6 @@ import { getNewGlobal } from './getNewGlobal.function.js'
 import { ContextItem } from '../ContextItem.type.js'
 import { handleStillTag } from './handleStillTag.function.js'
 import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
-import { updateExistingTagComponent } from '../../render/update/updateExistingTagComponent.function.js'
-import { createSupport } from '../createSupport.function.js'
 
 /** result is an indication to ignore further processing but that does not seem in use anymore */
 export function tryUpdateToTag(
@@ -99,17 +97,4 @@ function prepareUpdateToComponent(
     )
     return
   }
-
-  const support = createSupport(
-    templater,
-    contextItem,
-    ownerSupport,
-    ownerSupport.appSupport,
-  )
-
-  updateExistingTagComponent(
-    ownerSupport,
-    support, // latest value
-    contextItem,
-  )
 }

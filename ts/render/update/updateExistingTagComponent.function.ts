@@ -2,7 +2,7 @@ import { deepCompareDepth, hasSupportChanged, shallowCompareDepth } from'../../t
 import { PropsConfig } from '../../tag/createHtmlSupport.function.js'
 import {SupportTagGlobal, TemplaterResult, Wrapper } from '../../tag/getTemplaterResult.function.js'
 import { castProps, WrapRunner } from'../../tag/props/alterProp.function.js'
-import { renderSupport } from'../renderSupport.function.js'
+// import { renderSupport } from'../renderSupport.function.js'
 import { ValueTypes } from '../../tag/ValueTypes.enum.js'
 import { destroySupport } from '../destroySupport.function.js'
 import { getNewGlobal } from '../../tag/update/getNewGlobal.function.js'
@@ -13,70 +13,6 @@ import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.fu
 import { AnySupport } from '../../tag/index.js'
 import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
 import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
-
-export function updateExistingTagComponent(
-  ownerSupport: AnySupport,
-  newSupport: AnySupport, // lastest
-  subject:SupportContextItem,
-): void {
-  const global = subject.global as SupportTagGlobal
-  const oldSupport = subject.state.newest as AnySupport
-  
-  const oldWrapper = oldSupport.templater.wrapper
-  let newWrapper = newSupport.templater.wrapper as Wrapper
-  let isSameTag = false
-  const tagJsType = newSupport.templater.tagJsType
-  const skipComparing = ValueTypes.stateRender === tagJsType || ValueTypes.renderOnce === tagJsType
-
-  if(skipComparing) {
-    isSameTag = newSupport.templater.tagJsType === ValueTypes.renderOnce || isLikeTags(oldSupport, newSupport)
-  } else if(oldWrapper && newWrapper) {
-    // is this perhaps an outerHTML compare?
-    const innerHTML = oldSupport.templater.tag?._innerHTML
-    if(innerHTML) {
-      // newWrapper = innerHTML.outerHTML as any as Wrapper
-      newWrapper = (newSupport as any).outerHTML
-    }
-
-    const oldFunction = oldWrapper.original
-    const newFunction = newWrapper.original
-
-    // string compare both functions
-    isSameTag = oldFunction === newFunction
-  }
-
-  const templater = newSupport.templater
-  if(!isSameTag) {
-    swapTags(
-      subject,
-      templater,
-      ownerSupport,
-    )
-
-    return
-  }
-
-  const hasChanged = skipComparing || hasSupportChanged(
-    oldSupport,
-    templater
-  )
-
-  // everyhing has matched, no display needs updating.
-  if(!hasChanged) {
-    return
-  }
-
-  if( subject.locked ) {
-    global.blocked.push( newSupport )
-    return
-  }
-
-  renderSupport( newSupport )
-
-  ++subject.renderCount
-
-  return
-}
 
 export function syncFunctionProps(
   newSupport: AnySupport,

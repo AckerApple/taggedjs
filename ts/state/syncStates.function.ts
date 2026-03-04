@@ -1,17 +1,5 @@
 import { StatesSetter } from './states.utils.js'
 
-export function syncStatesArray(
-  from: StatesSetter[],
-  onto: StatesSetter[],
-) {
-  for (let index=0; index < from.length; ++index) {
-    const getter = from[index]
-    const setter = onto[index]
-    
-    syncStates(getter, setter)
-  }
-}
-
 let got: any
 function syncFromState(...x: any) {
   got = x

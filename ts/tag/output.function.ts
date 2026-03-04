@@ -1,9 +1,7 @@
-import { AnySupport, ContextItem, getContextInCycle, paint, SupportContextItem, TagGlobal, TemplateValue } from "../index.js"
+import { AnySupport, ContextItem, getContextInCycle, paint, TagGlobal, TemplateValue } from "../index.js"
 import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { paintAfters, painting } from "../render/paint.function.js"
-import { syncStatesArray } from "../state/syncStates.function.js"
 import { safeRenderSupport } from "./props/safeRenderSupport.function.js"
-import { ContextStateMeta, ContextStateSupport } from "./ContextStateMeta.type.js"
 import { findStateSupportUpContext } from "../interpolations/attributes/getSupportWithState.function.js"
 import { removeContextInCycle, setContextInCycle } from "./cycles/setContextInCycle.function.js"
 
@@ -56,28 +54,15 @@ export function syncWrapCallback(
   context: ContextItem, // aka stateOwner
 ) {
   const newestOwner = undefined as any
-  /*
-  const stateMeta = context.state as ContextStateMeta
-  const newerStates = (stateMeta.newer as ContextStateSupport).states
-  const olderStates = stateMeta.older ? (stateMeta.older as ContextStateSupport).states : newerStates
-  const newestOwner = stateMeta.newest as AnySupport
-
-  // sync the new states to the old before the old does any processing
-  syncStatesArray(newerStates, olderStates)
-  */
   setContextInCycle(context)
 
   const c = callback(...args) // call the latest callback
 
   removeContextInCycle()
 
-  // sync the old states to the new
-  // syncStatesArray(olderStates, newerStates)
-
   // now render the owner
   paintAfters.push([() => {
     const newGlobal = context.global as TagGlobal
-    // const newGlobal = newestOwner.context.global
     const ignore = newGlobal === undefined || newGlobal.deleted === true
     
     if( ignore ) {

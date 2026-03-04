@@ -1,4 +1,4 @@
-import { isInlineHtml, renderInlineHtml } from '../../render/renderSupport.function.js'
+import { isInlineHtml } from '../../render/renderSupport.function.js'
 import { renderExistingSupport } from '../../render/renderExistingTag.function.js'
 import { AnySupport } from '../index.js'
 
@@ -6,10 +6,11 @@ export function safeRenderSupport(
   newest: AnySupport,
 ) {
   const subject = newest.context
+  /*
   const isInline = isInlineHtml(newest.templater)
   if( isInline ) {
     return renderInlineHtml(newest)
-  }
+  }*/
 
   return renderExistingSupport(
     newest,

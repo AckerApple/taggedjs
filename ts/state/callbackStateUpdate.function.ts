@@ -1,5 +1,5 @@
 import { AnySupport, SupportContextItem, TemplateValue } from '../index.js'
-import { renderSupport } from '../render/renderSupport.function.js'
+//import { renderSupport } from '../render/renderSupport.function.js'
 import { Callback } from './callbackMaker.function.js'
 import { isPromise } from '../isInstance.js'
 import { StatesSetter } from './states.utils.js'
@@ -11,9 +11,6 @@ export default function callbackStateUpdate<T>(
   callback: Callback<any, any,any, any, any, any, T>,
   ...args: any[]
 ): T {
-  // NEWEST UPDATE OLDEST: ensure that the oldest has the latest values first
-  //syncStatesArray(newestSupport.states, oldStates)
-
   // run the callback
   const maybePromise = callback(...args as [any,any,any,any,any,any])
 
@@ -26,7 +23,7 @@ export default function callbackStateUpdate<T>(
 
   // context.global && 
   if(newestSupport.context.global) {
-    renderSupport(newestSupport) // TODO: remove with html``
+    // renderSupport(newestSupport) // TODO: remove with html``
   } else {
     const supContext = newestSupport.context
     supContext.tagJsVar.processUpdate(
@@ -40,7 +37,7 @@ export default function callbackStateUpdate<T>(
   if(isPromise(maybePromise)) {
     (maybePromise as Promise<any>).finally(() => {
       if(context.global) {
-        renderSupport(newestSupport) // TODO: remove
+        // renderSupport(newestSupport) // TODO: remove
       } else {
         const supContext = newestSupport.context
         supContext.tagJsVar.processUpdate(

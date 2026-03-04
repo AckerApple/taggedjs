@@ -95,7 +95,9 @@ export class Subject<T> implements LikeObservable<T> {
       if(tagJsUnsub) {
         tagJsUnsub() // its from taggedjs
       } else {
-        setTimeout(() => subscription.unsubscribe(), 0)
+        setTimeout(() => {
+          subscription.unsubscribe()
+        }, 0)
       }
 
       callback(x)

@@ -82,8 +82,11 @@ function attrs(
   return clone
 }
 
+// any added here need to appear within `ts/elements/ElementFunction.type.ts`
 const ATTRIBUTE_CALLABLE_DEFS: Array<[apiName: string, attrName: string]> = [
   ['alt', 'alt'],
+  ['ariaLabel', 'aria-label'],
+  ['referrerPolicy', 'referrerpolicy'],
   ['autoFocus', 'autoFocus'],
   ['border', 'border'],
   ['id', 'id'],
@@ -96,6 +99,7 @@ const ATTRIBUTE_CALLABLE_DEFS: Array<[apiName: string, attrName: string]> = [
   ['class', 'class'],
   ['href', 'href'],
   ['lang', 'lang'],
+  ['loading', 'loading'],
   ['value', 'value'],
   ['placeholder', 'placeholder'],
   ['src', 'src'],
@@ -142,7 +146,7 @@ const ELEMENT_EVENT_DEFS: Array<[apiName: string, eventName: string]> = [
   ['onMouseOut', 'onmouseout'],
   
   ['onKeyDown', 'onkeydown'],
-  ['onKeyUp', 'onkeyUp'],
+  ['onKeyUp', 'onkeyup'],
 ]
 
 function attr2(

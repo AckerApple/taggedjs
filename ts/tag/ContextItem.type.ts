@@ -59,7 +59,7 @@ export interface BaseContextItem extends AppContextItem {
 }
 
 export interface ContextItem extends BaseContextItem {
-  /** number represent reason for the lock */
+  /** number represent reason for the lock. 1 means reactive event lock */
   locked?: number
   deleted?: true
   

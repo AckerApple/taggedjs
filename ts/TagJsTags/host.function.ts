@@ -100,11 +100,6 @@ function processHostUpdate(
   contextItem: ContextItem,
   ownerSupport: AnySupport,
 ) {
-  if(isFunction(newValue) && !(newValue as any)?.tagJsType) {
-    console.log('issue on its way', { newValue })
-    throw new Error('issue on its way')
-  }
-
   const hasChanged = handleTagTypeChangeFrom(
     ValueTypes.host,
     newValue,

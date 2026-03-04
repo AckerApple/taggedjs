@@ -59,17 +59,12 @@ export function runTagCallback(
   const subject = component.context
   // const global = subject.global as SupportTagGlobal // tag.subject.global as TagGlobal
   
+  // 1 means reactive event lock
   subject.locked = 1 // prevent another render from re-rendering this tag
   // ++painting.locks
 
-  // sync the new states to the old before the old does any processing
-  // syncStatesArray(component.context.state.newest.states, states)
-
   // ACTUAL CALLBACK TO ORIGINAL FUNCTION
   const callbackResult = value.apply(bindTo, args)
-
-  // sync the old states to the new
-  // syncStatesArray(states, component.subject.global.newest.states)
 
   delete subject.locked
   // --painting.locks

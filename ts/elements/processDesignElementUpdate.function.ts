@@ -10,7 +10,7 @@ export function processDesignElementUpdate(
   context: ContextItem,
   ownerSupport: AnySupport,
 ) {
-  const skip = context.locked || context.deleted === true
+  const skip = context.deleted === true
   if(skip) {
     return // something else is running an event
   }

@@ -70,7 +70,7 @@ function registerListener(
     const stateSupport = getSupportWithState(ownerSupport)
     const updateCount = stateSupport.context.updateCount
 
-    stateSupport.context.locked = 1
+    stateSupport.context.locked = 1 // 1 means reactive event lock
     ++painting.locks
     setContextInCycle(stateSupport.context)
 

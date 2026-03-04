@@ -1,8 +1,7 @@
 
 import { AnySupport, TemplateValue } from '../../tag/index.js'
-import {SupportTagGlobal } from '../../tag/getTemplaterResult.function.js'
 import { paint, painting } from '../../render/paint.function.js'
-import { renderSupport } from'../../render/renderSupport.function.js'
+// import { renderSupport } from'../../render/renderSupport.function.js'
 
 export function renderTagUpdateArray(
   supports: AnySupport[],
@@ -17,19 +16,11 @@ export function renderTagUpdateArray(
 }
 
 function mapTagUpdate(support: AnySupport) {
-  const context = support.context
-  const global = context.global as SupportTagGlobal
-
-  if(!global) {
-    context.tagJsVar.processUpdate(
-      context.value as TemplateValue,
-      context,
-      support.ownerSupport as AnySupport,
-      [],
-    )
-    return // while rendering a parent, a child may have been deleted (pinbowl)
-  }
-
-  const stateMeta = context.state
-  renderSupport(stateMeta.newest as AnySupport)
+  const context = support.context  
+  context.tagJsVar.processUpdate(
+    context.value as TemplateValue,
+    context,
+    support.ownerSupport as AnySupport,
+    [],
+  )
 }

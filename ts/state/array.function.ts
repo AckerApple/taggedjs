@@ -11,7 +11,7 @@ export function array<T>(
   const support = getSupportInCycle()
 
   if(support) {
-      return state(() => firstSignal(Signal(initialValue)))
+    return state(() => firstSignal(Signal(initialValue)))
   }
 
   return firstSignal(Signal(initialValue))
@@ -21,7 +21,7 @@ function firstSignal(
   sig: SignalObject<any>,
 ) {
   const editors = ['push', 'pop', 'splice', 'shift', 'unshift']
-  const readers = ['map', 'reduce', 'forEach', 'every']
+  const readers = ['map', 'reduce', 'forEach', 'every', 'filter']
 
   const overwriteEmitter = (action: string): ((...args: any[]) => any) => {
     return (resignal as any)[action] = (...args: any[]) => {
@@ -54,7 +54,7 @@ function firstSignal(
       return (sig as any)[prop]
     },
     set(target, prop, value) {
-      if (!isNaN(prop as any)) {
+      if (!isNaN(prop as any)) { // array[index] setting
         sig.value[prop] = value
         sig.emit( sig.value )
         return true;

@@ -46,11 +46,11 @@ export function executeWrap(
   templater.tag = tag
 
   context.state.newer = { ...config }
-
+/*
   if(context.inputsHandler) {
     context.inputsHandler( castedProps )
   }
-
+*/
   removeContextInCycle()
 
   return useSupport
