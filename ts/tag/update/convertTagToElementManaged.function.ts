@@ -11,13 +11,6 @@ export function convertTagToElementManaged(
 ) {
   const context = support.context
   const newValue = support.returnValue // context.returnValue
-
-  // EXAMPLE: ['a','b'].map(x=> tag(() => [div,span]).key(x))
-  /*
-  if(Array.isArray(newValue)) {
-    ;(newValue as any).key = (arrayValue: any) => keyTag(arrayValue, newValue)
-  }
-  */
   const tagJsVar = valueToTagJsVar(newValue)
   delete (context as ContextItem).global
   context.contexts = []

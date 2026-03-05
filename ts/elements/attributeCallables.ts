@@ -23,16 +23,21 @@ export type AttrCallableInternal = (
 ) => ElementFunction
 
 export function makeAttrCallable(attrName: string, attr: AttrFn): AttrCallableInternal {
-  return function (
+  return function makeAttrCallableFunction(
     item: any,
     stringsOrValue: TemplateStringsArray | string | object | ((context: ContextItem) => any),
     values: any[],
   ): ElementFunction {
     if (isTemplateStringsArray(stringsOrValue)) {
-      const attrValue = stringsOrValue.reduce(
-        (all, chunk, index) => all + chunk + (values[index] ?? ''),
-        ''
-      )
+      const parts: string[] = []
+      for (let index = 0; index < stringsOrValue.length; ++index) {
+        parts.push(stringsOrValue[index] as string)
+        if (index < values.length) {
+          parts.push(String(values[index] ?? ''))
+        }
+      }
+
+      const attrValue = parts.join('')
       return attr(item, [attrName, attrValue])
     }
 

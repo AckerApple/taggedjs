@@ -57,8 +57,6 @@ export function processFunctionAttr(
       ++contextItem.updateCount
 
       const newValue = (value as any)()
-      // const oldValue = subContext.value
-      // const newTagJsTag = valueToTagJsVar(newValue)
 
       subContext.tagJsVar.processUpdate(
         newValue, // newTagJsTag as any,

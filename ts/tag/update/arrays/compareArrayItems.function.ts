@@ -1,57 +1,33 @@
 import { LastArrayItem } from '../../Context.types.js'
-import { SupportTagGlobal, TemplaterResult } from '../../getTemplaterResult.function.js'
+import { SupportTagGlobal } from '../../getTemplaterResult.function.js'
 import { destroySupport } from '../../../render/destroySupport.function.js'
 import { SupportContextItem } from '../../SupportContextItem.type.js'
 import type { StringTag } from '../../StringTag.type.js'
 import { ContextItem } from '../../ContextItem.type.js'
-import { castArrayItem } from './processTagArray.js'
-import { TagJsComponent } from '../../../TagJsTags/index.js'
+import { AnySupport } from '../../AnySupport.type.js'
 
-/** 1 = destroyed, 2 = value changes, 0 = no change */
-export function compareArrayItems(
-  value: (TemplaterResult | TagJsComponent<any>)[],
-  index: number,
-  lastArray: LastArrayItem[],
-  removed: number,
-) {
-  const newLength = value.length - 1
-  const at = index - removed
-  const lessLength = at < 0 || newLength < at
-  const prevContext = lastArray[index] as SupportContextItem
-
-  if(lessLength) {
-    destroyArrayItem(prevContext)
-    return 1
-  }
-
-  if( prevContext.arrayValue === undefined ) {
-    prevContext.arrayValue = index
-  }
-
-  // const oldKey = prevArrayValue.arrayValue === undefined ? index : prevArrayValue.arrayValue
-  const oldKey = prevContext.arrayValue // || prevContext.value.arrayValue
-  const newValueTag = castArrayItem(value[index])
-
-  const result = runArrayItemDiff(
-    oldKey,
-    newValueTag as StringTag,
-    prevContext,
-    lastArray,
-    index,
-  )
-
-  return result
-}
-
-function runArrayItemDiff(
+export function runArrayItemDiff(
   oldKey: string,
   newValueTag: StringTag,
   prevContext: SupportContextItem,
   lastArray: LastArrayItem[],
   index: number
 ) {
-  const newKey = (newValueTag as any).arrayValue || index
-  const isDiff = oldKey !== newKey
+  const keyValue = (newValueTag as any).arrayValue
+  const newKey = keyValue || index
+
+  let isDiff = oldKey !== newKey
+  if( isDiff === false && keyValue === undefined ) {
+    const hasChanged = prevContext.tagJsVar.hasValueChanged(
+      newValueTag,
+      prevContext,
+      undefined as any as AnySupport
+    )
+
+    if ( hasChanged ) {
+      isDiff = true
+    }
+  }
 
   if( isDiff ) {
     destroyArrayItem(prevContext)

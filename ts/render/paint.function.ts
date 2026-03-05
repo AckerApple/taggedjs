@@ -135,12 +135,12 @@ function paintRemover(
   element: Text | Element,
   _caller: string, // can be used for determining who is failing
 ) {
-  const parentNode = element.parentNode as ParentNode
   if(!element) {
     console.debug('no element by', {
       _caller, element
     })
   }
+  const parentNode = element.parentNode as ParentNode
   if(!parentNode) {
     console.debug('no parentNode by', {_caller, element})
   }

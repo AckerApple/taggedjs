@@ -3,13 +3,14 @@
 import { TemplaterResult } from '../../getTemplaterResult.function.js'
 import { tagValueUpdateHandler } from '../tagValueUpdateHandler.function.js'
 import { LastArrayItem } from '../../Context.types.js'
-import { compareArrayItems } from './compareArrayItems.function.js'
-import { AnySupport, TagJsComponent } from '../../index.js'
+import { destroyArrayItem, runArrayItemDiff } from './compareArrayItems.function.js'
+import { AnySupport, StringTag, TagJsComponent } from '../../index.js'
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
 import { TemplateValue } from '../../TemplateValue.type.js'
 import { ContextItem } from '../../ContextItem.type.js'
 import { TagJsTag } from '../../../TagJsTags/TagJsTag.type.js'
 import { batchAfters } from '../../../render/paint.function.js'
+import { SupportContextItem } from '../../SupportContextItem.type.js'
 
 export function processTagArray(
   contextItem: ContextItem,
@@ -27,6 +28,19 @@ export function processTagArray(
   
   let runtimeInsertBefore = contextItem.placeholder
   const length = value.length
+  const castedCache: unknown[] = new Array(length)
+  const castedCacheSet: boolean[] = new Array(length)
+  const getCastedArrayItem = function getCastedArrayItem(index: number) {
+    if(castedCacheSet[index]) {
+      return castedCache[index]
+    }
+
+    const casted = castArrayItem(value[index])
+    castedCache[index] = casted
+    castedCacheSet[index] = true
+    return casted
+  }
+
   let batchUpdates = noPriorRun ? false : length !== lastArray.length
 
   // ARRAY DELETES
@@ -37,6 +51,7 @@ export function processTagArray(
       value,
       contextItem,
       batchUpdates,
+      getCastedArrayItem,
     )
 
     batchUpdates = results.batchUpdates
@@ -44,11 +59,11 @@ export function processTagArray(
 
   for (let index=0; index < length; ++index) {
     const newSubject = reviewArrayItem(
-      value,
       index,
       contextItem.lastArray as LastArrayItem[],
       ownerSupport,
       batchUpdates,
+      getCastedArrayItem,
       runtimeInsertBefore,
       appendTo,
     )
@@ -62,6 +77,7 @@ function runArrayDeleteCheck(
   value: (TemplaterResult | TagJsComponent<any>)[],
   contextItem: ContextItem,
   batchUpdates: boolean,
+  getCastedArrayItem: (index: number) => unknown,
 ) {
   /** 🗑️ remove previous items first */
   const filteredLast: LastArrayItem[] = []
@@ -74,7 +90,6 @@ function runArrayDeleteCheck(
       batchUpdates = true // The item we are looking to update caused the render we are under
     }
 
-    // .key() was not used
     if (item.value === null) {
       filteredLast.push(item)
       continue
@@ -82,7 +97,7 @@ function runArrayDeleteCheck(
 
     // 👁️ COMPARE & REMOVE
     const newRemoved = compareArrayItems(
-      value, index, lastArray, removed
+      value, index, lastArray, removed, getCastedArrayItem
     )
 
     if (newRemoved === 0) {
@@ -106,15 +121,15 @@ function runArrayDeleteCheck(
 
 /** new and old array items processed here */
 function reviewArrayItem(
-  array: unknown[],
   index: number,
   lastArray: LastArrayItem[],
   ownerSupport: AnySupport,
   batchUpdates: boolean,
+  getCastedArrayItem: (index: number) => unknown,
   runtimeInsertBefore: Text | undefined, // used during updates
   appendTo?: Element, // used during initial rendering of entire array
 ) {
-  const item = castArrayItem(array[index])
+  const item = getCastedArrayItem(index)
   const previousContext = lastArray[index]
 
   if( previousContext ) {
@@ -132,7 +147,7 @@ function reviewArrayItem(
 
   // 🆕 NEW Array items processed below
 
-  const contextItem = createAndProcessContextItem(
+  const context = createAndProcessContextItem(
     item as TemplateValue,
     ownerSupport,
     lastArray, // acts as contexts aka Context[]
@@ -141,12 +156,14 @@ function reviewArrayItem(
   )
 
   // Added to previous array
-  lastArray.push(contextItem)
+  lastArray.push(context)
   if(item) {
-    contextItem.arrayValue = item?.arrayValue || contextItem.arrayValue || index
+    // set or use key()
+    // context.arrayValue = item?.arrayValue || context.arrayValue || context.value
+    context.arrayValue = (item as any).arrayValue || context.arrayValue
   }
 
-  return contextItem
+  return context
 }
 
 function reviewPreviousArrayItem(
@@ -160,7 +177,7 @@ function reviewPreviousArrayItem(
   appendTo?: Element, // used during initial rendering of entire array
 ) {
   if( batchUpdates ) {
-    batchAfters.push([() => {
+    batchAfters.push([function arrayBatchAfterHandler() {
       tagValueUpdateHandler(
         value as TemplateValue,
         context,
@@ -189,6 +206,7 @@ function reviewPreviousArrayItem(
       context,
       ownerSupport,
     )
+
     return context
   }
 
@@ -207,12 +225,53 @@ function reviewPreviousArrayItem(
   return contextItem
 }
 
-export function castArrayItem(item: any) {
-  const isBasicFun = typeof item === 'function' && (item as any as TagJsTag<any>).tagJsType === undefined
-  if( isBasicFun ) {
-    const fun = (item as any)
-    item = fun()
+/** Run within first array processing loop
+ *  1 = destroyed, 2 = value changes, 0 = no change */
+function compareArrayItems(
+  value: (TemplaterResult | TagJsComponent<any>)[],
+  index: number,
+  lastArray: LastArrayItem[],
+  removed: number,
+  getCastedArrayItem: (index: number) => unknown,
+) {
+  const newLength = value.length - 1
+  const at = index - removed
+  const lessLength = at < 0 || newLength < at
+  const prevContext = lastArray[index] as SupportContextItem
+
+  if(lessLength) {
+    destroyArrayItem(prevContext)
+    return 1
   }
 
-  return item
+  if( prevContext.arrayValue === undefined ) {
+    prevContext.arrayValue = index
+  }
+
+  const oldKey = prevContext.arrayValue
+  const newValueTag = getCastedArrayItem(index)
+
+  const result = runArrayItemDiff(
+    oldKey,
+    newValueTag as StringTag,
+    prevContext,
+    lastArray,
+    index,
+  )
+
+  return result
+}
+
+// For when an item in the array is a function
+export function castArrayItem(item: any) {
+  if(typeof item !== 'function') {
+    return item
+  }
+
+  const callable = item as (() => unknown) & TagJsTag<any>
+  if(callable.tagJsType !== undefined) {
+    return item
+  }
+
+  return callable()
 }

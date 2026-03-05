@@ -6,6 +6,11 @@ export function destroyArrayContext(
 ) {
   ++context.updateCount
   const lastArray = context.lastArray as unknown[]
+  
+  if( !lastArray ) {
+    return
+  }
+  
   destroyArray(context, lastArray)
 }
 

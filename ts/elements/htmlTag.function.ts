@@ -73,23 +73,17 @@ export function getPushKid(
   element: ElementVarBase,
   _elmFunctions: typeof elementFunctions,
 ): ElementFunction {
-  const pushKid = (...args: any[]) => {
+  const pushKid = function pushKid(...args: any[]) {
     const newElement: ElementFunction = {...pushKid as any}
     newElement.attributes = [...pushKid.attributes] as Attribute[]
     newElement.listeners = [...pushKid.listeners]
     newElement.allListeners = [...pushKid.allListeners]
     const contexts = newElement.contexts = newElement.contexts || [] as any[]
 
-    /*
-    if((pushKid as ElementFunction).contexts) {
-      newElement.contexts.push(...(pushKid as any).contexts)
-    }
-    */
-
     newElement.innerHTML = args
 
     // review each child for potential to be context
-    args.forEach(arg => {
+    args.forEach(function forGetPushKid(arg) {
       if( !isValueForContext(arg) ) {
         return
       }
@@ -112,15 +106,22 @@ export function getPushKid(
   }
 
   Object.assign(pushKid, element)
-  assignFunctionMembers(pushKid as any, elementFunctions(pushKid))
-  pushKid.attributes = [...element.attributes] as Attribute[]
-  pushKid.listeners = [...element.listeners]
-  pushKid.allListeners = [...element.allListeners]
+  assignFunctionMembers(pushKid as any, _elmFunctions(pushKid))
+  pushKid.attributes = cloneShallowArray(element.attributes) as Attribute[]
+  pushKid.listeners = cloneShallowArray(element.listeners)
+  pushKid.allListeners = cloneShallowArray(element.allListeners)
+  
   pushKid.toString = function () {
     return elementVarToHtmlString(this as any)
   }
 
   return pushKid as any as ElementFunction
+}
+
+function cloneShallowArray<T>(
+  value: T[],
+): T[] {
+  return value.length ? value.slice() : []
 }
 
 
@@ -140,7 +141,7 @@ function assignFunctionMembers(
   target: Record<string, any>,
   source: Record<string, any>,
 ) {
-  Object.entries(source).forEach(([key, value]) => {
+  Object.entries(source).forEach(function forAssignFunctionMembers([key, value]) {
     try {
       target[key] = value
     } catch {

@@ -81,13 +81,6 @@ function defineGetSet(name: string, eventFn: any) {
   })
 }
 
-type ShortTag = {
-  key: KeyFunction
-  arrayValue?: any
-  original?: Original
-  compareTo?: string
-}
-
 export type TagJsComponent<T extends ToTag> = TagJsTagBasics & {
   component: true
   tagJsType: 'component'

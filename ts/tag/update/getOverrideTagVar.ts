@@ -103,6 +103,7 @@ export function getOverrideTagVar(
 
       delete context.locked;
     },
+    
     hasValueChanged: (
       _value: unknown,
       _context: ContextItem,

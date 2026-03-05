@@ -46,6 +46,7 @@ function processArrayUpdates(
     contextItem,
     ownerSupport,
   )
+
   if(tagUpdateResponse === 0) {
     processTagArray(
       contextItem,
