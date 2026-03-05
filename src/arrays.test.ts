@@ -125,6 +125,31 @@ describe('⠇ array testing', () => {
     }
   })
 
+  it('unshift object tag renders newest object first', () => {
+    expect(Number(byId('unshift-object-count').innerText)).toBe(0)
+
+    byId('unshift-object-btn').click()
+    byId('unshift-object-btn').click()
+    byId('unshift-object-btn').click()
+
+    expect(Number(byId('unshift-object-count').innerText)).toBe(3, 'should be a count of 3')
+
+    const elements = document.querySelectorAll('#unshift-object-list > div')
+    const order = Array.from(elements)
+      .map((node) => {
+        const id = (node as HTMLElement).id
+        return Number(id.replace('unshift-object-item-id-', ''))
+      })
+
+    expect(order.length).toBe(3, 'Expected order length 3')
+    expect(order[0]).toBe(3, `Expected first order content to be 3 its ${order[0]}`)
+    expect(order[1]).toBe(2)
+    expect(order[2]).toBe(1)
+    expect(byId('unshift-object-name-3').innerText).toBe('Object 3')
+    expect(byId('unshift-object-name-2').innerText).toBe('Object 2')
+    expect(byId('unshift-object-name-1').innerText).toBe('Object 1')
+  })
+
   it('array basics', () => {
     expect(elmCount('#array-test-push-item')).toBe(1)
     

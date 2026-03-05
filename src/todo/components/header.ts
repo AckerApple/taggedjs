@@ -2,8 +2,9 @@ import { InputElementTargetEvent, tag, header, h1, input } from "taggedjs";
 import { handleKey } from "./item.js";
 import { Dispatch } from "../reducer.js";
 
-export const Header = (dispatch: Dispatch) =>
-  header
+export const Header = (dispatch: Dispatch) => {
+  console.log('HEADER SHOULD ONLY RENDER ONCE')
+  return header
     .class`header`
     .attr("data-testid",`header`)(
       h1('component todos'),
@@ -18,3 +19,4 @@ export const Header = (dispatch: Dispatch) =>
           }
         })
       )
+}

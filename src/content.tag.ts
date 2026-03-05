@@ -44,7 +44,23 @@ export const concatStyles = tag((innerHTML: any) => {
 
     div(
       'borderColor:',
-      select.id`dynamic-border-color`.onChange(event => borderColor = event.target.value)(option.value``.selected(_=> borderColor === '')(), option.value`black`.selected(_=> borderColor === 'black')('black'), option.value`blue`.selected(_=> borderColor === 'blue')('blue'), option.value`white`.selected(_=> borderColor === 'white')('white'))
+      select.id`dynamic-border-color`
+        .onChange(event => borderColor = event.target.value)(
+          option
+            .value``
+            .selected(_=> borderColor === ''),
+          
+          option
+            .value`black`
+            .selected(_=> borderColor === 'black')('black'),
+          
+          option
+            .value`blue`
+            .selected(_=> borderColor === 'blue')('blue'),
+          
+          option.value`white`
+            .selected(_=> borderColor === 'white')('white'),
+        )
     )
   )
 })
@@ -134,18 +150,28 @@ export const content = tag(() => {
       _=> renderCountDiv({renderCount, name: 'content'})
     ),
 
-    fieldset.id`inputs-updates-fieldset`(legend('inputs vs updates'), div(
-        button.id`updates-count-bump`.onClick(() => {
+    fieldset.id`inputs-updates-fieldset`(
+      legend('inputs vs updates'),
+      div(
+        button.id`updates-count-bump`
+          .onClick(() => {
             ++updatesArgA
             ++updatesArgB
           })('update updates args'),
-        span.id`updates-count-display`(_=> updatesCountTag(updatesArgA, updatesArgB))
+        
+        span.id`updates-count-display`(
+          _=> updatesCountTag(updatesArgA, updatesArgB)
+        )
       ), div(
-        button.id`inputs-count-bump`.onClick(() => {
+        button.id`inputs-count-bump`
+          .onClick(() => {
             ++inputsArgA
             inputsArgB = () => `inputs-${inputsArgA}`
           })('update inputs args'),
-        span.id`inputs-count-display`(_=> inputsCountTag(inputsArgA, inputsArgB))
+        
+        span.id`inputs-count-display`(
+          _=> inputsCountTag(inputsArgA, inputsArgB)
+        )
       )),
 
     fieldset.id`noParentTagFieldset`(legend('No Parent Test'), numberedNoParents),

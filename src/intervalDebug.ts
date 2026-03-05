@@ -54,6 +54,7 @@ export const intervalTester0 = tag(() => {
   }
 
   const delayIncrease = () => setTimeout(callback(() => {
+    console.log('yyyyy')
     currentTime = currentTime + 200
   }), 1000);
 

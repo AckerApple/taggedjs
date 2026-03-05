@@ -27,9 +27,9 @@ _=> users.map(user =>
 `;
 export function mapLoopsSection() {
     return [
-        docH3("map-loops", "🔂 Map Loops"),
+        docH3("map-loops", "🔂 Arrays - Map Looping"),
         p("TaggedJS uses normal JavaScript array mapping for list rendering. ", "Put the ", code("array.map"), " inside a ", code("_=>"), " block so the list is reactive."),
-        p("Return a tag for each item and add ", code(".key(...)"), " when the list can be reordered or removed so TaggedJS can keep elements stable."),
+        p("Return a tag for each item and add ", code(".key(...)"), " when the list can be reordered or removed so TaggedJS can keep elements stable. ", "Alternatively, if the first rendered element has an id like ", code("div.id`x-${x.id}`"), ", that id can act as the array value identifier."),
         figure(pre(code.class `language-ts`(mapLoopsCode)), figcaption("Map each item and key the result")),
         figure(pre(code.class `language-ts`(mapLoopsUserIdCode)), figcaption("Use a stable id as the loop key")),
     ];

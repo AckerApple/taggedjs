@@ -9,12 +9,19 @@ type Player = {
   scores: any[]
 }
 
+type UnshiftObject = {
+  id: number
+  name: string
+}
+
 export const arrays = tag(() => {/* ArrayTests */
   const players: Player[] = []
   let renderCount: number = 0
   let counter: number = 0
   const signalArray = array(['d','e','f'])
   const simpleArray = ['a','b','c']
+  const unshiftObjects = [] as {id:number, name:string}[]
+  let unshiftObjectId: number = 0
   const arrayFx = fxGroup({ stagger:10, duration: '.1s' })
   const fxValue = fx({duration: '.1s'})
   ;(fxValue as any).acker = 43
@@ -39,6 +46,14 @@ export const arrays = tag(() => {/* ArrayTests */
     }
   }
 
+  function unshiftObject() {
+    ++unshiftObjectId
+    unshiftObjects.unshift({
+      id: unshiftObjectId,
+      name: `Object ${unshiftObjectId}`
+    })
+  }
+
   ++renderCount
 
   return div(
@@ -54,9 +69,32 @@ export const arrays = tag(() => {/* ArrayTests */
       ),
       div.style`display:flex;flex-wrap:wrap;gap:1em`(subscribe(signalArray, array => {
           return array.map((x, index) => {
-            return div.attr(arrayFx as any).id(_=> `signal-array-item-${index}`).style`border:1px solid black;border-radius:.2em`('index:', _=> index, ' counter:', span.id(_=>`signal-array-item-counter-display-${index}`)(_=> counter), ' content:', _=> x, ' length:', _=> signalArray.length, button.id(`signal-array-item-delete-btn-${index}`).onClick(() => {
-                  signalArray.splice(index, 1)
-                })('🗑️ delete subscribe'), button.type`button`.onClick(() => ++counter)('++counter ', _=> counter)).key(x)
+            return div
+              .attr(arrayFx as any)
+              .id(_=> `signal-array-item-${index}`)
+              .style`border:1px solid black;border-radius:.2em`
+              (
+                'index:', _=> index,
+                ' counter:',
+                span
+                  .id(_=>`signal-array-item-counter-display-${index}`)
+                  (_=> counter),
+
+                ' content:',
+                _=> x,
+                ' length:',
+                _=> signalArray.length,
+                  
+                button
+                  .id(`signal-array-item-delete-btn-${index}`)
+                  .onClick(() => {
+                    signalArray.splice(index, 1)
+                  })('🗑️ delete subscribe'),
+                
+                button
+                  .type`button`
+                  .onClick(() => ++counter)('++counter ', _=> counter)
+                ).key(x)
           })
         }), div(
           button.type`button`.id`signal-array-increase-counter`.onClick(() => ++counter)('++counter ', _=> counter),
@@ -90,10 +128,41 @@ export const arrays = tag(() => {/* ArrayTests */
             })('🗑️ delete simple')
         ).key(x)
       ), div(
-        button.type`button`.onClick(() => ++counter)('++counter ', _=> counter),
+        button
+          .type`button`
+          .onClick(() => ++counter)('++counter ', _=> counter),
 
-        button.type`button`.onClick(() => simpleArray[ simpleArray.length ] = simpleArray.length.toString())('add number')
+        button
+          .type`button`
+          .onClick(() => simpleArray[ simpleArray.length ] = simpleArray.length.toString())
+          ('add number')
       )),
+
+    fieldset(
+      legend(
+        'unshift object array test ',
+        sup.id`unshift-object-count`(_=> {
+          return unshiftObjects.length
+        })
+      ),
+      div.id`unshift-object-list`
+        .style`display:flex;flex-direction:column;gap:.4em`
+        (
+          _=> unshiftObjects.map((item, index) => {
+            return div.id(_=> `unshift-object-item-id-${item.id}`)(
+              span.id(_=> `unshift-object-order-${item.id}`)(_=> index),
+              ' - ',
+              span.id(_=> `unshift-object-name-${item.id}`)(_=> item.name)
+            ) // DO NOT USE key() here for testing that the div.id is used
+            // .key(item.id)
+          })
+        ),
+      button
+        .id`unshift-object-btn`
+        .type`button`
+        .onClick(() => unshiftObject())
+        ('unshift object')
+    ),
 
     fieldset(
       legend('game with players'),

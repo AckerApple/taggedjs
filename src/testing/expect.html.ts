@@ -2,7 +2,11 @@ import { expect } from './index'
 import { html } from "./elmSelectors"
 
 export function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  console.log('sleep setup')
+  return new Promise(resolve => setTimeout(() => {
+    console.log('sleep')
+    resolve( undefined )
+  }, ms))
 }
 
 export function expectElmCount(

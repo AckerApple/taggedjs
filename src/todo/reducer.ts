@@ -60,7 +60,9 @@ export function todoReducer(todos: any[]) {
     }
     
     function updateToByIndex(
-        todo: Todo, partial: Partial<Todo>, index: number
+        todo: Todo,
+        partial: Partial<Todo>,
+        index: number
     ): number {
         const newTodo = { ...todo, ...partial }
         todos[index] = newTodo

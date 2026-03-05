@@ -13,7 +13,7 @@ export function runTesting(
   }
   
   const waitFor = 2000
-  testTimeout = setTimeout(async () => {
+  const run = async () => {
     tests = tests || storage.views
     console.debug(`🏃 Prepare test suites...`)
     const result = await runIsolatedTests(tests, runStartEndTests)
@@ -29,5 +29,12 @@ export function runTesting(
 
     alert('❌ tests failed. See console for more details')
 
-  }, waitFor) as any // cause delay to be separate from renders
+  }
+
+  console.info('⏳ test wait started')
+  // testTimeout = setTimeout(run, waitFor) as any // cause delay to be separate from renders
+  requestAnimationFrame(() => {
+    run()
+  })
+  // run()
 }

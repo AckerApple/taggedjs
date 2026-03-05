@@ -1,19 +1,17 @@
-import { htmlTag, p, pre, span } from "taggedjs"
+import { br, strong, p, pre, code, figcaption, figure } from "taggedjs"
 import { docH3 } from "./docHeading"
 
-const figure = htmlTag("figure")
-const figcaption = htmlTag("figcaption")
-const code = htmlTag("code")
+const mapLoopsCode = `import { div, tag } from "taggedjs"
 
-const mapLoopsCode = `const items = ['a', 'b', 'c']
-
-_=> items.map((item, index) =>
-  div(
-    'item:', _=> item,
-    ' index:', _=> index,
-    button.onClick(() => items.splice(index, 1))('remove')
-  ).key(item)
-)
+const arrayTag = tag(() => {
+  const items = ['a', 'b', 'c']
+  
+  return div(
+    items.map((item, index) =>
+      div(\`hello world item \${index}\`).key(item)
+    )
+  )
+})
 `
 
 const mapLoopsUserIdCode = `const users = [
@@ -23,15 +21,15 @@ const mapLoopsUserIdCode = `const users = [
 ]
 
 _=> users.map(user =>
-  div(
+  div.id(_=> \`user-\${user.id}\`)(
     span('name: ', _=> user.name)
-  ).key(user.id)
+  )
 )
 `
 
 export function mapLoopsSection() {
   return [
-    docH3("map-loops", "🔂 Map Loops"),
+    docH3("map-loops", "🔂 Arrays - Map Looping"),
     p(
       "TaggedJS uses normal JavaScript array mapping for list rendering. ",
       "Put the ",
@@ -43,15 +41,21 @@ export function mapLoopsSection() {
     p(
       "Return a tag for each item and add ",
       code(".key(...)"),
-      " when the list can be reordered or removed so TaggedJS can keep elements stable."
+      " when the list can be reordered or removed so TaggedJS can keep elements stable. ",
+      "Alternatively, if the first rendered element has an id like ",
+      code("div.id`x-${x.id}`"),
+      ", that id can act as the array value identifier."
     ),
     figure(
+      figcaption(strong("Map each item and key the result")),
       pre(code.class`language-ts`(mapLoopsCode)),
-      figcaption("Map each item and key the result")
     ),
+
+    br,
+    
     figure(
+      figcaption(strong("Use a stable id as the loop key")),
       pre(code.class`language-ts`(mapLoopsUserIdCode)),
-      figcaption("Use a stable id as the loop key")
     ),
   ]
 }

@@ -128,23 +128,49 @@ describe('☑️ todos', function todos() {
 })
 
 function runTodoSpeedometer() {
+  // const numberOfItemsToAdd = 20
   const numberOfItemsToAdd = 500
+  console.log(`☀️ 🟢 Starting ${numberOfItemsToAdd} todo tests...`)
   console.time('☀️-speedometer-all')
 
   console.time(`🆕 speedometer-adding ${numberOfItemsToAdd}`)
   const newTodo = document.querySelector(".new-todo") as any
+  
+  console.time(`Per 50 Items`)
   for (let i = 0; i < numberOfItemsToAdd; i++) {
-      newTodo.value = 'aaa - ' + i;
+    newTodo.value = 'aaa - ' + i;
       
-      // Dispatch the event on the child element
-      keydownOn(newTodo, 'Enter')
+    // Dispatch the event on the child element
+    keydownOn(newTodo, 'Enter')
+
+    if((i + 1) % 50 === 0) {
+      console.timeEnd(`Per 50 Items`)
+      console.time(`Per 50 Items`)
+    }
   }
+  console.timeEnd(`Per 50 Items`)
   console.timeEnd(`🆕 speedometer-adding ${numberOfItemsToAdd}`)
 
   console.time('✏️ speedometer-editing')
   const checkboxes = document.querySelectorAll(".toggle") as any
-  for (let i = 0; i < numberOfItemsToAdd; i++)
-      checkboxes[i].click();
+  for (let i = 0; i < numberOfItemsToAdd; i++) {
+    const checkbox = checkboxes[i]
+    if( !checkbox ) {
+      console.log('numberOfItemsToAdd', { numberOfItemsToAdd, i, checkboxes })
+    }
+    
+    checkbox.click();
+    expect(checkbox.checked).toBe(true)
+    expect(checkbox.parentNode).toBeDefined()
+    expect(checkbox.parentNode.tagName).toBe('DIV')
+    expect(checkbox.parentNode.parentNode).toBeDefined()
+    expect(checkbox.parentNode.parentNode.tagName).toBe('LI')
+    const classList = [...checkbox.parentNode.parentNode.classList]
+    expect(classList).toBeDefined()
+    expect(typeof classList).toBe('object')
+    expect(Array.isArray(classList)).toBe(true)
+    expect(classList.includes('completed')).toBe(true)
+  }
   console.timeEnd('✏️ speedometer-editing')
 
   console.time('🗑️ speedometer-deleting')

@@ -10,7 +10,10 @@ export const Item = tag((
   Item.updates(x => [todo,dispatch,index] = x)
 
   let editing = false
-  return li.attr("class.completed", _=> todo.completed).attr("class.editing", _=> editing)(_=> !editing ?
+  return li
+    .attr("class.completed", _=> todo.completed)
+    .attr("class.editing", _=> editing)
+    (_=> !editing ?
       div.class`view`(
         input
           .class`toggle`

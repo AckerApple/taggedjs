@@ -52,8 +52,14 @@ beforeAll(async () => {
       // Store app reference for tests
       window.app = module
     }
+
+    console.log('⏳ 1')
+    http://localhost:3000/isolated.html#todo
     // Wait for app initialization
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(() => {
+      console.log('test 233')
+      resolve( undefined )
+    }, 100))
   } catch (error) {
     console.error('Failed to load app:', error)
   }
@@ -77,8 +83,12 @@ beforeEach(async () => {
         checkbox.click();
       }
       
+      console.log('⏳ 2')
       // Wait for view to render
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(() => {
+        console.log('878');
+        resolve( undefined )
+      }, 1000));
     }
   }
 })

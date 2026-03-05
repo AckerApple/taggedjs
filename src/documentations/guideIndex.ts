@@ -15,7 +15,7 @@ const tocItems = [
   { id: "element-imports", label: "📦 Element Imports", level: "sub" },
   { id: "attributes", label: "🏷️ attributes``", level: "sub" },
   { id: "dynamic-content", label: "✨ Dynamic Content _=>", level: "sub" },
-  { id: "map-loops", label: "🔂 Map Loops", level: "sub" },
+  { id: "map-loops", label: "🔂 Arrays - Map Looping", level: "sub" },
   { id: "event-handlers", label: "🖱️ Event Handlers", level: "sub" },
   { id: "reactive-updates", label: "🔁 Reactive Updates" },
   { id: "react-vs-taggedjs", label: "⚖️ React vs TaggedJS", level: "sub" },

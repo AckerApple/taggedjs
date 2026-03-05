@@ -7,15 +7,26 @@ export const autoTestingControls = tag((
   runStartEndTests?: boolean,
 ) => {
   if(storage.autoTest) {
-    runTesting(false, tests, runStartEndTests)
+    tag.onInit(() => {
+      console.log('running after dom ready, right?')
+      runTesting(false, tests, runStartEndTests)
+    })
   }
 
   return div(
     'auto testing ',
   
-    input.type`checkbox`.onChange(toggleAutoTesting).checked(_=> storage.autoTest)(),
+    input
+      .type`checkbox`
+      .onChange(toggleAutoTesting)
+      .checked(_=> {
+        console.log('checked')
+        return storage.autoTest}),
     
-    button.type`button`.onClick(() => runTesting(true, tests, runStartEndTests))('run tests')
+    button
+      .type`button`
+      .onClick(() => runTesting(true, tests, runStartEndTests))
+      ('run tests')
   )
 })
 
