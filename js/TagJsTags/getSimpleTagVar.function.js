@@ -43,11 +43,18 @@ contextItem, ownerSupport, insertBefore, _appendTo) {
     paintCommands.push(paint);
 }
 export function deleteSimpleValue(context) {
-    if (!context.simpleValueElm && context.paint) {
-        context.paint[0] = blankHandler;
-        return; // I'm being deleted before my first render even occurred
-    }
     const elm = context.simpleValueElm;
+    if (!elm) {
+        // it has not hit the document yet
+        if (context.paint) {
+            context.paint[0] = blankHandler;
+            return; // I'm being deleted before my first render even occurred
+        }
+        const skip = context.value === undefined || context.value === false || context.value === null;
+        if (skip) {
+            return; // never had an element put down
+        }
+    }
     delete context.simpleValueElm;
     addPaintRemover(elm, 'deleteSimpleValue');
 }

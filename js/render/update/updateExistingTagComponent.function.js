@@ -1,4 +1,5 @@
 import { castProps } from '../../tag/props/alterProp.function.js';
+// import { renderSupport } from'../renderSupport.function.js'
 import { destroySupport } from '../destroySupport.function.js';
 import { getNewGlobal } from '../../tag/update/getNewGlobal.function.js';
 import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.function.js';

@@ -26,8 +26,6 @@ attrName, element, howToSet) {
         processUpdate: (value, contextItem, ownerSupport, values) => {
             ++contextItem.updateCount;
             const newValue = value();
-            // const oldValue = subContext.value
-            // const newTagJsTag = valueToTagJsVar(newValue)
             subContext.tagJsVar.processUpdate(newValue, // newTagJsTag as any,
             subContext, ownerSupport, values);
             subContext.value = newValue;

@@ -21,18 +21,6 @@ function attr(item, args) {
     const clone = getPushKid(item, item.elementFunctions);
     processSetAttribute(args[0], args[1], clone);
     return clone;
-    //const clone = getPushKid(item as any, item.elementFunctions)
-    // clone.attributes.push(args as Attribute)
-    // bumpContentId(clone, args[1])
-    /*
-      if( isValueForContext(args[0]) ) {
-        registerMockAttrContext(args[0], clone) // the attrName is a function or TagJsTag
-      } else if( isValueForContext(args[1]) ) {
-        registerMockAttrContext(args[1], clone) // the attrValue is a function or TagJsTag
-      }
-    
-      return clone
-      */
 }
 /** attrs({names: values}) */
 function attrs(item, args) {
@@ -120,25 +108,30 @@ function attr2(item, args) {
     }
     return item;
 }
-export function elementFunctions(item) {
+const sharedElementFunctionMembers = (() => {
     const eventCallables = Object.fromEntries(ELEMENT_EVENT_DEFS.map(([apiName, eventName]) => [
         apiName,
-        (callback) => callbackWrapper(item, eventName, callback),
+        function thisEventCallable(callback) {
+            return callbackWrapper(this, eventName, callback);
+        },
     ]));
-    const attributeCallables = Object.fromEntries(Object.entries(attributeCallableHandlers).map(([apiName, handler]) => [apiName, makeAttr(handler, item)]));
-    // TODO: This maybe the old way of doing things (see callables)
-    // This seems to be for supporting div.onClick()
-    const callables_other = {
+    const attributeCallables = Object.fromEntries(Object.entries(attributeCallableHandlers).map(([apiName, handler]) => [apiName, makeAttr(handler)]));
+    // element ids can act as array keys
+    const ogId = attributeCallables.id;
+    attributeCallables.id = function thisIdCallable(...args) {
+        const first = args[0];
+        this.arrayValue = typeof first === 'function' ? first() : first;
+        return ogId.apply(this, args);
+    };
+    return {
         ...eventCallables,
-        // onclick: makeCallback('click'),
-        // click: makeCallback('click'),
-        // onchange: makeCallback('onchange'),
-        // change: makeCallback('onchange'),
-        // onkeyup: makeCallback('onkeyup'),
-        // keyup: makeCallback('onkeyup'),
         /* apply attribute via attr(name: string, value?: any): **/
-        attr: (...args) => attr(item, args),
-        attrs: (attributes) => attrs(item, attributes),
+        attr: function thisAttr(...args) {
+            return attr(this, args);
+        },
+        attrs: function thisAttrs(attributes) {
+            return attrs(this, attributes);
+        },
         /** Used for setting array index-key value */
         key: function (arrayValue) {
             ;
@@ -147,7 +140,9 @@ export function elementFunctions(item) {
         },
         ...attributeCallables,
     };
-    return callables_other;
+})();
+export function elementFunctions(_item) {
+    return sharedElementFunctionMembers;
 }
 function bumpContentId(item, attrValue) {
     let bump = 1;
@@ -156,9 +151,9 @@ function bumpContentId(item, attrValue) {
     }
     item.contentId += bump;
 }
-function makeAttr(handler, item) {
-    return ((stringsOrValue, ...values) => {
-        return handler(item, stringsOrValue, values);
+function makeAttr(handler) {
+    return (function attrCallable(stringsOrValue, ...values) {
+        return handler(this, stringsOrValue, values);
     });
 }
 function setClassValue(element, name, value) {

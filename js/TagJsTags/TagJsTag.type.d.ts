@@ -9,6 +9,7 @@ export type ReadOnlyVar = {
     processInitAttribute: ProcessAttribute;
     processInit: ProcessInit;
     processUpdate: ProcessUpdate;
+    /** 0 = no change, > 0 = changed */
     hasValueChanged: HasValueChanged;
     destroy: ProcessDelete;
 };

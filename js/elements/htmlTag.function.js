@@ -26,20 +26,15 @@ export function htmlTag(tagName) {
     return pushKid;
 }
 export function getPushKid(element, _elmFunctions) {
-    const pushKid = (...args) => {
+    const pushKid = function pushKid(...args) {
         const newElement = { ...pushKid };
         newElement.attributes = [...pushKid.attributes];
         newElement.listeners = [...pushKid.listeners];
         newElement.allListeners = [...pushKid.allListeners];
         const contexts = newElement.contexts = newElement.contexts || [];
-        /*
-        if((pushKid as ElementFunction).contexts) {
-          newElement.contexts.push(...(pushKid as any).contexts)
-        }
-        */
         newElement.innerHTML = args;
         // review each child for potential to be context
-        args.forEach(arg => {
+        args.forEach(function forGetPushKid(arg) {
             if (!isValueForContext(arg)) {
                 return;
             }
@@ -57,14 +52,17 @@ export function getPushKid(element, _elmFunctions) {
         return newElement;
     };
     Object.assign(pushKid, element);
-    assignFunctionMembers(pushKid, elementFunctions(pushKid));
-    pushKid.attributes = [...element.attributes];
-    pushKid.listeners = [...element.listeners];
-    pushKid.allListeners = [...element.allListeners];
+    assignFunctionMembers(pushKid, _elmFunctions(pushKid));
+    pushKid.attributes = cloneShallowArray(element.attributes);
+    pushKid.listeners = cloneShallowArray(element.listeners);
+    pushKid.allListeners = cloneShallowArray(element.allListeners);
     pushKid.toString = function () {
         return elementVarToHtmlString(this);
     };
     return pushKid;
+}
+function cloneShallowArray(value) {
+    return value.length ? value.slice() : [];
 }
 /** used during updates */
 function registerMockChildContext(value, mockElm) {
@@ -74,7 +72,7 @@ function registerMockChildContext(value, mockElm) {
     mockElm.contexts.push(value);
 }
 function assignFunctionMembers(target, source) {
-    Object.entries(source).forEach(([key, value]) => {
+    Object.entries(source).forEach(function forAssignFunctionMembers([key, value]) {
         try {
             target[key] = value;
         }

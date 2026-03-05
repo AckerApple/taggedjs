@@ -2,11 +2,11 @@ import { AttrValue, ElementFunction } from './ElementFunction.type.js';
 export type Attrs = {
     [name: string]: AttrValue;
 };
-export declare function elementFunctions(item: any): {
-    attr: (...args: any[]) => ElementFunction;
-    attrs: (attributes: Attrs) => ElementFunction;
+export declare function elementFunctions(_item: any): {
+    attr: (this: ElementFunction, ...args: any[]) => ElementFunction;
+    attrs: (this: ElementFunction, attributes: Attrs) => ElementFunction;
     /** Used for setting array index-key value */
-    key: (arrayValue: any) => /*elided*/ any;
+    key: (this: ElementFunction, arrayValue: any) => ElementFunction;
 };
 /** used during updates */
 export declare function registerMockAttrContext(value: any, mockElm: ElementFunction): void;
