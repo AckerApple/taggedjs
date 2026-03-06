@@ -16,7 +16,9 @@ export const Main = (
             .class`toggle-all`
             .type`checkbox`
             .checked(_=> activeTodoCount < 1 ? 1 : 0)
-            .onChange((e: InputElementTargetEvent) => dispatch.toggleAll(e.target.checked)),
+            .onChange(
+              (e: InputElementTargetEvent) => dispatch.toggleAll(e.target.checked)
+            ),
             
             label
               .class`toggle-all-label`
