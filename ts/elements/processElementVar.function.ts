@@ -19,21 +19,24 @@ export function processElementVar(
   ownerSupport: AnySupport,
   _addedContexts: ContextItem[],
 ) {
-  const element = document.createElement(value.tagName)
+  const tagName = value.tagName
+  const element = document.createElement(tagName)
   context.target = element
 
   // mark special attributes
-  value.attributes.forEach(x => {
+  const attributes = value.attributes
+  for (let index = 0; index < attributes.length; ++index) {
+    const x = attributes[index]
     const name = x[0]
     if(typeof(name) !== 'string') {
-      return
+      continue
     }
 
-    x[2] = isSpecialAttr(name, element.tagName)
-  })
+    x[2] = isSpecialAttr(name, tagName)
+  }
 
   processAttributeArray(
-    value.attributes,
+    attributes,
     [], // values,
     element,
     ownerSupport,
@@ -50,9 +53,10 @@ export function processElementVar(
     paintAppend,
   )
 
-  value.listeners.forEach((listener, index) => 
-    registerListener(value, index, ownerSupport, listener, element)
-  )
+  const listeners = value.listeners
+  for (let index = 0; index < listeners.length; ++index) {
+    registerListener(value, index, ownerSupport, listeners[index], element)
+  }
 
   return element
 }
@@ -64,23 +68,25 @@ function registerListener(
   listener: MockElmListener,
   element: HTMLElement,
 ) {
+  const eventName = listener[0]
   const wrap = (...args: any[]) => {
     const listenScope = value.listeners[index]
     const toCall = listenScope[1]
     const stateSupport = getSupportWithState(ownerSupport)
-    const updateCount = stateSupport.context.updateCount
+    const stateContext = stateSupport.context
+    const updateCount = stateContext.updateCount
 
-    stateSupport.context.locked = 1 // 1 means reactive event lock
+    stateContext.locked = 1 // 1 means reactive event lock
     ++painting.locks
-    setContextInCycle(stateSupport.context)
+    setContextInCycle(stateContext)
 
     const result = (toCall as any)(...args)
 
     --painting.locks
-    delete stateSupport.context.locked
+    delete stateContext.locked
     removeContextInCycle()
 
-    const needsRender = updateCount === stateSupport.context.updateCount
+    const needsRender = updateCount === stateContext.updateCount
 
     if (needsRender) {
       return afterTagCallback(result, stateSupport)
@@ -101,7 +107,7 @@ function registerListener(
 
   addSupportEventListener(
     ownerSupport.appSupport,
-    listener[0], // eventName
+    eventName,
     element,
     wrap
   )

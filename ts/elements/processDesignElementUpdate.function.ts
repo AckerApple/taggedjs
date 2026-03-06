@@ -39,19 +39,27 @@ export function processDesignElementUpdate(
   const contexts = context.contexts as ContextItem[]
   const vContexts = value.contexts || []
   
-  const ogListeners = (context.tagJsVar as ElementFunction).allListeners as MockElmListener[]
-  const allListeners = (value as ElementFunction).allListeners
-  allListeners.forEach((newListener, index) => {
+  const oldElement = context.tagJsVar as ElementFunction
+  const newElement = value as ElementFunction
+  const ogListeners = oldElement.allListeners as MockElmListener[]
+  const allListeners = newElement.allListeners
+  for (let index = 0; index < allListeners.length; ++index) {
+    const newListener = allListeners[index] as MockElmListener
     // ensure the latest callback is always called. Needed for functions within array maps
     const wrapCallback = ogListeners[index][1]
     wrapCallback.toCallback = newListener[1].toCallback
-  })
+  }
 
   if(contexts.length !== vContexts.length) {
+    const conValues = new Array(contexts.length)
+    for (let index = 0; index < contexts.length; ++index) {
+      conValues[index] = contexts[index].value
+    }
+
     console.info('context mismatch', {
       value,
       context,
-      conValues: contexts.map(x => x.value),
+      conValues,
       vContexts,
       deleted: context.deleted,
       contexts
@@ -61,13 +69,14 @@ export function processDesignElementUpdate(
 
   context.locked = 79
   
-  contexts.forEach((context, index) => {
-    (context.tagJsVar as any).processUpdate(
-      vContexts[index], // context.value,
-      context,
+  for (let index = 0; index < contexts.length; ++index) {
+    const item = contexts[index]
+    ;(item.tagJsVar as any).processUpdate(
+      vContexts[index],
+      item,
       ownerSupport,
     )
-  })
+  }
 
   delete context.locked
 }
@@ -85,21 +94,21 @@ export function checkTagElementValueChange(
     return 0 // has not changed
   }
 
-  // return 1 // it has changed
-
-  const notElement = !value || value.tagJsType !== 'element'
-  if( notElement ) {
+  if(value.tagJsType !== 'element') {
     return 1
   }
 
-  const newContentId = (value as ElementFunction).contentId
-  const oldContentId = (context.value as ElementFunction).contentId
+  const newElement = value as ElementFunction
+  const oldElement = oldValue as ElementFunction
+
+  const newContentId = newElement.contentId
+  const oldContentId = oldElement.contentId
   if(newContentId !== oldContentId) {
     return 1
   }
 
-  const newKidLength = (value as ElementFunction).innerHTML.length
-  const oldKidLength = (context.value as any).innerHTML.length
+  const newKidLength = newElement.innerHTML.length
+  const oldKidLength = oldElement.innerHTML.length
   const kidLengthChanged = newKidLength !== oldKidLength
   if(kidLengthChanged) {
     return 1

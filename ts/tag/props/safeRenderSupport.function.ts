@@ -1,4 +1,3 @@
-import { isInlineHtml } from '../../render/renderSupport.function.js'
 import { renderExistingSupport } from '../../render/renderExistingTag.function.js'
 import { AnySupport } from '../index.js'
 

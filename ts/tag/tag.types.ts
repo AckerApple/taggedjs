@@ -15,10 +15,15 @@ export type RouteProps = {
   query: RouteQuery
 }
 
-type BasicResponse = ReadOnlyVar | StateToTag | AnyTag | number | string | any[] // ElementFunction
+type BasicResponse = ReadOnlyVar | StateToTag | AnyTag | number | string | boolean | any[] // ElementFunction
 type TagResponse = BasicResponse | (() => BasicResponse)
 
-export type SimpleToTag = ((...props: any[]) => TagResponse | (TagResponse | ((_contextItem: ContextItem) => BasicResponse))[])
+export type SimpleToTag = (
+  (...props: any[]) => TagResponse |
+  (
+    TagResponse | ((_contextItem: ContextItem) => BasicResponse)
+  )[]
+)
 export type ToTag = SimpleToTag | (() => SimpleToTag)
 
 export type StateToTag = () => AnyTag // ElementFunction // Warn: do not data type arguments, let them be inferred

@@ -75,32 +75,41 @@ export function getPushKid(
 ): ElementFunction {
   const pushKid = function pushKid(...args: any[]) {
     const newElement: ElementFunction = {...pushKid as any}
-    newElement.attributes = [...pushKid.attributes] as Attribute[]
-    newElement.listeners = [...pushKid.listeners]
-    newElement.allListeners = [...pushKid.allListeners]
-    const contexts = newElement.contexts = newElement.contexts || [] as any[]
+    newElement.attributes = cloneShallowArray(pushKid.attributes) as Attribute[]
+    newElement.listeners = cloneShallowArray(pushKid.listeners)
+    newElement.allListeners = cloneShallowArray(pushKid.allListeners)
+    let contexts = newElement.contexts as any[] | undefined
 
     newElement.innerHTML = args
 
     // review each child for potential to be context
-    args.forEach(function forGetPushKid(arg) {
+    for (let index = 0; index < args.length; ++index) {
+      const arg = args[index]
       if( !isValueForContext(arg) ) {
-        return
+        continue
       }
       
       if(arg.tagJsType === 'element') {
-        newElement.allListeners.push(...arg.allListeners)
+        appendArray(newElement.allListeners, arg.allListeners)
 
         if(arg.contexts) {
+          if(!contexts) {
+            contexts = []
+            newElement.contexts = contexts
+          }
           // the argument is an element so push up its contexts into mine
-          contexts.push( ...arg.contexts as any )
+          appendArray(contexts, arg.contexts as any)
           ++newElement.contentId
         }
-        return
+        continue
       }
 
-      registerMockChildContext(arg, newElement)
-    })
+      if(!contexts) {
+        contexts = []
+        newElement.contexts = contexts
+      }
+      contexts.push(arg)
+    }
 
     return newElement
   }
@@ -124,24 +133,21 @@ function cloneShallowArray<T>(
   return value.length ? value.slice() : []
 }
 
-
-/** used during updates */
-function registerMockChildContext(
-  value: any,
-  mockElm: ElementFunction,
+function appendArray<T>(
+  target: T[],
+  source: T[],
 ) {
-  if(!mockElm.contexts) {
-    mockElm.contexts = []
+  for (let index = 0; index < source.length; ++index) {
+    target.push(source[index] as T)
   }
-
-  mockElm.contexts.push( value )
 }
 
 function assignFunctionMembers(
   target: Record<string, any>,
   source: Record<string, any>,
 ) {
-  Object.entries(source).forEach(function forAssignFunctionMembers([key, value]) {
+  for (const key in source) {
+    const value = source[key]
     try {
       target[key] = value
     } catch {
@@ -152,5 +158,5 @@ function assignFunctionMembers(
         enumerable: false,
       })
     }
-  })
+  }
 }

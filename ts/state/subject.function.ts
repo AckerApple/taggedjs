@@ -1,8 +1,6 @@
 import { AnySupport } from '../tag/index.js'
 import { Subject, ValueSubject } from '../subject/index.js'
 import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js'
-import { SupportContextItem } from '../tag/SupportContextItem.type.js'
-import { ContextStateMeta, ContextStateSupport } from '../tag/ContextStateMeta.type.js'
 import { setUseMemory } from './setUseMemory.object.js'
 import { state } from './state.function.js'
 import { LikeObservable } from '../TagJsTags/processSubscribeWithAttribute.function.js'
@@ -21,7 +19,7 @@ export function subject<T>(
 }
 
 subject._value = <T>(value: T) => {
-  const oldestState = state(function subjectValue() {
+  state(function subjectValue() {
     return {
       state: setUseMemory.stateConfig.state,
       states: setUseMemory.stateConfig.states,
@@ -56,11 +54,11 @@ function all<A, B, C>(args: [LikeObservable<A> | A, LikeObservable<B> | B, LikeO
 function all<A, B>(args: [LikeObservable<A> | A, LikeObservable<B> | B]): Subject<[A,B]>
 function all<A>(args: [LikeObservable<A> | A]): Subject<[A]>
 function all(args: any[]): Subject<any> {
-  const oldestState = state(() => ({
+  state(() => ({
     state: setUseMemory.stateConfig.state,
     states: setUseMemory.stateConfig.states,
   }))
-  const nowSupport = getSupportInCycle() as AnySupport
+  getSupportInCycle() as AnySupport
   return Subject.all(args as any).pipe(x => {
     /*
     const context = nowSupport.context as SupportContextItem

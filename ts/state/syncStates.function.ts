@@ -16,16 +16,3 @@ export function syncStates(
   from(syncFromState, 1)
   onto(syncOntoState, 2)
 }
-
-let getIndex = 0
-const oldValues: any[] = []
-
-function oldGetCallback<T extends any[]>(...args: [...T]) {
-  oldValues.push(args)
-  return args
-}
-
-// This is the "get" argument that will be called and all arguments are ignored
-function newSetCallback <T extends any[]>(..._: [...T]) {
-  return oldValues[ getIndex++ ]
-}

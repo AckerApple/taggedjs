@@ -12,6 +12,9 @@ import { TagJsTag } from '../../../TagJsTags/TagJsTag.type.js'
 import { batchAfters } from '../../../render/paint.function.js'
 import { SupportContextItem } from '../../SupportContextItem.type.js'
 
+const notCasted = Symbol('not-casted')
+const noArgs: any[] = []
+
 export function processTagArray(
   contextItem: ContextItem,
   value: (TemplaterResult | TagJsComponent<any>)[], // arry of Tag classes
@@ -28,16 +31,15 @@ export function processTagArray(
   
   let runtimeInsertBefore = contextItem.placeholder
   const length = value.length
-  const castedCache: unknown[] = new Array(length)
-  const castedCacheSet: boolean[] = new Array(length)
+  const castedCache: unknown[] = new Array(length).fill(notCasted)
   const getCastedArrayItem = function getCastedArrayItem(index: number) {
-    if(castedCacheSet[index]) {
-      return castedCache[index]
+    const cached = castedCache[index]
+    if(cached !== notCasted) {
+      return cached
     }
 
     const casted = castArrayItem(value[index])
     castedCache[index] = casted
-    castedCacheSet[index] = true
     return casted
   }
 
@@ -57,10 +59,11 @@ export function processTagArray(
     batchUpdates = results.batchUpdates
   }
 
+  const liveArray = contextItem.lastArray as LastArrayItem[]
   for (let index=0; index < length; ++index) {
     const newSubject = reviewArrayItem(
       index,
-      contextItem.lastArray as LastArrayItem[],
+      liveArray,
       ownerSupport,
       batchUpdates,
       getCastedArrayItem,
@@ -82,6 +85,7 @@ function runArrayDeleteCheck(
   /** 🗑️ remove previous items first */
   const filteredLast: LastArrayItem[] = []
   let removed = 0
+  const maxIndex = value.length - 1
 
   for (let index = 0; index < lastArray.length; ++index) {
     const item = lastArray[index]
@@ -97,7 +101,7 @@ function runArrayDeleteCheck(
 
     // 👁️ COMPARE & REMOVE
     const newRemoved = compareArrayItems(
-      value, index, lastArray, removed, getCastedArrayItem
+      index, lastArray, removed, maxIndex, getCastedArrayItem
     )
 
     if (newRemoved === 0) {
@@ -116,7 +120,7 @@ function runArrayDeleteCheck(
 
   contextItem.lastArray = filteredLast
   
-  return {removed, batchUpdates}
+  return {batchUpdates}
 }
 
 /** new and old array items processed here */
@@ -136,9 +140,7 @@ function reviewArrayItem(
     return reviewPreviousArrayItem(
       item,
       previousContext,
-      lastArray,
       ownerSupport,
-      index,
       batchUpdates,
       runtimeInsertBefore,
       appendTo,
@@ -169,74 +171,48 @@ function reviewArrayItem(
 function reviewPreviousArrayItem(
   value: unknown,
   context: ContextItem,
-  lastArray: LastArrayItem[],
   ownerSupport: AnySupport,
-  index: number,
   batchUpdates: boolean, // delay render
-  runtimeInsertBefore: Text | undefined, // used during updates
-  appendTo?: Element, // used during initial rendering of entire array
+  _runtimeInsertBefore: Text | undefined, // used during updates
+  _appendTo?: Element, // used during initial rendering of entire array
 ) {
   if( batchUpdates ) {
-    batchAfters.push([function arrayBatchAfterHandler() {
-      tagValueUpdateHandler(
-        value as TemplateValue,
-        context,
-        ownerSupport,
-      )
-    }, []])
+    batchAfters.push([runArrayBatchAfterHandler, [value, context, ownerSupport]])
     context.value = value
 
     return context
   }
 
-  const couldBeSame = lastArray.length > index
-  if (couldBeSame) {
-    // array item returned array
-    if(Array.isArray(value)) {
-      context.tagJsVar.processUpdate(
-        value, context, ownerSupport, []
-      )
-      context.value = value
-
-      return context
-    }
-
-    tagValueUpdateHandler(
-      value as TemplateValue,
-      context,
-      ownerSupport,
+  // array item returned array
+  if(Array.isArray(value)) {
+    context.tagJsVar.processUpdate(
+      value, context, ownerSupport, noArgs
     )
+    context.value = value
 
     return context
   }
 
-  // NEW REPLACEMENT
-  const contextItem = createAndProcessContextItem(
+  tagValueUpdateHandler(
     value as TemplateValue,
+    context,
     ownerSupport,
-    lastArray,
-    runtimeInsertBefore as Text,
-    appendTo,
   )
 
-  // Added to previous array
-  lastArray.push(contextItem)
-
-  return contextItem
+  return context
 }
 
 /** Run within first array processing loop
  *  1 = destroyed, 2 = value changes, 0 = no change */
 function compareArrayItems(
-  value: (TemplaterResult | TagJsComponent<any>)[],
   index: number,
   lastArray: LastArrayItem[],
   removed: number,
+  maxIndex: number,
   getCastedArrayItem: (index: number) => unknown,
 ) {
-  const newLength = value.length - 1
   const at = index - removed
-  const lessLength = at < 0 || newLength < at
+  const lessLength = at < 0 || maxIndex < at
   const prevContext = lastArray[index] as SupportContextItem
 
   if(lessLength) {
@@ -260,6 +236,18 @@ function compareArrayItems(
   )
 
   return result
+}
+
+function runArrayBatchAfterHandler(
+  value: unknown,
+  context: ContextItem,
+  ownerSupport: AnySupport,
+) {
+  tagValueUpdateHandler(
+    value as TemplateValue,
+    context,
+    ownerSupport,
+  )
 }
 
 // For when an item in the array is a function

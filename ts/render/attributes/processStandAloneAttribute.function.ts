@@ -2,7 +2,7 @@
 
 import { HowToSet, setNonFunctionInputValue } from '../../interpolations/attributes/howToSetInputValue.function.js'
 import { BasicTypes, empty } from '../../tag/ValueTypes.enum.js'
-import { AnySupport, tag, TemplateValue } from '../../tag/index.js'
+import { AnySupport } from '../../tag/index.js'
 import { ContextItem } from '../../tag/ContextItem.type.js'
 import { isSpecialAttr } from '../../interpolations/attributes/isSpecialAttribute.function.js'
 import { isNoDisplayValue } from './isNoDisplayValue.function.js'
@@ -11,7 +11,7 @@ import { processAttribute } from './processAttribute.function.js'
 import { removeContextInCycle, setContextInCycle } from '../../tag/cycles/setContextInCycle.function.js'
 import { processTagJsTagAttribute } from './processTagJsAttribute.function.js'
 import { valueToTagJsVar } from '../../TagJsTags/valueToTagJsVar.function.js'
-import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
+import type { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js'
 
 // single/stand alone attributes

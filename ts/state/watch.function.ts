@@ -188,7 +188,7 @@ function defineOnMethod<R>(
       const subject = state(() => {
         return new ValueSubject<any>(undefined)
       })
-      const oldState = state(() => ({
+      state(() => ({
         state: setUseMemory.stateConfig.state,
         states: setUseMemory.stateConfig.states,
       }))
@@ -205,7 +205,6 @@ function defineOnMethod<R>(
           const setTo = callback(realValues, previousValues)
 
           if(nowSupport !== firstSupport) {
-            const newestState = oldState.state
             const context = firstSupport.context
             const stateMeta = context.state as ContextStateMeta
             const oldestStateSupport = stateMeta.older as ContextStateSupport

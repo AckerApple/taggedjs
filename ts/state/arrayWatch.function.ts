@@ -1,4 +1,4 @@
-import { AnySupport, Callback, ContextItem, getContextInCycle } from '../index.js'
+import { AnySupport, ContextItem, getContextInCycle } from '../index.js'
 import { findStateSupportUpContext } from '../interpolations/attributes/getSupportWithState.function.js'
 import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArray.function.js'
 import { SignalArray } from './array.function.js'

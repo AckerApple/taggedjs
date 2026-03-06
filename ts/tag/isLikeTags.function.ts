@@ -1,6 +1,6 @@
 import type { StringTag } from './StringTag.type.js'
 import type { DomTag } from './DomTag.type.js'
-import { AnySupport, SupportContextItem, TagJsComponent } from './index.js'
+import { AnySupport, SupportContextItem } from './index.js'
 import { TemplaterResult } from './getTemplaterResult.function.js'
 import { BasicTypes, ValueTypes } from './ValueTypes.enum.js'
 

@@ -1,14 +1,10 @@
 import { PropsConfig } from '../../tag/createHtmlSupport.function.js'
-import {SupportTagGlobal, TemplaterResult, Wrapper } from '../../tag/getTemplaterResult.function.js'
+import {SupportTagGlobal } from '../../tag/getTemplaterResult.function.js'
 import { castProps, WrapRunner } from'../../tag/props/alterProp.function.js'
 // import { renderSupport } from'../renderSupport.function.js'
-import { destroySupport } from '../destroySupport.function.js'
-import { getNewGlobal } from '../../tag/update/getNewGlobal.function.js'
 import { Props } from '../../Props.js'
 import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.function.js'
 import { AnySupport } from '../../tag/index.js'
-import { SupportContextItem } from '../../tag/SupportContextItem.type.js'
-import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 
 export function syncFunctionProps(
   newSupport: AnySupport,
@@ -85,26 +81,4 @@ export function moveProviders(
       }
     }
   }
-}
-
-/** Was tag, will be tag */
-function swapTags(
-  contextItem: SupportContextItem,
-  templater: TemplaterResult, // new tag
-  ownerSupport: AnySupport
-) {
-  const global = contextItem.global as SupportTagGlobal
-  const oldestSupport = contextItem.state.oldest as AnySupport
-  destroySupport(oldestSupport, global)
-  getNewGlobal(contextItem)
-
-  const t = templater as TagJsTag<any>
-
-  t.processInit(
-    templater,
-    contextItem,
-    ownerSupport,
-    contextItem.placeholder,
-    // undefined, // appendTo,
-  )
 }

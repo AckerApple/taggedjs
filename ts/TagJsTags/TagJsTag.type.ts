@@ -1,6 +1,6 @@
 import { HasValueChanged } from "../tag/Context.types.js"
 import { ContextItem } from "../tag/ContextItem.type.js"
-import { AnySupport, KeyFunction } from "../tag/index.js"
+import { AnySupport } from "../tag/index.js"
 import { ProcessAttribute, ProcessInit } from "../tag/ProcessInit.type.js"
 import { ProcessUpdate } from "../tag/ProcessUpdate.type.js"
 

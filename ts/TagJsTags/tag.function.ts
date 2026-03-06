@@ -1,6 +1,5 @@
 import { output } from '../tag/output.function.js'
 import { getInnerHTML } from '../TagJsTags/getInnerHTML.function.js'
-import { KeyFunction } from '../tag/getDomTag.function.js'
 import type { StringTag } from '../tag/StringTag.type.js'
 import { callback, promise, setUseMemory, state } from '../state/index.js'
 import { getTemplaterResult, TemplaterResult, Wrapper } from '../tag/getTemplaterResult.function.js'

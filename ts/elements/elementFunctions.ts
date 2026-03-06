@@ -53,16 +53,21 @@ function attrs(
 ) {
   const clone = getPushKid(item as any, item.elementFunctions)
 
-  Object.entries(args).map(args => {
-    clone.attributes.push(args as unknown as Attribute)
-    bumpContentId(clone, args[1])
-  
-    if( isValueForContext(args[0]) ) {
-      registerMockAttrContext(args[0], clone) // the attrName is a function or TagJsTag
-    } else if( isValueForContext(args[1]) ) {
-      registerMockAttrContext(args[1], clone) // the attrValue is a function or TagJsTag
+  for (const name in args) {
+    if(!Object.prototype.hasOwnProperty.call(args, name)) {
+      continue
     }
-  })
+
+    const value = (args as Record<string, AttrValue>)[name]
+    clone.attributes.push([name, value] as unknown as Attribute)
+    bumpContentId(clone, value)
+  
+    if( isValueForContext(name) ) {
+      registerMockAttrContext(name, clone) // the attrName is a function or TagJsTag
+    } else if( isValueForContext(value) ) {
+      registerMockAttrContext(value, clone) // the attrValue is a function or TagJsTag
+    }
+  }
 
   return clone
 }
@@ -221,13 +226,18 @@ function setClassValue(
   value: string | undefined | boolean | Record<string, any>
 ) {
   if (isObject(value)) {
-    Object.entries(value as object).forEach(([name, value]) => {
-      if(value) {
-        element.classList.add(name)
-      } else {
-        element.classList.remove(name)
+    for (const className in (value as Record<string, any>)) {
+      if(!Object.prototype.hasOwnProperty.call(value, className)) {
+        continue
       }
-    })
+
+      const classValue = (value as Record<string, any>)[className]
+      if(classValue) {
+        element.classList.add(className)
+      } else {
+        element.classList.remove(className)
+      }
+    }
     return// howToSetInputObjectValue(element, name, value as Record<string, any>)
   }
   
@@ -304,11 +314,15 @@ export function loopObjectAttributes(
   item: ElementFunction,
   object: any,
 ) {
-  const result = Object.entries(object).reduce((all, [name, value]) => {
-    return processSetAttribute(name, value, item)
-  }, item) as ElementFunction
+  for (const name in object) {
+    if(!Object.prototype.hasOwnProperty.call(object, name)) {
+      continue
+    }
 
-  return result
+    processSetAttribute(name, object[name], item)
+  }
+
+  return item
 }
 
 function processSetAttribute(
