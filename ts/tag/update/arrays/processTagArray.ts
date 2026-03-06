@@ -9,7 +9,7 @@ import { createAndProcessContextItem } from './createAndProcessContextItem.funct
 import { TemplateValue } from '../../TemplateValue.type.js'
 import { ContextItem } from '../../ContextItem.type.js'
 import { TagJsTag } from '../../../TagJsTags/TagJsTag.type.js'
-import { batchAfters } from '../../../render/paint.function.js'
+import { enqueueBatchAfterUnique } from '../../../render/paint.function.js'
 import { SupportContextItem } from '../../SupportContextItem.type.js'
 
 const notCasted = Symbol('not-casted')
@@ -177,7 +177,7 @@ function reviewPreviousArrayItem(
   _appendTo?: Element, // used during initial rendering of entire array
 ) {
   if( batchUpdates ) {
-    batchAfters.push([runArrayBatchAfterHandler, [value, context, ownerSupport]])
+    enqueueBatchAfterUnique(context, [runArrayBatchAfterHandler, [value, context, ownerSupport]])
     context.value = value
 
     return context

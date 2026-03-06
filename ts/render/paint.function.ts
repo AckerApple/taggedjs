@@ -23,10 +23,32 @@ let batchCycleOpen = false
 export const batchAfters: PaintCommand[] = [] // callbacks after all painted with a paint cycle after all
 const batchAfterChunkSize = 400
 let batchAfterHead = 0
+const batchAfterByKey = new Map<any, number>()
 
 export const painting = {
   locks: 0,
   removeLocks: 0,
+}
+
+export function enqueueBatchAfter(
+  command: PaintCommand,
+) {
+  batchAfters.push(command)
+}
+
+export function enqueueBatchAfterUnique(
+  key: any,
+  command: PaintCommand,
+) {
+  const existingIndex = batchAfterByKey.get(key)
+  if(existingIndex !== undefined && existingIndex >= batchAfterHead) {
+    batchAfters[existingIndex] = command
+    return
+  }
+
+  const index = batchAfters.length
+  batchAfters.push(command)
+  batchAfterByKey.set(key, index)
 }
 
 export function setContent(
@@ -105,6 +127,7 @@ function runBatchAfterFrame() {
 
   batchAfters.length = 0
   batchAfterHead = 0
+  batchAfterByKey.clear()
   batchCycleOpen = false
 }
 

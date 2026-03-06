@@ -3,7 +3,7 @@ import { addSupportEventListener } from '../interpolations/attributes/addSupport
 import { afterTagCallback } from '../interpolations/attributes/bindSubjectCallback.function.js'
 import { getSupportWithState } from '../interpolations/attributes/getSupportWithState.function.js'
 import { isSpecialAttr } from '../interpolations/attributes/isSpecialAttribute.function.js'
-import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArray.function.js'
+import { renderTagUpdate } from '../interpolations/attributes/renderTagArray.function.js'
 import { processAttributeArray } from '../render/dom/processAttributeArray.function.js'
 import { paint, paintAppend, painting } from '../render/paint.function.js'
 import { removeContextInCycle, setContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
@@ -97,7 +97,7 @@ function registerListener(
     if (isPromise(result)) {
       return result.then(() => {
         const newest = stateSupport.context.state.newest as AnySupport
-        renderTagUpdateArray([newest])
+        renderTagUpdate(newest)
         return 'promise-no-data-ever'
       })
     }
