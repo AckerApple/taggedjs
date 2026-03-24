@@ -29,6 +29,6 @@ export type TagWrapper<T> = ((
   ...props: T[]
 ) => TemplaterResult) & {
   original: Original
-  tagJsType?: typeof ValueTypes.renderOnce | typeof ValueTypes.stateRender
+  tagJsType?: typeof ValueTypes.stateRender
   lastRuns?: {[index: number]: TagTemplate}
 }

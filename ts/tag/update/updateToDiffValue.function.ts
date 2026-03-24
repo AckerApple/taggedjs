@@ -20,10 +20,6 @@ export function updateToDiffValue(
   delete context.deleted
 
   if(tagJsType) {
-    if(tagJsType === ValueTypes.renderOnce) {
-      return
-    }
-
     tryUpdateToTag(
       context,
       newValue as TemplaterResult,

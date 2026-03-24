@@ -3,7 +3,7 @@ import { isArray } from '../isInstance.js'
 import { ValueType } from '../tag/ValueTypes.enum.js'
 import { TemplateValue } from '../tag/TemplateValue.type.js'
 import { TagJsTag } from './TagJsTag.type.js'
-import { getSimpleTagVar } from './getSimpleTagVar.function.js'
+import { getSimpleTagVar } from './getStringTagVar.function.js'
 import { getArrayTagVar } from './getArrayTagJsTag.function.js'
 import { TagJsComponent } from './index.js'
 

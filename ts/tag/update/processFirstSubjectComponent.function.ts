@@ -1,5 +1,4 @@
 import { TemplaterResult } from '../getTemplaterResult.function.js'
-import { processFirstTagResult } from'./processTagResult.function.js'
 import { PropsConfig } from '../createHtmlSupport.function.js'
 import { ValueTypes } from '../ValueTypes.enum.js'
 import { getCastedProps } from '../getTagWrap.function.js'
@@ -7,7 +6,6 @@ import { createSupport } from '../createSupport.function.js'
 import { AnySupport, ContextItem } from '../index.js'
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { firstTagRender } from '../../render/renderTagOnly.function.js'
-import { buildBeforeElement } from '../../render/buildBeforeElement.function.js'
 import { Subject, SubscribeValue, TagJsComponent } from '../../index.js'
 import { castProps } from '../props/alterProp.function.js'
 import { convertTagToElementManaged } from './convertTagToElementManaged.function.js'
@@ -61,21 +59,11 @@ export function processReplacementComponent(
     return support
   }
 
-  if( !['dom','html'].includes(tag.tagJsType) ) {
-    return convertTagToElementManaged(
-      support,
-      support.ownerSupport as AnySupport,
-      context,
-    )
-  }
-
-  buildBeforeElement(
+  return convertTagToElementManaged(
     support,
-    undefined, // element for append child
-    context.placeholder as Text, // placeholder
+    support.ownerSupport as AnySupport,
+    context,
   )
-
-  return support
 }
 
 export function makeRealUpdate(
@@ -153,14 +141,5 @@ export function processFirstSubjectComponent(
     ownerSupport,
   )
 
-  // DISCOVER IF tag() did NOT return dom|html
-  const tag = support.templater.tag as any
-  if( !['dom','html'].includes(tag.tagJsType) ) {
-    return convertTagToElementManaged(support, ownerSupport, subject)
-  }
-
-  return processFirstTagResult(
-    support,
-    appendTo,
-  )
+  return convertTagToElementManaged(support, ownerSupport, subject)
 }

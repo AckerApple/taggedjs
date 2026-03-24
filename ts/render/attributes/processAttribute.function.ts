@@ -83,7 +83,6 @@ export function processAttribute(
     ) as any as AttributeContextItem
 
     contextItem.description = 'processAttribute'
-    contextItem.valueIndex = varIndex
     contextItem.isAttr = true
     contextItem.target = element
     contextItem.isNameOnly = true
@@ -161,9 +160,6 @@ export function processAttributeEmit(
       newAttrValue,
       element,
       attrName,
-      isSpecial,
-      howToSet,
-      subject,
     )
   }
   
@@ -220,31 +216,13 @@ function callbackFun(
   newAttrValue: any,
   element: HTMLElement,
   attrName: string,
-  isSpecial: SpecialDefinition,
-  howToSet: HowToSet,
-  _subject: AttributeContextItem,
 ) {
-  const wrapper = support.templater.wrapper
-  const tagJsType = wrapper?.tagJsType || (wrapper?.original as any)?.tagJsType
-  const oneRender = tagJsType === ValueTypes.renderOnce
-  
-  if(!oneRender) {
-    return processTagCallbackFun(
-      // subject,
-      newAttrValue,
-      support,
-      attrName,
-      element,
-    )
-  }
-
-  return processAttributeSubjectValue(
+  return processTagCallbackFun(
+    // subject,
     newAttrValue,
-    element,
-    attrName,
-    isSpecial,
-    howToSet,
     support,
+    attrName,
+    element,
   )
 }
 

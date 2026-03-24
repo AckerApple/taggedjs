@@ -34,24 +34,12 @@ function processUpdateOneContext(
     return
   }
 
-  // some values, like style, get rearranged and there value appearance may not match context appearance
-  const valueIndex = contextItem.valueIndex
-  const newValue = values[ valueIndex ] as any
-
-  // Removed, let the TagJsTags do the checking
-  // Do not continue if the value is just the same
-  /*
-  if(newValue === contextItem.value) {
-    return
-  }
-  */
-
   const TagJsTag = contextItem.tagJsVar as TagJsTag<any>
   
   setContextInCycle(contextItem)
   
   TagJsTag.processUpdate(
-    newValue,
+    '' as any, // newValue,
     contextItem,
     ownerSupport,
     values,
@@ -59,5 +47,5 @@ function processUpdateOneContext(
   
   removeContextInCycle()
   
-  contextItem.value = newValue
+  // contextItem.value = newValue
 }

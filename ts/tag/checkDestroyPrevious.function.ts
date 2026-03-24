@@ -8,7 +8,7 @@ export function checkArrayValueChange(
 ) {
   // no longer an array?
   if (!isArray(newValue)) {
-    destroyArrayContext(subject)
+    // destroyArrayContext(subject)
     return 9 // 'array'
   }
 

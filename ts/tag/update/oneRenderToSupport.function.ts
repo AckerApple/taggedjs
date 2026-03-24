@@ -1,5 +1,4 @@
 import { getTemplaterResult, Wrapper } from '../getTemplaterResult.function.js'
-import { newSupportByTemplater } from '../../render/update/processTag.function.js'
 import { AnySupport } from '../index.js'
 import { StringTag } from '../StringTag.type.js'
 import { ContextItem } from '../ContextItem.type.js'
@@ -14,9 +13,9 @@ export function oneRenderToSupport(
 ) {
   const templater = getTemplaterResult(PropWatches.DEEP)
   templater.tagJsType = wrapper.tagJsType as typeof ValueTypes.templater
-  const support = newSupportByTemplater(
+  const support = '' as any /*newSupportByTemplater(
     templater, ownerSupport, subject
-  )
+  )*/
 
   let tag: StringTag | undefined
   function wrap() {

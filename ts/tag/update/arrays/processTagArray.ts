@@ -16,20 +16,20 @@ const notCasted = Symbol('not-casted')
 const noArgs: any[] = []
 
 export function processTagArray(
-  contextItem: ContextItem,
+  context: ContextItem,
   value: (TemplaterResult | TagJsComponent<any>)[], // arry of Tag classes
   ownerSupport: AnySupport,
   appendTo?: Element,
 ) {
-  const noPriorRun = contextItem.lastArray === undefined
+  const noPriorRun = context.lastArray === undefined
 
   if( noPriorRun ){
-    contextItem.lastArray = []
+    context.lastArray = []
   }
   
-  const lastArray = contextItem.lastArray as LastArrayItem[]
+  const lastArray = context.lastArray as LastArrayItem[]
   
-  let runtimeInsertBefore = contextItem.placeholder
+  let runtimeInsertBefore = context.placeholder
   const length = value.length
   const castedCache: unknown[] = new Array(length).fill(notCasted)
   const getCastedArrayItem = function getCastedArrayItem(index: number) {
@@ -51,7 +51,7 @@ export function processTagArray(
     const results = runArrayDeleteCheck(
       lastArray,
       value,
-      contextItem,
+      context,
       batchUpdates,
       getCastedArrayItem,
     )
@@ -59,7 +59,7 @@ export function processTagArray(
     batchUpdates = results.batchUpdates
   }
 
-  const liveArray = contextItem.lastArray as LastArrayItem[]
+  const liveArray = context.lastArray as LastArrayItem[]
   for (let index=0; index < length; ++index) {
     const newSubject = reviewArrayItem(
       index,
@@ -193,7 +193,7 @@ function reviewPreviousArrayItem(
     return context
   }
 
-  tagValueUpdateHandler(
+  const tagValueUpdateResult = tagValueUpdateHandler(
     value as TemplateValue,
     context,
     ownerSupport,

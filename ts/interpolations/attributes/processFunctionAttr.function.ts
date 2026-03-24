@@ -78,8 +78,6 @@ export function processFunctionAttr(
     value: innerValue, // used for new value comparing
     tagJsVar: valueToTagJsVar(innerValue),
 
-    // TODO: Not needed
-    valueIndex: -1,
     withinOwnerElement: true,
     destroy$: new Subject(),
     render$: new Subject(),
@@ -96,8 +94,6 @@ export function processFunctionAttr(
     value,
     tagJsVar: TagJsTagOverride,
 
-    // TODO: Not needed
-    valueIndex: -1,
     withinOwnerElement: true,
     destroy$: new Subject(),
     render$: new Subject(),

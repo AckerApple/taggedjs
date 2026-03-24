@@ -20,9 +20,6 @@ export interface AppContextItem {
   state?: ContextStateMeta
   htmlDomMeta?: DomObjectChildren
 
-  /** only for html`` . When -1 then its a raw bolt value */
-  valueIndex: number
-
   /** TODO: is this deprecated? */
   oldTagJsVar?: TagJsTag<any>
 

@@ -3,7 +3,7 @@ import { HowToSet } from "../interpolations/attributes/howToSetInputValue.functi
 import { isSpecialAttr } from "../interpolations/attributes/isSpecialAttribute.function.js";
 import { processNonDynamicAttr } from "../interpolations/attributes/processNameValueAttribute.function.js";
 import { AttributeContextItem } from "../tag/AttributeContextItem.type.js";
-import { checkSimpleValueChange, deleteSimpleAttribute } from "./getSimpleTagVar.function.js";
+import { checkSimpleValueChange, deleteSimpleAttribute } from "./getStringTagVar.function.js";
 import { processAttributeUpdate } from "./processAttributeUpdate.function.js";
 import { TagJsTag } from "./TagJsTag.type.js";
 

@@ -8,7 +8,6 @@ import { Subscription } from '../subject/subject.utils.js'
 import { ValueTypes } from './ValueTypes.enum.js'
 import { PropWatches, TagJsComponent } from '../TagJsTags/tag.function.js'
 import { ProcessInit } from './ProcessInit.type.js'
-import { processTagInit } from './update/processTagInit.function.js'
 import { ProcessDelete, TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 import { checkTagValueChangeAndUpdate } from './checkTagValueChange.function.js'
 import { destroySupportByContextItem } from './destroySupportByContextItem.function.js'
@@ -22,7 +21,7 @@ export type Wrapper = ((
   subject: ContextItem,
   prevSupport?: AnySupport,
 ) => AnySupport) & TagWrapper<unknown> & {
-  tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater
+  tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.templater
   processInit: ProcessInit
   processUpdate: ProcessUpdate
   hasValueChanged: HasValueChanged | CheckSupportValueChange
@@ -76,7 +75,7 @@ export function getTemplaterResult(
   const templater: TemplaterResult = {
     component: false,
     tagJsType: ValueTypes.templater,
-    processInit: processTagInit,
+    processInit: '' as any, // processTagInit,
     processInitAttribute: blankHandler,
     processUpdate: tagValueUpdateHandler,
     hasValueChanged: checkTagValueChangeAndUpdate,

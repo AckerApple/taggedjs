@@ -68,7 +68,9 @@ export function setupSubscribe(
       value: TemplateValue,
       syncRun: boolean,
       subContext,
-    ) => onOutput(value, syncRun, subContext),
+    ) => {
+      return onOutput(value, syncRun, subContext)
+    },
     value,
     contextItem,
   )

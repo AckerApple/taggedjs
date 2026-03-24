@@ -9,6 +9,7 @@ export { elementVarToHtmlString } from './elementVarToHtmlString.function.js'
 export const button = htmlTag('button')
 export const select = htmlTag('select')
 export const option = htmlTag('option')
+export const optgroup = htmlTag('optgroup')
 export const input = htmlTag('input')
 export const textarea = htmlTag('textarea')
 

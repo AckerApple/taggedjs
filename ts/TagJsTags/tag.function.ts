@@ -9,7 +9,6 @@ import { RouteProps, RouteTag, StateToTag, ToTag } from '../tag/tag.types.js'
 import { UnknownFunction } from '../tag/update/oneRenderToSupport.function.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { AnyTag } from '../tag/AnyTag.type.js'
-import { processRenderOnceInit } from '../render/update/processRenderOnceInit.function.js'
 import { processTagComponentInit } from '../tag/update/processTagComponentInit.function.js'
 import { checkTagValueChangeAndUpdate } from '../tag/checkTagValueChange.function.js'
 import { destroySupportByContextItem } from '../tag/destroySupportByContextItem.function.js'
@@ -141,9 +140,7 @@ export enum PropWatches {
   IMMUTABLE = 'immutable'
 }
 
-/** Wraps a function tag in a state manager and calls wrapped function on event cycles
- * For single rendering, no event cycles, use: tag.renderOnce = (props) => html``
- */
+/** Wraps a function tag in a state manager and calls wrapped function on event cycles */
 export function tag<T extends ToTag>(
   tagComponent: T,
   propWatch: PropWatches = PropWatches.SHALLOW, // PropWatches.DEEP,
@@ -222,7 +219,6 @@ export declare namespace tag {
   let use: typeof tagUseFn
 
   /** Used to create a tag component that renders once and has no addition rendering cycles */
-  let renderOnce: typeof renderOnceFn
   let route: typeof routeFn;
   let app: (_routeTag: RouteTag) => StateToTag;
   let deepPropWatch: typeof tag;
@@ -251,10 +247,6 @@ function routeFn(_routeProps: RouteProps): StateToTag {
   throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
 }
 
-function renderOnceFn(): ReturnTag {
-  throw new Error('Do not call tag.renderOnce as a function but instead set it as: `(props) => tag.renderOnce = () => html`` `')
-}
-
 /** Used to create variable scoping when calling a function that lives within a prop container function */
 function tagUseFn(): ReturnTag {
   throw new Error('Do not call tag.use as a function but instead set it as: `(props) => tag.use = (use) => html`` `')
@@ -262,7 +254,6 @@ function tagUseFn(): ReturnTag {
 
 // actually placing of items into tag memory
 ;(tag as any).element = tagElement
-;(tag as any).renderOnce = renderOnceFn
 ;(tag as any).use = tagUseFn
 ;(tag as any).deepPropWatch = tag
 ;(tag as any).route = routeFn
@@ -294,18 +285,6 @@ function tagUseFn(): ReturnTag {
 }
 
 /* BELOW: Cast functions into setters with no getters */
-
-Object.defineProperty(tag, 'renderOnce', {
-  set(oneRenderFunction: Wrapper) {
-    oneRenderFunction.tagJsType = ValueTypes.renderOnce
-    oneRenderFunction.processInit = processRenderOnceInit
-    oneRenderFunction.processUpdate = tagValueUpdateHandler
-    oneRenderFunction.destroy = destroySupportByContextItem
-    oneRenderFunction.hasValueChanged = function renderOnceNeverChanges() {
-      return 0
-    }
-  },
-})
 
 Object.defineProperty(tag, 'use', {
   set(renderFunction: Wrapper) {

@@ -94,7 +94,7 @@ export function checkTagElementValueChange(
     return 0 // has not changed
   }
 
-  if(value.tagJsType !== 'element') {
+  if(value.tagJsType !== 'element' || oldValue === null) {
     return 1
   }
 

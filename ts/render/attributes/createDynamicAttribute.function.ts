@@ -39,7 +39,6 @@ export function createDynamicArrayAttribute(
         attrName: attrName as string,
         withinOwnerElement: true,
         tagJsVar,
-        valueIndex: (parentContext as SupportContextItem).varCounter, // contexts.length,
         parentContext,
         destroy$: new Subject(),
         render$: new Subject(),
@@ -127,8 +126,6 @@ export function createDynamicAttribute(
     tagJsVar,
     destroy$: new Subject(),
     render$: new Subject(),
-    // paintCommands: [],
-    valueIndex: varIndex,
     parentContext,
   }
 

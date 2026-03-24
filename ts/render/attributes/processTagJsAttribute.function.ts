@@ -32,7 +32,6 @@ export function processTagJsTagAttribute(
 
   contextItem.description = 'tagJsVar-attr'
   contextItem.target = element
-  contextItem.valueIndex = varIndex
   contextItem.isAttr = true
   contextItem.isNameOnly = isNameVar
   contextItem.stateOwner = getSupportWithState(support)

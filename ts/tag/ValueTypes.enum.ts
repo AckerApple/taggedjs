@@ -22,9 +22,6 @@ type ValueTypeObject = {
   templater: string
   tagComponent: string
   tagArray: string
-  // subject: string
-  // tagJsSubject: string
-  renderOnce: string
   stateRender: string
   version: number
   
@@ -48,7 +45,6 @@ export const ValueTypes: ValueTypeObject = {
   subscribe: 'subscribe',
   signal: 'signal',
   
-  renderOnce: 'renderOnce',
   stateRender: 'stateRender',
 
   version,

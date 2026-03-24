@@ -39,37 +39,6 @@ export function attachDomElements(
   // loop map of elements that need to be put down on document
   for (let index=0; index < nodes.length; ++index) {
     const node = (nodes as DomObjectElement[])[index]
-    
-    const v = node.v as ContextItem
-    const isNum = !isNaN(v as unknown as number)
-
-    if(isNum) {
-      // const valueIndex = context.varCounter // contexts.length
-      // const valueIndex = (parentContext as SupportContextItem).varCounter // contexts.length
-      const valueIndex = Number(v) // (parentContext as SupportContextItem).varCounter // contexts.length
-      const realValue = values[ valueIndex ]
-      const isSkipFun = isFunction(realValue) && realValue.tagJsType === undefined
-
-      if(isSkipFun) {
-        ++parentContext.varCounter
-        // TODO: I dont think we ever get in here?
-        continue
-      }
-
-      const contextItem = attachDynamicDom(
-        realValue,
-        contexts,
-        support,
-        parentContext,
-        depth,
-        appendTo as HTMLElement,
-        insertBefore,
-      )
-
-      contextItem.valueIndex = valueIndex
-
-      continue
-    }
 
     const newNode = {} as DomObjectElement // DomObjectText
     dom.push(newNode)
@@ -94,7 +63,6 @@ export function attachDomElements(
       tagJsVar: {
         tagJsType: 'new-parent-context'
       } as TagJsTag<any>,
-      valueIndex: -1,
       withinOwnerElement: true,
     }
 

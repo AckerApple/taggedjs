@@ -68,8 +68,6 @@ export function processElementVarFunction(
       }
     },
 
-    // TODO: Not needed
-    valueIndex: -1,
     withinOwnerElement: true,
     destroy$: new Subject(),
     render$: new Subject(),
