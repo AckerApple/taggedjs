@@ -10,7 +10,6 @@ export function processTagJsTagAttribute(value, contexts, parentContext, tagJsVa
     true, parentContext);
     contextItem.description = 'tagJsVar-attr';
     contextItem.target = element;
-    contextItem.valueIndex = varIndex;
     contextItem.isAttr = true;
     contextItem.isNameOnly = isNameVar;
     contextItem.stateOwner = getSupportWithState(support);

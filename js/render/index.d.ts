@@ -1,5 +1,4 @@
 export * from './renderTagOnly.function.js';
 export { renderWithSupport } from './renderWithSupport.function.js';
-export * from './buildBeforeElement.function.js';
 export * from './destroySupport.function.js';
 export { paint } from './paint.function.js';

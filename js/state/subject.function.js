@@ -11,7 +11,7 @@ export function subject(initialValue) {
     return new Subject(initialValue);
 }
 subject._value = (value) => {
-    const oldestState = state(function subjectValue() {
+    state(function subjectValue() {
         return {
             state: setUseMemory.stateConfig.state,
             states: setUseMemory.stateConfig.states,
@@ -38,11 +38,11 @@ subject._value = (value) => {
     });
 };
 function all(args) {
-    const oldestState = state(() => ({
+    state(() => ({
         state: setUseMemory.stateConfig.state,
         states: setUseMemory.stateConfig.states,
     }));
-    const nowSupport = getSupportInCycle();
+    getSupportInCycle();
     return Subject.all(args).pipe(x => {
         /*
         const context = nowSupport.context as SupportContextItem

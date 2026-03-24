@@ -11,10 +11,6 @@ export function getNewContext(value, contexts, withinOwnerElement, parentContext
         tagJsVar: tagJsVar || valueToTagJsVar(value),
         withinOwnerElement,
         parentContext,
-        // TODO: remove with html``
-        // valueIndex: contexts?.length || -1, // when -1 its a raw bolt value
-        // valueIndex: contexts.length
-        valueIndex: parentContext.varCounter,
     };
     return contextItem;
 }

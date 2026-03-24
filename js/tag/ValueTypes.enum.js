@@ -24,7 +24,6 @@ export const ValueTypes = {
     host: 'host',
     subscribe: 'subscribe',
     signal: 'signal',
-    renderOnce: 'renderOnce',
     stateRender: 'stateRender',
     version,
 };

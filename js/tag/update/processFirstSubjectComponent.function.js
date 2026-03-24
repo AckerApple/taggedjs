@@ -1,9 +1,7 @@
-import { processFirstTagResult } from './processTagResult.function.js';
 import { ValueTypes } from '../ValueTypes.enum.js';
 import { getCastedProps } from '../getTagWrap.function.js';
 import { createSupport } from '../createSupport.function.js';
 import { firstTagRender } from '../../render/renderTagOnly.function.js';
-import { buildBeforeElement } from '../../render/buildBeforeElement.function.js';
 import { castProps } from '../props/alterProp.function.js';
 import { convertTagToElementManaged } from './convertTagToElementManaged.function.js';
 import { removeContextInCycle, setContextInCycle } from '../cycles/setContextInCycle.function.js';
@@ -24,12 +22,7 @@ export function processReplacementComponent(templater, context, ownerSupport) {
     if (!tag) {
         return support;
     }
-    if (!['dom', 'html'].includes(tag.tagJsType)) {
-        return convertTagToElementManaged(support, support.ownerSupport, context);
-    }
-    buildBeforeElement(support, undefined, // element for append child
-    context.placeholder);
-    return support;
+    return convertTagToElementManaged(support, support.ownerSupport, context);
 }
 export function makeRealUpdate(newContext, value, context, convertValue, support) {
     // We need to deprecate this completely (castProps)
@@ -76,11 +69,6 @@ export function afterDestroy(context, _ownerSupport) {
 }
 export function processFirstSubjectComponent(templater, subject, ownerSupport, appendTo) {
     const support = createSupportWithProps(templater, subject, ownerSupport);
-    // DISCOVER IF tag() did NOT return dom|html
-    const tag = support.templater.tag;
-    if (!['dom', 'html'].includes(tag.tagJsType)) {
-        return convertTagToElementManaged(support, ownerSupport, subject);
-    }
-    return processFirstTagResult(support, appendTo);
+    return convertTagToElementManaged(support, ownerSupport, subject);
 }
 //# sourceMappingURL=processFirstSubjectComponent.function.js.map

@@ -94,7 +94,7 @@ function defineOnMethod(getWatch, attachTo) {
             const subject = state(() => {
                 return new ValueSubject(undefined);
             });
-            const oldState = state(() => ({
+            state(() => ({
                 state: setUseMemory.stateConfig.state,
                 states: setUseMemory.stateConfig.states,
             }));
@@ -103,7 +103,6 @@ function defineOnMethod(getWatch, attachTo) {
                     const nowSupport = getSupportInCycle();
                     const setTo = callback(realValues, previousValues);
                     if (nowSupport !== firstSupport) {
-                        const newestState = oldState.state;
                         const context = firstSupport.context;
                         const stateMeta = context.state;
                         const oldestStateSupport = stateMeta.older;

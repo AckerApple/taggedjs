@@ -1,10 +1,8 @@
 // taggedjs-no-compile
 import { paintAppend, paintAppendElementString, paintAppends, paintBeforeElementString, paintCommands } from "../paint.function.js";
 import { empty } from "../../tag/ValueTypes.enum.js";
-import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicDom.function.js";
 import { attachDomElement } from "./attachDomElement.function.js";
 import { Subject } from "../../subject/Subject.class.js";
-import { isFunction } from "../../index.js";
 export function attachDomElements(nodes, values, support, parentContext, depth, // used to know if dynamic variables live within parent owner tag/support
 appendTo, insertBefore) {
     const context = support.context;
@@ -20,23 +18,6 @@ appendTo, insertBefore) {
     // loop map of elements that need to be put down on document
     for (let index = 0; index < nodes.length; ++index) {
         const node = nodes[index];
-        const v = node.v;
-        const isNum = !isNaN(v);
-        if (isNum) {
-            // const valueIndex = context.varCounter // contexts.length
-            // const valueIndex = (parentContext as SupportContextItem).varCounter // contexts.length
-            const valueIndex = Number(v); // (parentContext as SupportContextItem).varCounter // contexts.length
-            const realValue = values[valueIndex];
-            const isSkipFun = isFunction(realValue) && realValue.tagJsType === undefined;
-            if (isSkipFun) {
-                ++parentContext.varCounter;
-                // TODO: I dont think we ever get in here?
-                continue;
-            }
-            const contextItem = attachDynamicDom(realValue, contexts, support, parentContext, depth, appendTo, insertBefore);
-            contextItem.valueIndex = valueIndex;
-            continue;
-        }
         const newNode = {}; // DomObjectText
         dom.push(newNode);
         if (node.nn === 'text') {
@@ -57,7 +38,6 @@ appendTo, insertBefore) {
             tagJsVar: {
                 tagJsType: 'new-parent-context'
             },
-            valueIndex: -1,
             withinOwnerElement: true,
         };
         newParentContext.varCounter = 0;

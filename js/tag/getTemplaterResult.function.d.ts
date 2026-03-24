@@ -12,7 +12,7 @@ import { ProcessDelete, TagJsTag } from '../TagJsTags/TagJsTag.type.js';
 import { CheckSupportValueChange, HasValueChanged } from './Context.types.js';
 import { ProcessUpdate } from './ProcessUpdate.type.js';
 export type Wrapper = ((newSupport: AnySupport, subject: ContextItem, prevSupport?: AnySupport) => AnySupport) & TagWrapper<unknown> & {
-    tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.renderOnce | typeof ValueTypes.templater;
+    tagJsType: typeof ValueTypes.tagComponent | typeof ValueTypes.templater;
     processInit: ProcessInit;
     processUpdate: ProcessUpdate;
     hasValueChanged: HasValueChanged | CheckSupportValueChange;

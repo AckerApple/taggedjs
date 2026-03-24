@@ -15,8 +15,6 @@ export function convertTagToElementManaged(support, ownerSupport, subject) {
         render$: new Subject(),
         // paintCommands: [],
         placeholder: context.placeholder,
-        // not important
-        valueIndex: -1,
         withinOwnerElement: true,
         parentContext: context,
         contexts: context.contexts, // share contexts especially so providers properly crawl my available contexts

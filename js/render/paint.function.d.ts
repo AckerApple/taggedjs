@@ -15,6 +15,8 @@ export declare const painting: {
     locks: number;
     removeLocks: number;
 };
+export declare function enqueueBatchAfter(command: PaintCommand): void;
+export declare function enqueueBatchAfterUnique(key: any, command: PaintCommand): void;
 export declare function setContent(text: string, textNode: Text): void;
 /** you must lock before calling this function */
 export declare function paint(): any;

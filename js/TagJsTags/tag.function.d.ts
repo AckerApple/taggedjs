@@ -63,9 +63,7 @@ export declare enum PropWatches {
     NONE = "none",
     IMMUTABLE = "immutable"
 }
-/** Wraps a function tag in a state manager and calls wrapped function on event cycles
- * For single rendering, no event cycles, use: tag.renderOnce = (props) => html``
- */
+/** Wraps a function tag in a state manager and calls wrapped function on event cycles */
 export declare function tag<T extends ToTag>(tagComponent: T, propWatch?: PropWatches): TaggedFunction<T>;
 type outputAlias = typeof output;
 type getInnerHTMLAlias = typeof getInnerHTML;
@@ -75,7 +73,6 @@ export declare namespace tag {
      */
     let use: typeof tagUseFn;
     /** Used to create a tag component that renders once and has no addition rendering cycles */
-    let renderOnce: typeof renderOnceFn;
     let route: typeof routeFn;
     let app: (_routeTag: RouteTag) => StateToTag;
     let deepPropWatch: typeof tag;
@@ -97,7 +94,6 @@ type ReturnTag = AnyTag | StateToTag | null | undefined;
  * Example: export default tag.route = (routeProps: RouteProps) => (state) => html``
  */
 declare function routeFn(_routeProps: RouteProps): StateToTag;
-declare function renderOnceFn(): ReturnTag;
 /** Used to create variable scoping when calling a function that lives within a prop container function */
 declare function tagUseFn(): ReturnTag;
 export {};

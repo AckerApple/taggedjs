@@ -19,18 +19,25 @@ export function processDesignElementUpdate(value, context, ownerSupport) {
     }
     const contexts = context.contexts;
     const vContexts = value.contexts || [];
-    const ogListeners = context.tagJsVar.allListeners;
-    const allListeners = value.allListeners;
-    allListeners.forEach((newListener, index) => {
+    const oldElement = context.tagJsVar;
+    const newElement = value;
+    const ogListeners = oldElement.allListeners;
+    const allListeners = newElement.allListeners;
+    for (let index = 0; index < allListeners.length; ++index) {
+        const newListener = allListeners[index];
         // ensure the latest callback is always called. Needed for functions within array maps
         const wrapCallback = ogListeners[index][1];
         wrapCallback.toCallback = newListener[1].toCallback;
-    });
+    }
     if (contexts.length !== vContexts.length) {
+        const conValues = new Array(contexts.length);
+        for (let index = 0; index < contexts.length; ++index) {
+            conValues[index] = contexts[index].value;
+        }
         console.info('context mismatch', {
             value,
             context,
-            conValues: contexts.map(x => x.value),
+            conValues,
             vContexts,
             deleted: context.deleted,
             contexts
@@ -38,10 +45,10 @@ export function processDesignElementUpdate(value, context, ownerSupport) {
         throw new Error(`Expected ${contexts.length} contexts but got ${vContexts.length}`);
     }
     context.locked = 79;
-    contexts.forEach((context, index) => {
-        context.tagJsVar.processUpdate(vContexts[index], // context.value,
-        context, ownerSupport);
-    });
+    for (let index = 0; index < contexts.length; ++index) {
+        const item = contexts[index];
+        item.tagJsVar.processUpdate(vContexts[index], item, ownerSupport);
+    }
     delete context.locked;
 }
 export function checkTagElementValueChange(value, context) {
@@ -52,18 +59,18 @@ export function checkTagElementValueChange(value, context) {
     if (oldValue === value) {
         return 0; // has not changed
     }
-    // return 1 // it has changed
-    const notElement = !value || value.tagJsType !== 'element';
-    if (notElement) {
+    if (value.tagJsType !== 'element' || oldValue === null) {
         return 1;
     }
-    const newContentId = value.contentId;
-    const oldContentId = context.value.contentId;
+    const newElement = value;
+    const oldElement = oldValue;
+    const newContentId = newElement.contentId;
+    const oldContentId = oldElement.contentId;
     if (newContentId !== oldContentId) {
         return 1;
     }
-    const newKidLength = value.innerHTML.length;
-    const oldKidLength = context.value.innerHTML.length;
+    const newKidLength = newElement.innerHTML.length;
+    const oldKidLength = oldElement.innerHTML.length;
     const kidLengthChanged = newKidLength !== oldKidLength;
     if (kidLengthChanged) {
         return 1;

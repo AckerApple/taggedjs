@@ -1,5 +1,4 @@
 // taggedjs-no-compile
-import { htmlInterpolationToDomMeta } from '../interpolations/optimizers/htmlInterpolationToDomMeta.function.js';
 import { replacePlaceholders } from '../interpolations/optimizers/replacePlaceholders.function.js';
 import { isLastRunMatched } from './isLastRunMatched.function.js';
 import { getStringsId } from './getStringsId.function.js';
@@ -12,7 +11,7 @@ export function getDomMeta(strings, values) {
     if (matches) {
         return lastRun.domMetaMap;
     }
-    const domMeta = htmlInterpolationToDomMeta(strings, values);
+    const domMeta = ''; // htmlInterpolationToDomMeta(strings, values)
     const map = replacePlaceholders(domMeta, values.length);
     const template = {
         interpolation: undefined,

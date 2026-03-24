@@ -94,7 +94,6 @@ function getNewSubject(templater, appElement) {
     const context = {
         updateCount: 0,
         value: templater,
-        valueIndex: 0,
         varCounter: 0,
         destroy$: new Subject(),
         render$: new Subject(),

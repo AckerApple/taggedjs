@@ -142,9 +142,11 @@ function parseAttrString(attrMatch, valueIndex, valuePositions, attributes) {
     const attrName = attrMatch[1] || attrMatch[3] || attrMatch[5];
     const attrChoice = attrMatch[2] || attrMatch[4] || attrMatch[6];
     let attrValue = attrChoice;
+    /*
     if (attrName === undefined) {
-        return valueIndex;
+      return valueIndex
     }
+    */
     const notEmpty = attrMatch[2] !== '';
     const noValue = attrValue === undefined && notEmpty;
     const lowerName = attrName.toLowerCase();

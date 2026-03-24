@@ -18,7 +18,6 @@ type ValueTypeObject = {
     templater: string;
     tagComponent: string;
     tagArray: string;
-    renderOnce: string;
     stateRender: string;
     version: number;
     subscribe: string;

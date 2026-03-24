@@ -8,6 +8,7 @@ export { elementVarToHtmlString } from './elementVarToHtmlString.function.js';
 export declare const button: import("./ElementFunction.type.js").ElementFunction;
 export declare const select: import("./ElementFunction.type.js").ElementFunction;
 export declare const option: import("./ElementFunction.type.js").ElementFunction;
+export declare const optgroup: import("./ElementFunction.type.js").ElementFunction;
 export declare const input: import("./ElementFunction.type.js").ElementFunction;
 export declare const textarea: import("./ElementFunction.type.js").ElementFunction;
 export declare const html: import("./ElementFunction.type.js").ElementFunction;

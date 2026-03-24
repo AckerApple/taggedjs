@@ -10,7 +10,7 @@ export type RouteProps = {
     paramSubject: ValueSubject<string>;
     query: RouteQuery;
 };
-type BasicResponse = ReadOnlyVar | StateToTag | AnyTag | number | string | any[];
+type BasicResponse = ReadOnlyVar | StateToTag | AnyTag | number | string | boolean | any[];
 type TagResponse = BasicResponse | (() => BasicResponse);
 export type SimpleToTag = ((...props: any[]) => TagResponse | (TagResponse | ((_contextItem: ContextItem) => BasicResponse))[]);
 export type ToTag = SimpleToTag | (() => SimpleToTag);

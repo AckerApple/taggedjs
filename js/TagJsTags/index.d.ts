@@ -1,7 +1,7 @@
 export * from './subscribe.function.js';
 export * from './getInnerHTML.function.js';
 export * from './tag.function.js';
-export { checkSimpleValueChange, deleteSimpleValue } from './getSimpleTagVar.function.js';
+export { checkSimpleValueChange, deleteSimpleValue } from './getStringTagVar.function.js';
 export { pipe } from './pipe.function.js';
 export * from './host.function.js';
 export { valueToTagJsVar } from './valueToTagJsVar.function.js';

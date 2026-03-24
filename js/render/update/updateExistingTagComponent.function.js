@@ -1,7 +1,4 @@
 import { castProps } from '../../tag/props/alterProp.function.js';
-// import { renderSupport } from'../renderSupport.function.js'
-import { destroySupport } from '../destroySupport.function.js';
-import { getNewGlobal } from '../../tag/update/getNewGlobal.function.js';
 import { syncPriorPropFunction } from '../../tag/update/syncPriorPropFunction.function.js';
 export function syncFunctionProps(newSupport, oldSupport, ownerSupport, newPropsArray, // templater.props
 maxDepth, depth = -1) {
@@ -49,15 +46,5 @@ export function moveProviders(oldSupport, newSupport) {
             }
         }
     }
-}
-/** Was tag, will be tag */
-function swapTags(contextItem, templater, // new tag
-ownerSupport) {
-    const global = contextItem.global;
-    const oldestSupport = contextItem.state.oldest;
-    destroySupport(oldestSupport, global);
-    getNewGlobal(contextItem);
-    const t = templater;
-    t.processInit(templater, contextItem, ownerSupport, contextItem.placeholder);
 }
 //# sourceMappingURL=updateExistingTagComponent.function.js.map

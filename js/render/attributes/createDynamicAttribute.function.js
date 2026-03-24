@@ -25,7 +25,6 @@ values, parentContext) {
                 attrName: attrName,
                 withinOwnerElement: true,
                 tagJsVar,
-                valueIndex: parentContext.varCounter, // contexts.length,
                 parentContext,
                 destroy$: new Subject(),
                 render$: new Subject(),
@@ -83,8 +82,6 @@ support, isSpecial, varIndex) {
         tagJsVar,
         destroy$: new Subject(),
         render$: new Subject(),
-        // paintCommands: [],
-        valueIndex: varIndex,
         parentContext,
     };
     context.push(contextItem);

@@ -2,36 +2,38 @@
 import { tagValueUpdateHandler } from '../tagValueUpdateHandler.function.js';
 import { destroyArrayItem, runArrayItemDiff } from './compareArrayItems.function.js';
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js';
-import { batchAfters } from '../../../render/paint.function.js';
-export function processTagArray(contextItem, value, // arry of Tag classes
+import { enqueueBatchAfterUnique } from '../../../render/paint.function.js';
+const notCasted = Symbol('not-casted');
+const noArgs = [];
+export function processTagArray(context, value, // arry of Tag classes
 ownerSupport, appendTo) {
-    const noPriorRun = contextItem.lastArray === undefined;
+    const noPriorRun = context.lastArray === undefined;
     if (noPriorRun) {
-        contextItem.lastArray = [];
+        context.lastArray = [];
     }
-    const lastArray = contextItem.lastArray;
-    let runtimeInsertBefore = contextItem.placeholder;
+    const lastArray = context.lastArray;
+    let runtimeInsertBefore = context.placeholder;
     const length = value.length;
-    const castedCache = new Array(length);
-    const castedCacheSet = new Array(length);
+    const castedCache = new Array(length).fill(notCasted);
     const getCastedArrayItem = function getCastedArrayItem(index) {
-        if (castedCacheSet[index]) {
-            return castedCache[index];
+        const cached = castedCache[index];
+        if (cached !== notCasted) {
+            return cached;
         }
         const casted = castArrayItem(value[index]);
         castedCache[index] = casted;
-        castedCacheSet[index] = true;
         return casted;
     };
     let batchUpdates = noPriorRun ? false : length !== lastArray.length;
     // ARRAY DELETES
     if (!noPriorRun) {
         // on each loop check the new length
-        const results = runArrayDeleteCheck(lastArray, value, contextItem, batchUpdates, getCastedArrayItem);
+        const results = runArrayDeleteCheck(lastArray, value, context, batchUpdates, getCastedArrayItem);
         batchUpdates = results.batchUpdates;
     }
+    const liveArray = context.lastArray;
     for (let index = 0; index < length; ++index) {
-        const newSubject = reviewArrayItem(index, contextItem.lastArray, ownerSupport, batchUpdates, getCastedArrayItem, runtimeInsertBefore, appendTo);
+        const newSubject = reviewArrayItem(index, liveArray, ownerSupport, batchUpdates, getCastedArrayItem, runtimeInsertBefore, appendTo);
         runtimeInsertBefore = newSubject.placeholder;
     }
 }
@@ -39,6 +41,7 @@ function runArrayDeleteCheck(lastArray, value, contextItem, batchUpdates, getCas
     /** 🗑️ remove previous items first */
     const filteredLast = [];
     let removed = 0;
+    const maxIndex = value.length - 1;
     for (let index = 0; index < lastArray.length; ++index) {
         const item = lastArray[index];
         if (item.locked === 1) {
@@ -49,7 +52,7 @@ function runArrayDeleteCheck(lastArray, value, contextItem, batchUpdates, getCas
             continue;
         }
         // 👁️ COMPARE & REMOVE
-        const newRemoved = compareArrayItems(value, index, lastArray, removed, getCastedArrayItem);
+        const newRemoved = compareArrayItems(index, lastArray, removed, maxIndex, getCastedArrayItem);
         if (newRemoved === 0) {
             filteredLast.push(item);
             continue;
@@ -62,7 +65,7 @@ function runArrayDeleteCheck(lastArray, value, contextItem, batchUpdates, getCas
         removed = removed + newRemoved;
     }
     contextItem.lastArray = filteredLast;
-    return { removed, batchUpdates };
+    return { batchUpdates };
 }
 /** new and old array items processed here */
 function reviewArrayItem(index, lastArray, ownerSupport, batchUpdates, getCastedArrayItem, runtimeInsertBefore, // used during updates
@@ -70,7 +73,7 @@ appendTo) {
     const item = getCastedArrayItem(index);
     const previousContext = lastArray[index];
     if (previousContext) {
-        return reviewPreviousArrayItem(item, previousContext, lastArray, ownerSupport, index, batchUpdates, runtimeInsertBefore, appendTo);
+        return reviewPreviousArrayItem(item, previousContext, ownerSupport, batchUpdates, runtimeInsertBefore, appendTo);
     }
     // 🆕 NEW Array items processed below
     const context = createAndProcessContextItem(item, ownerSupport, lastArray, // acts as contexts aka Context[]
@@ -84,39 +87,28 @@ appendTo) {
     }
     return context;
 }
-function reviewPreviousArrayItem(value, context, lastArray, ownerSupport, index, batchUpdates, // delay render
-runtimeInsertBefore, // used during updates
-appendTo) {
+function reviewPreviousArrayItem(value, context, ownerSupport, batchUpdates, // delay render
+_runtimeInsertBefore, // used during updates
+_appendTo) {
     if (batchUpdates) {
-        batchAfters.push([function arrayBatchAfterHandler() {
-                tagValueUpdateHandler(value, context, ownerSupport);
-            }, []]);
+        enqueueBatchAfterUnique(context, [runArrayBatchAfterHandler, [value, context, ownerSupport]]);
         context.value = value;
         return context;
     }
-    const couldBeSame = lastArray.length > index;
-    if (couldBeSame) {
-        // array item returned array
-        if (Array.isArray(value)) {
-            context.tagJsVar.processUpdate(value, context, ownerSupport, []);
-            context.value = value;
-            return context;
-        }
-        tagValueUpdateHandler(value, context, ownerSupport);
+    // array item returned array
+    if (Array.isArray(value)) {
+        context.tagJsVar.processUpdate(value, context, ownerSupport, noArgs);
+        context.value = value;
         return context;
     }
-    // NEW REPLACEMENT
-    const contextItem = createAndProcessContextItem(value, ownerSupport, lastArray, runtimeInsertBefore, appendTo);
-    // Added to previous array
-    lastArray.push(contextItem);
-    return contextItem;
+    const tagValueUpdateResult = tagValueUpdateHandler(value, context, ownerSupport);
+    return context;
 }
 /** Run within first array processing loop
  *  1 = destroyed, 2 = value changes, 0 = no change */
-function compareArrayItems(value, index, lastArray, removed, getCastedArrayItem) {
-    const newLength = value.length - 1;
+function compareArrayItems(index, lastArray, removed, maxIndex, getCastedArrayItem) {
     const at = index - removed;
-    const lessLength = at < 0 || newLength < at;
+    const lessLength = at < 0 || maxIndex < at;
     const prevContext = lastArray[index];
     if (lessLength) {
         destroyArrayItem(prevContext);
@@ -129,6 +121,9 @@ function compareArrayItems(value, index, lastArray, removed, getCastedArrayItem)
     const newValueTag = getCastedArrayItem(index);
     const result = runArrayItemDiff(oldKey, newValueTag, prevContext, lastArray, index);
     return result;
+}
+function runArrayBatchAfterHandler(value, context, ownerSupport) {
+    tagValueUpdateHandler(value, context, ownerSupport);
 }
 // For when an item in the array is a function
 export function castArrayItem(item) {

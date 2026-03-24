@@ -24,7 +24,9 @@ appendTo) {
             checkToPaint(syncRun);
         };
     };
-    const subContext = setupSubscribeCallbackProcessor(observables, ownerSupport, (value, syncRun, subContext) => onOutput(value, syncRun, subContext), value, contextItem);
+    const subContext = setupSubscribeCallbackProcessor(observables, ownerSupport, (value, syncRun, subContext) => {
+        return onOutput(value, syncRun, subContext);
+    }, value, contextItem);
     subContext.appendMarker = appendMarker;
     contextItem.subContext = subContext;
     value.processUpdate = processUpdateSubscribe;

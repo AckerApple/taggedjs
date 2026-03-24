@@ -9,10 +9,26 @@ export let paintAppends = [];
 export let paintAfters = []; // callbacks after all painted
 let batchCycleOpen = false;
 export const batchAfters = []; // callbacks after all painted with a paint cycle after all
+const batchAfterChunkSize = 400;
+let batchAfterHead = 0;
+const batchAfterByKey = new Map();
 export const painting = {
     locks: 0,
     removeLocks: 0,
 };
+export function enqueueBatchAfter(command) {
+    batchAfters.push(command);
+}
+export function enqueueBatchAfterUnique(key, command) {
+    const existingIndex = batchAfterByKey.get(key);
+    if (existingIndex !== undefined && existingIndex >= batchAfterHead) {
+        batchAfters[existingIndex] = command;
+        return;
+    }
+    const index = batchAfters.length;
+    batchAfters.push(command);
+    batchAfterByKey.set(key, index);
+}
 export function setContent(text, textNode) {
     textNode.textContent = text;
 }
@@ -29,7 +45,7 @@ function runCycles() {
     runPaintCycles();
     --painting.locks;
     runAfterCycle();
-    runBatchAfterCycle();
+    checkBatchAfterCycle();
 }
 /** Deletes happen last */
 function runAfterCycle() {
@@ -41,35 +57,54 @@ function runAfterCycle() {
     }
 }
 /* After paint  full cycle, these paint batches will all run together and then paint all together */
-function runBatchAfterCycle() {
+function checkBatchAfterCycle() {
     if (batchCycleOpen || !batchAfters.length) {
         return;
     }
-    batchCycleOpen = true;
-    // queueMicrotask(() => {
-    requestAnimationFrame(() => {
-        ++painting.locks;
-        while (batchAfters.length) {
-            const content = batchAfters.shift();
-            content[0](...content[1]);
-        }
-        runPaintCycles(); // actual paint with no after cycles
-        runAfterCycle();
-        --painting.locks;
-        batchCycleOpen = false;
-    });
+    runBatchAfterCycle();
 }
-function runPaintRemoves() {
-    // element.parentNode.removeChild
-    for (const content of paintRemoves) {
+function runBatchAfterCycle() {
+    batchCycleOpen = true;
+    requestAnimationFrame(runBatchAfterFrame);
+}
+function runBatchAfterFrame() {
+    ++painting.locks;
+    let processed = 0;
+    while (batchAfterHead < batchAfters.length && processed < batchAfterChunkSize) {
+        const content = batchAfters[batchAfterHead];
+        ++batchAfterHead;
         content[0](...content[1]);
+        ++processed;
     }
+    runPaintCycles(); // actual paint with no after cycles
+    runAfterCycle();
+    --painting.locks;
+    if (batchAfterHead < batchAfters.length) {
+        requestAnimationFrame(runBatchAfterFrame);
+        return;
+    }
+    batchAfters.length = 0;
+    batchAfterHead = 0;
+    batchAfterByKey.clear();
+    batchCycleOpen = false;
 }
 function runPaintCycles() {
     const removes = paintRemoves.length;
-    runPaintRemoves();
-    // paintRemoves = []
-    paintRemoves.splice(0, removes);
+    for (let index = 0; index < removes; ++index) {
+        const content = paintRemoves[index];
+        content[0](...content[1]);
+    }
+    if (removes === paintRemoves.length) {
+        paintRemoves.length = 0;
+    }
+    else {
+        let writeIndex = 0;
+        for (let readIndex = removes; readIndex < paintRemoves.length; ++readIndex) {
+            paintRemoves[writeIndex] = paintRemoves[readIndex];
+            ++writeIndex;
+        }
+        paintRemoves.length = writeIndex;
+    }
     // styles/attributes and textElement.textContent
     for (const content of paintContent) {
         content[0](...content[1]);

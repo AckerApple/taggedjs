@@ -2,7 +2,6 @@
 import { specialAttribute } from '../../interpolations/attributes/specialAttribute.js';
 import { isFunction } from '../../isInstance.js';
 import { bindSubjectCallback } from '../../interpolations/attributes/bindSubjectCallback.function.js';
-import { ValueTypes } from '../../tag/ValueTypes.enum.js';
 import { paintContent } from '../paint.function.js';
 import { processNonDynamicAttr } from '../../interpolations/attributes/processNameValueAttribute.function.js';
 import { getNewContext } from '../addOneContext.function.js';
@@ -47,7 +46,6 @@ contexts, parentContext, isSpecial) {
         const contextItem = getNewContext(valueInValues, [], // contexts,
         true, parentContext);
         contextItem.description = 'processAttribute';
-        contextItem.valueIndex = varIndex;
         contextItem.isAttr = true;
         contextItem.target = element;
         contextItem.isNameOnly = true;
@@ -73,7 +71,7 @@ contexts, parentContext, isSpecial) {
 export function processAttributeEmit(newAttrValue, attrName, subject, element, support, howToSet, isSpecial) {
     // should the function be wrapped so every time its called we re-render?
     if (isFunction(newAttrValue)) {
-        return callbackFun(support, newAttrValue, element, attrName, isSpecial, howToSet, subject);
+        return callbackFun(support, newAttrValue, element, attrName);
     }
     return processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support);
 }
@@ -97,16 +95,10 @@ export function processAttributeSubjectValue(newAttrValue, element, attrName, sp
     // value is 0
     howToSet(element, attrName, newAttrValue);
 }
-function callbackFun(support, newAttrValue, element, attrName, isSpecial, howToSet, _subject) {
-    const wrapper = support.templater.wrapper;
-    const tagJsType = wrapper?.tagJsType || wrapper?.original?.tagJsType;
-    const oneRender = tagJsType === ValueTypes.renderOnce;
-    if (!oneRender) {
-        return processTagCallbackFun(
-        // subject,
-        newAttrValue, support, attrName, element);
-    }
-    return processAttributeSubjectValue(newAttrValue, element, attrName, isSpecial, howToSet, support);
+function callbackFun(support, newAttrValue, element, attrName) {
+    return processTagCallbackFun(
+    // subject,
+    newAttrValue, support, attrName, element);
 }
 export function processTagCallbackFun(
 // subject: AttributeContextItem,

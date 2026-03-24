@@ -1,5 +1,5 @@
 import { isArray } from '../isInstance.js';
-import { getSimpleTagVar } from './getSimpleTagVar.function.js';
+import { getSimpleTagVar } from './getStringTagVar.function.js';
 import { getArrayTagVar } from './getArrayTagJsTag.function.js';
 export function valueToTagJsVar(value) {
     const tagJsType = value?.tagJsType;

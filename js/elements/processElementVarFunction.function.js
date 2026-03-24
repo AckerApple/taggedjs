@@ -43,8 +43,6 @@ export function processElementVarFunction(item, element, parentContext, ownerSup
                 return result;
             }
         },
-        // TODO: Not needed
-        valueIndex: -1,
         withinOwnerElement: true,
         destroy$: new Subject(),
         render$: new Subject(),

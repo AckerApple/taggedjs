@@ -1,5 +1,4 @@
 import { variablePrefix, variableSuffix } from "../../tag/DomTag.type.js";
-import { parseHTML } from "./parseHTML.function.js";
 export const realTagsRegEx = new RegExp(variablePrefix + '(\\d+)' + variableSuffix, 'gi');
 export const findRealTagsRegEx = new RegExp('(' + variablePrefix + '\\d+' + variableSuffix + ')', 'gi');
 // without last letter
@@ -11,7 +10,7 @@ const replacement = shortFront + '&#x72;$1' + variableSuffix;
 export function htmlInterpolationToDomMeta(strings, values) {
     // Parse the modified fragments
     const htmlString = htmlInterpolationToPlaceholders(strings, values).join('');
-    const domMeta = parseHTML(htmlString);
+    const domMeta = ''; // parseHTML(htmlString)
     return domMeta;
 }
 export function htmlInterpolationToPlaceholders(strings, values) {

@@ -1,5 +1,4 @@
 import { ValueTypes } from './ValueTypes.enum.js';
-import { processTagInit } from './update/processTagInit.function.js';
 import { checkTagValueChangeAndUpdate } from './checkTagValueChange.function.js';
 import { destroySupportByContextItem } from './destroySupportByContextItem.function.js';
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js';
@@ -8,7 +7,7 @@ export function getTemplaterResult(propWatch, props) {
     const templater = {
         component: false,
         tagJsType: ValueTypes.templater,
-        processInit: processTagInit,
+        processInit: '', // processTagInit,
         processInitAttribute: blankHandler,
         processUpdate: tagValueUpdateHandler,
         hasValueChanged: checkTagValueChangeAndUpdate,

@@ -1,4 +1,4 @@
-import { BasicTypes, ValueTypes } from '../index.js';
+import { BasicTypes } from '../index.js';
 import { tryUpdateToTag } from './tryUpdateToTag.function.js';
 import { isArray } from '../../isInstance.js';
 import { processTagArray } from './arrays/processTagArray.js';
@@ -9,9 +9,6 @@ export function updateToDiffValue(newValue, context, ownerSupport, ignoreOrDestr
     const tagJsType = newValue && newValue.tagJsType;
     delete context.deleted;
     if (tagJsType) {
-        if (tagJsType === ValueTypes.renderOnce) {
-            return;
-        }
         tryUpdateToTag(context, newValue, ownerSupport);
         return;
     }

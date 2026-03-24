@@ -1,6 +1,6 @@
 import { isSpecialAttr } from "../interpolations/attributes/isSpecialAttribute.function.js";
 import { processNonDynamicAttr } from "../interpolations/attributes/processNameValueAttribute.function.js";
-import { checkSimpleValueChange, deleteSimpleAttribute } from "./getSimpleTagVar.function.js";
+import { checkSimpleValueChange, deleteSimpleAttribute } from "./getStringTagVar.function.js";
 import { processAttributeUpdate } from "./processAttributeUpdate.function.js";
 /** init runner */
 export function processSimpleAttribute(name, value, // TemplateValue | StringTag | SubscribeValue | SignalObject,

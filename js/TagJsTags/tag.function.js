@@ -5,7 +5,6 @@ import { getTemplaterResult } from '../tag/getTemplaterResult.function.js';
 import { tags } from '../tag/tag.utils.js';
 import { getTagWrap } from '../tag/getTagWrap.function.js';
 import { ValueTypes } from '../tag/ValueTypes.enum.js';
-import { processRenderOnceInit } from '../render/update/processRenderOnceInit.function.js';
 import { processTagComponentInit } from '../tag/update/processTagComponentInit.function.js';
 import { checkTagValueChangeAndUpdate } from '../tag/checkTagValueChange.function.js';
 import { destroySupportByContextItem } from '../tag/destroySupportByContextItem.function.js';
@@ -63,9 +62,7 @@ export var PropWatches;
     PropWatches["NONE"] = "none";
     PropWatches["IMMUTABLE"] = "immutable";
 })(PropWatches || (PropWatches = {}));
-/** Wraps a function tag in a state manager and calls wrapped function on event cycles
- * For single rendering, no event cycles, use: tag.renderOnce = (props) => html``
- */
+/** Wraps a function tag in a state manager and calls wrapped function on event cycles */
 export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
     // ): TagJsComponent<any> {
     /** function developer triggers */
@@ -115,9 +112,6 @@ export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
 function routeFn(_routeProps) {
     throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `');
 }
-function renderOnceFn() {
-    throw new Error('Do not call tag.renderOnce as a function but instead set it as: `(props) => tag.renderOnce = () => html`` `');
-}
 /** Used to create variable scoping when calling a function that lives within a prop container function */
 function tagUseFn() {
     throw new Error('Do not call tag.use as a function but instead set it as: `(props) => tag.use = (use) => html`` `');
@@ -125,7 +119,6 @@ function tagUseFn() {
 // actually placing of items into tag memory
 ;
 tag.element = tagElement;
-tag.renderOnce = renderOnceFn;
 tag.use = tagUseFn;
 tag.deepPropWatch = tag;
 tag.route = routeFn;
@@ -146,17 +139,6 @@ tag.watchProps = function watchProps(tagComponent) {
     return tag(tagComponent, PropWatches.SHALLOW);
 };
 /* BELOW: Cast functions into setters with no getters */
-Object.defineProperty(tag, 'renderOnce', {
-    set(oneRenderFunction) {
-        oneRenderFunction.tagJsType = ValueTypes.renderOnce;
-        oneRenderFunction.processInit = processRenderOnceInit;
-        oneRenderFunction.processUpdate = tagValueUpdateHandler;
-        oneRenderFunction.destroy = destroySupportByContextItem;
-        oneRenderFunction.hasValueChanged = function renderOnceNeverChanges() {
-            return 0;
-        };
-    },
-});
 Object.defineProperty(tag, 'use', {
     set(renderFunction) {
         renderFunction.original = {

@@ -14,20 +14,11 @@ contextItem, ownerSupport) {
     if (contextItem.deleted) {
         return;
     }
-    // some values, like style, get rearranged and there value appearance may not match context appearance
-    const valueIndex = contextItem.valueIndex;
-    const newValue = values[valueIndex];
-    // Removed, let the TagJsTags do the checking
-    // Do not continue if the value is just the same
-    /*
-    if(newValue === contextItem.value) {
-      return
-    }
-    */
     const TagJsTag = contextItem.tagJsVar;
     setContextInCycle(contextItem);
-    TagJsTag.processUpdate(newValue, contextItem, ownerSupport, values);
+    TagJsTag.processUpdate('', // newValue,
+    contextItem, ownerSupport, values);
     removeContextInCycle();
-    contextItem.value = newValue;
+    // contextItem.value = newValue
 }
 //# sourceMappingURL=processUpdateContext.function.js.map

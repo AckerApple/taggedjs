@@ -25,16 +25,20 @@ function attr(item, args) {
 /** attrs({names: values}) */
 function attrs(item, args) {
     const clone = getPushKid(item, item.elementFunctions);
-    Object.entries(args).map(args => {
-        clone.attributes.push(args);
-        bumpContentId(clone, args[1]);
-        if (isValueForContext(args[0])) {
-            registerMockAttrContext(args[0], clone); // the attrName is a function or TagJsTag
+    for (const name in args) {
+        if (!Object.prototype.hasOwnProperty.call(args, name)) {
+            continue;
         }
-        else if (isValueForContext(args[1])) {
-            registerMockAttrContext(args[1], clone); // the attrValue is a function or TagJsTag
+        const value = args[name];
+        clone.attributes.push([name, value]);
+        bumpContentId(clone, value);
+        if (isValueForContext(name)) {
+            registerMockAttrContext(name, clone); // the attrName is a function or TagJsTag
         }
-    });
+        else if (isValueForContext(value)) {
+            registerMockAttrContext(value, clone); // the attrValue is a function or TagJsTag
+        }
+    }
     return clone;
 }
 // any added here need to appear within `ts/elements/ElementFunction.type.ts`
@@ -158,14 +162,18 @@ function makeAttr(handler) {
 }
 function setClassValue(element, name, value) {
     if (isObject(value)) {
-        Object.entries(value).forEach(([name, value]) => {
-            if (value) {
-                element.classList.add(name);
+        for (const className in value) {
+            if (!Object.prototype.hasOwnProperty.call(value, className)) {
+                continue;
+            }
+            const classValue = value[className];
+            if (classValue) {
+                element.classList.add(className);
             }
             else {
-                element.classList.remove(name);
+                element.classList.remove(className);
             }
-        });
+        }
         return; // howToSetInputObjectValue(element, name, value as Record<string, any>)
     }
     setSimpleAttribute(element, name, value);
@@ -217,10 +225,13 @@ const callables = Object.assign(Object.fromEntries(['checked', 'disabled', 'sele
     class: setupAttr('class', setClassValue),
 }, objectAttrEventCallables);
 export function loopObjectAttributes(item, object) {
-    const result = Object.entries(object).reduce((all, [name, value]) => {
-        return processSetAttribute(name, value, item);
-    }, item);
-    return result;
+    for (const name in object) {
+        if (!Object.prototype.hasOwnProperty.call(object, name)) {
+            continue;
+        }
+        processSetAttribute(name, object[name], item);
+    }
+    return item;
 }
 function processSetAttribute(name, value, item) {
     if (name in callables) {
