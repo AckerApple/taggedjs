@@ -2,6 +2,7 @@ import { isFunction, isObject } from '../index.js';
 import { setBooleanAttribute, setNonFunctionInputValue, setSimpleAttribute } from '../interpolations/attributes/howToSetInputValue.function.js';
 import { getPushKid } from './htmlTag.function.js';
 import { makeAttrCallable } from './attributeCallables.js';
+import { ATTRIBUTE_CALLABLE_DEFS } from './elementAttributes.array.js';
 function callbackWrapper(item, eventName, callback) {
     const clone = getPushKid(item, item.elementFunctions);
     return callbackWrapper2(clone, eventName, callback);
@@ -41,49 +42,6 @@ function attrs(item, args) {
     }
     return clone;
 }
-// any added here need to appear within `ts/elements/ElementFunction.type.ts`
-const ATTRIBUTE_CALLABLE_DEFS = [
-    ['alt', 'alt'],
-    ['ariaLabel', 'aria-label'],
-    ['referrerPolicy', 'referrerpolicy'],
-    ['autoFocus', 'autoFocus'],
-    ['border', 'border'],
-    ['id', 'id'],
-    ['for', 'for'],
-    ['fill', 'fill'],
-    ['content', 'content'],
-    ['charset', 'charset'],
-    ['cellPadding', 'cellpadding'],
-    ['cellSpacing', 'cellspacing'],
-    ['class', 'class'],
-    ['href', 'href'],
-    ['lang', 'lang'],
-    ['loading', 'loading'],
-    ['value', 'value'],
-    ['placeholder', 'placeholder'],
-    ['src', 'src'],
-    ['title', 'title'],
-    ['width', 'width'],
-    ['height', 'height'],
-    ['type', 'type'],
-    ['min', 'min'],
-    ['max', 'max'],
-    ['step', 'step'],
-    ['name', 'name'],
-    ['wrap', 'wrap'],
-    ['checked', 'checked'],
-    ['disabled', 'disabled'],
-    ['selected', 'selected'],
-    ['minLength', 'minLength'],
-    ['maxLength', 'maxLength'],
-    ['open', 'open'],
-    ['rel', 'rel'],
-    ['rows', 'rows'],
-    ['style', 'style'],
-    ['target', 'target'],
-    ['viewBox', 'viewBox'],
-    ['valign', 'valign'],
-];
 const attributeCallableHandlers = Object.fromEntries(ATTRIBUTE_CALLABLE_DEFS.map(([apiName, attrName]) => [apiName, makeAttrCallable(attrName, attr)]));
 const ELEMENT_EVENT_DEFS = [
     ['onClose', 'onclose'],
