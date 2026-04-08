@@ -103,6 +103,15 @@ export const content = tag(() => {
       // 'c:', xx,
     ),
 
+    fieldset(
+      legend('HTML String Decoding'),
+      div('Hello world & Hello earth'),
+      div('Hello world &amp; Hello earth'),
+      div('Hello world gt; Hello earth'),
+      div('Hello world > Hello earth'),
+      div('Hello script tag <script></script>'),
+    ),
+
     fieldset.style`flex-grow:1`(legend(
         'piped subject click ',
         span.id`pipe-counter-click-display`(_=> counter)

@@ -11,7 +11,7 @@
 import { LikeObjectChildren } from "taggedjs/js/interpolations/optimizers/LikeObjectElement.type.js"
 import { HmrImport } from "./hmr.js"
 import { switchAllProviderConstructors } from "./switchAllProviderConstructors.function"
-import { DomTag, StringTag, buildBeforeElement, ContextItem, destroySupport, paint, Support, SupportTagGlobal, TaggedFunction, Wrapper, AnySupport, SupportContextItem, Original, ContextStateSupport } from "taggedjs"
+import { DomTag, StringTag, ContextItem, destroySupport, paint, Support, SupportTagGlobal, TaggedFunction, Wrapper, AnySupport, SupportContextItem, Original, ContextStateSupport } from "taggedjs"
 
 /** @typedef {{renderTagOnly: renderTagOnly, renderSupport: renderSupport, renderWithSupport: renderWithSupport}} HmrImport */
 
@@ -123,12 +123,12 @@ async function swapSupport(
       switchAllProviderConstructors(appSupport, provider)
     })
   }
-
+/*
   buildBeforeElement(
     reSupport,
     undefined,
     placeholder,
-  )
+  )*/
 
   recurseContext(contextSubject.contexts as SupportContextItem[], reSupport)
 

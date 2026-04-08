@@ -47,7 +47,6 @@ function templaterToSupport(
     renderCount: 0,
     updateCount: 0,
     varCounter: 0,
-    valueIndex: 0,
 
     destroy$: new Subject(),
     render$: new Subject(),
@@ -122,20 +121,7 @@ function processValue(
         const tagString = templaterToHtml(value as TemplaterResult, support.context)
         strings.splice(index+1, 0, tagString)
         break
-  
-      case ValueTypes.renderOnce: 
-        const tSupport = oneRenderToSupport(
-          value as any,
-          subject as ContextItem,
-          support, // ownerTagSupport as TagSupport,
-        )
-  
-        readySupport(tSupport, subject as SupportContextItem)
-  
-        const fnString = templaterToHtml(tSupport.templater, support.context)
-        strings.splice(index+1, 0, fnString)
-        break
-   
+     
       case ValueTypes.templater:
       case ValueTypes.tag:
         const tag = (value as any).tag as StringTag // ??? TODO
@@ -152,7 +138,6 @@ function processValue(
             {
               updateCount: 0,
               value,
-              valueIndex,
               global: getNewGlobal(subject as SupportContextItem),
               parentContext: support.context,
               tagJsVar: valueToTagJsVar(value),
