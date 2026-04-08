@@ -217,11 +217,14 @@ export function paintAppend(
 const contentCleaner = (typeof document === 'object' && document.createElement('div')) as HTMLDivElement // used for content cleaning
 
 function toPlainTextElm(text: string) {
+  /*
   // swap &gt; for >
   contentCleaner.innerHTML = text // script tags should have already been sanitized before this step
 
   // delete <!-- -->
   return document.createTextNode(contentCleaner.innerHTML as string)
+  */
+ return document.createTextNode(text)
 }
 
 export function paintBeforeText(

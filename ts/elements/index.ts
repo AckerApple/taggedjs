@@ -2,7 +2,7 @@ import { htmlTag } from './htmlTag.function.js'
 export type { Attributes } from './htmlTag.function.js'
 export type { TagChildContent, HtmlItem, ToHtmlItem, ElementFunction } from './ElementFunction.type.js'
 export { htmlTag }
-export type { CombinedElementFunctions } from './ElementFunction.type.js'
+export type { CombinedElementFunctions } from './elementAttributes.array.js'
 export { noElement } from './noElement.function.js'
 export { elementVarToHtmlString } from './elementVarToHtmlString.function.js'
 

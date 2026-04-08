@@ -13,7 +13,14 @@ export function runArrayItemDiff(
   lastArray: LastArrayItem[],
   index: number
 ) {
-  const keyValue = (newValueTag as any).arrayValue
+  const keyValue = (newValueTag as any)?.arrayValue
+  /*
+  if( keyValue === undefined ) {
+    destroyArrayItem(prevContext)
+    lastArray.splice(index, 1)
+    return 3
+  }*/
+
   const newKey = keyValue || index
 
   let isDiff = oldKey !== newKey
