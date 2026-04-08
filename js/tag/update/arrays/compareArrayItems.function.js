@@ -1,11 +1,12 @@
 import { destroySupport } from '../../../render/destroySupport.function.js';
 export function runArrayItemDiff(oldKey, newValueTag, prevContext, lastArray, index) {
-    if (!newValueTag) {
-        destroyArrayItem(prevContext);
-        lastArray.splice(index, 1);
-        return 3;
-    }
-    const keyValue = newValueTag.arrayValue;
+    const keyValue = newValueTag?.arrayValue;
+    /*
+    if( keyValue === undefined ) {
+      destroyArrayItem(prevContext)
+      lastArray.splice(index, 1)
+      return 3
+    }*/
     const newKey = keyValue || index;
     let isDiff = oldKey !== newKey;
     if (isDiff === false && keyValue === undefined) {

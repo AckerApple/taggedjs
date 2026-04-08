@@ -150,10 +150,14 @@ export function paintAppend(relative, element) {
 }
 const contentCleaner = (typeof document === 'object' && document.createElement('div')); // used for content cleaning
 function toPlainTextElm(text) {
+    /*
     // swap &gt; for >
-    contentCleaner.innerHTML = text; // script tags should have already been sanitized before this step
+    contentCleaner.innerHTML = text // script tags should have already been sanitized before this step
+  
     // delete <!-- -->
-    return document.createTextNode(contentCleaner.innerHTML);
+    return document.createTextNode(contentCleaner.innerHTML as string)
+    */
+    return document.createTextNode(text);
 }
 export function paintBeforeText(relative, text, callback = blankHandler, _caller) {
     const textElm = toPlainTextElm(text);
