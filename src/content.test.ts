@@ -1,41 +1,15 @@
 import { describe, it, expect } from './testing'
-import { byId, click, html, query, changeOne, count, textContent } from './testing'
-import { sleep } from './testing'
-
-// Helper function to wait for animations to complete
-async function waitForAnimationsToComplete(selector: string, expectedCount: number, maxWait: number = 5000) {
-  const startTime = Date.now();
-  
-  while (Date.now() - startTime < maxWait) {
-    const animatingCount = count(`.animate__animated${selector}`);
-    if (animatingCount === expectedCount) {
-      // Wait a bit more to ensure the animation state has stabilized
-      await sleep(50);
-      return true;
-    }
-    await sleep(10);
-  }
-  
-  throw new Error(`Timeout waiting for animations to complete. Expected ${expectedCount} animating elements matching '.animate__animated${selector}', but found ${count(`.animate__animated${selector}`)}`);
-}
-
-// Helper to wait for elements to appear/disappear
-async function waitForElementCount(selector: string, expectedCount: number, maxWait: number = 5000) {
-  const startTime = Date.now();
-  
-  while (Date.now() - startTime < maxWait) {
-    const currentCount = count(selector);
-    if (currentCount === expectedCount) {
-      await sleep(50); // Small delay to ensure stability
-      return true;
-    }
-    await sleep(10);
-  }
-  
-  throw new Error(`Timeout waiting for element count. Expected ${expectedCount} elements matching '${selector}', but found ${count(selector)}`);
-}
+import { byId, click, html, query, changeOne, textContent } from './testing'
 
 describe('📰 content', () => {
+  it('sanitized', () => {
+    expect(html('#string-test-0')).toBe('Hello world & Hello earth')
+    expect(html('#string-test-1')).toBe('Hello world &amp; Hello earth')
+    expect(html('#string-test-2')).toBe('Hello world gt; Hello earth')
+    expect(html('#string-test-3')).toBe('Hello world > Hello earth')
+    expect(html('#string-test-4')).toBe('Hello script tag <script></script>')
+  })
+
   it('spacing', () => {
     expect(html('#hello-big-string-world')).toBe('hello <b>big</b> world')
     expect(html('#hello-spacing-dom-world')).toBe('54 hello worlds')

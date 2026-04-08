@@ -105,11 +105,11 @@ export const content = tag(() => {
 
     fieldset(
       legend('HTML String Decoding'),
-      div('Hello world & Hello earth'),
-      div('Hello world &amp; Hello earth'),
-      div('Hello world gt; Hello earth'),
-      div('Hello world > Hello earth'),
-      div('Hello script tag <script></script>'),
+      div.id`string-test-0`('Hello world & Hello earth'),
+      div.id`string-test-1`('Hello world &amp; Hello earth'),
+      div.id`string-test-2`('Hello world gt; Hello earth'),
+      div.id`string-test-3`('Hello world > Hello earth'),
+      div.id`string-test-4`('Hello script tag <script></script>'),
     ),
 
     fieldset.style`flex-grow:1`(legend(
