@@ -21,7 +21,8 @@ export type CombinedElementFunctions = ElementVarBase & {
     rel: AttributeCallable;
     /** Vertical alignment hint (legacy/compat usage) */
     valign: AttributeCallable;
-    open: boolean;
+    /** for dialog elements */
+    open: AttributeCallable;
     /** URL target for links and related elements */
     href: AttributeCallable;
     /** Current/input value for form controls */
@@ -48,6 +49,8 @@ export type CombinedElementFunctions = ElementVarBase & {
     src: AttributeCallable;
     /** Visible text rows (commonly for `textarea`) */
     rows: AttributeCallable;
+    /** Form input validation */
+    required: AttributeCallable;
     /** Element/input type behavior */
     type: AttributeCallable;
     /** Advisory text, often shown as tooltip */
@@ -92,6 +95,7 @@ export type CombinedElementFunctions = ElementVarBase & {
     }) => ElementFunction;
     contextMenu: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onCancel: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onDoubleClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onDblClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onBlur: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;

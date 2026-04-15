@@ -19,6 +19,8 @@ export type Attributes = {
     checked?: TruthyVar;
     disabled?: TruthyVar;
     autofocus?: TruthyVar;
+    required?: TruthyVar;
+    open?: TruthyVar;
     class?: string | object | ((_: InputElementTargetEvent) => string | object);
     style?: string | object | ((_: InputElementTargetEvent) => string | object);
     attr?: string | object | TagJsTag<any> | void | undefined | ((_: InputElementTargetEvent) => any);

@@ -35,6 +35,7 @@ export const ATTRIBUTE_CALLABLE_DEFS = [
     ['maxLength', 'maxLength'],
     ['open', 'open'],
     ['rel', 'rel'],
+    ['required', 'required'],
     ['rows', 'rows'],
     ['style', 'style'],
     ['target', 'target'],
