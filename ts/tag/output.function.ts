@@ -1,4 +1,4 @@
-import { AnySupport, ContextItem, getContextInCycle, paint, TagGlobal, TemplateValue } from "../index.js"
+import { AnySupport, ContextItem, getContextInCycle, isPromise, paint, TagGlobal, TemplateValue } from "../index.js"
 import { blankHandler } from "../render/dom/blankHandler.function.js"
 import { paintAfters, painting } from "../render/paint.function.js"
 import { safeRenderSupport } from "./props/safeRenderSupport.function.js"
@@ -53,15 +53,22 @@ export function syncWrapCallback(
   callback: any,
   context: ContextItem, // aka stateOwner
 ) {
-  const newestOwner = undefined as any
   setContextInCycle(context)
 
-  const c = callback(...args) // call the latest callback
+  const result = callback(...args) // call the latest callback
+
+  return afterCallback(result, context)
+}
+
+function afterCallback(
+  result: any | Promise<any>,
+  context: ContextItem, // aka stateOwner
+) {
+  const newestOwner = undefined as any
 
   removeContextInCycle()
 
-  // now render the owner
-  paintAfters.push([() => {
+  const toPaint = () => {
     const newGlobal = context.global as TagGlobal
     const ignore = newGlobal === undefined || newGlobal.deleted === true
     
@@ -84,7 +91,15 @@ export function syncWrapCallback(
     --painting.locks
 
     paint()
-  }, []])
+  }
 
-  return c
+  if( isPromise(result) ) {
+    result.then(() => {
+      paintAfters.push([toPaint, []])
+    })
+  }
+  
+  paintAfters.push([toPaint, []])
+
+  return result
 }

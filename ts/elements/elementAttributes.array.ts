@@ -1,7 +1,5 @@
-import { KeyFunction, TagJsComponent } from '../index.js'
-import { ContextItem } from '../tag/ContextItem.type.js'
+import { KeyFunction } from '../index.js'
 import { InputElementTargetEvent } from '../TagJsEvent.type.js'
-import { TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 import type { AttributeCallable } from './attributeCallables.js'
 import { AttrValue, ElementFunction } from './ElementFunction.type.js'
 import { ElementVarBase } from "./ElementVarBase.type"
@@ -41,8 +39,10 @@ export const ATTRIBUTE_CALLABLE_DEFS: Array<[apiName: string, attrName: string]>
   ['selected', 'selected'],
   ['minLength', 'minLength'],
   ['maxLength', 'maxLength'],
+  ['inputMode', 'inputMode'],
   ['open', 'open'],
   ['rel', 'rel'],
+  ['required', 'required'],
   ['rows', 'rows'],
   ['style', 'style'],
   ['target', 'target'],
@@ -71,7 +71,8 @@ export type CombinedElementFunctions = ElementVarBase & {
   /** Vertical alignment hint (legacy/compat usage) */
   valign: AttributeCallable
 
-  open: boolean
+  /** for dialog elements */
+  open: AttributeCallable
   
   /** URL target for links and related elements */
   href: AttributeCallable
@@ -83,6 +84,8 @@ export type CombinedElementFunctions = ElementVarBase & {
   minLength: AttributeCallable
   /** Maximum allowed character length */
   maxLength: AttributeCallable
+  /** typically for input type number format refinement */
+  inputMode: AttributeCallable
   /** Minimum numeric/date range value */
   min: AttributeCallable
   /** Maximum numeric/date range value */
@@ -99,6 +102,8 @@ export type CombinedElementFunctions = ElementVarBase & {
   src: AttributeCallable
   /** Visible text rows (commonly for `textarea`) */
   rows: AttributeCallable
+  /** Form input validation */
+  required: AttributeCallable
   /** Element/input type behavior */
   type: AttributeCallable
   /** Advisory text, often shown as tooltip */
@@ -154,6 +159,7 @@ export type CombinedElementFunctions = ElementVarBase & {
 
   contextMenu: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   onClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
+  onCancel: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   onDoubleClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   onDblClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   onBlur: (callback: (e: InputElementTargetEvent) => any) => ElementFunction

@@ -5,7 +5,7 @@ type AttrFn = (item: any, args: [name: string | unknown, value?: any]) => any
 
 export type AttributeCallable = {
   (strings: TemplateStringsArray, ...values: any[]): ElementFunction
-  (value: string): ElementFunction
+  (value: string | boolean | number): ElementFunction
   (value: (context: ContextItem) => any): ElementFunction
 }
 

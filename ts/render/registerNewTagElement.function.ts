@@ -1,18 +1,15 @@
 import { TemplaterResult } from '../tag/getTemplaterResult.function.js'
-import {  TagWrapper } from '../tag/tag.utils.js'
-import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { TagMaker } from '../tag/TagMaker.type.js'
-import { AnySupport, appElements, ContextItem, TagAppElement, TagGlobal, UseMemory, Wrapper } from '../index.js'
-import { DomObjectChildren, DomObjectElement, DomObjectText } from '../interpolations/optimizers/ObjectNode.types.js'
+import { AnySupport, TagGlobal } from '../index.js'
 import { processReplacementComponent } from '../tag/update/processFirstSubjectComponent.function.js'
 
 /** Only called by renderTagElement */
 export function registerTagElement(
   support: AnySupport,
-  element: Element | HTMLElement,
-  global: TagGlobal, // TODO: remove
-  templater: TemplaterResult,
-  app: TagMaker,
+  _element: Element | HTMLElement,
+  _global: TagGlobal, // TODO: remove
+  _templater: TemplaterResult,
+  _app: TagMaker,
   placeholder: Text,
 ) {
   const context = support.context

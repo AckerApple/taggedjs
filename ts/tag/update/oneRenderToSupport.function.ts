@@ -8,8 +8,8 @@ import { PropWatches } from '../../TagJsTags/tag.function.js'
 
 export function oneRenderToSupport(
   wrapper: Wrapper,
-  subject: ContextItem,
-  ownerSupport: AnySupport, // owner
+  _subject: ContextItem,
+  _ownerSupport: AnySupport, // owner
 ) {
   const templater = getTemplaterResult(PropWatches.DEEP)
   templater.tagJsType = wrapper.tagJsType as typeof ValueTypes.templater

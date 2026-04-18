@@ -133,7 +133,7 @@ export function processFirstSubjectComponent(
   templater: TemplaterResult,
   subject:SupportContextItem,
   ownerSupport: AnySupport,
-  appendTo: Element,
+  _appendTo: Element,
 ): AnySupport {
   const support = createSupportWithProps(
     templater,

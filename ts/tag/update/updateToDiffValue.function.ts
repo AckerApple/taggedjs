@@ -1,6 +1,6 @@
 import { SupportContextItem } from '../SupportContextItem.type.js'
 import { ContextItem } from '../ContextItem.type.js'
-import { BasicTypes, TagJsComponent, TemplaterResult, TemplateValue, ValueType, ValueTypes } from '../index.js'
+import { BasicTypes, TagJsComponent, TemplaterResult, TemplateValue, ValueType } from '../index.js'
 import { tryUpdateToTag } from './tryUpdateToTag.function.js'
 import { isArray } from '../../isInstance.js'
 import { processTagArray } from './arrays/processTagArray.js'

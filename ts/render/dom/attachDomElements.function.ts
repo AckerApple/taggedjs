@@ -6,11 +6,10 @@ import { AnySupport } from "../../tag/AnySupport.type.js"
 import { ContextItem } from "../../tag/ContextItem.type.js"
 import { ObjectChildren } from "../../interpolations/optimizers/LikeObjectElement.type.js"
 import { empty } from "../../tag/ValueTypes.enum.js"
-import { attachDynamicDom } from "../../interpolations/optimizers/attachDynamicDom.function.js"
 import { TagJsTag } from "../../TagJsTags/TagJsTag.type.js"
 import { attachDomElement } from "./attachDomElement.function.js"
 import { Subject } from "../../subject/Subject.class.js"
-import { isFunction, SupportContextItem } from "../../index.js"
+import { SupportContextItem } from "../../index.js"
 
 export function attachDomElements(
   nodes: ObjectChildren,

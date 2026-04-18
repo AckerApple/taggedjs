@@ -193,7 +193,7 @@ function reviewPreviousArrayItem(
     return context
   }
 
-  const tagValueUpdateResult = tagValueUpdateHandler(
+  tagValueUpdateHandler(
     value as TemplateValue,
     context,
     ownerSupport,

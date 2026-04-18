@@ -100,7 +100,7 @@ export function createDynamicAttribute(
   howToSet: HowToSet, //  = howToSetInputValue
   support: AnySupport,
   isSpecial: SpecialDefinition,
-  varIndex: number,
+  _varIndex: number,
 ) {
   if(typeof(value) === BasicTypes.function ) {
     ++(parentContext as SupportContextItem).varCounter
