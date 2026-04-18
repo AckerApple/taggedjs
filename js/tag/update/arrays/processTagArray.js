@@ -101,7 +101,7 @@ _appendTo) {
         context.value = value;
         return context;
     }
-    const tagValueUpdateResult = tagValueUpdateHandler(value, context, ownerSupport);
+    tagValueUpdateHandler(value, context, ownerSupport);
     return context;
 }
 /** Run within first array processing loop

@@ -1,6 +1,6 @@
 import { getTemplaterResult } from '../getTemplaterResult.function.js';
 import { PropWatches } from '../../TagJsTags/tag.function.js';
-export function oneRenderToSupport(wrapper, subject, ownerSupport) {
+export function oneRenderToSupport(wrapper, _subject, _ownerSupport) {
     const templater = getTemplaterResult(PropWatches.DEEP);
     templater.tagJsType = wrapper.tagJsType;
     const support = ''; /*newSupportByTemplater(

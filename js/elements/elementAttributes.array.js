@@ -33,6 +33,7 @@ export const ATTRIBUTE_CALLABLE_DEFS = [
     ['selected', 'selected'],
     ['minLength', 'minLength'],
     ['maxLength', 'maxLength'],
+    ['inputMode', 'inputMode'],
     ['open', 'open'],
     ['rel', 'rel'],
     ['required', 'required'],

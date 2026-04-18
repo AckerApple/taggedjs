@@ -6,4 +6,4 @@ import { Callback } from '../../interpolations/attributes/bindSubjectCallback.fu
 export declare function processReplacementComponent(templater: TemplaterResult, context: SupportContextItem, ownerSupport?: AnySupport): AnySupport;
 export declare function makeRealUpdate(newContext: ContextItem, value: string | number | boolean | TagJsComponent<any> | SubscribeValue | TemplaterResult | (TagJsComponent<any> | TemplaterResult)[] | Subject<unknown> | Callback | null | undefined, context: SupportContextItem, convertValue: any, support: AnySupport): void;
 export declare function afterDestroy(context: ContextItem & SupportContextItem, _ownerSupport: AnySupport): void;
-export declare function processFirstSubjectComponent(templater: TemplaterResult, subject: SupportContextItem, ownerSupport: AnySupport, appendTo: Element): AnySupport;
+export declare function processFirstSubjectComponent(templater: TemplaterResult, subject: SupportContextItem, ownerSupport: AnySupport, _appendTo: Element): AnySupport;

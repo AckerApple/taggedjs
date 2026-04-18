@@ -67,7 +67,7 @@ export function afterDestroy(context, _ownerSupport) {
     delete context.updatesHandler;
     // context.value.destroy(context, ownerSupport)
 }
-export function processFirstSubjectComponent(templater, subject, ownerSupport, appendTo) {
+export function processFirstSubjectComponent(templater, subject, ownerSupport, _appendTo) {
     const support = createSupportWithProps(templater, subject, ownerSupport);
     return convertTagToElementManaged(support, ownerSupport, subject);
 }

@@ -7,4 +7,4 @@ import { AttributeContextItem } from '../../tag/AttributeContextItem.type.js';
 export declare function createDynamicArrayAttribute(attrName: string, array: any[], element: HTMLElement, contexts: ContextItem[], howToSet: HowToSet, //  = howToSetInputValue
 values: unknown[], parentContext: ContextItem): ContextItem[];
 export declare function createDynamicAttribute(attrName: string, value: any, element: HTMLElement, context: ContextItem[], parentContext: ContextItem, howToSet: HowToSet, //  = howToSetInputValue
-support: AnySupport, isSpecial: SpecialDefinition, varIndex: number): void | AttributeContextItem;
+support: AnySupport, isSpecial: SpecialDefinition, _varIndex: number): void | AttributeContextItem;

@@ -62,7 +62,7 @@ function buildNewValueFromArray(array, values, startIndex) {
     }, []);
 }
 export function createDynamicAttribute(attrName, value, element, context, parentContext, howToSet, //  = howToSetInputValue
-support, isSpecial, varIndex) {
+support, isSpecial, _varIndex) {
     if (typeof (value) === BasicTypes.function) {
         ++parentContext.varCounter;
         return processTagCallbackFun(

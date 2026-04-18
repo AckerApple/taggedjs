@@ -1,7 +1,7 @@
 import { processReplacementComponent } from '../tag/update/processFirstSubjectComponent.function.js';
 /** Only called by renderTagElement */
-export function registerTagElement(support, element, global, // TODO: remove
-templater, app, placeholder) {
+export function registerTagElement(support, _element, _global, // TODO: remove
+_templater, _app, placeholder) {
     const context = support.context;
     context.state.oldest = support;
     context.state.newest = support;

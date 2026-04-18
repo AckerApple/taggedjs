@@ -33,6 +33,8 @@ export type CombinedElementFunctions = ElementVarBase & {
     minLength: AttributeCallable;
     /** Maximum allowed character length */
     maxLength: AttributeCallable;
+    /** typically for input type number format refinement */
+    inputMode: AttributeCallable;
     /** Minimum numeric/date range value */
     min: AttributeCallable;
     /** Maximum numeric/date range value */
