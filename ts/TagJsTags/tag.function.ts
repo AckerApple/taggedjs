@@ -145,6 +145,12 @@ export function tag<T extends ToTag>(
   tagComponent: T,
   propWatch: PropWatches = PropWatches.SHALLOW, // PropWatches.DEEP,
 ): TaggedFunction<T> {
+  const isRunningContent = getContextInCycle()
+
+  if(isRunningContent) {
+    throw new Error('A TaggedJs tag was created within a running tag. All component tags must be created outside of anyother tag')
+  }
+
 // ): TagJsComponent<any> {
   /** function developer triggers */
   const parentWrap = function tagWrapper(

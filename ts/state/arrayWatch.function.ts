@@ -1,7 +1,7 @@
 import { AnySupport, ContextItem, getContextInCycle } from '../index.js'
 import { findStateSupportUpContext } from '../interpolations/attributes/getSupportWithState.function.js'
 import { renderTagUpdateArray } from '../interpolations/attributes/renderTagArray.function.js'
-import { SignalArray } from './array.function.js'
+import { SignalArray } from './array.signal.js'
 import { Signal, SignalObject } from './signal.function.js'
 
 /** Changes in supplied array will cause calling tag to render */

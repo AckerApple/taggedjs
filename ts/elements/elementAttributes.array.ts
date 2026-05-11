@@ -21,6 +21,7 @@ export const ATTRIBUTE_CALLABLE_DEFS: Array<[apiName: string, attrName: string]>
   ['class', 'class'],
   ['href', 'href'],
   ['lang', 'lang'],
+  ['label', 'label'],
   ['loading', 'loading'],
   ['value', 'value'],
   ['placeholder', 'placeholder'],
@@ -43,6 +44,8 @@ export const ATTRIBUTE_CALLABLE_DEFS: Array<[apiName: string, attrName: string]>
   ['open', 'open'],
   ['rel', 'rel'],
   ['required', 'required'],
+  ['readonly', 'readonly'],
+  ['readOnly', 'readonly'],
   ['rows', 'rows'],
   ['style', 'style'],
   ['target', 'target'],
@@ -104,6 +107,7 @@ export type CombinedElementFunctions = ElementVarBase & {
   rows: AttributeCallable
   /** Form input validation */
   required: AttributeCallable
+  readonly: AttributeCallable
   /** Element/input type behavior */
   type: AttributeCallable
   /** Advisory text, often shown as tooltip */
@@ -118,6 +122,8 @@ export type CombinedElementFunctions = ElementVarBase & {
   lang: AttributeCallable
   /** Loading strategy hint (e.g. lazy/eager) */
   loading: AttributeCallable
+  /** used for optgroup elements */
+  label: AttributeCallable
   /** Associates a label/output element with a control id */
   for: AttributeCallable
   /** Marks control as non-interactive */
