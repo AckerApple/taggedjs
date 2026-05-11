@@ -64,6 +64,10 @@ export var PropWatches;
 })(PropWatches || (PropWatches = {}));
 /** Wraps a function tag in a state manager and calls wrapped function on event cycles */
 export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
+    const isRunningContent = getContextInCycle();
+    if (isRunningContent) {
+        throw new Error('A TaggedJs tag was created within a running tag. All component tags must be created outside of anyother tag');
+    }
     // ): TagJsComponent<any> {
     /** function developer triggers */
     const parentWrap = function tagWrapper(...props) {

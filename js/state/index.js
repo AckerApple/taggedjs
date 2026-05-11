@@ -13,5 +13,5 @@ export * from './onInit.function.js';
 export * from './onDestroy.function.js';
 export * from './state.function.js';
 export * from './states.function.js';
-export * from './array.function.js';
+export * from './array.signal.js';
 //# sourceMappingURL=index.js.map

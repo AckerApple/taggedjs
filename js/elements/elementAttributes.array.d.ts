@@ -53,6 +53,7 @@ export type CombinedElementFunctions = ElementVarBase & {
     rows: AttributeCallable;
     /** Form input validation */
     required: AttributeCallable;
+    readonly: AttributeCallable;
     /** Element/input type behavior */
     type: AttributeCallable;
     /** Advisory text, often shown as tooltip */
@@ -67,6 +68,8 @@ export type CombinedElementFunctions = ElementVarBase & {
     lang: AttributeCallable;
     /** Loading strategy hint (e.g. lazy/eager) */
     loading: AttributeCallable;
+    /** used for optgroup elements */
+    label: AttributeCallable;
     /** Associates a label/output element with a control id */
     for: AttributeCallable;
     /** Marks control as non-interactive */
