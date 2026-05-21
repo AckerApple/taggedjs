@@ -49,10 +49,10 @@ const TAG_ELEMENT_MARKER = '__taggedjs_tag_element__'
  * @param props object
  * @returns 
  */
-export function tagElement(
-  app: TagMaker,
+export function tagElement<T extends any[]>(
+  app: TagMaker<T>,
   element: HTMLElement | Element, // aka appElement
-  props?: unknown,
+  props?: T,
 ): {
   support: AnySupport
   tags: TagWrapper<unknown>[] // TagComponent[]
@@ -74,7 +74,7 @@ export function tagElement(
 
   // Create the app which returns [props, runOneTimeFunction]
   
-  let templater = (() => (templater2 as any)(props)) as unknown as TemplaterResult
+  let templater = (() => (templater2 as any)(...props as any[])) as unknown as TemplaterResult
   templater.propWatch = PropWatches.NONE
   templater.tagJsType = ValueTypes.stateRender
   templater.processUpdate = tagValueUpdateHandler
@@ -90,7 +90,8 @@ export function tagElement(
   initState(newest.context)
   setSupportInCycle(newest)
 
-  let templater2 = app(props) as unknown as TemplaterResult
+  const rightProps = props ? props as any : []
+  let templater2 = app(...rightProps) as unknown as TemplaterResult
   const isAppFunction = typeof templater2 == BasicTypes.function
 
   if(!isAppFunction) {

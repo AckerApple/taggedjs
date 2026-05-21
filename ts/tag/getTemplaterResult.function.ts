@@ -15,6 +15,7 @@ import { CheckSupportValueChange, HasValueChanged } from './Context.types.js'
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js'
 import { ProcessUpdate } from './ProcessUpdate.type.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
+import { elementVarToHtmlString } from '../elements/elementVarToHtmlString.function.js'
 
 export type Wrapper = ((
   newSupport: AnySupport,
@@ -58,6 +59,7 @@ export type TemplaterResult = TagJsTag<any> & {
   wrapper?: Wrapper
   tag?: TagJsComponent<any> // StringTag | DomTag
   props?: Props
+  outerHTML: string
 
   /** Used inside of an array.map() function */
   key: <T>(arrayValue: T) => TemplaterResultArrayItem<T>
@@ -83,6 +85,9 @@ export function getTemplaterResult(
 
     propWatch,
     props,
+    get outerHTML() {
+      return elementVarToHtmlString(this)
+    },
     key: function keyTemplate<T>(arrayValue: T) {
       (templater as TemplaterResultArrayItem<T>).arrayValue = arrayValue
       return templater

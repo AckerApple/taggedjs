@@ -1,10 +1,14 @@
 import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js'
+import type { TemplaterResult } from '../tag/getTemplaterResult.function.js'
+import { BasicTypes, ValueTypes } from '../tag/ValueTypes.enum.js'
+import type { TagJsComponent } from '../TagJsTags/tag.function.js'
 import { ElementVarBase } from './ElementVarBase.type.js'
 
 type ElementLike = Pick<ElementVarBase, 'tagName' | 'innerHTML' | 'attributes'>
+type HtmlStringValue = ElementVarBase | TemplaterResult | TagJsComponent<any>
 
-export function elementVarToHtmlString(element: ElementVarBase): string {
-  return renderElement(element)
+export function elementVarToHtmlString(element: HtmlStringValue): string {
+  return renderValue(element)
 }
 
 function renderElement(element: ElementLike): string {
@@ -47,27 +51,51 @@ function renderChildren(children: any[]): string {
   }
 
   return children
-    .map(child => {
-      const resolved = resolveDynamicValue(child)
-      if (isElementLike(resolved)) {
-        return renderElement(resolved)
-      }
-
-      if (Array.isArray(resolved)) {
-        return renderChildren(resolved)
-      }
-
-      if (resolved === undefined || resolved === null || resolved === false) {
-        return ''
-      }
-
-      return escapeHtml(String(resolved))
-    })
+    .map(renderValue)
     .join('')
+}
+
+function renderValue(value: any): string {
+  const resolved = resolveDynamicValue(value)
+  if (isElementLike(resolved)) {
+    return renderElement(resolved)
+  }
+
+  if (isTagComponentLike(resolved)) {
+    return renderTagComponent(resolved)
+  }
+
+  if (Array.isArray(resolved)) {
+    return renderChildren(resolved)
+  }
+
+  if (resolved === undefined || resolved === null || resolved === false) {
+    return ''
+  }
+
+  return escapeHtml(String(resolved))
 }
 
 function isElementLike(value: any): value is ElementLike {
   return !!value && typeof value === 'object' && typeof value.tagName === 'string'
+}
+
+function isTagComponentLike(value: any): value is TemplaterResult {
+  return !!value && typeof value === 'object' && value.tagJsType === ValueTypes.tagComponent
+}
+
+function renderTagComponent(component: TemplaterResult): string {
+  const original = component.wrapper?.original
+  if (typeof original !== 'function') {
+    return ''
+  }
+
+  let result: any = original(...(component.props as unknown[]))
+  if (typeof result === BasicTypes.function && result.tagJsType === undefined) {
+    result = result()
+  }
+
+  return renderValue(result)
 }
 
 function escapeHtml(value: string): string {

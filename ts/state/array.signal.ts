@@ -21,7 +21,7 @@ function firstSignal(
   sig: SignalObject<any>,
 ) {
   const editors = ['push', 'pop', 'splice', 'shift', 'unshift']
-  const readers = ['map', 'reduce', 'forEach', 'every', 'filter', 'findIndex']
+  const readers = ['map', 'reduce', 'forEach', 'every', 'filter', 'find', 'findIndex']
 
   const overwriteEmitter = (action: string): ((...args: any[]) => any) => {
     return (resignal as any)[action] = (...args: any[]) => {
