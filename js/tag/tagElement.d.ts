@@ -18,8 +18,8 @@ export declare const appElements: {
  * @param props object
  * @returns
  */
-export declare function tagElement(app: TagMaker, element: HTMLElement | Element, // aka appElement
-props?: unknown): {
+export declare function tagElement<T extends any[]>(app: TagMaker<T>, element: HTMLElement | Element, // aka appElement
+props?: T): {
     support: AnySupport;
     tags: TagWrapper<unknown>[];
     ValueTypes: typeof ValueTypes;

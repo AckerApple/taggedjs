@@ -11,7 +11,7 @@ export function array(initialValue = []) {
 }
 function firstSignal(sig) {
     const editors = ['push', 'pop', 'splice', 'shift', 'unshift'];
-    const readers = ['map', 'reduce', 'forEach', 'every', 'filter', 'findIndex'];
+    const readers = ['map', 'reduce', 'forEach', 'every', 'filter', 'find', 'findIndex'];
     const overwriteEmitter = (action) => {
         return resignal[action] = (...args) => {
             const result = sig.value[action](...args);

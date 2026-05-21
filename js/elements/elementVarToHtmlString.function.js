@@ -1,5 +1,6 @@
+import { BasicTypes, ValueTypes } from '../tag/ValueTypes.enum.js';
 export function elementVarToHtmlString(element) {
-    return renderElement(element);
+    return renderValue(element);
 }
 function renderElement(element) {
     const attributes = renderAttributes(element.attributes);
@@ -33,23 +34,41 @@ function renderChildren(children) {
         return '';
     }
     return children
-        .map(child => {
-        const resolved = resolveDynamicValue(child);
-        if (isElementLike(resolved)) {
-            return renderElement(resolved);
-        }
-        if (Array.isArray(resolved)) {
-            return renderChildren(resolved);
-        }
-        if (resolved === undefined || resolved === null || resolved === false) {
-            return '';
-        }
-        return escapeHtml(String(resolved));
-    })
+        .map(renderValue)
         .join('');
+}
+function renderValue(value) {
+    const resolved = resolveDynamicValue(value);
+    if (isElementLike(resolved)) {
+        return renderElement(resolved);
+    }
+    if (isTagComponentLike(resolved)) {
+        return renderTagComponent(resolved);
+    }
+    if (Array.isArray(resolved)) {
+        return renderChildren(resolved);
+    }
+    if (resolved === undefined || resolved === null || resolved === false) {
+        return '';
+    }
+    return escapeHtml(String(resolved));
 }
 function isElementLike(value) {
     return !!value && typeof value === 'object' && typeof value.tagName === 'string';
+}
+function isTagComponentLike(value) {
+    return !!value && typeof value === 'object' && value.tagJsType === ValueTypes.tagComponent;
+}
+function renderTagComponent(component) {
+    const original = component.wrapper?.original;
+    if (typeof original !== 'function') {
+        return '';
+    }
+    let result = original(...component.props);
+    if (typeof result === BasicTypes.function && result.tagJsType === undefined) {
+        result = result();
+    }
+    return renderValue(result);
 }
 function escapeHtml(value) {
     return value

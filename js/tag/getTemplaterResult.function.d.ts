@@ -40,6 +40,7 @@ export type TemplaterResult = TagJsTag<any> & {
     wrapper?: Wrapper;
     tag?: TagJsComponent<any>;
     props?: Props;
+    outerHTML: string;
     /** Used inside of an array.map() function */
     key: <T>(arrayValue: T) => TemplaterResultArrayItem<T>;
 };

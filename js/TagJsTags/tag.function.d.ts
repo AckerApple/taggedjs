@@ -32,6 +32,7 @@ export type TagJsComponent<T extends ToTag> = TagJsTagBasics & {
     innerHTML?: any;
     _innerHTML?: TaggedFunction<any>;
     original: UnknownFunction;
+    outerHTML: string;
     /** Process input/argument updates. Fires at start and on updates */
     inputs: (handler: (parameters: Parameters<T>) => any) => true;
     /** Process input/argument only on update cycles (not init) */

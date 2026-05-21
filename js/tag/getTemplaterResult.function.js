@@ -3,6 +3,7 @@ import { checkTagValueChangeAndUpdate } from './checkTagValueChange.function.js'
 import { destroySupportByContextItem } from './destroySupportByContextItem.function.js';
 import { tagValueUpdateHandler } from './update/tagValueUpdateHandler.function.js';
 import { blankHandler } from '../render/dom/blankHandler.function.js';
+import { elementVarToHtmlString } from '../elements/elementVarToHtmlString.function.js';
 export function getTemplaterResult(propWatch, props) {
     const templater = {
         component: false,
@@ -14,6 +15,9 @@ export function getTemplaterResult(propWatch, props) {
         destroy: destroySupportByContextItem,
         propWatch,
         props,
+        get outerHTML() {
+            return elementVarToHtmlString(this);
+        },
         key: function keyTemplate(arrayValue) {
             templater.arrayValue = arrayValue;
             return templater;

@@ -44,7 +44,7 @@ props) {
     element[TAG_ELEMENT_MARKER] = true;
     element.innerHTML = '';
     // Create the app which returns [props, runOneTimeFunction]
-    let templater = (() => templater2(props));
+    let templater = (() => templater2(...props));
     templater.propWatch = PropWatches.NONE;
     templater.tagJsType = ValueTypes.stateRender;
     templater.processUpdate = tagValueUpdateHandler;
@@ -57,7 +57,8 @@ props) {
     const newest = subject.state.newest;
     initState(newest.context);
     setSupportInCycle(newest);
-    let templater2 = app(props);
+    const rightProps = props ? props : [];
+    let templater2 = app(...rightProps);
     const isAppFunction = typeof templater2 == BasicTypes.function;
     if (!isAppFunction) {
         if (!isTagComponent(templater2)) {
