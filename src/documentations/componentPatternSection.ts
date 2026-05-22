@@ -80,6 +80,32 @@ const componentPromiseCode = `const promiseTag = tag(() => {
 })
 `
 
+const outerHtmlCode = `import { tag, div, span } from "taggedjs"
+
+const Greeting = tag((name: string) =>
+  div("hello world", () => name)
+)
+
+const html = Greeting(" love").outerHTML
+
+console.log(html)
+// <div>hello world love</div>
+
+const Nested = tag(() =>
+  div.class\`wrapper\`(
+    span("hello world")
+  )
+)
+
+Nested().outerHTML
+// <div class="wrapper"><span>hello world</span></div>
+`
+
+const outerHtmlManualCode = `import { elementVarToHtmlString } from "taggedjs"
+
+const html = elementVarToHtmlString(Greeting(" love"))
+`
+
 const onDestroyCode = `import { tag, div, button, onDestroy, host, signal } from "taggedjs"
 
 const contentTag = tag(() => {
@@ -206,6 +232,37 @@ export function componentPatternSection() {
         "Source: ",
         a.href(`${repoBaseUrl}/src/async.tag.ts`).target`_blank`(code("src/async.tag.ts"))
       )
+    ), docH3("tag-component-outer-html", "🧾 outerHTML for HTML Strings"), p(
+      "Call ",
+      code(".outerHTML"),
+      " on the result of a tag component to render it as a plain HTML string. ",
+      "This is useful for server-side rendering, static HTML generation, tests, ",
+      "and snapshots."
+    ), p(
+      code("outerHTML"),
+      " is a getter, not a function. Use ",
+      code("MyTag().outerHTML"),
+      ", not ",
+      code("MyTag.outerHTML"),
+      " or ",
+      code("MyTag().outerHTML()"),
+      "."
+    ), figure(
+      pre(code.class`language-ts`(outerHtmlCode)),
+      figcaption("Serialize a tag output directly")
+    ), p(
+      "The getter renders the component with its stored arguments, then ",
+      "serializes the returned TaggedJS element using the same behavior as ",
+      code("elementVarToHtmlString"),
+      "."
+    ), figure(
+      pre(code.class`language-ts`(outerHtmlManualCode)),
+      figcaption("Equivalent manual serializer form")
+    ), p(
+      "Event handlers are intentionally omitted from the returned HTML string, ",
+      "matching direct ",
+      code("elementVarToHtmlString"),
+      " output."
     ), docH3("on-destroy", "🧹 onDestroy Cleanup"), p(
       "Use ",
       code("onDestroy"),

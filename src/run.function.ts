@@ -10,14 +10,14 @@ export function run() {
   const location = locationSplit[0]?.toLowerCase()
   if(location && ['isolated.html','index-static.html'].includes(location)) {
     const start = Date.now()
-    tagElement(IsolatedApp, element, {test:1})
+    tagElement(IsolatedApp, element, [])
     const end = Date.now() - start
     console.info(`⏱️ isolated render in ${end}ms`)
     return
   }
 
   const start = Date.now()
-  tagElement(App, element, {test:1})
+  tagElement(App, element, [])
   const end = Date.now() - start
   console.info(`⏱️ rendered in ${end}ms`)
 }
