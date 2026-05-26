@@ -35,6 +35,43 @@ const componentArgsCode = `const boltTag = tag((parentCounter: number) => {
 })
 `
 
+const componentArgumentFlowCode = `export const parent = tag(() => {
+  let counter = 0
+
+  return div(
+    button.onClick(() => counter++)("Increment"),
+    _=> boltTag(counter)
+  )
+})
+
+const boltTag = tag((parentCounter: number) => {
+  boltTag.updates(args => [parentCounter] = args)
+
+  return div(_=> \`parent counter: \${parentCounter}\`)
+})
+`
+
+const componentInputsCode = `import { tag, output, footer, span, button } from "taggedjs"
+
+const Footer = tag((
+  todosCount: number,
+  removeCompleted: () => any,
+  route: string,
+  activeTodoCount: number,
+) => {
+  Footer.inputs(args => {
+    [todosCount, removeCompleted, route, activeTodoCount] = args
+    removeCompleted = output(removeCompleted)
+  })
+
+  return footer(
+    span(_=> activeTodoCount),
+    _=> (todosCount - activeTodoCount) > 0 &&
+      button.onClick(() => removeCompleted())("Clear completed")
+  )
+})
+`
+
 const componentCallCode = `return div(
   _=> boltTag(counter)
 )`
@@ -53,6 +90,20 @@ export const parent = tag(() => {
     _=> child(() => saved++),
     div(_=> \`saved: \${saved}\`)
   )
+})
+`
+
+const outputUpdatesCode = `import { tag, output, button } from "taggedjs"
+
+const child = tag((onSave: () => void) => {
+  onSave = output(onSave)
+
+  child.updates(args => {
+    [onSave] = args
+    onSave = output(onSave)
+  })
+
+  return button.onClick(onSave)("Save")
 })
 `
 
@@ -168,36 +219,102 @@ export function componentPatternSection() {
       pre(code.class`language-ts`(componentCallCode)),
       figcaption("Render tag components inside a dynamic output")
     ), docH3("tag-component-arguments", "🧵 Component Arguments"), p(
-      "Tag components receive arguments like normal functions, but you must opt in ",
-      "to argument updates when those values change. Call ",
-      code(".updates(...)"),
-      " inside the tag to re-assign the latest arguments in the same order they ",
-      "were passed."
+      "Component arguments are TaggedJS inputs. They are values the parent passes ",
+      "down to a child component, similar to Angular ",
+      code("@Input()"),
+      " properties."
     ), p(
-      "This keeps local variables in sync with the parent without re-running the ",
-      "entire tag function."
+      "A tag component is a stable instance after it is mounted. Its main function ",
+      "sets up local state and returns the view once; later parent changes update ",
+      "the dynamic output blocks instead of recreating the whole child."
+    ), p(
+      "That is why child tags that receive changing arguments should be rendered ",
+      "inside ",
+      code("_=>"),
+      ". The dynamic wrapper gives TaggedJS a place to send the latest parent ",
+      "values into the already-mounted child."
+    ), figure(
+      pre(code.class`language-ts`(componentArgumentFlowCode)),
+      figcaption(
+        "Source: ",
+        a.href(`${repoBaseUrl}/src/basic.tag.ts`).target`_blank`(code("src/basic.tag.ts"))
+      )
+    ), p(
+      "Use ",
+      code(".updates(...)"),
+      " when the child only needs the later values. It receives the current ",
+      "argument array in call order and copies those values into the local ",
+      "variables used by the child view."
     ), figure(
       pre(code.class`language-ts`(componentArgsCode)),
       figcaption(
         "Source: ",
         a.href(`${repoBaseUrl}/src/basic.tag.ts`).target`_blank`(code("src/basic.tag.ts"))
       )
-    ), docH3("tag-component-callbacks", "🪝 Functions for Output"), p(
-      "TaggedJS treats function arguments as outputs: when the child calls the ",
-      "function, the parent can update state and re-render the dependent ",
-      code("_=>"),
-      " segments."
+    ), docH3("tag-component-inputs-updates", "🔌 Inputs and Updates"), p(
+      "The important distinction is lifecycle timing, not two competing ways to ",
+      "declare inputs. The function parameters define the component inputs. ",
+      code(".updates(...)"),
+      " runs on later parent argument changes. ",
+      code(".inputs(...)"),
+      " runs during initial input setup and again on later argument changes."
     ), p(
-      "This mirrors Angular-style outputs and keeps data flowing up without ",
-      "recreating the child component."
+      "Reach for ",
+      code(".inputs(...)"),
+      " when incoming arguments need normalization every time they enter the ",
+      "component lifecycle. In this repo that usually means turning a function ",
+      "input into an output callback with ",
+      code("output(...)"),
+      ", because the callback must be bound on the first render and whenever the ",
+      "parent passes a new function."
+    ), p(
+      "This keeps the Angular-shaped model clear: inputs are values flowing down ",
+      "from the parent, updates are the moment those values are synchronized into ",
+      "an existing component, and dynamic ",
+      code("_=>"),
+      " output blocks are what re-render from those synchronized values."
+    ), figure(
+      pre(code.class`language-ts`(componentInputsCode)),
+      figcaption(
+        "Source: ",
+        a.href(`${repoBaseUrl}/src/todo/components/footer.ts`).target`_blank`(code("src/todo/components/footer.ts"))
+      )
+    ), docH3("tag-component-callbacks", "🪝 Functions for Output"), p(
+      "Function arguments are the TaggedJS output pattern. The parent passes a ",
+      "function down, the child calls it when something happens, and the parent ",
+      "updates its own state."
+    ), p(
+      "That mirrors Angular ",
+      code("@Output()"),
+      " event flow: inputs move data down into the child, outputs notify the ",
+      "parent that something happened."
     ), p(
       "Calling ",
       code("output"),
-      " with the callback binds the caller to the currently running tag, so when ",
-      "the child triggers it, TaggedJS knows which parent output to re-evaluate."
+      " binds the callback to the parent render context. When the child invokes ",
+      "that wrapped callback, TaggedJS can re-run the parent's affected ",
+      code("_=>"),
+      " output blocks after the parent state changes."
     ), figure(
       pre(code.class`language-ts`(componentOutputCode)),
       figcaption("Child callback triggers parent updates")
+    ), p(
+      "When a function input may change, wrap it again inside ",
+      code(".updates(...)"),
+      " or use ",
+      code(".inputs(...)"),
+      " for the initial-and-update form. The repository repeats this pattern in ",
+      code("innerCounters"),
+      ", ",
+      code("funInPropsChild"),
+      ", ",
+      code("propsDebug"),
+      ", and ",
+      code("Footer"),
+      "."
+    ), figure(
+      pre(code.class`language-ts`(outputUpdatesCode)),
+      figcaption("Re-wrap output callbacks after assigning new inputs")
     ), docH3("tag-component-async-callbacks", "⏱️ Async Callback Wrapper"), p(
       "TaggedJS exports ",
       code("callback"),
