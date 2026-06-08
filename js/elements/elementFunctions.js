@@ -50,6 +50,7 @@ const ELEMENT_EVENT_DEFS = [
     ['onClick', 'click'],
     ['onBlur', 'onblur'],
     ['onChange', 'onchange'],
+    ['onSubmit', 'onsubmit'],
     ['onInput', 'oninput'],
     ['contextMenu', 'contextmenu'],
     ['onMouseDown', 'onmousedown'],
