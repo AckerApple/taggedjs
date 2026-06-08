@@ -84,6 +84,7 @@ const ELEMENT_EVENT_DEFS: Array<[apiName: string, eventName: string]> = [
   ['onClick', 'click'],
   ['onBlur', 'onblur'],
   ['onChange', 'onchange'],
+  ['onSubmit', 'onsubmit'],
   ['onInput', 'oninput'],
   ['contextMenu', 'contextmenu'],
   

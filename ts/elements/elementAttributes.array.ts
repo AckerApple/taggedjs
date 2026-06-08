@@ -170,6 +170,7 @@ export type CombinedElementFunctions = ElementVarBase & {
   onDblClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   onBlur: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   onChange: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
+  onSubmit: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   onInput: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
   
   onKeyUp: (callback: (e: InputElementTargetEvent) => any) => ElementFunction
