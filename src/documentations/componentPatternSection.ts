@@ -157,6 +157,47 @@ const outerHtmlManualCode = `import { elementVarToHtmlString } from "taggedjs"
 const html = elementVarToHtmlString(Greeting(" love"))
 `
 
+const staticHtmlOutputCode = `import { Window as HappyWindow } from "happy-dom"
+import fs from "fs"
+import { tagElement } from "taggedjs"
+import { GuideApp } from "../src/documentations/guide.js"
+
+const window = new HappyWindow()
+globalThis.window = window as any
+globalThis.document = window.document as any
+
+const mount = document.createElement("app")
+mount.id = "docs-app"
+document.body.appendChild(mount)
+
+tagElement(GuideApp, mount)
+
+const html = mount.innerHTML
+fs.writeFileSync("documentation/index.html", html)
+`
+
+const staticHtmlShellCode = `<app id="docs-app">
+  <!-- taggedjs:ssr-start -->
+  <header>...</header>
+  <main>...</main>
+  <!-- taggedjs:ssr-end -->
+</app>
+
+<script type="module">
+  import { runDocs } from "../assets/dist/bundle.js"
+  runDocs()
+</script>
+`
+
+const staticHtmlRunDocsCode = `export function runDocs() {
+  const mount = document.getElementById("docs-app")
+  if(!mount) return
+
+  mount.innerHTML = ""
+  tagElement(GuideApp, mount)
+}
+`
+
 const onDestroyCode = `import { tag, div, button, onDestroy, host, signal } from "taggedjs"
 
 const contentTag = tag(() => {
@@ -380,6 +421,50 @@ export function componentPatternSection() {
       "matching direct ",
       code("elementVarToHtmlString"),
       " output."
+    ), docH3("static-html-seo-output", "🔎 Static HTML / SEO Output"), p(
+      "The same string output is what people usually mean by server-side ",
+      "rendering, static rendering, pre-rendering, or SEO output. TaggedJS can ",
+      "create the HTML before the browser runs the app, so crawlers and users ",
+      "receive real document content instead of an empty mount element."
+    ), p(
+      "This documentation page already uses that pattern. ",
+      code("scripts/renderDocsHtml.ts"),
+      " mounts ",
+      code("GuideApp"),
+      " in a Happy DOM document, reads ",
+      code("mount.innerHTML"),
+      ", and writes that string between the SSR markers in ",
+      code("documentation/index.html"),
+      "."
+    ), figure(
+      pre(code.class`language-ts`(staticHtmlOutputCode)),
+      figcaption("Generate static HTML from a TaggedJS component")
+    ), p(
+      "The saved page now contains the rendered header, table of contents, and ",
+      "guide sections as normal HTML inside ",
+      code("#docs-app"),
+      ". That is the SEO-friendly output: the content exists in the file before ",
+      "client JavaScript downloads."
+    ), figure(
+      pre(code.class`language-html`(staticHtmlShellCode)),
+      figcaption("Static content in the mount element, followed by the client app")
+    ), p(
+      "On load, the browser parses that string into real DOM immediately. Then ",
+      "the module script calls ",
+      code("runDocs()"),
+      ". This repo currently clears ",
+      code("#docs-app"),
+      " and mounts ",
+      code("GuideApp"),
+      " again so the page becomes the normal interactive TaggedJS app."
+    ), figure(
+      pre(code.class`language-ts`(staticHtmlRunDocsCode)),
+      figcaption("Client-side remount after the static HTML is visible")
+    ), p(
+      "That flow is close to what frameworks like Next.js do for React in goal: ",
+      "send useful HTML first, then attach the client runtime. The current ",
+      "TaggedJS docs implementation is a static pre-render plus client remount; ",
+      "it does not preserve and hydrate the existing DOM nodes."
     ), docH3("on-destroy", "🧹 onDestroy Cleanup"), p(
       "Use ",
       code("onDestroy"),

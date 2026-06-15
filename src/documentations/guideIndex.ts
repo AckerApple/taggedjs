@@ -19,6 +19,7 @@ const tocItems = [
   { id: "map-loops", label: "🔂 Arrays - Map Looping", level: "sub" },
   { id: "event-handlers", label: "🖱️ Event Handlers", level: "sub" },
   { id: "tag-component-outer-html", label: "🧾 outerHTML for HTML Strings", level: "sub" },
+  { id: "static-html-seo-output", label: "🔎 Static HTML / SEO Output", level: "sub" },
   { id: "reactive-updates", label: "🔁 Reactive Updates" },
   { id: "react-vs-taggedjs", label: "⚖️ React vs TaggedJS", level: "sub" },
   { id: "subscriptions", label: "📡 Subscriptions & Observables" },

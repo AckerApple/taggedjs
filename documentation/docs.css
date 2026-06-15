@@ -120,6 +120,15 @@ nav.primary a:hover {
 .guide-index li.toc-sub {
   margin-left: 0.85rem;
   font-size: 0.95rem;
+  list-style-type: circle;
+}
+
+.guide-index li:not(.toc-sub) {
+  list-style-type: disc;
+}
+
+.guide-index li.toc-sub::marker {
+  color: var(--muted);
 }
 
 .guide-index li.toc-sub a {
