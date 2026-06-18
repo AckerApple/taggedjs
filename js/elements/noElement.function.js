@@ -23,6 +23,17 @@ export function noElementMaker() {
         contentId: 0,
         listeners: [],
         allListeners: [],
+        /*
+            get outerHTML() {
+              return pushKid.outerHTML
+              // throw new Error('420')
+              console.log('-------------- 2')
+              return ['heck']
+            },
+        */
+        render() {
+            return this.innerHTML.map(x => x).join('');
+        },
         elementFunctions,
     };
     const pushKid = getPushKid(element, elementFunctions);

@@ -12,8 +12,9 @@ export type RouteProps = {
 };
 type BasicResponse = ReadOnlyVar | StateToTag | AnyTag | number | string | boolean | any[];
 type TagResponse = BasicResponse | (() => BasicResponse);
-export type SimpleToTag = ((...props: any[]) => TagResponse | (TagResponse | ((_contextItem: ContextItem) => BasicResponse))[]);
-export type ToTag = SimpleToTag | (() => SimpleToTag);
+export type SimpleToTag<T extends ((args: any) => any)> = ((...props: any[]) => ReturnType<T> | (TagResponse | ((_contextItem: ContextItem) => BasicResponse))[]);
+export type Tag<T extends ((args: any) => any)> = SimpleToTag<T> | (() => SimpleToTag<T>);
+export type ToTag<T extends ((args: any) => any)> = Tag<T>;
 export type StateToTag = () => AnyTag;
 export type RouteTag = (extraProps?: Record<string, any>) => AnyTag;
 export {};

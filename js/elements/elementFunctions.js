@@ -17,8 +17,6 @@ function callbackWrapper2(item, eventName, callback) {
     return item;
 }
 function attr(item, args) {
-    // return processSetAttribute(args[0], args[1], item)
-    // processSetAttribute(args[0], args[1], item)
     const clone = getPushKid(item, item.elementFunctions);
     processSetAttribute(args[0], args[1], clone);
     return clone;

@@ -1,6 +1,6 @@
 import { blankHandler } from '../render/dom/blankHandler.function.js';
 import { elementFunctions, isValueForContext } from './elementFunctions.js';
-import { elementVarToHtmlString } from './elementVarToHtmlString.function.js';
+import { directRenderElement, elementVarToHtmlString } from './elementVarToHtmlString.function.js';
 import { destroyDesignElement } from './destroyDesignElement.function.js';
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js';
 import { processDesignElementInit } from './processDesignElementInit.function.js';
@@ -20,9 +20,13 @@ export function htmlTag(tagName) {
         listeners: [],
         allListeners: [],
         elementFunctions,
+        render: function () {
+            return directRenderElement(this);
+        }
     };
     const pushKid = getPushKid(element, elementFunctions);
     pushKid.tagName = tagName;
+    // pushKid.render = element.render
     return pushKid;
 }
 export function getPushKid(element, _elmFunctions) {

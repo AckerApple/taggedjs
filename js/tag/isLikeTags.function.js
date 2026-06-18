@@ -4,7 +4,8 @@ oldSupport) {
     const isLike = isLikeBaseTags(newSupport, oldSupport);
     // is this perhaps an outerHTML compare?      
     if (!isLike && oldSupport.templater.tag?._innerHTML) {
-        if (isLikeBaseTags(newSupport.outerHTML, oldSupport)) {
+        const outer = newSupport.outerHTML;
+        if (isLikeBaseTags(outer, oldSupport)) {
             return true;
         }
     }

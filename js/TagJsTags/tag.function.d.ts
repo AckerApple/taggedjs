@@ -1,7 +1,7 @@
 import { output } from '../tag/output.function.js';
 import { getInnerHTML } from '../TagJsTags/getInnerHTML.function.js';
 import { TemplaterResult } from '../tag/getTemplaterResult.function.js';
-import { RouteProps, RouteTag, StateToTag, ToTag } from '../tag/tag.types.js';
+import { RouteProps, RouteTag, StateToTag, Tag, ToTag } from '../tag/tag.types.js';
 import { UnknownFunction } from '../tag/update/oneRenderToSupport.function.js';
 import { AnyTag } from '../tag/AnyTag.type.js';
 import { getElement as getTagElement } from '../tag/cycles/setContextInCycle.function.js';
@@ -14,6 +14,7 @@ import { ProcessInit, AnySupport, HasValueChanged } from '../index.js';
 import { ProcessDelete, TagJsTag, TagJsTagBasics } from './TagJsTag.type.js';
 import { ProcessUpdate } from '../tag/ProcessUpdate.type.js';
 import { ProcessAttribute } from '../tag/ProcessInit.type.js';
+import type { ElementFunction } from '../elements/ElementFunction.type.js';
 declare const tagElement: {
     get: typeof getTagElement;
     onclick: <T extends (...args: any[]) => any>(toBeCalled: T) => T;
@@ -23,7 +24,7 @@ declare const tagElement: {
     onmousedown: <T extends (...args: any[]) => any>(toBeCalled: T) => T;
     onMouseDown: <T extends (...args: any[]) => any>(toBeCalled: T) => T;
 };
-export type TagJsComponent<T extends ToTag> = TagJsTagBasics & {
+export type TagJsComponent<T extends ToTag<T>> = TagJsTagBasics & {
     component: true;
     tagJsType: 'component';
     values: unknown[];
@@ -55,7 +56,15 @@ export type TagJsComponent<T extends ToTag> = TagJsTagBasics & {
     /** Same as innerHTML = x */
     setHTML: (innerHTML: any) => TagJsComponent<any>;
 };
-export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => TagJsComponent<T>) & TagJsComponent<T>;
+type TaggedReturn<T> = T extends {
+    tagName: string;
+    innerHTML: any[];
+    outerHTML?: any[];
+    attributes: any[];
+    elementFunctions: any;
+} ? ElementFunction : T;
+type TaggedComponent<T extends ToTag<T>> = ((...x: Parameters<T>) => TaggedReturn<ReturnType<T>>);
+export type TaggedFunction<T extends ToTag<T>> = (TaggedComponent<T>) & TagJsComponent<TaggedComponent<T>>;
 /** How to handle checking for prop changes aka argument changes */
 export declare enum PropWatches {
     DEEP = "deep",
@@ -65,7 +74,9 @@ export declare enum PropWatches {
     IMMUTABLE = "immutable"
 }
 /** Wraps a function tag in a state manager and calls wrapped function on event cycles */
-export declare function tag<T extends ToTag>(tagComponent: T, propWatch?: PropWatches): TaggedFunction<T>;
+export declare function tag<T extends Tag<T>>(tagComponent: T, 
+/** @deprecated */
+propWatch?: PropWatches): TaggedFunction<(...x: Parameters<T>) => TaggedReturn<ReturnType<T>>>;
 type outputAlias = typeof output;
 type getInnerHTMLAlias = typeof getInnerHTML;
 export declare namespace tag {
@@ -78,8 +89,8 @@ export declare namespace tag {
     let app: (_routeTag: RouteTag) => StateToTag;
     let deepPropWatch: typeof tag;
     /** monitors root and 1 level argument for exact changes */
-    let immutableProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
-    let watchProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
+    let immutableProps: <T extends ToTag<T>>(tagComponent: T) => TaggedFunction<(...x: Parameters<T>) => TaggedReturn<ReturnType<T>>>;
+    let watchProps: <T extends ToTag<T>>(tagComponent: T) => TaggedFunction<(...x: Parameters<T>) => TaggedReturn<ReturnType<T>>>;
     let element: typeof tagElement;
     let inject: typeof tagInject;
     let output: outputAlias;

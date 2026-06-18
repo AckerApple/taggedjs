@@ -63,9 +63,15 @@ export var PropWatches;
     PropWatches["IMMUTABLE"] = "immutable";
 })(PropWatches || (PropWatches = {}));
 /** Wraps a function tag in a state manager and calls wrapped function on event cycles */
-export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
+export function tag(tagComponent, 
+/** @deprecated */
+propWatch = PropWatches.SHALLOW) {
     const isRunningContent = getContextInCycle();
     if (isRunningContent) {
+        console.log('error another tag tried to be create within:', {
+            runningTag: isRunningContent,
+            createTag: tagComponent,
+        });
         throw new Error('A TaggedJs tag was created within a running tag. All component tags must be created outside of anyother tag');
     }
     // ): TagJsComponent<any> {
@@ -91,7 +97,7 @@ export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
     tags.push(parentWrap);
     const returnWrap = parentWrap;
     /* Used for setting arguments as inputs and outputs. Runs every init and update of tag */
-    returnWrap.inputs = (handler) => {
+    returnWrap.inputs = function inputsFn(handler) {
         const context = getContextInCycle();
         context.inputsHandler = handler;
         const tagJsVar = context.tagJsVar;
@@ -101,7 +107,7 @@ export function tag(tagComponent, propWatch = PropWatches.SHALLOW) {
         return true;
     };
     // used for argument updates
-    returnWrap.updates = (handler) => {
+    returnWrap.updates = function updatesFn(handler) {
         const context = getContextInCycle();
         context.updatesHandler = handler;
         return true;

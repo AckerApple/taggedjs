@@ -1,8 +1,12 @@
 import { BasicTypes, ValueTypes } from '../tag/ValueTypes.enum.js';
 export function elementVarToHtmlString(element) {
-    return renderValue(element);
+    return elementToString(element);
 }
 function renderElement(element) {
+    return element.render();
+    // return directRenderElement(element)
+}
+export function directRenderElement(element) {
     const attributes = renderAttributes(element.attributes);
     const children = renderChildren(element.innerHTML);
     return `<${element.tagName}${attributes}>${children}</${element.tagName}>`;
@@ -34,10 +38,10 @@ function renderChildren(children) {
         return '';
     }
     return children
-        .map(renderValue)
+        .map(elementToString)
         .join('');
 }
-function renderValue(value) {
+export function elementToString(value) {
     const resolved = resolveDynamicValue(value);
     if (isElementLike(resolved)) {
         return renderElement(resolved);
@@ -68,7 +72,7 @@ function renderTagComponent(component) {
     if (typeof result === BasicTypes.function && result.tagJsType === undefined) {
         result = result();
     }
-    return renderValue(result);
+    return elementToString(result);
 }
 function escapeHtml(value) {
     return value
