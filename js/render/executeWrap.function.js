@@ -15,7 +15,9 @@ export function executeWrap(templater, result, useSupport, castedProps) {
         tag = originalFunction(...castedProps);
         // tag returns another function expected to be called
         if (typeof (tag) === BasicTypes.function && tag.tagJsType === undefined) {
-            tag = tag();
+            // 6-2026 REMOVED: Let a tag have its entire content always rerender
+            // tag = (tag as unknown as ReturnStringTag)()
+            tag = [tag];
         }
     }
     if (!tag) {

@@ -66,15 +66,18 @@ export var PropWatches;
 export function tag(tagComponent, 
 /** @deprecated */
 propWatch = PropWatches.SHALLOW) {
-    const isRunningContent = getContextInCycle();
-    if (isRunningContent) {
-        console.log('error another tag tried to be create within:', {
-            runningTag: isRunningContent,
-            createTag: tagComponent,
-        });
-        throw new Error('A TaggedJs tag was created within a running tag. All component tags must be created outside of anyother tag');
+    /* 6-2026 REMOVED: Lazy loading can have tags load within tags
+    // Check if a tag() is being created within a tag
+    const isRunningContent = getContextInCycle()
+  
+    if(isRunningContent) {
+      console.warn('error another tag tried to be create within:', {
+        runningTag: isRunningContent,
+        createTag: tagComponent,
+      })
+      throw new Error('A TaggedJs tag was created within a running tag. All component tags must be created outside of anyother tag')
     }
-    // ): TagJsComponent<any> {
+    */
     /** function developer triggers */
     const parentWrap = function tagWrapper(...props) {
         const templater = getTemplaterResult(propWatch, props);
