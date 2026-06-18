@@ -36,10 +36,6 @@ function attr(
   item: ElementFunction,
   args: [name: string | unknown, value?: any]
 ): ElementFunction {
-  // return processSetAttribute(args[0], args[1], item)
-
-
-  // processSetAttribute(args[0], args[1], item)
   const clone = getPushKid(item as any, item.elementFunctions)
   processSetAttribute(args[0], args[1], clone)
   return clone

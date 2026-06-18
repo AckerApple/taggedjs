@@ -12,7 +12,8 @@ export function isLikeTags(
 
   // is this perhaps an outerHTML compare?      
   if(!isLike && oldSupport.templater.tag?._innerHTML) {
-    if( isLikeBaseTags((newSupport as any).outerHTML, oldSupport) ) {
+    const outer = (newSupport as any).outerHTML
+    if( isLikeBaseTags(outer, oldSupport) ) {
       return true
     }
   }

@@ -3,11 +3,21 @@ import { host } from './host.function.js'
 import { ContextItem } from '../tag/index.js'
 import { setContextInCycle, removeContextInCycle } from '../tag/cycles/setContextInCycle.function.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
+import { noElement } from '../elements/noElement.function.js'
+import { div } from '../elements/index.js'
 
 describe('tag.inject', () => {
   afterEach(() => {
     // Clean up any context that might be left over
     removeContextInCycle()
+  })
+
+  it('x', () => {
+    const x = noElement(
+      div('hello world')
+    )    
+
+    expect(x.render()).toBe('<div>hello world</div>')
   })
 
   it('should inject host return value into child context', () => {

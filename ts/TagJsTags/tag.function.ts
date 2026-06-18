@@ -5,7 +5,7 @@ import { callback, promise, setUseMemory, state } from '../state/index.js'
 import { getTemplaterResult, TemplaterResult, Wrapper } from '../tag/getTemplaterResult.function.js'
 import { Original, TagComponent, TagWrapper, tags } from '../tag/tag.utils.js'
 import { getTagWrap } from '../tag/getTagWrap.function.js'
-import { RouteProps, RouteTag, StateToTag, ToTag } from '../tag/tag.types.js'
+import { RouteProps, RouteTag, StateToTag, Tag, ToTag } from '../tag/tag.types.js'
 import { UnknownFunction } from '../tag/update/oneRenderToSupport.function.js'
 import { ValueTypes } from '../tag/ValueTypes.enum.js'
 import { AnyTag } from '../tag/AnyTag.type.js'
@@ -28,6 +28,7 @@ import {
 import { ProcessDelete, TagJsTag, TagJsTagBasics } from './TagJsTag.type.js'
 import { ProcessUpdate } from '../tag/ProcessUpdate.type.js'
 import { ProcessAttribute } from '../tag/ProcessInit.type.js'
+import type { ElementFunction } from '../elements/ElementFunction.type.js'
 
 let tagCount = 0
 
@@ -79,7 +80,7 @@ function defineGetSet(name: string, eventFn: any) {
   })
 }
 
-export type TagJsComponent<T extends ToTag> = TagJsTagBasics & {
+export type TagJsComponent<T extends ToTag<T>> = TagJsTagBasics & {
   component: true
   tagJsType: 'component'
   // templater?: TemplaterResult
@@ -126,9 +127,20 @@ export type TagJsComponent<T extends ToTag> = TagJsTagBasics & {
   setHTML: (innerHTML: any) => TagJsComponent<any>
 }
 
-// export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnType<T> & ShortTag) & TagJsComponent<T>
-// export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => ReturnType<T>) & TagJsComponent<T>
-export type TaggedFunction<T extends ToTag> = ((...x: Parameters<T>) => TagJsComponent<T>) & TagJsComponent<T>
+type TaggedReturn<T> = T extends {
+  tagName: string
+  innerHTML: any[]
+  outerHTML?: any[]
+  attributes: any[]
+  elementFunctions: any
+} ? ElementFunction : T
+type TaggedComponent<T extends ToTag<T>> = (
+  (...x: Parameters<T>) => TaggedReturn<ReturnType<T>>
+)
+
+export type TaggedFunction<T extends ToTag<T>> = (
+  TaggedComponent<T>
+) & TagJsComponent<TaggedComponent<T>>
 
 /** How to handle checking for prop changes aka argument changes */
 export enum PropWatches {
@@ -142,13 +154,18 @@ export enum PropWatches {
 }
 
 /** Wraps a function tag in a state manager and calls wrapped function on event cycles */
-export function tag<T extends ToTag>(
+export function tag<T extends Tag<T>>(
   tagComponent: T,
+  /** @deprecated */
   propWatch: PropWatches = PropWatches.SHALLOW, // PropWatches.DEEP,
-): TaggedFunction<T> {
+): TaggedFunction<(...x: Parameters<T>) => TaggedReturn<ReturnType<T>>> {
   const isRunningContent = getContextInCycle()
 
   if(isRunningContent) {
+    console.log('error another tag tried to be create within:', {
+      runningTag: isRunningContent,
+      createTag: tagComponent,
+    })
     throw new Error('A TaggedJs tag was created within a running tag. All component tags must be created outside of anyother tag')
   }
 
@@ -185,10 +202,10 @@ export function tag<T extends ToTag>(
   tag.tagIndex = tagCount++ // needed for things like HMR
   tags.push(parentWrap as TagWrapper<unknown>)
 
-  const returnWrap = parentWrap as unknown as TaggedFunction<T>
+  const returnWrap = parentWrap as unknown as TaggedFunction<(...x: Parameters<T>) => TaggedReturn<ReturnType<T>>>
 
   /* Used for setting arguments as inputs and outputs. Runs every init and update of tag */
-  returnWrap.inputs = (handler: (parameters: Parameters<T>) => any) => {
+  returnWrap.inputs = function inputsFn(handler: (parameters: Parameters<T>) => any) {
     const context = getContextInCycle() as SupportContextItem
     context.inputsHandler = handler
 
@@ -202,7 +219,7 @@ export function tag<T extends ToTag>(
   }
 
   // used for argument updates
-  returnWrap.updates = (handler: (parameters: Parameters<T>) => any) => {
+  returnWrap.updates = function updatesFn(handler: (parameters: Parameters<T>) => any) {
     const context = getContextInCycle() as SupportContextItem
     context.updatesHandler = handler
     return true
@@ -231,8 +248,8 @@ export declare namespace tag {
   let deepPropWatch: typeof tag;
 
   /** monitors root and 1 level argument for exact changes */
-  let immutableProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
-  let watchProps: <T extends ToTag>(tagComponent: T) => TaggedFunction<T>;
+  let immutableProps: <T extends ToTag<T>>(tagComponent: T) => TaggedFunction<(...x: Parameters<T>) => TaggedReturn<ReturnType<T>>>;
+  let watchProps: <T extends ToTag<T>>(tagComponent: T) => TaggedFunction<(...x: Parameters<T>) => TaggedReturn<ReturnType<T>>>;
   
   let element: typeof tagElement;
   let inject: typeof tagInject;
@@ -279,15 +296,15 @@ function tagUseFn(): ReturnTag {
   throw new Error('Do not call tag.route as a function but instead set it as: `tag.route = (routeProps: RouteProps) => (state) => html`` `')
 }
 
-;(tag as any).immutableProps = function immutableProps<T extends ToTag>(
+;(tag as any).immutableProps = function immutableProps<T extends ToTag<T>>(
   tagComponent: T,
-): TaggedFunction<T> {
+): TaggedFunction<(...x: Parameters<T>) => TaggedReturn<ReturnType<T>>> {
   return tag(tagComponent, PropWatches.IMMUTABLE)
 }
 
-;(tag as any).watchProps = function watchProps<T extends ToTag>(
+;(tag as any).watchProps = function watchProps<T extends ToTag<T>>(
   tagComponent: T,
-): TaggedFunction<T> {
+): TaggedFunction<(...x: Parameters<T>) => TaggedReturn<ReturnType<T>>> {
   return tag(tagComponent, PropWatches.SHALLOW)
 }
 

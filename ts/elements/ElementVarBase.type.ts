@@ -5,10 +5,12 @@ import { elementFunctions } from './elementFunctions.js'
 
 export type ElementVarBase = ReadOnlyVar & {
   tagName: string
-  innerHTML: any[],
-  attributes: Attribute[],
-  contentId: number,
-  elementFunctions: typeof elementFunctions,
+  innerHTML: any[]
+  outerHTML?: any[]
+  attributes: Attribute[]
+  contentId: number
+  elementFunctions: typeof elementFunctions
+  render: () => string
   
   /** Children and self contexts all together */
   contexts?: TagJsTag<any>[]

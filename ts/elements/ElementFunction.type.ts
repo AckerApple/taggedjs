@@ -20,5 +20,4 @@ export type ElementFunction = (
   (
     ...children: TagChildContent[]
   ) => ElementFunction & CombinedElementFunctions
-  // ) => TagJsTag
 ) & CombinedElementFunctions

@@ -8,7 +8,7 @@ import { removeContextInCycle, setContextInCycle } from "./cycles/setContextInCy
 
 /** Used to call a function that belongs to a calling tag but is not with root arguments */
 export function output<CallbackReturn, ReceivedArguments extends any[]>(
-  callback: ((...args: any[]) => CallbackReturn),
+  callback?: ((...args: any[]) => CallbackReturn),
 ): (...args: ReceivedArguments) => CallbackReturn {
   if(!callback) {
     return blankHandler as any // output used on an argument that was not passed in

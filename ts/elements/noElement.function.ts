@@ -10,6 +10,7 @@ import { getPushKid } from './htmlTag.function.js'
 import { destroyHtmlDomMeta } from '../tag/destroyHtmlDomMeta.function.js'
 import { DomObjectChildren } from '../interpolations/optimizers/ObjectNode.types.js'
 import { ElementVarBase } from './ElementVarBase.type.js'
+import { elementToString } from './elementVarToHtmlString.function.js'
 
 /** used when you do NOT have a root element returned for your function */
 export const noElement = noElementMaker()
@@ -33,6 +34,17 @@ export function noElementMaker(): ElementFunction {
     contentId: 0,
     listeners: [],
     allListeners: [],
+/*
+    get outerHTML() {
+      return pushKid.outerHTML
+      // throw new Error('420')
+      console.log('-------------- 2')
+      return ['heck']
+    },
+*/
+    render() {
+      return this.innerHTML.map(x => x).join('')
+    },
 
     elementFunctions,
   }

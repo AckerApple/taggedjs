@@ -1,4 +1,4 @@
-import { div, span } from './index.js'
+import { div, noElement, span } from './index.js'
 import { elementVarToHtmlString } from './elementVarToHtmlString.function.js'
 import { tag } from '../TagJsTags/tag.function.js'
 
@@ -40,17 +40,20 @@ describe('elementVarToHtmlString', () => {
 
   describe('renders outerHTML', () => {
     it('renders outerHTML', () => {
-      const someTag = tag((x: string) => div('hello world', _=> x))
+      const someTag = tag(function someTagFn(x: string) {
+        return div('hello world', _=> x)
+      })
       const html = someTag(' love').outerHTML
 
       expect(html).toBe('<div>hello world love</div>')
     })
 
     it('renders array return outerHTML', () => {
-      const someTag = tag((x: string) => [
+      const someTag = tag(function someTagFun2(x: string) {
+        return noElement(
         div('hello world', _=> x, 1),
         div('hello world', _=> x, 2),
-      ])
+      )})
       const html = someTag(' love').outerHTML
 
       expect(html).toBe('<div>hello world love1</div><div>hello world love2</div>')

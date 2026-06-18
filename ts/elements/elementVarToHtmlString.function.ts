@@ -7,11 +7,22 @@ import { ElementVarBase } from './ElementVarBase.type.js'
 type ElementLike = Pick<ElementVarBase, 'tagName' | 'innerHTML' | 'attributes'>
 type HtmlStringValue = ElementVarBase | TemplaterResult | TagJsComponent<any>
 
-export function elementVarToHtmlString(element: HtmlStringValue): string {
-  return renderValue(element)
+export function elementVarToHtmlString(
+  element: HtmlStringValue
+): string {
+ return elementToString(element)
 }
 
-function renderElement(element: ElementLike): string {
+function renderElement(
+  element: ElementLike
+): string {
+  return (element as any).render()
+  // return directRenderElement(element)
+}
+
+export function directRenderElement(
+  element: ElementLike
+) {
   const attributes = renderAttributes(element.attributes)
   const children = renderChildren(element.innerHTML)
   return `<${element.tagName}${attributes}>${children}</${element.tagName}>`
@@ -51,11 +62,11 @@ function renderChildren(children: any[]): string {
   }
 
   return children
-    .map(renderValue)
+    .map(elementToString)
     .join('')
 }
 
-function renderValue(value: any): string {
+export function elementToString(value: any): string {
   const resolved = resolveDynamicValue(value)
   if (isElementLike(resolved)) {
     return renderElement(resolved)
@@ -95,7 +106,7 @@ function renderTagComponent(component: TemplaterResult): string {
     result = result()
   }
 
-  return renderValue(result)
+  return elementToString(result)
 }
 
 function escapeHtml(value: string): string {

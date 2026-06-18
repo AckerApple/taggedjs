@@ -3,7 +3,7 @@ import { Attribute } from '../interpolations/optimizers/ObjectNode.types.js'
 import { blankHandler } from '../render/dom/blankHandler.function.js'
 import { TagJsTag } from '../TagJsTags/TagJsTag.type.js'
 import { elementFunctions, isValueForContext } from './elementFunctions.js'
-import { elementVarToHtmlString } from './elementVarToHtmlString.function.js'
+import { directRenderElement, elementToString, elementVarToHtmlString } from './elementVarToHtmlString.function.js'
 import { destroyDesignElement } from './destroyDesignElement.function.js'
 import { processDesignElementUpdate, checkTagElementValueChange } from './processDesignElementUpdate.function.js'
 import { processDesignElementInit } from './processDesignElementInit.function.js'
@@ -64,10 +64,15 @@ export function htmlTag(
     allListeners: [],
 
     elementFunctions,
+
+    render: function() {
+      return directRenderElement(this)
+    }
   }
   
   const pushKid = getPushKid(element, elementFunctions)
   pushKid.tagName = tagName
+  // pushKid.render = element.render
   
   return pushKid
 }
