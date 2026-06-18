@@ -16,7 +16,7 @@ const contentTag = tag(() => {
   return div("this tag will be destroyed")
 })
 
-const destroys = tag(() => (showContent: boolean) =>
+const destroys = tag((showContent: boolean) =>
 div(
   "Content:", _=> showContent && contentTag(),
   button

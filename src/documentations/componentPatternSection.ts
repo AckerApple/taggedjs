@@ -8,7 +8,7 @@ const repoBaseUrl = "https://github.com/AckerApple/taggedjs/blob/gh-pages"
 
 const basicCounterCode = `import { tag, p, button } from 'taggedjs'
 
-export const basicCounter = tag(() => (counter = 0) => [
+export const basicCounter = tag((counter = 0) => [
   p('Counter: ', _=> counter}),
   button.onClick(() => counter++)('Increment Counter')
 ])
@@ -16,7 +16,7 @@ export const basicCounter = tag(() => (counter = 0) => [
 
 const basicShowHideCode = `import { tag, div, button } from 'taggedjs'
 
-export const basicShowHide = tag(() => (showDiv = true) =>
+export const basicShowHide = tag((showDiv = true) =>
   div(
     button.onClick(() => showDiv = !showDiv)(
       _=> \`Toggle Div (\${showDiv ? 'Hide' : 'Show'})\`
@@ -208,7 +208,7 @@ const contentTag = tag(() => {
   return div("this tag will be destroyed")
 })
 
-const destroys = tag(() => (showContent: boolean) =>
+const destroys = tag((showContent: boolean) =>
 div(
   "Content:", _=> showContent && contentTag(),
   button
@@ -230,7 +230,7 @@ export function componentPatternSection() {
       ". Below are some simple examples. You may see syntax used in ways you have not seen before BUT all code is native vanilla JavaScript that is supported everywhere."
     ), p.class`code-title`("Basic Counter Component"), figure.class`code-block`(pre(code.class`language-ts`(basicCounterCode))), p('☝️ ABOVE Explanation: The function "basicCounter" becomes a tag component when wrapped in a tag() call. The tag requires no inputs/props/arguments. The new tag/component is designed to create a local variable counter that is set to 0 and increments when a button is clicked.'), br, br, p.class`code-title`("Basic show/hide Component"), figure.class`code-block`(pre(code.class`language-ts`(basicShowHideCode))), p('☝️ ABOVE Explanation: The function "basicShowHide" becomes a tag component when wrapped in a tag() call. The tag requires no inputs/props/arguments. The new tag/component is designed to create a local variable "showDiv" that is toggled true/false when a button is clicked.'), br, br, p(
       "The ",
-      code("tag(() => (counter = 0) => div(_=> counter))"),
+      code("tag((counter = 0) => div(_=> counter))"),
       " form is shorthand for declaring local variables and returning markup. It ",
       "is the same as ",
       code("tag(() => { let counter = 0; return div(_=> counter) })"),

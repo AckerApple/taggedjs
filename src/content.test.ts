@@ -3,11 +3,17 @@ import { byId, click, html, query, changeOne, textContent } from './testing'
 
 describe('📰 content', () => {
   it('sanitized', () => {
-    expect(html('#string-test-0')).toBe('Hello world & Hello earth')
-    expect(html('#string-test-1')).toBe('Hello world &amp; Hello earth')
+    const html0 = html('#string-test-0')
+    const innerText0 = document.getElementById('string-test-0')
+    expect(html0).toBe('Hello world &amp; Hello earth', '#string-test-0 html fail')
+    expect(innerText0?.innerHTML).toBe('Hello world &amp; Hello earth', '#string-test-0 innerHTML fail')
+    expect(innerText0?.innerText).toBe('Hello world & Hello earth', '#string-test-0 text fail')
+    expect(html('#string-test-1')).toBe('Hello world &amp;amp; Hello earth')
     expect(html('#string-test-2')).toBe('Hello world gt; Hello earth')
-    expect(html('#string-test-3')).toBe('Hello world > Hello earth')
-    expect(html('#string-test-4')).toBe('Hello script tag <script></script>')
+    expect(html('#string-test-3')).toBe('Hello world &gt; Hello earth')
+    expect(byId('string-test-3').innerText).toBe('Hello world > Hello earth')
+    expect(html('#string-test-4')).toBe('Hello script tag &lt;script&gt;&lt;/script&gt;')
+    expect(byId('string-test-4').innerText).toBe('Hello script tag <script></script>')
   })
 
   it('spacing', () => {

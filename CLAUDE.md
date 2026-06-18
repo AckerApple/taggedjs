@@ -86,7 +86,7 @@ export default tag<YourComponentTemplate>("component-name", (tag, { html, state,
 import { div, span, button, hr } from "taggedjs";
 
 // Use mock element functions with attributes-first syntax
-export default tag(() => (
+export default tag((
   // ... state setup ...
 ) => div(
   button({id: "my-button", onClick: handler}, 'Click me'),
@@ -100,7 +100,7 @@ export default tag(() => (
 import { html } from "taggedjs";
 
 // Old template literal approach
-export default tag(() => (
+export default tag((
   // ... state setup ...
 ) => html`
   <button id="my-button" onclick=${handler}>Click me</button>

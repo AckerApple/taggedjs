@@ -94,13 +94,10 @@ export const content = tag(() => {
     ]
   })
 
-  const xx = contentTest('earth')
-
   return [
     div(
-      'a:', contentTest,
-      'b:', _=> xx,
-      // 'c:', xx,
+      'a:', contentTest('earth'),
+      'b:', _=> contentTest('earth'),
     ),
 
     fieldset(
@@ -138,7 +135,7 @@ export const content = tag(() => {
           .attr(fx({duration:'10ms', stagger: staggerBy * 2}) as any)(
             'test the tester - 2'
           ),
-        _=> showHideFx && (outerHtml(staggerBy).innerHTML = innerHtmlTag()),
+        _=> showHideFx && (outerHtml(staggerBy).innerHTML = [innerHtmlTag()]),
         div(
         div(
           'added: ',
@@ -306,6 +303,6 @@ const innerHtmlTag = () => {
   return 'inner html tag'
 }
 
-const contentTest = tag((a?: any) => () => {
+const contentTest = tag((a?: any) => {
   return div(`hello ${a || 'world'}`)
 })

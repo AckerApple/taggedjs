@@ -4,7 +4,7 @@ import { renderCountDiv } from "./renderCount.component.js"
 let destroyCount = signal(0) // lets use Signals
 let destroyTagCount = signal(0) // lets use Signals
 
-export const destroys = tag(() => (
+export const destroys = tag((
   on = true,
   tagOn = true,
   renderCount = 0,
@@ -38,8 +38,11 @@ export const destroys = tag(() => (
 
 const toDestroyHost = tag(() =>
   div.attr(host.onDestroy(() => {
-        ++destroyCount.value
-      }) as any).id`destroyable-content`.style`border:1px solid orange;`('will be destroyed')
+    ++destroyCount.value
+  }) as any)
+  .id`destroyable-content`
+  .style`border:1px solid orange;`
+  ('will be destroyed')
 )
 
 const toDestroyTag = tag(() => {

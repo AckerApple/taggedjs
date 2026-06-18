@@ -25,7 +25,7 @@ it('destroys', async () => {
   // await sleep(0) // SHOULD NOT NEED!
   
   const dContentCount = count('#destroyable-content')
-  expect(dContentCount).toBe(0, `Expected #destroyable-content to not exist`)
+  expect(dContentCount).toBe(0, `Expected #destroyable-content to not exist but found ${dContentCount} element(s)`)
   oldDestroyCount = destroyCount
   
   // cause restore

@@ -24,16 +24,16 @@ const subscribeWithCode = `import { tag, ValueSubject, subscribeWith, span } fro
 
 const status$ = new ValueSubject("idle") // anything with a subscribe method will do
 
-export const status = tag(() => (
+export const status = tag(() =>
   span(subscribeWith(status$, "idle", value => \`status: \${value}\`))
-))
+)
 `
 
 const subscribeAttributeCode = `import { tag, ValueSubject, subscribeWith, div } from "taggedjs"
 
 const color$ = new ValueSubject("tomato")
 
-export const swatch = tag(() => (
+export const swatch = tag((
   div
     .style( subscribeWith(color$, "tomato", color => ({ backgroundColor: color })) )
     ("color swatch")
