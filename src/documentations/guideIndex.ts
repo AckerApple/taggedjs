@@ -31,6 +31,12 @@ const tocItems = [
   { id: "subscribe-attributes", label: "🎨 Subscriptions in Attributes", level: "sub" },
   { id: "subscription-lifecycle", label: "♻️ Subscription Lifecycle", level: "sub" },
   { id: "manual-unsubscribe", label: "🧹 Manual Unsubscribe", level: "sub" },
+  { id: "dynamic-child-content", label: "Dynamic Child Content" },
+  { id: "dynamic-child-rules", label: "Rules of Thumb", level: "sub" },
+  { id: "dynamic-child-broken", label: "Broken: Frozen Child Data", level: "sub" },
+  { id: "dynamic-child-fixed", label: "Fixed: Updating Props", level: "sub" },
+  { id: "dynamic-child-function-children", label: "Function Children", level: "sub" },
+  { id: "dynamic-child-map-keys", label: "Stable Map Keys", level: "sub" },
 ]
 
 export function guideIndex() {

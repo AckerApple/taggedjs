@@ -17,7 +17,7 @@
   <noscript style="color:red">Javascript is required but is turned off on your device</noscript>
   <app id="docs-app">
         <!-- taggedjs:ssr-start -->
-        <header><div class="wrap"><h1>Work With The TaggedJS Code</h1><p>This guide is grounded in the real TaggedJS source. Each section points to current files and uses live excerpts so you can follow the actual patterns used in this repo.</p><nav class="primary"><a href="index.html">Docs Home</a><a href="../index.html">Live App</a></nav></div></header><main><a id="top"></a><div class="guide-layout"><section class="toc guide-index" id="toc"><h2 class="doc-title"><a class="doc-title-link" href="#toc">Guide Index</a></h2><ul><li class=""><a href="#project-layout">🗂️ Project Layout</a></li><li class=""><a href="#entry-point">🚪 Entry Point</a></li><li class=""><a href="#component-pattern">🧩 Component Pattern</a></li><li class="toc-sub"><a href="#tag-component-display">🧠 Component Display</a></li><li class="toc-sub"><a href="#tag-component-async-callbacks">⏱️ Async Callback Wrapper</a></li><li class="toc-sub"><a href="#tag-component-promise">⏳ tag.promise</a></li><li class="toc-sub"><a href="#on-destroy">🧹 onDestroy Cleanup</a></li><li class=""><a href="#tag-component-arguments">🧵 Component Arguments</a></li><li class="toc-sub"><a href="#tag-component-inputs-updates">🔌 Inputs and Updates</a></li><li class="toc-sub"><a href="#tag-component-callbacks">🪝 Functions for Output</a></li><li class=""><a href="#display">🖼️ Display</a></li><li class="toc-sub"><a href="#element-imports">📦 Element Imports</a></li><li class="toc-sub"><a href="#attributes">🏷️ attributes``</a></li><li class="toc-sub"><a href="#dynamic-content">✨ Dynamic Content _=&gt;</a></li><li class="toc-sub"><a href="#map-loops">🔂 Arrays - Map Looping</a></li><li class="toc-sub"><a href="#event-handlers">🖱️ Event Handlers</a></li><li class="toc-sub"><a href="#tag-component-outer-html">🧾 outerHTML for HTML Strings</a></li><li class="toc-sub"><a href="#static-html-seo-output">🔎 Static HTML / SEO Output</a></li><li class=""><a href="#reactive-updates">🔁 Reactive Updates</a></li><li class="toc-sub"><a href="#react-vs-taggedjs">⚖️ React vs TaggedJS</a></li><li class=""><a href="#subscriptions">📡 Subscriptions &amp; Observables</a></li><li class="toc-sub"><a href="#subscribe-output">🧾 Output Subscriptions</a></li><li class="toc-sub"><a href="#subscribe-map">🧩 Map Values to Output</a></li><li class="toc-sub"><a href="#subscribe-no-arrow">🚫 No _=&gt; Wrapper</a></li><li class="toc-sub"><a href="#subscribe-combine">🔗 Combine Observables</a></li><li class="toc-sub"><a href="#subscribe-with-default">Default value with subscribeWith</a></li><li class="toc-sub"><a href="#subscribe-attributes">🎨 Subscriptions in Attributes</a></li><li class="toc-sub"><a href="#subscription-lifecycle">♻️ Subscription Lifecycle</a></li><li class="toc-sub"><a href="#manual-unsubscribe">🧹 Manual Unsubscribe</a></li></ul></section><div class="guide-content"><section class="section-card" id="project-layout"><h2 class="doc-title"><a class="doc-title-link" href="#project-layout">🗂️ Project Layout</a></h2><p>The gh-pages branch is a full app. Source code lives in <code>src/</code>, the runtime entry is in <code>src/index.ts</code>, and the main view assembly lives in <code>src/app.tag.ts</code> plus the menu in <code>src/menu.tag.ts</code>.</p><p>Use the <code>documentation/</code> folder for doc pages, styles, and future guides. Keep documentation separate from app runtime code so it remains focused and easy to host.</p><p><a class="inline-link" href="#top">Back to top</a></p></section><section class="section-card" id="entry-point"><h2 class="doc-title"><a class="doc-title-link" href="#entry-point">🚪 Entry Point</a></h2><p>To start a TaggedJS app, place a custom element in your HTML and mount the component with <code>tagElement</code>. The mount call connects your component to that element and triggers the first render.</p><p>This is the minimal setup: an HTML document, a root element, and a module script that defines a <code>tag</code> component and mounts it.</p><figure><pre><code class="language-html">&lt;!DOCTYPE html&gt;
+        <header><div class="wrap"><h1>Work With The TaggedJS Code</h1><p>This guide is grounded in the real TaggedJS source. Each section points to current files and uses live excerpts so you can follow the actual patterns used in this repo.</p><nav class="primary"><a href="index.html">Docs Home</a><a href="../index.html">Live App</a></nav></div></header><main><a id="top"></a><div class="guide-layout"><section class="toc guide-index" id="toc"><h2 class="doc-title"><a class="doc-title-link" href="#toc">Guide Index</a></h2><ul><li class=""><a href="#project-layout">🗂️ Project Layout</a></li><li class=""><a href="#entry-point">🚪 Entry Point</a></li><li class=""><a href="#component-pattern">🧩 Component Pattern</a></li><li class="toc-sub"><a href="#tag-component-display">🧠 Component Display</a></li><li class="toc-sub"><a href="#tag-component-async-callbacks">⏱️ Async Callback Wrapper</a></li><li class="toc-sub"><a href="#tag-component-promise">⏳ tag.promise</a></li><li class="toc-sub"><a href="#on-destroy">🧹 onDestroy Cleanup</a></li><li class=""><a href="#tag-component-arguments">🧵 Component Arguments</a></li><li class="toc-sub"><a href="#tag-component-inputs-updates">🔌 Inputs and Updates</a></li><li class="toc-sub"><a href="#tag-component-callbacks">🪝 Functions for Output</a></li><li class=""><a href="#display">🖼️ Display</a></li><li class="toc-sub"><a href="#element-imports">📦 Element Imports</a></li><li class="toc-sub"><a href="#attributes">🏷️ attributes``</a></li><li class="toc-sub"><a href="#dynamic-content">✨ Dynamic Content _=&gt;</a></li><li class="toc-sub"><a href="#map-loops">🔂 Arrays - Map Looping</a></li><li class="toc-sub"><a href="#event-handlers">🖱️ Event Handlers</a></li><li class="toc-sub"><a href="#tag-component-outer-html">🧾 outerHTML for HTML Strings</a></li><li class="toc-sub"><a href="#static-html-seo-output">🔎 Static HTML / SEO Output</a></li><li class=""><a href="#reactive-updates">🔁 Reactive Updates</a></li><li class="toc-sub"><a href="#react-vs-taggedjs">⚖️ React vs TaggedJS</a></li><li class=""><a href="#subscriptions">📡 Subscriptions &amp; Observables</a></li><li class="toc-sub"><a href="#subscribe-output">🧾 Output Subscriptions</a></li><li class="toc-sub"><a href="#subscribe-map">🧩 Map Values to Output</a></li><li class="toc-sub"><a href="#subscribe-no-arrow">🚫 No _=&gt; Wrapper</a></li><li class="toc-sub"><a href="#subscribe-combine">🔗 Combine Observables</a></li><li class="toc-sub"><a href="#subscribe-with-default">Default value with subscribeWith</a></li><li class="toc-sub"><a href="#subscribe-attributes">🎨 Subscriptions in Attributes</a></li><li class="toc-sub"><a href="#subscription-lifecycle">♻️ Subscription Lifecycle</a></li><li class="toc-sub"><a href="#manual-unsubscribe">🧹 Manual Unsubscribe</a></li><li class=""><a href="#dynamic-child-content">Dynamic Child Content</a></li><li class="toc-sub"><a href="#dynamic-child-rules">Rules of Thumb</a></li><li class="toc-sub"><a href="#dynamic-child-broken">Broken: Frozen Child Data</a></li><li class="toc-sub"><a href="#dynamic-child-fixed">Fixed: Updating Props</a></li><li class="toc-sub"><a href="#dynamic-child-function-children">Function Children</a></li><li class="toc-sub"><a href="#dynamic-child-map-keys">Stable Map Keys</a></li></ul></section><div class="guide-content"><section class="section-card" id="project-layout"><h2 class="doc-title"><a class="doc-title-link" href="#project-layout">🗂️ Project Layout</a></h2><p>The gh-pages branch is a full app. Source code lives in <code>src/</code>, the runtime entry is in <code>src/index.ts</code>, and the main view assembly lives in <code>src/app.tag.ts</code> plus the menu in <code>src/menu.tag.ts</code>.</p><p>Use the <code>documentation/</code> folder for doc pages, styles, and future guides. Keep documentation separate from app runtime code so it remains focused and easy to host.</p><p><a class="inline-link" href="#top">Back to top</a></p></section><section class="section-card" id="entry-point"><h2 class="doc-title"><a class="doc-title-link" href="#entry-point">🚪 Entry Point</a></h2><p>To start a TaggedJS app, place a custom element in your HTML and mount the component with <code>tagElement</code>. The mount call connects your component to that element and triggers the first render.</p><p>This is the minimal setup: an HTML document, a root element, and a module script that defines a <code>tag</code> component and mounts it.</p><figure><pre><code class="language-html">&lt;!DOCTYPE html&gt;
         &lt;html lang="en"&gt;
           &lt;head&gt;
             &lt;meta charset="UTF-8" /&gt;
@@ -41,13 +41,13 @@
         &lt;/html&gt;
         </code></pre><figcaption>Minimal TaggedJS app bootstrap</figcaption></figure><p><a class="inline-link" href="#top">Back to top</a></p></section><section class="section-card" id="component-pattern"><h2 class="doc-title"><a class="doc-title-link" href="#component-pattern">🧩 Component Pattern</a></h2><p>Components are created by calling <code>tag</code> and returning mock element functions like <code>div</code>, <code>button</code>, and <code>p</code>. Below are some simple examples. You may see syntax used in ways you have not seen before BUT all code is native vanilla JavaScript that is supported everywhere.</p><p class="code-title">Basic Counter Component</p><figure class="code-block"><pre><code class="language-ts">import { tag, p, button } from 'taggedjs'
 
-        export const basicCounter = tag(() =&gt; (counter = 0) =&gt; [
+        export const basicCounter = tag((counter = 0) =&gt; [
           p('Counter: ', _=&gt; counter}),
           button.onClick(() =&gt; counter++)('Increment Counter')
         ])
         </code></pre></figure><p>☝️ ABOVE Explanation: The function "basicCounter" becomes a tag component when wrapped in a tag() call. The tag requires no inputs/props/arguments. The new tag/component is designed to create a local variable counter that is set to 0 and increments when a button is clicked.</p><br><br><p class="code-title">Basic show/hide Component</p><figure class="code-block"><pre><code class="language-ts">import { tag, div, button } from 'taggedjs'
 
-        export const basicShowHide = tag(() =&gt; (showDiv = true) =&gt;
+        export const basicShowHide = tag((showDiv = true) =&gt;
           div(
             button.onClick(() =&gt; showDiv = !showDiv)(
               _=&gt; `Toggle Div (${showDiv ? 'Hide' : 'Show'})`
@@ -55,7 +55,7 @@
             _=&gt; showDiv &amp;&amp; div('Now you see me')
           )
         )
-        </code></pre></figure><p>☝️ ABOVE Explanation: The function "basicShowHide" becomes a tag component when wrapped in a tag() call. The tag requires no inputs/props/arguments. The new tag/component is designed to create a local variable "showDiv" that is toggled true/false when a button is clicked.</p><br><br><p>The <code>tag(() =&gt; (counter = 0) =&gt; div(_=&gt; counter))</code> form is shorthand for declaring local variables and returning markup. It is the same as <code>tag(() =&gt; { let counter = 0; return div(_=&gt; counter) })</code>, just more compact.</p><p>Returning an array lets you emit multiple root elements without a wrapper. <code>() =&gt; [div('hello'), div('world')]</code> is the no-wrapper alternative to <code>() =&gt; div('hello world')</code> when you want separate siblings.</p><br><h3 class="doc-subtitle" id="tag-component-display"><a class="doc-title-link" href="#tag-component-display">🧠 Component Display</a></h3><p>When you pass arguments to a tag component, render it inside a <code>_=&gt;</code> block so TaggedJS treats argument changes as updates.</p><p>This keeps the tag mounted and lets <code>.updates(...)</code> receive new arguments without recreating the component.</p><p>Using <code>_=&gt;</code> also helps it stand out as dynamic display, while something like <code>div.onClick(() =&gt; {})</code> reads more like an event handler. It's optional, but recommended for clearer intent.</p><figure><pre><code class="language-ts">return div(
+        </code></pre></figure><p>☝️ ABOVE Explanation: The function "basicShowHide" becomes a tag component when wrapped in a tag() call. The tag requires no inputs/props/arguments. The new tag/component is designed to create a local variable "showDiv" that is toggled true/false when a button is clicked.</p><br><br><p>The <code>tag((counter = 0) =&gt; div(_=&gt; counter))</code> form is shorthand for declaring local variables and returning markup. It is the same as <code>tag(() =&gt; { let counter = 0; return div(_=&gt; counter) })</code>, just more compact.</p><p>Returning an array lets you emit multiple root elements without a wrapper. <code>() =&gt; [div('hello'), div('world')]</code> is the no-wrapper alternative to <code>() =&gt; div('hello world')</code> when you want separate siblings.</p><br><h3 class="doc-subtitle" id="tag-component-display"><a class="doc-title-link" href="#tag-component-display">🧠 Component Display</a></h3><p>When you pass arguments to a tag component, render it inside a <code>_=&gt;</code> block so TaggedJS treats argument changes as updates.</p><p>This keeps the tag mounted and lets <code>.updates(...)</code> receive new arguments without recreating the component.</p><p>Using <code>_=&gt;</code> also helps it stand out as dynamic display, while something like <code>div.onClick(() =&gt; {})</code> reads more like an event handler. It's optional, but recommended for clearer intent.</p><figure><pre><code class="language-ts">return div(
           _=&gt; boltTag(counter)
         )</code></pre><figcaption>Render tag components inside a dynamic output</figcaption></figure><h3 class="doc-subtitle" id="tag-component-arguments"><a class="doc-title-link" href="#tag-component-arguments">🧵 Component Arguments</a></h3><p>Component arguments are TaggedJS inputs. They are values the parent passes down to a child component, similar to Angular <code>@Input()</code> properties.</p><p>A tag component is a stable instance after it is mounted. Its main function sets up local state and returns the view once; later parent changes update the dynamic output blocks instead of recreating the whole child.</p><p>That is why child tags that receive changing arguments should be rendered inside <code>_=&gt;</code>. The dynamic wrapper gives TaggedJS a place to send the latest parent values into the already-mounted child.</p><figure><pre><code class="language-ts">export const parent = tag(() =&gt; {
           let counter = 0
@@ -211,7 +211,7 @@
           return div("this tag will be destroyed")
         })
 
-        const destroys = tag(() =&gt; (showContent: boolean) =&gt;
+        const destroys = tag((showContent: boolean) =&gt;
         div(
           "Content:", _=&gt; showContent &amp;&amp; contentTag(),
           button
@@ -284,14 +284,14 @@
 
         const status$ = new ValueSubject("idle") // anything with a subscribe method will do
 
-        export const status = tag(() =&gt; (
+        export const status = tag(() =&gt;
           span(subscribeWith(status$, "idle", value =&gt; `status: ${value}`))
-        ))
+        )
         </code></pre><figcaption>Default emission with subscribeWith</figcaption></figure><h3 class="doc-subtitle" id="subscribe-attributes"><a class="doc-title-link" href="#subscribe-attributes">🎨 Subscriptions in Attributes</a></h3><p>Subscriptions also work in attributes. The runtime wires the attribute once and updates the value on each emission.</p><figure><pre><code class="language-ts">import { tag, ValueSubject, subscribeWith, div } from "taggedjs"
 
         const color$ = new ValueSubject("tomato")
 
-        export const swatch = tag(() =&gt; (
+        export const swatch = tag((
           div
             .style( subscribeWith(color$, "tomato", color =&gt; ({ backgroundColor: color })) )
             ("color swatch")
@@ -309,7 +309,73 @@
 
           return "listening"
         })
-        </code></pre><figcaption>Source: <a href="https://github.com/AckerApple/taggedjs/blob/gh-pages/src/providers.tag.ts" target="_blank"><code>src/providers.tag.ts</code></a></figcaption></figure><p><a class="inline-link" href="#top">Back to top</a></p></section></div></div></main>
+        </code></pre><figcaption>Source: <a href="https://github.com/AckerApple/taggedjs/blob/gh-pages/src/providers.tag.ts" target="_blank"><code>src/providers.tag.ts</code></a></figcaption></figure><p><a class="inline-link" href="#top">Back to top</a></p></section><section class="section-card" id="dynamic-child-content"><h2 class="doc-title"><a class="doc-title-link" href="#dynamic-child-content">Dynamic Child Content and Updating Props</a></h2><p>If you are coming from React, Vue, or Svelte, the main trap is assuming that a child tag's function re-runs whenever the parent has new values. A TaggedJS tag sets up a stable component instance. After that, dynamic function children, subscriptions, and input handlers are the places where changing values are read again.</p><p>Static strings, static arrays, and objects computed during a tag render are snapshots. If the parent later changes state, those snapshots do not magically recompute inside an already-mounted child.</p><h3 class="doc-subtitle" id="dynamic-child-rules"><a class="doc-title-link" href="#dynamic-child-rules">Rules of Thumb</a></h3><ul><li><code>subscribe(observable)</code> creates reactive output for one observable.</li><li><code>subscribe.all([a$, b$], callback)</code> combines multiple observable values in one render callback and avoids nested subscription confusion.</li><li>Function children like <code>() =&gt; value</code> or <code>(_: unknown) =&gt; value</code> are not just event callbacks. In output and attributes, they mark values that must be re-evaluated on updates.</li><li><code>.inputs(...)</code> is the TaggedJS equivalent of handling updated component props or arguments. Use it when local derived variables depend on changing inputs.</li><li>Arrays returned from <code>.map(...)</code> should use <code>.key(stableValue)</code> when items can be added, removed, or reordered.</li></ul><h3 class="doc-subtitle" id="dynamic-child-broken"><a class="doc-title-link" href="#dynamic-child-broken">Broken: Derived Child Data Freezes</a></h3><p>This version combines two stores correctly with <code>subscribe.all</code>, but then passes a precomputed <code>parsed</code> object into a child that renders a static string. The child view is set up once, so later card changes can leave the details panel showing old JSON.</p><figure><pre><code class="language-ts">import { tag, subscribe, section, div, h2, pre } from "taggedjs"
+
+        const Dashboard = tag(() =&gt;
+          section(
+            subscribe.all([hardware$, rotation$], ([hardware, rotation]) =&gt; {
+              const payload = { hardware, rotation }
+              const card = visibleCard(payload, rotation.currentCardId)
+              const parsed = parsedDataForCard(card)
+
+              return div(
+                h2(card.title),
+                DetailsPanel(card, parsed)
+              )
+            })
+          )
+        )
+
+        const DetailsPanel = tag((card: Card, parsed: unknown) =&gt;
+          pre(JSON.stringify(parsed, null, 2))
+        )
+        </code></pre><figcaption>The child receives snapshots and renders a static pre block</figcaption></figure><h3 class="doc-subtitle" id="dynamic-child-fixed"><a class="doc-title-link" href="#dynamic-child-fixed">Fixed: Update Inputs and Render Dynamic Values</a></h3><p>Keep the parent subscription focused on combining stores and selecting the current card. Put child-specific derived data inside the child, then refresh it from <code>.inputs(...)</code> when the parent passes a new card.</p><p>The <code>pre(() =&gt; JSON.stringify(parsed, null, 2))</code> child is dynamic. TaggedJS can call it again after <code>parsed</code> is reassigned in the input handler.</p><figure><pre><code class="language-ts">import { tag, subscribe, section, div, h2, pre } from "taggedjs"
+
+        const Dashboard = tag(() =&gt;
+          section(
+            subscribe.all([hardware$, rotation$], ([hardware, rotation]) =&gt; {
+              const payload = { hardware, rotation }
+              const card = visibleCard(payload, rotation.currentCardId)
+
+              return div(
+                h2(() =&gt; card.title),
+                _ =&gt; DetailsPanel(card)
+              )
+            })
+          )
+        )
+
+        const DetailsPanel = tag((card: Card) =&gt; {
+          let parsed = parsedDataForCard(card)
+
+          DetailsPanel.inputs(([nextCard]) =&gt; {
+            card = nextCard
+            parsed = parsedDataForCard(card)
+          })
+
+          return pre(() =&gt; JSON.stringify(parsed, null, 2))
+        })
+        </code></pre><figcaption>The child owns derived local data and re-reads it dynamically</figcaption></figure><h3 class="doc-subtitle" id="dynamic-child-function-children"><a class="doc-title-link" href="#dynamic-child-function-children">Function Children Are Dynamic Rendering</a></h3><p>Use function children anywhere a value must be read again: text nodes, conditional children, mapped children, and attributes. Event handlers also use functions, but the meaning is different: <code>onClick(() =&gt; save())</code> handles an event, while <code>span(() =&gt; label)</code> renders a dynamic value.</p><figure><pre><code class="language-ts">const StatusBadge = tag((status: Status) =&gt; {
+          StatusBadge.inputs(([nextStatus]) =&gt; status = nextStatus)
+
+          return span
+            .class(() =&gt; `status status-${status.kind}`)
+            (() =&gt; status.label)
+        })
+        </code></pre><figcaption>Dynamic text and dynamic attributes</figcaption></figure><h3 class="doc-subtitle" id="dynamic-child-map-keys"><a class="doc-title-link" href="#dynamic-child-map-keys">Stable Keys for Mapped Tags</a></h3><p>When rendering a mapped array of tags, give each rendered item a stable primitive key from the data, such as an id, slug, or persistent name. Do not use fresh inline objects or arrays as keys because their identity changes every render and prevents stable matching.</p><figure><pre><code class="language-ts">const CardList = tag((cards: Card[]) =&gt; {
+          CardList.inputs(([nextCards]) =&gt; cards = nextCards)
+
+          return ul(
+            () =&gt; cards.map(card =&gt;
+              CardRow(card).key(card.id)
+            )
+          )
+        })
+
+        // Avoid keys that are recreated each render:
+        // CardRow(card).key({ id: card.id })
+        // CardRow(card).key([card.id])
+        </code></pre><figcaption>Use stable keys from item data</figcaption></figure><p><a class="inline-link" href="#top">Back to top</a></p></section></div></div></main>
         <!-- taggedjs:ssr-end -->
   </app>
   <script type="module">

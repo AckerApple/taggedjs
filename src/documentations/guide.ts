@@ -7,6 +7,7 @@ import { componentPatternSection } from "./componentPatternSection"
 import { displaySection } from "./displaySection"
 import { reactiveUpdatesSection } from "./reactiveUpdatesSection"
 import { subscriptionsSection } from "./subscriptionsSection"
+import { dynamicChildContentSection } from "./dynamicChildContentSection"
 
 export const GuideApp = tag(() => [
   guideHeader(),
@@ -22,6 +23,7 @@ export const GuideApp = tag(() => [
         displaySection(),
         reactiveUpdatesSection(),
         subscriptionsSection(),
+        dynamicChildContentSection(),
       )
     )
   )
