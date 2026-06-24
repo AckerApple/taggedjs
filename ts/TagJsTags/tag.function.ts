@@ -172,7 +172,7 @@ export function tag<T extends Tag<T>>(
   }
   */
 
-  /** function developer triggers */
+  /** ReturnWrap: function developer triggers */
   const parentWrap = function tagWrapper(
     ...props: (T | StringTag | StringTag[])[]
   ): TemplaterResult {

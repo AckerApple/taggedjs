@@ -16,7 +16,7 @@ export function updateToDiffValue(
 ) {
   // is new value a tag?
   const tagJsType = newValue && (newValue as TemplaterResult).tagJsType as ValueType
-  
+
   delete context.deleted
 
   if(tagJsType) {

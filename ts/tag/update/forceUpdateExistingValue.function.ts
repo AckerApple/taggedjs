@@ -21,7 +21,7 @@ export function forceUpdateExistingValue(
 
   // ignore
   if( ignoreOrDestroyed === 0 ) {
-    return ignoreOrDestroyed // do nothing
+    return 0 // do nothing
   }
 
   updateToDiffValue(

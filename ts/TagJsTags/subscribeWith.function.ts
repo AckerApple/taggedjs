@@ -66,6 +66,5 @@ export function checkSubscribeValueChanged(
     return 4
   }
 
-
   return 0 // still the same
 }

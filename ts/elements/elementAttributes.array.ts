@@ -8,6 +8,7 @@ import { ElementVarBase } from "./ElementVarBase.type"
 export const ATTRIBUTE_CALLABLE_DEFS: Array<[apiName: string, attrName: string]> = [
   ['alt', 'alt'],
   ['ariaLabel', 'aria-label'],
+  ['ariaHidden', 'aria-hidden'],
   ['referrerPolicy', 'referrerpolicy'],
   ['autoFocus', 'autoFocus'],
   ['border', 'border'],
@@ -144,6 +145,7 @@ export type CombinedElementFunctions = ElementVarBase & {
 
   /** Accessible label when visible text is missing/insufficient */
   ariaLabel: AttributeCallable
+  ariaHidden: AttributeCallable
 
   /** Referrer information policy used for outgoing requests */
   referrerPolicy: AttributeCallable

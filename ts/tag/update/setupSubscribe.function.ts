@@ -14,6 +14,7 @@ import { TagJsTag } from '../../TagJsTags/TagJsTag.type.js'
 import { processUpdateSubscribe } from './processUpdateSubscribe.function.js'
 import { removeContextInCycle, setContextInCycle } from '../cycles/setContextInCycle.function.js'
 import { LikeObservable } from '../../TagJsTags/processSubscribeWithAttribute.function.js'
+import { updateToDiffValue } from './updateToDiffValue.function.js'
 
 export function setupSubscribe(
   value: SubscribeValue,
@@ -46,15 +47,32 @@ export function setupSubscribe(
       subContext: SubscriptionContext,
     ) {
       const aContext = subContext.contextItem as ContextItem
-      
-      forceUpdateExistingValue(
-        aContext,
+      const TagJsTag = aContext.tagJsVar as TagJsTag<any>
+
+      const forceUpdate = TagJsTag.hasValueChanged(
         updateValue,
+        aContext,
         ownerSupport,
       )
 
-      aContext.tagJsVar.processUpdate(updateValue, aContext, ownerSupport, [updateValue])
-      // processUpdateContext(ownerSupport)
+      if( forceUpdate ) {
+        aContext.tagJsVar.destroy(aContext, ownerSupport)
+
+        updateToDiffValue(
+          updateValue,
+          aContext,
+          ownerSupport,
+          forceUpdate,
+        )
+      }
+
+      aContext.tagJsVar.processUpdate(
+        updateValue,
+        aContext,
+        ownerSupport,
+        [updateValue]
+      )
+
       aContext.value = updateValue
 
       checkToPaint(syncRun)
@@ -125,7 +143,7 @@ export function setupSubscribeCallbackProcessor(
       onOutput(responseValue, syncRun, subContext)
       
       removeContextInCycle()
-      
+
       return
     }
 
@@ -184,12 +202,13 @@ export function checkToPaint(
   syncRun: boolean,
 ) {
   if(syncRun) {
-    return
+    return false
   }
 
   if(setUseMemory.stateConfig.support) {
-    return
+    return false
   }
 
   paint()
+  return true
 }
