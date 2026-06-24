@@ -78,7 +78,7 @@ propWatch = PropWatches.SHALLOW) {
       throw new Error('A TaggedJs tag was created within a running tag. All component tags must be created outside of anyother tag')
     }
     */
-    /** function developer triggers */
+    /** ReturnWrap: function developer triggers */
     const parentWrap = function tagWrapper(...props) {
         const templater = getTemplaterResult(propWatch, props);
         templater.tagJsType = ValueTypes.tagComponent;

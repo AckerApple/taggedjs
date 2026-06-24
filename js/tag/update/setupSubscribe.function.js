@@ -1,12 +1,12 @@
 import { paint } from '../../render/paint.function.js';
 import { setUseMemory } from '../../state/setUseMemory.object.js';
-import { forceUpdateExistingValue } from './forceUpdateExistingValue.function.js';
 import { deleteSubContext } from './deleteContextSubContext.function.js';
 import { onFirstSubContext } from './onFirstSubContext.function.js';
 import { guaranteeInsertBefore } from '../guaranteeInsertBefore.function.js';
 import { valueToTagJsVar } from '../../TagJsTags/valueToTagJsVar.function.js';
 import { processUpdateSubscribe } from './processUpdateSubscribe.function.js';
 import { removeContextInCycle, setContextInCycle } from '../cycles/setContextInCycle.function.js';
+import { updateToDiffValue } from './updateToDiffValue.function.js';
 export function setupSubscribe(value, contextItem, ownerSupport, insertBeforeOriginal, // optional but will always be made
 appendTo) {
     const observables = value.Observables;
@@ -17,9 +17,13 @@ appendTo) {
         // MUTATION: from now on just run update
         onOutput = subContext.tagJsVar.onOutput = function subscriptionUpdate(updateValue, syncRun, subContext) {
             const aContext = subContext.contextItem;
-            forceUpdateExistingValue(aContext, updateValue, ownerSupport);
+            const TagJsTag = aContext.tagJsVar;
+            const forceUpdate = TagJsTag.hasValueChanged(updateValue, aContext, ownerSupport);
+            if (forceUpdate) {
+                aContext.tagJsVar.destroy(aContext, ownerSupport);
+                updateToDiffValue(updateValue, aContext, ownerSupport, forceUpdate);
+            }
             aContext.tagJsVar.processUpdate(updateValue, aContext, ownerSupport, [updateValue]);
-            // processUpdateContext(ownerSupport)
             aContext.value = updateValue;
             checkToPaint(syncRun);
         };
@@ -93,11 +97,12 @@ export function deleteAndUnsubscribe(contextItem, ownerSupport) {
 }
 export function checkToPaint(syncRun) {
     if (syncRun) {
-        return;
+        return false;
     }
     if (setUseMemory.stateConfig.support) {
-        return;
+        return false;
     }
     paint();
+    return true;
 }
 //# sourceMappingURL=setupSubscribe.function.js.map

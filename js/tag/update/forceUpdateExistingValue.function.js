@@ -7,7 +7,7 @@ ownerSupport) {
     const ignoreOrDestroyed = TagJsTag.hasValueChanged(newValue, contextItem, ownerSupport);
     // ignore
     if (ignoreOrDestroyed === 0) {
-        return ignoreOrDestroyed; // do nothing
+        return 0; // do nothing
     }
     updateToDiffValue(newValue, contextItem, ownerSupport, ignoreOrDestroyed);
     return ignoreOrDestroyed;

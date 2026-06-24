@@ -2,6 +2,7 @@
 export const ATTRIBUTE_CALLABLE_DEFS = [
     ['alt', 'alt'],
     ['ariaLabel', 'aria-label'],
+    ['ariaHidden', 'aria-hidden'],
     ['referrerPolicy', 'referrerpolicy'],
     ['autoFocus', 'autoFocus'],
     ['border', 'border'],

@@ -88,6 +88,7 @@ export type CombinedElementFunctions = ElementVarBase & {
     border: AttributeCallable;
     /** Accessible label when visible text is missing/insufficient */
     ariaLabel: AttributeCallable;
+    ariaHidden: AttributeCallable;
     /** Referrer information policy used for outgoing requests */
     referrerPolicy: AttributeCallable;
     /** SVG viewport and coordinate system definition */

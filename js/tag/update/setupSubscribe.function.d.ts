@@ -10,4 +10,4 @@ export declare function setupSubscribeCallbackProcessor(observables: LikeObserva
 onOutput: OnSubOutput, tagJsVar: SubscribeValue, contextItem: ContextItem): SubContext;
 export declare function unsubscribeContext(contextItem: ContextItem): void;
 export declare function deleteAndUnsubscribe(contextItem: ContextItem, ownerSupport: AnySupport): 76 | undefined;
-export declare function checkToPaint(syncRun: boolean): void;
+export declare function checkToPaint(syncRun: boolean): boolean;
