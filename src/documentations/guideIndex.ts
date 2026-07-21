@@ -4,6 +4,7 @@ import { docH2 } from "./docHeading"
 const tocItems = [
   { id: "project-layout", label: "🗂️ Project Layout" },
   { id: "entry-point", label: "🚪 Entry Point" },
+  { id: "mount-once-tag-element-updates", label: "Mount once; do not call tagElement for updates", level: "sub" },
   { id: "component-pattern", label: "🧩 Component Pattern" },
   { id: "tag-component-display", label: "🧠 Component Display", level: "sub" },
   { id: "tag-component-async-callbacks", label: "⏱️ Async Callback Wrapper", level: "sub" },
