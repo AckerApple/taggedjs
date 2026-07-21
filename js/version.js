@@ -1,2 +1,2 @@
-export const version = "3.2.4";
+export const version = "3.2.5";
 //# sourceMappingURL=version.js.map

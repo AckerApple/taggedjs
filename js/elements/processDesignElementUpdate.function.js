@@ -7,14 +7,15 @@ export function processDesignElementUpdate(value, context, ownerSupport) {
     }
     ++context.updateCount;
     const hasChanged = checkTagElementValueChange(value, context);
-    if (hasChanged) {
+    function changeIt() {
         destroyDesignElement(context, ownerSupport);
-        // delete context.htmlDomMeta // The next value needs to know its not been deleted
         context.htmlDomMeta = []; // The next value needs to know its not been deleted
-        // context.deleted = true // its not deleted but changed
         delete context.deleted; // its not deleted but changed
         updateToDiffValue(value, context, // newContext,
         ownerSupport, 789);
+    }
+    if (hasChanged) {
+        changeIt();
         return;
     }
     const contexts = context.contexts;
@@ -34,15 +35,19 @@ export function processDesignElementUpdate(value, context, ownerSupport) {
         for (let index = 0; index < contexts.length; ++index) {
             conValues[index] = contexts[index].value;
         }
-        console.info('context mismatch', {
-            value,
-            context,
-            conValues,
-            vContexts,
-            deleted: context.deleted,
-            contexts
-        });
-        throw new Error(`Expected ${contexts.length} contexts but got ${vContexts.length}`);
+        changeIt();
+        return;
+        /*
+        console.warn('context mismatch', {
+          value,
+          context,
+          conValues,
+          vContexts,
+          deleted: context.deleted,
+          contexts
+        })
+        throw new Error(`Expected ${contexts.length} contexts but got ${vContexts.length}`)
+        */
     }
     context.locked = 79;
     for (let index = 0; index < contexts.length; ++index) {
