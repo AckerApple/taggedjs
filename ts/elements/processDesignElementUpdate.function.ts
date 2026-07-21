@@ -18,12 +18,11 @@ export function processDesignElementUpdate(
   ++context.updateCount
 
   const hasChanged = checkTagElementValueChange(value, context)
-  if( hasChanged ) {
+
+  function changeIt() {
     destroyDesignElement(context, ownerSupport)
 
-    // delete context.htmlDomMeta // The next value needs to know its not been deleted
     context.htmlDomMeta = [] // The next value needs to know its not been deleted
-    // context.deleted = true // its not deleted but changed
     delete context.deleted // its not deleted but changed
 
     updateToDiffValue(
@@ -32,7 +31,10 @@ export function processDesignElementUpdate(
       ownerSupport,
       789,
     )
+  }
 
+  if( hasChanged ) {
+    changeIt()
     return
   }
 
@@ -56,7 +58,10 @@ export function processDesignElementUpdate(
       conValues[index] = contexts[index].value
     }
 
-    console.info('context mismatch', {
+    changeIt()
+    return
+    /*
+    console.warn('context mismatch', {
       value,
       context,
       conValues,
@@ -65,6 +70,7 @@ export function processDesignElementUpdate(
       contexts
     })
     throw new Error(`Expected ${contexts.length} contexts but got ${vContexts.length}`)
+    */
   }
 
   context.locked = 79
