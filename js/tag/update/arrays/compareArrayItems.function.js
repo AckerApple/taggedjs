@@ -1,4 +1,5 @@
 import { destroySupport } from '../../../render/destroySupport.function.js';
+import { addPaintRemover } from '../../../render/paint.function.js';
 export function runArrayItemDiff(oldKey, newValueTag, prevContext, lastArray, index) {
     const keyValue = newValueTag?.arrayValue;
     /*
@@ -24,14 +25,26 @@ export function runArrayItemDiff(oldKey, newValueTag, prevContext, lastArray, in
 }
 export function destroyArrayItem(context) {
     const global = context.global;
-    destroyArrayItemByGlobal(global, context);
+    const result = destroyArrayItemByGlobal(global, context);
+    destroyArrayMarkers(context);
+    return result;
 }
 function destroyArrayItemByGlobal(global, context) {
     if (global && context.state?.oldest) {
         const support = context.state.oldest;
-        destroySupport(support, global);
-        return;
+        return destroySupport(support, global);
     }
-    context.tagJsVar.destroy(context, {});
+    return context.tagJsVar.destroy(context, {});
+}
+function destroyArrayMarkers(context) {
+    context.arrayMarkersDeleted = true;
+    const startMarker = context.arrayStartMarker;
+    if (startMarker?.parentNode) {
+        addPaintRemover(startMarker, 'destroyArrayStartMarker');
+    }
+    const endMarker = context.placeholder;
+    if (endMarker?.parentNode) {
+        addPaintRemover(endMarker, 'destroyArrayEndMarker');
+    }
 }
 //# sourceMappingURL=compareArrayItems.function.js.map

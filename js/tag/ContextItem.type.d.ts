@@ -44,6 +44,10 @@ export interface ContextItem extends BaseContextItem {
     paint?: PaintCommand;
     lastArray?: LastArrayItem[];
     arrayValue?: any;
+    /** Stable boundary immediately before one rendered array item. */
+    arrayStartMarker?: Text;
+    /** Prevents an array marker queued for paint from being inserted after destruction. */
+    arrayMarkersDeleted?: true;
     global?: TagGlobal;
     placeholder?: Text;
 }

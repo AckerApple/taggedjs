@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 import { tagValueUpdateHandler } from '../tagValueUpdateHandler.function.js';
-import { destroyArrayItem, runArrayItemDiff } from './compareArrayItems.function.js';
+import { destroyArrayItem } from './compareArrayItems.function.js';
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js';
 import { enqueueBatchAfterUnique } from '../../../render/paint.function.js';
 const notCasted = Symbol('not-casted');
@@ -12,7 +12,6 @@ ownerSupport, appendTo) {
         context.lastArray = [];
     }
     const lastArray = context.lastArray;
-    let runtimeInsertBefore = context.placeholder;
     const length = value.length;
     const castedCache = new Array(length).fill(notCasted);
     const getCastedArrayItem = function getCastedArrayItem(index) {
@@ -24,48 +23,90 @@ ownerSupport, appendTo) {
         castedCache[index] = casted;
         return casted;
     };
-    let batchUpdates = noPriorRun ? false : length !== lastArray.length;
-    // ARRAY DELETES
-    if (!noPriorRun) {
-        // on each loop check the new length
-        const results = runArrayDeleteCheck(lastArray, value, context, batchUpdates, getCastedArrayItem);
-        batchUpdates = results.batchUpdates;
-    }
-    const liveArray = context.lastArray;
+    const batchUpdates = !noPriorRun && (length !== lastArray.length ||
+        lastArray.some(item => item.locked === 1));
+    const liveArray = noPriorRun
+        ? lastArray
+        : reconcileArrayContexts(lastArray, length, getCastedArrayItem);
+    context.lastArray = liveArray;
     for (let index = 0; index < length; ++index) {
-        const newSubject = reviewArrayItem(index, liveArray, ownerSupport, batchUpdates, getCastedArrayItem, runtimeInsertBefore, appendTo);
-        runtimeInsertBefore = newSubject.placeholder;
+        const insertBefore = findNextArrayStartMarker(liveArray, index + 1) || context.placeholder;
+        reviewArrayItem(index, liveArray, ownerSupport, batchUpdates, getCastedArrayItem, insertBefore, appendTo);
     }
 }
-function runArrayDeleteCheck(lastArray, value, contextItem, batchUpdates, getCastedArrayItem) {
-    /** 🗑️ remove previous items first */
-    const filteredLast = [];
-    let removed = 0;
-    const maxIndex = value.length - 1;
-    for (let index = 0; index < lastArray.length; ++index) {
-        const item = lastArray[index];
-        if (item.locked === 1) {
-            batchUpdates = true; // The item we are looking to update caused the render we are under
+function findNextArrayStartMarker(contexts, fromIndex) {
+    for (let index = fromIndex; index < contexts.length; ++index) {
+        const marker = contexts[index]?.arrayStartMarker;
+        if (marker) {
+            return marker;
         }
-        if (item.value === null) {
-            filteredLast.push(item);
-            continue;
-        }
-        // 👁️ COMPARE & REMOVE
-        const newRemoved = compareArrayItems(index, lastArray, removed, maxIndex, getCastedArrayItem);
-        if (newRemoved === 0) {
-            filteredLast.push(item);
-            continue;
-        }
-        // do the same number again because it was a mid delete
-        if (newRemoved === 2) {
-            index = index - 1;
-            continue;
-        }
-        removed = removed + newRemoved;
     }
-    contextItem.lastArray = filteredLast;
-    return { batchUpdates };
+}
+function reconcileArrayContexts(lastArray, newLength, getCastedArrayItem) {
+    const nextArray = new Array(newLength);
+    const usedContexts = new Set();
+    const keyedContexts = new Map();
+    for (let index = 0; index < lastArray.length; ++index) {
+        const context = lastArray[index];
+        const key = getContextKey(context);
+        if (key === undefined) {
+            continue;
+        }
+        const matches = keyedContexts.get(key);
+        if (matches) {
+            matches.push(context);
+        }
+        else {
+            keyedContexts.set(key, [context]);
+        }
+    }
+    // Explicit keys retain identity even when nullable siblings shift indices.
+    for (let index = 0; index < newLength; ++index) {
+        const key = getValueKey(getCastedArrayItem(index));
+        if (key === undefined) {
+            continue;
+        }
+        const matches = keyedContexts.get(key);
+        const context = matches?.shift();
+        if (context) {
+            nextArray[index] = context;
+            usedContexts.add(context);
+        }
+    }
+    // Values without keys continue to use their array position as identity.
+    for (let index = 0; index < newLength; ++index) {
+        if (nextArray[index]) {
+            continue;
+        }
+        const context = lastArray[index];
+        const value = getCastedArrayItem(index);
+        const contextKey = getContextKey(context);
+        const valueKey = getValueKey(value);
+        if (context &&
+            !usedContexts.has(context) &&
+            ((contextKey === undefined && valueKey === undefined) ||
+                isEmptyValue(context.value) ||
+                isEmptyValue(value))) {
+            nextArray[index] = context;
+            usedContexts.add(context);
+        }
+    }
+    for (let index = 0; index < lastArray.length; ++index) {
+        const context = lastArray[index];
+        if (!usedContexts.has(context)) {
+            destroyArrayItem(context);
+        }
+    }
+    return nextArray;
+}
+function getContextKey(context) {
+    return context?.arrayValue;
+}
+function getValueKey(value) {
+    return value?.arrayValue;
+}
+function isEmptyValue(value) {
+    return value === null || value === undefined;
 }
 /** new and old array items processed here */
 function reviewArrayItem(index, lastArray, ownerSupport, batchUpdates, getCastedArrayItem, runtimeInsertBefore, // used during updates
@@ -73,17 +114,22 @@ appendTo) {
     const item = getCastedArrayItem(index);
     const previousContext = lastArray[index];
     if (previousContext) {
-        return reviewPreviousArrayItem(item, previousContext, ownerSupport, batchUpdates, runtimeInsertBefore, appendTo);
+        const key = getValueKey(item);
+        if (key === undefined) {
+            delete previousContext.arrayValue;
+        }
+        else {
+            previousContext.arrayValue = key;
+        }
+        return reviewPreviousArrayItem(item, previousContext, ownerSupport, batchUpdates && previousContext.locked !== 1, runtimeInsertBefore, appendTo);
     }
     // 🆕 NEW Array items processed below
     const context = createAndProcessContextItem(item, ownerSupport, lastArray, // acts as contexts aka Context[]
     runtimeInsertBefore, appendTo);
-    // Added to previous array
-    lastArray.push(context);
-    if (item) {
-        // set or use key()
-        // context.arrayValue = item?.arrayValue || context.arrayValue || context.value
-        context.arrayValue = item.arrayValue || context.arrayValue;
+    lastArray[index] = context;
+    const key = getValueKey(item);
+    if (key !== undefined) {
+        context.arrayValue = key;
     }
     return context;
 }
@@ -92,7 +138,6 @@ _runtimeInsertBefore, // used during updates
 _appendTo) {
     if (batchUpdates) {
         enqueueBatchAfterUnique(context, [runArrayBatchAfterHandler, [value, context, ownerSupport]]);
-        context.value = value;
         return context;
     }
     // array item returned array
@@ -103,24 +148,6 @@ _appendTo) {
     }
     tagValueUpdateHandler(value, context, ownerSupport);
     return context;
-}
-/** Run within first array processing loop
- *  1 = destroyed, 2 = value changes, 0 = no change */
-function compareArrayItems(index, lastArray, removed, maxIndex, getCastedArrayItem) {
-    const at = index - removed;
-    const lessLength = at < 0 || maxIndex < at;
-    const prevContext = lastArray[index];
-    if (lessLength) {
-        destroyArrayItem(prevContext);
-        return 1;
-    }
-    if (prevContext.arrayValue === undefined) {
-        prevContext.arrayValue = index;
-    }
-    const oldKey = prevContext.arrayValue;
-    const newValueTag = getCastedArrayItem(index);
-    const result = runArrayItemDiff(oldKey, newValueTag, prevContext, lastArray, index);
-    return result;
 }
 function runArrayBatchAfterHandler(value, context, ownerSupport) {
     tagValueUpdateHandler(value, context, ownerSupport);
