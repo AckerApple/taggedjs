@@ -161,7 +161,9 @@ export function dynamicChildContentSection() {
       "When rendering a mapped array of tags, give each rendered item a stable ",
       "primitive key from the data, such as an id, slug, or persistent name. Do ",
       "not use fresh inline objects or arrays as keys because their identity ",
-      "changes every render and prevents stable matching."
+      "changes every render and prevents stable matching. A retained key keeps ",
+      "the existing DOM node and component instance mounted when nearby array ",
+      "positions change."
     ), figure(
       pre(code.class`language-ts`(mappedKeysCode)),
       figcaption("Use stable keys from item data")

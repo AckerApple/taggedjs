@@ -17,7 +17,7 @@
   <noscript style="color:red">Javascript is required but is turned off on your device</noscript>
   <app id="docs-app">
         <!-- taggedjs:ssr-start -->
-        <header><div class="wrap"><h1>Work With The TaggedJS Code</h1><p>This guide is grounded in the real TaggedJS source. Each section points to current files and uses live excerpts so you can follow the actual patterns used in this repo.</p><nav class="primary"><a href="index.html">Docs Home</a><a href="../index.html">Live App</a></nav></div></header><main><a id="top"></a><div class="guide-layout"><section class="toc guide-index" id="toc"><h2 class="doc-title"><a class="doc-title-link" href="#toc">Guide Index</a></h2><ul><li class=""><a href="#project-layout">🗂️ Project Layout</a></li><li class=""><a href="#entry-point">🚪 Entry Point</a></li><li class="toc-sub"><a href="#mount-once-tag-element-updates">Mount once; do not call tagElement for updates</a></li><li class=""><a href="#component-pattern">🧩 Component Pattern</a></li><li class="toc-sub"><a href="#tag-component-display">🧠 Component Display</a></li><li class="toc-sub"><a href="#tag-component-async-callbacks">⏱️ Async Callback Wrapper</a></li><li class="toc-sub"><a href="#tag-component-promise">⏳ tag.promise</a></li><li class="toc-sub"><a href="#on-destroy">🧹 onDestroy Cleanup</a></li><li class=""><a href="#tag-component-arguments">🧵 Component Arguments</a></li><li class="toc-sub"><a href="#tag-component-inputs-updates">🔌 Inputs and Updates</a></li><li class="toc-sub"><a href="#tag-component-callbacks">🪝 Functions for Output</a></li><li class=""><a href="#display">🖼️ Display</a></li><li class="toc-sub"><a href="#element-imports">📦 Element Imports</a></li><li class="toc-sub"><a href="#attributes">🏷️ attributes``</a></li><li class="toc-sub"><a href="#dynamic-content">✨ Dynamic Content _=&gt;</a></li><li class="toc-sub"><a href="#map-loops">🔂 Arrays - Map Looping</a></li><li class="toc-sub"><a href="#event-handlers">🖱️ Event Handlers</a></li><li class="toc-sub"><a href="#tag-component-outer-html">🧾 outerHTML for HTML Strings</a></li><li class="toc-sub"><a href="#static-html-seo-output">🔎 Static HTML / SEO Output</a></li><li class=""><a href="#reactive-updates">🔁 Reactive Updates</a></li><li class="toc-sub"><a href="#react-vs-taggedjs">⚖️ React vs TaggedJS</a></li><li class=""><a href="#subscriptions">📡 Subscriptions &amp; Observables</a></li><li class="toc-sub"><a href="#subscribe-output">🧾 Output Subscriptions</a></li><li class="toc-sub"><a href="#subscribe-map">🧩 Map Values to Output</a></li><li class="toc-sub"><a href="#subscribe-no-arrow">🚫 No _=&gt; Wrapper</a></li><li class="toc-sub"><a href="#subscribe-combine">🔗 Combine Observables</a></li><li class="toc-sub"><a href="#subscribe-with-default">Default value with subscribeWith</a></li><li class="toc-sub"><a href="#subscribe-attributes">🎨 Subscriptions in Attributes</a></li><li class="toc-sub"><a href="#subscription-lifecycle">♻️ Subscription Lifecycle</a></li><li class="toc-sub"><a href="#manual-unsubscribe">🧹 Manual Unsubscribe</a></li><li class=""><a href="#dynamic-child-content">Dynamic Child Content</a></li><li class="toc-sub"><a href="#dynamic-child-rules">Rules of Thumb</a></li><li class="toc-sub"><a href="#dynamic-child-broken">Broken: Frozen Child Data</a></li><li class="toc-sub"><a href="#dynamic-child-fixed">Fixed: Updating Props</a></li><li class="toc-sub"><a href="#dynamic-child-function-children">Function Children</a></li><li class="toc-sub"><a href="#dynamic-child-map-keys">Stable Map Keys</a></li></ul></section><div class="guide-content"><section class="section-card" id="project-layout"><h2 class="doc-title"><a class="doc-title-link" href="#project-layout">🗂️ Project Layout</a></h2><p>The gh-pages branch is a full app. Source code lives in <code>src/</code>, the runtime entry is in <code>src/index.ts</code>, and the main view assembly lives in <code>src/app.tag.ts</code> plus the menu in <code>src/menu.tag.ts</code>.</p><p>Use the <code>documentation/</code> folder for doc pages, styles, and future guides. Keep documentation separate from app runtime code so it remains focused and easy to host.</p><p><a class="inline-link" href="#top">Back to top</a></p></section><section class="section-card" id="entry-point"><h2 class="doc-title"><a class="doc-title-link" href="#entry-point">🚪 Entry Point</a></h2><p>To start a TaggedJS app, place a custom element in your HTML and mount the component with <code>tagElement</code>. The mount call connects your component to that element and triggers the first render.</p><p>This is the minimal setup: an HTML document, a root element, and a module script that defines a <code>tag</code> component and mounts it.</p><figure><pre><code class="language-html">&lt;!DOCTYPE html&gt;
+        <header><div class="wrap"><h1>Work With The TaggedJS Code</h1><p>This guide is grounded in the real TaggedJS source. Each section points to current files and uses live excerpts so you can follow the actual patterns used in this repo.</p><nav class="primary"><a href="index.html">Docs Home</a><a href="../index.html">Live App</a></nav></div></header><main><a id="top"></a><div class="guide-layout"><section class="toc guide-index" id="toc"><h2 class="doc-title"><a class="doc-title-link" href="#toc">Guide Index</a></h2><ul><li class=""><a href="#project-layout">🗂️ Project Layout</a></li><li class=""><a href="#entry-point">🚪 Entry Point</a></li><li class="toc-sub"><a href="#mount-once-tag-element-updates">Mount once; do not call tagElement for updates</a></li><li class=""><a href="#component-pattern">🧩 Component Pattern</a></li><li class="toc-sub"><a href="#tag-component-display">🧠 Component Display</a></li><li class="toc-sub"><a href="#tag-component-async-callbacks">⏱️ Async Callback Wrapper</a></li><li class="toc-sub"><a href="#tag-component-promise">⏳ tag.promise</a></li><li class="toc-sub"><a href="#on-destroy">🧹 onDestroy Cleanup</a></li><li class=""><a href="#tag-component-arguments">🧵 Component Arguments</a></li><li class="toc-sub"><a href="#tag-component-inputs-updates">🔌 Inputs and Updates</a></li><li class="toc-sub"><a href="#tag-component-callbacks">🪝 Functions for Output</a></li><li class=""><a href="#display">🖼️ Display</a></li><li class="toc-sub"><a href="#element-imports">📦 Element Imports</a></li><li class="toc-sub"><a href="#attributes">🏷️ attributes``</a></li><li class="toc-sub"><a href="#dynamic-content">✨ Dynamic Content _=&gt;</a></li><li class="toc-sub"><a href="#map-loops">🔂 Arrays - Map Looping</a></li><li class="toc-sub"><a href="#array-identity">Array Identity</a></li><li class="toc-sub"><a href="#keyed-dom-preservation">Keyed DOM Preservation</a></li><li class="toc-sub"><a href="#nullable-array-positions">Nullable Array Positions</a></li><li class="toc-sub"><a href="#array-index-keys">Why Index Keys Are Unsafe</a></li><li class="toc-sub"><a href="#event-handlers">🖱️ Event Handlers</a></li><li class="toc-sub"><a href="#tag-component-outer-html">🧾 outerHTML for HTML Strings</a></li><li class="toc-sub"><a href="#static-html-seo-output">🔎 Static HTML / SEO Output</a></li><li class=""><a href="#reactive-updates">🔁 Reactive Updates</a></li><li class="toc-sub"><a href="#react-vs-taggedjs">⚖️ React vs TaggedJS</a></li><li class=""><a href="#subscriptions">📡 Subscriptions &amp; Observables</a></li><li class="toc-sub"><a href="#subscribe-output">🧾 Output Subscriptions</a></li><li class="toc-sub"><a href="#subscribe-map">🧩 Map Values to Output</a></li><li class="toc-sub"><a href="#subscribe-no-arrow">🚫 No _=&gt; Wrapper</a></li><li class="toc-sub"><a href="#subscribe-combine">🔗 Combine Observables</a></li><li class="toc-sub"><a href="#subscribe-with-default">Default value with subscribeWith</a></li><li class="toc-sub"><a href="#subscribe-attributes">🎨 Subscriptions in Attributes</a></li><li class="toc-sub"><a href="#subscription-lifecycle">♻️ Subscription Lifecycle</a></li><li class="toc-sub"><a href="#manual-unsubscribe">🧹 Manual Unsubscribe</a></li><li class=""><a href="#dynamic-child-content">Dynamic Child Content</a></li><li class="toc-sub"><a href="#dynamic-child-rules">Rules of Thumb</a></li><li class="toc-sub"><a href="#dynamic-child-broken">Broken: Frozen Child Data</a></li><li class="toc-sub"><a href="#dynamic-child-fixed">Fixed: Updating Props</a></li><li class="toc-sub"><a href="#dynamic-child-function-children">Function Children</a></li><li class="toc-sub"><a href="#dynamic-child-map-keys">Stable Map Keys</a></li></ul></section><div class="guide-content"><section class="section-card" id="project-layout"><h2 class="doc-title"><a class="doc-title-link" href="#project-layout">🗂️ Project Layout</a></h2><p>The gh-pages branch is a full app. Source code lives in <code>src/</code>, the runtime entry is in <code>src/index.ts</code>, and the main view assembly lives in <code>src/app.tag.ts</code> plus the menu in <code>src/menu.tag.ts</code>.</p><p>Use the <code>documentation/</code> folder for doc pages, styles, and future guides. Keep documentation separate from app runtime code so it remains focused and easy to host.</p><p><a class="inline-link" href="#top">Back to top</a></p></section><section class="section-card" id="entry-point"><h2 class="doc-title"><a class="doc-title-link" href="#entry-point">🚪 Entry Point</a></h2><p>To start a TaggedJS app, place a custom element in your HTML and mount the component with <code>tagElement</code>. The mount call connects your component to that element and triggers the first render.</p><p>This is the minimal setup: an HTML document, a root element, and a module script that defines a <code>tag</code> component and mounts it.</p><figure><pre><code class="language-html">&lt;!DOCTYPE html&gt;
         &lt;html lang="en"&gt;
           &lt;head&gt;
             &lt;meta charset="UTF-8" /&gt;
@@ -263,29 +263,58 @@
           p(_=&gt;  count ),
           button.onClick(() =&gt; count++), 'increment')
         ])
-        </code></pre><figcaption>Dynamic content cue vs event handler</figcaption></figure><h3 class="doc-subtitle" id="map-loops"><a class="doc-title-link" href="#map-loops">🔂 Arrays - Map Looping</a></h3><p>TaggedJS uses normal JavaScript array mapping for list rendering. Put the <code>array.map</code> inside a <code>_=&gt;</code> block so the list is reactive.</p><p>Return a tag for each item and add <code>.key(...)</code> when the list can be reordered or removed so TaggedJS can keep elements stable. Alternatively, if the first rendered element has an id like <code>div.id`x-${x.id}`</code>, that id can act as the array value identifier.</p><figure><figcaption><strong>Map each item and key the result</strong></figcaption><pre><code class="language-ts">import { div, tag } from "taggedjs"
+        </code></pre><figcaption>Dynamic content cue vs event handler</figcaption></figure><h3 class="doc-subtitle" id="map-loops"><a class="doc-title-link" href="#map-loops">🔂 Arrays - Map Looping</a></h3><p>TaggedJS uses normal JavaScript array mapping for list rendering. Put the <code>array.map</code> inside a dynamic <code>() =&gt;</code> or <code>_ =&gt;</code> child so the list is evaluated when its reactive data changes.</p><figure><figcaption><strong>Key each mapped child with stable data</strong></figcaption><pre><code class="language-ts">type User = {
+          id: number
+          name: string
+        }
 
-        const arrayTag = tag(() =&gt; {
-          const items = ['a', 'b', 'c']
-          
-          return div(
-            items.map((item, index) =&gt;
-              div(`hello world item ${index}`).key(item)
+        const UserList = tag((users: User[]) =&gt;
+          ul(
+            () =&gt; users.map(user =&gt;
+              UserRow(user).key(user.id)
             )
           )
-        })
-        </code></pre></figure><br><figure><figcaption><strong>Use a stable id as the loop key</strong></figcaption><pre><code class="language-ts">const users = [
-          { id: 101, name: 'Ada' },
-          { id: 102, name: 'Grace' },
-          { id: 103, name: 'Linus' }
-        ]
-
-        _=&gt; users.map(user =&gt;
-          div.id(_=&gt; `user-${user.id}`)(
-            span('name: ', _=&gt; user.name)
-          )
         )
-        </code></pre></figure><h3 class="doc-subtitle" id="event-handlers"><a class="doc-title-link" href="#event-handlers">🖱️ Event Handlers</a></h3><p>Event handlers use method chaining like <code>button.onClick(...)</code>. The code in <code>src/basic.tag.ts</code> shows the standard pattern.</p><figure><pre><code class="language-ts">export const clicker = tag(() =&gt; {
+        </code></pre></figure><h3 class="doc-subtitle" id="array-identity"><a class="doc-title-link" href="#array-identity">Array Identity</a></h3><p>Every rendered array position needs an identity. Without an explicit key, TaggedJS uses the item's current array position. <code>null</code> and <code>undefined</code> are valid empty positions; they do not invalidate the array or the keyed items around them.</p><p>Use <code>.key(stableValue)</code> when an item may move because another item is inserted, removed, unshifted, or reordered. The key belongs to the rendered child, so derive it from persistent item data such as an id or slug. Keys can be falsy: <code>0</code> and <code>""</code> are valid keys.</p><p>An element ID currently also acts as its array key, but <code>.key(...)</code> is the clearest explicit API for list identity. Do not create an object or array inline for a key, such as <code>.key({ id: user.id })</code> or <code>.key([user.id])</code>: JavaScript compares those by reference, and a new reference on every render cannot match the previous child.</p><h3 class="doc-subtitle" id="keyed-dom-preservation"><a class="doc-title-link" href="#keyed-dom-preservation">What a Retained Key Preserves</a></h3><p>When the same key remains in the next array, TaggedJS retains that child's existing DOM node and component instance instead of destroying and recreating them. Newly inserted or unshifted children are placed relative to those retained keyed children.</p><p>That preservation matters for:</p><ul><li>component-local state;</li><li>focus, text selection, and native input state;</li><li>in-progress animations;</li><li>subscriptions and lifecycle hooks;</li><li>imperative third-party DOM integrations, such as a Stripe Element mounted inside the retained child.</li></ul><figure><figcaption><strong>Unshift without remounting existing rows</strong></figcaption><pre><code class="language-ts">const TodoList = tag(() =&gt; {
+          const todos = [
+            { id: 1, title: 'Keep this row mounted' }
+          ]
+          let nextId = 2
+
+          return section(
+            button.onClick(() =&gt; {
+              todos.unshift({
+                id: nextId++,
+                title: 'New first row'
+              })
+            })('Add first'),
+
+            ul(() =&gt; todos.map(todo =&gt;
+              TodoRow(todo).key(todo.id)
+            ))
+          )
+        })
+
+        // The row keyed 1 keeps the same DOM node and TodoRow instance.
+        // The new row is inserted before it.
+        </code></pre></figure><h3 class="doc-subtitle" id="nullable-array-positions"><a class="doc-title-link" href="#nullable-array-positions">Nullable and Empty Positions</a></h3><figure><figcaption><strong>A conditional empty position between keyed children</strong></figcaption><pre><code class="language-ts">return section(() =&gt; [
+          HeaderRow().key('header'),
+          showDraft ? DraftRow().key('draft') : null,
+          FooterRow().key('footer')
+        ])
+
+        // null and undefined both represent valid empty positions.
+        // The keyed footer is retained when the draft appears or disappears.
+        </code></pre></figure><h3 class="doc-subtitle" id="array-index-keys"><a class="doc-title-link" href="#array-index-keys">Why an Array Index Is Unsafe</a></h3><p>An index describes where an item is now, not which item it is. After an unshift or reorder, the same index refers to different data, so local state, focus, or an imperative DOM widget can become associated with the wrong row. An index is only suitable when positions themselves are the identity and items will never move.</p><figure><figcaption><strong>Key movable data by its stable identity</strong></figcaption><pre><code class="language-ts">// Unsafe when users can move, be inserted, or be removed:
+        users.map((user, index) =&gt;
+          UserRow(user).key(index)
+        )
+
+        // Safe: identity follows the user, not the current position:
+        users.map(user =&gt;
+          UserRow(user).key(user.id)
+        )
+        </code></pre></figure><br><h3 class="doc-subtitle" id="event-handlers"><a class="doc-title-link" href="#event-handlers">🖱️ Event Handlers</a></h3><p>Event handlers use method chaining like <code>button.onClick(...)</code>. The code in <code>src/basic.tag.ts</code> shows the standard pattern.</p><figure><pre><code class="language-ts">export const clicker = tag(() =&gt; {
           let counter = 0
 
           return button.onClick(() =&gt; counter++)(_=&gt; `Increment Counter: ${counter}`)
@@ -384,7 +413,7 @@
             .class(() =&gt; `status status-${status.kind}`)
             (() =&gt; status.label)
         })
-        </code></pre><figcaption>Dynamic text and dynamic attributes</figcaption></figure><h3 class="doc-subtitle" id="dynamic-child-map-keys"><a class="doc-title-link" href="#dynamic-child-map-keys">Stable Keys for Mapped Tags</a></h3><p>When rendering a mapped array of tags, give each rendered item a stable primitive key from the data, such as an id, slug, or persistent name. Do not use fresh inline objects or arrays as keys because their identity changes every render and prevents stable matching.</p><figure><pre><code class="language-ts">const CardList = tag((cards: Card[]) =&gt; {
+        </code></pre><figcaption>Dynamic text and dynamic attributes</figcaption></figure><h3 class="doc-subtitle" id="dynamic-child-map-keys"><a class="doc-title-link" href="#dynamic-child-map-keys">Stable Keys for Mapped Tags</a></h3><p>When rendering a mapped array of tags, give each rendered item a stable primitive key from the data, such as an id, slug, or persistent name. Do not use fresh inline objects or arrays as keys because their identity changes every render and prevents stable matching. A retained key keeps the existing DOM node and component instance mounted when nearby array positions change.</p><figure><pre><code class="language-ts">const CardList = tag((cards: Card[]) =&gt; {
           CardList.inputs(([nextCards]) =&gt; cards = nextCards)
 
           return ul(

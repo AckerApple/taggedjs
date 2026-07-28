@@ -162,14 +162,21 @@ function runTodoSpeedometer() {
     checkbox.click();
     expect(checkbox.checked).toBe(true)
     expect(checkbox.parentNode).toBeDefined()
+    expect(checkbox.parentNode, `checkbox ${i} should have a parent`).toBeDefined()
     expect(checkbox.parentNode.tagName).toBe('DIV')
     expect(checkbox.parentNode.parentNode).toBeDefined()
+    expect(checkbox.parentNode.parentNode, `checkbox ${i} should have an LI ancestor`).toBeDefined()
     expect(checkbox.parentNode.parentNode.tagName).toBe('LI')
     const classList = [...checkbox.parentNode.parentNode.classList]
     expect(classList).toBeDefined()
+    expect(classList, `checkbox ${i} LI should have a class list`).toBeDefined()
     expect(typeof classList).toBe('object')
     expect(Array.isArray(classList)).toBe(true)
     expect(classList.includes('completed')).toBe(true)
+    expect(
+      classList.includes('completed'),
+      `checkbox ${i} LI classes were: ${classList.join(' ')}`,
+    ).toBe(true)
   }
   console.timeEnd('✏️ speedometer-editing')
 
