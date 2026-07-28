@@ -68,6 +68,10 @@ export interface ContextItem extends BaseContextItem {
   // array only
   lastArray?: LastArrayItem[]
   arrayValue?: any
+  /** Stable boundary immediately before one rendered array item. */
+  arrayStartMarker?: Text
+  /** Prevents an array marker queued for paint from being inserted after destruction. */
+  arrayMarkersDeleted?: true
   
   // TAG SUPPORT ONLY BELOW
   global?: TagGlobal

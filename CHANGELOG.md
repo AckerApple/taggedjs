@@ -1,5 +1,12 @@
 ## CHANGELOG
 
+### v3.3.0 - 7-2026
+- Reworked array reconciliation to preserve keyed component instances and DOM nodes across inserts, removals, unshifts, and nullable positions
+- Added stable array-item boundaries so newly inserted keyed items render in the correct DOM order without destroying retained elements
+- Fixed large interactive arrays so the event-owning item updates synchronously while sibling updates remain batched
+- Added support and regression coverage for falsy keys, callable entries, nested arrays, and `null`/`undefined` positions
+- Documented array identity and stable key usage
+
 ### v3.1.0 - 1-2026
 - removed html``
 

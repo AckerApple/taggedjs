@@ -3,14 +3,13 @@
 import { TemplaterResult } from '../../getTemplaterResult.function.js'
 import { tagValueUpdateHandler } from '../tagValueUpdateHandler.function.js'
 import { LastArrayItem } from '../../Context.types.js'
-import { destroyArrayItem, runArrayItemDiff } from './compareArrayItems.function.js'
-import { AnySupport, StringTag, TagJsComponent } from '../../index.js'
+import { destroyArrayItem } from './compareArrayItems.function.js'
+import { AnySupport, TagJsComponent } from '../../index.js'
 import { createAndProcessContextItem } from './createAndProcessContextItem.function.js'
 import { TemplateValue } from '../../TemplateValue.type.js'
 import { ContextItem } from '../../ContextItem.type.js'
 import { TagJsTag } from '../../../TagJsTags/TagJsTag.type.js'
 import { enqueueBatchAfterUnique } from '../../../render/paint.function.js'
-import { SupportContextItem } from '../../SupportContextItem.type.js'
 
 const notCasted = Symbol('not-casted')
 const noArgs: any[] = []
@@ -29,7 +28,6 @@ export function processTagArray(
   
   const lastArray = context.lastArray as LastArrayItem[]
   
-  let runtimeInsertBefore = context.placeholder
   const length = value.length
   const castedCache: unknown[] = new Array(length).fill(notCasted)
   const getCastedArrayItem = function getCastedArrayItem(index: number) {
@@ -43,84 +41,133 @@ export function processTagArray(
     return casted
   }
 
-  let batchUpdates = noPriorRun ? false : length !== lastArray.length
+  const batchUpdates = !noPriorRun && (
+    length !== lastArray.length ||
+    lastArray.some(item => item.locked === 1)
+  )
+  const liveArray = noPriorRun
+    ? lastArray
+    : reconcileArrayContexts(lastArray, length, getCastedArrayItem)
 
-  // ARRAY DELETES
-  if( !noPriorRun ) {
-    // on each loop check the new length
-    const results = runArrayDeleteCheck(
-      lastArray,
-      value,
-      context,
-      batchUpdates,
-      getCastedArrayItem,
-    )
-
-    batchUpdates = results.batchUpdates
-  }
-
-  const liveArray = context.lastArray as LastArrayItem[]
+  context.lastArray = liveArray
   for (let index=0; index < length; ++index) {
-    const newSubject = reviewArrayItem(
+    const insertBefore = findNextArrayStartMarker(
+      liveArray,
+      index + 1,
+    ) || context.placeholder
+    reviewArrayItem(
       index,
       liveArray,
       ownerSupport,
       batchUpdates,
       getCastedArrayItem,
-      runtimeInsertBefore,
+      insertBefore,
       appendTo,
     )
-
-    runtimeInsertBefore = newSubject.placeholder
   }
 }
 
-function runArrayDeleteCheck(
-  lastArray: ContextItem[],
-  value: (TemplaterResult | TagJsComponent<any>)[],
-  contextItem: ContextItem,
-  batchUpdates: boolean,
+function findNextArrayStartMarker(
+  contexts: LastArrayItem[],
+  fromIndex: number,
+) {
+  for (let index = fromIndex; index < contexts.length; ++index) {
+    const marker = contexts[index]?.arrayStartMarker
+    if(marker) {
+      return marker
+    }
+  }
+}
+
+function reconcileArrayContexts(
+  lastArray: LastArrayItem[],
+  newLength: number,
   getCastedArrayItem: (index: number) => unknown,
 ) {
-  /** 🗑️ remove previous items first */
-  const filteredLast: LastArrayItem[] = []
-  let removed = 0
-  const maxIndex = value.length - 1
+  const nextArray = new Array<LastArrayItem>(newLength)
+  const usedContexts = new Set<LastArrayItem>()
+  const keyedContexts = new Map<unknown, LastArrayItem[]>()
 
   for (let index = 0; index < lastArray.length; ++index) {
-    const item = lastArray[index]
-
-    if( item.locked === 1 ) {
-      batchUpdates = true // The item we are looking to update caused the render we are under
-    }
-
-    if (item.value === null) {
-      filteredLast.push(item)
+    const context = lastArray[index]
+    const key = getContextKey(context)
+    if(key === undefined) {
       continue
     }
 
-    // 👁️ COMPARE & REMOVE
-    const newRemoved = compareArrayItems(
-      index, lastArray, removed, maxIndex, getCastedArrayItem
-    )
-
-    if (newRemoved === 0) {
-      filteredLast.push(item)
-      continue
+    const matches = keyedContexts.get(key)
+    if(matches) {
+      matches.push(context)
+    } else {
+      keyedContexts.set(key, [context])
     }
-
-    // do the same number again because it was a mid delete
-    if (newRemoved === 2) {
-      index = index - 1
-      continue
-    }
-
-    removed = removed + newRemoved
   }
 
-  contextItem.lastArray = filteredLast
-  
-  return {batchUpdates}
+  // Explicit keys retain identity even when nullable siblings shift indices.
+  for (let index = 0; index < newLength; ++index) {
+    const key = getValueKey(getCastedArrayItem(index))
+    if(key === undefined) {
+      continue
+    }
+
+    const matches = keyedContexts.get(key)
+    const context = matches?.shift()
+    if(context) {
+      nextArray[index] = context
+      usedContexts.add(context)
+    }
+  }
+
+  // Values without keys continue to use their array position as identity.
+  for (let index = 0; index < newLength; ++index) {
+    if(nextArray[index]) {
+      continue
+    }
+
+    const context = lastArray[index]
+    const value = getCastedArrayItem(index)
+    const contextKey = getContextKey(context)
+    const valueKey = getValueKey(value)
+    if(
+      context &&
+      !usedContexts.has(context) &&
+      (
+        (contextKey === undefined && valueKey === undefined) ||
+        isEmptyValue(context.value) ||
+        isEmptyValue(value)
+      )
+    ) {
+      nextArray[index] = context
+      usedContexts.add(context)
+    }
+  }
+
+  for (let index = 0; index < lastArray.length; ++index) {
+    const context = lastArray[index]
+    if(!usedContexts.has(context)) {
+      destroyArrayItem(context)
+    }
+  }
+
+  return nextArray
+}
+
+function getContextKey(
+  context: ContextItem | undefined,
+) {
+  return context?.arrayValue
+}
+
+function getValueKey(
+  value: unknown,
+) {
+  return (value as any)?.arrayValue
+}
+
+function isEmptyValue(
+  value: unknown,
+) {
+  return value === null || value === undefined
 }
 
 /** new and old array items processed here */
@@ -137,11 +184,18 @@ function reviewArrayItem(
   const previousContext = lastArray[index]
 
   if( previousContext ) {
+    const key = getValueKey(item)
+    if(key === undefined) {
+      delete previousContext.arrayValue
+    } else {
+      previousContext.arrayValue = key
+    }
+
     return reviewPreviousArrayItem(
       item,
       previousContext,
       ownerSupport,
-      batchUpdates,
+      batchUpdates && previousContext.locked !== 1,
       runtimeInsertBefore,
       appendTo,
     )
@@ -157,12 +211,10 @@ function reviewArrayItem(
     appendTo,
   )
 
-  // Added to previous array
-  lastArray.push(context)
-  if(item) {
-    // set or use key()
-    // context.arrayValue = item?.arrayValue || context.arrayValue || context.value
-    context.arrayValue = (item as any).arrayValue || context.arrayValue
+  lastArray[index] = context
+  const key = getValueKey(item)
+  if(key !== undefined) {
+    context.arrayValue = key
   }
 
   return context
@@ -178,7 +230,6 @@ function reviewPreviousArrayItem(
 ) {
   if( batchUpdates ) {
     enqueueBatchAfterUnique(context, [runArrayBatchAfterHandler, [value, context, ownerSupport]])
-    context.value = value
 
     return context
   }
@@ -200,42 +251,6 @@ function reviewPreviousArrayItem(
   )
 
   return context
-}
-
-/** Run within first array processing loop
- *  1 = destroyed, 2 = value changes, 0 = no change */
-function compareArrayItems(
-  index: number,
-  lastArray: LastArrayItem[],
-  removed: number,
-  maxIndex: number,
-  getCastedArrayItem: (index: number) => unknown,
-) {
-  const at = index - removed
-  const lessLength = at < 0 || maxIndex < at
-  const prevContext = lastArray[index] as SupportContextItem
-
-  if(lessLength) {
-    destroyArrayItem(prevContext)
-    return 1
-  }
-
-  if( prevContext.arrayValue === undefined ) {
-    prevContext.arrayValue = index
-  }
-
-  const oldKey = prevContext.arrayValue
-  const newValueTag = getCastedArrayItem(index)
-
-  const result = runArrayItemDiff(
-    oldKey,
-    newValueTag as StringTag,
-    prevContext,
-    lastArray,
-    index,
-  )
-
-  return result
 }
 
 function runArrayBatchAfterHandler(

@@ -5,6 +5,7 @@ import { SupportContextItem } from '../../SupportContextItem.type.js'
 import type { StringTag } from '../../StringTag.type.js'
 import { ContextItem } from '../../ContextItem.type.js'
 import { AnySupport } from '../../AnySupport.type.js'
+import { addPaintRemover } from '../../../render/paint.function.js'
 
 export function runArrayItemDiff(
   oldKey: string,
@@ -49,7 +50,9 @@ export function destroyArrayItem(
   context: ContextItem,
 ) {
   const global = context.global as SupportTagGlobal  
-  destroyArrayItemByGlobal(global, context)
+  const result = destroyArrayItemByGlobal(global, context)
+  destroyArrayMarkers(context)
+  return result
 }
 
 function destroyArrayItemByGlobal(
@@ -58,9 +61,24 @@ function destroyArrayItemByGlobal(
 ) {
   if(global && context.state?.oldest) {
     const support = context.state.oldest
-    destroySupport(support, global)
-    return
+    return destroySupport(support, global)
   }
   
-  context.tagJsVar.destroy(context, {} as any)
+  return context.tagJsVar.destroy(context, {} as any)
+}
+
+function destroyArrayMarkers(
+  context: ContextItem,
+) {
+  context.arrayMarkersDeleted = true
+
+  const startMarker = context.arrayStartMarker
+  if(startMarker?.parentNode) {
+    addPaintRemover(startMarker, 'destroyArrayStartMarker')
+  }
+
+  const endMarker = context.placeholder
+  if(endMarker?.parentNode) {
+    addPaintRemover(endMarker, 'destroyArrayEndMarker')
+  }
 }

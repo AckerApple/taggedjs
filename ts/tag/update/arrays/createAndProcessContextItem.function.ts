@@ -1,6 +1,6 @@
 // taggedjs-no-compile
 
-import { paintAppend, paintAppends } from '../../../render/paint.function.js'
+import { PaintCommand, paintAppends, paintCommands } from '../../../render/paint.function.js'
 import { AnySupport } from '../../index.js'
 import { domProcessContextItem } from '../../../interpolations/optimizers/domProcessContextItem.function.js'
 import { empty } from '../../ValueTypes.enum.js'
@@ -16,7 +16,8 @@ export function createAndProcessContextItem(
   insertBefore?: Text, // used during updates
   appendTo?: Element, // used during initial entire array rendering
 ): ContextItem {
-  const element = document.createTextNode(empty)
+  const startMarker = document.createTextNode(empty)
+  const endMarker = document.createTextNode(empty)
 
   const contextItem = getNewContext(
     value,
@@ -26,10 +27,24 @@ export function createAndProcessContextItem(
   )
 
   contextItem.withinOwnerElement = false
-  contextItem.placeholder = element
+  contextItem.arrayStartMarker = startMarker
+  contextItem.placeholder = endMarker
 
-  if(!appendTo) {
-    contextItem.placeholder = insertBefore
+  if(appendTo) {
+    paintAppends.push([
+      paintArrayMarkerAppend,
+      [appendTo, startMarker, contextItem],
+    ])
+  } else {
+    const startCommand: PaintCommand = [
+      paintArrayMarkerBefore,
+      [insertBefore, startMarker, contextItem],
+    ]
+    const endCommand: PaintCommand = [
+      paintArrayMarkerBefore,
+      [insertBefore, endMarker, contextItem],
+    ]
+    paintCommands.push(startCommand, endCommand)
   }
 
   domProcessContextItem(
@@ -37,12 +52,38 @@ export function createAndProcessContextItem(
     ownerSupport,
     contextItem,
     appendTo,
-    insertBefore,
+    endMarker,
   )
 
   if( appendTo ) {
-    paintAppends.push([paintAppend, [appendTo, element]])
+    paintAppends.push([
+      paintArrayMarkerAppend,
+      [appendTo, endMarker, contextItem],
+    ])
   }
 
   return contextItem
+}
+
+function paintArrayMarkerAppend(
+  appendTo: ParentNode,
+  marker: Text,
+  context: ContextItem,
+) {
+  if(!context.arrayMarkersDeleted) {
+    appendTo.appendChild(marker)
+  }
+}
+
+function paintArrayMarkerBefore(
+  insertBefore: Text | Element,
+  marker: Text,
+  context: ContextItem,
+) {
+  if(context.arrayMarkersDeleted) {
+    return
+  }
+
+  const parentNode = insertBefore.parentNode as ParentNode
+  parentNode.insertBefore(marker, insertBefore)
 }
