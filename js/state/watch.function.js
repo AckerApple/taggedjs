@@ -3,8 +3,7 @@ import { tag } from '../tag/index.js';
 import { getSupportInCycle } from '../tag/cycles/getSupportInCycle.function.js';
 import { setUseMemory } from './setUseMemory.object.js';
 import { state } from './state.function.js';
-/** @deprecated -
- * When an item in watch array changes, callback function will be triggered.
+/** When an item in watch array changes, callback function will be triggered.
  * Triggers on initial watch setup. TIP: try watch.noInit()
  * @param currentValues T[]
  * @param callback WatchCallback
@@ -33,6 +32,7 @@ const setupWatch = (currentValues, callback, { init, before, final = defaultFina
     const previous = state({
         pastResult: undefined,
         values: undefined,
+        beforeNext: undefined // fired callback returns function AND value changes 
     });
     const isFun = typeof (currentValues) === 'function';
     const realValues = isFun ? currentValues() : currentValues;
@@ -67,6 +67,10 @@ const setupWatch = (currentValues, callback, { init, before, final = defaultFina
         if (allExact) {
             return previous;
         }
+        if (previous.beforeNext instanceof Function) {
+            previous.beforeNext();
+            delete previous.beforeNext;
+        }
         if (before && !before(realValues)) {
             previous.values = realValues;
             return previous; // do not continue
@@ -75,6 +79,7 @@ const setupWatch = (currentValues, callback, { init, before, final = defaultFina
         previous.pastResult = final(result);
         previous.values.length = 0;
         previous.values.push(...realValues);
+        previous.beforeNext = result;
         return previous;
     }
     return processRealValues(realValues);

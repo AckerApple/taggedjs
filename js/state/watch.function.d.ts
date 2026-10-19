@@ -1,18 +1,21 @@
 import { Subject } from '../subject/index.js';
 export type WatchCallback<T> = (currentValues: any[], // | (() => any[]),
-previousValues: any[] | undefined) => T | ((currentValues: any[]) => T) | (() => T);
+previousValues: any[] | undefined) => T | 
+/** function to be called right BEFORE next change is about to occur */
+((currentValues: any[]) => T) | 
+/** function to be called right BEFORE next change is about to occur */
+(() => T);
 type WatchOperators<T> = {
     setup: WatchSetup<T>;
     /** When an item in watch array changes, callback function will be triggered. Does not trigger on initial watch setup. */
-    noInit: (<T>(currentValues: any[] | (() => any[]), callback: WatchCallback<T>) => T | undefined) & MasterWatch<T>;
+    noInit: (<T>(currentValues: (() => any[]), callback: WatchCallback<T>) => T | undefined) & MasterWatch<T>;
     /** When an item in watch array changes, callback function will be triggered */
-    asSubject: (<T>(currentValues: any[] | (() => any[]), callback: WatchCallback<T>) => Subject<T>) & MasterWatch<T>;
+    asSubject: (<T>(currentValues: (() => any[]), callback: WatchCallback<T>) => Subject<T>) & MasterWatch<T>;
     /** When an item in watch array changes and all values are truthy then callback function will be triggered */
-    truthy: (<T>(currentValues: any[] | (() => any[]), callback: WatchCallback<T>) => T | undefined) & MasterWatch<T>;
+    truthy: (<T>(currentValues: (() => any[]), callback: WatchCallback<T>) => T | undefined) & MasterWatch<T>;
 };
 type MasterWatch<T> = ((currentValues: any[], callback: WatchCallback<T>) => T) & WatchOperators<T>;
-/** @deprecated -
- * When an item in watch array changes, callback function will be triggered.
+/** When an item in watch array changes, callback function will be triggered.
  * Triggers on initial watch setup. TIP: try watch.noInit()
  * @param currentValues T[]
  * @param callback WatchCallback

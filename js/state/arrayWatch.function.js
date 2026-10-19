@@ -9,7 +9,7 @@ export function arrayWatch(initialValue = [], onChange) {
 }
 function firstSignal(sig, context, onChange = () => undefined) {
     const editorNames = new Set(['push', 'pop', 'splice', 'shift', 'unshift']);
-    const readerNames = new Set(['map', 'reduce', 'forEach', 'every', 'filter']);
+    const readerNames = new Set(['map', 'reduce', 'forEach', 'every', 'some', 'filter']);
     const editorWrappers = new Map();
     const readerWrappers = new Map();
     const render = () => {
@@ -39,7 +39,8 @@ function firstSignal(sig, context, onChange = () => undefined) {
         if (existing) {
             return existing;
         }
-        const wrapped = sig.value[action].bind(sig.value);
+        // Keep the wrapper stable while reading the current array after .value replacement.
+        const wrapped = (...args) => sig.value[action](...args);
         readerWrappers.set(action, wrapped);
         return wrapped;
     };

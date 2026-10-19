@@ -39,8 +39,10 @@ export type CombinedElementFunctions = ElementVarBase & {
     min: AttributeCallable;
     /** Maximum numeric/date range value */
     max: AttributeCallable;
+    multiple: AttributeCallable;
     /** Step interval for numeric/date inputs */
     step: AttributeCallable;
+    size: AttributeCallable;
     /** Field name used for forms and metadata */
     name: AttributeCallable;
     /** Text wrapping behavior (commonly for `textarea`) */
@@ -104,6 +106,11 @@ export type CombinedElementFunctions = ElementVarBase & {
     onCancel: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onDoubleClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onDblClick: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onPointerDown: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onDragStart: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onDragEnd: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onDrop: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
+    onDragOver: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onBlur: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onChange: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
     onSubmit: (callback: (e: InputElementTargetEvent) => any) => ElementFunction;
