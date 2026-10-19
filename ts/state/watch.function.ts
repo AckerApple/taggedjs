@@ -8,26 +8,30 @@ import { state } from'./state.function.js'
 export type WatchCallback<T> = (
   currentValues: any[], // | (() => any[]),
   previousValues: any[] | undefined // first run this is undefined
-) => T | ((currentValues: any[]) => T) | (() => T)
+) => T |
+  /** function to be called right BEFORE next change is about to occur */
+  ((currentValues: any[]) => T) |
+  /** function to be called right BEFORE next change is about to occur */
+  (() => T)
 
 type WatchOperators<T> = {
   setup: WatchSetup<T>,
 
   /** When an item in watch array changes, callback function will be triggered. Does not trigger on initial watch setup. */
   noInit: (<T>(
-    currentValues: any[] | (() => any[]),
+    currentValues: (() => any[]),
     callback: WatchCallback<T>
   ) => T | undefined) & MasterWatch<T>
   
   /** When an item in watch array changes, callback function will be triggered */
   asSubject: (<T>(
-    currentValues: any[] | (() => any[]),
+    currentValues: (() => any[]),
     callback: WatchCallback<T>
   ) => Subject<T>) & MasterWatch<T>
   
   /** When an item in watch array changes and all values are truthy then callback function will be triggered */
   truthy: (<T>(
-    currentValues: any[] | (() => any[]),
+    currentValues: (() => any[]),
     callback: WatchCallback<T>
   ) => T | undefined) & MasterWatch<T>
 }
@@ -42,15 +46,14 @@ type MasterWatch<T> = ((
   callback: WatchCallback<T>
 ) => T) & WatchOperators<T>
 
-/** @deprecated - 
- * When an item in watch array changes, callback function will be triggered.
+/** When an item in watch array changes, callback function will be triggered.
  * Triggers on initial watch setup. TIP: try watch.noInit()
  * @param currentValues T[]
  * @param callback WatchCallback
  * @returns T[]
  */
 export const watch = (<T>(
-  currentValues: unknown[] | (() => unknown[]),
+  currentValues: (() => unknown[]),
   callback: WatchCallback<T>
 ): T => {
   return setupWatch(currentValues, callback).pastResult
@@ -66,6 +69,8 @@ type WatchSetup<R> = {
   init?: (currentValues: any[], previousValues: any[]) => R
   
   final?: (x: any) => any,
+
+  // runs before calling watch function. Must return true to continue
   before?: (currentValues: any[]) => boolean,
 }
 
@@ -73,7 +78,7 @@ function newWatch<T, R>(
   setup: WatchSetup<R>
 ): WatchResult<T> {
   const method = <T>(
-    currentValues: any[],
+    currentValues: () => any[],
     callback: WatchCallback<T>  
   ) => {
     return setupWatch(currentValues, callback, setup).pastResult
@@ -99,7 +104,7 @@ type PreviousWatchMeta<T> = {
  * @returns 
  */
 const setupWatch = <T, R>(
-  currentValues: any[] | (() => any[]),
+  currentValues: (() => any[]),
   callback: WatchCallback<T>,
   {
     init,
@@ -110,6 +115,7 @@ const setupWatch = <T, R>(
   const previous = state({
     pastResult: undefined as T,
     values: undefined as unknown as any[],
+    beforeNext: undefined as unknown as any // fired callback returns function AND value changes 
   })
 
   const isFun = typeof(currentValues) === 'function'
@@ -153,6 +159,11 @@ const setupWatch = <T, R>(
       return previous
     }
 
+    if(previous.beforeNext instanceof Function) {
+      previous.beforeNext()
+      delete previous.beforeNext
+    }
+
     if(before && !before(realValues)) {
       previous.values = realValues
       return previous // do not continue
@@ -162,6 +173,7 @@ const setupWatch = <T, R>(
     previous.pastResult = final(result)
     previous.values.length = 0
     previous.values.push(...realValues)
+    previous.beforeNext = result
 
     return previous
   }
@@ -194,7 +206,7 @@ function defineOnMethod<R>(
       }))
       
       const method = <T>(
-        currentValues: any[] | (() => any[]),
+        currentValues: (() => any[]),
         callback: WatchCallback<T>  
       ) => {
         const handler = (

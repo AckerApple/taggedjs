@@ -3,7 +3,7 @@ export interface ElementTargetEvent extends Event {
 }
 
 export interface InputElementTargetEvent extends Event, KeyboardEvent {
-  target: HTMLInputElement
+  target: HTMLInputElement & HTMLSelectElement
 }
 /*
 export interface TagJsEvent extends InputElementTargetEvent {

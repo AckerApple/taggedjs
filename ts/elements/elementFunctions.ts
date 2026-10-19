@@ -78,6 +78,13 @@ const ELEMENT_EVENT_DEFS: Array<[apiName: string, eventName: string]> = [
   ['onCancel', 'oncancel'],
   ['onDoubleClick', 'ondblclick'],
   ['onClick', 'click'],
+  
+  ['onDragStart', 'ondragend'],
+  ['onDragEnd', 'ondragstart'],
+  ['onDragOver', 'ondragover'],
+  ['onDrop', 'ondrop'],
+  ['onPointerDown', 'onpointerdown'],
+  
   ['onBlur', 'onblur'],
   ['onChange', 'onchange'],
   ['onSubmit', 'onsubmit'],
@@ -233,7 +240,13 @@ const objectAttrEventCallables = Object.fromEntries([
   ['onClick', makeCallback('click')],
   ['onDoubleClick', makeCallback('ondblclick')],
   ['onDblClick', makeCallback('ondblclick')],
-  ['onDblClick', makeCallback('ondblclick')],
+  
+  ['onDragStart', makeCallback('ondragstart')],
+  ['onDragEnd', makeCallback('ondragend')],
+  ['onDrop', makeCallback('ondrop')],
+  ['onDragOver', makeCallback('ondragover')],
+  ['onPointerDown', makeCallback('onpointerdown')],
+
   ['onBlur', makeCallback('onblur')],
   ['onChange', makeCallback('onchange')],
   ['onCancel', makeCallback('oncancel')],

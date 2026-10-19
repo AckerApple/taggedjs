@@ -81,4 +81,54 @@ describe('arrayWatch.function', () => {
     expect(watched.splice).toBe(watched.splice)
     expect(watched.map).toBe(watched.map)
   })
+
+  it('supports some with native predicate arguments, thisArg, and short-circuiting', () => {
+    const values = [1, 2, 3]
+    const watched = arrayWatch(values)
+    const receiver = { wanted: 2 }
+    const predicate = jest.fn(function(this: typeof receiver, value: number, index: number, original: number[]) {
+      expect(this).toBe(receiver)
+      expect(original).toBe(values)
+      expect(index).toBe(value - 1)
+      return value === this.wanted
+    })
+    const found: boolean = watched.some(predicate, receiver)
+    expect(found).toBe(true)
+    expect(predicate).toHaveBeenCalledTimes(2)
+    expect(renderTagUpdateArray).not.toHaveBeenCalled()
+  })
+
+  it('returns false without calling the predicate for an empty watched array', () => {
+    const predicate = jest.fn(() => true)
+    expect(arrayWatch<number>().some(predicate)).toBe(false)
+    expect(predicate).not.toHaveBeenCalled()
+  })
+
+  it('keeps readers stable and current after mutation or value replacement', () => {
+    const onChange = jest.fn()
+    const watched = arrayWatch([1], onChange)
+    const some = watched.some
+    const map = watched.map
+    const results: boolean[] = []
+    const unsubscribe = watched.subscribe(() => results.push(some(value => value > 2)))
+    expect(some).toBe(watched.some)
+    expect(results).toEqual([false])
+    expect(some(value => value > 2)).toBe(false)
+    expect(onChange).not.toHaveBeenCalled()
+    expect(renderTagUpdateArray).not.toHaveBeenCalled()
+
+    watched.push(3)
+    watched[1] = 0
+    expect(onChange).toHaveBeenCalledTimes(2)
+    expect(renderTagUpdateArray).toHaveBeenCalledTimes(2)
+    watched.value = [4]
+    expect(results).toEqual([false, true, false, true])
+    expect(some(value => value > 2)).toBe(true)
+    expect(map(value => value * 2)).toEqual([8])
+    // Replacing .value emits the signal, but does not use the mutation render hook.
+    expect(onChange).toHaveBeenCalledTimes(2)
+    expect(renderTagUpdateArray).toHaveBeenCalledTimes(2)
+    unsubscribe.unsubscribe()
+  })
+
 })

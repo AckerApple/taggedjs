@@ -19,7 +19,7 @@ function firstSignal(
   onChange: any = () => undefined,
 ) {
   const editorNames = new Set(['push', 'pop', 'splice', 'shift', 'unshift'])
-  const readerNames = new Set(['map', 'reduce', 'forEach', 'every', 'filter'])
+  const readerNames = new Set(['map', 'reduce', 'forEach', 'every', 'some', 'filter'])
   const editorWrappers = new Map<PropertyKey, (...args: any[]) => any>()
   const readerWrappers = new Map<PropertyKey, (...args: any[]) => any>()
 
@@ -56,7 +56,8 @@ function firstSignal(
       return existing
     }
 
-    const wrapped = sig.value[action].bind(sig.value)
+    // Keep the wrapper stable while reading the current array after .value replacement.
+    const wrapped = (...args: any[]) => sig.value[action](...args)
     readerWrappers.set(action, wrapped)
     return wrapped
   }
